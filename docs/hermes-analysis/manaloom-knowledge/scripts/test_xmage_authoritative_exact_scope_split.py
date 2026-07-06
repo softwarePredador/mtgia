@@ -9826,6 +9826,113 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "dynamic_life_gain_x_value_not_supported")
 
+    def test_creature_etb_dynamic_life_gain_maps_supported_count_sources(self) -> None:
+        row = queue_row(
+            split.LIFE_UNIT,
+            effect_classes=["GainLifeEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["triggered_ability"],
+        )
+        fixtures = [
+            {
+                "name": "Ancestor's Chosen",
+                "oracle": "First strike\nWhen this creature enters, you gain 1 life for each card in your graveyard.",
+                "source": "new EntersBattlefieldTriggeredAbility(new GainLifeEffect(new CardsInControllerGraveyardCount()));",
+                "source_key": "graveyard_card_count",
+                "fields": {"graveyard_count_scope": "controller_graveyard", "graveyard_count_card_types": ["card"]},
+            },
+            {
+                "name": "Archway Angel",
+                "oracle": "Flying\nWhen this creature enters, you gain 2 life for each Gate you control.",
+                "source": (
+                    "private static final FilterPermanent filter = new FilterControlledPermanent(\"Gate you control\");"
+                    "filter.add(SubType.GATE.getPredicate());"
+                    "new EntersBattlefieldTriggeredAbility(new GainLifeEffect(new PermanentsOnBattlefieldCount(filter, 2)));"
+                ),
+                "source_key": "battlefield_permanent_count",
+                "per": 2,
+                "fields": {"battlefield_count_card_types": ["permanent"], "battlefield_count_subtypes": ["gate"]},
+            },
+            {
+                "name": "Aven Gagglemaster",
+                "oracle": "Flying\nWhen this creature enters, you gain 2 life for each creature you control with flying.",
+                "source": (
+                    "private static final FilterPermanent filter = new FilterControlledCreaturePermanent();"
+                    "filter.add(new AbilityPredicate(FlyingAbility.class));"
+                    "DynamicValue xValue = new PermanentsOnBattlefieldCount(filter, 2);"
+                    "new EntersBattlefieldTriggeredAbility(new GainLifeEffect(xValue));"
+                ),
+                "source_key": "battlefield_permanent_count",
+                "per": 2,
+                "fields": {"battlefield_count_card_types": ["creature"], "battlefield_count_keywords": ["flying"]},
+            },
+            {
+                "name": "Goldnight Redeemer",
+                "oracle": "Flying\nWhen this creature enters, you gain 2 life for each other creature you control.",
+                "source": (
+                    "new EntersBattlefieldTriggeredAbility(new GainLifeEffect("
+                    "new PermanentsOnBattlefieldCount(StaticFilters.FILTER_OTHER_CONTROLLED_CREATURE, 2)));"
+                ),
+                "source_key": "battlefield_permanent_count",
+                "per": 2,
+                "fields": {"battlefield_count_card_types": ["creature"], "battlefield_count_exclude_source": True},
+            },
+            {
+                "name": "Nylea's Disciple",
+                "oracle": "When this creature enters, you gain life equal to your devotion to green.",
+                "source": "new EntersBattlefieldTriggeredAbility(new GainLifeEffect(DevotionCount.G));",
+                "source_key": "controlled_permanents_mana_symbol_count",
+                "fields": {"mana_symbol_count_color": "G"},
+            },
+            {
+                "name": "Luminollusk",
+                "oracle": "Deathtouch\nVivid — When this creature enters, you gain life equal to the number of colors among permanents you control.",
+                "source": "new EntersBattlefieldTriggeredAbility(new GainLifeEffect(ColorsAmongControlledPermanentsCount.ALL_PERMANENTS));",
+                "source_key": "colors_among_permanents_you_control",
+            },
+            {
+                "name": "Shepherd of Heroes",
+                "oracle": "Flying\nWhen this creature enters, you gain 2 life for each creature in your party.",
+                "source": (
+                    "private static final DynamicValue xValue = new MultipliedValue(PartyCount.instance, 2);"
+                    "new EntersBattlefieldTriggeredAbility(new GainLifeEffect(xValue));"
+                ),
+                "source_key": "party_count",
+                "per": 2,
+            },
+            {
+                "name": "Flourishing Hunter",
+                "oracle": "When this creature enters, you gain life equal to the greatest toughness among other creatures you control.",
+                "source": (
+                    "new EntersBattlefieldTriggeredAbility(new GainLifeEffect("
+                    "GreatestAmongPermanentsValue.TOUGHNESS_OTHER_CONTROLLED_CREATURES));"
+                ),
+                "source_key": "greatest_toughness_among_other_controlled_creatures",
+            },
+        ]
+
+        for fixture in fixtures:
+            with self.subTest(card=fixture["name"]):
+                proposal, reason = split.split_row(
+                    row,
+                    metadata(
+                        name=fixture["name"],
+                        type_line="Creature - Fixture",
+                        oracle_text=fixture["oracle"],
+                    ),
+                    source_text=fixture["source"],
+                )
+
+                self.assertEqual(reason, "selected_exact_scope")
+                effect = proposal["effect_json"]
+                self.assertEqual(effect["battle_model_scope"], split.ETB_DYNAMIC_LIFE_GAIN_CREATURE_SCOPE)
+                self.assertTrue(effect["etb_dynamic_life_gain"])
+                self.assertEqual(effect["life_gain_amount_source"], fixture["source_key"])
+                self.assertEqual(effect["life_gain_per_count"], fixture.get("per", 1))
+                for key, value in (fixture.get("fields") or {}).items():
+                    self.assertEqual(effect.get(key), value)
+
     def test_life_gain_spell_with_condition_stays_blocked(self) -> None:
         row = queue_row(split.LIFE_UNIT, effect_classes=["GainLifeEffect"])
         proposal, reason = split.split_row(
@@ -15674,7 +15781,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertTrue(effect["_keywords_are_self"])
         self.assertEqual(effect["etb_life_gain_amount"], 4)
 
-    def test_creature_etb_gain_life_blocks_dynamic_amount(self) -> None:
+    def test_creature_etb_gain_life_maps_dynamic_creature_count(self) -> None:
         row = queue_row(
             split.LIFE_UNIT,
             effect_classes=["GainLifeEffect"],
@@ -15691,10 +15798,13 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             source_text="new GainLifeEffect(CreaturesYouControlCount.instance)",
         )
 
-        self.assertIsNone(proposal)
-        self.assertEqual(reason, "etb_life_gain_amount_not_fixed")
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.ETB_DYNAMIC_LIFE_GAIN_CREATURE_SCOPE)
+        self.assertEqual(effect["life_gain_amount_source"], "battlefield_permanent_count")
+        self.assertEqual(effect["battlefield_count_card_types"], ["creature"])
 
-    def test_creature_etb_gain_life_blocks_fixed_number_with_dynamic_multiplier(self) -> None:
+    def test_creature_etb_gain_life_blocks_dynamic_source_without_required_filter(self) -> None:
         row = queue_row(
             split.LIFE_UNIT,
             effect_classes=["GainLifeEffect"],
@@ -15713,7 +15823,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         )
 
         self.assertIsNone(proposal)
-        self.assertEqual(reason, "etb_life_gain_amount_not_fixed")
+        self.assertEqual(reason, "etb_dynamic_life_gain_source_filter_not_supported")
 
     def test_creature_dies_gain_life_maps_to_triggered_creature_scope(self) -> None:
         row = queue_row(

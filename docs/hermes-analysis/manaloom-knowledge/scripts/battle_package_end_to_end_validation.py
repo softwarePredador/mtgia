@@ -775,6 +775,87 @@ def run_dynamic_life_gain(
     }
 
 
+def run_creature_etb_dynamic_life_gain(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    active = battle.Player(str(scenario.get("player") or "ETB Life Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
+    active.life = int(scenario.get("starting_life") or 20)
+    active.hand = [dict(item) for item in scenario.get("controller_hand") or []]
+    active.battlefield = [dict(item) for item in scenario.get("controller_battlefield") or []]
+    active.graveyard = [dict(item) for item in scenario.get("controller_graveyard") or []]
+    opponent.battlefield = [dict(item) for item in scenario.get("opponent_battlefield") or []]
+    opponent.graveyard = [dict(item) for item in scenario.get("opponent_graveyard") or []]
+
+    effect_data = battle.get_card_effect(card)
+    permanent = battle.prepare_entering_permanent(
+        battle.enrich_card({**card, **effect_data}),
+        controller=active,
+        all_players=[active, opponent],
+        turn=int(scenario.get("turn") or 6),
+    )
+    active.battlefield.append(permanent)
+
+    before_events = len(events)
+    battle.resolve_generic_permanent_etb(
+        active,
+        [opponent],
+        permanent,
+        effect_data,
+        int(scenario.get("turn") or 6),
+        random.Random(int(scenario.get("seed") or 6070)),
+        all_players=[active, opponent],
+    )
+
+    expected_life_after = int(scenario.get("expected_life_after") or active.life)
+    expected_life_gain = int(scenario.get("expected_life_gain") or 0)
+    if active.life != expected_life_after:
+        fail(
+            "battle_execution",
+            f"{card['name']} life after ETB dynamic gain={active.life}, expected {expected_life_after}",
+        )
+    event = next(
+        (
+            data
+            for event_name, data in events[before_events:]
+            if event_name == "trigger_resolved"
+            and data.get("card") == card.get("name")
+            and data.get("effect") == "gain_life"
+        ),
+        None,
+    )
+    if event is None:
+        fail("battle_events", f"missing {card['name']} ETB gain_life trigger_resolved event")
+    if int(event.get("life_gain_requested") or 0) != expected_life_gain:
+        fail(
+            "battle_events",
+            f"{card['name']} life_gain_requested={event.get('life_gain_requested')}, expected {expected_life_gain}",
+        )
+    expected_source = scenario.get("expected_life_gain_source")
+    if expected_source and event.get("life_gain_amount_source") != expected_source:
+        fail(
+            "battle_events",
+            f"{card['name']} life_gain_amount_source={event.get('life_gain_amount_source')!r}",
+        )
+    expected_count = scenario.get("expected_dynamic_count")
+    if expected_count is not None and int(event.get("dynamic_life_gain_count") or 0) != int(expected_count):
+        fail(
+            "battle_events",
+            f"{card['name']} dynamic_life_gain_count={event.get('dynamic_life_gain_count')}",
+        )
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "life_after": active.life,
+        "life_gained": expected_life_gain,
+        "life_gain_amount_source": event.get("life_gain_amount_source"),
+        "dynamic_life_gain_count": event.get("dynamic_life_gain_count"),
+    }
+
+
 def run_creature_etb_create_tokens(
     battle,
     scenario: dict[str, Any],
@@ -2970,6 +3051,7 @@ SCENARIO_RUNNERS = {
     "creature_dies_create_tokens": run_creature_dies_create_tokens,
     "creature_etb_create_treasure": run_creature_etb_create_treasure,
     "creature_etb_create_tokens": run_creature_etb_create_tokens,
+    "creature_etb_dynamic_life_gain": run_creature_etb_dynamic_life_gain,
     "creature_etb_scry": run_creature_etb_scry,
     "destroy_target_create_treasure": run_destroy_target_create_treasure,
     "dynamic_life_gain": run_dynamic_life_gain,

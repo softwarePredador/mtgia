@@ -15309,6 +15309,82 @@ converge/colors spent, damage dealt to the controller, or broader non-simple
 Oracle text. Those require their own exact runtime adapter and focused package
 evidence.
 
+## PG557 ETB Dynamic Life Gain New Server Evidence
+
+PG557 evidence:
+
+- exact split report:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260706_pg557_etb_dynamic_life_gain_candidate.md`
+- package:
+  `docs/hermes-analysis/master_optimizer_reports/pg557_etb_dynamic_life_gain_new_server_package_package.md`
+- apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg557_etb_dynamic_life_gain_new_server_apply_evidence.md`
+- PG -> SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg557_etb_dynamic_life_gain_new_server_sync_report.json`
+- E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg557_etb_dynamic_life_gain_new_server_e2e.md`
+- post-sync queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260706_post_pg557_etb_dynamic_life_gain_new_server.md`
+- final exact-scope recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260706_post_pg557_etb_dynamic_life_gain_new_server_final.md`
+- readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260706_post_pg557_etb_dynamic_life_gain_new_server.md`
+- final audits:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260706_post_pg557_etb_dynamic_life_gain_new_server_final.md`,
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260706_post_pg557_etb_dynamic_life_gain_new_server_final.md`,
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260706_post_pg557_etb_dynamic_life_gain_new_server_final.md`,
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260706_post_pg557_etb_dynamic_life_gain_new_server_final.md`
+
+Validation:
+
+- focused code checks passed: `py_compile`, `54` package/E2E pytest tests, and
+  `962` exact-scope/runtime unittest tests;
+- exact split selected `12` cards for
+  `xmage_creature_etb_dynamic_life_gain` under
+  `xmage_creature_etb_dynamic_gain_life_v1`;
+- package precheck found `12/12` target card rows and no existing matching
+  expected rules;
+- package apply upserted `12` rows and deprecated `0` shadow rows;
+- PostgreSQL postcheck confirmed `12/12` promoted rows, `12/12`
+  verified/auto rows, and `12/12` oracle-hash rows;
+- PG -> SQLite sync loaded `8,977` PostgreSQL rows, updated `8,741` SQLite
+  rows, and exported `6,478` canonical snapshot rows;
+- package E2E: `status=pass`, `scenario_count=12`, `event_count=12`, and
+  every promoted card refreshed through PostgreSQL, Hermes SQLite, canonical
+  snapshot fallback, runtime `get_card_effect`, and battle execution;
+- final exact-scope recheck has `proposal_count=0` and
+  `safe_for_batch_pg_package_count=0`;
+- final audits passed: XMage strategy `pass`, PG-Hermes-SQLite `pass`,
+  operational surface `pass`, legacy contamination `pass`.
+
+Post-sync queue evidence:
+
+- pre-cycle `target_identity_count=25526`
+- post-cycle `target_identity_count=25514`
+- post-cycle `xmage_authoritative_source_count=25200`
+- post-cycle `xmage_missing_source_exception_count=314`
+- post-cycle `xmage_authoritative_parser_gap_count=0`
+- post-cycle `xmage_authoritative_adapter_required_count=25200`
+- post-cycle `adapter_work_unit_count=11354`
+
+Runtime semantics:
+
+- the splitter now accepts exact ETB-triggered dynamic life-gain creatures
+  backed by XMage `EntersBattlefieldTriggeredAbility` plus `GainLifeEffect`;
+- dynamic counts support graveyard card count, battlefield permanent count,
+  colors among permanents you control, devotion to green, greatest toughness
+  among other controlled creatures, and party count;
+- battlefield permanent count supports subtype filters, keyword filters, and
+  excluding the source permanent for "other creatures you control";
+- the runtime computes the dynamic count when the ETB resolves and records
+  replay evidence for count source, computed count, and gained life.
+
+Residual boundary: PG557 does not authorize non-ETB life-gain variants,
+target-opponent counts, target creature power/toughness, X values,
+converge/colors spent, damage-dealt-derived life gain, or broad non-simple
+Oracle text. Those require their own exact runtime adapter and focused package
+evidence.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

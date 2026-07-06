@@ -18295,8 +18295,17 @@ def resolve_generic_permanent_etb(
             "pick_all_matching": bool(effect_data.get("etb_library_pick_all_matching")),
         }
         resolve_dig_to_hand(player, permanent, dig_effect, turn)
-    if effect_data.get("etb_life_gain_amount"):
-        amount = int(effect_data.get("etb_life_gain_amount") or 0)
+    if effect_data.get("etb_life_gain_amount") or effect_data.get("etb_dynamic_life_gain"):
+        dynamic_replay_fields = {}
+        if effect_data.get("etb_dynamic_life_gain"):
+            amount, dynamic_replay_fields = dynamic_life_gain_amount(
+                player,
+                opponents,
+                {**effect_data, "_count_source_permanent": permanent},
+            )
+            amount = int(amount or 0)
+        else:
+            amount = int(effect_data.get("etb_life_gain_amount") or 0)
         life_before = int(getattr(player, "life", 0))
         if amount > 0:
             gain_life(player, amount, cap=999)
@@ -18311,6 +18320,7 @@ def resolve_generic_permanent_etb(
             controller_life_before=life_before,
             controller_life_after=int(getattr(player, "life", 0)),
             turn=turn,
+            **dynamic_replay_fields,
             **replay_rule_fields(effect_data),
         )
     if effect_data.get("etb_damage_amount") or effect_data.get("etb_dynamic_damage"):
@@ -46716,6 +46726,9 @@ def _graveyard_damage_card_matches(card, effect_data):
 
 
 def _battlefield_count_card_matches(card, effect_data):
+    source_permanent = effect_data.get("_count_source_permanent") if isinstance(effect_data, dict) else None
+    if effect_data.get("battlefield_count_exclude_source") and source_permanent is not None and card is source_permanent:
+        return False
     allowed_types = [
         str(value).strip().lower()
         for value in _as_list(effect_data.get("battlefield_count_card_types"))
@@ -46730,6 +46743,13 @@ def _battlefield_count_card_matches(card, effect_data):
     ]
     if allowed_subtypes and not any(permanent_has_subtype(card, subtype) for subtype in allowed_subtypes):
         return False
+    allowed_keywords = [
+        str(value).strip().lower().replace(" ", "_")
+        for value in _as_list(effect_data.get("battlefield_count_keywords"))
+        if str(value).strip()
+    ]
+    if allowed_keywords and not all(card_has_keyword(card, keyword) for keyword in allowed_keywords):
+        return False
     combat_state = str(effect_data.get("battlefield_count_combat_state") or "").strip().lower()
     if combat_state == "attacking" and not bool(card.get("attacking")):
         return False
@@ -46742,7 +46762,7 @@ def _battlefield_count_card_matches(card, effect_data):
         return False
     if tapped_state == "untapped" and bool(card.get("tapped")):
         return False
-    return bool(allowed_types or allowed_subtypes)
+    return bool(allowed_types or allowed_subtypes or allowed_keywords)
 
 
 def _battlefield_count_for_stat_modifier(player, opponents, effect_data):
@@ -46789,6 +46809,17 @@ def _controlled_permanent_color_count(player):
     for permanent in _controlled_permanents(player):
         colors.update(_spell_color_symbols(permanent))
     return len(colors)
+
+
+def _greatest_toughness_among_other_controlled_creatures(player, source_permanent=None):
+    greatest = 0
+    for permanent in _controlled_permanents(player):
+        if source_permanent is not None and permanent is source_permanent:
+            continue
+        if not is_battlefield_creature(permanent):
+            continue
+        greatest = max(greatest, _numeric_card_stat(permanent, "toughness", default=0))
+    return greatest
 
 
 def _permanent_subtype_values(permanent):
@@ -47052,8 +47083,21 @@ def _dynamic_life_gain_count_from_source(player, opponents, effect_data):
         "battlefield_permanent_count",
         "controller_hand_count",
         "domain_basic_land_types",
+        "colors_among_permanents_you_control",
+        "party_count",
+        "greatest_toughness_among_other_controlled_creatures",
+        "controlled_permanents_mana_symbol_count",
     }:
         return None, {}
+    if amount_source == "greatest_toughness_among_other_controlled_creatures":
+        count = _greatest_toughness_among_other_controlled_creatures(
+            player,
+            effect_data.get("_count_source_permanent"),
+        )
+        return count, {
+            "life_gain_amount_source": amount_source,
+            "greatest_toughness_among_other_controlled_creatures": count,
+        }
     count_effect_data = {**effect_data, "damage_amount_source": amount_source}
     count, replay_fields = _dynamic_damage_count_from_source(player, opponents, count_effect_data)
     if count is None:

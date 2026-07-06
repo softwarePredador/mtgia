@@ -1826,6 +1826,19 @@ Immediate checkpoint after PG361:
     cycle must implement another mapper/runtime subpattern before generating a
     new PostgreSQL package. Current evidence:
     `docs/hermes-analysis/master_optimizer_reports/pg556_dynamic_life_gain_new_server_apply_evidence.md`.
+83. PG557 promoted `12` creature ETB dynamic life-gain rows on the new server
+    after adding the exact `xmage_creature_etb_dynamic_gain_life_v1`
+    mapper/runtime lane for graveyard card counts, battlefield permanent
+    counts, Gate counts, flying creature counts, "other creatures" counts,
+    greatest toughness among other controlled creatures, colors among
+    controlled permanents, devotion to green, and party count. The cycle
+    reduced Commander-legal battle-gap identities from `25526` to `25514`,
+    reduced XMage-authoritative adapter-required identities from `25212` to
+    `25200`, and reduced `life_gain::xmage_life_gain_variant_review_v1` work
+    units from `714` to `702`. The final split returned `proposal_count=0`, so
+    the next cycle must implement another mapper/runtime subpattern before
+    generating a new PostgreSQL package. Current evidence:
+    `docs/hermes-analysis/master_optimizer_reports/pg557_etb_dynamic_life_gain_new_server_apply_evidence.md`.
 
 ## Non-Goals
 

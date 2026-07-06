@@ -286,6 +286,7 @@ PERMANENT_ACTIVATED_DRAW_DISCARD_SCOPE = "xmage_permanent_simple_activated_draw_
 SPELL_CAST_DRAW_ENGINE_SCOPE = "xmage_spell_cast_draw_engine_v1"
 SPELL_CAST_ADD_COUNTERS_SOURCE_SCOPE = "xmage_spell_cast_add_counters_source_v1"
 ETB_LIFE_GAIN_CREATURE_SCOPE = "xmage_creature_etb_gain_life_v1"
+ETB_DYNAMIC_LIFE_GAIN_CREATURE_SCOPE = "xmage_creature_etb_dynamic_gain_life_v1"
 ETB_DRAW_CREATURE_SCOPE = "xmage_creature_etb_draw_cards_v1"
 ETB_SCRY_CREATURE_SCOPE = "xmage_creature_etb_scry_v1"
 ETB_OPTIONAL_DISCARD_DRAW_CREATURE_SCOPE = "xmage_creature_etb_optional_discard_draw_cards_v1"
@@ -13506,6 +13507,18 @@ def _dynamic_life_gain_dict(
 
 def _life_gain_count_fields_from_filter(filter_text: str) -> dict[str, Any] | str | None:
     token = re.sub(r"\s+", " ", str(filter_text or "").strip().lower())
+    if token in {"card in your graveyard", "cards in your graveyard"}:
+        return {
+            "life_gain_amount_source": "graveyard_card_count",
+            "graveyard_count_scope": "controller_graveyard",
+            "graveyard_count_card_types": ["card"],
+        }
+    if token in {"creature card in your graveyard", "creature cards in your graveyard"}:
+        return {
+            "life_gain_amount_source": "graveyard_card_count",
+            "graveyard_count_scope": "controller_graveyard",
+            "graveyard_count_card_types": ["creature"],
+        }
     if token == "creature attacking you":
         return {
             "life_gain_amount_source": "battlefield_permanent_count",
@@ -13525,6 +13538,38 @@ def _life_gain_count_fields_from_filter(filter_text: str) -> dict[str, Any] | st
             "battlefield_count_scope": "controller_battlefield",
             "battlefield_count_card_types": ["creature"],
         }
+    if token in {"other creature you control", "other creatures you control"}:
+        return {
+            "life_gain_amount_source": "battlefield_permanent_count",
+            "battlefield_count_scope": "controller_battlefield",
+            "battlefield_count_card_types": ["creature"],
+            "battlefield_count_exclude_source": True,
+        }
+    if token in {"creature you control with flying", "creatures you control with flying"}:
+        return {
+            "life_gain_amount_source": "battlefield_permanent_count",
+            "battlefield_count_scope": "controller_battlefield",
+            "battlefield_count_card_types": ["creature"],
+            "battlefield_count_keywords": ["flying"],
+        }
+    if token in {"gate you control", "gates you control"}:
+        return {
+            "life_gain_amount_source": "battlefield_permanent_count",
+            "battlefield_count_scope": "controller_battlefield",
+            "battlefield_count_card_types": ["permanent"],
+            "battlefield_count_subtypes": ["gate"],
+        }
+    if token in {"creature in your party", "creatures in your party"}:
+        return {"life_gain_amount_source": "party_count"}
+    if token == "colors among permanents you control":
+        return {"life_gain_amount_source": "colors_among_permanents_you_control"}
+    if token == "your devotion to green":
+        return {
+            "life_gain_amount_source": "controlled_permanents_mana_symbol_count",
+            "mana_symbol_count_color": "G",
+        }
+    if token == "greatest toughness among other creatures you control":
+        return {"life_gain_amount_source": "greatest_toughness_among_other_controlled_creatures"}
     if token in {"forest on the battlefield", "forests on the battlefield"}:
         return {
             "life_gain_amount_source": "battlefield_permanent_count",
@@ -13607,7 +13652,44 @@ def dynamic_life_gain_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | 
         amount_source = str(count_fields.pop("life_gain_amount_source"))
         return _dynamic_life_gain_dict(amount_source, **count_fields)
 
+    devotion_match = re.match(r"^you gain life equal to (?P<filter>your devotion to green)\.?$", normalized)
+    if devotion_match:
+        count_fields = _life_gain_count_fields_from_filter(devotion_match.group("filter"))
+        if isinstance(count_fields, str):
+            return count_fields
+        if count_fields is None:
+            return "dynamic_life_gain_oracle_filter_not_supported"
+        amount_source = str(count_fields.pop("life_gain_amount_source"))
+        return _dynamic_life_gain_dict(amount_source, **count_fields)
+
+    greatest_match = re.match(
+        r"^you gain life equal to the (?P<filter>greatest toughness among other creatures you control)\.?$",
+        normalized,
+    )
+    if greatest_match:
+        count_fields = _life_gain_count_fields_from_filter(greatest_match.group("filter"))
+        if isinstance(count_fields, str):
+            return count_fields
+        if count_fields is None:
+            return "dynamic_life_gain_oracle_filter_not_supported"
+        amount_source = str(count_fields.pop("life_gain_amount_source"))
+        return _dynamic_life_gain_dict(amount_source, **count_fields)
+
     return None
+
+
+def etb_dynamic_life_gain_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str | None:
+    text = strip_parenthetical_reminders(oracle_text_after_leading_static_keywords(metadata))
+    normalized = re.sub(r"\s+", " ", text).strip().lower()
+    match = re.search(
+        r"(?:^|[. ]+)(?:undergrowth — |vivid — )?(?:when|whenever) "
+        r"(?:this creature|[^.]+?) enters(?: the battlefield)?[, ]+"
+        r"(?P<body>you gain .+?)\.?$",
+        normalized,
+    )
+    if not match:
+        return None
+    return dynamic_life_gain_from_oracle({"oracle_text": match.group("body")})
 
 
 def _dynamic_life_gain_source_spec_from_expr(source: str, expr: str) -> dict[str, Any] | str | None:
@@ -13617,6 +13699,8 @@ def _dynamic_life_gain_source_spec_from_expr(source: str, expr: str) -> dict[str
     if len(parts) > 1 and any(part.strip().startswith('"') for part in parts[1:]):
         token = parts[0].strip()
     multiplied_args = extract_constructor_args(token, "MultipliedValue")
+    if multiplied_args is None and token in {"amount", "xValue"}:
+        multiplied_args = extract_constructor_args(text, "MultipliedValue")
     if multiplied_args is not None:
         multiplied_parts = split_top_level_args(multiplied_args)
         if len(multiplied_parts) < 2 or not multiplied_parts[1].strip().isdigit():
@@ -13662,10 +13746,34 @@ def _dynamic_life_gain_source_spec_from_expr(source: str, expr: str) -> dict[str
             graveyard_count_scope="all_graveyards",
             graveyard_count_card_types=["creature"],
         )
+    if "CardsInControllerGraveyardCount" in search_text:
+        card_types = ["creature"] if "FILTER_CARD_CREATURE" in text else ["card"]
+        return _dynamic_life_gain_dict(
+            "graveyard_card_count",
+            graveyard_count_scope="controller_graveyard",
+            graveyard_count_card_types=card_types,
+        )
     if "DomainValue.REGULAR" in search_text:
         return _dynamic_life_gain_dict("domain_basic_land_types")
     if "CardsInControllerHandCount.ANY" in search_text:
         return _dynamic_life_gain_dict("controller_hand_count")
+    if "CreaturesYouControlCount" in search_text:
+        return _dynamic_life_gain_dict(
+            "battlefield_permanent_count",
+            battlefield_count_scope="controller_battlefield",
+            battlefield_count_card_types=["creature"],
+        )
+    if "PartyCount" in search_text:
+        return _dynamic_life_gain_dict("party_count")
+    if "ColorsAmongControlledPermanentsCount" in search_text:
+        return _dynamic_life_gain_dict("colors_among_permanents_you_control")
+    if "DevotionCount.G" in search_text:
+        return _dynamic_life_gain_dict(
+            "controlled_permanents_mana_symbol_count",
+            mana_symbol_count_color="G",
+        )
+    if "GreatestAmongPermanentsValue.TOUGHNESS_OTHER_CONTROLLED_CREATURES" in search_text:
+        return _dynamic_life_gain_dict("greatest_toughness_among_other_controlled_creatures")
     if "LandsYouControlCount.instance" in search_text:
         return _dynamic_life_gain_dict(
             "battlefield_permanent_count",
@@ -13685,12 +13793,29 @@ def _dynamic_life_gain_source_spec_from_expr(source: str, expr: str) -> dict[str
         count_parts = split_top_level_args(count_args)
         if len(count_parts) >= 2 and count_parts[1].strip().lstrip("-").isdigit():
             per = int(count_parts[1].strip())
-        if "FilterControlledCreaturePermanent" in search_text or "FILTER_CONTROLLED_CREATURE" in text:
-            return _dynamic_life_gain_dict(
+        if (
+            "FilterControlledCreaturePermanent" in search_text
+            or "FILTER_CONTROLLED_CREATURE" in text
+            or "FILTER_OTHER_CONTROLLED_CREATURE" in text
+        ):
+            fields = _dynamic_life_gain_dict(
                 "battlefield_permanent_count",
                 per=per,
                 battlefield_count_scope="controller_battlefield",
                 battlefield_count_card_types=["creature"],
+            )
+            if "FILTER_OTHER_CONTROLLED_CREATURE" in text:
+                fields["battlefield_count_exclude_source"] = True
+            if "AbilityPredicate(FlyingAbility.class)" in text:
+                fields["battlefield_count_keywords"] = ["flying"]
+            return fields
+        if "SubType.GATE" in text:
+            return _dynamic_life_gain_dict(
+                "battlefield_permanent_count",
+                per=per,
+                battlefield_count_scope="controller_battlefield",
+                battlefield_count_card_types=["permanent"],
+                battlefield_count_subtypes=["gate"],
             )
         if "FilterControlledLandPermanent" in text:
             return _dynamic_life_gain_dict(
@@ -16119,6 +16244,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "creature ETB dynamic graveyard-count damage trigger"
     elif scope == ETB_DYNAMIC_COUNT_DAMAGE_CREATURE_SCOPE:
         scope_kind = "creature ETB dynamic battlefield-count damage trigger"
+    elif scope == ETB_DYNAMIC_LIFE_GAIN_CREATURE_SCOPE:
+        scope_kind = "creature ETB dynamic life-gain trigger"
     elif scope == ETB_BOUNCE_CREATURE_SCOPE:
         scope_kind = "creature ETB return target permanent to hand trigger"
     elif scope == DESTROY_GAIN_LIFE_SCOPE:
@@ -16187,6 +16314,7 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "creature static self horsemanship evasion"
     elif scope in {
         ETB_LIFE_GAIN_CREATURE_SCOPE,
+        ETB_DYNAMIC_LIFE_GAIN_CREATURE_SCOPE,
         ETB_DRAW_CREATURE_SCOPE,
         ETB_DRAW_LOSE_LIFE_CREATURE_SCOPE,
         ETB_DAMAGE_CREATURE_SCOPE,
@@ -19716,6 +19844,52 @@ def split_row(
     if etb_life_gain_creature_unit:
         if not is_creature_metadata(metadata):
             return None, "etb_life_gain_not_creature"
+        dynamic_life_gain = etb_dynamic_life_gain_from_oracle(metadata)
+        if isinstance(dynamic_life_gain, str):
+            return None, dynamic_life_gain.replace("dynamic_life_gain", "etb_dynamic_life_gain")
+        if dynamic_life_gain is not None:
+            source_dynamic_life_gain = dynamic_life_gain_from_source(source_text)
+            if isinstance(source_dynamic_life_gain, str):
+                return None, source_dynamic_life_gain.replace("dynamic_life_gain", "etb_dynamic_life_gain")
+            if source_dynamic_life_gain is None:
+                return None, "etb_dynamic_life_gain_source_not_supported"
+            for key in (
+                "life_gain_amount_source",
+                "life_gain_base_amount",
+                "life_gain_per_count",
+                "graveyard_count_scope",
+                "graveyard_count_card_types",
+                "battlefield_count_scope",
+                "battlefield_count_card_types",
+                "battlefield_count_subtypes",
+                "battlefield_count_keywords",
+                "battlefield_count_exclude_source",
+                "mana_symbol_count_color",
+            ):
+                if dynamic_life_gain.get(key) != source_dynamic_life_gain.get(key):
+                    return None, "etb_dynamic_life_gain_source_oracle_mismatch"
+            keyword_list = ordered_keywords(keywords_from_ability_classes(row))
+            effect_json = {
+                "effect": "creature",
+                "battle_model_scope": ETB_DYNAMIC_LIFE_GAIN_CREATURE_SCOPE,
+                "ability_kind": "triggered",
+                "trigger": "enters_battlefield",
+                "etb_dynamic_life_gain": True,
+                "xmage_effect_class": "GainLifeEffect",
+                "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+                **dynamic_life_gain,
+            }
+            if keyword_list:
+                effect_json["keywords"] = keyword_list
+                effect_json["_keywords_are_self"] = True
+                for keyword in keyword_list:
+                    effect_json[keyword] = True
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_creature_etb_dynamic_life_gain",
+            ), "selected_exact_scope"
         amount = etb_life_gain_amount_from_oracle(metadata)
         constructor_amount = java_constructor_int(source_text, "GainLifeEffect")
         if amount is None or amount <= 0:

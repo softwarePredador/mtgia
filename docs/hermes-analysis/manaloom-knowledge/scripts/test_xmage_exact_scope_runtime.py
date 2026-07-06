@@ -6389,6 +6389,178 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_creature_etb_dynamic_life_gain_counts_flying_creatures(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.life = 20
+        active.battlefield = [
+            {"name": "Bird A", "type_line": "Creature - Bird", "flying": True},
+            {"name": "Bird B", "type_line": "Creature - Bird", "flying": True},
+            {"name": "Ground Creature", "type_line": "Creature - Soldier"},
+        ]
+        effect = {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_etb_dynamic_gain_life_v1",
+            "etb_dynamic_life_gain": True,
+            "life_gain_amount_source": "battlefield_permanent_count",
+            "battlefield_count_scope": "controller_battlefield",
+            "battlefield_count_card_types": ["creature"],
+            "battlefield_count_keywords": ["flying"],
+            "life_gain_base_amount": 0,
+            "life_gain_per_count": 2,
+        }
+        permanent = self.battle.prepare_entering_permanent(
+            self.battle.enrich_card({"name": "Aven Gagglemaster", "type_line": "Creature - Bird", **effect}),
+            controller=active,
+            all_players=[active, opponent],
+            turn=5,
+        )
+        active.battlefield.append(permanent)
+
+        self.battle.resolve_generic_permanent_etb(active, [opponent], permanent, effect, 5, random.Random(407))
+
+        self.assertEqual(active.life, 24)
+        self.assertTrue(
+            any(
+                event == "trigger_resolved"
+                and data.get("card") == "Aven Gagglemaster"
+                and data.get("effect") == "gain_life"
+                and data.get("life_gain_requested") == 4
+                and data.get("battlefield_life_gain_count") == 2
+                and data.get("dynamic_life_gain_count") == 2
+                for event, data in self.events
+            )
+        )
+
+    def test_creature_etb_dynamic_life_gain_excludes_source_for_other_creatures(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.life = 20
+        active.battlefield = [
+            {"name": "Ally A", "type_line": "Creature - Soldier"},
+            {"name": "Ally B", "type_line": "Creature - Cleric"},
+        ]
+        effect = {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_etb_dynamic_gain_life_v1",
+            "etb_dynamic_life_gain": True,
+            "life_gain_amount_source": "battlefield_permanent_count",
+            "battlefield_count_scope": "controller_battlefield",
+            "battlefield_count_card_types": ["creature"],
+            "battlefield_count_exclude_source": True,
+            "life_gain_base_amount": 0,
+            "life_gain_per_count": 2,
+        }
+        permanent = self.battle.prepare_entering_permanent(
+            self.battle.enrich_card({"name": "Goldnight Redeemer", "type_line": "Creature - Angel", **effect}),
+            controller=active,
+            all_players=[active, opponent],
+            turn=5,
+        )
+        active.battlefield.append(permanent)
+
+        self.battle.resolve_generic_permanent_etb(active, [opponent], permanent, effect, 5, random.Random(408))
+
+        self.assertEqual(active.life, 24)
+        self.assertTrue(
+            any(
+                event == "trigger_resolved"
+                and data.get("card") == "Goldnight Redeemer"
+                and data.get("life_gain_requested") == 4
+                and data.get("battlefield_life_gain_count") == 2
+                for event, data in self.events
+            )
+        )
+
+    def test_creature_etb_dynamic_life_gain_counts_devotion_party_colors_and_toughness(self) -> None:
+        fixtures = [
+            {
+                "name": "Nylea's Disciple",
+                "effect": {
+                    "life_gain_amount_source": "controlled_permanents_mana_symbol_count",
+                    "mana_symbol_count_color": "G",
+                    "life_gain_per_count": 1,
+                },
+                "battlefield": [
+                    {"name": "Double Green", "type_line": "Creature - Druid", "mana_cost": "{G}{G}"},
+                    {"name": "Single Green", "type_line": "Enchantment", "mana_cost": "{2}{G}"},
+                ],
+                "expected": 3,
+                "event_key": "controlled_permanents_mana_symbol_count",
+            },
+            {
+                "name": "Shepherd of Heroes",
+                "effect": {"life_gain_amount_source": "party_count", "life_gain_per_count": 2},
+                "battlefield": [
+                    {"name": "Cleric", "type_line": "Creature - Human Cleric"},
+                    {"name": "Rogue", "type_line": "Creature - Human Rogue"},
+                    {"name": "Warrior", "type_line": "Creature - Human Warrior"},
+                ],
+                "expected": 6,
+                "event_key": "party_count",
+                "event_count": 3,
+            },
+            {
+                "name": "Luminollusk",
+                "effect": {"life_gain_amount_source": "colors_among_permanents_you_control", "life_gain_per_count": 1},
+                "battlefield": [
+                    {"name": "Boros Permanent", "type_line": "Artifact", "mana_cost": "{W}{R}"},
+                    {"name": "Green Permanent", "type_line": "Creature - Elf", "mana_cost": "{G}"},
+                ],
+                "expected": 3,
+                "event_key": "controlled_permanent_color_count",
+            },
+            {
+                "name": "Flourishing Hunter",
+                "effect": {
+                    "life_gain_amount_source": "greatest_toughness_among_other_controlled_creatures",
+                    "life_gain_per_count": 1,
+                },
+                "battlefield": [
+                    {"name": "Tough Ally", "type_line": "Creature - Beast", "power": 2, "toughness": 5},
+                    {"name": "Small Ally", "type_line": "Creature - Elf", "power": 1, "toughness": 2},
+                ],
+                "expected": 5,
+                "event_key": "greatest_toughness_among_other_controlled_creatures",
+            },
+        ]
+
+        for fixture in fixtures:
+            with self.subTest(card=fixture["name"]):
+                self.events.clear()
+                active = self.battle.Player("Active", None, [])
+                opponent = self.battle.Player("Opponent", None, [])
+                active.life = 20
+                active.battlefield = list(fixture["battlefield"])
+                effect = {
+                    "effect": "creature",
+                    "battle_model_scope": "xmage_creature_etb_dynamic_gain_life_v1",
+                    "etb_dynamic_life_gain": True,
+                    "life_gain_base_amount": 0,
+                    **fixture["effect"],
+                }
+                permanent = self.battle.prepare_entering_permanent(
+                    self.battle.enrich_card({"name": fixture["name"], "type_line": "Creature - Fixture", **effect}),
+                    controller=active,
+                    all_players=[active, opponent],
+                    turn=5,
+                )
+                active.battlefield.append(permanent)
+
+                self.battle.resolve_generic_permanent_etb(active, [opponent], permanent, effect, 5, random.Random(409))
+
+                self.assertEqual(active.life, 20 + fixture["expected"])
+                self.assertTrue(
+                    any(
+                        event == "trigger_resolved"
+                        and data.get("card") == fixture["name"]
+                        and data.get("life_gain_requested") == fixture["expected"]
+                        and data.get("dynamic_life_gain_count") == fixture.get("event_count", fixture["expected"])
+                        and data.get(fixture["event_key"]) == fixture.get("event_count", fixture["expected"])
+                        for event, data in self.events
+                    )
+                )
+
     def test_composite_life_gain_draw_spell_resolves_both_components_once(self) -> None:
         active = self.battle.Player("Active", None, [{"name": "Drawn Card"}])
         opponent = self.battle.Player("Opponent", None, [])

@@ -95,6 +95,7 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "etb_draw_count_exclude_source",
     "etb_life_loss",
     "etb_life_gain_amount",
+    "etb_dynamic_life_gain",
     "etb_scry_count",
     "trigger_scry_count",
     "scry_count",
@@ -260,8 +261,11 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "battlefield_count_scope",
     "battlefield_count_card_types",
     "battlefield_count_subtypes",
+    "battlefield_count_keywords",
     "battlefield_count_combat_state",
     "battlefield_count_tapped_state",
+    "battlefield_count_exclude_source",
+    "mana_symbol_count_color",
     "counter_type",
     "counter_count",
     "counter_amount",
@@ -1387,6 +1391,124 @@ def dynamic_life_gain_execution_scenario_from_expected_rule(rule: dict[str, Any]
     return scenario
 
 
+def _populate_etb_life_gain_count_fixture(scenario: dict[str, Any], required: dict[str, Any]) -> int | None:
+    source = str(required.get("life_gain_amount_source") or "").strip().lower()
+    if source == "controller_hand_count":
+        count = 3
+        scenario["controller_hand"] = [
+            {"name": f"E2E Hand Card {index + 1}", "type_line": "Sorcery"}
+            for index in range(count)
+        ]
+        return count
+    if source == "domain_basic_land_types":
+        subtypes = ["Plains", "Island", "Swamp", "Mountain"]
+        scenario["controller_battlefield"] = [
+            {"name": subtype, "type_line": f"Basic Land - {subtype}", "subtypes": [subtype]}
+            for subtype in subtypes
+        ]
+        return len(subtypes)
+    if source == "graveyard_card_count":
+        card_types = [str(value).lower() for value in required.get("graveyard_count_card_types") or []]
+        if "creature" in card_types:
+            scenario["controller_graveyard"] = [
+                {"name": "E2E Graveyard Creature A", "type_line": "Creature - Spirit"},
+                {"name": "E2E Graveyard Creature B", "type_line": "Creature - Soldier"},
+                {"name": "E2E Graveyard Instant", "type_line": "Instant"},
+            ]
+            return 2
+        scenario["controller_graveyard"] = [
+            {"name": "E2E Graveyard Card A", "type_line": "Creature - Spirit"},
+            {"name": "E2E Graveyard Card B", "type_line": "Instant"},
+            {"name": "E2E Graveyard Card C", "type_line": "Land"},
+        ]
+        return 3
+    if source == "battlefield_permanent_count":
+        card_types = [str(value).lower() for value in required.get("battlefield_count_card_types") or []]
+        subtypes = [str(value).lower() for value in required.get("battlefield_count_subtypes") or []]
+        keywords = [str(value).lower().replace(" ", "_") for value in required.get("battlefield_count_keywords") or []]
+        count = 3
+        if subtypes:
+            subtype = subtypes[0].title()
+            scenario["controller_battlefield"] = [
+                {"name": f"E2E {subtype} {index + 1}", "type_line": f"Land - {subtype}", "subtypes": [subtype]}
+                for index in range(count)
+            ]
+        elif keywords:
+            keyword = keywords[0]
+            scenario["controller_battlefield"] = [
+                {"name": f"E2E Keyword Creature {index + 1}", "type_line": "Creature - Bird", keyword: True}
+                for index in range(count)
+            ]
+        elif "creature" in card_types:
+            scenario["controller_battlefield"] = [
+                {"name": f"E2E Other Creature {index + 1}", "type_line": "Creature - Soldier"}
+                for index in range(count)
+            ]
+        else:
+            scenario["controller_battlefield"] = [
+                {"name": f"E2E Permanent {index + 1}", "type_line": "Artifact"}
+                for index in range(count)
+            ]
+        return count
+    if source == "colors_among_permanents_you_control":
+        scenario["controller_battlefield"] = [
+            {"name": "E2E Boros Permanent", "type_line": "Artifact", "mana_cost": "{W}{R}"},
+            {"name": "E2E Green Permanent", "type_line": "Creature - Elf", "mana_cost": "{G}"},
+            {"name": "E2E Colorless Permanent", "type_line": "Artifact", "mana_cost": "{2}"},
+        ]
+        return 3
+    if source == "party_count":
+        scenario["controller_battlefield"] = [
+            {"name": "E2E Cleric", "type_line": "Creature - Human Cleric"},
+            {"name": "E2E Rogue", "type_line": "Creature - Human Rogue"},
+            {"name": "E2E Warrior", "type_line": "Creature - Human Warrior"},
+            {"name": "E2E Duplicate Rogue", "type_line": "Creature - Elf Rogue"},
+        ]
+        return 3
+    if source == "controlled_permanents_mana_symbol_count":
+        color = str(required.get("mana_symbol_count_color") or "G").upper()
+        scenario["controller_battlefield"] = [
+            {"name": "E2E Double Symbol", "type_line": "Creature - Druid", "mana_cost": f"{{{color}}}{{{color}}}"},
+            {"name": "E2E Single Symbol", "type_line": "Enchantment", "mana_cost": f"{{2}}{{{color}}}"},
+            {"name": "E2E Other Color", "type_line": "Artifact", "mana_cost": "{2}"},
+        ]
+        return 3
+    if source == "greatest_toughness_among_other_controlled_creatures":
+        scenario["controller_battlefield"] = [
+            {"name": "E2E Tough Creature", "type_line": "Creature - Beast", "power": 2, "toughness": 5},
+            {"name": "E2E Small Creature", "type_line": "Creature - Elf", "power": 1, "toughness": 2},
+        ]
+        return 5
+    return None
+
+
+def creature_etb_dynamic_life_gain_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_creature_etb_dynamic_gain_life_v1":
+        return None
+    source = str(required.get("life_gain_amount_source") or "").strip().lower()
+    base = int(required.get("life_gain_base_amount") or 0)
+    per = int(required.get("life_gain_per_count") or 1)
+    scenario: dict[str, Any] = {
+        "name": f"{rule['card_name']} resolves ETB dynamic life gain",
+        "type": "creature_etb_dynamic_life_gain",
+        "card": {"name": rule["card_name"]},
+        "starting_life": 20,
+        "logical_rule_key": rule["logical_rule_key"],
+        "expected_life_gain_source": source,
+    }
+    count = _populate_etb_life_gain_count_fixture(scenario, required)
+    if count is None:
+        return None
+    expected_life_gain = base + (count * per)
+    scenario["expected_dynamic_count"] = count
+    scenario["expected_life_gain"] = expected_life_gain
+    scenario["expected_life_after"] = int(scenario["starting_life"]) + expected_life_gain
+    return scenario
+
+
 def creature_dies_create_tokens_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
@@ -1735,6 +1857,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or fixed_create_creature_tokens_execution_scenario_from_expected_rule(rule)
         or multi_create_creature_tokens_execution_scenario_from_expected_rule(rule)
         or dynamic_life_gain_execution_scenario_from_expected_rule(rule)
+        or creature_etb_dynamic_life_gain_execution_scenario_from_expected_rule(rule)
     )
 
 
