@@ -541,6 +541,11 @@ Operational priority after this pivot:
     the current deck, and missing local Oracle cache rows. It may mutate Hermes
     SQLite `card_oracle_cache` under report evidence, but must not touch
     `deck_cards`, battle, promotion, or PostgreSQL product truth.
+72. run `global_commander_external_exact_artifact_engine_add_cut_pair_model.py`
+    after post-backfill local review opens add candidates. It must compare each
+    add candidate against the used cut card's required exact same-lane signals.
+    Token payoff alone does not replace `Biotransference` if the add lacks
+    artifact type-conversion coverage.
 
 Current pivot evidence:
 
@@ -566,6 +571,7 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_exact_artifact_engine_source_expander_20260706_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_exact_artifact_engine_candidate_reviewer_20260706_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_exact_artifact_oracle_backfill_20260706_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_external_exact_artifact_engine_add_cut_pair_model_20260706_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_manual_negative_trace_reviewer_20260706_kaalia_value_safe_stage1_live_research.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_followup_live_source_research_expander_20260706_kaalia_value_safe_stage1_after_manual_trace.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_expanded_source_candidate_reviewer_20260706_kaalia_value_safe_stage1_followup_live_after_manual_trace.md`
@@ -1534,6 +1540,14 @@ Current external refresh on 2026-07-05:
   support-only rows stay blocked. Candidate copy, battle, and promotion remain
   closed; the next gate is
   `model_external_exact_artifact_engine_add_cut_pairs_before_candidate_copy`.
+- The external exact artifact-engine add/cut pair model then compares those
+  five add candidates against `Biotransference` as the replacement-required cut.
+  Every candidate has `artifact_spell_token_payoff`, but none has
+  `artifact_type_conversion_engine`; all five pairs are blocked by
+  `add_does_not_cover_cut_required_signals:artifact_type_conversion_engine`.
+  Candidate copy, battle, source trace, and promotion remain closed; the next
+  gate is
+  `expand_exact_artifact_type_conversion_source_lane_or_keep_biotransference_protected`.
 
 ## Global Commander Rollout - 2026-07-01
 

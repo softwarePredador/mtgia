@@ -340,6 +340,15 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `deck_cards`; o reviewer pos-backfill ficou com
     `local_review_ready_count=5`, `missing_local_oracle_count=0`, e o proximo
     gate e `model_external_exact_artifact_engine_add_cut_pairs_before_candidate_copy`.
+    O modelo add/cut roda em
+    `manaloom-knowledge/scripts/global_commander_external_exact_artifact_engine_add_cut_pair_model.py`,
+    com evidencia:
+    `master_optimizer_reports/global_commander_external_exact_artifact_engine_add_cut_pair_model_20260706_current.md`.
+    Resultado: os cinco adds tem `artifact_spell_token_payoff`, mas nenhum
+    cobre `artifact_type_conversion_engine`; portanto nao substituem
+    `Biotransference`, candidate copy/battle/promocao seguem fechados, e o
+    proximo gate e
+    `expand_exact_artifact_type_conversion_source_lane_or_keep_biotransference_protected`.
     Quando uma hipotese add/cut estiver pronta, rode
     `manaloom-knowledge/scripts/global_commander_candidate_copy_materializer.py`
     para materializar uma unica troca em copia isolada do Hermes SQLite. A

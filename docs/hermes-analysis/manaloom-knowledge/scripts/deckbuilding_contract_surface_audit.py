@@ -102,6 +102,12 @@ GLOBAL_COMMANDER_EXTERNAL_EXACT_ARTIFACT_ORACLE_BACKFILL = (
 GLOBAL_COMMANDER_EXTERNAL_EXACT_ARTIFACT_ORACLE_BACKFILL_TEST = (
     SCRIPT_DIR / "test_global_commander_external_exact_artifact_oracle_backfill.py"
 )
+GLOBAL_COMMANDER_EXTERNAL_EXACT_ARTIFACT_ENGINE_ADD_CUT_PAIR_MODEL = (
+    SCRIPT_DIR / "global_commander_external_exact_artifact_engine_add_cut_pair_model.py"
+)
+GLOBAL_COMMANDER_EXTERNAL_EXACT_ARTIFACT_ENGINE_ADD_CUT_PAIR_MODEL_TEST = (
+    SCRIPT_DIR / "test_global_commander_external_exact_artifact_engine_add_cut_pair_model.py"
+)
 GLOBAL_COMMANDER_CANDIDATE_COPY_MATERIALIZER = SCRIPT_DIR / "global_commander_candidate_copy_materializer.py"
 GLOBAL_COMMANDER_CANDIDATE_COPY_MATERIALIZER_TEST = (
     SCRIPT_DIR / "test_global_commander_candidate_copy_materializer.py"
@@ -495,6 +501,10 @@ GLOBAL_COMMANDER_EXTERNAL_EXACT_ARTIFACT_ENGINE_CANDIDATE_REVIEWER_REPORT = (
 GLOBAL_COMMANDER_EXTERNAL_EXACT_ARTIFACT_ORACLE_BACKFILL_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_external_exact_artifact_oracle_backfill_20260706_current.md"
+)
+GLOBAL_COMMANDER_EXTERNAL_EXACT_ARTIFACT_ENGINE_ADD_CUT_PAIR_MODEL_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_external_exact_artifact_engine_add_cut_pair_model_20260706_current.md"
 )
 GLOBAL_COMMANDER_CANDIDATE_COPY_MATERIALIZER_REPORT = (
     REPO_ROOT
@@ -1030,6 +1040,9 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_external_exact_artifact_oracle_backfill.py",
                 "global_commander_external_exact_artifact_oracle_backfill_20260706_current.md",
                 "model_external_exact_artifact_engine_add_cut_pairs_before_candidate_copy",
+                "global_commander_external_exact_artifact_engine_add_cut_pair_model.py",
+                "global_commander_external_exact_artifact_engine_add_cut_pair_model_20260706_current.md",
+                "expand_exact_artifact_type_conversion_source_lane_or_keep_biotransference_protected",
                 "global_commander_candidate_copy_materializer.py",
                 "global_commander_candidate_copy_materializer_20260705_kaalia_nonland_top_pair.md",
                 "must reject stale chained sources",
@@ -2120,6 +2133,31 @@ def build_audit() -> dict[str, Any]:
                 "external_exact_artifact_oracle_backfill_plan_ready",
                 "external_exact_artifact_oracle_backfill_applied_review_rerun_required",
                 "Digsite Engineer",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_EXTERNAL_EXACT_ARTIFACT_ENGINE_ADD_CUT_PAIR_MODEL,
+            [
+                "global_commander_external_exact_artifact_engine_add_cut_pair_model",
+                "external_exact_artifact_engine_add_cut_pair_model_blocks_candidate_copy",
+                "expand_exact_artifact_type_conversion_source_lane_or_keep_biotransference_protected",
+                "artifact_type_conversion_engine",
+                "candidate_copy_allowed_now",
+                "battle_gate_allowed_now",
+                "promotion_allowed",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_EXTERNAL_EXACT_ARTIFACT_ENGINE_ADD_CUT_PAIR_MODEL_TEST,
+            [
+                "test_requires_type_conversion_signal_to_replace_biotransference",
+                "add_cut_pair_blocked_by_same_lane_signal_gap",
+                "add_cut_pair_ready_for_source_trace",
+                "artifact_type_conversion_engine",
             ],
         )
     )
@@ -3886,6 +3924,21 @@ def build_audit() -> dict[str, Any]:
                 "deck_rows_mutated: `false`",
                 "rerun_external_exact_artifact_engine_candidate_reviewer_after_backfill",
                 "Poetic Ingenuity",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_EXTERNAL_EXACT_ARTIFACT_ENGINE_ADD_CUT_PAIR_MODEL_REPORT,
+            [
+                "Global Commander External Exact Artifact Engine Add Cut Pair Model",
+                "external_exact_artifact_engine_add_cut_pair_model_blocks_candidate_copy",
+                "add_candidate_count: `5`",
+                "replacement_required_cut_count: `1`",
+                "ready_for_source_trace_pair_count: `0`",
+                "candidate_copy_allowed_now: `false`",
+                "add_does_not_cover_cut_required_signals:artifact_type_conversion_engine",
+                "expand_exact_artifact_type_conversion_source_lane_or_keep_biotransference_protected",
             ],
         )
     )
