@@ -1,0 +1,436 @@
+{
+  "artifact_type": "global_commander_candidate_copy_materializer",
+  "candidate_db": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_copy_materializer_20260706_lorehold_profile_repair_package_candidate/knowledge_candidate.db",
+  "generated_at": "2026-07-06T07:18:28.241601+00:00",
+  "materialization": {},
+  "materializations": [
+    {
+      "active_rule_count_for_add": 1,
+      "add": "Bant Panorama",
+      "cut": "Storm-Kiln Artist",
+      "deck_id": 612,
+      "role": "land",
+      "row_count": 100,
+      "total_cards": 100
+    },
+    {
+      "active_rule_count_for_add": 1,
+      "add": "Brokers Hideout",
+      "cut": "Jeska's Will",
+      "deck_id": 612,
+      "role": "land",
+      "row_count": 100,
+      "total_cards": 100
+    },
+    {
+      "active_rule_count_for_add": 1,
+      "add": "Pyromancer's Goggles",
+      "cut": "Artist's Talent",
+      "deck_id": 612,
+      "role": "mana_acceleration",
+      "row_count": 100,
+      "total_cards": 100
+    },
+    {
+      "active_rule_count_for_add": 1,
+      "add": "Call Forth the Tempest",
+      "cut": "Starfall Invocation",
+      "deck_id": 612,
+      "role": "board_wipes_resets",
+      "row_count": 100,
+      "total_cards": 100
+    },
+    {
+      "active_rule_count_for_add": 0,
+      "add": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+      "cut": "Brass's Bounty",
+      "deck_id": 612,
+      "role": "mana_acceleration",
+      "row_count": 100,
+      "total_cards": 100
+    }
+  ],
+  "model_pair": {},
+  "model_pairs": [
+    {
+      "add": "Bant Panorama",
+      "candidate": {
+        "card_name": "Bant Panorama",
+        "profile_roles": [
+          "lands"
+        ],
+        "role": "land",
+        "source": "profile_repair_land_cut_reviewer"
+      },
+      "commander": "Lorehold, the Historian",
+      "cut": "Storm-Kiln Artist",
+      "cut_candidate": {
+        "card_name": "Storm-Kiln Artist",
+        "profile_roles": [
+          "mana_acceleration",
+          "mana_rocks_treasure_ramp",
+          "spell_payoffs_copy_engines"
+        ],
+        "role": "land"
+      },
+      "deck_id": "612",
+      "pair": {
+        "add": "Bant Panorama",
+        "add_axis": "lands",
+        "add_profile_roles": [
+          "lands"
+        ],
+        "blockers": [
+          "land_floor_pair_needs_curve_and_role_loss_review"
+        ],
+        "candidate_copy_allowed": false,
+        "cut": "Storm-Kiln Artist",
+        "cut_profile_roles": [
+          "mana_acceleration",
+          "mana_rocks_treasure_ramp",
+          "spell_payoffs_copy_engines"
+        ],
+        "index": 1,
+        "reasons": [
+          "land_floor_repair_uses_nonland_cut"
+        ],
+        "shared_profile_roles": [],
+        "status": "reordered_land_floor_pair_needs_curve_review"
+      },
+      "role": "land",
+      "source_pool_status": "profile_repair_land_cut_review_ready_for_candidate_copy"
+    },
+    {
+      "add": "Brokers Hideout",
+      "candidate": {
+        "card_name": "Brokers Hideout",
+        "profile_roles": [
+          "lands"
+        ],
+        "role": "land",
+        "source": "profile_repair_land_cut_reviewer"
+      },
+      "commander": "Lorehold, the Historian",
+      "cut": "Jeska's Will",
+      "cut_candidate": {
+        "card_name": "Jeska's Will",
+        "profile_roles": [
+          "draw_rummage_opponent_turn_draw",
+          "mana_acceleration",
+          "mana_rocks_treasure_ramp"
+        ],
+        "role": "land"
+      },
+      "deck_id": "612",
+      "pair": {
+        "add": "Brokers Hideout",
+        "add_axis": "lands",
+        "add_profile_roles": [
+          "lands"
+        ],
+        "blockers": [
+          "land_floor_pair_needs_curve_and_role_loss_review"
+        ],
+        "candidate_copy_allowed": false,
+        "cut": "Jeska's Will",
+        "cut_profile_roles": [
+          "draw_rummage_opponent_turn_draw",
+          "mana_acceleration",
+          "mana_rocks_treasure_ramp"
+        ],
+        "index": 2,
+        "reasons": [
+          "land_floor_repair_uses_nonland_cut"
+        ],
+        "shared_profile_roles": [],
+        "status": "reordered_land_floor_pair_needs_curve_review"
+      },
+      "role": "land",
+      "source_pool_status": "profile_repair_land_cut_review_ready_for_candidate_copy"
+    },
+    {
+      "add": "Pyromancer's Goggles",
+      "candidate": {
+        "card_name": "Pyromancer's Goggles",
+        "profile_roles": [
+          "mana_acceleration",
+          "mana_rocks_treasure_ramp",
+          "spell_payoffs_copy_engines"
+        ],
+        "role": "mana_acceleration",
+        "source": "profile_repair_land_cut_reviewer"
+      },
+      "commander": "Lorehold, the Historian",
+      "cut": "Artist's Talent",
+      "cut_candidate": {
+        "card_name": "Artist's Talent",
+        "profile_roles": [
+          "card_draw_selection",
+          "dedicated_win_conditions",
+          "draw_rummage_opponent_turn_draw",
+          "mana_acceleration",
+          "mana_rocks_treasure_ramp",
+          "spell_payoffs_copy_engines"
+        ],
+        "role": "mana_acceleration"
+      },
+      "deck_id": "612",
+      "pair": {
+        "add": "Pyromancer's Goggles",
+        "add_axis": "protected_profile_anchor",
+        "add_profile_roles": [
+          "mana_acceleration",
+          "mana_rocks_treasure_ramp",
+          "spell_payoffs_copy_engines"
+        ],
+        "blockers": [],
+        "candidate_copy_allowed": false,
+        "cut": "Artist's Talent",
+        "cut_profile_roles": [
+          "card_draw_selection",
+          "dedicated_win_conditions",
+          "draw_rummage_opponent_turn_draw",
+          "mana_acceleration",
+          "mana_rocks_treasure_ramp",
+          "spell_payoffs_copy_engines"
+        ],
+        "index": 3,
+        "reasons": [
+          "protected_anchor_same_lane_overlap_after_reorder"
+        ],
+        "shared_profile_roles": [
+          "mana_acceleration",
+          "mana_rocks_treasure_ramp",
+          "spell_payoffs_copy_engines"
+        ],
+        "status": "reordered_protected_anchor_same_lane_pair"
+      },
+      "role": "mana_acceleration",
+      "source_pool_status": "profile_repair_land_cut_review_ready_for_candidate_copy"
+    },
+    {
+      "add": "Call Forth the Tempest",
+      "candidate": {
+        "card_name": "Call Forth the Tempest",
+        "profile_roles": [
+          "board_wipes_resets",
+          "miracle_haymakers"
+        ],
+        "role": "board_wipes_resets",
+        "source": "profile_repair_land_cut_reviewer"
+      },
+      "commander": "Lorehold, the Historian",
+      "cut": "Starfall Invocation",
+      "cut_candidate": {
+        "card_name": "Starfall Invocation",
+        "profile_roles": [
+          "board_wipes_resets",
+          "card_draw_selection",
+          "draw_rummage_opponent_turn_draw",
+          "miracle_haymakers"
+        ],
+        "role": "board_wipes_resets"
+      },
+      "deck_id": "612",
+      "pair": {
+        "add": "Call Forth the Tempest",
+        "add_axis": "protected_profile_anchor",
+        "add_profile_roles": [
+          "board_wipes_resets",
+          "miracle_haymakers"
+        ],
+        "blockers": [],
+        "candidate_copy_allowed": false,
+        "cut": "Starfall Invocation",
+        "cut_profile_roles": [
+          "board_wipes_resets",
+          "card_draw_selection",
+          "draw_rummage_opponent_turn_draw",
+          "miracle_haymakers"
+        ],
+        "index": 4,
+        "reasons": [
+          "protected_anchor_same_lane_overlap_after_reorder"
+        ],
+        "shared_profile_roles": [
+          "board_wipes_resets",
+          "miracle_haymakers"
+        ],
+        "status": "reordered_protected_anchor_same_lane_pair"
+      },
+      "role": "board_wipes_resets",
+      "source_pool_status": "profile_repair_land_cut_review_ready_for_candidate_copy"
+    },
+    {
+      "add": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+      "candidate": {
+        "card_name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+        "profile_roles": [
+          "mana_acceleration",
+          "mana_rocks_treasure_ramp"
+        ],
+        "role": "mana_acceleration",
+        "source": "profile_repair_land_cut_reviewer"
+      },
+      "commander": "Lorehold, the Historian",
+      "cut": "Brass's Bounty",
+      "cut_candidate": {
+        "card_name": "Brass's Bounty",
+        "profile_roles": [
+          "dedicated_win_conditions",
+          "mana_acceleration",
+          "mana_rocks_treasure_ramp",
+          "miracle_haymakers"
+        ],
+        "role": "mana_acceleration"
+      },
+      "deck_id": "612",
+      "pair": {
+        "add": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+        "add_axis": "protected_profile_anchor",
+        "add_profile_roles": [
+          "mana_acceleration",
+          "mana_rocks_treasure_ramp"
+        ],
+        "blockers": [],
+        "candidate_copy_allowed": false,
+        "cut": "Brass's Bounty",
+        "cut_profile_roles": [
+          "dedicated_win_conditions",
+          "mana_acceleration",
+          "mana_rocks_treasure_ramp",
+          "miracle_haymakers"
+        ],
+        "index": 5,
+        "reasons": [
+          "protected_anchor_same_lane_overlap_after_reorder"
+        ],
+        "shared_profile_roles": [
+          "mana_acceleration",
+          "mana_rocks_treasure_ramp"
+        ],
+        "status": "reordered_protected_anchor_same_lane_pair"
+      },
+      "role": "mana_acceleration",
+      "source_pool_status": "profile_repair_land_cut_review_ready_for_candidate_copy"
+    }
+  ],
+  "policy": {
+    "candidate_scope": "The swap or value-safe stage exists only inside the copied Hermes SQLite candidate DB.",
+    "promotion_gate": "Promotion stays closed until structure, strategy matrix, battle gate, and replay trace pass.",
+    "source_boundary": "Source DB and PostgreSQL are not mutated by this materializer."
+  },
+  "postgres_writes": false,
+  "source_db": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_copy_materializer_20260706_land_floor_deck612_package_candidate/knowledge_candidate.db",
+  "source_db_mutated": false,
+  "source_deck_summary_after": {
+    "avg_cmc": 3.03,
+    "cards": 100,
+    "deck_id": 612,
+    "hash": "a5c2900f3344fda8cbfd2b40cd628e3415974ab4b33b987c270e56a4b585170b",
+    "lands": 34,
+    "nonlands": 66,
+    "ruleset_hash": "5fd1940c63e2b3489fa5d2fa1d545ac2fcce87b0bcb8d811a6c06b5cc60c89a7",
+    "semantics_hash": "ed40a6d6e3f97ad764b35c51f1de3d10bc375e480d81f1a1dae122673206ea3e"
+  },
+  "source_deck_summary_before": {
+    "avg_cmc": 3.03,
+    "cards": 100,
+    "deck_id": 612,
+    "hash": "a5c2900f3344fda8cbfd2b40cd628e3415974ab4b33b987c270e56a4b585170b",
+    "lands": 34,
+    "nonlands": 66,
+    "ruleset_hash": "5fd1940c63e2b3489fa5d2fa1d545ac2fcce87b0bcb8d811a6c06b5cc60c89a7",
+    "semantics_hash": "ed40a6d6e3f97ad764b35c51f1de3d10bc375e480d81f1a1dae122673206ea3e"
+  },
+  "source_pair_guard": {
+    "actual_source_db": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_copy_materializer_20260706_land_floor_deck612_package_candidate/knowledge_candidate.db",
+    "allow_chained_source": false,
+    "already_present_stage_add_cards": [],
+    "expected_source_db": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_copy_materializer_20260706_land_floor_deck612_package_candidate/knowledge_candidate.db",
+    "missing_protected_blocked_cut_cards": [],
+    "missing_stage_cut_cards": [],
+    "protected_blocked_cut_cards": [],
+    "source_matches_pair_report": true
+  },
+  "source_reports": [
+    "docs/hermes-analysis/master_optimizer_reports/global_commander_profile_repair_land_cut_reviewer_20260706_lorehold_land_floor_package_profile.json"
+  ],
+  "status": "candidate_materialized_structure_ready_next_gate_closed",
+  "structure_validation": {
+    "add_cards": [
+      "Bant Panorama",
+      "Brokers Hideout",
+      "Pyromancer's Goggles",
+      "Call Forth the Tempest",
+      "Birgi, God of Storytelling // Harnfel, Horn of Bounty"
+    ],
+    "checks": {
+      "added_roles_present": true,
+      "all_adds_present_once": true,
+      "all_cuts_absent": true,
+      "commander_count_1": true,
+      "nonbasic_singleton_ok": true,
+      "total_cards_100": true,
+      "unresolved_card_rows_0": true
+    },
+    "commander_count": 1,
+    "cut_cards": [
+      "Storm-Kiln Artist",
+      "Jeska's Will",
+      "Artist's Talent",
+      "Starfall Invocation",
+      "Brass's Bounty"
+    ],
+    "deck_summary": {
+      "avg_cmc": 3.047,
+      "cards": 100,
+      "deck_id": 612,
+      "hash": "ab2cd75c69f8a3a44cb3c2f6bc185b21cc60741e99c40bddf80617256f45d73e",
+      "lands": 36,
+      "nonlands": 64,
+      "ruleset_hash": "1440fc0f47cb56a9541c4026d294b03aa1c1d9955bb0b6b1217cc9b31d49b9c4",
+      "semantics_hash": "4afccfa2d2662fd5f6484e2d456e64412739e7c5d4fd3a6d0d8ff30a060e679a"
+    },
+    "duplicate_or_missing_add_cards": [],
+    "missing_added_role_cards": [],
+    "nonbasic_singleton_violations": [],
+    "retained_cut_cards": [],
+    "status": "pass",
+    "unresolved_card_rows": []
+  },
+  "summary": {
+    "add": "Bant Panorama",
+    "adds": [
+      "Bant Panorama",
+      "Brokers Hideout",
+      "Pyromancer's Goggles",
+      "Call Forth the Tempest",
+      "Birgi, God of Storytelling // Harnfel, Horn of Bounty"
+    ],
+    "allow_battle_gate_now": false,
+    "allow_next_strategy_matrix": true,
+    "candidate_deck_hash": "ab2cd75c69f8a3a44cb3c2f6bc185b21cc60741e99c40bddf80617256f45d73e",
+    "commander": "Lorehold, the Historian",
+    "cut": "Storm-Kiln Artist",
+    "cuts": [
+      "Storm-Kiln Artist",
+      "Jeska's Will",
+      "Artist's Talent",
+      "Starfall Invocation",
+      "Brass's Bounty"
+    ],
+    "deck_id": 612,
+    "pair_count": 5,
+    "promotion_allowed": false,
+    "role": "profile_repair_land_cut_review",
+    "source_artifact_type": "global_commander_profile_repair_land_cut_reviewer",
+    "source_candidate_hash_differs": true,
+    "source_deck_hash_after": "a5c2900f3344fda8cbfd2b40cd628e3415974ab4b33b987c270e56a4b585170b",
+    "source_deck_hash_before": "a5c2900f3344fda8cbfd2b40cd628e3415974ab4b33b987c270e56a4b585170b",
+    "source_matches_pair_report": true,
+    "source_unchanged": true,
+    "stage": null,
+    "stage_next_gate": "materialize_profile_repair_candidate_copy"
+  }
+}

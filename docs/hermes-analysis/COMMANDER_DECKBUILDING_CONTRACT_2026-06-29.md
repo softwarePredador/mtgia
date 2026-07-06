@@ -284,6 +284,11 @@ anchors consume same-lane cuts before land repairs consume the remaining pool.
 It must keep candidate copy, battle, mutation, and promotion closed; if only
 land-floor pairs remain blocked, the next gate is
 `review_land_floor_cut_role_loss_before_candidate_copy`.
+Run `global_commander_profile_repair_land_cut_reviewer.py` for that gate. It
+projects the whole repair package, not isolated land pairs, and may open only
+an isolated candidate copy when hard floors remain safe. After that copy,
+rerun package-chain and commander-specific strategy matrix gates before any
+battle probe.
 
 19. run `global_commander_payoff_source_lane_expander.py` when a commander
    payoff axis is too sparse for materialization; it must scan local Oracle
@@ -1768,8 +1773,21 @@ Current external refresh on 2026-07-05:
   `profile_repair_cut_pair_reorder_ready_for_land_curve_review`,
   `protected_anchor_ready_pair_count=3`, and `land_pair_review_count=2`
   because the two land-floor pairs still need curve and role-loss review. The
-  next gate is
-  `review_land_floor_cut_role_loss_before_candidate_copy`.
+  land-cut reviewer projects the full repaired package and accepts the two
+  land pairs for candidate copy with
+  `profile_repair_land_cut_review_ready_for_candidate_copy`,
+  `ready_land_pair_count=2`, `hard_floor_blocker_count=0`,
+  `candidate_copy_blocker_count=0`, and the projected land count becomes `36`
+  while draw, miracle, removal, protection, recursion, tutor, and wincon remain
+  in range. Its next gate is `materialize_profile_repair_candidate_copy`. It
+  still records high-function cut warnings for `Storm-Kiln Artist` and
+  `Jeska's Will`, so battle and promotion stay closed. The profile-repair
+  materializer then creates an isolated 5-swap candidate copy, proves the
+  source DB is unchanged, and the package chain audit passes with
+  `core_floor_repaired=true` and
+  `strategy_ready=true`. The commander-specific strategy matrix is now
+  `package_strategy_ready_for_battle_probe` with `blocker_count=0`. The next
+  gate is `run_equal_battle_probe_with_replay_exposure`.
   Current evidence:
   `global_commander_learning_priority_audit_20260706_ramp_axis_exhaustion_current.md`,
   `global_commander_cross_commander_role_axis_learning_pivot_20260706_ramp_axis_exhaustion_current.md`,
@@ -1793,7 +1811,15 @@ Current external refresh on 2026-07-05:
   then
   `global_commander_profile_repair_cut_pair_reviewer_20260706_lorehold_land_floor_package_profile.md`,
   then
-  `global_commander_profile_repair_cut_pair_reorderer_20260706_lorehold_land_floor_package_profile.md`.
+  `global_commander_profile_repair_cut_pair_reorderer_20260706_lorehold_land_floor_package_profile.md`,
+  then
+  `global_commander_profile_repair_land_cut_reviewer_20260706_lorehold_land_floor_package_profile.md`,
+  `global_commander_candidate_copy_materializer_20260706_lorehold_profile_repair_package.md`,
+  `global_commander_core_role_audit_20260706_lorehold_profile_repair_package_hermes_only.md`,
+  `global_commander_strategy_matrix_20260706_lorehold_profile_repair_package_hermes_only.md`,
+  `global_commander_candidate_package_chain_audit_20260706_lorehold_profile_repair_package.md`,
+  and
+  `global_commander_candidate_package_strategy_matrix_20260706_lorehold_profile_repair_package.md`.
 
 ## Global Commander Rollout - 2026-07-01
 

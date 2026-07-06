@@ -598,6 +598,80 @@ class GlobalCommanderCandidateCopyMaterializerTests(unittest.TestCase):
         self.assertNotIn("Birgi, God of Storytelling // Harnfel, Horn of Bounty", candidate_names)
         self.assertNotIn("Smuggler's Share", candidate_names)
 
+    def test_materializes_profile_repair_land_cut_review_pairs_only_in_candidate_copy(self) -> None:
+        tmp, source_db = self._db()
+        self.addCleanup(tmp.cleanup)
+        review_report = Path(tmp.name) / "profile_repair_land_cut_review.json"
+        review_report.write_text(
+            json.dumps(
+                {
+                    "artifact_type": "global_commander_profile_repair_land_cut_reviewer",
+                    "status": "profile_repair_land_cut_review_ready_for_candidate_copy",
+                    "candidate_copy_allowed_now": True,
+                    "source_db": str(source_db.resolve()),
+                    "summary": {
+                        "deck_id": "619",
+                        "commander": "Kaalia of the Vast",
+                        "next_gate": "materialize_profile_repair_candidate_copy",
+                    },
+                    "materialization_pairs": [
+                        {
+                            "add": "Arena of Glory",
+                            "cut": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+                            "role": "land",
+                        },
+                        {
+                            "add": "Despark",
+                            "cut": "Smuggler's Share",
+                            "role": "spot_interaction",
+                        },
+                    ],
+                }
+            ),
+            encoding="utf-8",
+        )
+
+        payload = audit.build_payload(
+            source_db=source_db,
+            pair_report=review_report,
+            out_prefix=Path(tmp.name) / "out",
+            deck_id="619",
+        )
+
+        candidate_db = Path(payload["candidate_db"])
+        self.assertEqual(payload["status"], "candidate_materialized_structure_ready_next_gate_closed")
+        self.assertTrue(payload["summary"]["source_unchanged"])
+        self.assertEqual(payload["summary"]["pair_count"], 2)
+        self.assertEqual(
+            payload["summary"]["source_artifact_type"],
+            "global_commander_profile_repair_land_cut_reviewer",
+        )
+        self.assertEqual(payload["summary"]["stage_next_gate"], "materialize_profile_repair_candidate_copy")
+        self.assertEqual([row["role"] for row in payload["model_pairs"]], ["land", "spot_interaction"])
+        self.assertEqual(payload["structure_validation"]["status"], "pass")
+
+        source_conn = sqlite3.connect(source_db)
+        candidate_conn = sqlite3.connect(candidate_db)
+        self.addCleanup(source_conn.close)
+        self.addCleanup(candidate_conn.close)
+
+        source_names = {
+            row[0]
+            for row in source_conn.execute("SELECT card_name FROM deck_cards WHERE deck_id=619").fetchall()
+        }
+        candidate_names = {
+            row[0]
+            for row in candidate_conn.execute("SELECT card_name FROM deck_cards WHERE deck_id=619").fetchall()
+        }
+        self.assertIn("Birgi, God of Storytelling // Harnfel, Horn of Bounty", source_names)
+        self.assertIn("Smuggler's Share", source_names)
+        self.assertNotIn("Arena of Glory", source_names)
+        self.assertNotIn("Despark", source_names)
+        self.assertIn("Arena of Glory", candidate_names)
+        self.assertIn("Despark", candidate_names)
+        self.assertNotIn("Birgi, God of Storytelling // Harnfel, Horn of Bounty", candidate_names)
+        self.assertNotIn("Smuggler's Share", candidate_names)
+
 
 if __name__ == "__main__":
     unittest.main()

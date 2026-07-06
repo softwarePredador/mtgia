@@ -223,6 +223,12 @@ GLOBAL_COMMANDER_PROFILE_REPAIR_CUT_PAIR_REORDERER = (
 GLOBAL_COMMANDER_PROFILE_REPAIR_CUT_PAIR_REORDERER_TEST = (
     SCRIPT_DIR / "test_global_commander_profile_repair_cut_pair_reorderer.py"
 )
+GLOBAL_COMMANDER_PROFILE_REPAIR_LAND_CUT_REVIEWER = (
+    SCRIPT_DIR / "global_commander_profile_repair_land_cut_reviewer.py"
+)
+GLOBAL_COMMANDER_PROFILE_REPAIR_LAND_CUT_REVIEWER_TEST = (
+    SCRIPT_DIR / "test_global_commander_profile_repair_land_cut_reviewer.py"
+)
 GLOBAL_COMMANDER_PAYOFF_SOURCE_LANE_EXPANDER = (
     SCRIPT_DIR / "global_commander_payoff_source_lane_expander.py"
 )
@@ -701,6 +707,30 @@ GLOBAL_COMMANDER_LAND_FLOOR_PACKAGE_PROFILE_REPAIR_CUT_PAIR_REVIEW_REPORT = (
 GLOBAL_COMMANDER_LAND_FLOOR_PACKAGE_PROFILE_REPAIR_CUT_PAIR_REORDER_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_profile_repair_cut_pair_reorderer_20260706_lorehold_land_floor_package_profile.md"
+)
+GLOBAL_COMMANDER_LAND_FLOOR_PACKAGE_PROFILE_REPAIR_LAND_CUT_REVIEW_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_profile_repair_land_cut_reviewer_20260706_lorehold_land_floor_package_profile.md"
+)
+GLOBAL_COMMANDER_LOREHOLD_PROFILE_REPAIR_MATERIALIZER_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_copy_materializer_20260706_lorehold_profile_repair_package.md"
+)
+GLOBAL_COMMANDER_LOREHOLD_PROFILE_REPAIR_CORE_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_core_role_audit_20260706_lorehold_profile_repair_package_hermes_only.md"
+)
+GLOBAL_COMMANDER_LOREHOLD_PROFILE_REPAIR_STRATEGY_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_strategy_matrix_20260706_lorehold_profile_repair_package_hermes_only.md"
+)
+GLOBAL_COMMANDER_LOREHOLD_PROFILE_REPAIR_CHAIN_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_package_chain_audit_20260706_lorehold_profile_repair_package.md"
+)
+GLOBAL_COMMANDER_LOREHOLD_PROFILE_REPAIR_PACKAGE_STRATEGY_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_package_strategy_matrix_20260706_lorehold_profile_repair_package.md"
 )
 GLOBAL_COMMANDER_CANDIDATE_BATTLE_PROBE_REPORT = (
     REPO_ROOT
@@ -1243,6 +1273,10 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_profile_repair_package_resynthesizer_20260706_lorehold_land_floor_package_profile.md",
                 "global_commander_profile_repair_cut_pair_reviewer_20260706_lorehold_land_floor_package_profile.md",
                 "global_commander_profile_repair_cut_pair_reorderer_20260706_lorehold_land_floor_package_profile.md",
+                "global_commander_profile_repair_land_cut_reviewer_20260706_lorehold_land_floor_package_profile.md",
+                "global_commander_candidate_copy_materializer_20260706_lorehold_profile_repair_package.md",
+                "global_commander_candidate_package_chain_audit_20260706_lorehold_profile_repair_package.md",
+                "global_commander_candidate_package_strategy_matrix_20260706_lorehold_profile_repair_package.md",
                 "commander_profile_not_available",
                 "profile_lands_below_target",
                 "protected anchor cuts",
@@ -1254,6 +1288,12 @@ def build_audit() -> dict[str, Any]:
                 "profile_repair_cut_pair_reorder_ready_for_land_curve_review",
                 "protected_anchor_ready_pair_count",
                 "review_land_floor_cut_role_loss_before_candidate_copy",
+                "profile_repair_land_cut_review_ready_for_candidate_copy",
+                "ready_land_pair_count=2",
+                "hard_floor_blocker_count=0",
+                "materialize_profile_repair_candidate_copy",
+                "package_strategy_ready_for_battle_probe",
+                "run_equal_battle_probe_with_replay_exposure",
                 "repair_commander_profile_blockers_before_battle",
                 "global_commander_external_exact_artifact_engine_source_expander.py",
                 "global_commander_external_exact_artifact_engine_source_expander_20260706_current.md",
@@ -2630,6 +2670,8 @@ def build_audit() -> dict[str, Any]:
                 "load_reduced_scope_pairs",
                 "global_commander_land_floor_package_synthesizer",
                 "load_land_floor_package_pairs",
+                "global_commander_profile_repair_land_cut_reviewer",
+                "load_profile_repair_land_cut_review_pairs",
                 "model_pairs",
                 "--stage",
                 "stage add cards are already present",
@@ -2652,6 +2694,8 @@ def build_audit() -> dict[str, Any]:
                 "test_materializes_value_safe_stage_pairs_only_in_candidate_copy",
                 "test_materializes_reduced_scope_pairs_only_in_candidate_copy",
                 "test_materializes_land_floor_package_pairs_only_in_candidate_copy",
+                "test_materializes_profile_repair_land_cut_review_pairs_only_in_candidate_copy",
+                "global_commander_profile_repair_land_cut_reviewer",
                 "source_matches_pair_report",
                 "Protected Payoff",
                 "Arena of Glory",
@@ -4123,6 +4167,33 @@ def build_audit() -> dict[str, Any]:
     )
     checks.append(
         check_contains(
+            GLOBAL_COMMANDER_PROFILE_REPAIR_LAND_CUT_REVIEWER,
+            [
+                "global_commander_profile_repair_land_cut_reviewer",
+                "profile_repair_land_cut_review_ready_for_candidate_copy",
+                "profile_repair_land_cut_review_blocks_candidate_copy",
+                "land_floor_cut_role_loss_review_ready_for_candidate_copy",
+                "projected_role_below_hard_floor",
+                "materialize_profile_repair_candidate_copy",
+                "materialization_pairs",
+                "battle_or_optimization_performed",
+                "candidate_copy_allowed_now",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_PROFILE_REPAIR_LAND_CUT_REVIEWER_TEST,
+            [
+                "test_accepts_land_cuts_when_projected_package_preserves_hard_floors",
+                "test_blocks_land_cut_when_projected_role_falls_below_hard_floor",
+                "profile_repair_land_cut_review_ready_for_candidate_copy",
+                "projected_role_below_hard_floor:mana_rocks_treasure_ramp",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
             GLOBAL_COMMANDER_PAYOFF_SOURCE_LANE_EXPANDER,
             [
                 "global_commander_payoff_source_lane_expander",
@@ -5059,6 +5130,104 @@ def build_audit() -> dict[str, Any]:
                 "land_floor_pair_needs_curve_and_role_loss_review",
                 "Pyromancer's Goggles",
                 "Call Forth the Tempest",
+                "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_LAND_FLOOR_PACKAGE_PROFILE_REPAIR_LAND_CUT_REVIEW_REPORT,
+            [
+                "Global Commander Profile Repair Land Cut Reviewer",
+                "profile_repair_land_cut_review_ready_for_candidate_copy",
+                "commander: `Lorehold, the Historian`",
+                "pair_count: `5`",
+                "land_pair_review_count: `2`",
+                "ready_land_pair_count: `2`",
+                "hard_floor_blocker_count: `0`",
+                "candidate_copy_allowed_now: `true`",
+                "battle_gate_allowed_now: `false`",
+                "promotion_allowed: `false`",
+                "next_gate: `materialize_profile_repair_candidate_copy`",
+                "Storm-Kiln Artist",
+                "Jeska's Will",
+                "land_cut_removes_high_function_nonland_roles",
+                "Candidate-Copy Blockers",
+                "none",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_LOREHOLD_PROFILE_REPAIR_MATERIALIZER_REPORT,
+            [
+                "Global Commander Candidate Copy Materializer",
+                "candidate_materialized_structure_ready_next_gate_closed",
+                "source_artifact_type: `global_commander_profile_repair_land_cut_reviewer`",
+                "candidate: `5` swap(s)",
+                "source_unchanged: `true`",
+                "source_matches_pair_report: `true`",
+                "allow_battle_gate_now: `false`",
+                "allow_next_strategy_matrix: `true`",
+                "Bant Panorama",
+                "Storm-Kiln Artist",
+                "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_LOREHOLD_PROFILE_REPAIR_CORE_REPORT,
+            [
+                "Global Commander Core Role Audit",
+                "core_review_ready",
+                "Lorehold, the Historian",
+                "land",
+                "36",
+                "ramp",
+                "19",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_LOREHOLD_PROFILE_REPAIR_STRATEGY_REPORT,
+            [
+                "Global Commander Strategy Matrix",
+                "Lorehold, the Historian",
+                "ready_for_strategy_matrix",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_LOREHOLD_PROFILE_REPAIR_CHAIN_REPORT,
+            [
+                "Global Commander Candidate Package Chain Audit",
+                "status: `pass`",
+                "swap_count: `5`",
+                "materializer_chain_pass: `true`",
+                "core_floor_repaired: `true`",
+                "strategy_ready: `true`",
+                "battle_gate_allowed_now: `false`",
+                "promotion_allowed: `false`",
+                "run_commander_specific_strategy_matrix_for_package_before_battle",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_LOREHOLD_PROFILE_REPAIR_PACKAGE_STRATEGY_REPORT,
+            [
+                "Global Commander Candidate Package Strategy Matrix",
+                "package_strategy_ready_for_battle_probe",
+                "commander: `Lorehold, the Historian`",
+                "battle_gate_allowed_now: `true`",
+                "promotion_allowed: `false`",
+                "blocker_count: `0`",
+                "next_gate: `run_equal_battle_probe_with_replay_exposure`",
+                "Bant Panorama",
+                "Storm-Kiln Artist",
                 "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
             ],
         )
