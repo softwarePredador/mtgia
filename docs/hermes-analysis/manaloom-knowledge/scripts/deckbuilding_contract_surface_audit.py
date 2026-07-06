@@ -72,6 +72,12 @@ GLOBAL_COMMANDER_ENGINE_CUT_TRACE_REPLACEMENT_GATE = (
 GLOBAL_COMMANDER_ENGINE_CUT_TRACE_REPLACEMENT_GATE_TEST = (
     SCRIPT_DIR / "test_global_commander_engine_cut_trace_replacement_gate.py"
 )
+GLOBAL_COMMANDER_ENGINE_CUT_TRACE_REPLACEMENT_REVIEWER = (
+    SCRIPT_DIR / "global_commander_engine_cut_trace_replacement_reviewer.py"
+)
+GLOBAL_COMMANDER_ENGINE_CUT_TRACE_REPLACEMENT_REVIEWER_TEST = (
+    SCRIPT_DIR / "test_global_commander_engine_cut_trace_replacement_reviewer.py"
+)
 GLOBAL_COMMANDER_CANDIDATE_COPY_MATERIALIZER = SCRIPT_DIR / "global_commander_candidate_copy_materializer.py"
 GLOBAL_COMMANDER_CANDIDATE_COPY_MATERIALIZER_TEST = (
     SCRIPT_DIR / "test_global_commander_candidate_copy_materializer.py"
@@ -445,6 +451,10 @@ GLOBAL_COMMANDER_ENGINE_CUT_FOLLOWUP_ROUTER_REPORT = (
 GLOBAL_COMMANDER_ENGINE_CUT_TRACE_REPLACEMENT_GATE_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_engine_cut_trace_replacement_gate_20260706_current.md"
+)
+GLOBAL_COMMANDER_ENGINE_CUT_TRACE_REPLACEMENT_REVIEWER_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_engine_cut_trace_replacement_reviewer_20260706_current.md"
 )
 GLOBAL_COMMANDER_CANDIDATE_COPY_MATERIALIZER_REPORT = (
     REPO_ROOT
@@ -1933,6 +1943,30 @@ def build_audit() -> dict[str, Any]:
                 "test_build_report_keeps_candidate_copy_closed",
                 "candidate_copy_closed_after_trace_replacement_gate",
                 "run_forced_access_trace_for_unexposed_engine_cut",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_ENGINE_CUT_TRACE_REPLACEMENT_REVIEWER,
+            [
+                "global_commander_engine_cut_trace_replacement_reviewer",
+                "engine_cut_trace_replacement_review_blocks_candidate_copy",
+                "trace_review_blocks_negative_clearance_equal_score_tutor_candidate",
+                "no_exact_artifact_spell_engine_replacement_proof",
+                "candidate_copy_allowed_now",
+                "mutation_allowed",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_ENGINE_CUT_TRACE_REPLACEMENT_REVIEWER_TEST,
+            [
+                "test_equal_score_tutor_candidate_blocks_negative_clearance",
+                "test_exact_artifact_spell_engine_candidate_is_counted",
+                "engine_cut_trace_replacement_review_blocks_candidate_copy",
+                "no_exact_artifact_spell_engine_replacement_proof",
             ],
         )
     )
@@ -3620,6 +3654,21 @@ def build_audit() -> dict[str, Any]:
                 "review_engine_cut_trace_results_before_candidate_copy",
                 "natural_trace_manual_negative_review_required:Archaeomancer's Map",
                 "replacement_candidates_require_source_trace_review",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_ENGINE_CUT_TRACE_REPLACEMENT_REVIEWER_REPORT,
+            [
+                "Global Commander Engine Cut Trace Replacement Reviewer",
+                "engine_cut_trace_replacement_review_blocks_candidate_copy",
+                "trace_blocked_count: `1`",
+                "explicit_same_lane_replacement_proof_count: `0`",
+                "candidate_copy_allowed_now: `false`",
+                "battle_gate_allowed_now: `false`",
+                "find_exact_artifact_spell_engine_replacement_or_new_engine_cut_before_candidate_copy",
+                "no_exact_artifact_spell_engine_replacement_proof",
             ],
         )
     )

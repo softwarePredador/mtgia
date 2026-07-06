@@ -302,6 +302,14 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `12` candidatos engine para substituir `Biotransference`, com `2` seeds
     mais fortes (`Storm-Kiln Artist` e `Pitiless Plunderer`), mas ainda sem
     prova same-lane suficiente para candidate copy.
+    A revisao de trace/replacement agora roda em
+    `manaloom-knowledge/scripts/global_commander_engine_cut_trace_replacement_reviewer.py`,
+    com evidencia:
+    `master_optimizer_reports/global_commander_engine_cut_trace_replacement_reviewer_20260706_current.md`.
+    Resultado: `Archaeomancer's Map` segue bloqueado porque apareceu como
+    opcao de tutor com score igual ao escolhido, nao ha prova exact same-lane
+    para substituir `Biotransference`, e candidate copy/battle/promocao seguem
+    fechados.
     Quando uma hipotese add/cut estiver pronta, rode
     `manaloom-knowledge/scripts/global_commander_candidate_copy_materializer.py`
     para materializar uma unica troca em copia isolada do Hermes SQLite. A

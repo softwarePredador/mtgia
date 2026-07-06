@@ -1,0 +1,182 @@
+{
+  "artifact_type": "global_commander_engine_cut_trace_replacement_reviewer",
+  "battle_gate_allowed_now": false,
+  "battle_gate_performed": false,
+  "battle_or_optimization_performed": false,
+  "candidate_copy_allowed_now": false,
+  "candidate_copy_blockers": [
+    "trace_review_blocks_negative_clearance:Archaeomancer's Map",
+    "no_exact_artifact_spell_engine_replacement_proof",
+    "candidate_copy_closed_after_trace_replacement_review"
+  ],
+  "deck_action_allowed": false,
+  "generated_at": "2026-07-06T04:28:57.251030+00:00",
+  "input_artifacts": {
+    "trace_replacement_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_engine_cut_trace_replacement_gate_20260706_current.json",
+    "trace_replacement_status": "engine_cut_trace_replacement_gate_needs_trace_review"
+  },
+  "mutation_allowed": false,
+  "policy": {
+    "mutation_boundary": "This reviewer reads report artifacts only and keeps candidate copy, battle, and promotion closed.",
+    "negative_trace_boundary": "Rejected or considered tutor candidates do not clear a cut just because they were not cast.",
+    "same_lane_boundary": "Artifact/treasure adjacency is not exact Biotransference replacement proof without artifact-spell or type-conversion engine overlap."
+  },
+  "postgres_writes": false,
+  "promotion_allowed": false,
+  "replacement_review": {
+    "adjacent_candidate_count": 10,
+    "adjacent_candidate_sample": [
+      {
+        "battle_gate_allowed": false,
+        "candidate_copy_allowed": false,
+        "card_name": "Mind Stone",
+        "color_identity": [],
+        "edhrec_rank": 31,
+        "mutation_allowed": false,
+        "oracle_excerpt": "{T}: Add {C}. {1}, {T}, Sacrifice this artifact: Draw a card.",
+        "role_signals": [
+          "artifact_engine_overlap"
+        ],
+        "status": "adjacent_engine_candidate_needs_explicit_same_lane_proof",
+        "type_line": "Artifact"
+      },
+      {
+        "battle_gate_allowed": false,
+        "candidate_copy_allowed": false,
+        "card_name": "Solemn Simulacrum",
+        "color_identity": [],
+        "edhrec_rank": 34,
+        "mutation_allowed": false,
+        "oracle_excerpt": "When this creature enters, you may search your library for a basic land card, put that card onto the battlefield tapped, then shuffle. When this creature dies, you may draw a card.",
+        "role_signals": [
+          "artifact_engine_overlap",
+          "engine_access_tutor"
+        ],
+        "status": "adjacent_engine_candidate_needs_explicit_same_lane_proof",
+        "type_line": "Artifact Creature \u2014 Golem"
+      },
+      {
+        "battle_gate_allowed": false,
+        "candidate_copy_allowed": false,
+        "card_name": "Commander's Sphere",
+        "color_identity": [],
+        "edhrec_rank": 39,
+        "mutation_allowed": false,
+        "oracle_excerpt": "{T}: Add one mana of any color in your commander's color identity. Sacrifice this artifact: Draw a card.",
+        "role_signals": [
+          "artifact_engine_overlap"
+        ],
+        "status": "adjacent_engine_candidate_needs_explicit_same_lane_proof",
+        "type_line": "Artifact"
+      },
+      {
+        "battle_gate_allowed": false,
+        "candidate_copy_allowed": false,
+        "card_name": "Phyrexian Arena",
+        "color_identity": [
+          "B"
+        ],
+        "edhrec_rank": 96,
+        "mutation_allowed": false,
+        "oracle_excerpt": "At the beginning of your upkeep, you draw a card and you lose 1 life.",
+        "role_signals": [
+          "slow_draw_engine"
+        ],
+        "status": "adjacent_engine_candidate_needs_explicit_same_lane_proof",
+        "type_line": "Enchantment"
+      },
+      {
+        "battle_gate_allowed": false,
+        "candidate_copy_allowed": false,
+        "card_name": "Wayfarer's Bauble",
+        "color_identity": [],
+        "edhrec_rank": 108,
+        "mutation_allowed": false,
+        "oracle_excerpt": "{2}, {T}, Sacrifice this artifact: Search your library for a basic land card, put that card onto the battlefield tapped, then shuffle.",
+        "role_signals": [
+          "engine_access_tutor"
+        ],
+        "status": "adjacent_engine_candidate_needs_explicit_same_lane_proof",
+        "type_line": "Artifact"
+      }
+    ],
+    "battle_gate_allowed": false,
+    "candidate_copy_allowed": false,
+    "downgraded_candidate_sample": [
+      {
+        "battle_gate_allowed": false,
+        "candidate_copy_allowed": false,
+        "card_name": "Storm-Kiln Artist",
+        "color_identity": [
+          "R"
+        ],
+        "edhrec_rank": 233,
+        "mutation_allowed": false,
+        "oracle_excerpt": "This creature gets +1/+0 for each artifact you control. Magecraft \u2014 Whenever you cast or copy an instant or sorcery spell, create a Treasure token. (It's an artifact with \"{T}, Sacrifice this token: Add one mana of any color.\")",
+        "role_signals": [
+          "artifact_engine_overlap",
+          "treasure_engine"
+        ],
+        "status": "same_lane_engine_candidate_needs_source_trace_review",
+        "type_line": "Creature \u2014 Dwarf Shaman"
+      },
+      {
+        "battle_gate_allowed": false,
+        "candidate_copy_allowed": false,
+        "card_name": "Pitiless Plunderer",
+        "color_identity": [
+          "B"
+        ],
+        "edhrec_rank": 237,
+        "mutation_allowed": false,
+        "oracle_excerpt": "Whenever another creature you control dies, create a Treasure token. (It's an artifact with \"{T}, Sacrifice this token: Add one mana of any color.\")",
+        "role_signals": [
+          "artifact_engine_overlap",
+          "treasure_engine"
+        ],
+        "status": "same_lane_engine_candidate_needs_source_trace_review",
+        "type_line": "Creature \u2014 Human Pirate"
+      }
+    ],
+    "downgraded_strong_candidate_count": 2,
+    "exact_artifact_engine_candidate_count": 0,
+    "exact_candidate_sample": [],
+    "explicit_same_lane_replacement_proof_count": 0,
+    "mutation_allowed": false,
+    "next_gate": "find_exact_artifact_spell_engine_replacement_or_new_engine_cut_before_candidate_copy",
+    "status": "replacement_review_downgrades_to_adjacent_engine_candidates"
+  },
+  "source_db_mutated": false,
+  "status": "engine_cut_trace_replacement_review_blocks_candidate_copy",
+  "summary": {
+    "adjacent_candidate_count": 10,
+    "candidate_copy_blocker_count": 3,
+    "downgraded_strong_candidate_count": 2,
+    "exact_artifact_engine_candidate_count": 0,
+    "explicit_same_lane_replacement_proof_count": 0,
+    "next_gate": "find_exact_artifact_spell_engine_replacement_or_new_engine_cut_before_candidate_copy",
+    "trace_blocked_count": 1,
+    "trace_negative_clearance_allowed_count": 0,
+    "trace_review_count": 1
+  },
+  "trace_review_rows": [
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Archaeomancer's Map",
+      "chosen_card": "The One Ring",
+      "chosen_tutor_score": 85.0,
+      "decision_trace_count": 1,
+      "exposure_event_count": 0,
+      "input_status": "engine_cut_natural_trace_seen_without_usage_needs_manual_negative_review",
+      "mutation_allowed": false,
+      "negative_clearance_allowed": false,
+      "next_gate": "find_different_engine_cut_or_exact_same_lane_replacement",
+      "reason": "card_was_equal_or_better_tutor_candidate",
+      "review_status": "trace_review_blocks_negative_clearance_equal_score_tutor_candidate",
+      "score_gap_vs_chosen": 0.0,
+      "tutor_candidate_score": 85,
+      "usage_event_count": 0
+    }
+  ]
+}
