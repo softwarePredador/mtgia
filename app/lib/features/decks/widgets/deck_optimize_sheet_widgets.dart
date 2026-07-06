@@ -185,6 +185,8 @@ class OptimizationPreviewDialog extends StatefulWidget {
   final VoidCallback onCancel;
   final ValueChanged<OptimizePreviewSelection> onConfirm;
   final Future<void> Function()? onCopyDebug;
+  final Future<String?> Function(Map<String, dynamic> payload)?
+  onCreateShareLink;
 
   const OptimizationPreviewDialog({
     super.key,
@@ -205,6 +207,7 @@ class OptimizationPreviewDialog extends StatefulWidget {
     required this.onCancel,
     required this.onConfirm,
     this.onCopyDebug,
+    this.onCreateShareLink,
   });
 
   @override
@@ -313,7 +316,42 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
   }
 
   Future<void> _shareReport() async {
-    await Share.share(_buildShareReport());
+    var text = _buildShareReport();
+    final createShareLink = widget.onCreateShareLink;
+    if (createShareLink != null) {
+      final link = await createShareLink(_buildSharePayload());
+      if (link != null && link.trim().isNotEmpty) {
+        text = '$text\n\nLink publico: $link';
+      }
+    }
+    await Share.share(text);
+  }
+
+  Map<String, dynamic> _buildSharePayload() {
+    List<Map<String, dynamic>> selected(
+      List<Map<String, dynamic>> items,
+      Set<int> selectedIndexes,
+    ) {
+      return selectedIndexes
+          .where((index) => index >= 0 && index < items.length)
+          .map((index) => Map<String, dynamic>.from(items[index]))
+          .toList(growable: false);
+    }
+
+    return {
+      'type': 'optimization_preview',
+      'plan_label': _planLabel,
+      'archetype': widget.archetype,
+      'intensity_label': _intensityLabel,
+      'selected_change_count': _selectedChangeCount,
+      'reasoning': widget.reasoning,
+      'before': widget.deckAnalysis,
+      'after': widget.postAnalysis,
+      'warnings': widget.warnings,
+      'meta_reference_context': widget.metaReferenceContext,
+      'removals': selected(widget.displayRemovals, _selectedRemovalIndexes),
+      'additions': selected(widget.displayAdditions, _selectedAdditionIndexes),
+    };
   }
 
   String _buildShareReport() {

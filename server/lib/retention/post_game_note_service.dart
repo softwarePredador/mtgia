@@ -1,0 +1,218 @@
+import 'dart:convert';
+
+import 'package:postgres/postgres.dart';
+
+class PostGameNoteService {
+  PostGameNoteService(this.pool);
+
+  final Pool pool;
+
+  Future<void> ensureSchema() async {
+    await pool.execute(
+      Sql.named('''
+        CREATE TABLE IF NOT EXISTS post_game_notes (
+          id TEXT PRIMARY KEY,
+          user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+          deck_id UUID NOT NULL REFERENCES decks(id) ON DELETE CASCADE,
+          created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          result TEXT NOT NULL DEFAULT '',
+          table_level TEXT NOT NULL DEFAULT '',
+          notes TEXT NOT NULL DEFAULT '',
+          performed_well JSONB NOT NULL DEFAULT '[]'::jsonb,
+          underperformed JSONB NOT NULL DEFAULT '[]'::jsonb,
+          issues JSONB NOT NULL DEFAULT '[]'::jsonb,
+          updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+        )
+      '''),
+    );
+    await pool.execute(
+      Sql.named('''
+        CREATE INDEX IF NOT EXISTS idx_post_game_notes_deck_created
+        ON post_game_notes (deck_id, created_at DESC)
+      '''),
+    );
+    await pool.execute(
+      Sql.named('''
+        CREATE INDEX IF NOT EXISTS idx_post_game_notes_user_updated
+        ON post_game_notes (user_id, updated_at DESC)
+      '''),
+    );
+  }
+
+  Future<bool> ownsDeck({
+    required String userId,
+    required String deckId,
+  }) async {
+    final result = await pool.execute(
+      Sql.named('''
+        SELECT 1
+        FROM decks
+        WHERE id = CAST(@deckId AS uuid)
+          AND user_id = CAST(@userId AS uuid)
+        LIMIT 1
+      '''),
+      parameters: {'deckId': deckId, 'userId': userId},
+    );
+    return result.isNotEmpty;
+  }
+
+  Future<List<Map<String, dynamic>>> listNotes({
+    required String userId,
+    required String deckId,
+  }) async {
+    await ensureSchema();
+    final result = await pool.execute(
+      Sql.named('''
+        SELECT id, deck_id, created_at, result, table_level, notes,
+               performed_well, underperformed, issues, updated_at
+        FROM post_game_notes
+        WHERE deck_id = CAST(@deckId AS uuid)
+          AND user_id = CAST(@userId AS uuid)
+        ORDER BY created_at DESC, updated_at DESC
+      '''),
+      parameters: {'deckId': deckId, 'userId': userId},
+    );
+
+    return result.map(_rowToJson).toList(growable: false);
+  }
+
+  Future<Map<String, dynamic>> upsertNote({
+    required String userId,
+    required String deckId,
+    required Map<String, dynamic> note,
+  }) async {
+    await ensureSchema();
+
+    final id = _cleanString(note['id']);
+    final createdAt = _cleanString(note['created_at']);
+    final result = _cleanString(note['result']);
+    final tableLevel = _cleanString(note['table_level']);
+    final notes = _cleanString(note['notes']);
+    final performedWell = _stringList(note['performed_well']);
+    final underperformed = _stringList(note['underperformed']);
+    final issues = _stringList(note['issues']);
+
+    final inserted = await pool.execute(
+      Sql.named('''
+        INSERT INTO post_game_notes (
+          id,
+          user_id,
+          deck_id,
+          created_at,
+          result,
+          table_level,
+          notes,
+          performed_well,
+          underperformed,
+          issues,
+          updated_at
+        )
+        VALUES (
+          @id,
+          CAST(@userId AS uuid),
+          CAST(@deckId AS uuid),
+          COALESCE(CAST(NULLIF(@createdAt, '') AS timestamptz), NOW()),
+          @result,
+          @tableLevel,
+          @notes,
+          @performedWell::jsonb,
+          @underperformed::jsonb,
+          @issues::jsonb,
+          NOW()
+        )
+        ON CONFLICT (id) DO UPDATE SET
+          result = EXCLUDED.result,
+          table_level = EXCLUDED.table_level,
+          notes = EXCLUDED.notes,
+          performed_well = EXCLUDED.performed_well,
+          underperformed = EXCLUDED.underperformed,
+          issues = EXCLUDED.issues,
+          updated_at = NOW()
+        WHERE post_game_notes.user_id = CAST(@userId AS uuid)
+          AND post_game_notes.deck_id = CAST(@deckId AS uuid)
+        RETURNING id, deck_id, created_at, result, table_level, notes,
+                  performed_well, underperformed, issues, updated_at
+      '''),
+      parameters: {
+        'id':
+            id.isEmpty ? DateTime.now().microsecondsSinceEpoch.toString() : id,
+        'userId': userId,
+        'deckId': deckId,
+        'createdAt': createdAt,
+        'result': result,
+        'tableLevel': tableLevel,
+        'notes': notes,
+        'performedWell': jsonEncode(performedWell),
+        'underperformed': jsonEncode(underperformed),
+        'issues': jsonEncode(issues),
+      },
+    );
+
+    if (inserted.isEmpty) {
+      throw StateError('Post-game note not found or permission denied.');
+    }
+
+    return _rowToJson(inserted.first);
+  }
+
+  Future<bool> deleteNote({
+    required String userId,
+    required String deckId,
+    required String noteId,
+  }) async {
+    await ensureSchema();
+    final result = await pool.execute(
+      Sql.named('''
+        DELETE FROM post_game_notes
+        WHERE id = @noteId
+          AND deck_id = CAST(@deckId AS uuid)
+          AND user_id = CAST(@userId AS uuid)
+        RETURNING id
+      '''),
+      parameters: {'noteId': noteId, 'deckId': deckId, 'userId': userId},
+    );
+    return result.isNotEmpty;
+  }
+
+  Map<String, dynamic> _rowToJson(ResultRow row) {
+    final map = row.toColumnMap();
+    return {
+      'id': map['id']?.toString() ?? '',
+      'deck_id': map['deck_id']?.toString() ?? '',
+      'created_at': _dateString(map['created_at']),
+      'result': map['result']?.toString() ?? '',
+      'table_level': map['table_level']?.toString() ?? '',
+      'notes': map['notes']?.toString() ?? '',
+      'performed_well': _stringList(map['performed_well']),
+      'underperformed': _stringList(map['underperformed']),
+      'issues': _stringList(map['issues']),
+      'updated_at': _dateString(map['updated_at']),
+    };
+  }
+
+  static String _cleanString(Object? value) => value?.toString().trim() ?? '';
+
+  static String? _dateString(Object? value) {
+    if (value is DateTime) return value.toIso8601String();
+    final text = value?.toString();
+    return text == null || text.trim().isEmpty ? null : text;
+  }
+
+  static List<String> _stringList(Object? value) {
+    final raw = value is String ? _decodeJsonList(value) : value;
+    if (raw is! List) return const <String>[];
+    return raw
+        .map((entry) => entry.toString().trim())
+        .where((entry) => entry.isNotEmpty)
+        .toSet()
+        .toList(growable: false);
+  }
+
+  static Object? _decodeJsonList(String value) {
+    try {
+      return jsonDecode(value);
+    } catch (_) {
+      return const <String>[];
+    }
+  }
+}

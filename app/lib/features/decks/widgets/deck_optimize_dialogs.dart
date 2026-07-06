@@ -141,6 +141,7 @@ Future<OptimizePreviewSelection?> showOptimizationPreviewDialog(
   required List<Map<String, dynamic>> displayRemovals,
   required List<Map<String, dynamic>> displayAdditions,
   Future<void> Function()? onCopyDebug,
+  Future<String?> Function(Map<String, dynamic> payload)? onCreateShareLink,
 }) {
   return showDialog<OptimizePreviewSelection>(
     context: context,
@@ -163,6 +164,7 @@ Future<OptimizePreviewSelection?> showOptimizationPreviewDialog(
           onCancel: () => Navigator.pop(ctx),
           onConfirm: (selection) => Navigator.pop(ctx, selection),
           onCopyDebug: onCopyDebug,
+          onCreateShareLink: onCreateShareLink,
         ),
   );
 }

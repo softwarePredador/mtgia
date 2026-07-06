@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
+import '../../../core/api/api_client.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/friendly_error_mapper.dart';
 import '../../../core/widgets/app_state_panel.dart';
@@ -1518,6 +1519,29 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
     );
   }
 
+  Future<String?> _createOptimizationShareLink(
+    Map<String, dynamic> payload,
+  ) async {
+    try {
+      final response = await ApiClient()
+          .post('/decks/${Uri.encodeComponent(widget.deckId)}/reports', {
+            'title': 'Relatorio ManaLoom - otimizacao',
+            'description':
+                'Relatorio antes/depois gerado pelo preview de otimizacao.',
+            'payload': payload,
+          });
+      if (response.statusCode != 201 ||
+          response.data is! Map<String, dynamic>) {
+        return null;
+      }
+      final data = response.data as Map<String, dynamic>;
+      final publicUrl = data['public_url']?.toString().trim();
+      return publicUrl == null || publicUrl.isEmpty ? null : publicUrl;
+    } catch (_) {
+      return null;
+    }
+  }
+
   Future<void> _handleOptimizeAiFailure(
     BuildContext context,
     DeckProvider deckProvider,
@@ -1688,6 +1712,7 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
                     showOptimizeDebugCopiedSnackBar(context);
                   }
                   : null,
+          onCreateShareLink: _createOptimizationShareLink,
         );
         if (selection == null) return null;
         return buildOptimizeApplyPlan(preview, selection: selection);

@@ -175,5 +175,26 @@ void main() {
       expect(down, contains('drop column if exists logical_rule_key'));
       expect(down, contains('primary key (normalized_name)'));
     });
+
+    test('migration 030 persists retention and shareable report tables', () {
+      final migration = migrate.migrations.singleWhere(
+        (migration) => migration.version == '030',
+      );
+      final up = migration.up.toLowerCase();
+      final down = migration.down!.toLowerCase();
+
+      expect(
+        migration.name,
+        equals('create_retention_and_shareable_report_tables'),
+      );
+      expect(up, contains('create table if not exists post_game_notes'));
+      expect(up, contains('create table if not exists shared_deck_reports'));
+      expect(up, contains('performed_well jsonb'));
+      expect(up, contains('payload jsonb not null'));
+      expect(up, contains('idx_post_game_notes_deck_created'));
+      expect(up, contains('idx_shared_deck_reports_public_updated'));
+      expect(down, contains('drop table if exists shared_deck_reports'));
+      expect(down, contains('drop table if exists post_game_notes'));
+    });
   });
 }

@@ -891,6 +891,58 @@ final migrations = <Migration>[
       DROP COLUMN IF EXISTS execution_status;
     ''',
   ),
+  Migration(
+    version: '030',
+    name: 'create_retention_and_shareable_report_tables',
+    up: '''
+      CREATE TABLE IF NOT EXISTS post_game_notes (
+        id TEXT PRIMARY KEY,
+        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        deck_id UUID NOT NULL REFERENCES decks(id) ON DELETE CASCADE,
+        created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        result TEXT NOT NULL DEFAULT '',
+        table_level TEXT NOT NULL DEFAULT '',
+        notes TEXT NOT NULL DEFAULT '',
+        performed_well JSONB NOT NULL DEFAULT '[]'::jsonb,
+        underperformed JSONB NOT NULL DEFAULT '[]'::jsonb,
+        issues JSONB NOT NULL DEFAULT '[]'::jsonb,
+        updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_post_game_notes_deck_created
+      ON post_game_notes (deck_id, created_at DESC);
+
+      CREATE INDEX IF NOT EXISTS idx_post_game_notes_user_updated
+      ON post_game_notes (user_id, updated_at DESC);
+
+      CREATE TABLE IF NOT EXISTS shared_deck_reports (
+        id TEXT PRIMARY KEY,
+        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        deck_id UUID REFERENCES decks(id) ON DELETE SET NULL,
+        title TEXT NOT NULL,
+        description TEXT NOT NULL DEFAULT '',
+        payload JSONB NOT NULL,
+        is_public BOOLEAN NOT NULL DEFAULT TRUE,
+        created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        expires_at TIMESTAMP WITH TIME ZONE
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_shared_deck_reports_deck_created
+      ON shared_deck_reports (deck_id, created_at DESC);
+
+      CREATE INDEX IF NOT EXISTS idx_shared_deck_reports_public_updated
+      ON shared_deck_reports (is_public, updated_at DESC);
+    ''',
+    down: '''
+      DROP INDEX IF EXISTS idx_shared_deck_reports_public_updated;
+      DROP INDEX IF EXISTS idx_shared_deck_reports_deck_created;
+      DROP TABLE IF EXISTS shared_deck_reports CASCADE;
+      DROP INDEX IF EXISTS idx_post_game_notes_user_updated;
+      DROP INDEX IF EXISTS idx_post_game_notes_deck_created;
+      DROP TABLE IF EXISTS post_game_notes CASCADE;
+    ''',
+  ),
 ];
 
 class Migration {

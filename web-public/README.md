@@ -6,7 +6,7 @@ Arquitetura alvo:
 
 - `manaloom.com/*`: Next.js publico para SEO, descoberta, compartilhamento e conversao.
 - `manaloom.com/app/*`: Flutter Web logado para deck builder, IA, colecao, pos-jogo, comunidade, trade e notificacoes.
-- Integração atual: home e marketplace leem status, anúncios, imagens, preços, decks públicos e market movers do servidor ManaLoom quando disponível.
+- Integração atual: home, marketplace, decks públicos e relatórios compartilháveis leem status, anúncios, imagens, preços, decks, reports e market movers do servidor ManaLoom quando disponível.
 - Planos e capacidades públicas refletem contratos existentes do app/backend; não há cards, posts, perfis ou relatórios de demonstração.
 
 ## Instalar
@@ -75,7 +75,7 @@ web-public/
 
 Não há fonte mockada para conteúdo público. As fontes atuais ficam em:
 
-- `src/lib/public-server.ts`: `/health`, `/community/marketplace`, `/market/movers`, `/community/decks`, `/community/decks/:id`, `/community/users/:id`.
+- `src/lib/public-server.ts`: `/health`, `/community/marketplace`, `/market/movers`, `/community/decks`, `/community/decks/:id`, `/community/users/:id`, `/reports/:id`.
 - `src/lib/product-data.ts`: capacidades reais do produto e planos espelhados do contrato do app (`app/lib/features/commercial/models/manaloom_plan.dart`).
 
 Quando um endpoint não retorna dados, a interface mostra estado vazio ou 404. Ela não preenche com exemplos fictícios.
@@ -98,7 +98,7 @@ Substituicao recomendada para novas áreas:
 
 ## Proximos passos
 
-- Criar contrato público real para relatórios compartilháveis antes de reativar `/reports/[id]`.
+- Validar `/reports/[id]` com relatórios reais criados pelo app antes de campanha pública.
 - Criar contrato editorial real antes de publicar posts em `/blog/[slug]`.
 - Definir deploy/rewrite para servir Flutter Web em `/app`.
 - Adicionar imagens OG reais quando a identidade visual publica estiver fechada.

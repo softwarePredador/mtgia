@@ -7,12 +7,21 @@ void main() {
     final route = File(
       'routes/users/me/plan/checkout/index.dart',
     ).readAsStringSync();
+    final provider =
+        File('lib/billing/payment_provider.dart').readAsStringSync();
+    final webhook =
+        File('routes/billing/webhook/index.dart').readAsStringSync();
 
-    expect(route, contains('MANALOOM_INTERNAL_CHECKOUT_ENABLED'));
-    expect(route, contains('ALLOW_INTERNAL_PRO_ACTIVATION'));
-    expect(route, contains('MANALOOM_PRO_CHECKOUT_URL'));
-    expect(route, contains('payment_provider_not_configured'));
-    expect(route, contains('PlanService(pool).activatePro(userId)'));
+    expect(route, contains('ManaLoomPaymentProvider(pool: pool)'));
+    expect(route, isNot(contains('activatePro(userId)')));
+    expect(provider, contains('MANALOOM_INTERNAL_CHECKOUT_ENABLED'));
+    expect(provider, contains('ALLOW_INTERNAL_PRO_ACTIVATION'));
+    expect(provider, contains('MANALOOM_PRO_CHECKOUT_URL'));
+    expect(provider, contains('payment_provider_not_configured'));
+    expect(provider, contains('_verifyHmacSha256'));
+    expect(provider, contains('provider_adapter_not_implemented'));
+    expect(webhook, contains('verifyWebhook'));
+    expect(webhook, contains('context.request.body()'));
   });
 
   test('plan service persists Pro with renewal window', () {

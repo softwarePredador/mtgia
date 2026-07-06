@@ -14,7 +14,7 @@ class PostGameNotesScreen extends StatefulWidget {
 }
 
 class _PostGameNotesScreenState extends State<PostGameNotesScreen> {
-  final _store = PostGameNoteStore();
+  final _store = PostGameNoteStore(remoteClient: ApiPostGameNoteRemoteClient());
   final _resultController = TextEditingController();
   final _tableLevelController = TextEditingController(text: 'Casual');
   final _notesController = TextEditingController();

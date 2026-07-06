@@ -101,6 +101,17 @@ export type PublicDeckCard = {
   rarity?: string;
 };
 
+export type PublicSharedReport = {
+  id: string;
+  deckId?: string;
+  title: string;
+  description?: string;
+  payload: Record<string, unknown>;
+  createdAt?: string;
+  updatedAt?: string;
+  expiresAt?: string | null;
+};
+
 export type PublicUserProfile = {
   id: string;
   username?: string;
@@ -236,6 +247,17 @@ type PublicDeckCardResponse = {
   image_url?: string | null;
   set_code?: string | null;
   rarity?: string | null;
+};
+
+type PublicSharedReportResponse = {
+  id?: string;
+  deck_id?: string | null;
+  title?: string;
+  description?: string | null;
+  payload?: Record<string, unknown> | null;
+  created_at?: string | null;
+  updated_at?: string | null;
+  expires_at?: string | null;
 };
 
 type PublicUserProfileResponse = {
@@ -565,5 +587,25 @@ export async function loadPublicUserProfile(id: string): Promise<PublicUserProfi
     followingCount: user.following_count,
     publicDeckCount: user.public_deck_count,
     publicDecks: (payload?.public_decks ?? []).map(mapDeckSummary).filter((deck): deck is PublicDeckSummary => deck !== null)
+  };
+}
+
+export async function loadPublicReport(id: string): Promise<PublicSharedReport | null> {
+  const baseUrl = getServerBaseUrl();
+  const payload = await fetchJson<PublicSharedReportResponse>(baseUrl, `/reports/${encodeURIComponent(id)}`);
+
+  if (!payload?.id || !payload.title || !payload.payload) {
+    return null;
+  }
+
+  return {
+    id: payload.id,
+    deckId: payload.deck_id ?? undefined,
+    title: payload.title,
+    description: payload.description ?? undefined,
+    payload: payload.payload,
+    createdAt: payload.created_at ?? undefined,
+    updatedAt: payload.updated_at ?? undefined,
+    expiresAt: payload.expires_at ?? undefined
   };
 }
