@@ -1,0 +1,164 @@
+{
+  "artifact_type": "global_commander_external_nonpayoff_manual_negative_trace_reviewer",
+  "battle_gate_allowed_now": false,
+  "battle_gate_performed": false,
+  "battle_or_optimization_performed": false,
+  "battle_replay_performed": false,
+  "candidate_copy_allowed_now": false,
+  "candidate_copy_blockers": [
+    "manual_negative_review_cleared_no_current_deck_cards",
+    "static_or_land_seen_without_usage_is_not_cut_permission",
+    "candidate_copy_closed_until_fresh_cut_source_or_explicit_same_lane_replacement_exists"
+  ],
+  "card_level_cut_permission_now": false,
+  "deck_action_allowed": false,
+  "generated_at": "2026-07-06T03:25:16.412110+00:00",
+  "input_artifacts": {
+    "negative_review_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_current_deck_negative_review_collector_20260706_kaalia_value_safe_stage1_live_research.json",
+    "recovery_router_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_seed_exhaustion_recovery_router_20260706_kaalia_value_safe_stage1_live_research.json"
+  },
+  "manual_negative_review_cleared_now": false,
+  "mutation_allowed": false,
+  "policy": {
+    "land_lane_boundary": "Land play and mana-base context must route through mana-base review, not generic nonuse.",
+    "manual_review_boundary": "Manual negative trace review can block weak cut evidence but does not create add/cut permission.",
+    "mutation_boundary": "This reviewer does not copy decks, mutate DBs, run battles, reclassify cuts, or promote packages.",
+    "static_effect_boundary": "Passive or static effects require stronger negative evidence than lack of activation logs."
+  },
+  "postgres_writes": false,
+  "promotion_allowed": false,
+  "review_rows": [
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "card_name": "Grand Abolisher",
+      "collector_status": "external_current_deck_candidate_seen_without_usage_needs_manual_negative_review",
+      "decision": "passive_static_effect_needs_stronger_negative_evidence",
+      "decision_trace_count": 2,
+      "event_types": {
+        "priority_pass": 1,
+        "turn_end": 1
+      },
+      "exposure_event_count": 1,
+      "first_decision_trace": {
+        "event": "pass_no_action",
+        "player": "Kaalia of the Vast",
+        "turn": 8
+      },
+      "first_exposure_event": {
+        "event": "turn_end",
+        "player": "Kaalia of the Vast",
+        "turn": 8
+      },
+      "first_usage_event": null,
+      "manual_negative_review_cleared_now": false,
+      "manual_review_status": "manual_negative_trace_review_blocks_static_silence_without_activation",
+      "reason": "Static silence effects do not require an activation/cast event after they are on board.",
+      "source_role_terms": [
+        "can't cast spells"
+      ],
+      "source_type_line": "Creature \u2014 Human Cleric",
+      "target_cut_role": "haste_protection_silence",
+      "usage_event_count": 0,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "card_name": "Silence",
+      "collector_status": "external_current_deck_candidate_used_by_target_blocks_negative_review",
+      "decision": "not_cuttable_from_current_trace",
+      "decision_trace_count": 18,
+      "event_types": {
+        "cast_announced": 3,
+        "cost_paid": 3,
+        "priority_pass": 2,
+        "spell_cast": 3,
+        "spell_resolved": 3,
+        "turn_end": 1
+      },
+      "exposure_event_count": 1,
+      "first_decision_trace": {
+        "event": "pass_no_action",
+        "player": "Kaalia of the Vast",
+        "turn": 4
+      },
+      "first_exposure_event": {
+        "event": "turn_end",
+        "player": "Kaalia of the Vast",
+        "turn": 11
+      },
+      "first_usage_event": {
+        "card": "Voice of Victory",
+        "event": "cast_announced",
+        "player": "Kaalia of the Vast",
+        "turn": 5
+      },
+      "manual_negative_review_cleared_now": false,
+      "manual_review_status": "manual_negative_trace_review_blocks_used_current_deck_card",
+      "reason": "Target-deck usage was observed, so negative review cannot clear this card.",
+      "source_role_terms": [
+        "can't cast spells",
+        "can't cast spells this turn"
+      ],
+      "source_type_line": "Instant",
+      "target_cut_role": "haste_protection_silence",
+      "usage_event_count": 12,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "card_name": "Arena of Glory",
+      "collector_status": "external_current_deck_candidate_seen_without_usage_needs_manual_negative_review",
+      "decision": "land_seen_without_explicit_mode_use_is_not_cut_proof",
+      "decision_trace_count": 1,
+      "event_types": {
+        "land_played": 7,
+        "turn_end": 17,
+        "turn_start": 2
+      },
+      "exposure_event_count": 19,
+      "first_decision_trace": {
+        "event": "mulligan_decision",
+        "player": "Kaalia of the Vast",
+        "turn": 0
+      },
+      "first_exposure_event": {
+        "event": "turn_start",
+        "player": "Kaalia of the Vast",
+        "turn": 1
+      },
+      "first_usage_event": null,
+      "manual_negative_review_cleared_now": false,
+      "manual_review_status": "manual_negative_trace_review_blocks_land_lane_seen_without_usage",
+      "reason": "A land or land-lane card can carry mana/color/haste value without an explicit usage event.",
+      "source_role_terms": [
+        "add {",
+        "add {r}"
+      ],
+      "source_type_line": "Land",
+      "target_cut_role": "mana_acceleration",
+      "usage_event_count": 0,
+      "value_safe_reclassification_allowed": false
+    }
+  ],
+  "source_db_mutated": false,
+  "status": "external_nonpayoff_manual_negative_trace_review_blocks_current_deck_cuts",
+  "summary": {
+    "candidate_copy_allowed_count": 0,
+    "card_level_cut_permission_count": 0,
+    "commander": "Kaalia of the Vast",
+    "deck_id": "619",
+    "land_lane_blocked_count": 1,
+    "manual_negative_review_cleared_count": 0,
+    "manual_review_candidate_count": 3,
+    "next_gate": "find_new_external_source_or_explicit_same_lane_replacement_proof",
+    "static_silence_blocked_count": 1,
+    "used_blocked_count": 1
+  },
+  "value_safe_reclassification_allowed_now": false
+}

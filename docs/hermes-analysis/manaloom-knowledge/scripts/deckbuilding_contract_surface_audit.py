@@ -282,6 +282,12 @@ GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_CURRENT_DECK_NEGATIVE_REVIEW_COLLECTOR = (
 GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_CURRENT_DECK_NEGATIVE_REVIEW_COLLECTOR_TEST = (
     SCRIPT_DIR / "test_global_commander_external_nonpayoff_current_deck_negative_review_collector.py"
 )
+GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_MANUAL_NEGATIVE_TRACE_REVIEWER = (
+    SCRIPT_DIR / "global_commander_external_nonpayoff_manual_negative_trace_reviewer.py"
+)
+GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_MANUAL_NEGATIVE_TRACE_REVIEWER_TEST = (
+    SCRIPT_DIR / "test_global_commander_external_nonpayoff_manual_negative_trace_reviewer.py"
+)
 GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_NEW_SOURCE_OR_REPLACEMENT_FINDER = (
     SCRIPT_DIR / "global_commander_external_nonpayoff_new_source_or_replacement_finder.py"
 )
@@ -675,6 +681,10 @@ GLOBAL_COMMANDER_SCOPE1_EXTERNAL_NONPAYOFF_SEED_EXHAUSTION_RECOVERY_ROUTER_LIVE_
 GLOBAL_COMMANDER_SCOPE1_EXTERNAL_NONPAYOFF_CURRENT_DECK_NEGATIVE_REVIEW_COLLECTOR_LIVE_RESEARCH_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_current_deck_negative_review_collector_20260706_kaalia_value_safe_stage1_live_research.md"
+)
+GLOBAL_COMMANDER_SCOPE1_EXTERNAL_NONPAYOFF_MANUAL_NEGATIVE_TRACE_REVIEWER_LIVE_RESEARCH_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_manual_negative_trace_reviewer_20260706_kaalia_value_safe_stage1_live_research.md"
 )
 GLOBAL_COMMANDER_SCOPE1_EXTERNAL_NONPAYOFF_SEED_EXHAUSTION_RECOVERY_ROUTER_EXPANDED_SOURCES_REPORT = (
     REPO_ROOT
@@ -2618,6 +2628,28 @@ def build_audit() -> dict[str, Any]:
     )
     checks.append(
         check_contains(
+            GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_MANUAL_NEGATIVE_TRACE_REVIEWER,
+            [
+                "global_commander_external_nonpayoff_manual_negative_trace_reviewer",
+                "manual_negative_trace_review_blocks_static_silence_without_activation",
+                "manual_negative_trace_review_blocks_land_lane_seen_without_usage",
+                "candidate_copy_allowed_now",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_MANUAL_NEGATIVE_TRACE_REVIEWER_TEST,
+            [
+                "test_static_and_land_seen_without_usage_do_not_clear_negative_review",
+                "Grand Abolisher",
+                "Arena of Glory",
+                "Silence",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
             GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_NEW_SOURCE_OR_REPLACEMENT_FINDER,
             [
                 "global_commander_external_nonpayoff_new_source_or_replacement_finder",
@@ -4426,6 +4458,23 @@ def build_audit() -> dict[str, Any]:
                 "usage_blocked_candidate_count: `1`",
                 "seen_without_usage_count: `2`",
                 "negative_review_cleared_count: `0`",
+                "Grand Abolisher",
+                "Silence",
+                "Arena of Glory",
+                "find_new_external_source_or_explicit_same_lane_replacement_proof",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SCOPE1_EXTERNAL_NONPAYOFF_MANUAL_NEGATIVE_TRACE_REVIEWER_LIVE_RESEARCH_REPORT,
+            [
+                "Global Commander External Nonpayoff Manual Negative Trace Reviewer",
+                "external_nonpayoff_manual_negative_trace_review_blocks_current_deck_cuts",
+                "manual_negative_review_cleared_count: `0`",
+                "used_blocked_count: `1`",
+                "static_silence_blocked_count: `1`",
+                "land_lane_blocked_count: `1`",
                 "Grand Abolisher",
                 "Silence",
                 "Arena of Glory",

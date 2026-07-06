@@ -887,7 +887,14 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `Arena of Glory`; o coletor bloqueia tudo (`Silence` usada pelo alvo,
     `Grand Abolisher` e `Arena of Glory` vistos sem uso), com
     `negative_review_cleared_count=0`. Candidate copy, battle, promocao e
-    value-safe reclassification seguem fechados.
+    value-safe reclassification seguem fechados. O revisor manual fica em
+    `global_commander_external_nonpayoff_manual_negative_trace_reviewer_20260706_kaalia_value_safe_stage1_live_research.md`
+    e bloqueia novamente os tres casos: `Silence` por uso do alvo,
+    `Grand Abolisher` como efeito estatico/passivo de silence, e
+    `Arena of Glory` como land-lane/mana-base onde land play nao e nonuse
+    generico. `manual_negative_review_cleared_count=0`,
+    `candidate_copy_allowed_count=0`; o proximo gate segue
+    `find_new_external_source_or_explicit_same_lane_replacement_proof`.
     Observacao operacional: snapshots historicos de candidate-copy, battle-probe,
     battle-feedback e package-chain dependem de artefatos locais ignorados. Se
     faltarem ou forem regenerados sem esses artefatos, a auditoria de superficie

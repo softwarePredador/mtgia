@@ -486,7 +486,13 @@ Operational priority after this pivot:
     deck presence, Commander legality, land-lane routing, prior recycling, and
     role text, and keep card-level cut permission, candidate copy, battle,
     promotion, and value-safe reclassification closed;
-65. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
+65. run `global_commander_external_nonpayoff_manual_negative_trace_reviewer.py`
+    after current-deck negative review finds candidates seen without usage; it
+    must distinguish used cards, static/passive effects, land-lane context, and
+    weak seen-without-usage evidence before any cut consideration. It may block
+    weak negative evidence only; it must keep card-level cut permission,
+    candidate copy, battle, promotion, and value-safe reclassification closed;
+66. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
     probes, as regression evidence only unless they produce a named safe cut and
     equal-gate proof under the Lorehold promotion gate.
 
@@ -502,6 +508,7 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_land_cut_candidate_model_20260705_global_goal_hermes_only.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_nonland_core_candidate_model_20260705_global_goal_hermes_only.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_learning_priority_audit_20260706_source_exhaustion_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_manual_negative_trace_reviewer_20260706_kaalia_value_safe_stage1_live_research.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_copy_materializer_20260705_kaalia_nonland_top_pair.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_battle_probe_audit_20260705_kaalia_nonland_floor_dynamic_target.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_battle_feedback_model_20260705_current.md`
@@ -1363,6 +1370,13 @@ Current external refresh on 2026-07-05:
   `Silence` was used by the target, while `Grand Abolisher` and `Arena of
   Glory` were seen without usage and need manual negative trace review before
   any cut consideration. `negative_review_cleared_count=0`, so the next gate is
+  `find_new_external_source_or_explicit_same_lane_replacement_proof`.
+- Manual negative trace review blocks those three live candidates without
+  creating cut permission: `Silence` remains blocked because target usage was
+  observed, `Grand Abolisher` is blocked as a static silence effect without
+  activation proof, and `Arena of Glory` is blocked as a land-lane/mana-base
+  card where land play is not generic nonuse. `manual_negative_review_cleared_count=0`,
+  `candidate_copy_allowed_count=0`, and the next gate remains
   `find_new_external_source_or_explicit_same_lane_replacement_proof`.
 
 ## Global Commander Rollout - 2026-07-01
