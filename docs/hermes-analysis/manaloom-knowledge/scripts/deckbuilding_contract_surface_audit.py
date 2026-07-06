@@ -204,6 +204,12 @@ GLOBAL_COMMANDER_SAME_LANE_CUT_EVIDENCE_PLAN = (
 GLOBAL_COMMANDER_SAME_LANE_CUT_EVIDENCE_PLAN_TEST = (
     SCRIPT_DIR / "test_global_commander_same_lane_cut_evidence_plan.py"
 )
+GLOBAL_COMMANDER_SAME_LANE_STAGE_CUT_TRACE_COLLECTOR = (
+    SCRIPT_DIR / "global_commander_same_lane_stage_cut_trace_collector.py"
+)
+GLOBAL_COMMANDER_SAME_LANE_STAGE_CUT_TRACE_COLLECTOR_TEST = (
+    SCRIPT_DIR / "test_global_commander_same_lane_stage_cut_trace_collector.py"
+)
 README = REPO_ROOT / "docs/hermes-analysis/README.md"
 
 CONTRACT_MATRIX_JSON = (
@@ -453,6 +459,10 @@ GLOBAL_COMMANDER_SCOPE1_SAME_LANE_CUT_PAIR_COLLECTOR_REPORT = (
 GLOBAL_COMMANDER_SCOPE1_SAME_LANE_CUT_EVIDENCE_PLAN_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+)
+GLOBAL_COMMANDER_SCOPE1_SAME_LANE_STAGE_CUT_TRACE_COLLECTOR_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_stage_cut_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md"
 )
 
 REQUIRED_FOCUS_CARDS = {
@@ -810,6 +820,10 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_same_lane_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md",
                 "same_lane_cut_evidence_plan_ready_no_deck_action",
                 "collect_trace_or_external_evidence_for_same_lane_stage_only_cuts",
+                "global_commander_same_lane_stage_cut_trace_collector.py",
+                "global_commander_same_lane_stage_cut_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md",
+                "same_lane_stage_cut_trace_collection_blocks_used_cuts",
+                "build_same_lane_replacement_or_find_new_cut_source_for_used_stage_cuts",
                 "battle_gate_allowed_now",
                 "Path to Exile",
                 "Terminate",
@@ -1109,6 +1123,10 @@ def build_audit() -> dict[str, Any]:
                 "same_lane_cut_evidence_plan_ready_no_deck_action",
                 "stage_only_cut_evidence_count=28",
                 "collect_trace_or_external_evidence_for_same_lane_stage_only_cuts",
+                "global_commander_same_lane_stage_cut_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md",
+                "same_lane_stage_cut_trace_collection_blocks_used_cuts",
+                "usage_blocked_count=19",
+                "build_same_lane_replacement_or_find_new_cut_source_for_used_stage_cuts",
                 "battle_gate_allowed_now=false",
                 "Path to Exile",
                 "Terminate",
@@ -1853,6 +1871,35 @@ def build_audit() -> dict[str, Any]:
                 "same_lane_cut_evidence_plan_ready_no_deck_action",
                 "collect_trace_or_external_evidence_for_same_lane_stage_only_cuts",
                 "structural_staple_same_lane_or_equal_gate_proof",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SAME_LANE_STAGE_CUT_TRACE_COLLECTOR,
+            [
+                "global_commander_same_lane_stage_cut_trace_collector",
+                "same_lane_stage_cut_trace_collection_blocks_used_cuts",
+                "same_lane_stage_cut_trace_collection_needs_negative_review",
+                "same_lane_stage_cut_trace_collection_has_external_references_only",
+                "same_lane_stage_cut_trace_collection_needs_trace_generation",
+                "build_same_lane_replacement_or_find_new_cut_source_for_used_stage_cuts",
+                "same_lane_stage_cut_usage_trace_blocks_value_safe",
+                "candidate_copy_allowed_now",
+                "value_safe_reclassification_allowed_now",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SAME_LANE_STAGE_CUT_TRACE_COLLECTOR_TEST,
+            [
+                "test_usage_trace_blocks_value_safe_reclassification",
+                "test_external_reference_alone_needs_internal_trace",
+                "test_missing_trace_and_external_routes_to_trace_generation",
+                "same_lane_stage_cut_trace_collection_blocks_used_cuts",
+                "same_lane_stage_cut_external_reference_needs_internal_trace",
+                "generate_or_import_same_lane_stage_cut_usage_traces",
             ],
         )
     )
@@ -2963,6 +3010,29 @@ def build_audit() -> dict[str, Any]:
                 "protected_same_lane_usage_trace_or_equal_gate",
                 "structural_staple_same_lane_or_equal_gate_proof",
                 "prior_failed_gate_reopen_proof",
+                "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SCOPE1_SAME_LANE_STAGE_CUT_TRACE_COLLECTOR_REPORT,
+            [
+                "Global Commander Same-Lane Stage Cut Trace Collector",
+                "same_lane_stage_cut_trace_collection_blocks_used_cuts",
+                "stage_cut_count: `28`",
+                "usage_blocked_count: `19`",
+                "seen_without_usage_count: `4`",
+                "external_reference_only_count: `1`",
+                "needs_trace_or_external_research_count: `4`",
+                "seed_report_count: `8`",
+                "candidate_copy_allowed_now: `false`",
+                "value_safe_reclassification_allowed_now: `false`",
+                "battle_replay_performed: `false`",
+                "build_same_lane_replacement_or_find_new_cut_source_for_used_stage_cuts",
+                "Smothering Tithe",
+                "Diabolic Intent",
+                "Mana Vault",
                 "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
             ],
         )

@@ -202,6 +202,13 @@ cross-role risk review, contextual staple review, or prior failed-gate reopen
 proof. This plan still does not reclassify cuts, copy a deck, run battle, or
 promote anything.
 
+Then run `global_commander_same_lane_stage_cut_trace_collector.py`. It reuses
+existing current-scope replay artifacts and scans local external/reference
+artifacts for every same-lane stage-only cut. A cut used by the target deck
+blocks value-safe reclassification; seen-without-usage needs negative review;
+external references still need internal trace proof. Candidate copy, battle,
+promotion, and value-safe reclassification remain closed.
+
 ## XMage Authoritative Adaptation
 
 For all-card battle-rule acceleration, use local XMage as the authoritative

@@ -655,6 +655,13 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `stage_only_cut_evidence_count=28`, `hard_blocked_cut_count=19` e
     `ready_pair_count=0`. O proximo gate e
     `collect_trace_or_external_evidence_for_same_lane_stage_only_cuts`.
+    A coleta de trace desses cortes fica em
+    `global_commander_same_lane_stage_cut_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md`.
+    Resultado: `same_lane_stage_cut_trace_collection_blocks_used_cuts`, com
+    `stage_cut_count=28`, `usage_blocked_count=19`,
+    `seen_without_usage_count=4`, `external_reference_only_count=1` e
+    `needs_trace_or_external_research_count=4`. O proximo gate e
+    `build_same_lane_replacement_or_find_new_cut_source_for_used_stage_cuts`.
     Observacao operacional: snapshots historicos de candidate-copy, battle-probe,
     battle-feedback e package-chain dependem de artefatos locais ignorados. Se
     faltarem ou forem regenerados sem esses artefatos, a auditoria de superficie
