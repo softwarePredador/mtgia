@@ -270,6 +270,18 @@ GLOBAL_COMMANDER_REVIEWED_EXTERNAL_SEEDED_FORCE_ACCESS_TRACE_GENERATOR = (
 GLOBAL_COMMANDER_REVIEWED_EXTERNAL_SEEDED_FORCE_ACCESS_TRACE_GENERATOR_TEST = (
     SCRIPT_DIR / "test_global_commander_reviewed_external_seeded_force_access_trace_generator.py"
 )
+GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_SEED_EXHAUSTION_RECOVERY_ROUTER = (
+    SCRIPT_DIR / "global_commander_external_nonpayoff_seed_exhaustion_recovery_router.py"
+)
+GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_SEED_EXHAUSTION_RECOVERY_ROUTER_TEST = (
+    SCRIPT_DIR / "test_global_commander_external_nonpayoff_seed_exhaustion_recovery_router.py"
+)
+GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_CURRENT_DECK_NEGATIVE_REVIEW_COLLECTOR = (
+    SCRIPT_DIR / "global_commander_external_nonpayoff_current_deck_negative_review_collector.py"
+)
+GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_CURRENT_DECK_NEGATIVE_REVIEW_COLLECTOR_TEST = (
+    SCRIPT_DIR / "test_global_commander_external_nonpayoff_current_deck_negative_review_collector.py"
+)
 README = REPO_ROOT / "docs/hermes-analysis/README.md"
 
 CONTRACT_MATRIX_JSON = (
@@ -567,6 +579,14 @@ GLOBAL_COMMANDER_SCOPE1_REVIEWED_EXTERNAL_SEEDED_FORCE_ACCESS_TRACE_GENERATOR_RE
 GLOBAL_COMMANDER_SCOPE1_REVIEWED_EXTERNAL_NONPAYOFF_SEEDED_CUT_SOURCE_MINER_CURRENT_DB_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_reviewed_external_nonpayoff_seeded_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1_current_db.md"
+)
+GLOBAL_COMMANDER_SCOPE1_EXTERNAL_NONPAYOFF_SEED_EXHAUSTION_RECOVERY_ROUTER_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_seed_exhaustion_recovery_router_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+)
+GLOBAL_COMMANDER_SCOPE1_EXTERNAL_NONPAYOFF_CURRENT_DECK_NEGATIVE_REVIEW_COLLECTOR_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_current_deck_negative_review_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md"
 )
 
 REQUIRED_FOCUS_CARDS = {
@@ -964,6 +984,21 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_reviewed_external_seeded_cut_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md",
                 "reviewed_external_seeded_cut_trace_needs_force_access",
                 "force_access_or_expand_replay_window_for_seeded_hypotheses",
+                "global_commander_reviewed_external_seeded_force_access_trace_generator.py",
+                "global_commander_reviewed_external_seeded_force_access_trace_generator_20260705_kaalia_value_safe_stage1_repair_scope1.md",
+                "reviewed_external_seeded_forced_access_blocks_absent_hypotheses",
+                "rerun_seeded_cut_source_miner_against_current_evaluation_db",
+                "global_commander_reviewed_external_nonpayoff_seeded_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1_current_db.md",
+                "reviewed_external_seeded_cut_source_mining_exhausted_current_deck_no_cut_permission",
+                "expand_external_nonpayoff_seed_research_or_collect_current_deck_negative_review_before_candidate_copy",
+                "global_commander_external_nonpayoff_seed_exhaustion_recovery_router.py",
+                "global_commander_external_nonpayoff_seed_exhaustion_recovery_router_20260705_kaalia_value_safe_stage1_repair_scope1.md",
+                "external_nonpayoff_seed_exhaustion_recovery_routes_to_current_deck_negative_review",
+                "collect_current_deck_negative_review_for_external_nonpayoff_candidates",
+                "global_commander_external_nonpayoff_current_deck_negative_review_collector.py",
+                "global_commander_external_nonpayoff_current_deck_negative_review_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md",
+                "external_current_deck_negative_review_blocks_used_candidates",
+                "find_new_external_source_or_explicit_same_lane_replacement_proof",
                 "battle_gate_allowed_now",
                 "Path to Exile",
                 "Terminate",
@@ -1296,6 +1331,20 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_reviewed_external_seeded_cut_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md",
                 "reviewed_external_seeded_cut_trace_needs_force_access",
                 "force_access_or_expand_replay_window_for_seeded_hypotheses",
+                "global_commander_reviewed_external_seeded_force_access_trace_generator_20260705_kaalia_value_safe_stage1_repair_scope1.md",
+                "reviewed_external_seeded_forced_access_blocks_absent_hypotheses",
+                "rerun_seeded_cut_source_miner_against_current_evaluation_db",
+                "global_commander_reviewed_external_nonpayoff_seeded_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1_current_db.md",
+                "reviewed_external_seeded_cut_source_mining_exhausted_current_deck_no_cut_permission",
+                "expand_external_nonpayoff_seed_research_or_collect_current_deck_negative_review_before_candidate_copy",
+                "global_commander_external_nonpayoff_seed_exhaustion_recovery_router_20260705_kaalia_value_safe_stage1_repair_scope1.md",
+                "external_nonpayoff_seed_exhaustion_recovery_routes_to_current_deck_negative_review",
+                "collect_current_deck_negative_review_for_external_nonpayoff_candidates",
+                "global_commander_external_nonpayoff_current_deck_negative_review_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md",
+                "external_current_deck_negative_review_blocks_used_candidates",
+                "usage_blocked_candidate_count=5",
+                "negative_review_cleared_count=0",
+                "find_new_external_source_or_explicit_same_lane_replacement_proof",
                 "battle_gate_allowed_now=false",
                 "Path to Exile",
                 "Terminate",
@@ -2337,6 +2386,50 @@ def build_audit() -> dict[str, Any]:
                 "reviewed_external_seeded_forced_access_blocks_absent_hypotheses",
                 "reviewed_seeded_forced_access_card_absent_from_selected_db_blocks_cut_permission",
                 "rerun_seeded_cut_source_miner_against_current_evaluation_db",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_SEED_EXHAUSTION_RECOVERY_ROUTER,
+            [
+                "global_commander_external_nonpayoff_seed_exhaustion_recovery_router",
+                "external_nonpayoff_seed_exhaustion_recovery_routes_to_current_deck_negative_review",
+                "collect_current_deck_negative_review_for_external_nonpayoff_candidates",
+                "current_deck_boundary",
+                "candidate_copy_allowed_now",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_SEED_EXHAUSTION_RECOVERY_ROUTER_TEST,
+            [
+                "test_current_deck_candidate_routes_to_negative_review",
+                "test_identity_gap_routes_to_identity_resolution_when_no_current_deck_candidate",
+                "test_unseeded_role_routes_to_external_source_expansion",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_CURRENT_DECK_NEGATIVE_REVIEW_COLLECTOR,
+            [
+                "global_commander_external_nonpayoff_current_deck_negative_review_collector",
+                "external_current_deck_negative_review_blocks_used_candidates",
+                "external_current_deck_candidate_used_by_target_blocks_negative_review",
+                "negative_review_boundary",
+                "candidate_copy_allowed_now",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_CURRENT_DECK_NEGATIVE_REVIEW_COLLECTOR_TEST,
+            [
+                "test_usage_blocks_negative_review",
+                "test_seen_without_usage_requires_manual_review",
+                "test_unseen_candidates_need_force_access_or_broader_trace",
             ],
         )
     )
@@ -3704,6 +3797,44 @@ def build_audit() -> dict[str, Any]:
                 "Dragon Tempest",
                 "Simian Spirit Guide",
                 "none",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SCOPE1_EXTERNAL_NONPAYOFF_SEED_EXHAUSTION_RECOVERY_ROUTER_REPORT,
+            [
+                "Global Commander External Nonpayoff Seed Exhaustion Recovery Router",
+                "external_nonpayoff_seed_exhaustion_recovery_routes_to_current_deck_negative_review",
+                "target_role_count: `3`",
+                "seeded_exhausted_role_count: `2`",
+                "unseeded_role_count: `1`",
+                "current_deck_negative_review_candidate_count: `6`",
+                "held_package_pair_required_count: `4`",
+                "identity_resolution_required_count: `1`",
+                "force_access_selected_db_absent_count: `10`",
+                "candidate_copy_allowed_now: `false`",
+                "Lightning Greaves",
+                "Diabolic Intent",
+                "collect_current_deck_negative_review_for_external_nonpayoff_candidates",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SCOPE1_EXTERNAL_NONPAYOFF_CURRENT_DECK_NEGATIVE_REVIEW_COLLECTOR_REPORT,
+            [
+                "Global Commander External Nonpayoff Current Deck Negative Review Collector",
+                "external_current_deck_negative_review_blocks_used_candidates",
+                "current_deck_candidate_count: `6`",
+                "usage_blocked_candidate_count: `5`",
+                "seen_without_usage_count: `1`",
+                "not_seen_count: `0`",
+                "negative_review_cleared_count: `0`",
+                "candidate_copy_allowed_now: `false`",
+                "Lightning Greaves",
+                "Vampiric Tutor",
+                "find_new_external_source_or_explicit_same_lane_replacement_proof",
             ],
         )
     )

@@ -281,6 +281,16 @@ selected evaluation DB, not as safe to cut. In that case, rerun
 `--db` pointing at the current evaluation DB before any more trace, candidate
 copy, battle, promotion, or value-safe reclassification.
 
+When the current-DB seeded miner exhausts, run
+`global_commander_external_nonpayoff_seed_exhaustion_recovery_router.py`. It
+separates exhausted seeded roles, unseeded roles, current-deck external
+candidates, held package adds, and identity gaps. If it routes to current-deck
+negative review, run
+`global_commander_external_nonpayoff_current_deck_negative_review_collector.py`
+against existing current-scope traces. A current-deck external candidate used
+by the target deck remains blocked from cut consideration; this does not open
+candidate copy, battle, promotion, or value-safe reclassification.
+
 ## XMage Authoritative Adaptation
 
 For all-card battle-rule acceleration, use local XMage as the authoritative

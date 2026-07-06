@@ -1,0 +1,1006 @@
+{
+  "artifact_type": "global_commander_external_nonpayoff_current_deck_negative_review_collector",
+  "battle_gate_allowed_now": false,
+  "battle_gate_performed": false,
+  "battle_or_optimization_performed": false,
+  "battle_replay_performed": false,
+  "candidate_copy_allowed_now": false,
+  "candidate_copy_blockers": [
+    "external_current_deck_candidates_used_by_target:Lightning Greaves,Arcane Signet,Demonic Tutor,Diabolic Intent,Enlightened Tutor",
+    "external_current_deck_candidates_seen_need_manual_review:Vampiric Tutor",
+    "candidate_copy_closed_until_negative_review_or_fresh_cut_source_exists"
+  ],
+  "card_level_cut_permission_now": false,
+  "deck_action_allowed": false,
+  "generated_at": "2026-07-06T01:48:16.428436+00:00",
+  "input_artifacts": {
+    "recovery_router_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_seed_exhaustion_recovery_router_20260705_kaalia_value_safe_stage1_repair_scope1.json",
+    "trace_generator_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_generator_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+  },
+  "mutation_allowed": false,
+  "negative_review_cleared_now": false,
+  "policy": {
+    "negative_review_boundary": "A current-deck external candidate must not be treated as cuttable when target-deck use is observed.",
+    "promotion_boundary": "No candidate copy, deck mutation, battle gate, value-safe reclassification, or promotion is opened by this report.",
+    "trace_boundary": "This collector reuses existing current-scope replay artifacts and does not run a battle gate."
+  },
+  "postgres_writes": false,
+  "promotion_allowed": false,
+  "review_rows": [
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "card_name": "Lightning Greaves",
+      "decision": "not_cuttable_from_current_trace",
+      "decision_trace_count": 11,
+      "event_types": {
+        "cast_announced": 2,
+        "cost_paid": 2,
+        "equipment_attached": 1,
+        "equipment_unattached": 1,
+        "land_played": 4,
+        "priority_pass": 8,
+        "spell_cast": 2,
+        "spell_resolved": 2,
+        "turn_end": 12,
+        "turn_start": 4
+      },
+      "exposure_event_count": 16,
+      "first_decision_trace": {
+        "event": "mulligan_decision",
+        "player": "Kaalia of the Vast",
+        "turn": 0
+      },
+      "first_exposure_event": {
+        "event": "turn_start",
+        "player": "Kaalia of the Vast",
+        "turn": 1
+      },
+      "first_usage_event": {
+        "card": "Lightning Greaves",
+        "event": "cast_announced",
+        "player": "Kaalia of the Vast",
+        "turn": 2
+      },
+      "negative_review_cleared_now": false,
+      "next_evidence": "find_new_external_source_or_explicit_same_lane_replacement_proof",
+      "source_review_status": "external_source_candidate_local_review_current_deck_trace_required",
+      "status": "external_current_deck_candidate_used_by_target_blocks_negative_review",
+      "target_cut_role": "haste_protection_silence",
+      "usage_event_count": 8,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "card_name": "Arcane Signet",
+      "decision": "not_cuttable_from_current_trace",
+      "decision_trace_count": 5,
+      "event_types": {
+        "cast_announced": 1,
+        "cost_paid": 1,
+        "land_played": 2,
+        "mana_refreshed": 7,
+        "spell_cast": 1,
+        "turn_end": 9,
+        "turn_start": 2
+      },
+      "exposure_event_count": 11,
+      "first_decision_trace": {
+        "event": "mulligan_decision",
+        "player": "Kaalia of the Vast",
+        "turn": 0
+      },
+      "first_exposure_event": {
+        "event": "turn_start",
+        "player": "Kaalia of the Vast",
+        "turn": 1
+      },
+      "first_usage_event": {
+        "card": "Arcane Signet",
+        "event": "cast_announced",
+        "player": "Kaalia of the Vast",
+        "turn": 2
+      },
+      "negative_review_cleared_now": false,
+      "next_evidence": "find_new_external_source_or_explicit_same_lane_replacement_proof",
+      "source_review_status": "external_source_candidate_local_review_current_deck_trace_required",
+      "status": "external_current_deck_candidate_used_by_target_blocks_negative_review",
+      "target_cut_role": "mana_acceleration",
+      "usage_event_count": 3,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "card_name": "Demonic Tutor",
+      "decision": "not_cuttable_from_current_trace",
+      "decision_trace_count": 18,
+      "event_types": {
+        "cast_announced": 5,
+        "cast_illegal": 4,
+        "cost_paid": 1,
+        "priority_pass": 5,
+        "spell_cast": 1,
+        "spell_resolved": 1,
+        "turn_end": 7,
+        "turn_start": 7,
+        "tutor_resolved": 1
+      },
+      "exposure_event_count": 14,
+      "first_decision_trace": {
+        "event": "mulligan_decision",
+        "player": "Kaalia of the Vast",
+        "turn": 0
+      },
+      "first_exposure_event": {
+        "event": "turn_start",
+        "player": "Kaalia of the Vast",
+        "turn": 1
+      },
+      "first_usage_event": {
+        "card": "Demonic Tutor",
+        "event": "cast_announced",
+        "player": "Kaalia of the Vast",
+        "turn": 5
+      },
+      "negative_review_cleared_now": false,
+      "next_evidence": "find_new_external_source_or_explicit_same_lane_replacement_proof",
+      "source_review_status": "external_source_candidate_local_review_current_deck_trace_required",
+      "status": "external_current_deck_candidate_used_by_target_blocks_negative_review",
+      "target_cut_role": "tutors_access",
+      "usage_event_count": 9,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "card_name": "Diabolic Intent",
+      "decision": "not_cuttable_from_current_trace",
+      "decision_trace_count": 1,
+      "event_types": {
+        "additional_cost_paid": 1,
+        "cast_announced": 1,
+        "cost_paid": 1,
+        "permanent_moved_from_battlefield": 1,
+        "priority_pass": 6,
+        "spell_cast": 1,
+        "spell_resolved": 1,
+        "tutor_resolved": 1
+      },
+      "exposure_event_count": 0,
+      "first_decision_trace": {
+        "event": "cast_spell",
+        "player": "Kaalia of the Vast",
+        "turn": 7
+      },
+      "first_exposure_event": null,
+      "first_usage_event": {
+        "card": "Diabolic Intent",
+        "event": "cast_announced",
+        "player": "Kaalia of the Vast",
+        "turn": 7
+      },
+      "negative_review_cleared_now": false,
+      "next_evidence": "find_new_external_source_or_explicit_same_lane_replacement_proof",
+      "source_review_status": "external_source_candidate_local_review_current_deck_trace_required",
+      "status": "external_current_deck_candidate_used_by_target_blocks_negative_review",
+      "target_cut_role": "tutors_access",
+      "usage_event_count": 5,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "card_name": "Enlightened Tutor",
+      "decision": "not_cuttable_from_current_trace",
+      "decision_trace_count": 14,
+      "event_types": {
+        "end_step_instant": 1,
+        "spell_resolved": 1,
+        "turn_end": 5,
+        "turn_start": 5,
+        "tutor_resolved": 1
+      },
+      "exposure_event_count": 10,
+      "first_decision_trace": {
+        "event": "mulligan_decision",
+        "player": "Kaalia of the Vast",
+        "turn": 0
+      },
+      "first_exposure_event": {
+        "event": "turn_start",
+        "player": "Kaalia of the Vast",
+        "turn": 1
+      },
+      "first_usage_event": {
+        "card": "Enlightened Tutor",
+        "event": "spell_resolved",
+        "player": "Kaalia of the Vast",
+        "turn": 5
+      },
+      "negative_review_cleared_now": false,
+      "next_evidence": "find_new_external_source_or_explicit_same_lane_replacement_proof",
+      "source_review_status": "external_source_candidate_local_review_current_deck_trace_required",
+      "status": "external_current_deck_candidate_used_by_target_blocks_negative_review",
+      "target_cut_role": "tutors_access",
+      "usage_event_count": 2,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "card_name": "Vampiric Tutor",
+      "decision": "manual_negative_trace_review_required",
+      "decision_trace_count": 1,
+      "event_types": {
+        "priority_pass": 3
+      },
+      "exposure_event_count": 0,
+      "first_decision_trace": {
+        "event": "mulligan_decision",
+        "player": "Kaalia of the Vast",
+        "turn": 0
+      },
+      "first_exposure_event": null,
+      "first_usage_event": null,
+      "negative_review_cleared_now": false,
+      "next_evidence": "inspect_current_trace_nonuse_context_before_cut_consideration",
+      "source_review_status": "external_source_candidate_local_review_current_deck_trace_required",
+      "status": "external_current_deck_candidate_seen_without_usage_needs_manual_negative_review",
+      "target_cut_role": "tutors_access",
+      "usage_event_count": 0,
+      "value_safe_reclassification_allowed": false
+    }
+  ],
+  "seed_reports": [
+    {
+      "cards": {
+        "Arcane Signet": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Demonic Tutor": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Diabolic Intent": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Enlightened Tutor": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Lightning Greaves": {
+          "decision_trace_count": 4,
+          "event_types": {
+            "cast_announced": 1,
+            "cost_paid": 1,
+            "equipment_unattached": 1,
+            "land_played": 4,
+            "priority_pass": 4,
+            "spell_cast": 1,
+            "spell_resolved": 1,
+            "turn_end": 8,
+            "turn_start": 2
+          },
+          "exposure_event_count": 10,
+          "first_decision_trace": {
+            "event": "mulligan_decision",
+            "player": "Kaalia of the Vast",
+            "turn": 0
+          },
+          "first_exposure_event": {
+            "event": "turn_start",
+            "player": "Kaalia of the Vast",
+            "turn": 1
+          },
+          "first_usage_event": {
+            "card": "Lightning Greaves",
+            "event": "cast_announced",
+            "player": "Kaalia of the Vast",
+            "turn": 2
+          },
+          "reference_event_count": 9,
+          "usage_event_count": 4
+        },
+        "Vampiric Tutor": {
+          "decision_trace_count": 0,
+          "event_types": {
+            "priority_pass": 1
+          },
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 1,
+          "usage_event_count": 0
+        }
+      },
+      "decision_count": 121,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_42.decision_trace.jsonl",
+      "event_count": 818,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_42.events.jsonl",
+      "seed": 42
+    },
+    {
+      "cards": {
+        "Arcane Signet": {
+          "decision_trace_count": 4,
+          "event_types": {
+            "cast_announced": 1,
+            "cost_paid": 1,
+            "land_played": 2,
+            "mana_refreshed": 7,
+            "spell_cast": 1,
+            "turn_end": 9,
+            "turn_start": 2
+          },
+          "exposure_event_count": 11,
+          "first_decision_trace": {
+            "event": "mulligan_decision",
+            "player": "Kaalia of the Vast",
+            "turn": 0
+          },
+          "first_exposure_event": {
+            "event": "turn_start",
+            "player": "Kaalia of the Vast",
+            "turn": 1
+          },
+          "first_usage_event": {
+            "card": "Arcane Signet",
+            "event": "cast_announced",
+            "player": "Kaalia of the Vast",
+            "turn": 2
+          },
+          "reference_event_count": 9,
+          "usage_event_count": 3
+        },
+        "Demonic Tutor": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Diabolic Intent": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Enlightened Tutor": {
+          "decision_trace_count": 1,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": {
+            "event": "mulligan_decision",
+            "player": "Kaalia of the Vast",
+            "turn": 0
+          },
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Lightning Greaves": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Vampiric Tutor": {
+          "decision_trace_count": 0,
+          "event_types": {
+            "priority_pass": 1
+          },
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 1,
+          "usage_event_count": 0
+        }
+      },
+      "decision_count": 138,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_43.decision_trace.jsonl",
+      "event_count": 832,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_43.events.jsonl",
+      "seed": 43
+    },
+    {
+      "cards": {
+        "Arcane Signet": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Demonic Tutor": {
+          "decision_trace_count": 11,
+          "event_types": {
+            "cast_announced": 1,
+            "cost_paid": 1,
+            "priority_pass": 4,
+            "spell_cast": 1,
+            "spell_resolved": 1,
+            "turn_end": 4,
+            "turn_start": 5,
+            "tutor_resolved": 1
+          },
+          "exposure_event_count": 9,
+          "first_decision_trace": {
+            "event": "mulligan_decision",
+            "player": "Kaalia of the Vast",
+            "turn": 0
+          },
+          "first_exposure_event": {
+            "event": "turn_start",
+            "player": "Kaalia of the Vast",
+            "turn": 1
+          },
+          "first_usage_event": {
+            "card": "Demonic Tutor",
+            "event": "cast_announced",
+            "player": "Kaalia of the Vast",
+            "turn": 5
+          },
+          "reference_event_count": 4,
+          "usage_event_count": 5
+        },
+        "Diabolic Intent": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Enlightened Tutor": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Lightning Greaves": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Vampiric Tutor": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        }
+      },
+      "decision_count": 139,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_44.decision_trace.jsonl",
+      "event_count": 1003,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_44.events.jsonl",
+      "seed": 44
+    },
+    {
+      "cards": {
+        "Arcane Signet": {
+          "decision_trace_count": 1,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": {
+            "event": "mulligan_decision",
+            "player": "Kaalia of the Vast",
+            "turn": 0
+          },
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Demonic Tutor": {
+          "decision_trace_count": 0,
+          "event_types": {
+            "priority_pass": 1
+          },
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 1,
+          "usage_event_count": 0
+        },
+        "Diabolic Intent": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Enlightened Tutor": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Lightning Greaves": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Vampiric Tutor": {
+          "decision_trace_count": 1,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": {
+            "event": "mulligan_decision",
+            "player": "Kaalia of the Vast",
+            "turn": 0
+          },
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        }
+      },
+      "decision_count": 114,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_45.decision_trace.jsonl",
+      "event_count": 727,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_45.events.jsonl",
+      "seed": 45
+    },
+    {
+      "cards": {
+        "Arcane Signet": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Demonic Tutor": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Diabolic Intent": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Enlightened Tutor": {
+          "decision_trace_count": 12,
+          "event_types": {
+            "end_step_instant": 1,
+            "spell_resolved": 1,
+            "turn_end": 5,
+            "turn_start": 5,
+            "tutor_resolved": 1
+          },
+          "exposure_event_count": 10,
+          "first_decision_trace": {
+            "event": "mulligan_decision",
+            "player": "Kaalia of the Vast",
+            "turn": 0
+          },
+          "first_exposure_event": {
+            "event": "turn_start",
+            "player": "Kaalia of the Vast",
+            "turn": 1
+          },
+          "first_usage_event": {
+            "card": "Enlightened Tutor",
+            "event": "spell_resolved",
+            "player": "Kaalia of the Vast",
+            "turn": 5
+          },
+          "reference_event_count": 1,
+          "usage_event_count": 2
+        },
+        "Lightning Greaves": {
+          "decision_trace_count": 6,
+          "event_types": {
+            "cast_announced": 1,
+            "cost_paid": 1,
+            "equipment_attached": 1,
+            "priority_pass": 4,
+            "spell_cast": 1,
+            "spell_resolved": 1,
+            "turn_end": 4,
+            "turn_start": 2
+          },
+          "exposure_event_count": 6,
+          "first_decision_trace": {
+            "event": "pass_no_action",
+            "player": "Kaalia of the Vast",
+            "turn": 5
+          },
+          "first_exposure_event": {
+            "event": "turn_end",
+            "player": "Kaalia of the Vast",
+            "turn": 5
+          },
+          "first_usage_event": {
+            "card": "Lightning Greaves",
+            "event": "cast_announced",
+            "player": "Kaalia of the Vast",
+            "turn": 7
+          },
+          "reference_event_count": 5,
+          "usage_event_count": 4
+        },
+        "Vampiric Tutor": {
+          "decision_trace_count": 0,
+          "event_types": {
+            "priority_pass": 1
+          },
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 1,
+          "usage_event_count": 0
+        }
+      },
+      "decision_count": 136,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_46.decision_trace.jsonl",
+      "event_count": 1074,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_46.events.jsonl",
+      "seed": 46
+    },
+    {
+      "cards": {
+        "Arcane Signet": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Demonic Tutor": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Diabolic Intent": {
+          "decision_trace_count": 1,
+          "event_types": {
+            "additional_cost_paid": 1,
+            "cast_announced": 1,
+            "cost_paid": 1,
+            "permanent_moved_from_battlefield": 1,
+            "priority_pass": 5,
+            "spell_cast": 1,
+            "spell_resolved": 1,
+            "tutor_resolved": 1
+          },
+          "exposure_event_count": 0,
+          "first_decision_trace": {
+            "event": "cast_spell",
+            "player": "Kaalia of the Vast",
+            "turn": 7
+          },
+          "first_exposure_event": null,
+          "first_usage_event": {
+            "card": "Diabolic Intent",
+            "event": "cast_announced",
+            "player": "Kaalia of the Vast",
+            "turn": 7
+          },
+          "reference_event_count": 7,
+          "usage_event_count": 5
+        },
+        "Enlightened Tutor": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Lightning Greaves": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Vampiric Tutor": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        }
+      },
+      "decision_count": 134,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_47.decision_trace.jsonl",
+      "event_count": 795,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_47.events.jsonl",
+      "seed": 47
+    },
+    {
+      "cards": {
+        "Arcane Signet": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Demonic Tutor": {
+          "decision_trace_count": 7,
+          "event_types": {
+            "cast_announced": 4,
+            "cast_illegal": 4,
+            "turn_end": 3,
+            "turn_start": 2
+          },
+          "exposure_event_count": 5,
+          "first_decision_trace": {
+            "event": "pass_no_action",
+            "player": "Kaalia of the Vast",
+            "turn": 5
+          },
+          "first_exposure_event": {
+            "event": "turn_end",
+            "player": "Kaalia of the Vast",
+            "turn": 5
+          },
+          "first_usage_event": {
+            "card": "Demonic Tutor",
+            "event": "cast_announced",
+            "player": "Kaalia of the Vast",
+            "turn": 5
+          },
+          "reference_event_count": 4,
+          "usage_event_count": 4
+        },
+        "Diabolic Intent": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Enlightened Tutor": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Lightning Greaves": {
+          "decision_trace_count": 1,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": {
+            "event": "mulligan_decision",
+            "player": "Kaalia of the Vast",
+            "turn": 0
+          },
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Vampiric Tutor": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        }
+      },
+      "decision_count": 99,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_48.decision_trace.jsonl",
+      "event_count": 661,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_48.events.jsonl",
+      "seed": 48
+    },
+    {
+      "cards": {
+        "Arcane Signet": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Demonic Tutor": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Diabolic Intent": {
+          "decision_trace_count": 0,
+          "event_types": {
+            "priority_pass": 1
+          },
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 1,
+          "usage_event_count": 0
+        },
+        "Enlightened Tutor": {
+          "decision_trace_count": 1,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": {
+            "event": "mulligan_decision",
+            "player": "Kaalia of the Vast",
+            "turn": 0
+          },
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Lightning Greaves": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Vampiric Tutor": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        }
+      },
+      "decision_count": 147,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_49.decision_trace.jsonl",
+      "event_count": 1061,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_49.events.jsonl",
+      "seed": 49
+    }
+  ],
+  "source_db_mutated": false,
+  "status": "external_current_deck_negative_review_blocks_used_candidates",
+  "summary": {
+    "candidate_copy_allowed_count": 0,
+    "candidate_copy_blocker_count": 3,
+    "card_level_cut_permission_count": 0,
+    "commander": "Kaalia of the Vast",
+    "current_deck_candidate_count": 6,
+    "deck_id": "619",
+    "negative_review_cleared_count": 0,
+    "next_gate": "find_new_external_source_or_explicit_same_lane_replacement_proof",
+    "not_seen_count": 0,
+    "seed_report_count": 8,
+    "seen_without_usage_count": 1,
+    "usage_blocked_candidate_count": 5
+  },
+  "value_safe_reclassification_allowed_now": false
+}

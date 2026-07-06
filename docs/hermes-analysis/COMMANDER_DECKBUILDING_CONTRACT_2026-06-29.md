@@ -428,7 +428,16 @@ Operational priority after this pivot:
     seeded same-lane source remains, route to broader external nonpayoff seed
     research or current-deck negative review before any candidate copy, battle,
     promotion, or value-safe reclassification;
-57. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
+57. run `global_commander_external_nonpayoff_seed_exhaustion_recovery_router.py`
+    after current-DB seeded mining exhausts; it must separate exhausted seeded
+    roles, unseeded roles, current-deck external candidates, held package adds,
+    and identity gaps before opening any further source research;
+58. run `global_commander_external_nonpayoff_current_deck_negative_review_collector.py`
+    when the recovery router finds external candidates already in the current
+    deck; it must reuse current-scope traces, block any used card from
+    negative-review cut consideration, and keep candidate copy, battle,
+    promotion, and value-safe reclassification closed;
+59. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
     probes, as regression evidence only unless they produce a named safe cut and
     equal-gate proof under the Lorehold promotion gate.
 
@@ -503,6 +512,8 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_reviewed_external_seeded_cut_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_reviewed_external_seeded_force_access_trace_generator_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_reviewed_external_nonpayoff_seeded_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1_current_db.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_seed_exhaustion_recovery_router_20260705_kaalia_value_safe_stage1_repair_scope1.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_current_deck_negative_review_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 
 Historical candidate-copy, battle-probe, battle-feedback, and package-chain
 snapshots are local ignored evidence artifacts. The surface auditor must show
@@ -1123,6 +1134,31 @@ Current external refresh on 2026-07-05:
   `card_level_cut_permission_count=0`, and `candidate_copy_allowed_count=0`.
   The current scope1 seeded lane is exhausted; the next gate is
   `expand_external_nonpayoff_seed_research_or_collect_current_deck_negative_review_before_candidate_copy`.
+- Current external nonpayoff seed-exhaustion recovery routing returns
+  `external_nonpayoff_seed_exhaustion_recovery_routes_to_current_deck_negative_review`
+  with `target_role_count=3`, `seeded_exhausted_role_count=2`,
+  `unseeded_role_count=1`, `current_deck_negative_review_candidate_count=6`,
+  `held_package_pair_required_count=4`, `identity_resolution_required_count=1`,
+  `prior_fresh_seeded_same_lane_cut_source_count=0`,
+  `prior_blocked_recycled_seeded_cut_source_count=31`, and
+  `force_access_selected_db_absent_count=10`. The six current-deck candidates
+  are `Lightning Greaves`, `Arcane Signet`, `Demonic Tutor`,
+  `Enlightened Tutor`, `Vampiric Tutor`, and `Diabolic Intent`; they require
+  target-deck negative review before any cut consideration. Candidate copy,
+  battle, promotion, and value-safe reclassification remain closed; the next
+  gate is
+  `collect_current_deck_negative_review_for_external_nonpayoff_candidates`.
+- Current external nonpayoff current-deck negative-review collection returns
+  `external_current_deck_negative_review_blocks_used_candidates` with
+  `current_deck_candidate_count=6`, `usage_blocked_candidate_count=5`,
+  `seen_without_usage_count=1`, `not_seen_count=0`, `seed_report_count=8`,
+  `card_level_cut_permission_count=0`, `negative_review_cleared_count=0`, and
+  `candidate_copy_allowed_count=0`. The target deck used `Lightning Greaves`,
+  `Arcane Signet`, `Demonic Tutor`, `Diabolic Intent`, and
+  `Enlightened Tutor`; `Vampiric Tutor` was seen in decision trace without
+  usage and still needs manual negative review. Therefore this lane does not
+  create a safe cut; the next gate is
+  `find_new_external_source_or_explicit_same_lane_replacement_proof`.
 
 ## Global Commander Rollout - 2026-07-01
 

@@ -742,12 +742,33 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `card_level_cut_permission_count=0` e `candidate_copy_allowed_count=0`.
     Isso prova que as 10 hipoteses seedadas nao existem na DB candidata scope1
     atual; elas nao podem virar corte, copia candidata ou battle. O miner
-    rerodado na DB scope1 atual fica em
+    rerodado na DB scope1 atual (`rerun_seeded_cut_source_miner_against_current_evaluation_db`)
+    fica em
     `global_commander_reviewed_external_nonpayoff_seeded_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1_current_db.md`.
     Resultado: `reviewed_external_seeded_cut_source_mining_exhausted_current_deck_no_cut_permission`,
     com `fresh_seeded_same_lane_cut_source_count=0`,
     `blocked_recycled_seeded_cut_source_count=31` e proximo gate
     `expand_external_nonpayoff_seed_research_or_collect_current_deck_negative_review_before_candidate_copy`.
+    O roteador pos-esgotamento fica em
+    `global_commander_external_nonpayoff_seed_exhaustion_recovery_router_20260705_kaalia_value_safe_stage1_repair_scope1.md`.
+    Resultado: `external_nonpayoff_seed_exhaustion_recovery_routes_to_current_deck_negative_review`,
+    com `target_role_count=3`, `seeded_exhausted_role_count=2`,
+    `unseeded_role_count=1`,
+    `current_deck_negative_review_candidate_count=6`,
+    `held_package_pair_required_count=4`,
+    `identity_resolution_required_count=1` e
+    `force_access_selected_db_absent_count=10`. O proximo gate e
+    `collect_current_deck_negative_review_for_external_nonpayoff_candidates`.
+    O coletor de negative review para candidatos ja presentes no deck fica em
+    `global_commander_external_nonpayoff_current_deck_negative_review_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md`.
+    Resultado: `external_current_deck_negative_review_blocks_used_candidates`,
+    com `current_deck_candidate_count=6`, `usage_blocked_candidate_count=5`,
+    `seen_without_usage_count=1`, `not_seen_count=0`,
+    `negative_review_cleared_count=0` e `candidate_copy_allowed_now=false`.
+    Lightning Greaves, Arcane Signet, Demonic Tutor, Diabolic Intent e
+    Enlightened Tutor foram usados pelo alvo; Vampiric Tutor foi visto sem uso
+    e ainda precisa de negative review manual. O proximo gate e
+    `find_new_external_source_or_explicit_same_lane_replacement_proof`.
     Observacao operacional: snapshots historicos de candidate-copy, battle-probe,
     battle-feedback e package-chain dependem de artefatos locais ignorados. Se
     faltarem ou forem regenerados sem esses artefatos, a auditoria de superficie

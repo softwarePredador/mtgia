@@ -1,0 +1,469 @@
+{
+  "artifact_type": "global_commander_external_nonpayoff_seed_exhaustion_recovery_router",
+  "battle_gate_allowed_now": false,
+  "battle_gate_performed": false,
+  "battle_or_optimization_performed": false,
+  "battle_replay_performed": false,
+  "candidate_copy_allowed_now": false,
+  "candidate_copy_blockers": [
+    "reviewed_external_seed_exhaustion_is_not_cut_permission",
+    "candidate_copy_closed_until_current_deck_negative_review_or_fresh_cut_source_exists",
+    "battle_gate_closed_until_candidate_copy_and_card_level_usage_evidence_exist",
+    "current_deck_external_candidates_need_negative_review:Lightning Greaves,Arcane Signet,Demonic Tutor,Enlightened Tutor,Vampiric Tutor,Diabolic Intent",
+    "held_package_external_candidates_need_value_safe_pairs:Swiftfoot Boots,Boros Charm,Fellwar Stone,Gamble",
+    "unseeded_roles_need_expanded_source_candidates:tutors_access",
+    "identity_resolution_required:Bitter Reunion"
+  ],
+  "card_level_cut_permission_now": false,
+  "current_deck_negative_review_rows": [
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "card_name": "Lightning Greaves",
+      "cmc": 2.0,
+      "commander_identity_legal": true,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "haste"
+      ],
+      "miner_source_seed_allowed": false,
+      "next_evidence": "target_deck_trace_or_negative_review_before_cut_consideration",
+      "rerun_miner_allowed_for_card": false,
+      "review_status": "external_source_candidate_local_review_current_deck_trace_required",
+      "scryfall_id": "ca204b66-8d0c-431a-8d34-282f7c2d17da",
+      "source_status": "external_source_candidate_already_in_current_deck_needs_trace_policy",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Artifact \u2014 Equipment",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "card_name": "Arcane Signet",
+      "cmc": 2.0,
+      "commander_identity_legal": true,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "add one mana"
+      ],
+      "miner_source_seed_allowed": false,
+      "next_evidence": "target_deck_trace_or_negative_review_before_cut_consideration",
+      "rerun_miner_allowed_for_card": false,
+      "review_status": "external_source_candidate_local_review_current_deck_trace_required",
+      "scryfall_id": "0bc7f093-bef0-4f1a-852c-4b75ebf54838",
+      "source_status": "external_source_candidate_already_in_current_deck_needs_trace_policy",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Artifact",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "card_name": "Demonic Tutor",
+      "cmc": 2.0,
+      "commander_identity_legal": true,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "search your library",
+        "put that card into your hand"
+      ],
+      "miner_source_seed_allowed": false,
+      "next_evidence": "target_deck_trace_or_negative_review_before_cut_consideration",
+      "rerun_miner_allowed_for_card": false,
+      "review_status": "external_source_candidate_local_review_current_deck_trace_required",
+      "scryfall_id": "82004860-e589-4e38-8d61-8c0210e4ea39",
+      "source_status": "external_source_candidate_already_in_current_deck_needs_trace_policy",
+      "target_cut_role": "tutors_access",
+      "type_line": "Sorcery",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "card_name": "Enlightened Tutor",
+      "cmc": 1.0,
+      "commander_identity_legal": true,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "search your library"
+      ],
+      "miner_source_seed_allowed": false,
+      "next_evidence": "target_deck_trace_or_negative_review_before_cut_consideration",
+      "rerun_miner_allowed_for_card": false,
+      "review_status": "external_source_candidate_local_review_current_deck_trace_required",
+      "scryfall_id": "c5229c17-b7be-4b05-b683-f2277edc4849",
+      "source_status": "external_source_candidate_already_in_current_deck_needs_trace_policy",
+      "target_cut_role": "tutors_access",
+      "type_line": "Instant",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "card_name": "Vampiric Tutor",
+      "cmc": 1.0,
+      "commander_identity_legal": true,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "search your library"
+      ],
+      "miner_source_seed_allowed": false,
+      "next_evidence": "target_deck_trace_or_negative_review_before_cut_consideration",
+      "rerun_miner_allowed_for_card": false,
+      "review_status": "external_source_candidate_local_review_current_deck_trace_required",
+      "scryfall_id": "ededbdae-d9dc-4206-9335-d7158f2d7700",
+      "source_status": "external_source_candidate_already_in_current_deck_needs_trace_policy",
+      "target_cut_role": "tutors_access",
+      "type_line": "Instant",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "card_name": "Diabolic Intent",
+      "cmc": 2.0,
+      "commander_identity_legal": true,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "search your library",
+        "put that card into your hand"
+      ],
+      "miner_source_seed_allowed": false,
+      "next_evidence": "target_deck_trace_or_negative_review_before_cut_consideration",
+      "rerun_miner_allowed_for_card": false,
+      "review_status": "external_source_candidate_local_review_current_deck_trace_required",
+      "scryfall_id": "038519b9-bca8-4b27-b5ac-2409595469d0",
+      "source_status": "external_source_candidate_already_in_current_deck_needs_trace_policy",
+      "target_cut_role": "tutors_access",
+      "type_line": "Sorcery",
+      "value_safe_reclassification_allowed": false
+    }
+  ],
+  "deck_action_allowed": false,
+  "generated_at": "2026-07-06T01:46:01.123741+00:00",
+  "held_package_pair_rows": [
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "card_name": "Swiftfoot Boots",
+      "cmc": 2.0,
+      "commander_identity_legal": true,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "haste",
+        "hexproof"
+      ],
+      "miner_source_seed_allowed": false,
+      "next_evidence": "same_lane_value_safe_pair_before_candidate_copy",
+      "rerun_miner_allowed_for_card": false,
+      "review_status": "external_source_candidate_local_review_held_package_pair_required",
+      "scryfall_id": "c8b143ad-43ec-4e0d-a440-e348daa31391",
+      "source_status": "external_source_candidate_already_selected_as_add_needs_pair_policy",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Artifact \u2014 Equipment",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "card_name": "Boros Charm",
+      "cmc": 2.0,
+      "commander_identity_legal": true,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "indestructible",
+        "double strike"
+      ],
+      "miner_source_seed_allowed": false,
+      "next_evidence": "same_lane_value_safe_pair_before_candidate_copy",
+      "rerun_miner_allowed_for_card": false,
+      "review_status": "external_source_candidate_local_review_held_package_pair_required",
+      "scryfall_id": "2679d0dd-ba30-4a1c-b6a0-b3ac6c790496",
+      "source_status": "external_source_candidate_already_selected_as_add_needs_pair_policy",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Instant",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "card_name": "Fellwar Stone",
+      "cmc": 2.0,
+      "commander_identity_legal": true,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "add one mana"
+      ],
+      "miner_source_seed_allowed": false,
+      "next_evidence": "same_lane_value_safe_pair_before_candidate_copy",
+      "rerun_miner_allowed_for_card": false,
+      "review_status": "external_source_candidate_local_review_held_package_pair_required",
+      "scryfall_id": "95560508-7ac9-4be9-8a3f-3c7d5b52807b",
+      "source_status": "external_source_candidate_already_selected_as_add_needs_pair_policy",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Artifact",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "card_name": "Gamble",
+      "cmc": 1.0,
+      "commander_identity_legal": true,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "search your library",
+        "put that card into your hand"
+      ],
+      "miner_source_seed_allowed": false,
+      "next_evidence": "same_lane_value_safe_pair_before_candidate_copy",
+      "rerun_miner_allowed_for_card": false,
+      "review_status": "external_source_candidate_local_review_held_package_pair_required",
+      "scryfall_id": "a54f0869-94c8-42af-9080-166efb9486a4",
+      "source_status": "external_source_candidate_already_selected_as_add_needs_pair_policy",
+      "target_cut_role": "tutors_access",
+      "type_line": "Sorcery",
+      "value_safe_reclassification_allowed": false
+    }
+  ],
+  "identity_resolution_rows": [
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "card_name": "Bitter Reunion",
+      "cmc": null,
+      "commander_identity_legal": false,
+      "local_identity_found": false,
+      "local_role_evidence_terms": [],
+      "miner_source_seed_allowed": false,
+      "next_evidence": "resolve_local_identity_before_miner_seed",
+      "rerun_miner_allowed_for_card": false,
+      "review_status": "external_source_candidate_local_review_needs_identity_resolution",
+      "scryfall_id": null,
+      "source_status": "external_source_candidate_needs_local_identity_resolution",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": null,
+      "value_safe_reclassification_allowed": false
+    }
+  ],
+  "input_artifacts": {
+    "force_access_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_reviewed_external_seeded_force_access_trace_generator_20260705_kaalia_value_safe_stage1_repair_scope1.json",
+    "seeded_miner_current_db_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_reviewed_external_nonpayoff_seeded_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1_current_db.json",
+    "source_candidate_reviewer_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_same_lane_source_candidate_reviewer_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+  },
+  "mutation_allowed": false,
+  "policy": {
+    "current_deck_boundary": "External candidates already in the current deck need target-deck negative review before any cut consideration.",
+    "held_package_boundary": "External candidates already selected as adds remain held until value-safe same-lane pairs exist.",
+    "promotion_boundary": "No candidate copy, battle gate, deck mutation, or promotion is opened by this router.",
+    "seed_exhaustion_boundary": "Reviewed external seeds that exhaust the current DB do not create card-level cut permission."
+  },
+  "postgres_writes": false,
+  "promotion_allowed": false,
+  "recovery_actions": [
+    {
+      "action": "collect_current_deck_negative_review_for_external_nonpayoff_candidates",
+      "candidate_copy_allowed": false,
+      "candidate_count": 6,
+      "priority": "P0",
+      "reason": "The strongest remaining external candidates are already in the current deck, so absence/popularity cannot prove they are cuts.",
+      "status": "required_now"
+    },
+    {
+      "action": "expand_external_nonpayoff_source_candidate_pool",
+      "candidate_copy_allowed": false,
+      "exhausted_roles": [
+        "haste_protection_silence",
+        "mana_acceleration"
+      ],
+      "priority": "P1",
+      "reason": "Reviewed seeds produced no fresh current-DB cut source; broaden source candidates without reusing exhausted cards.",
+      "status": "evidence_lane",
+      "unseeded_roles": [
+        "tutors_access"
+      ]
+    },
+    {
+      "action": "resolve_external_nonpayoff_candidate_identity_before_seed_review",
+      "candidate_copy_allowed": false,
+      "candidate_count": 1,
+      "priority": "P2",
+      "reason": "Identity-missing source candidates cannot seed miner research.",
+      "status": "required_before_candidate_can_seed_miner"
+    },
+    {
+      "action": "hold_package_adds_until_value_safe_same_lane_pair_exists",
+      "candidate_copy_allowed": false,
+      "candidate_count": 4,
+      "priority": "P3",
+      "reason": "Cards already selected as package adds still need value-safe same-lane cuts before materialization.",
+      "status": "closed_no_deck_action"
+    },
+    {
+      "action": "keep_candidate_copy_battle_and_promotion_closed",
+      "candidate_copy_allowed": false,
+      "priority": "P4",
+      "reason": "Seed exhaustion and external source review are not card-level cut permission.",
+      "status": "closed_no_deck_action"
+    }
+  ],
+  "role_recovery_rows": [
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "current_deck_negative_review_candidate_count": 1,
+      "current_deck_negative_review_candidates": [
+        "Lightning Greaves"
+      ],
+      "held_package_pair_required_candidates": [
+        "Swiftfoot Boots",
+        "Boros Charm"
+      ],
+      "held_package_pair_required_count": 2,
+      "identity_resolution_required_candidates": [
+        "Bitter Reunion"
+      ],
+      "identity_resolution_required_count": 1,
+      "next_gate": "collect_current_deck_negative_review_for_external_nonpayoff_candidates",
+      "prior_fresh_source_count": 0,
+      "prior_recycled_source_count": 16,
+      "prior_role_status": "reviewed_external_seeded_role_exhausted_current_deck_sources",
+      "prior_scanned_source_count": 16,
+      "prior_seed_count": 2,
+      "ready_seed_candidate_count": 2,
+      "ready_seed_candidates": [
+        "Dragon Tempest",
+        "Dihada, Binder of Wills"
+      ],
+      "required_evidence": [
+        "current_deck_negative_review_before_cut_consideration",
+        "expanded_external_nonpayoff_source_candidates_if_current_deck_review_does_not_open_cut_source",
+        "same_lane_value_safe_pair_before_candidate_copy",
+        "card_level_trace_or_equal_gate_before_promotion"
+      ],
+      "reviewed_seed_cards": [
+        "Dragon Tempest",
+        "Dihada, Binder of Wills"
+      ],
+      "status": "seed_exhaustion_role_needs_current_deck_negative_review",
+      "target_cut_role": "haste_protection_silence",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "current_deck_negative_review_candidate_count": 1,
+      "current_deck_negative_review_candidates": [
+        "Arcane Signet"
+      ],
+      "held_package_pair_required_candidates": [
+        "Fellwar Stone"
+      ],
+      "held_package_pair_required_count": 1,
+      "identity_resolution_required_candidates": [],
+      "identity_resolution_required_count": 0,
+      "next_gate": "collect_current_deck_negative_review_for_external_nonpayoff_candidates",
+      "prior_fresh_source_count": 0,
+      "prior_recycled_source_count": 15,
+      "prior_role_status": "reviewed_external_seeded_role_exhausted_current_deck_sources",
+      "prior_scanned_source_count": 15,
+      "prior_seed_count": 3,
+      "ready_seed_candidate_count": 3,
+      "ready_seed_candidates": [
+        "Sword of the Animist",
+        "Dihada, Binder of Wills",
+        "Simian Spirit Guide"
+      ],
+      "required_evidence": [
+        "current_deck_negative_review_before_cut_consideration",
+        "expanded_external_nonpayoff_source_candidates_if_current_deck_review_does_not_open_cut_source",
+        "same_lane_value_safe_pair_before_candidate_copy",
+        "card_level_trace_or_equal_gate_before_promotion"
+      ],
+      "reviewed_seed_cards": [
+        "Sword of the Animist",
+        "Dihada, Binder of Wills",
+        "Simian Spirit Guide"
+      ],
+      "status": "seed_exhaustion_role_needs_current_deck_negative_review",
+      "target_cut_role": "mana_acceleration",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "current_deck_negative_review_candidate_count": 4,
+      "current_deck_negative_review_candidates": [
+        "Demonic Tutor",
+        "Enlightened Tutor",
+        "Vampiric Tutor",
+        "Diabolic Intent"
+      ],
+      "held_package_pair_required_candidates": [
+        "Gamble"
+      ],
+      "held_package_pair_required_count": 1,
+      "identity_resolution_required_candidates": [],
+      "identity_resolution_required_count": 0,
+      "next_gate": "collect_current_deck_negative_review_for_external_nonpayoff_candidates",
+      "prior_fresh_source_count": 0,
+      "prior_recycled_source_count": 16,
+      "prior_role_status": "reviewed_external_seed_missing_for_target_role",
+      "prior_scanned_source_count": 16,
+      "prior_seed_count": 0,
+      "ready_seed_candidate_count": 0,
+      "ready_seed_candidates": [],
+      "required_evidence": [
+        "current_deck_negative_review_before_cut_consideration",
+        "expanded_external_nonpayoff_source_candidates_if_current_deck_review_does_not_open_cut_source",
+        "same_lane_value_safe_pair_before_candidate_copy",
+        "card_level_trace_or_equal_gate_before_promotion"
+      ],
+      "reviewed_seed_cards": [],
+      "status": "seed_exhaustion_role_needs_current_deck_negative_review",
+      "target_cut_role": "tutors_access",
+      "value_safe_reclassification_allowed": false
+    }
+  ],
+  "source_db_mutated": false,
+  "status": "external_nonpayoff_seed_exhaustion_recovery_routes_to_current_deck_negative_review",
+  "summary": {
+    "candidate_copy_blocker_count": 7,
+    "commander": "Kaalia of the Vast",
+    "current_deck_negative_review_candidate_count": 6,
+    "deck_id": "619",
+    "force_access_selected_db_absent_count": 10,
+    "held_package_pair_required_count": 4,
+    "identity_resolution_required_count": 1,
+    "next_gate": "collect_current_deck_negative_review_for_external_nonpayoff_candidates",
+    "prior_blocked_recycled_seeded_cut_source_count": 31,
+    "prior_fresh_seeded_same_lane_cut_source_count": 0,
+    "review_status_counts": {
+      "external_source_candidate_local_review_current_deck_trace_required": 6,
+      "external_source_candidate_local_review_held_package_pair_required": 4,
+      "external_source_candidate_local_review_needs_identity_resolution": 1,
+      "external_source_candidate_local_review_ready_for_miner_seed": 5
+    },
+    "role_status_counts": {
+      "seed_exhaustion_role_needs_current_deck_negative_review": 3
+    },
+    "seeded_exhausted_role_count": 2,
+    "target_role_count": 3,
+    "unseeded_role_count": 1
+  },
+  "value_safe_reclassification_allowed_now": false
+}
