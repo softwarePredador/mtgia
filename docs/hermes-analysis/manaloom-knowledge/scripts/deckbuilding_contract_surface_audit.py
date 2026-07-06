@@ -90,6 +90,12 @@ GLOBAL_COMMANDER_EXTERNAL_EXACT_ARTIFACT_ENGINE_SOURCE_EXPANDER = (
 GLOBAL_COMMANDER_EXTERNAL_EXACT_ARTIFACT_ENGINE_SOURCE_EXPANDER_TEST = (
     SCRIPT_DIR / "test_global_commander_external_exact_artifact_engine_source_expander.py"
 )
+GLOBAL_COMMANDER_EXTERNAL_EXACT_ARTIFACT_ENGINE_CANDIDATE_REVIEWER = (
+    SCRIPT_DIR / "global_commander_external_exact_artifact_engine_candidate_reviewer.py"
+)
+GLOBAL_COMMANDER_EXTERNAL_EXACT_ARTIFACT_ENGINE_CANDIDATE_REVIEWER_TEST = (
+    SCRIPT_DIR / "test_global_commander_external_exact_artifact_engine_candidate_reviewer.py"
+)
 GLOBAL_COMMANDER_CANDIDATE_COPY_MATERIALIZER = SCRIPT_DIR / "global_commander_candidate_copy_materializer.py"
 GLOBAL_COMMANDER_CANDIDATE_COPY_MATERIALIZER_TEST = (
     SCRIPT_DIR / "test_global_commander_candidate_copy_materializer.py"
@@ -475,6 +481,10 @@ GLOBAL_COMMANDER_ENGINE_EXACT_REPLACEMENT_OR_NEW_CUT_FINDER_REPORT = (
 GLOBAL_COMMANDER_EXTERNAL_EXACT_ARTIFACT_ENGINE_SOURCE_EXPANDER_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_external_exact_artifact_engine_source_expander_20260706_current.md"
+)
+GLOBAL_COMMANDER_EXTERNAL_EXACT_ARTIFACT_ENGINE_CANDIDATE_REVIEWER_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_external_exact_artifact_engine_candidate_reviewer_20260706_current.md"
 )
 GLOBAL_COMMANDER_CANDIDATE_COPY_MATERIALIZER_REPORT = (
     REPO_ROOT
@@ -1004,6 +1014,9 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_external_exact_artifact_engine_source_expander.py",
                 "global_commander_external_exact_artifact_engine_source_expander_20260706_current.md",
                 "review_external_exact_artifact_engine_candidates_locally_before_candidate_copy",
+                "global_commander_external_exact_artifact_engine_candidate_reviewer.py",
+                "global_commander_external_exact_artifact_engine_candidate_reviewer_20260706_current.md",
+                "backfill_local_oracle_cache_for_external_exact_engine_seeds_before_add_cut_review",
                 "global_commander_candidate_copy_materializer.py",
                 "global_commander_candidate_copy_materializer_20260705_kaalia_nonland_top_pair.md",
                 "must reject stale chained sources",
@@ -2042,6 +2055,31 @@ def build_audit() -> dict[str, Any]:
                 "outside_commander_color_identity",
                 "already_in_current_deck",
                 "Conspiracy",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_EXTERNAL_EXACT_ARTIFACT_ENGINE_CANDIDATE_REVIEWER,
+            [
+                "global_commander_external_exact_artifact_engine_candidate_reviewer",
+                "external_exact_artifact_engine_candidate_review_blocks_candidate_copy",
+                "backfill_local_oracle_cache_for_external_exact_engine_seeds_before_add_cut_review",
+                "missing_local_oracle_cache",
+                "candidate_copy_allowed_now",
+                "battle_gate_allowed_now",
+                "promotion_allowed",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_EXTERNAL_EXACT_ARTIFACT_ENGINE_CANDIDATE_REVIEWER_TEST,
+            [
+                "test_review_requires_local_oracle_and_current_deck_absence",
+                "local_external_exact_engine_candidate_ready_for_add_cut_review",
+                "missing_local_oracle_cache",
+                "already_in_current_deck",
             ],
         )
     )
@@ -3776,6 +3814,22 @@ def build_audit() -> dict[str, Any]:
                 "Digsite Engineer",
                 "Golem Foundry",
                 "Poetic Ingenuity",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_EXTERNAL_EXACT_ARTIFACT_ENGINE_CANDIDATE_REVIEWER_REPORT,
+            [
+                "Global Commander External Exact Artifact Engine Candidate Reviewer",
+                "external_exact_artifact_engine_candidate_review_blocks_candidate_copy",
+                "external_ready_input_count: `5`",
+                "local_review_ready_count: `0`",
+                "missing_local_oracle_count: `5`",
+                "candidate_copy_allowed_now: `false`",
+                "backfill_local_oracle_cache_for_external_exact_engine_seeds_before_add_cut_review",
+                "Digsite Engineer",
+                "Ravenous Robots",
             ],
         )
     )

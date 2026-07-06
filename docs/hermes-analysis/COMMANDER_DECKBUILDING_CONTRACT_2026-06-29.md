@@ -529,6 +529,12 @@ Operational priority after this pivot:
     false type-conversion matches, mark already-current and support-only cards,
     and keep candidate copy, battle, mutation, and promotion closed until local
     review proves same-lane add/cut fit.
+70. run `global_commander_external_exact_artifact_engine_candidate_reviewer.py`
+    after external exact source expansion. It must cross-check every external
+    seed against local Hermes Oracle rows, Commander legality, current-deck
+    presence, color identity, and exact engine signals. Missing local Oracle
+    rows block candidate copy and route to cache backfill instead of manual deck
+    insertion.
 
 Current pivot evidence:
 
@@ -552,6 +558,7 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_engine_cut_trace_replacement_reviewer_20260706_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_engine_exact_replacement_or_new_cut_finder_20260706_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_exact_artifact_engine_source_expander_20260706_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_external_exact_artifact_engine_candidate_reviewer_20260706_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_manual_negative_trace_reviewer_20260706_kaalia_value_safe_stage1_live_research.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_followup_live_source_research_expander_20260706_kaalia_value_safe_stage1_after_manual_trace.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_expanded_source_candidate_reviewer_20260706_kaalia_value_safe_stage1_followup_live_after_manual_trace.md`
@@ -1510,6 +1517,14 @@ Current external refresh on 2026-07-05:
   Biotransference-style payoff replacements. Candidate copy, battle, and
   promotion remain closed; the next gate is
   `review_external_exact_artifact_engine_candidates_locally_before_candidate_copy`.
+- The external exact artifact-engine candidate reviewer cross-checks those
+  external seeds against local Hermes data. The five ready external seeds all
+  have local Commander legality, but no local `card_oracle_cache` row, so
+  `local_review_ready_count=0` and `missing_local_oracle_count=5`.
+  `Biotransference` remains blocked as already in the deck, and support-only
+  rows stay blocked. Candidate copy, battle, and promotion remain closed; the
+  next gate is
+  `backfill_local_oracle_cache_for_external_exact_engine_seeds_before_add_cut_review`.
 
 ## Global Commander Rollout - 2026-07-01
 

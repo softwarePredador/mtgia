@@ -326,6 +326,14 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     (`Digsite Engineer`, `Golem Foundry`, `Myrsmith`, `Poetic Ingenuity`,
     `Ravenous Robots`); candidate copy, battle e promocao continuam fechados
     ate `review_external_exact_artifact_engine_candidates_locally_before_candidate_copy`.
+    O reviewer local seguinte roda em
+    `manaloom-knowledge/scripts/global_commander_external_exact_artifact_engine_candidate_reviewer.py`,
+    com evidencia:
+    `master_optimizer_reports/global_commander_external_exact_artifact_engine_candidate_reviewer_20260706_current.md`.
+    Resultado: os cinco seeds externos prontos tem legalidade Commander local,
+    mas nao tem `card_oracle_cache` local; `local_review_ready_count=0`,
+    `missing_local_oracle_count=5`, e o proximo gate e
+    `backfill_local_oracle_cache_for_external_exact_engine_seeds_before_add_cut_review`.
     Quando uma hipotese add/cut estiver pronta, rode
     `manaloom-knowledge/scripts/global_commander_candidate_copy_materializer.py`
     para materializar uma unica troca em copia isolada do Hermes SQLite. A
