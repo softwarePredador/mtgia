@@ -22,6 +22,14 @@ Execution contract:
 - If the contract checkpoint passes, do not revalidate the full strategy again;
   rebuild the queue and continue family/subpattern work.
 
+Current database target note:
+
+- Any older reference in this file to `143.198.230.247:5433/halder` is
+  historical package evidence only. It is not the current operational target.
+  Current local PostgreSQL work must use
+  `server/bin/with_new_server_pg.sh`, which resolves to
+  `127.0.0.1:15432/halder` through the new EasyPanel server.
+
 ## Decision
 
 Use a staged source-and-gate pipeline:
