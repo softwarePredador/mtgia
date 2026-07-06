@@ -11242,18 +11242,58 @@ def activation_sacrifice_cost_from_source(text: str, window: str) -> dict[str, A
 
 def activation_discard_cost_from_oracle(text: str) -> dict[str, Any] | None:
     cost_text = str(text or "").lower().rsplit(":", 1)[0]
+    if re.search(r"(?:^|,)\s*discard a card at random\s*$", cost_text):
+        return {
+            "activation_discard_count": 1,
+            "activation_discard_target": "any_card",
+            "activation_requires_discard_card": True,
+            "activation_discard_random": True,
+        }
+    if re.search(r"(?:^|,)\s*discard a land card\s*$", cost_text):
+        return {
+            "activation_discard_count": 1,
+            "activation_discard_target": "land_card",
+            "activation_requires_discard_card": True,
+        }
     if re.search(r"(?:^|,)\s*discard a card\s*$", cost_text):
-        return {"activation_discard_count": 1, "activation_discard_target": "any_card"}
+        return {
+            "activation_discard_count": 1,
+            "activation_discard_target": "any_card",
+            "activation_requires_discard_card": True,
+        }
     return None
 
 
 def activation_discard_cost_from_source(window: str) -> dict[str, Any] | str | None:
-    if "DiscardCardCost" not in (window or ""):
+    if "DiscardCardCost" not in (window or "") and "DiscardTargetCost" not in (window or ""):
         return None
-    matches = re.findall(r"new\s+DiscardCardCost\s*\(\s*\)", window or "")
-    if len(matches) != 1:
+    random_matches = re.findall(r"new\s+DiscardCardCost\s*\(\s*true\s*\)", window or "")
+    plain_matches = re.findall(r"new\s+DiscardCardCost\s*\(\s*\)", window or "")
+    land_matches = re.findall(
+        r"new\s+DiscardTargetCost\s*\(\s*new\s+TargetCardInHand\s*\(\s*StaticFilters\.FILTER_CARD_LAND_A\s*\)\s*\)",
+        window or "",
+    )
+    supported_count = len(random_matches) + len(plain_matches) + len(land_matches)
+    if supported_count != 1:
         return "activated_damage_source_discard_cost_not_supported"
-    return {"activation_discard_count": 1, "activation_discard_target": "any_card"}
+    if random_matches:
+        return {
+            "activation_discard_count": 1,
+            "activation_discard_target": "any_card",
+            "activation_requires_discard_card": True,
+            "activation_discard_random": True,
+        }
+    if land_matches:
+        return {
+            "activation_discard_count": 1,
+            "activation_discard_target": "land_card",
+            "activation_requires_discard_card": True,
+        }
+    return {
+        "activation_discard_count": 1,
+        "activation_discard_target": "any_card",
+        "activation_requires_discard_card": True,
+    }
 
 
 def activated_damage_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
@@ -11309,7 +11349,6 @@ def activated_damage_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | N
 def activated_damage_from_source(source: str) -> dict[str, Any] | str:
     text = source or ""
     risky_cost_classes = {
-        "DiscardTargetCost",
         "ExileFrom",
         "ExileFromTopOfLibraryCost",
         "ExileSourceFromGraveCost",
@@ -19404,6 +19443,10 @@ def split_row(
             oracle_damage.get("activation_discard_target") or "any_card"
         ):
             return None, "activated_damage_source_oracle_discard_cost_mismatch"
+        if bool(parsed_activation.get("activation_discard_random")) != bool(
+            oracle_damage.get("activation_discard_random")
+        ):
+            return None, "activated_damage_source_oracle_discard_cost_mismatch"
         type_line = str(metadata.get("type_line") or "").lower()
         permanent_effect = (
             "creature"
@@ -19446,6 +19489,8 @@ def split_row(
                     "activation_requires_sacrifice",
                     "activation_discard_count",
                     "activation_discard_target",
+                    "activation_requires_discard_card",
+                    "activation_discard_random",
                 )
                 if key in parsed_activation
             },
@@ -19453,6 +19498,11 @@ def split_row(
         if parsed_activation.get("activation_discard_count"):
             activated_effect["activation_discard_count"] = int(parsed_activation["activation_discard_count"])
             activated_effect["activation_discard_target"] = parsed_activation.get("activation_discard_target") or "any_card"
+            activated_effect["activation_requires_discard_card"] = bool(
+                parsed_activation.get("activation_requires_discard_card", True)
+            )
+            if parsed_activation.get("activation_discard_random"):
+                activated_effect["activation_discard_random"] = True
         if source_sacrifice_cost:
             effect_json["activation_sacrifice_cost"] = source_sacrifice_cost
             effect_json["activation_requires_sacrifice_target"] = True

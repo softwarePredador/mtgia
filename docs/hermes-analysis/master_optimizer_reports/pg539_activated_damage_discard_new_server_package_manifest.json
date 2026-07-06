@@ -1,0 +1,864 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg539_activated_damage_discard_new_serve_20260706_003929",
+  "deploy_id": "pg539_activated_damage_discard_new_server",
+  "execution_scenarios": [
+    {
+      "card": {
+        "name": "Mage il-Vec"
+      },
+      "controller_hand": [
+        {
+          "cmc": 2,
+          "effect": "draw_cards",
+          "name": "E2E Spare Card A",
+          "type_line": "Sorcery"
+        },
+        {
+          "cmc": 1,
+          "effect": "direct_damage",
+          "name": "E2E Spare Card B",
+          "type_line": "Instant"
+        }
+      ],
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 0,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_damage": 1,
+      "expected_discard_count": 1,
+      "expected_discard_random": true,
+      "expected_discard_target": "any_card",
+      "logical_rule_key": "battle_rule_v1:7504da6d9f0cbba64663f7aa1ca8a728",
+      "name": "Mage il-Vec activates damage ability",
+      "opponent_life": 7,
+      "type": "simple_activated_damage"
+    },
+    {
+      "card": {
+        "name": "Molten Vortex"
+      },
+      "controller_hand": [
+        {
+          "effect": "land",
+          "name": "E2E Spare Mountain",
+          "type_line": "Basic Land - Mountain"
+        },
+        {
+          "cmc": 2,
+          "effect": "draw_cards",
+          "name": "E2E Nonland Spell",
+          "type_line": "Sorcery"
+        }
+      ],
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 0,
+        "green": 0,
+        "red": 1,
+        "white": 0
+      },
+      "expected_damage": 2,
+      "expected_discard_count": 1,
+      "expected_discard_random": false,
+      "expected_discard_target": "land_card",
+      "logical_rule_key": "battle_rule_v1:deeb2ef8fb972c498b0670db5ba1bfee",
+      "name": "Molten Vortex activates damage ability",
+      "opponent_life": 7,
+      "type": "simple_activated_damage"
+    },
+    {
+      "card": {
+        "name": "Ogre Shaman"
+      },
+      "controller_hand": [
+        {
+          "cmc": 2,
+          "effect": "draw_cards",
+          "name": "E2E Spare Card A",
+          "type_line": "Sorcery"
+        },
+        {
+          "cmc": 1,
+          "effect": "direct_damage",
+          "name": "E2E Spare Card B",
+          "type_line": "Instant"
+        }
+      ],
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 2,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_damage": 2,
+      "expected_discard_count": 1,
+      "expected_discard_random": true,
+      "expected_discard_target": "any_card",
+      "logical_rule_key": "battle_rule_v1:a6b1c355c3d7fa7cd78fb45f73843db0",
+      "name": "Ogre Shaman activates damage ability",
+      "opponent_life": 7,
+      "type": "simple_activated_damage"
+    },
+    {
+      "card": {
+        "name": "Seismic Assault"
+      },
+      "controller_hand": [
+        {
+          "effect": "land",
+          "name": "E2E Spare Mountain",
+          "type_line": "Basic Land - Mountain"
+        },
+        {
+          "cmc": 2,
+          "effect": "draw_cards",
+          "name": "E2E Nonland Spell",
+          "type_line": "Sorcery"
+        }
+      ],
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 0,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_damage": 2,
+      "expected_discard_count": 1,
+      "expected_discard_random": false,
+      "expected_discard_target": "land_card",
+      "logical_rule_key": "battle_rule_v1:12ae6fda6601703f62b89b1540631311",
+      "name": "Seismic Assault activates damage ability",
+      "opponent_life": 7,
+      "type": "simple_activated_damage"
+    },
+    {
+      "card": {
+        "name": "Stormbind"
+      },
+      "controller_hand": [
+        {
+          "cmc": 2,
+          "effect": "draw_cards",
+          "name": "E2E Spare Card A",
+          "type_line": "Sorcery"
+        },
+        {
+          "cmc": 1,
+          "effect": "direct_damage",
+          "name": "E2E Spare Card B",
+          "type_line": "Instant"
+        }
+      ],
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 2,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_damage": 2,
+      "expected_discard_count": 1,
+      "expected_discard_random": true,
+      "expected_discard_target": "any_card",
+      "logical_rule_key": "battle_rule_v1:82bbcf0f7e2c856359ed7560cdac1453",
+      "name": "Stormbind activates damage ability",
+      "opponent_life": 7,
+      "type": "simple_activated_damage"
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Mage il-Vec",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7504da6d9f0cbba64663f7aa1ca8a728",
+      "min_rule_version": 2,
+      "normalized_name": "mage il-vec",
+      "oracle_hash": "06bac3591316f0c9a1d5e9c0061d4680",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "direct_damage",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{0}",
+            "activation_discard_count": 1,
+            "activation_discard_random": true,
+            "activation_discard_target": "any_card",
+            "activation_requires_discard_card": true,
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "activation_sacrifice_cost": null,
+            "amount": 1,
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "damage": 1,
+            "effect": "direct_damage",
+            "target": "any_target",
+            "target_constraints": {
+              "scope": "any_target"
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "DamageTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_damage_amount": 1,
+        "activated_effect": "direct_damage",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_discard_count": 1,
+        "activation_discard_random": true,
+        "activation_discard_target": "any_card",
+        "activation_requires_discard_card": true,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "creature",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Molten Vortex",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:deeb2ef8fb972c498b0670db5ba1bfee",
+      "min_rule_version": 2,
+      "normalized_name": "molten vortex",
+      "oracle_hash": "a3cfa452b69c4fd33103d471e819ab9e",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "direct_damage",
+            "activation_cost_colors": [
+              "R"
+            ],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{R}",
+            "activation_discard_count": 1,
+            "activation_discard_target": "land_card",
+            "activation_requires_discard_card": true,
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "activation_sacrifice_cost": null,
+            "amount": 2,
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "damage": 2,
+            "effect": "direct_damage",
+            "target": "any_target",
+            "target_constraints": {
+              "scope": "any_target"
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "DamageTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_damage_amount": 2,
+        "activated_effect": "direct_damage",
+        "activation_cost_colors": [
+          "R"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{R}",
+        "activation_discard_count": 1,
+        "activation_discard_target": "land_card",
+        "activation_requires_discard_card": true,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "enchantment",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Ogre Shaman",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a6b1c355c3d7fa7cd78fb45f73843db0",
+      "min_rule_version": 2,
+      "normalized_name": "ogre shaman",
+      "oracle_hash": "deed3cfb0b3ac3237b199c2bdbf1bd37",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "direct_damage",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 2,
+            "activation_cost_mana": "{2}",
+            "activation_discard_count": 1,
+            "activation_discard_random": true,
+            "activation_discard_target": "any_card",
+            "activation_requires_discard_card": true,
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "activation_sacrifice_cost": null,
+            "amount": 2,
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "damage": 2,
+            "effect": "direct_damage",
+            "target": "any_target",
+            "target_constraints": {
+              "scope": "any_target"
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "DamageTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_damage_amount": 2,
+        "activated_effect": "direct_damage",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}",
+        "activation_discard_count": 1,
+        "activation_discard_random": true,
+        "activation_discard_target": "any_card",
+        "activation_requires_discard_card": true,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "creature",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Seismic Assault",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:12ae6fda6601703f62b89b1540631311",
+      "min_rule_version": 2,
+      "normalized_name": "seismic assault",
+      "oracle_hash": "fa3965f363704064543330fbde6e67b4",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "direct_damage",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{0}",
+            "activation_discard_count": 1,
+            "activation_discard_target": "land_card",
+            "activation_requires_discard_card": true,
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "activation_sacrifice_cost": null,
+            "amount": 2,
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "damage": 2,
+            "effect": "direct_damage",
+            "target": "any_target",
+            "target_constraints": {
+              "scope": "any_target"
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "DamageTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_damage_amount": 2,
+        "activated_effect": "direct_damage",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_discard_count": 1,
+        "activation_discard_target": "land_card",
+        "activation_requires_discard_card": true,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "enchantment",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Stormbind",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:82bbcf0f7e2c856359ed7560cdac1453",
+      "min_rule_version": 2,
+      "normalized_name": "stormbind",
+      "oracle_hash": "00ec51bdde1a61dd0e78ba1269d39142",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "direct_damage",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 2,
+            "activation_cost_mana": "{2}",
+            "activation_discard_count": 1,
+            "activation_discard_random": true,
+            "activation_discard_target": "any_card",
+            "activation_requires_discard_card": true,
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "activation_sacrifice_cost": null,
+            "amount": 2,
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "damage": 2,
+            "effect": "direct_damage",
+            "target": "any_target",
+            "target_constraints": {
+              "scope": "any_target"
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "DamageTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_damage_amount": 2,
+        "activated_effect": "direct_damage",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}",
+        "activation_discard_count": 1,
+        "activation_discard_random": true,
+        "activation_discard_target": "any_card",
+        "activation_requires_discard_card": true,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "enchantment",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_permanent_simple_activated_damage": 5
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg539_activated_damage_discard_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg539_activated_damage_discard_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg539_activated_damage_discard_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg539_activated_damage_discard_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg539_activated_damage_discard_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg539_activated_damage_discard_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-06T00:39:29+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Mage il-Vec"
+      },
+      "card_name": "Mage il-Vec",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7504da6d9f0cbba64663f7aa1ca8a728",
+      "normalized_name": "mage il-vec",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "direct_damage",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{0}",
+            "activation_discard_count": 1,
+            "activation_discard_random": true,
+            "activation_discard_target": "any_card",
+            "activation_requires_discard_card": true,
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "activation_sacrifice_cost": null,
+            "amount": 1,
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "damage": 1,
+            "effect": "direct_damage",
+            "target": "any_target",
+            "target_constraints": {
+              "scope": "any_target"
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "DamageTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_damage_amount": 1,
+        "activated_effect": "direct_damage",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_discard_count": 1,
+        "activation_discard_random": true,
+        "activation_discard_target": "any_card",
+        "activation_requires_discard_card": true,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "creature",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Molten Vortex"
+      },
+      "card_name": "Molten Vortex",
+      "effect": "enchantment",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:deeb2ef8fb972c498b0670db5ba1bfee",
+      "normalized_name": "molten vortex",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "direct_damage",
+            "activation_cost_colors": [
+              "R"
+            ],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{R}",
+            "activation_discard_count": 1,
+            "activation_discard_target": "land_card",
+            "activation_requires_discard_card": true,
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "activation_sacrifice_cost": null,
+            "amount": 2,
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "damage": 2,
+            "effect": "direct_damage",
+            "target": "any_target",
+            "target_constraints": {
+              "scope": "any_target"
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "DamageTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_damage_amount": 2,
+        "activated_effect": "direct_damage",
+        "activation_cost_colors": [
+          "R"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{R}",
+        "activation_discard_count": 1,
+        "activation_discard_target": "land_card",
+        "activation_requires_discard_card": true,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "enchantment",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Ogre Shaman"
+      },
+      "card_name": "Ogre Shaman",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a6b1c355c3d7fa7cd78fb45f73843db0",
+      "normalized_name": "ogre shaman",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "direct_damage",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 2,
+            "activation_cost_mana": "{2}",
+            "activation_discard_count": 1,
+            "activation_discard_random": true,
+            "activation_discard_target": "any_card",
+            "activation_requires_discard_card": true,
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "activation_sacrifice_cost": null,
+            "amount": 2,
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "damage": 2,
+            "effect": "direct_damage",
+            "target": "any_target",
+            "target_constraints": {
+              "scope": "any_target"
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "DamageTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_damage_amount": 2,
+        "activated_effect": "direct_damage",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}",
+        "activation_discard_count": 1,
+        "activation_discard_random": true,
+        "activation_discard_target": "any_card",
+        "activation_requires_discard_card": true,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "creature",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Seismic Assault"
+      },
+      "card_name": "Seismic Assault",
+      "effect": "enchantment",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:12ae6fda6601703f62b89b1540631311",
+      "normalized_name": "seismic assault",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "direct_damage",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{0}",
+            "activation_discard_count": 1,
+            "activation_discard_target": "land_card",
+            "activation_requires_discard_card": true,
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "activation_sacrifice_cost": null,
+            "amount": 2,
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "damage": 2,
+            "effect": "direct_damage",
+            "target": "any_target",
+            "target_constraints": {
+              "scope": "any_target"
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "DamageTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_damage_amount": 2,
+        "activated_effect": "direct_damage",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_discard_count": 1,
+        "activation_discard_target": "land_card",
+        "activation_requires_discard_card": true,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "enchantment",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Stormbind"
+      },
+      "card_name": "Stormbind",
+      "effect": "enchantment",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:82bbcf0f7e2c856359ed7560cdac1453",
+      "normalized_name": "stormbind",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "direct_damage",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 2,
+            "activation_cost_mana": "{2}",
+            "activation_discard_count": 1,
+            "activation_discard_random": true,
+            "activation_discard_target": "any_card",
+            "activation_requires_discard_card": true,
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "activation_sacrifice_cost": null,
+            "amount": 2,
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "damage": 2,
+            "effect": "direct_damage",
+            "target": "any_target",
+            "target_constraints": {
+              "scope": "any_target"
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "DamageTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_damage_amount": 2,
+        "activated_effect": "direct_damage",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}",
+        "activation_discard_count": 1,
+        "activation_discard_random": true,
+        "activation_discard_target": "any_card",
+        "activation_requires_discard_card": true,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "enchantment",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Mage il-Vec",
+    "Molten Vortex",
+    "Ogre Shaman",
+    "Seismic Assault",
+    "Stormbind"
+  ],
+  "selected_count": 5,
+  "slug": "activated_damage_discard",
+  "snapshot_checks": [
+    {
+      "card_name": "Mage il-Vec",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7504da6d9f0cbba64663f7aa1ca8a728",
+      "min_rule_version": 2,
+      "normalized_name": "mage il-vec",
+      "oracle_hash": "06bac3591316f0c9a1d5e9c0061d4680",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Molten Vortex",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:deeb2ef8fb972c498b0670db5ba1bfee",
+      "min_rule_version": 2,
+      "normalized_name": "molten vortex",
+      "oracle_hash": "a3cfa452b69c4fd33103d471e819ab9e",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Ogre Shaman",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a6b1c355c3d7fa7cd78fb45f73843db0",
+      "min_rule_version": 2,
+      "normalized_name": "ogre shaman",
+      "oracle_hash": "deed3cfb0b3ac3237b199c2bdbf1bd37",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Seismic Assault",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:12ae6fda6601703f62b89b1540631311",
+      "min_rule_version": 2,
+      "normalized_name": "seismic assault",
+      "oracle_hash": "fa3965f363704064543330fbde6e67b4",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Stormbind",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:82bbcf0f7e2c856359ed7560cdac1453",
+      "min_rule_version": 2,
+      "normalized_name": "stormbind",
+      "oracle_hash": "00ec51bdde1a61dd0e78ba1269d39142",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

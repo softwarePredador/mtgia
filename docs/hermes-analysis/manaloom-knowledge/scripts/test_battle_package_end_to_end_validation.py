@@ -87,3 +87,59 @@ def test_validate_runtime_lookup_derives_checks_from_expected_rules() -> None:
     assert len(results) == 1
     assert results[0]["card_name"] == "Verge Rangers"
     assert results[0]["effect"] == "topdeck_play"
+
+
+def test_simple_activated_damage_runner_executes_random_discard_cost() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "enchantment",
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_effect": "direct_damage",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_damage_amount": 2,
+        "target": "any_target",
+        "target_constraints": {"scope": "any_target"},
+        "activation_cost_mana": "{2}",
+        "activation_cost_generic": 2,
+        "activation_cost_colors": [],
+        "activation_requires_tap": False,
+        "activation_requires_sacrifice": False,
+        "activation_discard_count": 1,
+        "activation_discard_target": "any_card",
+        "activation_requires_discard_card": True,
+        "activation_discard_random": True,
+        "_rule_logical_key": "battle_rule_v1:stormbind",
+    }
+    try:
+        result = validator.run_simple_activated_damage(
+            battle,
+            {
+                "name": "Stormbind activates damage ability",
+                "type": "simple_activated_damage",
+                "card": {"name": "Stormbind"},
+                "opponent_life": 7,
+                "controller_mana": {"generic": 2},
+                "controller_hand": [
+                    {"name": "E2E Spare Card A", "type_line": "Sorcery", "effect": "draw_cards", "cmc": 2},
+                    {"name": "E2E Spare Card B", "type_line": "Instant", "effect": "direct_damage", "cmc": 1},
+                ],
+                "expected_damage": 2,
+                "expected_discard_count": 1,
+                "expected_discard_target": "any_card",
+                "expected_discard_random": True,
+                "logical_rule_key": "battle_rule_v1:stormbind",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Stormbind"
+    assert result["damage"] == 2
+    assert result["discarded_count"] == 1
+    assert result["opponent_life"] == 5

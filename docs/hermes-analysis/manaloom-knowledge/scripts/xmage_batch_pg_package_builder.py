@@ -301,6 +301,7 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "activation_discard_count",
     "activation_discard_target",
     "activation_requires_discard_card",
+    "activation_discard_random",
     "activation_sacrifice_target",
     "activation_requires_sacrifice_target",
     "permanent_type",
@@ -1108,6 +1109,52 @@ def creature_dies_create_tokens_execution_scenario_from_expected_rule(
     }
 
 
+def simple_activated_damage_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_permanent_simple_activated_damage_v1":
+        return None
+    discard_target = str(required.get("activation_discard_target") or "any_card")
+    discard_hand = []
+    if int(required.get("activation_discard_count") or 0):
+        if discard_target == "land_card":
+            discard_hand = [
+                {"name": "E2E Spare Mountain", "type_line": "Basic Land - Mountain", "effect": "land"},
+                {"name": "E2E Nonland Spell", "type_line": "Sorcery", "effect": "draw_cards", "cmc": 2},
+            ]
+        else:
+            discard_hand = [
+                {"name": "E2E Spare Card A", "type_line": "Sorcery", "effect": "draw_cards", "cmc": 2},
+                {"name": "E2E Spare Card B", "type_line": "Instant", "effect": "direct_damage", "cmc": 1},
+            ]
+    return {
+        "name": f"{rule['card_name']} activates damage ability",
+        "type": "simple_activated_damage",
+        "card": {"name": rule["card_name"]},
+        "opponent_life": 7,
+        "controller_mana": {
+            "generic": int(required.get("activation_cost_generic") or 0),
+            **{
+                color_name: list(required.get("activation_cost_colors") or []).count(symbol)
+                for symbol, color_name in {
+                    "W": "white",
+                    "U": "blue",
+                    "B": "black",
+                    "R": "red",
+                    "G": "green",
+                }.items()
+            },
+        },
+        "controller_hand": discard_hand,
+        "expected_damage": int(required.get("activated_damage_amount") or required.get("amount") or 0),
+        "expected_discard_count": int(required.get("activation_discard_count") or 0),
+        "expected_discard_target": discard_target,
+        "expected_discard_random": bool(required.get("activation_discard_random")),
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any] | None:
     return (
         static_global_pt_execution_scenario_from_expected_rule(rule)
@@ -1115,6 +1162,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or destroy_target_create_treasure_execution_scenario_from_expected_rule(rule)
         or creature_etb_create_treasure_execution_scenario_from_expected_rule(rule)
         or creature_dies_create_tokens_execution_scenario_from_expected_rule(rule)
+        or simple_activated_damage_execution_scenario_from_expected_rule(rule)
         or fixed_create_creature_tokens_execution_scenario_from_expected_rule(rule)
         or multi_create_creature_tokens_execution_scenario_from_expected_rule(rule)
     )

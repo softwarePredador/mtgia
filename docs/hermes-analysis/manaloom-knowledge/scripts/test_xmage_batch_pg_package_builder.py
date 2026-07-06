@@ -477,6 +477,7 @@ def test_manifest_expected_rule_preserves_activation_discard_cost_fields() -> No
             "activation_discard_count": 1,
             "activation_discard_target": "any_card",
             "activation_requires_discard_card": True,
+            "activation_discard_random": True,
         },
     }
 
@@ -485,6 +486,40 @@ def test_manifest_expected_rule_preserves_activation_discard_cost_fields() -> No
     assert expected["required_effect_fields"]["activation_discard_count"] == 1
     assert expected["required_effect_fields"]["activation_discard_target"] == "any_card"
     assert expected["required_effect_fields"]["activation_requires_discard_card"] is True
+    assert expected["required_effect_fields"]["activation_discard_random"] is True
+
+
+def test_manifest_builds_simple_activated_damage_execution_scenario() -> None:
+    rule = {
+        "normalized_name": "stormbind",
+        "card_name": "Stormbind",
+        "oracle_hash": "hash-stormbind",
+        "logical_rule_key": "battle_rule_v1:hash-stormbind",
+        "required_effect_fields": {
+            "effect": "enchantment",
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "activated_damage_amount": 2,
+            "target": "any_target",
+            "activation_cost_mana": "{2}",
+            "activation_cost_generic": 2,
+            "activation_cost_colors": [],
+            "activation_discard_count": 1,
+            "activation_discard_target": "any_card",
+            "activation_requires_discard_card": True,
+            "activation_discard_random": True,
+        },
+    }
+
+    scenario = builder.simple_activated_damage_execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "simple_activated_damage"
+    assert scenario["expected_damage"] == 2
+    assert scenario["expected_discard_count"] == 1
+    assert scenario["expected_discard_target"] == "any_card"
+    assert scenario["expected_discard_random"] is True
+    assert scenario["controller_mana"]["generic"] == 2
+    assert len(scenario["controller_hand"]) == 2
 
 
 def test_manifest_expected_rule_preserves_spell_additional_sacrifice_cost_fields() -> None:

@@ -6994,6 +6994,76 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["_activated_rule_effects"][0]["activation_discard_count"], 1)
         self.assertEqual(effect["_activated_rule_effects"][0]["activation_discard_target"], "any_card")
 
+    def test_permanent_activated_damage_maps_random_discard_card_cost(self) -> None:
+        row = queue_row(
+            split.DAMAGE_UNIT,
+            effect_classes=["DamageTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Stormbind",
+                type_line="Enchantment",
+                oracle_text="{2}, Discard a card at random: Stormbind deals 2 damage to any target.",
+            ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(new DamageTargetEffect(2), new ManaCostsImpl<>("{2}"));
+                ability.addCost(new DiscardCardCost(true));
+                ability.addTarget(new TargetAnyTarget());
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "enchantment")
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_DAMAGE_SCOPE)
+        self.assertEqual(effect["activated_damage_amount"], 2)
+        self.assertEqual(effect["activation_cost_mana"], "{2}")
+        self.assertEqual(effect["activation_discard_count"], 1)
+        self.assertEqual(effect["activation_discard_target"], "any_card")
+        self.assertTrue(effect["activation_requires_discard_card"])
+        self.assertTrue(effect["activation_discard_random"])
+        self.assertTrue(effect["_activated_rule_effects"][0]["activation_discard_random"])
+
+    def test_permanent_activated_damage_maps_land_discard_cost(self) -> None:
+        row = queue_row(
+            split.DAMAGE_UNIT,
+            effect_classes=["DamageTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Molten Vortex",
+                type_line="Enchantment",
+                oracle_text="{R}, Discard a land card: Molten Vortex deals 2 damage to any target.",
+            ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(
+                    new DamageTargetEffect(2), new ManaCostsImpl<>("{R}")
+                );
+                ability.addCost(new DiscardTargetCost(new TargetCardInHand(StaticFilters.FILTER_CARD_LAND_A)));
+                ability.addTarget(new TargetAnyTarget());
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "enchantment")
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_DAMAGE_SCOPE)
+        self.assertEqual(effect["activation_cost_mana"], "{R}")
+        self.assertEqual(effect["activation_discard_count"], 1)
+        self.assertEqual(effect["activation_discard_target"], "land_card")
+        self.assertTrue(effect["activation_requires_discard_card"])
+        self.assertEqual(effect["_activated_rule_effects"][0]["activation_discard_target"], "land_card")
+
     def test_permanent_activated_damage_maps_artifact_tap_self_sacrifice(self) -> None:
         row = queue_row(
             split.DAMAGE_UNIT,

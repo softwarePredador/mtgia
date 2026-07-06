@@ -43635,6 +43635,8 @@ def _activated_rule_effects_for_permanent(permanent):
             "activation_sacrifice_cost": permanent.get("activation_sacrifice_cost"),
             "activation_discard_count": permanent.get("activation_discard_count"),
             "activation_discard_target": permanent.get("activation_discard_target"),
+            "activation_requires_discard_card": permanent.get("activation_requires_discard_card"),
+            "activation_discard_random": permanent.get("activation_discard_random"),
             "activation_cost_mana": permanent.get("activation_cost_mana"),
             "activation_cost_generic": permanent.get("activation_cost_generic"),
             "activation_cost_colors": permanent.get("activation_cost_colors"),
@@ -44123,6 +44125,39 @@ def _choose_activation_sacrifice_cost_candidate(player, source, effect_data):
     return chosen, candidates
 
 
+def _activation_discard_cost_candidates(player, count, target_type):
+    count = max(0, int(count or 0))
+    if count <= 0:
+        return []
+    target = str(target_type or "any_card")
+    return [
+        card
+        for card in getattr(player, "hand", []) or []
+        if isinstance(card, dict)
+        and graveyard_card_matches_recursion_target(card, target)
+    ]
+
+
+def _choose_activation_discard_cost_cards(player, count, target_type, *, random_discard=False, rng=None):
+    count = max(0, int(count or 0))
+    if count <= 0:
+        return []
+    candidates = _activation_discard_cost_candidates(player, count, target_type)
+    if len(candidates) < count:
+        return []
+    if random_discard:
+        chooser = rng or random
+        return list(chooser.sample(candidates, count))
+    return sorted(
+        candidates,
+        key=lambda card: (
+            lorehold_draw_priority(card, player),
+            int(_opening_hand_card_cmc(card) or 0),
+            card.get("name", "?"),
+        ),
+    )[:count]
+
+
 def can_activate_generic_tap_damage_permanent(player, permanent, opponents, *, effect_data=None):
     effect_data = effect_data or generic_tap_damage_effect_for_permanent(permanent)
     if effect_data is None:
@@ -44157,12 +44192,11 @@ def can_activate_generic_tap_damage_permanent(player, permanent, opponents, *, e
     activation_discard_count = int(effect_data.get("activation_discard_count") or 0)
     activation_discard_target = effect_data.get("activation_discard_target") or "any_card"
     if activation_discard_count:
-        if activation_discard_target != "any_card":
-            return False
-        discard_cards = _choose_graveyard_self_return_discard_cards(
+        discard_cards = _choose_activation_discard_cost_cards(
             player,
             activation_discard_count,
             activation_discard_target,
+            random_discard=bool(effect_data.get("activation_discard_random")),
         )
         if len(discard_cards) != activation_discard_count:
             return False
@@ -44201,12 +44235,12 @@ def activate_generic_tap_damage_permanent(player, opponents, permanent, turn, rn
     discard_cards = []
     discard_resolution = {"to_top": [], "to_graveyard": [], "used_replacement": False}
     if activation_discard_count:
-        if activation_discard_target != "any_card":
-            return False
-        discard_cards = _choose_graveyard_self_return_discard_cards(
+        discard_cards = _choose_activation_discard_cost_cards(
             player,
             activation_discard_count,
             activation_discard_target,
+            random_discard=bool(effect_data.get("activation_discard_random")),
+            rng=rng,
         )
         if len(discard_cards) != activation_discard_count:
             return False

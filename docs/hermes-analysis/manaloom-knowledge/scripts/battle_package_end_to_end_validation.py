@@ -1185,6 +1185,103 @@ def add_manifest_mana(player, mana: dict[str, Any]) -> None:
             player.mana_pool.add(normalized, count)
 
 
+def run_simple_activated_damage(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    effect = battle.get_card_effect(card)
+    permanent_type = str(effect.get("effect") or "permanent")
+    default_type_line = {
+        "creature": "Creature - Wizard",
+        "artifact": "Artifact",
+        "enchantment": "Enchantment",
+    }.get(permanent_type, "Artifact")
+    source = battle.enrich_card(
+        {
+            **card,
+            "type_line": default_type_line,
+            "summoning_sick": False,
+            **effect,
+            **dict(scenario.get("source_overrides") or {}),
+        }
+    )
+    active = battle.Player(str(scenario.get("player") or "Activated Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Activated Opponent"), None, [])
+    opponent.life = int(scenario.get("opponent_life") or 7)
+    active.battlefield = [source]
+    active.hand = [dict(card) for card in scenario.get("controller_hand", [])]
+    add_manifest_mana(active, scenario.get("controller_mana") or {})
+    starting_life = opponent.life
+    starting_hand_names = [card.get("name", "?") for card in active.hand if isinstance(card, dict)]
+    expected_damage = int(scenario.get("expected_damage") or effect.get("activated_damage_amount") or 0)
+    expected_discard_count = int(scenario.get("expected_discard_count") or 0)
+    expected_discard_target = str(scenario.get("expected_discard_target") or "any_card")
+
+    if not battle.can_activate_generic_tap_damage_permanent(active, source, [opponent]):
+        fail("battle_execution", f"{card['name']} simple activated damage cannot activate")
+    activated = battle.activate_generic_tap_damage_permanent(
+        active,
+        [opponent],
+        source,
+        turn=int(scenario.get("turn") or 7),
+        rng=random.Random(int(scenario.get("seed") or 6072)),
+        phase=str(scenario.get("phase") or "precombat_main"),
+    )
+    if not activated:
+        fail("battle_execution", f"{card['name']} simple activated damage activation failed")
+    if opponent.life != starting_life - expected_damage:
+        fail(
+            "battle_execution",
+            f"{card['name']} opponent life={opponent.life}, expected {starting_life - expected_damage}",
+        )
+    activation_event = next(
+        (
+            data
+            for event, data in reversed(events)
+            if event == "activated_ability"
+            and data.get("card") == card.get("name")
+            and data.get("activation_kind") == "simple_activated_damage"
+        ),
+        None,
+    )
+    if activation_event is None:
+        fail("battle_events", f"missing {card['name']} simple activated damage event")
+    if activation_event.get("discarded_count") != expected_discard_count:
+        fail(
+            "battle_events",
+            f"{card['name']} discarded_count={activation_event.get('discarded_count')}, expected {expected_discard_count}",
+        )
+    if expected_discard_count:
+        discarded = list(activation_event.get("discarded") or [])
+        if len(discarded) != expected_discard_count:
+            fail("battle_events", f"{card['name']} discarded={discarded!r}")
+        if not set(discarded).issubset(set(starting_hand_names)):
+            fail("battle_events", f"{card['name']} discarded cards not from starting hand: {discarded!r}")
+        if activation_event.get("discard_target") != expected_discard_target:
+            fail(
+                "battle_events",
+                f"{card['name']} discard_target={activation_event.get('discard_target')!r}, expected {expected_discard_target!r}",
+            )
+        if expected_discard_target == "land_card":
+            discarded_cards = [
+                card
+                for card in active.graveyard
+                if isinstance(card, dict) and card.get("name") in set(discarded)
+            ]
+            if not discarded_cards or not all(battle.is_land(card) for card in discarded_cards):
+                fail("battle_events", f"{card['name']} discarded non-land for land discard cost")
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "damage": expected_damage,
+        "opponent_life": opponent.life,
+        "discarded_count": expected_discard_count,
+        "discard_target": expected_discard_target if expected_discard_count else None,
+    }
+
+
 def assert_expected_event_fields(stage: str, card_name: str, event_data: dict[str, Any], expected: dict[str, Any]) -> None:
     for key, expected_value in expected.items():
         if event_data.get(key) != expected_value:
@@ -2043,6 +2140,7 @@ SCENARIO_RUNNERS = {
     "multi_create_creature_tokens": run_multi_create_creature_tokens,
     "nonfliers_cant_block_rider": run_nonfliers_cant_block_rider,
     "remove_permanent_basic_land_compensation": run_remove_permanent_basic_land_compensation,
+    "simple_activated_damage": run_simple_activated_damage,
     "static_global_power_toughness_boost": run_static_global_power_toughness_boost,
     "target_creature_cant_block": run_target_creature_cant_block,
     "token_maker_attack_each_opponent": run_token_maker_attack_each_opponent,

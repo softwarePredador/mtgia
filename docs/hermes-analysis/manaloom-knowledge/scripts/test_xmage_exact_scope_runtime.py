@@ -8215,6 +8215,117 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertEqual(opponent.life, 5)
         self.assertFalse(any(event == "activated_ability" for event, _ in self.events))
 
+    def test_simple_activated_damage_random_discard_cost_uses_random_hand_card(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        opponent.life = 6
+        active.mana_pool.add_generic(2)
+        spare_a = {"name": "Spare A", "type_line": "Sorcery", "effect": "draw_cards", "cmc": 2}
+        spare_b = {"name": "Spare B", "type_line": "Instant", "effect": "direct_damage", "cmc": 1}
+        active.hand.extend([spare_a, spare_b])
+        permanent = {
+            "name": "Stormbind",
+            "type_line": "Enchantment",
+            "effect": "enchantment",
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "activated_effect": "direct_damage",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "activated_damage_amount": 2,
+            "target": "any_target",
+            "target_constraints": {"scope": "any_target"},
+            "activation_cost_mana": "{2}",
+            "activation_cost_generic": 2,
+            "activation_cost_colors": [],
+            "activation_requires_tap": False,
+            "activation_requires_sacrifice": False,
+            "activation_discard_count": 1,
+            "activation_discard_target": "any_card",
+            "activation_requires_discard_card": True,
+            "activation_discard_random": True,
+            "_rule_logical_key": "battle_rule_v1:stormbind",
+        }
+        active.battlefield.append(permanent)
+
+        activated = self.battle.activate_generic_tap_damage_permanent(
+            active,
+            [opponent],
+            permanent,
+            turn=7,
+            rng=random.Random(64),
+            phase="precombat_main",
+        )
+
+        self.assertTrue(activated)
+        self.assertEqual(active.available_mana(), 0)
+        self.assertEqual(len(active.hand), 1)
+        self.assertEqual(len(active.graveyard), 1)
+        self.assertIn(active.graveyard[0]["name"], {"Spare A", "Spare B"})
+        self.assertEqual(opponent.life, 4)
+        self.assertTrue(
+            any(
+                event == "activated_ability"
+                and data.get("card") == "Stormbind"
+                and data.get("discarded_count") == 1
+                and data.get("discard_target") == "any_card"
+                and data.get("rule_logical_key") == "battle_rule_v1:stormbind"
+                for event, data in self.events
+            )
+        )
+
+    def test_simple_activated_damage_land_discard_cost_requires_land_card(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        opponent.life = 6
+        active.mana_pool.add("red", 1)
+        land = {"name": "Spare Mountain", "type_line": "Basic Land - Mountain", "effect": "land"}
+        nonland = {"name": "Spare Shock", "type_line": "Instant", "effect": "direct_damage", "cmc": 1}
+        active.hand.extend([nonland, land])
+        permanent = {
+            "name": "Molten Vortex",
+            "type_line": "Enchantment",
+            "effect": "enchantment",
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "activated_effect": "direct_damage",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "activated_damage_amount": 2,
+            "target": "any_target",
+            "target_constraints": {"scope": "any_target"},
+            "activation_cost_mana": "{R}",
+            "activation_cost_generic": 0,
+            "activation_cost_colors": ["R"],
+            "activation_requires_tap": False,
+            "activation_requires_sacrifice": False,
+            "activation_discard_count": 1,
+            "activation_discard_target": "land_card",
+            "activation_requires_discard_card": True,
+            "_rule_logical_key": "battle_rule_v1:molten_vortex",
+        }
+        active.battlefield.append(permanent)
+
+        activated = self.battle.activate_generic_tap_damage_permanent(
+            active,
+            [opponent],
+            permanent,
+            turn=7,
+            rng=random.Random(65),
+            phase="precombat_main",
+        )
+
+        self.assertTrue(activated)
+        self.assertIn(nonland, active.hand)
+        self.assertNotIn(land, active.hand)
+        self.assertIn(land, active.graveyard)
+        self.assertEqual(opponent.life, 4)
+        self.assertTrue(
+            any(
+                event == "activated_ability"
+                and data.get("card") == "Molten Vortex"
+                and data.get("discarded") == ["Spare Mountain"]
+                and data.get("discard_target") == "land_card"
+                for event, data in self.events
+            )
+        )
+
     def test_simple_activated_destroy_taps_and_destroys_tapped_creature(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])
