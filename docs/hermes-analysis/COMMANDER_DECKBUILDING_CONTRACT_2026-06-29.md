@@ -443,7 +443,18 @@ Operational priority after this pivot:
     land-lane candidates, legality/identity blockers, and genuinely fresh
     outside-deck source candidates before any miner rerun, candidate copy,
     battle, promotion, or value-safe reclassification;
-60. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
+60. run `global_commander_external_nonpayoff_new_source_candidate_reviewer.py`
+    after new-source finding; it must locally revalidate finder-ready rows
+    against current evaluation DB identity, deck presence, held package state,
+    recycled seed state, commander legality, land-lane routing, and role text,
+    then expose reviewed cards only as scoped miner seeds. It must keep
+    card-level cut permission, candidate copy, battle, promotion, and
+    value-safe reclassification closed. If those seeds do not find a fresh
+    current-deck same-lane cut source when the seeded miner reruns, route back
+    to broader external nonpayoff seed research or current-deck negative review
+    before any deck action; its immediate next gate is
+    `rerun_seeded_cut_source_miner_with_new_reviewed_external_nonpayoff_sources`;
+61. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
     probes, as regression evidence only unless they produce a named safe cut and
     equal-gate proof under the Lorehold promotion gate.
 
@@ -521,6 +532,8 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_seed_exhaustion_recovery_router_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_current_deck_negative_review_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_new_source_or_replacement_finder_20260706_kaalia_value_safe_stage1_repair_scope1.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_new_source_candidate_reviewer_20260706_kaalia_value_safe_stage1_repair_scope1.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_reviewed_external_nonpayoff_seeded_cut_source_miner_20260706_kaalia_value_safe_stage1_repair_scope1_new_sources.md`
 
 Historical candidate-copy, battle-probe, battle-feedback, and package-chain
 snapshots are local ignored evidence artifacts. The surface auditor must show
@@ -1178,6 +1191,30 @@ Current external refresh on 2026-07-05:
   `tutors_access=4`. This is source-review evidence only; it does not create
   cut permission or candidate-copy permission. The next gate is
   `review_new_external_nonpayoff_source_candidates_locally_before_seeded_miner`.
+- Current external nonpayoff new-source candidate review returns
+  `new_external_source_candidates_reviewed_seed_ready_no_deck_action` with
+  `finder_ready_candidate_count=19`, `reviewed_candidate_count=19`,
+  `miner_source_seed_allowed_count=19`, and seed coverage
+  `haste_protection_silence=8`, `mana_acceleration=7`, and
+  `tutors_access=4`. Seed scopes are split into
+  `equipment_haste_protection_seed=1`,
+  `generic_tutor_seed_bracket_context_required=1`,
+  `mana_rock_seed_curve_pressure_review=7`,
+  `package_access_limited_seed=3`, `protection_spell_or_haste_seed=6`, and
+  `removal_redirection_seed=1`. This only authorizes a seeded miner rerun; it
+  keeps cut permission, candidate copy, battle, promotion, and value-safe
+  reclassification closed.
+- The seeded miner rerun with those new reviewed external seeds returns
+  `reviewed_external_seeded_cut_source_mining_exhausted_current_deck_no_cut_permission`
+  with `reviewed_seed_count=19`, `seeded_role_count=3`,
+  `unseeded_target_role_count=0`, `scanned_seeded_same_lane_source_count=47`,
+  `fresh_seeded_same_lane_cut_source_count=0`,
+  `blocked_recycled_seeded_cut_source_count=47`, and
+  `blocked_new_seeded_cut_source_count=0`. Therefore the new seeds improved
+  coverage but still did not find a fresh current-deck cut source; candidate
+  copy, battle, promotion, and value-safe reclassification remain closed. The
+  next gate is
+  `expand_external_nonpayoff_seed_research_or_collect_current_deck_negative_review_before_candidate_copy`.
 
 ## Global Commander Rollout - 2026-07-01
 

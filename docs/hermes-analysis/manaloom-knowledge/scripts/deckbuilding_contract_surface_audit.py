@@ -288,6 +288,12 @@ GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_NEW_SOURCE_OR_REPLACEMENT_FINDER = (
 GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_NEW_SOURCE_OR_REPLACEMENT_FINDER_TEST = (
     SCRIPT_DIR / "test_global_commander_external_nonpayoff_new_source_or_replacement_finder.py"
 )
+GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_NEW_SOURCE_CANDIDATE_REVIEWER = (
+    SCRIPT_DIR / "global_commander_external_nonpayoff_new_source_candidate_reviewer.py"
+)
+GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_NEW_SOURCE_CANDIDATE_REVIEWER_TEST = (
+    SCRIPT_DIR / "test_global_commander_external_nonpayoff_new_source_candidate_reviewer.py"
+)
 README = REPO_ROOT / "docs/hermes-analysis/README.md"
 
 CONTRACT_MATRIX_JSON = (
@@ -597,6 +603,14 @@ GLOBAL_COMMANDER_SCOPE1_EXTERNAL_NONPAYOFF_CURRENT_DECK_NEGATIVE_REVIEW_COLLECTO
 GLOBAL_COMMANDER_SCOPE1_EXTERNAL_NONPAYOFF_NEW_SOURCE_OR_REPLACEMENT_FINDER_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_new_source_or_replacement_finder_20260706_kaalia_value_safe_stage1_repair_scope1.md"
+)
+GLOBAL_COMMANDER_SCOPE1_EXTERNAL_NONPAYOFF_NEW_SOURCE_CANDIDATE_REVIEWER_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_new_source_candidate_reviewer_20260706_kaalia_value_safe_stage1_repair_scope1.md"
+)
+GLOBAL_COMMANDER_SCOPE1_REVIEWED_EXTERNAL_NONPAYOFF_SEEDED_CUT_SOURCE_MINER_NEW_SOURCES_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_reviewed_external_nonpayoff_seeded_cut_source_miner_20260706_kaalia_value_safe_stage1_repair_scope1_new_sources.md"
 )
 
 REQUIRED_FOCUS_CARDS = {
@@ -1013,6 +1027,13 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_external_nonpayoff_new_source_or_replacement_finder_20260706_kaalia_value_safe_stage1_repair_scope1.md",
                 "new_external_source_candidates_ready_for_local_review",
                 "review_new_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+                "global_commander_external_nonpayoff_new_source_candidate_reviewer.py",
+                "global_commander_external_nonpayoff_new_source_candidate_reviewer_20260706_kaalia_value_safe_stage1_repair_scope1.md",
+                "new_external_source_candidates_reviewed_seed_ready_no_deck_action",
+                "rerun_seeded_cut_source_miner_with_new_reviewed_external_nonpayoff_sources",
+                "global_commander_reviewed_external_nonpayoff_seeded_cut_source_miner_20260706_kaalia_value_safe_stage1_repair_scope1_new_sources.md",
+                "reviewed_external_seeded_cut_source_mining_exhausted_current_deck_no_cut_permission",
+                "blocked_recycled_seeded_cut_source_count=47",
                 "battle_gate_allowed_now",
                 "Path to Exile",
                 "Terminate",
@@ -1363,6 +1384,12 @@ def build_audit() -> dict[str, Any]:
                 "new_external_source_candidates_ready_for_local_review",
                 "new_external_ready_for_review_count=19",
                 "review_new_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+                "global_commander_external_nonpayoff_new_source_candidate_reviewer_20260706_kaalia_value_safe_stage1_repair_scope1.md",
+                "new_external_source_candidates_reviewed_seed_ready_no_deck_action",
+                "miner_source_seed_allowed_count=19",
+                "global_commander_reviewed_external_nonpayoff_seeded_cut_source_miner_20260706_kaalia_value_safe_stage1_repair_scope1_new_sources.md",
+                "scanned_seeded_same_lane_source_count=47",
+                "blocked_recycled_seeded_cut_source_count=47",
                 "battle_gate_allowed_now=false",
                 "Path to Exile",
                 "Terminate",
@@ -2473,6 +2500,36 @@ def build_audit() -> dict[str, Any]:
                 "test_land_candidate_routes_to_mana_base_lane",
                 "Loran's Escape",
                 "Hall of the Bandit Lord",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_NEW_SOURCE_CANDIDATE_REVIEWER,
+            [
+                "global_commander_external_nonpayoff_new_source_candidate_reviewer",
+                "new_external_source_candidates_reviewed_seed_ready_no_deck_action",
+                "new_external_source_local_review_ready_for_seeded_miner",
+                "new_external_source_local_review_blocks_current_deck",
+                "package_access_limited_seed",
+                "generic_tutor_seed_bracket_context_required",
+                "mana_rock_seed_curve_pressure_review",
+                "rerun_seeded_cut_source_miner_with_new_reviewed_external_nonpayoff_sources",
+                "card_level_cut_permission_now",
+                "candidate_copy_allowed_now",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_NEW_SOURCE_CANDIDATE_REVIEWER_TEST,
+            [
+                "test_ready_candidate_becomes_miner_seed_only",
+                "test_current_deck_candidate_is_blocked_even_if_finder_ready",
+                "test_equipment_tutor_seed_is_package_limited",
+                "new_external_source_candidates_reviewed_seed_ready_no_deck_action",
+                "new_external_source_local_review_blocks_current_deck",
+                "package_access_limited_seed",
             ],
         )
     )
@@ -3898,6 +3955,47 @@ def build_audit() -> dict[str, Any]:
                 "Grim Tutor",
                 "Stoneforge Mystic",
                 "review_new_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SCOPE1_EXTERNAL_NONPAYOFF_NEW_SOURCE_CANDIDATE_REVIEWER_REPORT,
+            [
+                "Global Commander External Nonpayoff New Source Candidate Reviewer",
+                "new_external_source_candidates_reviewed_seed_ready_no_deck_action",
+                "finder_ready_candidate_count: `19`",
+                "reviewed_candidate_count: `19`",
+                "miner_source_seed_allowed_count: `19`",
+                "card_level_cut_permission_count: `0`",
+                "candidate_copy_allowed_count: `0`",
+                "candidate_copy_allowed_now: `false`",
+                "Lavaspur Boots",
+                "Open the Armory",
+                "Grim Tutor",
+                "package_access_limited_seed",
+                "generic_tutor_seed_bracket_context_required",
+                "mana_rock_seed_curve_pressure_review",
+                "rerun_seeded_cut_source_miner_with_new_reviewed_external_nonpayoff_sources",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SCOPE1_REVIEWED_EXTERNAL_NONPAYOFF_SEEDED_CUT_SOURCE_MINER_NEW_SOURCES_REPORT,
+            [
+                "Global Commander Reviewed External Nonpayoff Seeded Cut Source Miner",
+                "reviewed_external_seeded_cut_source_mining_exhausted_current_deck_no_cut_permission",
+                "reviewed_seed_count: `19`",
+                "seeded_role_count: `3`",
+                "unseeded_target_role_count: `0`",
+                "scanned_seeded_same_lane_source_count: `47`",
+                "fresh_seeded_same_lane_cut_source_count: `0`",
+                "blocked_recycled_seeded_cut_source_count: `47`",
+                "blocked_new_seeded_cut_source_count: `0`",
+                "candidate_copy_allowed_now: `false`",
+                "reviewed_external_seeds_found_no_fresh_current_deck_cut_source",
+                "expand_external_nonpayoff_seed_research_or_collect_current_deck_negative_review_before_candidate_copy",
             ],
         )
     )

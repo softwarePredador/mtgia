@@ -779,6 +779,25 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `haste_protection_silence=8`, `mana_acceleration=7` e `tutors_access=4`,
     mas seguem como seed/review apenas. O proximo gate e
     `review_new_external_nonpayoff_source_candidates_locally_before_seeded_miner`.
+    O reviewer local dessas fontes novas fica em
+    `global_commander_external_nonpayoff_new_source_candidate_reviewer_20260706_kaalia_value_safe_stage1_repair_scope1.md`.
+    Resultado:
+    `new_external_source_candidates_reviewed_seed_ready_no_deck_action`, com
+    `finder_ready_candidate_count=19`, `reviewed_candidate_count=19`,
+    `miner_source_seed_allowed_count=19`, cobertura
+    `haste_protection_silence=8`, `mana_acceleration=7` e `tutors_access=4`,
+    e `candidate_copy_allowed_now=false`. A rerodada do minerador com essas
+    sementes fica em
+    `global_commander_reviewed_external_nonpayoff_seeded_cut_source_miner_20260706_kaalia_value_safe_stage1_repair_scope1_new_sources.md`.
+    Resultado:
+    `reviewed_external_seeded_cut_source_mining_exhausted_current_deck_no_cut_permission`,
+    com `reviewed_seed_count=19`, `seeded_role_count=3`,
+    `unseeded_target_role_count=0`, `scanned_seeded_same_lane_source_count=47`,
+    `fresh_seeded_same_lane_cut_source_count=0`,
+    `blocked_recycled_seeded_cut_source_count=47` e
+    `blocked_new_seeded_cut_source_count=0`. Ou seja: seed coverage melhorou,
+    mas ainda nao existe cut-source fresco para abrir copy, battle, promocao ou
+    value-safe reclassification.
     Observacao operacional: snapshots historicos de candidate-copy, battle-probe,
     battle-feedback e package-chain dependem de artefatos locais ignorados. Se
     faltarem ou forem regenerados sem esses artefatos, a auditoria de superficie

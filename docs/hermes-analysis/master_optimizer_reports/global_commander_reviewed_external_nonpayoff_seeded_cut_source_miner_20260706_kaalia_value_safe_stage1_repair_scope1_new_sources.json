@@ -1,0 +1,3863 @@
+{
+  "artifact_type": "global_commander_reviewed_external_nonpayoff_seeded_cut_source_miner",
+  "base_miner_status": "same_lane_new_cut_source_mining_exhausted_current_deck",
+  "base_miner_summary": {
+    "blocked_new_cut_source_count": 0,
+    "blocked_recycled_cut_source_count": 47,
+    "candidate_copy_blocker_count": 3,
+    "commander": "Kaalia of the Vast",
+    "deck_id": "619",
+    "exhausted_source_card_count": 42,
+    "exhausted_source_counts_by_category": {
+      "external_reference_stage_cut_source": 1,
+      "prior_blocked_cut_source": 17,
+      "prior_stage_only_cut_source": 25,
+      "seen_stage_cut_source": 4,
+      "trace_missing_stage_cut_source": 2,
+      "used_cut_recovery_source": 18,
+      "used_stage_cut_source": 18
+    },
+    "fresh_count_by_role": {},
+    "fresh_same_lane_cut_source_count": 0,
+    "next_gate": "broaden_same_lane_cut_research_or_package_axis_before_candidate_copy",
+    "scanned_same_lane_source_count": 47,
+    "status_counts": {
+      "blocked_recycled_cut_source": 47
+    },
+    "target_role_count": 3,
+    "target_roles": [
+      "haste_protection_silence",
+      "mana_acceleration",
+      "tutors_access"
+    ]
+  },
+  "battle_gate_allowed_now": false,
+  "battle_gate_performed": false,
+  "battle_or_optimization_performed": false,
+  "battle_replay_performed": false,
+  "blocked_new_seeded_cut_sources": [],
+  "blocked_recycled_seeded_cut_sources": [
+    {
+      "battle_gate_allowed": false,
+      "block_reasons": [
+        "already_consumed_by_same_lane_evidence_chain"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Smothering Tithe",
+      "cmc": 4.0,
+      "exclusion_categories": [
+        "prior_stage_only_cut_source",
+        "used_cut_recovery_source",
+        "used_stage_cut_source"
+      ],
+      "exclusion_sample": [
+        {
+          "card_name": "Smothering Tithe",
+          "category": "used_stage_cut_source",
+          "reasons": [
+            "structural_foundation_staple_requires_same_lane_or_battle_proof"
+          ],
+          "source_artifact": "stage_cut_trace_collector",
+          "source_status": "same_lane_stage_cut_usage_trace_blocks_value_safe",
+          "target_cut_role": "mana_acceleration"
+        },
+        {
+          "card_name": "Smothering Tithe",
+          "category": "used_cut_recovery_source",
+          "reasons": [
+            "structural_foundation_staple_requires_same_lane_or_battle_proof"
+          ],
+          "source_artifact": "used_cut_recovery_router",
+          "source_status": "used_structural_or_anchor_cut_needs_strict_replacement_or_new_cut_source",
+          "target_cut_role": "mana_acceleration"
+        },
+        {
+          "card_name": "Smothering Tithe",
+          "category": "prior_stage_only_cut_source",
+          "reasons": [
+            "structural_foundation_staple_requires_same_lane_or_battle_proof"
+          ],
+          "source_artifact": "same_lane_cut_pair_collector",
+          "source_status": "stage_only_same_lane_cut_candidate",
+          "target_cut_role": "mana_acceleration"
+        }
+      ],
+      "format_staple": {
+        "archetype": "white",
+        "card_name": "Smothering Tithe",
+        "category": "",
+        "edhrec_rank": 57
+      },
+      "mutation_allowed": false,
+      "next_evidence": "do_not_recycle_without_new_trace_or_external_policy_change",
+      "profile_roles": [
+        "mana_acceleration"
+      ],
+      "risk_flags": [
+        "mana_acceleration_cut"
+      ],
+      "score": 64,
+      "source_reasons": [
+        "fresh_same_lane_mana_acceleration",
+        "single_profile_role_slot",
+        "higher_curve_cut_pressure",
+        "slower_ramp_review_pressure"
+      ],
+      "staple_tier": "structural_foundation_anchor",
+      "status": "blocked_recycled_cut_source",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Enchantment",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "block_reasons": [
+        "already_consumed_by_same_lane_evidence_chain"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+      "cmc": 3.0,
+      "exclusion_categories": [
+        "prior_stage_only_cut_source",
+        "used_cut_recovery_source",
+        "used_stage_cut_source"
+      ],
+      "exclusion_sample": [
+        {
+          "card_name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+          "category": "used_stage_cut_source",
+          "reasons": [
+            "global_battle_feedback_requires_new_same_lane_or_gate"
+          ],
+          "source_artifact": "stage_cut_trace_collector",
+          "source_status": "same_lane_stage_cut_usage_trace_blocks_value_safe",
+          "target_cut_role": "mana_acceleration"
+        },
+        {
+          "card_name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+          "category": "used_cut_recovery_source",
+          "reasons": [
+            "global_battle_feedback_requires_new_same_lane_or_gate"
+          ],
+          "source_artifact": "used_cut_recovery_router",
+          "source_status": "used_structural_or_anchor_cut_needs_strict_replacement_or_new_cut_source",
+          "target_cut_role": "mana_acceleration"
+        },
+        {
+          "card_name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+          "category": "prior_stage_only_cut_source",
+          "reasons": [
+            "global_battle_feedback_requires_new_same_lane_or_gate"
+          ],
+          "source_artifact": "same_lane_cut_pair_collector",
+          "source_status": "stage_only_same_lane_cut_candidate",
+          "target_cut_role": "mana_acceleration"
+        }
+      ],
+      "format_staple": {},
+      "mutation_allowed": false,
+      "next_evidence": "do_not_recycle_without_new_trace_or_external_policy_change",
+      "profile_roles": [
+        "mana_acceleration"
+      ],
+      "risk_flags": [
+        "mana_acceleration_cut"
+      ],
+      "score": 58,
+      "source_reasons": [
+        "fresh_same_lane_mana_acceleration",
+        "single_profile_role_slot",
+        "slower_ramp_review_pressure"
+      ],
+      "staple_tier": "not_format_staple",
+      "status": "blocked_recycled_cut_source",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Legendary Creature \u2014 God",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "block_reasons": [
+        "already_consumed_by_same_lane_evidence_chain"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Hammer of Nazahn",
+      "cmc": 4.0,
+      "exclusion_categories": [
+        "prior_stage_only_cut_source",
+        "used_cut_recovery_source",
+        "used_stage_cut_source"
+      ],
+      "exclusion_sample": [
+        {
+          "card_name": "Hammer of Nazahn",
+          "category": "used_stage_cut_source",
+          "reasons": [
+            "target_role_is_protected_profile_lane_requires_trace_or_equal_gate"
+          ],
+          "source_artifact": "stage_cut_trace_collector",
+          "source_status": "same_lane_stage_cut_usage_trace_blocks_value_safe",
+          "target_cut_role": "haste_protection_silence"
+        },
+        {
+          "card_name": "Hammer of Nazahn",
+          "category": "used_cut_recovery_source",
+          "reasons": [
+            "target_role_is_protected_profile_lane_requires_trace_or_equal_gate"
+          ],
+          "source_artifact": "used_cut_recovery_router",
+          "source_status": "used_cut_has_same_lane_add_route_but_not_value_safe",
+          "target_cut_role": "haste_protection_silence"
+        },
+        {
+          "card_name": "Hammer of Nazahn",
+          "category": "prior_stage_only_cut_source",
+          "reasons": [
+            "target_role_is_protected_profile_lane_requires_trace_or_equal_gate"
+          ],
+          "source_artifact": "same_lane_cut_pair_collector",
+          "source_status": "stage_only_same_lane_cut_candidate",
+          "target_cut_role": "haste_protection_silence"
+        }
+      ],
+      "format_staple": {},
+      "mutation_allowed": false,
+      "next_evidence": "do_not_recycle_without_new_trace_or_external_policy_change",
+      "profile_roles": [
+        "haste_protection_silence"
+      ],
+      "risk_flags": [
+        "attack_window_or_extra_combat_cut",
+        "haste_or_protection_cut"
+      ],
+      "score": 58,
+      "source_reasons": [
+        "fresh_same_lane_haste_protection_silence",
+        "single_profile_role_slot",
+        "higher_curve_cut_pressure"
+      ],
+      "staple_tier": "not_format_staple",
+      "status": "blocked_recycled_cut_source",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Legendary Artifact \u2014 Equipment",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "block_reasons": [
+        "already_consumed_by_same_lane_evidence_chain"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Jeska's Will",
+      "cmc": 3.0,
+      "exclusion_categories": [
+        "prior_stage_only_cut_source",
+        "used_cut_recovery_source",
+        "used_stage_cut_source"
+      ],
+      "exclusion_sample": [
+        {
+          "card_name": "Jeska's Will",
+          "category": "used_stage_cut_source",
+          "reasons": [
+            "structural_foundation_staple_requires_same_lane_or_battle_proof"
+          ],
+          "source_artifact": "stage_cut_trace_collector",
+          "source_status": "same_lane_stage_cut_usage_trace_blocks_value_safe",
+          "target_cut_role": "mana_acceleration"
+        },
+        {
+          "card_name": "Jeska's Will",
+          "category": "used_cut_recovery_source",
+          "reasons": [
+            "structural_foundation_staple_requires_same_lane_or_battle_proof"
+          ],
+          "source_artifact": "used_cut_recovery_router",
+          "source_status": "used_structural_or_anchor_cut_needs_strict_replacement_or_new_cut_source",
+          "target_cut_role": "mana_acceleration"
+        },
+        {
+          "card_name": "Jeska's Will",
+          "category": "prior_stage_only_cut_source",
+          "reasons": [
+            "structural_foundation_staple_requires_same_lane_or_battle_proof"
+          ],
+          "source_artifact": "same_lane_cut_pair_collector",
+          "source_status": "stage_only_same_lane_cut_candidate",
+          "target_cut_role": "mana_acceleration"
+        }
+      ],
+      "format_staple": {
+        "archetype": "red",
+        "card_name": "Jeska's Will",
+        "category": "",
+        "edhrec_rank": 102
+      },
+      "mutation_allowed": false,
+      "next_evidence": "do_not_recycle_without_new_trace_or_external_policy_change",
+      "profile_roles": [
+        "mana_acceleration"
+      ],
+      "risk_flags": [
+        "mana_acceleration_cut"
+      ],
+      "score": 58,
+      "source_reasons": [
+        "fresh_same_lane_mana_acceleration",
+        "single_profile_role_slot",
+        "slower_ramp_review_pressure"
+      ],
+      "staple_tier": "structural_foundation_anchor",
+      "status": "blocked_recycled_cut_source",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Sorcery",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "block_reasons": [
+        "already_consumed_by_same_lane_evidence_chain"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Ancient Copper Dragon",
+      "cmc": 6.0,
+      "exclusion_categories": [
+        "prior_blocked_cut_source"
+      ],
+      "exclusion_sample": [
+        {
+          "card_name": "Ancient Copper Dragon",
+          "category": "prior_blocked_cut_source",
+          "reasons": [
+            "non_target_cut_risk:angel_demon_dragon_payoff_cut",
+            "commander_expected_package_anchor_requires_stage_proof"
+          ],
+          "source_artifact": "same_lane_cut_pair_collector",
+          "source_status": "blocked_same_lane_cut_candidate",
+          "target_cut_role": "mana_acceleration"
+        }
+      ],
+      "format_staple": {},
+      "mutation_allowed": false,
+      "next_evidence": "do_not_recycle_without_new_trace_or_external_policy_change",
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "mana_acceleration"
+      ],
+      "risk_flags": [
+        "angel_demon_dragon_payoff_cut",
+        "mana_acceleration_cut"
+      ],
+      "score": 54,
+      "source_reasons": [
+        "fresh_same_lane_mana_acceleration",
+        "higher_curve_cut_pressure",
+        "slower_ramp_review_pressure"
+      ],
+      "staple_tier": "not_format_staple",
+      "status": "blocked_recycled_cut_source",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Creature \u2014 Elder Dragon",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "block_reasons": [
+        "already_consumed_by_same_lane_evidence_chain"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Cavern-Hoard Dragon",
+      "cmc": 9.0,
+      "exclusion_categories": [
+        "prior_blocked_cut_source"
+      ],
+      "exclusion_sample": [
+        {
+          "card_name": "Cavern-Hoard Dragon",
+          "category": "prior_blocked_cut_source",
+          "reasons": [
+            "other_protected_profile_role_haste_protection_silence",
+            "non_target_cut_risk:angel_demon_dragon_payoff_cut,haste_or_protection_cut"
+          ],
+          "source_artifact": "same_lane_cut_pair_collector",
+          "source_status": "blocked_same_lane_cut_candidate",
+          "target_cut_role": "mana_acceleration"
+        },
+        {
+          "card_name": "Cavern-Hoard Dragon",
+          "category": "prior_blocked_cut_source",
+          "reasons": [
+            "target_role_is_protected_profile_lane_requires_trace_or_equal_gate",
+            "non_target_cut_risk:angel_demon_dragon_payoff_cut,mana_acceleration_cut"
+          ],
+          "source_artifact": "same_lane_cut_pair_collector",
+          "source_status": "blocked_same_lane_cut_candidate",
+          "target_cut_role": "haste_protection_silence"
+        }
+      ],
+      "format_staple": {},
+      "mutation_allowed": false,
+      "next_evidence": "do_not_recycle_without_new_trace_or_external_policy_change",
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "haste_protection_silence",
+        "mana_acceleration"
+      ],
+      "risk_flags": [
+        "angel_demon_dragon_payoff_cut",
+        "mana_acceleration_cut",
+        "haste_or_protection_cut"
+      ],
+      "score": 54,
+      "source_reasons": [
+        "fresh_same_lane_mana_acceleration",
+        "higher_curve_cut_pressure",
+        "slower_ramp_review_pressure"
+      ],
+      "staple_tier": "not_format_staple",
+      "status": "blocked_recycled_cut_source",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Creature \u2014 Dragon",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "block_reasons": [
+        "already_consumed_by_same_lane_evidence_chain"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Goldlust Triad",
+      "cmc": 5.0,
+      "exclusion_categories": [
+        "prior_blocked_cut_source"
+      ],
+      "exclusion_sample": [
+        {
+          "card_name": "Goldlust Triad",
+          "category": "prior_blocked_cut_source",
+          "reasons": [
+            "non_target_cut_risk:angel_demon_dragon_payoff_cut"
+          ],
+          "source_artifact": "same_lane_cut_pair_collector",
+          "source_status": "blocked_same_lane_cut_candidate",
+          "target_cut_role": "mana_acceleration"
+        }
+      ],
+      "format_staple": {},
+      "mutation_allowed": false,
+      "next_evidence": "do_not_recycle_without_new_trace_or_external_policy_change",
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "mana_acceleration"
+      ],
+      "risk_flags": [
+        "angel_demon_dragon_payoff_cut",
+        "mana_acceleration_cut"
+      ],
+      "score": 54,
+      "source_reasons": [
+        "fresh_same_lane_mana_acceleration",
+        "higher_curve_cut_pressure",
+        "slower_ramp_review_pressure"
+      ],
+      "staple_tier": "not_format_staple",
+      "status": "blocked_recycled_cut_source",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Creature \u2014 Dragon",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "block_reasons": [
+        "already_consumed_by_same_lane_evidence_chain"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Goldspan Dragon",
+      "cmc": 5.0,
+      "exclusion_categories": [
+        "prior_blocked_cut_source"
+      ],
+      "exclusion_sample": [
+        {
+          "card_name": "Goldspan Dragon",
+          "category": "prior_blocked_cut_source",
+          "reasons": [
+            "other_protected_profile_role_haste_protection_silence",
+            "non_target_cut_risk:angel_demon_dragon_payoff_cut,haste_or_protection_cut"
+          ],
+          "source_artifact": "same_lane_cut_pair_collector",
+          "source_status": "blocked_same_lane_cut_candidate",
+          "target_cut_role": "mana_acceleration"
+        },
+        {
+          "card_name": "Goldspan Dragon",
+          "category": "prior_blocked_cut_source",
+          "reasons": [
+            "target_role_is_protected_profile_lane_requires_trace_or_equal_gate",
+            "non_target_cut_risk:angel_demon_dragon_payoff_cut,mana_acceleration_cut"
+          ],
+          "source_artifact": "same_lane_cut_pair_collector",
+          "source_status": "blocked_same_lane_cut_candidate",
+          "target_cut_role": "haste_protection_silence"
+        }
+      ],
+      "format_staple": {},
+      "mutation_allowed": false,
+      "next_evidence": "do_not_recycle_without_new_trace_or_external_policy_change",
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "haste_protection_silence",
+        "mana_acceleration"
+      ],
+      "risk_flags": [
+        "angel_demon_dragon_payoff_cut",
+        "mana_acceleration_cut",
+        "haste_or_protection_cut"
+      ],
+      "score": 54,
+      "source_reasons": [
+        "fresh_same_lane_mana_acceleration",
+        "higher_curve_cut_pressure",
+        "slower_ramp_review_pressure"
+      ],
+      "staple_tier": "not_format_staple",
+      "status": "blocked_recycled_cut_source",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Creature \u2014 Dragon",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "block_reasons": [
+        "already_consumed_by_same_lane_evidence_chain"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Angel of the Ruins",
+      "cmc": 7.0,
+      "exclusion_categories": [
+        "prior_blocked_cut_source"
+      ],
+      "exclusion_sample": [
+        {
+          "card_name": "Angel of the Ruins",
+          "category": "prior_blocked_cut_source",
+          "reasons": [
+            "non_target_cut_risk:angel_demon_dragon_payoff_cut",
+            "commander_expected_package_anchor_requires_stage_proof"
+          ],
+          "source_artifact": "same_lane_cut_pair_collector",
+          "source_status": "blocked_same_lane_cut_candidate",
+          "target_cut_role": "tutors_access"
+        }
+      ],
+      "format_staple": {},
+      "mutation_allowed": false,
+      "next_evidence": "do_not_recycle_without_new_trace_or_external_policy_change",
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "tutors_access"
+      ],
+      "risk_flags": [
+        "angel_demon_dragon_payoff_cut",
+        "tutor_access_cut"
+      ],
+      "score": 53,
+      "source_reasons": [
+        "fresh_same_lane_tutors_access",
+        "higher_curve_cut_pressure",
+        "high_curve_tutor_review_pressure"
+      ],
+      "staple_tier": "not_format_staple",
+      "status": "blocked_recycled_cut_source",
+      "target_cut_role": "tutors_access",
+      "type_line": "Artifact Creature \u2014 Angel",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "block_reasons": [
+        "already_consumed_by_same_lane_evidence_chain"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Hoarding Broodlord",
+      "cmc": 8.0,
+      "exclusion_categories": [
+        "prior_blocked_cut_source"
+      ],
+      "exclusion_sample": [
+        {
+          "card_name": "Hoarding Broodlord",
+          "category": "prior_blocked_cut_source",
+          "reasons": [
+            "non_target_cut_risk:angel_demon_dragon_payoff_cut",
+            "commander_expected_package_anchor_requires_stage_proof"
+          ],
+          "source_artifact": "same_lane_cut_pair_collector",
+          "source_status": "blocked_same_lane_cut_candidate",
+          "target_cut_role": "tutors_access"
+        }
+      ],
+      "format_staple": {},
+      "mutation_allowed": false,
+      "next_evidence": "do_not_recycle_without_new_trace_or_external_policy_change",
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "tutors_access"
+      ],
+      "risk_flags": [
+        "angel_demon_dragon_payoff_cut",
+        "tutor_access_cut"
+      ],
+      "score": 53,
+      "source_reasons": [
+        "fresh_same_lane_tutors_access",
+        "higher_curve_cut_pressure",
+        "high_curve_tutor_review_pressure"
+      ],
+      "staple_tier": "not_format_staple",
+      "status": "blocked_recycled_cut_source",
+      "target_cut_role": "tutors_access",
+      "type_line": "Creature \u2014 Dragon",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "block_reasons": [
+        "already_consumed_by_same_lane_evidence_chain"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Razaketh, the Foulblooded",
+      "cmc": 8.0,
+      "exclusion_categories": [
+        "prior_blocked_cut_source"
+      ],
+      "exclusion_sample": [
+        {
+          "card_name": "Razaketh, the Foulblooded",
+          "category": "prior_blocked_cut_source",
+          "reasons": [
+            "non_target_cut_risk:angel_demon_dragon_payoff_cut",
+            "commander_expected_package_anchor_requires_stage_proof"
+          ],
+          "source_artifact": "same_lane_cut_pair_collector",
+          "source_status": "blocked_same_lane_cut_candidate",
+          "target_cut_role": "tutors_access"
+        }
+      ],
+      "format_staple": {},
+      "mutation_allowed": false,
+      "next_evidence": "do_not_recycle_without_new_trace_or_external_policy_change",
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "tutors_access"
+      ],
+      "risk_flags": [
+        "angel_demon_dragon_payoff_cut",
+        "tutor_access_cut"
+      ],
+      "score": 53,
+      "source_reasons": [
+        "fresh_same_lane_tutors_access",
+        "higher_curve_cut_pressure",
+        "high_curve_tutor_review_pressure"
+      ],
+      "staple_tier": "not_format_staple",
+      "status": "blocked_recycled_cut_source",
+      "target_cut_role": "tutors_access",
+      "type_line": "Legendary Creature \u2014 Demon",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "block_reasons": [
+        "already_consumed_by_same_lane_evidence_chain"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Rune-Scarred Demon",
+      "cmc": 7.0,
+      "exclusion_categories": [
+        "prior_blocked_cut_source"
+      ],
+      "exclusion_sample": [
+        {
+          "card_name": "Rune-Scarred Demon",
+          "category": "prior_blocked_cut_source",
+          "reasons": [
+            "non_target_cut_risk:angel_demon_dragon_payoff_cut",
+            "commander_expected_package_anchor_requires_stage_proof"
+          ],
+          "source_artifact": "same_lane_cut_pair_collector",
+          "source_status": "blocked_same_lane_cut_candidate",
+          "target_cut_role": "tutors_access"
+        }
+      ],
+      "format_staple": {},
+      "mutation_allowed": false,
+      "next_evidence": "do_not_recycle_without_new_trace_or_external_policy_change",
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "tutors_access"
+      ],
+      "risk_flags": [
+        "angel_demon_dragon_payoff_cut",
+        "tutor_access_cut"
+      ],
+      "score": 53,
+      "source_reasons": [
+        "fresh_same_lane_tutors_access",
+        "higher_curve_cut_pressure",
+        "high_curve_tutor_review_pressure"
+      ],
+      "staple_tier": "not_format_staple",
+      "status": "blocked_recycled_cut_source",
+      "target_cut_role": "tutors_access",
+      "type_line": "Creature \u2014 Demon",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "block_reasons": [
+        "already_consumed_by_same_lane_evidence_chain"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Starfield Shepherd",
+      "cmc": 5.0,
+      "exclusion_categories": [
+        "prior_blocked_cut_source"
+      ],
+      "exclusion_sample": [
+        {
+          "card_name": "Starfield Shepherd",
+          "category": "prior_blocked_cut_source",
+          "reasons": [
+            "non_target_cut_risk:angel_demon_dragon_payoff_cut"
+          ],
+          "source_artifact": "same_lane_cut_pair_collector",
+          "source_status": "blocked_same_lane_cut_candidate",
+          "target_cut_role": "tutors_access"
+        }
+      ],
+      "format_staple": {},
+      "mutation_allowed": false,
+      "next_evidence": "do_not_recycle_without_new_trace_or_external_policy_change",
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "tutors_access"
+      ],
+      "risk_flags": [
+        "angel_demon_dragon_payoff_cut",
+        "tutor_access_cut"
+      ],
+      "score": 53,
+      "source_reasons": [
+        "fresh_same_lane_tutors_access",
+        "higher_curve_cut_pressure",
+        "high_curve_tutor_review_pressure"
+      ],
+      "staple_tier": "not_format_staple",
+      "status": "blocked_recycled_cut_source",
+      "target_cut_role": "tutors_access",
+      "type_line": "Creature \u2014 Angel",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "block_reasons": [
+        "already_consumed_by_same_lane_evidence_chain"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Arcane Signet",
+      "cmc": 2.0,
+      "exclusion_categories": [
+        "prior_stage_only_cut_source",
+        "used_cut_recovery_source",
+        "used_stage_cut_source"
+      ],
+      "exclusion_sample": [
+        {
+          "card_name": "Arcane Signet",
+          "category": "used_stage_cut_source",
+          "reasons": [
+            "commander_expected_package_anchor_requires_stage_proof",
+            "structural_foundation_staple_requires_same_lane_or_battle_proof"
+          ],
+          "source_artifact": "stage_cut_trace_collector",
+          "source_status": "same_lane_stage_cut_usage_trace_blocks_value_safe",
+          "target_cut_role": "mana_acceleration"
+        },
+        {
+          "card_name": "Arcane Signet",
+          "category": "used_cut_recovery_source",
+          "reasons": [
+            "commander_expected_package_anchor_requires_stage_proof",
+            "structural_foundation_staple_requires_same_lane_or_battle_proof"
+          ],
+          "source_artifact": "used_cut_recovery_router",
+          "source_status": "used_structural_or_anchor_cut_needs_strict_replacement_or_new_cut_source",
+          "target_cut_role": "mana_acceleration"
+        },
+        {
+          "card_name": "Arcane Signet",
+          "category": "prior_stage_only_cut_source",
+          "reasons": [
+            "commander_expected_package_anchor_requires_stage_proof",
+            "structural_foundation_staple_requires_same_lane_or_battle_proof"
+          ],
+          "source_artifact": "same_lane_cut_pair_collector",
+          "source_status": "stage_only_same_lane_cut_candidate",
+          "target_cut_role": "mana_acceleration"
+        }
+      ],
+      "format_staple": {
+        "archetype": "ramp",
+        "card_name": "Arcane Signet",
+        "category": "",
+        "edhrec_rank": 3
+      },
+      "mutation_allowed": false,
+      "next_evidence": "do_not_recycle_without_new_trace_or_external_policy_change",
+      "profile_roles": [
+        "mana_acceleration"
+      ],
+      "risk_flags": [
+        "mana_acceleration_cut"
+      ],
+      "score": 52,
+      "source_reasons": [
+        "fresh_same_lane_mana_acceleration",
+        "single_profile_role_slot"
+      ],
+      "staple_tier": "structural_foundation_anchor",
+      "status": "blocked_recycled_cut_source",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Artifact",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "block_reasons": [
+        "already_consumed_by_same_lane_evidence_chain"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Dark Ritual",
+      "cmc": 1.0,
+      "exclusion_categories": [
+        "external_reference_stage_cut_source",
+        "prior_stage_only_cut_source"
+      ],
+      "exclusion_sample": [
+        {
+          "card_name": "Dark Ritual",
+          "category": "external_reference_stage_cut_source",
+          "reasons": [
+            "structural_foundation_staple_requires_same_lane_or_battle_proof"
+          ],
+          "source_artifact": "stage_cut_trace_collector",
+          "source_status": "same_lane_stage_cut_external_reference_needs_internal_trace",
+          "target_cut_role": "mana_acceleration"
+        },
+        {
+          "card_name": "Dark Ritual",
+          "category": "prior_stage_only_cut_source",
+          "reasons": [
+            "structural_foundation_staple_requires_same_lane_or_battle_proof"
+          ],
+          "source_artifact": "same_lane_cut_pair_collector",
+          "source_status": "stage_only_same_lane_cut_candidate",
+          "target_cut_role": "mana_acceleration"
+        }
+      ],
+      "format_staple": {
+        "archetype": "black",
+        "card_name": "Dark Ritual",
+        "category": "",
+        "edhrec_rank": 36
+      },
+      "mutation_allowed": false,
+      "next_evidence": "do_not_recycle_without_new_trace_or_external_policy_change",
+      "profile_roles": [
+        "mana_acceleration"
+      ],
+      "risk_flags": [
+        "mana_acceleration_cut"
+      ],
+      "score": 52,
+      "source_reasons": [
+        "fresh_same_lane_mana_acceleration",
+        "single_profile_role_slot"
+      ],
+      "staple_tier": "structural_foundation_anchor",
+      "status": "blocked_recycled_cut_source",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Instant",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "block_reasons": [
+        "already_consumed_by_same_lane_evidence_chain"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Demonic Tutor",
+      "cmc": 2.0,
+      "exclusion_categories": [
+        "prior_stage_only_cut_source",
+        "used_cut_recovery_source",
+        "used_stage_cut_source"
+      ],
+      "exclusion_sample": [
+        {
+          "card_name": "Demonic Tutor",
+          "category": "used_stage_cut_source",
+          "reasons": [
+            "commander_expected_package_anchor_requires_stage_proof",
+            "structural_foundation_staple_requires_same_lane_or_battle_proof"
+          ],
+          "source_artifact": "stage_cut_trace_collector",
+          "source_status": "same_lane_stage_cut_usage_trace_blocks_value_safe",
+          "target_cut_role": "tutors_access"
+        },
+        {
+          "card_name": "Demonic Tutor",
+          "category": "used_cut_recovery_source",
+          "reasons": [
+            "commander_expected_package_anchor_requires_stage_proof",
+            "structural_foundation_staple_requires_same_lane_or_battle_proof"
+          ],
+          "source_artifact": "used_cut_recovery_router",
+          "source_status": "used_structural_or_anchor_cut_needs_strict_replacement_or_new_cut_source",
+          "target_cut_role": "tutors_access"
+        },
+        {
+          "card_name": "Demonic Tutor",
+          "category": "prior_stage_only_cut_source",
+          "reasons": [
+            "commander_expected_package_anchor_requires_stage_proof",
+            "structural_foundation_staple_requires_same_lane_or_battle_proof"
+          ],
+          "source_artifact": "same_lane_cut_pair_collector",
+          "source_status": "stage_only_same_lane_cut_candidate",
+          "target_cut_role": "tutors_access"
+        }
+      ],
+      "format_staple": {
+        "archetype": "combo",
+        "card_name": "Demonic Tutor",
+        "category": "",
+        "edhrec_rank": 58
+      },
+      "mutation_allowed": false,
+      "next_evidence": "do_not_recycle_without_new_trace_or_external_policy_change",
+      "profile_roles": [
+        "tutors_access"
+      ],
+      "risk_flags": [
+        "tutor_access_cut"
+      ],
+      "score": 52,
+      "source_reasons": [
+        "fresh_same_lane_tutors_access",
+        "single_profile_role_slot"
+      ],
+      "staple_tier": "structural_foundation_anchor",
+      "status": "blocked_recycled_cut_source",
+      "target_cut_role": "tutors_access",
+      "type_line": "Sorcery",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "block_reasons": [
+        "already_consumed_by_same_lane_evidence_chain"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Enlightened Tutor",
+      "cmc": 1.0,
+      "exclusion_categories": [
+        "prior_stage_only_cut_source",
+        "used_cut_recovery_source",
+        "used_stage_cut_source"
+      ],
+      "exclusion_sample": [
+        {
+          "card_name": "Enlightened Tutor",
+          "category": "used_stage_cut_source",
+          "reasons": [
+            "commander_expected_package_anchor_requires_stage_proof",
+            "structural_foundation_staple_requires_same_lane_or_battle_proof"
+          ],
+          "source_artifact": "stage_cut_trace_collector",
+          "source_status": "same_lane_stage_cut_usage_trace_blocks_value_safe",
+          "target_cut_role": "tutors_access"
+        },
+        {
+          "card_name": "Enlightened Tutor",
+          "category": "used_cut_recovery_source",
+          "reasons": [
+            "commander_expected_package_anchor_requires_stage_proof",
+            "structural_foundation_staple_requires_same_lane_or_battle_proof"
+          ],
+          "source_artifact": "used_cut_recovery_router",
+          "source_status": "used_structural_or_anchor_cut_needs_strict_replacement_or_new_cut_source",
+          "target_cut_role": "tutors_access"
+        },
+        {
+          "card_name": "Enlightened Tutor",
+          "category": "prior_stage_only_cut_source",
+          "reasons": [
+            "commander_expected_package_anchor_requires_stage_proof",
+            "structural_foundation_staple_requires_same_lane_or_battle_proof"
+          ],
+          "source_artifact": "same_lane_cut_pair_collector",
+          "source_status": "stage_only_same_lane_cut_candidate",
+          "target_cut_role": "tutors_access"
+        }
+      ],
+      "format_staple": {
+        "archetype": "combo",
+        "card_name": "Enlightened Tutor",
+        "category": "",
+        "edhrec_rank": 115
+      },
+      "mutation_allowed": false,
+      "next_evidence": "do_not_recycle_without_new_trace_or_external_policy_change",
+      "profile_roles": [
+        "tutors_access"
+      ],
+      "risk_flags": [
+        "tutor_access_cut"
+      ],
+      "score": 52,
+      "source_reasons": [
+        "fresh_same_lane_tutors_access",
+        "single_profile_role_slot"
+      ],
+      "staple_tier": "structural_foundation_anchor",
+      "status": "blocked_recycled_cut_source",
+      "target_cut_role": "tutors_access",
+      "type_line": "Instant",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "block_reasons": [
+        "already_consumed_by_same_lane_evidence_chain"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Lightning Greaves",
+      "cmc": 2.0,
+      "exclusion_categories": [
+        "prior_stage_only_cut_source",
+        "used_cut_recovery_source",
+        "used_stage_cut_source"
+      ],
+      "exclusion_sample": [
+        {
+          "card_name": "Lightning Greaves",
+          "category": "used_stage_cut_source",
+          "reasons": [
+            "target_role_is_protected_profile_lane_requires_trace_or_equal_gate",
+            "commander_expected_package_anchor_requires_stage_proof"
+          ],
+          "source_artifact": "stage_cut_trace_collector",
+          "source_status": "same_lane_stage_cut_usage_trace_blocks_value_safe",
+          "target_cut_role": "haste_protection_silence"
+        },
+        {
+          "card_name": "Lightning Greaves",
+          "category": "used_cut_recovery_source",
+          "reasons": [
+            "target_role_is_protected_profile_lane_requires_trace_or_equal_gate",
+            "commander_expected_package_anchor_requires_stage_proof"
+          ],
+          "source_artifact": "used_cut_recovery_router",
+          "source_status": "used_structural_or_anchor_cut_needs_strict_replacement_or_new_cut_source",
+          "target_cut_role": "haste_protection_silence"
+        },
+        {
+          "card_name": "Lightning Greaves",
+          "category": "prior_stage_only_cut_source",
+          "reasons": [
+            "target_role_is_protected_profile_lane_requires_trace_or_equal_gate",
+            "commander_expected_package_anchor_requires_stage_proof"
+          ],
+          "source_artifact": "same_lane_cut_pair_collector",
+          "source_status": "stage_only_same_lane_cut_candidate",
+          "target_cut_role": "haste_protection_silence"
+        }
+      ],
+      "format_staple": {},
+      "mutation_allowed": false,
+      "next_evidence": "do_not_recycle_without_new_trace_or_external_policy_change",
+      "profile_roles": [
+        "haste_protection_silence"
+      ],
+      "risk_flags": [
+        "attack_window_or_extra_combat_cut",
+        "haste_or_protection_cut"
+      ],
+      "score": 52,
+      "source_reasons": [
+        "fresh_same_lane_haste_protection_silence",
+        "single_profile_role_slot"
+      ],
+      "staple_tier": "not_format_staple",
+      "status": "blocked_recycled_cut_source",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Artifact \u2014 Equipment",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "block_reasons": [
+        "already_consumed_by_same_lane_evidence_chain"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Mana Vault",
+      "cmc": 1.0,
+      "exclusion_categories": [
+        "prior_stage_only_cut_source",
+        "used_cut_recovery_source",
+        "used_stage_cut_source"
+      ],
+      "exclusion_sample": [
+        {
+          "card_name": "Mana Vault",
+          "category": "used_stage_cut_source",
+          "reasons": [
+            "structural_foundation_staple_requires_same_lane_or_battle_proof"
+          ],
+          "source_artifact": "stage_cut_trace_collector",
+          "source_status": "same_lane_stage_cut_usage_trace_blocks_value_safe",
+          "target_cut_role": "mana_acceleration"
+        },
+        {
+          "card_name": "Mana Vault",
+          "category": "used_cut_recovery_source",
+          "reasons": [
+            "structural_foundation_staple_requires_same_lane_or_battle_proof"
+          ],
+          "source_artifact": "used_cut_recovery_router",
+          "source_status": "used_structural_or_anchor_cut_needs_strict_replacement_or_new_cut_source",
+          "target_cut_role": "mana_acceleration"
+        },
+        {
+          "card_name": "Mana Vault",
+          "category": "prior_stage_only_cut_source",
+          "reasons": [
+            "structural_foundation_staple_requires_same_lane_or_battle_proof"
+          ],
+          "source_artifact": "same_lane_cut_pair_collector",
+          "source_status": "stage_only_same_lane_cut_candidate",
+          "target_cut_role": "mana_acceleration"
+        }
+      ],
+      "format_staple": {
+        "archetype": "ramp",
+        "card_name": "Mana Vault",
+        "category": "",
+        "edhrec_rank": 144
+      },
+      "mutation_allowed": false,
+      "next_evidence": "do_not_recycle_without_new_trace_or_external_policy_change",
+      "profile_roles": [
+        "mana_acceleration"
+      ],
+      "risk_flags": [
+        "mana_acceleration_cut"
+      ],
+      "score": 52,
+      "source_reasons": [
+        "fresh_same_lane_mana_acceleration",
+        "single_profile_role_slot"
+      ],
+      "staple_tier": "structural_foundation_anchor",
+      "status": "blocked_recycled_cut_source",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Artifact",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "block_reasons": [
+        "already_consumed_by_same_lane_evidence_chain"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Sol Ring",
+      "cmc": 1.0,
+      "exclusion_categories": [
+        "prior_stage_only_cut_source",
+        "used_cut_recovery_source",
+        "used_stage_cut_source"
+      ],
+      "exclusion_sample": [
+        {
+          "card_name": "Sol Ring",
+          "category": "used_stage_cut_source",
+          "reasons": [
+            "commander_expected_package_anchor_requires_stage_proof",
+            "structural_foundation_staple_requires_same_lane_or_battle_proof"
+          ],
+          "source_artifact": "stage_cut_trace_collector",
+          "source_status": "same_lane_stage_cut_usage_trace_blocks_value_safe",
+          "target_cut_role": "mana_acceleration"
+        },
+        {
+          "card_name": "Sol Ring",
+          "category": "used_cut_recovery_source",
+          "reasons": [
+            "commander_expected_package_anchor_requires_stage_proof",
+            "structural_foundation_staple_requires_same_lane_or_battle_proof"
+          ],
+          "source_artifact": "used_cut_recovery_router",
+          "source_status": "used_structural_or_anchor_cut_needs_strict_replacement_or_new_cut_source",
+          "target_cut_role": "mana_acceleration"
+        },
+        {
+          "card_name": "Sol Ring",
+          "category": "prior_stage_only_cut_source",
+          "reasons": [
+            "commander_expected_package_anchor_requires_stage_proof",
+            "structural_foundation_staple_requires_same_lane_or_battle_proof"
+          ],
+          "source_artifact": "same_lane_cut_pair_collector",
+          "source_status": "stage_only_same_lane_cut_candidate",
+          "target_cut_role": "mana_acceleration"
+        }
+      ],
+      "format_staple": {
+        "archetype": "ramp",
+        "card_name": "Sol Ring",
+        "category": "",
+        "edhrec_rank": 1
+      },
+      "mutation_allowed": false,
+      "next_evidence": "do_not_recycle_without_new_trace_or_external_policy_change",
+      "profile_roles": [
+        "mana_acceleration"
+      ],
+      "risk_flags": [
+        "mana_acceleration_cut"
+      ],
+      "score": 52,
+      "source_reasons": [
+        "fresh_same_lane_mana_acceleration",
+        "single_profile_role_slot"
+      ],
+      "staple_tier": "structural_foundation_anchor",
+      "status": "blocked_recycled_cut_source",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Artifact",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "block_reasons": [
+        "already_consumed_by_same_lane_evidence_chain"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Vampiric Tutor",
+      "cmc": 1.0,
+      "exclusion_categories": [
+        "prior_stage_only_cut_source",
+        "seen_stage_cut_source"
+      ],
+      "exclusion_sample": [
+        {
+          "card_name": "Vampiric Tutor",
+          "category": "seen_stage_cut_source",
+          "reasons": [
+            "commander_expected_package_anchor_requires_stage_proof",
+            "structural_foundation_staple_requires_same_lane_or_battle_proof"
+          ],
+          "source_artifact": "stage_cut_trace_collector",
+          "source_status": "same_lane_stage_cut_seen_without_usage_needs_negative_review",
+          "target_cut_role": "tutors_access"
+        },
+        {
+          "card_name": "Vampiric Tutor",
+          "category": "prior_stage_only_cut_source",
+          "reasons": [
+            "commander_expected_package_anchor_requires_stage_proof",
+            "structural_foundation_staple_requires_same_lane_or_battle_proof"
+          ],
+          "source_artifact": "same_lane_cut_pair_collector",
+          "source_status": "stage_only_same_lane_cut_candidate",
+          "target_cut_role": "tutors_access"
+        }
+      ],
+      "format_staple": {
+        "archetype": "combo",
+        "card_name": "Vampiric Tutor",
+        "category": "",
+        "edhrec_rank": 106
+      },
+      "mutation_allowed": false,
+      "next_evidence": "do_not_recycle_without_new_trace_or_external_policy_change",
+      "profile_roles": [
+        "tutors_access"
+      ],
+      "risk_flags": [
+        "tutor_access_cut"
+      ],
+      "score": 52,
+      "source_reasons": [
+        "fresh_same_lane_tutors_access",
+        "single_profile_role_slot"
+      ],
+      "staple_tier": "structural_foundation_anchor",
+      "status": "blocked_recycled_cut_source",
+      "target_cut_role": "tutors_access",
+      "type_line": "Instant",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "block_reasons": [
+        "already_consumed_by_same_lane_evidence_chain"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Voice of Victory",
+      "cmc": 2.0,
+      "exclusion_categories": [
+        "prior_stage_only_cut_source",
+        "used_cut_recovery_source",
+        "used_stage_cut_source"
+      ],
+      "exclusion_sample": [
+        {
+          "card_name": "Voice of Victory",
+          "category": "used_stage_cut_source",
+          "reasons": [
+            "target_role_is_protected_profile_lane_requires_trace_or_equal_gate"
+          ],
+          "source_artifact": "stage_cut_trace_collector",
+          "source_status": "same_lane_stage_cut_usage_trace_blocks_value_safe",
+          "target_cut_role": "haste_protection_silence"
+        },
+        {
+          "card_name": "Voice of Victory",
+          "category": "used_cut_recovery_source",
+          "reasons": [
+            "target_role_is_protected_profile_lane_requires_trace_or_equal_gate"
+          ],
+          "source_artifact": "used_cut_recovery_router",
+          "source_status": "used_cut_has_same_lane_add_route_but_not_value_safe",
+          "target_cut_role": "haste_protection_silence"
+        },
+        {
+          "card_name": "Voice of Victory",
+          "category": "prior_stage_only_cut_source",
+          "reasons": [
+            "target_role_is_protected_profile_lane_requires_trace_or_equal_gate"
+          ],
+          "source_artifact": "same_lane_cut_pair_collector",
+          "source_status": "stage_only_same_lane_cut_candidate",
+          "target_cut_role": "haste_protection_silence"
+        }
+      ],
+      "format_staple": {},
+      "mutation_allowed": false,
+      "next_evidence": "do_not_recycle_without_new_trace_or_external_policy_change",
+      "profile_roles": [
+        "haste_protection_silence"
+      ],
+      "risk_flags": [
+        "haste_or_protection_cut"
+      ],
+      "score": 52,
+      "source_reasons": [
+        "fresh_same_lane_haste_protection_silence",
+        "single_profile_role_slot"
+      ],
+      "staple_tier": "not_format_staple",
+      "status": "blocked_recycled_cut_source",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Creature \u2014 Human Bard",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "block_reasons": [
+        "already_consumed_by_same_lane_evidence_chain"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Aurelia, the Law Above",
+      "cmc": 5.0,
+      "exclusion_categories": [
+        "prior_blocked_cut_source"
+      ],
+      "exclusion_sample": [
+        {
+          "card_name": "Aurelia, the Law Above",
+          "category": "prior_blocked_cut_source",
+          "reasons": [
+            "target_role_is_protected_profile_lane_requires_trace_or_equal_gate",
+            "non_target_cut_risk:angel_demon_dragon_payoff_cut,card_flow_cut"
+          ],
+          "source_artifact": "same_lane_cut_pair_collector",
+          "source_status": "blocked_same_lane_cut_candidate",
+          "target_cut_role": "haste_protection_silence"
+        }
+      ],
+      "format_staple": {},
+      "mutation_allowed": false,
+      "next_evidence": "do_not_recycle_without_new_trace_or_external_policy_change",
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "board_wipes_resets",
+        "card_draw_selection",
+        "haste_protection_silence"
+      ],
+      "risk_flags": [
+        "angel_demon_dragon_payoff_cut",
+        "haste_or_protection_cut",
+        "card_flow_cut"
+      ],
+      "score": 48,
+      "source_reasons": [
+        "fresh_same_lane_haste_protection_silence",
+        "higher_curve_cut_pressure"
+      ],
+      "staple_tier": "not_format_staple",
+      "status": "blocked_recycled_cut_source",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Legendary Creature \u2014 Angel",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "block_reasons": [
+        "already_consumed_by_same_lane_evidence_chain"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Blightsteel Colossus // Blightsteel Colossus",
+      "cmc": 12.0,
+      "exclusion_categories": [
+        "prior_stage_only_cut_source",
+        "seen_stage_cut_source"
+      ],
+      "exclusion_sample": [
+        {
+          "card_name": "Blightsteel Colossus // Blightsteel Colossus",
+          "category": "seen_stage_cut_source",
+          "reasons": [
+            "target_role_is_protected_profile_lane_requires_trace_or_equal_gate"
+          ],
+          "source_artifact": "stage_cut_trace_collector",
+          "source_status": "same_lane_stage_cut_seen_without_usage_needs_negative_review",
+          "target_cut_role": "haste_protection_silence"
+        },
+        {
+          "card_name": "Blightsteel Colossus // Blightsteel Colossus",
+          "category": "prior_stage_only_cut_source",
+          "reasons": [
+            "target_role_is_protected_profile_lane_requires_trace_or_equal_gate"
+          ],
+          "source_artifact": "same_lane_cut_pair_collector",
+          "source_status": "stage_only_same_lane_cut_candidate",
+          "target_cut_role": "haste_protection_silence"
+        }
+      ],
+      "format_staple": {},
+      "mutation_allowed": false,
+      "next_evidence": "do_not_recycle_without_new_trace_or_external_policy_change",
+      "profile_roles": [
+        "dedicated_win_conditions",
+        "haste_protection_silence"
+      ],
+      "risk_flags": [
+        "haste_or_protection_cut"
+      ],
+      "score": 48,
+      "source_reasons": [
+        "fresh_same_lane_haste_protection_silence",
+        "higher_curve_cut_pressure"
+      ],
+      "staple_tier": "not_format_staple",
+      "status": "blocked_recycled_cut_source",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Artifact Creature \u2014 Phyrexian Golem",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "block_reasons": [
+        "already_consumed_by_same_lane_evidence_chain"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Cavern-Hoard Dragon",
+      "cmc": 9.0,
+      "exclusion_categories": [
+        "prior_blocked_cut_source"
+      ],
+      "exclusion_sample": [
+        {
+          "card_name": "Cavern-Hoard Dragon",
+          "category": "prior_blocked_cut_source",
+          "reasons": [
+            "other_protected_profile_role_haste_protection_silence",
+            "non_target_cut_risk:angel_demon_dragon_payoff_cut,haste_or_protection_cut"
+          ],
+          "source_artifact": "same_lane_cut_pair_collector",
+          "source_status": "blocked_same_lane_cut_candidate",
+          "target_cut_role": "mana_acceleration"
+        },
+        {
+          "card_name": "Cavern-Hoard Dragon",
+          "category": "prior_blocked_cut_source",
+          "reasons": [
+            "target_role_is_protected_profile_lane_requires_trace_or_equal_gate",
+            "non_target_cut_risk:angel_demon_dragon_payoff_cut,mana_acceleration_cut"
+          ],
+          "source_artifact": "same_lane_cut_pair_collector",
+          "source_status": "blocked_same_lane_cut_candidate",
+          "target_cut_role": "haste_protection_silence"
+        }
+      ],
+      "format_staple": {},
+      "mutation_allowed": false,
+      "next_evidence": "do_not_recycle_without_new_trace_or_external_policy_change",
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "haste_protection_silence",
+        "mana_acceleration"
+      ],
+      "risk_flags": [
+        "angel_demon_dragon_payoff_cut",
+        "mana_acceleration_cut",
+        "haste_or_protection_cut"
+      ],
+      "score": 48,
+      "source_reasons": [
+        "fresh_same_lane_haste_protection_silence",
+        "higher_curve_cut_pressure"
+      ],
+      "staple_tier": "not_format_staple",
+      "status": "blocked_recycled_cut_source",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Creature \u2014 Dragon",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "block_reasons": [
+        "already_consumed_by_same_lane_evidence_chain"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Goldspan Dragon",
+      "cmc": 5.0,
+      "exclusion_categories": [
+        "prior_blocked_cut_source"
+      ],
+      "exclusion_sample": [
+        {
+          "card_name": "Goldspan Dragon",
+          "category": "prior_blocked_cut_source",
+          "reasons": [
+            "other_protected_profile_role_haste_protection_silence",
+            "non_target_cut_risk:angel_demon_dragon_payoff_cut,haste_or_protection_cut"
+          ],
+          "source_artifact": "same_lane_cut_pair_collector",
+          "source_status": "blocked_same_lane_cut_candidate",
+          "target_cut_role": "mana_acceleration"
+        },
+        {
+          "card_name": "Goldspan Dragon",
+          "category": "prior_blocked_cut_source",
+          "reasons": [
+            "target_role_is_protected_profile_lane_requires_trace_or_equal_gate",
+            "non_target_cut_risk:angel_demon_dragon_payoff_cut,mana_acceleration_cut"
+          ],
+          "source_artifact": "same_lane_cut_pair_collector",
+          "source_status": "blocked_same_lane_cut_candidate",
+          "target_cut_role": "haste_protection_silence"
+        }
+      ],
+      "format_staple": {},
+      "mutation_allowed": false,
+      "next_evidence": "do_not_recycle_without_new_trace_or_external_policy_change",
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "haste_protection_silence",
+        "mana_acceleration"
+      ],
+      "risk_flags": [
+        "angel_demon_dragon_payoff_cut",
+        "mana_acceleration_cut",
+        "haste_or_protection_cut"
+      ],
+      "score": 48,
+      "source_reasons": [
+        "fresh_same_lane_haste_protection_silence",
+        "higher_curve_cut_pressure"
+      ],
+      "staple_tier": "not_format_staple",
+      "status": "blocked_recycled_cut_source",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Creature \u2014 Dragon",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "block_reasons": [
+        "already_consumed_by_same_lane_evidence_chain"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Hellkite Charger",
+      "cmc": 6.0,
+      "exclusion_categories": [
+        "prior_blocked_cut_source"
+      ],
+      "exclusion_sample": [
+        {
+          "card_name": "Hellkite Charger",
+          "category": "prior_blocked_cut_source",
+          "reasons": [
+            "target_role_is_protected_profile_lane_requires_trace_or_equal_gate",
+            "non_target_cut_risk:angel_demon_dragon_payoff_cut"
+          ],
+          "source_artifact": "same_lane_cut_pair_collector",
+          "source_status": "blocked_same_lane_cut_candidate",
+          "target_cut_role": "haste_protection_silence"
+        }
+      ],
+      "format_staple": {},
+      "mutation_allowed": false,
+      "next_evidence": "do_not_recycle_without_new_trace_or_external_policy_change",
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "haste_protection_silence"
+      ],
+      "risk_flags": [
+        "angel_demon_dragon_payoff_cut",
+        "attack_window_or_extra_combat_cut",
+        "haste_or_protection_cut"
+      ],
+      "score": 48,
+      "source_reasons": [
+        "fresh_same_lane_haste_protection_silence",
+        "higher_curve_cut_pressure"
+      ],
+      "staple_tier": "not_format_staple",
+      "status": "blocked_recycled_cut_source",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Creature \u2014 Dragon",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "block_reasons": [
+        "already_consumed_by_same_lane_evidence_chain"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "The One Ring",
+      "cmc": 4.0,
+      "exclusion_categories": [
+        "prior_stage_only_cut_source",
+        "used_cut_recovery_source",
+        "used_stage_cut_source"
+      ],
+      "exclusion_sample": [
+        {
+          "card_name": "The One Ring",
+          "category": "used_stage_cut_source",
+          "reasons": [
+            "target_role_is_protected_profile_lane_requires_trace_or_equal_gate",
+            "non_target_cut_risk:card_flow_cut"
+          ],
+          "source_artifact": "stage_cut_trace_collector",
+          "source_status": "same_lane_stage_cut_usage_trace_blocks_value_safe",
+          "target_cut_role": "haste_protection_silence"
+        },
+        {
+          "card_name": "The One Ring",
+          "category": "used_cut_recovery_source",
+          "reasons": [
+            "target_role_is_protected_profile_lane_requires_trace_or_equal_gate",
+            "non_target_cut_risk:card_flow_cut"
+          ],
+          "source_artifact": "used_cut_recovery_router",
+          "source_status": "used_cut_has_same_lane_add_route_but_not_value_safe",
+          "target_cut_role": "haste_protection_silence"
+        },
+        {
+          "card_name": "The One Ring",
+          "category": "prior_stage_only_cut_source",
+          "reasons": [
+            "target_role_is_protected_profile_lane_requires_trace_or_equal_gate",
+            "non_target_cut_risk:card_flow_cut"
+          ],
+          "source_artifact": "same_lane_cut_pair_collector",
+          "source_status": "stage_only_same_lane_cut_candidate",
+          "target_cut_role": "haste_protection_silence"
+        }
+      ],
+      "format_staple": {},
+      "mutation_allowed": false,
+      "next_evidence": "do_not_recycle_without_new_trace_or_external_policy_change",
+      "profile_roles": [
+        "card_draw_selection",
+        "haste_protection_silence"
+      ],
+      "risk_flags": [
+        "haste_or_protection_cut",
+        "card_flow_cut"
+      ],
+      "score": 48,
+      "source_reasons": [
+        "fresh_same_lane_haste_protection_silence",
+        "higher_curve_cut_pressure"
+      ],
+      "staple_tier": "not_format_staple",
+      "status": "blocked_recycled_cut_source",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Legendary Artifact",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "block_reasons": [
+        "already_consumed_by_same_lane_evidence_chain"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Ranger-Captain of Eos",
+      "cmc": 3.0,
+      "exclusion_categories": [
+        "prior_stage_only_cut_source",
+        "trace_missing_stage_cut_source"
+      ],
+      "exclusion_sample": [
+        {
+          "card_name": "Ranger-Captain of Eos",
+          "category": "trace_missing_stage_cut_source",
+          "reasons": [
+            "other_protected_profile_role_haste_protection_silence",
+            "non_target_cut_risk:haste_or_protection_cut",
+            "commander_expected_package_anchor_requires_stage_proof"
+          ],
+          "source_artifact": "stage_cut_trace_collector",
+          "source_status": "same_lane_stage_cut_needs_trace_or_external_research",
+          "target_cut_role": "tutors_access"
+        },
+        {
+          "card_name": "Ranger-Captain of Eos",
+          "category": "trace_missing_stage_cut_source",
+          "reasons": [
+            "target_role_is_protected_profile_lane_requires_trace_or_equal_gate",
+            "non_target_cut_risk:tutor_access_cut",
+            "commander_expected_package_anchor_requires_stage_proof"
+          ],
+          "source_artifact": "stage_cut_trace_collector",
+          "source_status": "same_lane_stage_cut_needs_trace_or_external_research",
+          "target_cut_role": "haste_protection_silence"
+        },
+        {
+          "card_name": "Ranger-Captain of Eos",
+          "category": "prior_stage_only_cut_source",
+          "reasons": [
+            "other_protected_profile_role_haste_protection_silence",
+            "non_target_cut_risk:haste_or_protection_cut",
+            "commander_expected_package_anchor_requires_stage_proof"
+          ],
+          "source_artifact": "same_lane_cut_pair_collector",
+          "source_status": "stage_only_same_lane_cut_candidate",
+          "target_cut_role": "tutors_access"
+        },
+        {
+          "card_name": "Ranger-Captain of Eos",
+          "category": "prior_stage_only_cut_source",
+          "reasons": [
+            "target_role_is_protected_profile_lane_requires_trace_or_equal_gate",
+            "non_target_cut_risk:tutor_access_cut",
+            "commander_expected_package_anchor_requires_stage_proof"
+          ],
+          "source_artifact": "same_lane_cut_pair_collector",
+          "source_status": "stage_only_same_lane_cut_candidate",
+          "target_cut_role": "haste_protection_silence"
+        }
+      ],
+      "format_staple": {},
+      "mutation_allowed": false,
+      "next_evidence": "do_not_recycle_without_new_trace_or_external_policy_change",
+      "profile_roles": [
+        "haste_protection_silence",
+        "tutors_access"
+      ],
+      "risk_flags": [
+        "haste_or_protection_cut",
+        "tutor_access_cut"
+      ],
+      "score": 47,
+      "source_reasons": [
+        "fresh_same_lane_tutors_access",
+        "high_curve_tutor_review_pressure"
+      ],
+      "staple_tier": "not_format_staple",
+      "status": "blocked_recycled_cut_source",
+      "target_cut_role": "tutors_access",
+      "type_line": "Creature \u2014 Human Soldier Ranger",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "block_reasons": [
+        "already_consumed_by_same_lane_evidence_chain"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Sunforger",
+      "cmc": 3.0,
+      "exclusion_categories": [
+        "prior_stage_only_cut_source",
+        "used_cut_recovery_source",
+        "used_stage_cut_source"
+      ],
+      "exclusion_sample": [
+        {
+          "card_name": "Sunforger",
+          "category": "used_stage_cut_source",
+          "reasons": [
+            "non_target_cut_risk:attack_window_or_extra_combat_cut,card_flow_cut"
+          ],
+          "source_artifact": "stage_cut_trace_collector",
+          "source_status": "same_lane_stage_cut_usage_trace_blocks_value_safe",
+          "target_cut_role": "tutors_access"
+        },
+        {
+          "card_name": "Sunforger",
+          "category": "used_cut_recovery_source",
+          "reasons": [
+            "non_target_cut_risk:attack_window_or_extra_combat_cut,card_flow_cut"
+          ],
+          "source_artifact": "used_cut_recovery_router",
+          "source_status": "used_cut_has_same_lane_add_route_but_not_value_safe",
+          "target_cut_role": "tutors_access"
+        },
+        {
+          "card_name": "Sunforger",
+          "category": "prior_stage_only_cut_source",
+          "reasons": [
+            "non_target_cut_risk:attack_window_or_extra_combat_cut,card_flow_cut"
+          ],
+          "source_artifact": "same_lane_cut_pair_collector",
+          "source_status": "stage_only_same_lane_cut_candidate",
+          "target_cut_role": "tutors_access"
+        }
+      ],
+      "format_staple": {},
+      "mutation_allowed": false,
+      "next_evidence": "do_not_recycle_without_new_trace_or_external_policy_change",
+      "profile_roles": [
+        "card_draw_selection",
+        "tutors_access"
+      ],
+      "risk_flags": [
+        "attack_window_or_extra_combat_cut",
+        "tutor_access_cut",
+        "card_flow_cut"
+      ],
+      "score": 47,
+      "source_reasons": [
+        "fresh_same_lane_tutors_access",
+        "high_curve_tutor_review_pressure"
+      ],
+      "staple_tier": "not_format_staple",
+      "status": "blocked_recycled_cut_source",
+      "target_cut_role": "tutors_access",
+      "type_line": "Artifact \u2014 Equipment",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "block_reasons": [
+        "already_consumed_by_same_lane_evidence_chain"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "The Seriema",
+      "cmc": 3.0,
+      "exclusion_categories": [
+        "prior_stage_only_cut_source",
+        "trace_missing_stage_cut_source"
+      ],
+      "exclusion_sample": [
+        {
+          "card_name": "The Seriema",
+          "category": "trace_missing_stage_cut_source",
+          "reasons": [
+            "other_protected_profile_role_haste_protection_silence",
+            "non_target_cut_risk:haste_or_protection_cut"
+          ],
+          "source_artifact": "stage_cut_trace_collector",
+          "source_status": "same_lane_stage_cut_needs_trace_or_external_research",
+          "target_cut_role": "tutors_access"
+        },
+        {
+          "card_name": "The Seriema",
+          "category": "trace_missing_stage_cut_source",
+          "reasons": [
+            "target_role_is_protected_profile_lane_requires_trace_or_equal_gate",
+            "non_target_cut_risk:tutor_access_cut"
+          ],
+          "source_artifact": "stage_cut_trace_collector",
+          "source_status": "same_lane_stage_cut_needs_trace_or_external_research",
+          "target_cut_role": "haste_protection_silence"
+        },
+        {
+          "card_name": "The Seriema",
+          "category": "prior_stage_only_cut_source",
+          "reasons": [
+            "other_protected_profile_role_haste_protection_silence",
+            "non_target_cut_risk:haste_or_protection_cut"
+          ],
+          "source_artifact": "same_lane_cut_pair_collector",
+          "source_status": "stage_only_same_lane_cut_candidate",
+          "target_cut_role": "tutors_access"
+        },
+        {
+          "card_name": "The Seriema",
+          "category": "prior_stage_only_cut_source",
+          "reasons": [
+            "target_role_is_protected_profile_lane_requires_trace_or_equal_gate",
+            "non_target_cut_risk:tutor_access_cut"
+          ],
+          "source_artifact": "same_lane_cut_pair_collector",
+          "source_status": "stage_only_same_lane_cut_candidate",
+          "target_cut_role": "haste_protection_silence"
+        }
+      ],
+      "format_staple": {},
+      "mutation_allowed": false,
+      "next_evidence": "do_not_recycle_without_new_trace_or_external_policy_change",
+      "profile_roles": [
+        "haste_protection_silence",
+        "tutors_access"
+      ],
+      "risk_flags": [
+        "haste_or_protection_cut",
+        "tutor_access_cut"
+      ],
+      "score": 47,
+      "source_reasons": [
+        "fresh_same_lane_tutors_access",
+        "high_curve_tutor_review_pressure"
+      ],
+      "staple_tier": "not_format_staple",
+      "status": "blocked_recycled_cut_source",
+      "target_cut_role": "tutors_access",
+      "type_line": "Legendary Artifact \u2014 Spacecraft",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "block_reasons": [
+        "already_consumed_by_same_lane_evidence_chain"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Diabolic Intent",
+      "cmc": 2.0,
+      "exclusion_categories": [
+        "prior_stage_only_cut_source",
+        "used_cut_recovery_source",
+        "used_stage_cut_source"
+      ],
+      "exclusion_sample": [
+        {
+          "card_name": "Diabolic Intent",
+          "category": "used_stage_cut_source",
+          "reasons": [
+            "contextual_staple_requires_stage_review"
+          ],
+          "source_artifact": "stage_cut_trace_collector",
+          "source_status": "same_lane_stage_cut_usage_trace_blocks_value_safe",
+          "target_cut_role": "tutors_access"
+        },
+        {
+          "card_name": "Diabolic Intent",
+          "category": "used_cut_recovery_source",
+          "reasons": [
+            "contextual_staple_requires_stage_review"
+          ],
+          "source_artifact": "used_cut_recovery_router",
+          "source_status": "used_cut_has_same_lane_add_route_but_not_value_safe",
+          "target_cut_role": "tutors_access"
+        },
+        {
+          "card_name": "Diabolic Intent",
+          "category": "prior_stage_only_cut_source",
+          "reasons": [
+            "contextual_staple_requires_stage_review"
+          ],
+          "source_artifact": "same_lane_cut_pair_collector",
+          "source_status": "stage_only_same_lane_cut_candidate",
+          "target_cut_role": "tutors_access"
+        }
+      ],
+      "format_staple": {
+        "archetype": "black",
+        "card_name": "Diabolic Intent",
+        "category": "",
+        "edhrec_rank": 265
+      },
+      "mutation_allowed": false,
+      "next_evidence": "do_not_recycle_without_new_trace_or_external_policy_change",
+      "profile_roles": [
+        "tutors_access"
+      ],
+      "risk_flags": [
+        "tutor_access_cut"
+      ],
+      "score": 46,
+      "source_reasons": [
+        "fresh_same_lane_tutors_access",
+        "single_profile_role_slot",
+        "contextual_staple_needs_trace"
+      ],
+      "staple_tier": "contextual_staple_stage_only",
+      "status": "blocked_recycled_cut_source",
+      "target_cut_role": "tutors_access",
+      "type_line": "Sorcery",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "block_reasons": [
+        "already_consumed_by_same_lane_evidence_chain"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Grand Abolisher",
+      "cmc": 2.0,
+      "exclusion_categories": [
+        "prior_stage_only_cut_source",
+        "seen_stage_cut_source"
+      ],
+      "exclusion_sample": [
+        {
+          "card_name": "Grand Abolisher",
+          "category": "seen_stage_cut_source",
+          "reasons": [
+            "target_role_is_protected_profile_lane_requires_trace_or_equal_gate",
+            "commander_expected_package_anchor_requires_stage_proof",
+            "contextual_staple_requires_stage_review"
+          ],
+          "source_artifact": "stage_cut_trace_collector",
+          "source_status": "same_lane_stage_cut_seen_without_usage_needs_negative_review",
+          "target_cut_role": "haste_protection_silence"
+        },
+        {
+          "card_name": "Grand Abolisher",
+          "category": "prior_stage_only_cut_source",
+          "reasons": [
+            "target_role_is_protected_profile_lane_requires_trace_or_equal_gate",
+            "commander_expected_package_anchor_requires_stage_proof",
+            "contextual_staple_requires_stage_review"
+          ],
+          "source_artifact": "same_lane_cut_pair_collector",
+          "source_status": "stage_only_same_lane_cut_candidate",
+          "target_cut_role": "haste_protection_silence"
+        }
+      ],
+      "format_staple": {
+        "archetype": "white",
+        "card_name": "Grand Abolisher",
+        "category": "",
+        "edhrec_rank": 249
+      },
+      "mutation_allowed": false,
+      "next_evidence": "do_not_recycle_without_new_trace_or_external_policy_change",
+      "profile_roles": [
+        "haste_protection_silence"
+      ],
+      "risk_flags": [
+        "haste_or_protection_cut"
+      ],
+      "score": 46,
+      "source_reasons": [
+        "fresh_same_lane_haste_protection_silence",
+        "single_profile_role_slot",
+        "contextual_staple_needs_trace"
+      ],
+      "staple_tier": "contextual_staple_stage_only",
+      "status": "blocked_recycled_cut_source",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Creature \u2014 Human Cleric",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "block_reasons": [
+        "already_consumed_by_same_lane_evidence_chain"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Ornithopter of Paradise",
+      "cmc": 2.0,
+      "exclusion_categories": [
+        "prior_stage_only_cut_source",
+        "used_cut_recovery_source",
+        "used_stage_cut_source"
+      ],
+      "exclusion_sample": [
+        {
+          "card_name": "Ornithopter of Paradise",
+          "category": "used_stage_cut_source",
+          "reasons": [
+            "contextual_staple_requires_stage_review"
+          ],
+          "source_artifact": "stage_cut_trace_collector",
+          "source_status": "same_lane_stage_cut_usage_trace_blocks_value_safe",
+          "target_cut_role": "mana_acceleration"
+        },
+        {
+          "card_name": "Ornithopter of Paradise",
+          "category": "used_cut_recovery_source",
+          "reasons": [
+            "contextual_staple_requires_stage_review"
+          ],
+          "source_artifact": "used_cut_recovery_router",
+          "source_status": "used_cut_has_same_lane_add_route_but_not_value_safe",
+          "target_cut_role": "mana_acceleration"
+        },
+        {
+          "card_name": "Ornithopter of Paradise",
+          "category": "prior_stage_only_cut_source",
+          "reasons": [
+            "contextual_staple_requires_stage_review"
+          ],
+          "source_artifact": "same_lane_cut_pair_collector",
+          "source_status": "stage_only_same_lane_cut_candidate",
+          "target_cut_role": "mana_acceleration"
+        }
+      ],
+      "format_staple": {
+        "archetype": "ramp",
+        "card_name": "Ornithopter of Paradise",
+        "category": "",
+        "edhrec_rank": 227
+      },
+      "mutation_allowed": false,
+      "next_evidence": "do_not_recycle_without_new_trace_or_external_policy_change",
+      "profile_roles": [
+        "mana_acceleration"
+      ],
+      "risk_flags": [
+        "mana_acceleration_cut"
+      ],
+      "score": 46,
+      "source_reasons": [
+        "fresh_same_lane_mana_acceleration",
+        "single_profile_role_slot",
+        "contextual_staple_needs_trace"
+      ],
+      "staple_tier": "contextual_staple_stage_only",
+      "status": "blocked_recycled_cut_source",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Artifact Creature \u2014 Thopter",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "block_reasons": [
+        "already_consumed_by_same_lane_evidence_chain"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Silence",
+      "cmc": 1.0,
+      "exclusion_categories": [
+        "prior_stage_only_cut_source",
+        "used_cut_recovery_source",
+        "used_stage_cut_source"
+      ],
+      "exclusion_sample": [
+        {
+          "card_name": "Silence",
+          "category": "used_stage_cut_source",
+          "reasons": [
+            "target_role_is_protected_profile_lane_requires_trace_or_equal_gate",
+            "commander_expected_package_anchor_requires_stage_proof"
+          ],
+          "source_artifact": "stage_cut_trace_collector",
+          "source_status": "same_lane_stage_cut_usage_trace_blocks_value_safe",
+          "target_cut_role": "haste_protection_silence"
+        },
+        {
+          "card_name": "Silence",
+          "category": "used_cut_recovery_source",
+          "reasons": [
+            "target_role_is_protected_profile_lane_requires_trace_or_equal_gate",
+            "commander_expected_package_anchor_requires_stage_proof"
+          ],
+          "source_artifact": "used_cut_recovery_router",
+          "source_status": "used_structural_or_anchor_cut_needs_strict_replacement_or_new_cut_source",
+          "target_cut_role": "haste_protection_silence"
+        },
+        {
+          "card_name": "Silence",
+          "category": "prior_stage_only_cut_source",
+          "reasons": [
+            "target_role_is_protected_profile_lane_requires_trace_or_equal_gate",
+            "commander_expected_package_anchor_requires_stage_proof"
+          ],
+          "source_artifact": "same_lane_cut_pair_collector",
+          "source_status": "stage_only_same_lane_cut_candidate",
+          "target_cut_role": "haste_protection_silence"
+        }
+      ],
+      "format_staple": {
+        "archetype": "white",
+        "card_name": "Silence",
+        "category": "",
+        "edhrec_rank": 423
+      },
+      "mutation_allowed": false,
+      "next_evidence": "do_not_recycle_without_new_trace_or_external_policy_change",
+      "profile_roles": [
+        "haste_protection_silence"
+      ],
+      "risk_flags": [
+        "haste_or_protection_cut"
+      ],
+      "score": 44,
+      "source_reasons": [
+        "fresh_same_lane_haste_protection_silence",
+        "single_profile_role_slot",
+        "format_staple_needs_review"
+      ],
+      "staple_tier": "format_staple_reviewable",
+      "status": "blocked_recycled_cut_source",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Instant",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "block_reasons": [
+        "already_consumed_by_same_lane_evidence_chain"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Alicia Masters, Skilled Sculptor",
+      "cmc": 2.0,
+      "exclusion_categories": [
+        "prior_stage_only_cut_source",
+        "seen_stage_cut_source"
+      ],
+      "exclusion_sample": [
+        {
+          "card_name": "Alicia Masters, Skilled Sculptor",
+          "category": "seen_stage_cut_source",
+          "reasons": [
+            "non_target_cut_risk:attack_window_or_extra_combat_cut"
+          ],
+          "source_artifact": "stage_cut_trace_collector",
+          "source_status": "same_lane_stage_cut_seen_without_usage_needs_negative_review",
+          "target_cut_role": "mana_acceleration"
+        },
+        {
+          "card_name": "Alicia Masters, Skilled Sculptor",
+          "category": "prior_stage_only_cut_source",
+          "reasons": [
+            "non_target_cut_risk:attack_window_or_extra_combat_cut"
+          ],
+          "source_artifact": "same_lane_cut_pair_collector",
+          "source_status": "stage_only_same_lane_cut_candidate",
+          "target_cut_role": "mana_acceleration"
+        }
+      ],
+      "format_staple": {},
+      "mutation_allowed": false,
+      "next_evidence": "do_not_recycle_without_new_trace_or_external_policy_change",
+      "profile_roles": [
+        "board_wipes_resets",
+        "mana_acceleration"
+      ],
+      "risk_flags": [
+        "attack_window_or_extra_combat_cut",
+        "mana_acceleration_cut"
+      ],
+      "score": 42,
+      "source_reasons": [
+        "fresh_same_lane_mana_acceleration"
+      ],
+      "staple_tier": "not_format_staple",
+      "status": "blocked_recycled_cut_source",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Legendary Creature \u2014 Human Artificer",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "block_reasons": [
+        "already_consumed_by_same_lane_evidence_chain"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Arena of Glory",
+      "cmc": 0.0,
+      "exclusion_categories": [
+        "prior_blocked_cut_source"
+      ],
+      "exclusion_sample": [
+        {
+          "card_name": "Arena of Glory",
+          "category": "prior_blocked_cut_source",
+          "reasons": [
+            "target_role_is_protected_profile_lane_requires_trace_or_equal_gate",
+            "commander_expected_package_anchor_requires_stage_proof"
+          ],
+          "source_artifact": "same_lane_cut_pair_collector",
+          "source_status": "blocked_same_lane_cut_candidate",
+          "target_cut_role": "haste_protection_silence"
+        }
+      ],
+      "format_staple": {},
+      "mutation_allowed": false,
+      "next_evidence": "do_not_recycle_without_new_trace_or_external_policy_change",
+      "profile_roles": [
+        "haste_protection_silence",
+        "lands"
+      ],
+      "risk_flags": [
+        "haste_or_protection_cut"
+      ],
+      "score": 42,
+      "source_reasons": [
+        "fresh_same_lane_haste_protection_silence"
+      ],
+      "staple_tier": "not_format_staple",
+      "status": "blocked_recycled_cut_source",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Land",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "block_reasons": [
+        "already_consumed_by_same_lane_evidence_chain"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Arid Mesa",
+      "cmc": 0.0,
+      "exclusion_categories": [
+        "prior_blocked_cut_source"
+      ],
+      "exclusion_sample": [
+        {
+          "card_name": "Arid Mesa",
+          "category": "prior_blocked_cut_source",
+          "reasons": [
+            "structural_foundation_staple_requires_same_lane_or_battle_proof"
+          ],
+          "source_artifact": "same_lane_cut_pair_collector",
+          "source_status": "blocked_same_lane_cut_candidate",
+          "target_cut_role": "tutors_access"
+        }
+      ],
+      "format_staple": {
+        "archetype": "combo",
+        "card_name": "Arid Mesa",
+        "category": "",
+        "edhrec_rank": 55
+      },
+      "mutation_allowed": false,
+      "next_evidence": "do_not_recycle_without_new_trace_or_external_policy_change",
+      "profile_roles": [
+        "lands",
+        "tutors_access"
+      ],
+      "risk_flags": [
+        "tutor_access_cut"
+      ],
+      "score": 42,
+      "source_reasons": [
+        "fresh_same_lane_tutors_access"
+      ],
+      "staple_tier": "structural_foundation_anchor",
+      "status": "blocked_recycled_cut_source",
+      "target_cut_role": "tutors_access",
+      "type_line": "Land",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "block_reasons": [
+        "already_consumed_by_same_lane_evidence_chain"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Bloodstained Mire",
+      "cmc": 0.0,
+      "exclusion_categories": [
+        "prior_blocked_cut_source"
+      ],
+      "exclusion_sample": [
+        {
+          "card_name": "Bloodstained Mire",
+          "category": "prior_blocked_cut_source",
+          "reasons": [
+            "structural_foundation_staple_requires_same_lane_or_battle_proof"
+          ],
+          "source_artifact": "same_lane_cut_pair_collector",
+          "source_status": "blocked_same_lane_cut_candidate",
+          "target_cut_role": "tutors_access"
+        }
+      ],
+      "format_staple": {
+        "archetype": "combo",
+        "card_name": "Bloodstained Mire",
+        "category": "",
+        "edhrec_rank": 43
+      },
+      "mutation_allowed": false,
+      "next_evidence": "do_not_recycle_without_new_trace_or_external_policy_change",
+      "profile_roles": [
+        "lands",
+        "tutors_access"
+      ],
+      "risk_flags": [
+        "tutor_access_cut"
+      ],
+      "score": 42,
+      "source_reasons": [
+        "fresh_same_lane_tutors_access"
+      ],
+      "staple_tier": "structural_foundation_anchor",
+      "status": "blocked_recycled_cut_source",
+      "target_cut_role": "tutors_access",
+      "type_line": "Land",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "block_reasons": [
+        "already_consumed_by_same_lane_evidence_chain"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Fabled Passage",
+      "cmc": 0.0,
+      "exclusion_categories": [
+        "prior_blocked_cut_source"
+      ],
+      "exclusion_sample": [
+        {
+          "card_name": "Fabled Passage",
+          "category": "prior_blocked_cut_source",
+          "reasons": [
+            "structural_foundation_staple_requires_same_lane_or_battle_proof"
+          ],
+          "source_artifact": "same_lane_cut_pair_collector",
+          "source_status": "blocked_same_lane_cut_candidate",
+          "target_cut_role": "tutors_access"
+        }
+      ],
+      "format_staple": {
+        "archetype": "combo",
+        "card_name": "Fabled Passage",
+        "category": "",
+        "edhrec_rank": 60
+      },
+      "mutation_allowed": false,
+      "next_evidence": "do_not_recycle_without_new_trace_or_external_policy_change",
+      "profile_roles": [
+        "lands",
+        "tutors_access"
+      ],
+      "risk_flags": [
+        "tutor_access_cut"
+      ],
+      "score": 42,
+      "source_reasons": [
+        "fresh_same_lane_tutors_access"
+      ],
+      "staple_tier": "structural_foundation_anchor",
+      "status": "blocked_recycled_cut_source",
+      "target_cut_role": "tutors_access",
+      "type_line": "Land",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "block_reasons": [
+        "already_consumed_by_same_lane_evidence_chain"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Marsh Flats",
+      "cmc": 0.0,
+      "exclusion_categories": [
+        "prior_blocked_cut_source"
+      ],
+      "exclusion_sample": [
+        {
+          "card_name": "Marsh Flats",
+          "category": "prior_blocked_cut_source",
+          "reasons": [
+            "structural_foundation_staple_requires_same_lane_or_battle_proof"
+          ],
+          "source_artifact": "same_lane_cut_pair_collector",
+          "source_status": "blocked_same_lane_cut_candidate",
+          "target_cut_role": "tutors_access"
+        }
+      ],
+      "format_staple": {
+        "archetype": "combo",
+        "card_name": "Marsh Flats",
+        "category": "",
+        "edhrec_rank": 51
+      },
+      "mutation_allowed": false,
+      "next_evidence": "do_not_recycle_without_new_trace_or_external_policy_change",
+      "profile_roles": [
+        "lands",
+        "tutors_access"
+      ],
+      "risk_flags": [
+        "tutor_access_cut"
+      ],
+      "score": 42,
+      "source_reasons": [
+        "fresh_same_lane_tutors_access"
+      ],
+      "staple_tier": "structural_foundation_anchor",
+      "status": "blocked_recycled_cut_source",
+      "target_cut_role": "tutors_access",
+      "type_line": "Land",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "block_reasons": [
+        "already_consumed_by_same_lane_evidence_chain"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Professional Face-Breaker",
+      "cmc": 3.0,
+      "exclusion_categories": [
+        "prior_stage_only_cut_source",
+        "used_cut_recovery_source",
+        "used_stage_cut_source"
+      ],
+      "exclusion_sample": [
+        {
+          "card_name": "Professional Face-Breaker",
+          "category": "used_stage_cut_source",
+          "reasons": [
+            "non_target_cut_risk:card_flow_cut",
+            "contextual_staple_requires_stage_review"
+          ],
+          "source_artifact": "stage_cut_trace_collector",
+          "source_status": "same_lane_stage_cut_usage_trace_blocks_value_safe",
+          "target_cut_role": "mana_acceleration"
+        },
+        {
+          "card_name": "Professional Face-Breaker",
+          "category": "used_cut_recovery_source",
+          "reasons": [
+            "non_target_cut_risk:card_flow_cut",
+            "contextual_staple_requires_stage_review"
+          ],
+          "source_artifact": "used_cut_recovery_router",
+          "source_status": "used_cut_has_same_lane_add_route_but_not_value_safe",
+          "target_cut_role": "mana_acceleration"
+        },
+        {
+          "card_name": "Professional Face-Breaker",
+          "category": "prior_stage_only_cut_source",
+          "reasons": [
+            "non_target_cut_risk:card_flow_cut",
+            "contextual_staple_requires_stage_review"
+          ],
+          "source_artifact": "same_lane_cut_pair_collector",
+          "source_status": "stage_only_same_lane_cut_candidate",
+          "target_cut_role": "mana_acceleration"
+        }
+      ],
+      "format_staple": {
+        "archetype": "red",
+        "card_name": "Professional Face-Breaker",
+        "category": "",
+        "edhrec_rank": 223
+      },
+      "mutation_allowed": false,
+      "next_evidence": "do_not_recycle_without_new_trace_or_external_policy_change",
+      "profile_roles": [
+        "card_draw_selection",
+        "mana_acceleration"
+      ],
+      "risk_flags": [
+        "mana_acceleration_cut",
+        "card_flow_cut"
+      ],
+      "score": 42,
+      "source_reasons": [
+        "fresh_same_lane_mana_acceleration",
+        "slower_ramp_review_pressure",
+        "contextual_staple_needs_trace"
+      ],
+      "staple_tier": "contextual_staple_stage_only",
+      "status": "blocked_recycled_cut_source",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Creature \u2014 Human Warrior",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "block_reasons": [
+        "already_consumed_by_same_lane_evidence_chain"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Ranger-Captain of Eos",
+      "cmc": 3.0,
+      "exclusion_categories": [
+        "prior_stage_only_cut_source",
+        "trace_missing_stage_cut_source"
+      ],
+      "exclusion_sample": [
+        {
+          "card_name": "Ranger-Captain of Eos",
+          "category": "trace_missing_stage_cut_source",
+          "reasons": [
+            "other_protected_profile_role_haste_protection_silence",
+            "non_target_cut_risk:haste_or_protection_cut",
+            "commander_expected_package_anchor_requires_stage_proof"
+          ],
+          "source_artifact": "stage_cut_trace_collector",
+          "source_status": "same_lane_stage_cut_needs_trace_or_external_research",
+          "target_cut_role": "tutors_access"
+        },
+        {
+          "card_name": "Ranger-Captain of Eos",
+          "category": "trace_missing_stage_cut_source",
+          "reasons": [
+            "target_role_is_protected_profile_lane_requires_trace_or_equal_gate",
+            "non_target_cut_risk:tutor_access_cut",
+            "commander_expected_package_anchor_requires_stage_proof"
+          ],
+          "source_artifact": "stage_cut_trace_collector",
+          "source_status": "same_lane_stage_cut_needs_trace_or_external_research",
+          "target_cut_role": "haste_protection_silence"
+        },
+        {
+          "card_name": "Ranger-Captain of Eos",
+          "category": "prior_stage_only_cut_source",
+          "reasons": [
+            "other_protected_profile_role_haste_protection_silence",
+            "non_target_cut_risk:haste_or_protection_cut",
+            "commander_expected_package_anchor_requires_stage_proof"
+          ],
+          "source_artifact": "same_lane_cut_pair_collector",
+          "source_status": "stage_only_same_lane_cut_candidate",
+          "target_cut_role": "tutors_access"
+        },
+        {
+          "card_name": "Ranger-Captain of Eos",
+          "category": "prior_stage_only_cut_source",
+          "reasons": [
+            "target_role_is_protected_profile_lane_requires_trace_or_equal_gate",
+            "non_target_cut_risk:tutor_access_cut",
+            "commander_expected_package_anchor_requires_stage_proof"
+          ],
+          "source_artifact": "same_lane_cut_pair_collector",
+          "source_status": "stage_only_same_lane_cut_candidate",
+          "target_cut_role": "haste_protection_silence"
+        }
+      ],
+      "format_staple": {},
+      "mutation_allowed": false,
+      "next_evidence": "do_not_recycle_without_new_trace_or_external_policy_change",
+      "profile_roles": [
+        "haste_protection_silence",
+        "tutors_access"
+      ],
+      "risk_flags": [
+        "haste_or_protection_cut",
+        "tutor_access_cut"
+      ],
+      "score": 42,
+      "source_reasons": [
+        "fresh_same_lane_haste_protection_silence"
+      ],
+      "staple_tier": "not_format_staple",
+      "status": "blocked_recycled_cut_source",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Creature \u2014 Human Soldier Ranger",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "block_reasons": [
+        "already_consumed_by_same_lane_evidence_chain"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "The Seriema",
+      "cmc": 3.0,
+      "exclusion_categories": [
+        "prior_stage_only_cut_source",
+        "trace_missing_stage_cut_source"
+      ],
+      "exclusion_sample": [
+        {
+          "card_name": "The Seriema",
+          "category": "trace_missing_stage_cut_source",
+          "reasons": [
+            "other_protected_profile_role_haste_protection_silence",
+            "non_target_cut_risk:haste_or_protection_cut"
+          ],
+          "source_artifact": "stage_cut_trace_collector",
+          "source_status": "same_lane_stage_cut_needs_trace_or_external_research",
+          "target_cut_role": "tutors_access"
+        },
+        {
+          "card_name": "The Seriema",
+          "category": "trace_missing_stage_cut_source",
+          "reasons": [
+            "target_role_is_protected_profile_lane_requires_trace_or_equal_gate",
+            "non_target_cut_risk:tutor_access_cut"
+          ],
+          "source_artifact": "stage_cut_trace_collector",
+          "source_status": "same_lane_stage_cut_needs_trace_or_external_research",
+          "target_cut_role": "haste_protection_silence"
+        },
+        {
+          "card_name": "The Seriema",
+          "category": "prior_stage_only_cut_source",
+          "reasons": [
+            "other_protected_profile_role_haste_protection_silence",
+            "non_target_cut_risk:haste_or_protection_cut"
+          ],
+          "source_artifact": "same_lane_cut_pair_collector",
+          "source_status": "stage_only_same_lane_cut_candidate",
+          "target_cut_role": "tutors_access"
+        },
+        {
+          "card_name": "The Seriema",
+          "category": "prior_stage_only_cut_source",
+          "reasons": [
+            "target_role_is_protected_profile_lane_requires_trace_or_equal_gate",
+            "non_target_cut_risk:tutor_access_cut"
+          ],
+          "source_artifact": "same_lane_cut_pair_collector",
+          "source_status": "stage_only_same_lane_cut_candidate",
+          "target_cut_role": "haste_protection_silence"
+        }
+      ],
+      "format_staple": {},
+      "mutation_allowed": false,
+      "next_evidence": "do_not_recycle_without_new_trace_or_external_policy_change",
+      "profile_roles": [
+        "haste_protection_silence",
+        "tutors_access"
+      ],
+      "risk_flags": [
+        "haste_or_protection_cut",
+        "tutor_access_cut"
+      ],
+      "score": 42,
+      "source_reasons": [
+        "fresh_same_lane_haste_protection_silence"
+      ],
+      "staple_tier": "not_format_staple",
+      "status": "blocked_recycled_cut_source",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Legendary Artifact \u2014 Spacecraft",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "block_reasons": [
+        "already_consumed_by_same_lane_evidence_chain"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Avacyn, Angel of Hope",
+      "cmc": 8.0,
+      "exclusion_categories": [
+        "prior_blocked_cut_source"
+      ],
+      "exclusion_sample": [
+        {
+          "card_name": "Avacyn, Angel of Hope",
+          "category": "prior_blocked_cut_source",
+          "reasons": [
+            "target_role_is_protected_profile_lane_requires_trace_or_equal_gate",
+            "non_target_cut_risk:angel_demon_dragon_payoff_cut",
+            "commander_expected_package_anchor_requires_stage_proof"
+          ],
+          "source_artifact": "same_lane_cut_pair_collector",
+          "source_status": "blocked_same_lane_cut_candidate",
+          "target_cut_role": "haste_protection_silence"
+        }
+      ],
+      "format_staple": {
+        "archetype": "commanders",
+        "card_name": "Avacyn, Angel of Hope",
+        "category": "",
+        "edhrec_rank": 755
+      },
+      "mutation_allowed": false,
+      "next_evidence": "do_not_recycle_without_new_trace_or_external_policy_change",
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "haste_protection_silence"
+      ],
+      "risk_flags": [
+        "angel_demon_dragon_payoff_cut",
+        "haste_or_protection_cut"
+      ],
+      "score": 40,
+      "source_reasons": [
+        "fresh_same_lane_haste_protection_silence",
+        "higher_curve_cut_pressure",
+        "format_staple_needs_review"
+      ],
+      "staple_tier": "format_staple_reviewable",
+      "status": "blocked_recycled_cut_source",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Legendary Creature \u2014 Angel",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "block_reasons": [
+        "already_consumed_by_same_lane_evidence_chain"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Ragavan, Nimble Pilferer",
+      "cmc": 1.0,
+      "exclusion_categories": [
+        "prior_stage_only_cut_source",
+        "used_cut_recovery_source",
+        "used_stage_cut_source"
+      ],
+      "exclusion_sample": [
+        {
+          "card_name": "Ragavan, Nimble Pilferer",
+          "category": "used_stage_cut_source",
+          "reasons": [
+            "target_role_is_protected_profile_lane_requires_trace_or_equal_gate",
+            "non_target_cut_risk:card_flow_cut,mana_acceleration_cut",
+            "contextual_staple_requires_stage_review"
+          ],
+          "source_artifact": "stage_cut_trace_collector",
+          "source_status": "same_lane_stage_cut_usage_trace_blocks_value_safe",
+          "target_cut_role": "haste_protection_silence"
+        },
+        {
+          "card_name": "Ragavan, Nimble Pilferer",
+          "category": "used_stage_cut_source",
+          "reasons": [
+            "other_protected_profile_role_haste_protection_silence",
+            "non_target_cut_risk:card_flow_cut,haste_or_protection_cut",
+            "contextual_staple_requires_stage_review"
+          ],
+          "source_artifact": "stage_cut_trace_collector",
+          "source_status": "same_lane_stage_cut_usage_trace_blocks_value_safe",
+          "target_cut_role": "mana_acceleration"
+        },
+        {
+          "card_name": "Ragavan, Nimble Pilferer",
+          "category": "used_cut_recovery_source",
+          "reasons": [
+            "target_role_is_protected_profile_lane_requires_trace_or_equal_gate",
+            "non_target_cut_risk:card_flow_cut,mana_acceleration_cut",
+            "contextual_staple_requires_stage_review"
+          ],
+          "source_artifact": "used_cut_recovery_router",
+          "source_status": "used_cut_has_same_lane_add_route_but_not_value_safe",
+          "target_cut_role": "haste_protection_silence"
+        },
+        {
+          "card_name": "Ragavan, Nimble Pilferer",
+          "category": "used_cut_recovery_source",
+          "reasons": [
+            "other_protected_profile_role_haste_protection_silence",
+            "non_target_cut_risk:card_flow_cut,haste_or_protection_cut",
+            "contextual_staple_requires_stage_review"
+          ],
+          "source_artifact": "used_cut_recovery_router",
+          "source_status": "used_cut_has_same_lane_add_route_but_not_value_safe",
+          "target_cut_role": "mana_acceleration"
+        },
+        {
+          "card_name": "Ragavan, Nimble Pilferer",
+          "category": "prior_stage_only_cut_source",
+          "reasons": [
+            "target_role_is_protected_profile_lane_requires_trace_or_equal_gate",
+            "non_target_cut_risk:card_flow_cut,mana_acceleration_cut",
+            "contextual_staple_requires_stage_review"
+          ],
+          "source_artifact": "same_lane_cut_pair_collector",
+          "source_status": "stage_only_same_lane_cut_candidate",
+          "target_cut_role": "haste_protection_silence"
+        },
+        {
+          "card_name": "Ragavan, Nimble Pilferer",
+          "category": "prior_stage_only_cut_source",
+          "reasons": [
+            "other_protected_profile_role_haste_protection_silence",
+            "non_target_cut_risk:card_flow_cut,haste_or_protection_cut",
+            "contextual_staple_requires_stage_review"
+          ],
+          "source_artifact": "same_lane_cut_pair_collector",
+          "source_status": "stage_only_same_lane_cut_candidate",
+          "target_cut_role": "mana_acceleration"
+        }
+      ],
+      "format_staple": {
+        "archetype": "commanders",
+        "card_name": "Ragavan, Nimble Pilferer",
+        "category": "",
+        "edhrec_rank": 267
+      },
+      "mutation_allowed": false,
+      "next_evidence": "do_not_recycle_without_new_trace_or_external_policy_change",
+      "profile_roles": [
+        "card_draw_selection",
+        "haste_protection_silence",
+        "mana_acceleration"
+      ],
+      "risk_flags": [
+        "mana_acceleration_cut",
+        "haste_or_protection_cut",
+        "card_flow_cut"
+      ],
+      "score": 36,
+      "source_reasons": [
+        "fresh_same_lane_haste_protection_silence",
+        "contextual_staple_needs_trace"
+      ],
+      "staple_tier": "contextual_staple_stage_only",
+      "status": "blocked_recycled_cut_source",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Legendary Creature \u2014 Monkey Pirate",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "block_reasons": [
+        "already_consumed_by_same_lane_evidence_chain"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Ragavan, Nimble Pilferer",
+      "cmc": 1.0,
+      "exclusion_categories": [
+        "prior_stage_only_cut_source",
+        "used_cut_recovery_source",
+        "used_stage_cut_source"
+      ],
+      "exclusion_sample": [
+        {
+          "card_name": "Ragavan, Nimble Pilferer",
+          "category": "used_stage_cut_source",
+          "reasons": [
+            "target_role_is_protected_profile_lane_requires_trace_or_equal_gate",
+            "non_target_cut_risk:card_flow_cut,mana_acceleration_cut",
+            "contextual_staple_requires_stage_review"
+          ],
+          "source_artifact": "stage_cut_trace_collector",
+          "source_status": "same_lane_stage_cut_usage_trace_blocks_value_safe",
+          "target_cut_role": "haste_protection_silence"
+        },
+        {
+          "card_name": "Ragavan, Nimble Pilferer",
+          "category": "used_stage_cut_source",
+          "reasons": [
+            "other_protected_profile_role_haste_protection_silence",
+            "non_target_cut_risk:card_flow_cut,haste_or_protection_cut",
+            "contextual_staple_requires_stage_review"
+          ],
+          "source_artifact": "stage_cut_trace_collector",
+          "source_status": "same_lane_stage_cut_usage_trace_blocks_value_safe",
+          "target_cut_role": "mana_acceleration"
+        },
+        {
+          "card_name": "Ragavan, Nimble Pilferer",
+          "category": "used_cut_recovery_source",
+          "reasons": [
+            "target_role_is_protected_profile_lane_requires_trace_or_equal_gate",
+            "non_target_cut_risk:card_flow_cut,mana_acceleration_cut",
+            "contextual_staple_requires_stage_review"
+          ],
+          "source_artifact": "used_cut_recovery_router",
+          "source_status": "used_cut_has_same_lane_add_route_but_not_value_safe",
+          "target_cut_role": "haste_protection_silence"
+        },
+        {
+          "card_name": "Ragavan, Nimble Pilferer",
+          "category": "used_cut_recovery_source",
+          "reasons": [
+            "other_protected_profile_role_haste_protection_silence",
+            "non_target_cut_risk:card_flow_cut,haste_or_protection_cut",
+            "contextual_staple_requires_stage_review"
+          ],
+          "source_artifact": "used_cut_recovery_router",
+          "source_status": "used_cut_has_same_lane_add_route_but_not_value_safe",
+          "target_cut_role": "mana_acceleration"
+        },
+        {
+          "card_name": "Ragavan, Nimble Pilferer",
+          "category": "prior_stage_only_cut_source",
+          "reasons": [
+            "target_role_is_protected_profile_lane_requires_trace_or_equal_gate",
+            "non_target_cut_risk:card_flow_cut,mana_acceleration_cut",
+            "contextual_staple_requires_stage_review"
+          ],
+          "source_artifact": "same_lane_cut_pair_collector",
+          "source_status": "stage_only_same_lane_cut_candidate",
+          "target_cut_role": "haste_protection_silence"
+        },
+        {
+          "card_name": "Ragavan, Nimble Pilferer",
+          "category": "prior_stage_only_cut_source",
+          "reasons": [
+            "other_protected_profile_role_haste_protection_silence",
+            "non_target_cut_risk:card_flow_cut,haste_or_protection_cut",
+            "contextual_staple_requires_stage_review"
+          ],
+          "source_artifact": "same_lane_cut_pair_collector",
+          "source_status": "stage_only_same_lane_cut_candidate",
+          "target_cut_role": "mana_acceleration"
+        }
+      ],
+      "format_staple": {
+        "archetype": "commanders",
+        "card_name": "Ragavan, Nimble Pilferer",
+        "category": "",
+        "edhrec_rank": 267
+      },
+      "mutation_allowed": false,
+      "next_evidence": "do_not_recycle_without_new_trace_or_external_policy_change",
+      "profile_roles": [
+        "card_draw_selection",
+        "haste_protection_silence",
+        "mana_acceleration"
+      ],
+      "risk_flags": [
+        "mana_acceleration_cut",
+        "haste_or_protection_cut",
+        "card_flow_cut"
+      ],
+      "score": 36,
+      "source_reasons": [
+        "fresh_same_lane_mana_acceleration",
+        "contextual_staple_needs_trace"
+      ],
+      "staple_tier": "contextual_staple_stage_only",
+      "status": "blocked_recycled_cut_source",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Legendary Creature \u2014 Monkey Pirate",
+      "value_safe_reclassification_allowed": false
+    }
+  ],
+  "candidate_copy_allowed_now": false,
+  "candidate_copy_blockers": [
+    "reviewed_external_seeds_do_not_create_cut_permission",
+    "candidate_copy_closed_until_seeded_fresh_cut_sources_have_trace",
+    "battle_gate_closed_until_candidate_copy_and_card_level_usage_evidence_exist",
+    "reviewed_external_seeds_found_no_fresh_current_deck_cut_source"
+  ],
+  "card_level_cut_permission_now": false,
+  "deck_action_allowed": false,
+  "fresh_seeded_same_lane_cut_sources": [],
+  "generated_at": "2026-07-06T02:18:29.309510+00:00",
+  "input_artifacts": {
+    "cut_pair_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_pair_collector_20260705_kaalia_value_safe_stage1_repair_scope1.json",
+    "package_source_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_package_source_synthesizer_20260705_kaalia_value_safe_stage1_repair_scope1.json",
+    "reviewer_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_new_source_candidate_reviewer_20260706_kaalia_value_safe_stage1_repair_scope1.json",
+    "selected_db": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_copy_materializer_20260705_kaalia_value_safe_stage1_repair_scope1_candidate/knowledge_candidate.db",
+    "trace_collector_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_stage_cut_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.json",
+    "used_cut_recovery_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_used_cut_recovery_router_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+  },
+  "miner_seed_rows": [
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "low-cost haste/ward equipment from a current Kaalia guide list",
+      "card_level_cut_permission_now": false,
+      "card_name": "Lavaspur Boots",
+      "cmc": 1.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "held_package_add": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "haste",
+        "ward"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_evidence": "rerun_seeded_cut_source_miner_with_new_reviewed_external_nonpayoff_sources",
+      "promotion_allowed": false,
+      "recycled_from_prior_external_seed": false,
+      "rerun_miner_allowed_for_card": true,
+      "review_status": "new_external_source_local_review_ready_for_seeded_miner",
+      "scryfall_id": "63bfb9ca-d9d5-4c17-be39-82eb115bc20c",
+      "seed_cautions": [
+        "equipment_seed_requires_package_target_mapping_before_add_approval",
+        "does_not_make_existing_attack_window_card_cuttable"
+      ],
+      "seed_scope": "equipment_haste_protection_seed",
+      "source_card_name": "Lavaspur Boots",
+      "source_ids": [
+        "draftsim_kaalia_deck_guide_2026_02_12"
+      ],
+      "source_status": "new_external_source_candidate_ready_for_local_miner_review",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Artifact \u2014 Equipment",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "free protection spell from a current Kaalia guide list",
+      "card_level_cut_permission_now": false,
+      "card_name": "Flawless Maneuver",
+      "cmc": 3.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "held_package_add": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "indestructible"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_evidence": "rerun_seeded_cut_source_miner_with_new_reviewed_external_nonpayoff_sources",
+      "promotion_allowed": false,
+      "recycled_from_prior_external_seed": false,
+      "rerun_miner_allowed_for_card": true,
+      "review_status": "new_external_source_local_review_ready_for_seeded_miner",
+      "scryfall_id": "4e183439-17d2-47ff-9d99-5e22821d91e3",
+      "seed_cautions": [
+        "protection_seed_requires_target_role_cut_source_evidence_later",
+        "does_not_make_current_protection_card_cuttable"
+      ],
+      "seed_scope": "protection_spell_or_haste_seed",
+      "source_card_name": "Flawless Maneuver",
+      "source_ids": [
+        "draftsim_kaalia_deck_guide_2026_02_12"
+      ],
+      "source_status": "new_external_source_candidate_ready_for_local_miner_review",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Instant",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "one-mana hexproof/indestructible protection from a current Kaalia guide list",
+      "card_level_cut_permission_now": false,
+      "card_name": "Loran's Escape",
+      "cmc": 1.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "held_package_add": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "hexproof",
+        "indestructible"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_evidence": "rerun_seeded_cut_source_miner_with_new_reviewed_external_nonpayoff_sources",
+      "promotion_allowed": false,
+      "recycled_from_prior_external_seed": false,
+      "rerun_miner_allowed_for_card": true,
+      "review_status": "new_external_source_local_review_ready_for_seeded_miner",
+      "scryfall_id": "1a9048d6-f3fa-4f3b-9baa-35318177bc6e",
+      "seed_cautions": [
+        "protection_seed_requires_target_role_cut_source_evidence_later",
+        "does_not_make_current_protection_card_cuttable"
+      ],
+      "seed_scope": "protection_spell_or_haste_seed",
+      "source_card_name": "Loran's Escape",
+      "source_ids": [
+        "draftsim_kaalia_deck_guide_2026_02_12"
+      ],
+      "source_status": "new_external_source_candidate_ready_for_local_miner_review",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Instant",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "commander recast/resilience spell from a current Kaalia guide list",
+      "card_level_cut_permission_now": false,
+      "card_name": "Malakir Rebirth // Malakir Mire",
+      "cmc": 1.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "held_package_add": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "return it to the battlefield"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_evidence": "rerun_seeded_cut_source_miner_with_new_reviewed_external_nonpayoff_sources",
+      "promotion_allowed": false,
+      "recycled_from_prior_external_seed": false,
+      "rerun_miner_allowed_for_card": true,
+      "review_status": "new_external_source_local_review_ready_for_seeded_miner",
+      "scryfall_id": "a731e87b-8d99-4b64-8ee3-8e540d652366",
+      "seed_cautions": [
+        "protection_seed_requires_target_role_cut_source_evidence_later",
+        "does_not_make_current_protection_card_cuttable"
+      ],
+      "seed_scope": "protection_spell_or_haste_seed",
+      "source_card_name": "Malakir Rebirth",
+      "source_ids": [
+        "draftsim_kaalia_deck_guide_2026_02_12"
+      ],
+      "source_status": "new_external_source_candidate_ready_for_local_miner_review",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Instant",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "one-mana anti-removal protection from a current Kaalia guide list",
+      "card_level_cut_permission_now": false,
+      "card_name": "Rebuff the Wicked",
+      "cmc": 1.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "held_package_add": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "counter target spell that targets"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_evidence": "rerun_seeded_cut_source_miner_with_new_reviewed_external_nonpayoff_sources",
+      "promotion_allowed": false,
+      "recycled_from_prior_external_seed": false,
+      "rerun_miner_allowed_for_card": true,
+      "review_status": "new_external_source_local_review_ready_for_seeded_miner",
+      "scryfall_id": "f5822e53-ddec-4c77-bcf4-091e35c1e731",
+      "seed_cautions": [
+        "protection_seed_requires_target_role_cut_source_evidence_later",
+        "does_not_make_current_protection_card_cuttable"
+      ],
+      "seed_scope": "protection_spell_or_haste_seed",
+      "source_card_name": "Rebuff the Wicked",
+      "source_ids": [
+        "draftsim_kaalia_deck_guide_2026_02_12"
+      ],
+      "source_status": "new_external_source_candidate_ready_for_local_miner_review",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Instant",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "board-protection phase-out spell from a current Kaalia guide list",
+      "card_level_cut_permission_now": false,
+      "card_name": "Clever Concealment",
+      "cmc": 4.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "held_package_add": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "phase out"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_evidence": "rerun_seeded_cut_source_miner_with_new_reviewed_external_nonpayoff_sources",
+      "promotion_allowed": false,
+      "recycled_from_prior_external_seed": false,
+      "rerun_miner_allowed_for_card": true,
+      "review_status": "new_external_source_local_review_ready_for_seeded_miner",
+      "scryfall_id": "42bb7ea9-f6e4-4551-8d93-3b1eae84b865",
+      "seed_cautions": [
+        "protection_seed_requires_target_role_cut_source_evidence_later",
+        "does_not_make_current_protection_card_cuttable"
+      ],
+      "seed_scope": "protection_spell_or_haste_seed",
+      "source_card_name": "Clever Concealment",
+      "source_ids": [
+        "draftsim_kaalia_deck_guide_2026_02_12"
+      ],
+      "source_status": "new_external_source_candidate_ready_for_local_miner_review",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Instant",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "phase-out protection spell from a current Kaalia guide list",
+      "card_level_cut_permission_now": false,
+      "card_name": "Galadriel's Dismissal",
+      "cmc": 1.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "held_package_add": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "phases out"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_evidence": "rerun_seeded_cut_source_miner_with_new_reviewed_external_nonpayoff_sources",
+      "promotion_allowed": false,
+      "recycled_from_prior_external_seed": false,
+      "rerun_miner_allowed_for_card": true,
+      "review_status": "new_external_source_local_review_ready_for_seeded_miner",
+      "scryfall_id": "e46d0b57-5eec-4ab6-b9a7-a5c5cc01cc34",
+      "seed_cautions": [
+        "protection_seed_requires_target_role_cut_source_evidence_later",
+        "does_not_make_current_protection_card_cuttable"
+      ],
+      "seed_scope": "protection_spell_or_haste_seed",
+      "source_card_name": "Galadriel's Dismissal",
+      "source_ids": [
+        "draftsim_kaalia_deck_guide_2026_02_12"
+      ],
+      "source_status": "new_external_source_candidate_ready_for_local_miner_review",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Instant",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "redundant targeted-removal redirection from Kaalia hidden-gems article",
+      "card_level_cut_permission_now": false,
+      "card_name": "Redirect Lightning",
+      "cmc": 1.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "held_package_add": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "change the target"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_evidence": "rerun_seeded_cut_source_miner_with_new_reviewed_external_nonpayoff_sources",
+      "promotion_allowed": false,
+      "recycled_from_prior_external_seed": false,
+      "rerun_miner_allowed_for_card": true,
+      "review_status": "new_external_source_local_review_ready_for_seeded_miner",
+      "scryfall_id": "c62b5c22-e058-436f-9575-a01cb2112829",
+      "seed_cautions": [
+        "redirection_seed_is_contextual_protection_not_generic_removal",
+        "requires_target_role_trace_before_cut_proof"
+      ],
+      "seed_scope": "removal_redirection_seed",
+      "source_card_name": "Redirect Lightning",
+      "source_ids": [
+        "edhrec_kaalia_hidden_gems_2026_03_26"
+      ],
+      "source_status": "new_external_source_candidate_ready_for_local_miner_review",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Instant \u2014 Lesson",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "two-mana color-fixing rock from a current Kaalia guide list",
+      "card_level_cut_permission_now": false,
+      "card_name": "Boros Signet",
+      "cmc": 2.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "held_package_add": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "add {"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_evidence": "rerun_seeded_cut_source_miner_with_new_reviewed_external_nonpayoff_sources",
+      "promotion_allowed": false,
+      "recycled_from_prior_external_seed": false,
+      "rerun_miner_allowed_for_card": true,
+      "review_status": "new_external_source_local_review_ready_for_seeded_miner",
+      "scryfall_id": "41c84665-1f99-40ab-aaca-1188649eb263",
+      "seed_cautions": [
+        "mana_rock_seed_requires_curve_and_source_pressure_review",
+        "does_not_make_existing_ramp_cuttable"
+      ],
+      "seed_scope": "mana_rock_seed_curve_pressure_review",
+      "source_card_name": "Boros Signet",
+      "source_ids": [
+        "draftsim_kaalia_deck_guide_2026_02_12"
+      ],
+      "source_status": "new_external_source_candidate_ready_for_local_miner_review",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Artifact",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "two-mana color-fixing rock from a current Kaalia guide list",
+      "card_level_cut_permission_now": false,
+      "card_name": "Orzhov Signet",
+      "cmc": 2.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "held_package_add": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "add {"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_evidence": "rerun_seeded_cut_source_miner_with_new_reviewed_external_nonpayoff_sources",
+      "promotion_allowed": false,
+      "recycled_from_prior_external_seed": false,
+      "rerun_miner_allowed_for_card": true,
+      "review_status": "new_external_source_local_review_ready_for_seeded_miner",
+      "scryfall_id": "de3dcb5d-775a-479f-99f5-d1883ed9b1b5",
+      "seed_cautions": [
+        "mana_rock_seed_requires_curve_and_source_pressure_review",
+        "does_not_make_existing_ramp_cuttable"
+      ],
+      "seed_scope": "mana_rock_seed_curve_pressure_review",
+      "source_card_name": "Orzhov Signet",
+      "source_ids": [
+        "draftsim_kaalia_deck_guide_2026_02_12"
+      ],
+      "source_status": "new_external_source_candidate_ready_for_local_miner_review",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Artifact",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "two-mana color-fixing rock from a current Kaalia guide list",
+      "card_level_cut_permission_now": false,
+      "card_name": "Rakdos Signet",
+      "cmc": 2.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "held_package_add": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "add {"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_evidence": "rerun_seeded_cut_source_miner_with_new_reviewed_external_nonpayoff_sources",
+      "promotion_allowed": false,
+      "recycled_from_prior_external_seed": false,
+      "rerun_miner_allowed_for_card": true,
+      "review_status": "new_external_source_local_review_ready_for_seeded_miner",
+      "scryfall_id": "3adb7681-977f-4a32-9ec8-51481b958268",
+      "seed_cautions": [
+        "mana_rock_seed_requires_curve_and_source_pressure_review",
+        "does_not_make_existing_ramp_cuttable"
+      ],
+      "seed_scope": "mana_rock_seed_curve_pressure_review",
+      "source_card_name": "Rakdos Signet",
+      "source_ids": [
+        "draftsim_kaalia_deck_guide_2026_02_12"
+      ],
+      "source_status": "new_external_source_candidate_ready_for_local_miner_review",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Artifact",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "two-mana rock from a current Kaalia guide list",
+      "card_level_cut_permission_now": false,
+      "card_name": "Mind Stone",
+      "cmc": 2.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "held_package_add": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "add {",
+        "draw a card"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_evidence": "rerun_seeded_cut_source_miner_with_new_reviewed_external_nonpayoff_sources",
+      "promotion_allowed": false,
+      "recycled_from_prior_external_seed": false,
+      "rerun_miner_allowed_for_card": true,
+      "review_status": "new_external_source_local_review_ready_for_seeded_miner",
+      "scryfall_id": "c97361b5-af16-4a7b-af85-a429dbaf4ad2",
+      "seed_cautions": [
+        "mana_rock_seed_requires_curve_and_source_pressure_review",
+        "does_not_make_existing_ramp_cuttable"
+      ],
+      "seed_scope": "mana_rock_seed_curve_pressure_review",
+      "source_card_name": "Mind Stone",
+      "source_ids": [
+        "draftsim_kaalia_deck_guide_2026_02_12"
+      ],
+      "source_status": "new_external_source_candidate_ready_for_local_miner_review",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Artifact",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "two-mana color-fixing talisman from a current Kaalia guide list",
+      "card_level_cut_permission_now": false,
+      "card_name": "Talisman of Conviction",
+      "cmc": 2.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "held_package_add": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "add {"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_evidence": "rerun_seeded_cut_source_miner_with_new_reviewed_external_nonpayoff_sources",
+      "promotion_allowed": false,
+      "recycled_from_prior_external_seed": false,
+      "rerun_miner_allowed_for_card": true,
+      "review_status": "new_external_source_local_review_ready_for_seeded_miner",
+      "scryfall_id": "6c326439-5620-4ec6-a56a-fe9c3d5d2a46",
+      "seed_cautions": [
+        "mana_rock_seed_requires_curve_and_source_pressure_review",
+        "does_not_make_existing_ramp_cuttable"
+      ],
+      "seed_scope": "mana_rock_seed_curve_pressure_review",
+      "source_card_name": "Talisman of Conviction",
+      "source_ids": [
+        "draftsim_kaalia_deck_guide_2026_02_12"
+      ],
+      "source_status": "new_external_source_candidate_ready_for_local_miner_review",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Artifact",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "two-mana color-fixing talisman from a current Kaalia guide list",
+      "card_level_cut_permission_now": false,
+      "card_name": "Talisman of Hierarchy",
+      "cmc": 2.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "held_package_add": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "add {"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_evidence": "rerun_seeded_cut_source_miner_with_new_reviewed_external_nonpayoff_sources",
+      "promotion_allowed": false,
+      "recycled_from_prior_external_seed": false,
+      "rerun_miner_allowed_for_card": true,
+      "review_status": "new_external_source_local_review_ready_for_seeded_miner",
+      "scryfall_id": "b693c3de-2eaf-4850-b405-e79d00adefda",
+      "seed_cautions": [
+        "mana_rock_seed_requires_curve_and_source_pressure_review",
+        "does_not_make_existing_ramp_cuttable"
+      ],
+      "seed_scope": "mana_rock_seed_curve_pressure_review",
+      "source_card_name": "Talisman of Hierarchy",
+      "source_ids": [
+        "draftsim_kaalia_deck_guide_2026_02_12"
+      ],
+      "source_status": "new_external_source_candidate_ready_for_local_miner_review",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Artifact",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "two-mana color-fixing talisman from a current Kaalia guide list",
+      "card_level_cut_permission_now": false,
+      "card_name": "Talisman of Indulgence",
+      "cmc": 2.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "held_package_add": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "add {"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_evidence": "rerun_seeded_cut_source_miner_with_new_reviewed_external_nonpayoff_sources",
+      "promotion_allowed": false,
+      "recycled_from_prior_external_seed": false,
+      "rerun_miner_allowed_for_card": true,
+      "review_status": "new_external_source_local_review_ready_for_seeded_miner",
+      "scryfall_id": "1d9aeaaa-66f6-41cb-9bac-162d6fd8662c",
+      "seed_cautions": [
+        "mana_rock_seed_requires_curve_and_source_pressure_review",
+        "does_not_make_existing_ramp_cuttable"
+      ],
+      "seed_scope": "mana_rock_seed_curve_pressure_review",
+      "source_card_name": "Talisman of Indulgence",
+      "source_ids": [
+        "draftsim_kaalia_deck_guide_2026_02_12"
+      ],
+      "source_status": "new_external_source_candidate_ready_for_local_miner_review",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Artifact",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "generic tutor alternative surfaced in current high-power Commander staple context",
+      "card_level_cut_permission_now": false,
+      "card_name": "Grim Tutor",
+      "cmc": 3.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "held_package_add": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "search your library"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_evidence": "rerun_seeded_cut_source_miner_with_new_reviewed_external_nonpayoff_sources",
+      "promotion_allowed": false,
+      "recycled_from_prior_external_seed": false,
+      "rerun_miner_allowed_for_card": true,
+      "review_status": "new_external_source_local_review_ready_for_seeded_miner",
+      "scryfall_id": "e62f8d69-a559-4f13-a5c9-5fb750b4af2c",
+      "seed_cautions": [
+        "high_power_generic_tutor_requires_commander_bracket_context",
+        "cannot_override_current_deck_usage_or_same_lane_cut_proof"
+      ],
+      "seed_scope": "generic_tutor_seed_bracket_context_required",
+      "source_card_name": "Grim Tutor",
+      "source_ids": [
+        "edhrec_game_changer_alternatives_2026_07_06"
+      ],
+      "source_status": "new_external_source_candidate_ready_for_local_miner_review",
+      "target_cut_role": "tutors_access",
+      "type_line": "Sorcery",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "equipment/aura tutor that can access haste or protection equipment packages",
+      "card_level_cut_permission_now": false,
+      "card_name": "Open the Armory",
+      "cmc": 2.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "held_package_add": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "search your library",
+        "reveal it",
+        "put it into your hand"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_evidence": "rerun_seeded_cut_source_miner_with_new_reviewed_external_nonpayoff_sources",
+      "promotion_allowed": false,
+      "recycled_from_prior_external_seed": false,
+      "rerun_miner_allowed_for_card": true,
+      "review_status": "new_external_source_local_review_ready_for_seeded_miner",
+      "scryfall_id": "2ecf7771-8061-4710-ad2e-80b092ae0b4b",
+      "seed_cautions": [
+        "equipment_or_aura_access_must_map_to_real_package_target",
+        "does_not_replace_generic_tutor_or_open_cut_permission"
+      ],
+      "seed_scope": "package_access_limited_seed",
+      "source_card_name": "Open the Armory",
+      "source_ids": [
+        "draftsim_equipment_tutors_2025_11_06"
+      ],
+      "source_status": "new_external_source_candidate_ready_for_local_miner_review",
+      "target_cut_role": "tutors_access",
+      "type_line": "Sorcery",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "low-cost equipment tutor that can access haste or protection equipment packages",
+      "card_level_cut_permission_now": false,
+      "card_name": "Steelshaper's Gift",
+      "cmc": 1.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "held_package_add": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "search your library",
+        "put it into your hand"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_evidence": "rerun_seeded_cut_source_miner_with_new_reviewed_external_nonpayoff_sources",
+      "promotion_allowed": false,
+      "recycled_from_prior_external_seed": false,
+      "rerun_miner_allowed_for_card": true,
+      "review_status": "new_external_source_local_review_ready_for_seeded_miner",
+      "scryfall_id": "d9abda7e-6ca2-42ea-ab24-c542e57014f1",
+      "seed_cautions": [
+        "equipment_or_aura_access_must_map_to_real_package_target",
+        "does_not_replace_generic_tutor_or_open_cut_permission"
+      ],
+      "seed_scope": "package_access_limited_seed",
+      "source_card_name": "Steelshaper's Gift",
+      "source_ids": [
+        "draftsim_equipment_tutors_2025_11_06"
+      ],
+      "source_status": "new_external_source_candidate_ready_for_local_miner_review",
+      "target_cut_role": "tutors_access",
+      "type_line": "Sorcery",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "creature-based equipment tutor that can access haste or protection equipment packages",
+      "card_level_cut_permission_now": false,
+      "card_name": "Stoneforge Mystic",
+      "cmc": 2.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "held_package_add": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "search your library",
+        "reveal it",
+        "put it into your hand"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_evidence": "rerun_seeded_cut_source_miner_with_new_reviewed_external_nonpayoff_sources",
+      "promotion_allowed": false,
+      "recycled_from_prior_external_seed": false,
+      "rerun_miner_allowed_for_card": true,
+      "review_status": "new_external_source_local_review_ready_for_seeded_miner",
+      "scryfall_id": "358789f9-7d87-411d-919e-d597da665cbd",
+      "seed_cautions": [
+        "equipment_or_aura_access_must_map_to_real_package_target",
+        "does_not_replace_generic_tutor_or_open_cut_permission"
+      ],
+      "seed_scope": "package_access_limited_seed",
+      "source_card_name": "Stoneforge Mystic",
+      "source_ids": [
+        "draftsim_equipment_tutors_2025_11_06"
+      ],
+      "source_status": "new_external_source_candidate_ready_for_local_miner_review",
+      "target_cut_role": "tutors_access",
+      "type_line": "Creature \u2014 Kor Artificer",
+      "value_safe_reclassification_allowed": false
+    }
+  ],
+  "mutation_allowed": false,
+  "policy": {
+    "battle_boundary": "No battle gate opens before candidate copy and card-level usage evidence.",
+    "cut_source_boundary": "A seeded role still needs a fresh same-lane current-deck cut source plus trace before candidate copy.",
+    "recycling_boundary": "Current-deck sources already used, seen, stage-only, blocked, or traced remain unavailable.",
+    "seed_boundary": "Reviewed external nonpayoff cards are miner seeds only; they are not add approval or cut permission."
+  },
+  "postgres_writes": false,
+  "promotion_allowed": false,
+  "role_diagnostics": [
+    {
+      "battle_gate_allowed": false,
+      "blocked_new_cut_source_count": 0,
+      "blocked_recycled_cut_source_count": 16,
+      "candidate_copy_allowed": false,
+      "fresh_same_lane_cut_source_count": 0,
+      "next_evidence": "expand_external_nonpayoff_seed_research_or_collect_current_deck_negative_review",
+      "scanned_same_lane_source_count": 16,
+      "seed_cards": [
+        "Lavaspur Boots",
+        "Flawless Maneuver",
+        "Loran's Escape",
+        "Malakir Rebirth // Malakir Mire",
+        "Rebuff the Wicked",
+        "Clever Concealment",
+        "Galadriel's Dismissal",
+        "Redirect Lightning"
+      ],
+      "seed_count": 8,
+      "status": "reviewed_external_seeded_role_exhausted_current_deck_sources",
+      "target_cut_role": "haste_protection_silence",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "blocked_new_cut_source_count": 0,
+      "blocked_recycled_cut_source_count": 15,
+      "candidate_copy_allowed": false,
+      "fresh_same_lane_cut_source_count": 0,
+      "next_evidence": "expand_external_nonpayoff_seed_research_or_collect_current_deck_negative_review",
+      "scanned_same_lane_source_count": 15,
+      "seed_cards": [
+        "Boros Signet",
+        "Orzhov Signet",
+        "Rakdos Signet",
+        "Mind Stone",
+        "Talisman of Conviction",
+        "Talisman of Hierarchy",
+        "Talisman of Indulgence"
+      ],
+      "seed_count": 7,
+      "status": "reviewed_external_seeded_role_exhausted_current_deck_sources",
+      "target_cut_role": "mana_acceleration",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "blocked_new_cut_source_count": 0,
+      "blocked_recycled_cut_source_count": 16,
+      "candidate_copy_allowed": false,
+      "fresh_same_lane_cut_source_count": 0,
+      "next_evidence": "expand_external_nonpayoff_seed_research_or_collect_current_deck_negative_review",
+      "scanned_same_lane_source_count": 16,
+      "seed_cards": [
+        "Grim Tutor",
+        "Open the Armory",
+        "Steelshaper's Gift",
+        "Stoneforge Mystic"
+      ],
+      "seed_count": 4,
+      "status": "reviewed_external_seeded_role_exhausted_current_deck_sources",
+      "target_cut_role": "tutors_access",
+      "value_safe_reclassification_allowed": false
+    }
+  ],
+  "source_db_mutated": false,
+  "status": "reviewed_external_seeded_cut_source_mining_exhausted_current_deck_no_cut_permission",
+  "summary": {
+    "blocked_new_seeded_cut_source_count": 0,
+    "blocked_recycled_seeded_cut_source_count": 47,
+    "candidate_copy_allowed_count": 0,
+    "candidate_copy_blocker_count": 4,
+    "card_level_cut_permission_count": 0,
+    "commander": "Kaalia of the Vast",
+    "deck_id": "619",
+    "fresh_seeded_same_lane_cut_source_count": 0,
+    "next_gate": "expand_external_nonpayoff_seed_research_or_collect_current_deck_negative_review_before_candidate_copy",
+    "reviewed_seed_count": 19,
+    "role_status_counts": {
+      "reviewed_external_seeded_role_exhausted_current_deck_sources": 3
+    },
+    "scanned_seeded_same_lane_source_count": 47,
+    "seed_count_by_role": {
+      "haste_protection_silence": 8,
+      "mana_acceleration": 7,
+      "tutors_access": 4
+    },
+    "seeded_role_count": 3,
+    "seeded_status_counts": {
+      "blocked_recycled_cut_source": 47
+    },
+    "target_role_count": 3,
+    "unseeded_target_role_count": 0
+  },
+  "value_safe_reclassification_allowed_now": false
+}

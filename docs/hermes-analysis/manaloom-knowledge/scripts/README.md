@@ -299,6 +299,22 @@ candidates, identity gaps, and legality blockers separated. Ready rows are
 miner/review seeds only; they do not open candidate copy, battle, promotion, or
 value-safe reclassification.
 
+Then run `global_commander_external_nonpayoff_new_source_candidate_reviewer.py`.
+It locally revalidates finder-ready fresh source rows against the current
+evaluation DB and turns only valid outside-deck, outside-package, non-recycled,
+non-land, commander-legal role matches into scoped miner seeds. Seed scopes
+separate package-limited equipment tutors, generic tutor bracket context, mana
+rocks, equipment haste/protection, protection spells, and redirection effects.
+These seeds still do not create card-level cut permission, candidate copy,
+battle, promotion, or value-safe reclassification.
+
+Then rerun `global_commander_reviewed_external_nonpayoff_seeded_cut_source_miner.py`
+with `--reviewer-report` pointing at the new-source candidate reviewer report.
+If every scanned same-lane cut source is recycled or blocked, the result remains
+`reviewed_external_seeded_cut_source_mining_exhausted_current_deck_no_cut_permission`
+and the flow must broaden external nonpayoff seed research or return to
+current-deck negative review before any deck action.
+
 ## XMage Authoritative Adaptation
 
 For all-card battle-rule acceleration, use local XMage as the authoritative
