@@ -223,6 +223,13 @@ fresh same-lane source remains, the next route is to broaden same-lane cut
 research or the package axis before candidate copy, battle, promotion, or
 value-safe reclassification.
 
+Then run `global_commander_same_lane_cut_axis_broadening_plan.py` after the new
+cut-source miner exhausts the current deck. It converts exhausted target roles
+into explicit external nonpayoff same-lane corpus work, holds the selected add
+package, and forbids recycling used, seen, stage-only, blocked, or traced cuts.
+Candidate copy, battle, promotion, and value-safe reclassification remain
+closed.
+
 ## XMage Authoritative Adaptation
 
 For all-card battle-rule acceleration, use local XMage as the authoritative

@@ -375,7 +375,13 @@ Operational priority after this pivot:
     exists. If none exists, it must broaden same-lane cut research or package
     axis before candidate copy, battle, promotion, or value-safe
     reclassification;
-48. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
+48. run `global_commander_same_lane_cut_axis_broadening_plan.py` when same-lane
+    new cut-source mining exhausts the current deck; it must convert exhausted
+    target roles into explicit external nonpayoff same-lane corpus actions,
+    hold the selected add package, forbid recycling used/seen/stage-only or
+    blocked cuts, and keep candidate copy, battle, promotion, and value-safe
+    reclassification closed;
+49. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
     probes, as regression evidence only unless they produce a named safe cut and
     equal-gate proof under the Lorehold promotion gate.
 
@@ -441,6 +447,7 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_stage_cut_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_used_cut_recovery_router_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_new_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_axis_broadening_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 
 Historical candidate-copy, battle-probe, battle-feedback, and package-chain
 snapshots are local ignored evidence artifacts. The surface auditor must show
@@ -980,6 +987,14 @@ Current external refresh on 2026-07-05:
   and `blocked_recycled_cut_source_count=47`. Candidate copy, battle,
   promotion, and value-safe reclassification remain closed. The next gate is
   `broaden_same_lane_cut_research_or_package_axis_before_candidate_copy`.
+- Current same-lane cut-axis broadening planning returns
+  `same_lane_cut_axis_broadening_plan_ready_no_deck_action` with
+  `target_role_count=3`, `fresh_same_lane_cut_source_count=0`,
+  `blocked_recycled_cut_source_count=47`, `ready_pair_count=0`, and
+  `unpaired_add_count=8`. All three target roles
+  (`haste_protection_silence`, `mana_acceleration`, `tutors_access`) are
+  current-deck exhausted and route to
+  `collect_external_nonpayoff_same_lane_cut_corpus_for_exhausted_roles`.
 
 ## Global Commander Rollout - 2026-07-01
 

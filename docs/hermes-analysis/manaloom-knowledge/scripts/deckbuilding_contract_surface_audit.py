@@ -222,6 +222,12 @@ GLOBAL_COMMANDER_SAME_LANE_NEW_CUT_SOURCE_MINER = (
 GLOBAL_COMMANDER_SAME_LANE_NEW_CUT_SOURCE_MINER_TEST = (
     SCRIPT_DIR / "test_global_commander_same_lane_new_cut_source_miner.py"
 )
+GLOBAL_COMMANDER_SAME_LANE_CUT_AXIS_BROADENING_PLAN = (
+    SCRIPT_DIR / "global_commander_same_lane_cut_axis_broadening_plan.py"
+)
+GLOBAL_COMMANDER_SAME_LANE_CUT_AXIS_BROADENING_PLAN_TEST = (
+    SCRIPT_DIR / "test_global_commander_same_lane_cut_axis_broadening_plan.py"
+)
 README = REPO_ROOT / "docs/hermes-analysis/README.md"
 
 CONTRACT_MATRIX_JSON = (
@@ -483,6 +489,10 @@ GLOBAL_COMMANDER_SCOPE1_SAME_LANE_USED_CUT_RECOVERY_ROUTER_REPORT = (
 GLOBAL_COMMANDER_SCOPE1_SAME_LANE_NEW_CUT_SOURCE_MINER_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_new_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+)
+GLOBAL_COMMANDER_SCOPE1_SAME_LANE_CUT_AXIS_BROADENING_PLAN_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_axis_broadening_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md"
 )
 
 REQUIRED_FOCUS_CARDS = {
@@ -852,6 +862,10 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_same_lane_new_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1.md",
                 "same_lane_new_cut_source_mining_exhausted_current_deck",
                 "broaden_same_lane_cut_research_or_package_axis_before_candidate_copy",
+                "global_commander_same_lane_cut_axis_broadening_plan.py",
+                "global_commander_same_lane_cut_axis_broadening_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md",
+                "same_lane_cut_axis_broadening_plan_ready_no_deck_action",
+                "collect_external_nonpayoff_same_lane_cut_corpus_for_exhausted_roles",
                 "battle_gate_allowed_now",
                 "Path to Exile",
                 "Terminate",
@@ -1163,6 +1177,9 @@ def build_audit() -> dict[str, Any]:
                 "same_lane_new_cut_source_mining_exhausted_current_deck",
                 "fresh_same_lane_cut_source_count=0",
                 "broaden_same_lane_cut_research_or_package_axis_before_candidate_copy",
+                "global_commander_same_lane_cut_axis_broadening_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md",
+                "same_lane_cut_axis_broadening_plan_ready_no_deck_action",
+                "collect_external_nonpayoff_same_lane_cut_corpus_for_exhausted_roles",
                 "battle_gate_allowed_now=false",
                 "Path to Exile",
                 "Terminate",
@@ -1992,6 +2009,32 @@ def build_audit() -> dict[str, Any]:
                 "same_lane_new_cut_source_hypotheses_ready_for_trace",
                 "same_lane_new_cut_source_mining_exhausted_current_deck",
                 "broaden_same_lane_cut_research_or_package_axis_before_candidate_copy",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SAME_LANE_CUT_AXIS_BROADENING_PLAN,
+            [
+                "global_commander_same_lane_cut_axis_broadening_plan",
+                "same_lane_cut_axis_broadening_not_ready_fresh_sources_need_trace",
+                "same_lane_cut_axis_broadening_plan_ready_no_deck_action",
+                "collect_external_nonpayoff_same_lane_cut_corpus_for_exhausted_roles",
+                "forbid_recycling_used_seen_stage_only_or_blocked_cuts",
+                "candidate_copy_allowed_now",
+                "value_safe_reclassification_allowed_now",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SAME_LANE_CUT_AXIS_BROADENING_PLAN_TEST,
+            [
+                "test_fresh_sources_block_broadening_until_trace",
+                "test_exhausted_roles_route_to_external_nonpayoff_corpus",
+                "test_missing_role_source_routes_to_discovery_before_resynthesis",
+                "same_lane_cut_axis_broadening_plan_ready_no_deck_action",
+                "collect_external_nonpayoff_same_lane_cut_corpus_for_exhausted_roles",
             ],
         )
     )
@@ -3167,6 +3210,27 @@ def build_audit() -> dict[str, Any]:
                 "Smothering Tithe",
                 "Mana Vault",
                 "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SCOPE1_SAME_LANE_CUT_AXIS_BROADENING_PLAN_REPORT,
+            [
+                "Global Commander Same-Lane Cut Axis Broadening Plan",
+                "same_lane_cut_axis_broadening_plan_ready_no_deck_action",
+                "target_role_count: `3`",
+                "scanned_same_lane_source_count: `47`",
+                "fresh_same_lane_cut_source_count: `0`",
+                "blocked_recycled_cut_source_count: `47`",
+                "ready_pair_count: `0`",
+                "unpaired_add_count: `8`",
+                "candidate_copy_allowed_now: `false`",
+                "value_safe_reclassification_allowed_now: `false`",
+                "collect_external_nonpayoff_same_lane_cut_corpus_for_exhausted_roles",
+                "haste_protection_silence",
+                "mana_acceleration",
+                "tutors_access",
             ],
         )
     )

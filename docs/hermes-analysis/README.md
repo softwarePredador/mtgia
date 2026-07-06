@@ -676,6 +676,13 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `fresh_same_lane_cut_source_count=0` e
     `blocked_recycled_cut_source_count=47`. O proximo gate e
     `broaden_same_lane_cut_research_or_package_axis_before_candidate_copy`.
+    O plano de ampliacao de eixo fica em
+    `global_commander_same_lane_cut_axis_broadening_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md`.
+    Resultado: `same_lane_cut_axis_broadening_plan_ready_no_deck_action`, com
+    `ready_pair_count=0`, `unpaired_add_count=8` e os tres papeis
+    (`haste_protection_silence`, `mana_acceleration`, `tutors_access`)
+    exauridos no deck atual. O proximo gate e
+    `collect_external_nonpayoff_same_lane_cut_corpus_for_exhausted_roles`.
     Observacao operacional: snapshots historicos de candidate-copy, battle-probe,
     battle-feedback e package-chain dependem de artefatos locais ignorados. Se
     faltarem ou forem regenerados sem esses artefatos, a auditoria de superficie
