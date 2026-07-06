@@ -1,0 +1,330 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg578_look_library_graveyard_new_server_20260706_225325",
+  "deploy_id": "PG578",
+  "execution_scenarios": [],
+  "expected_rules": [
+    {
+      "card_name": "Forbidden Alchemy",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e285a4ed5ba76a8a0a9def976a43b0a0",
+      "min_rule_version": 2,
+      "normalized_name": "forbidden alchemy",
+      "oracle_hash": "4800d22353040527a3f8a9ddaaa3529f",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_look_library_pick_to_hand_rest_graveyard_spell_v1",
+        "count": 1,
+        "destination": "hand",
+        "effect": "dig_to_hand",
+        "look_count": 4,
+        "pick_all_matching": false,
+        "pick_count": 1,
+        "pick_target": "any_card",
+        "pick_up_to_count": false,
+        "rest_destination": "graveyard",
+        "reveal": false,
+        "target": "any_card",
+        "target_constraints": {
+          "controller": "self",
+          "scope": "any_card",
+          "zone": "library"
+        },
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Nagging Thoughts",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0c0c6b5f5d6ac1b30757c2c3d4794c24",
+      "min_rule_version": 2,
+      "normalized_name": "nagging thoughts",
+      "oracle_hash": "d750ade2afb400a96ed4d09a6de448ed",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_look_library_pick_to_hand_rest_graveyard_spell_v1",
+        "count": 1,
+        "destination": "hand",
+        "effect": "dig_to_hand",
+        "look_count": 2,
+        "pick_all_matching": false,
+        "pick_count": 1,
+        "pick_target": "any_card",
+        "pick_up_to_count": false,
+        "rest_destination": "graveyard",
+        "reveal": false,
+        "target": "any_card",
+        "target_constraints": {
+          "controller": "self",
+          "scope": "any_card",
+          "zone": "library"
+        },
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Resentful Revelation",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:818eec9a981f612634bc818b78997e22",
+      "min_rule_version": 2,
+      "normalized_name": "resentful revelation",
+      "oracle_hash": "c0c873de2a6cb009f2bb3f0e304d6805",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_look_library_pick_to_hand_rest_graveyard_spell_v1",
+        "count": 1,
+        "destination": "hand",
+        "effect": "dig_to_hand",
+        "look_count": 3,
+        "pick_all_matching": false,
+        "pick_count": 1,
+        "pick_target": "any_card",
+        "pick_up_to_count": false,
+        "rest_destination": "graveyard",
+        "reveal": false,
+        "target": "any_card",
+        "target_constraints": {
+          "controller": "self",
+          "scope": "any_card",
+          "zone": "library"
+        },
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Tapping at the Window",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f81c5a7e4a1474b2f585b16efca99840",
+      "min_rule_version": 2,
+      "normalized_name": "tapping at the window",
+      "oracle_hash": "c85b98ff679c3eac0187834661613f50",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_look_library_pick_to_hand_rest_graveyard_spell_v1",
+        "count": 1,
+        "destination": "hand",
+        "effect": "dig_to_hand",
+        "look_count": 3,
+        "pick_all_matching": false,
+        "pick_count": 1,
+        "pick_target": "creature",
+        "pick_up_to_count": true,
+        "rest_destination": "graveyard",
+        "reveal": true,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "library"
+        },
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_look_library_pick_to_hand_rest_graveyard_spell": 4
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg578_look_library_graveyard_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg578_look_library_graveyard_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg578_look_library_graveyard_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg578_look_library_graveyard_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg578_look_library_graveyard_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg578_look_library_graveyard_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-06T22:53:25+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Forbidden Alchemy"
+      },
+      "card_name": "Forbidden Alchemy",
+      "effect": "dig_to_hand",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e285a4ed5ba76a8a0a9def976a43b0a0",
+      "normalized_name": "forbidden alchemy",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_look_library_pick_to_hand_rest_graveyard_spell_v1",
+        "count": 1,
+        "destination": "hand",
+        "effect": "dig_to_hand",
+        "look_count": 4,
+        "pick_all_matching": false,
+        "pick_count": 1,
+        "pick_target": "any_card",
+        "pick_up_to_count": false,
+        "rest_destination": "graveyard",
+        "reveal": false,
+        "target": "any_card",
+        "target_constraints": {
+          "controller": "self",
+          "scope": "any_card",
+          "zone": "library"
+        },
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Nagging Thoughts"
+      },
+      "card_name": "Nagging Thoughts",
+      "effect": "dig_to_hand",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0c0c6b5f5d6ac1b30757c2c3d4794c24",
+      "normalized_name": "nagging thoughts",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_look_library_pick_to_hand_rest_graveyard_spell_v1",
+        "count": 1,
+        "destination": "hand",
+        "effect": "dig_to_hand",
+        "look_count": 2,
+        "pick_all_matching": false,
+        "pick_count": 1,
+        "pick_target": "any_card",
+        "pick_up_to_count": false,
+        "rest_destination": "graveyard",
+        "reveal": false,
+        "target": "any_card",
+        "target_constraints": {
+          "controller": "self",
+          "scope": "any_card",
+          "zone": "library"
+        },
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Resentful Revelation"
+      },
+      "card_name": "Resentful Revelation",
+      "effect": "dig_to_hand",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:818eec9a981f612634bc818b78997e22",
+      "normalized_name": "resentful revelation",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_look_library_pick_to_hand_rest_graveyard_spell_v1",
+        "count": 1,
+        "destination": "hand",
+        "effect": "dig_to_hand",
+        "look_count": 3,
+        "pick_all_matching": false,
+        "pick_count": 1,
+        "pick_target": "any_card",
+        "pick_up_to_count": false,
+        "rest_destination": "graveyard",
+        "reveal": false,
+        "target": "any_card",
+        "target_constraints": {
+          "controller": "self",
+          "scope": "any_card",
+          "zone": "library"
+        },
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Tapping at the Window"
+      },
+      "card_name": "Tapping at the Window",
+      "effect": "dig_to_hand",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f81c5a7e4a1474b2f585b16efca99840",
+      "normalized_name": "tapping at the window",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_look_library_pick_to_hand_rest_graveyard_spell_v1",
+        "count": 1,
+        "destination": "hand",
+        "effect": "dig_to_hand",
+        "look_count": 3,
+        "pick_all_matching": false,
+        "pick_count": 1,
+        "pick_target": "creature",
+        "pick_up_to_count": true,
+        "rest_destination": "graveyard",
+        "reveal": true,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "library"
+        },
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Forbidden Alchemy",
+    "Nagging Thoughts",
+    "Resentful Revelation",
+    "Tapping at the Window"
+  ],
+  "selected_count": 4,
+  "slug": "look_library_graveyard_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Forbidden Alchemy",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e285a4ed5ba76a8a0a9def976a43b0a0",
+      "min_rule_version": 2,
+      "normalized_name": "forbidden alchemy",
+      "oracle_hash": "4800d22353040527a3f8a9ddaaa3529f",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_look_library_pick_to_hand_rest_graveyard_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Nagging Thoughts",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0c0c6b5f5d6ac1b30757c2c3d4794c24",
+      "min_rule_version": 2,
+      "normalized_name": "nagging thoughts",
+      "oracle_hash": "d750ade2afb400a96ed4d09a6de448ed",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_look_library_pick_to_hand_rest_graveyard_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Resentful Revelation",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:818eec9a981f612634bc818b78997e22",
+      "min_rule_version": 2,
+      "normalized_name": "resentful revelation",
+      "oracle_hash": "c0c873de2a6cb009f2bb3f0e304d6805",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_look_library_pick_to_hand_rest_graveyard_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Tapping at the Window",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f81c5a7e4a1474b2f585b16efca99840",
+      "min_rule_version": 2,
+      "normalized_name": "tapping at the window",
+      "oracle_hash": "c85b98ff679c3eac0187834661613f50",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_look_library_pick_to_hand_rest_graveyard_spell_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

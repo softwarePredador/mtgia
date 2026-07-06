@@ -238,6 +238,7 @@ RECURSION_BATTLEFIELD_COUNTER_SCOPE = (
 GRAVEYARD_TO_LIBRARY_SPELL_SCOPE = "xmage_put_target_graveyard_card_on_library_spell_v1"
 LIBRARY_PICK_SPELL_SCOPE = "xmage_reveal_top_library_pick_to_hand_rest_graveyard_spell_v1"
 LOOK_LIBRARY_PICK_SPELL_SCOPE = "xmage_look_library_pick_to_hand_rest_bottom_spell_v1"
+LOOK_LIBRARY_PICK_GRAVEYARD_SPELL_SCOPE = "xmage_look_library_pick_to_hand_rest_graveyard_spell_v1"
 GRAVEYARD_LAND_PLAY_SCOPE = "xmage_static_play_lands_from_graveyard_v1"
 PERMANENT_ACTIVATED_GRAVEYARD_TO_LIBRARY_SCOPE = (
     "xmage_permanent_simple_activated_graveyard_to_library_v1"
@@ -15454,22 +15455,50 @@ def library_pick_from_source(source: str) -> dict[str, Any] | str:
 
 
 def look_library_pick_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
-    text = re.sub(r"\s+", " ", oracle_text(metadata).strip().lower())
+    raw_text = strip_parenthetical_reminders(str(metadata.get("oracle_text") or ""))
+    effect_sentences: list[str] = []
+    for raw_line in raw_text.splitlines():
+        line = re.sub(r"\s+", " ", raw_line.strip()).strip()
+        if not line:
+            continue
+        for sentence in re.split(r"(?<=\.)\s+", line):
+            candidate = re.sub(r"\s+", " ", sentence.strip()).strip()
+            if candidate and not is_resolution_neutral_auxiliary_oracle_line(candidate):
+                effect_sentences.append(candidate)
+    text = re.sub(r"\s+", " ", " ".join(effect_sentences).strip().lower())
     prefix = r"^look at the top (?P<look>\w+) cards of your library\. "
-    simple_match = re.match(
+    simple_bottom_match = re.match(
         prefix
         + r"put (?P<count>one|two|three|\d+) of (?:them|those cards) into your hand "
         + r"and (?:the rest|the other) on the bottom of your library(?: in (?:any|a random) order)?\.?$",
         text,
     )
-    may_reveal_match = re.match(
+    simple_graveyard_match = re.match(
+        prefix
+        + r"put (?P<count>one|two|three|\d+) of (?:them|those cards) into your hand "
+        + r"and (?:the rest|the other) into your graveyard\.?$",
+        text,
+    )
+    may_reveal_bottom_match = re.match(
         prefix
         + r"you may reveal (?P<count>a|an|one|two|three|up to one|up to two|any number of) "
         + r"(?P<phrase>.+?) cards? from among them and put (?:it|the revealed cards?) into your hand\. "
         + r"(?:then )?put the rest on the bottom of your library(?: in (?:any|a random) order)?\.?$",
         text,
     )
-    match = simple_match or may_reveal_match
+    may_reveal_graveyard_match = re.match(
+        prefix
+        + r"you may reveal (?P<count>a|an|one|two|three|up to one|up to two|any number of) "
+        + r"(?P<phrase>.+?) cards? from among them and put (?:it|the revealed cards?) into your hand\. "
+        + r"(?:then )?put the rest into your graveyard\.?$",
+        text,
+    )
+    match = (
+        simple_bottom_match
+        or simple_graveyard_match
+        or may_reveal_bottom_match
+        or may_reveal_graveyard_match
+    )
     if not match:
         return "look_library_pick_oracle_not_simple"
     look_count = word_count_value(match.group("look"))
@@ -15478,6 +15507,7 @@ def look_library_pick_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | 
 
     count_token = str(match.group("count") or "").strip().lower()
     pick_all_matching = count_token == "any number of"
+    may_reveal_match = may_reveal_bottom_match or may_reveal_graveyard_match
     pick_up_to_count = bool(may_reveal_match)
     if pick_all_matching:
         pick_count = look_count
@@ -15502,7 +15532,9 @@ def look_library_pick_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | 
         "pick_target": pick_target,
         "pick_up_to_count": pick_up_to_count,
         "pick_all_matching": pick_all_matching,
-        "rest_destination": "library_bottom",
+        "rest_destination": "graveyard"
+        if simple_graveyard_match or may_reveal_graveyard_match
+        else "library_bottom",
     }
 
 
@@ -15511,14 +15543,14 @@ def look_library_pick_from_source(source: str) -> dict[str, Any] | str:
     filtered_match = re.search(
         r"LookLibraryAndPickControllerEffect\s*\(\s*(?P<look>\d+)\s*,\s*"
         r"(?P<pick>\d+|Integer\.MAX_VALUE)\s*,\s*(?P<filter>[^,]+)\s*,\s*"
-        r"PutCards\.HAND\s*,\s*PutCards\.(?P<rest>BOTTOM_ANY|BOTTOM_RANDOM)",
+        r"PutCards\.HAND\s*,\s*PutCards\.(?P<rest>BOTTOM_ANY|BOTTOM_RANDOM|GRAVEYARD)",
         text,
         re.S,
     )
     unfiltered_match = re.search(
         r"LookLibraryAndPickControllerEffect\s*\(\s*(?P<look>\d+)\s*,\s*"
         r"(?P<pick>\d+|Integer\.MAX_VALUE)\s*,\s*PutCards\.HAND\s*,\s*"
-        r"PutCards\.(?P<rest>BOTTOM_ANY|BOTTOM_RANDOM)",
+        r"PutCards\.(?P<rest>BOTTOM_ANY|BOTTOM_RANDOM|GRAVEYARD)",
         text,
         re.S,
     )
@@ -15534,14 +15566,17 @@ def look_library_pick_from_source(source: str) -> dict[str, Any] | str:
         pick_target = library_pick_target_from_source(text, filtered_match.group("filter"))
         if pick_target is None:
             return "look_library_pick_source_target_not_supported"
-    return {
+    rest = str(match.group("rest"))
+    result = {
         "look_count": look_count,
         "pick_count": pick_count,
         "pick_target": pick_target,
         "pick_all_matching": pick_all_matching,
-        "rest_destination": "library_bottom",
-        "library_bottom_order": "random" if match.group("rest") == "BOTTOM_RANDOM" else "any",
+        "rest_destination": "graveyard" if rest == "GRAVEYARD" else "library_bottom",
     }
+    if rest != "GRAVEYARD":
+        result["library_bottom_order"] = "random" if rest == "BOTTOM_RANDOM" else "any"
+    return result
 
 
 def etb_recursion_to_hand_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
@@ -17501,6 +17536,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "fixed reveal-top-library pick-to-hand spell"
     elif scope == LOOK_LIBRARY_PICK_SPELL_SCOPE:
         scope_kind = "fixed look-at-library pick-to-hand spell with rest on library bottom"
+    elif scope == LOOK_LIBRARY_PICK_GRAVEYARD_SPELL_SCOPE:
+        scope_kind = "fixed look-at-library pick-to-hand spell with rest in graveyard"
     elif scope == GRAVEYARD_SELF_RETURN_TO_HAND_SCOPE:
         scope_kind = "graveyard simple activated self-return-to-hand ability"
     elif scope == GRAVEYARD_SELF_RETURN_TO_BATTLEFIELD_SCOPE:
@@ -23695,7 +23732,12 @@ def split_row(
         }
         return build_proposal(row, metadata, effect_json, family_id="xmage_fixed_draw_spell"), "selected_exact_scope"
 
-    if unit == LOOK_LIBRARY_PICK_SPELL_UNIT:
+    if unit == LOOK_LIBRARY_PICK_SPELL_UNIT or (
+        unit == RECURSION_UNIT
+        and is_spell(metadata)
+        and classes == {"LookLibraryAndPickControllerEffect"}
+        and not set(row.get("xmage_signals") or [])
+    ):
         if classes != {"LookLibraryAndPickControllerEffect"}:
             return None, "look_library_pick_effect_class_not_pure"
         unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
@@ -23717,9 +23759,15 @@ def split_row(
             if source_pick.get(key) != oracle_pick.get(key):
                 return None, f"look_library_pick_source_oracle_{key}_mismatch"
         pick_target = str(oracle_pick["pick_target"])
+        rest_destination = str(oracle_pick["rest_destination"])
+        scope = (
+            LOOK_LIBRARY_PICK_GRAVEYARD_SPELL_SCOPE
+            if rest_destination == "graveyard"
+            else LOOK_LIBRARY_PICK_SPELL_SCOPE
+        )
         effect_json = {
             "effect": "dig_to_hand",
-            "battle_model_scope": LOOK_LIBRARY_PICK_SPELL_SCOPE,
+            "battle_model_scope": scope,
             "look_count": int(oracle_pick["look_count"]),
             "pick_count": int(oracle_pick["pick_count"]),
             "count": int(oracle_pick["pick_count"]),
@@ -23728,19 +23776,24 @@ def split_row(
             "target": pick_target,
             "target_constraints": library_pick_target_constraints_for(pick_target),
             "destination": "hand",
-            "rest_destination": "library_bottom",
-            "library_bottom_order": str(source_pick.get("library_bottom_order") or "any"),
+            "rest_destination": rest_destination,
             "reveal": pick_target != "any_card",
             "pick_up_to_count": bool(oracle_pick.get("pick_up_to_count")),
             "pick_all_matching": bool(oracle_pick.get("pick_all_matching")),
             "xmage_effect_class": "LookLibraryAndPickControllerEffect",
             **flags,
         }
+        if rest_destination == "library_bottom":
+            effect_json["library_bottom_order"] = str(source_pick.get("library_bottom_order") or "any")
         return build_proposal(
             row,
             metadata,
             effect_json,
-            family_id="xmage_look_library_pick_to_hand_rest_bottom_spell",
+            family_id=(
+                "xmage_look_library_pick_to_hand_rest_graveyard_spell"
+                if rest_destination == "graveyard"
+                else "xmage_look_library_pick_to_hand_rest_bottom_spell"
+            ),
         ), "selected_exact_scope"
 
     if unit == DAMAGE_UNIT:

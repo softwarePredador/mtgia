@@ -16193,6 +16193,98 @@ Validation:
 - post-backfill queue remained `target_identity_count=25343`, confirming the
   backfill fixed integrity without changing the adapter backlog.
 
+## PG578 Look Library Graveyard New Server Evidence
+
+PG578 evidence:
+
+- exact-scope split:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260706_pg578_look_library_graveyard_new_server.md`
+- exact-scope split JSON:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260706_pg578_look_library_graveyard_new_server.json`
+- package:
+  `docs/hermes-analysis/master_optimizer_reports/pg578_look_library_graveyard_new_server_package_package.md`
+- package manifest:
+  `docs/hermes-analysis/master_optimizer_reports/pg578_look_library_graveyard_new_server_package_manifest.json`
+- package precheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg578_look_library_graveyard_new_server_package_precheck.sql`
+- package apply SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg578_look_library_graveyard_new_server_package_apply.sql`
+- package postcheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg578_look_library_graveyard_new_server_package_postcheck.sql`
+- package rollback SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg578_look_library_graveyard_new_server_package_rollback.sql`
+- apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg578_look_library_graveyard_new_server_apply_evidence.md`
+- E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg578_look_library_graveyard_new_server_e2e.md`
+- sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg578_look_library_graveyard_new_server_sync_report.json`
+- post-PG578 readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260706_post_pg578_look_library_graveyard_new_server.md`
+- post-PG578 readiness JSON:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260706_post_pg578_look_library_graveyard_new_server.json`
+- post-PG578 queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260706_post_pg578_look_library_graveyard_new_server_commander_legal.md`
+- post-PG578 queue JSON:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260706_post_pg578_look_library_graveyard_new_server_commander_legal.json`
+- post-PG578 exact split:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260706_post_pg578_look_library_graveyard_new_server_recheck.md`
+- post-PG578 exact split JSON:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260706_post_pg578_look_library_graveyard_new_server_recheck.json`
+- final PG/Hermes/SQLite audit:
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260706_post_pg578_look_library_graveyard_new_server_wrapped.md`
+- final PG/Hermes/SQLite audit JSON:
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260706_post_pg578_look_library_graveyard_new_server_wrapped.json`
+- final governance audits:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260706_post_pg578_look_library_graveyard_new_server.md`,
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260706_post_pg578_look_library_graveyard_new_server.json`,
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260706_post_pg578_look_library_graveyard_new_server.md`,
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260706_post_pg578_look_library_graveyard_new_server.json`,
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260706_post_pg578_look_library_graveyard_new_server.md`,
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260706_post_pg578_look_library_graveyard_new_server.json`
+
+PG578 promoted `4` XMage-authoritative fixed look-library pick-to-hand spell
+rules where unpicked cards go to the graveyard:
+
+- `Forbidden Alchemy`
+- `Nagging Thoughts`
+- `Resentful Revelation`
+- `Tapping at the Window`
+
+Runtime/modeling change:
+
+- `xmage_authoritative_exact_scope_split.py` now supports
+  `xmage_look_library_pick_to_hand_rest_graveyard_spell_v1` for
+  `LookLibraryAndPickControllerEffect(N, M, [filter], PutCards.HAND,
+  PutCards.GRAVEYARD)` when Oracle/source agree exactly;
+- the mapper can rescue this subpattern from the recursion work unit when
+  flashback/madness only made the card look like graveyard recursion;
+- no new battle executor was needed because `battle_analyst_v9.py` already
+  resolves `dig_to_hand` with `rest_destination=graveyard`.
+
+Validation:
+
+- precheck found `4/4` Oracle-hash-matched target cards and no existing/shadow
+  rows;
+- apply upserted `4` rows and deprecated `0` rows;
+- postcheck found `1` verified/auto/oracle-hash row for each promoted card;
+- PG -> Hermes/SQLite sync loaded `4` PostgreSQL rows, updated `4` SQLite
+  rows, and exported `6651` canonical snapshot rows;
+- splitter suite passed `677` tests;
+- exact runtime suite passed `348` tests;
+- final PG/Hermes/SQLite contract passed `51/51`;
+- final XMage strategy audit passed `26/26`;
+- final operational and legacy contamination audits passed;
+- post-PG578 queue moved from PG577b `target_identity_count=25343` and
+  `xmage_authoritative_source_count=25029` to `25339` and `25025`;
+- the top recursion work unit moved from `1799` to `1795`;
+- final exact-scope recheck returned `proposal_count=0`.
+
+Residual boundary: PG578 does not authorize ETB look-top-back-to-top variants,
+activated library-pick permanents, X look-count variants, or conditional
+trigger variants. Those remain blocked under `look_library_pick_*`,
+`etb_library_pick_*`, or their source/Oracle mismatch reasons.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

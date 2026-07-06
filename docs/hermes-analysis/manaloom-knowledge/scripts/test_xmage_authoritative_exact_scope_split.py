@@ -5493,6 +5493,71 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertTrue(effect["pick_up_to_count"])
         self.assertTrue(effect["reveal"])
 
+    def test_recursion_bucket_look_library_pick_graveyard_spell_is_package_safe(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["LookLibraryAndPickControllerEffect"],
+            ability_classes=["FlashbackAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Forbidden Alchemy",
+                type_line="Instant",
+                oracle_text=(
+                    "Look at the top four cards of your library. "
+                    "Put one of them into your hand and the rest into your graveyard. "
+                    "Flashback {6}{B}"
+                ),
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new LookLibraryAndPickControllerEffect("
+                "4, 1, PutCards.HAND, PutCards.GRAVEYARD));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "dig_to_hand")
+        self.assertEqual(effect["battle_model_scope"], split.LOOK_LIBRARY_PICK_GRAVEYARD_SPELL_SCOPE)
+        self.assertEqual(effect["look_count"], 4)
+        self.assertEqual(effect["pick_count"], 1)
+        self.assertEqual(effect["pick_target"], "any_card")
+        self.assertEqual(effect["rest_destination"], "graveyard")
+        self.assertNotIn("library_bottom_order", effect)
+
+    def test_recursion_bucket_look_library_pick_graveyard_spell_filtered_is_package_safe(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["LookLibraryAndPickControllerEffect"],
+            ability_classes=["FlashbackAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Tapping at the Window",
+                type_line="Sorcery",
+                oracle_text=(
+                    "Look at the top three cards of your library. "
+                    "You may reveal a creature card from among them and put it into your hand. "
+                    "Put the rest into your graveyard. Flashback {2}{G}"
+                ),
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new LookLibraryAndPickControllerEffect("
+                "3, 1, StaticFilters.FILTER_CARD_CREATURE_A, "
+                "PutCards.HAND, PutCards.GRAVEYARD));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.LOOK_LIBRARY_PICK_GRAVEYARD_SPELL_SCOPE)
+        self.assertEqual(effect["pick_target"], "creature")
+        self.assertEqual(effect["target_constraints"]["card_types"], ["creature"])
+        self.assertTrue(effect["pick_up_to_count"])
+        self.assertTrue(effect["reveal"])
+
     def test_look_library_pick_spell_blocks_top_destination(self) -> None:
         row = queue_row(
             split.LOOK_LIBRARY_PICK_SPELL_UNIT,
