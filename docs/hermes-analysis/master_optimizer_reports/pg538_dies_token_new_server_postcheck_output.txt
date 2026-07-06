@@ -1,0 +1,5 @@
+    card_name     | normalized_name  |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
+------------------+------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
+ Carrier Thrall   | carrier thrall   | battle_rule_v1:9862b96824b4a0eff6fa32e596659d8a |                  1 |                           1 |                         1 |           0
+ Gravpack Monoist | gravpack monoist | battle_rule_v1:04f881988479704e8e63231c87908d7f |                  1 |                           1 |                         1 |           0
+(2 rows)

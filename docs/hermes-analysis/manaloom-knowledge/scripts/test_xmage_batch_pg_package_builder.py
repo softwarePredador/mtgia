@@ -995,6 +995,87 @@ def test_conditional_creature_etb_create_treasure_execution_scenario_sets_lands(
     assert scenario["opponent_land_count"] == 2
 
 
+def test_creature_dies_create_tokens_execution_scenario() -> None:
+    rule = {
+        "normalized_name": "carrier thrall",
+        "card_name": "Carrier Thrall",
+        "logical_rule_key": "battle_rule_v1:carrier-thrall",
+        "required_effect_fields": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+            "dies_trigger_effect": "token_maker",
+            "dies_token_count": 1,
+            "dies_token_name": "Eldrazi Scion Token",
+            "dies_token_power": 1,
+            "dies_token_toughness": 1,
+            "dies_token_subtype": "Eldrazi Scion",
+            "dies_token_colors": [],
+            "dies_token_sacrifice_for_colorless_mana": True,
+            "dies_token_mana_produced": 1,
+            "dies_token_produces": "C",
+            "dies_token_produced_mana_symbols": ["C"],
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario == {
+        "name": "Carrier Thrall dies and creates modeled creature tokens",
+        "type": "creature_dies_create_tokens",
+        "card": {
+            "name": "Carrier Thrall",
+            "type_line": "Creature",
+            "effect": "creature",
+        },
+        "expected_token": {
+            "name": "Eldrazi Scion Token",
+            "count": 1,
+            "power": 1,
+            "toughness": 1,
+            "subtype": "Eldrazi Scion",
+            "colors": [],
+            "keywords": [],
+            "artifact": False,
+            "tapped": False,
+            "sacrifice_for_colorless_mana": True,
+            "mana_produced": 1,
+            "produces": "C",
+            "produced_mana_symbols": ["C"],
+        },
+        "expected_keywords": [],
+        "logical_rule_key": "battle_rule_v1:carrier-thrall",
+    }
+
+
+def test_creature_dies_create_tokens_execution_scenario_preserves_artifact_tapped_token() -> None:
+    rule = {
+        "normalized_name": "gravpack monoist",
+        "card_name": "Gravpack Monoist",
+        "logical_rule_key": "battle_rule_v1:gravpack-monoist",
+        "required_effect_fields": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+            "dies_trigger_effect": "token_maker",
+            "dies_token_count": 1,
+            "dies_token_name": "Robot Token",
+            "dies_token_power": 2,
+            "dies_token_toughness": 2,
+            "dies_token_subtype": "Robot",
+            "dies_token_colors": [],
+            "dies_token_tapped": True,
+            "dies_artifact_tokens": True,
+            "keywords": ["flying"],
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario["type"] == "creature_dies_create_tokens"
+    assert scenario["expected_token"]["artifact"] is True
+    assert scenario["expected_token"]["tapped"] is True
+    assert scenario["expected_keywords"] == ["flying"]
+
+
 def test_manifest_checks_from_expected_rule_split_snapshot_and_runtime_fields() -> None:
     rule = {
         "normalized_name": "verge rangers",

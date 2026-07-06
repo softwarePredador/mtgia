@@ -1361,6 +1361,27 @@ def plural_token_description(description: str) -> str:
     return phrase + "s"
 
 
+def token_oracle_description_variants(token_data: dict[str, Any]) -> set[str]:
+    description = normalized_token_oracle_phrase(token_data.get("token_description"))
+    variants = {description}
+    if token_data.get("token_tapped") and not description.startswith("tapped "):
+        variants.add(f"tapped {description}")
+    if token_data.get("token_sacrifice_for_colorless_mana"):
+        mana_phrases = {
+            'with "sacrifice this creature: add {c}."',
+            'with "sacrifice this token: add {c}."',
+        }
+        for phrase in list(variants):
+            for source_phrase in mana_phrases:
+                if phrase.endswith(source_phrase):
+                    base = phrase[: -len(source_phrase)].rstrip()
+                    for oracle_phrase in mana_phrases:
+                        variants.add(f"{base} {oracle_phrase}".strip())
+                    variants.add(f'{base}. it has "sacrifice this token: add {{c}}."'.strip())
+                    variants.add(f'{base}. it has "sacrifice this creature: add {{c}}."'.strip())
+    return variants
+
+
 def count_word_for_oracle(count: int) -> str:
     for word, value in NUMBER_WORDS.items():
         if value == count:
@@ -1383,19 +1404,27 @@ def dies_create_token_oracle_blocker(
     phrase = match.group("phrase").strip()
     if any(marker in text for marker in (" if ", " for each ", " unless ", " instead ")):
         return "dies_token_oracle_not_simple"
-    token_description = normalized_token_oracle_phrase(token_data.get("token_description"))
+    token_descriptions = token_oracle_description_variants(token_data)
     if token_count == 1:
-        expected = {
-            f"a {token_description}",
-            f"an {token_description}",
-            f"one {token_description}",
-        }
+        expected = set()
+        for token_description in token_descriptions:
+            expected.update(
+                {
+                    f"a {token_description}",
+                    f"an {token_description}",
+                    f"one {token_description}",
+                }
+            )
     else:
-        plural_description = plural_token_description(token_description)
-        expected = {
-            f"{token_count} {plural_description}",
-            f"{count_word_for_oracle(token_count)} {plural_description}",
-        }
+        expected = set()
+        for token_description in token_descriptions:
+            plural_description = plural_token_description(token_description)
+            expected.update(
+                {
+                    f"{token_count} {plural_description}",
+                    f"{count_word_for_oracle(token_count)} {plural_description}",
+                }
+            )
     if phrase not in expected:
         return "dies_token_oracle_not_simple"
     return None
@@ -17760,6 +17789,7 @@ def split_row(
         )
         if token_reason:
             return None, token_reason
+        token_data = {**parsed_token_fields, **token_data}
         oracle_blocker = dies_create_token_oracle_blocker(metadata, token_data, token_count)
         if oracle_blocker:
             return None, oracle_blocker
@@ -17797,7 +17827,6 @@ def split_row(
             "token_tapped": "dies_token_tapped",
             "artifact_tokens": "dies_artifact_tokens",
         }
-        token_data = {**parsed_token_fields, **token_data}
         for source_key, target_key in optional_token_fields.items():
             if source_key in token_data:
                 effect_json[target_key] = token_data[source_key]

@@ -610,6 +610,115 @@ def run_multi_create_creature_tokens(
     }
 
 
+def run_creature_dies_create_tokens(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    active = battle.Player(str(scenario.get("player") or "Dies Token Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
+    effect_data = battle.get_card_effect(card)
+    permanent = battle.enrich_card({**card, **effect_data})
+    active.battlefield.append(permanent)
+
+    expected_keywords = [str(value) for value in (scenario.get("expected_keywords") or [])]
+    missing_keywords = [
+        keyword
+        for keyword in expected_keywords
+        if not battle.card_has_keyword(permanent, keyword)
+    ]
+    if missing_keywords:
+        fail(
+            "battle_execution",
+            f"{card['name']} missing expected permanent keywords: {missing_keywords}",
+        )
+
+    before_events = len(events)
+    destination = battle.move_creature_from_battlefield(
+        active,
+        permanent,
+        reason=str(scenario.get("reason") or "package_e2e_destroy"),
+        source=dict(scenario.get("source") or {"name": "Package E2E Removal"}),
+        all_players=[active, opponent],
+    )
+    if destination != "graveyard":
+        fail("battle_execution", f"{card['name']} destination={destination!r}")
+    if permanent not in active.graveyard:
+        fail("battle_execution", f"{card['name']} not moved to controller graveyard")
+
+    expected = dict(scenario.get("expected_token") or {})
+    expected_name = str(expected.get("name") or "")
+    expected_count = int(expected.get("count") or 1)
+    actual_tokens = [
+        item
+        for item in active.battlefield
+        if isinstance(item, dict) and battle.is_token_permanent(item)
+    ]
+    matches = [token for token in actual_tokens if token.get("name") == expected_name]
+    if len(matches) != expected_count:
+        fail("battle_execution", f"{card['name']} {expected_name} count={len(matches)}, expected {expected_count}")
+    for token in matches:
+        if expected.get("power") is not None and int(token.get("power") or 0) != int(expected["power"]):
+            fail("battle_execution", f"{card['name']} {expected_name} power={token.get('power')}")
+        if expected.get("toughness") is not None and int(token.get("toughness") or 0) != int(expected["toughness"]):
+            fail("battle_execution", f"{card['name']} {expected_name} toughness={token.get('toughness')}")
+        expected_subtype = expected.get("subtype")
+        if expected_subtype and str(expected_subtype) not in str(token.get("type_line") or ""):
+            fail("battle_execution", f"{card['name']} {expected_name} type_line={token.get('type_line')!r}")
+        expected_colors = expected.get("colors") or []
+        if expected_colors and list(token.get("colors") or []) != list(expected_colors):
+            fail("battle_execution", f"{card['name']} {expected_name} colors={token.get('colors')!r}")
+        for keyword in expected.get("keywords") or []:
+            if not battle.card_has_keyword(token, str(keyword)):
+                fail("battle_execution", f"{card['name']} {expected_name} missing keyword {keyword!r}")
+        if bool(expected.get("artifact")) and "artifact" not in str(token.get("type_line") or "").lower():
+            fail("battle_execution", f"{card['name']} {expected_name} artifact token type missing")
+        if bool(token.get("tapped")) != bool(expected.get("tapped")):
+            fail("battle_execution", f"{card['name']} {expected_name} tapped={token.get('tapped')}")
+        if bool(expected.get("sacrifice_for_colorless_mana")):
+            if token.get("sacrifice_for_colorless_mana") is not True:
+                fail("battle_execution", f"{card['name']} {expected_name} missing sacrifice mana ability")
+            if int(token.get("mana_produced") or 0) != int(expected.get("mana_produced") or 1):
+                fail("battle_execution", f"{card['name']} {expected_name} mana_produced={token.get('mana_produced')}")
+            if token.get("produces") != expected.get("produces", "C"):
+                fail("battle_execution", f"{card['name']} {expected_name} produces={token.get('produces')!r}")
+            expected_symbols = list(expected.get("produced_mana_symbols") or ["C"])
+            if list(token.get("produced_mana_symbols") or []) != expected_symbols:
+                fail(
+                    "battle_execution",
+                    f"{card['name']} {expected_name} produced_mana_symbols={token.get('produced_mana_symbols')!r}",
+                )
+
+    token_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "dies_token_maker_resolved"
+            and data.get("card") == card.get("name")
+        ),
+        None,
+    )
+    if token_event is None:
+        fail("battle_events", f"missing {card['name']} dies_token_maker_resolved event")
+    if int(token_event.get("token_count") or 0) != expected_count:
+        fail("battle_events", f"{card['name']} event token_count={token_event.get('token_count')}")
+    if token_event.get("token_name") != expected_name:
+        fail("battle_events", f"{card['name']} event token_name={token_event.get('token_name')!r}")
+    if bool(token_event.get("token_tapped")) != bool(expected.get("tapped")):
+        fail("battle_events", f"{card['name']} event token_tapped={token_event.get('token_tapped')}")
+
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "tokens_created": len(matches),
+        "token_name": expected_name,
+        "token_tapped": bool(expected.get("tapped")),
+        "validated_keywords": expected_keywords,
+        "sacrifice_for_colorless_mana": bool(expected.get("sacrifice_for_colorless_mana")),
+    }
+
+
 def run_tempting_offer_decline(battle, scenario: dict[str, Any], events: list[tuple[str, dict[str, Any]]]) -> dict[str, Any]:
     card = scenario["card"]
     active = battle.Player(
@@ -1926,6 +2035,7 @@ SCENARIO_RUNNERS = {
     "copy_stack_ability_response": run_copy_stack_ability_response,
     "copy_spell_choose_new_targets": run_copy_spell_choose_new_targets,
     "change_single_target_response": run_change_single_target_response,
+    "creature_dies_create_tokens": run_creature_dies_create_tokens,
     "creature_etb_create_treasure": run_creature_etb_create_treasure,
     "destroy_target_create_treasure": run_destroy_target_create_treasure,
     "fixed_create_creature_tokens": run_fixed_create_creature_tokens,

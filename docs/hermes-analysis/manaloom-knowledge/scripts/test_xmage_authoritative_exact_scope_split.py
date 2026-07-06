@@ -3481,6 +3481,94 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["dies_token_name"], "Spirit Token")
         self.assertEqual(effect["dies_token_keywords"], ["flying"])
 
+    def test_dies_create_token_matches_scion_mana_ability_oracle_wording(self) -> None:
+        row = queue_row(
+            split.DIES_TOKEN_CREATURE_UNIT,
+            effect_classes=["CreateTokenEffect"],
+            ability_kind="triggered",
+            ability_classes=["DiesSourceTriggeredAbility"],
+            xmage_signals=["token", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Carrier Thrall",
+                type_line="Creature - Vampire",
+                oracle_text=(
+                    "When this creature dies, create a 1/1 colorless Eldrazi Scion creature token. "
+                    "It has \"Sacrifice this token: Add {C}.\""
+                ),
+            ),
+            source_text="""
+                this.addAbility(new DiesSourceTriggeredAbility(
+                    new CreateTokenEffect(new EldraziScionToken()), false));
+                class EldraziScionToken extends TokenImpl {
+                    public EldraziScionToken() {
+                        super("Eldrazi Scion Token",
+                            "1/1 colorless Eldrazi Scion creature token with "
+                            + "\\"Sacrifice this creature: Add {C}.\\"");
+                        cardType.add(CardType.CREATURE);
+                        subtype.add(SubType.ELDRAZI);
+                        subtype.add(SubType.SCION);
+                        power = new MageInt(1);
+                        toughness = new MageInt(1);
+                        addAbility(new SimpleManaAbility(
+                            Zone.BATTLEFIELD, Mana.ColorlessMana(1),
+                            new SacrificeSourceCost()));
+                    }
+                }
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DIES_TOKEN_CREATURE_SCOPE)
+        self.assertEqual(effect["dies_token_count"], 1)
+        self.assertTrue(effect["dies_token_sacrifice_for_colorless_mana"])
+        self.assertEqual(effect["dies_token_produced_mana_symbols"], ["C"])
+
+    def test_dies_create_token_matches_tapped_artifact_token(self) -> None:
+        row = queue_row(
+            split.DIES_TOKEN_CREATURE_UNIT,
+            effect_classes=["CreateTokenEffect"],
+            ability_kind="triggered",
+            ability_classes=["DiesSourceTriggeredAbility", "FlyingAbility"],
+            xmage_signals=["token", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Gravpack Monoist",
+                type_line="Creature - Human Scout",
+                oracle_text=(
+                    "Flying\n"
+                    "When this creature dies, create a tapped 2/2 colorless Robot artifact creature token."
+                ),
+            ),
+            source_text="""
+                this.addAbility(FlyingAbility.getInstance());
+                this.addAbility(new DiesSourceTriggeredAbility(
+                    new CreateTokenEffect(new RobotToken(), 1, true)));
+                class RobotToken extends TokenImpl {
+                    public RobotToken() {
+                        super("Robot Token", "2/2 colorless Robot artifact creature token");
+                        cardType.add(CardType.ARTIFACT);
+                        cardType.add(CardType.CREATURE);
+                        subtype.add(SubType.ROBOT);
+                        power = new MageInt(2);
+                        toughness = new MageInt(2);
+                    }
+                }
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DIES_TOKEN_CREATURE_SCOPE)
+        self.assertTrue(effect["dies_token_tapped"])
+        self.assertTrue(effect["dies_artifact_tokens"])
+        self.assertEqual(effect["keywords"], ["flying"])
+
     def test_creature_etb_create_tokens_is_package_safe(self) -> None:
         row = queue_row(
             split.ETB_TOKEN_CREATURE_UNIT,

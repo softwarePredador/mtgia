@@ -14668,6 +14668,86 @@ creation attached to destroy/removal spells, activated Treasure makers, dynamic
 Treasure counts, optional/choice Treasure creation, or Treasure effects with
 additional non-Treasure behavior.
 
+## 2026-07-05 PG538 Creature Dies Token Checkpoint
+
+Applied package: `PG538 dies_token_new_server`.
+
+Scope closed:
+
+- Added exact XMage -> ManaLoom mapping for fixed creature dies triggers that
+  create modeled creature tokens under
+  `xmage_creature_dies_create_tokens_v1`.
+- Promoted `Carrier Thrall` from the local XMage source class
+  `CarrierThrall.java`.
+- Promoted `Gravpack Monoist` from the local XMage source class
+  `GravpackMonoist.java`.
+- Preserved token payload details needed by runtime:
+  - `Carrier Thrall`: `Eldrazi Scion Token` with sacrifice-for-colorless-mana
+    ability.
+  - `Gravpack Monoist`: tapped artifact `Robot Token`, while preserving self
+    `flying`.
+- Added package E2E support for `creature_dies_create_tokens` scenarios so a
+  package can prove the source creature moved to graveyard and the token was
+  actually created by the dies trigger.
+
+Evidence:
+
+- exact split:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260705_pg538_dies_token_candidate.md`
+- package:
+  `docs/hermes-analysis/master_optimizer_reports/pg538_dies_token_new_server_package_package.md`
+- apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg538_dies_token_new_server_apply_evidence.md`
+- PG -> SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg538_dies_token_new_server_pg_to_sqlite_sync.json`
+- E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg538_dies_token_new_server_e2e_validation.md`
+- post-sync queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260705_post_pg538_dies_token_new_server_commander_legal.md`
+- final exact-scope recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260705_post_pg538_dies_token_new_server_final.md`
+- readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260705_post_pg538_dies_token_new_server.md`
+- final audits:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260705_post_pg538_dies_token_new_server_final.md`,
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260705_post_pg538_dies_token_new_server_with_pg.md`,
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260705_post_pg538_dies_token_new_server.md`,
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260705_post_pg538_dies_token_new_server.md`
+
+Validation:
+
+- focused mapper/runtime tests: `912` tests passed;
+- builder package tests: `27` tests passed;
+- package precheck found `1` target card row for each promoted card and `0`
+  existing expected rows;
+- package apply upserted `2` rows and deprecated `0` shadow rows;
+- PostgreSQL postcheck confirmed `2/2` promoted rows, `2/2` verified/auto,
+  and `2/2` oracle hash rows;
+- PG -> SQLite sync loaded `2` PostgreSQL rows and updated `2` SQLite rows;
+- package E2E: `status=pass`, `scenario_count=2`,
+  `Carrier Thrall` created `1` `Eldrazi Scion Token` with
+  sacrifice-for-colorless-mana validated, and `Gravpack Monoist` created `1`
+  tapped `Robot Token` with self `flying` validated;
+- final exact-scope recheck has `proposal_count=0` and
+  `safe_for_batch_pg_package_count=0`;
+- final audits passed: XMage strategy `26/26`, PG-Hermes-SQLite `51/51`,
+  operational surface `39/39`, legacy contamination `32/32`.
+
+Post-sync queue evidence:
+
+- pre-cycle `target_identity_count=25814`
+- post-cycle `target_identity_count=25812`
+- post-cycle `xmage_authoritative_source_count=25498`
+- post-cycle `xmage_missing_source_exception_count=314`
+- post-cycle `xmage_authoritative_adapter_required_count=25498`
+- `token_maker` reduced from `2375` to `2373`
+- `dies_token_oracle_not_simple` residual is `3`
+
+Residual boundary: PG538 does not authorize conditional dies token triggers,
+dynamic token counts, token choices, activated token makers, named legendary
+token exceptions, recursion tokens, or token ability payloads outside the
+fields validated in the package E2E.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

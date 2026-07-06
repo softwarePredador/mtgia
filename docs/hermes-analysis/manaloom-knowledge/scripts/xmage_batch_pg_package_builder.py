@@ -1072,12 +1072,49 @@ def multi_create_creature_tokens_execution_scenario_from_expected_rule(
     }
 
 
+def creature_dies_create_tokens_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_creature_dies_create_tokens_v1":
+        return None
+    return {
+        "name": f"{rule['card_name']} dies and creates modeled creature tokens",
+        "type": "creature_dies_create_tokens",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": "Creature",
+            "effect": "creature",
+        },
+        "expected_token": {
+            "name": required.get("dies_token_name"),
+            "count": int(required.get("dies_token_count") or 1),
+            "power": required.get("dies_token_power"),
+            "toughness": required.get("dies_token_toughness"),
+            "subtype": required.get("dies_token_subtype"),
+            "colors": required.get("dies_token_colors") or [],
+            "keywords": required.get("dies_token_keywords") or [],
+            "artifact": bool(required.get("dies_artifact_tokens")),
+            "tapped": bool(required.get("dies_token_tapped")),
+            "sacrifice_for_colorless_mana": bool(
+                required.get("dies_token_sacrifice_for_colorless_mana")
+            ),
+            "mana_produced": required.get("dies_token_mana_produced"),
+            "produces": required.get("dies_token_produces"),
+            "produced_mana_symbols": required.get("dies_token_produced_mana_symbols") or [],
+        },
+        "expected_keywords": list(required.get("keywords") or []),
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any] | None:
     return (
         static_global_pt_execution_scenario_from_expected_rule(rule)
         or aura_static_pt_execution_scenario_from_expected_rule(rule)
         or destroy_target_create_treasure_execution_scenario_from_expected_rule(rule)
         or creature_etb_create_treasure_execution_scenario_from_expected_rule(rule)
+        or creature_dies_create_tokens_execution_scenario_from_expected_rule(rule)
         or fixed_create_creature_tokens_execution_scenario_from_expected_rule(rule)
         or multi_create_creature_tokens_execution_scenario_from_expected_rule(rule)
     )
