@@ -648,6 +648,107 @@ class GlobalCommanderLearningPriorityAuditTests(unittest.TestCase):
             "exclude_blocked_pairs_and_route_unexercised_packages_before_requeue",
         )
 
+    def test_role_axis_exhaustion_after_ramp_cut_lane_blocks_same_axis_reentry(self) -> None:
+        core_payload = {
+            "decks": [
+                {
+                    "deck_id": "619",
+                    "deck_name": "Kaalia Variant",
+                    "commander": "Kaalia of the Vast",
+                    "scope": "hermes_registered_variant",
+                    "shape_status": "structure_ready",
+                    "core_status": "core_role_gap",
+                    "role_bands": [
+                        {
+                            "role": "removal",
+                            "count": 1,
+                            "min": 6,
+                            "max": 14,
+                            "severity": "critical",
+                            "status": "below_floor",
+                        },
+                        {
+                            "role": "ramp",
+                            "count": 23,
+                            "min": 8,
+                            "max": 16,
+                            "severity": "review",
+                            "status": "above_range_review",
+                        },
+                    ],
+                }
+            ]
+        }
+        strategy_payload = {
+            "commanders": [
+                {
+                    "commander_key": "kaalia of the vast",
+                    "status": "ready_for_strategy_matrix",
+                    "source_lane_count": 1,
+                }
+            ]
+        }
+        nonland_payload = {
+            "nonland_pools": [
+                {
+                    "deck_id": "619",
+                    "role": "removal",
+                    "status": "review_nonland_add_cut_pool_ready",
+                    "candidate_count": 12,
+                    "cut_candidate_count": 12,
+                    "pair_hypotheses": [{"add": "Feed the Swarm", "cut": "Birgi"}],
+                }
+            ]
+        }
+        role_axis_exhaustion_payload = {
+            "artifact_type": "global_commander_ramp_axis_exhaustion_router",
+            "status": "ramp_axis_exhausted_requires_global_role_axis_pivot",
+            "exhausted_role_axis": "ramp",
+            "candidate_copy_allowed_now": False,
+            "battle_gate_allowed_now": False,
+            "candidate_copy_blockers": ["ramp_axis_current_cut_lane_exhausted"],
+            "summary": {
+                "deck_id": "619",
+                "commander": "Kaalia of the Vast",
+                "next_gate": "return_to_global_role_axis_learning_priority_after_ramp_axis_exhaustion",
+                "blocked_ramp_cut_count": 9,
+                "replacement_exact_ready_count": 0,
+                "alternative_forced_usage_blocked_count": 2,
+            },
+        }
+
+        report = audit.build_report(
+            core_payload=core_payload,
+            strategy_payload=strategy_payload,
+            nonland_payload=nonland_payload,
+            role_axis_exhaustion_payload=role_axis_exhaustion_payload,
+            bracket_status=audit.bracket_policy_status_from_text(""),
+            core_report_path=Path("docs/hermes-analysis/master_optimizer_reports/core.json"),
+            strategy_report_path=Path("docs/hermes-analysis/master_optimizer_reports/strategy.json"),
+            nonland_report_path=Path("docs/hermes-analysis/master_optimizer_reports/nonland.json"),
+            role_axis_exhaustion_report_path=Path("docs/hermes-analysis/master_optimizer_reports/ramp_axis.json"),
+        )
+
+        [row] = report["deck_priorities"]
+        self.assertEqual(row["role_axis_exhaustion_state"], "role_axis_exhausted_requires_global_learning_pivot")
+        self.assertEqual(row["role_axis_exhausted_role"], "ramp")
+        self.assertEqual(row["role_axis_blocked_cut_count"], 9)
+        self.assertEqual(
+            row["next_action"],
+            "pivot_to_cross_commander_role_axis_learning_after_ramp_axis_exhaustion",
+        )
+        self.assertEqual(report["summary"]["role_axis_exhaustion_blocked_deck_count"], 1)
+        self.assertEqual(
+            report["summary"]["role_axis_exhaustion_gate_counts"][
+                "role_axis_exhausted_requires_global_learning_pivot"
+            ],
+            1,
+        )
+        self.assertIn(
+            "role_axis_exhaustion_router_before_more_same_deck_axis_research",
+            report["method"]["priority_order"],
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

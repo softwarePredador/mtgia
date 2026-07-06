@@ -524,13 +524,25 @@ GLOBAL_COMMANDER_LEARNING_PRIORITY_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_learning_priority_audit_20260706_engine_axis_exhaustion_current.md"
 )
+GLOBAL_COMMANDER_LEARNING_PRIORITY_RAMP_AXIS_EXHAUSTION_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_learning_priority_audit_20260706_ramp_axis_exhaustion_current.md"
+)
 GLOBAL_COMMANDER_CROSS_COMMANDER_ROLE_AXIS_LEARNING_PIVOT_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_cross_commander_role_axis_learning_pivot_20260706_engine_axis_exhaustion_current.md"
 )
+GLOBAL_COMMANDER_CROSS_COMMANDER_ROLE_AXIS_RAMP_EXHAUSTION_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_cross_commander_role_axis_learning_pivot_20260706_ramp_axis_exhaustion_current.md"
+)
 GLOBAL_COMMANDER_ROLE_AXIS_POLICY_BUILDER_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_role_axis_policy_builder_20260706_post_engine_axis_exhaustion_current.md"
+)
+GLOBAL_COMMANDER_ROLE_AXIS_POLICY_BUILDER_POST_RAMP_EXHAUSTION_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_role_axis_policy_builder_20260706_post_ramp_axis_exhaustion_current.md"
 )
 GLOBAL_COMMANDER_ENGINE_AXIS_NONLAND_CUT_POLICY_MODEL_REPORT = (
     REPO_ROOT
@@ -1141,6 +1153,12 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_learning_priority_audit.py",
                 "global_commander_learning_priority_audit_20260706_engine_axis_exhaustion_current.md",
                 "pivot_to_cross_commander_role_axis_learning_after_engine_axis_exhaustion",
+                "role_axis_exhausted_requires_global_learning_pivot",
+                "pivot_to_cross_commander_role_axis_learning_after_ramp_axis_exhaustion",
+                "global_commander_learning_priority_audit_20260706_ramp_axis_exhaustion_current.md",
+                "global_commander_cross_commander_role_axis_learning_pivot_20260706_ramp_axis_exhaustion_current.md",
+                "global_commander_role_axis_policy_builder_20260706_post_ramp_axis_exhaustion_current.md",
+                "calibrate_land_floor_policy_before_candidate_copy",
                 "global_commander_external_exact_artifact_engine_source_expander.py",
                 "global_commander_external_exact_artifact_engine_source_expander_20260706_current.md",
                 "review_external_exact_artifact_engine_candidates_locally_before_candidate_copy",
@@ -1972,12 +1990,17 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_battle_feedback_model_20260705_current",
                 "DEFAULT_SOURCE_EXHAUSTION_REPORT",
                 "DEFAULT_ENGINE_AXIS_PIVOT_REPORT",
+                "DEFAULT_ROLE_AXIS_EXHAUSTION_REPORT",
                 "source_exhaustion_router_before_candidate_copy",
                 "engine_axis_exhaustion_router_before_more_same_deck_engine_research",
+                "role_axis_exhaustion_router_before_more_same_deck_axis_research",
                 "engine_axis_exhausted_requires_global_learning_pivot",
+                "role_axis_exhausted_requires_global_learning_pivot",
                 "pivot_to_cross_commander_role_axis_learning_after_engine_axis_exhaustion",
+                "pivot_to_cross_commander_role_axis_learning_after_{axis}_axis_exhaustion",
                 "source_exhaustion_gate_counts",
                 "engine_axis_pivot_gate_counts",
+                "role_axis_exhaustion_gate_counts",
                 "battle_feedback_model_before_requeue",
                 "blocked_exact_add_cut_pair_count",
                 "current_official_bracket_model_has_five_brackets_and_game_changers",
@@ -1993,8 +2016,12 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_cross_commander_role_axis_learning_pivot",
                 "source_cycle_decks_need_role_axis_policy_before_more_same_deck_source_expansion",
                 "ENGINE_AXIS_EXHAUSTED_STATE",
+                "ROLE_AXIS_EXHAUSTED_STATE",
                 "cross_commander_role_axis_suppressed_engine_axis_exhausted",
+                "axis_suppressed_by_role_axis_exhaustion",
+                "cross_commander_role_axis_suppressed_{role}_axis_exhausted",
                 "engine_axis_exhaustion_suppresses_engine_reentry_until_new_card_level_evidence",
+                "role_axis_exhaustion_suppresses_same_axis_reentry_until_new_card_level_evidence",
                 "deck_607_is_benchmark_evidence_only_not_action_source",
                 "candidate_copy_allowed_now",
             ],
@@ -2006,8 +2033,10 @@ def build_audit() -> dict[str, Any]:
             [
                 "test_source_cycle_prioritizes_role_axis_without_deck_action",
                 "test_engine_axis_exhaustion_suppresses_engine_reentry",
+                "test_role_axis_exhaustion_suppresses_ramp_reentry",
                 "source_expansion_cycle_requires_global_learning_pivot",
                 "engine_axis_exhausted_requires_global_learning_pivot",
+                "role_axis_exhausted_requires_global_learning_pivot",
                 "Kaalia Variant",
                 "benchmark_only_excluded_from_action_count",
             ],
@@ -2020,8 +2049,11 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_role_axis_policy_builder",
                 "role_axis_policy_blocks_same_deck_source_cycle",
                 "role_axis_policy_holds_exhausted_engine_axis",
+                "role_axis_policy_holds_exhausted_role_axis",
+                "axis_suppressed_by_role_axis_exhaustion",
                 "treat_engine_as_capacity_ceiling_not_missing_role",
                 "hold_engine_axis_after_biotransference_protection_exhaustion",
+                "hold_{role}_axis_after_current_cut_lane_exhaustion",
                 "apply_{role}_axis_policy_before_more_same_deck_source_expansion",
                 "engine_saturation_policy_must_be_applied_before_more_same_deck_source_expansion",
                 "candidate_copy_allowed_now",
@@ -2035,6 +2067,7 @@ def build_audit() -> dict[str, Any]:
             [
                 "test_engine_cycle_blocks_same_deck_source_expansion",
                 "test_engine_axis_exhaustion_holds_engine_and_routes_next_axis",
+                "test_role_axis_exhaustion_holds_ramp_and_routes_next_axis",
                 "apply_engine_axis_policy_to_nonland_cut_model_before_more_same_deck_source_expansion",
                 "apply_ramp_axis_policy_before_more_same_deck_source_expansion",
                 "treat_engine_as_capacity_ceiling_not_missing_role",
@@ -4059,6 +4092,47 @@ def build_audit() -> dict[str, Any]:
                 "apply_ramp_axis_policy_before_more_same_deck_source_expansion",
                 "treat_ramp_above_range_as_cut_pressure_not_add_lane",
                 "role_axis_policy_holds_exhausted_engine_axis",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_LEARNING_PRIORITY_RAMP_AXIS_EXHAUSTION_REPORT,
+            [
+                "Global Commander Learning Priority Audit",
+                "Role Axis Exhaustion Counts",
+                "role_axis_exhausted_requires_global_learning_pivot",
+                "pivot_to_cross_commander_role_axis_learning_after_ramp_axis_exhaustion",
+                "role_axis_exhaustion_router_before_more_same_deck_axis_research",
+                "Deck 607 is ranked only as a regression benchmark",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_CROSS_COMMANDER_ROLE_AXIS_RAMP_EXHAUSTION_REPORT,
+            [
+                "Global Commander Cross-Commander Role Axis Learning Pivot",
+                "cross_commander_role_axis_learning_pivot_ready_after_role_axis_exhaustion_no_deck_action",
+                "top_axis_role: `land`",
+                "role_axis_suppressed_axis_count: `1`",
+                "cross_commander_role_axis_suppressed_ramp_axis_exhausted",
+                "choose_next_non_exhausted_role_axis_after_ramp_axis_exhaustion",
+                "role_axis_exhaustion_suppresses_same_axis_reentry_until_new_card_level_evidence",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_ROLE_AXIS_POLICY_BUILDER_POST_RAMP_EXHAUSTION_REPORT,
+            [
+                "Global Commander Role Axis Policy Builder",
+                "role_axis_policy_ready_after_role_axis_exhaustion_blocks_same_deck_source_cycle",
+                "top_policy_role: `land`",
+                "held_role_axis_count: `1`",
+                "role_axis_policy_holds_exhausted_role_axis",
+                "calibrate_land_floor_policy_before_candidate_copy",
+                "exhausted_role_axis_cannot_reenter_without_new_card_level_evidence",
             ],
         )
     )

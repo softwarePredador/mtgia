@@ -182,17 +182,19 @@ Operational priority after this pivot:
    one global next-action queue;
 11. run `global_commander_cross_commander_role_axis_learning_pivot.py` whenever
    the learning queue reports `source_expansion_cycle_requires_global_learning_pivot`
-   or `engine_axis_exhausted_requires_global_learning_pivot`;
+   or any exhausted-axis state such as
+   `engine_axis_exhausted_requires_global_learning_pivot` or
+   `role_axis_exhausted_requires_global_learning_pivot`;
    it must group role floor/excess evidence across commanders, exclude deck
-   `607` from actionable counts, suppress any exhausted `engine` re-entry
+   `607` from actionable counts, suppress any exhausted role-axis re-entry
    until new card-level proof exists, and choose a global role axis before any
    further same-deck source expansion, candidate copy, battle, or promotion;
    then run `global_commander_role_axis_policy_builder.py` to convert the
    chosen role axis into explicit floor/ceiling/cut-pressure policy, treating
    above-range capacity roles as cut pressure rather than missing-role add
    lanes, while keeping same-deck source expansion, candidate copy, battle,
-   mutation, and promotion closed; when `engine` was exhausted, the builder
-   must hold `engine` as evidence and route the next non-exhausted axis; if the
+   mutation, and promotion closed; when a role axis was exhausted, the builder
+   must hold that axis as evidence and route the next non-exhausted axis; if the
    chosen axis is `ramp`, then run
    `global_commander_ramp_axis_nonland_cut_policy_model.py` to apply ramp
    ceiling policy to blocked nonland ramp cuts before any same-deck source
@@ -1697,6 +1699,20 @@ Current external refresh on 2026-07-05:
   The current router marks `ramp` exhausted for deck `619`: `9` scoped ramp cuts
   are blocked, exact replacements ready is `0`, and both alternative forced
   targets are usage-blocked.
+- The current learning-priority rerun consumes the ramp-axis exhaustion router
+  and sets the top action to
+  `pivot_to_cross_commander_role_axis_learning_after_ramp_axis_exhaustion`.
+  The cross-commander pivot suppresses both exhausted axes (`ramp` and
+  `engine`), keeps candidate copy, battle, mutation, and promotion closed, and
+  chooses `land` as the next non-exhausted global role axis. The policy builder
+  then holds `ramp` and `engine` as exhausted evidence, selects `land` floor
+  calibration, and routes the next gate to
+  `calibrate_land_floor_policy_before_candidate_copy`.
+  Current evidence:
+  `global_commander_learning_priority_audit_20260706_ramp_axis_exhaustion_current.md`,
+  `global_commander_cross_commander_role_axis_learning_pivot_20260706_ramp_axis_exhaustion_current.md`,
+  and
+  `global_commander_role_axis_policy_builder_20260706_post_ramp_axis_exhaustion_current.md`.
 
 ## Global Commander Rollout - 2026-07-01
 

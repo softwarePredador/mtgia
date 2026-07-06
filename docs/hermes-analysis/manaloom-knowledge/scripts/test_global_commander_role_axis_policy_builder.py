@@ -191,6 +191,88 @@ class GlobalCommanderRoleAxisPolicyBuilderTests(unittest.TestCase):
         )
         self.assertIn("619", report["engine_axis_exhausted_deck_role_pressure"])
 
+    def test_role_axis_exhaustion_holds_ramp_and_routes_next_axis(self) -> None:
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        root = Path(tmp.name)
+        pivot = write_json(
+            root,
+            "pivot.json",
+            {
+                "axis_rows": [
+                    {
+                        "role": "removal",
+                        "status": "cross_commander_role_axis_ready_no_deck_action",
+                        "priority_score": 220,
+                        "actionable_deck_count": 1,
+                        "commander_count": 1,
+                        "below_floor_deck_count": 1,
+                        "above_range_deck_count": 0,
+                        "source_cycle_blocked_deck_count": 0,
+                        "source_cycle_blocked_decks": [],
+                        "role_axis_exhausted_deck_count": 0,
+                        "role_axis_exhausted_decks": [],
+                        "axis_suppressed_by_role_axis_exhaustion": False,
+                        "evidence_rows": [
+                            {
+                                "deck_id": "619",
+                                "deck_name": "Kaalia Variant",
+                                "commander": "Kaalia of the Vast",
+                                "direction": "below_floor",
+                                "count": 1,
+                                "min": 6,
+                                "max": 14,
+                                "deck_role_axis_exhausted_requires_global_pivot": True,
+                                "role_axis_exhaustion_blocks_this_axis": False,
+                            }
+                        ],
+                    },
+                    {
+                        "role": "ramp",
+                        "status": "cross_commander_role_axis_suppressed_ramp_axis_exhausted",
+                        "priority_score": -140,
+                        "actionable_deck_count": 2,
+                        "commander_count": 2,
+                        "below_floor_deck_count": 0,
+                        "above_range_deck_count": 2,
+                        "source_cycle_blocked_deck_count": 0,
+                        "source_cycle_blocked_decks": [],
+                        "role_axis_exhausted_deck_count": 1,
+                        "role_axis_exhausted_decks": ["619"],
+                        "role_axis_exhausted_role": "ramp",
+                        "axis_suppressed_by_role_axis_exhaustion": True,
+                        "evidence_rows": [
+                            {
+                                "deck_id": "619",
+                                "deck_name": "Kaalia Variant",
+                                "commander": "Kaalia of the Vast",
+                                "direction": "above_range",
+                                "count": 23,
+                                "min": 8,
+                                "max": 16,
+                                "deck_role_axis_exhausted_requires_global_pivot": True,
+                                "role_axis_exhaustion_blocks_this_axis": True,
+                            }
+                        ],
+                    },
+                ]
+            },
+        )
+
+        report = builder.build_report(pivot_report=pivot)
+
+        self.assertEqual(
+            report["status"],
+            "role_axis_policy_ready_after_role_axis_exhaustion_no_deck_action",
+        )
+        self.assertEqual(report["summary"]["top_policy_role"], "removal")
+        self.assertEqual(report["summary"]["held_role_axis_count"], 1)
+        self.assertEqual(report["summary"]["role_axis_exhausted_deck_count"], 1)
+        held = next(row for row in report["axis_policy_rows"] if row["role"] == "ramp")
+        self.assertEqual(held["status"], "role_axis_policy_holds_exhausted_role_axis")
+        self.assertIn("hold_ramp_axis_after_current_cut_lane_exhaustion", held["policy_actions"])
+        self.assertIn("619", report["role_axis_exhausted_deck_role_pressure"])
+
 
 if __name__ == "__main__":
     unittest.main()
