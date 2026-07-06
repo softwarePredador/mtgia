@@ -1745,7 +1745,11 @@ Current external refresh on 2026-07-05:
   The repair package resynthesizer names a 5-add/5-cut review package
   (`Bant Panorama`, `Brokers Hideout`, and the three restored anchors), but
   keeps candidate copy closed on `cut_pair_review_required_before_candidate_copy`
-  until the selected cuts are reviewed as coherent pairs.
+  until the selected cuts are reviewed as coherent pairs. The cut-pair reviewer
+  keeps candidate copy closed: only `Birgi` over `Jeska's Will` has same-lane
+  overlap, while the two land pairs need curve/role-loss review and the
+  `Pyromancer's Goggles`/`Call Forth the Tempest` restore pairs are cross-lane.
+  The next gate is `reorder_or_expand_profile_repair_cut_pairs_before_candidate_copy`.
   Current evidence:
   `global_commander_learning_priority_audit_20260706_ramp_axis_exhaustion_current.md`,
   `global_commander_cross_commander_role_axis_learning_pivot_20260706_ramp_axis_exhaustion_current.md`,
@@ -1765,7 +1769,9 @@ Current external refresh on 2026-07-05:
   then
   `global_commander_profile_repair_candidate_model_20260706_lorehold_land_floor_package_profile.md`,
   and
-  `global_commander_profile_repair_package_resynthesizer_20260706_lorehold_land_floor_package_profile.md`.
+  `global_commander_profile_repair_package_resynthesizer_20260706_lorehold_land_floor_package_profile.md`,
+  then
+  `global_commander_profile_repair_cut_pair_reviewer_20260706_lorehold_land_floor_package_profile.md`.
 
 ## Global Commander Rollout - 2026-07-01
 

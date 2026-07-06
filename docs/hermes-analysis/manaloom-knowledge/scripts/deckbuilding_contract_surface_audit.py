@@ -211,6 +211,12 @@ GLOBAL_COMMANDER_PROFILE_REPAIR_PACKAGE_RESYNTHESIZER = (
 GLOBAL_COMMANDER_PROFILE_REPAIR_PACKAGE_RESYNTHESIZER_TEST = (
     SCRIPT_DIR / "test_global_commander_profile_repair_package_resynthesizer.py"
 )
+GLOBAL_COMMANDER_PROFILE_REPAIR_CUT_PAIR_REVIEWER = (
+    SCRIPT_DIR / "global_commander_profile_repair_cut_pair_reviewer.py"
+)
+GLOBAL_COMMANDER_PROFILE_REPAIR_CUT_PAIR_REVIEWER_TEST = (
+    SCRIPT_DIR / "test_global_commander_profile_repair_cut_pair_reviewer.py"
+)
 GLOBAL_COMMANDER_PAYOFF_SOURCE_LANE_EXPANDER = (
     SCRIPT_DIR / "global_commander_payoff_source_lane_expander.py"
 )
@@ -681,6 +687,10 @@ GLOBAL_COMMANDER_LAND_FLOOR_PACKAGE_PROFILE_REPAIR_CANDIDATE_REPORT = (
 GLOBAL_COMMANDER_LAND_FLOOR_PACKAGE_PROFILE_REPAIR_PACKAGE_RESYNTHESIS_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_profile_repair_package_resynthesizer_20260706_lorehold_land_floor_package_profile.md"
+)
+GLOBAL_COMMANDER_LAND_FLOOR_PACKAGE_PROFILE_REPAIR_CUT_PAIR_REVIEW_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_profile_repair_cut_pair_reviewer_20260706_lorehold_land_floor_package_profile.md"
 )
 GLOBAL_COMMANDER_CANDIDATE_BATTLE_PROBE_REPORT = (
     REPO_ROOT
@@ -1221,6 +1231,7 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_profile_blocker_repair_plan_20260706_lorehold_land_floor_package_profile.md",
                 "global_commander_profile_repair_candidate_model_20260706_lorehold_land_floor_package_profile.md",
                 "global_commander_profile_repair_package_resynthesizer_20260706_lorehold_land_floor_package_profile.md",
+                "global_commander_profile_repair_cut_pair_reviewer_20260706_lorehold_land_floor_package_profile.md",
                 "commander_profile_not_available",
                 "profile_lands_below_target",
                 "protected anchor cuts",
@@ -1228,6 +1239,7 @@ def build_audit() -> dict[str, Any]:
                 "protected_anchor_restore_requires_package_resynthesis",
                 "resynthesize_profile_repair_package_with_protected_anchor_restoration",
                 "cut_pair_review_required_before_candidate_copy",
+                "reorder_or_expand_profile_repair_cut_pairs_before_candidate_copy",
                 "repair_commander_profile_blockers_before_battle",
                 "global_commander_external_exact_artifact_engine_source_expander.py",
                 "global_commander_external_exact_artifact_engine_source_expander_20260706_current.md",
@@ -4043,6 +4055,33 @@ def build_audit() -> dict[str, Any]:
     )
     checks.append(
         check_contains(
+            GLOBAL_COMMANDER_PROFILE_REPAIR_CUT_PAIR_REVIEWER,
+            [
+                "global_commander_profile_repair_cut_pair_reviewer",
+                "profile_repair_cut_pair_review_blocks_candidate_copy",
+                "profile_repair_cut_pair_review_ready_for_candidate_copy",
+                "land_floor_pair_needs_curve_and_role_loss_review",
+                "protected_anchor_pair_lacks_same_lane_overlap",
+                "reorder_or_expand_profile_repair_cut_pairs_before_candidate_copy",
+                "pair_needs_manual_land_curve_review",
+                "pair_blocked_cross_lane_protected_anchor_cut",
+                "battle_or_optimization_performed",
+                "candidate_copy_allowed_now",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_PROFILE_REPAIR_CUT_PAIR_REVIEWER_TEST,
+            [
+                "test_blocks_land_curve_and_cross_lane_protected_anchor_pairs",
+                "test_same_lane_protected_anchor_pair_still_keeps_copy_closed_to_later_gate",
+                "protected_anchor_pair_lacks_same_lane_overlap",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
             GLOBAL_COMMANDER_PAYOFF_SOURCE_LANE_EXPANDER,
             [
                 "global_commander_payoff_source_lane_expander",
@@ -4935,6 +4974,27 @@ def build_audit() -> dict[str, Any]:
                 "Call Forth the Tempest",
                 "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
                 "cut_pair_review_required_before_candidate_copy",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_LAND_FLOOR_PACKAGE_PROFILE_REPAIR_CUT_PAIR_REVIEW_REPORT,
+            [
+                "Global Commander Profile Repair Cut Pair Reviewer",
+                "profile_repair_cut_pair_review_blocks_candidate_copy",
+                "commander: `Lorehold, the Historian`",
+                "pair_count: `5`",
+                "ready_pair_count: `1`",
+                "candidate_copy_allowed_now: `false`",
+                "battle_gate_allowed_now: `false`",
+                "promotion_allowed: `false`",
+                "next_gate: `reorder_or_expand_profile_repair_cut_pairs_before_candidate_copy`",
+                "pair_needs_manual_land_curve_review",
+                "pair_blocked_cross_lane_protected_anchor_cut",
+                "review_only_protected_anchor_same_lane_pair",
+                "land_floor_pair_needs_curve_and_role_loss_review",
+                "protected_anchor_pair_lacks_same_lane_overlap",
             ],
         )
     )
