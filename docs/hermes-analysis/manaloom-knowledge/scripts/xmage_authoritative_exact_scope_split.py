@@ -385,8 +385,26 @@ AUXILIARY_RECURSION_SPELL_ABILITY_CLASSES = {
 }
 
 ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES = {
+    # Cast/cost/static spell abilities that do not change the resolved effect.
+    "AffinityForArtifactsAbility",
+    "AssistAbility",
+    "CantBeCounteredSourceAbility",
+    "CastOnlyDuringPhaseStepSourceAbility",
+    "ConvokeAbility",
+    "CyclingAbility",
+    "DevoidAbility",
     "FlashbackAbility",
     "ForetellAbility",
+    "FreerunningAbility",
+    "LegendarySpellAbility",
+    "MadnessAbility",
+    "MiracleAbility",
+    "RetraceAbility",
+    "SpectacleAbility",
+    "SplitSecondAbility",
+    "SurgeAbility",
+    "SuspendAbility",
+    "UndauntedAbility",
 }
 
 NUMBER_WORDS = {
@@ -10170,8 +10188,12 @@ def fixed_draw_lose_life_spell_from_oracle(metadata: dict[str, Any]) -> dict[str
 
 
 def fixed_target_player_draw_spell_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
-    text = re.sub(r"\s+", " ", oracle_text(metadata)).strip().lower()
-    if has_oracle_complexity(metadata):
+    text = re.sub(
+        r"\s+",
+        " ",
+        " ".join(oracle_effect_lines_without_neutral_auxiliary(metadata)),
+    ).strip().lower()
+    if not text:
         return "target_player_draw_spell_oracle_not_simple"
     number_pattern = r"(a|one|two|three|four|five|six|seven|\d+)"
     match = re.fullmatch(rf"target player draws {number_pattern} cards?\.?", text)
@@ -15350,6 +15372,30 @@ def normalized_oracle_lines(metadata: dict[str, Any]) -> list[str]:
         if line:
             lines.append(line)
     return lines
+
+
+def is_resolution_neutral_auxiliary_oracle_line(line: str) -> bool:
+    normalized = re.sub(r"\s+", " ", line or "").strip().strip(".").lower()
+    if not normalized:
+        return False
+    return bool(
+        re.match(
+            r"^(?:"
+            r"affinity for artifacts|assist|can't be countered|convoke|cycling|devoid|"
+            r"flashback|foretell|freerunning|legendary|madness|miracle|retrace|"
+            r"spectacle|split second|surge|suspend|undaunted"
+            r")\b",
+            normalized,
+        )
+    )
+
+
+def oracle_effect_lines_without_neutral_auxiliary(metadata: dict[str, Any]) -> list[str]:
+    return [
+        line
+        for line in normalized_oracle_lines(metadata)
+        if not is_resolution_neutral_auxiliary_oracle_line(line)
+    ]
 
 
 def _unique_mana_symbols(symbols: list[str]) -> str:
@@ -21747,7 +21793,8 @@ def split_row(
             ), "selected_exact_scope"
         if classes != {"CreateTokenEffect", "DestroyTargetEffect"}:
             return None, "destroy_treasure_effect_classes_not_exact"
-        if ability_classes(row):
+        unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+        if unsupported_abilities:
             return None, "destroy_treasure_ability_class_not_simple"
         oracle_match = destroy_target_create_treasure_from_oracle(metadata)
         if oracle_match is None:
@@ -22158,7 +22205,8 @@ def split_row(
             ), "selected_exact_scope"
 
         if classes == {"DamageTargetEffect", "DrawCardSourceControllerEffect"}:
-            if ability_classes(row):
+            unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+            if unsupported_abilities:
                 return None, "damage_draw_ability_class_not_simple"
             oracle_damage_draw = fixed_damage_draw_from_oracle(metadata)
             if oracle_damage_draw is None:
@@ -22210,7 +22258,8 @@ def split_row(
             ), "selected_exact_scope"
 
         if classes == {"BoostTargetEffect", "DrawCardSourceControllerEffect"}:
-            if ability_classes(row):
+            unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+            if unsupported_abilities:
                 return None, "boost_draw_ability_class_not_simple"
             oracle_boost = fixed_boost_draw_from_oracle(metadata)
             if oracle_boost is None:
@@ -22421,7 +22470,8 @@ def split_row(
             ), "selected_exact_scope"
 
         if classes == {"DestroyTargetEffect", "DrawCardSourceControllerEffect"}:
-            if ability_classes(row):
+            unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+            if unsupported_abilities:
                 return None, "destroy_draw_ability_class_not_simple"
             if has_oracle_complexity(metadata):
                 return None, "destroy_draw_oracle_not_simple"
@@ -22473,7 +22523,8 @@ def split_row(
             ), "selected_exact_scope"
 
         if classes == {"ReturnToHandTargetEffect", "DrawCardSourceControllerEffect"}:
-            if ability_classes(row):
+            unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+            if unsupported_abilities:
                 return None, "bounce_draw_ability_class_not_simple"
             if has_oracle_complexity(metadata):
                 return None, "bounce_draw_oracle_not_simple"
@@ -22525,7 +22576,8 @@ def split_row(
             ), "selected_exact_scope"
 
         if classes == {"CounterTargetEffect", "DrawCardSourceControllerEffect"}:
-            if ability_classes(row):
+            unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+            if unsupported_abilities:
                 return None, "counter_draw_ability_class_not_simple"
             if has_oracle_complexity(metadata):
                 return None, "counter_draw_oracle_not_simple"
@@ -22571,7 +22623,8 @@ def split_row(
             ), "selected_exact_scope"
 
         if classes == {"DrawCardSourceControllerEffect", "PutCardFromHandOntoBattlefieldEffect"}:
-            if ability_classes(row):
+            unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+            if unsupported_abilities:
                 return None, "draw_put_land_ability_class_not_simple"
             if has_oracle_complexity(metadata):
                 return None, "draw_put_land_oracle_not_simple"
@@ -22629,7 +22682,8 @@ def split_row(
             {"DrawCardSourceControllerEffect", "LoseLifeSourceControllerEffect"},
             {"DrawCardTargetEffect", "LoseLifeTargetEffect"},
         ):
-            if ability_classes(row):
+            unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+            if unsupported_abilities:
                 return None, "draw_lose_life_spell_ability_class_not_simple"
             oracle_draw_life = fixed_draw_lose_life_spell_from_oracle(metadata)
             if isinstance(oracle_draw_life, str):
@@ -22672,7 +22726,8 @@ def split_row(
             ), "selected_exact_scope"
 
         if classes == {"DrawCardTargetEffect"}:
-            if ability_classes(row):
+            unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+            if unsupported_abilities:
                 return None, "target_player_draw_spell_ability_class_not_simple"
             oracle_target_draw = fixed_target_player_draw_spell_from_oracle(metadata)
             if isinstance(oracle_target_draw, str):
@@ -22707,7 +22762,8 @@ def split_row(
             {"DrawDiscardControllerEffect"},
             {"DrawCardSourceControllerEffect", "DiscardControllerEffect"},
         ):
-            if ability_classes(row):
+            unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+            if unsupported_abilities:
                 return None, "draw_discard_spell_ability_class_not_simple"
             oracle_draw_discard = fixed_draw_discard_spell_from_oracle(metadata)
             if isinstance(oracle_draw_discard, str):
@@ -22809,7 +22865,8 @@ def split_row(
     if unit == LOOK_LIBRARY_PICK_SPELL_UNIT:
         if classes != {"LookLibraryAndPickControllerEffect"}:
             return None, "look_library_pick_effect_class_not_pure"
-        if ability_classes(row):
+        unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+        if unsupported_abilities:
             return None, "look_library_pick_ability_class_not_simple"
         oracle_pick = look_library_pick_from_oracle(metadata)
         if isinstance(oracle_pick, str):
@@ -23040,7 +23097,8 @@ def split_row(
         ), "selected_exact_scope"
 
     if unit == LIFE_UNIT and classes == {"DestroyTargetEffect", "GainLifeEffect"}:
-        if ability_classes(row):
+        unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+        if unsupported_abilities:
             return None, "destroy_life_gain_ability_class_not_simple"
         if has_oracle_complexity(metadata):
             return None, "destroy_life_gain_oracle_not_simple"
@@ -23072,7 +23130,8 @@ def split_row(
         ), "selected_exact_scope"
 
     if unit == LIFE_UNIT and classes == {"DrawCardSourceControllerEffect", "GainLifeEffect"}:
-        if ability_classes(row):
+        unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+        if unsupported_abilities:
             return None, "life_gain_draw_ability_class_not_simple"
         if has_oracle_complexity(metadata):
             return None, "life_gain_draw_oracle_not_simple"
@@ -23118,7 +23177,8 @@ def split_row(
         ), "selected_exact_scope"
 
     if unit == LIFE_UNIT and classes == {"CounterTargetEffect", "GainLifeEffect"}:
-        if ability_classes(row):
+        unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+        if unsupported_abilities:
             return None, "counter_life_gain_ability_class_not_simple"
         if has_oracle_complexity(metadata):
             return None, "counter_life_gain_oracle_not_simple"
@@ -23286,7 +23346,8 @@ def split_row(
     if unit == COUNTER_UNIT:
         if classes != {"CounterTargetEffect"}:
             return None, "counter_effect_class_not_pure"
-        if ability_classes(row):
+        unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+        if unsupported_abilities:
             return None, "counter_ability_class_not_simple"
         if has_oracle_complexity(metadata):
             return None, "counter_oracle_not_simple"
@@ -23308,7 +23369,8 @@ def split_row(
     if unit == BOUNCE_UNIT:
         if classes != {"ReturnToHandTargetEffect"}:
             return None, "bounce_effect_class_not_pure"
-        if ability_classes(row):
+        unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+        if unsupported_abilities:
             return None, "bounce_ability_class_not_simple"
         if has_oracle_complexity(metadata):
             return None, "bounce_oracle_not_simple"
@@ -23329,7 +23391,8 @@ def split_row(
 
     if unit == RECURSION_UNIT:
         if classes == {"BoostTargetEffect"}:
-            if ability_classes(row):
+            unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+            if unsupported_abilities:
                 return None, "graveyard_count_boost_ability_class_not_simple"
             source_boost = graveyard_count_boost_target_from_source(source_text)
             if isinstance(source_boost, str):
@@ -23509,7 +23572,8 @@ def split_row(
                 family_id="xmage_dynamic_graveyard_count_damage_spell",
             ), "selected_exact_scope"
         if classes == {"RevealLibraryPickControllerEffect"}:
-            if ability_classes(row):
+            unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+            if unsupported_abilities:
                 return None, "library_pick_ability_class_not_simple"
             if has_oracle_complexity(metadata):
                 return None, "library_pick_oracle_not_simple"
@@ -23548,7 +23612,8 @@ def split_row(
                 family_id="xmage_reveal_top_library_pick_to_hand_rest_graveyard_spell",
             ), "selected_exact_scope"
         if classes == {"PutOnLibraryTargetEffect"}:
-            if ability_classes(row):
+            unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+            if unsupported_abilities:
                 return None, "graveyard_to_library_ability_class_not_simple"
             oracle_target = graveyard_to_library_from_oracle(metadata)
             if oracle_target is None:
@@ -23633,7 +23698,8 @@ def split_row(
                 family_id="xmage_target_player_shuffle_graveyard_cards_to_library_spell",
             ), "selected_exact_scope"
         if classes == {"ReturnFromGraveyardToBattlefieldWithCounterTargetEffect"}:
-            if ability_classes(row):
+            unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+            if unsupported_abilities:
                 return None, "recursion_battlefield_counter_ability_class_not_simple"
             if has_oracle_complexity(metadata):
                 return None, "recursion_battlefield_counter_oracle_not_simple"
@@ -23688,7 +23754,8 @@ def split_row(
                 family_id="xmage_graveyard_to_battlefield_with_counter_spell",
             ), "selected_exact_scope"
         if classes == {"ReturnFromYourGraveyardToBattlefieldAllEffect"}:
-            if ability_classes(row):
+            unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+            if unsupported_abilities:
                 return None, "recursion_battlefield_all_ability_class_not_simple"
             oracle_target = recursion_all_to_battlefield_from_oracle(metadata)
             if oracle_target is None:
@@ -23793,7 +23860,8 @@ def split_row(
                 family_id="xmage_graveyard_exile_spell",
             ), "selected_exact_scope"
         if classes == {"MillCardsControllerEffect", "ReturnCardChosenFromGraveyardEffect"}:
-            if ability_classes(row):
+            unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+            if unsupported_abilities:
                 return None, "mill_return_ability_class_not_simple"
             if has_oracle_complexity(metadata):
                 return None, "mill_return_oracle_not_simple"
@@ -23835,7 +23903,8 @@ def split_row(
             "ReturnFromGraveyardToHandTargetEffect",
         }
         if classes == multi_zone_recursion_classes:
-            if ability_classes(row):
+            unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+            if unsupported_abilities:
                 return None, "recursion_multi_zone_ability_class_not_simple"
             components = recursion_multi_zone_components_from_oracle(metadata)
             if components is None:
@@ -23914,7 +23983,8 @@ def split_row(
                 family_id="xmage_graveyard_to_battlefield_auxiliary_spell",
             ), "selected_exact_scope"
         if classes == {"ReturnFromGraveyardToBattlefieldTargetEffect"}:
-            if ability_classes(row):
+            unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+            if unsupported_abilities:
                 return None, "recursion_battlefield_ability_class_not_simple"
             choose_components = recursion_battlefield_choose_one_or_both_from_text(oracle_text(metadata))
             if choose_components is not None:
@@ -24042,7 +24112,8 @@ def split_row(
             "ReturnFromGraveyardToHandTargetEffect",
         }
         if classes == exile_self_recursion_classes:
-            if ability_classes(row):
+            unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+            if unsupported_abilities:
                 return None, "recursion_exile_self_ability_class_not_simple"
             if has_oracle_complexity(metadata):
                 return None, "recursion_exile_self_oracle_not_simple"
@@ -24173,7 +24244,8 @@ def split_row(
                 effect_json,
                 family_id="xmage_graveyard_to_hand_auxiliary_spell",
             ), "selected_exact_scope"
-        if ability_classes(row):
+        unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+        if unsupported_abilities:
             return None, "recursion_ability_class_not_simple"
         choose_components = recursion_choose_one_or_both_from_text(oracle_text(metadata))
         if choose_components is not None:
@@ -24303,7 +24375,8 @@ def split_row(
     if unit in {TUTOR_UNIT, TUTOR_HAND_UNIT}:
         if not is_spell(metadata):
             return None, "not_instant_or_sorcery_spell"
-        if ability_classes(row):
+        unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+        if unsupported_abilities:
             return None, "tutor_ability_class_not_simple"
         if has_additional_cost(source_text) or "additional cost" in oracle_text(metadata):
             return None, "additional_cost_detected"
@@ -24356,7 +24429,8 @@ def split_row(
         return build_proposal(row, metadata, effect_json, family_id="xmage_library_search_spell"), "selected_exact_scope"
 
     if unit == BOARD_WIPE_UNIT:
-        if ability_classes(row):
+        unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+        if unsupported_abilities:
             return None, "board_wipe_ability_class_not_simple"
         if has_oracle_complexity(metadata):
             return None, "board_wipe_oracle_not_simple"
@@ -24398,7 +24472,8 @@ def split_row(
     if unit == ADD_COUNTERS_TARGET_UNIT:
         if classes != {"AddCountersTargetEffect"}:
             return None, "add_counters_effect_class_not_pure"
-        if ability_classes(row):
+        unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+        if unsupported_abilities:
             return None, "add_counters_ability_class_not_simple"
         if has_oracle_complexity(metadata):
             return None, "add_counters_oracle_not_simple"
@@ -24428,7 +24503,8 @@ def split_row(
     if unit == BOOST_CONTROLLED_SPELL_UNIT:
         if classes != {"BoostControlledEffect"}:
             return None, "boost_controlled_effect_class_not_pure"
-        if ability_classes(row):
+        unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+        if unsupported_abilities:
             return None, "boost_controlled_ability_class_not_simple"
         source_boost = fixed_boost_controlled_from_source(source_text)
         if isinstance(source_boost, str):
@@ -24464,7 +24540,8 @@ def split_row(
     if unit == BOOST_ALL_SPELL_UNIT:
         if classes != {"BoostAllEffect"}:
             return None, "boost_all_effect_class_not_pure"
-        if ability_classes(row):
+        unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+        if unsupported_abilities:
             return None, "boost_all_ability_class_not_simple"
         source_boost = fixed_boost_all_from_source(source_text)
         if isinstance(source_boost, str):
@@ -24518,7 +24595,8 @@ def split_row(
     if unit == BOOST_TARGET_UNIT:
         if classes != {"BoostTargetEffect"}:
             return None, "boost_target_effect_class_not_pure"
-        if ability_classes(row):
+        unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+        if unsupported_abilities:
             return None, "boost_target_ability_class_not_simple"
         oracle_dynamic_boost = dynamic_count_boost_target_from_oracle(metadata)
         if isinstance(oracle_dynamic_boost, str):

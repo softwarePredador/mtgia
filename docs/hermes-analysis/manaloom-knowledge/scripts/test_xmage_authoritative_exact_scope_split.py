@@ -5025,6 +5025,58 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["draw_count"], 4)
         self.assertEqual(effect["count"], 4)
 
+    def test_fixed_target_player_draw_spell_ignores_neutral_auxiliary_oracle_lines(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=["DrawCardTargetEffect"],
+            ability_classes=["SuspendAbility"],
+            xmage_signals=["targeting", "draw"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Ancestral Vision",
+                type_line="Sorcery",
+                oracle_text=(
+                    "Suspend 4-{U}\n"
+                    "Target player draws three cards."
+                ),
+            ),
+            source_text=(
+                "this.getSpellAbility().addTarget(new TargetPlayer());"
+                "this.getSpellAbility().addEffect(new DrawCardTargetEffect(3));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        self.assertEqual(proposal["effect_json"]["draw_count"], 3)
+
+    def test_fixed_target_player_draw_spell_blocks_multitarget_auxiliary(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=["DrawCardTargetEffect"],
+            ability_classes=["AssistAbility"],
+            xmage_signals=["targeting", "draw"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Huddle Up",
+                type_line="Sorcery",
+                oracle_text=(
+                    "Assist\n"
+                    "Two target players each draw a card."
+                ),
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new DrawCardTargetEffect(1));"
+                "this.getSpellAbility().addTarget(new TargetPlayer(2));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "target_player_draw_spell_oracle_not_exact_fixed")
+
     def test_fixed_target_player_draw_spell_blocks_dynamic_source_count(self) -> None:
         row = queue_row(
             split.DRAW_UNIT,
