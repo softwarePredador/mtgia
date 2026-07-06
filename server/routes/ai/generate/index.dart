@@ -785,10 +785,28 @@ $metaContext
 
     if (!validation.isValid || validation.invalidCards.isNotEmpty) {
       Log.w(
-        'AI generate returned invalid or unresolved deck; using deterministic '
-        'fallback. format=$format errors=${validation.errors.join(' | ')} '
-        'invalid_cards=${validation.invalidCards.length}',
+        'AI generate returned invalid or unresolved deck. '
+        'format=$format errors=${validation.errors.join(' | ')} '
+        'invalid_cards=${validation.invalidCards.length} '
+        'fallback_allowed=${aiConfig.allowsMockFallbacks}',
       );
+
+      if (!aiConfig.allowsMockFallbacks) {
+        timings['total_ms'] = totalStopwatch.elapsedMilliseconds;
+        return Response.json(
+          statusCode: 422,
+          body: withAiGenerateRuntimeMetadata(
+            payload: {
+              'error': 'Generated deck failed validation',
+              'fallback_status': 'blocked_in_production',
+              ...responseBody,
+            },
+            cacheKey: cacheKey,
+            cacheHit: false,
+            timings: timings,
+          ),
+        );
+      }
 
       final fallbackWarningCode = validation.isValid
           ? 'ai_generate_invalid_card_fallback'

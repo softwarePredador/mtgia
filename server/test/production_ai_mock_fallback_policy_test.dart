@@ -15,6 +15,24 @@ void main() {
       expect(source, contains('HttpStatus.serviceUnavailable'));
     });
 
+    test('generate blocks deterministic validation fallback in production', () {
+      final source = File('routes/ai/generate/index.dart').readAsStringSync();
+      final invalidBranchIndex = source.indexOf(
+        'if (!validation.isValid || validation.invalidCards.isNotEmpty)',
+      );
+      final fallbackMarkerIndex =
+          source.indexOf('final fallbackWarningCode', invalidBranchIndex);
+      final guardIndex =
+          source.indexOf('!aiConfig.allowsMockFallbacks', invalidBranchIndex);
+
+      expect(invalidBranchIndex, isNonNegative);
+      expect(fallbackMarkerIndex, isNonNegative);
+      expect(guardIndex, isNonNegative);
+      expect(guardIndex, lessThan(fallbackMarkerIndex));
+      expect(source, contains("'fallback_status': 'blocked_in_production'"));
+      expect(source, contains('Generated deck failed validation'));
+    });
+
     test('archetypes blocks missing OpenAI provider before mock response', () {
       final source = File('routes/ai/archetypes/index.dart').readAsStringSync();
 
