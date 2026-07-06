@@ -114,6 +114,12 @@ GLOBAL_COMMANDER_EXACT_ARTIFACT_TYPE_CONVERSION_SOURCE_LANE_EXPANDER = (
 GLOBAL_COMMANDER_EXACT_ARTIFACT_TYPE_CONVERSION_SOURCE_LANE_EXPANDER_TEST = (
     SCRIPT_DIR / "test_global_commander_exact_artifact_type_conversion_source_lane_expander.py"
 )
+GLOBAL_COMMANDER_BIOTRANSFERENCE_PROTECTION_PIVOT_ROUTER = (
+    SCRIPT_DIR / "global_commander_biotransference_protection_pivot_router.py"
+)
+GLOBAL_COMMANDER_BIOTRANSFERENCE_PROTECTION_PIVOT_ROUTER_TEST = (
+    SCRIPT_DIR / "test_global_commander_biotransference_protection_pivot_router.py"
+)
 GLOBAL_COMMANDER_CANDIDATE_COPY_MATERIALIZER = SCRIPT_DIR / "global_commander_candidate_copy_materializer.py"
 GLOBAL_COMMANDER_CANDIDATE_COPY_MATERIALIZER_TEST = (
     SCRIPT_DIR / "test_global_commander_candidate_copy_materializer.py"
@@ -515,6 +521,10 @@ GLOBAL_COMMANDER_EXTERNAL_EXACT_ARTIFACT_ENGINE_ADD_CUT_PAIR_MODEL_REPORT = (
 GLOBAL_COMMANDER_EXACT_ARTIFACT_TYPE_CONVERSION_SOURCE_LANE_EXPANDER_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_exact_artifact_type_conversion_source_lane_expander_20260706_current.md"
+)
+GLOBAL_COMMANDER_BIOTRANSFERENCE_PROTECTION_PIVOT_ROUTER_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_biotransference_protection_pivot_router_20260706_current.md"
 )
 GLOBAL_COMMANDER_CANDIDATE_COPY_MATERIALIZER_REPORT = (
     REPO_ROOT
@@ -1056,6 +1066,9 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_exact_artifact_type_conversion_source_lane_expander.py",
                 "global_commander_exact_artifact_type_conversion_source_lane_expander_20260706_current.md",
                 "protect_biotransference_and_pivot_to_non_biotransference_engine_cut_or_global_axis",
+                "global_commander_biotransference_protection_pivot_router.py",
+                "global_commander_biotransference_protection_pivot_router_20260706_current.md",
+                "return_to_global_role_axis_learning_priority_after_engine_axis_exhaustion",
                 "global_commander_candidate_copy_materializer.py",
                 "global_commander_candidate_copy_materializer_20260705_kaalia_nonland_top_pair.md",
                 "must reject stale chained sources",
@@ -2196,6 +2209,32 @@ def build_audit() -> dict[str, Any]:
                 "exact_artifact_type_conversion_source_ready_for_add_cut_model",
                 "already_in_current_deck",
                 "Mardu Converter",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_BIOTRANSFERENCE_PROTECTION_PIVOT_ROUTER,
+            [
+                "global_commander_biotransference_protection_pivot_router",
+                "biotransference_protected_engine_axis_exhausted_pivot_required",
+                "return_to_global_role_axis_learning_priority_after_engine_axis_exhaustion",
+                "biotransference_protected_no_outside_type_conversion_replacement",
+                "non_biotransference_engine_cut_blocked_by_trace_review",
+                "candidate_copy_allowed_now",
+                "battle_gate_allowed_now",
+                "promotion_allowed",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_BIOTRANSFERENCE_PROTECTION_PIVOT_ROUTER_TEST,
+            [
+                "test_protects_biotransference_and_pivots_when_no_engine_cut_is_viable",
+                "biotransference_protected_engine_axis_exhausted_pivot_required",
+                "trace_review_blocks_negative_clearance_equal_score_tutor_candidate",
+                "viable_non_biotransference_engine_cut_count",
             ],
         )
     )
@@ -3992,6 +4031,21 @@ def build_audit() -> dict[str, Any]:
                 "candidate_copy_allowed_now: `false`",
                 "Biotransference",
                 "protect_biotransference_and_pivot_to_non_biotransference_engine_cut_or_global_axis",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_BIOTRANSFERENCE_PROTECTION_PIVOT_ROUTER_REPORT,
+            [
+                "Global Commander Biotransference Protection Pivot Router",
+                "biotransference_protected_engine_axis_exhausted_pivot_required",
+                "type_conversion_lane_exhausted: `true`",
+                "biotransference_protected: `true`",
+                "viable_non_biotransference_engine_cut_count: `0`",
+                "candidate_copy_allowed_now: `false`",
+                "Archaeomancer's Map",
+                "return_to_global_role_axis_learning_priority_after_engine_axis_exhaustion",
             ],
         )
     )

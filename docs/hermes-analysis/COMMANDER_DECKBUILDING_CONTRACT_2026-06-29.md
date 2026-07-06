@@ -552,6 +552,10 @@ Operational priority after this pivot:
     color-identity-compatible outside-deck converters, and keep
     `Biotransference` protected when the only exact converter is already in the
     current deck.
+74. run `global_commander_biotransference_protection_pivot_router.py` after the
+    exact type-conversion lane is exhausted. It must explicitly protect
+    `Biotransference`, recheck non-Biotransference engine cuts, and pivot back
+    to the global role-axis learning queue when no engine cut remains viable.
 
 Current pivot evidence:
 
@@ -579,6 +583,7 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_exact_artifact_oracle_backfill_20260706_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_exact_artifact_engine_add_cut_pair_model_20260706_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_exact_artifact_type_conversion_source_lane_expander_20260706_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_biotransference_protection_pivot_router_20260706_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_manual_negative_trace_reviewer_20260706_kaalia_value_safe_stage1_live_research.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_followup_live_source_research_expander_20260706_kaalia_value_safe_stage1_after_manual_trace.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_expanded_source_candidate_reviewer_20260706_kaalia_value_safe_stage1_followup_live_after_manual_trace.md`
@@ -1562,6 +1567,14 @@ Current external refresh on 2026-07-05:
   `ready_type_conversion_candidate_count=0`; `Biotransference` stays protected,
   candidate copy/battle/promotion remain closed, and the next gate is
   `protect_biotransference_and_pivot_to_non_biotransference_engine_cut_or_global_axis`.
+- The Biotransference protection pivot router makes that protection explicit:
+  `Biotransference` is excluded because no outside artifact type-conversion
+  source exists, `Archaeomancer's Map` remains blocked by
+  `trace_review_blocks_negative_clearance_equal_score_tutor_candidate`, and the
+  six other engine cuts remain protected by Kaalia commander-plan signals.
+  `viable_non_biotransference_engine_cut_count=0`, so candidate copy, battle,
+  and promotion remain closed; the next gate is
+  `return_to_global_role_axis_learning_priority_after_engine_axis_exhaustion`.
 
 ## Global Commander Rollout - 2026-07-01
 

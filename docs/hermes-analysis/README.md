@@ -357,6 +357,14 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `Biotransference` como conversor exato e ela ja esta no deck; nao ha add
     externo pronto, `Biotransference` fica protegida, e o proximo gate e
     `protect_biotransference_and_pivot_to_non_biotransference_engine_cut_or_global_axis`.
+    O router de protecao roda em
+    `manaloom-knowledge/scripts/global_commander_biotransference_protection_pivot_router.py`,
+    com evidencia:
+    `master_optimizer_reports/global_commander_biotransference_protection_pivot_router_20260706_current.md`.
+    Resultado: `Biotransference` protegido, `Archaeomancer's Map` bloqueado
+    por trace review, os demais engine cuts protegidos por sinais do plano de
+    Kaalia, `viable_non_biotransference_engine_cut_count=0`, e o proximo gate e
+    `return_to_global_role_axis_learning_priority_after_engine_axis_exhaustion`.
     Quando uma hipotese add/cut estiver pronta, rode
     `manaloom-knowledge/scripts/global_commander_candidate_copy_materializer.py`
     para materializar uma unica troca em copia isolada do Hermes SQLite. A
