@@ -254,6 +254,7 @@ ATTACK_TRIGGER_TARGET_KEYWORD_SCOPE = (
 )
 SELF_BOOST_ACTIVATED_SCOPE = "xmage_permanent_simple_activated_self_boost_until_eot_v1"
 SELF_KEYWORD_ACTIVATED_SCOPE = "xmage_permanent_simple_activated_self_keyword_until_eot_v1"
+REGENERATE_SOURCE_ACTIVATED_SCOPE = "xmage_permanent_simple_activated_regenerate_source_v1"
 TARGET_BOOST_ACTIVATED_SCOPE = "xmage_permanent_simple_activated_target_boost_until_eot_v1"
 TARGET_KEYWORD_ACTIVATED_SCOPE = "xmage_permanent_simple_activated_target_keyword_until_eot_v1"
 STATIC_KEYWORD_CREATURE_SCOPE = "xmage_static_self_combat_keyword_creature_v1"
@@ -8037,6 +8038,16 @@ def is_permanent_activated_self_keyword_unit(row: dict[str, Any]) -> bool:
     )
 
 
+def is_permanent_activated_regenerate_source_unit(row: dict[str, Any]) -> bool:
+    return (
+        str(row.get("adapter_work_unit") or "")
+        == "xmage_signature::RegenerateSourceEffect::SimpleActivatedAbility::no_target_class::no_condition_class::activated_ability"
+        and effect_classes(row) == {"RegenerateSourceEffect"}
+        and ability_classes(row) == {"SimpleActivatedAbility"}
+        and set(row.get("xmage_signals") or []) == {"activated_ability"}
+    )
+
+
 def is_creature_attack_target_keyword_unit(row: dict[str, Any]) -> bool:
     abilities = ability_classes(row)
     keyword_abilities = abilities.intersection(TARGET_GRANT_KEYWORD_ABILITY_CLASSES)
@@ -11182,6 +11193,86 @@ def activated_self_boost_from_source(source: str) -> dict[str, Any] | str:
         "power_delta": int(boost_matches[0][0]),
         "toughness_delta": int(boost_matches[0][1]),
         **activation,
+    }
+
+
+def activated_regenerate_source_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    text = strip_parenthetical_reminders(
+        oracle_text_after_leading_static_keywords(metadata)
+    )
+    text = re.sub(r"\s+", " ", text).strip().lower()
+    if text.count(":") != 1:
+        return "activated_regenerate_source_oracle_not_simple"
+    cost_text, effect_text = [part.strip() for part in text.split(":", 1)]
+    card_name = normalize_name(str(metadata.get("name") or ""))
+    source_pattern = r"(?:this creature|this permanent"
+    if card_name:
+        source_pattern += rf"|{re.escape(card_name)}"
+    source_pattern += r")"
+    if not re.fullmatch(rf"regenerate {source_pattern}\.?", effect_text):
+        return "activated_regenerate_source_oracle_not_simple"
+    activation = activation_cost_from_oracle_prefix(cost_text)
+    if isinstance(activation, str):
+        return str(activation).replace("activated_self_boost", "activated_regenerate_source")
+    return activation
+
+
+def activated_regenerate_source_from_source(source: str) -> dict[str, Any] | str:
+    text = source or ""
+    if "Zone.GRAVEYARD" in text:
+        return "activated_regenerate_source_not_battlefield"
+    risky_cost_classes = {
+        "CompositeCost",
+        "DiscardCardCost",
+        "DiscardTargetCost",
+        "ExileFrom",
+        "ExileFromGraveCost",
+        "ExileSourceFromGraveCost",
+        "OrCost",
+        "PayLifeCost",
+        "RemoveCounterCost",
+        "ReturnToHandSourceCost",
+        "ReturnToHandTargetCost",
+        "SacrificeSourceCost",
+        "SacrificeTargetCost",
+        "TapTargetCost",
+        "UntapSourceCost",
+    }
+    present_risky = sorted(cost for cost in risky_cost_classes if cost in text)
+    if present_risky:
+        return "activated_regenerate_source_cost_not_supported"
+    if len(re.findall(r"new\s+RegenerateSourceEffect\s*\(\s*\)", text, re.S)) != 1:
+        return "activated_regenerate_source_not_single_effect"
+    regenerate_index = text.find("RegenerateSourceEffect")
+    window = text[max(0, regenerate_index - 500) : regenerate_index + 2000]
+    if "SimpleActivatedAbility" not in window:
+        return "activated_regenerate_source_not_simple_activated"
+    mana_matches = re.findall(r'ManaCostsImpl<[^>]*>\s*\(\s*"([^"]+)"\s*\)', window, re.S)
+    generic_matches = re.findall(r"GenericManaCost\s*\(\s*(\d+)\s*\)", window, re.S)
+    colored_matches = re.findall(r"ColoredManaCost\s*\(\s*ColoredManaSymbol\.([WUBRG])\s*\)", window, re.S)
+    cost_kinds = sum(1 for matches in (mana_matches, generic_matches, colored_matches) if matches)
+    if cost_kinds > 1:
+        return "activated_regenerate_source_cost_not_supported"
+    if len(mana_matches) > 1 or len(generic_matches) > 1 or len(colored_matches) > 1:
+        return "activated_regenerate_source_cost_not_supported"
+    if mana_matches:
+        cost_text = canonical_mana_cost_text(mana_matches[0])
+    elif generic_matches:
+        cost_text = "{" + generic_matches[0] + "}"
+    elif colored_matches:
+        cost_text = "{" + colored_matches[0] + "}"
+    else:
+        cost_text = "{0}"
+    parsed = parse_mana_cost_text(cost_text)
+    if parsed is None:
+        return "activated_regenerate_source_mana_cost_not_supported"
+    generic, colors = parsed
+    return {
+        "activation_cost_mana": cost_text,
+        "activation_cost_generic": generic,
+        "activation_cost_colors": colors,
+        "activation_requires_tap": "TapSourceCost" in window,
+        "activation_requires_sacrifice": False,
     }
 
 
@@ -16846,6 +16937,7 @@ def split_row(
     permanent_activated_target_boost_unit = is_permanent_activated_target_boost_unit(row)
     permanent_activated_target_keyword_unit = is_permanent_activated_target_keyword_unit(row)
     permanent_activated_self_keyword_unit = is_permanent_activated_self_keyword_unit(row)
+    permanent_activated_regenerate_source_unit = is_permanent_activated_regenerate_source_unit(row)
     permanent_activated_tutor_battlefield_unit = is_permanent_activated_tutor_battlefield_unit(row)
     attack_target_keyword_unit = is_creature_attack_target_keyword_unit(row)
     static_controlled_pt_unit = is_static_controlled_pt_unit(row)
@@ -16966,6 +17058,7 @@ def split_row(
         and not permanent_activated_target_boost_unit
         and not permanent_activated_target_keyword_unit
         and not permanent_activated_self_keyword_unit
+        and not permanent_activated_regenerate_source_unit
         and not permanent_activated_tutor_battlefield_unit
         and not attack_target_keyword_unit
         and not static_controlled_pt_unit
@@ -18447,6 +18540,72 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_permanent_simple_activated_self_keyword_until_eot",
+        ), "selected_exact_scope"
+
+    if permanent_activated_regenerate_source_unit:
+        if not is_creature_metadata(metadata):
+            return None, "activated_regenerate_source_not_creature"
+        oracle_activation = activated_regenerate_source_from_oracle(metadata)
+        if isinstance(oracle_activation, str):
+            return None, oracle_activation
+        parsed_activation = activated_regenerate_source_from_source(source_text)
+        if isinstance(parsed_activation, str):
+            return None, parsed_activation
+        source_cost = (
+            int(parsed_activation["activation_cost_generic"]),
+            list(parsed_activation["activation_cost_colors"]),
+            bool(parsed_activation["activation_requires_tap"]),
+        )
+        oracle_cost = (
+            int(oracle_activation["activation_cost_generic"]),
+            list(oracle_activation["activation_cost_colors"]),
+            bool(oracle_activation["activation_requires_tap"]),
+        )
+        if source_cost != oracle_cost:
+            return None, "activated_regenerate_source_source_oracle_cost_mismatch"
+        activated_effect = {
+            "effect": "regenerate_source",
+            "battle_model_scope": REGENERATE_SOURCE_ACTIVATED_SCOPE,
+            "ability_kind": "activated",
+            "activated_effect": "regenerate_source",
+            "target": "self",
+            "target_controller": "self",
+            "target_constraints": {"source": "self", "card_types": ["creature"]},
+            "duration": "until_end_of_turn",
+            "regenerate_source": True,
+            "xmage_effect_class": "RegenerateSourceEffect",
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "activation_cost_mana": parsed_activation["activation_cost_mana"],
+            "activation_cost_generic": parsed_activation["activation_cost_generic"],
+            "activation_cost_colors": parsed_activation["activation_cost_colors"],
+            "activation_requires_tap": parsed_activation["activation_requires_tap"],
+            "activation_requires_sacrifice": False,
+        }
+        effect_json = {
+            "effect": "creature",
+            "battle_model_scope": REGENERATE_SOURCE_ACTIVATED_SCOPE,
+            "ability_kind": "static_and_activated",
+            "activated_effect": "regenerate_source",
+            "activated_battle_model_scope": REGENERATE_SOURCE_ACTIVATED_SCOPE,
+            "target": "self",
+            "target_controller": "self",
+            "target_constraints": {"source": "self", "card_types": ["creature"]},
+            "duration": "until_end_of_turn",
+            "regenerate_source": True,
+            "_activated_rule_effects": [activated_effect],
+            "xmage_effect_class": "RegenerateSourceEffect",
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "activation_cost_mana": parsed_activation["activation_cost_mana"],
+            "activation_cost_generic": parsed_activation["activation_cost_generic"],
+            "activation_cost_colors": parsed_activation["activation_cost_colors"],
+            "activation_requires_tap": parsed_activation["activation_requires_tap"],
+            "activation_requires_sacrifice": False,
+        }
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_permanent_simple_activated_regenerate_source",
         ), "selected_exact_scope"
 
     if attack_target_keyword_unit:
@@ -24974,6 +25133,7 @@ def build_exact_split_report(
             and not is_permanent_activated_target_boost_unit(row)
             and not is_permanent_activated_target_keyword_unit(row)
             and not is_permanent_activated_self_keyword_unit(row)
+            and not is_permanent_activated_regenerate_source_unit(row)
             and not is_creature_attack_target_keyword_unit(row)
             and not is_static_controlled_pt_unit(row)
             and not is_static_global_pt_unit(row)
@@ -25065,6 +25225,7 @@ def build_exact_split_report(
                 "xmage_signature BoostControlledEffect one-shot spell rows with exact fixed controlled-creature boost until EOT and no color/modal/dynamic filters",
                 "xmage_signature BoostSourceEffect + SimpleActivatedAbility rows with exact activated self boost until EOT and mana/tap source costs only",
                 "xmage_signature GainAbilitySourceEffect + SimpleActivatedAbility rows with exact activated self keyword until EOT and mana/tap source costs only",
+                "xmage_signature RegenerateSourceEffect + SimpleActivatedAbility rows with exact self-regeneration Oracle text and mana/tap source costs only",
                 "xmage_signature BoostTargetEffect + SimpleActivatedAbility + TargetCreaturePermanent rows with exact activated target-creature boost until EOT and mana/tap source costs only",
                 "xmage_signature BoostControlledEffect + SimpleStaticAbility rows with exact static controlled-creature power/toughness boosts and simple creature/artifact/subtype/legendary filters",
                 "xmage_signature BoostAllEffect + SimpleStaticAbility rows with exact static fixed creature power/toughness boosts for all, opponent, color, subtype, token, or land-creature filters",

@@ -19412,7 +19412,58 @@ def resolve_permanent_dies_token_maker(
     return created
 
 
+def _reason_allows_regeneration(reason):
+    reason_text = str(reason or "").strip().lower()
+    if not reason_text:
+        return False
+    blocked_tokens = ("exile", "sacrifice", "legend", "zero_toughness", "0_toughness")
+    if any(token in reason_text for token in blocked_tokens):
+        return False
+    return any(token in reason_text for token in ("destroy", "damage", "lethal"))
+
+
+def _source_prevents_regeneration(source):
+    if not isinstance(source, dict):
+        return False
+    return bool(
+        source.get("cant_be_regenerated")
+        or source.get("cannot_be_regenerated")
+        or source.get("destroy_cant_regenerate")
+    )
+
+
+def consume_regeneration_shield(owner, permanent, *, reason=None, source=None):
+    if not isinstance(permanent, dict):
+        return False
+    if not _reason_allows_regeneration(reason) or _source_prevents_regeneration(source):
+        return False
+    shields = max(0, int(permanent.get("regeneration_shields") or 0))
+    if shields <= 0:
+        return False
+    permanent["regeneration_shields"] = shields - 1
+    permanent["tapped"] = True
+    for key in ("attacking", "blocking", "blocked", "blockers"):
+        permanent.pop(key, None)
+    clear_permanent_damage_this_turn_flags(permanent)
+    emit_replay_event(
+        "regeneration_shield_used",
+        player=getattr(owner, "name", "?"),
+        card=permanent.get("name", "?"),
+        shield_count_before=shields,
+        shield_count_after=shields - 1,
+        tapped=True,
+        reason=reason,
+        source=source.get("name", "?") if isinstance(source, dict) else source,
+        destination="battlefield",
+        turn=CURRENT_REPLAY_TURN,
+        **replay_rule_fields(permanent),
+    )
+    return True
+
+
 def move_creature_from_battlefield(owner, creature, reason=None, source=None, all_players=None):
+    if consume_regeneration_shield(owner, creature, reason=reason, source=source):
+        return "battlefield"
     destination = _move_creature_from_battlefield(
         owner,
         creature,
@@ -19506,6 +19557,13 @@ def move_creature_from_battlefield(owner, creature, reason=None, source=None, al
 
 
 def move_permanent_from_battlefield(owner, permanent, reason=None, source=None, all_players=None):
+    if is_battlefield_creature(permanent) and consume_regeneration_shield(
+        owner,
+        permanent,
+        reason=reason,
+        source=source,
+    ):
+        return "battlefield"
     destination = _move_permanent_from_battlefield(
         owner,
         permanent,
@@ -43707,7 +43765,7 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng, *, fini
                         source=card,
                         all_players=[player, *list(opponents)],
                     )
-                    result = "creature_destroyed"
+                    result = "creature_regenerated" if destination == "battlefield" else "creature_destroyed"
             elif target_kind == "planeswalker":
                 loyalty_before = int(target.get("loyalty", 0) or 0)
                 damage_to_planeswalker(card, target, target_amount)
@@ -43839,6 +43897,7 @@ SIMPLE_ACTIVATED_DESTROY_SCOPE = "xmage_permanent_simple_activated_destroy_targe
 SIMPLE_ACTIVATED_TAP_TARGET_SCOPE = "xmage_permanent_simple_activated_tap_target_v1"
 SIMPLE_ACTIVATED_SELF_BOOST_SCOPE = "xmage_permanent_simple_activated_self_boost_until_eot_v1"
 SIMPLE_ACTIVATED_SELF_KEYWORD_SCOPE = "xmage_permanent_simple_activated_self_keyword_until_eot_v1"
+SIMPLE_ACTIVATED_REGENERATE_SOURCE_SCOPE = "xmage_permanent_simple_activated_regenerate_source_v1"
 SIMPLE_ACTIVATED_TARGET_BOOST_SCOPE = "xmage_permanent_simple_activated_target_boost_until_eot_v1"
 SIMPLE_ACTIVATED_TARGET_KEYWORD_SCOPE = "xmage_permanent_simple_activated_target_keyword_until_eot_v1"
 PERMANENT_ACTIVATED_LIFE_GAIN_SCOPE = "xmage_permanent_simple_activated_life_gain_v1"
@@ -44128,6 +44187,38 @@ def _activated_rule_effects_for_permanent(permanent):
         ):
             self_keyword_effect[key] = permanent.get(key)
         effects.append(self_keyword_effect)
+    if (
+        permanent.get("activated_effect") == "regenerate_source"
+        and permanent.get("activated_battle_model_scope") == SIMPLE_ACTIVATED_REGENERATE_SOURCE_SCOPE
+    ):
+        regenerate_effect = {
+            "effect": "regenerate_source",
+            "battle_model_scope": permanent.get("activated_battle_model_scope"),
+            "ability_kind": "activated",
+            "activated_effect": "regenerate_source",
+            "activation_requires_tap": bool(permanent.get("activation_requires_tap")),
+            "activation_requires_sacrifice": False,
+            "activation_cost_mana": permanent.get("activation_cost_mana"),
+            "activation_cost_generic": permanent.get("activation_cost_generic"),
+            "activation_cost_colors": permanent.get("activation_cost_colors"),
+            "target": "self",
+            "target_controller": "self",
+            "target_constraints": permanent.get("target_constraints")
+            or {"source": "self", "card_types": ["creature"]},
+            "duration": permanent.get("duration") or "until_end_of_turn",
+            "regenerate_source": True,
+        }
+        for key in (
+            "_rule_source",
+            "_rule_review_status",
+            "_rule_execution_status",
+            "_rule_confidence",
+            "_rule_version",
+            "_rule_logical_key",
+            "_rule_oracle_hash",
+        ):
+            regenerate_effect[key] = permanent.get(key)
+        effects.append(regenerate_effect)
     if (
         permanent.get("activated_effect") == "target_stat_modifier_until_eot"
         and permanent.get("activated_battle_model_scope") == SIMPLE_ACTIVATED_TARGET_BOOST_SCOPE
@@ -46682,6 +46773,141 @@ def activate_best_generic_self_keyword_permanent(player, all_players, turn, rng,
         phase=phase,
         auto_only=True,
     )
+
+
+def activated_regenerate_source_effect_for_permanent(permanent):
+    if not isinstance(permanent, dict):
+        return None
+    for effect_data in _activated_rule_effects_for_permanent(permanent):
+        if (
+            effect_data.get("battle_model_scope") == SIMPLE_ACTIVATED_REGENERATE_SOURCE_SCOPE
+            and effect_data.get("ability_kind") == "activated"
+            and effect_data.get("activated_effect") == "regenerate_source"
+        ):
+            return effect_data
+    return None
+
+
+def _regenerate_source_activation_cost(effect_data):
+    return _self_boost_activation_cost(effect_data)
+
+
+def can_activate_generic_regenerate_source_permanent(player, permanent, *, effect_data=None, auto_only=False):
+    effect_data = effect_data or activated_regenerate_source_effect_for_permanent(permanent)
+    if effect_data is None:
+        return False
+    if auto_only:
+        return False
+    if permanent not in getattr(player, "battlefield", []):
+        return False
+    if not is_battlefield_creature(permanent):
+        return False
+    if effect_data.get("activation_requires_tap") and permanent.get("tapped"):
+        return False
+    if (
+        effect_data.get("activation_requires_tap")
+        and permanent.get("summoning_sick")
+        and not has_haste(permanent)
+    ):
+        return False
+    activation_cost = _regenerate_source_activation_cost(effect_data)
+    return player.can_pay(activation_cost)
+
+
+def activate_generic_regenerate_source_permanent(
+    player,
+    all_players,
+    permanent,
+    turn,
+    rng,
+    *,
+    phase=None,
+    auto_only=False,
+):
+    effect_data = activated_regenerate_source_effect_for_permanent(permanent)
+    if not can_activate_generic_regenerate_source_permanent(
+        player,
+        permanent,
+        effect_data=effect_data,
+        auto_only=auto_only,
+    ):
+        return False
+    phase = phase or "precombat_main"
+    activation_cost = _regenerate_source_activation_cost(effect_data)
+    if not player.spend_mana(activation_cost):
+        return False
+    if effect_data.get("activation_requires_tap"):
+        permanent["tapped"] = True
+    shields_before = max(0, int(permanent.get("regeneration_shields") or 0))
+    set_until_eot(permanent, "regeneration_shields", shields_before + 1)
+    fields = replay_rule_fields(effect_data)
+    activation_cost_generic = int(effect_data.get("activation_cost_generic") or 0)
+    activation_cost_colors = list(effect_data.get("activation_cost_colors") or [])
+    mana_paid = activation_cost_generic + len(activation_cost_colors)
+    emit_decision_trace(
+        decision_type="activated_ability",
+        player=player,
+        turn=turn,
+        phase=phase,
+        available_options=[
+            decision_card_option(
+                permanent,
+                effect_data,
+                action="activate_regenerate_source",
+                score=sum(target_priority(permanent)),
+            )
+        ],
+        chosen_option=decision_card_option(
+            permanent,
+            effect_data,
+            action="activate_regenerate_source",
+        ),
+        rejected_options=[],
+        score_components={
+            "activation_cost": activation_cost,
+            "requires_tap": 1 if effect_data.get("activation_requires_tap") else 0,
+            "regeneration_shields_before": shields_before,
+        },
+        rule_source=fields.get("rule_source", "battle_rule"),
+        rule_status=fields.get("rule_review_status", "verified"),
+        confidence="medium",
+        expected_benefit_score=max(5, sum(target_priority(permanent)) * 2),
+        actual_outcome="regeneration_shield_created",
+        reason="create_regeneration_shield_before_destruction",
+        heuristic_version=DECISION_STRATEGY_VERSION,
+        resource_delta={
+            "mana": -mana_paid,
+            "tapped": 1 if effect_data.get("activation_requires_tap") else 0,
+            "regeneration_shields": 1,
+        },
+        risk_flags=[
+            flag
+            for flag, active in {
+                "tap_ability": bool(effect_data.get("activation_requires_tap")),
+                "temporary_replacement_shield": True,
+            }.items()
+            if active
+        ],
+    )
+    emit_replay_event(
+        "activated_ability",
+        player=player.name,
+        card=permanent.get("name", "?"),
+        effect="regenerate_source",
+        activation_kind="simple_activated_regenerate_source",
+        activation_cost=activation_cost,
+        tapped=bool(permanent.get("tapped")),
+        mana_paid=mana_paid,
+        target=permanent.get("name", "?"),
+        target_player=player.name,
+        regeneration_shields_before=shields_before,
+        regeneration_shields_after=shields_before + 1,
+        turn=turn,
+        phase=phase,
+        **fields,
+    )
+    check_sbas_until_stable(all_players)
+    return True
 
 
 def apply_damage_each_opponent(player, opponents, card, effect_data, turn):

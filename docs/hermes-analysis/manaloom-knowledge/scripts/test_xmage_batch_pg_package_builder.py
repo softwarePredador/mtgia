@@ -1752,3 +1752,34 @@ def test_spell_cast_gain_life_execution_scenario_uses_matching_and_nonmatching_s
     assert scenario["expected_trigger"] == "noncreature_spell_cast"
     assert scenario["matching_spell"]["type_line"] == "Instant"
     assert "Creature" in scenario["nonmatching_spell"]["type_line"]
+
+
+def test_simple_activated_regenerate_source_execution_scenario_uses_activation_mana() -> None:
+    rule = {
+        "normalized_name": "cudgel troll",
+        "card_name": "Cudgel Troll",
+        "logical_rule_key": "battle_rule_v1:cudgel-troll",
+        "required_effect_fields": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_regenerate_source_v1",
+            "activated_effect": "regenerate_source",
+            "activation_cost_mana": "{G}",
+            "activation_cost_generic": 0,
+            "activation_cost_colors": ["G"],
+            "activation_requires_tap": False,
+            "regenerate_source": True,
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario["type"] == "simple_activated_regenerate_source"
+    assert scenario["controller_mana"] == {
+        "generic": 0,
+        "white": 0,
+        "blue": 0,
+        "black": 0,
+        "red": 0,
+        "green": 1,
+    }
+    assert scenario["expected_regeneration_shields"] == 1

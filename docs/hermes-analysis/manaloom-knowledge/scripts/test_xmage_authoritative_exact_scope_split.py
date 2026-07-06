@@ -15231,6 +15231,67 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["activation_cost_mana"], "{G/P}")
         self.assertEqual(effect["activation_cost_colors"], ["G/P"])
 
+    def test_activated_regenerate_source_maps_mana_cost(self) -> None:
+        row = queue_row(
+            "xmage_signature::RegenerateSourceEffect::SimpleActivatedAbility::"
+            "no_target_class::no_condition_class::activated_ability",
+            effect_classes=["RegenerateSourceEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Cudgel Troll",
+                type_line="Creature - Troll",
+                oracle_text="{G}: Regenerate this creature.",
+            ),
+            source_text=(
+                "this.addAbility(new SimpleActivatedAbility("
+                "new RegenerateSourceEffect(), "
+                'new ManaCostsImpl<>("{G}")));'
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "creature")
+        self.assertEqual(effect["battle_model_scope"], split.REGENERATE_SOURCE_ACTIVATED_SCOPE)
+        self.assertEqual(effect["activated_effect"], "regenerate_source")
+        self.assertTrue(effect["regenerate_source"])
+        self.assertEqual(effect["activation_cost_mana"], "{G}")
+        self.assertEqual(effect["activation_cost_generic"], 0)
+        self.assertEqual(effect["activation_cost_colors"], ["G"])
+        self.assertFalse(effect["activation_requires_tap"])
+        self.assertEqual(effect["_activated_rule_effects"][0]["target"], "self")
+
+    def test_activated_regenerate_source_blocks_non_mana_source_cost(self) -> None:
+        row = queue_row(
+            "xmage_signature::RegenerateSourceEffect::SimpleActivatedAbility::"
+            "no_target_class::no_condition_class::activated_ability",
+            effect_classes=["RegenerateSourceEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Ghoul",
+                type_line="Creature - Zombie",
+                oracle_text="{B}: Regenerate this creature.",
+            ),
+            source_text=(
+                "this.addAbility(new SimpleActivatedAbility("
+                "new RegenerateSourceEffect(), "
+                "new PayLifeCost(2)));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "activated_regenerate_source_cost_not_supported")
+
     def test_activated_self_boost_accepts_colored_mana_cost_source(self) -> None:
         row = queue_row(
             split.SELF_BOOST_ACTIVATED_UNIT,

@@ -88,6 +88,102 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertEqual(active.mana_pool.total(), 0)
         self.assertFalse(any(event == "dies_mana_resolved" for event, _data in self.events))
 
+    def test_simple_activated_regenerate_source_consumes_shield_on_destroy(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        self.battle.CURRENT_REPLAY_TURN = 8
+        troll = {
+            "name": "Cudgel Troll",
+            "type_line": "Creature - Troll",
+            "effect": "creature",
+            "power": 4,
+            "toughness": 3,
+            "battle_model_scope": "xmage_permanent_simple_activated_regenerate_source_v1",
+            "activated_effect": "regenerate_source",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_regenerate_source_v1",
+            "target": "self",
+            "target_controller": "self",
+            "target_constraints": {"source": "self", "card_types": ["creature"]},
+            "regenerate_source": True,
+            "activation_cost_mana": "{G}",
+            "activation_cost_generic": 0,
+            "activation_cost_colors": ["G"],
+            "activation_requires_tap": False,
+        }
+        active.battlefield = [troll]
+        active.mana_pool.add("green", 1)
+
+        self.assertTrue(self.battle.can_activate_generic_regenerate_source_permanent(active, troll))
+        self.assertTrue(
+            self.battle.activate_generic_regenerate_source_permanent(
+                active,
+                [active],
+                troll,
+                turn=8,
+                rng=random.Random(1),
+            )
+        )
+        self.assertEqual(active.mana_pool.total(), 0)
+        self.assertEqual(troll.get("regeneration_shields"), 1)
+
+        destination = self.battle.move_creature_from_battlefield(
+            active,
+            troll,
+            reason="destroy",
+            source={"name": "E2E Doom Blade"},
+            all_players=[active],
+        )
+
+        self.assertEqual(destination, "battlefield")
+        self.assertIn(troll, active.battlefield)
+        self.assertNotIn(troll, active.graveyard)
+        self.assertTrue(troll.get("tapped"))
+        self.assertEqual(troll.get("regeneration_shields"), 0)
+        self.assertTrue(
+            any(
+                event == "regeneration_shield_used"
+                and data.get("card") == "Cudgel Troll"
+                and data.get("destination") == "battlefield"
+                for event, data in self.events
+            )
+        )
+
+    def test_direct_damage_reports_creature_regenerated_when_shield_replaces_destroy(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        self.battle.CURRENT_REPLAY_TURN = 9
+        troll = {
+            "name": "Shielded Troll",
+            "type_line": "Creature - Troll",
+            "effect": "creature",
+            "power": 2,
+            "toughness": 2,
+            "regeneration_shields": 1,
+        }
+        opponent.battlefield = [troll]
+
+        self.battle.apply_direct_damage(
+            active,
+            [opponent],
+            {"name": "E2E Lightning Bolt", "type_line": "Instant"},
+            {"effect": "direct_damage", "amount": 3, "target": "creature"},
+            turn=9,
+            rng=random.Random(2),
+        )
+
+        self.assertIn(troll, opponent.battlefield)
+        self.assertNotIn(troll, opponent.graveyard)
+        self.assertTrue(troll.get("tapped"))
+        self.assertEqual(troll.get("regeneration_shields"), 0)
+        self.assertTrue(
+            any(
+                event == "damage_resolved"
+                and data.get("target") == "Shielded Troll"
+                and data.get("result") == "creature_regenerated"
+                and data.get("destination") == "battlefield"
+                for event, data in self.events
+            )
+        )
+
     def test_static_flash_permission_artifact_filter_only_allows_artifacts(self) -> None:
         active = self.battle.Player("Active", None, [])
         artifact = {"name": "Mind Stone", "type_line": "Artifact", "mana_cost": "{2}"}

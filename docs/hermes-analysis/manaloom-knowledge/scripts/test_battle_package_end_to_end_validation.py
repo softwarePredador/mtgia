@@ -246,6 +246,51 @@ def test_simple_activated_self_keyword_runner_executes_keyword_effect() -> None:
     assert result["life_paid"] == 2
 
 
+def test_simple_activated_regenerate_source_runner_consumes_shield_on_destroy() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "creature",
+        "battle_model_scope": "xmage_permanent_simple_activated_regenerate_source_v1",
+        "activated_effect": "regenerate_source",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_regenerate_source_v1",
+        "target": "self",
+        "target_controller": "self",
+        "target_constraints": {"source": "self", "card_types": ["creature"]},
+        "regenerate_source": True,
+        "activation_cost_mana": "{G}",
+        "activation_cost_generic": 0,
+        "activation_cost_colors": ["G"],
+        "activation_requires_tap": False,
+        "_rule_logical_key": "battle_rule_v1:cudgel-troll",
+    }
+    try:
+        result = validator.run_simple_activated_regenerate_source(
+            battle,
+            {
+                "name": "Cudgel Troll regenerates",
+                "type": "simple_activated_regenerate_source",
+                "card": {"name": "Cudgel Troll"},
+                "controller_mana": {"green": 1},
+                "expected_tapped_source": False,
+                "expected_regeneration_shields": 1,
+                "logical_rule_key": "battle_rule_v1:cudgel-troll",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Cudgel Troll"
+    assert result["destination"] == "battlefield"
+    assert result["source_tapped"] is True
+    assert result["regeneration_shields_after"] == 0
+
+
 def test_stat_modifier_until_eot_runner_executes_keyword_only_spell() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

@@ -2400,6 +2400,102 @@ def run_simple_activated_self_keyword(
     }
 
 
+def run_simple_activated_regenerate_source(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    effect = battle.get_card_effect(card)
+    source = battle.enrich_card(
+        {
+            **card,
+            "type_line": "Creature - Troll",
+            "effect": "creature",
+            "power": int(scenario.get("source_power") or 2),
+            "toughness": int(scenario.get("source_toughness") or 2),
+            "summoning_sick": False,
+            **effect,
+            **dict(scenario.get("source_overrides") or {}),
+        }
+    )
+    active = battle.Player(str(scenario.get("player") or "Activated Controller"), None, [])
+    active.battlefield = [source]
+    add_manifest_mana(active, scenario.get("controller_mana") or {})
+    expected_tapped_source = bool(scenario.get("expected_tapped_source", effect.get("activation_requires_tap", False)))
+    expected_shields = int(scenario.get("expected_regeneration_shields") or 1)
+
+    if not battle.can_activate_generic_regenerate_source_permanent(active, source):
+        fail("battle_execution", f"{card['name']} simple activated regenerate source cannot activate")
+    activated = battle.activate_generic_regenerate_source_permanent(
+        active,
+        [active],
+        source,
+        turn=int(scenario.get("turn") or 7),
+        rng=random.Random(int(scenario.get("seed") or 6073)),
+        phase=str(scenario.get("phase") or "precombat_main"),
+    )
+    if not activated:
+        fail("battle_execution", f"{card['name']} simple activated regenerate source activation failed")
+    if int(source.get("regeneration_shields") or 0) != expected_shields:
+        fail(
+            "battle_execution",
+            f"{card['name']} regeneration_shields={source.get('regeneration_shields')!r}",
+        )
+    if bool(source.get("tapped")) != expected_tapped_source:
+        fail(
+            "battle_execution",
+            f"{card['name']} source tapped={bool(source.get('tapped'))}, expected {expected_tapped_source}",
+        )
+    destination = battle.move_creature_from_battlefield(
+        active,
+        source,
+        reason="destroy",
+        source={"name": "E2E Destroy Effect"},
+        all_players=[active],
+    )
+    if destination != "battlefield":
+        fail("battle_execution", f"{card['name']} regeneration destination={destination!r}")
+    if source not in active.battlefield or source in active.graveyard:
+        fail("battle_execution", f"{card['name']} was moved despite regeneration")
+    if not source.get("tapped"):
+        fail("battle_execution", f"{card['name']} was not tapped by regeneration replacement")
+    if int(source.get("regeneration_shields") or 0) != expected_shields - 1:
+        fail(
+            "battle_execution",
+            f"{card['name']} remaining regeneration_shields={source.get('regeneration_shields')!r}",
+        )
+    activation_event = next(
+        (
+            data
+            for event, data in reversed(events)
+            if event == "activated_ability"
+            and data.get("card") == card.get("name")
+            and data.get("activation_kind") == "simple_activated_regenerate_source"
+        ),
+        None,
+    )
+    if activation_event is None:
+        fail("battle_events", f"missing {card['name']} simple activated regenerate source event")
+    shield_event = next(
+        (
+            data
+            for event, data in reversed(events)
+            if event == "regeneration_shield_used" and data.get("card") == card.get("name")
+        ),
+        None,
+    )
+    if shield_event is None:
+        fail("battle_events", f"missing {card['name']} regeneration shield event")
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "destination": destination,
+        "source_tapped": bool(source.get("tapped")),
+        "regeneration_shields_after": int(source.get("regeneration_shields") or 0),
+    }
+
+
 def run_stat_modifier_until_eot(
     battle,
     scenario: dict[str, Any],
@@ -3345,6 +3441,7 @@ SCENARIO_RUNNERS = {
     "simple_activated_damage": run_simple_activated_damage,
     "simple_activated_tap_target": run_simple_activated_tap_target,
     "simple_activated_self_keyword": run_simple_activated_self_keyword,
+    "simple_activated_regenerate_source": run_simple_activated_regenerate_source,
     "simple_activated_create_token": run_simple_activated_create_token,
     "spell_cast_gain_life": run_spell_cast_gain_life,
     "stat_modifier_until_eot": run_stat_modifier_until_eot,
