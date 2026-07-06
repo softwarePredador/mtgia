@@ -1471,6 +1471,14 @@ Current external refresh on 2026-07-05:
   but those are review seeds only, not explicit same-lane proof. Candidate
   copy, battle gate, and promotion remain closed; the next gate is
   `review_engine_cut_trace_results_before_candidate_copy`.
+- The engine cut trace/replacement reviewer keeps candidate copy closed:
+  `Archaeomancer's Map` was an equal-score tutor candidate against the chosen
+  `The One Ring` line (`score_gap_vs_chosen=0.0`), so non-cast/non-use does
+  not clear a negative cut. The two stronger local replacement seeds
+  (`Storm-Kiln Artist` and `Pitiless Plunderer`) are artifact/treasure-adjacent
+  engines, not exact Biotransference-style artifact-spell or type-conversion
+  engines (`explicit_same_lane_replacement_proof_count=0`). The next gate is
+  `find_exact_artifact_spell_engine_replacement_or_new_engine_cut_before_candidate_copy`.
 
 ## Global Commander Rollout - 2026-07-01
 
