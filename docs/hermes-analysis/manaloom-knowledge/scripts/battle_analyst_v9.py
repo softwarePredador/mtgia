@@ -43701,6 +43701,10 @@ def _activated_rule_effects_for_permanent(permanent):
             "activation_cost_mana": permanent.get("activation_cost_mana"),
             "activation_cost_generic": permanent.get("activation_cost_generic"),
             "activation_cost_colors": permanent.get("activation_cost_colors"),
+            "activation_discard_count": permanent.get("activation_discard_count"),
+            "activation_discard_target": permanent.get("activation_discard_target"),
+            "activation_requires_discard_card": permanent.get("activation_requires_discard_card"),
+            "activation_discard_random": permanent.get("activation_discard_random"),
             "token_count": permanent.get("token_count") or 1,
             "token_name": permanent.get("token_name") or "Token",
             "token_subtype": permanent.get("token_subtype"),
@@ -44454,6 +44458,7 @@ def _activated_token_expected_score(effect_data, activation_cost_generic=0):
     if (effect_data or {}).get("token_haste"):
         score += token_count
     score -= max(0, int(activation_cost_generic or 0))
+    score -= int((effect_data or {}).get("activation_discard_count") or 0) * 2
     if (effect_data or {}).get("activation_requires_sacrifice"):
         score -= 2
     return score
@@ -44477,6 +44482,17 @@ def can_activate_generic_token_maker_permanent(player, permanent, *, effect_data
     activation_cost, _generic_cost, _colors = _activated_token_activation_cost(player, permanent, effect_data)
     if not player.can_pay(activation_cost):
         return False
+    activation_discard_count = int(effect_data.get("activation_discard_count") or 0)
+    activation_discard_target = effect_data.get("activation_discard_target") or "any_card"
+    if activation_discard_count:
+        discard_cards = _choose_activation_discard_cost_cards(
+            player,
+            activation_discard_count,
+            activation_discard_target,
+            random_discard=bool(effect_data.get("activation_discard_random")),
+        )
+        if len(discard_cards) != activation_discard_count:
+            return False
     try:
         return int(effect_data.get("token_count") or 1) > 0
     except (TypeError, ValueError):
@@ -44495,6 +44511,32 @@ def activate_generic_token_maker_permanent(player, opponents, all_players, perma
     )
     if not player.spend_mana(activation_cost):
         return False
+    activation_discard_count = int(effect_data.get("activation_discard_count") or 0)
+    activation_discard_target = effect_data.get("activation_discard_target") or "any_card"
+    discard_cards = []
+    discard_resolution = {"to_top": [], "to_graveyard": [], "used_replacement": False}
+    if activation_discard_count:
+        discard_cards = _choose_activation_discard_cost_cards(
+            player,
+            activation_discard_count,
+            activation_discard_target,
+            random_discard=bool(effect_data.get("activation_discard_random")),
+            rng=rng,
+        )
+        if len(discard_cards) != activation_discard_count:
+            return False
+        removed_cards = _remove_exact_cards_from_hand(player, discard_cards)
+        if len(removed_cards) != activation_discard_count:
+            return False
+        discard_resolution = resolve_effect_discard_cards(
+            player,
+            removed_cards,
+            top_limit=0,
+            opponents=opponents,
+            turn=turn,
+            phase=phase,
+            rng=rng,
+        )
     if effect_data.get("activation_requires_tap"):
         permanent["tapped"] = True
     sacrificed_source = False
@@ -44545,6 +44587,9 @@ def activate_generic_token_maker_permanent(player, opponents, all_players, perma
             "token_toughness": effect_data.get("token_toughness"),
             "requires_tap": 1 if effect_data.get("activation_requires_tap") else 0,
             "requires_sacrifice": 1 if sacrificed_source else 0,
+            "discarded": [card.get("name", "?") for card in discard_cards],
+            "discarded_count": activation_discard_count,
+            "discard_target": activation_discard_target if activation_discard_count else None,
         },
         rule_source=fields.get("rule_source", "battle_rule"),
         rule_status=fields.get("rule_review_status", "verified"),
@@ -44558,12 +44603,15 @@ def activate_generic_token_maker_permanent(player, opponents, all_players, perma
             "tokens": token_count,
             "permanents": -1 if sacrificed_source else 0,
             "tapped": 1 if effect_data.get("activation_requires_tap") else 0,
+            "graveyard": len(discard_resolution.get("to_graveyard") or []),
+            "cards_discarded": activation_discard_count,
         },
         risk_flags=[
             flag
             for flag, active in {
                 "tap_ability": bool(effect_data.get("activation_requires_tap")),
                 "sacrifice_source": sacrificed_source,
+                "discard_cost": activation_discard_count > 0,
                 "token_cap_possible": token_count > 20,
             }.items()
             if active
@@ -44578,6 +44626,12 @@ def activate_generic_token_maker_permanent(player, opponents, all_players, perma
         activation_cost=activation_cost,
         tapped=bool(permanent.get("tapped")),
         sacrificed_source=sacrificed_source,
+        discarded=[card.get("name", "?") for card in discard_cards],
+        discarded_count=activation_discard_count,
+        discard_target=activation_discard_target if activation_discard_count else None,
+        discard_to_graveyard=[card.get("name", "?") for card in discard_resolution.get("to_graveyard") or []],
+        discard_to_library_top=[card.get("name", "?") for card in discard_resolution.get("to_top") or []],
+        discard_replacement_used=bool(discard_resolution.get("used_replacement")),
         mana_paid=activation_cost_generic + len(activation_colors),
         tokens_requested=token_count,
         tokens_created=min(max(0, token_count), 20),

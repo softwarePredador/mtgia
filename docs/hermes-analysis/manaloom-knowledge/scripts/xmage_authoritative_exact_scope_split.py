@@ -1268,6 +1268,9 @@ def parse_simple_token_class(token_source: str, token_class: str) -> tuple[dict[
     if re.search(r"cardType\.add\s*\(\s*CardType\.LAND\s*\)", constructor_source):
         return {}, "token_land_token_runtime_not_supported"
     ability_classes = set(re.findall(r"addAbility\s*\(\s*([A-Za-z]+Ability)", constructor_source))
+    ability_classes.update(
+        re.findall(r"addAbility\s*\(\s*new\s+([A-Za-z]+Ability)", constructor_source)
+    )
     allowed_ability_classes = set(ALLOWED_TOKEN_ABILITY_KEYWORDS)
     if has_colorless_sacrifice_mana:
         allowed_ability_classes.add("SimpleManaAbility")
@@ -1442,8 +1445,6 @@ def activated_create_token_from_source(source: str) -> dict[str, Any] | str:
     window = text[ability_index : effect_match.start() + 1800]
     risky_cost_classes = {
         "CompositeCost",
-        "DiscardCardCost",
-        "DiscardTargetCost",
         "ExileFrom",
         "ExileFromGraveCost",
         "ExileFromTopOfLibraryCost",
@@ -1462,6 +1463,9 @@ def activated_create_token_from_source(source: str) -> dict[str, Any] | str:
     present_risky = sorted(cost for cost in risky_cost_classes if cost in window)
     if present_risky:
         return "activated_token_source_cost_not_supported"
+    discard_cost = activation_discard_cost_from_source(window)
+    if isinstance(discard_cost, str):
+        return discard_cost.replace("activated_damage", "activated_token")
     mana_matches = re.findall(r'ManaCostsImpl<[^>]*>\s*\(\s*"([^"]+)"\s*\)', window, re.S)
     generic_matches = re.findall(r"GenericManaCost\s*\(\s*(\d+)\s*\)", window, re.S)
     colored_matches = re.findall(r"ColoredManaCost\s*\(\s*ColoredManaSymbol\.([WUBRG])\s*\)", window, re.S)
@@ -1487,7 +1491,24 @@ def activated_create_token_from_source(source: str) -> dict[str, Any] | str:
         "activation_cost_colors": activation_cost_colors,
         "activation_requires_tap": "TapSourceCost" in window,
         "activation_requires_sacrifice": "SacrificeSourceCost" in window,
+        **(discard_cost or {}),
     }
+
+
+def activated_token_activation_cost_from_oracle_prefix(cost_text: str) -> dict[str, Any] | str:
+    text = re.sub(r"\s+", " ", str(cost_text or "").strip().lower())
+    discard_cost = activation_discard_cost_from_oracle(text)
+    if discard_cost:
+        discard_pattern = (
+            r"(?:^|,\s*)discard "
+            r"(?:a card at random|a land card|a card)"
+            r"(?:\s*,?|$)"
+        )
+        text = re.sub(discard_pattern, ",", text).strip(" ,")
+    activation = activation_cost_from_oracle_prefix(text, allow_source_sacrifice=True)
+    if isinstance(activation, str):
+        return activation.replace("activated_self_boost", "activated_token")
+    return {**activation, **(discard_cost or {})}
 
 
 def activated_create_token_oracle_blocker(
@@ -1500,15 +1521,19 @@ def activated_create_token_oracle_blocker(
     if text.count(":") != 1:
         return "activated_token_oracle_not_simple"
     cost_text, effect_text = [part.strip() for part in text.split(":", 1)]
-    activation = activation_cost_from_oracle_prefix(cost_text, allow_source_sacrifice=True)
+    activation = activated_token_activation_cost_from_oracle_prefix(cost_text)
     if isinstance(activation, str):
-        return activation.replace("activated_self_boost", "activated_token")
+        return activation
     for key in (
         "activation_cost_mana",
         "activation_cost_generic",
         "activation_cost_colors",
         "activation_requires_tap",
         "activation_requires_sacrifice",
+        "activation_discard_count",
+        "activation_discard_target",
+        "activation_requires_discard_card",
+        "activation_discard_random",
     ):
         if activation.get(key) != source_activation.get(key):
             return "activated_token_source_oracle_cost_mismatch"

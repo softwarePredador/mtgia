@@ -1,0 +1,231 @@
+{
+  "battle_execution": {
+    "event_count": 4,
+    "results": [
+      {
+        "card_name": "Icatian Crier",
+        "discard_target": "any_card",
+        "discarded_count": 1,
+        "scenario": "Icatian Crier activates token ability",
+        "token_name": "Citizen Token",
+        "tokens_created": 2
+      },
+      {
+        "card_name": "Pegasus Refuge",
+        "discard_target": "any_card",
+        "discarded_count": 1,
+        "scenario": "Pegasus Refuge activates token ability",
+        "token_name": "Pegasus Token",
+        "tokens_created": 1
+      },
+      {
+        "card_name": "Sliversmith",
+        "discard_target": "any_card",
+        "discarded_count": 1,
+        "scenario": "Sliversmith activates token ability",
+        "token_name": "Metallic Sliver",
+        "tokens_created": 1
+      },
+      {
+        "card_name": "Thraben Standard Bearer",
+        "discard_target": "any_card",
+        "discarded_count": 1,
+        "scenario": "Thraben Standard Bearer activates token ability",
+        "token_name": "Human Soldier Token",
+        "tokens_created": 1
+      }
+    ],
+    "scenario_count": 4
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-06T02:00:42.666642+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg542_activated_token_discard_new_server_package_manifest.json",
+  "package_id": "pg542_activated_token_discard_new_server_package_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 4
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+          "card_name": "Icatian Crier",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7e653e91c9430d0c3b8b7dc8660447b8",
+          "oracle_hash": "ba46c928be5cdfa3df8fbb0d9907393b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+          "card_name": "Pegasus Refuge",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5f011aa31880ce544088c1b7dd0e7720",
+          "oracle_hash": "bfee47379e00235d687dff2046c9169c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+          "card_name": "Sliversmith",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4a80da883d27481e71c4ef574ef01f29",
+          "oracle_hash": "4a4f3c94a6a88ce0361169e759f498e9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+          "card_name": "Thraben Standard Bearer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0c5166014767e3238c8a356a1b548f0e",
+          "oracle_hash": "7c859f71882c25480ce71e5d3c29ff32",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 4
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+          "card_name": "Icatian Crier",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7e653e91c9430d0c3b8b7dc8660447b8",
+          "oracle_hash": "ba46c928be5cdfa3df8fbb0d9907393b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+          "card_name": "Pegasus Refuge",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5f011aa31880ce544088c1b7dd0e7720",
+          "oracle_hash": "bfee47379e00235d687dff2046c9169c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+          "card_name": "Sliversmith",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4a80da883d27481e71c4ef574ef01f29",
+          "oracle_hash": "4a4f3c94a6a88ce0361169e759f498e9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+          "card_name": "Thraben Standard Bearer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0c5166014767e3238c8a356a1b548f0e",
+          "oracle_hash": "7c859f71882c25480ce71e5d3c29ff32",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 4
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+          "battle_rule_version": 2,
+          "card_name": "Icatian Crier",
+          "logical_rule_key": "battle_rule_v1:7e653e91c9430d0c3b8b7dc8660447b8"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+          "battle_rule_version": 2,
+          "card_name": "Pegasus Refuge",
+          "logical_rule_key": "battle_rule_v1:5f011aa31880ce544088c1b7dd0e7720"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+          "battle_rule_version": 2,
+          "card_name": "Sliversmith",
+          "logical_rule_key": "battle_rule_v1:4a80da883d27481e71c4ef574ef01f29"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+          "battle_rule_version": 2,
+          "card_name": "Thraben Standard Bearer",
+          "logical_rule_key": "battle_rule_v1:0c5166014767e3238c8a356a1b548f0e"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 4
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Icatian Crier",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:7e653e91c9430d0c3b8b7dc8660447b8"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Pegasus Refuge",
+          "component_keys": [],
+          "effect": "enchantment",
+          "logical_rule_key": "battle_rule_v1:5f011aa31880ce544088c1b7dd0e7720"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Sliversmith",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:4a80da883d27481e71c4ef574ef01f29"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Thraben Standard Bearer",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:0c5166014767e3238c8a356a1b548f0e"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 4,
+        "scenarios": 4
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

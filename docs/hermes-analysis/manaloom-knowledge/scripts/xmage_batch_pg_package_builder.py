@@ -1142,6 +1142,62 @@ def creature_dies_create_tokens_execution_scenario_from_expected_rule(
     }
 
 
+def simple_activated_create_token_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_permanent_simple_activated_create_token_v1":
+        return None
+    discard_target = str(required.get("activation_discard_target") or "any_card")
+    discard_hand = []
+    if int(required.get("activation_discard_count") or 0):
+        if discard_target == "land_card":
+            discard_hand = [
+                {"name": "E2E Spare Mountain", "type_line": "Basic Land - Mountain", "effect": "land"},
+                {"name": "E2E Nonland Spell", "type_line": "Sorcery", "effect": "draw_cards", "cmc": 2},
+            ]
+        else:
+            discard_hand = [
+                {"name": "E2E Spare Card A", "type_line": "Sorcery", "effect": "draw_cards", "cmc": 2},
+                {"name": "E2E Spare Card B", "type_line": "Instant", "effect": "direct_damage", "cmc": 1},
+            ]
+    return {
+        "name": f"{rule['card_name']} activates token ability",
+        "type": "simple_activated_create_token",
+        "card": {"name": rule["card_name"]},
+        "controller_mana": {
+            "generic": int(required.get("activation_cost_generic") or 0),
+            **{
+                color_name: list(required.get("activation_cost_colors") or []).count(symbol)
+                for symbol, color_name in {
+                    "W": "white",
+                    "U": "blue",
+                    "B": "black",
+                    "R": "red",
+                    "G": "green",
+                }.items()
+            },
+        },
+        "controller_hand": discard_hand,
+        "expected_token": {
+            "name": required.get("token_name"),
+            "count": int(required.get("token_count") or 1),
+            "power": required.get("token_power"),
+            "toughness": required.get("token_toughness"),
+            "subtype": required.get("token_subtype"),
+            "colors": required.get("token_colors") or [],
+            "keywords": required.get("token_keywords") or [],
+            "artifact": bool(required.get("artifact_tokens")),
+            "tapped": bool(required.get("token_tapped")),
+        },
+        "expected_tapped_source": bool(required.get("activation_requires_tap")),
+        "expected_discard_count": int(required.get("activation_discard_count") or 0),
+        "expected_discard_target": discard_target,
+        "expected_discard_random": bool(required.get("activation_discard_random")),
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def _manifest_mana_for_activation_cost(cost: str | None) -> dict[str, int]:
     mana = {
         "generic": 0,
@@ -1311,6 +1367,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or creature_dies_create_tokens_execution_scenario_from_expected_rule(rule)
         or simple_mana_source_execution_scenario_from_expected_rule(rule)
         or simple_activated_damage_execution_scenario_from_expected_rule(rule)
+        or simple_activated_create_token_execution_scenario_from_expected_rule(rule)
         or fixed_create_creature_tokens_execution_scenario_from_expected_rule(rule)
         or multi_create_creature_tokens_execution_scenario_from_expected_rule(rule)
     )

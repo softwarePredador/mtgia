@@ -1,0 +1,811 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg542_activated_token_discard_new_server_20260706_015701",
+  "deploy_id": "pg542_activated_token_discard_new_server",
+  "execution_scenarios": [
+    {
+      "card": {
+        "name": "Icatian Crier"
+      },
+      "controller_hand": [
+        {
+          "cmc": 2,
+          "effect": "draw_cards",
+          "name": "E2E Spare Card A",
+          "type_line": "Sorcery"
+        },
+        {
+          "cmc": 1,
+          "effect": "direct_damage",
+          "name": "E2E Spare Card B",
+          "type_line": "Instant"
+        }
+      ],
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 1,
+        "green": 0,
+        "red": 0,
+        "white": 1
+      },
+      "expected_discard_count": 1,
+      "expected_discard_random": false,
+      "expected_discard_target": "any_card",
+      "expected_tapped_source": true,
+      "expected_token": {
+        "artifact": false,
+        "colors": [
+          "W"
+        ],
+        "count": 2,
+        "keywords": [],
+        "name": "Citizen Token",
+        "power": 1,
+        "subtype": "Citizen",
+        "tapped": false,
+        "toughness": 1
+      },
+      "logical_rule_key": "battle_rule_v1:7e653e91c9430d0c3b8b7dc8660447b8",
+      "name": "Icatian Crier activates token ability",
+      "type": "simple_activated_create_token"
+    },
+    {
+      "card": {
+        "name": "Pegasus Refuge"
+      },
+      "controller_hand": [
+        {
+          "cmc": 2,
+          "effect": "draw_cards",
+          "name": "E2E Spare Card A",
+          "type_line": "Sorcery"
+        },
+        {
+          "cmc": 1,
+          "effect": "direct_damage",
+          "name": "E2E Spare Card B",
+          "type_line": "Instant"
+        }
+      ],
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 2,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_discard_count": 1,
+      "expected_discard_random": false,
+      "expected_discard_target": "any_card",
+      "expected_tapped_source": false,
+      "expected_token": {
+        "artifact": false,
+        "colors": [
+          "W"
+        ],
+        "count": 1,
+        "keywords": [
+          "flying"
+        ],
+        "name": "Pegasus Token",
+        "power": 1,
+        "subtype": "Pegasus",
+        "tapped": false,
+        "toughness": 1
+      },
+      "logical_rule_key": "battle_rule_v1:5f011aa31880ce544088c1b7dd0e7720",
+      "name": "Pegasus Refuge activates token ability",
+      "type": "simple_activated_create_token"
+    },
+    {
+      "card": {
+        "name": "Sliversmith"
+      },
+      "controller_hand": [
+        {
+          "cmc": 2,
+          "effect": "draw_cards",
+          "name": "E2E Spare Card A",
+          "type_line": "Sorcery"
+        },
+        {
+          "cmc": 1,
+          "effect": "direct_damage",
+          "name": "E2E Spare Card B",
+          "type_line": "Instant"
+        }
+      ],
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 1,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_discard_count": 1,
+      "expected_discard_random": false,
+      "expected_discard_target": "any_card",
+      "expected_tapped_source": true,
+      "expected_token": {
+        "artifact": true,
+        "colors": [],
+        "count": 1,
+        "keywords": [],
+        "name": "Metallic Sliver",
+        "power": 1,
+        "subtype": "Sliver",
+        "tapped": false,
+        "toughness": 1
+      },
+      "logical_rule_key": "battle_rule_v1:4a80da883d27481e71c4ef574ef01f29",
+      "name": "Sliversmith activates token ability",
+      "type": "simple_activated_create_token"
+    },
+    {
+      "card": {
+        "name": "Thraben Standard Bearer"
+      },
+      "controller_hand": [
+        {
+          "cmc": 2,
+          "effect": "draw_cards",
+          "name": "E2E Spare Card A",
+          "type_line": "Sorcery"
+        },
+        {
+          "cmc": 1,
+          "effect": "direct_damage",
+          "name": "E2E Spare Card B",
+          "type_line": "Instant"
+        }
+      ],
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 1,
+        "green": 0,
+        "red": 0,
+        "white": 1
+      },
+      "expected_discard_count": 1,
+      "expected_discard_random": false,
+      "expected_discard_target": "any_card",
+      "expected_tapped_source": true,
+      "expected_token": {
+        "artifact": false,
+        "colors": [
+          "W"
+        ],
+        "count": 1,
+        "keywords": [],
+        "name": "Human Soldier Token",
+        "power": 1,
+        "subtype": "Human Soldier",
+        "tapped": false,
+        "toughness": 1
+      },
+      "logical_rule_key": "battle_rule_v1:0c5166014767e3238c8a356a1b548f0e",
+      "name": "Thraben Standard Bearer activates token ability",
+      "type": "simple_activated_create_token"
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Icatian Crier",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7e653e91c9430d0c3b8b7dc8660447b8",
+      "min_rule_version": 2,
+      "normalized_name": "icatian crier",
+      "oracle_hash": "ba46c928be5cdfa3df8fbb0d9907393b",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "token_maker",
+            "activation_cost_colors": [
+              "W"
+            ],
+            "activation_cost_generic": 1,
+            "activation_cost_mana": "{1}{W}",
+            "activation_discard_count": 1,
+            "activation_discard_target": "any_card",
+            "activation_requires_discard_card": true,
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+            "effect": "token_maker",
+            "token_colors": [
+              "W"
+            ],
+            "token_count": 2,
+            "token_description": "1/1 white Citizen creature token",
+            "token_name": "Citizen Token",
+            "token_power": 1,
+            "token_subtype": "Citizen",
+            "token_toughness": 1,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "CreateTokenEffect",
+            "xmage_token_class": "CitizenToken"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+        "activated_effect": "token_maker",
+        "activation_cost_colors": [
+          "W"
+        ],
+        "activation_cost_generic": 1,
+        "activation_cost_mana": "{1}{W}",
+        "activation_discard_count": 1,
+        "activation_discard_target": "any_card",
+        "activation_requires_discard_card": true,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+        "effect": "creature",
+        "token_colors": [
+          "W"
+        ],
+        "token_count": 2,
+        "token_name": "Citizen Token",
+        "token_power": 1,
+        "token_subtype": "Citizen",
+        "token_toughness": 1,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "CitizenToken"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Pegasus Refuge",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5f011aa31880ce544088c1b7dd0e7720",
+      "min_rule_version": 2,
+      "normalized_name": "pegasus refuge",
+      "oracle_hash": "bfee47379e00235d687dff2046c9169c",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "token_maker",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 2,
+            "activation_cost_mana": "{2}",
+            "activation_discard_count": 1,
+            "activation_discard_target": "any_card",
+            "activation_requires_discard_card": true,
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+            "effect": "token_maker",
+            "token_colors": [
+              "W"
+            ],
+            "token_count": 1,
+            "token_description": "1/1 white Pegasus creature token with flying",
+            "token_flying": true,
+            "token_keywords": [
+              "flying"
+            ],
+            "token_name": "Pegasus Token",
+            "token_power": 1,
+            "token_subtype": "Pegasus",
+            "token_toughness": 1,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "CreateTokenEffect",
+            "xmage_token_class": "PegasusToken"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+        "activated_effect": "token_maker",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}",
+        "activation_discard_count": 1,
+        "activation_discard_target": "any_card",
+        "activation_requires_discard_card": true,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+        "effect": "enchantment",
+        "token_colors": [
+          "W"
+        ],
+        "token_count": 1,
+        "token_flying": true,
+        "token_keywords": [
+          "flying"
+        ],
+        "token_name": "Pegasus Token",
+        "token_power": 1,
+        "token_subtype": "Pegasus",
+        "token_toughness": 1,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "PegasusToken"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sliversmith",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4a80da883d27481e71c4ef574ef01f29",
+      "min_rule_version": 2,
+      "normalized_name": "sliversmith",
+      "oracle_hash": "4a4f3c94a6a88ce0361169e759f498e9",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "token_maker",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 1,
+            "activation_cost_mana": "{1}",
+            "activation_discard_count": 1,
+            "activation_discard_target": "any_card",
+            "activation_requires_discard_card": true,
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "artifact_tokens": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+            "effect": "token_maker",
+            "token_count": 1,
+            "token_description": "1/1 colorless Sliver artifact creature token named Metallic Sliver",
+            "token_name": "Metallic Sliver",
+            "token_power": 1,
+            "token_subtype": "Sliver",
+            "token_toughness": 1,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "CreateTokenEffect",
+            "xmage_token_class": "MetallicSliverToken"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+        "activated_effect": "token_maker",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 1,
+        "activation_cost_mana": "{1}",
+        "activation_discard_count": 1,
+        "activation_discard_target": "any_card",
+        "activation_requires_discard_card": true,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "artifact_tokens": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+        "effect": "creature",
+        "token_count": 1,
+        "token_name": "Metallic Sliver",
+        "token_power": 1,
+        "token_subtype": "Sliver",
+        "token_toughness": 1,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "MetallicSliverToken"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Thraben Standard Bearer",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0c5166014767e3238c8a356a1b548f0e",
+      "min_rule_version": 2,
+      "normalized_name": "thraben standard bearer",
+      "oracle_hash": "7c859f71882c25480ce71e5d3c29ff32",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "token_maker",
+            "activation_cost_colors": [
+              "W"
+            ],
+            "activation_cost_generic": 1,
+            "activation_cost_mana": "{1}{W}",
+            "activation_discard_count": 1,
+            "activation_discard_target": "any_card",
+            "activation_requires_discard_card": true,
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+            "effect": "token_maker",
+            "token_colors": [
+              "W"
+            ],
+            "token_count": 1,
+            "token_description": "1/1 white Human Soldier creature token",
+            "token_name": "Human Soldier Token",
+            "token_power": 1,
+            "token_subtype": "Human Soldier",
+            "token_toughness": 1,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "CreateTokenEffect",
+            "xmage_token_class": "HumanSoldierToken"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+        "activated_effect": "token_maker",
+        "activation_cost_colors": [
+          "W"
+        ],
+        "activation_cost_generic": 1,
+        "activation_cost_mana": "{1}{W}",
+        "activation_discard_count": 1,
+        "activation_discard_target": "any_card",
+        "activation_requires_discard_card": true,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+        "effect": "creature",
+        "token_colors": [
+          "W"
+        ],
+        "token_count": 1,
+        "token_name": "Human Soldier Token",
+        "token_power": 1,
+        "token_subtype": "Human Soldier",
+        "token_toughness": 1,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "HumanSoldierToken"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_permanent_simple_activated_create_token": 4
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg542_activated_token_discard_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg542_activated_token_discard_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg542_activated_token_discard_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg542_activated_token_discard_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg542_activated_token_discard_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg542_activated_token_discard_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-06T01:57:01+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Icatian Crier"
+      },
+      "card_name": "Icatian Crier",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7e653e91c9430d0c3b8b7dc8660447b8",
+      "normalized_name": "icatian crier",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "token_maker",
+            "activation_cost_colors": [
+              "W"
+            ],
+            "activation_cost_generic": 1,
+            "activation_cost_mana": "{1}{W}",
+            "activation_discard_count": 1,
+            "activation_discard_target": "any_card",
+            "activation_requires_discard_card": true,
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+            "effect": "token_maker",
+            "token_colors": [
+              "W"
+            ],
+            "token_count": 2,
+            "token_description": "1/1 white Citizen creature token",
+            "token_name": "Citizen Token",
+            "token_power": 1,
+            "token_subtype": "Citizen",
+            "token_toughness": 1,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "CreateTokenEffect",
+            "xmage_token_class": "CitizenToken"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+        "activated_effect": "token_maker",
+        "activation_cost_colors": [
+          "W"
+        ],
+        "activation_cost_generic": 1,
+        "activation_cost_mana": "{1}{W}",
+        "activation_discard_count": 1,
+        "activation_discard_target": "any_card",
+        "activation_requires_discard_card": true,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+        "effect": "creature",
+        "token_colors": [
+          "W"
+        ],
+        "token_count": 2,
+        "token_name": "Citizen Token",
+        "token_power": 1,
+        "token_subtype": "Citizen",
+        "token_toughness": 1,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "CitizenToken"
+      }
+    },
+    {
+      "card": {
+        "name": "Pegasus Refuge"
+      },
+      "card_name": "Pegasus Refuge",
+      "effect": "enchantment",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5f011aa31880ce544088c1b7dd0e7720",
+      "normalized_name": "pegasus refuge",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "token_maker",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 2,
+            "activation_cost_mana": "{2}",
+            "activation_discard_count": 1,
+            "activation_discard_target": "any_card",
+            "activation_requires_discard_card": true,
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+            "effect": "token_maker",
+            "token_colors": [
+              "W"
+            ],
+            "token_count": 1,
+            "token_description": "1/1 white Pegasus creature token with flying",
+            "token_flying": true,
+            "token_keywords": [
+              "flying"
+            ],
+            "token_name": "Pegasus Token",
+            "token_power": 1,
+            "token_subtype": "Pegasus",
+            "token_toughness": 1,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "CreateTokenEffect",
+            "xmage_token_class": "PegasusToken"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+        "activated_effect": "token_maker",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}",
+        "activation_discard_count": 1,
+        "activation_discard_target": "any_card",
+        "activation_requires_discard_card": true,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+        "effect": "enchantment",
+        "token_colors": [
+          "W"
+        ],
+        "token_count": 1,
+        "token_flying": true,
+        "token_keywords": [
+          "flying"
+        ],
+        "token_name": "Pegasus Token",
+        "token_power": 1,
+        "token_subtype": "Pegasus",
+        "token_toughness": 1,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "PegasusToken"
+      }
+    },
+    {
+      "card": {
+        "name": "Sliversmith"
+      },
+      "card_name": "Sliversmith",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4a80da883d27481e71c4ef574ef01f29",
+      "normalized_name": "sliversmith",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "token_maker",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 1,
+            "activation_cost_mana": "{1}",
+            "activation_discard_count": 1,
+            "activation_discard_target": "any_card",
+            "activation_requires_discard_card": true,
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "artifact_tokens": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+            "effect": "token_maker",
+            "token_count": 1,
+            "token_description": "1/1 colorless Sliver artifact creature token named Metallic Sliver",
+            "token_name": "Metallic Sliver",
+            "token_power": 1,
+            "token_subtype": "Sliver",
+            "token_toughness": 1,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "CreateTokenEffect",
+            "xmage_token_class": "MetallicSliverToken"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+        "activated_effect": "token_maker",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 1,
+        "activation_cost_mana": "{1}",
+        "activation_discard_count": 1,
+        "activation_discard_target": "any_card",
+        "activation_requires_discard_card": true,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "artifact_tokens": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+        "effect": "creature",
+        "token_count": 1,
+        "token_name": "Metallic Sliver",
+        "token_power": 1,
+        "token_subtype": "Sliver",
+        "token_toughness": 1,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "MetallicSliverToken"
+      }
+    },
+    {
+      "card": {
+        "name": "Thraben Standard Bearer"
+      },
+      "card_name": "Thraben Standard Bearer",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0c5166014767e3238c8a356a1b548f0e",
+      "normalized_name": "thraben standard bearer",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "token_maker",
+            "activation_cost_colors": [
+              "W"
+            ],
+            "activation_cost_generic": 1,
+            "activation_cost_mana": "{1}{W}",
+            "activation_discard_count": 1,
+            "activation_discard_target": "any_card",
+            "activation_requires_discard_card": true,
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+            "effect": "token_maker",
+            "token_colors": [
+              "W"
+            ],
+            "token_count": 1,
+            "token_description": "1/1 white Human Soldier creature token",
+            "token_name": "Human Soldier Token",
+            "token_power": 1,
+            "token_subtype": "Human Soldier",
+            "token_toughness": 1,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "CreateTokenEffect",
+            "xmage_token_class": "HumanSoldierToken"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+        "activated_effect": "token_maker",
+        "activation_cost_colors": [
+          "W"
+        ],
+        "activation_cost_generic": 1,
+        "activation_cost_mana": "{1}{W}",
+        "activation_discard_count": 1,
+        "activation_discard_target": "any_card",
+        "activation_requires_discard_card": true,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+        "effect": "creature",
+        "token_colors": [
+          "W"
+        ],
+        "token_count": 1,
+        "token_name": "Human Soldier Token",
+        "token_power": 1,
+        "token_subtype": "Human Soldier",
+        "token_toughness": 1,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "HumanSoldierToken"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Icatian Crier",
+    "Pegasus Refuge",
+    "Sliversmith",
+    "Thraben Standard Bearer"
+  ],
+  "selected_count": 4,
+  "slug": "activated_token_discard_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Icatian Crier",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7e653e91c9430d0c3b8b7dc8660447b8",
+      "min_rule_version": 2,
+      "normalized_name": "icatian crier",
+      "oracle_hash": "ba46c928be5cdfa3df8fbb0d9907393b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Pegasus Refuge",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5f011aa31880ce544088c1b7dd0e7720",
+      "min_rule_version": 2,
+      "normalized_name": "pegasus refuge",
+      "oracle_hash": "bfee47379e00235d687dff2046c9169c",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sliversmith",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4a80da883d27481e71c4ef574ef01f29",
+      "min_rule_version": 2,
+      "normalized_name": "sliversmith",
+      "oracle_hash": "4a4f3c94a6a88ce0361169e759f498e9",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Thraben Standard Bearer",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0c5166014767e3238c8a356a1b548f0e",
+      "min_rule_version": 2,
+      "normalized_name": "thraben standard bearer",
+      "oracle_hash": "7c859f71882c25480ce71e5d3c29ff32",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

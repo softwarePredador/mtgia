@@ -1289,3 +1289,45 @@ def test_manifest_checks_from_expected_rule_split_snapshot_and_runtime_fields() 
     }
     assert runtime_check["effect"] == "topdeck_play"
     assert runtime_check["required_effect_fields"] == rule["required_effect_fields"]
+
+
+def test_simple_activated_create_token_execution_scenario_includes_discard_cost() -> None:
+    rule = {
+        "normalized_name": "icatian crier",
+        "card_name": "Icatian Crier",
+        "logical_rule_key": "battle_rule_v1:icatian-crier",
+        "required_effect_fields": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+            "activation_cost_mana": "{1}{W}",
+            "activation_cost_generic": 1,
+            "activation_cost_colors": ["W"],
+            "activation_requires_tap": True,
+            "activation_discard_count": 1,
+            "activation_discard_target": "any_card",
+            "activation_requires_discard_card": True,
+            "token_count": 2,
+            "token_name": "Citizen Token",
+            "token_power": 1,
+            "token_toughness": 1,
+            "token_subtype": "Citizen",
+            "token_colors": ["W"],
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario["type"] == "simple_activated_create_token"
+    assert scenario["controller_mana"] == {
+        "generic": 1,
+        "white": 1,
+        "blue": 0,
+        "black": 0,
+        "red": 0,
+        "green": 0,
+    }
+    assert len(scenario["controller_hand"]) == 2
+    assert scenario["expected_discard_count"] == 1
+    assert scenario["expected_discard_target"] == "any_card"
+    assert scenario["expected_token"]["name"] == "Citizen Token"
+    assert scenario["expected_token"]["count"] == 2

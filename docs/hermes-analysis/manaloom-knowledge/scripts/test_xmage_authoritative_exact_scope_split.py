@@ -2811,7 +2811,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["token_name"], "Saproling Token")
         self.assertEqual(effect["_activated_rule_effects"][0]["effect"], "token_maker")
 
-    def test_permanent_activated_create_token_blocks_discard_cost(self) -> None:
+    def test_permanent_activated_create_token_maps_discard_cost(self) -> None:
         unit = (
             split.ACTIVATED_TOKEN_PERMANENT_UNIT_PREFIX
             + "no_target_class::no_condition_class::token,activated_ability"
@@ -2851,8 +2851,37 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             """,
         )
 
-        self.assertIsNone(proposal)
-        self.assertEqual(reason, "activated_token_source_cost_not_supported")
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_TOKEN_SCOPE)
+        self.assertEqual(effect["activation_cost_mana"], "{1}{W}")
+        self.assertEqual(effect["activation_discard_count"], 1)
+        self.assertEqual(effect["activation_discard_target"], "any_card")
+        self.assertTrue(effect["activation_requires_discard_card"])
+        self.assertEqual(effect["token_count"], 2)
+        self.assertEqual(effect["token_name"], "Citizen Token")
+
+    def test_token_class_blocks_new_unmodeled_ability(self) -> None:
+        token_data, reason = split.parse_simple_token_class(
+            """
+            public final class LlanowarElvesToken extends TokenImpl {
+            public LlanowarElvesToken() {
+                super("Llanowar Elves", "1/1 green Elf Druid creature token named Llanowar Elves. It has \\"{T}: Add {G}.\\"");
+                cardType.add(CardType.CREATURE);
+                color.setGreen(true);
+                subtype.add(SubType.ELF);
+                subtype.add(SubType.DRUID);
+                power = new MageInt(1);
+                toughness = new MageInt(1);
+                this.addAbility(new GreenManaAbility());
+            }
+            }
+            """,
+            "LlanowarElvesToken",
+        )
+
+        self.assertEqual(token_data, {})
+        self.assertEqual(reason, "token_ability_not_supported")
 
     def test_multi_create_creature_tokens_spell_blocks_missing_token_source(self) -> None:
         row = queue_row(split.TOKEN_SPELL_UNIT, effect_classes=["CreateTokenEffect"], xmage_signals=["token"])

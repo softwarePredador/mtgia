@@ -3854,6 +3854,73 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_simple_activated_create_token_pays_discard_cost(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.mana_pool.add_generic(1)
+        active.mana_pool.add("white", 1)
+        discard_card = {"name": "E2E Spare Card", "type_line": "Sorcery", "effect": "draw_cards", "cmc": 2}
+        active.hand = [discard_card]
+        permanent = {
+            "name": "Fixture Crier",
+            "type_line": "Creature - Human Spellshaper",
+            "effect": "creature",
+            "summoning_sick": False,
+            "_activated_rule_effects": [
+                {
+                    "effect": "token_maker",
+                    "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+                    "ability_kind": "activated",
+                    "activated_effect": "token_maker",
+                    "activation_cost_mana": "{1}{W}",
+                    "activation_cost_generic": 1,
+                    "activation_cost_colors": ["W"],
+                    "activation_requires_tap": True,
+                    "activation_discard_count": 1,
+                    "activation_discard_target": "any_card",
+                    "activation_requires_discard_card": True,
+                    "token_count": 2,
+                    "token_name": "Citizen Token",
+                    "token_subtype": "Citizen",
+                    "token_power": 1,
+                    "token_toughness": 1,
+                    "token_colors": ["W"],
+                    "_rule_logical_key": "battle_rule_v1:fixture_activated_token_discard",
+                }
+            ],
+        }
+        active.battlefield.append(permanent)
+
+        activated = self.battle.activate_generic_token_maker_permanent(
+            active,
+            [opponent],
+            [active, opponent],
+            permanent,
+            turn=5,
+            rng=random.Random(5),
+            phase="precombat_main",
+        )
+
+        self.assertTrue(activated)
+        self.assertTrue(permanent.get("tapped"))
+        self.assertEqual(active.available_mana(), 0)
+        self.assertEqual(active.hand, [])
+        self.assertIn(discard_card, active.graveyard)
+        tokens = [card for card in active.battlefield if card.get("name") == "Citizen Token"]
+        self.assertEqual(len(tokens), 2)
+        self.assertTrue(
+            any(
+                event == "activated_ability"
+                and data.get("card") == "Fixture Crier"
+                and data.get("activation_kind") == "simple_activated_create_token"
+                and data.get("tokens_created") == 2
+                and data.get("discarded_count") == 1
+                and data.get("discard_target") == "any_card"
+                and data.get("rule_logical_key") == "battle_rule_v1:fixture_activated_token_discard"
+                for event, data in self.events
+            )
+        )
+
     def test_simple_activated_create_token_preserves_artifact_keyword_token(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])
