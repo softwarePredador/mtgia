@@ -258,6 +258,13 @@ candidates can become miner source seeds. These seeds still do not create
 card-level cut permission, candidate copy, battle, promotion, or value-safe
 reclassification.
 
+Then run `global_commander_reviewed_external_nonpayoff_seeded_cut_source_miner.py`
+after local seed review. It reruns same-lane cut-source mining with reviewed
+external nonpayoff seeds and routes any fresh current-deck cut-source
+hypothesis to trace collection. Fresh seeded hypotheses still do not create
+card-level cut permission, candidate copy, battle, promotion, or value-safe
+reclassification.
+
 ## XMage Authoritative Adaptation
 
 For all-card battle-rule acceleration, use local XMage as the authoritative

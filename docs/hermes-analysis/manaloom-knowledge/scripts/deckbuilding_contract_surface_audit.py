@@ -252,6 +252,12 @@ GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_SAME_LANE_SOURCE_CANDIDATE_REVIEWER = (
 GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_SAME_LANE_SOURCE_CANDIDATE_REVIEWER_TEST = (
     SCRIPT_DIR / "test_global_commander_external_nonpayoff_same_lane_source_candidate_reviewer.py"
 )
+GLOBAL_COMMANDER_REVIEWED_EXTERNAL_NONPAYOFF_SEEDED_CUT_SOURCE_MINER = (
+    SCRIPT_DIR / "global_commander_reviewed_external_nonpayoff_seeded_cut_source_miner.py"
+)
+GLOBAL_COMMANDER_REVIEWED_EXTERNAL_NONPAYOFF_SEEDED_CUT_SOURCE_MINER_TEST = (
+    SCRIPT_DIR / "test_global_commander_reviewed_external_nonpayoff_seeded_cut_source_miner.py"
+)
 README = REPO_ROOT / "docs/hermes-analysis/README.md"
 
 CONTRACT_MATRIX_JSON = (
@@ -533,6 +539,10 @@ GLOBAL_COMMANDER_SCOPE1_EXTERNAL_NONPAYOFF_SAME_LANE_SOURCE_CANDIDATE_DISCOVERER
 GLOBAL_COMMANDER_SCOPE1_EXTERNAL_NONPAYOFF_SAME_LANE_SOURCE_CANDIDATE_REVIEWER_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_same_lane_source_candidate_reviewer_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+)
+GLOBAL_COMMANDER_SCOPE1_REVIEWED_EXTERNAL_NONPAYOFF_SEEDED_CUT_SOURCE_MINER_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_reviewed_external_nonpayoff_seeded_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1.md"
 )
 
 REQUIRED_FOCUS_CARDS = {
@@ -922,6 +932,10 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_external_nonpayoff_same_lane_source_candidate_reviewer_20260705_kaalia_value_safe_stage1_repair_scope1.md",
                 "external_nonpayoff_same_lane_source_candidates_reviewed_miner_seed_ready_no_deck_action",
                 "rerun_same_lane_cut_source_miner_with_reviewed_external_nonpayoff_candidates",
+                "global_commander_reviewed_external_nonpayoff_seeded_cut_source_miner.py",
+                "global_commander_reviewed_external_nonpayoff_seeded_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1.md",
+                "reviewed_external_seeded_cut_source_hypotheses_ready_for_trace",
+                "collect_trace_for_reviewed_external_seeded_cut_source_hypotheses",
                 "battle_gate_allowed_now",
                 "Path to Exile",
                 "Terminate",
@@ -1248,6 +1262,9 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_external_nonpayoff_same_lane_source_candidate_reviewer_20260705_kaalia_value_safe_stage1_repair_scope1.md",
                 "external_nonpayoff_same_lane_source_candidates_reviewed_miner_seed_ready_no_deck_action",
                 "rerun_same_lane_cut_source_miner_with_reviewed_external_nonpayoff_candidates",
+                "global_commander_reviewed_external_nonpayoff_seeded_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1.md",
+                "reviewed_external_seeded_cut_source_hypotheses_ready_for_trace",
+                "collect_trace_for_reviewed_external_seeded_cut_source_hypotheses",
                 "battle_gate_allowed_now=false",
                 "Path to Exile",
                 "Terminate",
@@ -2207,6 +2224,33 @@ def build_audit() -> dict[str, Any]:
                 "test_role_mismatch_blocks_miner_seed",
                 "external_nonpayoff_same_lane_source_candidates_reviewed_miner_seed_ready_no_deck_action",
                 "external_source_candidate_local_review_blocks_role_mismatch",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_REVIEWED_EXTERNAL_NONPAYOFF_SEEDED_CUT_SOURCE_MINER,
+            [
+                "global_commander_reviewed_external_nonpayoff_seeded_cut_source_miner",
+                "reviewed_external_seeded_cut_source_hypotheses_ready_for_trace",
+                "reviewed_external_seeded_cut_source_mining_exhausted_current_deck_no_cut_permission",
+                "collect_trace_for_reviewed_external_seeded_cut_source_hypotheses",
+                "reviewed_external_seed_missing_for_target_role",
+                "fresh_seeded_same_lane_cut_source_count",
+                "card_level_cut_permission_now",
+                "candidate_copy_allowed_now",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_REVIEWED_EXTERNAL_NONPAYOFF_SEEDED_CUT_SOURCE_MINER_TEST,
+            [
+                "test_seeded_fresh_source_routes_to_trace",
+                "test_recycled_source_stays_blocked_despite_seed",
+                "test_unseeded_target_role_remains_blocked",
+                "reviewed_external_seeded_cut_source_hypotheses_ready_for_trace",
+                "reviewed_external_seeded_cut_source_mining_exhausted_current_deck_no_cut_permission",
             ],
         )
     )
@@ -3487,6 +3531,29 @@ def build_audit() -> dict[str, Any]:
                 "rerun_same_lane_cut_source_miner_with_reviewed_external_nonpayoff_candidates",
                 "Dragon Tempest",
                 "Dihada, Binder of Wills",
+                "Simian Spirit Guide",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SCOPE1_REVIEWED_EXTERNAL_NONPAYOFF_SEEDED_CUT_SOURCE_MINER_REPORT,
+            [
+                "Global Commander Reviewed External Nonpayoff Seeded Cut Source Miner",
+                "reviewed_external_seeded_cut_source_hypotheses_ready_for_trace",
+                "reviewed_seed_count: `5`",
+                "seeded_role_count: `2`",
+                "target_role_count: `3`",
+                "unseeded_target_role_count: `1`",
+                "scanned_seeded_same_lane_source_count: `34`",
+                "fresh_seeded_same_lane_cut_source_count: `10`",
+                "blocked_recycled_seeded_cut_source_count: `21`",
+                "blocked_new_seeded_cut_source_count: `3`",
+                "card_level_cut_permission_count: `0`",
+                "candidate_copy_allowed_count: `0`",
+                "collect_trace_for_reviewed_external_seeded_cut_source_hypotheses",
+                "Basalt Monolith",
+                "Monologue Tax",
                 "Simian Spirit Guide",
             ],
         )

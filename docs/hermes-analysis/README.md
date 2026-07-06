@@ -714,6 +714,18 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `card_level_cut_permission_count=0` e `candidate_copy_allowed_count=0`.
     O proximo gate e
     `rerun_same_lane_cut_source_miner_with_reviewed_external_nonpayoff_candidates`.
+    O miner rerodado com seeds externos revisados fica em
+    `global_commander_reviewed_external_nonpayoff_seeded_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1.md`.
+    Resultado: `reviewed_external_seeded_cut_source_hypotheses_ready_for_trace`,
+    com `reviewed_seed_count=5`, `seeded_role_count=2`,
+    `target_role_count=3`, `unseeded_target_role_count=1`,
+    `scanned_seeded_same_lane_source_count=34`,
+    `fresh_seeded_same_lane_cut_source_count=10`,
+    `blocked_recycled_seeded_cut_source_count=21`,
+    `blocked_new_seeded_cut_source_count=3`,
+    `card_level_cut_permission_count=0` e `candidate_copy_allowed_count=0`.
+    O proximo gate e
+    `collect_trace_for_reviewed_external_seeded_cut_source_hypotheses`.
     Observacao operacional: snapshots historicos de candidate-copy, battle-probe,
     battle-feedback e package-chain dependem de artefatos locais ignorados. Se
     faltarem ou forem regenerados sem esses artefatos, a auditoria de superficie

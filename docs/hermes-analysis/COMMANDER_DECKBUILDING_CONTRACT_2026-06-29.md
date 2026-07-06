@@ -405,7 +405,13 @@ Operational priority after this pivot:
     only resolved outside-deck/outside-package candidates as miner source seeds,
     and keep card-level cut permission, candidate copy, battle, promotion, and
     value-safe reclassification closed;
-53. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
+53. run `global_commander_reviewed_external_nonpayoff_seeded_cut_source_miner.py`
+    after local seed review; it must rerun same-lane cut-source mining with
+    reviewed external nonpayoff seeds, prove whether any current-deck cut source
+    is fresh for a seeded role, route fresh hypotheses to trace collection, and
+    keep card-level cut permission, candidate copy, battle, promotion, and
+    value-safe reclassification closed;
+54. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
     probes, as regression evidence only unless they produce a named safe cut and
     equal-gate proof under the Lorehold promotion gate.
 
@@ -476,6 +482,7 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_same_lane_cut_policy_mapper_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_same_lane_source_candidate_discoverer_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_same_lane_source_candidate_reviewer_20260705_kaalia_value_safe_stage1_repair_scope1.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_reviewed_external_nonpayoff_seeded_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 
 Historical candidate-copy, battle-probe, battle-feedback, and package-chain
 snapshots are local ignored evidence artifacts. The surface auditor must show
@@ -1055,6 +1062,16 @@ Current external refresh on 2026-07-05:
   The 5 reviewed candidates may seed miner research only; they are not
   card-level cut permission. The next gate is
   `rerun_same_lane_cut_source_miner_with_reviewed_external_nonpayoff_candidates`.
+- Current reviewed external nonpayoff seeded cut-source mining returns
+  `reviewed_external_seeded_cut_source_hypotheses_ready_for_trace` with
+  `reviewed_seed_count=5`, `seeded_role_count=2`, `target_role_count=3`,
+  `unseeded_target_role_count=1`, `scanned_seeded_same_lane_source_count=34`,
+  `fresh_seeded_same_lane_cut_source_count=10`,
+  `blocked_recycled_seeded_cut_source_count=21`,
+  `blocked_new_seeded_cut_source_count=3`,
+  `card_level_cut_permission_count=0`, and `candidate_copy_allowed_count=0`.
+  Fresh hypotheses are trace work only, not cut permission. The next gate is
+  `collect_trace_for_reviewed_external_seeded_cut_source_hypotheses`.
 
 ## Global Commander Rollout - 2026-07-01
 
