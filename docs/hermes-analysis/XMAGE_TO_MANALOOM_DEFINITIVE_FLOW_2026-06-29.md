@@ -15659,6 +15659,58 @@ unsupported activated abilities, unrelated triggered/static auxiliaries, or
 spell/activated token makers. Those remain blocked under exact reason counts
 and require their own mapper/runtime package.
 
+## PG563 Regenerate Static Keyword New Server Evidence
+
+PG563 evidence:
+
+- candidate split:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260706_pg563_regenerate_static_keyword_candidate.md`
+- package:
+  `docs/hermes-analysis/master_optimizer_reports/pg563_regenerate_static_keyword_new_server_package_package.md`
+- E2E:
+  `docs/hermes-analysis/master_optimizer_reports/pg563_regenerate_static_keyword_new_server_e2e.md`
+- sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg563_regenerate_static_keyword_new_server_sync_report.json`
+- post queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260706_post_pg563_regenerate_static_keyword_new_server.md`
+- post split recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260706_post_pg563_regenerate_static_keyword_recheck.md`
+
+PG563 promoted `22` exact regenerate-source rows on the new server under
+`xmage_permanent_simple_activated_regenerate_source_v1`.
+
+Runtime semantics:
+
+- existing simple activated regenerate-source runtime remains the executor;
+- the splitter now accepts `RegenerateSourceEffect + SimpleActivatedAbility`
+  rows when the only auxiliary abilities are safe static self keywords and the
+  row has no targeting signal;
+- the resulting `effect_json` preserves the source creature keywords so the
+  cast permanent keeps abilities such as defender, first strike, flash,
+  flying, haste, reach, trample, and vigilance while exposing the activated
+  self-regeneration ability.
+
+Validation:
+
+- precheck found `22` target card rows, `0` existing rule rows, and `0` shadow
+  rows to deprecate;
+- apply upserted `22` rows and deprecated `0` shadows;
+- postcheck verified `22/22` promoted rows with `review_status=verified`,
+  `execution_status=auto`, and matching Oracle hash;
+- PG -> Hermes/SQLite sync loaded `9073` PostgreSQL rows, updated `8837`
+  SQLite rows, and exported `6574` canonical snapshot rows;
+- package E2E passed `22` scenarios and `44` battle events, validating PG,
+  SQLite, canonical snapshot, runtime lookup, and regeneration execution;
+- post-PG563 queue moved from `xmage_authoritative_adapter_required_count=25126`
+  to `25104`; split recheck returned `proposal_count=0`.
+
+Residual boundary: PG563 does not authorize regenerate rows with targeted
+activation signals, non-self regeneration, non-keyword auxiliary mechanics
+such as echo, infect, flanking, cascade, morph, bushido, level up, cycling, or
+protection, unsupported Oracle activation costs, or Oracle text that is not an
+exact self-regeneration ability. Those remain blocked under exact reason counts
+and require their own mapper/runtime package.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

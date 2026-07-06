@@ -147,6 +147,49 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_simple_activated_regenerate_source_preserves_static_keywords(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        spirit = {
+            "name": "Fixture Skyguard",
+            "type_line": "Creature - Spirit Knight",
+            "effect": "creature",
+            "power": 2,
+            "toughness": 2,
+            "battle_model_scope": "xmage_permanent_simple_activated_regenerate_source_v1",
+            "activated_effect": "regenerate_source",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_regenerate_source_v1",
+            "target": "self",
+            "target_controller": "self",
+            "target_constraints": {"source": "self", "card_types": ["creature"]},
+            "regenerate_source": True,
+            "activation_cost_mana": "{W}",
+            "activation_cost_generic": 0,
+            "activation_cost_colors": ["W"],
+            "activation_requires_tap": False,
+            "keywords": ["flying", "vigilance"],
+            "_keywords_are_self": True,
+            "flying": True,
+            "vigilance": True,
+        }
+        permanent = self.battle.enrich_card(dict(spirit))
+        permanent["effect"] = "creature"
+        active.battlefield = [permanent]
+        active.mana_pool.add("white", 1)
+
+        self.assertTrue(permanent["flying"])
+        self.assertTrue(self.battle.has_vigilance(permanent))
+        self.assertTrue(self.battle.can_activate_generic_regenerate_source_permanent(active, permanent))
+        self.assertTrue(
+            self.battle.activate_generic_regenerate_source_permanent(
+                active,
+                [active],
+                permanent,
+                turn=9,
+                rng=random.Random(9),
+            )
+        )
+        self.assertEqual(permanent.get("regeneration_shields"), 1)
+
     def test_direct_damage_reports_creature_regenerated_when_shield_replaces_destroy(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

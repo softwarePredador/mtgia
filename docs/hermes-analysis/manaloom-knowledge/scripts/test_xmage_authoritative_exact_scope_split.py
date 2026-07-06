@@ -15313,6 +15313,41 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertFalse(effect["activation_requires_tap"])
         self.assertEqual(effect["_activated_rule_effects"][0]["target"], "self")
 
+    def test_activated_regenerate_source_preserves_static_keywords(self) -> None:
+        row = queue_row(
+            "xmage_signature::RegenerateSourceEffect::FlyingAbility,SimpleActivatedAbility,VigilanceAbility::"
+            "no_target_class::no_condition_class::activated_ability",
+            effect_classes=["RegenerateSourceEffect"],
+            ability_kind="activated",
+            ability_classes=["FlyingAbility", "SimpleActivatedAbility", "VigilanceAbility"],
+            xmage_signals=["activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Skyguard",
+                type_line="Creature - Spirit Knight",
+                oracle_text="Flying, vigilance\n{W}: Regenerate Fixture Skyguard.",
+            ),
+            source_text=(
+                "this.addAbility(FlyingAbility.getInstance());"
+                "this.addAbility(VigilanceAbility.getInstance());"
+                "this.addAbility(new SimpleActivatedAbility("
+                "new RegenerateSourceEffect(), "
+                'new ManaCostsImpl<>("{W}")));'
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.REGENERATE_SOURCE_ACTIVATED_SCOPE)
+        self.assertEqual(effect["keywords"], ["flying", "vigilance"])
+        self.assertTrue(effect["_keywords_are_self"])
+        self.assertTrue(effect["flying"])
+        self.assertTrue(effect["vigilance"])
+        self.assertEqual(effect["_activated_rule_effects"][0]["keywords"], ["flying", "vigilance"])
+        self.assertTrue(effect["_activated_rule_effects"][0]["_keywords_are_self"])
+
     def test_activated_regenerate_source_blocks_non_mana_source_cost(self) -> None:
         row = queue_row(
             "xmage_signature::RegenerateSourceEffect::SimpleActivatedAbility::"

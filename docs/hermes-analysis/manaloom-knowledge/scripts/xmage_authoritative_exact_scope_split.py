@@ -8045,11 +8045,15 @@ def is_permanent_activated_self_keyword_unit(row: dict[str, Any]) -> bool:
 
 
 def is_permanent_activated_regenerate_source_unit(row: dict[str, Any]) -> bool:
+    abilities = ability_classes(row)
+    remaining = abilities - {"SimpleActivatedAbility"}
     return (
-        str(row.get("adapter_work_unit") or "")
-        == "xmage_signature::RegenerateSourceEffect::SimpleActivatedAbility::no_target_class::no_condition_class::activated_ability"
+        str(row.get("adapter_work_unit") or "").startswith(
+            "xmage_signature::RegenerateSourceEffect::"
+        )
         and effect_classes(row) == {"RegenerateSourceEffect"}
-        and ability_classes(row) == {"SimpleActivatedAbility"}
+        and "SimpleActivatedAbility" in abilities
+        and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
         and set(row.get("xmage_signals") or []) == {"activated_ability"}
     )
 
@@ -18569,6 +18573,7 @@ def split_row(
         )
         if source_cost != oracle_cost:
             return None, "activated_regenerate_source_source_oracle_cost_mismatch"
+        keyword_list = ordered_keywords(keywords_from_ability_classes(row))
         activated_effect = {
             "effect": "regenerate_source",
             "battle_model_scope": REGENERATE_SOURCE_ACTIVATED_SCOPE,
@@ -18587,6 +18592,9 @@ def split_row(
             "activation_requires_tap": parsed_activation["activation_requires_tap"],
             "activation_requires_sacrifice": False,
         }
+        if keyword_list:
+            activated_effect["keywords"] = keyword_list
+            activated_effect["_keywords_are_self"] = True
         effect_json = {
             "effect": "creature",
             "battle_model_scope": REGENERATE_SOURCE_ACTIVATED_SCOPE,
@@ -18607,6 +18615,11 @@ def split_row(
             "activation_requires_tap": parsed_activation["activation_requires_tap"],
             "activation_requires_sacrifice": False,
         }
+        if keyword_list:
+            effect_json["keywords"] = keyword_list
+            effect_json["_keywords_are_self"] = True
+            for keyword in keyword_list:
+                effect_json[keyword] = True
         return build_proposal(
             row,
             metadata,
