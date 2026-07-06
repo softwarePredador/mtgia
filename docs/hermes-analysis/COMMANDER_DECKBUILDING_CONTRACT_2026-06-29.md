@@ -202,7 +202,10 @@ Operational priority after this pivot:
    same-lane replacement before candidate copy; then run
    `global_commander_ramp_cut_followup_router.py` to split ramp blockers into
    trace-required, structured-review-required, and replacement-required lanes
-   before any candidate copy, battle, mutation, or promotion can open; if the
+   before any candidate copy, battle, mutation, or promotion can open; then run
+   `global_commander_ramp_cut_trace_replacement_gate.py` to execute natural
+   trace collection, review text-trace candidates, and mine local same-lane
+   ramp replacement seeds without opening candidate copy; if the
    chosen axis is `engine`,
    then run
    `global_commander_engine_axis_nonland_cut_policy_model.py` to apply that
@@ -594,6 +597,7 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_axis_nonland_cut_policy_model_20260706_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_cut_usage_same_lane_proof_scout_20260706_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_cut_followup_router_20260706_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_cut_trace_replacement_gate_20260706_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_engine_cut_usage_same_lane_proof_scout_20260706_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_engine_cut_followup_router_20260706_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_engine_cut_trace_replacement_gate_20260706_current.md`
@@ -1635,6 +1639,15 @@ Current external refresh on 2026-07-05:
   (`pair_ready_count=0`, `no_explicit_same_lane_pair_count=9`), and the next
   gate is
   `run_trace_plan_structured_review_and_replacement_search_before_candidate_copy`.
+- The ramp cut trace/replacement gate then runs `3` natural current-scope
+  replays for five trace-required ramp cuts. `Basalt Monolith`, `Burnt
+  Offering`, and `Cabal Ritual` show target usage and are blocked as cuts;
+  `Culling the Weak` and `Desperate Ritual` are still unexposed and require
+  forced-access trace. `Grim Monolith` remains a structured trace review item,
+  while local replacement mining finds `12` ramp candidates, including `2`
+  same-lane artifact ramp seeds (`Fellwar Stone` and `Commander's Sphere`).
+  Candidate copy, battle gate, mutation, and promotion remain closed; the next
+  gate is `run_forced_access_trace_for_unexposed_ramp_cut`.
 
 ## Global Commander Rollout - 2026-07-01
 

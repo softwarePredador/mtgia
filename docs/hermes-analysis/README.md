@@ -295,6 +295,15 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     estruturado, `3` para busca de corte/substituicao same-lane, todos os `9`
     pares seguem bloqueados, e o proximo gate e
     `run_trace_plan_structured_review_and_replacement_search_before_candidate_copy`.
+    Esse gate agora roda em
+    `manaloom-knowledge/scripts/global_commander_ramp_cut_trace_replacement_gate.py`,
+    com evidencia:
+    `master_optimizer_reports/global_commander_ramp_cut_trace_replacement_gate_20260706_current.md`.
+    Resultado: `3` replays naturais mostram uso de `Basalt Monolith`,
+    `Burnt Offering` e `Cabal Ritual`; `Culling the Weak` e `Desperate Ritual`
+    precisam forced access; `Grim Monolith` precisa review estruturado; os
+    candidatos ramp locais incluem `Fellwar Stone` e `Commander's Sphere`, mas
+    candidate copy segue fechado.
     Historicamente, a politica de `engine` ja foi aplicada em
     `manaloom-knowledge/scripts/global_commander_engine_axis_nonland_cut_policy_model.py`
     com evidencia:
@@ -1084,6 +1093,13 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `trace_plan_count=5`, `structured_review_count=1`,
     `replacement_required_count=3`, mantem `pair_ready_count=0` e roteia para
     `run_trace_plan_structured_review_and_replacement_search_before_candidate_copy`.
+    O gate de trace/replacement fica em
+    `global_commander_ramp_cut_trace_replacement_gate_20260706_current.md`: ele
+    roda `3` replays naturais, encontra uso de `Basalt Monolith`,
+    `Burnt Offering` e `Cabal Ritual`, deixa `Culling the Weak` e
+    `Desperate Ritual` para forced access, mantem `Grim Monolith` em review
+    estruturado e encontra `12` candidatos ramp locais (`2` fortes), ainda sem
+    abrir candidate copy.
     Observacao operacional: snapshots historicos de candidate-copy, battle-probe,
     battle-feedback e package-chain dependem de artefatos locais ignorados. Se
     faltarem ou forem regenerados sem esses artefatos, a auditoria de superficie

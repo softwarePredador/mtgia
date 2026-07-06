@@ -72,6 +72,12 @@ GLOBAL_COMMANDER_RAMP_CUT_FOLLOWUP_ROUTER = (
 GLOBAL_COMMANDER_RAMP_CUT_FOLLOWUP_ROUTER_TEST = (
     SCRIPT_DIR / "test_global_commander_ramp_cut_followup_router.py"
 )
+GLOBAL_COMMANDER_RAMP_CUT_TRACE_REPLACEMENT_GATE = (
+    SCRIPT_DIR / "global_commander_ramp_cut_trace_replacement_gate.py"
+)
+GLOBAL_COMMANDER_RAMP_CUT_TRACE_REPLACEMENT_GATE_TEST = (
+    SCRIPT_DIR / "test_global_commander_ramp_cut_trace_replacement_gate.py"
+)
 GLOBAL_COMMANDER_ENGINE_CUT_USAGE_SAME_LANE_PROOF_SCOUT = (
     SCRIPT_DIR / "global_commander_engine_cut_usage_same_lane_proof_scout.py"
 )
@@ -511,6 +517,10 @@ GLOBAL_COMMANDER_RAMP_CUT_USAGE_SAME_LANE_PROOF_SCOUT_REPORT = (
 GLOBAL_COMMANDER_RAMP_CUT_FOLLOWUP_ROUTER_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_cut_followup_router_20260706_current.md"
+)
+GLOBAL_COMMANDER_RAMP_CUT_TRACE_REPLACEMENT_GATE_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_cut_trace_replacement_gate_20260706_current.md"
 )
 GLOBAL_COMMANDER_ENGINE_CUT_USAGE_SAME_LANE_PROOF_SCOUT_REPORT = (
     REPO_ROOT
@@ -2075,6 +2085,30 @@ def build_audit() -> dict[str, Any]:
                 "trace_required_for_ramp_cuts:Basalt Monolith",
                 "structured_trace_review_required_for_ramp_cuts:Grim Monolith",
                 "replacement_required_for_used_ramp_cuts:Arcane Signet",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_RAMP_CUT_TRACE_REPLACEMENT_GATE,
+            [
+                "global_commander_ramp_cut_trace_replacement_gate",
+                "ramp_cut_trace_replacement_gate_needs_forced_access",
+                "same_lane_ramp_candidate_needs_source_trace_review",
+                "run_forced_access_trace_for_unexposed_ramp_cut",
+                "candidate_copy_closed_after_ramp_trace_replacement_gate",
+                "battle_replay_performed",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_RAMP_CUT_TRACE_REPLACEMENT_GATE_TEST,
+            [
+                "test_replacement_candidates_filter_color_and_current_deck",
+                "Talisman of Conviction",
+                "Smothering Tithe",
+                "candidate_copy_closed_after_ramp_trace_replacement_gate",
             ],
         )
     )
@@ -4042,6 +4076,27 @@ def build_audit() -> dict[str, Any]:
                 "no_explicit_same_lane_pair_count: `9`",
                 "run_trace_plan_structured_review_and_replacement_search_before_candidate_copy",
                 "replacement_required_for_used_ramp_cuts:Arcane Signet",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_RAMP_CUT_TRACE_REPLACEMENT_GATE_REPORT,
+            [
+                "Global Commander Ramp Cut Trace Replacement Gate",
+                "ramp_cut_trace_replacement_gate_needs_forced_access",
+                "trace_card_count: `5`",
+                "generated_replay_count: `3`",
+                "trace_no_exposure_count: `2`",
+                "trace_usage_observed_count: `3`",
+                "structured_manual_review_count: `1`",
+                "replacement_candidate_count: `12`",
+                "strong_replacement_candidate_count: `2`",
+                "candidate_copy_allowed_now: `false`",
+                "battle_replay_performed: `true`",
+                "run_forced_access_trace_for_unexposed_ramp_cut",
+                "Fellwar Stone",
+                "Commander's Sphere",
             ],
         )
     )

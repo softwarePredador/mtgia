@@ -1,0 +1,549 @@
+{
+  "artifact_type": "global_commander_ramp_cut_trace_replacement_gate",
+  "battle_gate_allowed_now": false,
+  "battle_gate_performed": false,
+  "battle_or_optimization_performed": false,
+  "battle_replay_performed": true,
+  "candidate_copy_allowed_now": false,
+  "candidate_copy_blockers": [
+    "natural_trace_no_target_exposure_needs_force_access:Culling the Weak,Desperate Ritual",
+    "natural_trace_usage_observed_blocks_cut:Basalt Monolith,Burnt Offering,Cabal Ritual",
+    "structured_trace_manual_review_required:Grim Monolith",
+    "replacement_candidates_require_source_trace_review",
+    "candidate_copy_closed_after_ramp_trace_replacement_gate"
+  ],
+  "commander": "Kaalia of the Vast",
+  "deck_action_allowed": false,
+  "deck_id": "619",
+  "generated_at": "2026-07-06T05:46:44.391086+00:00",
+  "input_artifacts": {
+    "battle_replay": "docs/hermes-analysis/manaloom-knowledge/scripts/battle_replay_v10_3.py",
+    "ramp_policy_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_axis_nonland_cut_policy_model_20260706_current.json",
+    "replay_dir": "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_cut_trace_replays_20260706_current",
+    "router_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_cut_followup_router_20260706_current.json",
+    "scout_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_cut_usage_same_lane_proof_scout_20260706_current.json",
+    "source_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db"
+  },
+  "mutation_allowed": false,
+  "policy": {
+    "mutation_boundary": "This gate reads SQLite and writes report artifacts only.",
+    "natural_trace_boundary": "Natural replay trace is evidence collection only, not a promotion battle gate.",
+    "replacement_boundary": "Local staple/oracle ramp candidates are review seeds, not explicit same-lane proof by themselves.",
+    "same_lane_boundary": "A replacement for a used ramp cut still needs source and trace review before candidate copy.",
+    "structured_trace_boundary": "Text trace candidates require manual structured review before negative clearance."
+  },
+  "postgres_writes": false,
+  "promotion_allowed": false,
+  "replacement_candidate_rows": [
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Evolving Wilds",
+      "color_identity": [],
+      "edhrec_rank": 16,
+      "mutation_allowed": false,
+      "oracle_excerpt": "{T}, Sacrifice this land: Search your library for a basic land card, put it onto the battlefield tapped, then shuffle.",
+      "role_signals": [
+        "land_search_ramp"
+      ],
+      "status": "adjacent_ramp_candidate_needs_explicit_same_lane_proof",
+      "type_line": "Land"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Fellwar Stone",
+      "color_identity": [],
+      "edhrec_rank": 18,
+      "mutation_allowed": false,
+      "oracle_excerpt": "{T}: Add one mana of any color that a land an opponent controls could produce.",
+      "role_signals": [
+        "mana_production",
+        "ramp_role_text"
+      ],
+      "status": "same_lane_ramp_candidate_needs_source_trace_review",
+      "type_line": "Artifact"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Thought Vessel",
+      "color_identity": [],
+      "edhrec_rank": 21,
+      "mutation_allowed": false,
+      "oracle_excerpt": "You have no maximum hand size. {T}: Add {C}.",
+      "role_signals": [
+        "ramp_role_text"
+      ],
+      "status": "adjacent_ramp_candidate_needs_explicit_same_lane_proof",
+      "type_line": "Artifact"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Myriad Landscape",
+      "color_identity": [],
+      "edhrec_rank": 24,
+      "mutation_allowed": false,
+      "oracle_excerpt": "This land enters tapped. {T}: Add {C}. {2}, {T}, Sacrifice this land: Search your library for up to two basic land cards that share a land type, put them onto the battlefield tapped, then shuffle.",
+      "role_signals": [
+        "land_search_ramp"
+      ],
+      "status": "adjacent_ramp_candidate_needs_explicit_same_lane_proof",
+      "type_line": "Land"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Terramorphic Expanse",
+      "color_identity": [],
+      "edhrec_rank": 28,
+      "mutation_allowed": false,
+      "oracle_excerpt": "{T}, Sacrifice this land: Search your library for a basic land card, put it onto the battlefield tapped, then shuffle.",
+      "role_signals": [
+        "land_search_ramp"
+      ],
+      "status": "adjacent_ramp_candidate_needs_explicit_same_lane_proof",
+      "type_line": "Land"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Mind Stone",
+      "color_identity": [],
+      "edhrec_rank": 31,
+      "mutation_allowed": false,
+      "oracle_excerpt": "{T}: Add {C}. {1}, {T}, Sacrifice this artifact: Draw a card.",
+      "role_signals": [
+        "ramp_role_text"
+      ],
+      "status": "adjacent_ramp_candidate_needs_explicit_same_lane_proof",
+      "type_line": "Artifact"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Solemn Simulacrum",
+      "color_identity": [],
+      "edhrec_rank": 34,
+      "mutation_allowed": false,
+      "oracle_excerpt": "When this creature enters, you may search your library for a basic land card, put that card onto the battlefield tapped, then shuffle. When this creature dies, you may draw a card.",
+      "role_signals": [
+        "land_search_ramp"
+      ],
+      "status": "adjacent_ramp_candidate_needs_explicit_same_lane_proof",
+      "type_line": "Artifact Creature \u2014 Golem"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Polluted Delta",
+      "color_identity": [],
+      "edhrec_rank": 38,
+      "mutation_allowed": false,
+      "oracle_excerpt": "{T}, Pay 1 life, Sacrifice this land: Search your library for an Island or Swamp card, put it onto the battlefield, then shuffle.",
+      "role_signals": [
+        "land_search_ramp"
+      ],
+      "status": "adjacent_ramp_candidate_needs_explicit_same_lane_proof",
+      "type_line": "Land"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Commander's Sphere",
+      "color_identity": [],
+      "edhrec_rank": 39,
+      "mutation_allowed": false,
+      "oracle_excerpt": "{T}: Add one mana of any color in your commander's color identity. Sacrifice this artifact: Draw a card.",
+      "role_signals": [
+        "mana_production",
+        "ramp_role_text"
+      ],
+      "status": "same_lane_ramp_candidate_needs_source_trace_review",
+      "type_line": "Artifact"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Misty Rainforest",
+      "color_identity": [],
+      "edhrec_rank": 41,
+      "mutation_allowed": false,
+      "oracle_excerpt": "{T}, Pay 1 life, Sacrifice this land: Search your library for a Forest or Island card, put it onto the battlefield, then shuffle.",
+      "role_signals": [
+        "land_search_ramp"
+      ],
+      "status": "adjacent_ramp_candidate_needs_explicit_same_lane_proof",
+      "type_line": "Land"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Flooded Strand",
+      "color_identity": [],
+      "edhrec_rank": 42,
+      "mutation_allowed": false,
+      "oracle_excerpt": "{T}, Pay 1 life, Sacrifice this land: Search your library for a Plains or Island card, put it onto the battlefield, then shuffle.",
+      "role_signals": [
+        "land_search_ramp"
+      ],
+      "status": "adjacent_ramp_candidate_needs_explicit_same_lane_proof",
+      "type_line": "Land"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Windswept Heath",
+      "color_identity": [],
+      "edhrec_rank": 46,
+      "mutation_allowed": false,
+      "oracle_excerpt": "{T}, Pay 1 life, Sacrifice this land: Search your library for a Forest or Plains card, put it onto the battlefield, then shuffle.",
+      "role_signals": [
+        "land_search_ramp"
+      ],
+      "status": "adjacent_ramp_candidate_needs_explicit_same_lane_proof",
+      "type_line": "Land"
+    }
+  ],
+  "replacement_reviews": [
+    {
+      "adjacent_candidate_count": 10,
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_sample": [
+        {
+          "battle_gate_allowed": false,
+          "candidate_copy_allowed": false,
+          "card_name": "Fellwar Stone",
+          "color_identity": [],
+          "edhrec_rank": 18,
+          "mutation_allowed": false,
+          "oracle_excerpt": "{T}: Add one mana of any color that a land an opponent controls could produce.",
+          "role_signals": [
+            "mana_production",
+            "ramp_role_text"
+          ],
+          "status": "same_lane_ramp_candidate_needs_source_trace_review",
+          "type_line": "Artifact"
+        },
+        {
+          "battle_gate_allowed": false,
+          "candidate_copy_allowed": false,
+          "card_name": "Commander's Sphere",
+          "color_identity": [],
+          "edhrec_rank": 39,
+          "mutation_allowed": false,
+          "oracle_excerpt": "{T}: Add one mana of any color in your commander's color identity. Sacrifice this artifact: Draw a card.",
+          "role_signals": [
+            "mana_production",
+            "ramp_role_text"
+          ],
+          "status": "same_lane_ramp_candidate_needs_source_trace_review",
+          "type_line": "Artifact"
+        }
+      ],
+      "cut_card": "Arcane Signet",
+      "mutation_allowed": false,
+      "next_gate": "review_ramp_replacement_candidates_before_candidate_copy",
+      "required_replacement_roles": [
+        "ramp"
+      ],
+      "status": "ramp_replacement_candidates_found_needs_source_trace_review",
+      "strong_candidate_count": 2
+    },
+    {
+      "adjacent_candidate_count": 10,
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_sample": [
+        {
+          "battle_gate_allowed": false,
+          "candidate_copy_allowed": false,
+          "card_name": "Fellwar Stone",
+          "color_identity": [],
+          "edhrec_rank": 18,
+          "mutation_allowed": false,
+          "oracle_excerpt": "{T}: Add one mana of any color that a land an opponent controls could produce.",
+          "role_signals": [
+            "mana_production",
+            "ramp_role_text"
+          ],
+          "status": "same_lane_ramp_candidate_needs_source_trace_review",
+          "type_line": "Artifact"
+        },
+        {
+          "battle_gate_allowed": false,
+          "candidate_copy_allowed": false,
+          "card_name": "Commander's Sphere",
+          "color_identity": [],
+          "edhrec_rank": 39,
+          "mutation_allowed": false,
+          "oracle_excerpt": "{T}: Add one mana of any color in your commander's color identity. Sacrifice this artifact: Draw a card.",
+          "role_signals": [
+            "mana_production",
+            "ramp_role_text"
+          ],
+          "status": "same_lane_ramp_candidate_needs_source_trace_review",
+          "type_line": "Artifact"
+        }
+      ],
+      "cut_card": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+      "mutation_allowed": false,
+      "next_gate": "review_ramp_replacement_candidates_before_candidate_copy",
+      "required_replacement_roles": [
+        "engine",
+        "ramp"
+      ],
+      "status": "ramp_replacement_candidates_found_needs_source_trace_review",
+      "strong_candidate_count": 2
+    },
+    {
+      "adjacent_candidate_count": 10,
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_sample": [
+        {
+          "battle_gate_allowed": false,
+          "candidate_copy_allowed": false,
+          "card_name": "Fellwar Stone",
+          "color_identity": [],
+          "edhrec_rank": 18,
+          "mutation_allowed": false,
+          "oracle_excerpt": "{T}: Add one mana of any color that a land an opponent controls could produce.",
+          "role_signals": [
+            "mana_production",
+            "ramp_role_text"
+          ],
+          "status": "same_lane_ramp_candidate_needs_source_trace_review",
+          "type_line": "Artifact"
+        },
+        {
+          "battle_gate_allowed": false,
+          "candidate_copy_allowed": false,
+          "card_name": "Commander's Sphere",
+          "color_identity": [],
+          "edhrec_rank": 39,
+          "mutation_allowed": false,
+          "oracle_excerpt": "{T}: Add one mana of any color in your commander's color identity. Sacrifice this artifact: Draw a card.",
+          "role_signals": [
+            "mana_production",
+            "ramp_role_text"
+          ],
+          "status": "same_lane_ramp_candidate_needs_source_trace_review",
+          "type_line": "Artifact"
+        }
+      ],
+      "cut_card": "Dark Ritual",
+      "mutation_allowed": false,
+      "next_gate": "review_ramp_replacement_candidates_before_candidate_copy",
+      "required_replacement_roles": [
+        "ramp"
+      ],
+      "status": "ramp_replacement_candidates_found_needs_source_trace_review",
+      "strong_candidate_count": 2
+    }
+  ],
+  "seed_rows": [
+    {
+      "decision_count": 124,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_cut_trace_replays_20260706_current/replay_seed_90.decision_trace.jsonl",
+      "event_count": 876,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_cut_trace_replays_20260706_current/replay_seed_90.events.jsonl",
+      "provenance_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_cut_trace_replays_20260706_current/deck_provenance_seed_90.json",
+      "replay_txt": "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_cut_trace_replays_20260706_current/replay_seed_90.txt",
+      "returncode": 0,
+      "seed": 90,
+      "status": "ramp_cut_natural_replay_generated"
+    },
+    {
+      "decision_count": 184,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_cut_trace_replays_20260706_current/replay_seed_91.decision_trace.jsonl",
+      "event_count": 1241,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_cut_trace_replays_20260706_current/replay_seed_91.events.jsonl",
+      "provenance_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_cut_trace_replays_20260706_current/deck_provenance_seed_91.json",
+      "replay_txt": "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_cut_trace_replays_20260706_current/replay_seed_91.txt",
+      "returncode": 0,
+      "seed": 91,
+      "status": "ramp_cut_natural_replay_generated"
+    },
+    {
+      "decision_count": 123,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_cut_trace_replays_20260706_current/replay_seed_92.decision_trace.jsonl",
+      "event_count": 827,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_cut_trace_replays_20260706_current/replay_seed_92.events.jsonl",
+      "provenance_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_cut_trace_replays_20260706_current/deck_provenance_seed_92.json",
+      "replay_txt": "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_cut_trace_replays_20260706_current/replay_seed_92.txt",
+      "returncode": 0,
+      "seed": 92,
+      "status": "ramp_cut_natural_replay_generated"
+    }
+  ],
+  "source_db_mutated": false,
+  "status": "ramp_cut_trace_replacement_gate_needs_forced_access",
+  "structured_review_rows": [
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Grim Monolith",
+      "mutation_allowed": false,
+      "next_gate": "manual_structured_trace_review_for_ramp_cut_before_candidate_copy",
+      "status": "ramp_cut_text_trace_candidate_requires_manual_structured_review",
+      "structured_evidence_count": 2,
+      "text_usage_candidate_count": 2
+    }
+  ],
+  "summary": {
+    "adjacent_replacement_candidate_count": 10,
+    "candidate_copy_blocker_count": 5,
+    "generated_replay_count": 3,
+    "next_gate": "run_forced_access_trace_for_unexposed_ramp_cut",
+    "replacement_candidate_count": 12,
+    "replacement_review_count": 3,
+    "seed_count": 3,
+    "strong_replacement_candidate_count": 2,
+    "structured_manual_review_count": 1,
+    "structured_review_card_count": 1,
+    "trace_card_count": 5,
+    "trace_manual_review_count": 0,
+    "trace_no_exposure_count": 2,
+    "trace_usage_observed_count": 3
+  },
+  "trace_review_rows": [
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Basalt Monolith",
+      "decision_trace_count": 2,
+      "event_types": {
+        "cast_announced": 1,
+        "cost_paid": 1,
+        "focus_card_access_snapshot": 24,
+        "land_played": 1,
+        "spell_cast": 1,
+        "turn_end": 8
+      },
+      "exposure_event_count": 8,
+      "first_decision_trace": {
+        "event": "cast_spell",
+        "player": "Kaalia of the Vast",
+        "turn": 5
+      },
+      "first_exposure_event": {
+        "event": "turn_end",
+        "player": "Kaalia of the Vast",
+        "turn": 5
+      },
+      "first_usage_event": {
+        "card": "Basalt Monolith",
+        "event": "cast_announced",
+        "player": "Kaalia of the Vast",
+        "turn": 5
+      },
+      "mutation_allowed": false,
+      "next_gate": "find_different_ramp_cut_or_same_lane_replacement_before_candidate_copy",
+      "status": "ramp_cut_natural_trace_usage_observed_blocks_cut",
+      "usage_event_count": 3
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Burnt Offering",
+      "decision_trace_count": 7,
+      "event_types": {
+        "additional_cost_paid": 1,
+        "end_step_instant": 1,
+        "permanent_moved_from_battlefield": 1,
+        "ritual_mana_added": 1,
+        "spell_resolved": 1,
+        "turn_end": 3,
+        "turn_start": 3
+      },
+      "exposure_event_count": 6,
+      "first_decision_trace": {
+        "event": "mulligan_decision",
+        "player": "Kaalia of the Vast",
+        "turn": 0
+      },
+      "first_exposure_event": {
+        "event": "turn_start",
+        "player": "Kaalia of the Vast",
+        "turn": 1
+      },
+      "first_usage_event": {
+        "card": "Burnt Offering",
+        "event": "spell_resolved",
+        "player": "Kaalia of the Vast",
+        "turn": 3
+      },
+      "mutation_allowed": false,
+      "next_gate": "find_different_ramp_cut_or_same_lane_replacement_before_candidate_copy",
+      "status": "ramp_cut_natural_trace_usage_observed_blocks_cut",
+      "usage_event_count": 1
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Cabal Ritual",
+      "decision_trace_count": 5,
+      "event_types": {
+        "cast_announced": 1,
+        "cost_paid": 1,
+        "spell_cast": 1,
+        "turn_end": 1,
+        "turn_start": 2
+      },
+      "exposure_event_count": 3,
+      "first_decision_trace": {
+        "event": "mulligan_decision",
+        "player": "Kaalia of the Vast",
+        "turn": 0
+      },
+      "first_exposure_event": {
+        "event": "turn_start",
+        "player": "Kaalia of the Vast",
+        "turn": 1
+      },
+      "first_usage_event": {
+        "card": "Cabal Ritual",
+        "event": "cast_announced",
+        "player": "Kaalia of the Vast",
+        "turn": 2
+      },
+      "mutation_allowed": false,
+      "next_gate": "find_different_ramp_cut_or_same_lane_replacement_before_candidate_copy",
+      "status": "ramp_cut_natural_trace_usage_observed_blocks_cut",
+      "usage_event_count": 3
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Culling the Weak",
+      "decision_trace_count": 0,
+      "event_types": {},
+      "exposure_event_count": 0,
+      "first_decision_trace": null,
+      "first_exposure_event": null,
+      "first_usage_event": null,
+      "mutation_allowed": false,
+      "next_gate": "run_forced_access_trace_for_unexposed_ramp_cut",
+      "status": "ramp_cut_natural_trace_no_target_exposure_needs_force_access",
+      "usage_event_count": 0
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Desperate Ritual",
+      "decision_trace_count": 0,
+      "event_types": {},
+      "exposure_event_count": 0,
+      "first_decision_trace": null,
+      "first_exposure_event": null,
+      "first_usage_event": null,
+      "mutation_allowed": false,
+      "next_gate": "run_forced_access_trace_for_unexposed_ramp_cut",
+      "status": "ramp_cut_natural_trace_no_target_exposure_needs_force_access",
+      "usage_event_count": 0
+    }
+  ]
+}
