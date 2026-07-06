@@ -8634,6 +8634,8 @@ CARD_EFFECT_FIELD_RULE_KEYS = (
     "counter_target_mana_value_min",
     "draw_on_counter",
     "life_gain_on_counter",
+    "scry_on_counter",
+    "scry_count",
     "counter_unless_pays_generic",
     "countered_spell_to_top_library",
     "countered_spell_to_exile",
@@ -10114,6 +10116,23 @@ class Player:
         if life_gain_on_counter:
             gain_life(self, life_gain_on_counter, cap=999)
         life_after = int(getattr(self, "life", life_before) or 0)
+        scry_on_counter = int(effect.get("scry_on_counter") or 0) if not counter_tax_paid else 0
+        scry_result = None
+        if scry_on_counter:
+            scry_result = scry_library_for_controller(self, scry_on_counter)
+            emit_replay_event(
+                "scry_resolved",
+                player=self.name,
+                card=counter.get("name", "?"),
+                scry_count=scry_on_counter,
+                looked_at=scry_result["looked_at"],
+                kept_on_top=scry_result["kept_on_top"],
+                bottomed=scry_result["bottomed"],
+                top_after=scry_result["top_after"],
+                turn=turn,
+                phase=phase,
+                **replay_rule_fields(effect),
+            )
         countered_to_top = bool(effect.get("countered_spell_to_top_library")) and not counter_tax_paid
         if countered_to_top and isinstance(target_card, dict):
             target_card["_countered_to_top_library"] = True
@@ -10162,6 +10181,11 @@ class Player:
             life_before=life_before,
             life_after=life_after,
             life_gained=max(0, life_after - life_before),
+            scry_on_counter=scry_on_counter,
+            scry_looked_at=(scry_result or {}).get("looked_at", []),
+            scry_kept_on_top=(scry_result or {}).get("kept_on_top", []),
+            scry_bottomed=(scry_result or {}).get("bottomed", []),
+            scry_top_after=(scry_result or {}).get("top_after", []),
             turn=turn,
             **replay_rule_fields(effect),
         )

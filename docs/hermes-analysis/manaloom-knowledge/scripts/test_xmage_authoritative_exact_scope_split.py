@@ -11264,6 +11264,71 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             ["counter", "draw_cards"],
         )
 
+    def test_counter_scry_spell_maps_to_counter_runtime_with_scry_on_counter(self) -> None:
+        row = queue_row(
+            split.COUNTER_UNIT,
+            effect_classes=["CounterTargetEffect", "ScryEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Dissolve",
+                oracle_text=(
+                    "Counter target spell. Scry 1. "
+                    "(Look at the top card of your library. You may put that card on the bottom.)"
+                ),
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new CounterTargetEffect());"
+                "this.getSpellAbility().addTarget(new TargetSpell());"
+                "this.getSpellAbility().addEffect(new ScryEffect(1));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "counter")
+        self.assertEqual(effect["battle_model_scope"], split.COUNTER_SCRY_SCOPE)
+        self.assertEqual(effect["target"], "spell")
+        self.assertEqual(effect["scry_on_counter"], 1)
+        self.assertEqual(effect["resolution_order"], "counter_then_scry")
+        self.assertEqual(
+            effect["target_constraints"],
+            {"zone": "stack", "stack_object": "spell"},
+        )
+        self.assertEqual(
+            [component["effect"] for component in effect["_composite_rule_components"]],
+            ["counter", "scry"],
+        )
+
+    def test_counter_scry_spell_blocks_scry_from_separate_trigger(self) -> None:
+        row = queue_row(
+            split.COUNTER_UNIT,
+            effect_classes=["CounterTargetEffect", "ScryEffect"],
+            ability_classes=["AttacksOrBlocksTriggeredAbility", "FlyingAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Sapphire Dragon // Psionic Pulse",
+                type_line="Creature - Dragon",
+                oracle_text=(
+                    "Flying\n"
+                    "Whenever this creature attacks or blocks, scry 2."
+                ),
+            ),
+            source_text=(
+                "this.addAbility(FlyingAbility.getInstance());"
+                "this.addAbility(new AttacksOrBlocksTriggeredAbility(new ScryEffect(2), false));"
+                "this.getSpellCard().getSpellAbility().addEffect(new CounterTargetEffect());"
+                "this.getSpellCard().getSpellAbility().addTarget("
+                "new TargetSpell(StaticFilters.FILTER_SPELL_NON_CREATURE));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "not_instant_or_sorcery_spell")
+
     def test_counter_gain_life_spell_maps_to_counter_runtime_with_life_gain(self) -> None:
         row = queue_row(
             split.LIFE_UNIT,

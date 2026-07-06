@@ -11089,6 +11089,89 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_counter_scry_scope_is_stack_response_and_scries_on_counter(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        responder = self.battle.Player(
+            "Responder",
+            None,
+            [
+                {"name": "Top Card", "type_line": "Instant", "cmc": 2},
+                {"name": "Second Card", "type_line": "Sorcery", "cmc": 5},
+            ],
+        )
+        responder.mana_pool.add_generic(1)
+        responder.mana_pool.add("blue", 2)
+        counter = {
+            "name": "Fixture Dissolve",
+            "type_line": "Instant",
+            "mana_cost": "{1}{U}{U}",
+            "cmc": 3,
+            "effect": "counter",
+            "battle_model_scope": "xmage_counter_target_and_scry_spell_v1",
+            "target": "spell",
+            "target_constraints": {"zone": "stack", "stack_object": "spell"},
+            "scry_on_counter": 1,
+            "scry_count": 1,
+            "_composite_rule_components": [
+                {
+                    "effect": "counter",
+                    "battle_model_scope": "xmage_counter_target_spell_v1",
+                    "target": "spell",
+                    "target_constraints": {"zone": "stack", "stack_object": "spell"},
+                },
+                {
+                    "effect": "scry",
+                    "battle_model_scope": "xmage_fixed_scry_spell_v1",
+                    "count": 1,
+                    "scry_count": 1,
+                    "compose_on_resolution": True,
+                },
+            ],
+            "instant": True,
+        }
+        responder.hand.append(counter)
+        target_spell = {
+            "name": "Target Threat",
+            "type_line": "Creature - Dragon",
+            "cmc": 7,
+            "effect": "finisher",
+        }
+        stack = self.battle.Stack()
+        stack.push(target_spell, active, {"effect": "finisher"})
+
+        self.assertTrue(
+            self.battle.priority_round(
+                active,
+                [active, responder],
+                stack,
+                turn=8,
+                rng=random.Random(8),
+                phase="precombat_main",
+            )
+        )
+
+        self.assertTrue(stack.items[-1].countered)
+        self.assertEqual([card["name"] for card in responder.graveyard], ["Fixture Dissolve"])
+        self.assertTrue(
+            any(
+                event == "scry_resolved"
+                and data.get("card") == "Fixture Dissolve"
+                and data.get("scry_count") == 1
+                and data.get("looked_at") == ["Top Card"]
+                for event, data in self.events
+            )
+        )
+        self.assertTrue(
+            any(
+                event == "spell_countered"
+                and data.get("counter") == "Fixture Dissolve"
+                and data.get("target") == "Target Threat"
+                and data.get("scry_on_counter") == 1
+                and data.get("scry_looked_at") == ["Top Card"]
+                for event, data in self.events
+            )
+        )
+
     def test_counter_gain_life_scope_is_stack_response_and_gains_life_on_counter(self) -> None:
         active = self.battle.Player("Active", None, [])
         responder = self.battle.Player("Responder", None, [])

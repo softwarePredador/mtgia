@@ -1,0 +1,238 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg566_counter_scry_new_server_20260706_122555",
+  "deploy_id": "pg566",
+  "execution_scenarios": [],
+  "expected_rules": [
+    {
+      "card_name": "Dissolve",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a61c2c90b84909502678d7b4354757b0",
+      "min_rule_version": 2,
+      "normalized_name": "dissolve",
+      "oracle_hash": "377dd830df6bd5396319ae9608195d1a",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_counter_target_spell_v1",
+            "effect": "counter",
+            "target": "spell",
+            "target_constraints": {
+              "stack_object": "spell",
+              "zone": "stack"
+            },
+            "xmage_effect_class": "CounterTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_scry_spell_v1",
+            "compose_on_resolution": true,
+            "count": 1,
+            "effect": "scry",
+            "scry_count": 1,
+            "xmage_effect_class": "ScryEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_counter_target_and_scry_spell_v1",
+        "effect": "counter",
+        "resolution_order": "counter_then_scry",
+        "scry_count": 1,
+        "target": "spell",
+        "target_constraints": {
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_classes": [
+          "CounterTargetEffect",
+          "ScryEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Memory Drain",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:268bfd4d14bad89ebe8c9432d7082e3d",
+      "min_rule_version": 2,
+      "normalized_name": "memory drain",
+      "oracle_hash": "89f9fe3458e018f0e66f9b3feb9711dd",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_counter_target_spell_v1",
+            "effect": "counter",
+            "target": "spell",
+            "target_constraints": {
+              "stack_object": "spell",
+              "zone": "stack"
+            },
+            "xmage_effect_class": "CounterTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_scry_spell_v1",
+            "compose_on_resolution": true,
+            "count": 2,
+            "effect": "scry",
+            "scry_count": 2,
+            "xmage_effect_class": "ScryEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_counter_target_and_scry_spell_v1",
+        "effect": "counter",
+        "resolution_order": "counter_then_scry",
+        "scry_count": 2,
+        "target": "spell",
+        "target_constraints": {
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_classes": [
+          "CounterTargetEffect",
+          "ScryEffect"
+        ]
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_counter_target_scry_spell": 2
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg566_counter_scry_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg566_counter_scry_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg566_counter_scry_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg566_counter_scry_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg566_counter_scry_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg566_counter_scry_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-06T12:25:55+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Dissolve"
+      },
+      "card_name": "Dissolve",
+      "effect": "counter",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a61c2c90b84909502678d7b4354757b0",
+      "normalized_name": "dissolve",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_counter_target_spell_v1",
+            "effect": "counter",
+            "target": "spell",
+            "target_constraints": {
+              "stack_object": "spell",
+              "zone": "stack"
+            },
+            "xmage_effect_class": "CounterTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_scry_spell_v1",
+            "compose_on_resolution": true,
+            "count": 1,
+            "effect": "scry",
+            "scry_count": 1,
+            "xmage_effect_class": "ScryEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_counter_target_and_scry_spell_v1",
+        "effect": "counter",
+        "resolution_order": "counter_then_scry",
+        "scry_count": 1,
+        "target": "spell",
+        "target_constraints": {
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_classes": [
+          "CounterTargetEffect",
+          "ScryEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Memory Drain"
+      },
+      "card_name": "Memory Drain",
+      "effect": "counter",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:268bfd4d14bad89ebe8c9432d7082e3d",
+      "normalized_name": "memory drain",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_counter_target_spell_v1",
+            "effect": "counter",
+            "target": "spell",
+            "target_constraints": {
+              "stack_object": "spell",
+              "zone": "stack"
+            },
+            "xmage_effect_class": "CounterTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_scry_spell_v1",
+            "compose_on_resolution": true,
+            "count": 2,
+            "effect": "scry",
+            "scry_count": 2,
+            "xmage_effect_class": "ScryEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_counter_target_and_scry_spell_v1",
+        "effect": "counter",
+        "resolution_order": "counter_then_scry",
+        "scry_count": 2,
+        "target": "spell",
+        "target_constraints": {
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_classes": [
+          "CounterTargetEffect",
+          "ScryEffect"
+        ]
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Dissolve",
+    "Memory Drain"
+  ],
+  "selected_count": 2,
+  "slug": "counter_scry_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Dissolve",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a61c2c90b84909502678d7b4354757b0",
+      "min_rule_version": 2,
+      "normalized_name": "dissolve",
+      "oracle_hash": "377dd830df6bd5396319ae9608195d1a",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_and_scry_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Memory Drain",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:268bfd4d14bad89ebe8c9432d7082e3d",
+      "min_rule_version": 2,
+      "normalized_name": "memory drain",
+      "oracle_hash": "89f9fe3458e018f0e66f9b3feb9711dd",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_and_scry_spell_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

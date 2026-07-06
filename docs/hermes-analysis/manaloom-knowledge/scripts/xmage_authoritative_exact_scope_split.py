@@ -209,6 +209,7 @@ SELF_SACRIFICE_MANA_SOURCE_SCOPE = "xmage_self_sacrifice_mana_source_permanent_v
 TAP_AND_SELF_SACRIFICE_MANA_SOURCE_SCOPE = "xmage_tap_and_self_sacrifice_mana_source_permanent_v1"
 COUNTER_SCOPE = "xmage_counter_target_spell_v1"
 COUNTER_DRAW_SCOPE = "xmage_counter_target_and_draw_card_spell_v1"
+COUNTER_SCRY_SCOPE = "xmage_counter_target_and_scry_spell_v1"
 COUNTER_GAIN_LIFE_SCOPE = "xmage_counter_target_and_controller_gain_life_spell_v1"
 COUNTER_UNLESS_PAYS_SCOPE = "xmage_counter_target_spell_unless_controller_pays_generic_v1"
 BOUNCE_SCOPE = "xmage_return_target_to_hand_spell_v1"
@@ -2895,6 +2896,32 @@ def counter_draw_target_from_oracle(metadata: dict[str, Any]) -> str | None:
     if not text.endswith(" draw a card."):
         return None
     return counter_target_from_oracle({"oracle_text": text.removesuffix(" draw a card.").strip()})
+
+
+def fixed_counter_scry_from_oracle(metadata: dict[str, Any]) -> tuple[str, int] | None:
+    text = strip_parenthetical_reminders(oracle_text(metadata))
+    text = re.sub(r"\s+", " ", text).strip()
+    match = re.match(r"^(?P<counter>counter target .+?)\. scry (?P<scry>\d+)\.?$", text)
+    if not match:
+        return None
+    target = counter_target_from_oracle({"oracle_text": match.group("counter")})
+    if target is None:
+        return None
+    return target, int(match.group("scry"))
+
+
+def fixed_counter_scry_from_source(source_text: str) -> tuple[str, int] | None:
+    text = str(source_text or "")
+    counter_matches = list(re.finditer(r"new\s+CounterTargetEffect\s*\(", text))
+    scry_match = fixed_scry_count_match_from_source(text)
+    if len(counter_matches) != 1 or scry_match is None:
+        return None
+    scry_count, scry_index = scry_match
+    if counter_matches[0].start() > scry_index:
+        return None
+    if not re.search(r"new\s+TargetSpell\s*\(\s*\)", text):
+        return None
+    return "spell", scry_count
 
 
 def fixed_counter_gain_life_from_oracle(metadata: dict[str, Any]) -> tuple[str, int] | None:
@@ -23348,6 +23375,53 @@ def split_row(
         ), "selected_exact_scope"
 
     if unit == COUNTER_UNIT:
+        if classes == {"CounterTargetEffect", "ScryEffect"}:
+            unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+            if unsupported_abilities:
+                return None, "counter_scry_ability_class_not_simple"
+            oracle_counter_scry = fixed_counter_scry_from_oracle(metadata)
+            if oracle_counter_scry is None:
+                return None, "counter_scry_oracle_not_exact_fixed"
+            source_counter_scry = fixed_counter_scry_from_source(source_text)
+            if source_counter_scry is None:
+                return None, "counter_scry_source_not_fixed"
+            target, scry_count = oracle_counter_scry
+            if source_counter_scry != (target, scry_count):
+                return None, "counter_scry_source_oracle_mismatch"
+            counter_component = {
+                "effect": "counter",
+                "battle_model_scope": COUNTER_SCOPE,
+                "target": target,
+                "target_constraints": counter_target_constraints_for(target),
+                "xmage_effect_class": "CounterTargetEffect",
+            }
+            scry_component = {
+                "effect": "scry",
+                "battle_model_scope": SCRY_SCOPE,
+                "count": scry_count,
+                "scry_count": scry_count,
+                "compose_on_resolution": True,
+                "xmage_effect_class": "ScryEffect",
+            }
+            effect_json = {
+                "effect": "counter",
+                "battle_model_scope": COUNTER_SCRY_SCOPE,
+                "target": target,
+                "target_constraints": counter_target_constraints_for(target),
+                "scry_on_counter": scry_count,
+                "scry_count": scry_count,
+                "resolution_order": "counter_then_scry",
+                "_composite_rule_components": [counter_component, scry_component],
+                "xmage_effect_classes": ["CounterTargetEffect", "ScryEffect"],
+                **flags,
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_counter_target_scry_spell",
+            ), "selected_exact_scope"
+
         if classes != {"CounterTargetEffect"}:
             return None, "counter_effect_class_not_pure"
         unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES

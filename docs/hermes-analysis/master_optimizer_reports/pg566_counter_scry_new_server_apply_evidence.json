@@ -1,0 +1,79 @@
+{
+  "database_target": "143.198.230.247:5433/halder",
+  "deploy_id": "pg566",
+  "generated_at": "2026-07-06T12:26:55.008635+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg566_counter_scry_new_server_package_manifest.json",
+  "mutations_performed": [
+    "postgres_apply_pg566_counter_scry_new_server"
+  ],
+  "postcheck": {
+    "backup_rows": 0,
+    "cards": [
+      "Dissolve",
+      "Memory Drain"
+    ],
+    "failed_cards": [],
+    "promoted_oracle_hash_rows": 2,
+    "promoted_rule_rows": 2,
+    "promoted_verified_auto_rows": 2,
+    "row_count": 2
+  },
+  "postcheck_rows": [
+    {
+      "backup_rows": 0,
+      "card_name": "Dissolve",
+      "logical_rule_key": "battle_rule_v1:a61c2c90b84909502678d7b4354757b0",
+      "normalized_name": "dissolve",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Memory Drain",
+      "logical_rule_key": "battle_rule_v1:268bfd4d14bad89ebe8c9432d7082e3d",
+      "normalized_name": "memory drain",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    }
+  ],
+  "precheck": {
+    "cards": [
+      "Dissolve",
+      "Memory Drain"
+    ],
+    "existing_expected_rows_before": 0,
+    "missing_targets": [],
+    "row_count": 2,
+    "total_target_card_rows": 2,
+    "would_deprecate_shadow_rows": 0
+  },
+  "precheck_rows": [
+    {
+      "canonical_card_id": "631bdfe4-fd93-4fb1-a281-a43d134191b5",
+      "card_name": "Dissolve",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:a61c2c90b84909502678d7b4354757b0",
+      "normalized_name": "dissolve",
+      "oracle_hash": "377dd830df6bd5396319ae9608195d1a",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "4ea73700-ea47-414a-bc2c-14758c4192fd",
+      "card_name": "Memory Drain",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:268bfd4d14bad89ebe8c9432d7082e3d",
+      "normalized_name": "memory drain",
+      "oracle_hash": "89f9fe3458e018f0e66f9b3feb9711dd",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    }
+  ],
+  "slug": "counter_scry_new_server"
+}
