@@ -541,6 +541,7 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_engine_axis_nonland_cut_policy_model_20260706_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_engine_cut_usage_same_lane_proof_scout_20260706_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_engine_cut_followup_router_20260706_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_engine_cut_trace_replacement_gate_20260706_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_manual_negative_trace_reviewer_20260706_kaalia_value_safe_stage1_live_research.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_followup_live_source_research_expander_20260706_kaalia_value_safe_stage1_after_manual_trace.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_expanded_source_candidate_reviewer_20260706_kaalia_value_safe_stage1_followup_live_after_manual_trace.md`
@@ -1460,6 +1461,15 @@ Current external refresh on 2026-07-05:
   still lack explicit same-lane routes (`no_explicit_same_lane_pair_count=6`),
   `candidate_copy_allowed_now=false`, and the next gate is
   `run_trace_plan_and_replacement_search_before_candidate_copy`.
+- The engine cut trace/replacement gate ran `3` natural current-scope replays
+  for `Archaeomancer's Map`; it produced no usage event, but did capture a
+  decision trace, so the card routes to manual negative trace review rather
+  than cut permission. Local staple/oracle mining for replacing the used
+  `Biotransference` found `12` engine candidates, including `2` stronger
+  artifact/treasure-engine seeds (`Storm-Kiln Artist` and `Pitiless Plunderer`),
+  but those are review seeds only, not explicit same-lane proof. Candidate
+  copy, battle gate, and promotion remain closed; the next gate is
+  `review_engine_cut_trace_results_before_candidate_copy`.
 
 ## Global Commander Rollout - 2026-07-01
 

@@ -66,6 +66,12 @@ GLOBAL_COMMANDER_ENGINE_CUT_FOLLOWUP_ROUTER = (
 GLOBAL_COMMANDER_ENGINE_CUT_FOLLOWUP_ROUTER_TEST = (
     SCRIPT_DIR / "test_global_commander_engine_cut_followup_router.py"
 )
+GLOBAL_COMMANDER_ENGINE_CUT_TRACE_REPLACEMENT_GATE = (
+    SCRIPT_DIR / "global_commander_engine_cut_trace_replacement_gate.py"
+)
+GLOBAL_COMMANDER_ENGINE_CUT_TRACE_REPLACEMENT_GATE_TEST = (
+    SCRIPT_DIR / "test_global_commander_engine_cut_trace_replacement_gate.py"
+)
 GLOBAL_COMMANDER_CANDIDATE_COPY_MATERIALIZER = SCRIPT_DIR / "global_commander_candidate_copy_materializer.py"
 GLOBAL_COMMANDER_CANDIDATE_COPY_MATERIALIZER_TEST = (
     SCRIPT_DIR / "test_global_commander_candidate_copy_materializer.py"
@@ -435,6 +441,10 @@ GLOBAL_COMMANDER_ENGINE_CUT_USAGE_SAME_LANE_PROOF_SCOUT_REPORT = (
 GLOBAL_COMMANDER_ENGINE_CUT_FOLLOWUP_ROUTER_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_engine_cut_followup_router_20260706_current.md"
+)
+GLOBAL_COMMANDER_ENGINE_CUT_TRACE_REPLACEMENT_GATE_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_engine_cut_trace_replacement_gate_20260706_current.md"
 )
 GLOBAL_COMMANDER_CANDIDATE_COPY_MATERIALIZER_REPORT = (
     REPO_ROOT
@@ -1900,6 +1910,29 @@ def build_audit() -> dict[str, Any]:
                 "trace_required_for_engine_cuts:Archaeomancer's Map",
                 "replacement_required_for_used_engine_cuts:Biotransference",
                 "find_explicit_same_lane_replacement_route_for_pair_before_candidate_copy",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_ENGINE_CUT_TRACE_REPLACEMENT_GATE,
+            [
+                "global_commander_engine_cut_trace_replacement_gate",
+                "engine_cut_trace_replacement_gate_needs_trace_review",
+                "engine_cut_natural_trace_seen_without_usage_needs_manual_negative_review",
+                "engine_replacement_candidates_found_needs_source_trace_review",
+                "candidate_copy_allowed_now",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_ENGINE_CUT_TRACE_REPLACEMENT_GATE_TEST,
+            [
+                "test_replacement_candidates_filter_color_and_current_deck",
+                "test_build_report_keeps_candidate_copy_closed",
+                "candidate_copy_closed_after_trace_replacement_gate",
+                "run_forced_access_trace_for_unexposed_engine_cut",
             ],
         )
     )
@@ -3569,6 +3602,24 @@ def build_audit() -> dict[str, Any]:
                 "run_trace_plan_and_replacement_search_before_candidate_copy",
                 "trace_required_for_engine_cuts:Archaeomancer's Map",
                 "replacement_required_for_used_engine_cuts:Biotransference",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_ENGINE_CUT_TRACE_REPLACEMENT_GATE_REPORT,
+            [
+                "Global Commander Engine Cut Trace Replacement Gate",
+                "engine_cut_trace_replacement_gate_needs_trace_review",
+                "generated_replay_count: `3`",
+                "trace_manual_review_count: `1`",
+                "replacement_candidate_count: `12`",
+                "strong_replacement_candidate_count: `2`",
+                "candidate_copy_allowed_now: `false`",
+                "battle_replay_performed: `true`",
+                "review_engine_cut_trace_results_before_candidate_copy",
+                "natural_trace_manual_negative_review_required:Archaeomancer's Map",
+                "replacement_candidates_require_source_trace_review",
             ],
         )
     )

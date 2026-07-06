@@ -1,0 +1,345 @@
+{
+  "artifact_type": "global_commander_engine_cut_trace_replacement_gate",
+  "battle_gate_allowed_now": false,
+  "battle_gate_performed": false,
+  "battle_replay_performed": true,
+  "candidate_copy_allowed_now": false,
+  "candidate_copy_blockers": [
+    "natural_trace_manual_negative_review_required:Archaeomancer's Map",
+    "replacement_candidates_require_source_trace_review",
+    "candidate_copy_closed_after_trace_replacement_gate"
+  ],
+  "deck_action_allowed": false,
+  "generated_at": "2026-07-06T04:22:23.939082+00:00",
+  "input_artifacts": {
+    "battle_replay": "docs/hermes-analysis/manaloom-knowledge/scripts/battle_replay_v10_3.py",
+    "engine_policy_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_engine_axis_nonland_cut_policy_model_20260706_current.json",
+    "replay_dir": "docs/hermes-analysis/master_optimizer_reports/global_commander_engine_cut_trace_replays_20260706_current",
+    "router_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_engine_cut_followup_router_20260706_current.json",
+    "source_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db"
+  },
+  "mutation_allowed": false,
+  "policy": {
+    "mutation_boundary": "This gate reads SQLite and writes report artifacts only.",
+    "natural_trace_boundary": "Natural replay trace is evidence collection only, not a promotion battle gate.",
+    "replacement_boundary": "Local staple/oracle engine candidates are review seeds, not explicit same-lane proof by themselves.",
+    "same_lane_boundary": "A replacement for a used engine cut still needs source and trace review before candidate copy."
+  },
+  "postgres_writes": false,
+  "promotion_allowed": false,
+  "replacement_candidate_rows": [
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Mind Stone",
+      "color_identity": [],
+      "edhrec_rank": 31,
+      "mutation_allowed": false,
+      "oracle_excerpt": "{T}: Add {C}. {1}, {T}, Sacrifice this artifact: Draw a card.",
+      "role_signals": [
+        "artifact_engine_overlap"
+      ],
+      "status": "adjacent_engine_candidate_needs_explicit_same_lane_proof",
+      "type_line": "Artifact"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Solemn Simulacrum",
+      "color_identity": [],
+      "edhrec_rank": 34,
+      "mutation_allowed": false,
+      "oracle_excerpt": "When this creature enters, you may search your library for a basic land card, put that card onto the battlefield tapped, then shuffle. When this creature dies, you may draw a card.",
+      "role_signals": [
+        "artifact_engine_overlap",
+        "engine_access_tutor"
+      ],
+      "status": "adjacent_engine_candidate_needs_explicit_same_lane_proof",
+      "type_line": "Artifact Creature \u2014 Golem"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Commander's Sphere",
+      "color_identity": [],
+      "edhrec_rank": 39,
+      "mutation_allowed": false,
+      "oracle_excerpt": "{T}: Add one mana of any color in your commander's color identity. Sacrifice this artifact: Draw a card.",
+      "role_signals": [
+        "artifact_engine_overlap"
+      ],
+      "status": "adjacent_engine_candidate_needs_explicit_same_lane_proof",
+      "type_line": "Artifact"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Phyrexian Arena",
+      "color_identity": [
+        "B"
+      ],
+      "edhrec_rank": 96,
+      "mutation_allowed": false,
+      "oracle_excerpt": "At the beginning of your upkeep, you draw a card and you lose 1 life.",
+      "role_signals": [
+        "slow_draw_engine"
+      ],
+      "status": "adjacent_engine_candidate_needs_explicit_same_lane_proof",
+      "type_line": "Enchantment"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Wayfarer's Bauble",
+      "color_identity": [],
+      "edhrec_rank": 108,
+      "mutation_allowed": false,
+      "oracle_excerpt": "{2}, {T}, Sacrifice this artifact: Search your library for a basic land card, put that card onto the battlefield tapped, then shuffle.",
+      "role_signals": [
+        "engine_access_tutor"
+      ],
+      "status": "adjacent_engine_candidate_needs_explicit_same_lane_proof",
+      "type_line": "Artifact"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Urza's Saga",
+      "color_identity": [],
+      "edhrec_rank": 119,
+      "mutation_allowed": false,
+      "oracle_excerpt": "(As this Saga enters and after your draw step, add a lore counter. Sacrifice after III.) I \u2014 This Saga gains \"{T}: Add {C}.\" II \u2014 This Saga gains \"{2}, {T}: Create a 0/0 colorless Construct artifact creature token with 'This token gets +1/+1 for each artifact ",
+      "role_signals": [
+        "artifact_engine_overlap",
+        "engine_access_tutor"
+      ],
+      "status": "adjacent_engine_candidate_needs_explicit_same_lane_proof",
+      "type_line": "Enchantment Land \u2014 Urza's Saga"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Deadly Dispute",
+      "color_identity": [
+        "B"
+      ],
+      "edhrec_rank": 131,
+      "mutation_allowed": false,
+      "oracle_excerpt": "As an additional cost to cast this spell, sacrifice an artifact or creature. Draw two cards and create a Treasure token. (It's an artifact with \"{T}, Sacrifice this token: Add one mana of any color.\")",
+      "role_signals": [
+        "artifact_engine_overlap"
+      ],
+      "status": "adjacent_engine_candidate_needs_explicit_same_lane_proof",
+      "type_line": "Instant"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Big Score",
+      "color_identity": [
+        "R"
+      ],
+      "edhrec_rank": 172,
+      "mutation_allowed": false,
+      "oracle_excerpt": "As an additional cost to cast this spell, discard a card. Draw two cards and create two Treasure tokens. (They're artifacts with \"{T}, Sacrifice this token: Add one mana of any color.\")",
+      "role_signals": [
+        "artifact_engine_overlap"
+      ],
+      "status": "adjacent_engine_candidate_needs_explicit_same_lane_proof",
+      "type_line": "Instant"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Boros Charm",
+      "color_identity": [
+        "R",
+        "W"
+      ],
+      "edhrec_rank": 173,
+      "mutation_allowed": false,
+      "oracle_excerpt": "Choose one \u2014 \u2022 Boros Charm deals 4 damage to target player or planeswalker. \u2022 Permanents you control gain indestructible until end of turn. \u2022 Target creature gains double strike until end of turn.",
+      "role_signals": [
+        "combat_engine"
+      ],
+      "status": "adjacent_engine_candidate_needs_explicit_same_lane_proof",
+      "type_line": "Instant"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Akroma's Will",
+      "color_identity": [
+        "W"
+      ],
+      "edhrec_rank": 205,
+      "mutation_allowed": false,
+      "oracle_excerpt": "Choose one. If you control a commander as you cast this spell, you may choose both instead. \u2022 Creatures you control gain flying, vigilance, and double strike until end of turn. \u2022 Creatures you control gain lifelink, indestructible, and protection from each col",
+      "role_signals": [
+        "combat_engine"
+      ],
+      "status": "adjacent_engine_candidate_needs_explicit_same_lane_proof",
+      "type_line": "Instant"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Storm-Kiln Artist",
+      "color_identity": [
+        "R"
+      ],
+      "edhrec_rank": 233,
+      "mutation_allowed": false,
+      "oracle_excerpt": "This creature gets +1/+0 for each artifact you control. Magecraft \u2014 Whenever you cast or copy an instant or sorcery spell, create a Treasure token. (It's an artifact with \"{T}, Sacrifice this token: Add one mana of any color.\")",
+      "role_signals": [
+        "artifact_engine_overlap",
+        "treasure_engine"
+      ],
+      "status": "same_lane_engine_candidate_needs_source_trace_review",
+      "type_line": "Creature \u2014 Dwarf Shaman"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Pitiless Plunderer",
+      "color_identity": [
+        "B"
+      ],
+      "edhrec_rank": 237,
+      "mutation_allowed": false,
+      "oracle_excerpt": "Whenever another creature you control dies, create a Treasure token. (It's an artifact with \"{T}, Sacrifice this token: Add one mana of any color.\")",
+      "role_signals": [
+        "artifact_engine_overlap",
+        "treasure_engine"
+      ],
+      "status": "same_lane_engine_candidate_needs_source_trace_review",
+      "type_line": "Creature \u2014 Human Pirate"
+    }
+  ],
+  "replacement_review_rows": [
+    {
+      "adjacent_candidate_count": 10,
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_sample": [
+        {
+          "battle_gate_allowed": false,
+          "candidate_copy_allowed": false,
+          "card_name": "Storm-Kiln Artist",
+          "color_identity": [
+            "R"
+          ],
+          "edhrec_rank": 233,
+          "mutation_allowed": false,
+          "oracle_excerpt": "This creature gets +1/+0 for each artifact you control. Magecraft \u2014 Whenever you cast or copy an instant or sorcery spell, create a Treasure token. (It's an artifact with \"{T}, Sacrifice this token: Add one mana of any color.\")",
+          "role_signals": [
+            "artifact_engine_overlap",
+            "treasure_engine"
+          ],
+          "status": "same_lane_engine_candidate_needs_source_trace_review",
+          "type_line": "Creature \u2014 Dwarf Shaman"
+        },
+        {
+          "battle_gate_allowed": false,
+          "candidate_copy_allowed": false,
+          "card_name": "Pitiless Plunderer",
+          "color_identity": [
+            "B"
+          ],
+          "edhrec_rank": 237,
+          "mutation_allowed": false,
+          "oracle_excerpt": "Whenever another creature you control dies, create a Treasure token. (It's an artifact with \"{T}, Sacrifice this token: Add one mana of any color.\")",
+          "role_signals": [
+            "artifact_engine_overlap",
+            "treasure_engine"
+          ],
+          "status": "same_lane_engine_candidate_needs_source_trace_review",
+          "type_line": "Creature \u2014 Human Pirate"
+        }
+      ],
+      "cut_card": "Biotransference",
+      "mutation_allowed": false,
+      "next_gate": "review_engine_replacement_candidates_before_candidate_copy",
+      "required_replacement_roles": [
+        "engine"
+      ],
+      "status": "engine_replacement_candidates_found_needs_source_trace_review",
+      "strong_candidate_count": 2
+    }
+  ],
+  "seed_reports": [
+    {
+      "decision_count": 130,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_engine_cut_trace_replays_20260706_current/replay_seed_80.decision_trace.jsonl",
+      "event_count": 789,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_engine_cut_trace_replays_20260706_current/replay_seed_80.events.jsonl",
+      "provenance_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_engine_cut_trace_replays_20260706_current/deck_provenance_seed_80.json",
+      "replay_txt": "docs/hermes-analysis/master_optimizer_reports/global_commander_engine_cut_trace_replays_20260706_current/replay_seed_80.txt",
+      "returncode": 0,
+      "seed": 80,
+      "status": "engine_cut_natural_replay_generated"
+    },
+    {
+      "decision_count": 103,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_engine_cut_trace_replays_20260706_current/replay_seed_81.decision_trace.jsonl",
+      "event_count": 636,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_engine_cut_trace_replays_20260706_current/replay_seed_81.events.jsonl",
+      "provenance_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_engine_cut_trace_replays_20260706_current/deck_provenance_seed_81.json",
+      "replay_txt": "docs/hermes-analysis/master_optimizer_reports/global_commander_engine_cut_trace_replays_20260706_current/replay_seed_81.txt",
+      "returncode": 0,
+      "seed": 81,
+      "status": "engine_cut_natural_replay_generated"
+    },
+    {
+      "decision_count": 133,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_engine_cut_trace_replays_20260706_current/replay_seed_82.decision_trace.jsonl",
+      "event_count": 945,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_engine_cut_trace_replays_20260706_current/replay_seed_82.events.jsonl",
+      "provenance_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_engine_cut_trace_replays_20260706_current/deck_provenance_seed_82.json",
+      "replay_txt": "docs/hermes-analysis/master_optimizer_reports/global_commander_engine_cut_trace_replays_20260706_current/replay_seed_82.txt",
+      "returncode": 0,
+      "seed": 82,
+      "status": "engine_cut_natural_replay_generated"
+    }
+  ],
+  "source_db_mutated": false,
+  "status": "engine_cut_trace_replacement_gate_needs_trace_review",
+  "summary": {
+    "adjacent_replacement_candidate_count": 10,
+    "candidate_copy_blocker_count": 3,
+    "commander": "Kaalia of the Vast",
+    "deck_id": "619",
+    "generated_replay_count": 3,
+    "next_gate": "review_engine_cut_trace_results_before_candidate_copy",
+    "replacement_candidate_count": 12,
+    "replacement_cut_count": 1,
+    "seed_count": 3,
+    "seed_start": 80,
+    "strong_replacement_candidate_count": 2,
+    "trace_card_count": 1,
+    "trace_manual_review_count": 1,
+    "trace_no_exposure_count": 0,
+    "trace_usage_observed_count": 0
+  },
+  "trace_review_rows": [
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Archaeomancer's Map",
+      "decision_trace_count": 1,
+      "event_types": {},
+      "exposure_event_count": 0,
+      "first_decision_trace": {
+        "event": "tutor",
+        "player": "Kaalia of the Vast",
+        "turn": 3
+      },
+      "first_exposure_event": null,
+      "first_usage_event": null,
+      "mutation_allowed": false,
+      "next_gate": "manual_negative_trace_review_for_engine_cut_before_candidate_copy",
+      "status": "engine_cut_natural_trace_seen_without_usage_needs_manual_negative_review",
+      "usage_event_count": 0
+    }
+  ]
+}

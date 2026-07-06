@@ -293,6 +293,15 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `Biotransference` vai para busca de corte diferente ou substituicao
     same-lane explicita, todos os `6` pares seguem bloqueados, e o proximo gate
     e `run_trace_plan_and_replacement_search_before_candidate_copy`.
+    Esse gate agora roda em
+    `manaloom-knowledge/scripts/global_commander_engine_cut_trace_replacement_gate.py`,
+    com evidencia:
+    `master_optimizer_reports/global_commander_engine_cut_trace_replacement_gate_20260706_current.md`.
+    Resultado: `3` replays naturais viram `Archaeomancer's Map` sem uso mas
+    com decision trace, exigindo revisao negativa manual; a busca local achou
+    `12` candidatos engine para substituir `Biotransference`, com `2` seeds
+    mais fortes (`Storm-Kiln Artist` e `Pitiless Plunderer`), mas ainda sem
+    prova same-lane suficiente para candidate copy.
     Quando uma hipotese add/cut estiver pronta, rode
     `manaloom-knowledge/scripts/global_commander_candidate_copy_materializer.py`
     para materializar uma unica troca em copia isolada do Hermes SQLite. A

@@ -1,0 +1,362 @@
+======================================================================
+BATTLE v10.3 - STRUCTURED REPLAY
+Target deck id: 619
+Commander: Kaalia of the Vast
+Evaluation mode: target-deck-under-pressure
+Evaluation target player: Kaalia of the Vast
+Opponents available: 12
+Opponents picked: Rograkh, Son of Rohgahh #94 (real), Tivit, Seller of Secrets #107 (real), Kenrith, the Returned King #113 (real)
+======================================================================
+
+DECK SOURCE PROVENANCE
+  Metrics are derived from the resolved runtime card lists; cached learned-deck metadata is not used for replay lands/CMC/curve.
+  Deck-source blockers are reported separately from battle-engine action/strategy/forensic blockers.
+  Kaalia of the Vast: source=sqlite_deck_cards metrics=runtime_derived_from_resolved_card_list cards=99 lands=34 avg_nonland_cmc=2.71 curve={"0": 1, "1": 16, "2": 17, "3": 18, "4": 6, "5": 3, "6": 1, "7+": 3} blockers=none
+  Rograkh, Son of Rohgahh #94 (real): source=learned_decks metrics=runtime_derived_from_resolved_built_deck cards=99 lands=22 avg_nonland_cmc=1.90 curve={"0": 8, "1": 24, "2": 22, "3": 17, "4": 3, "5": 3, "6": 0, "7+": 0} blockers=none
+  Tivit, Seller of Secrets #107 (real): source=learned_decks metrics=runtime_derived_from_resolved_built_deck cards=99 lands=27 avg_nonland_cmc=2.22 curve={"0": 5, "1": 20, "2": 23, "3": 11, "4": 9, "5": 2, "6": 0, "7+": 2} blockers=none
+  Kenrith, the Returned King #113 (real): source=learned_decks metrics=runtime_derived_from_resolved_built_deck cards=99 lands=27 avg_nonland_cmc=1.89 curve={"0": 5, "1": 25, "2": 22, "3": 14, "4": 5, "5": 1, "6": 0, "7+": 0} blockers=none
+
+MULLIGANS
+  MANA __opening_hand__: 2 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  MANA __opening_hand__: 2 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  MANA __opening_hand__: 2 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  MANA __opening_hand__: 2 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  MANA __opening_hand__: 2 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  Kaalia of the Vast: 1 mulligan(s), 7 cards, 2 lands, HandCards=[Strike It Rich, Mountain // Mountain, Imperial Seal, Genji Glove, Vorpal Sword, Hammer of Nazahn, Ancient Tomb]
+  MANA __opening_hand__: 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  MANA __opening_hand__: 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  MANA __opening_hand__: 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  MANA __opening_hand__: 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  MANA __opening_hand__: 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  Rograkh, Son of Rohgahh #94 (real): 1 mulligan(s), 7 cards, 2 lands, HandCards=[Grinding Station, Rhystic Study, Valley Floodcaller, Necropotence, Scalding Tarn, Polluted Delta, Praetor's Grasp]
+  MANA __opening_hand__: 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  MANA __opening_hand__: 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  MANA __opening_hand__: 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  MANA __opening_hand__: 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  MANA __opening_hand__: 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  Tivit, Seller of Secrets #107 (real): 0 mulligan(s), 7 cards, 2 lands, HandCards=[Demonic Tutor, Demonic Consultation, Force of Negation, Marsh Flats, Esper Sentinel, Pact of Negation, Mana Confluence]
+  MANA __opening_hand__: 1 available (1 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 1, 'colorless': 0, 'wildcard': 0})
+  MANA __opening_hand__: 1 available (1 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 1, 'colorless': 0, 'wildcard': 0})
+  MANA __opening_hand__: 1 available (1 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 1, 'colorless': 0, 'wildcard': 0})
+  MANA __opening_hand__: 1 available (1 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 1, 'colorless': 0, 'wildcard': 0})
+  MANA __opening_hand__: 1 available (1 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 1, 'colorless': 0, 'wildcard': 0})
+  MANA __opening_hand__: 1 available (1 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 1, 'colorless': 0, 'wildcard': 0})
+  MANA __opening_hand__: 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  MANA __opening_hand__: 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  MANA __opening_hand__: 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  MANA __opening_hand__: 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  MANA __opening_hand__: 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  MANA __opening_hand__: 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  Kenrith, the Returned King #113 (real): 3 mulligan(s), 5 cards, 1 lands, HandCards=[Enduring Vitality, Forbidden Orchard, Mirrormade, Chord of Calling, Kinnan, Bonder Prodigy]
+
+TURN 1 - Kaalia of the Vast | Life=40 Hand=7 Board=0 HandCards=[Strike It Rich, Mountain // Mountain, Imperial Seal, Genji Glove, Vorpal Sword, Hammer of Nazahn, Ancient Tomb]
+  MANA Kaalia of the Vast: 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  PLAY LAND Kaalia of the Vast: Mountain // Mountain mana+=1 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0} rule=curated/verified
+  ANNOUNCE Kaalia of the Vast: Strike It Rich role=normal phase=precombat_main locked_cost={red=1} targets=-
+  PAY COST Kaalia of the Vast: Strike It Rich cost={red=1} mana 1->0 life 40->40 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST Kaalia of the Vast: Strike It Rich (CMC=1.0) [treasure_maker] phase=precombat_main cost={red=1} rule=curated/verified
+  RESOLVE SPELL Kaalia of the Vast: Strike It Rich (CMC=1.0) [treasure_maker] rule=curated/verified
+  ANNOUNCE Kaalia of the Vast: Imperial Seal role=normal phase=precombat_main locked_cost={black=1} targets=-
+  PAY COST Kaalia of the Vast: Imperial Seal cost={black=1} mana 1->0 life 40->40 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST Kaalia of the Vast: Imperial Seal (CMC=1.0) [tutor] phase=precombat_main cost={black=1} rule=curated/verified
+  RESOLVE SPELL Kaalia of the Vast: Imperial Seal (CMC=1.0) [tutor] rule=curated/verified
+  TUTOR Kaalia of the Vast: Imperial Seal found Arid Mesa (any_to_top)
+  LIFE Kaalia of the Vast: event=tutor_life_loss_resolved card=Imperial Seal life=40->38
+  END Kaalia of the Vast: Life=38 Hand=5 Board=1 Grave=2 Discarded=0 HandCards=[Genji Glove, Vorpal Sword, Hammer of Nazahn, Ancient Tomb, Lightning Greaves] Permanents=[Mountain // Mountain]
+
+TURN 1 - Rograkh, Son of Rohgahh #94 (real) | Life=40 Hand=7 Board=0 HandCards=[Grinding Station, Rhystic Study, Valley Floodcaller, Necropotence, Scalding Tarn, Polluted Delta, Praetor's Grasp]
+  MANA Rograkh, Son of Rohgahh #94 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  PLAY LAND Rograkh, Son of Rohgahh #94 (real): Scalding Tarn mana+=1 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0} rule=curated/verified
+  END Rograkh, Son of Rohgahh #94 (real): Life=40 Hand=7 Board=1 Grave=0 Discarded=0 HandCards=[Grinding Station, Rhystic Study, Valley Floodcaller, Necropotence, Polluted Delta, Praetor's Grasp, Misty Rainforest] Permanents=[Scalding Tarn]
+
+TURN 1 - Tivit, Seller of Secrets #107 (real) | Life=40 Hand=7 Board=0 HandCards=[Demonic Tutor, Demonic Consultation, Force of Negation, Marsh Flats, Esper Sentinel, Pact of Negation, Mana Confluence]
+  MANA Tivit, Seller of Secrets #107 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  PLAY LAND Tivit, Seller of Secrets #107 (real): Marsh Flats mana+=1 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0} rule=curated/verified
+  END Tivit, Seller of Secrets #107 (real): Life=40 Hand=7 Board=1 Grave=0 Discarded=0 HandCards=[Demonic Tutor, Demonic Consultation, Force of Negation, Esper Sentinel, Pact of Negation, Mana Confluence, Tundra] Permanents=[Marsh Flats]
+
+TURN 1 - Kenrith, the Returned King #113 (real) | Life=40 Hand=5 Board=0 HandCards=[Enduring Vitality, Forbidden Orchard, Mirrormade, Chord of Calling, Kinnan, Bonder Prodigy]
+  MANA Kenrith, the Returned King #113 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  PLAY LAND Kenrith, the Returned King #113 (real): Forbidden Orchard mana+=1 pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0} rule=curated/verified
+  END Kenrith, the Returned King #113 (real): Life=40 Hand=5 Board=1 Grave=0 Discarded=0 HandCards=[Enduring Vitality, Mirrormade, Chord of Calling, Kinnan, Bonder Prodigy, Firestorm] Permanents=[Forbidden Orchard]
+
+TURN 2 - Kaalia of the Vast | Life=38 Hand=5 Board=1 HandCards=[Genji Glove, Vorpal Sword, Hammer of Nazahn, Ancient Tomb, Lightning Greaves]
+  MANA Kaalia of the Vast: 1 available (1 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  PLAY LAND Kaalia of the Vast: Ancient Tomb mana+=1 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 1, 'wildcard': 0} rule=curated/verified
+  ANNOUNCE Kaalia of the Vast: Lightning Greaves role=normal phase=precombat_main locked_cost={generic=2} targets=-
+  PAY COST Kaalia of the Vast: Lightning Greaves cost={generic=2} mana 2->0 life 38->38 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST Kaalia of the Vast: Lightning Greaves (CMC=2.0) [equipment_haste_shroud] phase=precombat_main cost={generic=2} rule=curated/active
+  RESOLVE SPELL Kaalia of the Vast: Lightning Greaves (CMC=2.0) [equipment_haste_shroud] rule=curated/active
+  END Kaalia of the Vast: Life=38 Hand=4 Board=3 Grave=2 Discarded=0 HandCards=[Genji Glove, Vorpal Sword, Hammer of Nazahn, Arid Mesa] Permanents=[Mountain // Mountain, Ancient Tomb, Lightning Greaves]
+
+TURN 2 - Rograkh, Son of Rohgahh #94 (real) | Life=40 Hand=7 Board=1 HandCards=[Grinding Station, Rhystic Study, Valley Floodcaller, Necropotence, Polluted Delta, Praetor's Grasp, Misty Rainforest]
+  MANA Rograkh, Son of Rohgahh #94 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  PLAY LAND Rograkh, Son of Rohgahh #94 (real): Polluted Delta mana+=1 pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0} rule=curated/verified
+  ACTIVATE Rograkh, Son of Rohgahh #94 (real): Polluted Delta kind=self_sacrifice_land_tutor_artifact mana_paid=- life=40->39 life_paid=1
+  ANNOUNCE Rograkh, Son of Rohgahh #94 (real): Rograkh, Son of Rohgahh role=commander phase=precombat_main locked_cost={} targets=-
+  PAY COST Rograkh, Son of Rohgahh #94 (real): Rograkh, Son of Rohgahh cost={} mana 1->1 life 39->39 life_paid=0 pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST COMMANDER Rograkh, Son of Rohgahh #94 (real): Rograkh, Son of Rohgahh (CMC=0.0) [creature] phase=precombat_main cost={} rule=type_line_creature/fact
+  END Rograkh, Son of Rohgahh #94 (real): Life=39 Hand=7 Board=3 Grave=1 Discarded=0 HandCards=[Grinding Station, Rhystic Study, Valley Floodcaller, Necropotence, Praetor's Grasp, Misty Rainforest, Cabal Ritual] Permanents=[Scalding Tarn, Badlands (tapped), Rograkh, Son of Rohgahh]
+
+TURN 2 - Tivit, Seller of Secrets #107 (real) | Life=40 Hand=7 Board=1 HandCards=[Demonic Tutor, Demonic Consultation, Force of Negation, Esper Sentinel, Pact of Negation, Mana Confluence, Tundra]
+  MANA Tivit, Seller of Secrets #107 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  PLAY LAND Tivit, Seller of Secrets #107 (real): Mana Confluence mana+=1 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0} rule=curated/verified
+  ANNOUNCE Tivit, Seller of Secrets #107 (real): Demonic Consultation role=normal phase=precombat_main locked_cost={black=1} targets=-
+  LIFE Tivit, Seller of Secrets #107 (real): event=conditional_mana_life_cost_paid card=Mana Confluence life=40->39
+  PAY COST Tivit, Seller of Secrets #107 (real): Demonic Consultation cost={black=1} mana 1->0 life 40->39 life_paid=1 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST Tivit, Seller of Secrets #107 (real): Demonic Consultation (CMC=1.0) [tutor] phase=precombat_main cost={black=1} rule=curated/verified
+  RESOLVE SPELL Tivit, Seller of Secrets #107 (real): Demonic Consultation (CMC=1.0) [tutor] rule=curated/verified
+  TUTOR Tivit, Seller of Secrets #107 (real): Demonic Consultation found Ancient Tomb (any)
+  END Tivit, Seller of Secrets #107 (real): Life=39 Hand=7 Board=2 Grave=1 Discarded=0 HandCards=[Demonic Tutor, Force of Negation, Esper Sentinel, Pact of Negation, Tundra, Starting Town, Ancient Tomb] Permanents=[Marsh Flats, Mana Confluence]
+
+TURN 2 - Kenrith, the Returned King #113 (real) | Life=40 Hand=5 Board=1 HandCards=[Enduring Vitality, Mirrormade, Chord of Calling, Kinnan, Bonder Prodigy, Firestorm]
+  MANA Kenrith, the Returned King #113 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kenrith, the Returned King #113 (real): Life=40 Hand=6 Board=1 Grave=0 Discarded=0 HandCards=[Enduring Vitality, Mirrormade, Chord of Calling, Kinnan, Bonder Prodigy, Firestorm, Warren Soultrader] Permanents=[Forbidden Orchard]
+
+TURN 3 - Kaalia of the Vast | Life=38 Hand=4 Board=3 HandCards=[Genji Glove, Vorpal Sword, Hammer of Nazahn, Arid Mesa]
+  MANA Kaalia of the Vast: 2 available (2 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 1, 'wildcard': 0})
+  PLAY LAND Kaalia of the Vast: Arid Mesa mana+=1 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 1, 'wildcard': 0} rule=curated/verified
+  END Kaalia of the Vast: Life=38 Hand=4 Board=4 Grave=2 Discarded=0 HandCards=[Genji Glove, Vorpal Sword, Hammer of Nazahn, Demonic Tutor] Permanents=[Mountain // Mountain, Ancient Tomb, Lightning Greaves, Arid Mesa]
+
+TURN 3 - Rograkh, Son of Rohgahh #94 (real) | Life=39 Hand=7 Board=3 HandCards=[Grinding Station, Rhystic Study, Valley Floodcaller, Necropotence, Praetor's Grasp, Misty Rainforest, Cabal Ritual]
+  MANA Rograkh, Son of Rohgahh #94 (real): 1 available (1 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  PLAY LAND Rograkh, Son of Rohgahh #94 (real): Misty Rainforest mana+=1 pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0} rule=curated/verified
+  ACTIVATE Rograkh, Son of Rohgahh #94 (real): Misty Rainforest kind=self_sacrifice_land_tutor_artifact mana_paid=- life=39->38 life_paid=1
+  ANNOUNCE Rograkh, Son of Rohgahh #94 (real): Grinding Station role=normal phase=precombat_main locked_cost={generic=2} targets=-
+  PAY COST Rograkh, Son of Rohgahh #94 (real): Grinding Station cost={generic=2} mana 2->0 life 38->38 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST Rograkh, Son of Rohgahh #94 (real): Grinding Station (CMC=2.0) [mill_engine] phase=precombat_main cost={generic=2} rule=curated/verified
+  RESOLVE SPELL Rograkh, Son of Rohgahh #94 (real): Grinding Station (CMC=2.0) [mill_engine] rule=curated/verified
+  COMBAT Rograkh, Son of Rohgahh #94 (real) -> Kaalia of the Vast: 1 attackers, 0 blockers, 0 gang blocks, 1 power (reason=evaluation_target_pressure, target_life=38)
+  DAMAGE Rograkh, Son of Rohgahh #94 (real) -> Kaalia of the Vast: 1 player damage, target life 37, target_dead=False
+  ACTIVATE Rograkh, Son of Rohgahh #94 (real): Grinding Station kind=tap_sacrifice_artifact_target_player_mill mana_paid=-
+  END Rograkh, Son of Rohgahh #94 (real): Life=38 Hand=6 Board=4 Grave=3 Discarded=0 HandCards=[Rhystic Study, Valley Floodcaller, Necropotence, Praetor's Grasp, Cabal Ritual, Simian Spirit Guide] Permanents=[Scalding Tarn, Badlands, Rograkh, Son of Rohgahh (tapped), Steam Vents (tapped)]
+
+TURN 3 - Tivit, Seller of Secrets #107 (real) | Life=39 Hand=7 Board=2 HandCards=[Demonic Tutor, Force of Negation, Esper Sentinel, Pact of Negation, Tundra, Starting Town, Ancient Tomb]
+  MANA Tivit, Seller of Secrets #107 (real): 1 available (1 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  PLAY LAND Tivit, Seller of Secrets #107 (real): Tundra mana+=1 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0} rule=curated/verified
+  ANNOUNCE Tivit, Seller of Secrets #107 (real): Esper Sentinel role=normal phase=precombat_main locked_cost={white=1} targets=-
+  LIFE Tivit, Seller of Secrets #107 (real): event=conditional_mana_life_cost_paid card=Mana Confluence life=39->38
+  PAY COST Tivit, Seller of Secrets #107 (real): Esper Sentinel cost={white=1} mana 2->1 life 39->38 life_paid=1 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST Tivit, Seller of Secrets #107 (real): Esper Sentinel (CMC=1.0) [draw_engine] phase=precombat_main cost={white=1} rule=curated/verified
+  RESOLVE SPELL Tivit, Seller of Secrets #107 (real): Esper Sentinel (CMC=1.0) [draw_engine] rule=curated/verified
+  END Tivit, Seller of Secrets #107 (real): Life=38 Hand=7 Board=4 Grave=2 Discarded=1 DiscardedCards=[Grand Arbiter Augustin IV] HandCards=[Demonic Tutor, Force of Negation, Pact of Negation, Starting Town, Ancient Tomb, Monologue Tax, Otawara, Soaring City] Permanents=[Marsh Flats, Mana Confluence, Tundra, Esper Sentinel]
+
+TURN 3 - Kenrith, the Returned King #113 (real) | Life=40 Hand=6 Board=1 HandCards=[Enduring Vitality, Mirrormade, Chord of Calling, Kinnan, Bonder Prodigy, Firestorm, Warren Soultrader]
+  MANA Kenrith, the Returned King #113 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kenrith, the Returned King #113 (real): Life=40 Hand=7 Board=1 Grave=0 Discarded=0 HandCards=[Enduring Vitality, Mirrormade, Chord of Calling, Kinnan, Bonder Prodigy, Firestorm, Warren Soultrader, Smothering Tithe] Permanents=[Forbidden Orchard]
+
+TURN 4 - Kaalia of the Vast | Life=37 Hand=4 Board=4 HandCards=[Genji Glove, Vorpal Sword, Hammer of Nazahn, Demonic Tutor]
+  MANA Kaalia of the Vast: 2 available (2 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 1, 'wildcard': 0})
+  ANNOUNCE Kaalia of the Vast: Infernal Plunge role=ramp phase=precombat_main locked_cost={red=1} targets=-
+  PAY COST Kaalia of the Vast: Infernal Plunge cost={red=1} mana 2->1 life 37->37 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 1, 'wildcard': 0}
+  CAST Kaalia of the Vast: Infernal Plunge (CMC=1.0) [ramp_ritual] phase=precombat_main cost={red=1} rule=curated/verified
+  END Kaalia of the Vast: Life=37 Hand=4 Board=4 Grave=6 Discarded=0 HandCards=[Genji Glove, Vorpal Sword, Hammer of Nazahn, Demonic Tutor] Permanents=[Mountain // Mountain, Ancient Tomb, Lightning Greaves, Arid Mesa]
+
+TURN 4 - Rograkh, Son of Rohgahh #94 (real) | Life=38 Hand=6 Board=4 HandCards=[Rhystic Study, Valley Floodcaller, Necropotence, Praetor's Grasp, Cabal Ritual, Simian Spirit Guide]
+  MANA Rograkh, Son of Rohgahh #94 (real): 2 available (2 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  ANNOUNCE Rograkh, Son of Rohgahh #94 (real): Cabal Ritual role=ramp phase=precombat_main locked_cost={generic=1, black=1} targets=-
+  PAY COST Rograkh, Son of Rohgahh #94 (real): Cabal Ritual cost={generic=1, black=1} mana 2->0 life 38->38 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST Rograkh, Son of Rohgahh #94 (real): Cabal Ritual (CMC=2.0) [ramp_ritual] phase=precombat_main cost={generic=1, black=1} rule=curated/verified
+  TRIGGER Tivit, Seller of Secrets #107 (real): Esper Sentinel event=opponent_noncreature_spell stack=0
+  RESOLVE ABILITY Tivit, Seller of Secrets #107 (real): Esper Sentinel kind=opponent_noncreature_spell trigger_spell=Cabal Ritual
+  COMBAT Rograkh, Son of Rohgahh #94 (real) -> Kaalia of the Vast: 1 attackers, 0 blockers, 0 gang blocks, 1 power (reason=evaluation_target_pressure, target_life=37)
+  DAMAGE Rograkh, Son of Rohgahh #94 (real) -> Kaalia of the Vast: 1 player damage, target life 36, target_dead=False
+  END Rograkh, Son of Rohgahh #94 (real): Life=38 Hand=6 Board=4 Grave=4 Discarded=0 HandCards=[Rhystic Study, Valley Floodcaller, Necropotence, Praetor's Grasp, Simian Spirit Guide, Wheel of Fortune] Permanents=[Scalding Tarn, Badlands, Rograkh, Son of Rohgahh (tapped), Steam Vents]
+
+TURN 4 - Tivit, Seller of Secrets #107 (real) | Life=38 Hand=8 Board=4 HandCards=[Demonic Tutor, Force of Negation, Pact of Negation, Starting Town, Ancient Tomb, Monologue Tax, Otawara, Soaring City, City of Traitors]
+  MANA Tivit, Seller of Secrets #107 (real): 2 available (2 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  PLAY LAND Tivit, Seller of Secrets #107 (real): Starting Town mana+=1 pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0} rule=curated/verified
+  ANNOUNCE Tivit, Seller of Secrets #107 (real): Monologue Tax role=ramp phase=precombat_main locked_cost={generic=2, white=1} targets=-
+  LIFE Tivit, Seller of Secrets #107 (real): event=conditional_mana_life_cost_paid card=Mana Confluence life=38->37
+  PAY COST Tivit, Seller of Secrets #107 (real): Monologue Tax cost={generic=2, white=1} mana 3->0 life 38->37 life_paid=1 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST Tivit, Seller of Secrets #107 (real): Monologue Tax (CMC=3.0) [ramp_engine] phase=precombat_main cost={generic=2, white=1} rule=curated/verified
+  COMBAT Tivit, Seller of Secrets #107 (real) -> Kaalia of the Vast: 1 attackers, 0 blockers, 0 gang blocks, 1 power (reason=evaluation_target_pressure, target_life=36)
+  DAMAGE Tivit, Seller of Secrets #107 (real) -> Kaalia of the Vast: 1 player damage, target life 35, target_dead=False
+  END Tivit, Seller of Secrets #107 (real): Life=37 Hand=7 Board=6 Grave=3 Discarded=1 DiscardedCards=[Otawara, Soaring City] HandCards=[Demonic Tutor, Force of Negation, Pact of Negation, Ancient Tomb, City of Traitors, Commandeer, Misty Rainforest] Permanents=[Marsh Flats, Mana Confluence, Tundra, Esper Sentinel (tapped), Starting Town, Monologue Tax]
+
+TURN 4 - Kenrith, the Returned King #113 (real) | Life=40 Hand=7 Board=1 HandCards=[Enduring Vitality, Mirrormade, Chord of Calling, Kinnan, Bonder Prodigy, Firestorm, Warren Soultrader, Smothering Tithe]
+  MANA Kenrith, the Returned King #113 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kenrith, the Returned King #113 (real): Life=40 Hand=7 Board=1 Grave=1 Discarded=1 DiscardedCards=[Warren Soultrader] HandCards=[Enduring Vitality, Mirrormade, Chord of Calling, Kinnan, Bonder Prodigy, Firestorm, Smothering Tithe, Wishclaw Talisman] Permanents=[Forbidden Orchard]
+
+TURN 5 - Kaalia of the Vast | Life=35 Hand=4 Board=4 HandCards=[Genji Glove, Vorpal Sword, Hammer of Nazahn, Demonic Tutor]
+  MANA Kaalia of the Vast: 2 available (2 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 1, 'wildcard': 0})
+  PLAY LAND Kaalia of the Vast: Dragonskull Summit mana+=1 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 1, 'wildcard': 0} rule=curated/verified
+  ACTIVATE Kaalia of the Vast: Ancient Tomb kind=contextual_fast_mana mana_paid=- life=35->33 life_paid=2
+  ANNOUNCE Kaalia of the Vast: Demonic Tutor role=normal phase=precombat_main locked_cost={generic=1, black=1} targets=-
+  PAY COST Kaalia of the Vast: Demonic Tutor cost={generic=1, black=1} mana 4->2 life 33->33 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 1, 'wildcard': 0}
+  CAST Kaalia of the Vast: Demonic Tutor (CMC=2.0) [tutor] phase=precombat_main cost={generic=1, black=1} rule=curated/verified
+  TRIGGER Tivit, Seller of Secrets #107 (real): Esper Sentinel event=opponent_noncreature_spell stack=1
+  RESOLVE ABILITY Tivit, Seller of Secrets #107 (real): Esper Sentinel kind=opponent_noncreature_spell trigger_spell=Demonic Tutor
+  RESOLVE SPELL Kaalia of the Vast: Demonic Tutor (CMC=2.0) [tutor] rule=curated/verified
+  TUTOR Kaalia of the Vast: Demonic Tutor found The One Ring (any_to_hand)
+  END Kaalia of the Vast: Life=33 Hand=4 Board=5 Grave=7 Discarded=0 HandCards=[Genji Glove, Vorpal Sword, Hammer of Nazahn, The One Ring] Permanents=[Mountain // Mountain, Ancient Tomb, Lightning Greaves, Arid Mesa, Dragonskull Summit]
+
+TURN 5 - Rograkh, Son of Rohgahh #94 (real) | Life=38 Hand=6 Board=4 HandCards=[Rhystic Study, Valley Floodcaller, Necropotence, Praetor's Grasp, Simian Spirit Guide, Wheel of Fortune]
+  MANA Rograkh, Son of Rohgahh #94 (real): 2 available (2 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  ANNOUNCE Rograkh, Son of Rohgahh #94 (real): Diabolic Intent role=normal phase=precombat_main locked_cost={generic=1, black=1} targets=-
+  PAY COST Rograkh, Son of Rohgahh #94 (real): Diabolic Intent cost={generic=1, black=1} mana 3->1 life 38->38 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST Rograkh, Son of Rohgahh #94 (real): Diabolic Intent (CMC=2.0) [tutor] phase=precombat_main cost={generic=1, black=1} rule=curated/verified
+  TRIGGER Tivit, Seller of Secrets #107 (real): Esper Sentinel event=opponent_noncreature_spell stack=2
+  RESOLVE ABILITY Tivit, Seller of Secrets #107 (real): Esper Sentinel kind=opponent_noncreature_spell trigger_spell=Diabolic Intent
+  RESOLVE SPELL Rograkh, Son of Rohgahh #94 (real): Diabolic Intent (CMC=2.0) [tutor] rule=curated/verified
+  TUTOR Rograkh, Son of Rohgahh #94 (real): Diabolic Intent found Mystic Remora (any_to_hand)
+  ANNOUNCE Rograkh, Son of Rohgahh #94 (real): Mystic Remora role=normal phase=precombat_main locked_cost={blue=1} targets=-
+  PAY COST Rograkh, Son of Rohgahh #94 (real): Mystic Remora cost={blue=1} mana 1->0 life 38->38 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST Rograkh, Son of Rohgahh #94 (real): Mystic Remora (CMC=1.0) [draw_engine] phase=precombat_main cost={blue=1} rule=curated/verified
+  TRIGGER Tivit, Seller of Secrets #107 (real): Monologue Tax event=opponent_spell stack=3
+  RESOLVE ABILITY Tivit, Seller of Secrets #107 (real): Monologue Tax kind=opponent_spell trigger_spell=Mystic Remora
+  COUNTER Tivit, Seller of Secrets #107 (real): Pact of Negation -> target=Mystic Remora stack_object=Mystic Remora result=countered phase=precombat_main priority_window=stack_response cost=0.0
+  END Rograkh, Son of Rohgahh #94 (real): Life=38 Hand=5 Board=3 Grave=6 Discarded=0 HandCards=[Rhystic Study, Valley Floodcaller, Necropotence, Praetor's Grasp, Wheel of Fortune] Permanents=[Scalding Tarn, Badlands, Steam Vents]
+
+TURN 5 - Tivit, Seller of Secrets #107 (real) | Life=37 Hand=8 Board=6 HandCards=[Demonic Tutor, Force of Negation, Ancient Tomb, City of Traitors, Commandeer, Misty Rainforest, Transmute Artifact, Rhystic Study]
+  MANA Tivit, Seller of Secrets #107 (real): 4 available (3 sources, 1 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  PLAY LAND Tivit, Seller of Secrets #107 (real): Ancient Tomb mana+=1 pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 1, 'wildcard': 0} rule=curated/verified
+  ACTIVATE Tivit, Seller of Secrets #107 (real): Ancient Tomb kind=contextual_fast_mana mana_paid=- life=37->35 life_paid=2
+  ANNOUNCE Tivit, Seller of Secrets #107 (real): Tivit, Seller of Secrets role=commander phase=precombat_main locked_cost={generic=3, black=1, blue=1, white=1} targets=-
+  LIFE Tivit, Seller of Secrets #107 (real): event=conditional_mana_life_cost_paid card=Mana Confluence life=35->34
+  PAY COST Tivit, Seller of Secrets #107 (real): Tivit, Seller of Secrets cost={generic=3, black=1, blue=1, white=1} mana 6->0 life 35->34 life_paid=1 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST COMMANDER Tivit, Seller of Secrets #107 (real): Tivit, Seller of Secrets (CMC=6.0) [ramp_permanent] phase=precombat_main cost={generic=3, black=1, blue=1, white=1} rule=functional_tags_json/heuristic
+  COMBAT Tivit, Seller of Secrets #107 (real) -> Kaalia of the Vast: 1 attackers, 0 blockers, 0 gang blocks, 1 power (reason=evaluation_target_pressure, target_life=33)
+  DAMAGE Tivit, Seller of Secrets #107 (real) -> Kaalia of the Vast: 1 player damage, target life 32, target_dead=False
+  END Tivit, Seller of Secrets #107 (real): Life=34 Hand=7 Board=8 Grave=6 Discarded=2 DiscardedCards=[Misty Rainforest, City of Traitors] HandCards=[Demonic Tutor, Force of Negation, Commandeer, Transmute Artifact, Rhystic Study, Force of Will, Imperial Seal] Permanents=[Marsh Flats, Mana Confluence, Tundra, Esper Sentinel (tapped), Starting Town, Monologue Tax, Ancient Tomb, Tivit, Seller of Secrets]
+
+TURN 5 - Kenrith, the Returned King #113 (real) | Life=40 Hand=7 Board=1 HandCards=[Enduring Vitality, Mirrormade, Chord of Calling, Kinnan, Bonder Prodigy, Firestorm, Smothering Tithe, Wishclaw Talisman]
+  MANA Kenrith, the Returned King #113 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kenrith, the Returned King #113 (real): Life=40 Hand=7 Board=1 Grave=2 Discarded=1 DiscardedCards=[Firestorm] HandCards=[Enduring Vitality, Mirrormade, Chord of Calling, Kinnan, Bonder Prodigy, Smothering Tithe, Wishclaw Talisman, Esper Sentinel] Permanents=[Forbidden Orchard]
+
+TURN 6 - Kaalia of the Vast | Life=32 Hand=4 Board=5 HandCards=[Genji Glove, Vorpal Sword, Hammer of Nazahn, The One Ring]
+  MANA Kaalia of the Vast: 3 available (3 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 1, 'wildcard': 0})
+  ACTIVATE Kaalia of the Vast: Ancient Tomb kind=contextual_fast_mana mana_paid=- life=32->30 life_paid=2
+  ANNOUNCE Kaalia of the Vast: Culling the Weak role=ramp phase=precombat_main locked_cost={black=1} targets=-
+  PAY COST Kaalia of the Vast: Culling the Weak cost={black=1} mana 4->3 life 30->30 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 2, 'wildcard': 0}
+  CAST Kaalia of the Vast: Culling the Weak (CMC=1.0) [ramp_ritual] phase=precombat_main cost={black=1} rule=curated/verified
+  END Kaalia of the Vast: Life=30 Hand=4 Board=5 Grave=8 Discarded=0 HandCards=[Genji Glove, Vorpal Sword, Hammer of Nazahn, The One Ring] Permanents=[Mountain // Mountain, Ancient Tomb, Lightning Greaves, Arid Mesa, Dragonskull Summit]
+
+TURN 6 - Rograkh, Son of Rohgahh #94 (real) | Life=38 Hand=5 Board=3 HandCards=[Rhystic Study, Valley Floodcaller, Necropotence, Praetor's Grasp, Wheel of Fortune]
+  MANA Rograkh, Son of Rohgahh #94 (real): 2 available (2 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  ANNOUNCE Rograkh, Son of Rohgahh #94 (real): Rograkh, Son of Rohgahh role=commander phase=precombat_main locked_cost={generic=2} targets=-
+  PAY COST Rograkh, Son of Rohgahh #94 (real): Rograkh, Son of Rohgahh cost={generic=2} mana 2->0 life 38->38 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST COMMANDER Rograkh, Son of Rohgahh #94 (real): Rograkh, Son of Rohgahh (CMC=0.0) [creature] phase=precombat_main cost={generic=2} rule=type_line_creature/fact
+  END Rograkh, Son of Rohgahh #94 (real): Life=38 Hand=6 Board=4 Grave=6 Discarded=0 HandCards=[Rhystic Study, Valley Floodcaller, Necropotence, Praetor's Grasp, Wheel of Fortune, Splinter's Technique] Permanents=[Scalding Tarn, Badlands, Steam Vents, Rograkh, Son of Rohgahh]
+
+TURN 6 - Tivit, Seller of Secrets #107 (real) | Life=34 Hand=7 Board=8 HandCards=[Demonic Tutor, Force of Negation, Commandeer, Transmute Artifact, Rhystic Study, Force of Will, Imperial Seal]
+  MANA Tivit, Seller of Secrets #107 (real): 4 available (4 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 1, 'wildcard': 0})
+  ACTIVATE Tivit, Seller of Secrets #107 (real): Ancient Tomb kind=contextual_fast_mana mana_paid=- life=34->32 life_paid=2
+  LIFE Tivit, Seller of Secrets #107 (real): event=conditional_mana_life_cost_paid card=Mana Confluence life=32->31
+  COMBAT Tivit, Seller of Secrets #107 (real) -> Kaalia of the Vast: 2 attackers, 0 blockers, 0 gang blocks, 7 power (reason=evaluation_target_pressure, target_life=30)
+  DAMAGE Tivit, Seller of Secrets #107 (real) -> Kaalia of the Vast: 7 player damage, target life 23, target_dead=False
+  END Tivit, Seller of Secrets #107 (real): Life=32 Hand=7 Board=8 Grave=8 Discarded=2 DiscardedCards=[Rhystic Study, Transmute Artifact] HandCards=[Demonic Tutor, Force of Negation, Commandeer, Force of Will, Imperial Seal, Silence, Misdirection] Permanents=[Marsh Flats, Mana Confluence, Tundra, Esper Sentinel (tapped), Starting Town, Monologue Tax, Ancient Tomb, Tivit, Seller of Secrets (tapped)]
+
+TURN 6 - Kenrith, the Returned King #113 (real) | Life=40 Hand=7 Board=1 HandCards=[Enduring Vitality, Mirrormade, Chord of Calling, Kinnan, Bonder Prodigy, Smothering Tithe, Wishclaw Talisman, Esper Sentinel]
+  MANA Kenrith, the Returned King #113 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kenrith, the Returned King #113 (real): Life=40 Hand=7 Board=1 Grave=3 Discarded=1 DiscardedCards=[Smothering Tithe] HandCards=[Enduring Vitality, Mirrormade, Chord of Calling, Kinnan, Bonder Prodigy, Wishclaw Talisman, Esper Sentinel, Mystic Remora] Permanents=[Forbidden Orchard]
+
+TURN 7 - Kaalia of the Vast | Life=23 Hand=4 Board=5 HandCards=[Genji Glove, Vorpal Sword, Hammer of Nazahn, The One Ring]
+  MANA Kaalia of the Vast: 3 available (3 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 1, 'wildcard': 0})
+  ACTIVATE Kaalia of the Vast: Ancient Tomb kind=contextual_fast_mana mana_paid=- life=23->21 life_paid=2
+  ANNOUNCE Kaalia of the Vast: Mjölnir, Hammer of Thor role=normal phase=precombat_main locked_cost={generic=3, red=1} targets=-
+  PAY COST Kaalia of the Vast: Mjölnir, Hammer of Thor cost={generic=3, red=1} mana 4->0 life 21->21 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST Kaalia of the Vast: Mjölnir, Hammer of Thor (CMC=0.0) [damage_wipe] phase=precombat_main cost={generic=3, red=1} rule=unknown/missing
+  TRIGGER Tivit, Seller of Secrets #107 (real): Esper Sentinel event=opponent_noncreature_spell stack=4
+  RESOLVE ABILITY Tivit, Seller of Secrets #107 (real): Esper Sentinel kind=opponent_noncreature_spell trigger_spell=Mjölnir, Hammer of Thor
+  RESOLVE SPELL Kaalia of the Vast: Mjölnir, Hammer of Thor (CMC=0.0) [damage_wipe] rule=unknown/missing
+  END Kaalia of the Vast: Life=21 Hand=4 Board=5 Grave=9 Discarded=0 HandCards=[Genji Glove, Vorpal Sword, Hammer of Nazahn, The One Ring] Permanents=[Mountain // Mountain, Ancient Tomb, Lightning Greaves, Arid Mesa, Dragonskull Summit]
+
+TURN 7 - Rograkh, Son of Rohgahh #94 (real) | Life=38 Hand=6 Board=3 HandCards=[Rhystic Study, Valley Floodcaller, Necropotence, Praetor's Grasp, Wheel of Fortune, Splinter's Technique]
+  MANA Rograkh, Son of Rohgahh #94 (real): 2 available (2 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  ANNOUNCE Rograkh, Son of Rohgahh #94 (real): Talisman of Dominance role=ramp phase=precombat_main locked_cost={generic=2} targets=-
+  PAY COST Rograkh, Son of Rohgahh #94 (real): Talisman of Dominance cost={generic=2} mana 2->0 life 38->38 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST Rograkh, Son of Rohgahh #94 (real): Talisman of Dominance (CMC=2.0) [ramp_permanent] phase=precombat_main cost={generic=2} rule=curated/verified
+  END Rograkh, Son of Rohgahh #94 (real): Life=38 Hand=6 Board=4 Grave=6 Discarded=0 HandCards=[Rhystic Study, Valley Floodcaller, Necropotence, Praetor's Grasp, Wheel of Fortune, Splinter's Technique] Permanents=[Scalding Tarn, Badlands, Steam Vents, Talisman of Dominance]
+
+TURN 7 - Tivit, Seller of Secrets #107 (real) | Life=32 Hand=8 Board=7 HandCards=[Demonic Tutor, Force of Negation, Commandeer, Force of Will, Imperial Seal, Silence, Misdirection, Polluted Delta]
+  MANA Tivit, Seller of Secrets #107 (real): 4 available (4 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 1, 'wildcard': 0})
+  PLAY LAND Tivit, Seller of Secrets #107 (real): Polluted Delta mana+=1 pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 1, 'wildcard': 0} rule=curated/verified
+  ACTIVATE Tivit, Seller of Secrets #107 (real): Polluted Delta kind=self_sacrifice_land_tutor_artifact mana_paid=- life=32->31 life_paid=1
+  LIFE Tivit, Seller of Secrets #107 (real): event=conditional_mana_life_cost_paid card=Mana Confluence life=31->30
+  COMBAT Tivit, Seller of Secrets #107 (real) -> Kaalia of the Vast: 1 attackers, 0 blockers, 0 gang blocks, 6 power (reason=evaluation_target_pressure, target_life=21)
+  DAMAGE Tivit, Seller of Secrets #107 (real) -> Kaalia of the Vast: 6 player damage, target life 15, target_dead=False
+  END Tivit, Seller of Secrets #107 (real): Life=31 Hand=7 Board=8 Grave=11 Discarded=1 DiscardedCards=[Displacer Kitten] HandCards=[Demonic Tutor, Force of Negation, Commandeer, Force of Will, Imperial Seal, Silence, Misdirection] Permanents=[Marsh Flats, Mana Confluence, Tundra, Starting Town, Monologue Tax, Ancient Tomb, Tivit, Seller of Secrets (tapped), Godless Shrine (tapped)]
+
+TURN 7 - Kenrith, the Returned King #113 (real) | Life=40 Hand=7 Board=1 HandCards=[Enduring Vitality, Mirrormade, Chord of Calling, Kinnan, Bonder Prodigy, Wishclaw Talisman, Esper Sentinel, Mystic Remora]
+  MANA Kenrith, the Returned King #113 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kenrith, the Returned King #113 (real): Life=40 Hand=7 Board=1 Grave=4 Discarded=1 DiscardedCards=[Mirrormade] HandCards=[Enduring Vitality, Chord of Calling, Kinnan, Bonder Prodigy, Wishclaw Talisman, Esper Sentinel, Mystic Remora, Silence] Permanents=[Forbidden Orchard]
+
+TURN 8 - Kaalia of the Vast | Life=15 Hand=4 Board=5 HandCards=[Genji Glove, Vorpal Sword, Hammer of Nazahn, The One Ring]
+  MANA Kaalia of the Vast: 3 available (3 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 1, 'wildcard': 0})
+  ACTIVATE Kaalia of the Vast: Ancient Tomb kind=contextual_fast_mana mana_paid=- life=15->13 life_paid=2
+  ANNOUNCE Kaalia of the Vast: The One Ring role=high_threat phase=precombat_main locked_cost={generic=4} targets=-
+  PAY COST Kaalia of the Vast: The One Ring cost={generic=4} mana 4->0 life 13->13 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST Kaalia of the Vast: The One Ring (CMC=4.0) [draw_engine] phase=precombat_main cost={generic=4} rule=curated/verified
+  RESOLVE SPELL Kaalia of the Vast: The One Ring (CMC=4.0) [draw_engine] rule=curated/verified
+  ACTIVATE Kaalia of the Vast: The One Ring kind=burden_draw mana_paid=-
+  END Kaalia of the Vast: Life=13 Hand=5 Board=6 Grave=9 Discarded=0 HandCards=[Genji Glove, Vorpal Sword, Hammer of Nazahn, Alicia Masters, Skilled Sculptor, Mountain // Mountain] Permanents=[Mountain // Mountain, Ancient Tomb, Lightning Greaves, Arid Mesa, Dragonskull Summit, The One Ring (tapped)]
+
+TURN 8 - Rograkh, Son of Rohgahh #94 (real) | Life=38 Hand=6 Board=4 HandCards=[Rhystic Study, Valley Floodcaller, Necropotence, Praetor's Grasp, Wheel of Fortune, Splinter's Technique]
+  MANA Rograkh, Son of Rohgahh #94 (real): 3 available (3 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  PLAY LAND Rograkh, Son of Rohgahh #94 (real): Verdant Catacombs mana+=1 pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0} rule=curated/verified
+  ACTIVATE Rograkh, Son of Rohgahh #94 (real): Verdant Catacombs kind=self_sacrifice_land_tutor_artifact mana_paid=- life=38->37 life_paid=1
+  ANNOUNCE Rograkh, Son of Rohgahh #94 (real): Rograkh, Son of Rohgahh role=commander phase=precombat_main locked_cost={generic=4} targets=-
+  PAY COST Rograkh, Son of Rohgahh #94 (real): Rograkh, Son of Rohgahh cost={generic=4} mana 4->0 life 37->37 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST COMMANDER Rograkh, Son of Rohgahh #94 (real): Rograkh, Son of Rohgahh (CMC=0.0) [creature] phase=precombat_main cost={generic=4} rule=type_line_creature/fact
+  END Rograkh, Son of Rohgahh #94 (real): Life=37 Hand=6 Board=6 Grave=7 Discarded=0 HandCards=[Rhystic Study, Valley Floodcaller, Necropotence, Praetor's Grasp, Wheel of Fortune, Splinter's Technique] Permanents=[Scalding Tarn, Badlands, Steam Vents, Talisman of Dominance, Blood Crypt (tapped), Rograkh, Son of Rohgahh]
+
+TURN 8 - Tivit, Seller of Secrets #107 (real) | Life=31 Hand=7 Board=8 HandCards=[Demonic Tutor, Force of Negation, Commandeer, Force of Will, Imperial Seal, Silence, Misdirection]
+  MANA Tivit, Seller of Secrets #107 (real): 5 available (5 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 1, 'wildcard': 0})
+  LIFE Tivit, Seller of Secrets #107 (real): event=conditional_mana_life_cost_paid card=Mana Confluence life=31->30
+  COMBAT Tivit, Seller of Secrets #107 (real) -> Kaalia of the Vast: 1 attackers, 0 blockers, 0 gang blocks, 6 power (reason=evaluation_target_pressure, target_life=13)
+  DAMAGE Tivit, Seller of Secrets #107 (real) -> Kaalia of the Vast: 0 player damage, target life 13, target_dead=False
+  END Tivit, Seller of Secrets #107 (real): Life=31 Hand=7 Board=8 Grave=12 Discarded=1 DiscardedCards=[Demonic Tutor] HandCards=[Force of Negation, Commandeer, Force of Will, Imperial Seal, Silence, Misdirection, Flusterstorm] Permanents=[Marsh Flats, Mana Confluence, Tundra, Starting Town, Monologue Tax, Ancient Tomb, Tivit, Seller of Secrets (tapped), Godless Shrine]
+
+TURN 8 - Kenrith, the Returned King #113 (real) | Life=40 Hand=7 Board=1 HandCards=[Enduring Vitality, Chord of Calling, Kinnan, Bonder Prodigy, Wishclaw Talisman, Esper Sentinel, Mystic Remora, Silence]
+  MANA Kenrith, the Returned King #113 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kenrith, the Returned King #113 (real): Life=40 Hand=7 Board=1 Grave=5 Discarded=1 DiscardedCards=[Enduring Vitality] HandCards=[Chord of Calling, Kinnan, Bonder Prodigy, Wishclaw Talisman, Esper Sentinel, Mystic Remora, Silence, Diabolic Intent] Permanents=[Forbidden Orchard]
+
+TURN 9 - Kaalia of the Vast | Life=13 Hand=5 Board=6 HandCards=[Genji Glove, Vorpal Sword, Hammer of Nazahn, Alicia Masters, Skilled Sculptor, Mountain // Mountain]
+  MANA Kaalia of the Vast: 3 available (3 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 1, 'wildcard': 0})
+  LIFE Kaalia of the Vast: event=one_ring_burden_life_loss card=The One Ring life=13->12
+  PLAY LAND Kaalia of the Vast: Mountain // Mountain mana+=1 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 2, 'green': 0, 'colorless': 1, 'wildcard': 0} rule=curated/verified
+  ACTIVATE Kaalia of the Vast: Ancient Tomb kind=contextual_fast_mana mana_paid=- life=12->10 life_paid=2
+  ANNOUNCE Kaalia of the Vast: Vampiric Tutor role=normal phase=precombat_main locked_cost={black=1} targets=-
+  PAY COST Kaalia of the Vast: Vampiric Tutor cost={black=1} mana 5->4 life 10->10 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 2, 'green': 0, 'colorless': 2, 'wildcard': 0}
+  CAST Kaalia of the Vast: Vampiric Tutor (CMC=1.0) [tutor] phase=precombat_main cost={black=1} rule=curated/verified
+  RESOLVE SPELL Kaalia of the Vast: Vampiric Tutor (CMC=1.0) [tutor] rule=curated/verified
+  TUTOR Kaalia of the Vast: Vampiric Tutor found Grand Abolisher (any_to_top)
+  LIFE Kaalia of the Vast: event=tutor_life_loss_resolved card=Vampiric Tutor life=10->8
+  ANNOUNCE Kaalia of the Vast: Alicia Masters, Skilled Sculptor role=creature phase=precombat_main locked_cost={generic=1, red=1} targets=-
+  PAY COST Kaalia of the Vast: Alicia Masters, Skilled Sculptor cost={generic=1, red=1} mana 4->2 life 8->8 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 1, 'wildcard': 0}
+  CAST CREATURE Kaalia of the Vast: Alicia Masters, Skilled Sculptor (CMC=2.0) [creature] phase=precombat_main cost={generic=1, red=1} rule=type_line_creature/fact
+  END Kaalia of the Vast: Life=8 Hand=3 Board=8 Grave=10 Discarded=0 HandCards=[Genji Glove, Vorpal Sword, Hammer of Nazahn] Permanents=[Mountain // Mountain, Ancient Tomb, Lightning Greaves, Arid Mesa, Dragonskull Summit, The One Ring, Mountain // Mountain, Alicia Masters, Skilled Sculptor]
+
+TURN 9 - Rograkh, Son of Rohgahh #94 (real) | Life=37 Hand=6 Board=6 HandCards=[Rhystic Study, Valley Floodcaller, Necropotence, Praetor's Grasp, Wheel of Fortune, Splinter's Technique]
+  MANA Rograkh, Son of Rohgahh #94 (real): 4 available (4 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  ANNOUNCE Rograkh, Son of Rohgahh #94 (real): Rhystic Study role=normal phase=precombat_main locked_cost={generic=2, blue=1} targets=-
+  PAY COST Rograkh, Son of Rohgahh #94 (real): Rhystic Study cost={generic=2, blue=1} mana 4->1 life 37->37 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST Rograkh, Son of Rohgahh #94 (real): Rhystic Study (CMC=3.0) [draw_engine] phase=precombat_main cost={generic=2, blue=1} rule=curated/verified
+  RESOLVE SPELL Rograkh, Son of Rohgahh #94 (real): Rhystic Study (CMC=3.0) [draw_engine] rule=curated/verified
+  COMBAT Rograkh, Son of Rohgahh #94 (real) -> Kaalia of the Vast: 1 attackers, 0 blockers, 0 gang blocks, 1 power (reason=evaluation_target_pressure, target_life=8)
+  DAMAGE Rograkh, Son of Rohgahh #94 (real) -> Kaalia of the Vast: 1 player damage, target life 7, target_dead=False
+  END Rograkh, Son of Rohgahh #94 (real): Life=37 Hand=7 Board=7 Grave=7 Discarded=0 HandCards=[Valley Floodcaller, Necropotence, Praetor's Grasp, Wheel of Fortune, Splinter's Technique, Yawgmoth's Will, Lotus Petal] Permanents=[Scalding Tarn, Badlands, Steam Vents, Talisman of Dominance, Blood Crypt, Rograkh, Son of Rohgahh (tapped), Rhystic Study]
+
+TURN 9 - Tivit, Seller of Secrets #107 (real) | Life=31 Hand=7 Board=8 HandCards=[Force of Negation, Commandeer, Force of Will, Imperial Seal, Silence, Misdirection, Flusterstorm]
+  MANA Tivit, Seller of Secrets #107 (real): 5 available (5 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 1, 'wildcard': 0})
+  LIFE Tivit, Seller of Secrets #107 (real): event=conditional_mana_life_cost_paid card=Mana Confluence life=31->30
+  COMBAT Tivit, Seller of Secrets #107 (real) -> Kaalia of the Vast: 1 attackers, 0 blockers, 0 gang blocks, 6 power (reason=evaluation_target_pressure, target_life=7)
+  DAMAGE Tivit, Seller of Secrets #107 (real) -> Kaalia of the Vast: 6 player damage, target life 1, target_dead=False
+  END Tivit, Seller of Secrets #107 (real): Life=31 Hand=7 Board=8 Grave=13 Discarded=1 DiscardedCards=[Teferi, Time Raveler] HandCards=[Force of Negation, Commandeer, Force of Will, Imperial Seal, Silence, Misdirection, Flusterstorm] Permanents=[Marsh Flats, Mana Confluence, Tundra, Starting Town, Monologue Tax, Ancient Tomb, Tivit, Seller of Secrets (tapped), Godless Shrine]
+
+TURN 9 - Kenrith, the Returned King #113 (real) | Life=40 Hand=7 Board=1 HandCards=[Chord of Calling, Kinnan, Bonder Prodigy, Wishclaw Talisman, Esper Sentinel, Mystic Remora, Silence, Diabolic Intent]
+  MANA Kenrith, the Returned King #113 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  END Kenrith, the Returned King #113 (real): Life=40 Hand=7 Board=1 Grave=6 Discarded=1 DiscardedCards=[Chord of Calling] HandCards=[Kinnan, Bonder Prodigy, Wishclaw Talisman, Esper Sentinel, Mystic Remora, Silence, Diabolic Intent, Pact of Negation] Permanents=[Forbidden Orchard]
+
+TURN 10 - Kaalia of the Vast | Life=1 Hand=3 Board=8 HandCards=[Genji Glove, Vorpal Sword, Hammer of Nazahn]
+  MANA Kaalia of the Vast: 4 available (4 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 2, 'green': 0, 'colorless': 1, 'wildcard': 0})
+  LIFE Kaalia of the Vast: event=one_ring_burden_life_loss card=The One Ring life=1->0
+  >>> DIED: Kaalia of the Vast (life_zero) <<<
+
+GAME OVER - Turn 10
+  >>> WIN: Rograkh, Son of Rohgahh #94 (real) (elimination) turn 10 <<<
+Winner: Rograkh, Son of Rohgahh #94 (real) (elimination)
+Kaalia of the Vast: DEAD Life=0 Hand=4 HandCards=[Genji Glove, Vorpal Sword, Hammer of Nazahn, Grand Abolisher]
+Rograkh, Son of Rohgahh #94 (real): ALIVE Life=37 Hand=7 HandCards=[Valley Floodcaller, Necropotence, Praetor's Grasp, Wheel of Fortune, Splinter's Technique, Yawgmoth's Will, Lotus Petal]
+Tivit, Seller of Secrets #107 (real): ALIVE Life=31 Hand=7 HandCards=[Force of Negation, Commandeer, Force of Will, Imperial Seal, Silence, Misdirection, Flusterstorm]
+Kenrith, the Returned King #113 (real): ALIVE Life=40 Hand=7 HandCards=[Kinnan, Bonder Prodigy, Wishclaw Talisman, Esper Sentinel, Mystic Remora, Silence, Diabolic Intent, Pact of Negation]
