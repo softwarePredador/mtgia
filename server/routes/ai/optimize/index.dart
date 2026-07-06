@@ -65,6 +65,7 @@ import '../../../lib/http_responses.dart';
 import '../../../lib/logger.dart';
 import '../../../lib/meta/meta_deck_reference_support.dart';
 import '../../../lib/observability.dart';
+import '../../../lib/openai_runtime_config.dart';
 import '../../../lib/ai/optimize_route_internal.dart';
 import '../../../lib/ai/optimize_response_support.dart';
 export '../../../lib/ai/optimize_response_support.dart';
@@ -429,6 +430,10 @@ Future<Response> onRequest(RequestContext context) async {
         resolveSemanticV2ExpandedCriticalRoles(
       env['SEMANTIC_LAYER_V2_EXPANDED_CRITICAL_ROLES'],
     );
+    final aiConfig = OpenAiRuntimeConfig(env);
+    final apiKey = env['OPENAI_API_KEY'];
+    final aiProviderMissingInProduction =
+        (apiKey == null || apiKey.isEmpty) && !aiConfig.allowsMockFallbacks;
 
     _optimizeRequestCount++;
 
@@ -440,6 +445,13 @@ Future<Response> onRequest(RequestContext context) async {
       return unauthorized('Authentication required');
     }
     final authenticatedUserId = userId;
+
+    if (aiProviderMissingInProduction && !intensity.isRebuild) {
+      return apiError(
+        HttpStatus.serviceUnavailable,
+        'AI provider is not configured',
+      );
+    }
 
     // 1. Fetch Deck Data
     final pool = context.read<Pool>();
@@ -826,7 +838,6 @@ Future<Response> onRequest(RequestContext context) async {
     }
 
     // 2. OtimizaÃ§Ã£o via DeckOptimizerService (IA + RAG)
-    final apiKey = env['OPENAI_API_KEY'];
     final disableCompleteAi = env['OPTIMIZE_COMPLETE_DISABLE_OPENAI'] == '1';
 
     final deckOptimizer = (apiKey != null && apiKey.isNotEmpty)

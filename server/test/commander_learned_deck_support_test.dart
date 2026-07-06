@@ -375,14 +375,24 @@ void main() {
       expect(route, isNot(contains("'metadata': learnedDeck['metadata']")));
     });
 
-    test('commander learning route stays auth-only in AI middleware', () {
+    test('read-only AI helper routes stay auth-only in AI middleware', () {
       final middleware = File('routes/ai/_middleware.dart').readAsStringSync();
 
       expect(middleware, contains("'/ai/commander-learning'"));
+      expect(middleware, contains("'/ai/generate/jobs/'"));
+      expect(middleware, contains("'/ai/optimize/jobs/'"));
       expect(middleware, contains('authOnlyHandler'));
       expect(middleware, contains('costlyAiHandler'));
       expect(
         middleware.indexOf("'/ai/commander-learning'"),
+        lessThan(middleware.indexOf('return costlyAiHandler(context)')),
+      );
+      expect(
+        middleware.indexOf("'/ai/generate/jobs/'"),
+        lessThan(middleware.indexOf('return costlyAiHandler(context)')),
+      );
+      expect(
+        middleware.indexOf("'/ai/optimize/jobs/'"),
         lessThan(middleware.indexOf('return costlyAiHandler(context)')),
       );
     });

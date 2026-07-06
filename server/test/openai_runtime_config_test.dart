@@ -22,6 +22,7 @@ void main() {
       final env = DotEnv()..addAll({'ENVIRONMENT': 'production'});
       final config = OpenAiRuntimeConfig(env);
 
+      expect(config.allowsMockFallbacks, isFalse);
       expect(
         config.shouldUseFallbackForInvalidApiKey(
           statusCode: 401,

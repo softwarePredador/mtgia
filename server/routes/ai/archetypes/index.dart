@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
 import 'package:dotenv/dotenv.dart';
@@ -175,6 +176,12 @@ Future<Response> onRequest(RequestContext context) async {
     final apiKey = env['OPENAI_API_KEY'];
 
     if (apiKey == null || apiKey.isEmpty) {
+      if (!aiConfig.allowsMockFallbacks) {
+        return apiError(
+          HttpStatus.serviceUnavailable,
+          'AI provider is not configured',
+        );
+      }
       final responseBody = _buildMockArchetypesPayload();
       totalStopwatch.stop();
       _annotateArchetypesPayload(

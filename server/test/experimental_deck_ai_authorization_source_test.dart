@@ -401,17 +401,18 @@ void main() {
       expect(recommendations, isNot(contains('colorFilter')));
     });
 
-    test('following community feed has explicit app-facing route file', () {
-      final dedicatedRoute = File(
-        'routes/community/decks/following/index.dart',
-      ).readAsStringSync();
+    test('following community feed is routed before deck id lookup', () {
       final dynamicRoute = File(
         'routes/community/decks/[id].dart',
       ).readAsStringSync();
 
-      expect(dedicatedRoute, contains('getFollowingFeed(context)'));
       expect(dynamicRoute, contains("if (id == 'following')"));
       expect(dynamicRoute, contains('getFollowingFeed(context)'));
+      expect(
+        dynamicRoute.indexOf("if (id == 'following')"),
+        lessThan(
+            dynamicRoute.indexOf("context.request.method == HttpMethod.get")),
+      );
     });
 
     test('deck-card intelligence queries avoid multi-row tag fanout', () {

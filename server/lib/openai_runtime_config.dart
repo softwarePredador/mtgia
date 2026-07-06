@@ -25,6 +25,8 @@ class OpenAiRuntimeConfig {
 
   bool get isProductionLike => _profile == 'prod';
 
+  bool get allowsMockFallbacks => !isProductionLike;
+
   bool shouldUseFallbackForInvalidApiKey({
     required int statusCode,
     required String responseBody,

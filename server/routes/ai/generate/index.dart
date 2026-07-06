@@ -177,6 +177,12 @@ Future<Response> onRequest(RequestContext context) async {
     );
 
     if (apiKey == null || apiKey.isEmpty) {
+      if (!aiConfig.allowsMockFallbacks) {
+        return apiError(
+          HttpStatus.serviceUnavailable,
+          'AI provider is not configured',
+        );
+      }
       final mockBody = await _buildMockGenerateResponse(
         pool: pool,
         prompt: prompt,
@@ -487,6 +493,8 @@ $metaContext
         archetypeSourceCommanderNames: archetypeSourceCommanderNames,
         archetypeCommanderColorIdentity: archetypeCommanderColorIdentity,
         usageHotCards: usageHotCards,
+        isMock: false,
+        generationMode: 'openai_timeout_deterministic_fallback',
         warningCode: 'openai_timeout_deterministic_fallback',
         warningMessage:
             'A geracao demorou mais que o limite configurado. Retornando fallback deterministico valido para manter o fluxo create/validate/optimize.',

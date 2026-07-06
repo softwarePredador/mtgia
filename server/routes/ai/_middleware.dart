@@ -21,10 +21,17 @@ Handler middleware(Handler handler) {
       .use(aiRateLimit());
 
   return (context) {
+    final path = context.request.uri.path;
     // Learned deck availability is a local PostgreSQL read used by the generate
     // screen. It must remain authenticated, but should not consume paid AI quota
     // or the cost-oriented AI rate-limit bucket.
-    if (context.request.uri.path == '/ai/commander-learning') {
+    //
+    // Async job polling is also a status read. The job routes still verify the
+    // authenticated owner before returning data, but polling must not consume AI
+    // quota or the rate-limit bucket that protects expensive generation calls.
+    if (path == '/ai/commander-learning' ||
+        path.startsWith('/ai/generate/jobs/') ||
+        path.startsWith('/ai/optimize/jobs/')) {
       return authOnlyHandler(context);
     }
     return costlyAiHandler(context);

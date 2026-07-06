@@ -1,4 +1,4 @@
-const DEFAULT_MANALOOM_API_BASE_URL = "https://evolution-cartinhas.2ta7qx.easypanel.host";
+const DEFAULT_MANALOOM_API_BASE_URL = "https://evolution-cartinhas.8ktevp.easypanel.host";
 const SERVER_REVALIDATE_SECONDS = 300;
 
 export type PublicHealth = {

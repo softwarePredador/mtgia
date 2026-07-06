@@ -490,8 +490,6 @@ Future<Map<String, dynamic>> _pollGeneratedDeckJob(
             'Não conseguimos concluir a geração agora. Tente novamente em instantes.',
       );
     }
-
-    await Future<void>.delayed(pollInterval);
   }
 
   _recordGenerateEvent('ai_generate_polling_timeout', {

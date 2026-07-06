@@ -174,6 +174,12 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
     Map<String, dynamic> analysis;
     var isMock = false;
     if (apiKey == null || apiKey.isEmpty) {
+      if (!aiConfig.allowsMockFallbacks) {
+        return Response.json(
+          statusCode: HttpStatus.serviceUnavailable,
+          body: {'error': 'AI provider is not configured'},
+        );
+      }
       analysis = _heuristicAnalysis(
         format: format,
         archetype: archetype,
@@ -192,6 +198,12 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
           metrics: metrics,
         );
       } catch (_) {
+        if (!aiConfig.allowsMockFallbacks) {
+          return Response.json(
+            statusCode: HttpStatus.badGateway,
+            body: {'error': 'AI provider failed'},
+          );
+        }
         isMock = true;
         analysis = _heuristicAnalysis(
           format: format,

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:http/http.dart' as http;
 import 'package:dotenv/dotenv.dart';
@@ -53,10 +54,18 @@ Future<Response> onRequest(RequestContext context) async {
     final apiKey = env['OPENAI_API_KEY'];
 
     // Se não tiver chave da API, retorna uma explicação mockada/heurística
+    // somente fora de produção.
     if (apiKey == null || apiKey.isEmpty) {
+      if (!aiConfig.allowsMockFallbacks) {
+        return apiError(
+          HttpStatus.serviceUnavailable,
+          'AI provider is not configured',
+        );
+      }
       return Response.json(
         body: {
-          'explanation': _generateFallbackExplanation(cardName, oracleText, typeLine),
+          'explanation':
+              _generateFallbackExplanation(cardName, oracleText, typeLine),
           'is_mock': true,
         },
       );
@@ -125,7 +134,7 @@ Explique esta carta para ajudar o jogador a tomar melhores decisões durante a p
     if (response.statusCode == 200) {
       final data = jsonDecode(utf8.decode(response.bodyBytes));
       final content = data['choices'][0]['message']['content'] as String;
-      
+
       // 2. Save to Database Cache
       if (cardId != null) {
         try {
@@ -166,7 +175,6 @@ Explique esta carta para ajudar o jogador a tomar melhores decisões durante a p
         'Failed to call AI provider: ${response.body}',
       );
     }
-
   } catch (e) {
     print('[ERROR] Internal server error: $e');
     return internalServerError('Internal server error');

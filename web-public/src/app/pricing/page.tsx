@@ -10,11 +10,11 @@ export const metadata: Metadata = {
 };
 
 function formatPlanValue(plan: (typeof productPlans)[number]) {
-  return plan.id === "pro" ? new Intl.NumberFormat("pt-BR").format(plan.monthlyAiLimit) : plan.priceLabel;
+  return plan.priceLabel;
 }
 
 function formatPlanCaption(plan: (typeof productPlans)[number]) {
-  return plan.id === "pro" ? "ações de IA por mês" : `${plan.monthlyAiLimit} ações de IA por mês`;
+  return `${new Intl.NumberFormat("pt-BR").format(plan.monthlyAiLimit)} ações de IA por mês`;
 }
 
 export default function PricingPage() {

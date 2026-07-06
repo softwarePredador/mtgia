@@ -71,7 +71,7 @@ export const productPlans: ProductPlan[] = [
   {
     id: "pro",
     name: "Pro",
-    priceLabel: "200",
+    priceLabel: "Pro",
     monthlyAiLimit: 200,
     description:
       "Para quem mantém decks vivos, compara upgrades e volta depois de cada partida.",
