@@ -1726,9 +1726,14 @@ Current external refresh on 2026-07-05:
   deck `612` stayed below land floor (`land=28`). The land floor package
   synthesizer therefore builds a full `7`-swap package for deck `612`; the
   package materializer keeps the source DB unchanged, repairs the generic land
-  floor to `land=34`, and passes package chain audit. Battle remains closed
-  because the package strategy matrix blocks on `commander_profile_not_available`
-  for Lorehold, so the next gate is `repair_commander_profile_blockers_before_battle`.
+  floor to `land=34`, and passes package chain audit. The first package
+  strategy matrix correctly stayed closed on `commander_profile_not_available`;
+  the follow-up matrix now consumes the local Lorehold reference profile and
+  keeps battle closed on real blockers: `profile_lands_below_target` because
+  Lorehold wants `36-38` lands, plus protected anchor cuts for `Pyromancer's
+  Goggles`, `Call Forth the Tempest`, and `Birgi, God of Storytelling //
+  Harnfel, Horn of Bounty`. The next gate remains
+  `repair_commander_profile_blockers_before_battle`, not battle.
   Current evidence:
   `global_commander_learning_priority_audit_20260706_ramp_axis_exhaustion_current.md`,
   `global_commander_cross_commander_role_axis_learning_pivot_20260706_ramp_axis_exhaustion_current.md`,
@@ -1740,7 +1745,9 @@ Current external refresh on 2026-07-05:
   `global_commander_candidate_copy_materializer_20260706_land_floor_deck612_package.md`,
   `global_commander_candidate_package_chain_audit_20260706_land_floor_deck612_package.md`,
   and
-  `global_commander_candidate_package_strategy_matrix_20260706_land_floor_deck612_package.md`.
+  `global_commander_candidate_package_strategy_matrix_20260706_land_floor_deck612_package.md`,
+  then
+  `global_commander_candidate_package_strategy_matrix_20260706_land_floor_deck612_package_lorehold_profile.md`.
 
 ## Global Commander Rollout - 2026-07-01
 

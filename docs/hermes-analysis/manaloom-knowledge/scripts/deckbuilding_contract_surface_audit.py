@@ -660,6 +660,10 @@ GLOBAL_COMMANDER_LAND_FLOOR_PACKAGE_STRATEGY_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_package_strategy_matrix_20260706_land_floor_deck612_package.md"
 )
+GLOBAL_COMMANDER_LAND_FLOOR_PACKAGE_STRATEGY_LOREHOLD_PROFILE_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_package_strategy_matrix_20260706_land_floor_deck612_package_lorehold_profile.md"
+)
 GLOBAL_COMMANDER_CANDIDATE_BATTLE_PROBE_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_battle_probe_audit_20260705_kaalia_nonland_floor_dynamic_target.md"
@@ -1195,7 +1199,10 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_candidate_copy_materializer_20260706_land_floor_deck612_package.md",
                 "global_commander_candidate_package_chain_audit_20260706_land_floor_deck612_package.md",
                 "global_commander_candidate_package_strategy_matrix_20260706_land_floor_deck612_package.md",
+                "global_commander_candidate_package_strategy_matrix_20260706_land_floor_deck612_package_lorehold_profile.md",
                 "commander_profile_not_available",
+                "profile_lands_below_target",
+                "protected anchor cuts",
                 "repair_commander_profile_blockers_before_battle",
                 "global_commander_external_exact_artifact_engine_source_expander.py",
                 "global_commander_external_exact_artifact_engine_source_expander_20260706_current.md",
@@ -3922,6 +3929,10 @@ def build_audit() -> dict[str, Any]:
                 "promotion_allowed",
                 "repair_commander_profile_blockers_before_battle",
                 "attack_window_cut_without_replacement",
+                "LOREHOLD_PROFILE",
+                "protected_profile_anchor_cut",
+                "protected_anchor_boundary",
+                "topdeck_miracle_setup",
                 "battle_or_optimization_performed",
                 "mutation_allowed",
             ],
@@ -4779,6 +4790,26 @@ def build_audit() -> dict[str, Any]:
                 "repair_commander_profile_blockers_before_battle",
                 "Ash Barrens",
                 "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_LAND_FLOOR_PACKAGE_STRATEGY_LOREHOLD_PROFILE_REPORT,
+            [
+                "Global Commander Candidate Package Strategy Matrix",
+                "package_strategy_blocks_battle",
+                "commander: `Lorehold, the Historian`",
+                "profile_version: `lorehold_reference_profile_v1_2026-05-11`",
+                "battle_gate_allowed_now: `false`",
+                "promotion_allowed: `false`",
+                "profile_lands_below_target",
+                "protected_profile_anchor_cut:Pyromancer's Goggles",
+                "protected_profile_anchor_cut:Call Forth the Tempest",
+                "protected_profile_anchor_cut:Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+                "repair_commander_profile_blockers_before_battle",
+                "protected_anchor_boundary",
+                "Ash Barrens",
             ],
         )
     )

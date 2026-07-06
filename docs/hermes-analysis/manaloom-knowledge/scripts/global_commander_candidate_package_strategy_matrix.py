@@ -122,11 +122,118 @@ KAALIA_PROFILE = {
     },
 }
 
-PROFILE_BY_COMMANDER = {
-    normalize_name(KAALIA_PROFILE["commander"]): KAALIA_PROFILE,
+LOREHOLD_PROFILE = {
+    "commander": "Lorehold, the Historian",
+    "source": "server/lib/ai/commander_reference_profile_support.dart",
+    "version": "lorehold_reference_profile_v1_2026-05-11",
+    "role_targets": {
+        "lands": {"min": 36, "max": 38, "hard_floor": True},
+        "mana_rocks_treasure_ramp": {"min": 10, "max": 13, "hard_floor": True},
+        "topdeck_miracle_setup": {"min": 6, "max": 9, "hard_floor": True},
+        "draw_rummage_opponent_turn_draw": {"min": 8, "max": 12, "hard_floor": True},
+        "miracle_haymakers": {"min": 10, "max": 16, "hard_floor": True},
+        "spot_interaction": {"min": 4, "max": 6, "hard_floor": True},
+        "board_wipes_resets": {"min": 3, "max": 5, "hard_floor": True},
+        "spell_payoffs_copy_engines": {"min": 5, "max": 8, "hard_floor": True},
+        "graveyard_recursion": {"min": 2, "max": 5, "hard_floor": True},
+        "dedicated_win_conditions": {"min": 4, "max": 7, "hard_floor": True},
+    },
+    "expected_packages": {
+        "topdeck_and_miracle_setup": [
+            "Sensei's Divining Top",
+            "Scroll Rack",
+            "Library of Leng",
+            "Brainstone",
+            "Temple Bell",
+            "Mikokoro, Center of the Sea",
+            "Victory Chimes",
+        ],
+        "mana_ramp_foundation": [
+            "Sol Ring",
+            "Arcane Signet",
+            "Boros Signet",
+            "Fellwar Stone",
+            "Talisman of Conviction",
+            "Mana Vault",
+            "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+        ],
+        "draw_rummage_foundation": [
+            "Esper Sentinel",
+            "Faithless Looting",
+            "Unexpected Windfall",
+            "Wheel of Fortune",
+            "Reforge the Soul",
+        ],
+        "miracle_payoffs_expensive_spells": [
+            "Approach of the Second Sun",
+            "Storm Herd",
+            "Rise of the Eldrazi",
+            "Soulfire Eruption",
+            "Apex of Power",
+            "Volcanic Vision",
+            "Creative Technique",
+            "Dance with Calamity",
+            "Call Forth the Tempest",
+            "Brass's Bounty",
+            "Hit the Mother Lode",
+            "Mizzix's Mastery",
+        ],
+        "interaction_and_resets": [
+            "Swords to Plowshares",
+            "Path to Exile",
+            "Generous Gift",
+            "Blasphemous Act",
+            "Austere Command",
+            "Terminus",
+            "Bonfire of the Damned",
+        ],
+        "protection_and_equipment": [
+            "Boros Charm",
+            "Lightning Greaves",
+            "Teferi's Protection",
+            "Silence",
+        ],
+        "spell_payoff_copy_package": [
+            "Storm-Kiln Artist",
+            "Monastery Mentor",
+            "Young Pyromancer",
+            "Primal Amulet // Primal Wellspring",
+            "Pyromancer's Goggles",
+            "Double Vision",
+            "Sunbird's Invocation",
+            "Arcane Bombardment",
+            "Chandra, Hope's Beacon",
+        ],
+    },
+    "protected_cut_cards": [
+        "Aetherflux Reservoir",
+        "Bender's Waterskin",
+        "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+        "Call Forth the Tempest",
+        "Mana Vault",
+        "Mizzix's Mastery",
+        "Molecule Man",
+        "Pyromancer's Goggles",
+        "Scroll Rack",
+        "Sensei's Divining Top",
+        "The Mind Stone",
+        "The Scarlet Witch",
+        "Victory Chimes",
+    ],
 }
 
-ROLE_ORDER = list(KAALIA_PROFILE["role_targets"].keys())
+PROFILE_BY_COMMANDER = {
+    normalize_name(KAALIA_PROFILE["commander"]): KAALIA_PROFILE,
+    normalize_name(LOREHOLD_PROFILE["commander"]): LOREHOLD_PROFILE,
+}
+
+ROLE_ORDER = sorted(
+    {
+        role
+        for profile in PROFILE_BY_COMMANDER.values()
+        for role in profile["role_targets"]
+    }
+)
 
 
 def utc_now() -> str:
@@ -145,6 +252,10 @@ def load_json(path: Path) -> dict[str, Any]:
     return payload if isinstance(payload, dict) else {}
 
 
+def table_columns(conn: sqlite3.Connection, table: str) -> set[str]:
+    return {row[1] for row in conn.execute(f"PRAGMA table_info({table})")}
+
+
 def card_text(row: Mapping[str, Any]) -> str:
     return f"{row.get('type_line') or ''}\n{row.get('oracle_text') or ''}".lower()
 
@@ -156,11 +267,17 @@ def has_any(text: str, patterns: tuple[str, ...]) -> bool:
 def deck_rows(db_path: Path, deck_id: str) -> list[dict[str, Any]]:
     with sqlite3.connect(db_path) as conn:
         conn.row_factory = sqlite3.Row
+        columns = table_columns(conn, "deck_cards")
+        functional_tags_expr = "functional_tags_json" if "functional_tags_json" in columns else "'[]' AS functional_tags_json"
+        type_expr = "type_line" if "type_line" in columns else "'' AS type_line"
+        oracle_expr = "oracle_text" if "oracle_text" in columns else "'' AS oracle_text"
+        cmc_expr = "cmc" if "cmc" in columns else "0 AS cmc"
+        is_commander_expr = "COALESCE(is_commander, 0)" if "is_commander" in columns else "0"
         rows = conn.execute(
-            """
+            f"""
             SELECT card_name, COALESCE(quantity, 1) AS quantity,
-                   functional_tag, functional_tags_json, type_line, oracle_text,
-                   COALESCE(is_commander, 0) AS is_commander
+                   functional_tag, {functional_tags_expr}, {type_expr}, {oracle_expr},
+                   {cmc_expr}, {is_commander_expr} AS is_commander
             FROM deck_cards
             WHERE deck_id=?
             ORDER BY card_name
@@ -267,6 +384,118 @@ def is_wincon(row: Mapping[str, Any], roles: set[str]) -> bool:
     return "wincon" in roles
 
 
+def normalized_card_name(row: Mapping[str, Any]) -> str:
+    return normalize_name(str(row.get("card_name") or ""))
+
+
+def card_name_in(row: Mapping[str, Any], names: list[str] | tuple[str, ...]) -> bool:
+    card_name = normalized_card_name(row)
+    return card_name in {normalize_name(name) for name in names}
+
+
+def is_instant_or_sorcery(row: Mapping[str, Any]) -> bool:
+    type_line = str(row.get("type_line") or "").lower()
+    return "instant" in type_line or "sorcery" in type_line
+
+
+def is_lorehold_topdeck_miracle_setup(row: Mapping[str, Any]) -> bool:
+    text = card_text(row)
+    if card_name_in(row, LOREHOLD_PROFILE["expected_packages"]["topdeck_and_miracle_setup"]):
+        return True
+    return has_any(
+        text,
+        (
+            "look at the top",
+            "put them back in any order",
+            "put it on top",
+            "put that card on top",
+            "top card of your library",
+            "scry",
+            "surveil",
+            "miracle",
+        ),
+    )
+
+
+def is_lorehold_draw_rummage(row: Mapping[str, Any], roles: set[str]) -> bool:
+    text = card_text(row)
+    return "draw" in roles or has_any(
+        text,
+        (
+            "draw a card",
+            "draw two cards",
+            "draw three cards",
+            "draw seven cards",
+            "draw that many cards",
+            "discard a card",
+            "discards their hand",
+            "exile the top",
+            "play that card",
+        ),
+    )
+
+
+def is_lorehold_miracle_haymaker(row: Mapping[str, Any]) -> bool:
+    text = card_text(row)
+    if not is_instant_or_sorcery(row):
+        return False
+    if card_name_in(row, LOREHOLD_PROFILE["expected_packages"]["miracle_payoffs_expensive_spells"]):
+        return True
+    cmc = float(row.get("cmc") or 0)
+    if cmc >= 5:
+        return True
+    return has_any(
+        text,
+        (
+            "miracle",
+            "cascade",
+            "extra turn",
+            "you win the game",
+            "deals damage to each",
+            "destroy all",
+            "exile all",
+            "copy it",
+            "copy that spell",
+        ),
+    )
+
+
+def is_lorehold_spell_payoff_copy_engine(row: Mapping[str, Any], roles: set[str]) -> bool:
+    text = card_text(row)
+    if card_name_in(row, LOREHOLD_PROFILE["expected_packages"]["spell_payoff_copy_package"]):
+        return True
+    return "engine" in roles and has_any(
+        text,
+        (
+            "copy target instant",
+            "copy target sorcery",
+            "copy that spell",
+            "whenever you cast or copy an instant or sorcery",
+            "whenever you cast a noncreature spell",
+            "magecraft",
+            "spells you cast cost",
+            "costs less to cast",
+            "create a treasure token",
+            "create a 1/1",
+        ),
+    )
+
+
+def is_lorehold_graveyard_recursion(row: Mapping[str, Any], roles: set[str]) -> bool:
+    text = card_text(row)
+    return "recursion" in roles or has_any(
+        text,
+        (
+            "from your graveyard",
+            "from a graveyard",
+            "flashback",
+            "escape",
+            "return target nonland permanent card",
+            "return an instant or sorcery card",
+        ),
+    )
+
+
 def profile_roles_for_card(row: Mapping[str, Any]) -> set[str]:
     roles, _source = core_roles.card_roles(row)
     profile_roles: set[str] = set()
@@ -290,6 +519,18 @@ def profile_roles_for_card(row: Mapping[str, Any]) -> set[str]:
         profile_roles.add("reanimation_plan_b")
     if is_wincon(row, roles):
         profile_roles.add("dedicated_win_conditions")
+    if is_mana_acceleration(row, roles):
+        profile_roles.add("mana_rocks_treasure_ramp")
+    if is_lorehold_topdeck_miracle_setup(row):
+        profile_roles.add("topdeck_miracle_setup")
+    if is_lorehold_draw_rummage(row, roles):
+        profile_roles.add("draw_rummage_opponent_turn_draw")
+    if is_lorehold_miracle_haymaker(row):
+        profile_roles.add("miracle_haymakers")
+    if is_lorehold_spell_payoff_copy_engine(row, roles):
+        profile_roles.add("spell_payoffs_copy_engines")
+    if is_lorehold_graveyard_recursion(row, roles):
+        profile_roles.add("graveyard_recursion")
     return profile_roles
 
 
@@ -373,9 +614,17 @@ def is_attack_window_card(row: Mapping[str, Any]) -> bool:
     )
 
 
-def cut_risk(row: Mapping[str, Any]) -> list[str]:
+def protected_cut_names(profile: Mapping[str, Any] | None) -> set[str]:
+    if not profile:
+        return set()
+    return {normalize_name(str(card)) for card in profile.get("protected_cut_cards", [])}
+
+
+def cut_risk(row: Mapping[str, Any], profile: Mapping[str, Any] | None = None) -> list[str]:
     roles, _source = core_roles.card_roles(row)
     risks: list[str] = []
+    if normalized_card_name(row) in protected_cut_names(profile):
+        risks.append("protected_profile_anchor_cut")
     if is_add_payoff(row):
         risks.append("angel_demon_dragon_payoff_cut")
     if is_attack_window_card(row):
@@ -396,6 +645,7 @@ def package_delta_rows(
     package_summary: Mapping[str, Any],
     base_rows: list[dict[str, Any]],
     candidate_rows: list[dict[str, Any]],
+    profile: Mapping[str, Any] | None = None,
 ) -> list[dict[str, Any]]:
     base_by_name = card_by_name(base_rows)
     candidate_by_name = card_by_name(candidate_rows)
@@ -421,7 +671,7 @@ def package_delta_rows(
                 "card": card,
                 "present": bool(row),
                 "profile_roles": sorted(profile_roles_for_card(row)) if row else [],
-                "risk_flags": cut_risk(row) if row else ["cut_card_missing_from_base"],
+                "risk_flags": cut_risk(row, profile) if row else ["cut_card_missing_from_base"],
             }
         )
     return rows
@@ -430,6 +680,7 @@ def package_delta_rows(
 def strategy_blockers(
     *,
     package_chain: Mapping[str, Any],
+    profile: Mapping[str, Any] | None,
     target_rows: list[dict[str, Any]],
     delta_rows: list[dict[str, Any]],
 ) -> list[str]:
@@ -442,6 +693,10 @@ def strategy_blockers(
     for row in target_rows:
         if row["hard_floor"] and row["candidate_status"] == "below_target":
             blockers.append(f"profile_{row['role']}_below_target")
+    protected_names = protected_cut_names(profile)
+    for row in delta_rows:
+        if row["action"] == "cut" and normalize_name(str(row["card"])) in protected_names:
+            blockers.append(f"protected_profile_anchor_cut:{row['card']}")
     attack_cuts = [
         row for row in delta_rows if row["action"] == "cut" and "attack_window_or_extra_combat_cut" in row["risk_flags"]
     ]
@@ -488,9 +743,15 @@ def build_report(
         target_rows = target_evaluations(profile=profile, base_counts=base_counts, candidate_counts=candidate_counts)
         base_packages = package_presence(base_rows, profile)
         candidate_packages = package_presence(candidate_rows, profile)
-        delta_rows = package_delta_rows(package_summary=summary, base_rows=base_rows, candidate_rows=candidate_rows)
+        delta_rows = package_delta_rows(
+            package_summary=summary,
+            base_rows=base_rows,
+            candidate_rows=candidate_rows,
+            profile=profile,
+        )
         blockers = strategy_blockers(
             package_chain=package_chain,
+            profile=profile,
             target_rows=target_rows,
             delta_rows=delta_rows,
         )
@@ -537,6 +798,7 @@ def build_report(
             "profile_gate": "Commander-specific role targets and package risks are checked after generic core floors.",
             "battle_boundary": "Only a strategy-ready package can open an equal battle probe; this matrix never promotes a deck.",
             "cut_boundary": "Interaction upgrades cannot hide cuts that weaken the commander's attack window or source-lane plan.",
+            "protected_anchor_boundary": "Commander expected-package anchors require same-lane proof before a package can cut them.",
         },
     }
 
