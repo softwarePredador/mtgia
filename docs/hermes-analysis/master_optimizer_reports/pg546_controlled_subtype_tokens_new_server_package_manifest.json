@@ -1,0 +1,209 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg546_controlled_subtype_tokens_new_serv_20260706_031919",
+  "deploy_id": "pg546_controlled_subtype_tokens_new_server",
+  "execution_scenarios": [
+    {
+      "card": {
+        "name": "Elven Ambush"
+      },
+      "controlled_permanent_subtype": "Elf",
+      "controlled_permanent_subtype_count": 3,
+      "expected_token": {
+        "artifact": false,
+        "colors": [
+          "G"
+        ],
+        "count": 3,
+        "keywords": [],
+        "name": "Elf Warrior Token",
+        "power": 1,
+        "subtype": "Elf Warrior",
+        "tapped": false,
+        "toughness": 1
+      },
+      "logical_rule_key": "battle_rule_v1:f23c570fb19e052cecaff60afccd357e",
+      "name": "Elven Ambush creates modeled creature tokens",
+      "type": "fixed_create_creature_tokens"
+    },
+    {
+      "card": {
+        "name": "Elvish Promenade"
+      },
+      "controlled_permanent_subtype": "Elf",
+      "controlled_permanent_subtype_count": 3,
+      "expected_token": {
+        "artifact": false,
+        "colors": [
+          "G"
+        ],
+        "count": 3,
+        "keywords": [],
+        "name": "Elf Warrior Token",
+        "power": 1,
+        "subtype": "Elf Warrior",
+        "tapped": false,
+        "toughness": 1
+      },
+      "logical_rule_key": "battle_rule_v1:f23c570fb19e052cecaff60afccd357e",
+      "name": "Elvish Promenade creates modeled creature tokens",
+      "type": "fixed_create_creature_tokens"
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Elven Ambush",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f23c570fb19e052cecaff60afccd357e",
+      "min_rule_version": 2,
+      "normalized_name": "elven ambush",
+      "oracle_hash": "6847122917f5971195b6e688be719fe6",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "battle_model_scope": "xmage_controlled_subtype_create_creature_tokens_spell_v1",
+        "effect": "token_maker",
+        "token_colors": [
+          "G"
+        ],
+        "token_count_source": "controlled_permanents_with_subtype",
+        "token_count_subtype": "Elf",
+        "token_name": "Elf Warrior Token",
+        "token_power": 1,
+        "token_subtype": "Elf Warrior",
+        "token_toughness": 1,
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "ElfWarriorToken"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Elvish Promenade",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f23c570fb19e052cecaff60afccd357e",
+      "min_rule_version": 2,
+      "normalized_name": "elvish promenade",
+      "oracle_hash": "6847122917f5971195b6e688be719fe6",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "battle_model_scope": "xmage_controlled_subtype_create_creature_tokens_spell_v1",
+        "effect": "token_maker",
+        "token_colors": [
+          "G"
+        ],
+        "token_count_source": "controlled_permanents_with_subtype",
+        "token_count_subtype": "Elf",
+        "token_name": "Elf Warrior Token",
+        "token_power": 1,
+        "token_subtype": "Elf Warrior",
+        "token_toughness": 1,
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "ElfWarriorToken"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_controlled_subtype_create_creature_tokens_spell": 2
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg546_controlled_subtype_tokens_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg546_controlled_subtype_tokens_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg546_controlled_subtype_tokens_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg546_controlled_subtype_tokens_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg546_controlled_subtype_tokens_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg546_controlled_subtype_tokens_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-06T03:19:19+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Elven Ambush"
+      },
+      "card_name": "Elven Ambush",
+      "effect": "token_maker",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f23c570fb19e052cecaff60afccd357e",
+      "normalized_name": "elven ambush",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "battle_model_scope": "xmage_controlled_subtype_create_creature_tokens_spell_v1",
+        "effect": "token_maker",
+        "token_colors": [
+          "G"
+        ],
+        "token_count_source": "controlled_permanents_with_subtype",
+        "token_count_subtype": "Elf",
+        "token_name": "Elf Warrior Token",
+        "token_power": 1,
+        "token_subtype": "Elf Warrior",
+        "token_toughness": 1,
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "ElfWarriorToken"
+      }
+    },
+    {
+      "card": {
+        "name": "Elvish Promenade"
+      },
+      "card_name": "Elvish Promenade",
+      "effect": "token_maker",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f23c570fb19e052cecaff60afccd357e",
+      "normalized_name": "elvish promenade",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "battle_model_scope": "xmage_controlled_subtype_create_creature_tokens_spell_v1",
+        "effect": "token_maker",
+        "token_colors": [
+          "G"
+        ],
+        "token_count_source": "controlled_permanents_with_subtype",
+        "token_count_subtype": "Elf",
+        "token_name": "Elf Warrior Token",
+        "token_power": 1,
+        "token_subtype": "Elf Warrior",
+        "token_toughness": 1,
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "ElfWarriorToken"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Elven Ambush",
+    "Elvish Promenade"
+  ],
+  "selected_count": 2,
+  "slug": "pg546_controlled_subtype_tokens_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Elven Ambush",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f23c570fb19e052cecaff60afccd357e",
+      "min_rule_version": 2,
+      "normalized_name": "elven ambush",
+      "oracle_hash": "6847122917f5971195b6e688be719fe6",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_controlled_subtype_create_creature_tokens_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Elvish Promenade",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f23c570fb19e052cecaff60afccd357e",
+      "min_rule_version": 2,
+      "normalized_name": "elvish promenade",
+      "oracle_hash": "6847122917f5971195b6e688be719fe6",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_controlled_subtype_create_creature_tokens_spell_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

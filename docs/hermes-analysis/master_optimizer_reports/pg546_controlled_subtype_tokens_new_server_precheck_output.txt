@@ -1,0 +1,5 @@
+    card_name     | normalized_name  |           oracle_hash            |                logical_rule_key                 |      shadow_handling       | target_card_rows |          canonical_card_id           | existing_rule_rows | expected_rule_rows_before | would_deprecate_shadow_rows
+------------------+------------------+----------------------------------+-------------------------------------------------+----------------------------+------------------+--------------------------------------+--------------------+---------------------------+-----------------------------
+ Elven Ambush     | elven ambush     | 6847122917f5971195b6e688be719fe6 | battle_rule_v1:f23c570fb19e052cecaff60afccd357e | deprecate_nonmatching_rows |                1 | 7727661c-5dcb-4d05-95ba-bb3da06c6beb |                  0 |                         0 |                           0
+ Elvish Promenade | elvish promenade | 6847122917f5971195b6e688be719fe6 | battle_rule_v1:f23c570fb19e052cecaff60afccd357e | deprecate_nonmatching_rows |                1 | e294f817-78a5-4fdf-ad86-a09e81c0baf8 |                  0 |                         0 |                           0
+(2 rows)

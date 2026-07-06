@@ -518,6 +518,19 @@ def run_fixed_create_creature_tokens(
     card = dict(scenario["card"])
     active = battle.Player(str(scenario.get("player") or "Token Controller"), None, [])
     opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
+    support_subtype = str(scenario.get("controlled_permanent_subtype") or "").strip()
+    support_count = int(scenario.get("controlled_permanent_subtype_count") or 0)
+    for index in range(max(0, support_count)):
+        active.battlefield.append(
+            {
+                "name": f"{support_subtype or 'Subtype'} Support {index + 1}",
+                "type_line": f"Creature - {support_subtype or 'Subtype'}",
+                "subtypes": [support_subtype] if support_subtype else [],
+                "power": 1,
+                "toughness": 1,
+                "effect": "creature",
+            }
+        )
     before_events = len(events)
     battle.apply_effect_immediate(
         active,

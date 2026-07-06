@@ -229,6 +229,55 @@ def test_creature_dies_create_treasure_runner_executes_trigger() -> None:
     assert result["validated_keywords"] == ["defender"]
 
 
+def test_fixed_create_tokens_runner_counts_controlled_subtype_support() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "token_maker",
+        "battle_model_scope": "xmage_controlled_subtype_create_creature_tokens_spell_v1",
+        "ability_kind": "one_shot",
+        "token_count_source": "controlled_permanents_with_subtype",
+        "token_count_subtype": "Elf",
+        "token_name": "Elf Warrior Token",
+        "token_power": 1,
+        "token_toughness": 1,
+        "token_subtype": "Elf Warrior",
+        "token_colors": ["G"],
+        "_rule_logical_key": "battle_rule_v1:elven-ambush",
+    }
+    try:
+        result = validator.run_fixed_create_creature_tokens(
+            battle,
+            {
+                "name": "Elven Ambush creates modeled creature tokens",
+                "type": "fixed_create_creature_tokens",
+                "card": {"name": "Elven Ambush"},
+                "controlled_permanent_subtype": "Elf",
+                "controlled_permanent_subtype_count": 3,
+                "expected_token": {
+                    "name": "Elf Warrior Token",
+                    "count": 3,
+                    "power": 1,
+                    "toughness": 1,
+                    "subtype": "Elf Warrior",
+                    "colors": ["G"],
+                },
+                "logical_rule_key": "battle_rule_v1:elven-ambush",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Elven Ambush"
+    assert result["tokens_created"] == 3
+    assert result["token_name"] == "Elf Warrior Token"
+
+
 def test_simple_mana_source_refresh_runner_pays_activation_cost_from_support_source() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

@@ -1439,6 +1439,33 @@ def test_simple_activated_create_token_execution_scenario_includes_discard_cost(
     assert scenario["expected_token"]["count"] == 2
 
 
+def test_controlled_subtype_token_spell_execution_scenario_seeds_support_permanents() -> None:
+    rule = {
+        "normalized_name": "elven ambush",
+        "card_name": "Elven Ambush",
+        "logical_rule_key": "battle_rule_v1:elven-ambush",
+        "required_effect_fields": {
+            "effect": "token_maker",
+            "battle_model_scope": "xmage_controlled_subtype_create_creature_tokens_spell_v1",
+            "token_count_source": "controlled_permanents_with_subtype",
+            "token_count_subtype": "Elf",
+            "token_name": "Elf Warrior Token",
+            "token_power": 1,
+            "token_toughness": 1,
+            "token_subtype": "Elf Warrior",
+            "token_colors": ["G"],
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario["type"] == "fixed_create_creature_tokens"
+    assert scenario["controlled_permanent_subtype"] == "Elf"
+    assert scenario["controlled_permanent_subtype_count"] == 3
+    assert scenario["expected_token"]["count"] == 3
+    assert scenario["expected_token"]["name"] == "Elf Warrior Token"
+
+
 def test_graveyard_self_exile_activated_create_token_execution_scenario_marks_source_zone() -> None:
     rule = {
         "normalized_name": "eternal student",

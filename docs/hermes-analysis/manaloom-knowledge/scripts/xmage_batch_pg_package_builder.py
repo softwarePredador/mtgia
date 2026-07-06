@@ -105,6 +105,7 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "token_count",
     "token_count_source",
     "token_count_per_x",
+    "token_count_subtype",
     "token_component_count",
     "token_total_count",
     "xmage_token_class",
@@ -1123,15 +1124,19 @@ def fixed_create_creature_tokens_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
     required = dict(rule.get("required_effect_fields") or {})
-    if required.get("battle_model_scope") != "xmage_fixed_create_creature_tokens_spell_v1":
+    if required.get("battle_model_scope") not in {
+        "xmage_fixed_create_creature_tokens_spell_v1",
+        "xmage_controlled_subtype_create_creature_tokens_spell_v1",
+    }:
         return None
-    return {
+    expected_count = int(required.get("token_count") or 1)
+    scenario = {
         "name": f"{rule['card_name']} creates modeled creature tokens",
         "type": "fixed_create_creature_tokens",
         "card": {"name": rule["card_name"]},
         "expected_token": {
             "name": required.get("token_name"),
-            "count": int(required.get("token_count") or 1),
+            "count": expected_count,
             "power": required.get("token_power"),
             "toughness": required.get("token_toughness"),
             "subtype": required.get("token_subtype"),
@@ -1142,6 +1147,12 @@ def fixed_create_creature_tokens_execution_scenario_from_expected_rule(
         },
         "logical_rule_key": rule["logical_rule_key"],
     }
+    if required.get("token_count_source") == "controlled_permanents_with_subtype":
+        expected_count = 3
+        scenario["expected_token"]["count"] = expected_count
+        scenario["controlled_permanent_subtype"] = required.get("token_count_subtype")
+        scenario["controlled_permanent_subtype_count"] = expected_count
+    return scenario
 
 
 def multi_create_creature_tokens_execution_scenario_from_expected_rule(

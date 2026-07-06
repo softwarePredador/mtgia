@@ -38731,9 +38731,19 @@ def x_value_from_effect_context(effect_data, default=0):
 
 
 def token_count_for_effect(player, effect_data, default=5, opponents=None):
-    if isinstance(effect_data, dict) and str(effect_data.get("token_count_source") or "").lower() == "x_value":
+    token_count_source = str((effect_data or {}).get("token_count_source") or "").lower()
+    if isinstance(effect_data, dict) and token_count_source == "x_value":
         per_x = int(effect_data.get("token_count_per_x") or 1)
         return x_value_from_effect_context(effect_data) * max(0, per_x)
+    if isinstance(effect_data, dict) and token_count_source == "controlled_permanents_with_subtype":
+        subtype = str(effect_data.get("token_count_subtype") or "").strip()
+        if not subtype:
+            return 0
+        return sum(
+            1
+            for permanent in getattr(player, "battlefield", [])
+            if isinstance(permanent, dict) and permanent_has_subtype(permanent, subtype)
+        )
     per_opponent = (effect_data or {}).get("token_count_per_opponent")
     if per_opponent not in (None, "", False):
         live_opponents = [
