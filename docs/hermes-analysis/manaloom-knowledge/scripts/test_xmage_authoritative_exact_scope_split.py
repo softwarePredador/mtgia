@@ -6937,6 +6937,91 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             ["scry", "draw_cards"],
         )
 
+    def test_creature_etb_scry_maps_fixed_trigger_to_runtime(self) -> None:
+        row = queue_row(
+            split.ETB_SCRY_CREATURE_UNIT,
+            effect_classes=["ScryEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["triggered_ability"],
+        )
+
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Omenspeaker",
+                type_line="Creature - Human Wizard",
+                oracle_text="When this creature enters, scry 2.",
+            ),
+            source_text="""
+                this.addAbility(new EntersBattlefieldTriggeredAbility(new ScryEffect(2)));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.ETB_SCRY_CREATURE_SCOPE)
+        self.assertEqual(effect["effect"], "creature")
+        self.assertEqual(effect["trigger"], "enters_battlefield")
+        self.assertEqual(effect["etb_trigger_effect"], "scry")
+        self.assertEqual(effect["etb_scry_count"], 2)
+        self.assertEqual(effect["trigger_scry_count"], 2)
+        self.assertEqual(effect["xmage_effect_class"], "ScryEffect")
+
+    def test_creature_etb_scry_blocks_dynamic_oracle_count(self) -> None:
+        row = queue_row(
+            split.ETB_SCRY_CREATURE_UNIT,
+            effect_classes=["ScryEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["triggered_ability"],
+        )
+
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Cascade Seer",
+                type_line="Creature - Merfolk Wizard",
+                oracle_text=(
+                    "When this creature enters, scry X, where X is the number "
+                    "of creatures in your party."
+                ),
+            ),
+            source_text="""
+                this.addAbility(new EntersBattlefieldTriggeredAbility(new ScryEffect(PartyCount.instance)));
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "etb_scry_oracle_not_fixed")
+
+    def test_creature_etb_scry_blocks_multiple_scry_sequence(self) -> None:
+        row = queue_row(
+            split.ETB_SCRY_CREATURE_UNIT,
+            effect_classes=["ScryEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["triggered_ability"],
+        )
+
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Cryptic Annelid",
+                type_line="Creature - Worm Beast",
+                oracle_text="When Cryptic Annelid enters, scry 1, then scry 2, then scry 3.",
+            ),
+            source_text="""
+                Ability ability = new EntersBattlefieldTriggeredAbility(new ScryEffect(1));
+                ability.addEffect(new ScryEffect(2));
+                ability.addEffect(new ScryEffect(3));
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "etb_scry_oracle_not_simple")
+
     def test_fixed_scry_draw_spell_maps_draw_first_order_to_composite_runtime(self) -> None:
         row = queue_row(
             split.DRAW_UNIT,

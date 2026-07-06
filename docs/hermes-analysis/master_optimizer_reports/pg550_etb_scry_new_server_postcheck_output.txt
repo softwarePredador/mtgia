@@ -1,0 +1,12 @@
+      card_name      |   normalized_name   |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
+---------------------+---------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
+ Automatic Librarian | automatic librarian | battle_rule_v1:ca42913baa856009e5da562479d1a4e1 |                  1 |                           1 |                         1 |           0
+ Chrome Cat          | chrome cat          | battle_rule_v1:0a639e63e1f6566d56a772ef264e2bb8 |                  1 |                           1 |                         1 |           0
+ Galadhrim Guide     | galadhrim guide     | battle_rule_v1:ca42913baa856009e5da562479d1a4e1 |                  1 |                           1 |                         1 |           0
+ Lost Legion         | lost legion         | battle_rule_v1:ca42913baa856009e5da562479d1a4e1 |                  1 |                           1 |                         1 |           0
+ Octoprophet         | octoprophet         | battle_rule_v1:ca42913baa856009e5da562479d1a4e1 |                  1 |                           1 |                         1 |           0
+ Omenspeaker         | omenspeaker         | battle_rule_v1:ca42913baa856009e5da562479d1a4e1 |                  1 |                           1 |                         1 |           0
+ Prophet of the Peak | prophet of the peak | battle_rule_v1:ca42913baa856009e5da562479d1a4e1 |                  1 |                           1 |                         1 |           0
+ Rumbling Sentry     | rumbling sentry     | battle_rule_v1:0a639e63e1f6566d56a772ef264e2bb8 |                  1 |                           1 |                         1 |           0
+ Sage's Row Savant   | sage's row savant   | battle_rule_v1:ca42913baa856009e5da562479d1a4e1 |                  1 |                           1 |                         1 |           0
+(9 rows)

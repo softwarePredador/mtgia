@@ -699,6 +699,10 @@ patterns:
   `ReturnToHandTargetEffect + ScryEffect`, exact same-spell Oracle/source
   agreement, supported single target constraint, and fixed scry count ->
   `xmage_return_target_to_hand_and_scry_spell_v1`
+- `xmage_signature::ScryEffect::EntersBattlefieldTriggeredAbility::no_target_class::no_condition_class::triggered_ability`
+  with exact creature ETB fixed "scry N" Oracle/source agreement, no target,
+  no condition, and no multiple/dynamic scry sequence ->
+  `xmage_creature_etb_scry_v1`
 - `ramp_permanent::xmage_artifact_mana_source_variant_review_v1` and
   `ramp_permanent::xmage_creature_mana_source_variant_review_v1` ->
   `xmage_simple_tap_mana_source_permanent_v1`
@@ -14825,6 +14829,63 @@ dynamic Treasure counts, Treasure creation from non-source death triggers,
 activated Treasure makers, non-Treasure artifact tokens such as Blood, Clue,
 Food, Map, or Powerstone, or any dies trigger with extra behavior beyond fixed
 controller Treasure creation.
+
+## PG550 ETB Scry New Server Evidence
+
+PG550 evidence:
+
+- exact split report:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260706_pg550_etb_scry_candidate.md`
+- package:
+  `docs/hermes-analysis/master_optimizer_reports/pg550_etb_scry_new_server_package_package.md`
+- apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg550_etb_scry_new_server_apply_evidence.md`
+- PG -> SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg550_etb_scry_new_server_sync_report.json`
+- E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg550_etb_scry_new_server_e2e.md`
+- post-sync queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260706_post_pg550_etb_scry_new_server.md`
+- final exact-scope recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260706_post_pg550_etb_scry_new_server_final.md`
+- readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260706_post_pg550_etb_scry_new_server.md`
+- final audits:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260706_post_pg550_etb_scry_new_server_final.md`,
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260706_post_pg550_etb_scry_new_server_with_pg.md`,
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260706_post_pg550_etb_scry_new_server_final.md`,
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260706_post_pg550_etb_scry_new_server_final.md`
+
+Validation:
+
+- focused split/package/E2E tests passed: `614` splitter tests and `50`
+  package/E2E tests;
+- package precheck found `1` target card row for each promoted card, `0`
+  existing expected rows, and `0` shadow rows scheduled for deprecation;
+- package apply upserted `9` rows and deprecated `0` shadow rows;
+- PostgreSQL postcheck confirmed `9/9` promoted rows, `9/9` verified/auto, and
+  `9/9` oracle hash rows;
+- PG -> SQLite sync loaded `8,876` PostgreSQL rows, updated `8,640` SQLite
+  rows, and exported `6,379` canonical snapshot rows;
+- package E2E: `status=pass`, `scenario_count=9`, and every promoted card
+  emitted `etb_scry_resolved` with the expected fixed scry count;
+- final exact-scope recheck has `proposal_count=0` and
+  `safe_for_batch_pg_package_count=0`;
+- final audits passed: XMage strategy `26/26`, PG-Hermes-SQLite `51/51`,
+  operational surface `pass`, legacy contamination `pass`.
+
+Post-sync queue evidence:
+
+- pre-cycle `target_identity_count=25624`
+- post-cycle `target_identity_count=25615`
+- post-cycle `xmage_authoritative_source_count=25301`
+- post-cycle `xmage_missing_source_exception_count=314`
+- post-cycle `xmage_authoritative_parser_gap_count=0`
+- post-cycle `xmage_authoritative_adapter_required_count=25301`
+
+Residual boundary: PG550 does not authorize dynamic `scry X`, multiple scry
+sequences, target-based scry, conditional scry, surveil, scry plus another ETB
+effect, or non-ETB activated/static scry abilities.
 
 ## Required Artifacts Per Cycle
 

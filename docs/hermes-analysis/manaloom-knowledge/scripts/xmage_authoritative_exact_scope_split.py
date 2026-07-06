@@ -114,6 +114,10 @@ DIES_TOKEN_CREATURE_UNIT = (
 ACTIVATED_TOKEN_PERMANENT_UNIT_PREFIX = (
     "token_maker::xmage_signature::CreateTokenEffect::SimpleActivatedAbility::"
 )
+ETB_SCRY_CREATURE_UNIT = (
+    "xmage_signature::ScryEffect::EntersBattlefieldTriggeredAbility::"
+    "no_target_class::no_condition_class::triggered_ability"
+)
 SUPPORTED_UNITS = {
     DRAW_UNIT,
     DAMAGE_UNIT,
@@ -274,6 +278,7 @@ SPELL_CAST_DRAW_ENGINE_SCOPE = "xmage_spell_cast_draw_engine_v1"
 SPELL_CAST_ADD_COUNTERS_SOURCE_SCOPE = "xmage_spell_cast_add_counters_source_v1"
 ETB_LIFE_GAIN_CREATURE_SCOPE = "xmage_creature_etb_gain_life_v1"
 ETB_DRAW_CREATURE_SCOPE = "xmage_creature_etb_draw_cards_v1"
+ETB_SCRY_CREATURE_SCOPE = "xmage_creature_etb_scry_v1"
 ETB_OPTIONAL_DISCARD_DRAW_CREATURE_SCOPE = "xmage_creature_etb_optional_discard_draw_cards_v1"
 ETB_DYNAMIC_DRAW_CREATURE_SCOPE = "xmage_creature_etb_dynamic_draw_cards_v1"
 ETB_DRAW_LOSE_LIFE_CREATURE_SCOPE = "xmage_creature_etb_draw_lose_life_v1"
@@ -7286,6 +7291,15 @@ def is_creature_etb_draw_unit(row: dict[str, Any]) -> bool:
     )
 
 
+def is_creature_etb_scry_unit(row: dict[str, Any]) -> bool:
+    return (
+        str(row.get("adapter_work_unit") or "") == ETB_SCRY_CREATURE_UNIT
+        and effect_classes(row) == {"ScryEffect"}
+        and ability_classes(row) == {"EntersBattlefieldTriggeredAbility"}
+        and set(row.get("xmage_signals") or []).issubset({"triggered_ability"})
+    )
+
+
 def is_creature_etb_draw_lose_life_unit(row: dict[str, Any]) -> bool:
     if str(row.get("adapter_work_unit") or "") != DRAW_ENGINE_UNIT:
         return False
@@ -13295,6 +13309,40 @@ def etb_draw_count_from_oracle(metadata: dict[str, Any]) -> int | None:
     return int(value)
 
 
+def etb_scry_count_from_oracle(metadata: dict[str, Any]) -> int | str:
+    text = strip_parenthetical_reminders(oracle_text_after_leading_static_keywords(metadata))
+    text = re.sub(r"\s+", " ", text).strip()
+    if len(re.findall(r"\bscry\b", text)) != 1:
+        return "etb_scry_oracle_not_simple"
+    if re.search(r"\bscry\s+x\b", text):
+        return "etb_scry_oracle_not_fixed"
+    match = re.fullmatch(
+        r"(?:when|whenever) (?:this creature|[^.]+?) enters(?: the battlefield)?[, ]+"
+        r"scry (one|two|three|four|five|\d+)\.?",
+        text,
+    )
+    if not match:
+        return "etb_scry_oracle_not_exact_fixed"
+    count = number_word_to_int(match.group(1))
+    if count <= 0:
+        return "etb_scry_oracle_not_fixed"
+    return count
+
+
+def etb_scry_count_from_source(source_text: str) -> int | str:
+    text = str(source_text or "")
+    if "TargetPointer" in text or ".setTargetPointer" in text:
+        return "etb_scry_source_target_not_supported"
+    if "Conditional" in text or "Condition" in text:
+        return "etb_scry_source_condition_not_supported"
+    scry_match = fixed_scry_count_match_from_source(text)
+    if scry_match is None:
+        return "etb_scry_source_count_not_fixed"
+    if len(re.findall(r"EntersBattlefieldTriggeredAbility\s*\(", text)) != 1:
+        return "etb_scry_source_trigger_not_exact"
+    return int(scry_match[0])
+
+
 def etb_optional_discard_draw_from_oracle(metadata: dict[str, Any]) -> dict[str, int] | str:
     text = re.sub(r"\s+", " ", oracle_text_after_leading_static_keywords(metadata)).strip()
     if re.fullmatch(
@@ -15735,6 +15783,7 @@ def split_row(
     etb_life_gain_creature_unit = is_creature_etb_life_gain_unit(row)
     dies_life_gain_creature_unit = is_creature_dies_life_gain_unit(row)
     etb_draw_creature_unit = is_creature_etb_draw_unit(row)
+    etb_scry_creature_unit = is_creature_etb_scry_unit(row)
     etb_draw_lose_life_creature_unit = is_creature_etb_draw_lose_life_unit(row)
     dies_draw_creature_unit = is_creature_dies_draw_unit(row)
     combat_damage_draw_creature_unit = is_creature_combat_damage_draw_unit(row)
@@ -15857,6 +15906,7 @@ def split_row(
         and not etb_life_gain_creature_unit
         and not dies_life_gain_creature_unit
         and not etb_draw_creature_unit
+        and not etb_scry_creature_unit
         and not etb_draw_lose_life_creature_unit
         and not dies_draw_creature_unit
         and not combat_damage_draw_creature_unit
@@ -15932,6 +15982,7 @@ def split_row(
         and not static_horsemanship_creature_unit
         and not dies_life_gain_creature_unit
         and not etb_draw_creature_unit
+        and not etb_scry_creature_unit
         and not etb_draw_lose_life_creature_unit
         and not dies_draw_creature_unit
         and not combat_damage_draw_creature_unit
@@ -19050,6 +19101,37 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_creature_dies_fixed_damage_target",
+        ), "selected_exact_scope"
+
+    if etb_scry_creature_unit:
+        if not is_creature_metadata(metadata):
+            return None, "etb_scry_not_creature"
+        oracle_count = etb_scry_count_from_oracle(metadata)
+        if isinstance(oracle_count, str):
+            return None, oracle_count
+        source_count = etb_scry_count_from_source(source_text)
+        if isinstance(source_count, str):
+            return None, source_count
+        if source_count != oracle_count:
+            return None, "etb_scry_source_oracle_mismatch"
+        effect_json = {
+            "effect": "creature",
+            "battle_model_scope": ETB_SCRY_CREATURE_SCOPE,
+            "ability_kind": "triggered",
+            "trigger": "enters_battlefield",
+            "trigger_effect": "scry",
+            "etb_trigger_effect": "scry",
+            "etb_scry_count": int(oracle_count),
+            "trigger_scry_count": int(oracle_count),
+            "scry_count": int(oracle_count),
+            "xmage_effect_class": "ScryEffect",
+            "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        }
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_creature_etb_scry",
         ), "selected_exact_scope"
 
     if etb_draw_creature_unit:
@@ -23447,6 +23529,7 @@ def build_exact_split_report(
             and not is_creature_etb_life_gain_unit(row)
             and not is_creature_dies_life_gain_unit(row)
             and not is_creature_etb_draw_unit(row)
+            and not is_creature_etb_scry_unit(row)
             and not is_creature_etb_draw_lose_life_unit(row)
             and not is_creature_dies_draw_unit(row)
             and not is_creature_combat_damage_draw_unit(row)
@@ -23535,6 +23618,7 @@ def build_exact_split_report(
                 "life_gain::xmage_life_gain_variant_review_v1 rows with GainLifeEffect and EntersBattlefieldTriggeredAbility plus only static self keywords",
                 "life_gain::xmage_life_gain_variant_review_v1 rows with GainLifeEffect and DiesSourceTriggeredAbility plus only static self keywords",
                 "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect and EntersBattlefieldTriggeredAbility plus only static self keywords",
+                "xmage_signature ScryEffect rows with EntersBattlefieldTriggeredAbility, exact fixed ETB scry Oracle/source agreement, and no target or condition",
                 "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect + LoseLifeSourceControllerEffect, EntersBattlefieldTriggeredAbility, exact fixed draw/life-loss Oracle/source agreement, and only static self keywords",
                 "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect and DiesSourceTriggeredAbility plus only static self keywords",
                 "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect and DealsCombatDamageToAPlayerTriggeredAbility, exact fixed combat-damage-to-player draw Oracle/source agreement, and only static self keywords",

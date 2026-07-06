@@ -790,6 +790,78 @@ def run_creature_etb_create_tokens(
     }
 
 
+def run_creature_etb_scry(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    active = battle.Player(str(scenario.get("player") or "ETB Scry Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
+    library_names = list(
+        scenario.get("library_top_names")
+        or ["Low Priority Land", "High Priority Spell", "Medium Priority Creature"]
+    )
+    active.library = [
+        {
+            "name": str(name),
+            "cmc": index + 1,
+            "effect": "land" if index == 0 else "draw_cards",
+            "type_line": "Land" if index == 0 else "Instant",
+        }
+        for index, name in enumerate(library_names)
+    ]
+    expected_scry_count = int(scenario.get("expected_scry_count") or 0)
+    if expected_scry_count <= 0:
+        fail("battle_execution", f"{card['name']} missing expected_scry_count")
+
+    effect_data = battle.get_card_effect(card)
+    permanent = battle.prepare_entering_permanent(
+        battle.enrich_card({**card, **effect_data}),
+        controller=active,
+        all_players=[active, opponent],
+        turn=int(scenario.get("turn") or 6),
+    )
+    active.battlefield.append(permanent)
+
+    before_events = len(events)
+    library_before = len(active.library)
+    battle.resolve_generic_permanent_etb(
+        active,
+        [opponent],
+        permanent,
+        effect_data,
+        int(scenario.get("turn") or 6),
+        random.Random(int(scenario.get("seed") or 6068)),
+        all_players=[active, opponent],
+    )
+
+    scry_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "etb_scry_resolved" and data.get("card") == card.get("name")
+        ),
+        None,
+    )
+    if scry_event is None:
+        fail("battle_events", f"missing {card['name']} etb_scry_resolved event")
+    if int(scry_event.get("scry_count") or 0) != expected_scry_count:
+        fail("battle_events", f"{card['name']} event scry_count={scry_event.get('scry_count')}")
+    expected_looked = min(expected_scry_count, library_before)
+    if len(scry_event.get("scry_looked_at") or []) != expected_looked:
+        fail("battle_events", f"{card['name']} looked_at={scry_event.get('scry_looked_at')}")
+    if len(active.library) != library_before:
+        fail("battle_execution", f"{card['name']} scry changed library size")
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "scry_count": expected_scry_count,
+        "looked_at": scry_event.get("scry_looked_at") or [],
+        "top_after": scry_event.get("scry_top_after") or [],
+    }
+
+
 def run_creature_dies_create_tokens(
     battle,
     scenario: dict[str, Any],
@@ -2618,6 +2690,7 @@ SCENARIO_RUNNERS = {
     "creature_dies_create_tokens": run_creature_dies_create_tokens,
     "creature_etb_create_treasure": run_creature_etb_create_treasure,
     "creature_etb_create_tokens": run_creature_etb_create_tokens,
+    "creature_etb_scry": run_creature_etb_scry,
     "destroy_target_create_treasure": run_destroy_target_create_treasure,
     "fixed_create_creature_tokens": run_fixed_create_creature_tokens,
     "mana_source_life_cost_spend": run_mana_source_life_cost_spend,

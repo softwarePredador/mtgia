@@ -1,0 +1,706 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg550_etb_scry_new_server_etb_scry_new_s_20260706_044550",
+  "deploy_id": "pg550_etb_scry_new_server",
+  "execution_scenarios": [
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Automatic Librarian",
+        "type_line": "Creature"
+      },
+      "expected_scry_count": 2,
+      "library_top_names": [
+        "Low Priority Land",
+        "High Priority Spell",
+        "Medium Priority Creature",
+        "Reserve Card"
+      ],
+      "logical_rule_key": "battle_rule_v1:ca42913baa856009e5da562479d1a4e1",
+      "name": "Automatic Librarian enters and scries 2",
+      "type": "creature_etb_scry"
+    },
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Chrome Cat",
+        "type_line": "Creature"
+      },
+      "expected_scry_count": 1,
+      "library_top_names": [
+        "Low Priority Land",
+        "High Priority Spell",
+        "Medium Priority Creature",
+        "Reserve Card"
+      ],
+      "logical_rule_key": "battle_rule_v1:0a639e63e1f6566d56a772ef264e2bb8",
+      "name": "Chrome Cat enters and scries 1",
+      "type": "creature_etb_scry"
+    },
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Galadhrim Guide",
+        "type_line": "Creature"
+      },
+      "expected_scry_count": 2,
+      "library_top_names": [
+        "Low Priority Land",
+        "High Priority Spell",
+        "Medium Priority Creature",
+        "Reserve Card"
+      ],
+      "logical_rule_key": "battle_rule_v1:ca42913baa856009e5da562479d1a4e1",
+      "name": "Galadhrim Guide enters and scries 2",
+      "type": "creature_etb_scry"
+    },
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Lost Legion",
+        "type_line": "Creature"
+      },
+      "expected_scry_count": 2,
+      "library_top_names": [
+        "Low Priority Land",
+        "High Priority Spell",
+        "Medium Priority Creature",
+        "Reserve Card"
+      ],
+      "logical_rule_key": "battle_rule_v1:ca42913baa856009e5da562479d1a4e1",
+      "name": "Lost Legion enters and scries 2",
+      "type": "creature_etb_scry"
+    },
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Octoprophet",
+        "type_line": "Creature"
+      },
+      "expected_scry_count": 2,
+      "library_top_names": [
+        "Low Priority Land",
+        "High Priority Spell",
+        "Medium Priority Creature",
+        "Reserve Card"
+      ],
+      "logical_rule_key": "battle_rule_v1:ca42913baa856009e5da562479d1a4e1",
+      "name": "Octoprophet enters and scries 2",
+      "type": "creature_etb_scry"
+    },
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Omenspeaker",
+        "type_line": "Creature"
+      },
+      "expected_scry_count": 2,
+      "library_top_names": [
+        "Low Priority Land",
+        "High Priority Spell",
+        "Medium Priority Creature",
+        "Reserve Card"
+      ],
+      "logical_rule_key": "battle_rule_v1:ca42913baa856009e5da562479d1a4e1",
+      "name": "Omenspeaker enters and scries 2",
+      "type": "creature_etb_scry"
+    },
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Prophet of the Peak",
+        "type_line": "Creature"
+      },
+      "expected_scry_count": 2,
+      "library_top_names": [
+        "Low Priority Land",
+        "High Priority Spell",
+        "Medium Priority Creature",
+        "Reserve Card"
+      ],
+      "logical_rule_key": "battle_rule_v1:ca42913baa856009e5da562479d1a4e1",
+      "name": "Prophet of the Peak enters and scries 2",
+      "type": "creature_etb_scry"
+    },
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Rumbling Sentry",
+        "type_line": "Creature"
+      },
+      "expected_scry_count": 1,
+      "library_top_names": [
+        "Low Priority Land",
+        "High Priority Spell",
+        "Medium Priority Creature",
+        "Reserve Card"
+      ],
+      "logical_rule_key": "battle_rule_v1:0a639e63e1f6566d56a772ef264e2bb8",
+      "name": "Rumbling Sentry enters and scries 1",
+      "type": "creature_etb_scry"
+    },
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Sage's Row Savant",
+        "type_line": "Creature"
+      },
+      "expected_scry_count": 2,
+      "library_top_names": [
+        "Low Priority Land",
+        "High Priority Spell",
+        "Medium Priority Creature",
+        "Reserve Card"
+      ],
+      "logical_rule_key": "battle_rule_v1:ca42913baa856009e5da562479d1a4e1",
+      "name": "Sage's Row Savant enters and scries 2",
+      "type": "creature_etb_scry"
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Automatic Librarian",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ca42913baa856009e5da562479d1a4e1",
+      "min_rule_version": 2,
+      "normalized_name": "automatic librarian",
+      "oracle_hash": "91b6e9b9d7a202215da5ac166ffca6c2",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_scry_v1",
+        "effect": "creature",
+        "etb_scry_count": 2,
+        "scry_count": 2,
+        "trigger": "enters_battlefield",
+        "trigger_effect": "scry",
+        "trigger_scry_count": 2,
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "ScryEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Chrome Cat",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0a639e63e1f6566d56a772ef264e2bb8",
+      "min_rule_version": 2,
+      "normalized_name": "chrome cat",
+      "oracle_hash": "17bde51cf2fc1eb8f0bbbdff2363c864",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_scry_v1",
+        "effect": "creature",
+        "etb_scry_count": 1,
+        "scry_count": 1,
+        "trigger": "enters_battlefield",
+        "trigger_effect": "scry",
+        "trigger_scry_count": 1,
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "ScryEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Galadhrim Guide",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ca42913baa856009e5da562479d1a4e1",
+      "min_rule_version": 2,
+      "normalized_name": "galadhrim guide",
+      "oracle_hash": "065b614b72df33d771426db0ab60e75d",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_scry_v1",
+        "effect": "creature",
+        "etb_scry_count": 2,
+        "scry_count": 2,
+        "trigger": "enters_battlefield",
+        "trigger_effect": "scry",
+        "trigger_scry_count": 2,
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "ScryEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Lost Legion",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ca42913baa856009e5da562479d1a4e1",
+      "min_rule_version": 2,
+      "normalized_name": "lost legion",
+      "oracle_hash": "91b6e9b9d7a202215da5ac166ffca6c2",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_scry_v1",
+        "effect": "creature",
+        "etb_scry_count": 2,
+        "scry_count": 2,
+        "trigger": "enters_battlefield",
+        "trigger_effect": "scry",
+        "trigger_scry_count": 2,
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "ScryEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Octoprophet",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ca42913baa856009e5da562479d1a4e1",
+      "min_rule_version": 2,
+      "normalized_name": "octoprophet",
+      "oracle_hash": "91b6e9b9d7a202215da5ac166ffca6c2",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_scry_v1",
+        "effect": "creature",
+        "etb_scry_count": 2,
+        "scry_count": 2,
+        "trigger": "enters_battlefield",
+        "trigger_effect": "scry",
+        "trigger_scry_count": 2,
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "ScryEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Omenspeaker",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ca42913baa856009e5da562479d1a4e1",
+      "min_rule_version": 2,
+      "normalized_name": "omenspeaker",
+      "oracle_hash": "91b6e9b9d7a202215da5ac166ffca6c2",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_scry_v1",
+        "effect": "creature",
+        "etb_scry_count": 2,
+        "scry_count": 2,
+        "trigger": "enters_battlefield",
+        "trigger_effect": "scry",
+        "trigger_scry_count": 2,
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "ScryEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Prophet of the Peak",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ca42913baa856009e5da562479d1a4e1",
+      "min_rule_version": 2,
+      "normalized_name": "prophet of the peak",
+      "oracle_hash": "91b6e9b9d7a202215da5ac166ffca6c2",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_scry_v1",
+        "effect": "creature",
+        "etb_scry_count": 2,
+        "scry_count": 2,
+        "trigger": "enters_battlefield",
+        "trigger_effect": "scry",
+        "trigger_scry_count": 2,
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "ScryEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Rumbling Sentry",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0a639e63e1f6566d56a772ef264e2bb8",
+      "min_rule_version": 2,
+      "normalized_name": "rumbling sentry",
+      "oracle_hash": "17bde51cf2fc1eb8f0bbbdff2363c864",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_scry_v1",
+        "effect": "creature",
+        "etb_scry_count": 1,
+        "scry_count": 1,
+        "trigger": "enters_battlefield",
+        "trigger_effect": "scry",
+        "trigger_scry_count": 1,
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "ScryEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sage's Row Savant",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ca42913baa856009e5da562479d1a4e1",
+      "min_rule_version": 2,
+      "normalized_name": "sage's row savant",
+      "oracle_hash": "065b614b72df33d771426db0ab60e75d",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_scry_v1",
+        "effect": "creature",
+        "etb_scry_count": 2,
+        "scry_count": 2,
+        "trigger": "enters_battlefield",
+        "trigger_effect": "scry",
+        "trigger_scry_count": 2,
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "ScryEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_creature_etb_scry": 9
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg550_etb_scry_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg550_etb_scry_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg550_etb_scry_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg550_etb_scry_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg550_etb_scry_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg550_etb_scry_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-06T04:45:50+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Automatic Librarian"
+      },
+      "card_name": "Automatic Librarian",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ca42913baa856009e5da562479d1a4e1",
+      "normalized_name": "automatic librarian",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_scry_v1",
+        "effect": "creature",
+        "etb_scry_count": 2,
+        "scry_count": 2,
+        "trigger": "enters_battlefield",
+        "trigger_effect": "scry",
+        "trigger_scry_count": 2,
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "ScryEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Chrome Cat"
+      },
+      "card_name": "Chrome Cat",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0a639e63e1f6566d56a772ef264e2bb8",
+      "normalized_name": "chrome cat",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_scry_v1",
+        "effect": "creature",
+        "etb_scry_count": 1,
+        "scry_count": 1,
+        "trigger": "enters_battlefield",
+        "trigger_effect": "scry",
+        "trigger_scry_count": 1,
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "ScryEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Galadhrim Guide"
+      },
+      "card_name": "Galadhrim Guide",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ca42913baa856009e5da562479d1a4e1",
+      "normalized_name": "galadhrim guide",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_scry_v1",
+        "effect": "creature",
+        "etb_scry_count": 2,
+        "scry_count": 2,
+        "trigger": "enters_battlefield",
+        "trigger_effect": "scry",
+        "trigger_scry_count": 2,
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "ScryEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Lost Legion"
+      },
+      "card_name": "Lost Legion",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ca42913baa856009e5da562479d1a4e1",
+      "normalized_name": "lost legion",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_scry_v1",
+        "effect": "creature",
+        "etb_scry_count": 2,
+        "scry_count": 2,
+        "trigger": "enters_battlefield",
+        "trigger_effect": "scry",
+        "trigger_scry_count": 2,
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "ScryEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Octoprophet"
+      },
+      "card_name": "Octoprophet",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ca42913baa856009e5da562479d1a4e1",
+      "normalized_name": "octoprophet",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_scry_v1",
+        "effect": "creature",
+        "etb_scry_count": 2,
+        "scry_count": 2,
+        "trigger": "enters_battlefield",
+        "trigger_effect": "scry",
+        "trigger_scry_count": 2,
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "ScryEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Omenspeaker"
+      },
+      "card_name": "Omenspeaker",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ca42913baa856009e5da562479d1a4e1",
+      "normalized_name": "omenspeaker",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_scry_v1",
+        "effect": "creature",
+        "etb_scry_count": 2,
+        "scry_count": 2,
+        "trigger": "enters_battlefield",
+        "trigger_effect": "scry",
+        "trigger_scry_count": 2,
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "ScryEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Prophet of the Peak"
+      },
+      "card_name": "Prophet of the Peak",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ca42913baa856009e5da562479d1a4e1",
+      "normalized_name": "prophet of the peak",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_scry_v1",
+        "effect": "creature",
+        "etb_scry_count": 2,
+        "scry_count": 2,
+        "trigger": "enters_battlefield",
+        "trigger_effect": "scry",
+        "trigger_scry_count": 2,
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "ScryEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Rumbling Sentry"
+      },
+      "card_name": "Rumbling Sentry",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0a639e63e1f6566d56a772ef264e2bb8",
+      "normalized_name": "rumbling sentry",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_scry_v1",
+        "effect": "creature",
+        "etb_scry_count": 1,
+        "scry_count": 1,
+        "trigger": "enters_battlefield",
+        "trigger_effect": "scry",
+        "trigger_scry_count": 1,
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "ScryEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Sage's Row Savant"
+      },
+      "card_name": "Sage's Row Savant",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ca42913baa856009e5da562479d1a4e1",
+      "normalized_name": "sage's row savant",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_scry_v1",
+        "effect": "creature",
+        "etb_scry_count": 2,
+        "scry_count": 2,
+        "trigger": "enters_battlefield",
+        "trigger_effect": "scry",
+        "trigger_scry_count": 2,
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "ScryEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Automatic Librarian",
+    "Chrome Cat",
+    "Galadhrim Guide",
+    "Lost Legion",
+    "Octoprophet",
+    "Omenspeaker",
+    "Prophet of the Peak",
+    "Rumbling Sentry",
+    "Sage's Row Savant"
+  ],
+  "selected_count": 9,
+  "slug": "etb_scry_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Automatic Librarian",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ca42913baa856009e5da562479d1a4e1",
+      "min_rule_version": 2,
+      "normalized_name": "automatic librarian",
+      "oracle_hash": "91b6e9b9d7a202215da5ac166ffca6c2",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_scry_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Chrome Cat",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0a639e63e1f6566d56a772ef264e2bb8",
+      "min_rule_version": 2,
+      "normalized_name": "chrome cat",
+      "oracle_hash": "17bde51cf2fc1eb8f0bbbdff2363c864",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_scry_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Galadhrim Guide",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ca42913baa856009e5da562479d1a4e1",
+      "min_rule_version": 2,
+      "normalized_name": "galadhrim guide",
+      "oracle_hash": "065b614b72df33d771426db0ab60e75d",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_scry_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Lost Legion",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ca42913baa856009e5da562479d1a4e1",
+      "min_rule_version": 2,
+      "normalized_name": "lost legion",
+      "oracle_hash": "91b6e9b9d7a202215da5ac166ffca6c2",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_scry_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Octoprophet",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ca42913baa856009e5da562479d1a4e1",
+      "min_rule_version": 2,
+      "normalized_name": "octoprophet",
+      "oracle_hash": "91b6e9b9d7a202215da5ac166ffca6c2",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_scry_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Omenspeaker",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ca42913baa856009e5da562479d1a4e1",
+      "min_rule_version": 2,
+      "normalized_name": "omenspeaker",
+      "oracle_hash": "91b6e9b9d7a202215da5ac166ffca6c2",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_scry_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Prophet of the Peak",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ca42913baa856009e5da562479d1a4e1",
+      "min_rule_version": 2,
+      "normalized_name": "prophet of the peak",
+      "oracle_hash": "91b6e9b9d7a202215da5ac166ffca6c2",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_scry_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Rumbling Sentry",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0a639e63e1f6566d56a772ef264e2bb8",
+      "min_rule_version": 2,
+      "normalized_name": "rumbling sentry",
+      "oracle_hash": "17bde51cf2fc1eb8f0bbbdff2363c864",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_scry_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sage's Row Savant",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ca42913baa856009e5da562479d1a4e1",
+      "min_rule_version": 2,
+      "normalized_name": "sage's row savant",
+      "oracle_hash": "065b614b72df33d771426db0ab60e75d",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_scry_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

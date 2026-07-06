@@ -95,6 +95,9 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "etb_draw_count_exclude_source",
     "etb_life_loss",
     "etb_life_gain_amount",
+    "etb_scry_count",
+    "trigger_scry_count",
+    "scry_count",
     "etb_damage_amount",
     "etb_damage_target",
     "etb_remove_effect",
@@ -1098,6 +1101,39 @@ def creature_etb_create_tokens_execution_scenario_from_expected_rule(
     return scenario
 
 
+def creature_etb_scry_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_creature_etb_scry_v1":
+        return None
+    scry_count = int(
+        required.get("etb_scry_count")
+        or required.get("trigger_scry_count")
+        or required.get("scry_count")
+        or 0
+    )
+    if scry_count <= 0:
+        return None
+    return {
+        "name": f"{rule['card_name']} enters and scries {scry_count}",
+        "type": "creature_etb_scry",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": "Creature",
+            "effect": "creature",
+        },
+        "expected_scry_count": scry_count,
+        "library_top_names": [
+            "Low Priority Land",
+            "High Priority Spell",
+            "Medium Priority Creature",
+            "Reserve Card",
+        ],
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def creature_dies_create_treasure_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
@@ -1520,6 +1556,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or creature_etb_create_treasure_execution_scenario_from_expected_rule(rule)
         or creature_dies_create_treasure_execution_scenario_from_expected_rule(rule)
         or creature_etb_create_tokens_execution_scenario_from_expected_rule(rule)
+        or creature_etb_scry_execution_scenario_from_expected_rule(rule)
         or creature_dies_create_tokens_execution_scenario_from_expected_rule(rule)
         or simple_mana_source_execution_scenario_from_expected_rule(rule)
         or simple_activated_damage_execution_scenario_from_expected_rule(rule)

@@ -18242,6 +18242,27 @@ def resolve_generic_permanent_etb(
             turn=turn,
             **replay_rule_fields(effect_data),
         )
+    if effect_data.get("etb_scry_count"):
+        count = max(0, int(effect_data.get("etb_scry_count") or 0))
+        library_before = len(getattr(player, "library", []) or [])
+        scry_result = scry_library_for_controller(player, count)
+        emit_replay_event(
+            "etb_scry_resolved",
+            player=player.name,
+            card=permanent.get("name", "?"),
+            trigger="enters_battlefield",
+            effect="scry",
+            scry_count=count,
+            scry_looked_at=scry_result["looked_at"],
+            scry_kept_on_top=scry_result["kept_on_top"],
+            scry_bottomed=scry_result["bottomed"],
+            scry_top_after=scry_result["top_after"],
+            library_before=library_before,
+            library_after=len(getattr(player, "library", []) or []),
+            turn=turn,
+            phase=phase,
+            **replay_rule_fields(effect_data),
+        )
     if effect_data.get("etb_library_look_count"):
         dig_effect = {
             **effect_data,

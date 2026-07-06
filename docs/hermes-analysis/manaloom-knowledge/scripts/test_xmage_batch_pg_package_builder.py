@@ -1153,6 +1153,29 @@ def test_conditional_creature_etb_create_treasure_execution_scenario_sets_lands(
     assert scenario["opponent_land_count"] == 2
 
 
+def test_creature_etb_scry_execution_scenario() -> None:
+    rule = {
+        "normalized_name": "omenspeaker",
+        "card_name": "Omenspeaker",
+        "logical_rule_key": "battle_rule_v1:omenspeaker",
+        "required_effect_fields": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_etb_scry_v1",
+            "trigger": "enters_battlefield",
+            "etb_trigger_effect": "scry",
+            "etb_scry_count": 2,
+            "trigger_scry_count": 2,
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario["type"] == "creature_etb_scry"
+    assert scenario["expected_scry_count"] == 2
+    assert scenario["card"]["name"] == "Omenspeaker"
+    assert scenario["logical_rule_key"] == "battle_rule_v1:omenspeaker"
+
+
 def test_creature_dies_create_tokens_execution_scenario() -> None:
     rule = {
         "normalized_name": "carrier thrall",
