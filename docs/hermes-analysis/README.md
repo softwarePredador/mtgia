@@ -540,6 +540,26 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     e promove o proximo preflight limpo para o deck `616` com
     `+Ash Barrens / -Rise of the Eldrazi`. Nenhuma copy, battle ou promocao foi
     aberta por esse relatorio.
+    O ciclo seguinte do deck `616` gerou pacote land-floor completo, corrigiu a
+    source lane de ramp em
+    `manaloom-knowledge/scripts/global_commander_profile_repair_candidate_model.py`
+    para usar `mana_ramp_foundation` em `mana_rocks_treasure_ramp` /
+    `mana_acceleration`, e corrigiu o reorder de cortes para que reparos de
+    piso usem cortes de papéis acima do alvo antes das lands. A cadeia final
+    ficou estruturalmente pronta em
+    `master_optimizer_reports/global_commander_candidate_package_chain_audit_20260706_larger_gate_feedback_land_floor_profile_repair_deck616.md`
+    com `36` lands, `10` ramp, core floor reparado e strategy matrix
+    `package_strategy_ready_for_battle_probe`.
+    O replay natural precisou de `30` seeds para exercitar `Bant Panorama`,
+    `Boros Signet` e `Brokers Hideout`; o gate maior em
+    `master_optimizer_reports/global_commander_larger_battle_gate_audit_20260706_larger_gate_feedback_land_floor_profile_repair_deck616_vs607.md`
+    exercitou todos os `8` adds, melhorou a base imediata `616` (`11W/13L/0S`
+    contra `8W/15L/1S`), mas perdeu para o baseline protegido `607`
+    (`14W/9L/1S`), bloqueando promoção por
+    `candidate_did_not_beat_protected_baseline`. O feedback global agora tem
+    `blocked_package_count=3`, e o land-floor policy builder bloqueia `612` e
+    `616`, roteando o próximo preflight limpo para deck `609` com
+    `+Sunbaked Canyon / -Tibalt's Trickery`.
     O modelo nonland agora bloqueia cortes cross-lane de ramp com
     `cross_lane_ramp_cut_requires_same_lane_source_or_gate`, removendo `Birgi`
     dos cuts genericos de removal. O novo top pair `+Feed the Swarm /

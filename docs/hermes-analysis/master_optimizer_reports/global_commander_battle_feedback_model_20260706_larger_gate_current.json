@@ -2,11 +2,13 @@
   "artifact_type": "global_commander_battle_feedback_model",
   "battle_or_optimization_performed": false,
   "deck_action_allowed": false,
-  "generated_at": "2026-07-06T12:39:37.290422+00:00",
+  "generated_at": "2026-07-06T13:27:29.765730+00:00",
   "ignored_artifacts": [],
   "input_artifacts": [
     "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_battle_probe_audit_20260706_larger_gate_feedback_land_floor_profile_repair_deck612.json",
+    "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_battle_probe_audit_20260706_larger_gate_feedback_land_floor_profile_repair_deck616.json",
     "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_battle_probe_audit_20260706_lorehold_profile_repair_package.json",
+    "docs/hermes-analysis/master_optimizer_reports/global_commander_larger_battle_gate_audit_20260706_larger_gate_feedback_land_floor_profile_repair_deck616_vs607.json",
     "docs/hermes-analysis/master_optimizer_reports/global_commander_larger_battle_gate_audit_20260706_larger_gate_feedback_land_floor_profile_repair_vs607.json",
     "docs/hermes-analysis/master_optimizer_reports/global_commander_larger_battle_gate_audit_20260706_lorehold_profile_repair_vs607.json"
   ],
@@ -301,6 +303,147 @@
         "Call Forth the Tempest"
       ],
       "worst_candidate_vs_protected_win_delta": -3
+    },
+    {
+      "added_cards": [
+        "Arid Mesa",
+        "Ash Barrens",
+        "Bant Panorama",
+        "Battlefield Forge",
+        "Boros Signet",
+        "Brokers Hideout",
+        "Cabaretti Courtyard",
+        "Sunbaked Canyon"
+      ],
+      "best_candidate_vs_immediate_base_win_delta": 3,
+      "best_candidate_vs_protected_win_delta": -3,
+      "classification_counts": {
+        "package_improved_weak_base_but_failed_protected_baseline": 1
+      },
+      "commander": "Lorehold, the Historian",
+      "cut_cards": [
+        "Boltwave",
+        "Coruscation Mage",
+        "Explosive Singularity",
+        "Guttersnipe",
+        "Rise of the Eldrazi",
+        "Soul Immolation",
+        "Stuffy Doll",
+        "Worldfire"
+      ],
+      "deck_id": "616",
+      "largest_sample_games": 24,
+      "observation_count": 1,
+      "observations": [
+        {
+          "added_cards": [
+            "Arid Mesa",
+            "Ash Barrens",
+            "Bant Panorama",
+            "Battlefield Forge",
+            "Boros Signet",
+            "Brokers Hideout",
+            "Cabaretti Courtyard",
+            "Sunbaked Canyon"
+          ],
+          "artifact_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_larger_battle_gate_audit_20260706_larger_gate_feedback_land_floor_profile_repair_deck616_vs607.json",
+          "artifact_type": "global_commander_larger_battle_gate_audit",
+          "blocker_reasons": [
+            "candidate_did_not_beat_protected_baseline"
+          ],
+          "candidate_key": "candidate_land_floor_profile_repair_deck616",
+          "candidate_vs_immediate_base_win_delta": 3,
+          "candidate_vs_immediate_base_win_rate_delta": 12.5,
+          "candidate_vs_protected_win_delta": -3,
+          "candidate_vs_protected_win_rate_delta": -12.5,
+          "classification": "package_improved_weak_base_but_failed_protected_baseline",
+          "commander": "Lorehold, the Historian",
+          "cut_cards": [
+            "Boltwave",
+            "Coruscation Mage",
+            "Explosive Singularity",
+            "Guttersnipe",
+            "Rise of the Eldrazi",
+            "Soul Immolation",
+            "Stuffy Doll",
+            "Worldfire"
+          ],
+          "deck_id": "616",
+          "forced_access_mode": "none",
+          "immediate_base_key": "deck_616",
+          "larger_gate_exercised_added_cards": [
+            "Arid Mesa",
+            "Ash Barrens",
+            "Bant Panorama",
+            "Battlefield Forge",
+            "Boros Signet",
+            "Brokers Hideout",
+            "Cabaretti Courtyard",
+            "Sunbaked Canyon"
+          ],
+          "larger_gate_unexercised_added_cards": [],
+          "protected_baseline_key": "deck_607",
+          "recommendation": "block_package_until_new_source_lane_cut_or_strategy",
+          "sample_games": 24,
+          "status": "larger_battle_gate_blocks_promotion"
+        }
+      ],
+      "package_status": "package_blocked_by_protected_baseline_gate",
+      "primary_evidence": {
+        "added_cards": [
+          "Arid Mesa",
+          "Ash Barrens",
+          "Bant Panorama",
+          "Battlefield Forge",
+          "Boros Signet",
+          "Brokers Hideout",
+          "Cabaretti Courtyard",
+          "Sunbaked Canyon"
+        ],
+        "artifact_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_larger_battle_gate_audit_20260706_larger_gate_feedback_land_floor_profile_repair_deck616_vs607.json",
+        "artifact_type": "global_commander_larger_battle_gate_audit",
+        "blocker_reasons": [
+          "candidate_did_not_beat_protected_baseline"
+        ],
+        "candidate_key": "candidate_land_floor_profile_repair_deck616",
+        "candidate_vs_immediate_base_win_delta": 3,
+        "candidate_vs_immediate_base_win_rate_delta": 12.5,
+        "candidate_vs_protected_win_delta": -3,
+        "candidate_vs_protected_win_rate_delta": -12.5,
+        "classification": "package_improved_weak_base_but_failed_protected_baseline",
+        "commander": "Lorehold, the Historian",
+        "cut_cards": [
+          "Boltwave",
+          "Coruscation Mage",
+          "Explosive Singularity",
+          "Guttersnipe",
+          "Rise of the Eldrazi",
+          "Soul Immolation",
+          "Stuffy Doll",
+          "Worldfire"
+        ],
+        "deck_id": "616",
+        "forced_access_mode": "none",
+        "immediate_base_key": "deck_616",
+        "larger_gate_exercised_added_cards": [
+          "Arid Mesa",
+          "Ash Barrens",
+          "Bant Panorama",
+          "Battlefield Forge",
+          "Boros Signet",
+          "Brokers Hideout",
+          "Cabaretti Courtyard",
+          "Sunbaked Canyon"
+        ],
+        "larger_gate_unexercised_added_cards": [],
+        "protected_baseline_key": "deck_607",
+        "recommendation": "block_package_until_new_source_lane_cut_or_strategy",
+        "sample_games": 24,
+        "status": "larger_battle_gate_blocks_promotion"
+      },
+      "recommendation": "block_package_until_new_source_lane_cut_or_strategy",
+      "unexercised_added_cards": [],
+      "worst_candidate_vs_protected_win_delta": -3
     }
   ],
   "pair_feedback": [
@@ -537,6 +680,94 @@
       "recommendation": "run_exposure_replay_or_focused_test_before_candidate_gate",
       "superseded_ready_probe_count": 0,
       "worst_win_rate_delta": 100.0
+    },
+    {
+      "added_cards": [
+        "Bant Panorama",
+        "Boros Signet",
+        "Brokers Hideout"
+      ],
+      "best_win_rate_delta": 0.0,
+      "classification_counts": {
+        "failed_unexercised_candidate_pair": 1
+      },
+      "commander": "Lorehold, the Historian",
+      "cut_cards": [
+        "Boltwave",
+        "Guttersnipe",
+        "Worldfire"
+      ],
+      "deck_id": "616",
+      "largest_sample_games": 1,
+      "observation_count": 1,
+      "observations": [
+        {
+          "added_cards": [
+            "Bant Panorama",
+            "Boros Signet",
+            "Brokers Hideout"
+          ],
+          "added_cards_decision_only": [],
+          "added_cards_exercised_in_events": [],
+          "added_cards_unobserved": [],
+          "artifact_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_battle_probe_audit_20260706_larger_gate_feedback_land_floor_profile_repair_deck616.json",
+          "artifact_type": "global_commander_candidate_battle_probe_audit",
+          "base_win_rate": 100.0,
+          "blocker_reasons": [
+            "added_cards_not_exercised_in_replay_events"
+          ],
+          "candidate_win_rate": 100.0,
+          "classification": "failed_unexercised_candidate_pair",
+          "commander": "Lorehold, the Historian",
+          "cut_cards": [
+            "Boltwave",
+            "Guttersnipe",
+            "Worldfire"
+          ],
+          "deck_id": "616",
+          "recommendation": "run_exposure_replay_or_focused_test_before_candidate_gate",
+          "same_sample_shape": true,
+          "sample_games": 1,
+          "stale_lorehold_mentions": 0,
+          "status": "battle_probe_blocks_promotion",
+          "win_rate_delta": 0.0
+        }
+      ],
+      "pair_status": "pair_needs_exposure_replay_before_gate",
+      "primary_evidence": {
+        "added_cards": [
+          "Bant Panorama",
+          "Boros Signet",
+          "Brokers Hideout"
+        ],
+        "added_cards_decision_only": [],
+        "added_cards_exercised_in_events": [],
+        "added_cards_unobserved": [],
+        "artifact_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_battle_probe_audit_20260706_larger_gate_feedback_land_floor_profile_repair_deck616.json",
+        "artifact_type": "global_commander_candidate_battle_probe_audit",
+        "base_win_rate": 100.0,
+        "blocker_reasons": [
+          "added_cards_not_exercised_in_replay_events"
+        ],
+        "candidate_win_rate": 100.0,
+        "classification": "failed_unexercised_candidate_pair",
+        "commander": "Lorehold, the Historian",
+        "cut_cards": [
+          "Boltwave",
+          "Guttersnipe",
+          "Worldfire"
+        ],
+        "deck_id": "616",
+        "recommendation": "run_exposure_replay_or_focused_test_before_candidate_gate",
+        "same_sample_shape": true,
+        "sample_games": 1,
+        "stale_lorehold_mentions": 0,
+        "status": "battle_probe_blocks_promotion",
+        "win_rate_delta": 0.0
+      },
+      "recommendation": "run_exposure_replay_or_focused_test_before_candidate_gate",
+      "superseded_ready_probe_count": 0,
+      "worst_win_rate_delta": 0.0
     }
   ],
   "policy": {
@@ -552,27 +783,27 @@
   "source_db_mutated": false,
   "status": "pass",
   "summary": {
-    "audit_artifact_count": 4,
-    "blocked_package_count": 2,
+    "audit_artifact_count": 6,
+    "blocked_package_count": 3,
     "blocked_pair_count": 0,
     "ignored_artifact_count": 0,
     "needs_exercise_package_count": 0,
-    "needs_exposure_pair_count": 2,
+    "needs_exposure_pair_count": 3,
     "observation_classification_counts": {
-      "failed_unexercised_candidate_pair": 2
+      "failed_unexercised_candidate_pair": 3
     },
-    "observation_count": 2,
+    "observation_count": 3,
     "package_classification_counts": {
-      "package_improved_weak_base_but_failed_protected_baseline": 2
+      "package_improved_weak_base_but_failed_protected_baseline": 3
     },
-    "package_count": 2,
-    "package_observation_count": 2,
+    "package_count": 3,
+    "package_observation_count": 3,
     "package_status_counts": {
-      "package_blocked_by_protected_baseline_gate": 2
+      "package_blocked_by_protected_baseline_gate": 3
     },
-    "pair_count": 2,
+    "pair_count": 3,
     "pair_status_counts": {
-      "pair_needs_exposure_replay_before_gate": 2
+      "pair_needs_exposure_replay_before_gate": 3
     },
     "ready_pair_count": 0
   }

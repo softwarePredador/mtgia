@@ -1,16 +1,16 @@
 # Global Commander Land Floor Policy Builder
 
-- generated_at: `2026-07-06T13:04:58.849603+00:00`
+- generated_at: `2026-07-06T13:27:39.286563+00:00`
 - status: `land_floor_policy_ready_no_deck_action`
 - deck_policy_count: `9`
-- ready_pair_preflight_deck_count: `8`
-- battle_feedback_blocked_land_preflight_count: `1`
-- blocked_deck_count: `1`
-- top_deck_id: `616`
+- ready_pair_preflight_deck_count: `7`
+- battle_feedback_blocked_land_preflight_count: `2`
+- blocked_deck_count: `2`
+- top_deck_id: `609`
 - top_commander: `Lorehold, the Historian`
-- top_land_gap: `5`
-- top_pair_add: `Ash Barrens`
-- top_pair_cut: `Rise of the Eldrazi`
+- top_land_gap: `4`
+- top_pair_add: `Sunbaked Canyon`
+- top_pair_cut: `Tibalt's Trickery`
 - candidate_copy_allowed_now: `false`
 - battle_gate_allowed_now: `false`
 - promotion_allowed: `false`
@@ -20,7 +20,6 @@
 
 | Deck | Commander | Status | Land Gap | Current/Floor | Candidates | Pairs | Top Add | Top Cut | Next Gate |
 | --- | --- | --- | ---: | --- | ---: | ---: | --- | --- | --- |
-| `VARIANT Lorehold Variant 11 - Rafael Paste 2026-06-24 (616)` | `Lorehold, the Historian` | `land_floor_policy_ready_for_pair_preflight_no_deck_action` | 5 | `29/34` | 519 | 9 | `Ash Barrens` | `Rise of the Eldrazi` | `run_candidate_copy_materializer_for_land_floor_pair_after_commander_source_lane` |
 | `VARIANT Lorehold Variant 04 - Rafael Paste 2026-06-24 (609)` | `Lorehold, the Historian` | `land_floor_policy_ready_for_pair_preflight_no_deck_action` | 4 | `30/34` | 510 | 9 | `Sunbaked Canyon` | `Tibalt's Trickery` | `run_candidate_copy_materializer_for_land_floor_pair_after_commander_source_lane` |
 | `VARIANT Lorehold Variant 05 - Rafael Paste 2026-06-24 (610)` | `Lorehold, the Historian` | `land_floor_policy_ready_for_pair_preflight_no_deck_action` | 4 | `30/34` | 508 | 9 | `Ash Barrens` | `Brilliant Restoration` | `run_candidate_copy_materializer_for_land_floor_pair_after_commander_source_lane` |
 | `VARIANT Lorehold Variant 03 - Rafael Paste 2026-06-23 (608)` | `Lorehold, the Historian` | `land_floor_policy_ready_for_pair_preflight_no_deck_action` | 3 | `31/34` | 516 | 9 | `Ash Barrens` | `Cool but Rude` | `run_candidate_copy_materializer_for_land_floor_pair_after_commander_source_lane` |
@@ -29,6 +28,7 @@
 | `VARIANT Lorehold Variant 09 - Rafael Paste 2026-06-24 (614)` | `Lorehold, the Historian` | `land_floor_policy_ready_for_pair_preflight_no_deck_action` | 1 | `33/34` | 509 | 9 | `Ash Barrens` | `Monument to Endurance` | `run_candidate_copy_materializer_for_land_floor_pair_after_commander_source_lane` |
 | `Runtime Lorehold Learned 19e93de3cca (6)` | `Lorehold, the Historian` | `land_floor_policy_ready_for_pair_preflight_no_deck_action` | 1 | `33/34` | 499 | 9 | `Ash Barrens` | `Birgi, God of Storytelling // Harnfel, Horn of Bounty` | `run_candidate_copy_materializer_for_land_floor_pair_after_commander_source_lane` |
 | `VARIANT Lorehold Variant 07 - Rafael Paste 2026-06-24 (612)` | `Lorehold, the Historian` | `blocked_by_protected_baseline_package_feedback` | 7 | `27/34` | 507 | 9 | `Ash Barrens` | `Longshot, Rebel Bowman` | `replace_failed_package_source_lane_or_cut_set_before_land_floor_preflight` |
+| `VARIANT Lorehold Variant 11 - Rafael Paste 2026-06-24 (616)` | `Lorehold, the Historian` | `blocked_by_protected_baseline_package_feedback` | 5 | `29/34` | 519 | 9 | `Ash Barrens` | `Rise of the Eldrazi` | `replace_failed_package_source_lane_or_cut_set_before_land_floor_preflight` |
 
 ## Blockers
 

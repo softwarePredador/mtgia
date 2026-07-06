@@ -111,6 +111,36 @@ class GlobalCommanderProfileRepairCutPairReordererTests(unittest.TestCase):
         self.assertIn("protected_anchor_pair_lacks_same_lane_overlap", call_pair["blockers"])
         self.assertEqual(report["summary"]["next_gate"], "expand_profile_repair_cut_source_lane_before_candidate_copy")
 
+    def test_nonland_floor_repair_add_uses_over_target_cut_before_land_pairs(self) -> None:
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        root = Path(tmp.name)
+        package = {
+            "summary": {"deck_id": "616", "commander": "Lorehold, the Historian"},
+            "selected_add_package": [
+                {"card_name": "Bant Panorama", "selected_for_axis": "lands", "profile_roles": ["lands"]},
+                {"card_name": "Boros Signet", "selected_for_axis": "mana_rocks_treasure_ramp", "profile_roles": ["mana_rocks_treasure_ramp"]},
+            ],
+        }
+        candidate = {
+            "summary": {"deck_id": "616", "commander": "Lorehold, the Historian"},
+            "global_cut_review_pool": [
+                {"card_name": "Worldfire", "score": 80, "profile_roles": ["board_wipes_resets"]},
+                {"card_name": "Reckless Endeavor", "score": 30, "profile_roles": ["mana_rocks_treasure_ramp"]},
+            ],
+        }
+
+        report = reorderer.build_report(
+            package_resynthesis_report=write_json(root, "package.json", package),
+            candidate_model_report=write_json(root, "candidate.json", candidate),
+        )
+
+        pair_by_add = {row["add"]: row for row in report["reordered_pairs"]}
+        self.assertEqual(pair_by_add["Boros Signet"]["cut"], "Worldfire")
+        self.assertEqual(pair_by_add["Boros Signet"]["status"], "reordered_profile_floor_repair_pair")
+        self.assertEqual(pair_by_add["Bant Panorama"]["cut"], "Reckless Endeavor")
+        self.assertEqual(report["status"], "profile_repair_cut_pair_reorder_ready_for_land_curve_review")
+
 
 if __name__ == "__main__":
     unittest.main()

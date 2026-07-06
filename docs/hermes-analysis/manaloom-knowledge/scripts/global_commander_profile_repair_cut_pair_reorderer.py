@@ -90,6 +90,22 @@ def best_same_lane_cut(add: Mapping[str, Any], cuts: list[dict[str, Any]], used:
     return dict(candidates[0][3])
 
 
+def best_non_overlapping_cut(add: Mapping[str, Any], cuts: list[dict[str, Any]], used: set[str]) -> dict[str, Any] | None:
+    add_roles = roles(add)
+    candidates = []
+    for row in cuts:
+        name = card_name(row)
+        if name in used:
+            continue
+        if add_roles & roles(row):
+            continue
+        candidates.append((int(row.get("score") or 0), name, row))
+    if not candidates:
+        return None
+    candidates.sort(key=lambda item: (-item[0], item[1]))
+    return dict(candidates[0][2])
+
+
 def next_unused_cut(cuts: list[dict[str, Any]], used: set[str]) -> dict[str, Any] | None:
     for row in cuts:
         name = card_name(row)
@@ -124,9 +140,8 @@ def pair_row(index: int, add: Mapping[str, Any], cut: Mapping[str, Any] | None) 
         status = "reordered_same_lane_profile_repair_pair"
         reasons.append("same_lane_role_overlap_after_reorder")
     else:
-        status = "reordered_pair_blocked_cross_lane_cut"
-        blockers.append("pair_lacks_same_lane_overlap")
-        reasons.append("cross_lane_pair_after_reorder")
+        status = "reordered_profile_floor_repair_pair"
+        reasons.append("profile_floor_repair_uses_over_target_cut_after_reorder")
     return {
         "index": index,
         "add": card_name(add),
@@ -146,8 +161,22 @@ def reorder_pairs(adds: list[dict[str, Any]], cuts: list[dict[str, Any]]) -> lis
     used: set[str] = set()
     assignments: dict[str, dict[str, Any] | None] = {}
     protected_adds = [row for row in adds if str(row.get("selected_for_axis") or "") == PROTECTED_ANCHOR_AXIS]
+    nonland_adds = [
+        row
+        for row in adds
+        if str(row.get("selected_for_axis") or "") not in {PROTECTED_ANCHOR_AXIS, LAND_AXIS}
+    ]
     for add in protected_adds:
         cut = best_same_lane_cut(add, cuts, used)
+        if cut is None:
+            cut = next_unused_cut(cuts, used)
+        assignments[card_name(add)] = cut
+        if cut:
+            used.add(card_name(cut))
+    for add in nonland_adds:
+        cut = best_non_overlapping_cut(add, cuts, used)
+        if cut is None:
+            cut = best_same_lane_cut(add, cuts, used)
         if cut is None:
             cut = next_unused_cut(cuts, used)
         assignments[card_name(add)] = cut
@@ -186,13 +215,14 @@ def build_report(*, package_resynthesis_report: Path, candidate_model_report: Pa
         for row in pairs
         if row.get("add_axis") == LAND_AXIS and "land_floor_pair_needs_curve_and_role_loss_review" in row.get("blockers", [])
     )
-    status = (
-        "profile_repair_cut_pair_reorder_ready_for_land_curve_review"
-        if protected_ready == sum(1 for row in pairs if row.get("add_axis") == PROTECTED_ANCHOR_AXIS)
-        and land_review > 0
-        and set(blockers) == {"land_floor_pair_needs_curve_and_role_loss_review"}
-        else "profile_repair_cut_pair_reorder_blocks_candidate_copy"
-    )
+    protected_total = sum(1 for row in pairs if row.get("add_axis") == PROTECTED_ANCHOR_AXIS)
+    protected_clean = protected_ready == protected_total
+    if not blockers:
+        status = "profile_repair_cut_pair_reorder_ready_for_candidate_copy"
+    elif protected_clean and land_review > 0 and set(blockers) == {"land_floor_pair_needs_curve_and_role_loss_review"}:
+        status = "profile_repair_cut_pair_reorder_ready_for_land_curve_review"
+    else:
+        status = "profile_repair_cut_pair_reorder_blocks_candidate_copy"
     return {
         "generated_at": utc_now(),
         "status": status,
@@ -222,7 +252,11 @@ def build_report(*, package_resynthesis_report: Path, candidate_model_report: Pa
             "next_gate": (
                 "review_land_floor_cut_role_loss_before_candidate_copy"
                 if status == "profile_repair_cut_pair_reorder_ready_for_land_curve_review"
-                else "expand_profile_repair_cut_source_lane_before_candidate_copy"
+                else (
+                    "materialize_profile_repair_candidate_copy"
+                    if status == "profile_repair_cut_pair_reorder_ready_for_candidate_copy"
+                    else "expand_profile_repair_cut_source_lane_before_candidate_copy"
+                )
             ),
         },
         "reordered_pairs": pairs,

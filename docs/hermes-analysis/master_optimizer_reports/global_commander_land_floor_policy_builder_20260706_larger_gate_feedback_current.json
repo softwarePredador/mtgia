@@ -18,45 +18,6 @@
       "battle_gate_allowed": false,
       "candidate_copy_allowed": false,
       "commander": "Lorehold, the Historian",
-      "current_land_count": 29,
-      "cut_candidate_count": 63,
-      "deck_id": "616",
-      "deck_name": "VARIANT Lorehold Variant 11 - Rafael Paste 2026-06-24",
-      "land_gap": 5,
-      "mutation_allowed": false,
-      "named_land_candidate_count": 519,
-      "next_gate": "run_candidate_copy_materializer_for_land_floor_pair_after_commander_source_lane",
-      "pair_hypothesis_count": 9,
-      "preflight_score": 643,
-      "promotion_allowed": false,
-      "recommended_land_classes": [
-        "add_land_quantity_before_spell_slots",
-        "add_W_source_or_fetchable_access",
-        "add_R_source_or_fetchable_access",
-        "review_fetchable_dual_or_basic_mix"
-      ],
-      "status": "land_floor_policy_ready_for_pair_preflight_no_deck_action",
-      "target_land_floor": 34,
-      "top_pair": {
-        "add": "Ash Barrens",
-        "cut": "Rise of the Eldrazi",
-        "mutation_allowed": false,
-        "pair_score": 143,
-        "required_gates": [
-          "candidate_copy_only",
-          "structure_and_legality_recheck",
-          "mana_base_profile_recheck",
-          "strategy_matrix_before_battle",
-          "battle_gate_with_drawn_cast_used_trace_before_promotion"
-        ],
-        "status": "review_only_land_add_cut_pair"
-      }
-    },
-    {
-      "battle_feedback": null,
-      "battle_gate_allowed": false,
-      "candidate_copy_allowed": false,
-      "commander": "Lorehold, the Historian",
       "current_land_count": 30,
       "cut_candidate_count": 59,
       "deck_id": "609",
@@ -399,9 +360,76 @@
         ],
         "status": "review_only_land_add_cut_pair"
       }
+    },
+    {
+      "battle_feedback": {
+        "added_cards": [
+          "Arid Mesa",
+          "Ash Barrens",
+          "Bant Panorama",
+          "Battlefield Forge",
+          "Boros Signet",
+          "Brokers Hideout",
+          "Cabaretti Courtyard",
+          "Sunbaked Canyon"
+        ],
+        "artifact_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_larger_battle_gate_audit_20260706_larger_gate_feedback_land_floor_profile_repair_deck616_vs607.json",
+        "candidate_vs_immediate_base_win_delta": 3,
+        "candidate_vs_protected_win_delta": -3,
+        "classification": "package_improved_weak_base_but_failed_protected_baseline",
+        "cut_cards": [
+          "Boltwave",
+          "Coruscation Mage",
+          "Explosive Singularity",
+          "Guttersnipe",
+          "Rise of the Eldrazi",
+          "Soul Immolation",
+          "Stuffy Doll",
+          "Worldfire"
+        ],
+        "package_status": "package_blocked_by_protected_baseline_gate",
+        "protected_baseline_key": "deck_607",
+        "recommendation": "block_package_until_new_source_lane_cut_or_strategy"
+      },
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "commander": "Lorehold, the Historian",
+      "current_land_count": 29,
+      "cut_candidate_count": 63,
+      "deck_id": "616",
+      "deck_name": "VARIANT Lorehold Variant 11 - Rafael Paste 2026-06-24",
+      "land_gap": 5,
+      "mutation_allowed": false,
+      "named_land_candidate_count": 519,
+      "next_gate": "replace_failed_package_source_lane_or_cut_set_before_land_floor_preflight",
+      "pair_hypothesis_count": 9,
+      "preflight_score": 643,
+      "promotion_allowed": false,
+      "recommended_land_classes": [
+        "add_land_quantity_before_spell_slots",
+        "add_W_source_or_fetchable_access",
+        "add_R_source_or_fetchable_access",
+        "review_fetchable_dual_or_basic_mix"
+      ],
+      "status": "blocked_by_protected_baseline_package_feedback",
+      "target_land_floor": 34,
+      "top_pair": {
+        "add": "Ash Barrens",
+        "cut": "Rise of the Eldrazi",
+        "mutation_allowed": false,
+        "pair_score": 143,
+        "required_gates": [
+          "candidate_copy_only",
+          "structure_and_legality_recheck",
+          "mana_base_profile_recheck",
+          "strategy_matrix_before_battle",
+          "battle_gate_with_drawn_cast_used_trace_before_promotion"
+        ],
+        "status": "review_only_land_add_cut_pair"
+      }
     }
   ],
-  "generated_at": "2026-07-06T13:04:58.849603+00:00",
+  "generated_at": "2026-07-06T13:27:39.286563+00:00",
   "input_artifacts": {
     "battle_feedback_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_battle_feedback_model_20260706_larger_gate_current.json",
     "land_cut_model_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_land_cut_candidate_model_20260705_global_goal_hermes_only.json",
@@ -422,23 +450,23 @@
   "source_db_mutated": false,
   "status": "land_floor_policy_ready_no_deck_action",
   "summary": {
-    "battle_feedback_blocked_land_preflight_count": 1,
+    "battle_feedback_blocked_land_preflight_count": 2,
     "battle_gate_allowed_count": 0,
-    "blocked_deck_count": 1,
+    "blocked_deck_count": 2,
     "candidate_copy_allowed_count": 0,
     "deck_policy_count": 9,
     "land_axis_policy_next_gate": "calibrate_land_floor_policy_before_candidate_copy",
     "land_axis_policy_status": "role_axis_policy_ready_for_floor_calibration",
     "next_gate": "run_candidate_copy_materializer_for_land_floor_pair_after_commander_source_lane",
-    "ready_pair_preflight_deck_count": 8,
+    "ready_pair_preflight_deck_count": 7,
     "status_counts": {
-      "blocked_by_protected_baseline_package_feedback": 1,
-      "land_floor_policy_ready_for_pair_preflight_no_deck_action": 8
+      "blocked_by_protected_baseline_package_feedback": 2,
+      "land_floor_policy_ready_for_pair_preflight_no_deck_action": 7
     },
     "top_commander": "Lorehold, the Historian",
-    "top_deck_id": "616",
-    "top_land_gap": 5,
-    "top_pair_add": "Ash Barrens",
-    "top_pair_cut": "Rise of the Eldrazi"
+    "top_deck_id": "609",
+    "top_land_gap": 4,
+    "top_pair_add": "Sunbaked Canyon",
+    "top_pair_cut": "Tibalt's Trickery"
   }
 }

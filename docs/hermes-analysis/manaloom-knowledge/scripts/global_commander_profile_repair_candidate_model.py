@@ -39,6 +39,8 @@ DEFAULT_OUT_PREFIX = (
 
 ROLE_TO_EXPECTED_PACKAGE = {
     "angels_demons_dragons_payoffs": "angels_demons_dragons_payoffs",
+    "mana_acceleration": "mana_ramp_foundation",
+    "mana_rocks_treasure_ramp": "mana_ramp_foundation",
     "spot_interaction": "interaction_and_resets",
     "commander_attack_window": "commander_attack_enablers",
     "haste_protection_silence": "commander_attack_enablers",
@@ -254,6 +256,19 @@ def candidate_score(axis: str, card_name: str, oracle: Mapping[str, Any], roles:
         if "return target creature card" in body:
             score += 6
             reasons.append("targeted_creature_reanimation")
+    elif axis in {"mana_acceleration", "mana_rocks_treasure_ramp"}:
+        if "mana_acceleration" in roles or "mana_rocks_treasure_ramp" in roles:
+            score += 35
+            reasons.append("role_confirms_mana_ramp_foundation")
+        if cmc <= 2:
+            score += 10
+            reasons.append("cheap_ramp")
+        if "add " in body or "treasure" in body:
+            score += 8
+            reasons.append("mana_production_text")
+        if "cost" in body and "less" in body:
+            score += 6
+            reasons.append("cost_reduction_text")
     elif axis == "lands":
         if "land" in str(oracle.get("type_line") or "").lower():
             score += 30
@@ -303,6 +318,10 @@ def build_card_candidates(
             status = "blocked_not_attack_window_role"
         elif axis == "reanimation_plan_b" and "reanimation_plan_b" not in roles:
             status = "blocked_not_reanimation_plan_b_role"
+        elif axis in {"mana_acceleration", "mana_rocks_treasure_ramp"} and not (
+            "mana_acceleration" in roles or "mana_rocks_treasure_ramp" in roles
+        ):
+            status = "blocked_not_mana_ramp_foundation_role"
         else:
             status = "review_only_profile_repair_add_candidate"
         score, reasons = candidate_score(axis, card_name, oracle, roles, source)

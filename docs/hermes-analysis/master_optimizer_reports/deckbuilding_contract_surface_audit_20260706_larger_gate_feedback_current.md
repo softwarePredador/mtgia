@@ -1,6 +1,6 @@
 # Deckbuilding Contract Surface Audit
 
-- Generated at: `2026-07-06T13:06:58.962911+00:00`
+- Generated at: `2026-07-06T13:32:38.509826+00:00`
 - Status: `pass`
 - Contract: `docs/hermes-analysis/COMMANDER_DECKBUILDING_CONTRACT_2026-06-29.md`
 

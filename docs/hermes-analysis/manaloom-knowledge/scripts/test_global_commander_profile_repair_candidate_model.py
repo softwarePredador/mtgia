@@ -28,6 +28,9 @@ def strategy_payload(*, blockers: list[str]) -> dict[str, object]:
             "commander_attack_enablers": {
                 "missing_cards": ["Arena of Glory"],
             },
+            "mana_ramp_foundation": {
+                "missing_cards": ["Boros Signet"],
+            },
             "reanimation_plan_b": {
                 "missing_cards": ["Reanimate"],
             },
@@ -94,6 +97,14 @@ def repair_payload(*, add_payoff_shortfall: int = 18, axes: list[str] | None = N
             "candidate_count": 2,
             "target_min": 3,
             "target_max": 6,
+            "shortfall_to_min": 1,
+        },
+        "mana_rocks_treasure_ramp": {
+            "blocker": "profile_mana_rocks_treasure_ramp_below_target",
+            "repair_axis": "mana_rocks_treasure_ramp",
+            "candidate_count": 9,
+            "target_min": 10,
+            "target_max": 13,
             "shortfall_to_min": 1,
         },
         "protected_profile_anchor": {
@@ -255,6 +266,18 @@ class GlobalCommanderProfileRepairCandidateModelTests(unittest.TestCase):
                 "despark",
             ),
             (
+                "Boros Signet",
+                "boros signet",
+                "{2}",
+                "[]",
+                "[]",
+                "Artifact",
+                "{1}, {T}: Add {R}{W}.",
+                2,
+                "",
+                "boros-signet",
+            ),
+            (
                 "Vampiric Tutor",
                 "vampiric tutor",
                 "{B}",
@@ -296,6 +319,7 @@ class GlobalCommanderProfileRepairCandidateModelTests(unittest.TestCase):
             "City of Brass",
             "Arena of Glory",
             "Ancient Copper Dragon",
+            "Boros Signet",
             "Despark",
             "Vampiric Tutor",
             "Reanimate",
@@ -418,6 +442,32 @@ class GlobalCommanderProfileRepairCandidateModelTests(unittest.TestCase):
         self.assertEqual(pool["repair_axis"], "reanimation_plan_b")
         self.assertEqual(pool["top_add_candidates"][0]["card_name"], "Reanimate")
         self.assertIn("reanimation_plan_b", pool["top_add_candidates"][0]["profile_roles"])
+
+    def test_mana_ramp_blocker_uses_expected_ramp_foundation_source_lane(self) -> None:
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        root = Path(tmp.name)
+        db = self._db(root)
+        strategy = self._json(
+            root,
+            "strategy.json",
+            strategy_payload(blockers=["profile_mana_rocks_treasure_ramp_below_target"]),
+        )
+        repair = self._json(
+            root,
+            "repair.json",
+            repair_payload(axes=["mana_rocks_treasure_ramp"]),
+        )
+
+        report = model.build_report(repair_plan_report=repair, strategy_report=strategy, sqlite_db=db)
+
+        self.assertEqual(report["status"], "profile_repair_candidate_model_ready_for_candidate_copy")
+        pool = report["repair_axis_pools"][0]
+        self.assertEqual(pool["repair_axis"], "mana_rocks_treasure_ramp")
+        self.assertEqual(pool["candidate_source_axis"], "mana_rocks_treasure_ramp")
+        self.assertEqual(pool["top_add_candidates"][0]["card_name"], "Boros Signet")
+        self.assertIn("mana_rocks_treasure_ramp", pool["top_add_candidates"][0]["profile_roles"])
+        self.assertIn("role_confirms_mana_ramp_foundation", pool["top_add_candidates"][0]["fit_reasons"])
 
     def test_global_feedback_cut_stays_blocked_in_profile_repair_pool(self) -> None:
         tmp = tempfile.TemporaryDirectory()

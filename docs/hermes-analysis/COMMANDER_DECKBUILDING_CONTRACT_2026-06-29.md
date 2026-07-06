@@ -208,6 +208,10 @@ Operational priority after this pivot:
    gap before candidate copy; candidate copy remains closed until the isolated
    materializer, commander-source-lane requirement, structure/legal recheck,
    strategy matrix, battle gate, and replay trace gates are satisfied; if the
+   later commander-profile repair finds a hard-floor role such as ramp still
+   below target, its source lane must come from the commander's expected package
+   when available, and its cuts must come from over-target roles so the repair
+   produces a real net floor gain rather than a same-role count swap; if the
    chosen axis is `ramp`, then run
    `global_commander_ramp_axis_nonland_cut_policy_model.py` to apply ramp
    ceiling policy to blocked nonland ramp cuts before any same-deck source
