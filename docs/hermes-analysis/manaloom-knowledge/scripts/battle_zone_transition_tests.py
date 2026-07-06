@@ -1155,6 +1155,55 @@ def register_tests(battle, player, card):
         assert goblin_token not in active.graveyard
         assert active.mana_pool.red == 1
 
+    def test_verdant_eidolon_pays_green_and_sacrifices_source_for_contextual_mana():
+        active = player("Active")
+        active.mana_pool.add("green", 1)
+        eidolon = battle.enrich_card(
+            {
+                "name": "Verdant Eidolon",
+                "cmc": 4,
+                "type_line": "Creature - Spirit",
+                "effect": "ramp_permanent",
+                "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1",
+                "ability_kind": "activated_mana",
+                "is_mana_source": True,
+                "mana_source_contextual_only": True,
+                "mana_produced": 3,
+                "produces": "WUBRG",
+                "activation_mana_cost": "{G}",
+                "mana_activation_requires_sacrifice": True,
+                "activation_requires_sacrifice": True,
+                "mana_activation_requires_tap": False,
+                "activation_requires_tap": False,
+                "power": 2,
+                "toughness": 2,
+            }
+        )
+        payoff = {
+            "name": "Hill Giant",
+            "mana_cost": "{3}",
+            "cmc": 3,
+            "type_line": "Creature - Giant",
+            "effect": "creature",
+        }
+        active.battlefield = [eidolon]
+        active.hand = [payoff]
+
+        activated = battle.activate_self_sacrifice_mana_sources(
+            active,
+            [],
+            [active],
+            turn=3,
+            phase="precombat_main",
+        )
+
+        assert activated == 1
+        assert eidolon not in active.battlefield
+        assert eidolon in active.graveyard
+        assert active.mana_pool.green == 0
+        assert active.available_mana() == 3
+        assert active.conditional_mana_sources
+
     def test_weathered_wayfarer_activated_tutor_requires_opponent_more_lands():
         active = player("Active")
         opponent = player("Opponent")
@@ -1565,6 +1614,7 @@ def register_tests(battle, player, card):
         test_ravenous_baloth_life_gain_sacrifices_beast_only,
         test_attrition_activated_destroy_sacrifices_creature_cost,
         test_skirk_prospector_sacrifices_goblin_for_contextual_mana,
+        test_verdant_eidolon_pays_green_and_sacrifices_source_for_contextual_mana,
         test_weathered_wayfarer_activated_tutor_requires_opponent_more_lands,
         test_spellseeker_etb_finds_cheap_instant_or_sorcery_only,
         test_trophy_mage_etb_finds_artifact_with_mana_value_three_only,

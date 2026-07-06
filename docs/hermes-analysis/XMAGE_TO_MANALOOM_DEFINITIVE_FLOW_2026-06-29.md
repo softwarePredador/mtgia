@@ -15978,6 +15978,117 @@ mana, or unsupported dynamic output. The known post-PG574 residuals in this
 neighborhood are `Goblin Clearcutter`, `The Golden Throne`,
 `Slobad, Iron Goblin`, and `Overeager Apprentice`.
 
+## PG575 Self-Sacrifice Mana Source Auxiliary New Server Evidence
+
+PG575 evidence:
+
+- candidate split:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260706_pg575_self_sacrifice_mana_source_auxiliary_candidate.md`
+- package:
+  `docs/hermes-analysis/master_optimizer_reports/pg575_self_sacrifice_mana_source_auxiliary_package.md`
+- apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg575_self_sacrifice_mana_source_auxiliary_apply_evidence.md`
+- sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg575_self_sacrifice_mana_source_auxiliary_sync_report.json`
+- E2E:
+  `docs/hermes-analysis/master_optimizer_reports/pg575_self_sacrifice_mana_source_auxiliary_e2e.md`
+- post-sync queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260706_post_pg575_self_sacrifice_mana_source_auxiliary_commander_legal.md`
+- post split recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260706_post_pg575_self_sacrifice_mana_source_auxiliary_recheck.md`
+- readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260706_post_pg575_self_sacrifice_mana_source_auxiliary.md`
+
+PG575 promoted `15` self-sacrifice mana-source rows on the new server under
+`xmage_self_sacrifice_mana_source_permanent_v1`.
+
+Runtime semantics:
+
+- self-sacrifice mana sources are contextual-only and activate only when the
+  produced mana unlocks a real same-turn play;
+- the runtime pays the activation mana cost when present, sacrifices the source,
+  and then adds the produced mana;
+- the mapper accepts safe simple mana-ability windows with `SacrificeSourceCost`
+  and supports fixed symbols, any-color output, and represented "any
+  combination" output;
+- non-mana companion abilities stay `_runtime_partial` metadata and are not
+  executed by this package.
+
+Validation:
+
+- focused split tests passed with `671` cases after the mapper change;
+- the battle runtime suite passed with PG-backed rules, including
+  `test_verdant_eidolon_pays_green_and_sacrifices_source_for_contextual_mana`;
+- package precheck found `15/15` target card rows, no missing targets, and
+  `0` existing expected executable rows before apply;
+- package apply verified `15/15` promoted rows with `review_status=verified`,
+  `execution_status=auto`, and matching Oracle hash;
+- PG -> Hermes/SQLite sync loaded `15` PostgreSQL rows, updated `17` SQLite
+  rows, and exported `6635` canonical snapshot rows;
+- post-PG575 queue moved to `target_identity_count=25355` and
+  `xmage_authoritative_source_count=25041`;
+- post-PG575 exact split isolated one remaining safe neighbor,
+  `All-Fates Scroll`, for PG576.
+
+Residual boundary: PG575 does not authorize "different colors" constraints,
+static mana grants, non-mana sacrifice abilities, discard/pay-life/exile costs,
+unsupported conditional or dynamic mana, or source/Oracle mismatches.
+
+## PG576 Simple Mana Source Auxiliary Draw New Server Evidence
+
+PG576 evidence:
+
+- candidate split:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260706_pg576_simple_mana_source_auxiliary_draw_candidate.md`
+- package:
+  `docs/hermes-analysis/master_optimizer_reports/pg576_simple_mana_source_auxiliary_draw_package.md`
+- apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg576_simple_mana_source_auxiliary_draw_apply_evidence.md`
+- sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg576_simple_mana_source_auxiliary_draw_sync_report.json`
+- E2E:
+  `docs/hermes-analysis/master_optimizer_reports/pg576_simple_mana_source_auxiliary_draw_e2e.md`
+- post-sync queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260706_post_pg576_simple_mana_source_auxiliary_draw_commander_legal.md`
+- post split recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260706_post_pg576_simple_mana_source_auxiliary_draw_recheck.md`
+- readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260706_post_pg576_simple_mana_source_auxiliary_draw.md`
+- final audits:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260706_post_pg576_simple_mana_source_auxiliary_draw.md`,
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260706_post_pg576_simple_mana_source_auxiliary_draw.md`,
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260706_post_pg576_simple_mana_source_auxiliary_draw.md`,
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260706_post_pg576_simple_mana_source_auxiliary_draw.md`
+
+PG576 promoted `1` simple tap mana-source row on the new server under
+`xmage_simple_tap_mana_source_permanent_v1`.
+
+Runtime semantics:
+
+- `All-Fates Scroll` is executable only as `{T}: Add one mana of any color`;
+- the sacrifice draw-X ability remains `_runtime_partial` metadata and is not
+  executed by this package.
+
+Validation:
+
+- package precheck found `1/1` target card row, no missing targets, and `0`
+  existing expected executable rows before apply;
+- package apply verified `1/1` promoted row with `review_status=verified`,
+  `execution_status=auto`, and matching Oracle hash;
+- PG -> Hermes/SQLite sync loaded `1` PostgreSQL row, updated `1` SQLite row,
+  and exported `6636` canonical snapshot rows;
+- post-PG576 queue moved from PG574 `target_identity_count=25370` and
+  `xmage_authoritative_source_count=25056` to `25354` and `25040`;
+- global readiness after sync reported `battle_and_oracle_ready=5596` and
+  `battle_family_mapper_required=28277`;
+- final exact-scope recheck returned `proposal_count=0`;
+- final audits passed: XMage strategy `26/26`, PG-Hermes-SQLite `51/51`,
+  operational surface `pass`, legacy contamination `pass`, and server-target
+  `pass`.
+
+Residual boundary: PG576 does not authorize execution of All-Fates Scroll's
+draw-X sacrifice ability. That remains a separate activated draw runtime family.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

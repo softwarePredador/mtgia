@@ -10855,7 +10855,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["activation_mana_cost"], "{R}")
         self.assertFalse(effect["mana_activation_requires_tap"])
 
-    def test_mana_source_with_etb_draw_and_food_sacrifice_mana_stays_blocked(self) -> None:
+    def test_mana_source_with_etb_draw_and_food_sacrifice_mana_maps_partial(self) -> None:
         row = queue_row(
             split.RAMP_ARTIFACT_UNIT,
             effect_classes=["DrawCardSourceControllerEffect"],
@@ -10888,8 +10888,18 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             ),
         )
 
-        self.assertIsNone(proposal)
-        self.assertEqual(reason, "mana_source_source_sacrifice_cost_not_supported")
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.SELF_SACRIFICE_MANA_SOURCE_SCOPE)
+        self.assertEqual(effect["produces"], "WUBRG")
+        self.assertEqual(effect["mana_produced"], 1)
+        self.assertEqual(effect["activation_mana_cost"], "{1}")
+        self.assertTrue(effect["mana_activation_requires_tap"])
+        self.assertTrue(effect["_runtime_partial"])
+        self.assertEqual(
+            effect["xmage_auxiliary_ability_classes"],
+            ["EntersBattlefieldTriggeredAbility", "FoodAbility"],
+        )
 
     def test_simple_mana_source_with_unmodeled_auxiliary_sacrifice_maps_partial_mana(self) -> None:
         row = queue_row(
@@ -11322,6 +11332,196 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["produced_mana_symbols"], ["R", "G", "W"])
         self.assertEqual(effect["produces"], "RGW")
 
+    def test_self_sacrifice_mana_source_with_delayed_draw_tail_maps_partial(self) -> None:
+        row = queue_row(
+            split.RAMP_ARTIFACT_UNIT,
+            effect_classes=[
+                "AddManaOfAnyColorEffect",
+                "CreateDelayedTriggeredAbilityEffect",
+                "DrawCardSourceControllerEffect",
+            ],
+            ability_kind="activated",
+            ability_classes=["AtTheBeginOfNextUpkeepDelayedTriggeredAbility", "SimpleManaAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Astrolabe",
+                type_line="Artifact",
+                oracle_text=(
+                    "{1}, {T}, Sacrifice this artifact: Add two mana of any one color. "
+                    "Draw a card at the beginning of the next turn's upkeep."
+                ),
+            ),
+            source_text=(
+                'SimpleManaAbility ability = new SimpleManaAbility(Zone.BATTLEFIELD, '
+                'new AddManaOfAnyColorEffect(2), new ManaCostsImpl<>("{1}"));'
+                "ability.addCost(new TapSourceCost());"
+                "ability.addCost(new SacrificeSourceCost());"
+                "ability.addEffect(new CreateDelayedTriggeredAbilityEffect("
+                "new AtTheBeginOfNextUpkeepDelayedTriggeredAbility("
+                "new DrawCardSourceControllerEffect(1), Duration.OneUse), false));"
+                "this.addAbility(ability);"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.SELF_SACRIFICE_MANA_SOURCE_SCOPE)
+        self.assertTrue(effect["mana_source_contextual_only"])
+        self.assertEqual(effect["produces"], "WUBRG")
+        self.assertEqual(effect["mana_produced"], 2)
+        self.assertEqual(effect["activation_mana_cost"], "{1}")
+        self.assertTrue(effect["mana_activation_requires_tap"])
+        self.assertTrue(effect["_runtime_partial"])
+        self.assertIn("draw a card", effect["_runtime_partial_sacrifice_mana_tail"])
+
+    def test_self_sacrifice_mana_source_any_combination_maps_partial(self) -> None:
+        row = queue_row(
+            split.RAMP_ARTIFACT_UNIT,
+            effect_classes=["AddManaInAnyCombinationEffect", "DrawCardSourceControllerEffect"],
+            ability_kind="activated",
+            ability_classes=[
+                "EntersBattlefieldTappedAbility",
+                "PutIntoGraveFromBattlefieldSourceTriggeredAbility",
+                "SimpleManaAbility",
+            ],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Terrarion",
+                type_line="Artifact",
+                oracle_text=(
+                    "This artifact enters tapped.\n"
+                    "{2}, {T}, Sacrifice this artifact: Add two mana in any combination of colors.\n"
+                    "When this artifact is put into a graveyard from the battlefield, draw a card."
+                ),
+            ),
+            source_text=(
+                "this.addAbility(new EntersBattlefieldTappedAbility());"
+                "Ability ability = new SimpleManaAbility(Zone.BATTLEFIELD, "
+                "new AddManaInAnyCombinationEffect(2), new GenericManaCost(2));"
+                "ability.addCost(new TapSourceCost());"
+                "ability.addCost(new SacrificeSourceCost());"
+                "this.addAbility(ability);"
+                "this.addAbility(new PutIntoGraveFromBattlefieldSourceTriggeredAbility("
+                "new DrawCardSourceControllerEffect(1)));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.SELF_SACRIFICE_MANA_SOURCE_SCOPE)
+        self.assertEqual(effect["produces"], "WUBRG")
+        self.assertEqual(effect["mana_produced"], 2)
+        self.assertEqual(effect["activation_mana_cost"], "{2}")
+        self.assertTrue(effect["enters_tapped"])
+        self.assertTrue(effect["_runtime_partial"])
+
+    def test_self_sacrifice_mana_source_with_colored_activation_cost_maps(self) -> None:
+        row = queue_row(
+            split.RAMP_CREATURE_UNIT,
+            effect_classes=["AddManaOfAnyColorEffect", "ReturnSourceFromGraveyardToHandEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleManaAbility", "SpellCastControllerTriggeredAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Verdant Eidolon",
+                type_line="Creature - Spirit",
+                oracle_text=(
+                    "{G}, Sacrifice this creature: Add three mana of any one color.\n"
+                    "Whenever you cast a multicolored spell, you may return this card from your graveyard to your hand."
+                ),
+            ),
+            source_text=(
+                'Ability ability = new SimpleManaAbility(Zone.BATTLEFIELD, '
+                'new AddManaOfAnyColorEffect(3), new ManaCostsImpl<>("{G}"));'
+                "ability.addCost(new SacrificeSourceCost());"
+                "this.addAbility(ability);"
+                "this.addAbility(new SpellCastControllerTriggeredAbility("
+                "Zone.GRAVEYARD, new ReturnSourceFromGraveyardToHandEffect(), "
+                "StaticFilters.FILTER_SPELL_A_MULTICOLORED, true, SetTargetPointer.NONE));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.SELF_SACRIFICE_MANA_SOURCE_SCOPE)
+        self.assertEqual(effect["produces"], "WUBRG")
+        self.assertEqual(effect["mana_produced"], 3)
+        self.assertEqual(effect["activation_mana_cost"], "{G}")
+        self.assertFalse(effect["mana_activation_requires_tap"])
+        self.assertTrue(effect["_runtime_partial"])
+
+    def test_self_sacrifice_mana_source_blocks_different_colors_without_runtime_constraint(self) -> None:
+        row = queue_row(
+            split.RAMP_ARTIFACT_UNIT,
+            effect_classes=["AddManaOfTwoDifferentColorsEffect", "DrawCardSourceControllerEffect"],
+            ability_kind="activated",
+            ability_classes=["EntersBattlefieldTriggeredAbility", "SimpleManaAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Guild Globe",
+                type_line="Artifact",
+                oracle_text=(
+                    "When this artifact enters, draw a card.\n"
+                    "{2}, {T}, Sacrifice this artifact: Add two mana of different colors."
+                ),
+            ),
+            source_text=(
+                "this.addAbility(new EntersBattlefieldTriggeredAbility(new DrawCardSourceControllerEffect(1)));"
+                "Ability ability = new SimpleManaAbility(Zone.BATTLEFIELD, "
+                "new AddManaOfTwoDifferentColorsEffect(), new GenericManaCost(2));"
+                "ability.addCost(new TapSourceCost());"
+                "ability.addCost(new SacrificeSourceCost());"
+                "this.addAbility(ability);"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "mana_source_sacrifice_oracle_not_simple")
+
+    def test_simple_mana_source_with_sacrifice_draw_auxiliary_maps_mana_only_partial(self) -> None:
+        row = queue_row(
+            split.RAMP_ARTIFACT_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect"],
+            ability_kind="activated",
+            ability_classes=["AnyColorManaAbility", "SimpleActivatedAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="All-Fates Scroll",
+                type_line="Artifact",
+                oracle_text=(
+                    "{T}: Add one mana of any color.\n"
+                    "{7}, {T}, Sacrifice this artifact: Draw X cards, where X is the number of differently named lands you control."
+                ),
+            ),
+            source_text=(
+                "this.addAbility(new AnyColorManaAbility());"
+                "Ability ability = new SimpleActivatedAbility("
+                "new DrawCardSourceControllerEffect(xValue), new GenericManaCost(7));"
+                "ability.addCost(new TapSourceCost());"
+                "ability.addCost(new SacrificeSourceCost());"
+                "this.addAbility(ability.addHint(xValue.getHint()));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.MANA_SCOPE)
+        self.assertEqual(proposal["family_id"], "xmage_simple_mana_source_with_unmodeled_auxiliary")
+        self.assertEqual(effect["produces"], "WUBRG")
+        self.assertEqual(effect["mana_produced"], 1)
+        self.assertTrue(effect["_runtime_partial"])
+        self.assertEqual(effect["modeled_ability_subset"], "mana_source_only")
+
     def test_tap_and_self_sacrifice_mana_source_maps_combined_scope(self) -> None:
         row = queue_row(
             split.RAMP_ARTIFACT_UNIT,
@@ -11359,7 +11559,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertTrue(effect["sacrifice_mana_activation_requires_sacrifice"])
         self.assertEqual(effect["ability_kind"], "mana_and_sacrifice_mana")
 
-    def test_etb_draw_sacrifice_mana_source_stays_out_of_tap_sacrifice_scope(self) -> None:
+    def test_etb_draw_sacrifice_mana_source_maps_self_sacrifice_partial(self) -> None:
         row = queue_row(
             split.RAMP_ARTIFACT_UNIT,
             effect_classes=["DrawCardSourceControllerEffect"],
@@ -11386,15 +11586,15 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             ),
         )
 
-        self.assertIsNone(proposal)
-        self.assertIn(
-            reason,
-            {
-                "mana_source_sacrifice_oracle_not_simple",
-                "mana_source_source_sacrifice_cost_not_supported",
-                "tap_sacrifice_mana_source_tap_oracle_not_simple",
-            },
-        )
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.SELF_SACRIFICE_MANA_SOURCE_SCOPE)
+        self.assertEqual(effect["produces"], "WUBRG")
+        self.assertEqual(effect["mana_produced"], 5)
+        self.assertEqual(effect["produced_mana_symbols"], ["W", "U", "B", "R", "G"])
+        self.assertEqual(effect["activation_mana_cost"], "{5}")
+        self.assertTrue(effect["_runtime_partial"])
+        self.assertNotEqual(effect["battle_model_scope"], split.TAP_AND_SELF_SACRIFICE_MANA_SOURCE_SCOPE)
 
     def test_conditional_simple_mana_source_stays_blocked(self) -> None:
         row = queue_row(

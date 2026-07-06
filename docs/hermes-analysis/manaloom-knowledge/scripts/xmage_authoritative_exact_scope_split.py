@@ -15735,6 +15735,7 @@ def mana_detail_from_add_phrase(mana_phrase: str) -> dict[str, Any] | None:
         "one mana of any one color": 1,
         "two mana of any color": 2,
         "two mana of any one color": 2,
+        "two mana in any combination of colors": 2,
         "three mana of any color": 3,
         "three mana of any one color": 3,
         "three mana in any combination of colors": 3,
@@ -15829,13 +15830,14 @@ def simple_mana_source_detail_from_line(text: str) -> dict[str, Any] | None:
 def sacrifice_mana_source_detail_from_line(text: str) -> dict[str, Any] | None:
     normalized = strip_parenthetical_reminders(re.sub(r"\s+", " ", str(text or "").strip().lower())).strip()
     prefix_match = re.match(
-        r"^(?P<costs>(?:\{(?:t|[0-9wubrgc]+)\},\s*)*)sacrifice [^:]+: add (?P<mana>.+?)\.?$",
+        r"^(?P<costs>(?:\{(?:t|[0-9wubrgc]+)\},\s*)*)sacrifice [^:]+: add (?P<mana>[^.]+)(?P<tail>\..*)?$",
         normalized,
     )
     if not prefix_match:
         return None
     costs = prefix_match.group("costs") or ""
     mana_phrase = prefix_match.group("mana").strip()
+    tail = (prefix_match.group("tail") or "").strip()
     requires_tap = "{t}" in costs
     activation_symbols = [
         symbol.upper()
@@ -15843,32 +15845,15 @@ def sacrifice_mana_source_detail_from_line(text: str) -> dict[str, Any] | None:
         if symbol.lower() != "t"
     ]
     activation_mana_cost = "".join(f"{{{symbol}}}" for symbol in activation_symbols)
-    any_color_amounts = {
-        "one mana of any color": 1,
-        "one mana of any one color": 1,
-        "two mana of any color": 2,
-        "two mana of any one color": 2,
-    }
-    if mana_phrase in any_color_amounts:
-        detail = {
-            "produces": "WUBRG",
-            "mana_produced": any_color_amounts[mana_phrase],
-            "mana_activation_requires_tap": requires_tap,
-            "mana_activation_requires_sacrifice": True,
-        }
-    else:
-        produced_symbols = _brace_mana_symbols(mana_phrase)
-        if not produced_symbols:
-            return None
-        detail = {
-            "produces": _unique_mana_symbols(produced_symbols),
-            "mana_produced": len(produced_symbols),
-            "produced_mana_symbols": produced_symbols,
-            "mana_activation_requires_tap": requires_tap,
-            "mana_activation_requires_sacrifice": True,
-        }
+    detail = mana_detail_from_add_phrase(mana_phrase)
+    if detail is None:
+        return None
+    detail["mana_activation_requires_tap"] = requires_tap
+    detail["mana_activation_requires_sacrifice"] = True
     if activation_mana_cost:
         detail["activation_mana_cost"] = activation_mana_cost
+    if tail:
+        detail["_runtime_partial_sacrifice_mana_tail"] = tail.lstrip(".").strip()
     return detail
 
 
@@ -16111,16 +16096,24 @@ def tap_and_self_sacrifice_mana_source_source_blocker(
 
 def sacrifice_mana_source_source_blocker(source_text: str, detail: dict[str, Any]) -> str | None:
     text = source_text or ""
-    simple_ability_count = len(re.findall(r"new\s+SimpleManaAbility\s*\(", text))
-    any_color_ability_count = len(re.findall(r"new\s+AnyColorManaAbility\s*\(", text))
+    windows = [
+        window
+        for window in simple_mana_ability_windows(text)
+        if "SacrificeSourceCost" in window
+    ]
+    if len(windows) != 1:
+        return "mana_source_sacrifice_source_not_single_simple_mana"
+    window = windows[0]
+    simple_ability_count = len(re.findall(r"new\s+SimpleManaAbility\s*\(", window))
+    any_color_ability_count = len(re.findall(r"new\s+AnyColorManaAbility\s*\(", window))
     if simple_ability_count + any_color_ability_count != 1:
         return "mana_source_sacrifice_source_not_single_simple_mana"
-    if "SacrificeSourceCost" not in text:
+    if "SacrificeSourceCost" not in window:
         return "mana_source_sacrifice_source_cost_missing"
     requires_tap = bool(detail.get("mana_activation_requires_tap"))
-    if requires_tap and "TapSourceCost" not in text:
+    if requires_tap and "TapSourceCost" not in window and simple_ability_count > 0:
         return "mana_source_sacrifice_source_tap_cost_missing"
-    if not requires_tap and "TapSourceCost" in text:
+    if not requires_tap and "TapSourceCost" in window:
         return "mana_source_sacrifice_source_oracle_tap_mismatch"
     activation_mana_cost = str(detail.get("activation_mana_cost") or "")
     if activation_mana_cost:
@@ -16128,21 +16121,21 @@ def sacrifice_mana_source_source_blocker(source_text: str, detail: dict[str, Any
         if generic_match:
             generic_cost = generic_match.group(1)
             if (
-                f"GenericManaCost({generic_cost})" not in text
-                and f'ManaCostsImpl<>("{activation_mana_cost}")' not in text
-                and f"ManaCostsImpl<>(\"{activation_mana_cost}\")" not in text
+                f"GenericManaCost({generic_cost})" not in window
+                and f'ManaCostsImpl<>("{activation_mana_cost}")' not in window
+                and f"ManaCostsImpl<>(\"{activation_mana_cost}\")" not in window
             ):
                 return "mana_source_sacrifice_source_activation_cost_mismatch"
-        elif f'ManaCostsImpl<>("{activation_mana_cost}")' not in text:
+        elif f'ManaCostsImpl<>("{activation_mana_cost}")' not in window:
             return "mana_source_sacrifice_source_activation_cost_mismatch"
-    elif "GenericManaCost" in text or "ManaCostsImpl<>" in text:
+    elif "GenericManaCost" in window or "ManaCostsImpl<>" in window:
         return "mana_source_sacrifice_source_activation_cost_mismatch"
-    source_symbols = java_simple_mana_symbols_from_source(text)
+    source_symbols = java_simple_mana_symbols_from_source(window)
     expected_symbols = list(detail.get("produced_mana_symbols") or [])
     if source_symbols is not None and expected_symbols and Counter(source_symbols) != Counter(expected_symbols):
         return "mana_source_sacrifice_source_mana_output_mismatch"
     if str(detail.get("produces") or "") == "WUBRG" and not expected_symbols:
-        source_any_color_amount = java_any_color_mana_amount_from_source(text)
+        source_any_color_amount = java_any_color_mana_amount_from_source(window)
         if source_any_color_amount != int(detail.get("mana_produced") or 0):
             return "mana_source_sacrifice_source_mana_output_mismatch"
     return None
@@ -16151,7 +16144,10 @@ def sacrifice_mana_source_source_blocker(source_text: str, detail: dict[str, Any
 def simple_mana_ability_windows(source_text: str) -> list[str]:
     text = source_text or ""
     windows: list[str] = []
-    positions = [match.start() for match in re.finditer(r"new\s+SimpleManaAbility\b", text)]
+    positions = [
+        match.start()
+        for match in re.finditer(r"new\s+(?:SimpleManaAbility|AnyColorManaAbility)\b", text)
+    ]
     for index, position in enumerate(positions):
         next_position = positions[index + 1] if index + 1 < len(positions) else len(text)
         end_candidates = [
@@ -16165,7 +16161,6 @@ def simple_mana_ability_windows(source_text: str) -> list[str]:
             if value > position
         ]
         end = min(end_candidates) if end_candidates else min(len(text), position + 1600)
-        end = min(len(text), max(end, position + 400))
         windows.append(text[position:end])
     return windows
 
@@ -25632,6 +25627,10 @@ def split_row(
             classes == {"DrawCardSourceControllerEffect"}
             and "SimpleActivatedAbility" in mana_ability_classes
             and not (
+                "SacrificeSourceCost" in source_text
+                and isinstance(activated_draw_from_mana_source_oracle(metadata), str)
+            )
+            and not (
                 mana_ability_classes
                 - SAFE_MANA_ABILITY_CLASSES
                 - SAFE_MANA_AUXILIARY_ABILITY_CLASSES
@@ -25640,6 +25639,7 @@ def split_row(
         )
         mana_source_with_etb_draw = (
             classes == {"DrawCardSourceControllerEffect"}
+            and "SacrificeSourceCost" not in source_text
             and "EntersBattlefieldTriggeredAbility" in mana_ability_classes
             and not (
                 mana_ability_classes
@@ -25878,14 +25878,9 @@ def split_row(
                 family_id="xmage_tap_and_self_sacrifice_mana_source_permanent",
             ), "selected_exact_scope"
         self_sacrifice_mana_source = (
-            classes <= {"AddManaOfAnyColorEffect"}
-            and not simple_mana_source_detail_from_oracle(metadata)
+            not simple_mana_source_detail_from_oracle(metadata)
             and bool(mana_ability_classes & SAFE_MANA_ABILITY_CLASSES)
-            and not (
-                mana_ability_classes
-                - SAFE_MANA_ABILITY_CLASSES
-                - SAFE_MANA_AUXILIARY_ABILITY_CLASSES
-            )
+            and not mana_ability_classes.intersection(UNSAFE_MANA_ABILITY_CLASSES)
             and "SacrificeSourceCost" in source_text
         )
         if self_sacrifice_mana_source:
@@ -25904,6 +25899,16 @@ def split_row(
                 else "permanent"
             )
             mana_requires_tap = bool(mana_source_detail.get("mana_activation_requires_tap", False))
+            auxiliary_abilities_for_self_sacrifice = mana_ability_classes - SAFE_MANA_ABILITY_CLASSES
+            modeled_mana_effect_classes = {
+                "AddManaInAnyCombinationEffect",
+                "AddManaOfAnyColorEffect",
+                "BasicManaEffect",
+                "ManaEffect",
+            }
+            unmodeled_effect_classes = sorted(
+                cls for cls in classes if cls not in modeled_mana_effect_classes
+            )
             effect_json = {
                 "effect": "ramp_permanent",
                 "battle_model_scope": SELF_SACRIFICE_MANA_SOURCE_SCOPE,
@@ -25918,6 +25923,8 @@ def split_row(
                 "permanent_type": permanent_type,
                 "ability_kind": "activated_mana",
                 "xmage_mana_ability_classes": sorted(mana_ability_classes),
+                "xmage_auxiliary_ability_classes": sorted(auxiliary_abilities_for_self_sacrifice),
+                "xmage_unmodeled_effect_classes": unmodeled_effect_classes,
                 "xmage_ability_class": (
                     "SimpleManaAbility"
                     if "SimpleManaAbility" in mana_ability_classes
@@ -25926,6 +25933,22 @@ def split_row(
                 "xmage_cost_class": "SacrificeSourceCost",
                 "xmage_effect_classes": sorted(classes),
             }
+            if (
+                auxiliary_abilities_for_self_sacrifice
+                or unmodeled_effect_classes
+                or mana_source_detail.get("_runtime_partial_sacrifice_mana_tail")
+            ):
+                effect_json["_runtime_partial"] = True
+                effect_json["_runtime_partial_reason"] = (
+                    "Only the XMage self-sacrifice mana ability is executable in this rule; "
+                    "listed auxiliary ability/effect classes and same-ability non-mana tails remain unmodeled."
+                )
+            if mana_source_detail.get("_runtime_partial_sacrifice_mana_tail"):
+                effect_json["_runtime_partial_sacrifice_mana_tail"] = mana_source_detail[
+                    "_runtime_partial_sacrifice_mana_tail"
+                ]
+            if "EntersBattlefieldTappedAbility" in mana_ability_classes:
+                effect_json["enters_tapped"] = True
             if mana_source_detail.get("produced_mana_symbols"):
                 effect_json["produced_mana_symbols"] = list(mana_source_detail["produced_mana_symbols"])
             if mana_source_detail.get("activation_mana_cost"):
