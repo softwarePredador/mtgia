@@ -1,8 +1,13 @@
 #!/usr/bin/env python3
 """Check DB schema and query quality for optimize pipeline."""
+import os
 import psycopg2
 
-conn = psycopg2.connect('postgresql://postgres:c2abeef5e66f21b0ce86@143.198.230.247:5433/halder')
+DATABASE_URL = os.environ.get('DATABASE_URL')
+if not DATABASE_URL:
+    raise SystemExit('DATABASE_URL must be set to inspect the remote schema')
+
+conn = psycopg2.connect(DATABASE_URL)
 cur = conn.cursor()
 
 # 1. Check cards table columns

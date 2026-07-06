@@ -1,8 +1,13 @@
 #!/usr/bin/env python3
 """Verify exactly how allCardData is structured for Jin's deck."""
+import os
 import psycopg2
 
-conn = psycopg2.connect('postgresql://postgres:c2abeef5e66f21b0ce86@143.198.230.247:5433/halder')
+DATABASE_URL = os.environ.get('DATABASE_URL')
+if not DATABASE_URL:
+    raise SystemExit('DATABASE_URL must be set to inspect deck rows')
+
+conn = psycopg2.connect(DATABASE_URL)
 cur = conn.cursor()
 
 # Jin deck: simulate what the Dart code does

@@ -2,12 +2,14 @@
 """Teste de performance com 1 deck."""
 
 import time
+import os
 import requests
 import jwt
 import psycopg2
 
 SECRET = 'your-super-secret-and-long-string-for-jwt'
 BASE = 'http://localhost:8080'
+DATABASE_URL = os.environ.get('DATABASE_URL')
 
 # Deck Goblins (aggro, 95 cartas)
 DECK_ID = '8c22deb9-80bd-489f-8e87-1344eabac698'
@@ -23,7 +25,9 @@ def main():
     print()
 
     # Limpar cache primeiro
-    conn = psycopg2.connect('postgresql://postgres:c2abeef5e66f21b0ce86@143.198.230.247:5433/halder')
+    if not DATABASE_URL:
+        raise SystemExit('DATABASE_URL must be set to run this integration test')
+    conn = psycopg2.connect(DATABASE_URL)
     cur = conn.cursor()
     cur.execute('DELETE FROM ai_optimize_cache WHERE deck_id = %s', (DECK_ID,))
     conn.commit()

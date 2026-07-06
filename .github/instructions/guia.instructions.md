@@ -64,8 +64,8 @@ cd app && flutter test
 # BANCO DE DADOS (PostgreSQL remoto)
 # ══════════════════════════════════════════════════════════════
 
-# Conexão direta (usar variáveis do .env)
-psql postgresql://postgres:c2abeef5e66f21b0ce86@143.198.230.247:5433/halder
+# Conexão direta (usar variáveis do .env ou secret manager local)
+psql "$DATABASE_URL"
 
 # Limpar cache de otimização (OBRIGATÓRIO após alterar DeckArchetypeAnalyzer)
 psql $DATABASE_URL -c "DELETE FROM ai_optimize_cache"
@@ -73,7 +73,8 @@ psql $DATABASE_URL -c "DELETE FROM ai_optimize_cache"
 # Via Python (se psql não disponível)
 .venv/bin/python -c "
 import psycopg2
-conn = psycopg2.connect('postgresql://postgres:c2abeef5e66f21b0ce86@143.198.230.247:5433/halder')
+import os
+conn = psycopg2.connect(os.environ['DATABASE_URL'])
 cur = conn.cursor()
 cur.execute('DELETE FROM ai_optimize_cache')
 conn.commit()
