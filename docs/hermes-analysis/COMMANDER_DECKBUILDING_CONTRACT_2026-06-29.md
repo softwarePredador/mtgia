@@ -189,7 +189,11 @@ Operational priority after this pivot:
    chosen role axis into explicit floor/ceiling/cut-pressure policy, treating
    above-range `engine` as capacity pressure rather than a missing-role add
    lane, while keeping same-deck source expansion, candidate copy, battle,
-   mutation, and promotion closed;
+   mutation, and promotion closed; then run
+   `global_commander_engine_axis_nonland_cut_policy_model.py` to apply that
+   policy to the current nonland cut model, split engine-only and
+   excess-overlap cut pressure from protected commander-plan engines, and route
+   all pairs to card-level usage/same-lane proof before candidate copy;
 12. run `global_commander_candidate_copy_materializer.py` only after a named
    add/cut pool is ready; it may materialize one hypothesis inside an isolated
    copied Hermes SQLite DB, must prove the source DB hash is unchanged, and
@@ -527,6 +531,7 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_learning_priority_audit_20260706_source_expansion_cycle_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_cross_commander_role_axis_learning_pivot_20260706_source_expansion_cycle_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_role_axis_policy_builder_20260706_engine_axis_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_engine_axis_nonland_cut_policy_model_20260706_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_manual_negative_trace_reviewer_20260706_kaalia_value_safe_stage1_live_research.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_followup_live_source_research_expander_20260706_kaalia_value_safe_stage1_after_manual_trace.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_expanded_source_candidate_reviewer_20260706_kaalia_value_safe_stage1_followup_live_after_manual_trace.md`
@@ -1426,6 +1431,12 @@ Current external refresh on 2026-07-05:
   candidate copy, battle, mutation, and promotion closed and routes the next
   gate to
   `apply_engine_axis_policy_to_nonland_cut_model_before_more_same_deck_source_expansion`.
+- The engine-axis nonland cut policy model applies that policy to the current
+  nonland cut model. It evaluates `12` old cuts for source-cycle deck `619`,
+  keeps `6` engine cuts protected by Kaalia commander-plan signals, leaves `4`
+  non-engine tutor cuts outside this axis, and exposes only `2` review-only
+  engine cut-pressure rows. Candidate copy remains closed; the next gate is
+  `collect_card_level_usage_and_same_lane_proof_for_engine_policy_cut_pressure`.
 
 ## Global Commander Rollout - 2026-07-01
 

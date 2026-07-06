@@ -269,7 +269,15 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `master_optimizer_reports/global_commander_role_axis_policy_builder_20260706_engine_axis_current.md`.
     Resultado: `engine` e tratado como pressao de capacidade/teto, nao como
     lane de adicionar carta; candidate copy, battle e promocao seguem fechados
-    ate aplicar essa politica ao modelo de corte nonland.
+    ate aplicar essa politica ao modelo de corte nonland. A aplicacao atual
+    fica em
+    `manaloom-knowledge/scripts/global_commander_engine_axis_nonland_cut_policy_model.py`
+    com evidencia:
+    `master_optimizer_reports/global_commander_engine_axis_nonland_cut_policy_model_20260706_current.md`.
+    Resultado: de `12` cortes antigos, apenas `2` viram pressao review-only de
+    corte engine; `6` engines ficam protegidas por sinal de plano da Kaalia e
+    `4` cortes tutor ficam fora desse eixo. O proximo gate e
+    `collect_card_level_usage_and_same_lane_proof_for_engine_policy_cut_pressure`.
     Quando uma hipotese add/cut estiver pronta, rode
     `manaloom-knowledge/scripts/global_commander_candidate_copy_materializer.py`
     para materializar uma unica troca em copia isolada do Hermes SQLite. A

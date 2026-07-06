@@ -48,6 +48,12 @@ GLOBAL_COMMANDER_ROLE_AXIS_POLICY_BUILDER = SCRIPT_DIR / "global_commander_role_
 GLOBAL_COMMANDER_ROLE_AXIS_POLICY_BUILDER_TEST = (
     SCRIPT_DIR / "test_global_commander_role_axis_policy_builder.py"
 )
+GLOBAL_COMMANDER_ENGINE_AXIS_NONLAND_CUT_POLICY_MODEL = (
+    SCRIPT_DIR / "global_commander_engine_axis_nonland_cut_policy_model.py"
+)
+GLOBAL_COMMANDER_ENGINE_AXIS_NONLAND_CUT_POLICY_MODEL_TEST = (
+    SCRIPT_DIR / "test_global_commander_engine_axis_nonland_cut_policy_model.py"
+)
 GLOBAL_COMMANDER_CANDIDATE_COPY_MATERIALIZER = SCRIPT_DIR / "global_commander_candidate_copy_materializer.py"
 GLOBAL_COMMANDER_CANDIDATE_COPY_MATERIALIZER_TEST = (
     SCRIPT_DIR / "test_global_commander_candidate_copy_materializer.py"
@@ -405,6 +411,10 @@ GLOBAL_COMMANDER_CROSS_COMMANDER_ROLE_AXIS_LEARNING_PIVOT_REPORT = (
 GLOBAL_COMMANDER_ROLE_AXIS_POLICY_BUILDER_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_role_axis_policy_builder_20260706_engine_axis_current.md"
+)
+GLOBAL_COMMANDER_ENGINE_AXIS_NONLAND_CUT_POLICY_MODEL_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_engine_axis_nonland_cut_policy_model_20260706_current.md"
 )
 GLOBAL_COMMANDER_CANDIDATE_COPY_MATERIALIZER_REPORT = (
     REPO_ROOT
@@ -1798,6 +1808,30 @@ def build_audit() -> dict[str, Any]:
                 "test_engine_cycle_blocks_same_deck_source_expansion",
                 "apply_engine_axis_policy_to_nonland_cut_model_before_more_same_deck_source_expansion",
                 "treat_engine_as_capacity_ceiling_not_missing_role",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_ENGINE_AXIS_NONLAND_CUT_POLICY_MODEL,
+            [
+                "global_commander_engine_axis_nonland_cut_policy_model",
+                "engine_axis_nonland_cut_policy_applied_review_only",
+                "engine_axis_policy_review_cut_pressure_ready",
+                "engine_axis_policy_blocks_cut_until_source_lane_review",
+                "collect_card_level_usage_and_same_lane_proof_for_engine_policy_cut_pressure",
+                "candidate_copy_allowed_now",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_ENGINE_AXIS_NONLAND_CUT_POLICY_MODEL_TEST,
+            [
+                "test_engine_policy_splits_ready_and_protected_cuts",
+                "engine_only_excess_cut_pressure",
+                "engine_overlap_excess_cut_pressure",
+                "kaalia_attack_window_or_extra_combat",
             ],
         )
     )
@@ -3416,6 +3450,21 @@ def build_audit() -> dict[str, Any]:
                 "candidate_copy_allowed_now: `false`",
                 "apply_engine_axis_policy_to_nonland_cut_model_before_more_same_deck_source_expansion",
                 "treat_engine_as_capacity_ceiling_not_missing_role",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_ENGINE_AXIS_NONLAND_CUT_POLICY_MODEL_REPORT,
+            [
+                "Global Commander Engine Axis Nonland Cut Policy Model",
+                "engine_axis_nonland_cut_policy_applied_review_only",
+                "evaluated_cut_count: `12`",
+                "engine_cut_pressure_ready_count: `2`",
+                "protected_engine_cut_count: `6`",
+                "candidate_copy_allowed_now: `false`",
+                "collect_card_level_usage_and_same_lane_proof_for_engine_policy_cut_pressure",
+                "engine_axis_policy_blocks_cut_until_source_lane_review",
             ],
         )
     )
