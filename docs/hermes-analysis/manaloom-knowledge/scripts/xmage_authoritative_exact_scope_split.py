@@ -95,6 +95,10 @@ TOKEN_SPELL_UNIT = (
     "token_maker::xmage_signature::CreateTokenEffect::no_ability_class::"
     "no_target_class::no_condition_class::token"
 )
+TOKEN_SPELL_FLASHBACK_UNIT = (
+    "token_maker::xmage_signature::CreateTokenEffect::FlashbackAbility::"
+    "no_target_class::no_condition_class::token"
+)
 LOOK_LIBRARY_PICK_SPELL_UNIT = (
     "xmage_signature::LookLibraryAndPickControllerEffect::no_ability_class::"
     "no_target_class::no_condition_class::no_signal"
@@ -132,6 +136,7 @@ SUPPORTED_UNITS = {
     BOOST_ALL_SPELL_UNIT,
     STATIC_CONTROLLED_PT_UNIT,
     TOKEN_SPELL_UNIT,
+    TOKEN_SPELL_FLASHBACK_UNIT,
     LOOK_LIBRARY_PICK_SPELL_UNIT,
 }
 
@@ -15827,7 +15832,7 @@ def split_row(
         and len(ability_classes(row)) == 1
         and next(iter(ability_classes(row))) in TARGET_GRANT_KEYWORD_ABILITY_CLASSES
     )
-    fixed_token_spell_unit = unit == TOKEN_SPELL_UNIT
+    fixed_token_spell_unit = unit in {TOKEN_SPELL_UNIT, TOKEN_SPELL_FLASHBACK_UNIT}
     treasure_etb_creature_unit = (
         unit == TREASURE_UNIT
         and effect_classes(row) == {"CreateTokenEffect"}
@@ -17943,6 +17948,22 @@ def split_row(
         ), "selected_exact_scope"
 
     if fixed_token_spell_unit:
+        token_auxiliary_fields: dict[str, Any] = {}
+        if unit == TOKEN_SPELL_FLASHBACK_UNIT:
+            abilities = ability_classes(row)
+            if abilities != {"FlashbackAbility"}:
+                return None, "token_auxiliary_ability_class_not_supported"
+            source_cost = parse_flashback_cost_from_source(source_text)
+            oracle_cost = auxiliary_cost_from_oracle(metadata, "flashback")
+            if not source_cost or not oracle_cost:
+                return None, "token_flashback_cost_not_supported"
+            if source_cost != oracle_cost:
+                return None, "token_flashback_cost_mismatch"
+            token_auxiliary_fields = {
+                "xmage_auxiliary_ability_classes": ["FlashbackAbility"],
+                "flashback_cost": source_cost,
+                "flashback_status": "runtime_executor_v1",
+            }
         multi_tokens = multi_create_token_effects_from_source(source_text)
         if not isinstance(multi_tokens, str):
             components: list[dict[str, Any]] = []
@@ -17976,6 +17997,7 @@ def split_row(
                 "token_component_count": len(components),
                 "token_total_count": sum(int(component.get("token_count") or 0) for component in components),
                 "_composite_rule_components": components,
+                **token_auxiliary_fields,
             }
             return build_proposal(
                 row,
@@ -18048,6 +18070,7 @@ def split_row(
             "xmage_effect_class": "CreateTokenEffect",
             **token_count_fields,
             **token_data,
+            **token_auxiliary_fields,
         }
         return build_proposal(
             row,
@@ -23567,6 +23590,7 @@ def build_exact_split_report(
                 "token_maker CreateTokenEffect rows with EntersBattlefieldTriggeredAbility, a fixed token count, and a literal safe creature token class",
                 "token_maker CreateTokenEffect rows with DiesSourceTriggeredAbility, a fixed token count, literal safe creature token class, and exact non-conditional dies Oracle text",
                 "token_maker CreateTokenEffect rows with SimpleActivatedAbility, a fixed creature token class, exact Oracle/source token text, and mana/tap/source self-sacrifice costs only",
+                "token_maker CreateTokenEffect rows with FlashbackAbility, exact mana flashback source/Oracle cost agreement, and fixed safe creature token creation",
                 "grant_protection_from_chosen_color rows with BoostTargetEffect + GainAbilityTargetEffect, one fixed target creature, and exact until-EOT keyword Oracle text",
             ],
             "blocked_generic_review_scopes_from_pg": True,

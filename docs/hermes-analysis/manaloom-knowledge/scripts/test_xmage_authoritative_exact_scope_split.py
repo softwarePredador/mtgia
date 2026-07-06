@@ -2619,6 +2619,87 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["token_toughness"], 1)
         self.assertEqual(effect["token_colors"], ["R"])
 
+    def test_fixed_create_creature_tokens_spell_with_flashback_maps_cost(self) -> None:
+        row = queue_row(
+            split.TOKEN_SPELL_FLASHBACK_UNIT,
+            effect_classes=["CreateTokenEffect"],
+            ability_classes=["FlashbackAbility"],
+            xmage_signals=["token"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Lingering Souls",
+                type_line="Sorcery",
+                oracle_text=(
+                    "Create two 1/1 white Spirit creature tokens with flying.\n"
+                    "Flashback {1}{B}"
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new CreateTokenEffect(new SpiritWhiteToken(), 2));
+                this.addAbility(new FlashbackAbility(this, new ManaCostsImpl<>("{1}{B}")));
+                class SpiritWhiteToken extends TokenImpl {
+                    public SpiritWhiteToken() {
+                        super("Spirit Token", "1/1 white Spirit creature token with flying");
+                        cardType.add(CardType.CREATURE);
+                        subtype.add(SubType.SPIRIT);
+                        color.setWhite(true);
+                        power = new MageInt(1);
+                        toughness = new MageInt(1);
+                        this.addAbility(FlyingAbility.getInstance());
+                    }
+                }
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.TOKEN_SPELL_SCOPE)
+        self.assertEqual(effect["token_count"], 2)
+        self.assertEqual(effect["token_name"], "Spirit Token")
+        self.assertEqual(effect["token_keywords"], ["flying"])
+        self.assertEqual(effect["flashback_cost"], "{1}{B}")
+        self.assertEqual(effect["flashback_status"], "runtime_executor_v1")
+        self.assertEqual(effect["xmage_auxiliary_ability_classes"], ["FlashbackAbility"])
+
+    def test_fixed_create_creature_tokens_spell_blocks_non_mana_flashback_cost(self) -> None:
+        row = queue_row(
+            split.TOKEN_SPELL_FLASHBACK_UNIT,
+            effect_classes=["CreateTokenEffect"],
+            ability_classes=["FlashbackAbility"],
+            xmage_signals=["token"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Battle Screech",
+                type_line="Sorcery",
+                oracle_text=(
+                    "Create two 1/1 white Bird creature tokens with flying.\n"
+                    "Flashback-Tap three untapped white creatures you control."
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new CreateTokenEffect(new BirdToken(), 2));
+                this.addAbility(new FlashbackAbility(this, new TapTargetCost(new TargetControlledPermanent(3, filter))));
+                class BirdToken extends TokenImpl {
+                    public BirdToken() {
+                        super("Bird Token", "1/1 white Bird creature token with flying");
+                        cardType.add(CardType.CREATURE);
+                        subtype.add(SubType.BIRD);
+                        color.setWhite(true);
+                        power = new MageInt(1);
+                        toughness = new MageInt(1);
+                        this.addAbility(FlyingAbility.getInstance());
+                    }
+                }
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "token_flashback_cost_not_supported")
+
     def test_x_create_creature_tokens_spell_maps_get_x_value(self) -> None:
         row = queue_row(split.TOKEN_SPELL_UNIT, effect_classes=["CreateTokenEffect"], xmage_signals=["token"])
         proposal, reason = split.split_row(

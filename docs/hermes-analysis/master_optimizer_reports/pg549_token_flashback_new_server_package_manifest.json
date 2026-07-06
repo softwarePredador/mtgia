@@ -1,0 +1,1183 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg549_token_flashback_new_server_token_f_20260706_041844",
+  "deploy_id": "pg549_token_flashback_new_server",
+  "execution_scenarios": [
+    {
+      "card": {
+        "name": "Army of the Damned"
+      },
+      "expected_token": {
+        "artifact": false,
+        "colors": [
+          "B"
+        ],
+        "count": 13,
+        "keywords": [],
+        "name": "Zombie Token",
+        "power": 2,
+        "subtype": "Zombie",
+        "tapped": true,
+        "toughness": 2
+      },
+      "logical_rule_key": "battle_rule_v1:e101ae8cffb1ad36659191cb37a7f80d",
+      "name": "Army of the Damned creates modeled creature tokens",
+      "type": "fixed_create_creature_tokens"
+    },
+    {
+      "card": {
+        "name": "Beast Attack"
+      },
+      "expected_token": {
+        "artifact": false,
+        "colors": [
+          "G"
+        ],
+        "count": 1,
+        "keywords": [],
+        "name": "Beast Token",
+        "power": 4,
+        "subtype": "Beast",
+        "tapped": false,
+        "toughness": 4
+      },
+      "logical_rule_key": "battle_rule_v1:20c56778a1992592a9e79070be36ffe0",
+      "name": "Beast Attack creates modeled creature tokens",
+      "type": "fixed_create_creature_tokens"
+    },
+    {
+      "card": {
+        "name": "Call of the Herd"
+      },
+      "expected_token": {
+        "artifact": false,
+        "colors": [
+          "G"
+        ],
+        "count": 1,
+        "keywords": [],
+        "name": "Elephant Token",
+        "power": 3,
+        "subtype": "Elephant",
+        "tapped": false,
+        "toughness": 3
+      },
+      "logical_rule_key": "battle_rule_v1:6ba5014e640d21a31f5ebc1f5e9185d5",
+      "name": "Call of the Herd creates modeled creature tokens",
+      "type": "fixed_create_creature_tokens"
+    },
+    {
+      "card": {
+        "name": "Chatter of the Squirrel"
+      },
+      "expected_token": {
+        "artifact": false,
+        "colors": [
+          "G"
+        ],
+        "count": 1,
+        "keywords": [],
+        "name": "Squirrel Token",
+        "power": 1,
+        "subtype": "Squirrel",
+        "tapped": false,
+        "toughness": 1
+      },
+      "logical_rule_key": "battle_rule_v1:c0e16a90ce29ded5d1194a4e20dda154",
+      "name": "Chatter of the Squirrel creates modeled creature tokens",
+      "type": "fixed_create_creature_tokens"
+    },
+    {
+      "card": {
+        "name": "Crush of Wurms"
+      },
+      "expected_token": {
+        "artifact": false,
+        "colors": [
+          "G"
+        ],
+        "count": 3,
+        "keywords": [],
+        "name": "Wurm Token",
+        "power": 6,
+        "subtype": "Wurm",
+        "tapped": false,
+        "toughness": 6
+      },
+      "logical_rule_key": "battle_rule_v1:980fed86a6285fffbece2444a59aea6d",
+      "name": "Crush of Wurms creates modeled creature tokens",
+      "type": "fixed_create_creature_tokens"
+    },
+    {
+      "card": {
+        "name": "Elephant Ambush"
+      },
+      "expected_token": {
+        "artifact": false,
+        "colors": [
+          "G"
+        ],
+        "count": 1,
+        "keywords": [],
+        "name": "Elephant Token",
+        "power": 3,
+        "subtype": "Elephant",
+        "tapped": false,
+        "toughness": 3
+      },
+      "logical_rule_key": "battle_rule_v1:ace48628d5ae36959b46552d369fd486",
+      "name": "Elephant Ambush creates modeled creature tokens",
+      "type": "fixed_create_creature_tokens"
+    },
+    {
+      "card": {
+        "name": "Join the Dance"
+      },
+      "expected_token": {
+        "artifact": false,
+        "colors": [
+          "W"
+        ],
+        "count": 2,
+        "keywords": [],
+        "name": "Human Token",
+        "power": 1,
+        "subtype": "Human",
+        "tapped": false,
+        "toughness": 1
+      },
+      "logical_rule_key": "battle_rule_v1:3eb8c5091faf5fc53be72d36b1eb2196",
+      "name": "Join the Dance creates modeled creature tokens",
+      "type": "fixed_create_creature_tokens"
+    },
+    {
+      "card": {
+        "name": "Lingering Souls"
+      },
+      "expected_token": {
+        "artifact": false,
+        "colors": [
+          "W"
+        ],
+        "count": 2,
+        "keywords": [
+          "flying"
+        ],
+        "name": "Spirit Token",
+        "power": 1,
+        "subtype": "Spirit",
+        "tapped": false,
+        "toughness": 1
+      },
+      "logical_rule_key": "battle_rule_v1:a4c61759b967ecfaccf80a59d38353b3",
+      "name": "Lingering Souls creates modeled creature tokens",
+      "type": "fixed_create_creature_tokens"
+    },
+    {
+      "card": {
+        "name": "Moan of the Unhallowed"
+      },
+      "expected_token": {
+        "artifact": false,
+        "colors": [
+          "B"
+        ],
+        "count": 2,
+        "keywords": [],
+        "name": "Zombie Token",
+        "power": 2,
+        "subtype": "Zombie",
+        "tapped": false,
+        "toughness": 2
+      },
+      "logical_rule_key": "battle_rule_v1:66a4f2f8592f1a22b703004e3cef386d",
+      "name": "Moan of the Unhallowed creates modeled creature tokens",
+      "type": "fixed_create_creature_tokens"
+    },
+    {
+      "card": {
+        "name": "Reap the Seagraf"
+      },
+      "expected_token": {
+        "artifact": false,
+        "colors": [
+          "B"
+        ],
+        "count": 1,
+        "keywords": [],
+        "name": "Zombie Token",
+        "power": 2,
+        "subtype": "Zombie",
+        "tapped": false,
+        "toughness": 2
+      },
+      "logical_rule_key": "battle_rule_v1:a7916f222a9928fbecbb1fa2e0fcb225",
+      "name": "Reap the Seagraf creates modeled creature tokens",
+      "type": "fixed_create_creature_tokens"
+    },
+    {
+      "card": {
+        "name": "Roar of the Wurm"
+      },
+      "expected_token": {
+        "artifact": false,
+        "colors": [
+          "G"
+        ],
+        "count": 1,
+        "keywords": [],
+        "name": "Wurm Token",
+        "power": 6,
+        "subtype": "Wurm",
+        "tapped": false,
+        "toughness": 6
+      },
+      "logical_rule_key": "battle_rule_v1:0f83c527186efe0000b099e4355cfe91",
+      "name": "Roar of the Wurm creates modeled creature tokens",
+      "type": "fixed_create_creature_tokens"
+    },
+    {
+      "card": {
+        "name": "Shadowbeast Sighting"
+      },
+      "expected_token": {
+        "artifact": false,
+        "colors": [
+          "G"
+        ],
+        "count": 1,
+        "keywords": [],
+        "name": "Beast Token",
+        "power": 4,
+        "subtype": "Beast",
+        "tapped": false,
+        "toughness": 4
+      },
+      "logical_rule_key": "battle_rule_v1:dc8bc7bd6132e782fac0098d05975c6c",
+      "name": "Shadowbeast Sighting creates modeled creature tokens",
+      "type": "fixed_create_creature_tokens"
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Army of the Damned",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e101ae8cffb1ad36659191cb37a7f80d",
+      "min_rule_version": 2,
+      "normalized_name": "army of the damned",
+      "oracle_hash": "4905dce455a89e75362d5b0478daa350",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+        "effect": "token_maker",
+        "flashback_cost": "{7}{B}{B}{B}",
+        "flashback_status": "runtime_executor_v1",
+        "token_colors": [
+          "B"
+        ],
+        "token_count": 13,
+        "token_name": "Zombie Token",
+        "token_power": 2,
+        "token_subtype": "Zombie",
+        "token_tapped": true,
+        "token_toughness": 2,
+        "xmage_auxiliary_ability_classes": [
+          "FlashbackAbility"
+        ],
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "ZombieToken"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Beast Attack",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:20c56778a1992592a9e79070be36ffe0",
+      "min_rule_version": 2,
+      "normalized_name": "beast attack",
+      "oracle_hash": "2a291b12d5aec28bc5c60574452d473b",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+        "effect": "token_maker",
+        "flashback_cost": "{2}{G}{G}{G}",
+        "flashback_status": "runtime_executor_v1",
+        "token_colors": [
+          "G"
+        ],
+        "token_count": 1,
+        "token_name": "Beast Token",
+        "token_power": 4,
+        "token_subtype": "Beast",
+        "token_toughness": 4,
+        "xmage_auxiliary_ability_classes": [
+          "FlashbackAbility"
+        ],
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "Beast44Token"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Call of the Herd",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6ba5014e640d21a31f5ebc1f5e9185d5",
+      "min_rule_version": 2,
+      "normalized_name": "call of the herd",
+      "oracle_hash": "783884211b45c5b76ff4959686b9e366",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+        "effect": "token_maker",
+        "flashback_cost": "{3}{G}",
+        "flashback_status": "runtime_executor_v1",
+        "token_colors": [
+          "G"
+        ],
+        "token_count": 1,
+        "token_name": "Elephant Token",
+        "token_power": 3,
+        "token_subtype": "Elephant",
+        "token_toughness": 3,
+        "xmage_auxiliary_ability_classes": [
+          "FlashbackAbility"
+        ],
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "ElephantToken"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Chatter of the Squirrel",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c0e16a90ce29ded5d1194a4e20dda154",
+      "min_rule_version": 2,
+      "normalized_name": "chatter of the squirrel",
+      "oracle_hash": "0e2fd068dca30f2569722baaa5ff9e53",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+        "effect": "token_maker",
+        "flashback_cost": "{1}{G}",
+        "flashback_status": "runtime_executor_v1",
+        "token_colors": [
+          "G"
+        ],
+        "token_count": 1,
+        "token_name": "Squirrel Token",
+        "token_power": 1,
+        "token_subtype": "Squirrel",
+        "token_toughness": 1,
+        "xmage_auxiliary_ability_classes": [
+          "FlashbackAbility"
+        ],
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "SquirrelToken"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Crush of Wurms",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:980fed86a6285fffbece2444a59aea6d",
+      "min_rule_version": 2,
+      "normalized_name": "crush of wurms",
+      "oracle_hash": "fef198b6e8474d61347290d37185257e",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+        "effect": "token_maker",
+        "flashback_cost": "{9}{G}{G}{G}",
+        "flashback_status": "runtime_executor_v1",
+        "token_colors": [
+          "G"
+        ],
+        "token_count": 3,
+        "token_name": "Wurm Token",
+        "token_power": 6,
+        "token_subtype": "Wurm",
+        "token_toughness": 6,
+        "xmage_auxiliary_ability_classes": [
+          "FlashbackAbility"
+        ],
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "WurmToken"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Elephant Ambush",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ace48628d5ae36959b46552d369fd486",
+      "min_rule_version": 2,
+      "normalized_name": "elephant ambush",
+      "oracle_hash": "68d862f995dc322039a4103300577efa",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+        "effect": "token_maker",
+        "flashback_cost": "{6}{G}{G}",
+        "flashback_status": "runtime_executor_v1",
+        "token_colors": [
+          "G"
+        ],
+        "token_count": 1,
+        "token_name": "Elephant Token",
+        "token_power": 3,
+        "token_subtype": "Elephant",
+        "token_toughness": 3,
+        "xmage_auxiliary_ability_classes": [
+          "FlashbackAbility"
+        ],
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "ElephantToken"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Join the Dance",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3eb8c5091faf5fc53be72d36b1eb2196",
+      "min_rule_version": 2,
+      "normalized_name": "join the dance",
+      "oracle_hash": "2ba7a34bd7062658268f7a21fe59548f",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+        "effect": "token_maker",
+        "flashback_cost": "{3}{G}{W}",
+        "flashback_status": "runtime_executor_v1",
+        "token_colors": [
+          "W"
+        ],
+        "token_count": 2,
+        "token_name": "Human Token",
+        "token_power": 1,
+        "token_subtype": "Human",
+        "token_toughness": 1,
+        "xmage_auxiliary_ability_classes": [
+          "FlashbackAbility"
+        ],
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "HumanToken"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Lingering Souls",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a4c61759b967ecfaccf80a59d38353b3",
+      "min_rule_version": 2,
+      "normalized_name": "lingering souls",
+      "oracle_hash": "ef8670b9500a3748b7dcac01007352ee",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+        "effect": "token_maker",
+        "flashback_cost": "{1}{B}",
+        "flashback_status": "runtime_executor_v1",
+        "token_colors": [
+          "W"
+        ],
+        "token_count": 2,
+        "token_flying": true,
+        "token_keywords": [
+          "flying"
+        ],
+        "token_name": "Spirit Token",
+        "token_power": 1,
+        "token_subtype": "Spirit",
+        "token_toughness": 1,
+        "xmage_auxiliary_ability_classes": [
+          "FlashbackAbility"
+        ],
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "SpiritWhiteToken"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Moan of the Unhallowed",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:66a4f2f8592f1a22b703004e3cef386d",
+      "min_rule_version": 2,
+      "normalized_name": "moan of the unhallowed",
+      "oracle_hash": "5bd6d795206c41573e35ae75bea8cfc7",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+        "effect": "token_maker",
+        "flashback_cost": "{5}{B}{B}",
+        "flashback_status": "runtime_executor_v1",
+        "token_colors": [
+          "B"
+        ],
+        "token_count": 2,
+        "token_name": "Zombie Token",
+        "token_power": 2,
+        "token_subtype": "Zombie",
+        "token_toughness": 2,
+        "xmage_auxiliary_ability_classes": [
+          "FlashbackAbility"
+        ],
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "ZombieToken"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Reap the Seagraf",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a7916f222a9928fbecbb1fa2e0fcb225",
+      "min_rule_version": 2,
+      "normalized_name": "reap the seagraf",
+      "oracle_hash": "bc733e8b9b926952dc3b4507e35c6e06",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+        "effect": "token_maker",
+        "flashback_cost": "{4}{U}",
+        "flashback_status": "runtime_executor_v1",
+        "token_colors": [
+          "B"
+        ],
+        "token_count": 1,
+        "token_name": "Zombie Token",
+        "token_power": 2,
+        "token_subtype": "Zombie",
+        "token_toughness": 2,
+        "xmage_auxiliary_ability_classes": [
+          "FlashbackAbility"
+        ],
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "ZombieToken"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Roar of the Wurm",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0f83c527186efe0000b099e4355cfe91",
+      "min_rule_version": 2,
+      "normalized_name": "roar of the wurm",
+      "oracle_hash": "cc3761b8b20e3478ff772bd58c173341",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+        "effect": "token_maker",
+        "flashback_cost": "{3}{G}",
+        "flashback_status": "runtime_executor_v1",
+        "token_colors": [
+          "G"
+        ],
+        "token_count": 1,
+        "token_name": "Wurm Token",
+        "token_power": 6,
+        "token_subtype": "Wurm",
+        "token_toughness": 6,
+        "xmage_auxiliary_ability_classes": [
+          "FlashbackAbility"
+        ],
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "WurmToken"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Shadowbeast Sighting",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:dc8bc7bd6132e782fac0098d05975c6c",
+      "min_rule_version": 2,
+      "normalized_name": "shadowbeast sighting",
+      "oracle_hash": "c97547d092808a4c795699edc4a6e2f9",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+        "effect": "token_maker",
+        "flashback_cost": "{6}{G}",
+        "flashback_status": "runtime_executor_v1",
+        "token_colors": [
+          "G"
+        ],
+        "token_count": 1,
+        "token_name": "Beast Token",
+        "token_power": 4,
+        "token_subtype": "Beast",
+        "token_toughness": 4,
+        "xmage_auxiliary_ability_classes": [
+          "FlashbackAbility"
+        ],
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "Beast44Token"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_fixed_create_creature_tokens_spell": 12
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg549_token_flashback_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg549_token_flashback_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg549_token_flashback_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg549_token_flashback_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg549_token_flashback_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg549_token_flashback_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-06T04:18:44+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Army of the Damned"
+      },
+      "card_name": "Army of the Damned",
+      "effect": "token_maker",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e101ae8cffb1ad36659191cb37a7f80d",
+      "normalized_name": "army of the damned",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+        "effect": "token_maker",
+        "flashback_cost": "{7}{B}{B}{B}",
+        "flashback_status": "runtime_executor_v1",
+        "token_colors": [
+          "B"
+        ],
+        "token_count": 13,
+        "token_name": "Zombie Token",
+        "token_power": 2,
+        "token_subtype": "Zombie",
+        "token_tapped": true,
+        "token_toughness": 2,
+        "xmage_auxiliary_ability_classes": [
+          "FlashbackAbility"
+        ],
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "ZombieToken"
+      }
+    },
+    {
+      "card": {
+        "name": "Beast Attack"
+      },
+      "card_name": "Beast Attack",
+      "effect": "token_maker",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:20c56778a1992592a9e79070be36ffe0",
+      "normalized_name": "beast attack",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+        "effect": "token_maker",
+        "flashback_cost": "{2}{G}{G}{G}",
+        "flashback_status": "runtime_executor_v1",
+        "token_colors": [
+          "G"
+        ],
+        "token_count": 1,
+        "token_name": "Beast Token",
+        "token_power": 4,
+        "token_subtype": "Beast",
+        "token_toughness": 4,
+        "xmage_auxiliary_ability_classes": [
+          "FlashbackAbility"
+        ],
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "Beast44Token"
+      }
+    },
+    {
+      "card": {
+        "name": "Call of the Herd"
+      },
+      "card_name": "Call of the Herd",
+      "effect": "token_maker",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6ba5014e640d21a31f5ebc1f5e9185d5",
+      "normalized_name": "call of the herd",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+        "effect": "token_maker",
+        "flashback_cost": "{3}{G}",
+        "flashback_status": "runtime_executor_v1",
+        "token_colors": [
+          "G"
+        ],
+        "token_count": 1,
+        "token_name": "Elephant Token",
+        "token_power": 3,
+        "token_subtype": "Elephant",
+        "token_toughness": 3,
+        "xmage_auxiliary_ability_classes": [
+          "FlashbackAbility"
+        ],
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "ElephantToken"
+      }
+    },
+    {
+      "card": {
+        "name": "Chatter of the Squirrel"
+      },
+      "card_name": "Chatter of the Squirrel",
+      "effect": "token_maker",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c0e16a90ce29ded5d1194a4e20dda154",
+      "normalized_name": "chatter of the squirrel",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+        "effect": "token_maker",
+        "flashback_cost": "{1}{G}",
+        "flashback_status": "runtime_executor_v1",
+        "token_colors": [
+          "G"
+        ],
+        "token_count": 1,
+        "token_name": "Squirrel Token",
+        "token_power": 1,
+        "token_subtype": "Squirrel",
+        "token_toughness": 1,
+        "xmage_auxiliary_ability_classes": [
+          "FlashbackAbility"
+        ],
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "SquirrelToken"
+      }
+    },
+    {
+      "card": {
+        "name": "Crush of Wurms"
+      },
+      "card_name": "Crush of Wurms",
+      "effect": "token_maker",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:980fed86a6285fffbece2444a59aea6d",
+      "normalized_name": "crush of wurms",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+        "effect": "token_maker",
+        "flashback_cost": "{9}{G}{G}{G}",
+        "flashback_status": "runtime_executor_v1",
+        "token_colors": [
+          "G"
+        ],
+        "token_count": 3,
+        "token_name": "Wurm Token",
+        "token_power": 6,
+        "token_subtype": "Wurm",
+        "token_toughness": 6,
+        "xmage_auxiliary_ability_classes": [
+          "FlashbackAbility"
+        ],
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "WurmToken"
+      }
+    },
+    {
+      "card": {
+        "name": "Elephant Ambush"
+      },
+      "card_name": "Elephant Ambush",
+      "effect": "token_maker",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ace48628d5ae36959b46552d369fd486",
+      "normalized_name": "elephant ambush",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+        "effect": "token_maker",
+        "flashback_cost": "{6}{G}{G}",
+        "flashback_status": "runtime_executor_v1",
+        "token_colors": [
+          "G"
+        ],
+        "token_count": 1,
+        "token_name": "Elephant Token",
+        "token_power": 3,
+        "token_subtype": "Elephant",
+        "token_toughness": 3,
+        "xmage_auxiliary_ability_classes": [
+          "FlashbackAbility"
+        ],
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "ElephantToken"
+      }
+    },
+    {
+      "card": {
+        "name": "Join the Dance"
+      },
+      "card_name": "Join the Dance",
+      "effect": "token_maker",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3eb8c5091faf5fc53be72d36b1eb2196",
+      "normalized_name": "join the dance",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+        "effect": "token_maker",
+        "flashback_cost": "{3}{G}{W}",
+        "flashback_status": "runtime_executor_v1",
+        "token_colors": [
+          "W"
+        ],
+        "token_count": 2,
+        "token_name": "Human Token",
+        "token_power": 1,
+        "token_subtype": "Human",
+        "token_toughness": 1,
+        "xmage_auxiliary_ability_classes": [
+          "FlashbackAbility"
+        ],
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "HumanToken"
+      }
+    },
+    {
+      "card": {
+        "name": "Lingering Souls"
+      },
+      "card_name": "Lingering Souls",
+      "effect": "token_maker",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a4c61759b967ecfaccf80a59d38353b3",
+      "normalized_name": "lingering souls",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+        "effect": "token_maker",
+        "flashback_cost": "{1}{B}",
+        "flashback_status": "runtime_executor_v1",
+        "token_colors": [
+          "W"
+        ],
+        "token_count": 2,
+        "token_flying": true,
+        "token_keywords": [
+          "flying"
+        ],
+        "token_name": "Spirit Token",
+        "token_power": 1,
+        "token_subtype": "Spirit",
+        "token_toughness": 1,
+        "xmage_auxiliary_ability_classes": [
+          "FlashbackAbility"
+        ],
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "SpiritWhiteToken"
+      }
+    },
+    {
+      "card": {
+        "name": "Moan of the Unhallowed"
+      },
+      "card_name": "Moan of the Unhallowed",
+      "effect": "token_maker",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:66a4f2f8592f1a22b703004e3cef386d",
+      "normalized_name": "moan of the unhallowed",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+        "effect": "token_maker",
+        "flashback_cost": "{5}{B}{B}",
+        "flashback_status": "runtime_executor_v1",
+        "token_colors": [
+          "B"
+        ],
+        "token_count": 2,
+        "token_name": "Zombie Token",
+        "token_power": 2,
+        "token_subtype": "Zombie",
+        "token_toughness": 2,
+        "xmage_auxiliary_ability_classes": [
+          "FlashbackAbility"
+        ],
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "ZombieToken"
+      }
+    },
+    {
+      "card": {
+        "name": "Reap the Seagraf"
+      },
+      "card_name": "Reap the Seagraf",
+      "effect": "token_maker",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a7916f222a9928fbecbb1fa2e0fcb225",
+      "normalized_name": "reap the seagraf",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+        "effect": "token_maker",
+        "flashback_cost": "{4}{U}",
+        "flashback_status": "runtime_executor_v1",
+        "token_colors": [
+          "B"
+        ],
+        "token_count": 1,
+        "token_name": "Zombie Token",
+        "token_power": 2,
+        "token_subtype": "Zombie",
+        "token_toughness": 2,
+        "xmage_auxiliary_ability_classes": [
+          "FlashbackAbility"
+        ],
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "ZombieToken"
+      }
+    },
+    {
+      "card": {
+        "name": "Roar of the Wurm"
+      },
+      "card_name": "Roar of the Wurm",
+      "effect": "token_maker",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0f83c527186efe0000b099e4355cfe91",
+      "normalized_name": "roar of the wurm",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+        "effect": "token_maker",
+        "flashback_cost": "{3}{G}",
+        "flashback_status": "runtime_executor_v1",
+        "token_colors": [
+          "G"
+        ],
+        "token_count": 1,
+        "token_name": "Wurm Token",
+        "token_power": 6,
+        "token_subtype": "Wurm",
+        "token_toughness": 6,
+        "xmage_auxiliary_ability_classes": [
+          "FlashbackAbility"
+        ],
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "WurmToken"
+      }
+    },
+    {
+      "card": {
+        "name": "Shadowbeast Sighting"
+      },
+      "card_name": "Shadowbeast Sighting",
+      "effect": "token_maker",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:dc8bc7bd6132e782fac0098d05975c6c",
+      "normalized_name": "shadowbeast sighting",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+        "effect": "token_maker",
+        "flashback_cost": "{6}{G}",
+        "flashback_status": "runtime_executor_v1",
+        "token_colors": [
+          "G"
+        ],
+        "token_count": 1,
+        "token_name": "Beast Token",
+        "token_power": 4,
+        "token_subtype": "Beast",
+        "token_toughness": 4,
+        "xmage_auxiliary_ability_classes": [
+          "FlashbackAbility"
+        ],
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "Beast44Token"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Army of the Damned",
+    "Beast Attack",
+    "Call of the Herd",
+    "Chatter of the Squirrel",
+    "Crush of Wurms",
+    "Elephant Ambush",
+    "Join the Dance",
+    "Lingering Souls",
+    "Moan of the Unhallowed",
+    "Reap the Seagraf",
+    "Roar of the Wurm",
+    "Shadowbeast Sighting"
+  ],
+  "selected_count": 12,
+  "slug": "token_flashback_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Army of the Damned",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e101ae8cffb1ad36659191cb37a7f80d",
+      "min_rule_version": 2,
+      "normalized_name": "army of the damned",
+      "oracle_hash": "4905dce455a89e75362d5b0478daa350",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Beast Attack",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:20c56778a1992592a9e79070be36ffe0",
+      "min_rule_version": 2,
+      "normalized_name": "beast attack",
+      "oracle_hash": "2a291b12d5aec28bc5c60574452d473b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Call of the Herd",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6ba5014e640d21a31f5ebc1f5e9185d5",
+      "min_rule_version": 2,
+      "normalized_name": "call of the herd",
+      "oracle_hash": "783884211b45c5b76ff4959686b9e366",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Chatter of the Squirrel",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c0e16a90ce29ded5d1194a4e20dda154",
+      "min_rule_version": 2,
+      "normalized_name": "chatter of the squirrel",
+      "oracle_hash": "0e2fd068dca30f2569722baaa5ff9e53",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Crush of Wurms",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:980fed86a6285fffbece2444a59aea6d",
+      "min_rule_version": 2,
+      "normalized_name": "crush of wurms",
+      "oracle_hash": "fef198b6e8474d61347290d37185257e",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Elephant Ambush",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ace48628d5ae36959b46552d369fd486",
+      "min_rule_version": 2,
+      "normalized_name": "elephant ambush",
+      "oracle_hash": "68d862f995dc322039a4103300577efa",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Join the Dance",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3eb8c5091faf5fc53be72d36b1eb2196",
+      "min_rule_version": 2,
+      "normalized_name": "join the dance",
+      "oracle_hash": "2ba7a34bd7062658268f7a21fe59548f",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Lingering Souls",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a4c61759b967ecfaccf80a59d38353b3",
+      "min_rule_version": 2,
+      "normalized_name": "lingering souls",
+      "oracle_hash": "ef8670b9500a3748b7dcac01007352ee",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Moan of the Unhallowed",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:66a4f2f8592f1a22b703004e3cef386d",
+      "min_rule_version": 2,
+      "normalized_name": "moan of the unhallowed",
+      "oracle_hash": "5bd6d795206c41573e35ae75bea8cfc7",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Reap the Seagraf",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a7916f222a9928fbecbb1fa2e0fcb225",
+      "min_rule_version": 2,
+      "normalized_name": "reap the seagraf",
+      "oracle_hash": "bc733e8b9b926952dc3b4507e35c6e06",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Roar of the Wurm",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0f83c527186efe0000b099e4355cfe91",
+      "min_rule_version": 2,
+      "normalized_name": "roar of the wurm",
+      "oracle_hash": "cc3761b8b20e3478ff772bd58c173341",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Shadowbeast Sighting",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:dc8bc7bd6132e782fac0098d05975c6c",
+      "min_rule_version": 2,
+      "normalized_name": "shadowbeast sighting",
+      "oracle_hash": "c97547d092808a4c795699edc4a6e2f9",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}
