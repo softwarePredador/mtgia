@@ -264,6 +264,12 @@ GLOBAL_COMMANDER_REVIEWED_EXTERNAL_SEEDED_CUT_TRACE_COLLECTOR = (
 GLOBAL_COMMANDER_REVIEWED_EXTERNAL_SEEDED_CUT_TRACE_COLLECTOR_TEST = (
     SCRIPT_DIR / "test_global_commander_reviewed_external_seeded_cut_trace_collector.py"
 )
+GLOBAL_COMMANDER_REVIEWED_EXTERNAL_SEEDED_FORCE_ACCESS_TRACE_GENERATOR = (
+    SCRIPT_DIR / "global_commander_reviewed_external_seeded_force_access_trace_generator.py"
+)
+GLOBAL_COMMANDER_REVIEWED_EXTERNAL_SEEDED_FORCE_ACCESS_TRACE_GENERATOR_TEST = (
+    SCRIPT_DIR / "test_global_commander_reviewed_external_seeded_force_access_trace_generator.py"
+)
 README = REPO_ROOT / "docs/hermes-analysis/README.md"
 
 CONTRACT_MATRIX_JSON = (
@@ -553,6 +559,14 @@ GLOBAL_COMMANDER_SCOPE1_REVIEWED_EXTERNAL_NONPAYOFF_SEEDED_CUT_SOURCE_MINER_REPO
 GLOBAL_COMMANDER_SCOPE1_REVIEWED_EXTERNAL_SEEDED_CUT_TRACE_COLLECTOR_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_reviewed_external_seeded_cut_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+)
+GLOBAL_COMMANDER_SCOPE1_REVIEWED_EXTERNAL_SEEDED_FORCE_ACCESS_TRACE_GENERATOR_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_reviewed_external_seeded_force_access_trace_generator_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+)
+GLOBAL_COMMANDER_SCOPE1_REVIEWED_EXTERNAL_NONPAYOFF_SEEDED_CUT_SOURCE_MINER_CURRENT_DB_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_reviewed_external_nonpayoff_seeded_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1_current_db.md"
 )
 
 REQUIRED_FOCUS_CARDS = {
@@ -2299,6 +2313,35 @@ def build_audit() -> dict[str, Any]:
     )
     checks.append(
         check_contains(
+            GLOBAL_COMMANDER_REVIEWED_EXTERNAL_SEEDED_FORCE_ACCESS_TRACE_GENERATOR,
+            [
+                "global_commander_reviewed_external_seeded_force_access_trace_generator",
+                "reviewed_external_seeded_forced_access_blocks_absent_hypotheses",
+                "reviewed_seeded_forced_access_card_absent_from_selected_db_blocks_cut_permission",
+                "rerun_seeded_cut_source_miner_against_current_evaluation_db",
+                "run_forced_replay_seed",
+                "focus_cards",
+                "seeded_hypothesis_boundary",
+                "card_level_cut_permission_now",
+                "candidate_copy_allowed_now",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_REVIEWED_EXTERNAL_SEEDED_FORCE_ACCESS_TRACE_GENERATOR_TEST,
+            [
+                "test_forced_access_usage_blocks_seeded_hypothesis_cut",
+                "test_forced_access_without_usage_still_does_not_open_cut_permission",
+                "test_forced_access_not_found_routes_to_current_db_remine",
+                "reviewed_external_seeded_forced_access_blocks_absent_hypotheses",
+                "reviewed_seeded_forced_access_card_absent_from_selected_db_blocks_cut_permission",
+                "rerun_seeded_cut_source_miner_against_current_evaluation_db",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
             GLOBAL_COMMANDER_CUT_SOURCE_HYPOTHESIS_TRACE_COLLECTOR,
             [
                 "global_commander_cut_source_hypothesis_trace_collector",
@@ -3619,6 +3662,48 @@ def build_audit() -> dict[str, Any]:
                 "Basalt Monolith",
                 "Monologue Tax",
                 "Strike It Rich",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SCOPE1_REVIEWED_EXTERNAL_SEEDED_FORCE_ACCESS_TRACE_GENERATOR_REPORT,
+            [
+                "Global Commander Reviewed External Seeded Force Access Trace Generator",
+                "reviewed_external_seeded_forced_access_blocks_absent_hypotheses",
+                "source_hypothesis_count: `10`",
+                "focus_hypothesis_count: `10`",
+                "seed_count: `3`",
+                "usage_blocked_count: `0`",
+                "selected_db_absent_count: `10`",
+                "card_level_cut_permission_count: `0`",
+                "candidate_copy_allowed_now: `false`",
+                "rerun_seeded_cut_source_miner_against_current_evaluation_db",
+                "Basalt Monolith",
+                "Cabal Ritual",
+                "Strike It Rich",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SCOPE1_REVIEWED_EXTERNAL_NONPAYOFF_SEEDED_CUT_SOURCE_MINER_CURRENT_DB_REPORT,
+            [
+                "Global Commander Reviewed External Nonpayoff Seeded Cut Source Miner",
+                "reviewed_external_seeded_cut_source_mining_exhausted_current_deck_no_cut_permission",
+                "reviewed_seed_count: `5`",
+                "seeded_role_count: `2`",
+                "target_role_count: `3`",
+                "unseeded_target_role_count: `1`",
+                "scanned_seeded_same_lane_source_count: `31`",
+                "fresh_seeded_same_lane_cut_source_count: `0`",
+                "blocked_recycled_seeded_cut_source_count: `31`",
+                "blocked_new_seeded_cut_source_count: `0`",
+                "candidate_copy_allowed_now: `false`",
+                "expand_external_nonpayoff_seed_research_or_collect_current_deck_negative_review_before_candidate_copy",
+                "Dragon Tempest",
+                "Simian Spirit Guide",
+                "none",
             ],
         )
     )

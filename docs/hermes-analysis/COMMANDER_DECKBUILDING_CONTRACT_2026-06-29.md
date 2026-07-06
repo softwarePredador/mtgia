@@ -416,7 +416,19 @@ Operational priority after this pivot:
     existing replay/decision trace artifacts to classify each seeded hypothesis
     as used, seen without usage, or unseen, and keep card-level cut permission,
     candidate copy, battle, promotion, and value-safe reclassification closed;
-55. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
+55. run `global_commander_reviewed_external_seeded_force_access_trace_generator.py`
+    only for unseen reviewed external seeded hypotheses; it must use forced
+    access against the current evaluation target, classify `not_found` as
+    absent from the selected evaluation DB rather than negative proof, and keep
+    card-level cut permission, candidate copy, battle, promotion, and
+    value-safe reclassification closed;
+56. rerun `global_commander_reviewed_external_nonpayoff_seeded_cut_source_miner.py`
+    with `--db` pointing at the current evaluation DB whenever seeded
+    force-access proves prior hypotheses are absent from that DB; if no fresh
+    seeded same-lane source remains, route to broader external nonpayoff seed
+    research or current-deck negative review before any candidate copy, battle,
+    promotion, or value-safe reclassification;
+57. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
     probes, as regression evidence only unless they produce a named safe cut and
     equal-gate proof under the Lorehold promotion gate.
 
@@ -489,6 +501,8 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_same_lane_source_candidate_reviewer_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_reviewed_external_nonpayoff_seeded_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_reviewed_external_seeded_cut_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_reviewed_external_seeded_force_access_trace_generator_20260705_kaalia_value_safe_stage1_repair_scope1.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_reviewed_external_nonpayoff_seeded_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1_current_db.md`
 
 Historical candidate-copy, battle-probe, battle-feedback, and package-chain
 snapshots are local ignored evidence artifacts. The surface auditor must show
@@ -1086,6 +1100,29 @@ Current external refresh on 2026-07-05:
   The existing trace window did not expose the hypotheses, so this is not
   negative proof. The next gate is
   `force_access_or_expand_replay_window_for_seeded_hypotheses`.
+- Current reviewed external seeded forced-access generation returns
+  `reviewed_external_seeded_forced_access_blocks_absent_hypotheses` with
+  `source_hypothesis_count=10`, `focus_hypothesis_count=10`,
+  `selected_db_absent_count=10`, `usage_blocked_count=0`,
+  `card_level_cut_permission_count=0`, and `candidate_copy_allowed_count=0`.
+  Forced access applied against the current `Kaalia of the Vast` evaluation
+  target, but all 10 seeded hypotheses were absent from the selected scope1
+  candidate DB. This is a source-lineage blocker, not negative cut proof.
+  Candidate copy, battle, promotion, and value-safe reclassification remain
+  closed; the next gate is
+  `rerun_seeded_cut_source_miner_against_current_evaluation_db`.
+- Current reviewed external nonpayoff seeded cut-source mining rerun against
+  the current scope1 DB returns
+  `reviewed_external_seeded_cut_source_mining_exhausted_current_deck_no_cut_permission`
+  with `reviewed_seed_count=5`, `seeded_role_count=2`,
+  `target_role_count=3`, `unseeded_target_role_count=1`,
+  `scanned_seeded_same_lane_source_count=31`,
+  `fresh_seeded_same_lane_cut_source_count=0`,
+  `blocked_recycled_seeded_cut_source_count=31`,
+  `blocked_new_seeded_cut_source_count=0`,
+  `card_level_cut_permission_count=0`, and `candidate_copy_allowed_count=0`.
+  The current scope1 seeded lane is exhausted; the next gate is
+  `expand_external_nonpayoff_seed_research_or_collect_current_deck_negative_review_before_candidate_copy`.
 
 ## Global Commander Rollout - 2026-07-01
 

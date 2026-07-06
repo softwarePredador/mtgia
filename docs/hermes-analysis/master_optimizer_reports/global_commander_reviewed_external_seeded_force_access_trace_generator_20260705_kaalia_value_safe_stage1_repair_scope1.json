@@ -1,0 +1,1030 @@
+{
+  "artifact_type": "global_commander_reviewed_external_seeded_force_access_trace_generator",
+  "battle_gate_allowed_now": false,
+  "battle_gate_performed": false,
+  "battle_or_optimization_performed": false,
+  "candidate_copy_allowed_now": false,
+  "candidate_copy_blockers": [
+    "seeded_hypotheses_absent_from_selected_db:Basalt Monolith,Monologue Tax,Burnt Offering,Culling the Weak,Desperate Ritual,Grim Monolith,Infernal Plunge,Pyretic Ritual,Cabal Ritual,Strike It Rich",
+    "candidate_copy_closed_after_seeded_forced_access_trace"
+  ],
+  "card_level_cut_permission_now": false,
+  "deck_action_allowed": false,
+  "forced_access_replay_performed": true,
+  "generated_at": "2026-07-06T01:35:47.470135+00:00",
+  "input_artifacts": {
+    "battle_replay": "docs/hermes-analysis/manaloom-knowledge/scripts/battle_replay_v10_3.py",
+    "replay_dir": "docs/hermes-analysis/master_optimizer_reports/global_commander_reviewed_external_seeded_force_access_replays_20260705_kaalia_value_safe_stage1_repair_scope1",
+    "seeded_trace_collector_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_reviewed_external_seeded_cut_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.json",
+    "selected_db": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_copy_materializer_20260705_kaalia_value_safe_stage1_repair_scope1_candidate/knowledge_candidate.db",
+    "trace_generator_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_generator_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+  },
+  "mutation_allowed": false,
+  "policy": {
+    "forced_access_boundary": "Forced access is diagnostic evidence only; it is not a natural battle gate.",
+    "promotion_boundary": "No candidate copy, deck mutation, battle gate, value-safe reclassification, or promotion is opened by this report.",
+    "seeded_hypothesis_boundary": "Reviewed external seeds can target trace work, but do not create card-level cut permission.",
+    "target_boundary": "Forced access applies only to the current evaluation target player."
+  },
+  "postgres_writes": false,
+  "promotion_allowed": false,
+  "review_rows": [
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "cut_card": "Basalt Monolith",
+      "decision": "seeded_hypothesis_source_db_mismatch_or_already_removed",
+      "decision_trace_count": 0,
+      "event_types": {
+        "focus_card_access_snapshot": 135,
+        "forced_focus_access_applied": 3
+      },
+      "exposure_event_count": 0,
+      "first_decision_trace": null,
+      "first_exposure_event": null,
+      "first_forced_access_event": {
+        "card": "Basalt Monolith",
+        "event": "forced_focus_access_applied",
+        "mode": "opening_hand",
+        "player": "Kaalia of the Vast",
+        "replaced_card": null,
+        "status": "not_found",
+        "turn": 0
+      },
+      "first_usage_event": null,
+      "forced_access_moved_or_present_count": 0,
+      "forced_access_not_found_count": 3,
+      "missing_inputs": [],
+      "next_gate": "rerun_seeded_cut_source_miner_against_current_evaluation_db",
+      "profile_roles": [
+        "mana_acceleration"
+      ],
+      "source_reasons": [
+        "fresh_same_lane_mana_acceleration",
+        "single_profile_role_slot",
+        "slower_ramp_review_pressure"
+      ],
+      "source_score": 58,
+      "status": "reviewed_seeded_forced_access_card_absent_from_selected_db_blocks_cut_permission",
+      "target_cut_role": "mana_acceleration",
+      "usage_event_count": 0,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "cut_card": "Monologue Tax",
+      "decision": "seeded_hypothesis_source_db_mismatch_or_already_removed",
+      "decision_trace_count": 0,
+      "event_types": {
+        "focus_card_access_snapshot": 135,
+        "forced_focus_access_applied": 3
+      },
+      "exposure_event_count": 0,
+      "first_decision_trace": null,
+      "first_exposure_event": null,
+      "first_forced_access_event": {
+        "card": "Monologue Tax",
+        "event": "forced_focus_access_applied",
+        "mode": "opening_hand",
+        "player": "Kaalia of the Vast",
+        "replaced_card": null,
+        "status": "not_found",
+        "turn": 0
+      },
+      "first_usage_event": null,
+      "forced_access_moved_or_present_count": 0,
+      "forced_access_not_found_count": 3,
+      "missing_inputs": [],
+      "next_gate": "rerun_seeded_cut_source_miner_against_current_evaluation_db",
+      "profile_roles": [
+        "mana_acceleration"
+      ],
+      "source_reasons": [
+        "fresh_same_lane_mana_acceleration",
+        "single_profile_role_slot",
+        "slower_ramp_review_pressure"
+      ],
+      "source_score": 58,
+      "status": "reviewed_seeded_forced_access_card_absent_from_selected_db_blocks_cut_permission",
+      "target_cut_role": "mana_acceleration",
+      "usage_event_count": 0,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "cut_card": "Burnt Offering",
+      "decision": "seeded_hypothesis_source_db_mismatch_or_already_removed",
+      "decision_trace_count": 0,
+      "event_types": {
+        "focus_card_access_snapshot": 135,
+        "forced_focus_access_applied": 3
+      },
+      "exposure_event_count": 0,
+      "first_decision_trace": null,
+      "first_exposure_event": null,
+      "first_forced_access_event": {
+        "card": "Burnt Offering",
+        "event": "forced_focus_access_applied",
+        "mode": "opening_hand",
+        "player": "Kaalia of the Vast",
+        "replaced_card": null,
+        "status": "not_found",
+        "turn": 0
+      },
+      "first_usage_event": null,
+      "forced_access_moved_or_present_count": 0,
+      "forced_access_not_found_count": 3,
+      "missing_inputs": [],
+      "next_gate": "rerun_seeded_cut_source_miner_against_current_evaluation_db",
+      "profile_roles": [
+        "mana_acceleration"
+      ],
+      "source_reasons": [
+        "fresh_same_lane_mana_acceleration",
+        "single_profile_role_slot"
+      ],
+      "source_score": 52,
+      "status": "reviewed_seeded_forced_access_card_absent_from_selected_db_blocks_cut_permission",
+      "target_cut_role": "mana_acceleration",
+      "usage_event_count": 0,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "cut_card": "Culling the Weak",
+      "decision": "seeded_hypothesis_source_db_mismatch_or_already_removed",
+      "decision_trace_count": 0,
+      "event_types": {
+        "focus_card_access_snapshot": 135,
+        "forced_focus_access_applied": 3
+      },
+      "exposure_event_count": 0,
+      "first_decision_trace": null,
+      "first_exposure_event": null,
+      "first_forced_access_event": {
+        "card": "Culling the Weak",
+        "event": "forced_focus_access_applied",
+        "mode": "opening_hand",
+        "player": "Kaalia of the Vast",
+        "replaced_card": null,
+        "status": "not_found",
+        "turn": 0
+      },
+      "first_usage_event": null,
+      "forced_access_moved_or_present_count": 0,
+      "forced_access_not_found_count": 3,
+      "missing_inputs": [],
+      "next_gate": "rerun_seeded_cut_source_miner_against_current_evaluation_db",
+      "profile_roles": [
+        "mana_acceleration"
+      ],
+      "source_reasons": [
+        "fresh_same_lane_mana_acceleration",
+        "single_profile_role_slot"
+      ],
+      "source_score": 52,
+      "status": "reviewed_seeded_forced_access_card_absent_from_selected_db_blocks_cut_permission",
+      "target_cut_role": "mana_acceleration",
+      "usage_event_count": 0,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "cut_card": "Desperate Ritual",
+      "decision": "seeded_hypothesis_source_db_mismatch_or_already_removed",
+      "decision_trace_count": 0,
+      "event_types": {
+        "focus_card_access_snapshot": 135,
+        "forced_focus_access_applied": 3
+      },
+      "exposure_event_count": 0,
+      "first_decision_trace": null,
+      "first_exposure_event": null,
+      "first_forced_access_event": {
+        "card": "Desperate Ritual",
+        "event": "forced_focus_access_applied",
+        "mode": "opening_hand",
+        "player": "Kaalia of the Vast",
+        "replaced_card": null,
+        "status": "not_found",
+        "turn": 0
+      },
+      "first_usage_event": null,
+      "forced_access_moved_or_present_count": 0,
+      "forced_access_not_found_count": 3,
+      "missing_inputs": [],
+      "next_gate": "rerun_seeded_cut_source_miner_against_current_evaluation_db",
+      "profile_roles": [
+        "mana_acceleration"
+      ],
+      "source_reasons": [
+        "fresh_same_lane_mana_acceleration",
+        "single_profile_role_slot"
+      ],
+      "source_score": 52,
+      "status": "reviewed_seeded_forced_access_card_absent_from_selected_db_blocks_cut_permission",
+      "target_cut_role": "mana_acceleration",
+      "usage_event_count": 0,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "cut_card": "Grim Monolith",
+      "decision": "seeded_hypothesis_source_db_mismatch_or_already_removed",
+      "decision_trace_count": 0,
+      "event_types": {
+        "focus_card_access_snapshot": 135,
+        "forced_focus_access_applied": 3
+      },
+      "exposure_event_count": 0,
+      "first_decision_trace": null,
+      "first_exposure_event": null,
+      "first_forced_access_event": {
+        "card": "Grim Monolith",
+        "event": "forced_focus_access_applied",
+        "mode": "opening_hand",
+        "player": "Kaalia of the Vast",
+        "replaced_card": null,
+        "status": "not_found",
+        "turn": 0
+      },
+      "first_usage_event": null,
+      "forced_access_moved_or_present_count": 0,
+      "forced_access_not_found_count": 3,
+      "missing_inputs": [],
+      "next_gate": "rerun_seeded_cut_source_miner_against_current_evaluation_db",
+      "profile_roles": [
+        "mana_acceleration"
+      ],
+      "source_reasons": [
+        "fresh_same_lane_mana_acceleration",
+        "single_profile_role_slot"
+      ],
+      "source_score": 52,
+      "status": "reviewed_seeded_forced_access_card_absent_from_selected_db_blocks_cut_permission",
+      "target_cut_role": "mana_acceleration",
+      "usage_event_count": 0,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "cut_card": "Infernal Plunge",
+      "decision": "seeded_hypothesis_source_db_mismatch_or_already_removed",
+      "decision_trace_count": 0,
+      "event_types": {
+        "focus_card_access_snapshot": 135,
+        "forced_focus_access_applied": 3
+      },
+      "exposure_event_count": 0,
+      "first_decision_trace": null,
+      "first_exposure_event": null,
+      "first_forced_access_event": {
+        "card": "Infernal Plunge",
+        "event": "forced_focus_access_applied",
+        "mode": "opening_hand",
+        "player": "Kaalia of the Vast",
+        "replaced_card": null,
+        "status": "not_found",
+        "turn": 0
+      },
+      "first_usage_event": null,
+      "forced_access_moved_or_present_count": 0,
+      "forced_access_not_found_count": 3,
+      "missing_inputs": [],
+      "next_gate": "rerun_seeded_cut_source_miner_against_current_evaluation_db",
+      "profile_roles": [
+        "mana_acceleration"
+      ],
+      "source_reasons": [
+        "fresh_same_lane_mana_acceleration",
+        "single_profile_role_slot"
+      ],
+      "source_score": 52,
+      "status": "reviewed_seeded_forced_access_card_absent_from_selected_db_blocks_cut_permission",
+      "target_cut_role": "mana_acceleration",
+      "usage_event_count": 0,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "cut_card": "Pyretic Ritual",
+      "decision": "seeded_hypothesis_source_db_mismatch_or_already_removed",
+      "decision_trace_count": 0,
+      "event_types": {
+        "focus_card_access_snapshot": 135,
+        "forced_focus_access_applied": 3
+      },
+      "exposure_event_count": 0,
+      "first_decision_trace": null,
+      "first_exposure_event": null,
+      "first_forced_access_event": {
+        "card": "Pyretic Ritual",
+        "event": "forced_focus_access_applied",
+        "mode": "opening_hand",
+        "player": "Kaalia of the Vast",
+        "replaced_card": null,
+        "status": "not_found",
+        "turn": 0
+      },
+      "first_usage_event": null,
+      "forced_access_moved_or_present_count": 0,
+      "forced_access_not_found_count": 3,
+      "missing_inputs": [],
+      "next_gate": "rerun_seeded_cut_source_miner_against_current_evaluation_db",
+      "profile_roles": [
+        "mana_acceleration"
+      ],
+      "source_reasons": [
+        "fresh_same_lane_mana_acceleration",
+        "single_profile_role_slot"
+      ],
+      "source_score": 52,
+      "status": "reviewed_seeded_forced_access_card_absent_from_selected_db_blocks_cut_permission",
+      "target_cut_role": "mana_acceleration",
+      "usage_event_count": 0,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "cut_card": "Cabal Ritual",
+      "decision": "seeded_hypothesis_source_db_mismatch_or_already_removed",
+      "decision_trace_count": 0,
+      "event_types": {
+        "focus_card_access_snapshot": 135,
+        "forced_focus_access_applied": 3
+      },
+      "exposure_event_count": 0,
+      "first_decision_trace": null,
+      "first_exposure_event": null,
+      "first_forced_access_event": {
+        "card": "Cabal Ritual",
+        "event": "forced_focus_access_applied",
+        "mode": "opening_hand",
+        "player": "Kaalia of the Vast",
+        "replaced_card": null,
+        "status": "not_found",
+        "turn": 0
+      },
+      "first_usage_event": null,
+      "forced_access_moved_or_present_count": 0,
+      "forced_access_not_found_count": 3,
+      "missing_inputs": [],
+      "next_gate": "rerun_seeded_cut_source_miner_against_current_evaluation_db",
+      "profile_roles": [
+        "mana_acceleration"
+      ],
+      "source_reasons": [
+        "fresh_same_lane_mana_acceleration",
+        "single_profile_role_slot",
+        "format_staple_needs_review"
+      ],
+      "source_score": 44,
+      "status": "reviewed_seeded_forced_access_card_absent_from_selected_db_blocks_cut_permission",
+      "target_cut_role": "mana_acceleration",
+      "usage_event_count": 0,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "cut_card": "Strike It Rich",
+      "decision": "seeded_hypothesis_source_db_mismatch_or_already_removed",
+      "decision_trace_count": 0,
+      "event_types": {
+        "focus_card_access_snapshot": 135,
+        "forced_focus_access_applied": 3
+      },
+      "exposure_event_count": 0,
+      "first_decision_trace": null,
+      "first_exposure_event": null,
+      "first_forced_access_event": {
+        "card": "Strike It Rich",
+        "event": "forced_focus_access_applied",
+        "mode": "opening_hand",
+        "player": "Kaalia of the Vast",
+        "replaced_card": null,
+        "status": "not_found",
+        "turn": 0
+      },
+      "first_usage_event": null,
+      "forced_access_moved_or_present_count": 0,
+      "forced_access_not_found_count": 3,
+      "missing_inputs": [],
+      "next_gate": "rerun_seeded_cut_source_miner_against_current_evaluation_db",
+      "profile_roles": [
+        "mana_acceleration",
+        "reanimation_plan_b"
+      ],
+      "source_reasons": [
+        "fresh_same_lane_mana_acceleration"
+      ],
+      "source_score": 42,
+      "status": "reviewed_seeded_forced_access_card_absent_from_selected_db_blocks_cut_permission",
+      "target_cut_role": "mana_acceleration",
+      "usage_event_count": 0,
+      "value_safe_reclassification_allowed": false
+    }
+  ],
+  "seed_reports": [
+    {
+      "decision_count": 120,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_reviewed_external_seeded_force_access_replays_20260705_kaalia_value_safe_stage1_repair_scope1/forced_replay_seed_53.decision_trace.jsonl",
+      "event_count": 981,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_reviewed_external_seeded_force_access_replays_20260705_kaalia_value_safe_stage1_repair_scope1/forced_replay_seed_53.events.jsonl",
+      "forced_access": {
+        "Basalt Monolith": {
+          "already_in_hand_count": 0,
+          "first_event": {
+            "card": "Basalt Monolith",
+            "event": "forced_focus_access_applied",
+            "mode": "opening_hand",
+            "player": "Kaalia of the Vast",
+            "replaced_card": null,
+            "status": "not_found",
+            "turn": 0
+          },
+          "moved_count": 0,
+          "not_found_count": 1,
+          "statuses": {
+            "not_found": 1
+          }
+        },
+        "Burnt Offering": {
+          "already_in_hand_count": 0,
+          "first_event": {
+            "card": "Burnt Offering",
+            "event": "forced_focus_access_applied",
+            "mode": "opening_hand",
+            "player": "Kaalia of the Vast",
+            "replaced_card": null,
+            "status": "not_found",
+            "turn": 0
+          },
+          "moved_count": 0,
+          "not_found_count": 1,
+          "statuses": {
+            "not_found": 1
+          }
+        },
+        "Cabal Ritual": {
+          "already_in_hand_count": 0,
+          "first_event": {
+            "card": "Cabal Ritual",
+            "event": "forced_focus_access_applied",
+            "mode": "opening_hand",
+            "player": "Kaalia of the Vast",
+            "replaced_card": null,
+            "status": "not_found",
+            "turn": 0
+          },
+          "moved_count": 0,
+          "not_found_count": 1,
+          "statuses": {
+            "not_found": 1
+          }
+        },
+        "Culling the Weak": {
+          "already_in_hand_count": 0,
+          "first_event": {
+            "card": "Culling the Weak",
+            "event": "forced_focus_access_applied",
+            "mode": "opening_hand",
+            "player": "Kaalia of the Vast",
+            "replaced_card": null,
+            "status": "not_found",
+            "turn": 0
+          },
+          "moved_count": 0,
+          "not_found_count": 1,
+          "statuses": {
+            "not_found": 1
+          }
+        },
+        "Desperate Ritual": {
+          "already_in_hand_count": 0,
+          "first_event": {
+            "card": "Desperate Ritual",
+            "event": "forced_focus_access_applied",
+            "mode": "opening_hand",
+            "player": "Kaalia of the Vast",
+            "replaced_card": null,
+            "status": "not_found",
+            "turn": 0
+          },
+          "moved_count": 0,
+          "not_found_count": 1,
+          "statuses": {
+            "not_found": 1
+          }
+        },
+        "Grim Monolith": {
+          "already_in_hand_count": 0,
+          "first_event": {
+            "card": "Grim Monolith",
+            "event": "forced_focus_access_applied",
+            "mode": "opening_hand",
+            "player": "Kaalia of the Vast",
+            "replaced_card": null,
+            "status": "not_found",
+            "turn": 0
+          },
+          "moved_count": 0,
+          "not_found_count": 1,
+          "statuses": {
+            "not_found": 1
+          }
+        },
+        "Infernal Plunge": {
+          "already_in_hand_count": 0,
+          "first_event": {
+            "card": "Infernal Plunge",
+            "event": "forced_focus_access_applied",
+            "mode": "opening_hand",
+            "player": "Kaalia of the Vast",
+            "replaced_card": null,
+            "status": "not_found",
+            "turn": 0
+          },
+          "moved_count": 0,
+          "not_found_count": 1,
+          "statuses": {
+            "not_found": 1
+          }
+        },
+        "Monologue Tax": {
+          "already_in_hand_count": 0,
+          "first_event": {
+            "card": "Monologue Tax",
+            "event": "forced_focus_access_applied",
+            "mode": "opening_hand",
+            "player": "Kaalia of the Vast",
+            "replaced_card": null,
+            "status": "not_found",
+            "turn": 0
+          },
+          "moved_count": 0,
+          "not_found_count": 1,
+          "statuses": {
+            "not_found": 1
+          }
+        },
+        "Pyretic Ritual": {
+          "already_in_hand_count": 0,
+          "first_event": {
+            "card": "Pyretic Ritual",
+            "event": "forced_focus_access_applied",
+            "mode": "opening_hand",
+            "player": "Kaalia of the Vast",
+            "replaced_card": null,
+            "status": "not_found",
+            "turn": 0
+          },
+          "moved_count": 0,
+          "not_found_count": 1,
+          "statuses": {
+            "not_found": 1
+          }
+        },
+        "Strike It Rich": {
+          "already_in_hand_count": 0,
+          "first_event": {
+            "card": "Strike It Rich",
+            "event": "forced_focus_access_applied",
+            "mode": "opening_hand",
+            "player": "Kaalia of the Vast",
+            "replaced_card": null,
+            "status": "not_found",
+            "turn": 0
+          },
+          "moved_count": 0,
+          "not_found_count": 1,
+          "statuses": {
+            "not_found": 1
+          }
+        }
+      },
+      "provenance_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_reviewed_external_seeded_force_access_replays_20260705_kaalia_value_safe_stage1_repair_scope1/forced_deck_provenance_seed_53.json",
+      "replay_txt": "docs/hermes-analysis/master_optimizer_reports/global_commander_reviewed_external_seeded_force_access_replays_20260705_kaalia_value_safe_stage1_repair_scope1/forced_replay_seed_53.txt",
+      "returncode": 0,
+      "seed": 53,
+      "status": "seeded_forced_replay_generated"
+    },
+    {
+      "decision_count": 161,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_reviewed_external_seeded_force_access_replays_20260705_kaalia_value_safe_stage1_repair_scope1/forced_replay_seed_54.decision_trace.jsonl",
+      "event_count": 1144,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_reviewed_external_seeded_force_access_replays_20260705_kaalia_value_safe_stage1_repair_scope1/forced_replay_seed_54.events.jsonl",
+      "forced_access": {
+        "Basalt Monolith": {
+          "already_in_hand_count": 0,
+          "first_event": {
+            "card": "Basalt Monolith",
+            "event": "forced_focus_access_applied",
+            "mode": "opening_hand",
+            "player": "Kaalia of the Vast",
+            "replaced_card": null,
+            "status": "not_found",
+            "turn": 0
+          },
+          "moved_count": 0,
+          "not_found_count": 1,
+          "statuses": {
+            "not_found": 1
+          }
+        },
+        "Burnt Offering": {
+          "already_in_hand_count": 0,
+          "first_event": {
+            "card": "Burnt Offering",
+            "event": "forced_focus_access_applied",
+            "mode": "opening_hand",
+            "player": "Kaalia of the Vast",
+            "replaced_card": null,
+            "status": "not_found",
+            "turn": 0
+          },
+          "moved_count": 0,
+          "not_found_count": 1,
+          "statuses": {
+            "not_found": 1
+          }
+        },
+        "Cabal Ritual": {
+          "already_in_hand_count": 0,
+          "first_event": {
+            "card": "Cabal Ritual",
+            "event": "forced_focus_access_applied",
+            "mode": "opening_hand",
+            "player": "Kaalia of the Vast",
+            "replaced_card": null,
+            "status": "not_found",
+            "turn": 0
+          },
+          "moved_count": 0,
+          "not_found_count": 1,
+          "statuses": {
+            "not_found": 1
+          }
+        },
+        "Culling the Weak": {
+          "already_in_hand_count": 0,
+          "first_event": {
+            "card": "Culling the Weak",
+            "event": "forced_focus_access_applied",
+            "mode": "opening_hand",
+            "player": "Kaalia of the Vast",
+            "replaced_card": null,
+            "status": "not_found",
+            "turn": 0
+          },
+          "moved_count": 0,
+          "not_found_count": 1,
+          "statuses": {
+            "not_found": 1
+          }
+        },
+        "Desperate Ritual": {
+          "already_in_hand_count": 0,
+          "first_event": {
+            "card": "Desperate Ritual",
+            "event": "forced_focus_access_applied",
+            "mode": "opening_hand",
+            "player": "Kaalia of the Vast",
+            "replaced_card": null,
+            "status": "not_found",
+            "turn": 0
+          },
+          "moved_count": 0,
+          "not_found_count": 1,
+          "statuses": {
+            "not_found": 1
+          }
+        },
+        "Grim Monolith": {
+          "already_in_hand_count": 0,
+          "first_event": {
+            "card": "Grim Monolith",
+            "event": "forced_focus_access_applied",
+            "mode": "opening_hand",
+            "player": "Kaalia of the Vast",
+            "replaced_card": null,
+            "status": "not_found",
+            "turn": 0
+          },
+          "moved_count": 0,
+          "not_found_count": 1,
+          "statuses": {
+            "not_found": 1
+          }
+        },
+        "Infernal Plunge": {
+          "already_in_hand_count": 0,
+          "first_event": {
+            "card": "Infernal Plunge",
+            "event": "forced_focus_access_applied",
+            "mode": "opening_hand",
+            "player": "Kaalia of the Vast",
+            "replaced_card": null,
+            "status": "not_found",
+            "turn": 0
+          },
+          "moved_count": 0,
+          "not_found_count": 1,
+          "statuses": {
+            "not_found": 1
+          }
+        },
+        "Monologue Tax": {
+          "already_in_hand_count": 0,
+          "first_event": {
+            "card": "Monologue Tax",
+            "event": "forced_focus_access_applied",
+            "mode": "opening_hand",
+            "player": "Kaalia of the Vast",
+            "replaced_card": null,
+            "status": "not_found",
+            "turn": 0
+          },
+          "moved_count": 0,
+          "not_found_count": 1,
+          "statuses": {
+            "not_found": 1
+          }
+        },
+        "Pyretic Ritual": {
+          "already_in_hand_count": 0,
+          "first_event": {
+            "card": "Pyretic Ritual",
+            "event": "forced_focus_access_applied",
+            "mode": "opening_hand",
+            "player": "Kaalia of the Vast",
+            "replaced_card": null,
+            "status": "not_found",
+            "turn": 0
+          },
+          "moved_count": 0,
+          "not_found_count": 1,
+          "statuses": {
+            "not_found": 1
+          }
+        },
+        "Strike It Rich": {
+          "already_in_hand_count": 0,
+          "first_event": {
+            "card": "Strike It Rich",
+            "event": "forced_focus_access_applied",
+            "mode": "opening_hand",
+            "player": "Kaalia of the Vast",
+            "replaced_card": null,
+            "status": "not_found",
+            "turn": 0
+          },
+          "moved_count": 0,
+          "not_found_count": 1,
+          "statuses": {
+            "not_found": 1
+          }
+        }
+      },
+      "provenance_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_reviewed_external_seeded_force_access_replays_20260705_kaalia_value_safe_stage1_repair_scope1/forced_deck_provenance_seed_54.json",
+      "replay_txt": "docs/hermes-analysis/master_optimizer_reports/global_commander_reviewed_external_seeded_force_access_replays_20260705_kaalia_value_safe_stage1_repair_scope1/forced_replay_seed_54.txt",
+      "returncode": 0,
+      "seed": 54,
+      "status": "seeded_forced_replay_generated"
+    },
+    {
+      "decision_count": 110,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_reviewed_external_seeded_force_access_replays_20260705_kaalia_value_safe_stage1_repair_scope1/forced_replay_seed_55.decision_trace.jsonl",
+      "event_count": 776,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_reviewed_external_seeded_force_access_replays_20260705_kaalia_value_safe_stage1_repair_scope1/forced_replay_seed_55.events.jsonl",
+      "forced_access": {
+        "Basalt Monolith": {
+          "already_in_hand_count": 0,
+          "first_event": {
+            "card": "Basalt Monolith",
+            "event": "forced_focus_access_applied",
+            "mode": "opening_hand",
+            "player": "Kaalia of the Vast",
+            "replaced_card": null,
+            "status": "not_found",
+            "turn": 0
+          },
+          "moved_count": 0,
+          "not_found_count": 1,
+          "statuses": {
+            "not_found": 1
+          }
+        },
+        "Burnt Offering": {
+          "already_in_hand_count": 0,
+          "first_event": {
+            "card": "Burnt Offering",
+            "event": "forced_focus_access_applied",
+            "mode": "opening_hand",
+            "player": "Kaalia of the Vast",
+            "replaced_card": null,
+            "status": "not_found",
+            "turn": 0
+          },
+          "moved_count": 0,
+          "not_found_count": 1,
+          "statuses": {
+            "not_found": 1
+          }
+        },
+        "Cabal Ritual": {
+          "already_in_hand_count": 0,
+          "first_event": {
+            "card": "Cabal Ritual",
+            "event": "forced_focus_access_applied",
+            "mode": "opening_hand",
+            "player": "Kaalia of the Vast",
+            "replaced_card": null,
+            "status": "not_found",
+            "turn": 0
+          },
+          "moved_count": 0,
+          "not_found_count": 1,
+          "statuses": {
+            "not_found": 1
+          }
+        },
+        "Culling the Weak": {
+          "already_in_hand_count": 0,
+          "first_event": {
+            "card": "Culling the Weak",
+            "event": "forced_focus_access_applied",
+            "mode": "opening_hand",
+            "player": "Kaalia of the Vast",
+            "replaced_card": null,
+            "status": "not_found",
+            "turn": 0
+          },
+          "moved_count": 0,
+          "not_found_count": 1,
+          "statuses": {
+            "not_found": 1
+          }
+        },
+        "Desperate Ritual": {
+          "already_in_hand_count": 0,
+          "first_event": {
+            "card": "Desperate Ritual",
+            "event": "forced_focus_access_applied",
+            "mode": "opening_hand",
+            "player": "Kaalia of the Vast",
+            "replaced_card": null,
+            "status": "not_found",
+            "turn": 0
+          },
+          "moved_count": 0,
+          "not_found_count": 1,
+          "statuses": {
+            "not_found": 1
+          }
+        },
+        "Grim Monolith": {
+          "already_in_hand_count": 0,
+          "first_event": {
+            "card": "Grim Monolith",
+            "event": "forced_focus_access_applied",
+            "mode": "opening_hand",
+            "player": "Kaalia of the Vast",
+            "replaced_card": null,
+            "status": "not_found",
+            "turn": 0
+          },
+          "moved_count": 0,
+          "not_found_count": 1,
+          "statuses": {
+            "not_found": 1
+          }
+        },
+        "Infernal Plunge": {
+          "already_in_hand_count": 0,
+          "first_event": {
+            "card": "Infernal Plunge",
+            "event": "forced_focus_access_applied",
+            "mode": "opening_hand",
+            "player": "Kaalia of the Vast",
+            "replaced_card": null,
+            "status": "not_found",
+            "turn": 0
+          },
+          "moved_count": 0,
+          "not_found_count": 1,
+          "statuses": {
+            "not_found": 1
+          }
+        },
+        "Monologue Tax": {
+          "already_in_hand_count": 0,
+          "first_event": {
+            "card": "Monologue Tax",
+            "event": "forced_focus_access_applied",
+            "mode": "opening_hand",
+            "player": "Kaalia of the Vast",
+            "replaced_card": null,
+            "status": "not_found",
+            "turn": 0
+          },
+          "moved_count": 0,
+          "not_found_count": 1,
+          "statuses": {
+            "not_found": 1
+          }
+        },
+        "Pyretic Ritual": {
+          "already_in_hand_count": 0,
+          "first_event": {
+            "card": "Pyretic Ritual",
+            "event": "forced_focus_access_applied",
+            "mode": "opening_hand",
+            "player": "Kaalia of the Vast",
+            "replaced_card": null,
+            "status": "not_found",
+            "turn": 0
+          },
+          "moved_count": 0,
+          "not_found_count": 1,
+          "statuses": {
+            "not_found": 1
+          }
+        },
+        "Strike It Rich": {
+          "already_in_hand_count": 0,
+          "first_event": {
+            "card": "Strike It Rich",
+            "event": "forced_focus_access_applied",
+            "mode": "opening_hand",
+            "player": "Kaalia of the Vast",
+            "replaced_card": null,
+            "status": "not_found",
+            "turn": 0
+          },
+          "moved_count": 0,
+          "not_found_count": 1,
+          "statuses": {
+            "not_found": 1
+          }
+        }
+      },
+      "provenance_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_reviewed_external_seeded_force_access_replays_20260705_kaalia_value_safe_stage1_repair_scope1/forced_deck_provenance_seed_55.json",
+      "replay_txt": "docs/hermes-analysis/master_optimizer_reports/global_commander_reviewed_external_seeded_force_access_replays_20260705_kaalia_value_safe_stage1_repair_scope1/forced_replay_seed_55.txt",
+      "returncode": 0,
+      "seed": 55,
+      "status": "seeded_forced_replay_generated"
+    }
+  ],
+  "source_db_mutated": false,
+  "status": "reviewed_external_seeded_forced_access_blocks_absent_hypotheses",
+  "summary": {
+    "candidate_copy_allowed_count": 0,
+    "candidate_copy_blocker_count": 2,
+    "card_level_cut_permission_count": 0,
+    "commander": "Kaalia of the Vast",
+    "deck_id": "619",
+    "focus_cards": [
+      "Basalt Monolith",
+      "Monologue Tax",
+      "Burnt Offering",
+      "Culling the Weak",
+      "Desperate Ritual",
+      "Grim Monolith",
+      "Infernal Plunge",
+      "Pyretic Ritual",
+      "Cabal Ritual",
+      "Strike It Rich"
+    ],
+    "focus_hypothesis_count": 10,
+    "force_failure_count": 0,
+    "forced_access_mode": "opening_hand",
+    "manual_review_count": 0,
+    "missing_input_count": 0,
+    "next_gate": "rerun_seeded_cut_source_miner_against_current_evaluation_db",
+    "seed_count": 3,
+    "seed_start": 53,
+    "selected_db_absent_count": 10,
+    "source_hypothesis_count": 10,
+    "usage_blocked_count": 0
+  },
+  "value_safe_reclassification_allowed_now": false
+}

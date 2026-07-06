@@ -272,6 +272,15 @@ without usage, or unseen. Unseen is not negative proof; force-access or broader
 replay is still required before any value-safe claim, candidate copy, battle,
 promotion, or deck action.
 
+Then run `global_commander_reviewed_external_seeded_force_access_trace_generator.py`
+for unseen reviewed external seeded hypotheses. It uses forced opening-hand
+access only against the current evaluation target and remains diagnostic only.
+If forced access returns `not_found`, treat the hypothesis as absent from the
+selected evaluation DB, not as safe to cut. In that case, rerun
+`global_commander_reviewed_external_nonpayoff_seeded_cut_source_miner.py` with
+`--db` pointing at the current evaluation DB before any more trace, candidate
+copy, battle, promotion, or value-safe reclassification.
+
 ## XMage Authoritative Adaptation
 
 For all-card battle-rule acceleration, use local XMage as the authoritative

@@ -734,6 +734,20 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `seed_report_count=8`, `card_level_cut_permission_count=0` e
     `candidate_copy_allowed_count=0`. O proximo gate e
     `force_access_or_expand_replay_window_for_seeded_hypotheses`.
+    O forced-access seedado fica em
+    `global_commander_reviewed_external_seeded_force_access_trace_generator_20260705_kaalia_value_safe_stage1_repair_scope1.md`.
+    Resultado: `reviewed_external_seeded_forced_access_blocks_absent_hypotheses`,
+    com `source_hypothesis_count=10`, `focus_hypothesis_count=10`,
+    `seed_count=3`, `selected_db_absent_count=10`,
+    `card_level_cut_permission_count=0` e `candidate_copy_allowed_count=0`.
+    Isso prova que as 10 hipoteses seedadas nao existem na DB candidata scope1
+    atual; elas nao podem virar corte, copia candidata ou battle. O miner
+    rerodado na DB scope1 atual fica em
+    `global_commander_reviewed_external_nonpayoff_seeded_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1_current_db.md`.
+    Resultado: `reviewed_external_seeded_cut_source_mining_exhausted_current_deck_no_cut_permission`,
+    com `fresh_seeded_same_lane_cut_source_count=0`,
+    `blocked_recycled_seeded_cut_source_count=31` e proximo gate
+    `expand_external_nonpayoff_seed_research_or_collect_current_deck_negative_review_before_candidate_copy`.
     Observacao operacional: snapshots historicos de candidate-copy, battle-probe,
     battle-feedback e package-chain dependem de artefatos locais ignorados. Se
     faltarem ou forem regenerados sem esses artefatos, a auditoria de superficie
