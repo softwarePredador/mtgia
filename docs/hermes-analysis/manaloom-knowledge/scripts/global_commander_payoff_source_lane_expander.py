@@ -2,7 +2,7 @@
 """Expand Commander payoff source lanes before broad repair materialization.
 
 This read-only gate consumes the profile repair candidate model and scans local
-Oracle/Hermes rows for legal, commander-color-compatible payoff creatures. It
+Oracle/Hermes rows for legal, commander-color-compatible payoff cards. It
 does not mutate decks, run battles, or authorize promotion.
 """
 
@@ -28,7 +28,9 @@ DEFAULT_REPAIR_CANDIDATE_MODEL_REPORT = (
 DEFAULT_OUT_PREFIX = (
     REPORT_DIR / "global_commander_payoff_source_lane_expander_20260705_kaalia_removal_floor_step5"
 )
-ADD_ROLE = "angels_demons_dragons_payoffs"
+DEFAULT_ADD_ROLE = "angels_demons_dragons_payoffs"
+SPELL_PAYOFF_ROLE = "spell_payoffs_copy_engines"
+SUPPORTED_PAYOFF_AXES = (DEFAULT_ADD_ROLE, SPELL_PAYOFF_ROLE)
 
 
 def utc_now() -> str:
@@ -101,10 +103,10 @@ def deck_name_keys(conn: sqlite3.Connection, deck_id: str) -> set[str]:
     return keys
 
 
-def expected_package_names(payload: Mapping[str, Any]) -> set[str]:
+def expected_package_names(payload: Mapping[str, Any], add_role: str) -> set[str]:
     out: set[str] = set()
     for pool in payload.get("repair_axis_pools") or []:
-        if not isinstance(pool, Mapping) or pool.get("repair_axis") != ADD_ROLE:
+        if not isinstance(pool, Mapping) or pool.get("repair_axis") != add_role:
             continue
         for row in pool.get("top_add_candidates") or []:
             if isinstance(row, Mapping):
@@ -113,8 +115,19 @@ def expected_package_names(payload: Mapping[str, Any]) -> set[str]:
 
 
 def payoff_axis(payload: Mapping[str, Any]) -> dict[str, Any]:
+    pools = [
+        pool
+        for pool in payload.get("repair_axis_pools") or []
+        if isinstance(pool, Mapping) and pool.get("repair_axis") in SUPPORTED_PAYOFF_AXES
+    ]
+    for pool in pools:
+        if pool.get("status") == "needs_add_candidate_source_lane":
+            return dict(pool)
+    for pool in pools:
+        if not pool.get("top_add_candidates"):
+            return dict(pool)
     for pool in payload.get("repair_axis_pools") or []:
-        if isinstance(pool, Mapping) and pool.get("repair_axis") == ADD_ROLE:
+        if isinstance(pool, Mapping) and pool.get("repair_axis") == DEFAULT_ADD_ROLE:
             return dict(pool)
     return {}
 
@@ -126,8 +139,31 @@ def commander_legality(legalities: Mapping[str, str], card_name: str) -> str:
     return ""
 
 
-def all_oracle_payoff_rows(conn: sqlite3.Connection) -> list[dict[str, Any]]:
+def all_oracle_payoff_rows(conn: sqlite3.Connection, *, add_role: str) -> list[dict[str, Any]]:
     conn.row_factory = sqlite3.Row
+    if add_role == SPELL_PAYOFF_ROLE:
+        rows = conn.execute(
+            """
+            SELECT name, normalized_name, mana_cost, colors_json, color_identity_json,
+                   type_line, oracle_text, cmc, scryfall_id, card_id
+            FROM card_oracle_cache
+            WHERE lower(type_line) NOT LIKE '%land%'
+              AND (
+                lower(oracle_text) LIKE '%copy target instant%'
+                OR lower(oracle_text) LIKE '%copy target sorcery%'
+                OR lower(oracle_text) LIKE '%copy that spell%'
+                OR lower(oracle_text) LIKE '%whenever you cast or copy an instant or sorcery%'
+                OR lower(oracle_text) LIKE '%whenever you cast a noncreature spell%'
+                OR lower(oracle_text) LIKE '%magecraft%'
+                OR lower(oracle_text) LIKE '%spells you cast cost%'
+                OR lower(oracle_text) LIKE '%costs less to cast%'
+                OR lower(oracle_text) LIKE '%create a treasure token%'
+                OR lower(oracle_text) LIKE '%create a 1/1%'
+              )
+            ORDER BY name
+            """
+        ).fetchall()
+        return [dict(row) for row in rows]
     rows = conn.execute(
         """
         SELECT name, normalized_name, mana_cost, colors_json, color_identity_json,
@@ -164,7 +200,13 @@ def card_text(row: Mapping[str, Any]) -> str:
     return f"{row.get('type_line') or ''}\n{row.get('oracle_text') or ''}".lower()
 
 
-def impact_score(*, row: Mapping[str, Any], expected_package: bool, legality: str) -> tuple[int, list[str]]:
+def impact_score(
+    *,
+    row: Mapping[str, Any],
+    expected_package: bool,
+    legality: str,
+    add_role: str,
+) -> tuple[int, list[str]]:
     body = card_text(row)
     cmc = float(row.get("cmc") or 0)
     score = 40
@@ -181,6 +223,38 @@ def impact_score(*, row: Mapping[str, Any], expected_package: bool, legality: st
     if expected_package:
         score += 25
         reasons.append("profile_expected_package")
+    if add_role == SPELL_PAYOFF_ROLE:
+        if 2 <= cmc <= 5:
+            score += 12
+            reasons.append("castable_spell_engine_curve")
+        elif 6 <= cmc <= 7:
+            score += 4
+            reasons.append("high_curve_spell_engine_review")
+        elif cmc > 7:
+            score -= 4
+            reasons.append("too_expensive_spell_engine_review")
+        if "whenever you cast or copy an instant or sorcery" in body or "magecraft" in body:
+            score += 16
+            reasons.append("magecraft_spell_payoff")
+        if "whenever you cast a noncreature spell" in body or "whenever you cast an instant or sorcery" in body:
+            score += 14
+            reasons.append("spell_cast_payoff")
+        if "copy target instant" in body or "copy target sorcery" in body or "copy that spell" in body:
+            score += 14
+            reasons.append("spell_copy_payoff")
+        if "spells you cast cost" in body or "costs less to cast" in body:
+            score += 12
+            reasons.append("spell_cost_reduction")
+        if "create a treasure token" in body or "treasure token" in body:
+            score += 10
+            reasons.append("treasure_spell_conversion")
+        if "create a 1/1" in body:
+            score += 8
+            reasons.append("token_spell_payoff")
+        if "draw" in body or "exile the top" in body:
+            score += 8
+            reasons.append("card_flow_payload")
+        return score, reasons
     if 5 <= cmc <= 8:
         score += 12
         reasons.append("kaalia_cheat_curve")
@@ -239,14 +313,16 @@ def build_candidate_rows(
     deck_id: str,
     commander_colors: list[str],
     limit: int,
+    add_role: str,
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     existing = deck_name_keys(conn, deck_id)
-    expected = expected_package_names(payload)
+    expected = expected_package_names(payload, add_role)
     legalities = land_pool.commander_legality_by_name(conn)
     candidates: list[dict[str, Any]] = []
     blocked: list[dict[str, Any]] = []
     seen: set[str] = set()
-    for row in all_oracle_payoff_rows(conn):
+    local_source = "local_oracle_spell_payoff_scan" if add_role == SPELL_PAYOFF_ROLE else "local_oracle_add_type_scan"
+    for row in all_oracle_payoff_rows(conn, add_role=add_role):
         card_name = str(row.get("name") or "")
         keys = land_pool.candidate_keys(card_name)
         if not keys or keys & seen:
@@ -262,13 +338,18 @@ def build_candidate_rows(
             block_reasons.append("not_commander_color_identity_compatible")
         if legality and legality != "legal":
             block_reasons.append(f"commander_legality_{legality}")
-        if ADD_ROLE not in roles:
-            block_reasons.append("not_profile_add_payoff")
-        score, reasons = impact_score(row=row, expected_package=bool(keys & expected), legality=legality)
+        if add_role not in roles:
+            block_reasons.append(f"not_profile_{add_role}")
+        score, reasons = impact_score(
+            row=row,
+            expected_package=bool(keys & expected),
+            legality=legality,
+            add_role=add_role,
+        )
         base = {
             "card_name": card_name,
             "score": score,
-            "source": "profile_expected_package" if keys & expected else "local_oracle_add_type_scan",
+            "source": "profile_expected_package" if keys & expected else local_source,
             "commander_legality": legality or "missing",
             "color_identity": colors,
             "profile_roles": sorted(roles),
@@ -317,6 +398,7 @@ def build_report(
     commander = str(summary.get("commander") or "")
     colors = [str(color) for color in summary.get("commander_color_identity") or []]
     axis = payoff_axis(payload)
+    add_role = str(axis.get("repair_axis") or DEFAULT_ADD_ROLE)
     shortfall = int(axis.get("shortfall_to_min") or 0)
     with sqlite3.connect(db_path) as conn:
         candidates, blocked = build_candidate_rows(
@@ -325,6 +407,7 @@ def build_report(
             deck_id=deck_id,
             commander_colors=colors,
             limit=limit,
+            add_role=add_role,
         )
     ready_count = len(candidates)
     covers = ready_count >= shortfall if shortfall else bool(candidates)
@@ -354,7 +437,7 @@ def build_report(
             "deck_id": deck_id,
             "commander": commander,
             "commander_color_identity": colors,
-            "repair_axis": ADD_ROLE,
+            "repair_axis": add_role,
             "shortfall_to_min": shortfall,
             "ready_candidate_count": ready_count,
             "blocked_candidate_count_sample": len(blocked),
@@ -385,6 +468,7 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
         f"- commander: `{summary['commander']}`",
         f"- deck_id: `{summary['deck_id']}`",
         f"- colors: `{''.join(summary['commander_color_identity'])}`",
+        f"- repair_axis: `{summary['repair_axis']}`",
         f"- shortfall_to_min: `{summary['shortfall_to_min']}`",
         f"- ready_candidate_count: `{summary['ready_candidate_count']}`",
         f"- ready_candidates_cover_shortfall: `{str(summary['ready_candidates_cover_shortfall']).lower()}`",

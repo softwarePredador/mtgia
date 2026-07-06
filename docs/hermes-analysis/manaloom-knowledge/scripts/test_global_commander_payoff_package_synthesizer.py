@@ -14,7 +14,7 @@ import global_commander_payoff_package_synthesizer as synthesizer
 def add(name: str, axis: str, roles: list[str], score: int) -> dict[str, object]:
     status = (
         "review_only_commander_payoff_source_candidate"
-        if axis == synthesizer.PAYOFF_AXIS
+        if axis in synthesizer.SUPPORTED_PAYOFF_AXES
         else "review_only_profile_repair_add_candidate"
     )
     if axis == synthesizer.LAND_AXIS:
@@ -109,6 +109,57 @@ def payoff_payload(count: int) -> dict[str, object]:
     }
 
 
+def lorehold_profile_payload() -> dict[str, object]:
+    return {
+        "status": "profile_repair_candidate_model_blocks_materialization",
+        "summary": {
+            "deck_id": "609",
+            "commander": "Lorehold, the Historian",
+            "commander_color_identity": ["W", "R"],
+        },
+        "repair_axis_pools": [
+            {
+                "repair_axis": synthesizer.LAND_AXIS,
+                "blocker": "profile_lands_below_target",
+                "shortfall_to_min": 2,
+                "top_add_candidates": [
+                    add("Bant Panorama", synthesizer.LAND_AXIS, ["lands"], 90),
+                    add("Evolving Wilds", synthesizer.LAND_AXIS, ["lands"], 80),
+                ],
+            },
+            {
+                "repair_axis": synthesizer.SPELL_PAYOFF_AXIS,
+                "blocker": "profile_spell_payoffs_copy_engines_below_target",
+                "shortfall_to_min": 1,
+                "top_add_candidates": [],
+            },
+        ],
+        "global_cut_review_pool": [
+            {
+                **cut("Lorehold Spell Payoff Cut", score=95),
+                "profile_roles": [synthesizer.SPELL_PAYOFF_AXIS],
+                "matching_over_target_roles": [synthesizer.SPELL_PAYOFF_AXIS],
+            },
+            *[cut(f"Lorehold Cut {index}", score=70 - index) for index in range(3)],
+        ],
+    }
+
+
+def lorehold_payoff_payload() -> dict[str, object]:
+    return {
+        "status": "commander_payoff_source_lane_expanded",
+        "summary": {
+            "repair_axis": synthesizer.SPELL_PAYOFF_AXIS,
+            "ready_candidate_count": 2,
+            "shortfall_to_min": 1,
+        },
+        "top_payoff_candidates": [
+            add("Double Vision", synthesizer.SPELL_PAYOFF_AXIS, ["spell_payoffs_copy_engines"], 145),
+            add("Young Pyromancer", synthesizer.SPELL_PAYOFF_AXIS, ["spell_payoffs_copy_engines"], 135),
+        ],
+    }
+
+
 class GlobalCommanderPayoffPackageSynthesizerTests(unittest.TestCase):
     def _json(self, root: Path, name: str, payload: dict[str, object]) -> Path:
         path = root / name
@@ -187,6 +238,27 @@ class GlobalCommanderPayoffPackageSynthesizerTests(unittest.TestCase):
         self.assertEqual(report["summary"]["initial_axis_requirements"][synthesizer.REANIMATION_AXIS], 1)
         selected_names = [row["card_name"] for row in report["selected_add_package"]]
         self.assertIn("Reanimate", selected_names)
+
+    def test_lorehold_spell_payoff_axis_uses_source_lane_axis(self) -> None:
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        root = Path(tmp.name)
+        profile = self._json(root, "lorehold_profile.json", lorehold_profile_payload())
+        payoffs = self._json(root, "lorehold_payoffs.json", lorehold_payoff_payload())
+
+        report = synthesizer.build_report(
+            repair_candidate_model_report=profile,
+            payoff_source_lane_report=payoffs,
+        )
+
+        self.assertEqual(report["status"], "commander_payoff_package_synthesis_ready_for_candidate_copy")
+        self.assertEqual(report["summary"]["payoff_axis"], synthesizer.SPELL_PAYOFF_AXIS)
+        self.assertEqual(report["summary"]["initial_axis_requirements"][synthesizer.SPELL_PAYOFF_AXIS], 1)
+        selected_names = [row["card_name"] for row in report["selected_add_package"]]
+        self.assertEqual(selected_names, ["Bant Panorama", "Evolving Wilds", "Double Vision"])
+        selected_cuts = [row["card_name"] for row in report["selected_cut_package"]]
+        self.assertNotIn("Lorehold Spell Payoff Cut", selected_cuts)
+        self.assertIn(synthesizer.SPELL_PAYOFF_AXIS, report["selected_add_package"][2]["covered_axes"])
 
 
 if __name__ == "__main__":

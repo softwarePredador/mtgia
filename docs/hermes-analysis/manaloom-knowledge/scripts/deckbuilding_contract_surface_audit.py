@@ -5667,13 +5667,14 @@ def build_audit() -> dict[str, Any]:
             GLOBAL_COMMANDER_BATTLE_FEEDBACK_LARGER_GATE_REPORT,
             [
                 "Global Commander Battle Feedback Model",
-                "package_count: `3`",
-                "blocked_package_count: `3`",
+                "package_count: `4`",
+                "blocked_package_count: `4`",
                 "package_blocked_by_protected_baseline_gate",
                 "package_improved_weak_base_but_failed_protected_baseline",
+                "package_failed_protected_baseline_gate",
                 "block_package_until_new_source_lane_cut_or_strategy",
                 "protected_baseline_supersession",
-                "Call Forth the Tempest",
+                "Escape Tunnel",
             ],
         )
     )

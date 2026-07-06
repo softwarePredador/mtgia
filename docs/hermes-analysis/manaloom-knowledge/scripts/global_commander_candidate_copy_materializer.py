@@ -366,6 +366,77 @@ def load_land_floor_package_pairs(
     }
 
 
+def load_payoff_package_synthesis_pairs(
+    package_report: Path,
+    *,
+    deck_id: str | None = None,
+    add: str | None = None,
+    cut: str | None = None,
+) -> dict[str, Any]:
+    payload = read_json(package_report)
+    if payload.get("artifact_type") != "global_commander_payoff_package_synthesizer":
+        raise RuntimeError(f"{package_report} is not a payoff package synthesizer report")
+    if not payload.get("candidate_copy_allowed_now"):
+        raise RuntimeError(f"payoff package candidate copy is not allowed by {package_report}")
+    summary = payload.get("summary") or {}
+    if deck_id and str(summary.get("deck_id")) != str(deck_id):
+        raise RuntimeError(f"payoff package deck_id mismatch: expected {deck_id}, got {summary.get('deck_id')}")
+
+    add_rows = {
+        normalize_name(str(row.get("card_name") or "")): dict(row)
+        for row in payload.get("selected_add_package") or []
+        if isinstance(row, Mapping)
+    }
+    cut_rows = {
+        normalize_name(str(row.get("card_name") or "")): dict(row)
+        for row in payload.get("selected_cut_package") or []
+        if isinstance(row, Mapping)
+    }
+    pairs: list[dict[str, Any]] = []
+    for pair in payload.get("tentative_add_cut_pairs") or []:
+        if not isinstance(pair, Mapping):
+            continue
+        pair_add = str(pair.get("add") or "")
+        pair_cut = str(pair.get("cut") or "")
+        if add and normalize_name(pair_add) != normalize_name(add):
+            continue
+        if cut and normalize_name(pair_cut) != normalize_name(cut):
+            continue
+        add_axes = [str(axis) for axis in pair.get("add_axes") or [] if axis]
+        candidate = add_rows.get(normalize_name(pair_add), {})
+        cut_candidate = cut_rows.get(normalize_name(pair_cut), {})
+        role = str(candidate.get("selected_for_axis") or (add_axes[0] if add_axes else "") or "")
+        pairs.append(
+            {
+                "deck_id": str(summary.get("deck_id") or ""),
+                "commander": summary.get("commander"),
+                "role": role,
+                "add": pair_add,
+                "cut": pair_cut,
+                "pair": dict(pair),
+                "candidate": candidate,
+                "cut_candidate": cut_candidate,
+                "source_pool_status": payload.get("status"),
+            }
+        )
+    if not pairs:
+        raise RuntimeError(f"no matching payoff package pairs found in {package_report}")
+
+    return {
+        "deck_id": str(summary.get("deck_id") or ""),
+        "deck_name": summary.get("deck_name"),
+        "commander": summary.get("commander"),
+        "role": "payoff_package_synthesis",
+        "stage": None,
+        "pairs": pairs,
+        "source_pool_status": payload.get("status"),
+        "source_report_db": expected_source_db(payload, package_report),
+        "blocked_cut_candidates": [],
+        "source_artifact_type": payload.get("artifact_type"),
+        "next_gate": summary.get("next_gate"),
+    }
+
+
 def load_profile_repair_land_cut_review_pairs(
     review_report: Path,
     *,
@@ -438,6 +509,8 @@ def load_materialization_package(
         return load_reduced_scope_pairs(pair_report, deck_id=deck_id, add=add, cut=cut)
     if payload.get("artifact_type") == "global_commander_land_floor_package_synthesizer":
         return load_land_floor_package_pairs(pair_report, deck_id=deck_id, add=add, cut=cut)
+    if payload.get("artifact_type") == "global_commander_payoff_package_synthesizer":
+        return load_payoff_package_synthesis_pairs(pair_report, deck_id=deck_id, add=add, cut=cut)
     if payload.get("artifact_type") == "global_commander_profile_repair_land_cut_reviewer":
         return load_profile_repair_land_cut_review_pairs(pair_report, deck_id=deck_id, add=add, cut=cut)
     pair = load_top_pair_from_pool(pair_report, deck_id=deck_id, add=add, cut=cut)

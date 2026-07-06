@@ -33,11 +33,13 @@ DEFAULT_OUT_PREFIX = (
 )
 
 PAYOFF_AXIS = "angels_demons_dragons_payoffs"
+SPELL_PAYOFF_AXIS = "spell_payoffs_copy_engines"
+SUPPORTED_PAYOFF_AXES = (PAYOFF_AXIS, SPELL_PAYOFF_AXIS)
 ATTACK_AXIS = "commander_attack_window"
 LAND_AXIS = "lands"
 SPOT_AXIS = "spot_interaction"
 REANIMATION_AXIS = "reanimation_plan_b"
-AXIS_ORDER = (ATTACK_AXIS, LAND_AXIS, SPOT_AXIS, PAYOFF_AXIS, REANIMATION_AXIS)
+DEFAULT_AXIS_ORDER = (ATTACK_AXIS, LAND_AXIS, SPOT_AXIS, PAYOFF_AXIS, REANIMATION_AXIS)
 READY_ADD_STATUSES = {
     "review_only_profile_repair_add_candidate",
     "review_only_named_land_candidate",
@@ -87,6 +89,21 @@ def axis_pool(profile_payload: Mapping[str, Any], axis: str) -> dict[str, Any]:
     return {}
 
 
+def payoff_axis(*, profile_payload: Mapping[str, Any], payoff_payload: Mapping[str, Any]) -> str:
+    summary = payoff_payload.get("summary") or {}
+    reported_axis = str(summary.get("repair_axis") or "")
+    if reported_axis in SUPPORTED_PAYOFF_AXES:
+        return reported_axis
+    for pool in profile_payload.get("repair_axis_pools") or []:
+        if isinstance(pool, Mapping) and pool.get("repair_axis") in SUPPORTED_PAYOFF_AXES:
+            return str(pool.get("repair_axis"))
+    return PAYOFF_AXIS
+
+
+def axis_order_for(selected_payoff_axis: str) -> tuple[str, ...]:
+    return (ATTACK_AXIS, LAND_AXIS, SPOT_AXIS, selected_payoff_axis, REANIMATION_AXIS)
+
+
 def axis_candidates(profile_payload: Mapping[str, Any], axis: str) -> list[dict[str, Any]]:
     pool = axis_pool(profile_payload, axis)
     rows = [dict(row) for row in pool.get("top_add_candidates") or [] if isinstance(row, Mapping)]
@@ -115,9 +132,10 @@ def ready_cut_candidates(profile_payload: Mapping[str, Any]) -> list[dict[str, A
     return unique_by_name(rows)
 
 
-def initial_requirements(profile_payload: Mapping[str, Any]) -> dict[str, int]:
-    requirements = {axis: 0 for axis in AXIS_ORDER}
-    for axis in (LAND_AXIS, SPOT_AXIS, PAYOFF_AXIS, REANIMATION_AXIS):
+def initial_requirements(profile_payload: Mapping[str, Any], *, selected_payoff_axis: str) -> dict[str, int]:
+    axis_order = axis_order_for(selected_payoff_axis)
+    requirements = {axis: 0 for axis in axis_order}
+    for axis in (LAND_AXIS, SPOT_AXIS, selected_payoff_axis, REANIMATION_AXIS):
         pool = axis_pool(profile_payload, axis)
         requirements[axis] = max(0, int(pool.get("shortfall_to_min") or 0))
     attack_pool = axis_pool(profile_payload, ATTACK_AXIS)
@@ -130,7 +148,20 @@ def candidate_roles(row: Mapping[str, Any]) -> set[str]:
     return {str(role) for role in row.get("profile_roles") or [] if role}
 
 
-def covered_axes(*, row: Mapping[str, Any], selected_axis: str, remaining: Mapping[str, int]) -> list[str]:
+def cut_roles(row: Mapping[str, Any]) -> set[str]:
+    roles = set(candidate_roles(row))
+    roles.update(str(role) for role in row.get("core_roles") or [] if role)
+    roles.update(str(role) for role in row.get("matching_over_target_roles") or [] if role)
+    return roles
+
+
+def covered_axes(
+    *,
+    row: Mapping[str, Any],
+    selected_axis: str,
+    remaining: Mapping[str, int],
+    selected_payoff_axis: str,
+) -> list[str]:
     roles = candidate_roles(row)
     covered: list[str] = []
     if selected_axis == ATTACK_AXIS and int(remaining.get(ATTACK_AXIS) or 0) > 0:
@@ -139,16 +170,20 @@ def covered_axes(*, row: Mapping[str, Any], selected_axis: str, remaining: Mappi
         covered.append(LAND_AXIS)
     if SPOT_AXIS in roles and int(remaining.get(SPOT_AXIS) or 0) > 0:
         covered.append(SPOT_AXIS)
-    if PAYOFF_AXIS in roles and int(remaining.get(PAYOFF_AXIS) or 0) > 0:
-        covered.append(PAYOFF_AXIS)
+    if selected_payoff_axis in roles and int(remaining.get(selected_payoff_axis) or 0) > 0:
+        covered.append(selected_payoff_axis)
     if REANIMATION_AXIS in roles and int(remaining.get(REANIMATION_AXIS) or 0) > 0:
         covered.append(REANIMATION_AXIS)
     if selected_axis == LAND_AXIS and int(remaining.get(LAND_AXIS) or 0) > 0 and LAND_AXIS not in covered:
         covered.append(LAND_AXIS)
     if selected_axis == SPOT_AXIS and int(remaining.get(SPOT_AXIS) or 0) > 0 and SPOT_AXIS not in covered:
         covered.append(SPOT_AXIS)
-    if selected_axis == PAYOFF_AXIS and int(remaining.get(PAYOFF_AXIS) or 0) > 0 and PAYOFF_AXIS not in covered:
-        covered.append(PAYOFF_AXIS)
+    if (
+        selected_axis == selected_payoff_axis
+        and int(remaining.get(selected_payoff_axis) or 0) > 0
+        and selected_payoff_axis not in covered
+    ):
+        covered.append(selected_payoff_axis)
     if (
         selected_axis == REANIMATION_AXIS
         and int(remaining.get(REANIMATION_AXIS) or 0) > 0
@@ -163,18 +198,20 @@ def select_add_package(
     profile_payload: Mapping[str, Any],
     payoff_payload: Mapping[str, Any],
     requirements: Mapping[str, int],
+    selected_payoff_axis: str,
 ) -> tuple[list[dict[str, Any]], dict[str, int]]:
-    remaining = {axis: int(requirements.get(axis) or 0) for axis in AXIS_ORDER}
+    axis_order = axis_order_for(selected_payoff_axis)
+    remaining = {axis: int(requirements.get(axis) or 0) for axis in axis_order}
     selected: list[dict[str, Any]] = []
     seen: set[str] = set()
     candidates_by_axis = {
         ATTACK_AXIS: axis_candidates(profile_payload, ATTACK_AXIS),
         LAND_AXIS: axis_candidates(profile_payload, LAND_AXIS),
         SPOT_AXIS: axis_candidates(profile_payload, SPOT_AXIS),
-        PAYOFF_AXIS: payoff_candidates(payoff_payload),
+        selected_payoff_axis: payoff_candidates(payoff_payload),
         REANIMATION_AXIS: axis_candidates(profile_payload, REANIMATION_AXIS),
     }
-    for axis in AXIS_ORDER:
+    for axis in axis_order:
         while remaining.get(axis, 0) > 0:
             picked: dict[str, Any] | None = None
             picked_coverage: list[str] = []
@@ -183,7 +220,12 @@ def select_add_package(
                 key = normalize_name(name)
                 if not name or key in seen:
                     continue
-                coverage = covered_axes(row=candidate, selected_axis=axis, remaining=remaining)
+                coverage = covered_axes(
+                    row=candidate,
+                    selected_axis=axis,
+                    remaining=remaining,
+                    selected_payoff_axis=selected_payoff_axis,
+                )
                 if not coverage:
                     continue
                 picked = candidate
@@ -204,15 +246,23 @@ def select_add_package(
     return selected, remaining
 
 
-def select_cuts(profile_payload: Mapping[str, Any], add_count: int) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+def select_cuts(
+    profile_payload: Mapping[str, Any],
+    add_count: int,
+    *,
+    protected_axes: set[str],
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     cuts = ready_cut_candidates(profile_payload)
+    safe_cuts = [row for row in cuts if not (cut_roles(row) & protected_axes)]
     selected = []
-    for row in cuts[:add_count]:
+    for row in safe_cuts[:add_count]:
         selected_row = dict(row)
         selected_row["status"] = "review_only_synthesized_package_cut"
         selected_row["mutation_allowed"] = False
         selected.append(selected_row)
-    return selected, cuts[add_count:]
+    selected_keys = {normalize_name(str(row.get("card_name") or "")) for row in selected}
+    remaining = [row for row in cuts if normalize_name(str(row.get("card_name") or "")) not in selected_keys]
+    return selected, remaining
 
 
 def pair_adds_and_cuts(adds: list[dict[str, Any]], cuts: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -271,13 +321,21 @@ def build_report(
     payoff_payload = load_json(payoff_source_lane_report)
     profile_summary = profile_payload.get("summary") or {}
     payoff_summary = payoff_payload.get("summary") or {}
-    requirements = initial_requirements(profile_payload)
+    selected_payoff_axis = payoff_axis(profile_payload=profile_payload, payoff_payload=payoff_payload)
+    axis_order = axis_order_for(selected_payoff_axis)
+    requirements = initial_requirements(profile_payload, selected_payoff_axis=selected_payoff_axis)
     selected_adds, remaining = select_add_package(
         profile_payload=profile_payload,
         payoff_payload=payoff_payload,
         requirements=requirements,
+        selected_payoff_axis=selected_payoff_axis,
     )
-    selected_cuts, remaining_cuts = select_cuts(profile_payload, len(selected_adds))
+    protected_axes = {axis for axis, required in requirements.items() if int(required or 0) > 0}
+    selected_cuts, remaining_cuts = select_cuts(
+        profile_payload,
+        len(selected_adds),
+        protected_axes=protected_axes,
+    )
     blocker_rows = blockers(
         remaining_requirements=remaining,
         selected_add_count=len(selected_adds),
@@ -311,6 +369,9 @@ def build_report(
             "commander_color_identity": profile_summary.get("commander_color_identity")
             or payoff_summary.get("commander_color_identity")
             or [],
+            "payoff_axis": selected_payoff_axis,
+            "axis_order": list(axis_order),
+            "protected_cut_axes": sorted(protected_axes),
             "initial_axis_requirements": requirements,
             "remaining_axis_requirements": remaining,
             "selected_add_count": len(selected_adds),
@@ -360,7 +421,7 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
         "| Axis | Initial | Remaining |",
         "| --- | ---: | ---: |",
     ]
-    for axis in AXIS_ORDER:
+    for axis in summary.get("axis_order") or DEFAULT_AXIS_ORDER:
         lines.append(
             f"| `{axis}` | {summary['initial_axis_requirements'].get(axis, 0)} | {summary['remaining_axis_requirements'].get(axis, 0)} |"
         )

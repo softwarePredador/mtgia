@@ -598,6 +598,103 @@ class GlobalCommanderCandidateCopyMaterializerTests(unittest.TestCase):
         self.assertNotIn("Birgi, God of Storytelling // Harnfel, Horn of Bounty", candidate_names)
         self.assertNotIn("Smuggler's Share", candidate_names)
 
+    def test_materializes_payoff_package_synthesis_pairs_only_in_candidate_copy(self) -> None:
+        tmp, source_db = self._db()
+        self.addCleanup(tmp.cleanup)
+        package_report = Path(tmp.name) / "payoff_package.json"
+        package_report.write_text(
+            json.dumps(
+                {
+                    "artifact_type": "global_commander_payoff_package_synthesizer",
+                    "status": "commander_payoff_package_synthesis_ready_for_candidate_copy",
+                    "candidate_copy_allowed_now": True,
+                    "summary": {
+                        "deck_id": "619",
+                        "commander": "Kaalia of the Vast",
+                        "next_gate": "materialize_synthesized_commander_package_chain_copy",
+                    },
+                    "selected_add_package": [
+                        {
+                            "card_name": "Arena of Glory",
+                            "selected_for_axis": "lands",
+                            "covered_axes": ["lands"],
+                            "status": "review_only_synthesized_package_add",
+                        },
+                        {
+                            "card_name": "Despark",
+                            "selected_for_axis": "spot_interaction",
+                            "covered_axes": ["spot_interaction"],
+                            "status": "review_only_synthesized_package_add",
+                        },
+                    ],
+                    "selected_cut_package": [
+                        {
+                            "card_name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+                            "status": "review_only_synthesized_package_cut",
+                        },
+                        {
+                            "card_name": "Smuggler's Share",
+                            "status": "review_only_synthesized_package_cut",
+                        },
+                    ],
+                    "tentative_add_cut_pairs": [
+                        {
+                            "add": "Arena of Glory",
+                            "cut": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+                            "add_axes": ["lands"],
+                        },
+                        {
+                            "add": "Despark",
+                            "cut": "Smuggler's Share",
+                            "add_axes": ["spot_interaction"],
+                        },
+                    ],
+                }
+            ),
+            encoding="utf-8",
+        )
+
+        payload = audit.build_payload(
+            source_db=source_db,
+            pair_report=package_report,
+            out_prefix=Path(tmp.name) / "out",
+            deck_id="619",
+        )
+
+        candidate_db = Path(payload["candidate_db"])
+        self.assertEqual(payload["status"], "candidate_materialized_structure_ready_next_gate_closed")
+        self.assertTrue(payload["summary"]["source_unchanged"])
+        self.assertEqual(payload["summary"]["pair_count"], 2)
+        self.assertEqual(payload["summary"]["source_artifact_type"], "global_commander_payoff_package_synthesizer")
+        self.assertEqual(
+            payload["summary"]["stage_next_gate"],
+            "materialize_synthesized_commander_package_chain_copy",
+        )
+        self.assertEqual([row["role"] for row in payload["model_pairs"]], ["lands", "spot_interaction"])
+        self.assertEqual(payload["structure_validation"]["status"], "pass")
+
+        source_conn = sqlite3.connect(source_db)
+        candidate_conn = sqlite3.connect(candidate_db)
+        self.addCleanup(source_conn.close)
+        self.addCleanup(candidate_conn.close)
+
+        source_names = {
+            row[0]
+            for row in source_conn.execute("SELECT card_name FROM deck_cards WHERE deck_id=619").fetchall()
+        }
+        candidate_names = {
+            row[0]
+            for row in candidate_conn.execute("SELECT card_name FROM deck_cards WHERE deck_id=619").fetchall()
+        }
+        self.assertIn("Birgi, God of Storytelling // Harnfel, Horn of Bounty", source_names)
+        self.assertIn("Smuggler's Share", source_names)
+        self.assertNotIn("Arena of Glory", source_names)
+        self.assertNotIn("Despark", source_names)
+        self.assertIn("Arena of Glory", candidate_names)
+        self.assertIn("Despark", candidate_names)
+        self.assertNotIn("Birgi, God of Storytelling // Harnfel, Horn of Bounty", candidate_names)
+        self.assertNotIn("Smuggler's Share", candidate_names)
+
     def test_materializes_profile_repair_land_cut_review_pairs_only_in_candidate_copy(self) -> None:
         tmp, source_db = self._db()
         self.addCleanup(tmp.cleanup)

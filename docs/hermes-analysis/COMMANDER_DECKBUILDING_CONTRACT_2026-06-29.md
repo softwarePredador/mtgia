@@ -1950,14 +1950,23 @@ Current external refresh on 2026-07-05:
   (`14W/9L/1S`) with `candidate_vs_protected_win_delta: -6`,
   `candidate_vs_immediate_base_win_delta: 1`, and
   `candidate_did_not_beat_protected_baseline`. The refreshed battle feedback
-  `global_commander_battle_feedback_model_20260706_larger_gate_current.md` now
-  has `package_count: 2` and `blocked_package_count: 2`; the post-feedback
-  strategy matrix
+  `global_commander_battle_feedback_model_20260706_larger_gate_current.md`
+  then had `package_count: 2` and `blocked_package_count: 2`; the
+  post-feedback strategy matrix
   `global_commander_candidate_package_strategy_matrix_20260706_larger_gate_feedback_land_floor_profile_repair_deck612_post_larger_feedback.md`
   blocks battle with `battle_feedback_blocker_count: 2` and next gate
   `replace_failed_package_source_lane_or_cut_set_before_battle`. The next
   Commander goal must treat this as reusable negative package feedback and
   change source lane, cut set, or strategy hypothesis before any new battle.
+- The later deck `609` profile-repair package extends the same global feedback
+  model rather than opening promotion. It adds `Artist's Talent`,
+  `Bant Panorama`, and `Bloodstained Mire`, cuts `Big Score`,
+  `Brass's Bounty`, and `Hit the Mother Lode`, then fails the larger gate
+  against protected `607` and immediate base `609`. The refreshed
+  `global_commander_battle_feedback_model_20260706_larger_gate_current.md`
+  now has `package_count: 4`, `blocked_package_count: 4`, and keeps every
+  package blocked by protected-baseline feedback until a new source lane, cut
+  set, or strategy hypothesis changes the package.
 
 ## Global Commander Rollout - 2026-07-01
 
