@@ -32470,7 +32470,9 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
             scored_candidates.sort(
                 key=lambda item: (-item[1], -int(float(item[0].get("cmc") or 0)), item[0].get("name", ""))
             )
-            found, found_score, found_reason = scored_candidates[0]
+            selection_count = max(1, int(permanent.get("tutor_count") or permanent.get("count") or 1))
+            selected_candidates = scored_candidates[:selection_count]
+            found, found_score, found_reason = selected_candidates[0]
             if activation_cost > 0 and not player.spend_mana(activation_cost_text):
                 _utility_artifact_skip_event(
                     player,
@@ -32486,7 +32488,11 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
             if permanent in player.battlefield:
                 player.battlefield.remove(permanent)
             player.graveyard.append(permanent)
-            moved_cards, destination = move_library_tutor_selection(player, [found], f"{target_type}_to_hand")
+            moved_cards, destination = move_library_tutor_selection(
+                player,
+                [candidate for candidate, _score, _reason in selected_candidates],
+                f"{target_type}_to_hand",
+            )
             chosen = moved_cards[0] if moved_cards else found
             emit_decision_trace(
                 decision_type="utility_artifact_activation",
@@ -32531,6 +32537,8 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
                     "target_type": target_type,
                     "candidate_count": len(scored_candidates),
                     "selected_card": chosen.get("name", "?") if chosen else None,
+                    "selection_count": selection_count,
+                    "selected_cards": [item.get("name", "?") for item in moved_cards],
                 },
                 rule_source="utility_artifact_activation_v1",
                 rule_status=permanent.get("_rule_review_status", "active"),
@@ -37426,6 +37434,11 @@ def lorehold_low_artifact_tutor_score(candidate, target_type, player):
 
 
 def tutor_candidate_score(candidate, target_type, player, opponents, turn):
+    target_key = str(target_type or "any").lower()
+    for suffix in ("_to_top", "_to_hand", "_to_battlefield", "_to_graveyard"):
+        if target_key.endswith(suffix):
+            target_key = target_key[: -len(suffix)] or "any"
+            break
     effect_data = get_card_effect(candidate)
     effect = str(effect_data.get("effect") or candidate.get("effect") or "unknown")
     cmc = int(float(candidate.get("cmc") or 0))
@@ -37438,7 +37451,7 @@ def tutor_candidate_score(candidate, target_type, player, opponents, turn):
     score = threat_score(effect, candidate.get("name", ""), player, [player] + list(opponents), turn)
     reason = "highest_contextual_value"
     type_line = str(candidate.get("type_line") or "").lower()
-    if target_type == "basic_plains_or_creature_mana_value_1_or_less":
+    if target_key == "basic_plains_or_creature_mana_value_1_or_less":
         is_basic_plains = (
             is_effective_land(candidate)
             and "basic" in type_line
@@ -37454,11 +37467,27 @@ def tutor_candidate_score(candidate, target_type, player, opponents, turn):
         elif is_small_creature:
             score += 62 if lands >= 3 else 24
             reason = "find_one_drop_creature_payoff" if lands >= 3 else "keep_small_creature_fallback"
-    elif target_type == "plains":
+    elif target_key == "plains":
         score += 82 if lands < 3 else 28
         reason = "fix_mana_with_plains_tutor" if lands < 3 else "bank_plains_option"
-    elif target_type == "land" or (is_effective_land(candidate) and lands < 3):
+    elif target_key in {
+        "land",
+        "basic_land",
+        "forest",
+        "snow_land",
+        "basic_land_type",
+        "basic_forest_or_island",
+        "plains_island_swamp_or_mountain",
+        "basic_land_or_gate",
+        "basic_land_or_town",
+        "basic_plains",
+        "artifact_mana_ability_or_basic_land",
+        "artifact_with_mana_ability_or_basic_land",
+    } or (is_effective_land(candidate) and lands < 3 and "land" in target_key):
         score += 80 if lands < 3 else 25
+        reason = "fix_mana_or_land_drop"
+    elif target_key == "any" and is_effective_land(candidate) and lands < 3 and turn <= 3:
+        score += 45
         reason = "fix_mana_or_land_drop"
     elif effect in ("ramp_permanent", "land_ramp", "ramp_engine") and lands < 4:
         score += 65
@@ -58802,6 +58831,9 @@ def apply_effect_immediate(
                 **replay_rule_fields(effect_data),
             )
     elif effect == "tutor":
+        if not pay_additional_card_costs(player, card, effect_data, turn=turn):
+            finish_resolved_spell(player, card, turn=turn)
+            return
         target_type = effect_data.get("target", "any")
         original_target_type = target_type
         delirium_required = int(effect_data.get("delirium_graveyard_card_type_count") or 0)

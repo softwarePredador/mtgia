@@ -247,6 +247,9 @@ TUTOR_HAND_SCOPE = "xmage_library_search_to_hand_spell_v1"
 PERMANENT_ACTIVATED_TUTOR_BATTLEFIELD_SCOPE = (
     "xmage_permanent_simple_activated_library_search_to_battlefield_v1"
 )
+PERMANENT_ACTIVATED_TUTOR_HAND_SCOPE = (
+    "xmage_permanent_simple_activated_library_search_to_hand_v1"
+)
 ETB_TUTOR_BATTLEFIELD_CREATURE_SCOPE = "xmage_creature_etb_library_search_to_battlefield_v1"
 ETB_TUTOR_HAND_CREATURE_SCOPE = "xmage_creature_etb_library_search_to_hand_v1"
 BOARD_WIPE_SCOPE = "xmage_destroy_all_matching_permanents_spell_v1"
@@ -7657,6 +7660,16 @@ def is_permanent_activated_tutor_battlefield_unit(row: dict[str, Any]) -> bool:
         return False
     return (
         effect_classes(row) == {"SearchLibraryPutInPlayEffect"}
+        and ability_classes(row) == {"SimpleActivatedAbility"}
+        and "activated_ability" in set(row.get("xmage_signals") or [])
+    )
+
+
+def is_permanent_activated_tutor_hand_unit(row: dict[str, Any]) -> bool:
+    if str(row.get("adapter_work_unit") or "") not in {TUTOR_UNIT, TUTOR_HAND_UNIT}:
+        return False
+    return (
+        effect_classes(row) == {"SearchLibraryPutInHandEffect"}
         and ability_classes(row) == {"SimpleActivatedAbility"}
         and "activated_ability" in set(row.get("xmage_signals") or [])
     )
@@ -16137,6 +16150,7 @@ def library_tutor_target_from_phrase(phrase: str) -> str | None:
         "plains cards": "plains",
         "basic forest or island card": "basic_forest_or_island",
         "basic forest or island cards": "basic_forest_or_island",
+        "land card": "land",
         "land cards": "land",
         "snow land card": "snow_land",
         "plains, island, swamp, or mountain card": "plains_island_swamp_or_mountain",
@@ -16237,6 +16251,8 @@ def parse_library_tutor_query(query: str) -> dict[str, Any] | None:
         "instant card": {"target": "instant", "target_card_types": ["instant"]},
         "instant or sorcery card": {"target": "instant_or_sorcery"},
         "instant and/or sorcery card": {"target": "instant_or_sorcery"},
+        "land card": {"target": "land", "target_card_types": ["land"]},
+        "land cards": {"target": "land", "target_card_types": ["land"]},
         "planeswalker card": {"target": "planeswalker", "target_card_types": ["planeswalker"]},
         "planeswalker cards": {"target": "planeswalker", "target_card_types": ["planeswalker"]},
         "permanent card": {
@@ -16664,6 +16680,97 @@ def activated_library_tutor_to_battlefield_from_source(source: str) -> dict[str,
     }
 
 
+def activated_library_tutor_to_hand_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    text = activated_ability_line_from_oracle(metadata)
+    text = re.sub(r"\s+", " ", text).strip().lower()
+    if text.count(":") != 1:
+        return "activated_library_tutor_to_hand_oracle_not_simple"
+    cost_text, effect_text = [part.strip() for part in text.split(":", 1)]
+    source_name = re.sub(r"\s+", " ", str(metadata.get("name") or "").strip().lower())
+    if source_name:
+        source_sacrifice_pattern = rf"(^|,\s*)sacrifice {re.escape(source_name)}(?=,|$)"
+        cost_text = re.sub(
+            source_sacrifice_pattern,
+            lambda match: f"{match.group(1)}sacrifice this permanent",
+            cost_text,
+        )
+    activation = activation_cost_from_oracle_prefix(cost_text, allow_source_sacrifice=True)
+    if isinstance(activation, str):
+        return str(activation).replace("activated_self_boost", "activated_library_tutor_to_hand")
+    match = re.match(
+        r"^search your library for (?P<query>.+?)"
+        r"(?:, reveal (?:it|that card|them|those cards))?,? "
+        r"(?:and )?put (?:it|that card|them|those cards) into your hand"
+        r"(?:, then shuffle(?: your library)?\.?|\.? (?:then shuffle(?: your library)?\.?)?)"
+        r"(?: .*)?$",
+        effect_text,
+    )
+    if not match:
+        return "activated_library_tutor_to_hand_oracle_not_simple"
+    parsed = parse_library_tutor_query(match.group("query"))
+    if parsed is None:
+        return "activated_library_tutor_to_hand_oracle_target_not_supported"
+    parsed["destination"] = "hand"
+    parsed["enters_tapped"] = False
+    return {**parsed, **activation}
+
+
+def activated_library_tutor_to_hand_from_source(source: str) -> dict[str, Any] | str:
+    text = source or ""
+    effect_matches = re.findall(r"SearchLibraryPutInHandEffect\s*\(", text)
+    if len(effect_matches) != 1:
+        return "activated_library_tutor_to_hand_source_effect_not_supported"
+    effect_index = text.find("SearchLibraryPutInHandEffect")
+    window = text[max(0, effect_index - 500) : effect_index + 1800]
+    if "SimpleActivatedAbility" not in window:
+        return "activated_library_tutor_to_hand_source_not_simple_activated"
+    risky_cost_classes = {
+        "CompositeCost",
+        "DiscardCardCost",
+        "DiscardTargetCost",
+        "ExileFrom",
+        "PayLifeCost",
+        "RemoveCounterCost",
+        "ReturnToHandSourceCost",
+        "SacrificeTargetCost",
+        "TapTargetCost",
+    }
+    present_risky = sorted(cost for cost in risky_cost_classes if cost in window)
+    if present_risky:
+        return "activated_library_tutor_to_hand_source_cost_not_supported"
+    parsed_target = library_tutor_source_query(text)
+    if parsed_target is None:
+        return "activated_library_tutor_to_hand_source_target_not_supported"
+    count, up_to = library_tutor_count_from_source(text)
+    cost_text = "{0}"
+    mana_match = re.search(r'ManaCostsImpl<[^>]*>\s*\(\s*"([^"]+)"\s*\)', window)
+    generic_match = re.search(r"GenericManaCost\s*\(\s*(\d+)\s*\)", window)
+    colored_match = re.search(r"ColoredManaCost\s*\(\s*ColoredManaSymbol\.([WUBRG])\s*\)", window)
+    if mana_match:
+        cost_text = mana_match.group(1)
+    elif generic_match:
+        cost_text = "{" + generic_match.group(1) + "}"
+    elif colored_match:
+        cost_text = "{" + colored_match.group(1) + "}"
+    cost_text = canonical_mana_cost_text(cost_text)
+    parsed_cost = parse_mana_cost_text(cost_text)
+    if parsed_cost is None:
+        return "activated_library_tutor_to_hand_source_mana_cost_not_supported"
+    activation_cost_generic, activation_cost_colors = parsed_cost
+    return {
+        **parsed_target,
+        "count": count,
+        "up_to_count": up_to,
+        "destination": "hand",
+        "enters_tapped": False,
+        "activation_cost_mana": cost_text,
+        "activation_cost_generic": activation_cost_generic,
+        "activation_cost_colors": activation_cost_colors,
+        "activation_requires_tap": "TapSourceCost" in window,
+        "activation_requires_sacrifice": "SacrificeSourceCost" in window,
+    }
+
+
 def library_tutor_specs_match(source_tutor: dict[str, Any], oracle_tutor: dict[str, Any]) -> str | None:
     scalar_keys = (
         "target",
@@ -17078,6 +17185,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "permanent with a simple activated graveyard-to-battlefield ability"
     elif scope == PERMANENT_ACTIVATED_TUTOR_BATTLEFIELD_SCOPE:
         scope_kind = "permanent with a simple activated library-search-to-battlefield ability"
+    elif scope == PERMANENT_ACTIVATED_TUTOR_HAND_SCOPE:
+        scope_kind = "noncreature permanent with a simple self-sacrifice library-search-to-hand ability"
     elif scope == LIBRARY_PICK_SPELL_SCOPE:
         scope_kind = "fixed reveal-top-library pick-to-hand spell"
     elif scope == LOOK_LIBRARY_PICK_SPELL_SCOPE:
@@ -17206,6 +17315,7 @@ def split_row(
     permanent_activated_self_keyword_unit = is_permanent_activated_self_keyword_unit(row)
     permanent_activated_regenerate_source_unit = is_permanent_activated_regenerate_source_unit(row)
     permanent_activated_tutor_battlefield_unit = is_permanent_activated_tutor_battlefield_unit(row)
+    permanent_activated_tutor_hand_unit = is_permanent_activated_tutor_hand_unit(row)
     attack_target_keyword_unit = is_creature_attack_target_keyword_unit(row)
     static_controlled_pt_unit = is_static_controlled_pt_unit(row)
     static_global_pt_unit = is_static_global_pt_unit(row)
@@ -17327,6 +17437,7 @@ def split_row(
         and not permanent_activated_self_keyword_unit
         and not permanent_activated_regenerate_source_unit
         and not permanent_activated_tutor_battlefield_unit
+        and not permanent_activated_tutor_hand_unit
         and not attack_target_keyword_unit
         and not static_controlled_pt_unit
         and not static_global_pt_unit
@@ -17406,6 +17517,7 @@ def split_row(
         and not permanent_activated_target_keyword_unit
         and not permanent_activated_self_keyword_unit
         and not permanent_activated_tutor_battlefield_unit
+        and not permanent_activated_tutor_hand_unit
         and not attack_target_keyword_unit
         and not static_controlled_pt_unit
         and not static_global_pt_unit
@@ -17950,6 +18062,106 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_permanent_simple_activated_library_search_to_battlefield",
+        ), "selected_exact_scope"
+
+    if permanent_activated_tutor_hand_unit:
+        if not is_permanent_metadata(metadata) or is_spell(metadata):
+            return None, "activated_library_tutor_to_hand_not_permanent"
+        type_line = str(metadata.get("type_line") or "").lower()
+        if "creature" in type_line:
+            return None, "activated_library_tutor_to_hand_creature_runtime_not_supported"
+        oracle_tutor = activated_library_tutor_to_hand_from_oracle(metadata)
+        if isinstance(oracle_tutor, str):
+            return None, oracle_tutor
+        source_tutor = activated_library_tutor_to_hand_from_source(source_text)
+        if isinstance(source_tutor, str):
+            return None, source_tutor
+        mismatch = library_tutor_specs_match(source_tutor, oracle_tutor)
+        if mismatch:
+            return None, f"activated_library_tutor_to_hand_source_oracle_{mismatch}_mismatch"
+        for key in (
+            "activation_cost_mana",
+            "activation_cost_generic",
+            "activation_cost_colors",
+            "activation_requires_tap",
+            "activation_requires_sacrifice",
+        ):
+            if source_tutor.get(key) != oracle_tutor.get(key):
+                return None, f"activated_library_tutor_to_hand_source_oracle_{key}_mismatch"
+        if not bool(source_tutor.get("activation_requires_sacrifice")):
+            return None, "activated_library_tutor_to_hand_non_sacrifice_runtime_not_supported"
+        permanent_effect = (
+            "artifact"
+            if "artifact" in type_line
+            else "enchantment"
+            if "enchantment" in type_line
+            else "planeswalker"
+            if "planeswalker" in type_line
+            else "land"
+            if "land" in type_line
+            else "battle"
+            if "battle" in type_line
+            else "permanent"
+        )
+        target = str(oracle_tutor["target"])
+        target_constraints = library_tutor_effect_constraints(oracle_tutor)
+        activated_effect = {
+            "effect": "tutor",
+            "battle_model_scope": PERMANENT_ACTIVATED_TUTOR_HAND_SCOPE,
+            "ability_kind": "activated",
+            "activated_effect": "tutor",
+            "activated_battle_model_scope": PERMANENT_ACTIVATED_TUTOR_HAND_SCOPE,
+            "activated_self_sacrifice_tutor_to_hand": True,
+            "target": target,
+            "tutor_target": target,
+            "target_constraints": target_constraints,
+            "count": int(oracle_tutor["count"]),
+            "tutor_count": int(oracle_tutor["count"]),
+            "destination": "hand",
+            "tutor_destination": "hand",
+            "xmage_effect_class": "SearchLibraryPutInHandEffect",
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "activation_cost_mana": source_tutor["activation_cost_mana"],
+            "activation_cost_generic": source_tutor["activation_cost_generic"],
+            "activation_cost_colors": source_tutor["activation_cost_colors"],
+            "activation_requires_tap": source_tutor["activation_requires_tap"],
+            "activation_requires_sacrifice": source_tutor["activation_requires_sacrifice"],
+            **target_constraints,
+        }
+        effect_json = {
+            "effect": permanent_effect,
+            "battle_model_scope": PERMANENT_ACTIVATED_TUTOR_HAND_SCOPE,
+            "ability_kind": "static_and_activated",
+            "activated_effect": "tutor",
+            "activated_battle_model_scope": PERMANENT_ACTIVATED_TUTOR_HAND_SCOPE,
+            "activated_self_sacrifice_tutor_to_hand": True,
+            "target": target,
+            "tutor_target": target,
+            "target_constraints": target_constraints,
+            "count": int(oracle_tutor["count"]),
+            "tutor_count": int(oracle_tutor["count"]),
+            "destination": "hand",
+            "tutor_destination": "hand",
+            "_activated_rule_effects": [activated_effect],
+            "xmage_effect_class": "SearchLibraryPutInHandEffect",
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "activation_cost_mana": source_tutor["activation_cost_mana"],
+            "activation_cost_generic": source_tutor["activation_cost_generic"],
+            "activation_cost_colors": source_tutor["activation_cost_colors"],
+            "activation_requires_tap": source_tutor["activation_requires_tap"],
+            "activation_requires_sacrifice": source_tutor["activation_requires_sacrifice"],
+            **target_constraints,
+        }
+        if bool(oracle_tutor.get("up_to_count")):
+            activated_effect["up_to_count"] = True
+            activated_effect["tutor_up_to_count"] = True
+            effect_json["up_to_count"] = True
+            effect_json["tutor_up_to_count"] = True
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_noncreature_permanent_self_sacrifice_library_search_to_hand",
         ), "selected_exact_scope"
 
     if permanent_activated_draw_unit:
@@ -25632,6 +25844,7 @@ def build_exact_split_report(
             and not is_permanent_activated_target_keyword_unit(row)
             and not is_permanent_activated_self_keyword_unit(row)
             and not is_permanent_activated_regenerate_source_unit(row)
+            and not is_permanent_activated_tutor_hand_unit(row)
             and not is_creature_attack_target_keyword_unit(row)
             and not is_static_controlled_pt_unit(row)
             and not is_static_global_pt_unit(row)
@@ -25720,6 +25933,7 @@ def build_exact_split_report(
                 "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, SimpleActivatedAbility plus only static self keywords, fixed activated damage, mana/tap/self-sacrifice source costs only, and simple any-target or creature targets",
                 "removal_destroy::targeted_destroy_variant_v1 rows with DestroyTargetEffect, SimpleActivatedAbility, exact activated destroy-target Oracle text, and mana/tap/self-sacrifice source costs only",
                 "life_gain::xmage_life_gain_variant_review_v1 rows with GainLifeEffect, SimpleActivatedAbility, exact fixed activated life-gain Oracle text, and mana/tap/source self-sacrifice costs only",
+                "tutor::xmage_library_search_variant_review_v1 rows with SearchLibraryPutInHandEffect, SimpleActivatedAbility, exact activated tutor-to-hand Oracle/source agreement, noncreature permanent type, and mana/tap/source self-sacrifice costs only",
                 "xmage_signature BoostControlledEffect one-shot spell rows with exact fixed controlled-creature boost until EOT and no color/modal/dynamic filters",
                 "xmage_signature BoostSourceEffect + SimpleActivatedAbility rows with exact activated self boost until EOT and mana/tap source costs only",
                 "xmage_signature GainAbilitySourceEffect + SimpleActivatedAbility rows with exact activated self keyword until EOT and mana/tap source costs only",

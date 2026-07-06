@@ -5701,6 +5701,75 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "additional_cost_detected")
 
+    def test_permanent_activated_tutor_to_hand_maps_self_sacrifice_artifact(self) -> None:
+        row = queue_row(
+            split.TUTOR_UNIT,
+            effect_classes=["SearchLibraryPutInHandEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Armillary Sphere",
+                type_line="Artifact",
+                oracle_text=(
+                    "{2}, {T}, Sacrifice this artifact: Search your library for up to two basic land cards, "
+                    "reveal them, and put them into your hand. Then shuffle."
+                ),
+            ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(
+                        new SearchLibraryPutInHandEffect(
+                            new TargetCardInLibrary(0, 2, StaticFilters.FILTER_CARD_BASIC_LANDS), true),
+                        new GenericManaCost(2));
+                ability.addCost(new TapSourceCost());
+                ability.addCost(new SacrificeSourceCost());
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "artifact")
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_TUTOR_HAND_SCOPE)
+        self.assertTrue(effect["activated_self_sacrifice_tutor_to_hand"])
+        self.assertEqual(effect["tutor_target"], "basic_land")
+        self.assertEqual(effect["tutor_destination"], "hand")
+        self.assertEqual(effect["tutor_count"], 2)
+        self.assertTrue(effect["tutor_up_to_count"])
+        self.assertEqual(effect["activation_cost_generic"], 2)
+        self.assertTrue(effect["activation_requires_tap"])
+        self.assertTrue(effect["activation_requires_sacrifice"])
+
+    def test_permanent_activated_tutor_to_hand_blocks_non_sacrifice_runtime(self) -> None:
+        row = queue_row(
+            split.TUTOR_UNIT,
+            effect_classes=["SearchLibraryPutInHandEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Map",
+                type_line="Artifact",
+                oracle_text=(
+                    "{2}, {T}: Search your library for a land card, reveal it, put it into your hand, then shuffle."
+                ),
+            ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(
+                        new SearchLibraryPutInHandEffect(new TargetCardInLibrary(new FilterLandCard()), true),
+                        new GenericManaCost(2));
+                ability.addCost(new TapSourceCost());
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "activated_library_tutor_to_hand_non_sacrifice_runtime_not_supported")
+
     def test_permanent_activated_draw_maps_simple_mana_and_tap_cost(self) -> None:
         row = queue_row(
             split.DRAW_ENGINE_UNIT,

@@ -393,7 +393,7 @@ def register_tests(battle, player, card):
         assert sorcery not in active.hand
         assert mystical in active.graveyard
 
-    def test_worldly_tutor_puts_creature_on_library_top(self):
+    def test_worldly_tutor_puts_creature_on_library_top():
         active = player("Active")
         removal = {"name": "Removal Spell", "cmc": 2, "type_line": "Instant", "effect": "removal_destroy"}
         creature = {"name": "Target Creature", "cmc": 5, "type_line": "Creature", "effect": "creature"}
@@ -419,7 +419,7 @@ def register_tests(battle, player, card):
         assert creature not in active.hand
         assert worldly in active.graveyard
 
-    def test_vampiric_tutor_puts_best_card_on_library_top_and_loses_two_life(self):
+    def test_vampiric_tutor_puts_best_card_on_library_top_and_loses_two_life():
         active = player("Active")
         active.life = 20
         land = {"name": "Command Tower", "cmc": 0, "type_line": "Land", "effect": "land"}
@@ -448,7 +448,7 @@ def register_tests(battle, player, card):
         assert active.life == 18
         assert spell in active.graveyard
 
-    def test_imperial_seal_puts_best_card_on_library_top_and_loses_two_life(self):
+    def test_imperial_seal_puts_best_card_on_library_top_and_loses_two_life():
         active = player("Active")
         active.life = 18
         land = {"name": "Swamp", "cmc": 0, "type_line": "Land", "effect": "land"}
@@ -477,7 +477,7 @@ def register_tests(battle, player, card):
         assert active.life == 16
         assert spell in active.graveyard
 
-    def test_demonic_tutor_puts_best_card_into_hand(self):
+    def test_demonic_tutor_puts_best_card_into_hand():
         active = player("Active")
         land = {"name": "Forest", "cmc": 0, "type_line": "Land", "effect": "land"}
         engine = {"name": "Rhystic Study", "cmc": 3, "type_line": "Enchantment", "effect": "draw_engine"}
@@ -502,7 +502,7 @@ def register_tests(battle, player, card):
         assert engine in active.hand
         assert spell in active.graveyard
 
-    def test_diabolic_intent_sacrifices_creature_and_puts_best_card_into_hand(self):
+    def test_diabolic_intent_sacrifices_creature_and_puts_best_card_into_hand():
         active = player("Active")
         fodder = {
             "name": "Young Wolf",
@@ -538,7 +538,7 @@ def register_tests(battle, player, card):
         assert engine in active.hand
         assert spell in active.graveyard
 
-    def test_sylvan_scrying_puts_land_into_hand(self):
+    def test_sylvan_scrying_puts_land_into_hand():
         active = player("Active")
         land = {"name": "Command Tower", "cmc": 0, "type_line": "Land", "effect": "land"}
         spell_card = {"name": "Counterspell", "cmc": 2, "type_line": "Instant", "effect": "counter"}
@@ -564,7 +564,7 @@ def register_tests(battle, player, card):
         assert spell_card in active.library
         assert spell in active.graveyard
 
-    def test_expedition_map_activated_tutor_puts_land_into_hand(self):
+    def test_expedition_map_activated_tutor_puts_land_into_hand():
         active = player("Active")
         active.mana_pool.add_generic(2)
         map_permanent = battle.enrich_card(
@@ -600,7 +600,47 @@ def register_tests(battle, player, card):
         assert land not in active.library
         assert spell_card in active.library
 
-    def test_moonsilver_key_activated_tutor_prefers_mana_artifact_target(self):
+    def test_armillary_sphere_activated_tutor_puts_two_basic_lands_into_hand():
+        active = player("Active")
+        active.mana_pool.add_generic(2)
+        sphere = battle.enrich_card(
+            {
+                "name": "Armillary Sphere",
+                "cmc": 2,
+                "type_line": "Artifact",
+                "effect": "artifact",
+                "activated_self_sacrifice_tutor_to_hand": True,
+                "activation_cost_generic": 2,
+                "activation_requires_tap": True,
+                "tutor_target": "basic_land",
+                "tutor_destination": "hand",
+                "tutor_count": 2,
+            }
+        )
+        plains = {"name": "Plains", "cmc": 0, "type_line": "Basic Land - Plains", "effect": "land"}
+        mountain = {"name": "Mountain", "cmc": 0, "type_line": "Basic Land - Mountain", "effect": "land"}
+        spell_card = {"name": "Wrath of God", "cmc": 4, "type_line": "Sorcery", "effect": "board_wipe"}
+        active.battlefield = [sphere]
+        active.library = [spell_card, plains, mountain]
+
+        activations = battle.activate_utility_artifacts(
+            active,
+            [],
+            [active],
+            turn=10,
+            rng=random.Random(570),
+            phase="precombat_main",
+        )
+
+        assert activations == 1
+        assert sphere in active.graveyard
+        assert plains in active.hand
+        assert mountain in active.hand
+        assert plains not in active.library
+        assert mountain not in active.library
+        assert spell_card in active.library
+
+    def test_moonsilver_key_activated_tutor_prefers_mana_artifact_target():
         active = player("Active")
         active.mana_pool.add_generic(1)
         key_permanent = battle.enrich_card(
@@ -655,7 +695,7 @@ def register_tests(battle, player, card):
         assert mana_artifact not in active.library
         assert non_target_artifact in active.library
 
-    def test_weathered_wayfarer_activated_tutor_requires_opponent_more_lands(self):
+    def test_weathered_wayfarer_activated_tutor_requires_opponent_more_lands():
         active = player("Active")
         opponent = player("Opponent")
         active.mana_pool.add("white", 1)
@@ -698,7 +738,7 @@ def register_tests(battle, player, card):
         assert land not in active.library
         assert spell_card in active.library
 
-    def test_spellseeker_etb_finds_cheap_instant_or_sorcery_only(self):
+    def test_spellseeker_etb_finds_cheap_instant_or_sorcery_only():
         active = player("Active")
         removal = {"name": "Swords to Plowshares", "cmc": 1, "type_line": "Instant", "effect": "remove_creature"}
         big_spell = {"name": "Time Warp", "cmc": 5, "type_line": "Sorcery", "effect": "extra_turn"}
@@ -726,7 +766,7 @@ def register_tests(battle, player, card):
         assert big_spell in active.library
         assert creature in active.library
 
-    def test_trophy_mage_etb_finds_artifact_with_mana_value_three_only(self):
+    def test_trophy_mage_etb_finds_artifact_with_mana_value_three_only():
         active = player("Active")
         cheap_artifact = {"name": "Sol Ring", "cmc": 1, "type_line": "Artifact", "effect": "ramp_permanent"}
         target_artifact = {"name": "Chromatic Lantern", "cmc": 3, "type_line": "Artifact", "effect": "ramp_engine"}
@@ -1048,6 +1088,18 @@ def register_tests(battle, player, card):
         test_passive_permanent_does_not_draw_or_make_mana_on_resolution,
         test_tutor_to_graveyard_moves_library_card_without_drawing,
         test_mystical_tutor_finds_instant_or_sorcery_only,
+        test_worldly_tutor_puts_creature_on_library_top,
+        test_vampiric_tutor_puts_best_card_on_library_top_and_loses_two_life,
+        test_imperial_seal_puts_best_card_on_library_top_and_loses_two_life,
+        test_demonic_tutor_puts_best_card_into_hand,
+        test_diabolic_intent_sacrifices_creature_and_puts_best_card_into_hand,
+        test_sylvan_scrying_puts_land_into_hand,
+        test_expedition_map_activated_tutor_puts_land_into_hand,
+        test_armillary_sphere_activated_tutor_puts_two_basic_lands_into_hand,
+        test_moonsilver_key_activated_tutor_prefers_mana_artifact_target,
+        test_weathered_wayfarer_activated_tutor_requires_opponent_more_lands,
+        test_spellseeker_etb_finds_cheap_instant_or_sorcery_only,
+        test_trophy_mage_etb_finds_artifact_with_mana_value_three_only,
         test_tutor_trace_uses_contextual_target_scoring,
         test_board_wipe_trace_records_asymmetry_context,
         test_wheel_trace_uses_multiplayer_discard_draw_model,
@@ -1055,6 +1107,7 @@ def register_tests(battle, player, card):
         test_wheel_uses_library_of_leng_replacement_for_effect_discard,
         test_effect_discard_replacement_prefers_keepable_spells_over_graveyard,
         test_wheel_cast_guard_blocks_opponent_refill_without_payoff,
+        test_wheel_cast_guard_blocks_self_decking_even_with_payoff,
         test_reforge_defaults_wheel_draw_count_to_seven,
         test_reanimation_recursion_returns_creature_to_battlefield,
     ]
