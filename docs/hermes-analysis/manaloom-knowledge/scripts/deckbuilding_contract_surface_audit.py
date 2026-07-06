@@ -102,6 +102,12 @@ GLOBAL_COMMANDER_RAMP_ALTERNATIVE_CUT_FORCED_ACCESS_TRACE_GENERATOR = (
 GLOBAL_COMMANDER_RAMP_ALTERNATIVE_CUT_FORCED_ACCESS_TRACE_GENERATOR_TEST = (
     SCRIPT_DIR / "test_global_commander_ramp_alternative_cut_forced_access_trace_generator.py"
 )
+GLOBAL_COMMANDER_RAMP_AXIS_EXHAUSTION_ROUTER = (
+    SCRIPT_DIR / "global_commander_ramp_axis_exhaustion_router.py"
+)
+GLOBAL_COMMANDER_RAMP_AXIS_EXHAUSTION_ROUTER_TEST = (
+    SCRIPT_DIR / "test_global_commander_ramp_axis_exhaustion_router.py"
+)
 GLOBAL_COMMANDER_ENGINE_CUT_USAGE_SAME_LANE_PROOF_SCOUT = (
     SCRIPT_DIR / "global_commander_engine_cut_usage_same_lane_proof_scout.py"
 )
@@ -561,6 +567,10 @@ GLOBAL_COMMANDER_RAMP_ALTERNATIVE_CUT_TRACE_GENERATOR_REPORT = (
 GLOBAL_COMMANDER_RAMP_ALTERNATIVE_CUT_FORCED_ACCESS_TRACE_GENERATOR_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_alternative_cut_forced_access_trace_generator_20260706_current.md"
+)
+GLOBAL_COMMANDER_RAMP_AXIS_EXHAUSTION_ROUTER_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_axis_exhaustion_router_20260706_current.md"
 )
 GLOBAL_COMMANDER_ENGINE_CUT_USAGE_SAME_LANE_PROOF_SCOUT_REPORT = (
     REPO_ROOT
@@ -4305,6 +4315,44 @@ def build_audit() -> dict[str, Any]:
                 "expand_ramp_cut_source_or_pivot_role_axis_after_alternative_forced_access",
                 "alternative_ramp_cut_forced_usage_observed_blocks_cut:Ornithopter of Paradise,Pyretic Ritual",
                 "candidate_copy_closed_after_alternative_ramp_cut_forced_access",
+            ],
+        )
+    )
+    checks.extend(
+        [
+            check_contains(
+                GLOBAL_COMMANDER_RAMP_AXIS_EXHAUSTION_ROUTER,
+                [
+                    "Route global Commander learning after current ramp cut lanes exhaust.",
+                    "ramp_axis_exhausted_requires_global_role_axis_pivot",
+                    "candidate_copy_allowed_now",
+                ],
+            ),
+            check_contains(
+                GLOBAL_COMMANDER_RAMP_AXIS_EXHAUSTION_ROUTER_TEST,
+                [
+                    "Tests for ramp axis exhaustion routing.",
+                    "test_routes_to_global_pivot_when_ramp_lane_is_exhausted",
+                    "test_does_not_mark_exhausted_with_ready_replacement",
+                ],
+            ),
+        ]
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_RAMP_AXIS_EXHAUSTION_ROUTER_REPORT,
+            [
+                "Global Commander Ramp Axis Exhaustion Router",
+                "ramp_axis_exhausted_requires_global_role_axis_pivot",
+                "exhausted_role_axis: `ramp`",
+                "blocked_ramp_cut_count: `9`",
+                "replacement_exact_ready_count: `0`",
+                "alternative_focus_card_count: `2`",
+                "alternative_forced_usage_blocked_count: `2`",
+                "current_ramp_lane_exhausted: `true`",
+                "candidate_copy_allowed_now: `false`",
+                "return_to_global_role_axis_learning_priority_after_ramp_axis_exhaustion",
+                "ramp_axis_current_cut_lane_exhausted",
             ],
         )
     )

@@ -1688,6 +1688,15 @@ Current external refresh on 2026-07-05:
   in the opening hand (`9` usage events each across `3` replays), so both
   alternative cuts are blocked and the next route is
   `expand_ramp_cut_source_or_pivot_role_axis_after_alternative_forced_access`.
+- Run `global_commander_ramp_axis_exhaustion_router.py` after current and
+  alternative ramp cut lanes are blocked. It may mark the current `ramp` axis
+  exhausted only when all scoped ramp cuts are blocked, no exact replacement is
+  ready, and alternative forced-access targets are also used. That router must
+  return to global role-axis learning before more same-deck ramp source search
+  and must keep candidate copy, battle gate, mutation, and promotion closed.
+  The current router marks `ramp` exhausted for deck `619`: `9` scoped ramp cuts
+  are blocked, exact replacements ready is `0`, and both alternative forced
+  targets are usage-blocked.
 
 ## Global Commander Rollout - 2026-07-01
 

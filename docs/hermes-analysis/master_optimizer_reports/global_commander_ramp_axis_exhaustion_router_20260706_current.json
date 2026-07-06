@@ -1,0 +1,56 @@
+{
+  "artifact_type": "global_commander_ramp_axis_exhaustion_router",
+  "battle_gate_allowed_now": false,
+  "battle_gate_performed": false,
+  "battle_or_optimization_performed": false,
+  "blocked_alternative_ramp_cuts": [
+    "Ornithopter of Paradise",
+    "Pyretic Ritual"
+  ],
+  "blocked_current_ramp_cuts": [
+    "Arcane Signet",
+    "Basalt Monolith",
+    "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+    "Burnt Offering",
+    "Cabal Ritual",
+    "Culling the Weak",
+    "Dark Ritual",
+    "Desperate Ritual",
+    "Grim Monolith"
+  ],
+  "candidate_copy_allowed_now": false,
+  "candidate_copy_blockers": [
+    "candidate_copy_closed_after_ramp_axis_exhaustion_router",
+    "battle_gate_closed_after_ramp_axis_exhaustion_router",
+    "ramp_axis_current_cut_lane_exhausted"
+  ],
+  "commander": "Kaalia of the Vast",
+  "deck_action_allowed": false,
+  "deck_id": "619",
+  "exhausted_role_axis": "ramp",
+  "generated_at": "2026-07-06T06:12:53.626313+00:00",
+  "input_artifacts": {
+    "alternative_ramp_forced_access_trace_generator": "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_alternative_cut_forced_access_trace_generator_20260706_current.json",
+    "ramp_forced_recovery_router": "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_cut_forced_recovery_router_20260706_current.json"
+  },
+  "mutation_allowed": false,
+  "policy": {
+    "axis_boundary": "An exhausted ramp axis is a learning route signal, not permission to cut cards.",
+    "mutation_boundary": "No deck mutation, candidate copy, battle gate, or promotion is opened by this router.",
+    "pivot_boundary": "The next step must return to global role-axis learning before more same-deck ramp source search."
+  },
+  "postgres_writes": false,
+  "promotion_allowed": false,
+  "source_db_mutated": false,
+  "status": "ramp_axis_exhausted_requires_global_role_axis_pivot",
+  "summary": {
+    "alternative_focus_card_count": 2,
+    "alternative_forced_usage_blocked_count": 2,
+    "blocked_ramp_cut_count": 9,
+    "commander": "Kaalia of the Vast",
+    "current_ramp_lane_exhausted": true,
+    "deck_id": "619",
+    "next_gate": "return_to_global_role_axis_learning_priority_after_ramp_axis_exhaustion",
+    "replacement_exact_ready_count": 0
+  }
+}
