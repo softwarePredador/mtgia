@@ -816,6 +816,27 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     por banned/current legality. Nenhuma dessas linhas abre copy, battle,
     promocao ou value-safe reclassification; o proximo gate e
     `review_expanded_external_nonpayoff_source_candidates_locally_before_seeded_miner`.
+    O reviewer do pool expandido fica em
+    `global_commander_external_nonpayoff_expanded_source_candidate_reviewer_20260706_kaalia_value_safe_stage1_repair_scope1_new_sources.md`.
+    Resultado:
+    `expanded_external_source_candidates_reviewed_seed_ready_no_deck_action`,
+    com `reviewed_candidate_count=26`,
+    `miner_source_seed_allowed_count=22`, `blocked_current_deck_count=1` e
+    `blocked_commander_banned_count=3`. A rerodada do minerador fica em
+    `global_commander_reviewed_external_nonpayoff_seeded_cut_source_miner_20260706_kaalia_value_safe_stage1_repair_scope1_expanded_sources.md`.
+    Resultado:
+    `reviewed_external_seeded_cut_source_mining_exhausted_current_deck_no_cut_permission`,
+    com `reviewed_seed_count=22`, `scanned_seeded_same_lane_source_count=47`,
+    `fresh_seeded_same_lane_cut_source_count=0` e
+    `blocked_recycled_seeded_cut_source_count=47`. O router seguinte fica em
+    `global_commander_external_nonpayoff_seed_exhaustion_recovery_router_20260706_kaalia_value_safe_stage1_repair_scope1_expanded_sources.md`
+    e roteia para negative review de `Mana Vault`. O coletor fica em
+    `global_commander_external_nonpayoff_current_deck_negative_review_collector_20260706_kaalia_value_safe_stage1_repair_scope1_expanded_sources.md`.
+    Resultado: `external_current_deck_negative_review_blocks_used_candidates`,
+    com `current_deck_candidate_count=1`, `usage_blocked_candidate_count=1`,
+    `seen_without_usage_count=0`, `not_seen_count=0` e
+    `candidate_copy_allowed_now=false`. Mana Vault foi usada pelo alvo nos
+    traces atuais, entao nao e safe cut nem justificativa para copy.
     Observacao operacional: snapshots historicos de candidate-copy, battle-probe,
     battle-feedback e package-chain dependem de artefatos locais ignorados. Se
     faltarem ou forem regenerados sem esses artefatos, a auditoria de superficie

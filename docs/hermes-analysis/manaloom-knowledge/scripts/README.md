@@ -326,6 +326,15 @@ mismatches. Expanded rows are still review candidates only; candidate copy,
 battle, promotion, and value-safe reclassification remain closed until later
 local review, seeded mining, trace, and equal-gate evidence.
 
+Then run `global_commander_external_nonpayoff_expanded_source_candidate_reviewer.py`.
+It revalidates the expanded pool locally and emits scoped miner seeds only for
+legal outside-deck candidates with role-text support. Rerun
+`global_commander_reviewed_external_nonpayoff_seeded_cut_source_miner.py` with
+that reviewer report. If the miner exhausts and the router finds a current-deck
+candidate such as `Mana Vault`, run
+`global_commander_external_nonpayoff_current_deck_negative_review_collector.py`;
+target-deck usage blocks that card from becoming a safe cut.
+
 ## XMage Authoritative Adaptation
 
 For all-card battle-rule acceleration, use local XMage as the authoritative

@@ -42,6 +42,25 @@ CURRENT_DECK_REVIEW = "external_source_candidate_local_review_current_deck_trace
 HELD_PACKAGE_REVIEW = "external_source_candidate_local_review_held_package_pair_required"
 IDENTITY_REVIEW = "external_source_candidate_local_review_needs_identity_resolution"
 READY_SEED_REVIEW = "external_source_candidate_local_review_ready_for_miner_seed"
+CURRENT_DECK_REVIEW_STATUSES = {
+    CURRENT_DECK_REVIEW,
+    "new_external_source_local_review_blocks_current_deck",
+    "expanded_source_candidate_local_review_blocks_current_deck",
+}
+HELD_PACKAGE_REVIEW_STATUSES = {
+    HELD_PACKAGE_REVIEW,
+    "new_external_source_local_review_blocks_held_package_add",
+}
+IDENTITY_REVIEW_STATUSES = {
+    IDENTITY_REVIEW,
+    "new_external_source_local_review_needs_identity_resolution",
+    "expanded_source_candidate_local_review_needs_identity_resolution",
+}
+READY_SEED_REVIEW_STATUSES = {
+    READY_SEED_REVIEW,
+    "new_external_source_local_review_ready_for_seeded_miner",
+    "expanded_source_candidate_local_review_ready_for_seeded_miner",
+}
 EXHAUSTED_ROLE = "reviewed_external_seeded_role_exhausted_current_deck_sources"
 UNSEEDED_ROLE = "reviewed_external_seed_missing_for_target_role"
 
@@ -119,10 +138,10 @@ def build_role_recovery_rows(
     for diagnostic in role_diagnostics:
         role = str(diagnostic.get("target_cut_role") or "")
         role_reviews = rows_for_role(review_rows, role)
-        current_deck = [row for row in role_reviews if row.get("review_status") == CURRENT_DECK_REVIEW]
-        held_package = [row for row in role_reviews if row.get("review_status") == HELD_PACKAGE_REVIEW]
-        identity = [row for row in role_reviews if row.get("review_status") == IDENTITY_REVIEW]
-        ready_seed = [row for row in role_reviews if row.get("review_status") == READY_SEED_REVIEW]
+        current_deck = [row for row in role_reviews if row.get("review_status") in CURRENT_DECK_REVIEW_STATUSES]
+        held_package = [row for row in role_reviews if row.get("review_status") in HELD_PACKAGE_REVIEW_STATUSES]
+        identity = [row for row in role_reviews if row.get("review_status") in IDENTITY_REVIEW_STATUSES]
+        ready_seed = [row for row in role_reviews if row.get("review_status") in READY_SEED_REVIEW_STATUSES]
         role_seeds = rows_for_role(miner_seed_rows, role)
         status, next_gate = role_recovery_status(
             diagnostic=diagnostic,
@@ -293,9 +312,9 @@ def build_report(
         for row in role_diagnostics
         if row.get("status") == UNSEEDED_ROLE
     ]
-    current_deck_rows = [row for row in review_rows if row.get("review_status") == CURRENT_DECK_REVIEW]
-    held_package_rows = [row for row in review_rows if row.get("review_status") == HELD_PACKAGE_REVIEW]
-    identity_rows = [row for row in review_rows if row.get("review_status") == IDENTITY_REVIEW]
+    current_deck_rows = [row for row in review_rows if row.get("review_status") in CURRENT_DECK_REVIEW_STATUSES]
+    held_package_rows = [row for row in review_rows if row.get("review_status") in HELD_PACKAGE_REVIEW_STATUSES]
+    identity_rows = [row for row in review_rows if row.get("review_status") in IDENTITY_REVIEW_STATUSES]
     status, next_gate = choose_status_and_next_gate(
         current_deck_count=len(current_deck_rows),
         identity_count=len(identity_rows),

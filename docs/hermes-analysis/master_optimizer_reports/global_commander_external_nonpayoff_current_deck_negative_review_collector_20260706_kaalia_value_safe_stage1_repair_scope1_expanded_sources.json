@@ -1,0 +1,298 @@
+{
+  "artifact_type": "global_commander_external_nonpayoff_current_deck_negative_review_collector",
+  "battle_gate_allowed_now": false,
+  "battle_gate_performed": false,
+  "battle_or_optimization_performed": false,
+  "battle_replay_performed": false,
+  "candidate_copy_allowed_now": false,
+  "candidate_copy_blockers": [
+    "external_current_deck_candidates_used_by_target:Mana Vault",
+    "candidate_copy_closed_until_negative_review_or_fresh_cut_source_exists"
+  ],
+  "card_level_cut_permission_now": false,
+  "deck_action_allowed": false,
+  "generated_at": "2026-07-06T02:34:59.769022+00:00",
+  "input_artifacts": {
+    "recovery_router_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_seed_exhaustion_recovery_router_20260706_kaalia_value_safe_stage1_repair_scope1_expanded_sources.json",
+    "trace_generator_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_generator_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+  },
+  "mutation_allowed": false,
+  "negative_review_cleared_now": false,
+  "policy": {
+    "negative_review_boundary": "A current-deck external candidate must not be treated as cuttable when target-deck use is observed.",
+    "promotion_boundary": "No candidate copy, deck mutation, battle gate, value-safe reclassification, or promotion is opened by this report.",
+    "trace_boundary": "This collector reuses existing current-scope replay artifacts and does not run a battle gate."
+  },
+  "postgres_writes": false,
+  "promotion_allowed": false,
+  "review_rows": [
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "card_name": "Mana Vault",
+      "decision": "not_cuttable_from_current_trace",
+      "decision_trace_count": 4,
+      "event_types": {
+        "cast_announced": 3,
+        "cost_paid": 3,
+        "land_played": 3,
+        "spell_cast": 3,
+        "turn_end": 16,
+        "turn_start": 1
+      },
+      "exposure_event_count": 17,
+      "first_decision_trace": {
+        "event": "cast_spell",
+        "player": "Kaalia of the Vast",
+        "turn": 3
+      },
+      "first_exposure_event": {
+        "event": "turn_end",
+        "player": "Kaalia of the Vast",
+        "turn": 3
+      },
+      "first_usage_event": {
+        "card": "Mana Vault",
+        "event": "cast_announced",
+        "player": "Kaalia of the Vast",
+        "turn": 3
+      },
+      "negative_review_cleared_now": false,
+      "next_evidence": "find_new_external_source_or_explicit_same_lane_replacement_proof",
+      "source_review_status": "expanded_source_candidate_local_review_blocks_current_deck",
+      "status": "external_current_deck_candidate_used_by_target_blocks_negative_review",
+      "target_cut_role": "mana_acceleration",
+      "usage_event_count": 9,
+      "value_safe_reclassification_allowed": false
+    }
+  ],
+  "seed_reports": [
+    {
+      "cards": {
+        "Mana Vault": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        }
+      },
+      "decision_count": 121,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_42.decision_trace.jsonl",
+      "event_count": 818,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_42.events.jsonl",
+      "seed": 42
+    },
+    {
+      "cards": {
+        "Mana Vault": {
+          "decision_trace_count": 1,
+          "event_types": {
+            "cast_announced": 1,
+            "cost_paid": 1,
+            "land_played": 1,
+            "spell_cast": 1,
+            "turn_end": 7
+          },
+          "exposure_event_count": 7,
+          "first_decision_trace": {
+            "event": "cast_spell",
+            "player": "Kaalia of the Vast",
+            "turn": 3
+          },
+          "first_exposure_event": {
+            "event": "turn_end",
+            "player": "Kaalia of the Vast",
+            "turn": 3
+          },
+          "first_usage_event": {
+            "card": "Mana Vault",
+            "event": "cast_announced",
+            "player": "Kaalia of the Vast",
+            "turn": 3
+          },
+          "reference_event_count": 1,
+          "usage_event_count": 3
+        }
+      },
+      "decision_count": 138,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_43.decision_trace.jsonl",
+      "event_count": 832,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_43.events.jsonl",
+      "seed": 43
+    },
+    {
+      "cards": {
+        "Mana Vault": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        }
+      },
+      "decision_count": 139,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_44.decision_trace.jsonl",
+      "event_count": 1003,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_44.events.jsonl",
+      "seed": 44
+    },
+    {
+      "cards": {
+        "Mana Vault": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        }
+      },
+      "decision_count": 114,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_45.decision_trace.jsonl",
+      "event_count": 727,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_45.events.jsonl",
+      "seed": 45
+    },
+    {
+      "cards": {
+        "Mana Vault": {
+          "decision_trace_count": 1,
+          "event_types": {
+            "cast_announced": 1,
+            "cost_paid": 1,
+            "spell_cast": 1,
+            "turn_end": 1
+          },
+          "exposure_event_count": 1,
+          "first_decision_trace": {
+            "event": "cast_spell",
+            "player": "Kaalia of the Vast",
+            "turn": 8
+          },
+          "first_exposure_event": {
+            "event": "turn_end",
+            "player": "Kaalia of the Vast",
+            "turn": 8
+          },
+          "first_usage_event": {
+            "card": "Mana Vault",
+            "event": "cast_announced",
+            "player": "Kaalia of the Vast",
+            "turn": 8
+          },
+          "reference_event_count": 0,
+          "usage_event_count": 3
+        }
+      },
+      "decision_count": 136,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_46.decision_trace.jsonl",
+      "event_count": 1074,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_46.events.jsonl",
+      "seed": 46
+    },
+    {
+      "cards": {
+        "Mana Vault": {
+          "decision_trace_count": 2,
+          "event_types": {
+            "cast_announced": 1,
+            "cost_paid": 1,
+            "land_played": 2,
+            "spell_cast": 1,
+            "turn_end": 8,
+            "turn_start": 1
+          },
+          "exposure_event_count": 9,
+          "first_decision_trace": {
+            "event": "mulligan_decision",
+            "player": "Kaalia of the Vast",
+            "turn": 0
+          },
+          "first_exposure_event": {
+            "event": "turn_start",
+            "player": "Kaalia of the Vast",
+            "turn": 1
+          },
+          "first_usage_event": {
+            "card": "Mana Vault",
+            "event": "cast_announced",
+            "player": "Kaalia of the Vast",
+            "turn": 1
+          },
+          "reference_event_count": 2,
+          "usage_event_count": 3
+        }
+      },
+      "decision_count": 134,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_47.decision_trace.jsonl",
+      "event_count": 795,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_47.events.jsonl",
+      "seed": 47
+    },
+    {
+      "cards": {
+        "Mana Vault": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        }
+      },
+      "decision_count": 99,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_48.decision_trace.jsonl",
+      "event_count": 661,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_48.events.jsonl",
+      "seed": 48
+    },
+    {
+      "cards": {
+        "Mana Vault": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        }
+      },
+      "decision_count": 147,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_49.decision_trace.jsonl",
+      "event_count": 1061,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_49.events.jsonl",
+      "seed": 49
+    }
+  ],
+  "source_db_mutated": false,
+  "status": "external_current_deck_negative_review_blocks_used_candidates",
+  "summary": {
+    "candidate_copy_allowed_count": 0,
+    "candidate_copy_blocker_count": 2,
+    "card_level_cut_permission_count": 0,
+    "commander": "Kaalia of the Vast",
+    "current_deck_candidate_count": 1,
+    "deck_id": "619",
+    "negative_review_cleared_count": 0,
+    "next_gate": "find_new_external_source_or_explicit_same_lane_replacement_proof",
+    "not_seen_count": 0,
+    "seed_report_count": 8,
+    "seen_without_usage_count": 0,
+    "usage_blocked_candidate_count": 1
+  },
+  "value_safe_reclassification_allowed_now": false
+}
