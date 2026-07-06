@@ -16,9 +16,9 @@ import '../../lib/rate_limit_middleware.dart';
 Handler middleware(Handler handler) {
   final authOnlyHandler = handler.use(authMiddleware());
   final costlyAiHandler = handler
-      .use(authMiddleware())
+      .use(aiRateLimit())
       .use(aiPlanLimitMiddleware())
-      .use(aiRateLimit());
+      .use(authMiddleware());
 
   return (context) {
     final path = context.request.uri.path;
