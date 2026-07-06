@@ -905,7 +905,17 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `blocked_recycled_seeded_cut_source_count=47`; o router follow-up volta para
     `expand_external_nonpayoff_source_candidate_pool`, sem current-deck negative
     review candidates e com candidate copy, battle, promocao e value-safe
-    reclassification fechados.
+    reclassification fechados. O learning-priority atual fica em
+    `global_commander_learning_priority_audit_20260706_source_expansion_cycle_current.md`
+    e classifica esse estado como
+    `source_expansion_cycle_requires_global_learning_pivot`, com top action
+    `pivot_to_cross_commander_role_axis_learning_before_more_same_deck_source_expansion`.
+    O pivot cross-commander fica em
+    `global_commander_cross_commander_role_axis_learning_pivot_20260706_source_expansion_cycle_current.md`:
+    ele agrupa `axis_count=10`, escolhe `engine` como eixo global principal,
+    marca `source_cycle_axis_count=4`, exclui `607` de action counts e manda
+    construir uma politica de eixo global antes de mais pesquisa source do mesmo
+    deck.
     Observacao operacional: snapshots historicos de candidate-copy, battle-probe,
     battle-feedback e package-chain dependem de artefatos locais ignorados. Se
     faltarem ou forem regenerados sem esses artefatos, a auditoria de superficie

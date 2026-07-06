@@ -177,197 +177,202 @@ Operational priority after this pivot:
    such as removal, but win plans remain commander-specific source-lane work
    before named cards;
 10. run `global_commander_learning_priority_audit.py` to combine core gaps,
-   source-lane availability, current external research, staple/bracket
-   guardrails, and the Lorehold benchmark rule into one global next-action
-   queue;
-11. run `global_commander_candidate_copy_materializer.py` only after a named
+   source-lane availability, current external research, source-expansion cycle
+   detection, staple/bracket guardrails, and the Lorehold benchmark rule into
+   one global next-action queue;
+11. run `global_commander_cross_commander_role_axis_learning_pivot.py` whenever
+   the learning queue reports `source_expansion_cycle_requires_global_learning_pivot`;
+   it must group role floor/excess evidence across commanders, exclude deck
+   `607` from actionable counts, and choose a global role axis before any
+   further same-deck source expansion, candidate copy, battle, or promotion;
+12. run `global_commander_candidate_copy_materializer.py` only after a named
    add/cut pool is ready; it may materialize one hypothesis inside an isolated
    copied Hermes SQLite DB, must prove the source DB hash is unchanged, and
    must reject stale chained sources unless explicitly overridden. Protected
    blocked cut cards from the pair report must still be present in the source DB.
    Promotion/battle gates stay closed until strategy, battle, and replay
    evidence pass;
-12. run `global_commander_candidate_battle_probe_audit.py` after a candidate
+13. run `global_commander_candidate_battle_probe_audit.py` after a candidate
    copy has a small equal-seed battle/replay probe; it must compare base versus
    candidate metrics, prove replay target identity is commander-specific, and
    require added cards to be exercised in replay events before any larger gate
    can be trusted;
-13. run `global_commander_battle_feedback_model.py` after battle probe/gate
+14. run `global_commander_battle_feedback_model.py` after battle probe/gate
    audit artifacts exist; it consolidates exact add/cut signatures into
    reusable learning feedback, blocks pairs with failed exercised equal-gate
    evidence, supersedes smaller positive probes when a larger gate rejects the
    same pair, and routes unexercised packages to exposure replay instead of
    requeueing them as fresh hypotheses;
-14. run `global_commander_candidate_package_chain_audit.py` when multiple
+15. run `global_commander_candidate_package_chain_audit.py` when multiple
    isolated candidate-copy swaps are chained into one package; it must prove
    every source DB stayed unchanged, every pair report matched its source,
    final core floors are repaired, strategy readiness exists, and battle plus
    promotion remain closed until a commander-specific package strategy matrix
    and replay-backed equal gate exist;
-15. run `global_commander_candidate_package_strategy_matrix.py` after a clean
+16. run `global_commander_candidate_package_strategy_matrix.py` after a clean
    package chain and before any battle probe; it must compare the base deck and
    final copied candidate against the commander's role targets, expected
    packages, and cut-risk lanes, then keep battle and promotion closed when a
    package fixes generic core floors but weakens commander-specific strategy;
-16. run `global_commander_profile_blocker_repair_plan.py` whenever the package
+17. run `global_commander_profile_blocker_repair_plan.py` whenever the package
    strategy matrix blocks battle; it must convert profile blockers into repair
    axes, source lanes, same-lane cut policies, and a rerun sequence without
    mutating decks or opening battle/promotion;
-17. run `global_commander_profile_repair_candidate_model.py` after a repair
+18. run `global_commander_profile_repair_candidate_model.py` after a repair
    plan and before any profile-repair candidate copy; it must name legal,
    color-identity-compatible add candidates, review-only cut pressure, blocked
    cuts, and materialization blockers for each repair axis. Large
    commander-payoff shortfalls must route to a broader commander source lane
    instead of a narrow add/cut materialization;
-18. run `global_commander_payoff_source_lane_expander.py` when a commander
+19. run `global_commander_payoff_source_lane_expander.py` when a commander
    payoff axis is too sparse for materialization; it must scan local Oracle
    rows by commander color identity, Commander legality, creature payoff type,
    current deck membership, and role-confirming text, then keep candidate copy
    and battle closed while routing broad shortfalls to package synthesis;
-19. run `global_commander_payoff_package_synthesizer.py` after a payoff source
+20. run `global_commander_payoff_package_synthesizer.py` after a payoff source
    lane is expanded; it must synthesize a full-profile package, exploit
    cross-axis cards such as attack-window lands, pair every add with a reviewed
    cut, enforce package-size limits, and keep materialization closed when cuts
    or stage sizing are insufficient;
-20. run `global_commander_cut_source_lane_expander.py` when a synthesized
+21. run `global_commander_cut_source_lane_expander.py` when a synthesized
    package has too few reviewed cuts; it must scan the current deck for
    above-target role pressure, protect lands/payoffs/interaction/attack-window
    lanes, separate format staples and expected package anchors into stage-only
    rows, and keep materialization closed when value-safe cuts or package size
    still fail;
-21. run `global_commander_value_safe_stage_splitter.py` after cut source-lane
+22. run `global_commander_value_safe_stage_splitter.py` after cut source-lane
    expansion; it may open only the next isolated stage-copy gate when a stage
    has paired value-safe adds/cuts under the package-size limit. It must keep
    full-package materialization closed while any add is unpaired, and it must
    keep battle/promotion closed until candidate-copy, strategy-matrix, and
    replay gates pass;
-22. run `global_commander_package_scope_reducer.py` when a profile-repair
+23. run `global_commander_package_scope_reducer.py` when a profile-repair
    package is blocked because the full package has fewer value-safe cuts than
    adds; it may open only the strongest smaller paired scope in an isolated DB
    copy, preferring a scope that closes a whole blocker axis, while keeping the
    original full package, battle, and promotion closed;
-23. run `global_commander_contextual_stage_cut_evidence_collector.py` after
+24. run `global_commander_contextual_stage_cut_evidence_collector.py` after
    `global_commander_stage_only_cut_evidence_plan.py` names contextual staple
    cuts; it must inspect current deck context, local format-staple context, and
    missing usage/same-lane/replay proof, but it must not reclassify a cut,
    materialize a candidate, run battle, or promote a package;
-24. run `global_commander_contextual_usage_trace_scout.py` after contextual
+25. run `global_commander_contextual_usage_trace_scout.py` after contextual
    stage-cut collection; it must search existing local artifacts for current
    commander/deck usage traces, classify planning/rule-coherence/cross-deck
    references as non-proof, and keep candidate copy plus reclassification closed
    when no current-scope trace exists;
-25. run `global_commander_contextual_usage_trace_generator.py` when the scout
+26. run `global_commander_contextual_usage_trace_generator.py` when the scout
    finds no current-scope trace; it may run structured replays against the
    isolated candidate DB and summarize target-deck exposure/usage, but it is
    evidence collection only, not a battle gate or promotion gate;
-26. run `global_commander_contextual_usage_trace_reviewer.py` after generated
+27. run `global_commander_contextual_usage_trace_reviewer.py` after generated
    trace exists; observed use by the target deck blocks automatic value-safe
    reclassification until same-lane replacement proof or stronger negative trace
    exists;
-27. run `global_commander_same_lane_replacement_model.py` after usage review
+28. run `global_commander_same_lane_replacement_model.py` after usage review
    blocks contextual cuts; it must compare usage-blocked cuts with explicit
    same-lane replacement routes from the synthesized package, treat incidental
    role overlap as non-proof, and route to a new cut-source-lane evidence pass
    when no explicit replacement route exists;
-28. run `global_commander_new_cut_source_lane_trace_collector.py` after the
+29. run `global_commander_new_cut_source_lane_trace_collector.py` after the
    same-lane model routes to new cut-source-lane evidence; it must reuse
    existing replay artifacts first, count only target-deck traces, and keep
    value-safe reclassification closed for any remaining cut that was used,
    merely seen without usage, or not seen in the current replay window;
-29. run `global_commander_forced_cut_access_trace_generator.py` only for
+30. run `global_commander_forced_cut_access_trace_generator.py` only for
    unresolved remaining cuts after natural/current-scope trace collection; it
    may use `MANALOOM_FORCE_FOCUS_ACCESS_MODE=opening_hand` against the current
    evaluation target player, but forced access is diagnostic evidence only and
    must not count as a natural battle gate or promotion gate;
-30. rerun `global_commander_cut_source_lane_expander.py` with the forced
+31. rerun `global_commander_cut_source_lane_expander.py` with the forced
    cut-access report before reducing scope again; if forced access proves the
    unresolved cuts are used, candidate copy remains closed and the next route is
    a new value-safe cut source or a smaller package with fresh cut proof;
-31. run `global_commander_post_forced_recovery_synthesizer.py` after post-forced
+32. run `global_commander_post_forced_recovery_synthesizer.py` after post-forced
    cut-lane expansion and scope reduction; it must select the next evidence
    lane without deck action, and if no value-safe cut pair exists it must route
    to mining a fresh value-safe cut source before package resynthesis;
-32. run `global_commander_value_safe_cut_source_miner.py` after post-forced
+33. run `global_commander_value_safe_cut_source_miner.py` after post-forced
     recovery routes to a fresh cut source; it may mine hypotheses from the
     current deck, but fresh hypotheses are not value-safe cuts until trace,
     same-lane, or equal-gate proof is collected;
-33. run `global_commander_cut_source_hypothesis_trace_collector.py` after fresh
+34. run `global_commander_cut_source_hypothesis_trace_collector.py` after fresh
     hypotheses exist; it must reuse current replay artifacts first, count only
     target-deck usage, and keep candidate copy closed when a hypothesis was used
     or only seen without a negative proof;
-34. run `global_commander_cut_hypothesis_same_lane_proof.py` after fresh
+35. run `global_commander_cut_hypothesis_same_lane_proof.py` after fresh
     hypothesis trace collection blocks value-safe reclassification; it must
     compare used/seen hypotheses against explicit package add axes, treat
     profile-role overlap as incidental unless the add covers that lane, and
     route to more cut-source mining or external cut research when no explicit
     same-lane route exists;
-35. run `global_commander_external_cut_source_research_plan.py` when same-lane
+36. run `global_commander_external_cut_source_research_plan.py` when same-lane
     proof routes to more mining or external research; it must record current
     official/Commander source lanes, separate popularity and strategy articles
     from deck truth, and route to external commander reference corpus collection
     without opening candidate copy, battle, promotion, or value-safe
     reclassification;
-36. run `global_commander_external_reference_corpus_collector.py` after the
+37. run `global_commander_external_reference_corpus_collector.py` after the
     external research plan; it must map external corpus presence, absence,
     bracket context, and strategy-article signals back to named cut candidates,
     while preserving the rule that external absence cannot override target-deck
     usage and external presence cannot replace same-lane/equal-gate proof;
-37. run `global_commander_external_corpus_cut_policy_mapper.py` after corpus
+38. run `global_commander_external_corpus_cut_policy_mapper.py` after corpus
     collection; it must convert corpus rows into explicit miner exclusions and
     negative-review holds so the next miner pass cannot recycle the same
     blocked hypotheses as fresh value-safe cuts without new evidence;
-38. rerun `global_commander_value_safe_cut_source_miner.py` with
+39. rerun `global_commander_value_safe_cut_source_miner.py` with
     `--external-cut-policy-report` after policy mapping; if the policy consumes
     all current hypotheses and no fresh value-safe cut source remains, the route
     must broaden the package axis or external cut research rather than opening
     candidate copy, battle, or promotion;
-39. run `global_commander_package_axis_broadening_plan.py` after policy-aware
+40. run `global_commander_package_axis_broadening_plan.py` after policy-aware
     mining exhausts the current cut lane; it must compare current package add
     axes with target cut roles, treat secondary text on payoff cards as
     incidental rather than same-lane proof, and route to package resynthesis
     with same-lane axis requirements or external nonpayoff cut-lane corpus
     research without opening candidate copy, battle, promotion, or value-safe
     reclassification;
-40. run `global_commander_same_lane_package_resynthesizer.py` after package-axis
+41. run `global_commander_same_lane_package_resynthesizer.py` after package-axis
     broadening routes to same-lane resynthesis; it must convert each exhausted
     target cut role into an explicit required add axis, hold payoff-only adds
     until they have their own same-lane cuts, and route to same-lane add source
     lane expansion while candidate copy, battle, promotion, and value-safe
     reclassification remain closed;
-41. run `global_commander_same_lane_add_source_lane_expander.py` after same-lane
+42. run `global_commander_same_lane_add_source_lane_expander.py` after same-lane
     package resynthesis; it must scan the current evaluation DB for legal,
     commander-color-compatible source candidates for each required add axis,
     separate review-only candidates from blocked color/legality/existing-deck
     rows, and route to package resynthesis from source lanes while candidate
     copy, battle, promotion, and value-safe reclassification stay closed;
-42. run `global_commander_same_lane_package_source_synthesizer.py` after all
+43. run `global_commander_same_lane_package_source_synthesizer.py` after all
     required same-lane add source lanes have review candidates; it must select a
     bounded review-only add package with explicit required axes, keep every add
     unpaired until value-safe cuts are proven, and route to same-lane cut-pair
     collection without opening candidate copy, battle, promotion, or value-safe
     reclassification;
-43. run `global_commander_same_lane_cut_pair_collector.py` after same-lane
+44. run `global_commander_same_lane_cut_pair_collector.py` after same-lane
     package source synthesis; it must pair each selected add only with a cut in
     the exact `replaces_cut_role`, classify protected/staple/expected-package
     cuts as stage-only or blocked, and keep candidate copy, battle, promotion,
     and value-safe reclassification closed when no same-lane value-safe pairs
     exist;
-44. run `global_commander_same_lane_cut_evidence_plan.py` when same-lane cut
+45. run `global_commander_same_lane_cut_evidence_plan.py` when same-lane cut
     pairing finds only stage-only or hard-blocked cuts; it must map every
     stage-only reason to trace, staple, anchor, prior-gate, cross-role, or
     manual evidence lanes without reclassifying cuts or opening candidate copy,
     battle, promotion, or value-safe reclassification;
-45. run `global_commander_same_lane_stage_cut_trace_collector.py` after the
+46. run `global_commander_same_lane_stage_cut_trace_collector.py` after the
     same-lane cut evidence plan; it must reuse existing current-scope traces and
     local external/reference artifacts to classify stage-only cuts as used,
     seen-needs-negative-review, external-reference-only, or trace-missing while
     keeping candidate copy, battle, promotion, and value-safe reclassification
     closed;
-46. run `global_commander_same_lane_used_cut_recovery_router.py` when stage-cut
+47. run `global_commander_same_lane_used_cut_recovery_router.py` when stage-cut
     trace collection shows used cuts; it must route used cuts to explicit
     same-lane replacement proof or fresh cut-source mining/research, and it
     must keep every used cut non-value-safe until that later evidence exists;
-47. run `global_commander_same_lane_new_cut_source_miner.py` after used-cut
+48. run `global_commander_same_lane_new_cut_source_miner.py` after used-cut
     recovery routes to fresh cut-source mining; it must scan the current
     evaluation DB for unconsumed same-lane cut sources, block any card already
     used, seen, stage-only, blocked, or traced in the current evidence chain,
@@ -375,75 +380,75 @@ Operational priority after this pivot:
     exists. If none exists, it must broaden same-lane cut research or package
     axis before candidate copy, battle, promotion, or value-safe
     reclassification;
-48. run `global_commander_same_lane_cut_axis_broadening_plan.py` when same-lane
+49. run `global_commander_same_lane_cut_axis_broadening_plan.py` when same-lane
     new cut-source mining exhausts the current deck; it must convert exhausted
     target roles into explicit external nonpayoff same-lane corpus actions,
     hold the selected add package, forbid recycling used/seen/stage-only or
     blocked cuts, and keep candidate copy, battle, promotion, and value-safe
     reclassification closed;
-49. run `global_commander_external_nonpayoff_same_lane_cut_corpus_collector.py`
+50. run `global_commander_external_nonpayoff_same_lane_cut_corpus_collector.py`
     after cut-axis broadening routes to external nonpayoff same-lane corpus; it
     must record role-level external source signals, source limitations, bracket
     and combo-dependency context, and target-deck trace override boundaries
     without creating cut permission, candidate copy, battle, promotion, or
     value-safe reclassification;
-50. run `global_commander_external_nonpayoff_same_lane_cut_policy_mapper.py`
+51. run `global_commander_external_nonpayoff_same_lane_cut_policy_mapper.py`
     after corpus collection; it must convert role-level corpus into explicit
     source-discovery policy, keep the policy role-level rather than card-level
     cut permission, require named external source candidates before miner
     reruns, and keep candidate copy, battle, promotion, and value-safe
     reclassification closed;
-51. run `global_commander_external_nonpayoff_same_lane_source_candidate_discoverer.py`
+52. run `global_commander_external_nonpayoff_same_lane_source_candidate_discoverer.py`
     after policy mapping; it must turn allowed role-level source-discovery
     policy into named external source-candidate rows, classify current-deck,
     held-package, locally resolved, and unresolved cards, and keep card-level
     cut permission, candidate copy, battle, promotion, and value-safe
     reclassification closed;
-52. run `global_commander_external_nonpayoff_same_lane_source_candidate_reviewer.py`
+53. run `global_commander_external_nonpayoff_same_lane_source_candidate_reviewer.py`
     after source-candidate discovery; it must locally review named candidates
     against identity, commander color identity, and role-text evidence, allow
     only resolved outside-deck/outside-package candidates as miner source seeds,
     and keep card-level cut permission, candidate copy, battle, promotion, and
     value-safe reclassification closed;
-53. run `global_commander_reviewed_external_nonpayoff_seeded_cut_source_miner.py`
+54. run `global_commander_reviewed_external_nonpayoff_seeded_cut_source_miner.py`
     after local seed review; it must rerun same-lane cut-source mining with
     reviewed external nonpayoff seeds, prove whether any current-deck cut source
     is fresh for a seeded role, route fresh hypotheses to trace collection, and
     keep card-level cut permission, candidate copy, battle, promotion, and
     value-safe reclassification closed;
-54. run `global_commander_reviewed_external_seeded_cut_trace_collector.py`
+55. run `global_commander_reviewed_external_seeded_cut_trace_collector.py`
     after seeded cut-source mining finds fresh hypotheses; it must reuse
     existing replay/decision trace artifacts to classify each seeded hypothesis
     as used, seen without usage, or unseen, and keep card-level cut permission,
     candidate copy, battle, promotion, and value-safe reclassification closed;
-55. run `global_commander_reviewed_external_seeded_force_access_trace_generator.py`
+56. run `global_commander_reviewed_external_seeded_force_access_trace_generator.py`
     only for unseen reviewed external seeded hypotheses; it must use forced
     access against the current evaluation target, classify `not_found` as
     absent from the selected evaluation DB rather than negative proof, and keep
     card-level cut permission, candidate copy, battle, promotion, and
     value-safe reclassification closed;
-56. rerun `global_commander_reviewed_external_nonpayoff_seeded_cut_source_miner.py`
+57. rerun `global_commander_reviewed_external_nonpayoff_seeded_cut_source_miner.py`
     with `--db` pointing at the current evaluation DB whenever seeded
     force-access proves prior hypotheses are absent from that DB; if no fresh
     seeded same-lane source remains, route to broader external nonpayoff seed
     research or current-deck negative review before any candidate copy, battle,
     promotion, or value-safe reclassification;
-57. run `global_commander_external_nonpayoff_seed_exhaustion_recovery_router.py`
+58. run `global_commander_external_nonpayoff_seed_exhaustion_recovery_router.py`
     after current-DB seeded mining exhausts; it must separate exhausted seeded
     roles, unseeded roles, current-deck external candidates, held package adds,
     and identity gaps before opening any further source research;
-58. run `global_commander_external_nonpayoff_current_deck_negative_review_collector.py`
+59. run `global_commander_external_nonpayoff_current_deck_negative_review_collector.py`
     when the recovery router finds external candidates already in the current
     deck; it must reuse current-scope traces, block any used card from
     negative-review cut consideration, and keep candidate copy, battle,
     promotion, and value-safe reclassification closed;
-59. run `global_commander_external_nonpayoff_new_source_or_replacement_finder.py`
+60. run `global_commander_external_nonpayoff_new_source_or_replacement_finder.py`
     after current-deck negative review blocks used cards; it must separate
     current-deck replacement blockers, held package adds, recycled prior seeds,
     land-lane candidates, legality/identity blockers, and genuinely fresh
     outside-deck source candidates before any miner rerun, candidate copy,
     battle, promotion, or value-safe reclassification;
-60. run `global_commander_external_nonpayoff_new_source_candidate_reviewer.py`
+61. run `global_commander_external_nonpayoff_new_source_candidate_reviewer.py`
     after new-source finding; it must locally revalidate finder-ready rows
     against current evaluation DB identity, deck presence, held package state,
     recycled seed state, commander legality, land-lane routing, and role text,
@@ -454,7 +459,7 @@ Operational priority after this pivot:
     to broader external nonpayoff seed research or current-deck negative review
     before any deck action; its immediate next gate is
     `rerun_seeded_cut_source_miner_with_new_reviewed_external_nonpayoff_sources`;
-61. run `global_commander_external_nonpayoff_source_candidate_pool_expander.py`
+62. run `global_commander_external_nonpayoff_source_candidate_pool_expander.py`
     when the post-review seeded miner and seed-exhaustion router route to source
     expansion; it must use current external source snapshots, local DB identity,
     current-deck presence, prior seed recycling checks, Commander legality,
@@ -462,7 +467,7 @@ Operational priority after this pivot:
     exhausted cards. It may create review-ready source candidates only; it must
     keep card-level cut permission, candidate copy, battle, promotion, and
     value-safe reclassification closed;
-62. run `global_commander_external_nonpayoff_expanded_source_candidate_reviewer.py`
+63. run `global_commander_external_nonpayoff_expanded_source_candidate_reviewer.py`
     after source-candidate pool expansion; it must revalidate expanded rows
     against current deck presence, prior recycling, Commander legality, local
     identity, color identity, land-lane routing, and role text before allowing
@@ -470,7 +475,7 @@ Operational priority after this pivot:
     cards and cards already present in the current evaluation deck remain
     blocked. It must keep card-level cut permission, candidate copy, battle,
     promotion, and value-safe reclassification closed;
-63. run `global_commander_external_nonpayoff_followup_source_candidate_expander.py`
+64. run `global_commander_external_nonpayoff_followup_source_candidate_expander.py`
     when the expanded seeded miner and current-deck negative review still block
     every cut source; it must treat all prior finder, reviewer, and expander
     rows as cumulatively recycled, then use current external source snapshots,
@@ -479,26 +484,26 @@ Operational priority after this pivot:
     feed the existing expanded reviewer shape, but it must keep card-level cut
     permission, candidate copy, battle, promotion, and value-safe
     reclassification closed;
-64. run `global_commander_external_nonpayoff_live_source_research_expander.py`
+65. run `global_commander_external_nonpayoff_live_source_research_expander.py`
     after a cumulative source-candidate expansion finds no ready candidates; it
     must broaden current external source types, map live nonpayoff cards into
     the existing expanded-reviewer row shape, recheck local identity, current
     deck presence, Commander legality, land-lane routing, prior recycling, and
     role text, and keep card-level cut permission, candidate copy, battle,
     promotion, and value-safe reclassification closed;
-65. run `global_commander_external_nonpayoff_manual_negative_trace_reviewer.py`
+66. run `global_commander_external_nonpayoff_manual_negative_trace_reviewer.py`
     after current-deck negative review finds candidates seen without usage; it
     must distinguish used cards, static/passive effects, land-lane context, and
     weak seen-without-usage evidence before any cut consideration. It may block
     weak negative evidence only; it must keep card-level cut permission,
     candidate copy, battle, promotion, and value-safe reclassification closed;
-66. run `global_commander_external_nonpayoff_followup_live_source_research_expander.py`
+67. run `global_commander_external_nonpayoff_followup_live_source_research_expander.py`
     when manual negative trace review clears no current-deck cuts; it must carry
     all prior source, reviewer, miner, router, negative-review, and manual
     reports as cumulative recycling evidence, broaden only genuinely fresh live
     source lanes, and keep card-level cut permission, candidate copy, battle,
     promotion, and value-safe reclassification closed;
-67. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
+68. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
     probes, as regression evidence only unless they produce a named safe cut and
     equal-gate proof under the Lorehold promotion gate.
 
@@ -514,6 +519,8 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_land_cut_candidate_model_20260705_global_goal_hermes_only.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_nonland_core_candidate_model_20260705_global_goal_hermes_only.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_learning_priority_audit_20260706_source_exhaustion_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_learning_priority_audit_20260706_source_expansion_cycle_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_cross_commander_role_axis_learning_pivot_20260706_source_expansion_cycle_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_manual_negative_trace_reviewer_20260706_kaalia_value_safe_stage1_live_research.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_followup_live_source_research_expander_20260706_kaalia_value_safe_stage1_after_manual_trace.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_expanded_source_candidate_reviewer_20260706_kaalia_value_safe_stage1_followup_live_after_manual_trace.md`
@@ -1398,6 +1405,16 @@ Current external refresh on 2026-07-05:
   routes all three seeded roles back to broader source expansion with
   `candidate_copy_allowed_now=false`, `battle_gate_allowed_now=false`, and
   `promotion_allowed=false`.
+- The global learning queue now treats that router as
+  `source_expansion_cycle_requires_global_learning_pivot`, not ordinary source
+  expansion. Its top next action is
+  `pivot_to_cross_commander_role_axis_learning_before_more_same_deck_source_expansion`.
+  The cross-commander pivot groups `10` role axes, excludes `607` benchmark
+  evidence from action counts, and selects `engine` as the top global axis
+  (`16` actionable decks, `6` commanders, `source_cycle_axis_count=4`). The
+  next gate is
+  `build_cross_commander_role_axis_policy_before_more_same_deck_source_expansion`;
+  candidate copy, battle, and promotion remain closed.
 
 ## Global Commander Rollout - 2026-07-01
 

@@ -38,6 +38,12 @@ GLOBAL_COMMANDER_NAMED_LAND_CANDIDATE_POOL = SCRIPT_DIR / "global_commander_name
 GLOBAL_COMMANDER_LAND_CUT_CANDIDATE_MODEL = SCRIPT_DIR / "global_commander_land_cut_candidate_model.py"
 GLOBAL_COMMANDER_NONLAND_CORE_CANDIDATE_MODEL = SCRIPT_DIR / "global_commander_nonland_core_candidate_model.py"
 GLOBAL_COMMANDER_LEARNING_PRIORITY_AUDIT = SCRIPT_DIR / "global_commander_learning_priority_audit.py"
+GLOBAL_COMMANDER_CROSS_COMMANDER_ROLE_AXIS_LEARNING_PIVOT = (
+    SCRIPT_DIR / "global_commander_cross_commander_role_axis_learning_pivot.py"
+)
+GLOBAL_COMMANDER_CROSS_COMMANDER_ROLE_AXIS_LEARNING_PIVOT_TEST = (
+    SCRIPT_DIR / "test_global_commander_cross_commander_role_axis_learning_pivot.py"
+)
 GLOBAL_COMMANDER_CANDIDATE_COPY_MATERIALIZER = SCRIPT_DIR / "global_commander_candidate_copy_materializer.py"
 GLOBAL_COMMANDER_CANDIDATE_COPY_MATERIALIZER_TEST = (
     SCRIPT_DIR / "test_global_commander_candidate_copy_materializer.py"
@@ -386,7 +392,11 @@ GLOBAL_COMMANDER_NONLAND_CORE_CANDIDATE_MODEL_REPORT = (
 )
 GLOBAL_COMMANDER_LEARNING_PRIORITY_REPORT = (
     REPO_ROOT
-    / "docs/hermes-analysis/master_optimizer_reports/global_commander_learning_priority_audit_20260706_source_exhaustion_current.md"
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_learning_priority_audit_20260706_source_expansion_cycle_current.md"
+)
+GLOBAL_COMMANDER_CROSS_COMMANDER_ROLE_AXIS_LEARNING_PIVOT_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_cross_commander_role_axis_learning_pivot_20260706_source_expansion_cycle_current.md"
 )
 GLOBAL_COMMANDER_CANDIDATE_COPY_MATERIALIZER_REPORT = (
     REPO_ROOT
@@ -1726,13 +1736,37 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_battle_feedback_model_20260705_current",
                 "DEFAULT_SOURCE_EXHAUSTION_REPORT",
                 "source_exhaustion_router_before_candidate_copy",
+                "source_expansion_cycle_detection_before_more_same_deck_research",
+                "source_expansion_cycle_requires_global_learning_pivot",
+                "pivot_to_cross_commander_role_axis_learning_before_more_same_deck_source_expansion",
                 "source_exhaustion_gate_counts",
-                "expand_external_nonpayoff_source_candidate_pool_before_candidate_copy",
                 "battle_feedback_model_before_requeue",
                 "blocked_exact_add_cut_pair_count",
                 "current_official_bracket_model_has_five_brackets_and_game_changers",
                 "benchmark_regression_only_not_global_template",
                 "battle_or_optimization_performed",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_CROSS_COMMANDER_ROLE_AXIS_LEARNING_PIVOT,
+            [
+                "global_commander_cross_commander_role_axis_learning_pivot",
+                "source_cycle_decks_need_role_axis_policy_before_more_same_deck_source_expansion",
+                "deck_607_is_benchmark_evidence_only_not_action_source",
+                "candidate_copy_allowed_now",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_CROSS_COMMANDER_ROLE_AXIS_LEARNING_PIVOT_TEST,
+            [
+                "test_source_cycle_prioritizes_role_axis_without_deck_action",
+                "source_expansion_cycle_requires_global_learning_pivot",
+                "Kaalia Variant",
+                "benchmark_only_excluded_from_action_count",
             ],
         )
     )
@@ -3312,6 +3346,32 @@ def build_audit() -> dict[str, Any]:
             if GLOBAL_COMMANDER_LEARNING_PRIORITY_REPORT.exists()
             else ["global_commander_learning_priority_report"],
         }
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_LEARNING_PRIORITY_REPORT,
+            [
+                "Global Commander Learning Priority Audit",
+                "source_expansion_cycle_requires_global_learning_pivot",
+                "pivot_to_cross_commander_role_axis_learning_before_more_same_deck_source_expansion",
+                "source_expansion_cycle_detection_before_more_same_deck_research",
+                "Deck 607 is ranked only as a regression benchmark",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_CROSS_COMMANDER_ROLE_AXIS_LEARNING_PIVOT_REPORT,
+            [
+                "Global Commander Cross-Commander Role Axis Learning Pivot",
+                "cross_commander_role_axis_learning_pivot_ready_no_deck_action",
+                "top_axis_role: `engine`",
+                "source_cycle_axis_count: `4`",
+                "benchmark_only_excluded_from_action_count: `5`",
+                "build_cross_commander_role_axis_policy_before_more_same_deck_source_expansion",
+                "deck_607_is_benchmark_evidence_only_not_action_source",
+            ],
+        )
     )
     for path, spec in VOLATILE_HISTORICAL_REPORTS.items():
         volatile_historical_reports.append(check_volatile_historical_report(path, spec))

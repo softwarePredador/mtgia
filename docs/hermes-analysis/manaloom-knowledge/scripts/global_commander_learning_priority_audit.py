@@ -24,9 +24,10 @@ DEFAULT_NONLAND_REPORT = REPORT_DIR / "global_commander_nonland_core_candidate_m
 DEFAULT_BATTLE_FEEDBACK_REPORT = REPORT_DIR / "global_commander_battle_feedback_model_20260705_current.json"
 DEFAULT_SOURCE_EXHAUSTION_REPORT = (
     REPORT_DIR
-    / "global_commander_external_nonpayoff_seed_exhaustion_recovery_router_20260706_kaalia_value_safe_stage1_repair_scope1_followup_after_mana_vault.json"
+    / "global_commander_external_nonpayoff_seed_exhaustion_recovery_router_20260706_kaalia_value_safe_stage1_followup_live_after_manual_trace.json"
 )
 BRACKET_POLICY_FILE = REPO_ROOT / "server/lib/edh_bracket_policy.dart"
+SOURCE_EXPANSION_CYCLE_RECYCLED_CUT_SOURCE_THRESHOLD = 40
 
 EXTERNAL_RESEARCH_SNAPSHOT = [
     {
@@ -203,11 +204,20 @@ def source_exhaustion_summary_by_deck(source_exhaustion_payload: dict[str, Any])
     next_gate = str(summary.get("next_gate") or "")
     prior_fresh = int(summary.get("prior_fresh_seeded_same_lane_cut_source_count") or 0)
     seeded_exhausted = int(summary.get("seeded_exhausted_role_count") or 0)
+    target_role_count = int(summary.get("target_role_count") or 0)
     current_deck_review = int(summary.get("current_deck_negative_review_candidate_count") or 0)
+    blocked_recycled = int(summary.get("prior_blocked_recycled_seeded_cut_source_count") or 0)
+    all_seeded_roles_exhausted = bool(target_role_count and seeded_exhausted >= target_role_count)
     state = "not_applicable"
     if candidate_copy_allowed is False:
         if current_deck_review > 0:
             state = "current_deck_negative_review_required_before_candidate_copy"
+        elif (
+            prior_fresh == 0
+            and all_seeded_roles_exhausted
+            and blocked_recycled >= SOURCE_EXPANSION_CYCLE_RECYCLED_CUT_SOURCE_THRESHOLD
+        ):
+            state = "source_expansion_cycle_requires_global_learning_pivot"
         elif "source_candidate_pool" in next_gate or (prior_fresh == 0 and seeded_exhausted > 0):
             state = "source_expansion_required_before_candidate_copy"
         else:
@@ -223,14 +233,14 @@ def source_exhaustion_summary_by_deck(source_exhaustion_payload: dict[str, Any])
             "candidate_copy_allowed_now": candidate_copy_allowed,
             "battle_gate_allowed_now": bool(source_exhaustion_payload.get("battle_gate_allowed_now")),
             "next_gate": next_gate or "none",
-            "target_role_count": int(summary.get("target_role_count") or 0),
+            "target_role_count": target_role_count,
             "seeded_exhausted_role_count": seeded_exhausted,
             "unseeded_role_count": int(summary.get("unseeded_role_count") or 0),
             "current_deck_negative_review_candidate_count": current_deck_review,
             "prior_fresh_seeded_same_lane_cut_source_count": prior_fresh,
-            "prior_blocked_recycled_seeded_cut_source_count": int(
-                summary.get("prior_blocked_recycled_seeded_cut_source_count") or 0
-            ),
+            "prior_blocked_recycled_seeded_cut_source_count": blocked_recycled,
+            "all_seeded_roles_exhausted": all_seeded_roles_exhausted,
+            "source_expansion_cycle_threshold": SOURCE_EXPANSION_CYCLE_RECYCLED_CUT_SOURCE_THRESHOLD,
             "candidate_copy_blockers": list(source_exhaustion_payload.get("candidate_copy_blockers") or []),
         }
     }
@@ -242,6 +252,7 @@ def source_exhaustion_blocks_candidate_copy(source_exhaustion_summary: dict[str,
     state = source_exhaustion_summary.get("state") or source_exhaustion_summary.get("source_exhaustion_state")
     return str(state or "") in {
         "current_deck_negative_review_required_before_candidate_copy",
+        "source_expansion_cycle_requires_global_learning_pivot",
         "source_expansion_required_before_candidate_copy",
         "source_exhaustion_unresolved_before_candidate_copy",
     }
@@ -307,6 +318,8 @@ def next_action_for_deck(
     if stage == "core_floor_repair" and source_exhaustion_blocks_candidate_copy(source_exhaustion_summary):
         if str((source_exhaustion_summary or {}).get("state")) == "current_deck_negative_review_required_before_candidate_copy":
             return "collect_current_deck_negative_review_before_candidate_copy"
+        if str((source_exhaustion_summary or {}).get("state")) == "source_expansion_cycle_requires_global_learning_pivot":
+            return "pivot_to_cross_commander_role_axis_learning_before_more_same_deck_source_expansion"
         return "expand_external_nonpayoff_source_candidate_pool_before_candidate_copy"
     if stage == "core_floor_repair" and gate_state == "land_add_cut_pool_ready_review_only":
         if has_commander_source_lane:
@@ -400,6 +413,12 @@ def build_deck_priorities(
                 ),
                 "source_exhaustion_prior_blocked_recycled_cut_source_count": int(
                     (source_exhaustion_summary or {}).get("prior_blocked_recycled_seeded_cut_source_count") or 0
+                ),
+                "source_exhaustion_all_seeded_roles_exhausted": bool(
+                    (source_exhaustion_summary or {}).get("all_seeded_roles_exhausted")
+                ),
+                "source_expansion_cycle_threshold": int(
+                    (source_exhaustion_summary or {}).get("source_expansion_cycle_threshold") or 0
                 ),
                 "candidate_copy_allowed_by_source_exhaustion": (
                     (source_exhaustion_summary or {}).get("candidate_copy_allowed_now")
@@ -554,6 +573,7 @@ def build_report(
                 "land_candidate_pool_and_cut_model",
                 "nonland_candidate_pool_and_cut_model",
                 "source_exhaustion_router_before_candidate_copy",
+                "source_expansion_cycle_detection_before_more_same_deck_research",
                 "role_extreme_review",
                 "commander_profile_and_source_lanes",
                 "commander_specific_strategy_matrix",
@@ -653,9 +673,11 @@ def write_markdown(payload: dict[str, Any], path: Path) -> None:
             "",
             "## Method Notes",
             "",
+            f"- Priority order: `{payload['method']['priority_order']}`.",
             "- This is a learning queue, not a deck mutation permit.",
             "- Exact add/cut pairs blocked by battle feedback must not be requeued as fresh hypotheses.",
             "- Source-exhaustion routers override candidate-copy routing until a fresh same-lane cut source or required negative review exists.",
+            "- Repeated source expansion with all seeded roles exhausted and high recycled cut-source counts pivots to cross-commander role-axis learning before more same-deck research.",
             "- External sources calibrate priorities; PostgreSQL/backend remains product truth.",
             "- Deck 607 is ranked only as a regression benchmark and must not become the global objective function.",
             "",
