@@ -2,10 +2,10 @@ import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 
-import '../../../lib/auth_service.dart';
-import '../../../lib/logger.dart';
-import '../../../lib/observability.dart';
-import '../../../lib/scryfall_image_url.dart';
+import '../../../../lib/auth_service.dart';
+import '../../../../lib/logger.dart';
+import '../../../../lib/observability.dart';
+import '../../../../lib/scryfall_image_url.dart';
 
 Future<Response> onRequest(RequestContext context, String id) async {
   // Caso especial: /community/decks/following é capturado como id="following"

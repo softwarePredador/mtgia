@@ -49,7 +49,7 @@ void main() {
     test('community copy returns deck wrapper and copies basic card fields',
         () {
       final source =
-          File('routes/community/decks/[id].dart').readAsStringSync();
+          File('routes/community/decks/[id]/index.dart').readAsStringSync();
 
       final responseStart = source.indexOf('statusCode: HttpStatus.created,');
       final responseEnd =

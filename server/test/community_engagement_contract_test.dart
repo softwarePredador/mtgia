@@ -34,7 +34,8 @@ void main() {
     });
 
     test('public deck detail exposes visual analysis and comment count', () {
-      final route = File('routes/community/decks/[id].dart').readAsStringSync();
+      final route =
+          File('routes/community/decks/[id]/index.dart').readAsStringSync();
 
       expect(route, contains('comment_count'));
       expect(route, contains('comments_summary'));
