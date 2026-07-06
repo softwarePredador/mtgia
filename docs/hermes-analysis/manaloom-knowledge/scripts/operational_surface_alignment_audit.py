@@ -27,8 +27,10 @@ FAILURE_MODE_MATRIX = DOCS_DIR / "MANALOOM_FAILURE_MODE_VALIDATION_MATRIX_2026-0
 XMAGE_FLOW = DOCS_DIR / "XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md"
 BATTLE_RULES_CONTRACT = DOCS_DIR / "BATTLE_RULES_FAMILY_PIPELINE_CONTRACT_2026-06-29.md"
 DECKBUILDING_CONTRACT = DOCS_DIR / "COMMANDER_DECKBUILDING_CONTRACT_2026-06-29.md"
+APP_AI_BRIDGE_CONTRACT = DOCS_DIR / "APP_AI_KNOWLEDGE_BRIDGE_CONTRACT_2026-07-06.md"
 XMAGE_AUDIT = SCRIPT_DIR / "xmage_strategy_consistency_audit.py"
 DECKBUILDING_AUDIT = SCRIPT_DIR / "deckbuilding_contract_surface_audit.py"
+APP_AI_BRIDGE_AUDIT = SCRIPT_DIR / "app_ai_knowledge_bridge_audit.py"
 LOREHOLD_ARTIFACT_AUDIT = SCRIPT_DIR / "lorehold_artifact_contract_audit.py"
 LOREHOLD_PROMOTION_DECISION_AUDIT = SCRIPT_DIR / "lorehold_promotion_gate_decision_audit.py"
 VARIANT_MATRIX = SCRIPT_DIR / "lorehold_variant_strategy_matrix.py"
@@ -52,6 +54,7 @@ BUILD_OPTIMIZED_DECK = SCRIPT_DIR / "build_optimized_deck.py"
 UNIVERSAL_OPTIMIZER = SCRIPT_DIR / "universal_optimizer.py"
 ROUTE_GENERATE = REPO_ROOT / "server" / "routes" / "ai" / "generate" / "index.dart"
 DECKBUILDING_SUPPORT = REPO_ROOT / "server" / "lib" / "ai" / "commander_deckbuilding_contract_support.dart"
+QUALITY_GATE = REPO_ROOT / "scripts" / "quality_gate.sh"
 LEGACY_CONTAMINATION_BASELINE = DOCS_DIR / "LEGACY_CONTAMINATION_BASELINE_2026-06-30.json"
 
 CURRENT_XMAGE_MANIFEST = (
@@ -144,6 +147,8 @@ def build_checks() -> list[Check]:
                 "COMMANDER_DECKBUILDING_CONTRACT_2026-06-29.md",
                 "MANALOOM_OPERATIONAL_LOOKUP_GUIDE_2026-06-30.md",
                 "MANALOOM_FAILURE_MODE_VALIDATION_MATRIX_2026-06-30.md",
+                "APP_AI_KNOWLEDGE_BRIDGE_CONTRACT_2026-07-06.md",
+                "app_ai_knowledge_bridge_audit.py",
                 "legacy_contamination_audit.py",
                 CURRENT_XMAGE_MANIFEST,
                 "global_commander_deck_contract_audit.py",
@@ -179,6 +184,16 @@ def build_checks() -> list[Check]:
                 "legacy_contamination_audit.py",
             ],
             "docs.failure_mode_matrix_exists_and_covers_old_bug_classes",
+        ),
+        check_contains(
+            APP_AI_BRIDGE_CONTRACT,
+            [
+                "Status: `active_operating_contract`",
+                "PostgreSQL/backend is the product truth surface",
+                "Reports are evidence only",
+                "./scripts/quality_gate.sh ai-bridge",
+            ],
+            "docs.app_ai_bridge_contract_exists",
         ),
         check_contains(
             XMAGE_FLOW,
@@ -235,6 +250,27 @@ def build_checks() -> list[Check]:
                 "PG -> Hermes -> SQLite sync sequence drift",
             ],
             "scripts.legacy_contamination_audit_blocks_new_old_patterns",
+        ),
+        check_contains(
+            APP_AI_BRIDGE_AUDIT,
+            [
+                "GENERATE_ROUTE_REQUIRED",
+                "OPTIMIZE_CONSUMER_REQUIRED",
+                "PROMPT_EVAL_REQUIRED",
+                "APP_SANITIZATION_REQUIRED",
+                "runtime.no_report_md_as_product_truth",
+            ],
+            "scripts.app_ai_bridge_audit_blocks_report_only_knowledge",
+        ),
+        check_contains(
+            QUALITY_GATE,
+            [
+                "run_app_ai_bridge",
+                "ai-bridge",
+                "manaloom_app_ai_bridge_audit.sh",
+                "run_ai_prompt_eval",
+            ],
+            "scripts.quality_gate_exposes_app_ai_bridge",
         ),
         check_contains(
             LEGACY_CONTAMINATION_BASELINE,

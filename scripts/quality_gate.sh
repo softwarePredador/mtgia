@@ -90,6 +90,17 @@ run_resolution_corpus() {
   "$ROOT_DIR/scripts/quality_gate_resolution_corpus.sh"
 }
 
+run_ai_prompt_eval() {
+  print_header "Commander AI prompt eval"
+  "$ROOT_DIR/scripts/manaloom_ai_prompt_eval.sh"
+}
+
+run_app_ai_bridge() {
+  print_header "App AI knowledge bridge audit"
+  "$ROOT_DIR/scripts/manaloom_app_ai_bridge_audit.sh"
+  run_ai_prompt_eval
+}
+
 ensure_cmd() {
   if ! command -v "$1" >/dev/null 2>&1; then
     echo "❌ Comando não encontrado: $1"
@@ -108,6 +119,8 @@ Uso:
   ./scripts/quality_gate.sh quick   # validação rápida (dart test + flutter analyze)
   ./scripts/quality_gate.sh full    # validação completa (dart test + flutter analyze + flutter test)
   ./scripts/quality_gate.sh resolution # gate recorrente do corpus de resolução
+  ./scripts/quality_gate.sh ai-eval # eval fixa de prompt/saída da IA Commander
+  ./scripts/quality_gate.sh ai-bridge # ponte app/IA: auditoria + eval Commander
 
 Dica:
   Use 'quick' durante implementação e 'full' antes de concluir item/sprint.
@@ -120,6 +133,8 @@ Exemplos:
   ./scripts/quality_gate.sh full
   API_BASE_URL=https://sua-api.easypanel.host ./scripts/quality_gate.sh full
   ./scripts/quality_gate.sh resolution
+  ./scripts/quality_gate.sh ai-eval
+  ./scripts/quality_gate.sh ai-bridge
 EOF
 }
 
@@ -137,6 +152,12 @@ main() {
       ;;
     resolution)
       run_resolution_corpus
+      ;;
+    ai-eval)
+      run_ai_prompt_eval
+      ;;
+    ai-bridge)
+      run_app_ai_bridge
       ;;
     -h|--help|help)
       print_usage

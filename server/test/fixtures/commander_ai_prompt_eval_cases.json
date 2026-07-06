@@ -1,0 +1,503 @@
+{
+  "schema_version": "commander_ai_prompt_eval_v1_2026-07-06",
+  "minimum_score": 90,
+  "cases": [
+    {
+      "id": "kaalia_collection_budget_bracket3",
+      "commander": "Kaalia of the Vast",
+      "archetype": "mardu attack-window midrange",
+      "bracket": 3,
+      "color_identity": ["W", "B", "R"],
+      "recommendation_context": {
+        "prefer_collection": true,
+        "budget_limit_brl": 100,
+        "include_price_risk_curve_bracket": true
+      },
+      "deck": [
+        "Kaalia of the Vast",
+        "Boros Guildgate",
+        "Murder",
+        "Genji Glove",
+        "Archaeomancer's Map",
+        "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+        "Ancient Copper Dragon",
+        "Lightning Greaves",
+        "Sol Ring",
+        "Demonic Tutor"
+      ],
+      "protected_cards": [
+        "Kaalia of the Vast",
+        "Archaeomancer's Map",
+        "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+        "Ancient Copper Dragon",
+        "Lightning Greaves",
+        "Sol Ring",
+        "Demonic Tutor"
+      ],
+      "blocked_pairs": [
+        {
+          "out": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+          "in": "Feed the Swarm",
+          "reason": "larger equal gate failed; do not recycle this pair without new source lane"
+        },
+        {
+          "out": "Archaeomancer's Map",
+          "in": "Feed the Swarm",
+          "reason": "battle feedback blocks this exact pair"
+        }
+      ],
+      "expected": {
+        "min_total_score": 92,
+        "min_collection_matches": 1,
+        "role_count_after_at_least": {
+          "land": 1,
+          "removal": 1,
+          "protection": 1
+        },
+        "role_delta_at_least": {
+          "ramp": 0,
+          "tutor": 0
+        }
+      },
+      "card_catalog": {
+        "Kaalia of the Vast": {
+          "roles": ["commander", "attack_window", "payoff"],
+          "color_identity": ["W", "B", "R"],
+          "price_brl": 0,
+          "owned": true,
+          "min_bracket": 2
+        },
+        "Boros Guildgate": {
+          "roles": ["land", "mana_fixing"],
+          "color_identity": ["W", "R"],
+          "price_brl": 1,
+          "owned": true,
+          "min_bracket": 1
+        },
+        "Battlefield Forge": {
+          "roles": ["land", "mana_fixing"],
+          "color_identity": [],
+          "price_brl": 22,
+          "owned": true,
+          "min_bracket": 2
+        },
+        "Murder": {
+          "roles": ["removal"],
+          "color_identity": ["B"],
+          "price_brl": 2,
+          "owned": true,
+          "min_bracket": 1
+        },
+        "Anguished Unmaking": {
+          "roles": ["removal"],
+          "color_identity": ["W", "B"],
+          "price_brl": 36,
+          "owned": false,
+          "min_bracket": 2
+        },
+        "Genji Glove": {
+          "roles": ["protection", "equipment", "attack_window"],
+          "color_identity": [],
+          "price_brl": 4,
+          "owned": true,
+          "min_bracket": 1
+        },
+        "Swiftfoot Boots": {
+          "roles": ["protection", "equipment", "attack_window"],
+          "color_identity": [],
+          "price_brl": 28,
+          "owned": false,
+          "min_bracket": 2
+        },
+        "Archaeomancer's Map": {
+          "roles": ["ramp", "land"],
+          "color_identity": ["W"],
+          "price_brl": 50,
+          "owned": true,
+          "min_bracket": 2
+        },
+        "Birgi, God of Storytelling // Harnfel, Horn of Bounty": {
+          "roles": ["ramp", "engine"],
+          "color_identity": ["R"],
+          "price_brl": 45,
+          "owned": true,
+          "min_bracket": 3
+        },
+        "Feed the Swarm": {
+          "roles": ["removal"],
+          "color_identity": ["B"],
+          "price_brl": 6,
+          "owned": false,
+          "min_bracket": 2
+        },
+        "Ancient Copper Dragon": {
+          "roles": ["payoff", "ramp"],
+          "color_identity": ["R"],
+          "price_brl": 240,
+          "owned": true,
+          "min_bracket": 3
+        },
+        "Lightning Greaves": {
+          "roles": ["protection", "equipment", "attack_window"],
+          "color_identity": [],
+          "price_brl": 42,
+          "owned": true,
+          "min_bracket": 2
+        },
+        "Sol Ring": {
+          "roles": ["ramp"],
+          "color_identity": [],
+          "price_brl": 10,
+          "owned": true,
+          "min_bracket": 2
+        },
+        "Demonic Tutor": {
+          "roles": ["tutor"],
+          "color_identity": ["B"],
+          "price_brl": 200,
+          "owned": true,
+          "min_bracket": 4
+        }
+      },
+      "candidate_response": {
+        "summary": "Kaalia precisa manter a janela de ataque e trocar cartas lentas sem reciclar pares bloqueados por battle.",
+        "swaps": [
+          {
+            "out": "Boros Guildgate",
+            "in": "Battlefield Forge",
+            "category": "Land Base",
+            "reasoning": "Funcao: melhora mana fixing sem entrar virado. Risco: causa dano, mas Kaalia bracket 3 aceita esse tradeoff. Curva: nao aumenta mana value. Preco: owned/colecao, custo BRL 0. Bracket: adequado para upgraded sem virar cEDH.",
+            "priority": "High"
+          },
+          {
+            "out": "Murder",
+            "in": "Anguished Unmaking",
+            "category": "Removal",
+            "reasoning": "Funcao: removal instantaneo e mais amplo. Risco: perde 3 vidas, aceitavel em Commander. Curva: mesmo custo 3, mas resposta muito melhor. Preco: BRL 36 dentro do budget. Bracket: encaixa no bracket 3 sem elevar para cEDH.",
+            "priority": "High"
+          },
+          {
+            "out": "Genji Glove",
+            "in": "Swiftfoot Boots",
+            "category": "Protection",
+            "reasoning": "Funcao: protege Kaalia e acelera ataque com haste. Risco: ainda perde para wipe global. Curva: custo 2 com equip 1 e entra antes do comandante. Preco: BRL 28 dentro do budget. Bracket: protecao comum e justa para bracket 3.",
+            "priority": "Medium"
+          }
+        ]
+      }
+    },
+    {
+      "id": "lorehold_protected_anchor_bracket2",
+      "commander": "Velomachus Lorehold",
+      "archetype": "boros spells recursion",
+      "bracket": 2,
+      "color_identity": ["W", "R"],
+      "recommendation_context": {
+        "prefer_collection": false,
+        "budget_limit_brl": 80,
+        "include_price_risk_curve_bracket": true
+      },
+      "deck": [
+        "Velomachus Lorehold",
+        "Boros Locket",
+        "Commander's Sphere",
+        "Seething Song",
+        "Sunforger",
+        "Lorehold Command",
+        "Wrath of God",
+        "Faithless Looting",
+        "Plains",
+        "Mountain"
+      ],
+      "protected_cards": [
+        "Velomachus Lorehold",
+        "Sunforger",
+        "Seething Song",
+        "Lorehold Command",
+        "Wrath of God"
+      ],
+      "blocked_pairs": [],
+      "expected": {
+        "min_total_score": 90,
+        "min_collection_matches": 0,
+        "role_count_after_at_least": {
+          "ramp": 2,
+          "draw": 1,
+          "wipe": 1
+        },
+        "role_delta_at_least": {
+          "wipe": 0,
+          "engine": 0
+        }
+      },
+      "card_catalog": {
+        "Velomachus Lorehold": {
+          "roles": ["commander", "payoff"],
+          "color_identity": ["W", "R"],
+          "price_brl": 0,
+          "owned": true,
+          "min_bracket": 2
+        },
+        "Boros Locket": {
+          "roles": ["ramp", "draw"],
+          "color_identity": ["W", "R"],
+          "price_brl": 2,
+          "owned": true,
+          "min_bracket": 1
+        },
+        "Talisman of Conviction": {
+          "roles": ["ramp", "mana_fixing"],
+          "color_identity": [],
+          "price_brl": 24,
+          "owned": false,
+          "min_bracket": 2
+        },
+        "Commander's Sphere": {
+          "roles": ["ramp", "draw"],
+          "color_identity": [],
+          "price_brl": 2,
+          "owned": true,
+          "min_bracket": 1
+        },
+        "Arcane Signet": {
+          "roles": ["ramp", "mana_fixing"],
+          "color_identity": [],
+          "price_brl": 18,
+          "owned": false,
+          "min_bracket": 2
+        },
+        "Seething Song": {
+          "roles": ["ramp", "engine"],
+          "color_identity": ["R"],
+          "price_brl": 20,
+          "owned": true,
+          "min_bracket": 2
+        },
+        "Sunforger": {
+          "roles": ["engine", "tutor", "interaction"],
+          "color_identity": ["W", "R"],
+          "price_brl": 35,
+          "owned": true,
+          "min_bracket": 2
+        },
+        "Lorehold Command": {
+          "roles": ["engine", "removal", "draw"],
+          "color_identity": ["W", "R"],
+          "price_brl": 8,
+          "owned": true,
+          "min_bracket": 2
+        },
+        "Wrath of God": {
+          "roles": ["wipe"],
+          "color_identity": ["W"],
+          "price_brl": 50,
+          "owned": true,
+          "min_bracket": 2
+        },
+        "Faithless Looting": {
+          "roles": ["draw", "selection"],
+          "color_identity": ["R"],
+          "price_brl": 4,
+          "owned": true,
+          "min_bracket": 1
+        },
+        "Plains": {
+          "roles": ["land"],
+          "color_identity": [],
+          "price_brl": 0,
+          "owned": true,
+          "min_bracket": 1
+        },
+        "Mountain": {
+          "roles": ["land"],
+          "color_identity": [],
+          "price_brl": 0,
+          "owned": true,
+          "min_bracket": 1
+        }
+      },
+      "candidate_response": {
+        "summary": "O shell Lorehold melhora ao baixar rocks de 3 manas sem cortar engine protegida.",
+        "swaps": [
+          {
+            "out": "Boros Locket",
+            "in": "Talisman of Conviction",
+            "category": "Mana Ramp",
+            "reasoning": "Funcao: ramp e fixing mais cedo. Risco: causa dano ocasional, baixo em 40 vidas. Curva: cai de 3 para 2 manas. Preco: BRL 24 dentro do budget. Bracket: upgrade justo para bracket 2.",
+            "priority": "High"
+          },
+          {
+            "out": "Commander's Sphere",
+            "in": "Arcane Signet",
+            "category": "Mana Ramp",
+            "reasoning": "Funcao: mantem ramp/fixing com eficiencia maior. Risco: perde compra tardia da Sphere, mas o deck preserva Faithless Looting e Lorehold Command. Curva: reduz de 3 para 2. Preco: BRL 18. Bracket: staple aceitavel em bracket 2.",
+            "priority": "High"
+          }
+        ]
+      }
+    },
+    {
+      "id": "atraxa_budget_curve_no_cedh",
+      "commander": "Atraxa, Praetors' Voice",
+      "archetype": "counters value",
+      "bracket": 3,
+      "color_identity": ["W", "U", "B", "G"],
+      "recommendation_context": {
+        "prefer_collection": true,
+        "budget_limit_brl": 120,
+        "include_price_risk_curve_bracket": true
+      },
+      "deck": [
+        "Atraxa, Praetors' Voice",
+        "Cultivate",
+        "Divination",
+        "Mortify",
+        "Abzan Charm",
+        "Deepglow Skate",
+        "Inexorable Tide",
+        "Command Tower",
+        "Farseek",
+        "Forest"
+      ],
+      "protected_cards": [
+        "Atraxa, Praetors' Voice",
+        "Deepglow Skate",
+        "Inexorable Tide",
+        "Command Tower"
+      ],
+      "blocked_pairs": [],
+      "expected": {
+        "min_total_score": 90,
+        "min_collection_matches": 1,
+        "role_count_after_at_least": {
+          "draw": 1,
+          "removal": 1,
+          "ramp": 2
+        },
+        "role_delta_at_least": {
+          "ramp": 0,
+          "payoff": 0
+        }
+      },
+      "card_catalog": {
+        "Atraxa, Praetors' Voice": {
+          "roles": ["commander", "payoff"],
+          "color_identity": ["W", "U", "B", "G"],
+          "price_brl": 0,
+          "owned": true,
+          "min_bracket": 3
+        },
+        "Cultivate": {
+          "roles": ["ramp"],
+          "color_identity": ["G"],
+          "price_brl": 4,
+          "owned": true,
+          "min_bracket": 1
+        },
+        "Nature's Lore": {
+          "roles": ["ramp"],
+          "color_identity": ["G"],
+          "price_brl": 32,
+          "owned": true,
+          "min_bracket": 2
+        },
+        "Divination": {
+          "roles": ["draw"],
+          "color_identity": ["U"],
+          "price_brl": 1,
+          "owned": true,
+          "min_bracket": 1
+        },
+        "Painful Truths": {
+          "roles": ["draw"],
+          "color_identity": ["B"],
+          "price_brl": 14,
+          "owned": false,
+          "min_bracket": 2
+        },
+        "Mortify": {
+          "roles": ["removal"],
+          "color_identity": ["W", "B"],
+          "price_brl": 3,
+          "owned": true,
+          "min_bracket": 1
+        },
+        "Assassin's Trophy": {
+          "roles": ["removal"],
+          "color_identity": ["B", "G"],
+          "price_brl": 55,
+          "owned": false,
+          "min_bracket": 3
+        },
+        "Abzan Charm": {
+          "roles": ["draw", "removal", "counters"],
+          "color_identity": ["W", "B", "G"],
+          "price_brl": 3,
+          "owned": true,
+          "min_bracket": 1
+        },
+        "Deepglow Skate": {
+          "roles": ["payoff", "counters"],
+          "color_identity": ["U"],
+          "price_brl": 35,
+          "owned": true,
+          "min_bracket": 3
+        },
+        "Inexorable Tide": {
+          "roles": ["payoff", "engine", "counters"],
+          "color_identity": ["U"],
+          "price_brl": 45,
+          "owned": true,
+          "min_bracket": 3
+        },
+        "Command Tower": {
+          "roles": ["land", "mana_fixing"],
+          "color_identity": [],
+          "price_brl": 8,
+          "owned": true,
+          "min_bracket": 1
+        },
+        "Farseek": {
+          "roles": ["ramp"],
+          "color_identity": ["G"],
+          "price_brl": 6,
+          "owned": true,
+          "min_bracket": 2
+        },
+        "Forest": {
+          "roles": ["land"],
+          "color_identity": [],
+          "price_brl": 0,
+          "owned": true,
+          "min_bracket": 1
+        }
+      },
+      "candidate_response": {
+        "summary": "Atraxa ganha consistencia ao reduzir curva sem quebrar o pacote de counters.",
+        "swaps": [
+          {
+            "out": "Cultivate",
+            "in": "Nature's Lore",
+            "category": "Mana Ramp",
+            "reasoning": "Funcao: ramp mais eficiente e ainda corrige cores. Risco: exige alvo de floresta no pacote de lands. Curva: cai de 3 para 2 manas. Preco: owned/colecao, custo BRL 0. Bracket: forte mas correto para bracket 3.",
+            "priority": "High"
+          },
+          {
+            "out": "Divination",
+            "in": "Painful Truths",
+            "category": "Card Draw",
+            "reasoning": "Funcao: compra mais cartas em deck 4 cores. Risco: perde vida, mas Commander suporta esse custo. Curva: mantem mana value 3 com teto maior. Preco: BRL 14 dentro do budget. Bracket: bom upgrade para bracket 3.",
+            "priority": "Medium"
+          },
+          {
+            "out": "Mortify",
+            "in": "Assassin's Trophy",
+            "category": "Removal",
+            "reasoning": "Funcao: removal universal instantaneo. Risco: da land ao oponente, entao usar em ameacas decisivas. Curva: reduz de 3 para 2. Preco: BRL 55 dentro do budget. Bracket: adequado para mesa upgraded bracket 3.",
+            "priority": "High"
+          }
+        ]
+      }
+    }
+  ]
+}

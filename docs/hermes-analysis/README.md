@@ -31,6 +31,19 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `manaloom-knowledge/scripts/legacy_contamination_audit.py` registram o
     historico tolerado e falham se essas classes antigas crescerem de novo.
 
+- `APP_AI_KNOWLEDGE_BRIDGE_CONTRACT_2026-07-06.md`
+  - Status: `active_operating_contract`.
+  - Define como pesquisa, XMage, battle traces, Hermes e PostgreSQL viram
+    conhecimento realmente consumido por `/ai/generate`, `/ai/optimize`,
+    battle/runtime e app Flutter.
+  - Regra principal: relatorios `.md` sao evidencia humana; produto consome
+    PostgreSQL/backend, runtime adapters, snapshots/views e payloads seguros.
+  - Auditoria ativa:
+    `manaloom-knowledge/scripts/app_ai_knowledge_bridge_audit.py`.
+  - Gate recomendado antes de retomar lote global XMage/cartas ou alterar
+    prompt/recomendacao:
+    `./scripts/quality_gate.sh ai-bridge`.
+
 ## Contrato de dados / aliases
 
 - `DATA_FIELD_ALIAS_CONTRACT_2026-06-30.md`

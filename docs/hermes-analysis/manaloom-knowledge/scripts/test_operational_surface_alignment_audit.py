@@ -21,6 +21,11 @@ class OperationalSurfaceAlignmentAuditTests(unittest.TestCase):
             "docs.failure_mode_matrix_exists_and_covers_old_bug_classes",
             check_names,
         )
+        self.assertIn("docs.app_ai_bridge_contract_exists", check_names)
+        self.assertIn(
+            "scripts.app_ai_bridge_audit_blocks_report_only_knowledge",
+            check_names,
+        )
 
     def test_forbidden_stale_snippet_fails(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
