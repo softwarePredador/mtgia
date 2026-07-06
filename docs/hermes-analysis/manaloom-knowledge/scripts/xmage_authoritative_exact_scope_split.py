@@ -16633,6 +16633,7 @@ def activated_library_tutor_to_battlefield_from_source(source: str) -> dict[str,
         "DiscardCardCost",
         "DiscardTargetCost",
         "ExileFrom",
+        "ExileSourceFromGraveCost",
         "PayLifeCost",
         "RemoveCounterCost",
         "ReturnToHandSourceCost",
@@ -16729,6 +16730,7 @@ def activated_library_tutor_to_hand_from_source(source: str) -> dict[str, Any] |
         "DiscardCardCost",
         "DiscardTargetCost",
         "ExileFrom",
+        "ExileSourceFromGraveCost",
         "PayLifeCost",
         "RemoveCounterCost",
         "ReturnToHandSourceCost",
@@ -18068,8 +18070,6 @@ def split_row(
         if not is_permanent_metadata(metadata) or is_spell(metadata):
             return None, "activated_library_tutor_to_hand_not_permanent"
         type_line = str(metadata.get("type_line") or "").lower()
-        if "creature" in type_line:
-            return None, "activated_library_tutor_to_hand_creature_runtime_not_supported"
         oracle_tutor = activated_library_tutor_to_hand_from_oracle(metadata)
         if isinstance(oracle_tutor, str):
             return None, oracle_tutor
@@ -18088,10 +18088,10 @@ def split_row(
         ):
             if source_tutor.get(key) != oracle_tutor.get(key):
                 return None, f"activated_library_tutor_to_hand_source_oracle_{key}_mismatch"
-        if not bool(source_tutor.get("activation_requires_sacrifice")):
-            return None, "activated_library_tutor_to_hand_non_sacrifice_runtime_not_supported"
         permanent_effect = (
-            "artifact"
+            "creature"
+            if "creature" in type_line
+            else "artifact"
             if "artifact" in type_line
             else "enchantment"
             if "enchantment" in type_line
@@ -18111,7 +18111,6 @@ def split_row(
             "ability_kind": "activated",
             "activated_effect": "tutor",
             "activated_battle_model_scope": PERMANENT_ACTIVATED_TUTOR_HAND_SCOPE,
-            "activated_self_sacrifice_tutor_to_hand": True,
             "target": target,
             "tutor_target": target,
             "target_constraints": target_constraints,
@@ -18128,13 +18127,14 @@ def split_row(
             "activation_requires_sacrifice": source_tutor["activation_requires_sacrifice"],
             **target_constraints,
         }
+        if bool(source_tutor.get("activation_requires_sacrifice")):
+            activated_effect["activated_self_sacrifice_tutor_to_hand"] = True
         effect_json = {
             "effect": permanent_effect,
             "battle_model_scope": PERMANENT_ACTIVATED_TUTOR_HAND_SCOPE,
             "ability_kind": "static_and_activated",
             "activated_effect": "tutor",
             "activated_battle_model_scope": PERMANENT_ACTIVATED_TUTOR_HAND_SCOPE,
-            "activated_self_sacrifice_tutor_to_hand": True,
             "target": target,
             "tutor_target": target,
             "target_constraints": target_constraints,
@@ -18152,6 +18152,8 @@ def split_row(
             "activation_requires_sacrifice": source_tutor["activation_requires_sacrifice"],
             **target_constraints,
         }
+        if bool(source_tutor.get("activation_requires_sacrifice")):
+            effect_json["activated_self_sacrifice_tutor_to_hand"] = True
         if bool(oracle_tutor.get("up_to_count")):
             activated_effect["up_to_count"] = True
             activated_effect["tutor_up_to_count"] = True
@@ -18161,7 +18163,7 @@ def split_row(
             row,
             metadata,
             effect_json,
-            family_id="xmage_noncreature_permanent_self_sacrifice_library_search_to_hand",
+            family_id="xmage_permanent_simple_activated_library_search_to_hand",
         ), "selected_exact_scope"
 
     if permanent_activated_draw_unit:

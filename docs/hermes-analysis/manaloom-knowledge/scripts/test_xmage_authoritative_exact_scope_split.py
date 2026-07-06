@@ -5742,7 +5742,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertTrue(effect["activation_requires_tap"])
         self.assertTrue(effect["activation_requires_sacrifice"])
 
-    def test_permanent_activated_tutor_to_hand_blocks_non_sacrifice_runtime(self) -> None:
+    def test_permanent_activated_tutor_to_hand_maps_non_sacrifice_artifact(self) -> None:
         row = queue_row(
             split.TUTOR_UNIT,
             effect_classes=["SearchLibraryPutInHandEffect"],
@@ -5767,8 +5767,78 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             """,
         )
 
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "artifact")
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_TUTOR_HAND_SCOPE)
+        self.assertNotIn("activated_self_sacrifice_tutor_to_hand", effect)
+        self.assertEqual(effect["tutor_target"], "land")
+        self.assertEqual(effect["tutor_destination"], "hand")
+        self.assertEqual(effect["activation_cost_generic"], 2)
+        self.assertTrue(effect["activation_requires_tap"])
+        self.assertFalse(effect["activation_requires_sacrifice"])
+
+    def test_permanent_activated_tutor_to_hand_maps_creature_legendary_filter(self) -> None:
+        row = queue_row(
+            split.TUTOR_UNIT,
+            effect_classes=["SearchLibraryPutInHandEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Captain Sisay",
+                type_line="Legendary Creature - Human Soldier",
+                oracle_text="{T}: Search your library for a legendary card, reveal that card, put it into your hand, then shuffle.",
+            ),
+            source_text="""
+                FilterCard filter = new FilterCard("legendary card");
+                filter.add(SuperType.LEGENDARY.getPredicate());
+                Ability ability = new SimpleActivatedAbility(
+                    new SearchLibraryPutInHandEffect(new TargetCardInLibrary(filter), true, true));
+                ability.addCost(new TapSourceCost());
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "creature")
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_TUTOR_HAND_SCOPE)
+        self.assertEqual(effect["tutor_target"], "any")
+        self.assertEqual(effect["tutor_destination"], "hand")
+        self.assertEqual(effect["required_supertypes"], ["legendary"])
+        self.assertEqual(effect["activation_cost_generic"], 0)
+        self.assertTrue(effect["activation_requires_tap"])
+        self.assertFalse(effect["activation_requires_sacrifice"])
+
+    def test_permanent_activated_tutor_to_hand_blocks_discard_cost(self) -> None:
+        row = queue_row(
+            split.TUTOR_UNIT,
+            effect_classes=["SearchLibraryPutInHandEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fauna Shaman",
+                type_line="Creature - Elf Shaman",
+                oracle_text="{G}, {T}, Discard a creature card: Search your library for a creature card, reveal it, put it into your hand, then shuffle.",
+            ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(
+                    new SearchLibraryPutInHandEffect(new TargetCardInLibrary(StaticFilters.FILTER_CARD_CREATURE), true),
+                    new ManaCostsImpl<>("{G}"));
+                ability.addCost(new TapSourceCost());
+                ability.addCost(new DiscardTargetCost(new TargetCardInHand(StaticFilters.FILTER_CARD_CREATURE)));
+            """,
+        )
+
         self.assertIsNone(proposal)
-        self.assertEqual(reason, "activated_library_tutor_to_hand_non_sacrifice_runtime_not_supported")
+        self.assertEqual(reason, "activated_library_tutor_to_hand_oracle_cost_not_supported")
 
     def test_permanent_activated_draw_maps_simple_mana_and_tap_cost(self) -> None:
         row = queue_row(

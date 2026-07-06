@@ -695,6 +695,224 @@ def register_tests(battle, player, card):
         assert mana_artifact not in active.library
         assert non_target_artifact in active.library
 
+    def test_journeyers_kite_activated_tutor_to_hand_does_not_sacrifice_source():
+        active = player("Active")
+        active.mana_pool.add_generic(3)
+        kite = battle.enrich_card(
+            {
+                "name": "Journeyer's Kite",
+                "cmc": 2,
+                "type_line": "Artifact",
+                "effect": "artifact",
+                "_activated_rule_effects": [
+                    {
+                        "effect": "tutor",
+                        "battle_model_scope": "xmage_permanent_simple_activated_library_search_to_hand_v1",
+                        "ability_kind": "activated",
+                        "activated_effect": "tutor",
+                        "activation_cost_generic": 3,
+                        "activation_cost_colors": [],
+                        "activation_requires_tap": True,
+                        "activation_requires_sacrifice": False,
+                        "target": "basic_land",
+                        "tutor_target": "basic_land",
+                        "count": 1,
+                        "tutor_count": 1,
+                        "destination": "hand",
+                        "tutor_destination": "hand",
+                    }
+                ],
+            }
+        )
+        plains = {"name": "Plains", "cmc": 0, "type_line": "Basic Land - Plains", "effect": "land"}
+        command_tower = {"name": "Command Tower", "cmc": 0, "type_line": "Land", "effect": "land"}
+        active.battlefield = [kite]
+        active.library = [command_tower, plains]
+
+        activations = battle.activate_utility_artifacts(
+            active,
+            [],
+            [active],
+            turn=10,
+            rng=random.Random(571),
+            phase="precombat_main",
+        )
+
+        assert activations == 1
+        assert kite in active.battlefield
+        assert kite not in active.graveyard
+        assert kite.get("tapped") is True
+        assert plains in active.hand
+        assert command_tower in active.library
+
+    def test_captain_sisay_activated_tutor_finds_legendary_card_only():
+        active = player("Active")
+        sisay = battle.enrich_card(
+            {
+                "name": "Captain Sisay",
+                "cmc": 4,
+                "type_line": "Legendary Creature - Human Soldier",
+                "effect": "creature",
+                "power": 2,
+                "toughness": 2,
+                "summoning_sick": False,
+                "_activated_rule_effects": [
+                    {
+                        "effect": "tutor",
+                        "battle_model_scope": "xmage_permanent_simple_activated_library_search_to_hand_v1",
+                        "ability_kind": "activated",
+                        "activated_effect": "tutor",
+                        "activation_cost_generic": 0,
+                        "activation_cost_colors": [],
+                        "activation_requires_tap": True,
+                        "activation_requires_sacrifice": False,
+                        "target": "any",
+                        "tutor_target": "any",
+                        "required_supertypes": ["legendary"],
+                        "count": 1,
+                        "tutor_count": 1,
+                        "destination": "hand",
+                        "tutor_destination": "hand",
+                    }
+                ],
+            }
+        )
+        legendary = {
+            "name": "The One Ring",
+            "cmc": 4,
+            "type_line": "Legendary Artifact",
+            "effect": "draw_engine",
+        }
+        nonlegendary = {"name": "Sol Ring", "cmc": 1, "type_line": "Artifact", "effect": "ramp_permanent"}
+        active.battlefield = [sisay]
+        active.library = [nonlegendary, legendary]
+
+        activations = battle.activate_utility_artifacts(
+            active,
+            [],
+            [active],
+            turn=10,
+            rng=random.Random(572),
+            phase="precombat_main",
+        )
+
+        assert activations == 1
+        assert sisay.get("tapped") is True
+        assert legendary in active.hand
+        assert nonlegendary in active.library
+
+    def test_captain_sisay_activated_tutor_blocks_summoning_sick_creature():
+        active = player("Active")
+        sisay = battle.enrich_card(
+            {
+                "name": "Captain Sisay",
+                "cmc": 4,
+                "type_line": "Legendary Creature - Human Soldier",
+                "effect": "creature",
+                "power": 2,
+                "toughness": 2,
+                "summoning_sick": True,
+                "_activated_rule_effects": [
+                    {
+                        "effect": "tutor",
+                        "battle_model_scope": "xmage_permanent_simple_activated_library_search_to_hand_v1",
+                        "ability_kind": "activated",
+                        "activated_effect": "tutor",
+                        "activation_cost_generic": 0,
+                        "activation_cost_colors": [],
+                        "activation_requires_tap": True,
+                        "activation_requires_sacrifice": False,
+                        "target": "any",
+                        "tutor_target": "any",
+                        "required_supertypes": ["legendary"],
+                        "count": 1,
+                        "tutor_count": 1,
+                        "destination": "hand",
+                        "tutor_destination": "hand",
+                    }
+                ],
+            }
+        )
+        legendary = {
+            "name": "The One Ring",
+            "cmc": 4,
+            "type_line": "Legendary Artifact",
+            "effect": "draw_engine",
+        }
+        active.battlefield = [sisay]
+        active.library = [legendary]
+
+        activations = battle.activate_utility_artifacts(
+            active,
+            [],
+            [active],
+            turn=10,
+            rng=random.Random(573),
+            phase="precombat_main",
+        )
+
+        assert activations == 0
+        assert sisay.get("tapped") is not True
+        assert legendary in active.library
+        assert legendary not in active.hand
+
+    def test_dragonstorm_forecaster_activated_tutor_respects_target_names():
+        active = player("Active")
+        active.mana_pool.add_generic(2)
+        forecaster = battle.enrich_card(
+            {
+                "name": "Dragonstorm Forecaster",
+                "cmc": 3,
+                "type_line": "Creature - Human Shaman",
+                "effect": "creature",
+                "power": 2,
+                "toughness": 3,
+                "summoning_sick": False,
+                "_activated_rule_effects": [
+                    {
+                        "effect": "tutor",
+                        "battle_model_scope": "xmage_permanent_simple_activated_library_search_to_hand_v1",
+                        "ability_kind": "activated",
+                        "activated_effect": "tutor",
+                        "activation_cost_generic": 2,
+                        "activation_cost_colors": [],
+                        "activation_requires_tap": True,
+                        "activation_requires_sacrifice": False,
+                        "target": "any",
+                        "tutor_target": "any",
+                        "target_names": ["Dragonstorm Globe", "Boulderborn Dragon"],
+                        "count": 1,
+                        "tutor_count": 1,
+                        "destination": "hand",
+                        "tutor_destination": "hand",
+                    }
+                ],
+            }
+        )
+        target = {
+            "name": "Boulderborn Dragon",
+            "cmc": 7,
+            "type_line": "Creature - Dragon",
+            "effect": "creature",
+        }
+        non_target = {"name": "Ancient Gold Dragon", "cmc": 7, "type_line": "Creature - Dragon", "effect": "creature"}
+        active.battlefield = [forecaster]
+        active.library = [non_target, target]
+
+        activations = battle.activate_utility_artifacts(
+            active,
+            [],
+            [active],
+            turn=10,
+            rng=random.Random(574),
+            phase="precombat_main",
+        )
+
+        assert activations == 1
+        assert forecaster.get("tapped") is True
+        assert target in active.hand
+        assert non_target in active.library
+
     def test_weathered_wayfarer_activated_tutor_requires_opponent_more_lands():
         active = player("Active")
         opponent = player("Opponent")
@@ -1097,6 +1315,10 @@ def register_tests(battle, player, card):
         test_expedition_map_activated_tutor_puts_land_into_hand,
         test_armillary_sphere_activated_tutor_puts_two_basic_lands_into_hand,
         test_moonsilver_key_activated_tutor_prefers_mana_artifact_target,
+        test_journeyers_kite_activated_tutor_to_hand_does_not_sacrifice_source,
+        test_captain_sisay_activated_tutor_finds_legendary_card_only,
+        test_captain_sisay_activated_tutor_blocks_summoning_sick_creature,
+        test_dragonstorm_forecaster_activated_tutor_respects_target_names,
         test_weathered_wayfarer_activated_tutor_requires_opponent_more_lands,
         test_spellseeker_etb_finds_cheap_instant_or_sorcery_only,
         test_trophy_mage_etb_finds_artifact_with_mana_value_three_only,
