@@ -1,0 +1,294 @@
+{
+  "artifact_type": "global_commander_ramp_alternative_cut_forced_access_trace_generator",
+  "battle_gate_allowed_now": false,
+  "battle_gate_performed": false,
+  "battle_or_optimization_performed": false,
+  "battle_replay_performed": true,
+  "candidate_copy_allowed_now": false,
+  "candidate_copy_blockers": [
+    "alternative_ramp_cut_forced_usage_observed_blocks_cut:Ornithopter of Paradise,Pyretic Ritual",
+    "candidate_copy_closed_after_alternative_ramp_cut_forced_access"
+  ],
+  "commander": "Kaalia of the Vast",
+  "deck_action_allowed": false,
+  "deck_id": "619",
+  "forced_access_replay_performed": true,
+  "generated_at": "2026-07-06T06:09:57.587908+00:00",
+  "input_artifacts": {
+    "alternative_trace_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_alternative_cut_trace_generator_20260706_current.json",
+    "battle_replay": "docs/hermes-analysis/manaloom-knowledge/scripts/battle_replay_v10_3.py",
+    "replay_dir": "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_alternative_cut_forced_access_replays_20260706_current",
+    "source_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db"
+  },
+  "mutation_allowed": false,
+  "policy": {
+    "alternative_cut_boundary": "Alternative ramp cuts used under forced access are blocked as cuts.",
+    "forced_access_boundary": "Forced access is diagnostic evidence only; it is not a natural battle gate.",
+    "promotion_boundary": "No candidate copy, deck mutation, battle gate, or promotion is opened by this report."
+  },
+  "postgres_writes": false,
+  "promotion_allowed": false,
+  "review_rows": [
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Ornithopter of Paradise",
+      "decision": "not_cut_safe_after_forced_access_usage",
+      "decision_trace_count": 21,
+      "event_types": {
+        "cast_announced": 3,
+        "cost_paid": 3,
+        "creature_cast": 3,
+        "damage_wipe_resolved": 1,
+        "focus_card_access_snapshot": 138,
+        "forced_focus_access_applied": 3,
+        "land_played": 6,
+        "mana_refreshed": 7,
+        "permanent_moved_from_battlefield": 2,
+        "turn_end": 17,
+        "turn_start": 11
+      },
+      "exposure_event_count": 28,
+      "first_decision_trace": {
+        "event": "pass_no_action",
+        "player": "Kaalia of the Vast",
+        "turn": 1
+      },
+      "first_exposure_event": {
+        "event": "turn_start",
+        "player": "Kaalia of the Vast",
+        "turn": 1
+      },
+      "first_forced_access_event": {
+        "card": "Ornithopter of Paradise",
+        "event": "forced_focus_access_applied",
+        "mode": "opening_hand",
+        "player": "Kaalia of the Vast",
+        "replaced_card": "Plains // Plains",
+        "status": "moved",
+        "turn": 0
+      },
+      "first_usage_event": {
+        "card": "Ornithopter of Paradise",
+        "event": "cast_announced",
+        "player": "Kaalia of the Vast",
+        "turn": 7
+      },
+      "forced_access_moved_or_present_count": 3,
+      "forced_access_not_found_count": 0,
+      "mutation_allowed": false,
+      "next_gate": "expand_ramp_cut_source_or_pivot_role_axis_after_alternative_forced_access",
+      "status": "alternative_ramp_cut_forced_access_usage_observed_blocks_cut",
+      "usage_event_count": 9
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Pyretic Ritual",
+      "decision": "not_cut_safe_after_forced_access_usage",
+      "decision_trace_count": 22,
+      "event_types": {
+        "cast_announced": 3,
+        "cost_paid": 3,
+        "focus_card_access_snapshot": 138,
+        "forced_focus_access_applied": 3,
+        "spell_cast": 3,
+        "turn_end": 9,
+        "turn_start": 12
+      },
+      "exposure_event_count": 21,
+      "first_decision_trace": {
+        "event": "pass_no_action",
+        "player": "Kaalia of the Vast",
+        "turn": 1
+      },
+      "first_exposure_event": {
+        "event": "turn_start",
+        "player": "Kaalia of the Vast",
+        "turn": 1
+      },
+      "first_forced_access_event": {
+        "card": "Pyretic Ritual",
+        "event": "forced_focus_access_applied",
+        "mode": "opening_hand",
+        "player": "Kaalia of the Vast",
+        "replaced_card": "Plains // Plains",
+        "status": "moved",
+        "turn": 0
+      },
+      "first_usage_event": {
+        "card": "Pyretic Ritual",
+        "event": "cast_announced",
+        "player": "Kaalia of the Vast",
+        "turn": 7
+      },
+      "forced_access_moved_or_present_count": 3,
+      "forced_access_not_found_count": 0,
+      "mutation_allowed": false,
+      "next_gate": "expand_ramp_cut_source_or_pivot_role_axis_after_alternative_forced_access",
+      "status": "alternative_ramp_cut_forced_access_usage_observed_blocks_cut",
+      "usage_event_count": 9
+    }
+  ],
+  "seed_rows": [
+    {
+      "decision_count": 165,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_alternative_cut_forced_access_replays_20260706_current/forced_replay_seed_120.decision_trace.jsonl",
+      "event_count": 1033,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_alternative_cut_forced_access_replays_20260706_current/forced_replay_seed_120.events.jsonl",
+      "forced_access": {
+        "Ornithopter of Paradise": {
+          "already_in_hand_count": 0,
+          "first_event": {
+            "card": "Ornithopter of Paradise",
+            "event": "forced_focus_access_applied",
+            "mode": "opening_hand",
+            "player": "Kaalia of the Vast",
+            "replaced_card": "Plains // Plains",
+            "status": "moved",
+            "turn": 0
+          },
+          "moved_count": 1,
+          "not_found_count": 0,
+          "statuses": {
+            "moved": 1
+          }
+        },
+        "Pyretic Ritual": {
+          "already_in_hand_count": 0,
+          "first_event": {
+            "card": "Pyretic Ritual",
+            "event": "forced_focus_access_applied",
+            "mode": "opening_hand",
+            "player": "Kaalia of the Vast",
+            "replaced_card": "Plains // Plains",
+            "status": "moved",
+            "turn": 0
+          },
+          "moved_count": 1,
+          "not_found_count": 0,
+          "statuses": {
+            "moved": 1
+          }
+        }
+      },
+      "provenance_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_alternative_cut_forced_access_replays_20260706_current/forced_deck_provenance_seed_120.json",
+      "replay_txt": "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_alternative_cut_forced_access_replays_20260706_current/forced_replay_seed_120.txt",
+      "returncode": 0,
+      "seed": 120,
+      "status": "alternative_ramp_cut_forced_replay_generated"
+    },
+    {
+      "decision_count": 130,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_alternative_cut_forced_access_replays_20260706_current/forced_replay_seed_121.decision_trace.jsonl",
+      "event_count": 844,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_alternative_cut_forced_access_replays_20260706_current/forced_replay_seed_121.events.jsonl",
+      "forced_access": {
+        "Ornithopter of Paradise": {
+          "already_in_hand_count": 0,
+          "first_event": {
+            "card": "Ornithopter of Paradise",
+            "event": "forced_focus_access_applied",
+            "mode": "opening_hand",
+            "player": "Kaalia of the Vast",
+            "replaced_card": "Elegant Parlor",
+            "status": "moved",
+            "turn": 0
+          },
+          "moved_count": 1,
+          "not_found_count": 0,
+          "statuses": {
+            "moved": 1
+          }
+        },
+        "Pyretic Ritual": {
+          "already_in_hand_count": 1,
+          "first_event": {
+            "card": "Pyretic Ritual",
+            "event": "forced_focus_access_applied",
+            "mode": "opening_hand",
+            "player": "Kaalia of the Vast",
+            "replaced_card": null,
+            "status": "already_in_hand",
+            "turn": 0
+          },
+          "moved_count": 0,
+          "not_found_count": 0,
+          "statuses": {
+            "already_in_hand": 1
+          }
+        }
+      },
+      "provenance_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_alternative_cut_forced_access_replays_20260706_current/forced_deck_provenance_seed_121.json",
+      "replay_txt": "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_alternative_cut_forced_access_replays_20260706_current/forced_replay_seed_121.txt",
+      "returncode": 0,
+      "seed": 121,
+      "status": "alternative_ramp_cut_forced_replay_generated"
+    },
+    {
+      "decision_count": 115,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_alternative_cut_forced_access_replays_20260706_current/forced_replay_seed_122.decision_trace.jsonl",
+      "event_count": 820,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_alternative_cut_forced_access_replays_20260706_current/forced_replay_seed_122.events.jsonl",
+      "forced_access": {
+        "Ornithopter of Paradise": {
+          "already_in_hand_count": 0,
+          "first_event": {
+            "card": "Ornithopter of Paradise",
+            "event": "forced_focus_access_applied",
+            "mode": "opening_hand",
+            "player": "Kaalia of the Vast",
+            "replaced_card": "Grand Abolisher",
+            "status": "moved",
+            "turn": 0
+          },
+          "moved_count": 1,
+          "not_found_count": 0,
+          "statuses": {
+            "moved": 1
+          }
+        },
+        "Pyretic Ritual": {
+          "already_in_hand_count": 0,
+          "first_event": {
+            "card": "Pyretic Ritual",
+            "event": "forced_focus_access_applied",
+            "mode": "opening_hand",
+            "player": "Kaalia of the Vast",
+            "replaced_card": "Lightning, Army of One",
+            "status": "moved",
+            "turn": 0
+          },
+          "moved_count": 1,
+          "not_found_count": 0,
+          "statuses": {
+            "moved": 1
+          }
+        }
+      },
+      "provenance_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_alternative_cut_forced_access_replays_20260706_current/forced_deck_provenance_seed_122.json",
+      "replay_txt": "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_alternative_cut_forced_access_replays_20260706_current/forced_replay_seed_122.txt",
+      "returncode": 0,
+      "seed": 122,
+      "status": "alternative_ramp_cut_forced_replay_generated"
+    }
+  ],
+  "source_db_mutated": false,
+  "status": "ramp_alternative_cut_forced_access_blocks_used_targets",
+  "summary": {
+    "candidate_copy_blocker_count": 2,
+    "focus_card_count": 2,
+    "focus_cards": [
+      "Ornithopter of Paradise",
+      "Pyretic Ritual"
+    ],
+    "force_failure_count": 0,
+    "forced_access_mode": "opening_hand",
+    "generated_replay_count": 3,
+    "manual_review_count": 0,
+    "next_gate": "expand_ramp_cut_source_or_pivot_role_axis_after_alternative_forced_access",
+    "seed_count": 3,
+    "seed_start": 120,
+    "usage_blocked_count": 2
+  }
+}

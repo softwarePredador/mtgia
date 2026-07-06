@@ -1679,6 +1679,15 @@ Current external refresh on 2026-07-05:
   trace ran `3` replays for `Ornithopter of Paradise` and `Pyretic Ritual`;
   both remained unexposed with `0` usage, `0` exposure, and `0` decision traces,
   so the next gate is `force_access_or_expand_trace_for_alternative_ramp_cut`.
+- Run `global_commander_ramp_alternative_cut_forced_access_trace_generator.py`
+  only after those natural alternative traces fail to expose the targets.
+  Forced usage blocks the alternative cut; seen-without-usage still requires
+  manual negative review; no forced-access result can open candidate copy,
+  battle gate, mutation, or promotion by itself. The current forced-access
+  report used both `Ornithopter of Paradise` and `Pyretic Ritual` when placed
+  in the opening hand (`9` usage events each across `3` replays), so both
+  alternative cuts are blocked and the next route is
+  `expand_ramp_cut_source_or_pivot_role_axis_after_alternative_forced_access`.
 
 ## Global Commander Rollout - 2026-07-01
 
