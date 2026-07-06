@@ -1,0 +1,567 @@
+{
+  "added_card_review_rows": [
+    {
+      "accessed_games": 6,
+      "card_name": "Ash Barrens",
+      "drawn_games": 3,
+      "exercise_event_count": 4,
+      "exercise_events": {
+        "land_played": 4
+      },
+      "near_access_games": 6,
+      "opening_hand_games": 1,
+      "status": "larger_gate_added_card_exercised",
+      "trace_games": 24,
+      "zone_counts": {
+        "battlefield": 68,
+        "graveyard": 3,
+        "hand": 20,
+        "library": 1262
+      }
+    },
+    {
+      "accessed_games": 3,
+      "card_name": "Bant Panorama",
+      "drawn_games": 1,
+      "exercise_event_count": 2,
+      "exercise_events": {
+        "land_played": 2
+      },
+      "near_access_games": 2,
+      "opening_hand_games": 1,
+      "status": "larger_gate_added_card_exercised",
+      "trace_games": 24,
+      "zone_counts": {
+        "battlefield": 86,
+        "graveyard": 3,
+        "hand": 20,
+        "library": 1244
+      }
+    },
+    {
+      "accessed_games": 5,
+      "card_name": "Battlefield Forge",
+      "drawn_games": 4,
+      "exercise_event_count": 4,
+      "exercise_events": {
+        "land_played": 4
+      },
+      "near_access_games": 7,
+      "opening_hand_games": 0,
+      "status": "larger_gate_added_card_exercised",
+      "trace_games": 24,
+      "zone_counts": {
+        "battlefield": 106,
+        "graveyard": 3,
+        "hand": 4,
+        "library": 1240
+      }
+    },
+    {
+      "accessed_games": 6,
+      "card_name": "Brokers Hideout",
+      "drawn_games": 1,
+      "exercise_event_count": 5,
+      "exercise_events": {
+        "land_played": 5
+      },
+      "near_access_games": 1,
+      "opening_hand_games": 4,
+      "status": "larger_gate_added_card_exercised",
+      "trace_games": 24,
+      "zone_counts": {
+        "battlefield": 222,
+        "graveyard": 3,
+        "hand": 37,
+        "library": 1091
+      }
+    },
+    {
+      "accessed_games": 5,
+      "card_name": "Cabaretti Courtyard",
+      "drawn_games": 3,
+      "exercise_event_count": 3,
+      "exercise_events": {
+        "land_played": 3
+      },
+      "near_access_games": 7,
+      "opening_hand_games": 0,
+      "status": "larger_gate_added_card_exercised",
+      "trace_games": 24,
+      "zone_counts": {
+        "battlefield": 119,
+        "graveyard": 74,
+        "hand": 18,
+        "library": 1142
+      }
+    },
+    {
+      "accessed_games": 5,
+      "card_name": "Demolition Field",
+      "drawn_games": 2,
+      "exercise_event_count": 3,
+      "exercise_events": {
+        "land_played": 3
+      },
+      "near_access_games": 6,
+      "opening_hand_games": 0,
+      "status": "larger_gate_added_card_exercised",
+      "trace_games": 24,
+      "zone_counts": {
+        "battlefield": 82,
+        "graveyard": 8,
+        "hand": 7,
+        "library": 1256
+      }
+    },
+    {
+      "accessed_games": 8,
+      "card_name": "Escape Tunnel",
+      "drawn_games": 3,
+      "exercise_event_count": 6,
+      "exercise_events": {
+        "land_played": 6
+      },
+      "near_access_games": 5,
+      "opening_hand_games": 2,
+      "status": "larger_gate_added_card_exercised",
+      "trace_games": 24,
+      "zone_counts": {
+        "battlefield": 298,
+        "graveyard": 6,
+        "hand": 54,
+        "library": 995
+      }
+    },
+    {
+      "accessed_games": 7,
+      "card_name": "Evolving Wilds",
+      "drawn_games": 4,
+      "exercise_event_count": 6,
+      "exercise_events": {
+        "land_played": 6
+      },
+      "near_access_games": 4,
+      "opening_hand_games": 2,
+      "status": "larger_gate_added_card_exercised",
+      "trace_games": 24,
+      "zone_counts": {
+        "battlefield": 240,
+        "graveyard": 3,
+        "hand": 44,
+        "library": 1066
+      }
+    },
+    {
+      "accessed_games": 7,
+      "card_name": "Sunbaked Canyon",
+      "drawn_games": 3,
+      "exercise_event_count": 9,
+      "exercise_events": {
+        "land_played": 7,
+        "utility_land_activated": 2
+      },
+      "near_access_games": 4,
+      "opening_hand_games": 3,
+      "status": "larger_gate_added_card_exercised",
+      "trace_games": 24,
+      "zone_counts": {
+        "absent": 3,
+        "battlefield": 161,
+        "graveyard": 81,
+        "hand": 25,
+        "library": 1083
+      }
+    }
+  ],
+  "artifact_type": "global_commander_larger_battle_gate_audit",
+  "battle_or_optimization_performed": false,
+  "blockers": [
+    "candidate_did_not_beat_protected_baseline"
+  ],
+  "deck_mutation_allowed": false,
+  "generated_at": "2026-07-06T12:39:04.739484+00:00",
+  "global_learning": [
+    "A package can repair a weaker base shell and still fail protected-baseline replacement.",
+    "Natural replay access is necessary but not sufficient; the larger gate must also beat the protected baseline.",
+    "Added cards without larger-gate exercise remain learning evidence, not promotion evidence."
+  ],
+  "input_artifacts": {
+    "gate_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_larger_equal_battle_gate_20260706_larger_gate_feedback_land_floor_profile_repair_vs607.json",
+    "natural_replay_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_added_card_natural_replay_trace_generator_20260706_larger_gate_feedback_land_floor_profile_repair_deck612.json",
+    "strategy_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_package_strategy_matrix_20260706_larger_gate_feedback_land_floor_profile_repair_deck612.json"
+  },
+  "postgres_writes": false,
+  "promotion_allowed": false,
+  "results": {
+    "candidate": {
+      "archetype": "profile-repair-package",
+      "avg_win_turn": 19.25,
+      "construction_valid": true,
+      "deck_key": "candidate_land_floor_profile_repair",
+      "deck_name": "Lorehold land-floor profile repair candidate",
+      "deck_shape": {},
+      "games": 24,
+      "losses": 16,
+      "opponents": [
+        {
+          "archetype": "control",
+          "avg_win_turn": 0,
+          "losses": 3,
+          "opponent": "Kinnan, Bonder Prodigy #72 (real)",
+          "stalls": 0,
+          "win_rate": 0.0,
+          "win_reasons": {},
+          "wins": 0
+        },
+        {
+          "archetype": "combo",
+          "avg_win_turn": 17.0,
+          "losses": 1,
+          "opponent": "Kraum, Ludevic's Opus #51 (real)",
+          "stalls": 0,
+          "win_rate": 66.67,
+          "win_reasons": {
+            "elimination": 2
+          },
+          "wins": 2
+        },
+        {
+          "archetype": "combo",
+          "avg_win_turn": 17.5,
+          "losses": 1,
+          "opponent": "Vivi Ornitier #99 (real)",
+          "stalls": 0,
+          "win_rate": 66.67,
+          "win_reasons": {
+            "elimination": 2
+          },
+          "wins": 2
+        },
+        {
+          "archetype": "combo",
+          "avg_win_turn": 17.0,
+          "losses": 1,
+          "opponent": "Rograkh, Son of Rohgahh #117 (real)",
+          "stalls": 0,
+          "win_rate": 66.67,
+          "win_reasons": {
+            "approach": 1,
+            "elimination": 1
+          },
+          "wins": 2
+        },
+        {
+          "archetype": "combo",
+          "avg_win_turn": 25.0,
+          "losses": 2,
+          "opponent": "Rograkh, Son of Rohgahh #94 (real)",
+          "stalls": 0,
+          "win_rate": 33.33,
+          "win_reasons": {
+            "elimination": 1
+          },
+          "wins": 1
+        },
+        {
+          "archetype": "ramp_value",
+          "avg_win_turn": 0,
+          "losses": 3,
+          "opponent": "Inalla, Archmage Ritualist #44 (real)",
+          "stalls": 0,
+          "win_rate": 0.0,
+          "win_reasons": {},
+          "wins": 0
+        },
+        {
+          "archetype": "control",
+          "avg_win_turn": 26.0,
+          "losses": 2,
+          "opponent": "Tivit, Seller of Secrets #107 (real)",
+          "stalls": 0,
+          "win_rate": 33.33,
+          "win_reasons": {
+            "elimination": 1
+          },
+          "wins": 1
+        },
+        {
+          "archetype": "combo",
+          "avg_win_turn": 0,
+          "losses": 3,
+          "opponent": "Najeela, the Blade-Blossom #111 (real)",
+          "stalls": 0,
+          "win_rate": 0.0,
+          "win_reasons": {},
+          "wins": 0
+        }
+      ],
+      "stalls": 0,
+      "win_rate": 33.33,
+      "wins": 8
+    },
+    "immediate_base": {
+      "archetype": "spell-copy-combo-variant",
+      "avg_win_turn": 17.14,
+      "construction_valid": true,
+      "deck_key": "deck_612",
+      "deck_name": "VARIANT Lorehold Variant 07 - Rafael Paste 2026-06-24",
+      "deck_shape": {},
+      "games": 24,
+      "losses": 17,
+      "opponents": [
+        {
+          "archetype": "control",
+          "avg_win_turn": 20.0,
+          "losses": 2,
+          "opponent": "Kinnan, Bonder Prodigy #72 (real)",
+          "stalls": 0,
+          "win_rate": 33.33,
+          "win_reasons": {
+            "approach": 1
+          },
+          "wins": 1
+        },
+        {
+          "archetype": "combo",
+          "avg_win_turn": 0,
+          "losses": 3,
+          "opponent": "Kraum, Ludevic's Opus #51 (real)",
+          "stalls": 0,
+          "win_rate": 0.0,
+          "win_reasons": {},
+          "wins": 0
+        },
+        {
+          "archetype": "combo",
+          "avg_win_turn": 17.5,
+          "losses": 1,
+          "opponent": "Vivi Ornitier #99 (real)",
+          "stalls": 0,
+          "win_rate": 66.67,
+          "win_reasons": {
+            "approach": 2
+          },
+          "wins": 2
+        },
+        {
+          "archetype": "combo",
+          "avg_win_turn": 14.5,
+          "losses": 1,
+          "opponent": "Rograkh, Son of Rohgahh #117 (real)",
+          "stalls": 0,
+          "win_rate": 66.67,
+          "win_reasons": {
+            "elimination": 2
+          },
+          "wins": 2
+        },
+        {
+          "archetype": "combo",
+          "avg_win_turn": 16.0,
+          "losses": 2,
+          "opponent": "Rograkh, Son of Rohgahh #94 (real)",
+          "stalls": 0,
+          "win_rate": 33.33,
+          "win_reasons": {
+            "elimination": 1
+          },
+          "wins": 1
+        },
+        {
+          "archetype": "ramp_value",
+          "avg_win_turn": 0,
+          "losses": 3,
+          "opponent": "Inalla, Archmage Ritualist #44 (real)",
+          "stalls": 0,
+          "win_rate": 0.0,
+          "win_reasons": {},
+          "wins": 0
+        },
+        {
+          "archetype": "control",
+          "avg_win_turn": 0,
+          "losses": 3,
+          "opponent": "Tivit, Seller of Secrets #107 (real)",
+          "stalls": 0,
+          "win_rate": 0.0,
+          "win_reasons": {},
+          "wins": 0
+        },
+        {
+          "archetype": "combo",
+          "avg_win_turn": 20.0,
+          "losses": 2,
+          "opponent": "Najeela, the Blade-Blossom #111 (real)",
+          "stalls": 0,
+          "win_rate": 33.33,
+          "win_reasons": {
+            "approach": 1
+          },
+          "wins": 1
+        }
+      ],
+      "stalls": 0,
+      "win_rate": 29.17,
+      "wins": 7
+    },
+    "protected_baseline": {
+      "archetype": "battle-variant",
+      "avg_win_turn": 17.36,
+      "construction_valid": true,
+      "deck_key": "deck_607",
+      "deck_name": "VARIANT Lorehold Variant 02 - Rafael Paste 2026-06-23",
+      "deck_shape": {},
+      "games": 24,
+      "losses": 9,
+      "opponents": [
+        {
+          "archetype": "control",
+          "avg_win_turn": 21.0,
+          "losses": 2,
+          "opponent": "Kinnan, Bonder Prodigy #72 (real)",
+          "stalls": 0,
+          "win_rate": 33.33,
+          "win_reasons": {
+            "elimination": 1
+          },
+          "wins": 1
+        },
+        {
+          "archetype": "combo",
+          "avg_win_turn": 15.5,
+          "losses": 1,
+          "opponent": "Kraum, Ludevic's Opus #51 (real)",
+          "stalls": 0,
+          "win_rate": 66.67,
+          "win_reasons": {
+            "elimination": 2
+          },
+          "wins": 2
+        },
+        {
+          "archetype": "combo",
+          "avg_win_turn": 12.0,
+          "losses": 2,
+          "opponent": "Vivi Ornitier #99 (real)",
+          "stalls": 0,
+          "win_rate": 33.33,
+          "win_reasons": {
+            "elimination": 1
+          },
+          "wins": 1
+        },
+        {
+          "archetype": "combo",
+          "avg_win_turn": 19.5,
+          "losses": 1,
+          "opponent": "Rograkh, Son of Rohgahh #117 (real)",
+          "stalls": 0,
+          "win_rate": 66.67,
+          "win_reasons": {
+            "elimination": 2
+          },
+          "wins": 2
+        },
+        {
+          "archetype": "combo",
+          "avg_win_turn": 17.5,
+          "losses": 1,
+          "opponent": "Rograkh, Son of Rohgahh #94 (real)",
+          "stalls": 0,
+          "win_rate": 66.67,
+          "win_reasons": {
+            "approach": 1,
+            "elimination": 1
+          },
+          "wins": 2
+        },
+        {
+          "archetype": "ramp_value",
+          "avg_win_turn": 27.0,
+          "losses": 1,
+          "opponent": "Inalla, Archmage Ritualist #44 (real)",
+          "stalls": 1,
+          "win_rate": 33.33,
+          "win_reasons": {
+            "elimination": 1
+          },
+          "wins": 1
+        },
+        {
+          "archetype": "control",
+          "avg_win_turn": 17.33,
+          "losses": 0,
+          "opponent": "Tivit, Seller of Secrets #107 (real)",
+          "stalls": 0,
+          "win_rate": 100.0,
+          "win_reasons": {
+            "elimination": 3
+          },
+          "wins": 3
+        },
+        {
+          "archetype": "combo",
+          "avg_win_turn": 13.0,
+          "losses": 1,
+          "opponent": "Najeela, the Blade-Blossom #111 (real)",
+          "stalls": 0,
+          "win_rate": 66.67,
+          "win_reasons": {
+            "approach": 2
+          },
+          "wins": 2
+        }
+      ],
+      "stalls": 1,
+      "win_rate": 58.33,
+      "wins": 14
+    }
+  },
+  "source_db_mutated": false,
+  "status": "larger_battle_gate_blocks_promotion",
+  "summary": {
+    "added_card_count": 9,
+    "candidate_key": "candidate_land_floor_profile_repair",
+    "candidate_vs_immediate_base": {
+      "candidate_beats_other": true,
+      "candidate_win_rate": 33.33,
+      "candidate_wins": 8,
+      "other_win_rate": 29.17,
+      "other_wins": 7,
+      "win_delta": 1,
+      "win_rate_delta": 4.16
+    },
+    "candidate_vs_protected": {
+      "candidate_beats_other": false,
+      "candidate_win_rate": 33.33,
+      "candidate_wins": 8,
+      "other_win_rate": 58.33,
+      "other_wins": 14,
+      "win_delta": -6,
+      "win_rate_delta": -25.0
+    },
+    "commander": "Lorehold, the Historian",
+    "deck_id": "612",
+    "forced_access_mode": "none",
+    "games_per_opponent": 3,
+    "immediate_base_key": "deck_612",
+    "larger_gate_exercised_added_cards": [
+      "Ash Barrens",
+      "Bant Panorama",
+      "Battlefield Forge",
+      "Brokers Hideout",
+      "Cabaretti Courtyard",
+      "Demolition Field",
+      "Escape Tunnel",
+      "Evolving Wilds",
+      "Sunbaked Canyon"
+    ],
+    "larger_gate_unexercised_added_cards": [],
+    "natural_replay_larger_gate_allowed_next": true,
+    "natural_replay_status": "candidate_added_card_natural_replay_all_exercised_ready_for_larger_gate",
+    "next_gate": "repair_package_or_convert_to_global_learning_no_promotion",
+    "opponent_count": 8,
+    "protected_baseline_key": "deck_607"
+  }
+}

@@ -1908,9 +1908,48 @@ Current external refresh on 2026-07-05:
   `global_commander_candidate_package_strategy_matrix_20260706_larger_gate_feedback_land_floor_deck612.md`
   blocks battle with `profile_lands_below_target` and protected anchor cuts for
   `Pyromancer's Goggles`, `Call Forth the Tempest`, and `Birgi, God of
-  Storytelling // Harnfel, Horn of Bounty`. The next goal is to repair or
-  resynthesize the land-floor package so Lorehold reaches `36-38` lands without
-  cutting those anchors; replay, battle, mutation, and promotion remain closed.
+  Storytelling // Harnfel, Horn of Bounty`.
+- The land-floor profile repair follow-up is complete as learning evidence, not
+  promotion evidence. The repair sequence
+  `global_commander_profile_blocker_repair_plan_20260706_larger_gate_feedback_land_floor_deck612_profile.md`,
+  `global_commander_profile_repair_candidate_model_20260706_larger_gate_feedback_land_floor_deck612_profile.md`,
+  `global_commander_profile_repair_package_resynthesizer_20260706_larger_gate_feedback_land_floor_deck612_profile.md`,
+  `global_commander_profile_repair_cut_pair_reviewer_20260706_larger_gate_feedback_land_floor_deck612_profile.md`,
+  `global_commander_profile_repair_cut_pair_reorderer_20260706_larger_gate_feedback_land_floor_deck612_profile.md`,
+  and
+  `global_commander_profile_repair_land_cut_reviewer_20260706_larger_gate_feedback_land_floor_deck612_profile.md`
+  restores `Pyromancer's Goggles`, `Call Forth the Tempest`, and `Birgi, God of
+  Storytelling // Harnfel, Horn of Bounty`, reaches `36` lands, and opens only
+  candidate-copy materialization. The materializer
+  `global_commander_candidate_copy_materializer_20260706_larger_gate_feedback_land_floor_profile_repair_deck612.md`
+  keeps the source DB unchanged; the package chain/core/strategy reports
+  `global_commander_candidate_package_chain_audit_20260706_larger_gate_feedback_land_floor_profile_repair_deck612.md`
+  and
+  `global_commander_candidate_package_strategy_matrix_20260706_larger_gate_feedback_land_floor_profile_repair_deck612.md`
+  reach `package_strategy_ready_for_battle_probe`. The strategy matrix now
+  distinguishes restored raw cuts from net cuts via `restored_cut`,
+  `cut_restored_in_final_candidate`, `net_package_adds`, and
+  `net_package_cuts`, so restored protected anchors cannot create false
+  protected-cut blockers or added-card exercise targets. The probe audit
+  `global_commander_candidate_battle_probe_audit_20260706_larger_gate_feedback_land_floor_profile_repair_deck612.md`
+  initially blocks promotion until all added lands are exercised; natural replay
+  `global_commander_candidate_added_card_natural_replay_trace_generator_20260706_larger_gate_feedback_land_floor_profile_repair_deck612.md`
+  then exercises all `7` missing added cards without forced access. The larger
+  gate audit
+  `global_commander_larger_battle_gate_audit_20260706_larger_gate_feedback_land_floor_profile_repair_vs607.md`
+  exercises all `9` net adds and improves the immediate base (`8W/16L/0S`
+  versus `7W/17L/0S`), but fails the protected baseline `607`
+  (`14W/9L/1S`) with `candidate_vs_protected_win_delta: -6`,
+  `candidate_vs_immediate_base_win_delta: 1`, and
+  `candidate_did_not_beat_protected_baseline`. The refreshed battle feedback
+  `global_commander_battle_feedback_model_20260706_larger_gate_current.md` now
+  has `package_count: 2` and `blocked_package_count: 2`; the post-feedback
+  strategy matrix
+  `global_commander_candidate_package_strategy_matrix_20260706_larger_gate_feedback_land_floor_profile_repair_deck612_post_larger_feedback.md`
+  blocks battle with `battle_feedback_blocker_count: 2` and next gate
+  `replace_failed_package_source_lane_or_cut_set_before_battle`. The next
+  Commander goal must treat this as reusable negative package feedback and
+  change source lane, cut set, or strategy hypothesis before any new battle.
 
 ## Global Commander Rollout - 2026-07-01
 

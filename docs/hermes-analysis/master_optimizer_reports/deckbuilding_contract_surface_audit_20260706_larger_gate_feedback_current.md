@@ -1,6 +1,6 @@
 # Deckbuilding Contract Surface Audit
 
-- Generated at: `2026-07-06T12:24:22.731374+00:00`
+- Generated at: `2026-07-06T12:54:06.291464+00:00`
 - Status: `pass`
 - Contract: `docs/hermes-analysis/COMMANDER_DECKBUILDING_CONTRACT_2026-06-29.md`
 
@@ -264,6 +264,10 @@
 | pass | `docs/hermes-analysis/master_optimizer_reports/global_commander_larger_battle_gate_audit_20260706_lorehold_profile_repair_vs607.md` |  |
 | pass | `docs/hermes-analysis/master_optimizer_reports/global_commander_battle_feedback_model_20260706_larger_gate_current.md` |  |
 | pass | `docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_package_strategy_matrix_20260706_lorehold_profile_repair_package_post_larger_feedback.md` |  |
+| pass | `docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_package_strategy_matrix_20260706_larger_gate_feedback_land_floor_profile_repair_deck612.md` |  |
+| pass | `docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_added_card_natural_replay_trace_generator_20260706_larger_gate_feedback_land_floor_profile_repair_deck612.md` |  |
+| pass | `docs/hermes-analysis/master_optimizer_reports/global_commander_larger_battle_gate_audit_20260706_larger_gate_feedback_land_floor_profile_repair_vs607.md` |  |
+| pass | `docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_package_strategy_matrix_20260706_larger_gate_feedback_land_floor_profile_repair_deck612_post_larger_feedback.md` |  |
 | pass | `docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_package_strategy_matrix_20260706_larger_gate_feedback_land_floor_deck612.md` |  |
 | pass | `docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_package_strategy_matrix_20260705_kaalia_removal_floor_step5.md` |  |
 | pass | `docs/hermes-analysis/master_optimizer_reports/global_commander_profile_blocker_repair_plan_20260705_kaalia_removal_floor_step5.md` |  |

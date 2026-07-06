@@ -494,9 +494,43 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `master_optimizer_reports/global_commander_candidate_package_strategy_matrix_20260706_larger_gate_feedback_land_floor_deck612.md`
     bloqueou battle com `profile_lands_below_target` e os cortes protegidos
     `Pyromancer's Goggles`, `Call Forth the Tempest` e `Birgi, God of
-    Storytelling // Harnfel, Horn of Bounty`. O proximo objetivo e reparar ou
-    resintetizar esse pacote para chegar ao piso Lorehold `36-38` lands sem
-    cortar essas ancoras; nao ha autorizacao para replay/battle desse pacote.
+    Storytelling // Harnfel, Horn of Bounty`.
+    O reparo desse pacote passou pelos relatórios
+    `master_optimizer_reports/global_commander_profile_blocker_repair_plan_20260706_larger_gate_feedback_land_floor_deck612_profile.md`,
+    `master_optimizer_reports/global_commander_profile_repair_candidate_model_20260706_larger_gate_feedback_land_floor_deck612_profile.md`,
+    `master_optimizer_reports/global_commander_profile_repair_package_resynthesizer_20260706_larger_gate_feedback_land_floor_deck612_profile.md`,
+    `master_optimizer_reports/global_commander_profile_repair_cut_pair_reviewer_20260706_larger_gate_feedback_land_floor_deck612_profile.md`,
+    `master_optimizer_reports/global_commander_profile_repair_cut_pair_reorderer_20260706_larger_gate_feedback_land_floor_deck612_profile.md`,
+    e
+    `master_optimizer_reports/global_commander_profile_repair_land_cut_reviewer_20260706_larger_gate_feedback_land_floor_deck612_profile.md`.
+    Ele restaurou as tres ancoras, levou Lorehold a `36` lands, materializou
+    uma copia isolada em
+    `master_optimizer_reports/global_commander_candidate_copy_materializer_20260706_larger_gate_feedback_land_floor_profile_repair_deck612.md`,
+    e passou chain/core/strategy em
+    `master_optimizer_reports/global_commander_candidate_package_chain_audit_20260706_larger_gate_feedback_land_floor_profile_repair_deck612.md`.
+    O strategy matrix
+    `master_optimizer_reports/global_commander_candidate_package_strategy_matrix_20260706_larger_gate_feedback_land_floor_profile_repair_deck612.md`
+    abriu apenas o probe (`package_strategy_ready_for_battle_probe`) e corrigiu
+    a leitura de cortes restaurados: `restored_cut` e
+    `cut_restored_in_final_candidate` nao contam como cortes liquidos. O probe
+    pequeno teve candidata `100.0%` contra base `0.0%`, mas a auditoria
+    `master_optimizer_reports/global_commander_candidate_battle_probe_audit_20260706_larger_gate_feedback_land_floor_profile_repair_deck612.md`
+    bloqueou promocao ate exercitar as lands adicionadas. O replay natural
+    `master_optimizer_reports/global_commander_candidate_added_card_natural_replay_trace_generator_20260706_larger_gate_feedback_land_floor_profile_repair_deck612.md`
+    exercitou todos os `7` adds que faltavam, sem forced access.
+    O gate maior consolidado em
+    `master_optimizer_reports/global_commander_larger_battle_gate_audit_20260706_larger_gate_feedback_land_floor_profile_repair_vs607.md`
+    exercitou todos os `9` adds liquidos e mostrou melhoria contra a base
+    imediata (`8W/16L/0S` contra `7W/17L/0S`), mas falha clara contra o
+    baseline protegido `607` (`14W/9L/1S`): `candidate_vs_protected_win_delta`
+    `-6`, `candidate_vs_immediate_base_win_delta` `1`, blocker
+    `candidate_did_not_beat_protected_baseline`. O feedback atual agora tem
+    `package_count=2`, `blocked_package_count=2`, e a matriz pos-feedback
+    `master_optimizer_reports/global_commander_candidate_package_strategy_matrix_20260706_larger_gate_feedback_land_floor_profile_repair_deck612_post_larger_feedback.md`
+    bloqueia nova battle com `battle_feedback_blocker_count=2` e
+    `replace_failed_package_source_lane_or_cut_set_before_battle`. Proximo goal:
+    tratar a falha como aprendizado global negativo de pacote, abrir nova
+    source/cut lane ou hipotese estrategica, e nao repetir esse pacote exato.
     O modelo nonland agora bloqueia cortes cross-lane de ramp com
     `cross_lane_ramp_cut_requires_same_lane_source_or_gate`, removendo `Birgi`
     dos cuts genericos de removal. O novo top pair `+Feed the Swarm /
@@ -511,14 +545,14 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `master_optimizer_reports/global_commander_battle_feedback_model_20260705_current.md`;
     evidencia atual deste ciclo:
     `master_optimizer_reports/global_commander_battle_feedback_model_20260706_larger_gate_current.md`.
-    O modelo marcou `2` pares como `pair_blocked_by_failed_gate`
-    (`+Feed the Swarm / -Birgi, God of Storytelling // Harnfel, Horn of Bounty`
-    e `+Feed the Swarm / -Archaeomancer's Map`), manteve `1` assinatura de
-    probe em `pair_needs_exposure_replay_before_gate`, e agregou `1` pacote em
-    `package_blocked_by_protected_baseline_gate`. A recomendacao reutilizavel para
-    os pares exercitados que falharam e `block_pair_until_new_source_lane_or_cut`;
-    o probe pequeno positivo de `+Feed / -Birgi` fica supersedido pelo gate maior
-    reprovado.
+    O modelo atual agora marca `2` assinaturas de probe em
+    `pair_needs_exposure_replay_before_gate` e agrega `2` pacotes em
+    `package_blocked_by_protected_baseline_gate`: o pacote profile-repair
+    anterior com `Call Forth the Tempest` sem exercicio no gate maior, e o novo
+    pacote land-floor/profile-repair que exercitou todos os adds liquidos mas
+    perdeu para o baseline protegido `607`. A recomendacao reutilizavel e
+    `block_package_until_new_source_lane_cut_or_strategy`; probes pequenos
+    positivos ficam supersedidos por gate maior reprovado.
     O modelo nonland consome esse feedback antes de emitir pares frescos:
     pares exatos bloqueados entram em `blocked_by_global_battle_feedback` /
     `blocked_pair_hypotheses`, entao `+Feed the Swarm / -Archaeomancer's Map`

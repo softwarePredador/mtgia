@@ -798,6 +798,22 @@ GLOBAL_COMMANDER_LARGER_GATE_FEEDBACK_LAND_FLOOR_PACKAGE_STRATEGY_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_package_strategy_matrix_20260706_larger_gate_feedback_land_floor_deck612.md"
 )
+GLOBAL_COMMANDER_LARGER_GATE_FEEDBACK_PROFILE_REPAIR_STRATEGY_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_package_strategy_matrix_20260706_larger_gate_feedback_land_floor_profile_repair_deck612.md"
+)
+GLOBAL_COMMANDER_LARGER_GATE_FEEDBACK_PROFILE_REPAIR_NATURAL_REPLAY_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_added_card_natural_replay_trace_generator_20260706_larger_gate_feedback_land_floor_profile_repair_deck612.md"
+)
+GLOBAL_COMMANDER_LARGER_GATE_FEEDBACK_PROFILE_REPAIR_LARGER_AUDIT_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_larger_battle_gate_audit_20260706_larger_gate_feedback_land_floor_profile_repair_vs607.md"
+)
+GLOBAL_COMMANDER_LARGER_GATE_FEEDBACK_PROFILE_REPAIR_POST_FEEDBACK_STRATEGY_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_package_strategy_matrix_20260706_larger_gate_feedback_land_floor_profile_repair_deck612_post_larger_feedback.md"
+)
 GLOBAL_COMMANDER_CANDIDATE_PACKAGE_CHAIN_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_package_chain_audit_20260705_kaalia_removal_floor_step5.md"
@@ -1386,6 +1402,22 @@ def build_audit() -> dict[str, Any]:
                 "package_strategy_ready_for_battle_probe",
                 "run_equal_battle_probe_with_replay_exposure",
                 "repair_commander_profile_blockers_before_battle",
+                "global_commander_profile_blocker_repair_plan_20260706_larger_gate_feedback_land_floor_deck612_profile.md",
+                "global_commander_profile_repair_land_cut_reviewer_20260706_larger_gate_feedback_land_floor_deck612_profile.md",
+                "global_commander_candidate_copy_materializer_20260706_larger_gate_feedback_land_floor_profile_repair_deck612.md",
+                "global_commander_candidate_package_strategy_matrix_20260706_larger_gate_feedback_land_floor_profile_repair_deck612.md",
+                "restored_cut",
+                "cut_restored_in_final_candidate",
+                "net_package_adds",
+                "net_package_cuts",
+                "global_commander_candidate_added_card_natural_replay_trace_generator_20260706_larger_gate_feedback_land_floor_profile_repair_deck612.md",
+                "global_commander_larger_battle_gate_audit_20260706_larger_gate_feedback_land_floor_profile_repair_vs607.md",
+                "candidate_vs_protected_win_delta: -6",
+                "candidate_vs_immediate_base_win_delta: 1",
+                "package_count: 2",
+                "blocked_package_count: 2",
+                "global_commander_candidate_package_strategy_matrix_20260706_larger_gate_feedback_land_floor_profile_repair_deck612_post_larger_feedback.md",
+                "battle_feedback_blocker_count: 2",
                 "global_commander_external_exact_artifact_engine_source_expander.py",
                 "global_commander_external_exact_artifact_engine_source_expander_20260706_current.md",
                 "review_external_exact_artifact_engine_candidates_locally_before_candidate_copy",
@@ -1856,11 +1888,26 @@ def build_audit() -> dict[str, Any]:
                 "pivot_to_cross_commander_role_axis_learning_after_ramp_axis_exhaustion",
                 "global_commander_candidate_copy_materializer_20260706_larger_gate_feedback_land_floor_deck612.md",
                 "global_commander_candidate_package_strategy_matrix_20260706_larger_gate_feedback_land_floor_deck612.md",
+                "global_commander_profile_blocker_repair_plan_20260706_larger_gate_feedback_land_floor_deck612_profile.md",
+                "global_commander_profile_repair_land_cut_reviewer_20260706_larger_gate_feedback_land_floor_deck612_profile.md",
+                "global_commander_candidate_copy_materializer_20260706_larger_gate_feedback_land_floor_profile_repair_deck612.md",
+                "global_commander_candidate_package_strategy_matrix_20260706_larger_gate_feedback_land_floor_profile_repair_deck612.md",
+                "restored_cut",
+                "cut_restored_in_final_candidate",
+                "global_commander_candidate_added_card_natural_replay_trace_generator_20260706_larger_gate_feedback_land_floor_profile_repair_deck612.md",
+                "global_commander_larger_battle_gate_audit_20260706_larger_gate_feedback_land_floor_profile_repair_vs607.md",
+                "candidate_vs_protected_win_delta",
+                "`-6`",
+                "candidate_vs_immediate_base_win_delta",
+                "`1`",
+                "package_count=2",
+                "blocked_package_count=2",
+                "global_commander_candidate_package_strategy_matrix_20260706_larger_gate_feedback_land_floor_profile_repair_deck612_post_larger_feedback.md",
+                "battle_feedback_blocker_count=2",
                 "global_commander_battle_feedback_model.py",
                 "global_commander_battle_feedback_model_20260705_current.md",
-                "pair_blocked_by_failed_gate",
                 "pair_needs_exposure_replay_before_gate",
-                "block_pair_until_new_source_lane_or_cut",
+                "block_package_until_new_source_lane_cut_or_strategy",
                 "blocked_by_global_battle_feedback",
                 "blocked_pair_hypotheses",
                 "global_commander_candidate_package_chain_audit.py",
@@ -4073,6 +4120,8 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_candidate_battle_probe_runner",
                 "candidate_battle_probe_inputs_ready",
                 "battle_probe_audit_ready",
+                "net_package_adds",
+                "net_package_cuts",
                 "MANALOOM_FOCUS_ACCESS_CARDS",
                 "source_db_mutated",
                 "promotion_allowed",
@@ -4166,6 +4215,7 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_larger_battle_gate_audit",
                 "larger_battle_gate_blocks_promotion",
                 "candidate_did_not_beat_protected_baseline",
+                "net_package_adds",
                 "larger_gate_unexercised_added_cards",
                 "promotion_allowed",
                 "protected_baseline_key",
@@ -4269,6 +4319,11 @@ def build_audit() -> dict[str, Any]:
                 "protected_profile_anchor_cut",
                 "protected_anchor_boundary",
                 "topdeck_miracle_setup",
+                "net_package_delta",
+                "restored_cut",
+                "cut_restored_in_final_candidate",
+                "net_package_adds",
+                "net_package_cuts",
                 "DEFAULT_BATTLE_FEEDBACK_REPORT",
                 "blocked_packages_from_battle_feedback",
                 "battle_feedback_failed_protected_baseline_package",
@@ -4288,6 +4343,8 @@ def build_audit() -> dict[str, Any]:
                 "battle_feedback_failed_exact_package",
                 "battle_feedback_failed_protected_baseline_package",
                 "replace_failed_package_source_lane_or_cut_set_before_battle",
+                "test_lorehold_restored_protected_anchor_is_not_treated_as_net_cut",
+                "cut_restored_in_final_candidate",
             ],
         )
     )
@@ -5573,8 +5630,8 @@ def build_audit() -> dict[str, Any]:
             GLOBAL_COMMANDER_BATTLE_FEEDBACK_LARGER_GATE_REPORT,
             [
                 "Global Commander Battle Feedback Model",
-                "package_count: `1`",
-                "blocked_package_count: `1`",
+                "package_count: `2`",
+                "blocked_package_count: `2`",
                 "package_blocked_by_protected_baseline_gate",
                 "package_improved_weak_base_but_failed_protected_baseline",
                 "block_package_until_new_source_lane_cut_or_strategy",
@@ -5596,6 +5653,68 @@ def build_audit() -> dict[str, Any]:
                 "battle_feedback_failed_protected_baseline_package",
                 "battle_feedback_larger_gate_unexercised_added_cards",
                 "package_blocked_by_protected_baseline_gate",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_LARGER_GATE_FEEDBACK_PROFILE_REPAIR_STRATEGY_REPORT,
+            [
+                "Global Commander Candidate Package Strategy Matrix",
+                "package_strategy_ready_for_battle_probe",
+                "battle_gate_allowed_now: `true`",
+                "battle_feedback_blocker_count: `0`",
+                "restored_cut",
+                "cut_restored_in_final_candidate",
+                "Pyromancer's Goggles",
+                "Call Forth the Tempest",
+                "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+                "run_equal_battle_probe_with_replay_exposure",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_LARGER_GATE_FEEDBACK_PROFILE_REPAIR_NATURAL_REPLAY_REPORT,
+            [
+                "Global Commander Candidate Added Card Natural Replay Trace Generator",
+                "candidate_added_card_natural_replay_all_exercised_ready_for_larger_gate",
+                "forced_access_used: `false`",
+                "larger_battle_gate_allowed_next: `true`",
+                "Bant Panorama",
+                "Brokers Hideout",
+                "Evolving Wilds",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_LARGER_GATE_FEEDBACK_PROFILE_REPAIR_LARGER_AUDIT_REPORT,
+            [
+                "Global Commander Larger Battle Gate Audit",
+                "larger_battle_gate_blocks_promotion",
+                "candidate_did_not_beat_protected_baseline",
+                "protected baseline: `14W/9L/1S`",
+                "immediate base: `7W/17L/0S`",
+                "candidate: `8W/16L/0S`",
+                "candidate_vs_protected_win_delta: `-6`",
+                "candidate_vs_immediate_base_win_delta: `1`",
+                "larger_gate_added_card_exercised",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_LARGER_GATE_FEEDBACK_PROFILE_REPAIR_POST_FEEDBACK_STRATEGY_REPORT,
+            [
+                "Global Commander Candidate Package Strategy Matrix",
+                "package_strategy_blocks_battle",
+                "battle_gate_allowed_now: `false`",
+                "battle_feedback_blocker_count: `2`",
+                "battle_feedback_failed_exact_package",
+                "battle_feedback_failed_protected_baseline_package",
+                "protected_delta `-6`",
+                "replace_failed_package_source_lane_or_cut_set_before_battle",
             ],
         )
     )

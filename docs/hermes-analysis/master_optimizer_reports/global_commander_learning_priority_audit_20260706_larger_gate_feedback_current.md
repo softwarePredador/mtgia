@@ -1,6 +1,6 @@
 # Global Commander Learning Priority Audit
 
-- Generated at: `2026-07-06T12:14:16.029450+00:00`
+- Generated at: `2026-07-06T12:39:55.300162+00:00`
 - Status: `pass`
 - Decks ranked: `17`
 - Commanders ranked: `6`
@@ -86,8 +86,8 @@
 ## Battle Feedback
 
 - Status: `pass`.
-- Pair status counts: `{'pair_needs_exposure_replay_before_gate': 1}`.
-- Package status counts: `{'package_blocked_by_protected_baseline_gate': 1}`.
+- Pair status counts: `{'pair_needs_exposure_replay_before_gate': 2}`.
+- Package status counts: `{'package_blocked_by_protected_baseline_gate': 2}`.
 - Next gate: `exclude_blocked_pairs_packages_and_route_unexercised_evidence_before_requeue`.
 
 ## Method Notes

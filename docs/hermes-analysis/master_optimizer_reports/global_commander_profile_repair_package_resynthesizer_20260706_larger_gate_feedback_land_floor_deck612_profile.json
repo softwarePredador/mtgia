@@ -1,0 +1,239 @@
+{
+  "artifact_type": "global_commander_profile_repair_package_resynthesizer",
+  "battle_gate_allowed_now": false,
+  "battle_gate_performed": false,
+  "battle_or_optimization_performed": false,
+  "battle_replay_performed": false,
+  "candidate_copy_allowed_now": false,
+  "candidate_copy_blockers": [
+    "cut_pair_review_required_before_candidate_copy"
+  ],
+  "deck_action_allowed": false,
+  "generated_at": "2026-07-06T12:28:21.585572+00:00",
+  "input_artifacts": {
+    "candidate_model_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_profile_repair_candidate_model_20260706_larger_gate_feedback_land_floor_deck612_profile.json"
+  },
+  "mutation_allowed": false,
+  "policy": {
+    "battle_boundary": "No battle, promotion, or deck action opens from package resynthesis alone.",
+    "protected_anchor_boundary": "Protected anchors may be restored as adds, but every replacement cut still needs pair review.",
+    "resynthesis_boundary": "This gate only resynthesizes review rows; it does not create a deck copy."
+  },
+  "postgres_writes": false,
+  "promotion_allowed": false,
+  "selected_add_package": [
+    {
+      "card_name": "Bant Panorama",
+      "fit_reasons": [
+        "commander_legal",
+        "fills_land_quantity_gap",
+        "supports_fetchable_or_dual_mix",
+        "untapped_or_commander_expected"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "lands"
+      ],
+      "score": 46,
+      "selected_for_axis": "lands",
+      "source_blocker": "profile_lands_below_target",
+      "source_pool_status": "review_only_profile_repair_candidate_pool_ready",
+      "status": "review_only_resynthesized_profile_repair_add"
+    },
+    {
+      "card_name": "Brokers Hideout",
+      "fit_reasons": [
+        "commander_legal",
+        "fills_land_quantity_gap",
+        "supports_fetchable_or_dual_mix",
+        "untapped_or_commander_expected"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "lands"
+      ],
+      "score": 46,
+      "selected_for_axis": "lands",
+      "source_blocker": "profile_lands_below_target",
+      "source_pool_status": "review_only_profile_repair_candidate_pool_ready",
+      "status": "review_only_resynthesized_profile_repair_add"
+    },
+    {
+      "card_name": "Pyromancer's Goggles",
+      "fit_reasons": [
+        "restore_protected_anchor_to_candidate_package",
+        "restores_protected_profile_anchor",
+        "protected_anchor_restore_axis"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "mana_acceleration",
+        "mana_rocks_treasure_ramp",
+        "spell_payoffs_copy_engines"
+      ],
+      "score": 115,
+      "selected_for_axis": "protected_profile_anchor",
+      "source_blocker": "protected_profile_anchor_cut:Pyromancer's Goggles",
+      "source_pool_status": "protected_anchor_restore_requires_package_resynthesis",
+      "status": "review_only_resynthesized_profile_repair_add"
+    },
+    {
+      "card_name": "Call Forth the Tempest",
+      "fit_reasons": [
+        "restore_protected_anchor_to_candidate_package",
+        "restores_protected_profile_anchor",
+        "protected_anchor_restore_axis"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "board_wipes_resets",
+        "miracle_haymakers"
+      ],
+      "score": 115,
+      "selected_for_axis": "protected_profile_anchor",
+      "source_blocker": "protected_profile_anchor_cut:Call Forth the Tempest",
+      "source_pool_status": "protected_anchor_restore_requires_package_resynthesis",
+      "status": "review_only_resynthesized_profile_repair_add"
+    },
+    {
+      "card_name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+      "fit_reasons": [
+        "restore_protected_anchor_to_candidate_package",
+        "restores_protected_profile_anchor",
+        "protected_anchor_restore_axis"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "mana_acceleration",
+        "mana_rocks_treasure_ramp"
+      ],
+      "score": 115,
+      "selected_for_axis": "protected_profile_anchor",
+      "source_blocker": "protected_profile_anchor_cut:Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+      "source_pool_status": "protected_anchor_restore_requires_package_resynthesis",
+      "status": "review_only_resynthesized_profile_repair_add"
+    }
+  ],
+  "selected_cut_package": [
+    {
+      "card_name": "Artist's Talent",
+      "core_roles": [
+        "draw",
+        "engine",
+        "ramp",
+        "wincon"
+      ],
+      "cut_reasons": [
+        "over_target_dedicated_win_conditions",
+        "over_target_draw_rummage_opponent_turn_draw",
+        "over_target_mana_rocks_treasure_ramp",
+        "over_target_spell_payoffs_copy_engines"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "card_draw_selection",
+        "dedicated_win_conditions",
+        "draw_rummage_opponent_turn_draw",
+        "mana_acceleration",
+        "mana_rocks_treasure_ramp",
+        "spell_payoffs_copy_engines"
+      ],
+      "score": 72,
+      "status": "review_only_resynthesized_profile_repair_cut"
+    },
+    {
+      "card_name": "Brass's Bounty",
+      "core_roles": [
+        "ramp",
+        "wincon"
+      ],
+      "cut_reasons": [
+        "over_target_dedicated_win_conditions",
+        "over_target_mana_rocks_treasure_ramp"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "dedicated_win_conditions",
+        "mana_acceleration",
+        "mana_rocks_treasure_ramp",
+        "miracle_haymakers"
+      ],
+      "score": 56,
+      "status": "review_only_resynthesized_profile_repair_cut"
+    },
+    {
+      "card_name": "Starfall Invocation",
+      "core_roles": [
+        "board_wipe",
+        "draw",
+        "removal"
+      ],
+      "cut_reasons": [
+        "over_target_board_wipes_resets",
+        "over_target_draw_rummage_opponent_turn_draw"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "board_wipes_resets",
+        "card_draw_selection",
+        "draw_rummage_opponent_turn_draw",
+        "miracle_haymakers"
+      ],
+      "score": 55,
+      "status": "review_only_resynthesized_profile_repair_cut"
+    },
+    {
+      "card_name": "Storm-Kiln Artist",
+      "core_roles": [
+        "engine",
+        "ramp"
+      ],
+      "cut_reasons": [
+        "over_target_mana_rocks_treasure_ramp",
+        "over_target_spell_payoffs_copy_engines"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "mana_acceleration",
+        "mana_rocks_treasure_ramp",
+        "spell_payoffs_copy_engines"
+      ],
+      "score": 54,
+      "status": "review_only_resynthesized_profile_repair_cut"
+    },
+    {
+      "card_name": "Jeska's Will",
+      "core_roles": [
+        "ramp"
+      ],
+      "cut_reasons": [
+        "over_target_draw_rummage_opponent_turn_draw",
+        "over_target_mana_rocks_treasure_ramp"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "draw_rummage_opponent_turn_draw",
+        "mana_acceleration",
+        "mana_rocks_treasure_ramp"
+      ],
+      "score": 53,
+      "status": "review_only_resynthesized_profile_repair_cut"
+    }
+  ],
+  "source_candidate_copy_blockers": [
+    "protected_profile_anchor:Pyromancer's Goggles:protected_anchor_restore_requires_package_resynthesis",
+    "protected_profile_anchor:Call Forth the Tempest:protected_anchor_restore_requires_package_resynthesis",
+    "protected_profile_anchor:Birgi, God of Storytelling // Harnfel, Horn of Bounty:protected_anchor_restore_requires_package_resynthesis"
+  ],
+  "source_db_mutated": false,
+  "status": "profile_repair_package_resynthesis_ready_for_cut_pair_review",
+  "summary": {
+    "candidate_copy_blocker_count": 1,
+    "commander": "Lorehold, the Historian",
+    "deck_id": "612",
+    "next_gate": "review_resynthesized_profile_repair_cut_pairs_before_candidate_copy",
+    "selected_add_count": 5,
+    "selected_cut_count": 5,
+    "source_candidate_copy_blocker_count": 3
+  }
+}

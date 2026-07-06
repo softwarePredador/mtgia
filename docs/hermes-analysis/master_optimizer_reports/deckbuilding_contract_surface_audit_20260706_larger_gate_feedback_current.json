@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-06T12:24:22.731374+00:00",
+  "generated_at": "2026-07-06T12:54:06.291464+00:00",
   "status": "pass",
   "contract": "docs/hermes-analysis/COMMANDER_DECKBUILDING_CONTRACT_2026-06-29.md",
   "active_surfaces": [
@@ -1535,6 +1535,30 @@
     },
     {
       "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_package_strategy_matrix_20260706_lorehold_profile_repair_package_post_larger_feedback.md",
+      "exists": true,
+      "status": "pass",
+      "missing": []
+    },
+    {
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_package_strategy_matrix_20260706_larger_gate_feedback_land_floor_profile_repair_deck612.md",
+      "exists": true,
+      "status": "pass",
+      "missing": []
+    },
+    {
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_added_card_natural_replay_trace_generator_20260706_larger_gate_feedback_land_floor_profile_repair_deck612.md",
+      "exists": true,
+      "status": "pass",
+      "missing": []
+    },
+    {
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_larger_battle_gate_audit_20260706_larger_gate_feedback_land_floor_profile_repair_vs607.md",
+      "exists": true,
+      "status": "pass",
+      "missing": []
+    },
+    {
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_package_strategy_matrix_20260706_larger_gate_feedback_land_floor_profile_repair_deck612_post_larger_feedback.md",
       "exists": true,
       "status": "pass",
       "missing": []

@@ -86,8 +86,8 @@ def strategy_inputs(strategy_report: Path) -> dict[str, Any]:
     candidate_db = artifacts.get("candidate_db")
     if not base_db or not candidate_db:
         raise ValueError(f"strategy report has no base_db/candidate_db: {strategy_report}")
-    package_adds = [str(card) for card in summary.get("package_adds") or []]
-    package_cuts = [str(card) for card in summary.get("package_cuts") or []]
+    package_adds = [str(card) for card in summary.get("net_package_adds") or summary.get("package_adds") or []]
+    package_cuts = [str(card) for card in summary.get("net_package_cuts") or summary.get("package_cuts") or []]
     commander = str(summary.get("commander") or payload.get("commander") or "")
     return {
         "strategy_report": strategy_report,

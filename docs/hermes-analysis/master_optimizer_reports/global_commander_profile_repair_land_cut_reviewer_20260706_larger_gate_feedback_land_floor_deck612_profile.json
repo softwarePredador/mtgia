@@ -1,0 +1,541 @@
+{
+  "artifact_type": "global_commander_profile_repair_land_cut_reviewer",
+  "battle_gate_allowed_now": false,
+  "battle_gate_performed": false,
+  "battle_or_optimization_performed": false,
+  "battle_replay_performed": false,
+  "candidate_copy_allowed_now": true,
+  "candidate_copy_blockers": [],
+  "deck_action_allowed": false,
+  "generated_at": "2026-07-06T12:28:43.758682+00:00",
+  "input_artifacts": {
+    "candidate_model_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_profile_repair_candidate_model_20260706_larger_gate_feedback_land_floor_deck612_profile.json",
+    "cut_pair_reorder_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_profile_repair_cut_pair_reorderer_20260706_larger_gate_feedback_land_floor_deck612_profile.json",
+    "strategy_matrix_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_package_strategy_matrix_20260706_larger_gate_feedback_land_floor_deck612.json"
+  },
+  "land_pair_reviews": [
+    {
+      "add": "Bant Panorama",
+      "blockers": [],
+      "cut": "Storm-Kiln Artist",
+      "cut_cmc": 4.0,
+      "cut_core_roles": [
+        "engine",
+        "ramp"
+      ],
+      "cut_profile_roles": [
+        "mana_acceleration",
+        "mana_rocks_treasure_ramp",
+        "spell_payoffs_copy_engines"
+      ],
+      "projected_cut_role_counts": {
+        "mana_rocks_treasure_ramp": 19,
+        "spell_payoffs_copy_engines": 12
+      },
+      "reasons": [
+        "land_floor_nonland_cut_reviewed_against_projected_package",
+        "package_level_role_replacement_exists"
+      ],
+      "status": "land_floor_cut_role_loss_review_ready_for_candidate_copy",
+      "warnings": [
+        "land_cut_removes_high_function_nonland_roles:mana_acceleration,mana_rocks_treasure_ramp,spell_payoffs_copy_engines"
+      ]
+    },
+    {
+      "add": "Brokers Hideout",
+      "blockers": [],
+      "cut": "Jeska's Will",
+      "cut_cmc": 3.0,
+      "cut_core_roles": [
+        "ramp"
+      ],
+      "cut_profile_roles": [
+        "draw_rummage_opponent_turn_draw",
+        "mana_acceleration",
+        "mana_rocks_treasure_ramp"
+      ],
+      "projected_cut_role_counts": {
+        "draw_rummage_opponent_turn_draw": 11,
+        "mana_rocks_treasure_ramp": 19
+      },
+      "reasons": [
+        "land_floor_nonland_cut_reviewed_against_projected_package"
+      ],
+      "status": "land_floor_cut_role_loss_review_ready_for_candidate_copy",
+      "warnings": [
+        "land_cut_removes_high_function_nonland_roles:draw_rummage_opponent_turn_draw,mana_acceleration,mana_rocks_treasure_ramp",
+        "low_curve_ramp_cut_requires_strategy_matrix_and_replay_after_copy"
+      ]
+    }
+  ],
+  "materialization_pairs": [
+    {
+      "add": "Bant Panorama",
+      "candidate": {
+        "card_name": "Bant Panorama",
+        "profile_roles": [
+          "lands"
+        ],
+        "role": "land",
+        "source": "profile_repair_land_cut_reviewer"
+      },
+      "commander": "Lorehold, the Historian",
+      "cut": "Storm-Kiln Artist",
+      "cut_candidate": {
+        "card_name": "Storm-Kiln Artist",
+        "profile_roles": [
+          "mana_acceleration",
+          "mana_rocks_treasure_ramp",
+          "spell_payoffs_copy_engines"
+        ],
+        "role": "land"
+      },
+      "deck_id": "612",
+      "pair": {
+        "add": "Bant Panorama",
+        "add_axis": "lands",
+        "add_profile_roles": [
+          "lands"
+        ],
+        "blockers": [
+          "land_floor_pair_needs_curve_and_role_loss_review"
+        ],
+        "candidate_copy_allowed": false,
+        "cut": "Storm-Kiln Artist",
+        "cut_profile_roles": [
+          "mana_acceleration",
+          "mana_rocks_treasure_ramp",
+          "spell_payoffs_copy_engines"
+        ],
+        "index": 1,
+        "reasons": [
+          "land_floor_repair_uses_nonland_cut"
+        ],
+        "shared_profile_roles": [],
+        "status": "reordered_land_floor_pair_needs_curve_review"
+      },
+      "role": "land",
+      "source_pool_status": "profile_repair_land_cut_review_ready_for_candidate_copy"
+    },
+    {
+      "add": "Brokers Hideout",
+      "candidate": {
+        "card_name": "Brokers Hideout",
+        "profile_roles": [
+          "lands"
+        ],
+        "role": "land",
+        "source": "profile_repair_land_cut_reviewer"
+      },
+      "commander": "Lorehold, the Historian",
+      "cut": "Jeska's Will",
+      "cut_candidate": {
+        "card_name": "Jeska's Will",
+        "profile_roles": [
+          "draw_rummage_opponent_turn_draw",
+          "mana_acceleration",
+          "mana_rocks_treasure_ramp"
+        ],
+        "role": "land"
+      },
+      "deck_id": "612",
+      "pair": {
+        "add": "Brokers Hideout",
+        "add_axis": "lands",
+        "add_profile_roles": [
+          "lands"
+        ],
+        "blockers": [
+          "land_floor_pair_needs_curve_and_role_loss_review"
+        ],
+        "candidate_copy_allowed": false,
+        "cut": "Jeska's Will",
+        "cut_profile_roles": [
+          "draw_rummage_opponent_turn_draw",
+          "mana_acceleration",
+          "mana_rocks_treasure_ramp"
+        ],
+        "index": 2,
+        "reasons": [
+          "land_floor_repair_uses_nonland_cut"
+        ],
+        "shared_profile_roles": [],
+        "status": "reordered_land_floor_pair_needs_curve_review"
+      },
+      "role": "land",
+      "source_pool_status": "profile_repair_land_cut_review_ready_for_candidate_copy"
+    },
+    {
+      "add": "Pyromancer's Goggles",
+      "candidate": {
+        "card_name": "Pyromancer's Goggles",
+        "profile_roles": [
+          "mana_acceleration",
+          "mana_rocks_treasure_ramp",
+          "spell_payoffs_copy_engines"
+        ],
+        "role": "mana_acceleration",
+        "source": "profile_repair_land_cut_reviewer"
+      },
+      "commander": "Lorehold, the Historian",
+      "cut": "Artist's Talent",
+      "cut_candidate": {
+        "card_name": "Artist's Talent",
+        "profile_roles": [
+          "card_draw_selection",
+          "dedicated_win_conditions",
+          "draw_rummage_opponent_turn_draw",
+          "mana_acceleration",
+          "mana_rocks_treasure_ramp",
+          "spell_payoffs_copy_engines"
+        ],
+        "role": "mana_acceleration"
+      },
+      "deck_id": "612",
+      "pair": {
+        "add": "Pyromancer's Goggles",
+        "add_axis": "protected_profile_anchor",
+        "add_profile_roles": [
+          "mana_acceleration",
+          "mana_rocks_treasure_ramp",
+          "spell_payoffs_copy_engines"
+        ],
+        "blockers": [],
+        "candidate_copy_allowed": false,
+        "cut": "Artist's Talent",
+        "cut_profile_roles": [
+          "card_draw_selection",
+          "dedicated_win_conditions",
+          "draw_rummage_opponent_turn_draw",
+          "mana_acceleration",
+          "mana_rocks_treasure_ramp",
+          "spell_payoffs_copy_engines"
+        ],
+        "index": 3,
+        "reasons": [
+          "protected_anchor_same_lane_overlap_after_reorder"
+        ],
+        "shared_profile_roles": [
+          "mana_acceleration",
+          "mana_rocks_treasure_ramp",
+          "spell_payoffs_copy_engines"
+        ],
+        "status": "reordered_protected_anchor_same_lane_pair"
+      },
+      "role": "mana_acceleration",
+      "source_pool_status": "profile_repair_land_cut_review_ready_for_candidate_copy"
+    },
+    {
+      "add": "Call Forth the Tempest",
+      "candidate": {
+        "card_name": "Call Forth the Tempest",
+        "profile_roles": [
+          "board_wipes_resets",
+          "miracle_haymakers"
+        ],
+        "role": "board_wipes_resets",
+        "source": "profile_repair_land_cut_reviewer"
+      },
+      "commander": "Lorehold, the Historian",
+      "cut": "Starfall Invocation",
+      "cut_candidate": {
+        "card_name": "Starfall Invocation",
+        "profile_roles": [
+          "board_wipes_resets",
+          "card_draw_selection",
+          "draw_rummage_opponent_turn_draw",
+          "miracle_haymakers"
+        ],
+        "role": "board_wipes_resets"
+      },
+      "deck_id": "612",
+      "pair": {
+        "add": "Call Forth the Tempest",
+        "add_axis": "protected_profile_anchor",
+        "add_profile_roles": [
+          "board_wipes_resets",
+          "miracle_haymakers"
+        ],
+        "blockers": [],
+        "candidate_copy_allowed": false,
+        "cut": "Starfall Invocation",
+        "cut_profile_roles": [
+          "board_wipes_resets",
+          "card_draw_selection",
+          "draw_rummage_opponent_turn_draw",
+          "miracle_haymakers"
+        ],
+        "index": 4,
+        "reasons": [
+          "protected_anchor_same_lane_overlap_after_reorder"
+        ],
+        "shared_profile_roles": [
+          "board_wipes_resets",
+          "miracle_haymakers"
+        ],
+        "status": "reordered_protected_anchor_same_lane_pair"
+      },
+      "role": "board_wipes_resets",
+      "source_pool_status": "profile_repair_land_cut_review_ready_for_candidate_copy"
+    },
+    {
+      "add": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+      "candidate": {
+        "card_name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+        "profile_roles": [
+          "mana_acceleration",
+          "mana_rocks_treasure_ramp"
+        ],
+        "role": "mana_acceleration",
+        "source": "profile_repair_land_cut_reviewer"
+      },
+      "commander": "Lorehold, the Historian",
+      "cut": "Brass's Bounty",
+      "cut_candidate": {
+        "card_name": "Brass's Bounty",
+        "profile_roles": [
+          "dedicated_win_conditions",
+          "mana_acceleration",
+          "mana_rocks_treasure_ramp",
+          "miracle_haymakers"
+        ],
+        "role": "mana_acceleration"
+      },
+      "deck_id": "612",
+      "pair": {
+        "add": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+        "add_axis": "protected_profile_anchor",
+        "add_profile_roles": [
+          "mana_acceleration",
+          "mana_rocks_treasure_ramp"
+        ],
+        "blockers": [],
+        "candidate_copy_allowed": false,
+        "cut": "Brass's Bounty",
+        "cut_profile_roles": [
+          "dedicated_win_conditions",
+          "mana_acceleration",
+          "mana_rocks_treasure_ramp",
+          "miracle_haymakers"
+        ],
+        "index": 5,
+        "reasons": [
+          "protected_anchor_same_lane_overlap_after_reorder"
+        ],
+        "shared_profile_roles": [
+          "mana_acceleration",
+          "mana_rocks_treasure_ramp"
+        ],
+        "status": "reordered_protected_anchor_same_lane_pair"
+      },
+      "role": "mana_acceleration",
+      "source_pool_status": "profile_repair_land_cut_review_ready_for_candidate_copy"
+    }
+  ],
+  "mutation_allowed": false,
+  "package_impacts": [
+    {
+      "expected_count": 5,
+      "package": "draw_rummage_foundation",
+      "present_count": 2,
+      "projected_present_count": 2,
+      "removed_present_cards": [],
+      "restored_missing_cards": [],
+      "status": "package_presence_preserved_or_improved"
+    },
+    {
+      "expected_count": 7,
+      "package": "interaction_and_resets",
+      "present_count": 2,
+      "projected_present_count": 2,
+      "removed_present_cards": [],
+      "restored_missing_cards": [],
+      "status": "package_presence_preserved_or_improved"
+    },
+    {
+      "expected_count": 7,
+      "package": "mana_ramp_foundation",
+      "present_count": 3,
+      "projected_present_count": 4,
+      "removed_present_cards": [],
+      "restored_missing_cards": [
+        "birgi, god of storytelling // harnfel, horn of bounty"
+      ],
+      "status": "package_presence_preserved_or_improved"
+    },
+    {
+      "expected_count": 12,
+      "package": "miracle_payoffs_expensive_spells",
+      "present_count": 3,
+      "projected_present_count": 3,
+      "removed_present_cards": [
+        "brass's bounty"
+      ],
+      "restored_missing_cards": [
+        "call forth the tempest"
+      ],
+      "status": "package_presence_preserved_or_improved"
+    },
+    {
+      "expected_count": 4,
+      "package": "protection_and_equipment",
+      "present_count": 3,
+      "projected_present_count": 3,
+      "removed_present_cards": [],
+      "restored_missing_cards": [],
+      "status": "package_presence_preserved_or_improved"
+    },
+    {
+      "expected_count": 9,
+      "package": "spell_payoff_copy_package",
+      "present_count": 2,
+      "projected_present_count": 2,
+      "removed_present_cards": [
+        "storm-kiln artist"
+      ],
+      "restored_missing_cards": [
+        "pyromancer's goggles"
+      ],
+      "status": "package_presence_preserved_or_improved"
+    },
+    {
+      "expected_count": 7,
+      "package": "topdeck_and_miracle_setup",
+      "present_count": 3,
+      "projected_present_count": 3,
+      "removed_present_cards": [],
+      "restored_missing_cards": [],
+      "status": "package_presence_preserved_or_improved"
+    }
+  ],
+  "policy": {
+    "battle_boundary": "Candidate copy can open for structure and strategy rerun only; battle and promotion remain closed.",
+    "land_cut_review_boundary": "This gate evaluates role loss only; it does not copy or mutate a deck.",
+    "profile_package_boundary": "Projected counts use the whole reordered repair package, not isolated land pairs."
+  },
+  "postgres_writes": false,
+  "projected_role_counts": {
+    "angels_demons_dragons_payoffs": 3,
+    "board_wipes_resets": 8,
+    "card_draw_selection": 9,
+    "dedicated_win_conditions": 12,
+    "draw_rummage_opponent_turn_draw": 11,
+    "graveyard_recursion": 8,
+    "haste_protection_silence": 17,
+    "lands": 36,
+    "mana_acceleration": 19,
+    "mana_rocks_treasure_ramp": 19,
+    "miracle_haymakers": 11,
+    "reanimation_plan_b": 7,
+    "spell_payoffs_copy_engines": 12,
+    "spot_interaction": 6,
+    "topdeck_miracle_setup": 7,
+    "tutors_access": 15
+  },
+  "promotion_allowed": false,
+  "source_db": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_copy_materializer_20260706_larger_gate_feedback_land_floor_deck612_candidate/knowledge_candidate.db",
+  "source_db_mutated": false,
+  "status": "profile_repair_land_cut_review_ready_for_candidate_copy",
+  "summary": {
+    "candidate_copy_blocker_count": 0,
+    "commander": "Lorehold, the Historian",
+    "deck_id": "612",
+    "hard_floor_blocker_count": 0,
+    "land_pair_review_count": 2,
+    "next_gate": "materialize_profile_repair_candidate_copy",
+    "pair_count": 5,
+    "ready_land_pair_count": 2
+  },
+  "target_results": [
+    {
+      "blockers": [],
+      "candidate_count": 8,
+      "max": 5,
+      "min": 3,
+      "projected_count": 8,
+      "role": "board_wipes_resets",
+      "status": "above_target_review"
+    },
+    {
+      "blockers": [],
+      "candidate_count": 14,
+      "max": 7,
+      "min": 4,
+      "projected_count": 12,
+      "role": "dedicated_win_conditions",
+      "status": "above_target_review"
+    },
+    {
+      "blockers": [],
+      "candidate_count": 14,
+      "max": 12,
+      "min": 8,
+      "projected_count": 11,
+      "role": "draw_rummage_opponent_turn_draw",
+      "status": "in_range"
+    },
+    {
+      "blockers": [],
+      "candidate_count": 8,
+      "max": 5,
+      "min": 2,
+      "projected_count": 8,
+      "role": "graveyard_recursion",
+      "status": "above_target_review"
+    },
+    {
+      "blockers": [],
+      "candidate_count": 34,
+      "max": 38,
+      "min": 36,
+      "projected_count": 36,
+      "role": "lands",
+      "status": "in_range"
+    },
+    {
+      "blockers": [],
+      "candidate_count": 21,
+      "max": 13,
+      "min": 10,
+      "projected_count": 19,
+      "role": "mana_rocks_treasure_ramp",
+      "status": "above_target_review"
+    },
+    {
+      "blockers": [],
+      "candidate_count": 12,
+      "max": 16,
+      "min": 10,
+      "projected_count": 11,
+      "role": "miracle_haymakers",
+      "status": "in_range"
+    },
+    {
+      "blockers": [],
+      "candidate_count": 13,
+      "max": 8,
+      "min": 5,
+      "projected_count": 12,
+      "role": "spell_payoffs_copy_engines",
+      "status": "above_target_review"
+    },
+    {
+      "blockers": [],
+      "candidate_count": 6,
+      "max": 6,
+      "min": 4,
+      "projected_count": 6,
+      "role": "spot_interaction",
+      "status": "in_range"
+    },
+    {
+      "blockers": [],
+      "candidate_count": 7,
+      "max": 9,
+      "min": 6,
+      "projected_count": 7,
+      "role": "topdeck_miracle_setup",
+      "status": "in_range"
+    }
+  ]
+}

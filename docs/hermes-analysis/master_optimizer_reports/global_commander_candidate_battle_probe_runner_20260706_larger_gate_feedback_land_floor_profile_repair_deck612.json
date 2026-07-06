@@ -1,0 +1,71 @@
+{
+  "artifact_type": "global_commander_candidate_battle_probe_runner",
+  "battle_or_optimization_performed": true,
+  "battle_probe_audit_ready": true,
+  "battle_replay_performed": true,
+  "blocker_reasons": [],
+  "commands": {
+    "battle_gate": {
+      "command": "/usr/local/bin/python3 /Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_variant_battle_gate.py --db /Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db --deck-ids 612 --candidate-db /Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_copy_materializer_20260706_larger_gate_feedback_land_floor_profile_repair_deck612_candidate/knowledge_candidate.db --candidate-deck-id 612 --candidate-key candidate_land_floor_profile_repair --candidate-name Lorehold, the Historian profile repair package candidate --candidate-archetype profile-repair-package --games 1 --opponent-limit 1 --opponent-seed 20260706 --simulation-seed 42 --game-timeout-seconds 30.0 --deck-process-timeout-seconds 120.0 --isolate-deck-process --stem global_commander_candidate_battle_probe_gate_20260706_larger_gate_feedback_land_floor_profile_repair_deck612 --checkpoint-stem global_commander_candidate_battle_probe_gate_20260706_larger_gate_feedback_land_floor_profile_repair_deck612_checkpoint",
+      "returncode": 0,
+      "stderr_tail": "",
+      "stdout_tail": "Loaded 1 real opponent decks from 96 valid candidates (seed=20260706)\nrunning deck_612 games=1 opponents=1\nrunning candidate_land_floor_profile_repair games=1 opponents=1\n{\n  \"status\": \"ready\",\n  \"json\": \"/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_battle_probe_gate_20260706_larger_gate_feedback_land_floor_profile_repair_deck612.json\",\n  \"markdown\": \"/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_battle_probe_gate_20260706_larger_gate_feedback_land_floor_profile_repair_deck612.md\"\n}\n"
+    },
+    "battle_replay": {
+      "command": "/usr/local/bin/python3 /Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_replay_v10_3.py",
+      "returncode": 0,
+      "stderr_tail": "",
+      "stdout_tail": "Loaded 12 real opponent decks from 96 valid candidates (seed=20260706)\nReplay: docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_battle_probe_runner_20260706_larger_gate_feedback_land_floor_profile_repair_deck612_replay/replay.txt\nReplay events: docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_battle_probe_runner_20260706_larger_gate_feedback_land_floor_profile_repair_deck612_replay/replay.events.jsonl\nDecision trace: docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_battle_probe_runner_20260706_larger_gate_feedback_land_floor_profile_repair_deck612_replay/replay.decision_trace.jsonl\n"
+    }
+  },
+  "generated_at": "2026-07-06T12:34:59.858858+00:00",
+  "input_artifacts": {
+    "base_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+    "battle_gate": "docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_variant_battle_gate.py",
+    "battle_replay": "docs/hermes-analysis/manaloom-knowledge/scripts/battle_replay_v10_3.py",
+    "candidate_db": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_copy_materializer_20260706_larger_gate_feedback_land_floor_profile_repair_deck612_candidate/knowledge_candidate.db",
+    "strategy_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_package_strategy_matrix_20260706_larger_gate_feedback_land_floor_profile_repair_deck612.json"
+  },
+  "output_artifacts": {
+    "base_metrics": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_battle_probe_runner_20260706_larger_gate_feedback_land_floor_profile_repair_deck612_base_metrics.json",
+    "battle_gate_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_battle_probe_gate_20260706_larger_gate_feedback_land_floor_profile_repair_deck612.json",
+    "candidate_metrics": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_battle_probe_runner_20260706_larger_gate_feedback_land_floor_profile_repair_deck612_candidate_metrics.json",
+    "replay_dir": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_battle_probe_runner_20260706_larger_gate_feedback_land_floor_profile_repair_deck612_replay"
+  },
+  "postgres_writes": false,
+  "promotion_allowed": false,
+  "replay_files_ready": true,
+  "source_db_mutated": false,
+  "status": "candidate_battle_probe_inputs_ready",
+  "summary": {
+    "base_win_rate": 0.0,
+    "candidate_win_rate": 100.0,
+    "commander": "Lorehold, the Historian",
+    "deck_id": 612,
+    "next_gate": "run_global_commander_candidate_battle_probe_audit",
+    "package_adds": [
+      "Ash Barrens",
+      "Bant Panorama",
+      "Battlefield Forge",
+      "Brokers Hideout",
+      "Cabaretti Courtyard",
+      "Demolition Field",
+      "Escape Tunnel",
+      "Evolving Wilds",
+      "Sunbaked Canyon"
+    ],
+    "package_cuts": [
+      "Agate Instigator",
+      "Ancient Gold Dragon",
+      "Artist's Talent",
+      "Brass's Bounty",
+      "Jeska's Will",
+      "Longshot, Rebel Bowman",
+      "Starfall Invocation",
+      "Storm-Kiln Artist",
+      "Warleader's Call"
+    ],
+    "sample_games": 1,
+    "win_rate_delta": 100.0
+  }
+}

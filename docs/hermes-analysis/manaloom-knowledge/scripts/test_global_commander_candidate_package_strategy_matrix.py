@@ -233,6 +233,66 @@ class GlobalCommanderCandidatePackageStrategyMatrixTests(unittest.TestCase):
         )
         self.assertFalse(report["battle_gate_allowed_now"])
 
+    def test_lorehold_restored_protected_anchor_is_not_treated_as_net_cut(self) -> None:
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        root = Path(tmp.name)
+        anchor = "Birgi, God of Storytelling // Harnfel, Horn of Bounty"
+        base_rows = [
+            ("Land", 34, "land", '["land"]', 0, "Land", ""),
+            (
+                anchor,
+                1,
+                "engine",
+                '["engine","ramp","creature"]',
+                3,
+                "Legendary Creature - God",
+                "Whenever you cast a spell, add {R}. Until end of turn, you don't lose this mana as steps and phases end.",
+            ),
+            (
+                "Storm-Kiln Artist",
+                1,
+                "engine",
+                '["engine","ramp"]',
+                4,
+                "Creature - Dwarf Shaman",
+                "Magecraft - Create a Treasure token.",
+            ),
+        ]
+        candidate_rows = [
+            ("Land", 36, "land", '["land"]', 0, "Land", ""),
+            (
+                anchor,
+                1,
+                "engine",
+                '["engine","ramp","creature"]',
+                3,
+                "Legendary Creature - God",
+                "Whenever you cast a spell, add {R}. Until end of turn, you don't lose this mana as steps and phases end.",
+            ),
+        ]
+        base = self._db(root, "base.db", base_rows)
+        candidate = self._db(root, "candidate.db", candidate_rows)
+        chain = self._chain(
+            root,
+            package_chain_payload(
+                commander="Lorehold, the Historian",
+                adds=["Bant Panorama", anchor],
+                cuts=[anchor, "Storm-Kiln Artist"],
+            ),
+        )
+
+        report = matrix.build_report(package_chain_report=chain, base_db=base, candidate_db=candidate)
+
+        self.assertNotIn(f"protected_profile_anchor_cut:{anchor}", report["blocker_reasons"])
+        self.assertNotIn(anchor, report["summary"]["net_package_adds"])
+        self.assertNotIn(anchor, report["summary"]["net_package_cuts"])
+        restored_rows = [
+            row for row in report["package_delta"] if row["card"] == anchor and row["action"] == "restored_cut"
+        ]
+        self.assertEqual(len(restored_rows), 1)
+        self.assertEqual(restored_rows[0]["risk_flags"], ["cut_restored_in_final_candidate"])
+
     def test_profile_role_classifier_handles_path_and_modal_removal(self) -> None:
         path_roles = matrix.profile_roles_for_card(
             {

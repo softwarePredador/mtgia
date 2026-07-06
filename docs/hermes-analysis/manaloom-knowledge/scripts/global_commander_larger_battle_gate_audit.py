@@ -208,7 +208,7 @@ def build_report(
     strategy = load_json(strategy_report)
     natural = load_json(natural_replay_report) if natural_replay_report.exists() else {}
     strategy_summary = strategy.get("summary") or {}
-    added_cards = [str(card) for card in strategy_summary.get("package_adds") or []]
+    added_cards = [str(card) for card in strategy_summary.get("net_package_adds") or strategy_summary.get("package_adds") or []]
     candidate = result_by_key(gate, candidate_key)
     protected = result_by_key(gate, protected_baseline_key)
     immediate = result_by_key(gate, immediate_base_key)

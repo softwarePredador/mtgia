@@ -588,6 +588,33 @@ def card_by_name(rows: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
     return {normalize_name(str(row.get("card_name") or "")): row for row in rows}
 
 
+def card_quantity_counter(rows: list[dict[str, Any]]) -> Counter[str]:
+    counts: Counter[str] = Counter()
+    for row in rows:
+        name = str(row.get("card_name") or "")
+        if name:
+            counts[name] += int(row.get("quantity") or 1)
+    return counts
+
+
+def net_package_delta(
+    *,
+    base_rows: list[dict[str, Any]],
+    candidate_rows: list[dict[str, Any]],
+) -> tuple[list[str], list[str]]:
+    base = card_quantity_counter(base_rows)
+    candidate = card_quantity_counter(candidate_rows)
+    adds: list[str] = []
+    cuts: list[str] = []
+    for name in sorted(set(base) | set(candidate)):
+        delta = candidate[name] - base[name]
+        if delta > 0:
+            adds.extend([name] * delta)
+        elif delta < 0:
+            cuts.extend([name] * abs(delta))
+    return adds, cuts
+
+
 def package_presence(rows: list[dict[str, Any]], profile: Mapping[str, Any]) -> dict[str, Any]:
     names = set(card_by_name(rows))
     result = {}
@@ -724,6 +751,12 @@ def package_delta_rows(
     candidate_by_name = card_by_name(candidate_rows)
     adds = [str(card) for card in package_summary.get("package_adds", [])]
     cuts = [str(card) for card in package_summary.get("package_cuts", [])]
+    restored_keys = {
+        normalize_name(card)
+        for card in adds
+        if normalize_name(card) in {normalize_name(cut) for cut in cuts}
+        and normalize_name(card) in candidate_by_name
+    }
     rows = []
     for card in adds:
         row = candidate_by_name.get(normalize_name(card), {})
@@ -737,14 +770,19 @@ def package_delta_rows(
             }
         )
     for card in cuts:
-        row = base_by_name.get(normalize_name(card), {})
+        key = normalize_name(card)
+        row = base_by_name.get(key, {})
+        restored = key in restored_keys
         rows.append(
             {
-                "action": "cut",
+                "action": "restored_cut" if restored else "cut",
                 "card": card,
                 "present": bool(row),
+                "restored_in_final_candidate": restored,
                 "profile_roles": sorted(profile_roles_for_card(row)) if row else [],
-                "risk_flags": cut_risk(row, profile) if row else ["cut_card_missing_from_base"],
+                "risk_flags": ["cut_restored_in_final_candidate"]
+                if restored
+                else cut_risk(row, profile) if row else ["cut_card_missing_from_base"],
             }
         )
     return rows
@@ -808,6 +846,7 @@ def build_report(
         candidate_db = REPO_ROOT / str(summary.get("final_candidate_db") or "")
     base_rows = deck_rows(base_db, deck_id)
     candidate_rows = deck_rows(candidate_db, deck_id)
+    net_package_adds, net_package_cuts = net_package_delta(base_rows=base_rows, candidate_rows=candidate_rows)
     if profile is None:
         blockers = ["commander_profile_not_available"]
         target_rows: list[dict[str, Any]] = []
@@ -870,6 +909,8 @@ def build_report(
             "battle_feedback_blocker_count": len(feedback_blockers),
             "package_adds": package_adds,
             "package_cuts": package_cuts,
+            "net_package_adds": net_package_adds,
+            "net_package_cuts": net_package_cuts,
             "next_gate": (
                 "run_equal_battle_probe_with_replay_exposure"
                 if battle_allowed

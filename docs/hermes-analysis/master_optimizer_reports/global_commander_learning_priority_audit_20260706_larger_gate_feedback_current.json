@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-06T12:14:16.029450+00:00",
+  "generated_at": "2026-07-06T12:39:55.300162+00:00",
   "status": "pass",
   "artifact_type": "global_commander_learning_priority_audit",
   "contract": "docs/hermes-analysis/COMMANDER_DECKBUILDING_CONTRACT_2026-06-29.md",
@@ -110,31 +110,31 @@
     "bracket_policy_status": "aligned_with_current_official_bracket_model",
     "battle_feedback_status": "pass",
     "blocked_exact_add_cut_pair_count": 0,
-    "blocked_exact_package_count": 1,
+    "blocked_exact_package_count": 2,
     "source_exhaustion_blocked_deck_count": 1,
     "engine_axis_pivot_blocked_deck_count": 1,
     "role_axis_exhaustion_blocked_deck_count": 1,
     "battle_feedback_pair_status_counts": {
-      "pair_needs_exposure_replay_before_gate": 1
+      "pair_needs_exposure_replay_before_gate": 2
     },
     "battle_feedback_package_status_counts": {
-      "package_blocked_by_protected_baseline_gate": 1
+      "package_blocked_by_protected_baseline_gate": 2
     }
   },
   "battle_feedback_summary": {
     "status": "pass",
-    "pair_count": 1,
+    "pair_count": 2,
     "blocked_pair_count": 0,
-    "needs_exposure_pair_count": 1,
+    "needs_exposure_pair_count": 2,
     "ready_pair_count": 0,
-    "package_count": 1,
-    "blocked_package_count": 1,
+    "package_count": 2,
+    "blocked_package_count": 2,
     "needs_exercise_package_count": 0,
     "pair_status_counts": {
-      "pair_needs_exposure_replay_before_gate": 1
+      "pair_needs_exposure_replay_before_gate": 2
     },
     "package_status_counts": {
-      "package_blocked_by_protected_baseline_gate": 1
+      "package_blocked_by_protected_baseline_gate": 2
     },
     "next_gate": "exclude_blocked_pairs_packages_and_route_unexercised_evidence_before_requeue"
   },
