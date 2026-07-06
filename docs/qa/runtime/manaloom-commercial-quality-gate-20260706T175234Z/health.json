@@ -1,10 +1,10 @@
 {
   "status": "healthy",
   "service": "mtgia-server",
-  "timestamp": "2026-07-06T17:37:59.029436",
+  "timestamp": "2026-07-06T17:52:35.441532",
   "environment": "production",
   "version": "1.0.0",
-  "git_sha": "7cd6fbf5eb99192bd7346933f4e3220734e1ec2e",
+  "git_sha": "076ba55a6e9f7a1f00d5c2dfd59065e1c4c8463c",
   "checks": {
     "process": {
       "status": "healthy"

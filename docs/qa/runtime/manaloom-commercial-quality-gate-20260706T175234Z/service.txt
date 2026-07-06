@@ -1,0 +1,1 @@
+evolution_cartinhas localhost:5000/manaloom/cartinhas:076ba55a6e 1/1

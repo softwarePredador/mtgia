@@ -114,10 +114,10 @@ Evidencia de 2026-07-06:
 - Restore `full` validado em Postgres 17 temporario remoto.
 - Resultado dos restores: `82` tabelas publicas restauradas.
 - Deploy backend final validado no SHA
-  `7cd6fbf5eb99192bd7346933f4e3220734e1ec2e`.
+  `076ba55a6e9f7a1f00d5c2dfd59065e1c4c8463c`.
 - Smoke de produto final: `status=ok`.
 - Quality gate comercial:
-  `docs/qa/runtime/manaloom-commercial-quality-gate-20260706T173758Z/summary.json`
+  `docs/qa/runtime/manaloom-commercial-quality-gate-20260706T175234Z/summary.json`
   com `status=pass`, `service_replicas=1/1`, `successful_runs=2`,
   `mock_response_count=0`, `cron_lines=2` e `issues=[]`.
 - Login Flutter Web local validado em

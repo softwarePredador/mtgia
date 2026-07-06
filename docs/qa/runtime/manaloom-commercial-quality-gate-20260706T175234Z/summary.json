@@ -2,7 +2,7 @@
   "status": "pass",
   "api": "https://evolution-cartinhas.2ta7qx.easypanel.host",
   "web": "https://evolution-manaloom-web-public.2ta7qx.easypanel.host",
-  "git_sha": "7cd6fbf5eb99192bd7346933f4e3220734e1ec2e",
+  "git_sha": "076ba55a6e9f7a1f00d5c2dfd59065e1c4c8463c",
   "service_replicas": "1/1",
   "ai_generation": {
     "status": "pass",
@@ -14,5 +14,5 @@
     "cron_lines": 2
   },
   "issues": [],
-  "artifacts_dir": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/qa/runtime/manaloom-commercial-quality-gate-20260706T173758Z"
+  "artifacts_dir": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/qa/runtime/manaloom-commercial-quality-gate-20260706T175234Z"
 }

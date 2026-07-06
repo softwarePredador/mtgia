@@ -109,7 +109,7 @@ Objetivo: publicar com confianca, medicao e fallback controlado.
 - Migração `031` aplicada no banco novo para `deck_comments` e
   `content_reports`.
 - Deploy final validado no backend novo com SHA
-  `7cd6fbf5eb99192bd7346933f4e3220734e1ec2e`.
+  `076ba55a6e9f7a1f00d5c2dfd59065e1c4c8463c`.
 - Smoke final validou plano Free, checkout bloqueado por provedor ausente,
   pos-jogo, timeline, relatorio publico, deck publico, comentarios, denuncia,
   trade match, exclusao do deck e limpeza do usuario temporario.
@@ -123,8 +123,8 @@ Objetivo: publicar com confianca, medicao e fallback controlado.
   com `279087037` bytes.
 - Restore `schema` e restore `full` validados em container Postgres 17
   temporario com `82` tabelas publicas.
-- Quality gate comercial passou em 2026-07-06:
-  `docs/qa/runtime/manaloom-commercial-quality-gate-20260706T173758Z/summary.json`.
+- Quality gate comercial pos-deploy passou em 2026-07-06:
+  `docs/qa/runtime/manaloom-commercial-quality-gate-20260706T175234Z/summary.json`.
 - Login Flutter Web local validado em `http://127.0.0.1:8088/app/#/login`,
   sem `RangeError` e sem erros de console.
 - Fluxo pos-jogo agora leva diretamente para otimizacao/rebuild do deck com
