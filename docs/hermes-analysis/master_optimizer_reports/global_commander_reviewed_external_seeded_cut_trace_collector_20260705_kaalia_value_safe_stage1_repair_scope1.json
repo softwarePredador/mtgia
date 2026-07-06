@@ -1,0 +1,1183 @@
+{
+  "artifact_type": "global_commander_reviewed_external_seeded_cut_trace_collector",
+  "battle_gate_allowed_now": false,
+  "battle_gate_performed": false,
+  "battle_or_optimization_performed": false,
+  "battle_replay_performed": false,
+  "candidate_copy_allowed_now": false,
+  "candidate_copy_blockers": [
+    "unseen_seeded_hypotheses_need_force_access:Basalt Monolith,Monologue Tax,Burnt Offering,Culling the Weak,Desperate Ritual,Grim Monolith,Infernal Plunge,Pyretic Ritual,Cabal Ritual,Strike It Rich",
+    "candidate_copy_closed_until_seeded_hypothesis_has_negative_or_same_lane_proof"
+  ],
+  "card_level_cut_permission_now": false,
+  "deck_action_allowed": false,
+  "generated_at": "2026-07-06T01:21:33.069680+00:00",
+  "input_artifacts": {
+    "seeded_miner_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_reviewed_external_nonpayoff_seeded_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1.json",
+    "trace_generator_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_generator_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+  },
+  "mutation_allowed": false,
+  "policy": {
+    "candidate_copy_boundary": "This collector never opens candidate copy, battle, promotion, or value-safe reclassification.",
+    "trace_boundary": "This collector reuses existing replay artifacts and does not run a new battle.",
+    "unseen_boundary": "Unseen hypotheses are not negative proof; force-access or broader replay is required.",
+    "usage_boundary": "A seeded cut hypothesis used by the target deck is not value-safe from this trace."
+  },
+  "postgres_writes": false,
+  "promotion_allowed": false,
+  "review_rows": [
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "cut_card": "Basalt Monolith",
+      "decision": "insufficient_existing_trace",
+      "decision_trace_count": 0,
+      "event_types": {},
+      "exposure_event_count": 0,
+      "first_decision_trace": null,
+      "first_exposure_event": null,
+      "first_usage_event": null,
+      "next_evidence": "force_access_or_expand_replay_window_before_reclassification",
+      "profile_roles": [
+        "mana_acceleration"
+      ],
+      "source_reasons": [
+        "fresh_same_lane_mana_acceleration",
+        "single_profile_role_slot",
+        "slower_ramp_review_pressure"
+      ],
+      "source_score": 58,
+      "status": "reviewed_seeded_cut_hypothesis_not_seen_needs_force_access_or_broader_trace",
+      "target_cut_role": "mana_acceleration",
+      "usage_event_count": 0,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "cut_card": "Monologue Tax",
+      "decision": "insufficient_existing_trace",
+      "decision_trace_count": 0,
+      "event_types": {},
+      "exposure_event_count": 0,
+      "first_decision_trace": null,
+      "first_exposure_event": null,
+      "first_usage_event": null,
+      "next_evidence": "force_access_or_expand_replay_window_before_reclassification",
+      "profile_roles": [
+        "mana_acceleration"
+      ],
+      "source_reasons": [
+        "fresh_same_lane_mana_acceleration",
+        "single_profile_role_slot",
+        "slower_ramp_review_pressure"
+      ],
+      "source_score": 58,
+      "status": "reviewed_seeded_cut_hypothesis_not_seen_needs_force_access_or_broader_trace",
+      "target_cut_role": "mana_acceleration",
+      "usage_event_count": 0,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "cut_card": "Burnt Offering",
+      "decision": "insufficient_existing_trace",
+      "decision_trace_count": 0,
+      "event_types": {},
+      "exposure_event_count": 0,
+      "first_decision_trace": null,
+      "first_exposure_event": null,
+      "first_usage_event": null,
+      "next_evidence": "force_access_or_expand_replay_window_before_reclassification",
+      "profile_roles": [
+        "mana_acceleration"
+      ],
+      "source_reasons": [
+        "fresh_same_lane_mana_acceleration",
+        "single_profile_role_slot"
+      ],
+      "source_score": 52,
+      "status": "reviewed_seeded_cut_hypothesis_not_seen_needs_force_access_or_broader_trace",
+      "target_cut_role": "mana_acceleration",
+      "usage_event_count": 0,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "cut_card": "Culling the Weak",
+      "decision": "insufficient_existing_trace",
+      "decision_trace_count": 0,
+      "event_types": {},
+      "exposure_event_count": 0,
+      "first_decision_trace": null,
+      "first_exposure_event": null,
+      "first_usage_event": null,
+      "next_evidence": "force_access_or_expand_replay_window_before_reclassification",
+      "profile_roles": [
+        "mana_acceleration"
+      ],
+      "source_reasons": [
+        "fresh_same_lane_mana_acceleration",
+        "single_profile_role_slot"
+      ],
+      "source_score": 52,
+      "status": "reviewed_seeded_cut_hypothesis_not_seen_needs_force_access_or_broader_trace",
+      "target_cut_role": "mana_acceleration",
+      "usage_event_count": 0,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "cut_card": "Desperate Ritual",
+      "decision": "insufficient_existing_trace",
+      "decision_trace_count": 0,
+      "event_types": {},
+      "exposure_event_count": 0,
+      "first_decision_trace": null,
+      "first_exposure_event": null,
+      "first_usage_event": null,
+      "next_evidence": "force_access_or_expand_replay_window_before_reclassification",
+      "profile_roles": [
+        "mana_acceleration"
+      ],
+      "source_reasons": [
+        "fresh_same_lane_mana_acceleration",
+        "single_profile_role_slot"
+      ],
+      "source_score": 52,
+      "status": "reviewed_seeded_cut_hypothesis_not_seen_needs_force_access_or_broader_trace",
+      "target_cut_role": "mana_acceleration",
+      "usage_event_count": 0,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "cut_card": "Grim Monolith",
+      "decision": "insufficient_existing_trace",
+      "decision_trace_count": 0,
+      "event_types": {},
+      "exposure_event_count": 0,
+      "first_decision_trace": null,
+      "first_exposure_event": null,
+      "first_usage_event": null,
+      "next_evidence": "force_access_or_expand_replay_window_before_reclassification",
+      "profile_roles": [
+        "mana_acceleration"
+      ],
+      "source_reasons": [
+        "fresh_same_lane_mana_acceleration",
+        "single_profile_role_slot"
+      ],
+      "source_score": 52,
+      "status": "reviewed_seeded_cut_hypothesis_not_seen_needs_force_access_or_broader_trace",
+      "target_cut_role": "mana_acceleration",
+      "usage_event_count": 0,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "cut_card": "Infernal Plunge",
+      "decision": "insufficient_existing_trace",
+      "decision_trace_count": 0,
+      "event_types": {},
+      "exposure_event_count": 0,
+      "first_decision_trace": null,
+      "first_exposure_event": null,
+      "first_usage_event": null,
+      "next_evidence": "force_access_or_expand_replay_window_before_reclassification",
+      "profile_roles": [
+        "mana_acceleration"
+      ],
+      "source_reasons": [
+        "fresh_same_lane_mana_acceleration",
+        "single_profile_role_slot"
+      ],
+      "source_score": 52,
+      "status": "reviewed_seeded_cut_hypothesis_not_seen_needs_force_access_or_broader_trace",
+      "target_cut_role": "mana_acceleration",
+      "usage_event_count": 0,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "cut_card": "Pyretic Ritual",
+      "decision": "insufficient_existing_trace",
+      "decision_trace_count": 0,
+      "event_types": {},
+      "exposure_event_count": 0,
+      "first_decision_trace": null,
+      "first_exposure_event": null,
+      "first_usage_event": null,
+      "next_evidence": "force_access_or_expand_replay_window_before_reclassification",
+      "profile_roles": [
+        "mana_acceleration"
+      ],
+      "source_reasons": [
+        "fresh_same_lane_mana_acceleration",
+        "single_profile_role_slot"
+      ],
+      "source_score": 52,
+      "status": "reviewed_seeded_cut_hypothesis_not_seen_needs_force_access_or_broader_trace",
+      "target_cut_role": "mana_acceleration",
+      "usage_event_count": 0,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "cut_card": "Cabal Ritual",
+      "decision": "insufficient_existing_trace",
+      "decision_trace_count": 0,
+      "event_types": {},
+      "exposure_event_count": 0,
+      "first_decision_trace": null,
+      "first_exposure_event": null,
+      "first_usage_event": null,
+      "next_evidence": "force_access_or_expand_replay_window_before_reclassification",
+      "profile_roles": [
+        "mana_acceleration"
+      ],
+      "source_reasons": [
+        "fresh_same_lane_mana_acceleration",
+        "single_profile_role_slot",
+        "format_staple_needs_review"
+      ],
+      "source_score": 44,
+      "status": "reviewed_seeded_cut_hypothesis_not_seen_needs_force_access_or_broader_trace",
+      "target_cut_role": "mana_acceleration",
+      "usage_event_count": 0,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "cut_card": "Strike It Rich",
+      "decision": "insufficient_existing_trace",
+      "decision_trace_count": 0,
+      "event_types": {},
+      "exposure_event_count": 0,
+      "first_decision_trace": null,
+      "first_exposure_event": null,
+      "first_usage_event": null,
+      "next_evidence": "force_access_or_expand_replay_window_before_reclassification",
+      "profile_roles": [
+        "mana_acceleration",
+        "reanimation_plan_b"
+      ],
+      "source_reasons": [
+        "fresh_same_lane_mana_acceleration"
+      ],
+      "source_score": 42,
+      "status": "reviewed_seeded_cut_hypothesis_not_seen_needs_force_access_or_broader_trace",
+      "target_cut_role": "mana_acceleration",
+      "usage_event_count": 0,
+      "value_safe_reclassification_allowed": false
+    }
+  ],
+  "seed_reports": [
+    {
+      "cards": {
+        "Basalt Monolith": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Burnt Offering": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Cabal Ritual": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Culling the Weak": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Desperate Ritual": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Grim Monolith": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Infernal Plunge": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Monologue Tax": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Pyretic Ritual": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Strike It Rich": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        }
+      },
+      "decision_count": 121,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_42.decision_trace.jsonl",
+      "event_count": 818,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_42.events.jsonl",
+      "seed": 42
+    },
+    {
+      "cards": {
+        "Basalt Monolith": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Burnt Offering": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Cabal Ritual": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Culling the Weak": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Desperate Ritual": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Grim Monolith": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Infernal Plunge": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Monologue Tax": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Pyretic Ritual": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Strike It Rich": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        }
+      },
+      "decision_count": 138,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_43.decision_trace.jsonl",
+      "event_count": 832,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_43.events.jsonl",
+      "seed": 43
+    },
+    {
+      "cards": {
+        "Basalt Monolith": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Burnt Offering": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Cabal Ritual": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Culling the Weak": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Desperate Ritual": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Grim Monolith": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Infernal Plunge": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Monologue Tax": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Pyretic Ritual": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Strike It Rich": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        }
+      },
+      "decision_count": 139,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_44.decision_trace.jsonl",
+      "event_count": 1003,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_44.events.jsonl",
+      "seed": 44
+    },
+    {
+      "cards": {
+        "Basalt Monolith": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Burnt Offering": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Cabal Ritual": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Culling the Weak": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Desperate Ritual": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Grim Monolith": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Infernal Plunge": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Monologue Tax": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Pyretic Ritual": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Strike It Rich": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        }
+      },
+      "decision_count": 114,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_45.decision_trace.jsonl",
+      "event_count": 727,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_45.events.jsonl",
+      "seed": 45
+    },
+    {
+      "cards": {
+        "Basalt Monolith": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Burnt Offering": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Cabal Ritual": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Culling the Weak": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Desperate Ritual": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Grim Monolith": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Infernal Plunge": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Monologue Tax": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Pyretic Ritual": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Strike It Rich": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        }
+      },
+      "decision_count": 136,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_46.decision_trace.jsonl",
+      "event_count": 1074,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_46.events.jsonl",
+      "seed": 46
+    },
+    {
+      "cards": {
+        "Basalt Monolith": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Burnt Offering": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Cabal Ritual": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Culling the Weak": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Desperate Ritual": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Grim Monolith": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Infernal Plunge": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Monologue Tax": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Pyretic Ritual": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Strike It Rich": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        }
+      },
+      "decision_count": 134,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_47.decision_trace.jsonl",
+      "event_count": 795,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_47.events.jsonl",
+      "seed": 47
+    },
+    {
+      "cards": {
+        "Basalt Monolith": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Burnt Offering": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Cabal Ritual": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Culling the Weak": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Desperate Ritual": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Grim Monolith": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Infernal Plunge": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Monologue Tax": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Pyretic Ritual": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Strike It Rich": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        }
+      },
+      "decision_count": 99,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_48.decision_trace.jsonl",
+      "event_count": 661,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_48.events.jsonl",
+      "seed": 48
+    },
+    {
+      "cards": {
+        "Basalt Monolith": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Burnt Offering": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Cabal Ritual": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Culling the Weak": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Desperate Ritual": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Grim Monolith": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Infernal Plunge": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Monologue Tax": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Pyretic Ritual": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Strike It Rich": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        }
+      },
+      "decision_count": 147,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_49.decision_trace.jsonl",
+      "event_count": 1061,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_49.events.jsonl",
+      "seed": 49
+    }
+  ],
+  "source_db_mutated": false,
+  "status": "reviewed_external_seeded_cut_trace_needs_force_access",
+  "summary": {
+    "candidate_copy_allowed_count": 0,
+    "candidate_copy_blocker_count": 2,
+    "card_level_cut_permission_count": 0,
+    "commander": "Kaalia of the Vast",
+    "deck_id": "619",
+    "hypothesis_count": 10,
+    "next_gate": "force_access_or_expand_replay_window_for_seeded_hypotheses",
+    "not_seen_count": 10,
+    "seed_report_count": 8,
+    "seen_without_usage_count": 0,
+    "usage_blocked_hypothesis_count": 0
+  },
+  "value_safe_reclassification_allowed_now": false
+}

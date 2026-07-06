@@ -726,6 +726,14 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `card_level_cut_permission_count=0` e `candidate_copy_allowed_count=0`.
     O proximo gate e
     `collect_trace_for_reviewed_external_seeded_cut_source_hypotheses`.
+    O collector de trace dessas hipoteses fica em
+    `global_commander_reviewed_external_seeded_cut_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md`.
+    Resultado: `reviewed_external_seeded_cut_trace_needs_force_access`,
+    com `hypothesis_count=10`, `usage_blocked_hypothesis_count=0`,
+    `seen_without_usage_count=0`, `not_seen_count=10`,
+    `seed_report_count=8`, `card_level_cut_permission_count=0` e
+    `candidate_copy_allowed_count=0`. O proximo gate e
+    `force_access_or_expand_replay_window_for_seeded_hypotheses`.
     Observacao operacional: snapshots historicos de candidate-copy, battle-probe,
     battle-feedback e package-chain dependem de artefatos locais ignorados. Se
     faltarem ou forem regenerados sem esses artefatos, a auditoria de superficie

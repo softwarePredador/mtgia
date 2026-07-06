@@ -258,6 +258,12 @@ GLOBAL_COMMANDER_REVIEWED_EXTERNAL_NONPAYOFF_SEEDED_CUT_SOURCE_MINER = (
 GLOBAL_COMMANDER_REVIEWED_EXTERNAL_NONPAYOFF_SEEDED_CUT_SOURCE_MINER_TEST = (
     SCRIPT_DIR / "test_global_commander_reviewed_external_nonpayoff_seeded_cut_source_miner.py"
 )
+GLOBAL_COMMANDER_REVIEWED_EXTERNAL_SEEDED_CUT_TRACE_COLLECTOR = (
+    SCRIPT_DIR / "global_commander_reviewed_external_seeded_cut_trace_collector.py"
+)
+GLOBAL_COMMANDER_REVIEWED_EXTERNAL_SEEDED_CUT_TRACE_COLLECTOR_TEST = (
+    SCRIPT_DIR / "test_global_commander_reviewed_external_seeded_cut_trace_collector.py"
+)
 README = REPO_ROOT / "docs/hermes-analysis/README.md"
 
 CONTRACT_MATRIX_JSON = (
@@ -543,6 +549,10 @@ GLOBAL_COMMANDER_SCOPE1_EXTERNAL_NONPAYOFF_SAME_LANE_SOURCE_CANDIDATE_REVIEWER_R
 GLOBAL_COMMANDER_SCOPE1_REVIEWED_EXTERNAL_NONPAYOFF_SEEDED_CUT_SOURCE_MINER_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_reviewed_external_nonpayoff_seeded_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+)
+GLOBAL_COMMANDER_SCOPE1_REVIEWED_EXTERNAL_SEEDED_CUT_TRACE_COLLECTOR_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_reviewed_external_seeded_cut_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md"
 )
 
 REQUIRED_FOCUS_CARDS = {
@@ -936,6 +946,10 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_reviewed_external_nonpayoff_seeded_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1.md",
                 "reviewed_external_seeded_cut_source_hypotheses_ready_for_trace",
                 "collect_trace_for_reviewed_external_seeded_cut_source_hypotheses",
+                "global_commander_reviewed_external_seeded_cut_trace_collector.py",
+                "global_commander_reviewed_external_seeded_cut_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md",
+                "reviewed_external_seeded_cut_trace_needs_force_access",
+                "force_access_or_expand_replay_window_for_seeded_hypotheses",
                 "battle_gate_allowed_now",
                 "Path to Exile",
                 "Terminate",
@@ -1265,6 +1279,9 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_reviewed_external_nonpayoff_seeded_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1.md",
                 "reviewed_external_seeded_cut_source_hypotheses_ready_for_trace",
                 "collect_trace_for_reviewed_external_seeded_cut_source_hypotheses",
+                "global_commander_reviewed_external_seeded_cut_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md",
+                "reviewed_external_seeded_cut_trace_needs_force_access",
+                "force_access_or_expand_replay_window_for_seeded_hypotheses",
                 "battle_gate_allowed_now=false",
                 "Path to Exile",
                 "Terminate",
@@ -2251,6 +2268,32 @@ def build_audit() -> dict[str, Any]:
                 "test_unseeded_target_role_remains_blocked",
                 "reviewed_external_seeded_cut_source_hypotheses_ready_for_trace",
                 "reviewed_external_seeded_cut_source_mining_exhausted_current_deck_no_cut_permission",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_REVIEWED_EXTERNAL_SEEDED_CUT_TRACE_COLLECTOR,
+            [
+                "global_commander_reviewed_external_seeded_cut_trace_collector",
+                "reviewed_external_seeded_cut_trace_needs_force_access",
+                "reviewed_seeded_cut_hypothesis_used_by_target_trace_blocks_cut",
+                "reviewed_seeded_cut_hypothesis_not_seen_needs_force_access_or_broader_trace",
+                "force_access_or_expand_replay_window_for_seeded_hypotheses",
+                "card_level_cut_permission_now",
+                "candidate_copy_allowed_now",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_REVIEWED_EXTERNAL_SEEDED_CUT_TRACE_COLLECTOR_TEST,
+            [
+                "test_target_usage_blocks_seeded_hypothesis_cut",
+                "test_seen_without_usage_requires_negative_review",
+                "test_unseen_hypotheses_need_force_access",
+                "reviewed_external_seeded_cut_trace_needs_force_access",
+                "reviewed_external_seeded_cut_trace_blocks_used_hypotheses",
             ],
         )
     )
@@ -3555,6 +3598,27 @@ def build_audit() -> dict[str, Any]:
                 "Basalt Monolith",
                 "Monologue Tax",
                 "Simian Spirit Guide",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SCOPE1_REVIEWED_EXTERNAL_SEEDED_CUT_TRACE_COLLECTOR_REPORT,
+            [
+                "Global Commander Reviewed External Seeded Cut Trace Collector",
+                "reviewed_external_seeded_cut_trace_needs_force_access",
+                "hypothesis_count: `10`",
+                "usage_blocked_hypothesis_count: `0`",
+                "seen_without_usage_count: `0`",
+                "not_seen_count: `10`",
+                "seed_report_count: `8`",
+                "card_level_cut_permission_count: `0`",
+                "candidate_copy_allowed_count: `0`",
+                "candidate_copy_allowed_now: `false`",
+                "force_access_or_expand_replay_window_for_seeded_hypotheses",
+                "Basalt Monolith",
+                "Monologue Tax",
+                "Strike It Rich",
             ],
         )
     )

@@ -411,7 +411,12 @@ Operational priority after this pivot:
     is fresh for a seeded role, route fresh hypotheses to trace collection, and
     keep card-level cut permission, candidate copy, battle, promotion, and
     value-safe reclassification closed;
-54. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
+54. run `global_commander_reviewed_external_seeded_cut_trace_collector.py`
+    after seeded cut-source mining finds fresh hypotheses; it must reuse
+    existing replay/decision trace artifacts to classify each seeded hypothesis
+    as used, seen without usage, or unseen, and keep card-level cut permission,
+    candidate copy, battle, promotion, and value-safe reclassification closed;
+55. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
     probes, as regression evidence only unless they produce a named safe cut and
     equal-gate proof under the Lorehold promotion gate.
 
@@ -483,6 +488,7 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_same_lane_source_candidate_discoverer_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_same_lane_source_candidate_reviewer_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_reviewed_external_nonpayoff_seeded_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_reviewed_external_seeded_cut_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 
 Historical candidate-copy, battle-probe, battle-feedback, and package-chain
 snapshots are local ignored evidence artifacts. The surface auditor must show
@@ -1072,6 +1078,14 @@ Current external refresh on 2026-07-05:
   `card_level_cut_permission_count=0`, and `candidate_copy_allowed_count=0`.
   Fresh hypotheses are trace work only, not cut permission. The next gate is
   `collect_trace_for_reviewed_external_seeded_cut_source_hypotheses`.
+- Current reviewed external seeded cut-trace collection returns
+  `reviewed_external_seeded_cut_trace_needs_force_access` with
+  `hypothesis_count=10`, `usage_blocked_hypothesis_count=0`,
+  `seen_without_usage_count=0`, `not_seen_count=10`, `seed_report_count=8`,
+  `card_level_cut_permission_count=0`, and `candidate_copy_allowed_count=0`.
+  The existing trace window did not expose the hypotheses, so this is not
+  negative proof. The next gate is
+  `force_access_or_expand_replay_window_for_seeded_hypotheses`.
 
 ## Global Commander Rollout - 2026-07-01
 

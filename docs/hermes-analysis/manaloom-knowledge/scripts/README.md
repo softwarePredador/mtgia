@@ -265,6 +265,13 @@ hypothesis to trace collection. Fresh seeded hypotheses still do not create
 card-level cut permission, candidate copy, battle, promotion, or value-safe
 reclassification.
 
+Then run `global_commander_reviewed_external_seeded_cut_trace_collector.py`
+after seeded cut-source mining finds fresh hypotheses. It reuses existing
+replay and decision-trace artifacts to classify each hypothesis as used, seen
+without usage, or unseen. Unseen is not negative proof; force-access or broader
+replay is still required before any value-safe claim, candidate copy, battle,
+promotion, or deck action.
+
 ## XMage Authoritative Adaptation
 
 For all-card battle-rule acceleration, use local XMage as the authoritative
