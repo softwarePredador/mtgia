@@ -291,6 +291,14 @@ against existing current-scope traces. A current-deck external candidate used
 by the target deck remains blocked from cut consideration; this does not open
 candidate copy, battle, promotion, or value-safe reclassification.
 
+Then run `global_commander_external_nonpayoff_new_source_or_replacement_finder.py`.
+It searches for genuinely fresh outside-deck source candidates or explicit
+same-lane replacement proof after current-deck usage blocks negative review. It
+must keep current-deck cards, held package adds, recycled seeds, land-lane
+candidates, identity gaps, and legality blockers separated. Ready rows are
+miner/review seeds only; they do not open candidate copy, battle, promotion, or
+value-safe reclassification.
+
 ## XMage Authoritative Adaptation
 
 For all-card battle-rule acceleration, use local XMage as the authoritative

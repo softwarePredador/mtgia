@@ -769,6 +769,16 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     Enlightened Tutor foram usados pelo alvo; Vampiric Tutor foi visto sem uso
     e ainda precisa de negative review manual. O proximo gate e
     `find_new_external_source_or_explicit_same_lane_replacement_proof`.
+    O finder de fonte nova/prova de substituicao fica em
+    `global_commander_external_nonpayoff_new_source_or_replacement_finder_20260706_kaalia_value_safe_stage1_repair_scope1.md`.
+    Resultado: `new_external_source_candidates_ready_for_local_review`, com
+    `current_deck_usage_blocked_count=5`,
+    `explicit_same_lane_replacement_proof_count=0`,
+    `new_external_candidate_count=22` e
+    `new_external_ready_for_review_count=19`. As fontes novas cobrem
+    `haste_protection_silence=8`, `mana_acceleration=7` e `tutors_access=4`,
+    mas seguem como seed/review apenas. O proximo gate e
+    `review_new_external_nonpayoff_source_candidates_locally_before_seeded_miner`.
     Observacao operacional: snapshots historicos de candidate-copy, battle-probe,
     battle-feedback e package-chain dependem de artefatos locais ignorados. Se
     faltarem ou forem regenerados sem esses artefatos, a auditoria de superficie

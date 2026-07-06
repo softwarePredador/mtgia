@@ -282,6 +282,12 @@ GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_CURRENT_DECK_NEGATIVE_REVIEW_COLLECTOR = (
 GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_CURRENT_DECK_NEGATIVE_REVIEW_COLLECTOR_TEST = (
     SCRIPT_DIR / "test_global_commander_external_nonpayoff_current_deck_negative_review_collector.py"
 )
+GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_NEW_SOURCE_OR_REPLACEMENT_FINDER = (
+    SCRIPT_DIR / "global_commander_external_nonpayoff_new_source_or_replacement_finder.py"
+)
+GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_NEW_SOURCE_OR_REPLACEMENT_FINDER_TEST = (
+    SCRIPT_DIR / "test_global_commander_external_nonpayoff_new_source_or_replacement_finder.py"
+)
 README = REPO_ROOT / "docs/hermes-analysis/README.md"
 
 CONTRACT_MATRIX_JSON = (
@@ -587,6 +593,10 @@ GLOBAL_COMMANDER_SCOPE1_EXTERNAL_NONPAYOFF_SEED_EXHAUSTION_RECOVERY_ROUTER_REPOR
 GLOBAL_COMMANDER_SCOPE1_EXTERNAL_NONPAYOFF_CURRENT_DECK_NEGATIVE_REVIEW_COLLECTOR_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_current_deck_negative_review_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+)
+GLOBAL_COMMANDER_SCOPE1_EXTERNAL_NONPAYOFF_NEW_SOURCE_OR_REPLACEMENT_FINDER_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_new_source_or_replacement_finder_20260706_kaalia_value_safe_stage1_repair_scope1.md"
 )
 
 REQUIRED_FOCUS_CARDS = {
@@ -999,6 +1009,10 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_external_nonpayoff_current_deck_negative_review_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md",
                 "external_current_deck_negative_review_blocks_used_candidates",
                 "find_new_external_source_or_explicit_same_lane_replacement_proof",
+                "global_commander_external_nonpayoff_new_source_or_replacement_finder.py",
+                "global_commander_external_nonpayoff_new_source_or_replacement_finder_20260706_kaalia_value_safe_stage1_repair_scope1.md",
+                "new_external_source_candidates_ready_for_local_review",
+                "review_new_external_nonpayoff_source_candidates_locally_before_seeded_miner",
                 "battle_gate_allowed_now",
                 "Path to Exile",
                 "Terminate",
@@ -1345,6 +1359,10 @@ def build_audit() -> dict[str, Any]:
                 "usage_blocked_candidate_count=5",
                 "negative_review_cleared_count=0",
                 "find_new_external_source_or_explicit_same_lane_replacement_proof",
+                "global_commander_external_nonpayoff_new_source_or_replacement_finder_20260706_kaalia_value_safe_stage1_repair_scope1.md",
+                "new_external_source_candidates_ready_for_local_review",
+                "new_external_ready_for_review_count=19",
+                "review_new_external_nonpayoff_source_candidates_locally_before_seeded_miner",
                 "battle_gate_allowed_now=false",
                 "Path to Exile",
                 "Terminate",
@@ -2430,6 +2448,31 @@ def build_audit() -> dict[str, Any]:
                 "test_usage_blocks_negative_review",
                 "test_seen_without_usage_requires_manual_review",
                 "test_unseen_candidates_need_force_access_or_broader_trace",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_NEW_SOURCE_OR_REPLACEMENT_FINDER,
+            [
+                "global_commander_external_nonpayoff_new_source_or_replacement_finder",
+                "new_external_source_candidates_ready_for_local_review",
+                "current_deck_candidate_used_by_target_blocks_replacement_proof",
+                "new_external_source_candidate_ready_for_local_miner_review",
+                "route_land_candidate_to_mana_base_lane",
+                "candidate_copy_allowed_now",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_NEW_SOURCE_OR_REPLACEMENT_FINDER_TEST,
+            [
+                "test_current_deck_usage_blocks_replacement_proof",
+                "test_new_legal_outside_deck_candidate_is_ready_for_review",
+                "test_land_candidate_routes_to_mana_base_lane",
+                "Loran's Escape",
+                "Hall of the Bandit Lord",
             ],
         )
     )
@@ -3835,6 +3878,26 @@ def build_audit() -> dict[str, Any]:
                 "Lightning Greaves",
                 "Vampiric Tutor",
                 "find_new_external_source_or_explicit_same_lane_replacement_proof",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SCOPE1_EXTERNAL_NONPAYOFF_NEW_SOURCE_OR_REPLACEMENT_FINDER_REPORT,
+            [
+                "Global Commander External Nonpayoff New Source Or Replacement Finder",
+                "new_external_source_candidates_ready_for_local_review",
+                "current_deck_negative_review_candidate_count: `6`",
+                "current_deck_usage_blocked_count: `5`",
+                "manual_negative_review_required_count: `1`",
+                "explicit_same_lane_replacement_proof_count: `0`",
+                "new_external_candidate_count: `22`",
+                "new_external_ready_for_review_count: `19`",
+                "candidate_copy_allowed_now: `false`",
+                "Lavaspur Boots",
+                "Grim Tutor",
+                "Stoneforge Mystic",
+                "review_new_external_nonpayoff_source_candidates_locally_before_seeded_miner",
             ],
         )
     )

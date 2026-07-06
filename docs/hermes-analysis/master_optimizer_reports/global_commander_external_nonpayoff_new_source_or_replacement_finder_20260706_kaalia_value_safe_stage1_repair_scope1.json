@@ -1,0 +1,1366 @@
+{
+  "generated_at": "2026-07-06T02:04:41.219784+00:00",
+  "status": "new_external_source_candidates_ready_for_local_review",
+  "artifact_type": "global_commander_external_nonpayoff_new_source_or_replacement_finder",
+  "postgres_writes": false,
+  "source_db_mutated": false,
+  "battle_or_optimization_performed": false,
+  "battle_gate_performed": false,
+  "battle_replay_performed": false,
+  "mutation_allowed": false,
+  "deck_action_allowed": false,
+  "promotion_allowed": false,
+  "battle_gate_allowed_now": false,
+  "candidate_copy_allowed_now": false,
+  "value_safe_reclassification_allowed_now": false,
+  "card_level_cut_permission_now": false,
+  "explicit_same_lane_replacement_proof_now": false,
+  "input_artifacts": {
+    "negative_review_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_current_deck_negative_review_collector_20260705_kaalia_value_safe_stage1_repair_scope1.json",
+    "previous_reviewer_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_same_lane_source_candidate_reviewer_20260705_kaalia_value_safe_stage1_repair_scope1.json",
+    "package_source_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_package_source_synthesizer_20260705_kaalia_value_safe_stage1_repair_scope1.json",
+    "selected_db": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_copy_materializer_20260705_kaalia_value_safe_stage1_repair_scope1_candidate/knowledge_candidate.db"
+  },
+  "summary": {
+    "deck_id": "619",
+    "commander": "Kaalia of the Vast",
+    "current_deck_negative_review_candidate_count": 6,
+    "current_deck_usage_blocked_count": 5,
+    "manual_negative_review_required_count": 1,
+    "explicit_same_lane_replacement_proof_count": 0,
+    "new_external_candidate_count": 22,
+    "new_external_ready_for_review_count": 19,
+    "ready_count_by_role": {
+      "haste_protection_silence": 8,
+      "mana_acceleration": 7,
+      "tutors_access": 4
+    },
+    "status_counts": {
+      "new_external_source_candidate_ready_for_local_miner_review": 19,
+      "new_source_candidate_needs_local_identity_resolution": 1,
+      "new_source_candidate_land_lane_requires_mana_base_model": 2
+    },
+    "next_gate": "review_new_external_nonpayoff_source_candidates_locally_before_seeded_miner"
+  },
+  "source_snapshots": [
+    {
+      "source_id": "edhrec_kaalia_hidden_gems_2026_03_26",
+      "url": "https://edhrec.com/articles/hidden-gems-for-kaalia-of-the-vast",
+      "observed_on": "2026-07-06",
+      "source_type": "commander_strategy_article",
+      "signal": "Kaalia needs immediate attack windows, mana to recast, and redundant support when opponents remove her.",
+      "guardrail": "hidden-gem/article presence is source-lane evidence only, not cut permission"
+    },
+    {
+      "source_id": "draftsim_kaalia_deck_guide_2026_02_12",
+      "url": "https://draftsim.com/kaalia-of-the-vast-edh-deck/",
+      "observed_on": "2026-07-06",
+      "source_type": "commander_deck_guide_and_list",
+      "signal": "The guide lists redundant protection, haste, mana rocks, reanimation, and Kaalia payoff support.",
+      "guardrail": "a public list can suggest source candidates but cannot override target-deck usage"
+    },
+    {
+      "source_id": "wizards_banned_restricted_commander_2026_07_06",
+      "url": "https://magic.wizards.com/en/banned-restricted-list",
+      "observed_on": "2026-07-06",
+      "source_type": "official_format_legality",
+      "signal": "Commander legality and banned-card status must be checked before treating a card as a live candidate.",
+      "guardrail": "legality is required but still not strategy proof"
+    },
+    {
+      "source_id": "draftsim_equipment_tutors_2025_11_06",
+      "url": "https://draftsim.com/equipment-tutor-mtg/",
+      "observed_on": "2026-07-06",
+      "source_type": "general_equipment_tutor_article",
+      "signal": "Equipment tutors are an access lane for finding equipment cards, including haste/protection equipment packages.",
+      "guardrail": "equipment access is narrower than unrestricted tutor access and must map to a real package need"
+    },
+    {
+      "source_id": "edhrec_game_changer_alternatives_2026_07_06",
+      "url": "https://edhrec.com/articles/top-10-game-changer-alternatives",
+      "observed_on": "2026-07-06",
+      "source_type": "high_power_commander_staple_context",
+      "signal": "High-power tutor alternatives such as Grim Tutor are bracket/context signals, not automatic upgrades.",
+      "guardrail": "generic high-power tutor context cannot override commander fit or target trace evidence"
+    }
+  ],
+  "current_deck_replacement_review_rows": [
+    {
+      "card_name": "Lightning Greaves",
+      "target_cut_role": "haste_protection_silence",
+      "prior_status": "external_current_deck_candidate_used_by_target_blocks_negative_review",
+      "usage_event_count": 8,
+      "decision_trace_count": 11,
+      "replacement_status": "current_deck_candidate_used_by_target_blocks_replacement_proof",
+      "explicit_same_lane_replacement_proof_now": false,
+      "candidate_copy_allowed": false,
+      "value_safe_reclassification_allowed": false,
+      "required_evidence": [
+        "fresh_outside_deck_same_lane_source_candidate",
+        "same_lane_value_safe_cut_pair_or_equal_gate",
+        "target_trace_negative_review_if_card_remains_cut_candidate"
+      ]
+    },
+    {
+      "card_name": "Arcane Signet",
+      "target_cut_role": "mana_acceleration",
+      "prior_status": "external_current_deck_candidate_used_by_target_blocks_negative_review",
+      "usage_event_count": 3,
+      "decision_trace_count": 5,
+      "replacement_status": "current_deck_candidate_used_by_target_blocks_replacement_proof",
+      "explicit_same_lane_replacement_proof_now": false,
+      "candidate_copy_allowed": false,
+      "value_safe_reclassification_allowed": false,
+      "required_evidence": [
+        "fresh_outside_deck_same_lane_source_candidate",
+        "same_lane_value_safe_cut_pair_or_equal_gate",
+        "target_trace_negative_review_if_card_remains_cut_candidate"
+      ]
+    },
+    {
+      "card_name": "Demonic Tutor",
+      "target_cut_role": "tutors_access",
+      "prior_status": "external_current_deck_candidate_used_by_target_blocks_negative_review",
+      "usage_event_count": 9,
+      "decision_trace_count": 18,
+      "replacement_status": "current_deck_candidate_used_by_target_blocks_replacement_proof",
+      "explicit_same_lane_replacement_proof_now": false,
+      "candidate_copy_allowed": false,
+      "value_safe_reclassification_allowed": false,
+      "required_evidence": [
+        "fresh_outside_deck_same_lane_source_candidate",
+        "same_lane_value_safe_cut_pair_or_equal_gate",
+        "target_trace_negative_review_if_card_remains_cut_candidate"
+      ]
+    },
+    {
+      "card_name": "Diabolic Intent",
+      "target_cut_role": "tutors_access",
+      "prior_status": "external_current_deck_candidate_used_by_target_blocks_negative_review",
+      "usage_event_count": 5,
+      "decision_trace_count": 1,
+      "replacement_status": "current_deck_candidate_used_by_target_blocks_replacement_proof",
+      "explicit_same_lane_replacement_proof_now": false,
+      "candidate_copy_allowed": false,
+      "value_safe_reclassification_allowed": false,
+      "required_evidence": [
+        "fresh_outside_deck_same_lane_source_candidate",
+        "same_lane_value_safe_cut_pair_or_equal_gate",
+        "target_trace_negative_review_if_card_remains_cut_candidate"
+      ]
+    },
+    {
+      "card_name": "Enlightened Tutor",
+      "target_cut_role": "tutors_access",
+      "prior_status": "external_current_deck_candidate_used_by_target_blocks_negative_review",
+      "usage_event_count": 2,
+      "decision_trace_count": 14,
+      "replacement_status": "current_deck_candidate_used_by_target_blocks_replacement_proof",
+      "explicit_same_lane_replacement_proof_now": false,
+      "candidate_copy_allowed": false,
+      "value_safe_reclassification_allowed": false,
+      "required_evidence": [
+        "fresh_outside_deck_same_lane_source_candidate",
+        "same_lane_value_safe_cut_pair_or_equal_gate",
+        "target_trace_negative_review_if_card_remains_cut_candidate"
+      ]
+    },
+    {
+      "card_name": "Vampiric Tutor",
+      "target_cut_role": "tutors_access",
+      "prior_status": "external_current_deck_candidate_seen_without_usage_needs_manual_negative_review",
+      "usage_event_count": 0,
+      "decision_trace_count": 1,
+      "replacement_status": "current_deck_candidate_seen_without_usage_needs_manual_review",
+      "explicit_same_lane_replacement_proof_now": false,
+      "candidate_copy_allowed": false,
+      "value_safe_reclassification_allowed": false,
+      "required_evidence": [
+        "fresh_outside_deck_same_lane_source_candidate",
+        "same_lane_value_safe_cut_pair_or_equal_gate",
+        "target_trace_negative_review_if_card_remains_cut_candidate"
+      ]
+    }
+  ],
+  "new_external_source_rows": [
+    {
+      "target_cut_role": "haste_protection_silence",
+      "card_name": "Lavaspur Boots",
+      "source_card_name": "Lavaspur Boots",
+      "candidate_signal": "low-cost haste/ward equipment from a current Kaalia guide list",
+      "source_ids": [
+        "draftsim_kaalia_deck_guide_2026_02_12"
+      ],
+      "status": "new_external_source_candidate_ready_for_local_miner_review",
+      "next_gate": "review_new_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "current_deck_present": false,
+      "held_package_add": false,
+      "recycled_from_prior_external_seed": false,
+      "local_identity_found": true,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "type_line": "Artifact \u2014 Equipment",
+      "cmc": 1.0,
+      "local_role_evidence_terms": [
+        "haste",
+        "ward"
+      ],
+      "miner_source_seed_allowed": true,
+      "explicit_same_lane_replacement_proof_now": false,
+      "card_level_cut_permission_now": false,
+      "candidate_copy_allowed": false,
+      "battle_gate_allowed": false,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "target_cut_role": "haste_protection_silence",
+      "card_name": "Flawless Maneuver",
+      "source_card_name": "Flawless Maneuver",
+      "candidate_signal": "free protection spell from a current Kaalia guide list",
+      "source_ids": [
+        "draftsim_kaalia_deck_guide_2026_02_12"
+      ],
+      "status": "new_external_source_candidate_ready_for_local_miner_review",
+      "next_gate": "review_new_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "current_deck_present": false,
+      "held_package_add": false,
+      "recycled_from_prior_external_seed": false,
+      "local_identity_found": true,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "type_line": "Instant",
+      "cmc": 3.0,
+      "local_role_evidence_terms": [
+        "indestructible"
+      ],
+      "miner_source_seed_allowed": true,
+      "explicit_same_lane_replacement_proof_now": false,
+      "card_level_cut_permission_now": false,
+      "candidate_copy_allowed": false,
+      "battle_gate_allowed": false,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "target_cut_role": "haste_protection_silence",
+      "card_name": "Loran's Escape",
+      "source_card_name": "Loran's Escape",
+      "candidate_signal": "one-mana hexproof/indestructible protection from a current Kaalia guide list",
+      "source_ids": [
+        "draftsim_kaalia_deck_guide_2026_02_12"
+      ],
+      "status": "new_external_source_candidate_ready_for_local_miner_review",
+      "next_gate": "review_new_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "current_deck_present": false,
+      "held_package_add": false,
+      "recycled_from_prior_external_seed": false,
+      "local_identity_found": true,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "type_line": "Instant",
+      "cmc": 1.0,
+      "local_role_evidence_terms": [
+        "hexproof",
+        "indestructible"
+      ],
+      "miner_source_seed_allowed": true,
+      "explicit_same_lane_replacement_proof_now": false,
+      "card_level_cut_permission_now": false,
+      "candidate_copy_allowed": false,
+      "battle_gate_allowed": false,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "target_cut_role": "haste_protection_silence",
+      "card_name": "Malakir Rebirth // Malakir Mire",
+      "source_card_name": "Malakir Rebirth",
+      "candidate_signal": "commander recast/resilience spell from a current Kaalia guide list",
+      "source_ids": [
+        "draftsim_kaalia_deck_guide_2026_02_12"
+      ],
+      "status": "new_external_source_candidate_ready_for_local_miner_review",
+      "next_gate": "review_new_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "current_deck_present": false,
+      "held_package_add": false,
+      "recycled_from_prior_external_seed": false,
+      "local_identity_found": true,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "type_line": "Instant",
+      "cmc": 1.0,
+      "local_role_evidence_terms": [
+        "return it to the battlefield"
+      ],
+      "miner_source_seed_allowed": true,
+      "explicit_same_lane_replacement_proof_now": false,
+      "card_level_cut_permission_now": false,
+      "candidate_copy_allowed": false,
+      "battle_gate_allowed": false,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "target_cut_role": "haste_protection_silence",
+      "card_name": "Rebuff the Wicked",
+      "source_card_name": "Rebuff the Wicked",
+      "candidate_signal": "one-mana anti-removal protection from a current Kaalia guide list",
+      "source_ids": [
+        "draftsim_kaalia_deck_guide_2026_02_12"
+      ],
+      "status": "new_external_source_candidate_ready_for_local_miner_review",
+      "next_gate": "review_new_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "current_deck_present": false,
+      "held_package_add": false,
+      "recycled_from_prior_external_seed": false,
+      "local_identity_found": true,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "type_line": "Instant",
+      "cmc": 1.0,
+      "local_role_evidence_terms": [
+        "counter target spell that targets"
+      ],
+      "miner_source_seed_allowed": true,
+      "explicit_same_lane_replacement_proof_now": false,
+      "card_level_cut_permission_now": false,
+      "candidate_copy_allowed": false,
+      "battle_gate_allowed": false,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "target_cut_role": "haste_protection_silence",
+      "card_name": "Clever Concealment",
+      "source_card_name": "Clever Concealment",
+      "candidate_signal": "board-protection phase-out spell from a current Kaalia guide list",
+      "source_ids": [
+        "draftsim_kaalia_deck_guide_2026_02_12"
+      ],
+      "status": "new_external_source_candidate_ready_for_local_miner_review",
+      "next_gate": "review_new_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "current_deck_present": false,
+      "held_package_add": false,
+      "recycled_from_prior_external_seed": false,
+      "local_identity_found": true,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "type_line": "Instant",
+      "cmc": 4.0,
+      "local_role_evidence_terms": [
+        "phase out"
+      ],
+      "miner_source_seed_allowed": true,
+      "explicit_same_lane_replacement_proof_now": false,
+      "card_level_cut_permission_now": false,
+      "candidate_copy_allowed": false,
+      "battle_gate_allowed": false,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "target_cut_role": "haste_protection_silence",
+      "card_name": "Galadriel's Dismissal",
+      "source_card_name": "Galadriel's Dismissal",
+      "candidate_signal": "phase-out protection spell from a current Kaalia guide list",
+      "source_ids": [
+        "draftsim_kaalia_deck_guide_2026_02_12"
+      ],
+      "status": "new_external_source_candidate_ready_for_local_miner_review",
+      "next_gate": "review_new_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "current_deck_present": false,
+      "held_package_add": false,
+      "recycled_from_prior_external_seed": false,
+      "local_identity_found": true,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "type_line": "Instant",
+      "cmc": 1.0,
+      "local_role_evidence_terms": [
+        "phases out"
+      ],
+      "miner_source_seed_allowed": true,
+      "explicit_same_lane_replacement_proof_now": false,
+      "card_level_cut_permission_now": false,
+      "candidate_copy_allowed": false,
+      "battle_gate_allowed": false,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "target_cut_role": "haste_protection_silence",
+      "card_name": "Mass Hysteria",
+      "source_card_name": "Mass Hysteria",
+      "candidate_signal": "global haste source from a current Kaalia guide list",
+      "source_ids": [
+        "draftsim_kaalia_deck_guide_2026_02_12"
+      ],
+      "status": "new_source_candidate_needs_local_identity_resolution",
+      "next_gate": "resolve_local_identity_before_review",
+      "current_deck_present": false,
+      "held_package_add": false,
+      "recycled_from_prior_external_seed": false,
+      "local_identity_found": false,
+      "commander_identity_legal": false,
+      "commander_legality_status": "legal",
+      "type_line": null,
+      "cmc": null,
+      "local_role_evidence_terms": [],
+      "miner_source_seed_allowed": false,
+      "explicit_same_lane_replacement_proof_now": false,
+      "card_level_cut_permission_now": false,
+      "candidate_copy_allowed": false,
+      "battle_gate_allowed": false,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "target_cut_role": "haste_protection_silence",
+      "card_name": "Hall of the Bandit Lord",
+      "source_card_name": "Hall of the Bandit Lord",
+      "candidate_signal": "haste land from Kaalia hidden-gems article",
+      "source_ids": [
+        "edhrec_kaalia_hidden_gems_2026_03_26"
+      ],
+      "status": "new_source_candidate_land_lane_requires_mana_base_model",
+      "next_gate": "route_land_candidate_to_mana_base_lane",
+      "current_deck_present": false,
+      "held_package_add": false,
+      "recycled_from_prior_external_seed": false,
+      "local_identity_found": true,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "type_line": "Legendary Land",
+      "cmc": 0.0,
+      "local_role_evidence_terms": [
+        "haste"
+      ],
+      "miner_source_seed_allowed": false,
+      "explicit_same_lane_replacement_proof_now": false,
+      "card_level_cut_permission_now": false,
+      "candidate_copy_allowed": false,
+      "battle_gate_allowed": false,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "target_cut_role": "haste_protection_silence",
+      "card_name": "Redirect Lightning",
+      "source_card_name": "Redirect Lightning",
+      "candidate_signal": "redundant targeted-removal redirection from Kaalia hidden-gems article",
+      "source_ids": [
+        "edhrec_kaalia_hidden_gems_2026_03_26"
+      ],
+      "status": "new_external_source_candidate_ready_for_local_miner_review",
+      "next_gate": "review_new_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "current_deck_present": false,
+      "held_package_add": false,
+      "recycled_from_prior_external_seed": false,
+      "local_identity_found": true,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "type_line": "Instant \u2014 Lesson",
+      "cmc": 1.0,
+      "local_role_evidence_terms": [
+        "change the target"
+      ],
+      "miner_source_seed_allowed": true,
+      "explicit_same_lane_replacement_proof_now": false,
+      "card_level_cut_permission_now": false,
+      "candidate_copy_allowed": false,
+      "battle_gate_allowed": false,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "target_cut_role": "mana_acceleration",
+      "card_name": "Boros Signet",
+      "source_card_name": "Boros Signet",
+      "candidate_signal": "two-mana color-fixing rock from a current Kaalia guide list",
+      "source_ids": [
+        "draftsim_kaalia_deck_guide_2026_02_12"
+      ],
+      "status": "new_external_source_candidate_ready_for_local_miner_review",
+      "next_gate": "review_new_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "current_deck_present": false,
+      "held_package_add": false,
+      "recycled_from_prior_external_seed": false,
+      "local_identity_found": true,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "type_line": "Artifact",
+      "cmc": 2.0,
+      "local_role_evidence_terms": [
+        "add {"
+      ],
+      "miner_source_seed_allowed": true,
+      "explicit_same_lane_replacement_proof_now": false,
+      "card_level_cut_permission_now": false,
+      "candidate_copy_allowed": false,
+      "battle_gate_allowed": false,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "target_cut_role": "mana_acceleration",
+      "card_name": "Orzhov Signet",
+      "source_card_name": "Orzhov Signet",
+      "candidate_signal": "two-mana color-fixing rock from a current Kaalia guide list",
+      "source_ids": [
+        "draftsim_kaalia_deck_guide_2026_02_12"
+      ],
+      "status": "new_external_source_candidate_ready_for_local_miner_review",
+      "next_gate": "review_new_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "current_deck_present": false,
+      "held_package_add": false,
+      "recycled_from_prior_external_seed": false,
+      "local_identity_found": true,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "type_line": "Artifact",
+      "cmc": 2.0,
+      "local_role_evidence_terms": [
+        "add {"
+      ],
+      "miner_source_seed_allowed": true,
+      "explicit_same_lane_replacement_proof_now": false,
+      "card_level_cut_permission_now": false,
+      "candidate_copy_allowed": false,
+      "battle_gate_allowed": false,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "target_cut_role": "mana_acceleration",
+      "card_name": "Rakdos Signet",
+      "source_card_name": "Rakdos Signet",
+      "candidate_signal": "two-mana color-fixing rock from a current Kaalia guide list",
+      "source_ids": [
+        "draftsim_kaalia_deck_guide_2026_02_12"
+      ],
+      "status": "new_external_source_candidate_ready_for_local_miner_review",
+      "next_gate": "review_new_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "current_deck_present": false,
+      "held_package_add": false,
+      "recycled_from_prior_external_seed": false,
+      "local_identity_found": true,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "type_line": "Artifact",
+      "cmc": 2.0,
+      "local_role_evidence_terms": [
+        "add {"
+      ],
+      "miner_source_seed_allowed": true,
+      "explicit_same_lane_replacement_proof_now": false,
+      "card_level_cut_permission_now": false,
+      "candidate_copy_allowed": false,
+      "battle_gate_allowed": false,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "target_cut_role": "mana_acceleration",
+      "card_name": "Mind Stone",
+      "source_card_name": "Mind Stone",
+      "candidate_signal": "two-mana rock from a current Kaalia guide list",
+      "source_ids": [
+        "draftsim_kaalia_deck_guide_2026_02_12"
+      ],
+      "status": "new_external_source_candidate_ready_for_local_miner_review",
+      "next_gate": "review_new_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "current_deck_present": false,
+      "held_package_add": false,
+      "recycled_from_prior_external_seed": false,
+      "local_identity_found": true,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "type_line": "Artifact",
+      "cmc": 2.0,
+      "local_role_evidence_terms": [
+        "add {",
+        "draw a card"
+      ],
+      "miner_source_seed_allowed": true,
+      "explicit_same_lane_replacement_proof_now": false,
+      "card_level_cut_permission_now": false,
+      "candidate_copy_allowed": false,
+      "battle_gate_allowed": false,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "target_cut_role": "mana_acceleration",
+      "card_name": "Talisman of Conviction",
+      "source_card_name": "Talisman of Conviction",
+      "candidate_signal": "two-mana color-fixing talisman from a current Kaalia guide list",
+      "source_ids": [
+        "draftsim_kaalia_deck_guide_2026_02_12"
+      ],
+      "status": "new_external_source_candidate_ready_for_local_miner_review",
+      "next_gate": "review_new_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "current_deck_present": false,
+      "held_package_add": false,
+      "recycled_from_prior_external_seed": false,
+      "local_identity_found": true,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "type_line": "Artifact",
+      "cmc": 2.0,
+      "local_role_evidence_terms": [
+        "add {"
+      ],
+      "miner_source_seed_allowed": true,
+      "explicit_same_lane_replacement_proof_now": false,
+      "card_level_cut_permission_now": false,
+      "candidate_copy_allowed": false,
+      "battle_gate_allowed": false,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "target_cut_role": "mana_acceleration",
+      "card_name": "Talisman of Hierarchy",
+      "source_card_name": "Talisman of Hierarchy",
+      "candidate_signal": "two-mana color-fixing talisman from a current Kaalia guide list",
+      "source_ids": [
+        "draftsim_kaalia_deck_guide_2026_02_12"
+      ],
+      "status": "new_external_source_candidate_ready_for_local_miner_review",
+      "next_gate": "review_new_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "current_deck_present": false,
+      "held_package_add": false,
+      "recycled_from_prior_external_seed": false,
+      "local_identity_found": true,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "type_line": "Artifact",
+      "cmc": 2.0,
+      "local_role_evidence_terms": [
+        "add {"
+      ],
+      "miner_source_seed_allowed": true,
+      "explicit_same_lane_replacement_proof_now": false,
+      "card_level_cut_permission_now": false,
+      "candidate_copy_allowed": false,
+      "battle_gate_allowed": false,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "target_cut_role": "mana_acceleration",
+      "card_name": "Talisman of Indulgence",
+      "source_card_name": "Talisman of Indulgence",
+      "candidate_signal": "two-mana color-fixing talisman from a current Kaalia guide list",
+      "source_ids": [
+        "draftsim_kaalia_deck_guide_2026_02_12"
+      ],
+      "status": "new_external_source_candidate_ready_for_local_miner_review",
+      "next_gate": "review_new_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "current_deck_present": false,
+      "held_package_add": false,
+      "recycled_from_prior_external_seed": false,
+      "local_identity_found": true,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "type_line": "Artifact",
+      "cmc": 2.0,
+      "local_role_evidence_terms": [
+        "add {"
+      ],
+      "miner_source_seed_allowed": true,
+      "explicit_same_lane_replacement_proof_now": false,
+      "card_level_cut_permission_now": false,
+      "candidate_copy_allowed": false,
+      "battle_gate_allowed": false,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "target_cut_role": "tutors_access",
+      "card_name": "Grim Tutor",
+      "source_card_name": "Grim Tutor",
+      "candidate_signal": "generic tutor alternative surfaced in current high-power Commander staple context",
+      "source_ids": [
+        "edhrec_game_changer_alternatives_2026_07_06"
+      ],
+      "status": "new_external_source_candidate_ready_for_local_miner_review",
+      "next_gate": "review_new_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "current_deck_present": false,
+      "held_package_add": false,
+      "recycled_from_prior_external_seed": false,
+      "local_identity_found": true,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "type_line": "Sorcery",
+      "cmc": 3.0,
+      "local_role_evidence_terms": [
+        "search your library"
+      ],
+      "miner_source_seed_allowed": true,
+      "explicit_same_lane_replacement_proof_now": false,
+      "card_level_cut_permission_now": false,
+      "candidate_copy_allowed": false,
+      "battle_gate_allowed": false,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "target_cut_role": "tutors_access",
+      "card_name": "Open the Armory",
+      "source_card_name": "Open the Armory",
+      "candidate_signal": "equipment/aura tutor that can access haste or protection equipment packages",
+      "source_ids": [
+        "draftsim_equipment_tutors_2025_11_06"
+      ],
+      "status": "new_external_source_candidate_ready_for_local_miner_review",
+      "next_gate": "review_new_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "current_deck_present": false,
+      "held_package_add": false,
+      "recycled_from_prior_external_seed": false,
+      "local_identity_found": true,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "type_line": "Sorcery",
+      "cmc": 2.0,
+      "local_role_evidence_terms": [
+        "search your library",
+        "reveal it",
+        "put it into your hand"
+      ],
+      "miner_source_seed_allowed": true,
+      "explicit_same_lane_replacement_proof_now": false,
+      "card_level_cut_permission_now": false,
+      "candidate_copy_allowed": false,
+      "battle_gate_allowed": false,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "target_cut_role": "tutors_access",
+      "card_name": "Steelshaper's Gift",
+      "source_card_name": "Steelshaper's Gift",
+      "candidate_signal": "low-cost equipment tutor that can access haste or protection equipment packages",
+      "source_ids": [
+        "draftsim_equipment_tutors_2025_11_06"
+      ],
+      "status": "new_external_source_candidate_ready_for_local_miner_review",
+      "next_gate": "review_new_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "current_deck_present": false,
+      "held_package_add": false,
+      "recycled_from_prior_external_seed": false,
+      "local_identity_found": true,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "type_line": "Sorcery",
+      "cmc": 1.0,
+      "local_role_evidence_terms": [
+        "search your library",
+        "put it into your hand"
+      ],
+      "miner_source_seed_allowed": true,
+      "explicit_same_lane_replacement_proof_now": false,
+      "card_level_cut_permission_now": false,
+      "candidate_copy_allowed": false,
+      "battle_gate_allowed": false,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "target_cut_role": "tutors_access",
+      "card_name": "Stoneforge Mystic",
+      "source_card_name": "Stoneforge Mystic",
+      "candidate_signal": "creature-based equipment tutor that can access haste or protection equipment packages",
+      "source_ids": [
+        "draftsim_equipment_tutors_2025_11_06"
+      ],
+      "status": "new_external_source_candidate_ready_for_local_miner_review",
+      "next_gate": "review_new_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "current_deck_present": false,
+      "held_package_add": false,
+      "recycled_from_prior_external_seed": false,
+      "local_identity_found": true,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "type_line": "Creature \u2014 Kor Artificer",
+      "cmc": 2.0,
+      "local_role_evidence_terms": [
+        "search your library",
+        "reveal it",
+        "put it into your hand"
+      ],
+      "miner_source_seed_allowed": true,
+      "explicit_same_lane_replacement_proof_now": false,
+      "card_level_cut_permission_now": false,
+      "candidate_copy_allowed": false,
+      "battle_gate_allowed": false,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "target_cut_role": "tutors_access",
+      "card_name": "Maelstrom of the Spirit Dragon",
+      "source_card_name": "Maelstrom of the Spirit Dragon",
+      "candidate_signal": "Dragon tutor utility land from Kaalia hidden-gems article",
+      "source_ids": [
+        "edhrec_kaalia_hidden_gems_2026_03_26"
+      ],
+      "status": "new_source_candidate_land_lane_requires_mana_base_model",
+      "next_gate": "route_land_candidate_to_mana_base_lane",
+      "current_deck_present": false,
+      "held_package_add": false,
+      "recycled_from_prior_external_seed": false,
+      "local_identity_found": true,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "type_line": "Land",
+      "cmc": 0.0,
+      "local_role_evidence_terms": [
+        "search your library",
+        "reveal it",
+        "put it into your hand"
+      ],
+      "miner_source_seed_allowed": false,
+      "explicit_same_lane_replacement_proof_now": false,
+      "card_level_cut_permission_now": false,
+      "candidate_copy_allowed": false,
+      "battle_gate_allowed": false,
+      "value_safe_reclassification_allowed": false
+    }
+  ],
+  "ready_new_external_source_rows": [
+    {
+      "target_cut_role": "haste_protection_silence",
+      "card_name": "Lavaspur Boots",
+      "source_card_name": "Lavaspur Boots",
+      "candidate_signal": "low-cost haste/ward equipment from a current Kaalia guide list",
+      "source_ids": [
+        "draftsim_kaalia_deck_guide_2026_02_12"
+      ],
+      "status": "new_external_source_candidate_ready_for_local_miner_review",
+      "next_gate": "review_new_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "current_deck_present": false,
+      "held_package_add": false,
+      "recycled_from_prior_external_seed": false,
+      "local_identity_found": true,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "type_line": "Artifact \u2014 Equipment",
+      "cmc": 1.0,
+      "local_role_evidence_terms": [
+        "haste",
+        "ward"
+      ],
+      "miner_source_seed_allowed": true,
+      "explicit_same_lane_replacement_proof_now": false,
+      "card_level_cut_permission_now": false,
+      "candidate_copy_allowed": false,
+      "battle_gate_allowed": false,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "target_cut_role": "haste_protection_silence",
+      "card_name": "Flawless Maneuver",
+      "source_card_name": "Flawless Maneuver",
+      "candidate_signal": "free protection spell from a current Kaalia guide list",
+      "source_ids": [
+        "draftsim_kaalia_deck_guide_2026_02_12"
+      ],
+      "status": "new_external_source_candidate_ready_for_local_miner_review",
+      "next_gate": "review_new_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "current_deck_present": false,
+      "held_package_add": false,
+      "recycled_from_prior_external_seed": false,
+      "local_identity_found": true,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "type_line": "Instant",
+      "cmc": 3.0,
+      "local_role_evidence_terms": [
+        "indestructible"
+      ],
+      "miner_source_seed_allowed": true,
+      "explicit_same_lane_replacement_proof_now": false,
+      "card_level_cut_permission_now": false,
+      "candidate_copy_allowed": false,
+      "battle_gate_allowed": false,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "target_cut_role": "haste_protection_silence",
+      "card_name": "Loran's Escape",
+      "source_card_name": "Loran's Escape",
+      "candidate_signal": "one-mana hexproof/indestructible protection from a current Kaalia guide list",
+      "source_ids": [
+        "draftsim_kaalia_deck_guide_2026_02_12"
+      ],
+      "status": "new_external_source_candidate_ready_for_local_miner_review",
+      "next_gate": "review_new_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "current_deck_present": false,
+      "held_package_add": false,
+      "recycled_from_prior_external_seed": false,
+      "local_identity_found": true,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "type_line": "Instant",
+      "cmc": 1.0,
+      "local_role_evidence_terms": [
+        "hexproof",
+        "indestructible"
+      ],
+      "miner_source_seed_allowed": true,
+      "explicit_same_lane_replacement_proof_now": false,
+      "card_level_cut_permission_now": false,
+      "candidate_copy_allowed": false,
+      "battle_gate_allowed": false,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "target_cut_role": "haste_protection_silence",
+      "card_name": "Malakir Rebirth // Malakir Mire",
+      "source_card_name": "Malakir Rebirth",
+      "candidate_signal": "commander recast/resilience spell from a current Kaalia guide list",
+      "source_ids": [
+        "draftsim_kaalia_deck_guide_2026_02_12"
+      ],
+      "status": "new_external_source_candidate_ready_for_local_miner_review",
+      "next_gate": "review_new_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "current_deck_present": false,
+      "held_package_add": false,
+      "recycled_from_prior_external_seed": false,
+      "local_identity_found": true,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "type_line": "Instant",
+      "cmc": 1.0,
+      "local_role_evidence_terms": [
+        "return it to the battlefield"
+      ],
+      "miner_source_seed_allowed": true,
+      "explicit_same_lane_replacement_proof_now": false,
+      "card_level_cut_permission_now": false,
+      "candidate_copy_allowed": false,
+      "battle_gate_allowed": false,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "target_cut_role": "haste_protection_silence",
+      "card_name": "Rebuff the Wicked",
+      "source_card_name": "Rebuff the Wicked",
+      "candidate_signal": "one-mana anti-removal protection from a current Kaalia guide list",
+      "source_ids": [
+        "draftsim_kaalia_deck_guide_2026_02_12"
+      ],
+      "status": "new_external_source_candidate_ready_for_local_miner_review",
+      "next_gate": "review_new_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "current_deck_present": false,
+      "held_package_add": false,
+      "recycled_from_prior_external_seed": false,
+      "local_identity_found": true,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "type_line": "Instant",
+      "cmc": 1.0,
+      "local_role_evidence_terms": [
+        "counter target spell that targets"
+      ],
+      "miner_source_seed_allowed": true,
+      "explicit_same_lane_replacement_proof_now": false,
+      "card_level_cut_permission_now": false,
+      "candidate_copy_allowed": false,
+      "battle_gate_allowed": false,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "target_cut_role": "haste_protection_silence",
+      "card_name": "Clever Concealment",
+      "source_card_name": "Clever Concealment",
+      "candidate_signal": "board-protection phase-out spell from a current Kaalia guide list",
+      "source_ids": [
+        "draftsim_kaalia_deck_guide_2026_02_12"
+      ],
+      "status": "new_external_source_candidate_ready_for_local_miner_review",
+      "next_gate": "review_new_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "current_deck_present": false,
+      "held_package_add": false,
+      "recycled_from_prior_external_seed": false,
+      "local_identity_found": true,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "type_line": "Instant",
+      "cmc": 4.0,
+      "local_role_evidence_terms": [
+        "phase out"
+      ],
+      "miner_source_seed_allowed": true,
+      "explicit_same_lane_replacement_proof_now": false,
+      "card_level_cut_permission_now": false,
+      "candidate_copy_allowed": false,
+      "battle_gate_allowed": false,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "target_cut_role": "haste_protection_silence",
+      "card_name": "Galadriel's Dismissal",
+      "source_card_name": "Galadriel's Dismissal",
+      "candidate_signal": "phase-out protection spell from a current Kaalia guide list",
+      "source_ids": [
+        "draftsim_kaalia_deck_guide_2026_02_12"
+      ],
+      "status": "new_external_source_candidate_ready_for_local_miner_review",
+      "next_gate": "review_new_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "current_deck_present": false,
+      "held_package_add": false,
+      "recycled_from_prior_external_seed": false,
+      "local_identity_found": true,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "type_line": "Instant",
+      "cmc": 1.0,
+      "local_role_evidence_terms": [
+        "phases out"
+      ],
+      "miner_source_seed_allowed": true,
+      "explicit_same_lane_replacement_proof_now": false,
+      "card_level_cut_permission_now": false,
+      "candidate_copy_allowed": false,
+      "battle_gate_allowed": false,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "target_cut_role": "haste_protection_silence",
+      "card_name": "Redirect Lightning",
+      "source_card_name": "Redirect Lightning",
+      "candidate_signal": "redundant targeted-removal redirection from Kaalia hidden-gems article",
+      "source_ids": [
+        "edhrec_kaalia_hidden_gems_2026_03_26"
+      ],
+      "status": "new_external_source_candidate_ready_for_local_miner_review",
+      "next_gate": "review_new_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "current_deck_present": false,
+      "held_package_add": false,
+      "recycled_from_prior_external_seed": false,
+      "local_identity_found": true,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "type_line": "Instant \u2014 Lesson",
+      "cmc": 1.0,
+      "local_role_evidence_terms": [
+        "change the target"
+      ],
+      "miner_source_seed_allowed": true,
+      "explicit_same_lane_replacement_proof_now": false,
+      "card_level_cut_permission_now": false,
+      "candidate_copy_allowed": false,
+      "battle_gate_allowed": false,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "target_cut_role": "mana_acceleration",
+      "card_name": "Boros Signet",
+      "source_card_name": "Boros Signet",
+      "candidate_signal": "two-mana color-fixing rock from a current Kaalia guide list",
+      "source_ids": [
+        "draftsim_kaalia_deck_guide_2026_02_12"
+      ],
+      "status": "new_external_source_candidate_ready_for_local_miner_review",
+      "next_gate": "review_new_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "current_deck_present": false,
+      "held_package_add": false,
+      "recycled_from_prior_external_seed": false,
+      "local_identity_found": true,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "type_line": "Artifact",
+      "cmc": 2.0,
+      "local_role_evidence_terms": [
+        "add {"
+      ],
+      "miner_source_seed_allowed": true,
+      "explicit_same_lane_replacement_proof_now": false,
+      "card_level_cut_permission_now": false,
+      "candidate_copy_allowed": false,
+      "battle_gate_allowed": false,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "target_cut_role": "mana_acceleration",
+      "card_name": "Orzhov Signet",
+      "source_card_name": "Orzhov Signet",
+      "candidate_signal": "two-mana color-fixing rock from a current Kaalia guide list",
+      "source_ids": [
+        "draftsim_kaalia_deck_guide_2026_02_12"
+      ],
+      "status": "new_external_source_candidate_ready_for_local_miner_review",
+      "next_gate": "review_new_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "current_deck_present": false,
+      "held_package_add": false,
+      "recycled_from_prior_external_seed": false,
+      "local_identity_found": true,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "type_line": "Artifact",
+      "cmc": 2.0,
+      "local_role_evidence_terms": [
+        "add {"
+      ],
+      "miner_source_seed_allowed": true,
+      "explicit_same_lane_replacement_proof_now": false,
+      "card_level_cut_permission_now": false,
+      "candidate_copy_allowed": false,
+      "battle_gate_allowed": false,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "target_cut_role": "mana_acceleration",
+      "card_name": "Rakdos Signet",
+      "source_card_name": "Rakdos Signet",
+      "candidate_signal": "two-mana color-fixing rock from a current Kaalia guide list",
+      "source_ids": [
+        "draftsim_kaalia_deck_guide_2026_02_12"
+      ],
+      "status": "new_external_source_candidate_ready_for_local_miner_review",
+      "next_gate": "review_new_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "current_deck_present": false,
+      "held_package_add": false,
+      "recycled_from_prior_external_seed": false,
+      "local_identity_found": true,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "type_line": "Artifact",
+      "cmc": 2.0,
+      "local_role_evidence_terms": [
+        "add {"
+      ],
+      "miner_source_seed_allowed": true,
+      "explicit_same_lane_replacement_proof_now": false,
+      "card_level_cut_permission_now": false,
+      "candidate_copy_allowed": false,
+      "battle_gate_allowed": false,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "target_cut_role": "mana_acceleration",
+      "card_name": "Mind Stone",
+      "source_card_name": "Mind Stone",
+      "candidate_signal": "two-mana rock from a current Kaalia guide list",
+      "source_ids": [
+        "draftsim_kaalia_deck_guide_2026_02_12"
+      ],
+      "status": "new_external_source_candidate_ready_for_local_miner_review",
+      "next_gate": "review_new_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "current_deck_present": false,
+      "held_package_add": false,
+      "recycled_from_prior_external_seed": false,
+      "local_identity_found": true,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "type_line": "Artifact",
+      "cmc": 2.0,
+      "local_role_evidence_terms": [
+        "add {",
+        "draw a card"
+      ],
+      "miner_source_seed_allowed": true,
+      "explicit_same_lane_replacement_proof_now": false,
+      "card_level_cut_permission_now": false,
+      "candidate_copy_allowed": false,
+      "battle_gate_allowed": false,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "target_cut_role": "mana_acceleration",
+      "card_name": "Talisman of Conviction",
+      "source_card_name": "Talisman of Conviction",
+      "candidate_signal": "two-mana color-fixing talisman from a current Kaalia guide list",
+      "source_ids": [
+        "draftsim_kaalia_deck_guide_2026_02_12"
+      ],
+      "status": "new_external_source_candidate_ready_for_local_miner_review",
+      "next_gate": "review_new_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "current_deck_present": false,
+      "held_package_add": false,
+      "recycled_from_prior_external_seed": false,
+      "local_identity_found": true,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "type_line": "Artifact",
+      "cmc": 2.0,
+      "local_role_evidence_terms": [
+        "add {"
+      ],
+      "miner_source_seed_allowed": true,
+      "explicit_same_lane_replacement_proof_now": false,
+      "card_level_cut_permission_now": false,
+      "candidate_copy_allowed": false,
+      "battle_gate_allowed": false,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "target_cut_role": "mana_acceleration",
+      "card_name": "Talisman of Hierarchy",
+      "source_card_name": "Talisman of Hierarchy",
+      "candidate_signal": "two-mana color-fixing talisman from a current Kaalia guide list",
+      "source_ids": [
+        "draftsim_kaalia_deck_guide_2026_02_12"
+      ],
+      "status": "new_external_source_candidate_ready_for_local_miner_review",
+      "next_gate": "review_new_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "current_deck_present": false,
+      "held_package_add": false,
+      "recycled_from_prior_external_seed": false,
+      "local_identity_found": true,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "type_line": "Artifact",
+      "cmc": 2.0,
+      "local_role_evidence_terms": [
+        "add {"
+      ],
+      "miner_source_seed_allowed": true,
+      "explicit_same_lane_replacement_proof_now": false,
+      "card_level_cut_permission_now": false,
+      "candidate_copy_allowed": false,
+      "battle_gate_allowed": false,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "target_cut_role": "mana_acceleration",
+      "card_name": "Talisman of Indulgence",
+      "source_card_name": "Talisman of Indulgence",
+      "candidate_signal": "two-mana color-fixing talisman from a current Kaalia guide list",
+      "source_ids": [
+        "draftsim_kaalia_deck_guide_2026_02_12"
+      ],
+      "status": "new_external_source_candidate_ready_for_local_miner_review",
+      "next_gate": "review_new_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "current_deck_present": false,
+      "held_package_add": false,
+      "recycled_from_prior_external_seed": false,
+      "local_identity_found": true,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "type_line": "Artifact",
+      "cmc": 2.0,
+      "local_role_evidence_terms": [
+        "add {"
+      ],
+      "miner_source_seed_allowed": true,
+      "explicit_same_lane_replacement_proof_now": false,
+      "card_level_cut_permission_now": false,
+      "candidate_copy_allowed": false,
+      "battle_gate_allowed": false,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "target_cut_role": "tutors_access",
+      "card_name": "Grim Tutor",
+      "source_card_name": "Grim Tutor",
+      "candidate_signal": "generic tutor alternative surfaced in current high-power Commander staple context",
+      "source_ids": [
+        "edhrec_game_changer_alternatives_2026_07_06"
+      ],
+      "status": "new_external_source_candidate_ready_for_local_miner_review",
+      "next_gate": "review_new_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "current_deck_present": false,
+      "held_package_add": false,
+      "recycled_from_prior_external_seed": false,
+      "local_identity_found": true,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "type_line": "Sorcery",
+      "cmc": 3.0,
+      "local_role_evidence_terms": [
+        "search your library"
+      ],
+      "miner_source_seed_allowed": true,
+      "explicit_same_lane_replacement_proof_now": false,
+      "card_level_cut_permission_now": false,
+      "candidate_copy_allowed": false,
+      "battle_gate_allowed": false,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "target_cut_role": "tutors_access",
+      "card_name": "Open the Armory",
+      "source_card_name": "Open the Armory",
+      "candidate_signal": "equipment/aura tutor that can access haste or protection equipment packages",
+      "source_ids": [
+        "draftsim_equipment_tutors_2025_11_06"
+      ],
+      "status": "new_external_source_candidate_ready_for_local_miner_review",
+      "next_gate": "review_new_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "current_deck_present": false,
+      "held_package_add": false,
+      "recycled_from_prior_external_seed": false,
+      "local_identity_found": true,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "type_line": "Sorcery",
+      "cmc": 2.0,
+      "local_role_evidence_terms": [
+        "search your library",
+        "reveal it",
+        "put it into your hand"
+      ],
+      "miner_source_seed_allowed": true,
+      "explicit_same_lane_replacement_proof_now": false,
+      "card_level_cut_permission_now": false,
+      "candidate_copy_allowed": false,
+      "battle_gate_allowed": false,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "target_cut_role": "tutors_access",
+      "card_name": "Steelshaper's Gift",
+      "source_card_name": "Steelshaper's Gift",
+      "candidate_signal": "low-cost equipment tutor that can access haste or protection equipment packages",
+      "source_ids": [
+        "draftsim_equipment_tutors_2025_11_06"
+      ],
+      "status": "new_external_source_candidate_ready_for_local_miner_review",
+      "next_gate": "review_new_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "current_deck_present": false,
+      "held_package_add": false,
+      "recycled_from_prior_external_seed": false,
+      "local_identity_found": true,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "type_line": "Sorcery",
+      "cmc": 1.0,
+      "local_role_evidence_terms": [
+        "search your library",
+        "put it into your hand"
+      ],
+      "miner_source_seed_allowed": true,
+      "explicit_same_lane_replacement_proof_now": false,
+      "card_level_cut_permission_now": false,
+      "candidate_copy_allowed": false,
+      "battle_gate_allowed": false,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "target_cut_role": "tutors_access",
+      "card_name": "Stoneforge Mystic",
+      "source_card_name": "Stoneforge Mystic",
+      "candidate_signal": "creature-based equipment tutor that can access haste or protection equipment packages",
+      "source_ids": [
+        "draftsim_equipment_tutors_2025_11_06"
+      ],
+      "status": "new_external_source_candidate_ready_for_local_miner_review",
+      "next_gate": "review_new_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "current_deck_present": false,
+      "held_package_add": false,
+      "recycled_from_prior_external_seed": false,
+      "local_identity_found": true,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "type_line": "Creature \u2014 Kor Artificer",
+      "cmc": 2.0,
+      "local_role_evidence_terms": [
+        "search your library",
+        "reveal it",
+        "put it into your hand"
+      ],
+      "miner_source_seed_allowed": true,
+      "explicit_same_lane_replacement_proof_now": false,
+      "card_level_cut_permission_now": false,
+      "candidate_copy_allowed": false,
+      "battle_gate_allowed": false,
+      "value_safe_reclassification_allowed": false
+    }
+  ],
+  "candidate_copy_blockers": [
+    "current_deck_usage_blocks_replacement_proof",
+    "fresh_external_source_candidates_are_miner_seeds_not_cut_permission",
+    "held_package_adds_still_need_value_safe_pairs",
+    "partial_role_coverage_cannot_open_candidate_copy_or_battle"
+  ],
+  "policy": {
+    "replacement_boundary": "A current-deck card used by the target is not cuttable without explicit same-lane replacement proof or equal-gate evidence.",
+    "source_boundary": "New external candidates can seed later mining/review only; they are not deck actions.",
+    "land_boundary": "Land candidates route to mana-base modeling, not nonland same-lane replacement.",
+    "legality_boundary": "Official/current Commander legality blocks banned or color-identity-invalid candidates before strategy review.",
+    "mutation_boundary": "This finder does not copy decks, mutate DBs, run battles, or promote a package."
+  }
+}
