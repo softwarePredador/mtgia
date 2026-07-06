@@ -1,0 +1,1054 @@
+{
+  "artifact_type": "global_commander_ramp_cut_usage_same_lane_proof_scout",
+  "battle_gate_allowed_now": false,
+  "battle_or_optimization_performed": false,
+  "battle_run_performed": false,
+  "candidate_copy_allowed_now": false,
+  "candidate_copy_blockers": [
+    "usage_observed_blocks_ramp_cuts:Arcane Signet,Birgi, God of Storytelling // Harnfel, Horn of Bounty,Dark Ritual",
+    "missing_current_scope_usage_trace_for_ramp_cuts:Basalt Monolith,Burnt Offering,Cabal Ritual,Culling the Weak,Desperate Ritual",
+    "no_explicit_same_lane_replacement_route_for_ramp_cut_pairs"
+  ],
+  "cut_evidence_rows": [
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Arcane Signet",
+      "commander": "Kaalia of the Vast",
+      "deck_id": "619",
+      "matching_excess_roles": [
+        "ramp"
+      ],
+      "mutation_allowed": false,
+      "next_required_evidence": "find_different_cut_or_explicit_same_lane_replacement",
+      "policy_bucket": "ramp_only_excess_cut_pressure",
+      "promotion_allowed": false,
+      "roles": [
+        "ramp"
+      ],
+      "same_lane_replacement_route_count": 0,
+      "status": "ramp_cut_usage_observed_blocks_candidate_copy",
+      "structured_evidence_count": 4,
+      "structured_evidence_sample": [
+        {
+          "artifact_type": "global_commander_external_nonpayoff_current_deck_negative_review_collector",
+          "decision": "not_cuttable_from_current_trace",
+          "decision_trace_count": 5,
+          "exposure_event_count": 11,
+          "first_decision_trace": {
+            "event": "mulligan_decision",
+            "player": "Kaalia of the Vast",
+            "turn": 0
+          },
+          "first_exposure_event": {
+            "event": "turn_start",
+            "player": "Kaalia of the Vast",
+            "turn": 1
+          },
+          "first_usage_event": {
+            "card": "Arcane Signet",
+            "event": "cast_announced",
+            "player": "Kaalia of the Vast",
+            "turn": 2
+          },
+          "same_lane_replacement_routes": [],
+          "source_artifact": "docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_current_deck_negative_review_collector_20260705_kaalia_value_safe_stage1_repair_scope1.json",
+          "status": "external_current_deck_candidate_used_by_target_blocks_negative_review",
+          "trace_group": "usage_blocked",
+          "usage_event_count": 3
+        },
+        {
+          "artifact_type": "global_commander_new_cut_source_lane_trace_collector",
+          "decision": "not_value_safe_from_existing_remaining_cut_trace",
+          "decision_trace_count": 5,
+          "exposure_event_count": 11,
+          "first_decision_trace": {
+            "event": "mulligan_decision",
+            "player": "Kaalia of the Vast",
+            "turn": 0
+          },
+          "first_exposure_event": {
+            "event": "turn_start",
+            "player": "Kaalia of the Vast",
+            "turn": 1
+          },
+          "first_usage_event": {
+            "card": "Arcane Signet",
+            "event": "cast_announced",
+            "player": "Kaalia of the Vast",
+            "turn": 2
+          },
+          "same_lane_replacement_routes": [],
+          "source_artifact": "docs/hermes-analysis/master_optimizer_reports/global_commander_new_cut_source_lane_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.json",
+          "status": "remaining_cut_used_by_target_trace_blocks_value_safe",
+          "trace_group": "usage_blocked",
+          "usage_event_count": 3
+        },
+        {
+          "artifact_type": "global_commander_same_lane_stage_cut_trace_collector",
+          "decision": "",
+          "decision_trace_count": 5,
+          "exposure_event_count": 11,
+          "first_decision_trace": {
+            "event": "mulligan_decision",
+            "player": "Kaalia of the Vast",
+            "turn": 0
+          },
+          "first_exposure_event": {
+            "event": "turn_start",
+            "player": "Kaalia of the Vast",
+            "turn": 1
+          },
+          "first_usage_event": {
+            "card": "Arcane Signet",
+            "event": "cast_announced",
+            "player": "Kaalia of the Vast",
+            "turn": 2
+          },
+          "same_lane_replacement_routes": [],
+          "source_artifact": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_stage_cut_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.json",
+          "status": "same_lane_stage_cut_usage_trace_blocks_value_safe",
+          "trace_group": "usage_blocked",
+          "usage_event_count": 3
+        },
+        {
+          "artifact_type": "global_commander_external_nonpayoff_same_lane_source_candidate_reviewer",
+          "decision": "",
+          "decision_trace_count": 0,
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "same_lane_replacement_routes": [],
+          "source_artifact": "docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_same_lane_source_candidate_reviewer_20260705_kaalia_value_safe_stage1_repair_scope1.json",
+          "status": "",
+          "trace_group": "not_seen_or_no_trace",
+          "usage_event_count": 0
+        }
+      ],
+      "text_usage_candidate_count": 9,
+      "trace_group": "usage_blocked"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Basalt Monolith",
+      "commander": "Kaalia of the Vast",
+      "deck_id": "619",
+      "matching_excess_roles": [
+        "ramp"
+      ],
+      "mutation_allowed": false,
+      "next_required_evidence": "generate_or_import_current_scope_usage_trace_for_ramp_cut",
+      "policy_bucket": "ramp_only_excess_cut_pressure",
+      "promotion_allowed": false,
+      "roles": [
+        "ramp"
+      ],
+      "same_lane_replacement_route_count": 0,
+      "status": "ramp_cut_missing_current_scope_usage_trace",
+      "structured_evidence_count": 2,
+      "structured_evidence_sample": [
+        {
+          "artifact_type": "global_commander_reviewed_external_seeded_cut_trace_collector",
+          "decision": "insufficient_existing_trace",
+          "decision_trace_count": 0,
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "same_lane_replacement_routes": [],
+          "source_artifact": "docs/hermes-analysis/master_optimizer_reports/global_commander_reviewed_external_seeded_cut_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.json",
+          "status": "reviewed_seeded_cut_hypothesis_not_seen_needs_force_access_or_broader_trace",
+          "trace_group": "not_seen_or_no_trace",
+          "usage_event_count": 0
+        },
+        {
+          "artifact_type": "global_commander_reviewed_external_seeded_force_access_trace_generator",
+          "decision": "seeded_hypothesis_source_db_mismatch_or_already_removed",
+          "decision_trace_count": 0,
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "same_lane_replacement_routes": [],
+          "source_artifact": "docs/hermes-analysis/master_optimizer_reports/global_commander_reviewed_external_seeded_force_access_trace_generator_20260705_kaalia_value_safe_stage1_repair_scope1.json",
+          "status": "reviewed_seeded_forced_access_card_absent_from_selected_db_blocks_cut_permission",
+          "trace_group": "not_seen_or_no_trace",
+          "usage_event_count": 0
+        }
+      ],
+      "text_usage_candidate_count": 0,
+      "trace_group": "not_seen_or_no_trace"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+      "commander": "Kaalia of the Vast",
+      "deck_id": "619",
+      "matching_excess_roles": [
+        "engine",
+        "ramp"
+      ],
+      "mutation_allowed": false,
+      "next_required_evidence": "find_different_cut_or_explicit_same_lane_replacement",
+      "policy_bucket": "ramp_overlap_excess_cut_pressure",
+      "promotion_allowed": false,
+      "roles": [
+        "engine",
+        "ramp"
+      ],
+      "same_lane_replacement_route_count": 0,
+      "status": "ramp_cut_usage_observed_blocks_candidate_copy",
+      "structured_evidence_count": 2,
+      "structured_evidence_sample": [
+        {
+          "artifact_type": "global_commander_new_cut_source_lane_trace_collector",
+          "decision": "not_value_safe_from_existing_remaining_cut_trace",
+          "decision_trace_count": 7,
+          "exposure_event_count": 13,
+          "first_decision_trace": {
+            "event": "tutor",
+            "player": "Kaalia of the Vast",
+            "turn": 7
+          },
+          "first_exposure_event": {
+            "event": "turn_end",
+            "player": "Kaalia of the Vast",
+            "turn": 1
+          },
+          "first_usage_event": {
+            "card": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+            "event": "cast_announced",
+            "player": "Kaalia of the Vast",
+            "turn": 3
+          },
+          "same_lane_replacement_routes": [],
+          "source_artifact": "docs/hermes-analysis/master_optimizer_reports/global_commander_new_cut_source_lane_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.json",
+          "status": "remaining_cut_used_by_target_trace_blocks_value_safe",
+          "trace_group": "usage_blocked",
+          "usage_event_count": 21
+        },
+        {
+          "artifact_type": "global_commander_same_lane_stage_cut_trace_collector",
+          "decision": "",
+          "decision_trace_count": 7,
+          "exposure_event_count": 13,
+          "first_decision_trace": {
+            "event": "tutor",
+            "player": "Kaalia of the Vast",
+            "turn": 7
+          },
+          "first_exposure_event": {
+            "event": "turn_end",
+            "player": "Kaalia of the Vast",
+            "turn": 1
+          },
+          "first_usage_event": {
+            "card": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+            "event": "cast_announced",
+            "player": "Kaalia of the Vast",
+            "turn": 3
+          },
+          "same_lane_replacement_routes": [],
+          "source_artifact": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_stage_cut_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.json",
+          "status": "same_lane_stage_cut_usage_trace_blocks_value_safe",
+          "trace_group": "usage_blocked",
+          "usage_event_count": 21
+        }
+      ],
+      "text_usage_candidate_count": 4,
+      "trace_group": "usage_blocked"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Burnt Offering",
+      "commander": "Kaalia of the Vast",
+      "deck_id": "619",
+      "matching_excess_roles": [
+        "ramp"
+      ],
+      "mutation_allowed": false,
+      "next_required_evidence": "generate_or_import_current_scope_usage_trace_for_ramp_cut",
+      "policy_bucket": "ramp_only_excess_cut_pressure",
+      "promotion_allowed": false,
+      "roles": [
+        "ramp"
+      ],
+      "same_lane_replacement_route_count": 0,
+      "status": "ramp_cut_missing_current_scope_usage_trace",
+      "structured_evidence_count": 2,
+      "structured_evidence_sample": [
+        {
+          "artifact_type": "global_commander_reviewed_external_seeded_cut_trace_collector",
+          "decision": "insufficient_existing_trace",
+          "decision_trace_count": 0,
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "same_lane_replacement_routes": [],
+          "source_artifact": "docs/hermes-analysis/master_optimizer_reports/global_commander_reviewed_external_seeded_cut_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.json",
+          "status": "reviewed_seeded_cut_hypothesis_not_seen_needs_force_access_or_broader_trace",
+          "trace_group": "not_seen_or_no_trace",
+          "usage_event_count": 0
+        },
+        {
+          "artifact_type": "global_commander_reviewed_external_seeded_force_access_trace_generator",
+          "decision": "seeded_hypothesis_source_db_mismatch_or_already_removed",
+          "decision_trace_count": 0,
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "same_lane_replacement_routes": [],
+          "source_artifact": "docs/hermes-analysis/master_optimizer_reports/global_commander_reviewed_external_seeded_force_access_trace_generator_20260705_kaalia_value_safe_stage1_repair_scope1.json",
+          "status": "reviewed_seeded_forced_access_card_absent_from_selected_db_blocks_cut_permission",
+          "trace_group": "not_seen_or_no_trace",
+          "usage_event_count": 0
+        }
+      ],
+      "text_usage_candidate_count": 0,
+      "trace_group": "not_seen_or_no_trace"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Cabal Ritual",
+      "commander": "Kaalia of the Vast",
+      "deck_id": "619",
+      "matching_excess_roles": [
+        "ramp"
+      ],
+      "mutation_allowed": false,
+      "next_required_evidence": "generate_or_import_current_scope_usage_trace_for_ramp_cut",
+      "policy_bucket": "ramp_only_excess_cut_pressure",
+      "promotion_allowed": false,
+      "roles": [
+        "ramp"
+      ],
+      "same_lane_replacement_route_count": 0,
+      "status": "ramp_cut_missing_current_scope_usage_trace",
+      "structured_evidence_count": 2,
+      "structured_evidence_sample": [
+        {
+          "artifact_type": "global_commander_reviewed_external_seeded_cut_trace_collector",
+          "decision": "insufficient_existing_trace",
+          "decision_trace_count": 0,
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "same_lane_replacement_routes": [],
+          "source_artifact": "docs/hermes-analysis/master_optimizer_reports/global_commander_reviewed_external_seeded_cut_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.json",
+          "status": "reviewed_seeded_cut_hypothesis_not_seen_needs_force_access_or_broader_trace",
+          "trace_group": "not_seen_or_no_trace",
+          "usage_event_count": 0
+        },
+        {
+          "artifact_type": "global_commander_reviewed_external_seeded_force_access_trace_generator",
+          "decision": "seeded_hypothesis_source_db_mismatch_or_already_removed",
+          "decision_trace_count": 0,
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "same_lane_replacement_routes": [],
+          "source_artifact": "docs/hermes-analysis/master_optimizer_reports/global_commander_reviewed_external_seeded_force_access_trace_generator_20260705_kaalia_value_safe_stage1_repair_scope1.json",
+          "status": "reviewed_seeded_forced_access_card_absent_from_selected_db_blocks_cut_permission",
+          "trace_group": "not_seen_or_no_trace",
+          "usage_event_count": 0
+        }
+      ],
+      "text_usage_candidate_count": 0,
+      "trace_group": "not_seen_or_no_trace"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Culling the Weak",
+      "commander": "Kaalia of the Vast",
+      "deck_id": "619",
+      "matching_excess_roles": [
+        "ramp"
+      ],
+      "mutation_allowed": false,
+      "next_required_evidence": "generate_or_import_current_scope_usage_trace_for_ramp_cut",
+      "policy_bucket": "ramp_only_excess_cut_pressure",
+      "promotion_allowed": false,
+      "roles": [
+        "ramp"
+      ],
+      "same_lane_replacement_route_count": 0,
+      "status": "ramp_cut_missing_current_scope_usage_trace",
+      "structured_evidence_count": 3,
+      "structured_evidence_sample": [
+        {
+          "artifact_type": "global_commander_external_nonpayoff_expanded_source_candidate_reviewer",
+          "decision": "",
+          "decision_trace_count": 0,
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "same_lane_replacement_routes": [],
+          "source_artifact": "docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_expanded_source_candidate_reviewer_20260706_kaalia_value_safe_stage1_followup_live_after_manual_trace.json",
+          "status": "",
+          "trace_group": "not_seen_or_no_trace",
+          "usage_event_count": 0
+        },
+        {
+          "artifact_type": "global_commander_reviewed_external_seeded_cut_trace_collector",
+          "decision": "insufficient_existing_trace",
+          "decision_trace_count": 0,
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "same_lane_replacement_routes": [],
+          "source_artifact": "docs/hermes-analysis/master_optimizer_reports/global_commander_reviewed_external_seeded_cut_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.json",
+          "status": "reviewed_seeded_cut_hypothesis_not_seen_needs_force_access_or_broader_trace",
+          "trace_group": "not_seen_or_no_trace",
+          "usage_event_count": 0
+        },
+        {
+          "artifact_type": "global_commander_reviewed_external_seeded_force_access_trace_generator",
+          "decision": "seeded_hypothesis_source_db_mismatch_or_already_removed",
+          "decision_trace_count": 0,
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "same_lane_replacement_routes": [],
+          "source_artifact": "docs/hermes-analysis/master_optimizer_reports/global_commander_reviewed_external_seeded_force_access_trace_generator_20260705_kaalia_value_safe_stage1_repair_scope1.json",
+          "status": "reviewed_seeded_forced_access_card_absent_from_selected_db_blocks_cut_permission",
+          "trace_group": "not_seen_or_no_trace",
+          "usage_event_count": 0
+        }
+      ],
+      "text_usage_candidate_count": 0,
+      "trace_group": "not_seen_or_no_trace"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Dark Ritual",
+      "commander": "Kaalia of the Vast",
+      "deck_id": "619",
+      "matching_excess_roles": [
+        "ramp"
+      ],
+      "mutation_allowed": false,
+      "next_required_evidence": "find_different_cut_or_explicit_same_lane_replacement",
+      "policy_bucket": "ramp_only_excess_cut_pressure",
+      "promotion_allowed": false,
+      "roles": [
+        "ramp"
+      ],
+      "same_lane_replacement_route_count": 0,
+      "status": "ramp_cut_usage_observed_blocks_candidate_copy",
+      "structured_evidence_count": 3,
+      "structured_evidence_sample": [
+        {
+          "artifact_type": "global_commander_forced_cut_access_trace_generator",
+          "decision": "not_value_safe_after_forced_access_usage",
+          "decision_trace_count": 39,
+          "exposure_event_count": 39,
+          "first_decision_trace": {
+            "event": "pass_no_action",
+            "player": "Kaalia of the Vast",
+            "turn": 1
+          },
+          "first_exposure_event": {
+            "event": "turn_start",
+            "player": "Kaalia of the Vast",
+            "turn": 1
+          },
+          "first_usage_event": {
+            "card": "Dark Ritual",
+            "event": "cast_announced",
+            "player": "Kaalia of the Vast",
+            "turn": 7
+          },
+          "same_lane_replacement_routes": [],
+          "source_artifact": "docs/hermes-analysis/master_optimizer_reports/global_commander_forced_cut_access_trace_generator_20260705_kaalia_value_safe_stage1_repair_scope1.json",
+          "status": "forced_access_usage_observed_blocks_value_safe",
+          "trace_group": "usage_blocked",
+          "usage_event_count": 4
+        },
+        {
+          "artifact_type": "global_commander_new_cut_source_lane_trace_collector",
+          "decision": "insufficient_existing_trace",
+          "decision_trace_count": 0,
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "same_lane_replacement_routes": [],
+          "source_artifact": "docs/hermes-analysis/master_optimizer_reports/global_commander_new_cut_source_lane_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.json",
+          "status": "remaining_cut_not_seen_needs_forced_access_or_more_trace",
+          "trace_group": "not_seen_or_no_trace",
+          "usage_event_count": 0
+        },
+        {
+          "artifact_type": "global_commander_same_lane_stage_cut_trace_collector",
+          "decision": "",
+          "decision_trace_count": 0,
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "same_lane_replacement_routes": [],
+          "source_artifact": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_stage_cut_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.json",
+          "status": "same_lane_stage_cut_external_reference_needs_internal_trace",
+          "trace_group": "not_seen_or_no_trace",
+          "usage_event_count": 0
+        }
+      ],
+      "text_usage_candidate_count": 0,
+      "trace_group": "usage_blocked"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Desperate Ritual",
+      "commander": "Kaalia of the Vast",
+      "deck_id": "619",
+      "matching_excess_roles": [
+        "ramp"
+      ],
+      "mutation_allowed": false,
+      "next_required_evidence": "generate_or_import_current_scope_usage_trace_for_ramp_cut",
+      "policy_bucket": "ramp_only_excess_cut_pressure",
+      "promotion_allowed": false,
+      "roles": [
+        "ramp"
+      ],
+      "same_lane_replacement_route_count": 0,
+      "status": "ramp_cut_missing_current_scope_usage_trace",
+      "structured_evidence_count": 2,
+      "structured_evidence_sample": [
+        {
+          "artifact_type": "global_commander_reviewed_external_seeded_cut_trace_collector",
+          "decision": "insufficient_existing_trace",
+          "decision_trace_count": 0,
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "same_lane_replacement_routes": [],
+          "source_artifact": "docs/hermes-analysis/master_optimizer_reports/global_commander_reviewed_external_seeded_cut_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.json",
+          "status": "reviewed_seeded_cut_hypothesis_not_seen_needs_force_access_or_broader_trace",
+          "trace_group": "not_seen_or_no_trace",
+          "usage_event_count": 0
+        },
+        {
+          "artifact_type": "global_commander_reviewed_external_seeded_force_access_trace_generator",
+          "decision": "seeded_hypothesis_source_db_mismatch_or_already_removed",
+          "decision_trace_count": 0,
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "same_lane_replacement_routes": [],
+          "source_artifact": "docs/hermes-analysis/master_optimizer_reports/global_commander_reviewed_external_seeded_force_access_trace_generator_20260705_kaalia_value_safe_stage1_repair_scope1.json",
+          "status": "reviewed_seeded_forced_access_card_absent_from_selected_db_blocks_cut_permission",
+          "trace_group": "not_seen_or_no_trace",
+          "usage_event_count": 0
+        }
+      ],
+      "text_usage_candidate_count": 0,
+      "trace_group": "not_seen_or_no_trace"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Grim Monolith",
+      "commander": "Kaalia of the Vast",
+      "deck_id": "619",
+      "matching_excess_roles": [
+        "ramp"
+      ],
+      "mutation_allowed": false,
+      "next_required_evidence": "review_text_trace_candidate_before_candidate_copy",
+      "policy_bucket": "ramp_only_excess_cut_pressure",
+      "promotion_allowed": false,
+      "roles": [
+        "ramp"
+      ],
+      "same_lane_replacement_route_count": 0,
+      "status": "ramp_cut_text_trace_candidate_needs_structured_review",
+      "structured_evidence_count": 2,
+      "structured_evidence_sample": [
+        {
+          "artifact_type": "global_commander_reviewed_external_seeded_cut_trace_collector",
+          "decision": "insufficient_existing_trace",
+          "decision_trace_count": 0,
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "same_lane_replacement_routes": [],
+          "source_artifact": "docs/hermes-analysis/master_optimizer_reports/global_commander_reviewed_external_seeded_cut_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.json",
+          "status": "reviewed_seeded_cut_hypothesis_not_seen_needs_force_access_or_broader_trace",
+          "trace_group": "not_seen_or_no_trace",
+          "usage_event_count": 0
+        },
+        {
+          "artifact_type": "global_commander_reviewed_external_seeded_force_access_trace_generator",
+          "decision": "seeded_hypothesis_source_db_mismatch_or_already_removed",
+          "decision_trace_count": 0,
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "same_lane_replacement_routes": [],
+          "source_artifact": "docs/hermes-analysis/master_optimizer_reports/global_commander_reviewed_external_seeded_force_access_trace_generator_20260705_kaalia_value_safe_stage1_repair_scope1.json",
+          "status": "reviewed_seeded_forced_access_card_absent_from_selected_db_blocks_cut_permission",
+          "trace_group": "not_seen_or_no_trace",
+          "usage_event_count": 0
+        }
+      ],
+      "text_usage_candidate_count": 2,
+      "trace_group": "not_seen_or_no_trace"
+    }
+  ],
+  "deck_action_allowed": false,
+  "generated_at": "2026-07-06T05:34:40.026529+00:00",
+  "input_artifacts": {
+    "ramp_policy_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_axis_nonland_cut_policy_model_20260706_current.json",
+    "scan_roots": [
+      "docs/hermes-analysis/master_optimizer_reports"
+    ]
+  },
+  "mutation_allowed": false,
+  "pair_review_rows": [
+    {
+      "add": "Feed the Swarm",
+      "battle_gate_allowed": false,
+      "blockers": [
+        "cut_card_used_by_target_trace",
+        "no_explicit_same_lane_replacement_route"
+      ],
+      "candidate_copy_allowed": false,
+      "candidate_role": "removal",
+      "cut": "Arcane Signet",
+      "cut_evidence_status": "ramp_cut_usage_observed_blocks_candidate_copy",
+      "cut_roles": [
+        "ramp"
+      ],
+      "explicit_same_lane_roles": [],
+      "mutation_allowed": false,
+      "promotion_allowed": false,
+      "status": "ramp_cut_pair_blocks_candidate_copy"
+    },
+    {
+      "add": "Feed the Swarm",
+      "battle_gate_allowed": false,
+      "blockers": [
+        "cut_card_missing_current_scope_usage_trace",
+        "no_explicit_same_lane_replacement_route"
+      ],
+      "candidate_copy_allowed": false,
+      "candidate_role": "removal",
+      "cut": "Basalt Monolith",
+      "cut_evidence_status": "ramp_cut_missing_current_scope_usage_trace",
+      "cut_roles": [
+        "ramp"
+      ],
+      "explicit_same_lane_roles": [],
+      "mutation_allowed": false,
+      "promotion_allowed": false,
+      "status": "ramp_cut_pair_blocks_candidate_copy"
+    },
+    {
+      "add": "Feed the Swarm",
+      "battle_gate_allowed": false,
+      "blockers": [
+        "cut_card_used_by_target_trace",
+        "no_explicit_same_lane_replacement_route"
+      ],
+      "candidate_copy_allowed": false,
+      "candidate_role": "removal",
+      "cut": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+      "cut_evidence_status": "ramp_cut_usage_observed_blocks_candidate_copy",
+      "cut_roles": [
+        "engine",
+        "ramp"
+      ],
+      "explicit_same_lane_roles": [],
+      "mutation_allowed": false,
+      "promotion_allowed": false,
+      "status": "ramp_cut_pair_blocks_candidate_copy"
+    },
+    {
+      "add": "Path to Exile",
+      "battle_gate_allowed": false,
+      "blockers": [
+        "cut_card_used_by_target_trace",
+        "no_explicit_same_lane_replacement_route"
+      ],
+      "candidate_copy_allowed": false,
+      "candidate_role": "removal",
+      "cut": "Arcane Signet",
+      "cut_evidence_status": "ramp_cut_usage_observed_blocks_candidate_copy",
+      "cut_roles": [
+        "ramp"
+      ],
+      "explicit_same_lane_roles": [],
+      "mutation_allowed": false,
+      "promotion_allowed": false,
+      "status": "ramp_cut_pair_blocks_candidate_copy"
+    },
+    {
+      "add": "Path to Exile",
+      "battle_gate_allowed": false,
+      "blockers": [
+        "cut_card_missing_current_scope_usage_trace",
+        "no_explicit_same_lane_replacement_route"
+      ],
+      "candidate_copy_allowed": false,
+      "candidate_role": "removal",
+      "cut": "Basalt Monolith",
+      "cut_evidence_status": "ramp_cut_missing_current_scope_usage_trace",
+      "cut_roles": [
+        "ramp"
+      ],
+      "explicit_same_lane_roles": [],
+      "mutation_allowed": false,
+      "promotion_allowed": false,
+      "status": "ramp_cut_pair_blocks_candidate_copy"
+    },
+    {
+      "add": "Path to Exile",
+      "battle_gate_allowed": false,
+      "blockers": [
+        "cut_card_used_by_target_trace",
+        "no_explicit_same_lane_replacement_route"
+      ],
+      "candidate_copy_allowed": false,
+      "candidate_role": "removal",
+      "cut": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+      "cut_evidence_status": "ramp_cut_usage_observed_blocks_candidate_copy",
+      "cut_roles": [
+        "engine",
+        "ramp"
+      ],
+      "explicit_same_lane_roles": [],
+      "mutation_allowed": false,
+      "promotion_allowed": false,
+      "status": "ramp_cut_pair_blocks_candidate_copy"
+    },
+    {
+      "add": "Swords to Plowshares",
+      "battle_gate_allowed": false,
+      "blockers": [
+        "cut_card_used_by_target_trace",
+        "no_explicit_same_lane_replacement_route"
+      ],
+      "candidate_copy_allowed": false,
+      "candidate_role": "removal",
+      "cut": "Arcane Signet",
+      "cut_evidence_status": "ramp_cut_usage_observed_blocks_candidate_copy",
+      "cut_roles": [
+        "ramp"
+      ],
+      "explicit_same_lane_roles": [],
+      "mutation_allowed": false,
+      "promotion_allowed": false,
+      "status": "ramp_cut_pair_blocks_candidate_copy"
+    },
+    {
+      "add": "Swords to Plowshares",
+      "battle_gate_allowed": false,
+      "blockers": [
+        "cut_card_missing_current_scope_usage_trace",
+        "no_explicit_same_lane_replacement_route"
+      ],
+      "candidate_copy_allowed": false,
+      "candidate_role": "removal",
+      "cut": "Basalt Monolith",
+      "cut_evidence_status": "ramp_cut_missing_current_scope_usage_trace",
+      "cut_roles": [
+        "ramp"
+      ],
+      "explicit_same_lane_roles": [],
+      "mutation_allowed": false,
+      "promotion_allowed": false,
+      "status": "ramp_cut_pair_blocks_candidate_copy"
+    },
+    {
+      "add": "Swords to Plowshares",
+      "battle_gate_allowed": false,
+      "blockers": [
+        "cut_card_used_by_target_trace",
+        "no_explicit_same_lane_replacement_route"
+      ],
+      "candidate_copy_allowed": false,
+      "candidate_role": "removal",
+      "cut": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+      "cut_evidence_status": "ramp_cut_usage_observed_blocks_candidate_copy",
+      "cut_roles": [
+        "engine",
+        "ramp"
+      ],
+      "explicit_same_lane_roles": [],
+      "mutation_allowed": false,
+      "promotion_allowed": false,
+      "status": "ramp_cut_pair_blocks_candidate_copy"
+    }
+  ],
+  "policy": {
+    "mutation_boundary": "This scout does not copy decks, run battles, mutate DBs, or promote packages.",
+    "same_lane_boundary": "A removal add does not replace a ramp cut unless an explicit same-lane route is proven.",
+    "trace_boundary": "Textual trace references are scout evidence only; structured trace/proof rows drive this decision.",
+    "usage_boundary": "Observed use by the target deck blocks treating a ramp cut as safe."
+  },
+  "pool_summaries": [
+    {
+      "commander": "Kaalia of the Vast",
+      "cut_count": 9,
+      "deck_id": "619",
+      "pair_count": 9,
+      "role": "removal"
+    }
+  ],
+  "postgres_writes": false,
+  "promotion_allowed": false,
+  "source_db_mutated": false,
+  "status": "ramp_cut_usage_same_lane_proof_blocks_candidate_copy",
+  "summary": {
+    "candidate_copy_blocker_count": 3,
+    "cut_card_count": 9,
+    "cut_status_counts": {
+      "ramp_cut_missing_current_scope_usage_trace": 5,
+      "ramp_cut_text_trace_candidate_needs_structured_review": 1,
+      "ramp_cut_usage_observed_blocks_candidate_copy": 3
+    },
+    "explicit_same_lane_route_count": 0,
+    "missing_trace_cut_count": 5,
+    "next_gate": "generate_current_scope_trace_or_find_explicit_same_lane_ramp_replacement_before_candidate_copy",
+    "pair_count": 9,
+    "pair_ready_count": 0,
+    "pair_status_counts": {
+      "ramp_cut_pair_blocks_candidate_copy": 9
+    },
+    "pool_count": 1,
+    "text_occurrence_count": 969,
+    "usage_blocked_cut_count": 3
+  },
+  "text_occurrence_sample": [
+    {
+      "card_name": "Arcane Signet",
+      "classification": "current_scope_text_usage_reference_candidate",
+      "excerpt": "{\"additional_costs\": [], \"additional_generic\": 0, \"alternative_cost\": null, \"alternative_cost_kind\": null, \"card\": \"Arcane Signet\", \"card_id\": \"af4dbd03-8804-42d5-8672-546dcb1a77a2\", \"cast_pipeline\": \"601.2_minimal\", \"effect\": \"ramp_permanent\", \"event\": \"cast_",
+      "line": 89,
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_43.events.jsonl"
+    },
+    {
+      "card_name": "Arcane Signet",
+      "classification": "current_scope_text_usage_reference_candidate",
+      "excerpt": "{\"additional_costs\": [], \"additional_generic\": 0, \"alternative_cost\": null, \"alternative_cost_kind\": null, \"card\": \"Arcane Signet\", \"cast_pipeline\": \"601.2_minimal\", \"effect\": \"ramp_permanent\", \"event\": \"cast_announced\", \"locked_cost\": {\"colored\": {}, \"generic",
+      "line": 41,
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_45.events.jsonl"
+    },
+    {
+      "card_name": "Arcane Signet",
+      "classification": "current_scope_text_usage_reference_candidate",
+      "excerpt": "{\"additional_costs\": [], \"additional_generic\": 0, \"alternative_cost\": null, \"alternative_cost_kind\": null, \"card\": \"Arcane Signet\", \"cast_pipeline\": \"601.2_minimal\", \"cmc\": 2.0, \"effect\": \"ramp_permanent\", \"event\": \"spell_cast\", \"locked_cost\": {\"colored\": {}, ",
+      "line": 43,
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_45.events.jsonl"
+    },
+    {
+      "card_name": "Arcane Signet",
+      "classification": "current_scope_text_usage_reference_candidate",
+      "excerpt": "{\"additional_costs\": [], \"additional_generic\": 0, \"alternative_cost\": null, \"alternative_cost_kind\": null, \"card\": \"Arcane Signet\", \"cast_pipeline\": \"601.2_minimal\", \"effect\": \"ramp_permanent\", \"event\": \"cast_announced\", \"locked_cost\": {\"colored\": {}, \"generic",
+      "line": 940,
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_46.events.jsonl"
+    },
+    {
+      "card_name": "Arcane Signet",
+      "classification": "current_scope_text_usage_reference_candidate",
+      "excerpt": "{\"additional_costs\": [], \"additional_generic\": 0, \"alternative_cost\": null, \"alternative_cost_kind\": null, \"card\": \"Arcane Signet\", \"cast_pipeline\": \"601.2_minimal\", \"cmc\": 2.0, \"effect\": \"ramp_permanent\", \"event\": \"spell_cast\", \"locked_cost\": {\"colored\": {}, ",
+      "line": 942,
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_46.events.jsonl"
+    },
+    {
+      "card_name": "Arcane Signet",
+      "classification": "current_scope_text_usage_reference_candidate",
+      "excerpt": "\"remaining_cut_cards_used_by_target_deck:Sunforger,Jeska's Will,Smothering Tithe,Demonic Tutor,Enlightened Tutor,Arcane Signet,Mana Vault,Sol Ring,Birgi, God of Storytelling // Harnfel, Horn of Bounty\",",
+      "line": 9,
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_new_cut_source_lane_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+    },
+    {
+      "card_name": "Arcane Signet",
+      "classification": "current_scope_text_usage_reference_candidate",
+      "excerpt": "| `Arcane Signet` | `remaining_cut_used_by_target_trace_blocks_value_safe` | 3 | 11 | 5 | `find_different_cut_or_same_lane_replacement_proof` |",
+      "line": 29,
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_new_cut_source_lane_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+    },
+    {
+      "card_name": "Arcane Signet",
+      "classification": "current_scope_text_usage_reference_candidate",
+      "excerpt": "- `remaining_cut_cards_used_by_target_deck:Sunforger,Jeska's Will,Smothering Tithe,Demonic Tutor,Enlightened Tutor,Arcane Signet,Mana Vault,Sol Ring,Birgi, God of Storytelling // Harnfel, Horn of Bounty`",
+      "line": 37,
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_new_cut_source_lane_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+    },
+    {
+      "card_name": "Arcane Signet",
+      "classification": "current_scope_text_usage_reference_candidate",
+      "excerpt": "\"excerpt\": \"- `remaining_cut_cards_used_by_target_deck:Sunforger,Jeska's Will,Smothering Tithe,Demonic Tutor,Enlightened Tutor,Arcane Signet,Mana Vault,Sol Ring,Birgi, God of Storytelling // Harnfel, Horn of Bounty`\",",
+      "line": 362,
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_stage_cut_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+    },
+    {
+      "card_name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+      "classification": "current_scope_text_usage_reference_candidate",
+      "excerpt": "\"remaining_cut_cards_used_by_target_deck:Sunforger,Jeska's Will,Smothering Tithe,Demonic Tutor,Enlightened Tutor,Arcane Signet,Mana Vault,Sol Ring,Birgi, God of Storytelling // Harnfel, Horn of Bounty\",",
+      "line": 9,
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_new_cut_source_lane_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+    },
+    {
+      "card_name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+      "classification": "current_scope_text_usage_reference_candidate",
+      "excerpt": "| `Birgi, God of Storytelling // Harnfel, Horn of Bounty` | `remaining_cut_used_by_target_trace_blocks_value_safe` | 21 | 13 | 7 | `find_different_cut_or_same_lane_replacement_proof` |",
+      "line": 33,
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_new_cut_source_lane_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+    },
+    {
+      "card_name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+      "classification": "current_scope_text_usage_reference_candidate",
+      "excerpt": "- `remaining_cut_cards_used_by_target_deck:Sunforger,Jeska's Will,Smothering Tithe,Demonic Tutor,Enlightened Tutor,Arcane Signet,Mana Vault,Sol Ring,Birgi, God of Storytelling // Harnfel, Horn of Bounty`",
+      "line": 37,
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_new_cut_source_lane_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+    },
+    {
+      "card_name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+      "classification": "current_scope_text_usage_reference_candidate",
+      "excerpt": "\"excerpt\": \"- `remaining_cut_cards_used_by_target_deck:Sunforger,Jeska's Will,Smothering Tithe,Demonic Tutor,Enlightened Tutor,Arcane Signet,Mana Vault,Sol Ring,Birgi, God of Storytelling // Harnfel, Horn of Bounty`\",",
+      "line": 362,
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_stage_cut_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+    },
+    {
+      "card_name": "Grim Monolith",
+      "classification": "current_scope_text_usage_reference_candidate",
+      "excerpt": "{\"additional_costs\": [], \"additional_generic\": 0, \"alternative_cost\": null, \"alternative_cost_kind\": null, \"card\": \"Grim Monolith\", \"cast_pipeline\": \"601.2_minimal\", \"effect\": \"ramp_permanent\", \"event\": \"cast_announced\", \"locked_cost\": {\"colored\": {}, \"generic",
+      "line": 136,
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_47.events.jsonl"
+    },
+    {
+      "card_name": "Grim Monolith",
+      "classification": "current_scope_text_usage_reference_candidate",
+      "excerpt": "{\"additional_costs\": [], \"additional_generic\": 0, \"alternative_cost\": null, \"alternative_cost_kind\": null, \"card\": \"Grim Monolith\", \"cast_pipeline\": \"601.2_minimal\", \"cmc\": 2.0, \"effect\": \"ramp_permanent\", \"event\": \"spell_cast\", \"locked_cost\": {\"colored\": {}, ",
+      "line": 138,
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_47.events.jsonl"
+    },
+    {
+      "card_name": "Arcane Signet",
+      "classification": "current_scope_non_trace_reference_not_proof",
+      "excerpt": "\"card_name\": \"Arcane Signet\",",
+      "line": 1751,
+      "path": "docs/hermes-analysis/master_optimizer_reports/deck619_battle_rule_coherence_pg200_trouble_in_pairs_postsync_v1.json"
+    },
+    {
+      "card_name": "Arcane Signet",
+      "classification": "current_scope_non_trace_reference_not_proof",
+      "excerpt": "\"normalized_name\": \"arcane signet\",",
+      "line": 1774,
+      "path": "docs/hermes-analysis/master_optimizer_reports/deck619_battle_rule_coherence_pg200_trouble_in_pairs_postsync_v1.json"
+    },
+    {
+      "card_name": "Arcane Signet",
+      "classification": "historical_or_cross_scope_trace_reference_not_proof",
+      "excerpt": "{\"card\": \"Arcane Signet\", \"cmc\": 2.0, \"effect\": \"ramp_permanent\", \"event\": \"spell_cast\", \"phase\": \"precombat_main\", \"player\": \"Ishai, Ojutai Dragonspeaker #52 (real)\", \"role\": \"ramp\", \"rule_confidence\": 1.0, \"rule_review_status\": \"verified\", \"rule_source\": \"ma",
+      "line": 169,
+      "path": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_42.jsonl"
+    },
+    {
+      "card_name": "Arcane Signet",
+      "classification": "historical_or_cross_scope_trace_reference_not_proof",
+      "excerpt": "{\"card\": \"Arcane Signet\", \"cmc\": 2.0, \"effect\": \"ramp_permanent\", \"event\": \"spell_cast\", \"phase\": \"precombat_main\", \"player\": \"Rograkh, Son of Rohgahh #94 (real)\", \"role\": \"ramp\", \"rule_confidence\": 1.0, \"rule_review_status\": \"verified\", \"rule_source\": \"manual",
+      "line": 174,
+      "path": "docs/hermes-analysis/master_optimizer_reports/forensic_replays/battle_forensic_seed_42.jsonl"
+    },
+    {
+      "card_name": "Arcane Signet",
+      "classification": "current_scope_non_trace_reference_not_proof",
+      "excerpt": "\"Arcane Signet\",",
+      "line": 90,
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_package_strategy_matrix_20260705_kaalia_removal_floor_step5.json"
+    },
+    {
+      "card_name": "Arcane Signet",
+      "classification": "current_scope_non_trace_reference_not_proof",
+      "excerpt": "\"Arcane Signet\",",
+      "line": 218,
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_package_strategy_matrix_20260705_kaalia_removal_floor_step5.json"
+    },
+    {
+      "card_name": "Arcane Signet",
+      "classification": "current_scope_non_trace_reference_not_proof",
+      "excerpt": "\"Arcane Signet\",",
+      "line": 90,
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_package_strategy_matrix_20260705_kaalia_value_safe_stage1.json"
+    },
+    {
+      "card_name": "Arcane Signet",
+      "classification": "current_scope_non_trace_reference_not_proof",
+      "excerpt": "\"Arcane Signet\",",
+      "line": 217,
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_package_strategy_matrix_20260705_kaalia_value_safe_stage1.json"
+    },
+    {
+      "card_name": "Arcane Signet",
+      "classification": "current_scope_non_trace_reference_not_proof",
+      "excerpt": "\"Arcane Signet\",",
+      "line": 90,
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_package_strategy_matrix_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+    },
+    {
+      "card_name": "Arcane Signet",
+      "classification": "current_scope_non_trace_reference_not_proof",
+      "excerpt": "\"Arcane Signet\",",
+      "line": 215,
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_package_strategy_matrix_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+    },
+    {
+      "card_name": "Arcane Signet",
+      "classification": "current_scope_non_trace_reference_not_proof",
+      "excerpt": "\"Arcane Signet\",",
+      "line": 90,
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_package_strategy_matrix_20260705_kaalia_value_safe_stage1_repair_stage1.json"
+    },
+    {
+      "card_name": "Arcane Signet",
+      "classification": "current_scope_non_trace_reference_not_proof",
+      "excerpt": "\"Arcane Signet\",",
+      "line": 215,
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_package_strategy_matrix_20260705_kaalia_value_safe_stage1_repair_stage1.json"
+    },
+    {
+      "card_name": "Arcane Signet",
+      "classification": "current_scope_non_trace_reference_not_proof",
+      "excerpt": "\"Arcane Signet\",",
+      "line": 90,
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_package_strategy_matrix_20260705_kaalia_value_safe_stage1_repair_stage2.json"
+    },
+    {
+      "card_name": "Arcane Signet",
+      "classification": "current_scope_non_trace_reference_not_proof",
+      "excerpt": "\"Arcane Signet\",",
+      "line": 216,
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_package_strategy_matrix_20260705_kaalia_value_safe_stage1_repair_stage2.json"
+    },
+    {
+      "card_name": "Arcane Signet",
+      "classification": "current_scope_trace_reference",
+      "excerpt": "{\"actual_outcome\": \"keep\", \"alternatives_considered\": [{\"cmc\": 2.0, \"effect\": \"ramp_permanent\", \"is_land\": false, \"name\": \"Arcane Signet\", \"type_line\": \"Artifact\"}, {\"cmc\": 0.0, \"effect\": \"land\", \"is_land\": true, \"name\": \"Raucous Theater\", \"type_line\": \"Land \\",
+      "line": 2,
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_43.decision_trace.jsonl"
+    }
+  ]
+}

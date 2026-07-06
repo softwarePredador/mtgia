@@ -196,7 +196,11 @@ Operational priority after this pivot:
    chosen axis is `ramp`, then run
    `global_commander_ramp_axis_nonland_cut_policy_model.py` to apply ramp
    ceiling policy to blocked nonland ramp cuts before any same-deck source
-   expansion; if the chosen axis is `engine`, then run
+   expansion, then run
+   `global_commander_ramp_cut_usage_same_lane_proof_scout.py` to consume
+   existing trace/proof artifacts, block used ramp cuts, and require explicit
+   same-lane replacement before candidate copy; if the chosen axis is `engine`,
+   then run
    `global_commander_engine_axis_nonland_cut_policy_model.py` to apply that
    policy to the current nonland cut model, split engine-only and
    excess-overlap cut pressure from protected commander-plan engines, and route
@@ -584,6 +588,7 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_role_axis_policy_builder_20260706_post_engine_axis_exhaustion_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_engine_axis_nonland_cut_policy_model_20260706_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_axis_nonland_cut_policy_model_20260706_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_cut_usage_same_lane_proof_scout_20260706_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_engine_cut_usage_same_lane_proof_scout_20260706_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_engine_cut_followup_router_20260706_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_engine_cut_trace_replacement_gate_20260706_current.md`
@@ -1608,6 +1613,14 @@ Current external refresh on 2026-07-05:
   require card-level usage and same-lane proof. Candidate copy, battle, DB
   mutation, and promotion remain closed; the next gate is
   `collect_card_level_usage_and_same_lane_proof_for_ramp_policy_cut_pressure`.
+- The ramp cut usage/same-lane scout keeps all `9` ramp pairs blocked:
+  `Arcane Signet`, `Birgi, God of Storytelling // Harnfel, Horn of Bounty`,
+  and `Dark Ritual` have observed current-scope usage; five other ramp cuts
+  lack current-scope usage trace; `Grim Monolith` has text trace candidates
+  needing structured review; and no pair has an explicit same-lane replacement
+  route (`explicit_same_lane_route_count=0`, `pair_ready_count=0`). Candidate
+  copy, battle, mutation, and promotion remain closed; the next gate is
+  `generate_current_scope_trace_or_find_explicit_same_lane_ramp_replacement_before_candidate_copy`.
 
 ## Global Commander Rollout - 2026-07-01
 

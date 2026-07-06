@@ -280,6 +280,13 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     corte ramp, `2` rows de overlap non-excess ficam bloqueadas para review, e
     o proximo gate e
     `collect_card_level_usage_and_same_lane_proof_for_ramp_policy_cut_pressure`.
+    Esse gate agora e coletado por
+    `manaloom-knowledge/scripts/global_commander_ramp_cut_usage_same_lane_proof_scout.py`,
+    com evidencia:
+    `master_optimizer_reports/global_commander_ramp_cut_usage_same_lane_proof_scout_20260706_current.md`.
+    Resultado: `3` cortes ramp tem uso observado, `5` faltam trace atual,
+    `1` precisa review estruturado de trace textual, nenhuma rota same-lane
+    explicita existe, e candidate copy continua fechado.
     Historicamente, a politica de `engine` ja foi aplicada em
     `manaloom-knowledge/scripts/global_commander_engine_axis_nonland_cut_policy_model.py`
     com evidencia:
@@ -1058,6 +1065,12 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     ela avalia `24` cortes, expõe `9` pressoes review-only de corte ramp,
     mantem candidate copy, battle e promocao fechados e exige
     `collect_card_level_usage_and_same_lane_proof_for_ramp_policy_cut_pressure`.
+    O scout de uso/same-lane fica em
+    `global_commander_ramp_cut_usage_same_lane_proof_scout_20260706_current.md`:
+    ele bloqueia todos os `9` pares, com `usage_blocked_cut_count=3`,
+    `missing_trace_cut_count=5`, `explicit_same_lane_route_count=0` e proximo
+    gate
+    `generate_current_scope_trace_or_find_explicit_same_lane_ramp_replacement_before_candidate_copy`.
     Observacao operacional: snapshots historicos de candidate-copy, battle-probe,
     battle-feedback e package-chain dependem de artefatos locais ignorados. Se
     faltarem ou forem regenerados sem esses artefatos, a auditoria de superficie

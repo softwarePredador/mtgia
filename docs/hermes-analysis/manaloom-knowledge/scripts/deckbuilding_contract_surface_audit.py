@@ -60,6 +60,12 @@ GLOBAL_COMMANDER_RAMP_AXIS_NONLAND_CUT_POLICY_MODEL = (
 GLOBAL_COMMANDER_RAMP_AXIS_NONLAND_CUT_POLICY_MODEL_TEST = (
     SCRIPT_DIR / "test_global_commander_ramp_axis_nonland_cut_policy_model.py"
 )
+GLOBAL_COMMANDER_RAMP_CUT_USAGE_SAME_LANE_PROOF_SCOUT = (
+    SCRIPT_DIR / "global_commander_ramp_cut_usage_same_lane_proof_scout.py"
+)
+GLOBAL_COMMANDER_RAMP_CUT_USAGE_SAME_LANE_PROOF_SCOUT_TEST = (
+    SCRIPT_DIR / "test_global_commander_ramp_cut_usage_same_lane_proof_scout.py"
+)
 GLOBAL_COMMANDER_ENGINE_CUT_USAGE_SAME_LANE_PROOF_SCOUT = (
     SCRIPT_DIR / "global_commander_engine_cut_usage_same_lane_proof_scout.py"
 )
@@ -491,6 +497,10 @@ GLOBAL_COMMANDER_ENGINE_AXIS_NONLAND_CUT_POLICY_MODEL_REPORT = (
 GLOBAL_COMMANDER_RAMP_AXIS_NONLAND_CUT_POLICY_MODEL_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_axis_nonland_cut_policy_model_20260706_current.md"
+)
+GLOBAL_COMMANDER_RAMP_CUT_USAGE_SAME_LANE_PROOF_SCOUT_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_cut_usage_same_lane_proof_scout_20260706_current.md"
 )
 GLOBAL_COMMANDER_ENGINE_CUT_USAGE_SAME_LANE_PROOF_SCOUT_REPORT = (
     REPO_ROOT
@@ -2006,6 +2016,30 @@ def build_audit() -> dict[str, Any]:
                 "ramp_only_excess_cut_pressure",
                 "ramp_overlap_excess_cut_pressure",
                 "kaalia_angel_demon_dragon_payoff",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_RAMP_CUT_USAGE_SAME_LANE_PROOF_SCOUT,
+            [
+                "global_commander_ramp_cut_usage_same_lane_proof_scout",
+                "ramp_cut_usage_same_lane_proof_blocks_candidate_copy",
+                "ramp_cut_usage_observed_blocks_candidate_copy",
+                "missing_current_scope_usage_trace_for_ramp_cuts",
+                "no_explicit_same_lane_replacement_route_for_ramp_cut_pairs",
+                "candidate_copy_allowed_now",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_RAMP_CUT_USAGE_SAME_LANE_PROOF_SCOUT_TEST,
+            [
+                "test_usage_observed_and_no_same_lane_blocks_candidate_copy",
+                "usage_observed_blocks_ramp_cuts:Arcane Signet",
+                "missing_current_scope_usage_trace_for_ramp_cuts:Basalt Monolith",
+                "no_explicit_same_lane_replacement_route_for_ramp_cut_pairs",
             ],
         )
     )
@@ -3936,6 +3970,23 @@ def build_audit() -> dict[str, Any]:
                 "candidate_copy_allowed_now: `false`",
                 "collect_card_level_usage_and_same_lane_proof_for_ramp_policy_cut_pressure",
                 "ramp_axis_policy_blocks_non_excess_overlap",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_RAMP_CUT_USAGE_SAME_LANE_PROOF_SCOUT_REPORT,
+            [
+                "Global Commander Ramp Cut Usage Same-Lane Proof Scout",
+                "ramp_cut_usage_same_lane_proof_blocks_candidate_copy",
+                "cut_card_count: `9`",
+                "usage_blocked_cut_count: `3`",
+                "missing_trace_cut_count: `5`",
+                "explicit_same_lane_route_count: `0`",
+                "pair_ready_count: `0`",
+                "candidate_copy_allowed_now: `false`",
+                "usage_observed_blocks_ramp_cuts:Arcane Signet",
+                "no_explicit_same_lane_replacement_route_for_ramp_cut_pairs",
             ],
         )
     )
