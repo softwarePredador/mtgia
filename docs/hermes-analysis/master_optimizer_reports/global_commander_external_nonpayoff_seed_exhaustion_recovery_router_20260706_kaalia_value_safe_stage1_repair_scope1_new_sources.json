@@ -1,0 +1,190 @@
+{
+  "artifact_type": "global_commander_external_nonpayoff_seed_exhaustion_recovery_router",
+  "battle_gate_allowed_now": false,
+  "battle_gate_performed": false,
+  "battle_or_optimization_performed": false,
+  "battle_replay_performed": false,
+  "candidate_copy_allowed_now": false,
+  "candidate_copy_blockers": [
+    "reviewed_external_seed_exhaustion_is_not_cut_permission",
+    "candidate_copy_closed_until_current_deck_negative_review_or_fresh_cut_source_exists",
+    "battle_gate_closed_until_candidate_copy_and_card_level_usage_evidence_exist"
+  ],
+  "card_level_cut_permission_now": false,
+  "current_deck_negative_review_rows": [],
+  "deck_action_allowed": false,
+  "generated_at": "2026-07-06T02:21:00.872353+00:00",
+  "held_package_pair_rows": [],
+  "identity_resolution_rows": [],
+  "input_artifacts": {
+    "force_access_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_reviewed_external_seeded_force_access_trace_generator_20260705_kaalia_value_safe_stage1_repair_scope1.json",
+    "seeded_miner_current_db_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_reviewed_external_nonpayoff_seeded_cut_source_miner_20260706_kaalia_value_safe_stage1_repair_scope1_new_sources.json",
+    "source_candidate_reviewer_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_new_source_candidate_reviewer_20260706_kaalia_value_safe_stage1_repair_scope1.json"
+  },
+  "mutation_allowed": false,
+  "policy": {
+    "current_deck_boundary": "External candidates already in the current deck need target-deck negative review before any cut consideration.",
+    "held_package_boundary": "External candidates already selected as adds remain held until value-safe same-lane pairs exist.",
+    "promotion_boundary": "No candidate copy, battle gate, deck mutation, or promotion is opened by this router.",
+    "seed_exhaustion_boundary": "Reviewed external seeds that exhaust the current DB do not create card-level cut permission."
+  },
+  "postgres_writes": false,
+  "promotion_allowed": false,
+  "recovery_actions": [
+    {
+      "action": "expand_external_nonpayoff_source_candidate_pool",
+      "candidate_copy_allowed": false,
+      "exhausted_roles": [
+        "haste_protection_silence",
+        "mana_acceleration",
+        "tutors_access"
+      ],
+      "priority": "P1",
+      "reason": "Reviewed seeds produced no fresh current-DB cut source; broaden source candidates without reusing exhausted cards.",
+      "status": "evidence_lane",
+      "unseeded_roles": []
+    },
+    {
+      "action": "keep_candidate_copy_battle_and_promotion_closed",
+      "candidate_copy_allowed": false,
+      "priority": "P4",
+      "reason": "Seed exhaustion and external source review are not card-level cut permission.",
+      "status": "closed_no_deck_action"
+    }
+  ],
+  "role_recovery_rows": [
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "current_deck_negative_review_candidate_count": 0,
+      "current_deck_negative_review_candidates": [],
+      "held_package_pair_required_candidates": [],
+      "held_package_pair_required_count": 0,
+      "identity_resolution_required_candidates": [],
+      "identity_resolution_required_count": 0,
+      "next_gate": "expand_external_nonpayoff_source_candidate_pool_for_exhausted_role",
+      "prior_fresh_source_count": 0,
+      "prior_recycled_source_count": 16,
+      "prior_role_status": "reviewed_external_seeded_role_exhausted_current_deck_sources",
+      "prior_scanned_source_count": 16,
+      "prior_seed_count": 8,
+      "ready_seed_candidate_count": 0,
+      "ready_seed_candidates": [],
+      "required_evidence": [
+        "current_deck_negative_review_before_cut_consideration",
+        "expanded_external_nonpayoff_source_candidates_if_current_deck_review_does_not_open_cut_source",
+        "same_lane_value_safe_pair_before_candidate_copy",
+        "card_level_trace_or_equal_gate_before_promotion"
+      ],
+      "reviewed_seed_cards": [
+        "Lavaspur Boots",
+        "Flawless Maneuver",
+        "Loran's Escape",
+        "Malakir Rebirth // Malakir Mire",
+        "Rebuff the Wicked",
+        "Clever Concealment",
+        "Galadriel's Dismissal",
+        "Redirect Lightning"
+      ],
+      "status": "seed_exhaustion_role_needs_broader_external_seed_research",
+      "target_cut_role": "haste_protection_silence",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "current_deck_negative_review_candidate_count": 0,
+      "current_deck_negative_review_candidates": [],
+      "held_package_pair_required_candidates": [],
+      "held_package_pair_required_count": 0,
+      "identity_resolution_required_candidates": [],
+      "identity_resolution_required_count": 0,
+      "next_gate": "expand_external_nonpayoff_source_candidate_pool_for_exhausted_role",
+      "prior_fresh_source_count": 0,
+      "prior_recycled_source_count": 15,
+      "prior_role_status": "reviewed_external_seeded_role_exhausted_current_deck_sources",
+      "prior_scanned_source_count": 15,
+      "prior_seed_count": 7,
+      "ready_seed_candidate_count": 0,
+      "ready_seed_candidates": [],
+      "required_evidence": [
+        "current_deck_negative_review_before_cut_consideration",
+        "expanded_external_nonpayoff_source_candidates_if_current_deck_review_does_not_open_cut_source",
+        "same_lane_value_safe_pair_before_candidate_copy",
+        "card_level_trace_or_equal_gate_before_promotion"
+      ],
+      "reviewed_seed_cards": [
+        "Boros Signet",
+        "Orzhov Signet",
+        "Rakdos Signet",
+        "Mind Stone",
+        "Talisman of Conviction",
+        "Talisman of Hierarchy",
+        "Talisman of Indulgence"
+      ],
+      "status": "seed_exhaustion_role_needs_broader_external_seed_research",
+      "target_cut_role": "mana_acceleration",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "current_deck_negative_review_candidate_count": 0,
+      "current_deck_negative_review_candidates": [],
+      "held_package_pair_required_candidates": [],
+      "held_package_pair_required_count": 0,
+      "identity_resolution_required_candidates": [],
+      "identity_resolution_required_count": 0,
+      "next_gate": "expand_external_nonpayoff_source_candidate_pool_for_exhausted_role",
+      "prior_fresh_source_count": 0,
+      "prior_recycled_source_count": 16,
+      "prior_role_status": "reviewed_external_seeded_role_exhausted_current_deck_sources",
+      "prior_scanned_source_count": 16,
+      "prior_seed_count": 4,
+      "ready_seed_candidate_count": 0,
+      "ready_seed_candidates": [],
+      "required_evidence": [
+        "current_deck_negative_review_before_cut_consideration",
+        "expanded_external_nonpayoff_source_candidates_if_current_deck_review_does_not_open_cut_source",
+        "same_lane_value_safe_pair_before_candidate_copy",
+        "card_level_trace_or_equal_gate_before_promotion"
+      ],
+      "reviewed_seed_cards": [
+        "Grim Tutor",
+        "Open the Armory",
+        "Steelshaper's Gift",
+        "Stoneforge Mystic"
+      ],
+      "status": "seed_exhaustion_role_needs_broader_external_seed_research",
+      "target_cut_role": "tutors_access",
+      "value_safe_reclassification_allowed": false
+    }
+  ],
+  "source_db_mutated": false,
+  "status": "external_nonpayoff_seed_exhaustion_recovery_routes_to_source_expansion",
+  "summary": {
+    "candidate_copy_blocker_count": 3,
+    "commander": "Kaalia of the Vast",
+    "current_deck_negative_review_candidate_count": 0,
+    "deck_id": "619",
+    "force_access_selected_db_absent_count": 10,
+    "held_package_pair_required_count": 0,
+    "identity_resolution_required_count": 0,
+    "next_gate": "expand_external_nonpayoff_source_candidate_pool",
+    "prior_blocked_recycled_seeded_cut_source_count": 47,
+    "prior_fresh_seeded_same_lane_cut_source_count": 0,
+    "review_status_counts": {
+      "new_external_source_local_review_ready_for_seeded_miner": 19
+    },
+    "role_status_counts": {
+      "seed_exhaustion_role_needs_broader_external_seed_research": 3
+    },
+    "seeded_exhausted_role_count": 3,
+    "target_role_count": 3,
+    "unseeded_role_count": 0
+  },
+  "value_safe_reclassification_allowed_now": false
+}

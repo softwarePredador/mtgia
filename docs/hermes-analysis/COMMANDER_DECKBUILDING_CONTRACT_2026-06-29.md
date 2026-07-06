@@ -454,7 +454,15 @@ Operational priority after this pivot:
     to broader external nonpayoff seed research or current-deck negative review
     before any deck action; its immediate next gate is
     `rerun_seeded_cut_source_miner_with_new_reviewed_external_nonpayoff_sources`;
-61. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
+61. run `global_commander_external_nonpayoff_source_candidate_pool_expander.py`
+    when the post-review seeded miner and seed-exhaustion router route to source
+    expansion; it must use current external source snapshots, local DB identity,
+    current-deck presence, prior seed recycling checks, Commander legality,
+    and role-text evidence to broaden the candidate pool without reusing
+    exhausted cards. It may create review-ready source candidates only; it must
+    keep card-level cut permission, candidate copy, battle, promotion, and
+    value-safe reclassification closed;
+62. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
     probes, as regression evidence only unless they produce a named safe cut and
     equal-gate proof under the Lorehold promotion gate.
 
@@ -534,6 +542,8 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_new_source_or_replacement_finder_20260706_kaalia_value_safe_stage1_repair_scope1.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_new_source_candidate_reviewer_20260706_kaalia_value_safe_stage1_repair_scope1.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_reviewed_external_nonpayoff_seeded_cut_source_miner_20260706_kaalia_value_safe_stage1_repair_scope1_new_sources.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_seed_exhaustion_recovery_router_20260706_kaalia_value_safe_stage1_repair_scope1_new_sources.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_source_candidate_pool_expander_20260706_kaalia_value_safe_stage1_repair_scope1_new_sources.md`
 
 Historical candidate-copy, battle-probe, battle-feedback, and package-chain
 snapshots are local ignored evidence artifacts. The surface auditor must show
@@ -1215,6 +1225,25 @@ Current external refresh on 2026-07-05:
   copy, battle, promotion, and value-safe reclassification remain closed. The
   next gate is
   `expand_external_nonpayoff_seed_research_or_collect_current_deck_negative_review_before_candidate_copy`.
+- The seed-exhaustion router rerun against the new reviewed-source miner returns
+  `external_nonpayoff_seed_exhaustion_recovery_routes_to_source_expansion`
+  with `target_role_count=3`, `seeded_exhausted_role_count=3`,
+  `unseeded_role_count=0`, `current_deck_negative_review_candidate_count=0`,
+  `identity_resolution_required_count=0`,
+  `prior_fresh_seeded_same_lane_cut_source_count=0`, and
+  `prior_blocked_recycled_seeded_cut_source_count=47`. The next gate is
+  `expand_external_nonpayoff_source_candidate_pool`.
+- Current external nonpayoff source-candidate pool expansion returns
+  `external_nonpayoff_source_candidate_pool_expanded_ready_for_local_review`
+  with `expanded_candidate_count=26`,
+  `expanded_ready_for_review_count=22`, and role coverage
+  `haste_protection_silence=8`, `mana_acceleration=8`, and
+  `tutors_access=6`. It blocks `Mana Vault` because it is already in the
+  current evaluation deck and blocks `Mana Crypt`, `Jeweled Lotus`, and
+  `Dockside Extortionist` because current Commander legality marks them banned.
+  The ready rows are source-review candidates only; candidate copy, battle,
+  promotion, and value-safe reclassification remain closed. The next gate is
+  `review_expanded_external_nonpayoff_source_candidates_locally_before_seeded_miner`.
 
 ## Global Commander Rollout - 2026-07-01
 

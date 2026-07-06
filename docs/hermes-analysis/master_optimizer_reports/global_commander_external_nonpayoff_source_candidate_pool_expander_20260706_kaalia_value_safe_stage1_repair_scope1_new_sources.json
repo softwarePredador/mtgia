@@ -1,0 +1,1486 @@
+{
+  "artifact_type": "global_commander_external_nonpayoff_source_candidate_pool_expander",
+  "battle_gate_allowed_now": false,
+  "battle_gate_performed": false,
+  "battle_or_optimization_performed": false,
+  "battle_replay_performed": false,
+  "candidate_copy_allowed_now": false,
+  "candidate_copy_blockers": [
+    "expanded_external_candidates_are_review_seeds_not_cut_permission",
+    "prior_reviewed_seeds_remain_recycled_and_blocked",
+    "current_deck_cards_need_trace_or_negative_review_before_cut_consideration",
+    "banned_cards_are_discarded_before_strategy_review",
+    "candidate_copy_closed_until_seeded_miner_finds_traceable_current_deck_cut_source"
+  ],
+  "card_level_cut_permission_now": false,
+  "deck_action_allowed": false,
+  "expanded_source_candidate_rows": [
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "high-use haste/hexproof equipment not present in the current evaluation deck",
+      "card_level_cut_permission_now": false,
+      "card_name": "Swiftfoot Boots",
+      "cmc": 2.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "haste",
+        "hexproof"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_gate": "review_expanded_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "recycled_from_prior_external_seed": false,
+      "seed_scope": "equipment_haste_protection_seed",
+      "source_card_name": "Swiftfoot Boots",
+      "source_ids": [
+        "edhrec_kaalia_default_2026_07_06"
+      ],
+      "status": "expanded_external_source_candidate_ready_for_local_review",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Artifact \u2014 Equipment",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "instant-speed permanent protection from the default aggregate",
+      "card_level_cut_permission_now": false,
+      "card_name": "Boros Charm",
+      "cmc": 2.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "indestructible",
+        "permanents you control gain indestructible"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_gate": "review_expanded_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "recycled_from_prior_external_seed": false,
+      "seed_scope": "protection_spell_or_haste_seed",
+      "source_card_name": "Boros Charm",
+      "source_ids": [
+        "edhrec_kaalia_default_2026_07_06"
+      ],
+      "status": "expanded_external_source_candidate_ready_for_local_review",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Instant",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "high-power protection spell surfaced as a game-changer/default support card",
+      "card_level_cut_permission_now": false,
+      "card_name": "Teferi's Protection",
+      "cmc": 3.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "phase out",
+        "protection from",
+        "protection from everything",
+        "phased out"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_gate": "review_expanded_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "recycled_from_prior_external_seed": false,
+      "seed_scope": "protection_spell_or_haste_seed",
+      "source_card_name": "Teferi's Protection",
+      "source_ids": [
+        "edhrec_kaalia_default_2026_07_06",
+        "edhrec_kaalia_expensive_2026_07_06"
+      ],
+      "status": "expanded_external_source_candidate_ready_for_local_review",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Instant",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "creature-based repeated protection from the default aggregate",
+      "card_level_cut_permission_now": false,
+      "card_name": "Mother of Runes",
+      "cmc": 1.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "protection from"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_gate": "review_expanded_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "recycled_from_prior_external_seed": false,
+      "seed_scope": "repeatable_creature_protection_seed",
+      "source_card_name": "Mother of Runes",
+      "source_ids": [
+        "edhrec_kaalia_default_2026_07_06"
+      ],
+      "status": "expanded_external_source_candidate_ready_for_local_review",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Creature \u2014 Human Cleric",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "flash indestructible equipment from expensive/indestructible Kaalia aggregates",
+      "card_level_cut_permission_now": false,
+      "card_name": "Mithril Coat",
+      "cmc": 3.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "indestructible"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_gate": "review_expanded_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "recycled_from_prior_external_seed": false,
+      "seed_scope": "equipment_haste_protection_seed",
+      "source_card_name": "Mithril Coat",
+      "source_ids": [
+        "edhrec_kaalia_expensive_2026_07_06"
+      ],
+      "status": "expanded_external_source_candidate_ready_for_local_review",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Legendary Artifact \u2014 Equipment",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "equipment protection/evasion from expensive Kaalia aggregate",
+      "card_level_cut_permission_now": false,
+      "card_name": "Whispersilk Cloak",
+      "cmc": 3.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "shroud",
+        "can't be blocked"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_gate": "review_expanded_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "recycled_from_prior_external_seed": false,
+      "seed_scope": "equipment_haste_protection_seed",
+      "source_card_name": "Whispersilk Cloak",
+      "source_ids": [
+        "edhrec_kaalia_expensive_2026_07_06"
+      ],
+      "status": "expanded_external_source_candidate_ready_for_local_review",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Artifact \u2014 Equipment",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "low-cost resilience enchantment from optimized Kaalia support pool",
+      "card_level_cut_permission_now": false,
+      "card_name": "Kaya's Ghostform",
+      "cmc": 1.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "return that card to the battlefield"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_gate": "review_expanded_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "recycled_from_prior_external_seed": false,
+      "seed_scope": "enchantment_resilience_or_haste_seed",
+      "source_card_name": "Kaya's Ghostform",
+      "source_ids": [
+        "edhrec_kaalia_optimized_2026_07_06"
+      ],
+      "status": "expanded_external_source_candidate_ready_for_local_review",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Enchantment \u2014 Aura",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "haste anthem from expensive Kaalia support pool",
+      "card_level_cut_permission_now": false,
+      "card_name": "Rising of the Day",
+      "cmc": 3.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "haste",
+        "creatures you control have haste"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_gate": "review_expanded_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "recycled_from_prior_external_seed": false,
+      "seed_scope": "enchantment_resilience_or_haste_seed",
+      "source_card_name": "Rising of the Day",
+      "source_ids": [
+        "edhrec_kaalia_expensive_2026_07_06"
+      ],
+      "status": "expanded_external_source_candidate_ready_for_local_review",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Enchantment",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "two-mana mana artifact from default/optimized Kaalia aggregates",
+      "card_level_cut_permission_now": false,
+      "card_name": "Fellwar Stone",
+      "cmc": 2.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "add one mana",
+        "mana of any color",
+        "add one mana of any color"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_gate": "review_expanded_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "recycled_from_prior_external_seed": false,
+      "seed_scope": "mana_rock_seed_curve_pressure_review",
+      "source_card_name": "Fellwar Stone",
+      "source_ids": [
+        "edhrec_kaalia_default_2026_07_06",
+        "edhrec_kaalia_optimized_2026_07_06"
+      ],
+      "status": "expanded_external_source_candidate_ready_for_local_review",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Artifact",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "color-fixing mana artifact from optimized Kaalia aggregate",
+      "card_level_cut_permission_now": false,
+      "card_name": "Chromatic Lantern",
+      "cmc": 3.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "add one mana",
+        "mana of any color",
+        "add one mana of any color"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_gate": "review_expanded_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "recycled_from_prior_external_seed": false,
+      "seed_scope": "color_fixing_rock_seed_curve_pressure_review",
+      "source_card_name": "Chromatic Lantern",
+      "source_ids": [
+        "edhrec_kaalia_optimized_2026_07_06"
+      ],
+      "status": "expanded_external_source_candidate_ready_for_local_review",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Artifact",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "one-shot acceleration from optimized Kaalia aggregate",
+      "card_level_cut_permission_now": false,
+      "card_name": "Lotus Petal",
+      "cmc": 0.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "add one mana",
+        "mana of any color",
+        "add one mana of any color"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_gate": "review_expanded_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "recycled_from_prior_external_seed": false,
+      "seed_scope": "zero_mana_or_conditional_acceleration_seed_bracket_context_required",
+      "source_card_name": "Lotus Petal",
+      "source_ids": [
+        "edhrec_kaalia_optimized_2026_07_06"
+      ],
+      "status": "expanded_external_source_candidate_ready_for_local_review",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Artifact",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "high-power zero-mana acceleration from optimized/expensive Kaalia aggregates",
+      "card_level_cut_permission_now": false,
+      "card_name": "Chrome Mox",
+      "cmc": 0.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "add one mana"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_gate": "review_expanded_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "recycled_from_prior_external_seed": false,
+      "seed_scope": "zero_mana_or_conditional_acceleration_seed_bracket_context_required",
+      "source_card_name": "Chrome Mox",
+      "source_ids": [
+        "edhrec_kaalia_optimized_2026_07_06",
+        "edhrec_kaalia_expensive_2026_07_06"
+      ],
+      "status": "expanded_external_source_candidate_ready_for_local_review",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Artifact",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "high-power zero-mana acceleration from optimized/expensive Kaalia aggregates",
+      "card_level_cut_permission_now": false,
+      "card_name": "Mox Diamond",
+      "cmc": 0.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "add one mana",
+        "mana of any color",
+        "add one mana of any color"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_gate": "review_expanded_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "recycled_from_prior_external_seed": false,
+      "seed_scope": "zero_mana_or_conditional_acceleration_seed_bracket_context_required",
+      "source_card_name": "Mox Diamond",
+      "source_ids": [
+        "edhrec_kaalia_optimized_2026_07_06",
+        "edhrec_kaalia_expensive_2026_07_06"
+      ],
+      "status": "expanded_external_source_candidate_ready_for_local_review",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Artifact",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "conditional zero-mana legendary acceleration from optimized Kaalia aggregate",
+      "card_level_cut_permission_now": false,
+      "card_name": "Mox Amber",
+      "cmc": 0.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "add one mana",
+        "mana of any color",
+        "add one mana of any color"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_gate": "review_expanded_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "recycled_from_prior_external_seed": false,
+      "seed_scope": "zero_mana_or_conditional_acceleration_seed_bracket_context_required",
+      "source_card_name": "Mox Amber",
+      "source_ids": [
+        "edhrec_kaalia_optimized_2026_07_06"
+      ],
+      "status": "expanded_external_source_candidate_ready_for_local_review",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Legendary Artifact",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "two-mana utility rock from optimized Kaalia aggregate",
+      "card_level_cut_permission_now": false,
+      "card_name": "Thought Vessel",
+      "cmc": 2.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "add {",
+        "add {c}"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_gate": "review_expanded_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "recycled_from_prior_external_seed": false,
+      "seed_scope": "mana_rock_seed_curve_pressure_review",
+      "source_card_name": "Thought Vessel",
+      "source_ids": [
+        "edhrec_kaalia_optimized_2026_07_06"
+      ],
+      "status": "expanded_external_source_candidate_ready_for_local_review",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Artifact",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "conditional metalcraft acceleration from optimized Kaalia aggregate",
+      "card_level_cut_permission_now": false,
+      "card_name": "Mox Opal",
+      "cmc": 0.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "add one mana",
+        "mana of any color",
+        "add one mana of any color"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_gate": "review_expanded_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "recycled_from_prior_external_seed": false,
+      "seed_scope": "zero_mana_or_conditional_acceleration_seed_bracket_context_required",
+      "source_card_name": "Mox Opal",
+      "source_ids": [
+        "edhrec_kaalia_optimized_2026_07_06"
+      ],
+      "status": "expanded_external_source_candidate_ready_for_local_review",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Legendary Artifact",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "high-power mana artifact seen in optimized lists but already present in the current evaluation deck",
+      "card_level_cut_permission_now": false,
+      "card_name": "Mana Vault",
+      "cmc": 1.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": true,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "add {",
+        "add {c}"
+      ],
+      "miner_source_seed_allowed": false,
+      "next_gate": "target_deck_trace_or_negative_review_before_cut_consideration",
+      "recycled_from_prior_external_seed": false,
+      "seed_scope": "blocked_not_a_seed",
+      "source_card_name": "Mana Vault",
+      "source_ids": [
+        "edhrec_kaalia_optimized_2026_07_06"
+      ],
+      "status": "expanded_source_candidate_already_in_current_deck_blocked",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Artifact",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "historical high-power acceleration that must be rejected by current Commander legality",
+      "card_level_cut_permission_now": false,
+      "card_name": "Mana Crypt",
+      "cmc": 0.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "banned",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "add {",
+        "add {c}"
+      ],
+      "miner_source_seed_allowed": false,
+      "next_gate": "discard_banned_candidate",
+      "recycled_from_prior_external_seed": false,
+      "seed_scope": "blocked_not_a_seed",
+      "source_card_name": "Mana Crypt",
+      "source_ids": [
+        "wizards_commander_bans_2024_09_23",
+        "mtgcommander_current_banned_list_2026_07_06"
+      ],
+      "status": "expanded_source_candidate_blocks_commander_banned",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Artifact",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "historical commander-specific acceleration that must be rejected by current Commander legality",
+      "card_level_cut_permission_now": false,
+      "card_name": "Jeweled Lotus",
+      "cmc": null,
+      "commander_identity_legal": false,
+      "commander_legality_status": "banned",
+      "current_deck_present": false,
+      "local_identity_found": false,
+      "local_role_evidence_terms": [],
+      "miner_source_seed_allowed": false,
+      "next_gate": "discard_banned_candidate",
+      "recycled_from_prior_external_seed": false,
+      "seed_scope": "blocked_not_a_seed",
+      "source_card_name": "Jeweled Lotus",
+      "source_ids": [
+        "wizards_commander_bans_2024_09_23",
+        "mtgcommander_current_banned_list_2026_07_06"
+      ],
+      "status": "expanded_source_candidate_blocks_commander_banned",
+      "target_cut_role": "mana_acceleration",
+      "type_line": null,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "historical treasure acceleration that must be rejected by current Commander legality",
+      "card_level_cut_permission_now": false,
+      "card_name": "Dockside Extortionist",
+      "cmc": null,
+      "commander_identity_legal": false,
+      "commander_legality_status": "banned",
+      "current_deck_present": false,
+      "local_identity_found": false,
+      "local_role_evidence_terms": [],
+      "miner_source_seed_allowed": false,
+      "next_gate": "discard_banned_candidate",
+      "recycled_from_prior_external_seed": false,
+      "seed_scope": "blocked_not_a_seed",
+      "source_card_name": "Dockside Extortionist",
+      "source_ids": [
+        "wizards_commander_bans_2024_09_23",
+        "mtgcommander_current_banned_list_2026_07_06"
+      ],
+      "status": "expanded_source_candidate_blocks_commander_banned",
+      "target_cut_role": "mana_acceleration",
+      "type_line": null,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "artifact tutor/access card from expensive Kaalia aggregate",
+      "card_level_cut_permission_now": false,
+      "card_name": "Wishclaw Talisman",
+      "cmc": 2.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "search your library",
+        "put it into your hand",
+        "search your library for a card"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_gate": "review_expanded_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "recycled_from_prior_external_seed": false,
+      "seed_scope": "high_power_generic_tutor_seed_bracket_context_required",
+      "source_card_name": "Wishclaw Talisman",
+      "source_ids": [
+        "edhrec_kaalia_expensive_2026_07_06"
+      ],
+      "status": "expanded_external_source_candidate_ready_for_local_review",
+      "target_cut_role": "tutors_access",
+      "type_line": "Artifact",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "red high-power tutor surfaced in optimized/stax Kaalia aggregates",
+      "card_level_cut_permission_now": false,
+      "card_name": "Gamble",
+      "cmc": 1.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "search your library",
+        "search your library for a card",
+        "put that card into your hand"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_gate": "review_expanded_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "recycled_from_prior_external_seed": false,
+      "seed_scope": "high_power_generic_tutor_seed_bracket_context_required",
+      "source_card_name": "Gamble",
+      "source_ids": [
+        "edhrec_kaalia_optimized_2026_07_06"
+      ],
+      "status": "expanded_external_source_candidate_ready_for_local_review",
+      "target_cut_role": "tutors_access",
+      "type_line": "Sorcery",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "high-power topdeck tutor from expensive optimized Kaalia aggregate",
+      "card_level_cut_permission_now": false,
+      "card_name": "Imperial Seal",
+      "cmc": 1.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "search your library",
+        "search your library for a card"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_gate": "review_expanded_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "recycled_from_prior_external_seed": false,
+      "seed_scope": "high_power_generic_tutor_seed_bracket_context_required",
+      "source_card_name": "Imperial Seal",
+      "source_ids": [
+        "edhrec_kaalia_expensive_2026_07_06"
+      ],
+      "status": "expanded_external_source_candidate_ready_for_local_review",
+      "target_cut_role": "tutors_access",
+      "type_line": "Sorcery",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "narrow creature tutor that can access selected low-power support creatures",
+      "card_level_cut_permission_now": false,
+      "card_name": "Imperial Recruiter",
+      "cmc": 3.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "search your library",
+        "reveal it",
+        "put it into your hand",
+        "search your library for a creature card"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_gate": "review_expanded_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "recycled_from_prior_external_seed": false,
+      "seed_scope": "narrow_creature_tutor_seed_package_target_required",
+      "source_card_name": "Imperial Recruiter",
+      "source_ids": [
+        "edhrec_kaalia_optimized_2026_07_06"
+      ],
+      "status": "expanded_external_source_candidate_ready_for_local_review",
+      "target_cut_role": "tutors_access",
+      "type_line": "Creature \u2014 Human Advisor",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "narrow creature tutor that can access selected low-toughness support creatures",
+      "card_level_cut_permission_now": false,
+      "card_name": "Recruiter of the Guard",
+      "cmc": 3.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "search your library",
+        "reveal it",
+        "put it into your hand",
+        "search your library for a creature card"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_gate": "review_expanded_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "recycled_from_prior_external_seed": false,
+      "seed_scope": "narrow_creature_tutor_seed_package_target_required",
+      "source_card_name": "Recruiter of the Guard",
+      "source_ids": [
+        "edhrec_kaalia_optimized_2026_07_06"
+      ],
+      "status": "expanded_external_source_candidate_ready_for_local_review",
+      "target_cut_role": "tutors_access",
+      "type_line": "Creature \u2014 Human Soldier",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "conditional tutor from optimized Kaalia sorcery pool",
+      "card_level_cut_permission_now": false,
+      "card_name": "Demonic Counsel",
+      "cmc": 2.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "search your library",
+        "reveal it",
+        "put it into your hand"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_gate": "review_expanded_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "recycled_from_prior_external_seed": false,
+      "seed_scope": "conditional_tutor_seed_context_required",
+      "source_card_name": "Demonic Counsel",
+      "source_ids": [
+        "edhrec_kaalia_optimized_2026_07_06"
+      ],
+      "status": "expanded_external_source_candidate_ready_for_local_review",
+      "target_cut_role": "tutors_access",
+      "type_line": "Sorcery",
+      "value_safe_reclassification_allowed": false
+    }
+  ],
+  "generated_at": "2026-07-06T02:27:17.502379+00:00",
+  "input_artifacts": {
+    "previous_finder_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_new_source_or_replacement_finder_20260706_kaalia_value_safe_stage1_repair_scope1.json",
+    "previous_reviewer_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_new_source_candidate_reviewer_20260706_kaalia_value_safe_stage1_repair_scope1.json",
+    "recovery_router_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_seed_exhaustion_recovery_router_20260706_kaalia_value_safe_stage1_repair_scope1_new_sources.json",
+    "selected_db": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_copy_materializer_20260705_kaalia_value_safe_stage1_repair_scope1_candidate/knowledge_candidate.db"
+  },
+  "mutation_allowed": false,
+  "policy": {
+    "deck_boundary": "Cards already present in the current deck cannot be used as fresh source seeds.",
+    "expansion_boundary": "External pool expansion only creates reviewed-source candidates for a later local review gate.",
+    "legality_boundary": "Current Commander banned cards are discarded even if they appear in historical/high-power context.",
+    "mutation_boundary": "This expander does not copy decks, mutate DBs, run battles, reclassify cuts, or promote packages.",
+    "recycling_boundary": "Candidates already reviewed or found in the prior seed pool are blocked, not reused."
+  },
+  "postgres_writes": false,
+  "promotion_allowed": false,
+  "ready_expanded_source_candidate_rows": [
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "high-use haste/hexproof equipment not present in the current evaluation deck",
+      "card_level_cut_permission_now": false,
+      "card_name": "Swiftfoot Boots",
+      "cmc": 2.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "haste",
+        "hexproof"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_gate": "review_expanded_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "recycled_from_prior_external_seed": false,
+      "seed_scope": "equipment_haste_protection_seed",
+      "source_card_name": "Swiftfoot Boots",
+      "source_ids": [
+        "edhrec_kaalia_default_2026_07_06"
+      ],
+      "status": "expanded_external_source_candidate_ready_for_local_review",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Artifact \u2014 Equipment",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "instant-speed permanent protection from the default aggregate",
+      "card_level_cut_permission_now": false,
+      "card_name": "Boros Charm",
+      "cmc": 2.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "indestructible",
+        "permanents you control gain indestructible"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_gate": "review_expanded_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "recycled_from_prior_external_seed": false,
+      "seed_scope": "protection_spell_or_haste_seed",
+      "source_card_name": "Boros Charm",
+      "source_ids": [
+        "edhrec_kaalia_default_2026_07_06"
+      ],
+      "status": "expanded_external_source_candidate_ready_for_local_review",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Instant",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "high-power protection spell surfaced as a game-changer/default support card",
+      "card_level_cut_permission_now": false,
+      "card_name": "Teferi's Protection",
+      "cmc": 3.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "phase out",
+        "protection from",
+        "protection from everything",
+        "phased out"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_gate": "review_expanded_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "recycled_from_prior_external_seed": false,
+      "seed_scope": "protection_spell_or_haste_seed",
+      "source_card_name": "Teferi's Protection",
+      "source_ids": [
+        "edhrec_kaalia_default_2026_07_06",
+        "edhrec_kaalia_expensive_2026_07_06"
+      ],
+      "status": "expanded_external_source_candidate_ready_for_local_review",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Instant",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "creature-based repeated protection from the default aggregate",
+      "card_level_cut_permission_now": false,
+      "card_name": "Mother of Runes",
+      "cmc": 1.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "protection from"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_gate": "review_expanded_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "recycled_from_prior_external_seed": false,
+      "seed_scope": "repeatable_creature_protection_seed",
+      "source_card_name": "Mother of Runes",
+      "source_ids": [
+        "edhrec_kaalia_default_2026_07_06"
+      ],
+      "status": "expanded_external_source_candidate_ready_for_local_review",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Creature \u2014 Human Cleric",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "flash indestructible equipment from expensive/indestructible Kaalia aggregates",
+      "card_level_cut_permission_now": false,
+      "card_name": "Mithril Coat",
+      "cmc": 3.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "indestructible"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_gate": "review_expanded_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "recycled_from_prior_external_seed": false,
+      "seed_scope": "equipment_haste_protection_seed",
+      "source_card_name": "Mithril Coat",
+      "source_ids": [
+        "edhrec_kaalia_expensive_2026_07_06"
+      ],
+      "status": "expanded_external_source_candidate_ready_for_local_review",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Legendary Artifact \u2014 Equipment",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "equipment protection/evasion from expensive Kaalia aggregate",
+      "card_level_cut_permission_now": false,
+      "card_name": "Whispersilk Cloak",
+      "cmc": 3.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "shroud",
+        "can't be blocked"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_gate": "review_expanded_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "recycled_from_prior_external_seed": false,
+      "seed_scope": "equipment_haste_protection_seed",
+      "source_card_name": "Whispersilk Cloak",
+      "source_ids": [
+        "edhrec_kaalia_expensive_2026_07_06"
+      ],
+      "status": "expanded_external_source_candidate_ready_for_local_review",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Artifact \u2014 Equipment",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "low-cost resilience enchantment from optimized Kaalia support pool",
+      "card_level_cut_permission_now": false,
+      "card_name": "Kaya's Ghostform",
+      "cmc": 1.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "return that card to the battlefield"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_gate": "review_expanded_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "recycled_from_prior_external_seed": false,
+      "seed_scope": "enchantment_resilience_or_haste_seed",
+      "source_card_name": "Kaya's Ghostform",
+      "source_ids": [
+        "edhrec_kaalia_optimized_2026_07_06"
+      ],
+      "status": "expanded_external_source_candidate_ready_for_local_review",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Enchantment \u2014 Aura",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "haste anthem from expensive Kaalia support pool",
+      "card_level_cut_permission_now": false,
+      "card_name": "Rising of the Day",
+      "cmc": 3.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "haste",
+        "creatures you control have haste"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_gate": "review_expanded_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "recycled_from_prior_external_seed": false,
+      "seed_scope": "enchantment_resilience_or_haste_seed",
+      "source_card_name": "Rising of the Day",
+      "source_ids": [
+        "edhrec_kaalia_expensive_2026_07_06"
+      ],
+      "status": "expanded_external_source_candidate_ready_for_local_review",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Enchantment",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "two-mana mana artifact from default/optimized Kaalia aggregates",
+      "card_level_cut_permission_now": false,
+      "card_name": "Fellwar Stone",
+      "cmc": 2.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "add one mana",
+        "mana of any color",
+        "add one mana of any color"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_gate": "review_expanded_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "recycled_from_prior_external_seed": false,
+      "seed_scope": "mana_rock_seed_curve_pressure_review",
+      "source_card_name": "Fellwar Stone",
+      "source_ids": [
+        "edhrec_kaalia_default_2026_07_06",
+        "edhrec_kaalia_optimized_2026_07_06"
+      ],
+      "status": "expanded_external_source_candidate_ready_for_local_review",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Artifact",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "color-fixing mana artifact from optimized Kaalia aggregate",
+      "card_level_cut_permission_now": false,
+      "card_name": "Chromatic Lantern",
+      "cmc": 3.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "add one mana",
+        "mana of any color",
+        "add one mana of any color"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_gate": "review_expanded_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "recycled_from_prior_external_seed": false,
+      "seed_scope": "color_fixing_rock_seed_curve_pressure_review",
+      "source_card_name": "Chromatic Lantern",
+      "source_ids": [
+        "edhrec_kaalia_optimized_2026_07_06"
+      ],
+      "status": "expanded_external_source_candidate_ready_for_local_review",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Artifact",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "one-shot acceleration from optimized Kaalia aggregate",
+      "card_level_cut_permission_now": false,
+      "card_name": "Lotus Petal",
+      "cmc": 0.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "add one mana",
+        "mana of any color",
+        "add one mana of any color"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_gate": "review_expanded_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "recycled_from_prior_external_seed": false,
+      "seed_scope": "zero_mana_or_conditional_acceleration_seed_bracket_context_required",
+      "source_card_name": "Lotus Petal",
+      "source_ids": [
+        "edhrec_kaalia_optimized_2026_07_06"
+      ],
+      "status": "expanded_external_source_candidate_ready_for_local_review",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Artifact",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "high-power zero-mana acceleration from optimized/expensive Kaalia aggregates",
+      "card_level_cut_permission_now": false,
+      "card_name": "Chrome Mox",
+      "cmc": 0.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "add one mana"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_gate": "review_expanded_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "recycled_from_prior_external_seed": false,
+      "seed_scope": "zero_mana_or_conditional_acceleration_seed_bracket_context_required",
+      "source_card_name": "Chrome Mox",
+      "source_ids": [
+        "edhrec_kaalia_optimized_2026_07_06",
+        "edhrec_kaalia_expensive_2026_07_06"
+      ],
+      "status": "expanded_external_source_candidate_ready_for_local_review",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Artifact",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "high-power zero-mana acceleration from optimized/expensive Kaalia aggregates",
+      "card_level_cut_permission_now": false,
+      "card_name": "Mox Diamond",
+      "cmc": 0.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "add one mana",
+        "mana of any color",
+        "add one mana of any color"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_gate": "review_expanded_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "recycled_from_prior_external_seed": false,
+      "seed_scope": "zero_mana_or_conditional_acceleration_seed_bracket_context_required",
+      "source_card_name": "Mox Diamond",
+      "source_ids": [
+        "edhrec_kaalia_optimized_2026_07_06",
+        "edhrec_kaalia_expensive_2026_07_06"
+      ],
+      "status": "expanded_external_source_candidate_ready_for_local_review",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Artifact",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "conditional zero-mana legendary acceleration from optimized Kaalia aggregate",
+      "card_level_cut_permission_now": false,
+      "card_name": "Mox Amber",
+      "cmc": 0.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "add one mana",
+        "mana of any color",
+        "add one mana of any color"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_gate": "review_expanded_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "recycled_from_prior_external_seed": false,
+      "seed_scope": "zero_mana_or_conditional_acceleration_seed_bracket_context_required",
+      "source_card_name": "Mox Amber",
+      "source_ids": [
+        "edhrec_kaalia_optimized_2026_07_06"
+      ],
+      "status": "expanded_external_source_candidate_ready_for_local_review",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Legendary Artifact",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "two-mana utility rock from optimized Kaalia aggregate",
+      "card_level_cut_permission_now": false,
+      "card_name": "Thought Vessel",
+      "cmc": 2.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "add {",
+        "add {c}"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_gate": "review_expanded_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "recycled_from_prior_external_seed": false,
+      "seed_scope": "mana_rock_seed_curve_pressure_review",
+      "source_card_name": "Thought Vessel",
+      "source_ids": [
+        "edhrec_kaalia_optimized_2026_07_06"
+      ],
+      "status": "expanded_external_source_candidate_ready_for_local_review",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Artifact",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "conditional metalcraft acceleration from optimized Kaalia aggregate",
+      "card_level_cut_permission_now": false,
+      "card_name": "Mox Opal",
+      "cmc": 0.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "add one mana",
+        "mana of any color",
+        "add one mana of any color"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_gate": "review_expanded_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "recycled_from_prior_external_seed": false,
+      "seed_scope": "zero_mana_or_conditional_acceleration_seed_bracket_context_required",
+      "source_card_name": "Mox Opal",
+      "source_ids": [
+        "edhrec_kaalia_optimized_2026_07_06"
+      ],
+      "status": "expanded_external_source_candidate_ready_for_local_review",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Legendary Artifact",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "artifact tutor/access card from expensive Kaalia aggregate",
+      "card_level_cut_permission_now": false,
+      "card_name": "Wishclaw Talisman",
+      "cmc": 2.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "search your library",
+        "put it into your hand",
+        "search your library for a card"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_gate": "review_expanded_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "recycled_from_prior_external_seed": false,
+      "seed_scope": "high_power_generic_tutor_seed_bracket_context_required",
+      "source_card_name": "Wishclaw Talisman",
+      "source_ids": [
+        "edhrec_kaalia_expensive_2026_07_06"
+      ],
+      "status": "expanded_external_source_candidate_ready_for_local_review",
+      "target_cut_role": "tutors_access",
+      "type_line": "Artifact",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "red high-power tutor surfaced in optimized/stax Kaalia aggregates",
+      "card_level_cut_permission_now": false,
+      "card_name": "Gamble",
+      "cmc": 1.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "search your library",
+        "search your library for a card",
+        "put that card into your hand"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_gate": "review_expanded_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "recycled_from_prior_external_seed": false,
+      "seed_scope": "high_power_generic_tutor_seed_bracket_context_required",
+      "source_card_name": "Gamble",
+      "source_ids": [
+        "edhrec_kaalia_optimized_2026_07_06"
+      ],
+      "status": "expanded_external_source_candidate_ready_for_local_review",
+      "target_cut_role": "tutors_access",
+      "type_line": "Sorcery",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "high-power topdeck tutor from expensive optimized Kaalia aggregate",
+      "card_level_cut_permission_now": false,
+      "card_name": "Imperial Seal",
+      "cmc": 1.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "search your library",
+        "search your library for a card"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_gate": "review_expanded_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "recycled_from_prior_external_seed": false,
+      "seed_scope": "high_power_generic_tutor_seed_bracket_context_required",
+      "source_card_name": "Imperial Seal",
+      "source_ids": [
+        "edhrec_kaalia_expensive_2026_07_06"
+      ],
+      "status": "expanded_external_source_candidate_ready_for_local_review",
+      "target_cut_role": "tutors_access",
+      "type_line": "Sorcery",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "narrow creature tutor that can access selected low-power support creatures",
+      "card_level_cut_permission_now": false,
+      "card_name": "Imperial Recruiter",
+      "cmc": 3.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "search your library",
+        "reveal it",
+        "put it into your hand",
+        "search your library for a creature card"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_gate": "review_expanded_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "recycled_from_prior_external_seed": false,
+      "seed_scope": "narrow_creature_tutor_seed_package_target_required",
+      "source_card_name": "Imperial Recruiter",
+      "source_ids": [
+        "edhrec_kaalia_optimized_2026_07_06"
+      ],
+      "status": "expanded_external_source_candidate_ready_for_local_review",
+      "target_cut_role": "tutors_access",
+      "type_line": "Creature \u2014 Human Advisor",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "narrow creature tutor that can access selected low-toughness support creatures",
+      "card_level_cut_permission_now": false,
+      "card_name": "Recruiter of the Guard",
+      "cmc": 3.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "search your library",
+        "reveal it",
+        "put it into your hand",
+        "search your library for a creature card"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_gate": "review_expanded_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "recycled_from_prior_external_seed": false,
+      "seed_scope": "narrow_creature_tutor_seed_package_target_required",
+      "source_card_name": "Recruiter of the Guard",
+      "source_ids": [
+        "edhrec_kaalia_optimized_2026_07_06"
+      ],
+      "status": "expanded_external_source_candidate_ready_for_local_review",
+      "target_cut_role": "tutors_access",
+      "type_line": "Creature \u2014 Human Soldier",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "conditional tutor from optimized Kaalia sorcery pool",
+      "card_level_cut_permission_now": false,
+      "card_name": "Demonic Counsel",
+      "cmc": 2.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "search your library",
+        "reveal it",
+        "put it into your hand"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_gate": "review_expanded_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+      "recycled_from_prior_external_seed": false,
+      "seed_scope": "conditional_tutor_seed_context_required",
+      "source_card_name": "Demonic Counsel",
+      "source_ids": [
+        "edhrec_kaalia_optimized_2026_07_06"
+      ],
+      "status": "expanded_external_source_candidate_ready_for_local_review",
+      "target_cut_role": "tutors_access",
+      "type_line": "Sorcery",
+      "value_safe_reclassification_allowed": false
+    }
+  ],
+  "source_db_mutated": false,
+  "source_snapshots": [
+    {
+      "guardrail": "aggregate popularity is a source lane only and cannot override local deck trace evidence",
+      "observed_on": "2026-07-06",
+      "signal": "Default Kaalia aggregate highlights Swiftfoot Boots, Boros Charm, Teferi's Protection, Mother of Runes, and Fellwar Stone among high-usage support cards.",
+      "source_id": "edhrec_kaalia_default_2026_07_06",
+      "source_type": "commander_aggregate_card_page",
+      "url": "https://edhrec.com/commanders/kaalia-of-the-vast"
+    },
+    {
+      "guardrail": "optimized/high-power presence requires bracket and game-changer context before any add approval",
+      "observed_on": "2026-07-06",
+      "signal": "Optimized Kaalia aggregate broadens mana artifacts to Fellwar Stone, Chromatic Lantern, Lotus Petal, Chrome Mox, Mox Diamond, Mox Amber, Thought Vessel, and Mox Opal.",
+      "source_id": "edhrec_kaalia_optimized_2026_07_06",
+      "source_type": "commander_optimized_card_page",
+      "url": "https://edhrec.com/commanders/kaalia-of-the-vast/optimized"
+    },
+    {
+      "guardrail": "expensive-meta presence is not affordability, cut, or candidate-copy permission",
+      "observed_on": "2026-07-06",
+      "signal": "Expensive Kaalia aggregate surfaces Mithril Coat, Wishclaw Talisman, and Whispersilk Cloak as additional support/access candidates.",
+      "source_id": "edhrec_kaalia_expensive_2026_07_06",
+      "source_type": "commander_expensive_card_page",
+      "url": "https://edhrec.com/commanders/kaalia-of-the-vast/expensive"
+    },
+    {
+      "guardrail": "banned cards are blockers, not candidate seeds",
+      "observed_on": "2026-07-06",
+      "signal": "Dockside Extortionist, Jeweled Lotus, Mana Crypt, and Nadu were banned in Commander effective September 23, 2024.",
+      "source_id": "wizards_commander_bans_2024_09_23",
+      "source_type": "official_ban_announcement",
+      "url": "https://magic.wizards.com/en/news/announcements/commander-banned-and-restricted-announcement-september-23-2024"
+    },
+    {
+      "guardrail": "legality is necessary but not strategic proof",
+      "observed_on": "2026-07-06",
+      "signal": "The Commander banned list is the current legality guardrail for candidate expansion.",
+      "source_id": "mtgcommander_current_banned_list_2026_07_06",
+      "source_type": "official_commander_banned_list",
+      "url": "https://mtgcommander.net/index.php/banned-list/"
+    }
+  ],
+  "status": "external_nonpayoff_source_candidate_pool_expanded_ready_for_local_review",
+  "summary": {
+    "candidate_copy_allowed_count": 0,
+    "card_level_cut_permission_count": 0,
+    "commander": "Kaalia of the Vast",
+    "deck_id": "619",
+    "expanded_candidate_count": 26,
+    "expanded_ready_for_review_count": 22,
+    "next_gate": "review_expanded_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+    "prior_router_status": "external_nonpayoff_seed_exhaustion_recovery_routes_to_source_expansion",
+    "ready_count_by_role": {
+      "haste_protection_silence": 8,
+      "mana_acceleration": 8,
+      "tutors_access": 6
+    },
+    "seed_scope_counts": {
+      "color_fixing_rock_seed_curve_pressure_review": 1,
+      "conditional_tutor_seed_context_required": 1,
+      "enchantment_resilience_or_haste_seed": 2,
+      "equipment_haste_protection_seed": 3,
+      "high_power_generic_tutor_seed_bracket_context_required": 3,
+      "mana_rock_seed_curve_pressure_review": 2,
+      "narrow_creature_tutor_seed_package_target_required": 2,
+      "protection_spell_or_haste_seed": 2,
+      "repeatable_creature_protection_seed": 1,
+      "zero_mana_or_conditional_acceleration_seed_bracket_context_required": 5
+    },
+    "status_counts": {
+      "expanded_external_source_candidate_ready_for_local_review": 22,
+      "expanded_source_candidate_already_in_current_deck_blocked": 1,
+      "expanded_source_candidate_blocks_commander_banned": 3
+    }
+  },
+  "value_safe_reclassification_allowed_now": false
+}

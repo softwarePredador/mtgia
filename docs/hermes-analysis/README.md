@@ -798,6 +798,24 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `blocked_new_seeded_cut_source_count=0`. Ou seja: seed coverage melhorou,
     mas ainda nao existe cut-source fresco para abrir copy, battle, promocao ou
     value-safe reclassification.
+    O router dessa exaustao fica em
+    `global_commander_external_nonpayoff_seed_exhaustion_recovery_router_20260706_kaalia_value_safe_stage1_repair_scope1_new_sources.md`.
+    Resultado:
+    `external_nonpayoff_seed_exhaustion_recovery_routes_to_source_expansion`,
+    com `target_role_count=3`, `seeded_exhausted_role_count=3`,
+    `unseeded_role_count=0`, `current_deck_negative_review_candidate_count=0`
+    e `prior_blocked_recycled_seeded_cut_source_count=47`. O expander de pool
+    externo fica em
+    `global_commander_external_nonpayoff_source_candidate_pool_expander_20260706_kaalia_value_safe_stage1_repair_scope1_new_sources.md`.
+    Resultado:
+    `external_nonpayoff_source_candidate_pool_expanded_ready_for_local_review`,
+    com `expanded_candidate_count=26`, `expanded_ready_for_review_count=22`,
+    cobertura `haste_protection_silence=8`, `mana_acceleration=8` e
+    `tutors_access=6`. `Mana Vault` foi bloqueada por ja estar no deck atual;
+    `Mana Crypt`, `Jeweled Lotus` e `Dockside Extortionist` foram bloqueadas
+    por banned/current legality. Nenhuma dessas linhas abre copy, battle,
+    promocao ou value-safe reclassification; o proximo gate e
+    `review_expanded_external_nonpayoff_source_candidates_locally_before_seeded_miner`.
     Observacao operacional: snapshots historicos de candidate-copy, battle-probe,
     battle-feedback e package-chain dependem de artefatos locais ignorados. Se
     faltarem ou forem regenerados sem esses artefatos, a auditoria de superficie

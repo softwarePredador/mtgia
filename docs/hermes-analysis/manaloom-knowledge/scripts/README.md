@@ -315,6 +315,17 @@ If every scanned same-lane cut source is recycled or blocked, the result remains
 and the flow must broaden external nonpayoff seed research or return to
 current-deck negative review before any deck action.
 
+Then rerun `global_commander_external_nonpayoff_seed_exhaustion_recovery_router.py`
+with the new seeded-miner and reviewer reports. If it routes to source
+expansion, run
+`global_commander_external_nonpayoff_source_candidate_pool_expander.py`. The
+expander uses current external snapshots and local DB validation to add
+non-recycled source candidates while blocking current-deck cards, banned cards,
+land-lane candidates, color-identity mismatches, identity gaps, and role-text
+mismatches. Expanded rows are still review candidates only; candidate copy,
+battle, promotion, and value-safe reclassification remain closed until later
+local review, seeded mining, trace, and equal-gate evidence.
+
 ## XMage Authoritative Adaptation
 
 For all-card battle-rule acceleration, use local XMage as the authoritative

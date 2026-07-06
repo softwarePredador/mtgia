@@ -294,6 +294,12 @@ GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_NEW_SOURCE_CANDIDATE_REVIEWER = (
 GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_NEW_SOURCE_CANDIDATE_REVIEWER_TEST = (
     SCRIPT_DIR / "test_global_commander_external_nonpayoff_new_source_candidate_reviewer.py"
 )
+GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_SOURCE_CANDIDATE_POOL_EXPANDER = (
+    SCRIPT_DIR / "global_commander_external_nonpayoff_source_candidate_pool_expander.py"
+)
+GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_SOURCE_CANDIDATE_POOL_EXPANDER_TEST = (
+    SCRIPT_DIR / "test_global_commander_external_nonpayoff_source_candidate_pool_expander.py"
+)
 README = REPO_ROOT / "docs/hermes-analysis/README.md"
 
 CONTRACT_MATRIX_JSON = (
@@ -611,6 +617,14 @@ GLOBAL_COMMANDER_SCOPE1_EXTERNAL_NONPAYOFF_NEW_SOURCE_CANDIDATE_REVIEWER_REPORT 
 GLOBAL_COMMANDER_SCOPE1_REVIEWED_EXTERNAL_NONPAYOFF_SEEDED_CUT_SOURCE_MINER_NEW_SOURCES_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_reviewed_external_nonpayoff_seeded_cut_source_miner_20260706_kaalia_value_safe_stage1_repair_scope1_new_sources.md"
+)
+GLOBAL_COMMANDER_SCOPE1_EXTERNAL_NONPAYOFF_SEED_EXHAUSTION_RECOVERY_ROUTER_NEW_SOURCES_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_seed_exhaustion_recovery_router_20260706_kaalia_value_safe_stage1_repair_scope1_new_sources.md"
+)
+GLOBAL_COMMANDER_SCOPE1_EXTERNAL_NONPAYOFF_SOURCE_CANDIDATE_POOL_EXPANDER_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_source_candidate_pool_expander_20260706_kaalia_value_safe_stage1_repair_scope1_new_sources.md"
 )
 
 REQUIRED_FOCUS_CARDS = {
@@ -1034,6 +1048,10 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_reviewed_external_nonpayoff_seeded_cut_source_miner_20260706_kaalia_value_safe_stage1_repair_scope1_new_sources.md",
                 "reviewed_external_seeded_cut_source_mining_exhausted_current_deck_no_cut_permission",
                 "blocked_recycled_seeded_cut_source_count=47",
+                "global_commander_external_nonpayoff_source_candidate_pool_expander.py",
+                "global_commander_external_nonpayoff_source_candidate_pool_expander_20260706_kaalia_value_safe_stage1_repair_scope1_new_sources.md",
+                "external_nonpayoff_source_candidate_pool_expanded_ready_for_local_review",
+                "review_expanded_external_nonpayoff_source_candidates_locally_before_seeded_miner",
                 "battle_gate_allowed_now",
                 "Path to Exile",
                 "Terminate",
@@ -1390,6 +1408,12 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_reviewed_external_nonpayoff_seeded_cut_source_miner_20260706_kaalia_value_safe_stage1_repair_scope1_new_sources.md",
                 "scanned_seeded_same_lane_source_count=47",
                 "blocked_recycled_seeded_cut_source_count=47",
+                "global_commander_external_nonpayoff_source_candidate_pool_expander_20260706_kaalia_value_safe_stage1_repair_scope1_new_sources.md",
+                "external_nonpayoff_source_candidate_pool_expanded_ready_for_local_review",
+                "expanded_ready_for_review_count=22",
+                "Mana Vault",
+                "Mana Crypt",
+                "review_expanded_external_nonpayoff_source_candidates_locally_before_seeded_miner",
                 "battle_gate_allowed_now=false",
                 "Path to Exile",
                 "Terminate",
@@ -2530,6 +2554,37 @@ def build_audit() -> dict[str, Any]:
                 "new_external_source_candidates_reviewed_seed_ready_no_deck_action",
                 "new_external_source_local_review_blocks_current_deck",
                 "package_access_limited_seed",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_SOURCE_CANDIDATE_POOL_EXPANDER,
+            [
+                "global_commander_external_nonpayoff_source_candidate_pool_expander",
+                "external_nonpayoff_source_candidate_pool_expanded_ready_for_local_review",
+                "expanded_external_source_candidate_ready_for_local_review",
+                "expanded_source_candidate_recycled_from_prior_seed_blocked",
+                "expanded_source_candidate_already_in_current_deck_blocked",
+                "expanded_source_candidate_blocks_commander_banned",
+                "review_expanded_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+                "wizards_commander_bans_2024_09_23",
+                "candidate_copy_allowed_now",
+                "card_level_cut_permission_now",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_SOURCE_CANDIDATE_POOL_EXPANDER_TEST,
+            [
+                "test_legal_outside_deck_candidate_is_ready_for_review",
+                "test_previous_seed_is_blocked_as_recycled",
+                "test_current_deck_and_banned_candidates_stay_blocked",
+                "Boros Charm",
+                "Swiftfoot Boots",
+                "Mana Crypt",
+                "expanded_source_candidate_blocks_commander_banned",
             ],
         )
     )
@@ -3996,6 +4051,46 @@ def build_audit() -> dict[str, Any]:
                 "candidate_copy_allowed_now: `false`",
                 "reviewed_external_seeds_found_no_fresh_current_deck_cut_source",
                 "expand_external_nonpayoff_seed_research_or_collect_current_deck_negative_review_before_candidate_copy",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SCOPE1_EXTERNAL_NONPAYOFF_SEED_EXHAUSTION_RECOVERY_ROUTER_NEW_SOURCES_REPORT,
+            [
+                "Global Commander External Nonpayoff Seed Exhaustion Recovery Router",
+                "external_nonpayoff_seed_exhaustion_recovery_routes_to_source_expansion",
+                "target_role_count: `3`",
+                "seeded_exhausted_role_count: `3`",
+                "unseeded_role_count: `0`",
+                "current_deck_negative_review_candidate_count: `0`",
+                "prior_fresh_seeded_same_lane_cut_source_count: `0`",
+                "prior_blocked_recycled_seeded_cut_source_count: `47`",
+                "candidate_copy_allowed_now: `false`",
+                "expand_external_nonpayoff_source_candidate_pool",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SCOPE1_EXTERNAL_NONPAYOFF_SOURCE_CANDIDATE_POOL_EXPANDER_REPORT,
+            [
+                "Global Commander External Nonpayoff Source Candidate Pool Expander",
+                "external_nonpayoff_source_candidate_pool_expanded_ready_for_local_review",
+                "expanded_candidate_count: `26`",
+                "expanded_ready_for_review_count: `22`",
+                "candidate_copy_allowed_count: `0`",
+                "card_level_cut_permission_count: `0`",
+                "candidate_copy_allowed_now: `false`",
+                "Swiftfoot Boots",
+                "Boros Charm",
+                "Fellwar Stone",
+                "Wishclaw Talisman",
+                "Mana Vault",
+                "Mana Crypt",
+                "Jeweled Lotus",
+                "Dockside Extortionist",
+                "review_expanded_external_nonpayoff_source_candidates_locally_before_seeded_miner",
             ],
         )
     )
