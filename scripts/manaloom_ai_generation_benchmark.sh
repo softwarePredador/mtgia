@@ -108,16 +108,26 @@ done
 
 jq -s '
   def sorted_times: map(.time_total_ms) | sort;
+  def successful_runs: map(select(.http_code == 200)) | length;
+  def mock_response_count:
+    map(select(.is_mock == true or .generation_mode == "mock_fallback"))
+    | length;
   def percentile($p):
     sorted_times as $values
     | if ($values | length) == 0 then null
       else $values[((($values | length) - 1) * $p / 100) | floor]
       end;
   {
-    status: "ok",
+    status: (
+      if successful_runs == length and mock_response_count == 0
+      then "pass"
+      else "degraded"
+      end
+    ),
     api: "'"$BASE"'",
     runs: length,
-    successful_runs: map(select(.http_code == 200)) | length,
+    successful_runs: successful_runs,
+    mock_response_count: mock_response_count,
     avg_total_ms: ((map(.time_total_ms) | add) / length | round),
     p50_total_ms: percentile(50),
     p95_total_ms: percentile(95),
