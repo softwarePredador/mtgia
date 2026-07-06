@@ -44,6 +44,10 @@ GLOBAL_COMMANDER_CROSS_COMMANDER_ROLE_AXIS_LEARNING_PIVOT = (
 GLOBAL_COMMANDER_CROSS_COMMANDER_ROLE_AXIS_LEARNING_PIVOT_TEST = (
     SCRIPT_DIR / "test_global_commander_cross_commander_role_axis_learning_pivot.py"
 )
+GLOBAL_COMMANDER_ROLE_AXIS_POLICY_BUILDER = SCRIPT_DIR / "global_commander_role_axis_policy_builder.py"
+GLOBAL_COMMANDER_ROLE_AXIS_POLICY_BUILDER_TEST = (
+    SCRIPT_DIR / "test_global_commander_role_axis_policy_builder.py"
+)
 GLOBAL_COMMANDER_CANDIDATE_COPY_MATERIALIZER = SCRIPT_DIR / "global_commander_candidate_copy_materializer.py"
 GLOBAL_COMMANDER_CANDIDATE_COPY_MATERIALIZER_TEST = (
     SCRIPT_DIR / "test_global_commander_candidate_copy_materializer.py"
@@ -397,6 +401,10 @@ GLOBAL_COMMANDER_LEARNING_PRIORITY_REPORT = (
 GLOBAL_COMMANDER_CROSS_COMMANDER_ROLE_AXIS_LEARNING_PIVOT_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_cross_commander_role_axis_learning_pivot_20260706_source_expansion_cycle_current.md"
+)
+GLOBAL_COMMANDER_ROLE_AXIS_POLICY_BUILDER_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_role_axis_policy_builder_20260706_engine_axis_current.md"
 )
 GLOBAL_COMMANDER_CANDIDATE_COPY_MATERIALIZER_REPORT = (
     REPO_ROOT
@@ -1767,6 +1775,29 @@ def build_audit() -> dict[str, Any]:
                 "source_expansion_cycle_requires_global_learning_pivot",
                 "Kaalia Variant",
                 "benchmark_only_excluded_from_action_count",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_ROLE_AXIS_POLICY_BUILDER,
+            [
+                "global_commander_role_axis_policy_builder",
+                "role_axis_policy_blocks_same_deck_source_cycle",
+                "treat_engine_as_capacity_ceiling_not_missing_role",
+                "engine_saturation_policy_must_be_applied_before_more_same_deck_source_expansion",
+                "candidate_copy_allowed_now",
+                "mutation_boundary",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_ROLE_AXIS_POLICY_BUILDER_TEST,
+            [
+                "test_engine_cycle_blocks_same_deck_source_expansion",
+                "apply_engine_axis_policy_to_nonland_cut_model_before_more_same_deck_source_expansion",
+                "treat_engine_as_capacity_ceiling_not_missing_role",
             ],
         )
     )
@@ -3370,6 +3401,21 @@ def build_audit() -> dict[str, Any]:
                 "benchmark_only_excluded_from_action_count: `5`",
                 "build_cross_commander_role_axis_policy_before_more_same_deck_source_expansion",
                 "deck_607_is_benchmark_evidence_only_not_action_source",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_ROLE_AXIS_POLICY_BUILDER_REPORT,
+            [
+                "Global Commander Role Axis Policy Builder",
+                "role_axis_policy_ready_blocks_same_deck_source_cycle",
+                "top_policy_role: `engine`",
+                "top_pressure_class: `ceiling_saturation_axis`",
+                "source_cycle_deck_count: `1`",
+                "candidate_copy_allowed_now: `false`",
+                "apply_engine_axis_policy_to_nonland_cut_model_before_more_same_deck_source_expansion",
+                "treat_engine_as_capacity_ceiling_not_missing_role",
             ],
         )
     )

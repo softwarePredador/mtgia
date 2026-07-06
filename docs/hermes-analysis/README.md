@@ -258,6 +258,18 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     Brackets + Game Changers; o backend agora aceita `1..5` em
     `server/lib/edh_bracket_policy.dart`, mas bracket continua sendo sinal de
     pregame/power e nao prova final de qualidade estrategica.
+    Quando a fila de aprendizado detectar ciclo de expansao no mesmo deck,
+    rode `manaloom-knowledge/scripts/global_commander_cross_commander_role_axis_learning_pivot.py`
+    antes de novas fontes do mesmo deck. Evidencia atual:
+    `master_optimizer_reports/global_commander_cross_commander_role_axis_learning_pivot_20260706_source_expansion_cycle_current.md`.
+    O pivot escolheu `engine` como eixo global superior e excluiu o `607` de
+    contagens acionaveis. Em seguida, rode
+    `manaloom-knowledge/scripts/global_commander_role_axis_policy_builder.py`
+    para transformar o eixo em politica de teto/piso/corte. Evidencia atual:
+    `master_optimizer_reports/global_commander_role_axis_policy_builder_20260706_engine_axis_current.md`.
+    Resultado: `engine` e tratado como pressao de capacidade/teto, nao como
+    lane de adicionar carta; candidate copy, battle e promocao seguem fechados
+    ate aplicar essa politica ao modelo de corte nonland.
     Quando uma hipotese add/cut estiver pronta, rode
     `manaloom-knowledge/scripts/global_commander_candidate_copy_materializer.py`
     para materializar uma unica troca em copia isolada do Hermes SQLite. A
@@ -916,6 +928,11 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     marca `source_cycle_axis_count=4`, exclui `607` de action counts e manda
     construir uma politica de eixo global antes de mais pesquisa source do mesmo
     deck.
+    O builder de politica de eixo fica em
+    `global_commander_role_axis_policy_builder_20260706_engine_axis_current.md`:
+    ele transforma o eixo `engine` em politica de capacidade/teto, mantem
+    candidate copy, battle, mutacao e promocao fechados e roteia para
+    `apply_engine_axis_policy_to_nonland_cut_model_before_more_same_deck_source_expansion`.
     Observacao operacional: snapshots historicos de candidate-copy, battle-probe,
     battle-feedback e package-chain dependem de artefatos locais ignorados. Se
     faltarem ou forem regenerados sem esses artefatos, a auditoria de superficie

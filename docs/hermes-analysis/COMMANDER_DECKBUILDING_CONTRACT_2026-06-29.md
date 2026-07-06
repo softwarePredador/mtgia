@@ -185,6 +185,11 @@ Operational priority after this pivot:
    it must group role floor/excess evidence across commanders, exclude deck
    `607` from actionable counts, and choose a global role axis before any
    further same-deck source expansion, candidate copy, battle, or promotion;
+   then run `global_commander_role_axis_policy_builder.py` to convert the
+   chosen role axis into explicit floor/ceiling/cut-pressure policy, treating
+   above-range `engine` as capacity pressure rather than a missing-role add
+   lane, while keeping same-deck source expansion, candidate copy, battle,
+   mutation, and promotion closed;
 12. run `global_commander_candidate_copy_materializer.py` only after a named
    add/cut pool is ready; it may materialize one hypothesis inside an isolated
    copied Hermes SQLite DB, must prove the source DB hash is unchanged, and
@@ -521,6 +526,7 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_learning_priority_audit_20260706_source_exhaustion_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_learning_priority_audit_20260706_source_expansion_cycle_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_cross_commander_role_axis_learning_pivot_20260706_source_expansion_cycle_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_role_axis_policy_builder_20260706_engine_axis_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_manual_negative_trace_reviewer_20260706_kaalia_value_safe_stage1_live_research.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_followup_live_source_research_expander_20260706_kaalia_value_safe_stage1_after_manual_trace.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_expanded_source_candidate_reviewer_20260706_kaalia_value_safe_stage1_followup_live_after_manual_trace.md`
@@ -1415,6 +1421,11 @@ Current external refresh on 2026-07-05:
   next gate is
   `build_cross_commander_role_axis_policy_before_more_same_deck_source_expansion`;
   candidate copy, battle, and promotion remain closed.
+- The role-axis policy builder now converts the engine axis into explicit
+  capacity/ceiling policy before any new same-deck source expansion. It keeps
+  candidate copy, battle, mutation, and promotion closed and routes the next
+  gate to
+  `apply_engine_axis_policy_to_nonland_cut_model_before_more_same_deck_source_expansion`.
 
 ## Global Commander Rollout - 2026-07-01
 
