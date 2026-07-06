@@ -53,6 +53,12 @@ def matrix_payload(*, blockers: list[str]) -> dict[str, object]:
                 "action": "cut",
                 "card": "Genji Glove",
                 "risk_flags": ["attack_window_or_extra_combat_cut"],
+            },
+            {
+                "action": "cut",
+                "card": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+                "profile_roles": ["mana_rocks_treasure_ramp"],
+                "risk_flags": ["protected_profile_anchor_cut", "mana_acceleration_cut"],
             }
         ],
     }
@@ -143,6 +149,30 @@ class GlobalCommanderProfileBlockerRepairPlanTests(unittest.TestCase):
             report["recommended_repair_sequence"],
         )
         self.assertEqual(report["over_target_review_roles"][0]["role"], "tutors_access")
+
+    def test_protected_profile_anchor_cut_maps_to_restore_or_same_lane_replacement(self) -> None:
+        path = self._report_path(
+            matrix_payload(
+                blockers=[
+                    "protected_profile_anchor_cut:Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+                ]
+            )
+        )
+
+        report = repair.build_report(strategy_matrix_report=path)
+
+        self.assertEqual(report["status"], "profile_blocker_repair_plan_ready")
+        action = report["repair_actions"][0]
+        self.assertEqual(action["repair_axis"], "protected_profile_anchor")
+        self.assertEqual(action["protected_card"], "Birgi, God of Storytelling // Harnfel, Horn of Bounty")
+        self.assertIn("mana_rocks_treasure_ramp", action["affected_profile_roles"])
+        self.assertIn("restore_protected_anchor_to_candidate_package", action["source_lanes"])
+        self.assertIn("same_lane_replacement_proof_for_protected_anchor", action["source_lanes"])
+        self.assertIn(
+            "restore_or_same_lane_replace_protected_anchor:Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+            report["recommended_repair_sequence"],
+        )
+        self.assertFalse(report["battle_gate_allowed_now"])
 
     def test_ready_strategy_matrix_needs_no_repair_and_keeps_battle_gate_signal(self) -> None:
         path = self._report_path(matrix_payload(blockers=[]))

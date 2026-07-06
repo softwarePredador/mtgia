@@ -198,6 +198,15 @@ def attack_window_cut_rows(strategy_matrix: Mapping[str, Any]) -> list[dict[str,
     return rows
 
 
+def package_delta_card_row(strategy_matrix: Mapping[str, Any], card_name: str) -> dict[str, Any]:
+    for row in strategy_matrix.get("package_delta") or []:
+        if not isinstance(row, dict):
+            continue
+        if str(row.get("card") or "") == card_name:
+            return dict(row)
+    return {}
+
+
 def role_repair_action(strategy_matrix: Mapping[str, Any], role: str, target_row: Mapping[str, Any]) -> dict[str, Any]:
     shortfall = max(0, int(target_row.get("min") or 0) - int(target_row.get("candidate_count") or 0))
     return {
@@ -211,6 +220,26 @@ def role_repair_action(strategy_matrix: Mapping[str, Any], role: str, target_row
         "missing_expected_package_cards": missing_expected_cards(strategy_matrix, role),
         "battle_policy": "repair and rerun package strategy matrix before any equal battle probe",
         "cut_policy": "use same-lane or proven excess cuts only; do not cut attack-window, hard-floor, or source-anchor cards",
+    }
+
+
+def protected_anchor_repair_action(strategy_matrix: Mapping[str, Any], blocker: str) -> dict[str, Any]:
+    card_name = blocker.removeprefix("protected_profile_anchor_cut:")
+    delta_row = package_delta_card_row(strategy_matrix, card_name)
+    return {
+        "blocker": blocker,
+        "repair_axis": "protected_profile_anchor",
+        "protected_card": card_name,
+        "affected_profile_roles": [str(role) for role in delta_row.get("profile_roles") or []],
+        "risk_flags": [str(flag) for flag in delta_row.get("risk_flags") or []],
+        "source_lanes": [
+            "restore_protected_anchor_to_candidate_package",
+            "same_lane_replacement_proof_for_protected_anchor",
+            "commander_expected_package_anchor_review",
+        ],
+        "missing_expected_package_cards": [card_name],
+        "battle_policy": "restore the protected anchor or prove a same-lane replacement before rerunning strategy matrix",
+        "cut_policy": "do not materialize, battle, or promote a package that leaves protected commander anchors cut",
     }
 
 
@@ -287,6 +316,13 @@ def repair_sequence(actions: list[dict[str, Any]]) -> list[str]:
         sequence.append("repair_commander_payoff_density_with_legal_source_lanes")
     if "profile_spot_interaction_below_target" in blockers:
         sequence.append("finish_spot_interaction_floor_with_same_lane_cut")
+    protected_anchor_cards = [
+        str(action.get("protected_card"))
+        for action in actions
+        if str(action.get("blocker")).startswith("protected_profile_anchor_cut:")
+    ]
+    for card in protected_anchor_cards:
+        sequence.append(f"restore_or_same_lane_replace_protected_anchor:{card}")
     remaining = [
         str(action.get("repair_axis"))
         for action in actions
@@ -298,6 +334,7 @@ def repair_sequence(actions: list[dict[str, Any]]) -> list[str]:
             "profile_angels_demons_dragons_payoffs_below_target",
             "profile_spot_interaction_below_target",
         }
+        and not str(action.get("blocker")).startswith("protected_profile_anchor_cut:")
     ]
     sequence.extend(f"repair_{role}" for role in remaining)
     if actions:
@@ -331,6 +368,8 @@ def build_report(*, strategy_matrix_report: Path) -> dict[str, Any]:
                 )
         elif blocker == "attack_window_cut_without_replacement":
             actions.append(attack_window_repair_action(strategy_matrix))
+        elif blocker.startswith("protected_profile_anchor_cut:"):
+            actions.append(protected_anchor_repair_action(strategy_matrix, blocker))
         elif blocker == "package_core_floor_not_repaired":
             core_actions = package_core_floor_repair_actions(strategy_matrix, package_chain)
             if core_actions:

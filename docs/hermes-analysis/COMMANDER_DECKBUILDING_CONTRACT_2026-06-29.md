@@ -1733,7 +1733,12 @@ Current external refresh on 2026-07-05:
   Lorehold wants `36-38` lands, plus protected anchor cuts for `Pyromancer's
   Goggles`, `Call Forth the Tempest`, and `Birgi, God of Storytelling //
   Harnfel, Horn of Bounty`. The next gate remains
-  `repair_commander_profile_blockers_before_battle`, not battle.
+  `repair_commander_profile_blockers_before_battle`, not battle. The repair
+  plan for this matrix is now explicit: add `2` lands to meet the Lorehold
+  floor and restore or prove same-lane replacements for the protected anchors
+  `Pyromancer's Goggles`, `Call Forth the Tempest`, and `Birgi, God of
+  Storytelling // Harnfel, Horn of Bounty` before rerunning the package
+  strategy matrix.
   Current evidence:
   `global_commander_learning_priority_audit_20260706_ramp_axis_exhaustion_current.md`,
   `global_commander_cross_commander_role_axis_learning_pivot_20260706_ramp_axis_exhaustion_current.md`,
@@ -1747,7 +1752,9 @@ Current external refresh on 2026-07-05:
   and
   `global_commander_candidate_package_strategy_matrix_20260706_land_floor_deck612_package.md`,
   then
-  `global_commander_candidate_package_strategy_matrix_20260706_land_floor_deck612_package_lorehold_profile.md`.
+  `global_commander_candidate_package_strategy_matrix_20260706_land_floor_deck612_package_lorehold_profile.md`,
+  and
+  `global_commander_profile_blocker_repair_plan_20260706_lorehold_land_floor_package_profile.md`.
 
 ## Global Commander Rollout - 2026-07-01
 
