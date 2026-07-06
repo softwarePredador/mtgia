@@ -25,6 +25,9 @@ void main() {
       expect(deleteRoute, contains('String deckId'));
       expect(deleteRoute, contains('String noteId'));
       expect(deleteRoute, contains('HttpMethod.delete'));
+      expect(service, contains('buildTimeline'));
+      expect(service, contains('diagnostics'));
+      expect(service, contains('next_actions'));
     });
 
     test('shareable reports have authenticated creation and public read route',

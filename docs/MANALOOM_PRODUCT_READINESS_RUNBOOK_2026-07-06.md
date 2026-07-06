@@ -18,7 +18,13 @@
 - Pos-jogo com sync:
   - `GET/POST /decks/:id/post-game-notes`
   - `DELETE /decks/:id/post-game-notes/:noteId`
+  - `GET /decks/:id/post-game-timeline`
   - app Flutter continua offline com `SharedPreferences` e sincroniza quando autenticado.
+- Comunidade e trade:
+  - `GET/POST /community/decks/:id/comments`
+  - `POST /community/decks/:id/reports`
+  - `GET /community/trade-matches`
+  - `GET /community/decks/:id` inclui `visual_analysis` e `comments_summary`.
 - Relatorios publicos:
   - `POST /decks/:id/reports`
   - `GET /reports/:id`

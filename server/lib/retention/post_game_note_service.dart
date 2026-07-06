@@ -76,6 +76,51 @@ class PostGameNoteService {
     return result.map(_rowToJson).toList(growable: false);
   }
 
+  Future<Map<String, dynamic>> buildTimeline({
+    required String userId,
+    required String deckId,
+  }) async {
+    final notes = await listNotes(userId: userId, deckId: deckId);
+    final issueCounts = <String, int>{};
+    final performerCounts = <String, int>{};
+    final reviewCounts = <String, int>{};
+    final weekly = <String, int>{};
+
+    for (final note in notes) {
+      for (final issue in _stringList(note['issues'])) {
+        issueCounts[issue] = (issueCounts[issue] ?? 0) + 1;
+      }
+      for (final card in _stringList(note['performed_well'])) {
+        performerCounts[card] = (performerCounts[card] ?? 0) + 1;
+      }
+      for (final card in _stringList(note['underperformed'])) {
+        reviewCounts[card] = (reviewCounts[card] ?? 0) + 1;
+      }
+      final createdAt = DateTime.tryParse(note['created_at']?.toString() ?? '');
+      if (createdAt != null) {
+        final weekKey = _weekKey(createdAt.toUtc());
+        weekly[weekKey] = (weekly[weekKey] ?? 0) + 1;
+      }
+    }
+
+    final dominantIssues = _top(issueCounts);
+    final reviewCandidates = _top(reviewCounts);
+    return {
+      'deck_id': deckId,
+      'match_count': notes.length,
+      'issue_counts': issueCounts,
+      'dominant_issues': dominantIssues,
+      'top_performers': _top(performerCounts),
+      'review_candidates': reviewCandidates,
+      'weekly_activity': weekly.entries
+          .map((entry) => {'week': entry.key, 'match_count': entry.value})
+          .toList(growable: false),
+      'diagnostics': _diagnostics(dominantIssues, reviewCandidates),
+      'next_actions': _nextActions(dominantIssues, reviewCandidates),
+      'timeline': notes,
+    };
+  }
+
   Future<Map<String, dynamic>> upsertNote({
     required String userId,
     required String deckId,
@@ -214,5 +259,96 @@ class PostGameNoteService {
     } catch (_) {
       return const <String>[];
     }
+  }
+
+  static List<String> _top(Map<String, int> counts) {
+    final entries = counts.entries.toList()
+      ..sort((a, b) {
+        final byCount = b.value.compareTo(a.value);
+        if (byCount != 0) return byCount;
+        return a.key.compareTo(b.key);
+      });
+    return entries.take(5).map((entry) => entry.key).toList(growable: false);
+  }
+
+  static List<Map<String, dynamic>> _diagnostics(
+    List<String> dominantIssues,
+    List<String> reviewCandidates,
+  ) {
+    final diagnostics = <Map<String, dynamic>>[
+      for (final issue in dominantIssues)
+        {
+          'issue': issue,
+          'label': _issueLabel(issue),
+          'message': _issueDiagnostic(issue),
+        },
+      if (reviewCandidates.isNotEmpty)
+        {
+          'issue': 'underperformers',
+          'label': 'Cartas para revisar',
+          'message':
+              'As cartas ${reviewCandidates.take(3).join(', ')} apareceram como baixo desempenho. Revise funcao, curva e alternativas antes do proximo upgrade.',
+        },
+    ];
+    return diagnostics;
+  }
+
+  static List<String> _nextActions(
+    List<String> dominantIssues,
+    List<String> reviewCandidates,
+  ) {
+    final actions = <String>[
+      for (final issue in dominantIssues) _issueAction(issue),
+      if (reviewCandidates.isNotEmpty)
+        'Abrir otimizacao focada preservando o plano principal e substituindo ${reviewCandidates.take(3).join(', ')} somente se houver ganho claro.',
+    ];
+    return actions.toSet().take(6).toList(growable: false);
+  }
+
+  static String _issueLabel(String issue) => switch (issue) {
+        'mana' => 'Mana',
+        'draw' => 'Compra',
+        'removal' => 'Remocao',
+        'win_condition' => 'Win condition',
+        'speed' => 'Velocidade',
+        'protection' => 'Protecao',
+        _ => issue,
+      };
+
+  static String _issueDiagnostic(String issue) => switch (issue) {
+        'mana' =>
+          'O deck esta registrando problema de mana. Priorize base, ramp e curva antes de adicionar novas pecas de valor.',
+        'draw' =>
+          'A partida indicou falta de compra ou selecao. Procure fontes repetiveis e cartas que nao quebrem o plano do comandante.',
+        'removal' =>
+          'A mesa exigiu mais interacao. Compare removals pontuais, wipes e respostas flexiveis por bracket.',
+        'win_condition' =>
+          'O deck gerou jogo mas nao encerrou. Revise finalizadores, redundancia e linhas reais de vitoria.',
+        'speed' =>
+          'O deck pareceu atrasado no ritmo da mesa. Baixe curva ou aumente aceleracao sem sacrificar consistencia.',
+        'protection' =>
+          'Pecas-chave ficaram vulneraveis. Inclua protecao adequada ao bracket e ao tipo de remocao esperado.',
+        _ => 'Sinal recorrente registrado no historico pos-jogo.',
+      };
+
+  static String _issueAction(String issue) => switch (issue) {
+        'mana' => 'Rodar otimizacao por mana/curva antes de trocar payoff.',
+        'draw' =>
+          'Priorizar 2-4 fontes de compra ou selecao no proximo ajuste.',
+        'removal' => 'Comparar pacote de remocao com o nivel da mesa.',
+        'win_condition' =>
+          'Definir finalizadores e redundancia antes do proximo teste.',
+        'speed' => 'Revisar curva inicial e ramp de baixo custo.',
+        'protection' =>
+          'Adicionar protecao para comandante ou motor principal.',
+        _ => 'Revisar notas recentes antes de aplicar upgrade.',
+      };
+
+  static String _weekKey(DateTime date) {
+    final monday = date.subtract(Duration(days: date.weekday - 1));
+    final year = monday.year.toString().padLeft(4, '0');
+    final month = monday.month.toString().padLeft(2, '0');
+    final day = monday.day.toString().padLeft(2, '0');
+    return '$year-$month-$day';
   }
 }

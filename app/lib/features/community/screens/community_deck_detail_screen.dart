@@ -21,14 +21,25 @@ class CommunityDeckDetailScreen extends StatefulWidget {
 
 class _CommunityDeckDetailScreenState extends State<CommunityDeckDetailScreen> {
   Map<String, dynamic>? _deckData;
+  List<CommunityDeckComment> _comments = const <CommunityDeckComment>[];
+  List<CommunityTradeMatch> _tradeMatches = const <CommunityTradeMatch>[];
+  final _commentController = TextEditingController();
   bool _isLoading = true;
   String? _error;
   bool _isCopying = false;
+  bool _isSubmittingComment = false;
+  bool _isReporting = false;
 
   @override
   void initState() {
     super.initState();
     _loadDeck();
+  }
+
+  @override
+  void dispose() {
+    _commentController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadDeck() async {
@@ -37,13 +48,21 @@ class _CommunityDeckDetailScreenState extends State<CommunityDeckDetailScreen> {
       _error = null;
     });
 
-    final data = await context.read<CommunityProvider>().fetchPublicDeckDetails(
-      widget.deckId,
-    );
+    final provider = context.read<CommunityProvider>();
+    final results = await Future.wait<dynamic>([
+      provider.fetchPublicDeckDetails(widget.deckId),
+      provider.fetchDeckComments(widget.deckId),
+      provider.fetchTradeMatches(deckId: widget.deckId),
+    ]);
+    final data = results[0] as Map<String, dynamic>?;
+    final comments = results[1] as List<CommunityDeckComment>;
+    final tradeMatches = results[2] as List<CommunityTradeMatch>;
 
     if (mounted) {
       setState(() {
         _deckData = data;
+        _comments = comments;
+        _tradeMatches = tradeMatches;
         _isLoading = false;
         _error = data == null ? 'Não foi possível carregar o deck' : null;
       });
@@ -75,6 +94,43 @@ class _CommunityDeckDetailScreenState extends State<CommunityDeckDetailScreen> {
         ),
       );
     }
+  }
+
+  Future<void> _submitComment() async {
+    final body = _commentController.text.trim();
+    if (body.length < 3) return;
+    setState(() => _isSubmittingComment = true);
+    final ok = await context.read<CommunityProvider>().addDeckComment(
+      widget.deckId,
+      body,
+    );
+    if (!mounted) return;
+    _commentController.clear();
+    setState(() => _isSubmittingComment = false);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(ok ? 'Comentário publicado.' : 'Falha ao comentar.'),
+        backgroundColor: ok ? AppTheme.success : AppTheme.error,
+      ),
+    );
+    if (ok) await _loadDeck();
+  }
+
+  Future<void> _reportDeck() async {
+    setState(() => _isReporting = true);
+    final ok = await context.read<CommunityProvider>().reportDeck(
+      widget.deckId,
+      reason: 'other',
+      details: 'Denuncia enviada pelo app.',
+    );
+    if (!mounted) return;
+    setState(() => _isReporting = false);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(ok ? 'Denúncia registrada.' : 'Falha ao denunciar.'),
+        backgroundColor: ok ? AppTheme.success : AppTheme.error,
+      ),
+    );
   }
 
   @override
@@ -143,6 +199,8 @@ class _CommunityDeckDetailScreenState extends State<CommunityDeckDetailScreen> {
     final commander = (deck['commander'] as List?) ?? [];
     final mainBoard = (deck['main_board'] as Map<String, dynamic>?) ?? {};
     final stats = (deck['stats'] as Map<String, dynamic>?) ?? {};
+    final visualAnalysis =
+        deck['visual_analysis'] as Map<String, dynamic>? ?? const {};
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -304,6 +362,25 @@ class _CommunityDeckDetailScreenState extends State<CommunityDeckDetailScreen> {
 
           const SizedBox(height: 20),
 
+          _VisualAnalysisPanel(analysis: visualAnalysis),
+
+          if (_tradeMatches.isNotEmpty) ...[
+            const SizedBox(height: 14),
+            _TradeMatchesPanel(matches: _tradeMatches),
+          ],
+
+          const SizedBox(height: 14),
+          _CommunityFeedbackPanel(
+            comments: _comments,
+            controller: _commentController,
+            isSubmitting: _isSubmittingComment,
+            isReporting: _isReporting,
+            onSubmit: _submitComment,
+            onReport: _reportDeck,
+          ),
+
+          const SizedBox(height: 20),
+
           // Commander section
           if (commander.isNotEmpty) ...[
             const Text(
@@ -412,4 +489,266 @@ class _CommunityDeckDetailScreenState extends State<CommunityDeckDetailScreen> {
 
   String _capitalize(String s) =>
       s.isEmpty ? s : '${s[0].toUpperCase()}${s.substring(1)}';
+}
+
+class _VisualAnalysisPanel extends StatelessWidget {
+  const _VisualAnalysisPanel({required this.analysis});
+
+  final Map<String, dynamic> analysis;
+
+  @override
+  Widget build(BuildContext context) {
+    final headline = analysis['headline']?.toString() ?? 'Análise pública';
+    final reading =
+        analysis['reading']?.toString() ??
+        'Análise visual será refinada conforme o deck receber histórico.';
+    final curve = analysis['curve_shape'] as Map<String, dynamic>? ?? const {};
+    final colors = (analysis['color_identity_hint'] as List? ?? const [])
+        .map((entry) => entry.toString())
+        .toList(growable: false);
+
+    return Container(
+      key: const Key('community-deck-visual-analysis'),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceSlate,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        border: Border.all(color: AppTheme.frost400.withValues(alpha: 0.24)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.insights_outlined, color: AppTheme.frost400),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  headline,
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    color: AppTheme.textPrimary,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Text(
+            reading,
+            style: const TextStyle(color: AppTheme.textSecondary, height: 1.35),
+          ),
+          const SizedBox(height: 10),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              _MetricPill(label: 'baixo', value: '${curve['low'] ?? 0}'),
+              _MetricPill(label: 'médio', value: '${curve['mid'] ?? 0}'),
+              _MetricPill(label: 'alto', value: '${curve['high'] ?? 0}'),
+              if (colors.isNotEmpty)
+                _MetricPill(label: 'cores', value: colors.join('')),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TradeMatchesPanel extends StatelessWidget {
+  const _TradeMatchesPanel({required this.matches});
+
+  final List<CommunityTradeMatch> matches;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      key: const Key('community-deck-trade-matches'),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceSlate,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        border: Border.all(color: AppTheme.brass400.withValues(alpha: 0.24)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.swap_horiz_rounded, color: AppTheme.brass400),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  'Matches de cartas faltantes',
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    color: AppTheme.textPrimary,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          ...matches
+              .take(3)
+              .map(
+                (match) => Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: Text(
+                    '${match.cardName} com ${match.ownerName}',
+                    style: const TextStyle(
+                      color: AppTheme.textSecondary,
+                      height: 1.35,
+                    ),
+                  ),
+                ),
+              ),
+          if (matches.length > 3) ...[
+            const SizedBox(height: 8),
+            Text(
+              '+${matches.length - 3} matches adicionais em trade.',
+              style: const TextStyle(color: AppTheme.brass400),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _CommunityFeedbackPanel extends StatelessWidget {
+  const _CommunityFeedbackPanel({
+    required this.comments,
+    required this.controller,
+    required this.isSubmitting,
+    required this.isReporting,
+    required this.onSubmit,
+    required this.onReport,
+  });
+
+  final List<CommunityDeckComment> comments;
+  final TextEditingController controller;
+  final bool isSubmitting;
+  final bool isReporting;
+  final VoidCallback onSubmit;
+  final VoidCallback onReport;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      key: const Key('community-deck-feedback-panel'),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceSlate,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        border: Border.all(color: AppTheme.outlineMuted),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.forum_outlined, color: AppTheme.frost400),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  'Feedback da comunidade',
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    color: AppTheme.textPrimary,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+              IconButton(
+                tooltip: 'Denunciar deck',
+                onPressed: isReporting ? null : onReport,
+                icon:
+                    isReporting
+                        ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                        : const Icon(Icons.flag_outlined),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          TextField(
+            controller: controller,
+            minLines: 1,
+            maxLines: 3,
+            decoration: const InputDecoration(
+              labelText: 'Comentar no deck',
+              hintText: 'Sugira ajuste, risco ou carta para testar.',
+            ),
+          ),
+          const SizedBox(height: 8),
+          Align(
+            alignment: Alignment.centerRight,
+            child: ElevatedButton.icon(
+              onPressed: isSubmitting ? null : onSubmit,
+              icon:
+                  isSubmitting
+                      ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                      : const Icon(Icons.send_outlined),
+              label: const Text('Publicar'),
+            ),
+          ),
+          const SizedBox(height: 10),
+          if (comments.isEmpty)
+            const Text(
+              'Ainda não há comentários neste deck.',
+              style: TextStyle(color: AppTheme.textSecondary),
+            )
+          else
+            ...comments
+                .take(3)
+                .map(
+                  (comment) => Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: Text(
+                      '${comment.authorName ?? 'Jogador'}: ${comment.body}',
+                      style: const TextStyle(
+                        color: AppTheme.textSecondary,
+                        height: 1.35,
+                      ),
+                    ),
+                  ),
+                ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MetricPill extends StatelessWidget {
+  const _MetricPill({required this.label, required this.value});
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+      decoration: BoxDecoration(
+        color: AppTheme.backgroundAbyss.withValues(alpha: 0.36),
+        borderRadius: BorderRadius.circular(AppTheme.radiusPill),
+      ),
+      child: Text(
+        '$value $label',
+        style: const TextStyle(
+          color: AppTheme.textSecondary,
+          fontSize: AppTheme.fontSm,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
+    );
+  }
 }

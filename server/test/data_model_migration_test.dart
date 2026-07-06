@@ -196,5 +196,30 @@ void main() {
       expect(down, contains('drop table if exists shared_deck_reports'));
       expect(down, contains('drop table if exists post_game_notes'));
     });
+
+    test('migration 031 persists community engagement and moderation tables',
+        () {
+      final migration = migrate.migrations.singleWhere(
+        (migration) => migration.version == '031',
+      );
+      final up = migration.up.toLowerCase();
+      final down = migration.down!.toLowerCase();
+
+      expect(
+        migration.name,
+        equals('create_community_engagement_tables'),
+      );
+      expect(up, contains('create table if not exists deck_comments'));
+      expect(up, contains('create table if not exists content_reports'));
+      expect(up, contains("status in ('visible', 'hidden', 'deleted')"));
+      expect(
+          up,
+          contains(
+              "target_type in ('deck', 'comment', 'profile', 'binder_item')"));
+      expect(up, contains('idx_deck_comments_deck_created'));
+      expect(up, contains('idx_content_reports_target_status'));
+      expect(down, contains('drop table if exists content_reports'));
+      expect(down, contains('drop table if exists deck_comments'));
+    });
   });
 }

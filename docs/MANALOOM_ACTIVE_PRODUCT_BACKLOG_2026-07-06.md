@@ -63,12 +63,12 @@ Objetivo: ManaLoom acompanha a vida do deck depois da primeira criacao.
 
 | Item | Status | Proxima execucao |
 | --- | --- | --- |
-| Historico de partidas | EM_ANDAMENTO | Evoluir notas pos-jogo para timeline agregada. |
+| Historico de partidas | CONCLUIDO_PARCIAL | Endpoint `GET /decks/:id/post-game-timeline` e tela pos-jogo com historico. |
 | Notas pos-jogo | CONCLUIDO_PARCIAL | Validar sync e UX em deck real. |
 | Cartas que performaram bem/mal | CONCLUIDO_PARCIAL | Exibir agregados por deck. |
-| Diagnostico mana/compra/remocao/win condition | EM_ANDAMENTO | Gerar insight automatico a partir das notas. |
-| Sugestao automatica depois da partida | EM_ANDAMENTO | Integrar pos-jogo com optimize/rebuild. |
-| Linha do tempo de evolucao do deck | EM_ANDAMENTO | Criar leitura historica de notas/relatorios. |
+| Diagnostico mana/compra/remocao/win condition | CONCLUIDO_PARCIAL | Backend agrega issues e gera diagnosticos/acoes. |
+| Sugestao automatica depois da partida | CONCLUIDO_PARCIAL | Backend retorna `next_actions`; falta CTA direto para optimize/rebuild. |
+| Linha do tempo de evolucao do deck | CONCLUIDO_PARCIAL | Backend retorna `weekly_activity` e `timeline`; falta visual refinado. |
 | Alertas de preco/cartas faltantes/upgrades | EM_ANDAMENTO | Consolidar market movers + wishlist/binder. |
 
 ## 6. Comunidade E Trade
@@ -78,13 +78,14 @@ Objetivo: produto vira rede, nao apenas ferramenta individual.
 | Item | Status | Proxima execucao |
 | --- | --- | --- |
 | Perfil publico de jogador | CONCLUIDO_PARCIAL | QA visual e SEO da pagina publica. |
-| Decks publicos com analise visual | EM_ANDAMENTO | Melhorar pagina publica de deck. |
+| Decks publicos com analise visual | CONCLUIDO_PARCIAL | API publica retorna `visual_analysis`; app exibe leitura visual. |
 | Seguir jogadores | CONCLUIDO_PARCIAL | Validar feed e notificacoes. |
-| Comentarios/feedback em decks | EM_ANDAMENTO | Implementar modelo/rota/UI. |
+| Comentarios/feedback em decks | CONCLUIDO_PARCIAL | Rotas `comments`, provider e tela publica implementados. |
 | Binder publico | CONCLUIDO_PARCIAL | QA de privacidade e campos publicos. |
 | Lista de cartas para troca | CONCLUIDO_PARCIAL | QA de disponibilidade e filtros. |
-| Match entre carta faltante e usuario que tem | EM_ANDAMENTO | Criar endpoint de trade matching. |
-| Compartilhamento externo de deck/analise | CONCLUIDO_PARCIAL | Polir metadados e preview social. |
+| Match entre carta faltante e usuario que tem | CONCLUIDO_PARCIAL | `GET /community/trade-matches` cruza want list/deck faltante com ficharios publicos. |
+| Moderacao/denuncia basica | CONCLUIDO_PARCIAL | `POST /community/decks/:id/reports` registra denuncias em `content_reports`; falta painel admin. |
+| Compartilhamento externo de deck/analise | CONCLUIDO_PARCIAL | API publica inclui analise visual; falta metadados sociais finais. |
 
 ## 7. Qualidade Comercial
 

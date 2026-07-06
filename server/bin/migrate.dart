@@ -943,6 +943,66 @@ final migrations = <Migration>[
       DROP TABLE IF EXISTS post_game_notes CASCADE;
     ''',
   ),
+  Migration(
+    version: '031',
+    name: 'create_community_engagement_tables',
+    up: '''
+      CREATE TABLE IF NOT EXISTS deck_comments (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        deck_id UUID NOT NULL REFERENCES decks(id) ON DELETE CASCADE,
+        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        body TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'visible',
+        created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        CONSTRAINT chk_deck_comments_status CHECK (
+          status IN ('visible', 'hidden', 'deleted')
+        ),
+        CONSTRAINT chk_deck_comments_body_length CHECK (
+          char_length(body) BETWEEN 3 AND 1200
+        )
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_deck_comments_deck_created
+      ON deck_comments (deck_id, created_at DESC)
+      WHERE status = 'visible';
+
+      CREATE INDEX IF NOT EXISTS idx_deck_comments_user_created
+      ON deck_comments (user_id, created_at DESC);
+
+      CREATE TABLE IF NOT EXISTS content_reports (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        reporter_user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+        target_type TEXT NOT NULL,
+        target_id TEXT NOT NULL,
+        reason TEXT NOT NULL,
+        details TEXT NOT NULL DEFAULT '',
+        status TEXT NOT NULL DEFAULT 'open',
+        created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        reviewed_at TIMESTAMP WITH TIME ZONE,
+        reviewed_by UUID REFERENCES users(id) ON DELETE SET NULL,
+        CONSTRAINT chk_content_reports_target_type CHECK (
+          target_type IN ('deck', 'comment', 'profile', 'binder_item')
+        ),
+        CONSTRAINT chk_content_reports_reason CHECK (
+          reason IN ('spam', 'abuse', 'scam', 'inappropriate', 'copyright', 'other')
+        ),
+        CONSTRAINT chk_content_reports_status CHECK (
+          status IN ('open', 'reviewing', 'resolved', 'dismissed')
+        )
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_content_reports_target_status
+      ON content_reports (target_type, target_id, status, created_at DESC);
+    ''',
+    down: '''
+      DROP INDEX IF EXISTS idx_content_reports_target_status;
+      DROP TABLE IF EXISTS content_reports CASCADE;
+      DROP INDEX IF EXISTS idx_deck_comments_user_created;
+      DROP INDEX IF EXISTS idx_deck_comments_deck_created;
+      DROP TABLE IF EXISTS deck_comments CASCADE;
+    ''',
+  ),
 ];
 
 class Migration {

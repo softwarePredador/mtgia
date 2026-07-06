@@ -33,10 +33,17 @@ Future<Response> _getPublicDeck(RequestContext context, String deckId) async {
         SELECT d.id, d.name, d.format, d.description,
                d.synergy_score, d.strengths, d.weaknesses,
                d.is_public, d.created_at,
+               COALESCE(comment_counts.comment_count, 0)::int AS comment_count,
                u.id as owner_id,
                u.username as owner_username
         FROM decks d
         JOIN users u ON u.id = d.user_id
+        LEFT JOIN LATERAL (
+          SELECT COUNT(*)::int AS comment_count
+          FROM deck_comments dcmt
+          WHERE dcmt.deck_id = d.id
+            AND dcmt.status = 'visible'
+        ) comment_counts ON TRUE
         WHERE d.id = @deckId AND d.is_public = true
       '''),
       parameters: {'deckId': deckId},
@@ -117,6 +124,7 @@ Future<Response> _getPublicDeck(RequestContext context, String deckId) async {
     }
 
     final manaCurve = <String, int>{};
+    final typeDistribution = <String, int>{};
     final colorDistribution = <String, int>{
       'W': 0,
       'U': 0,
@@ -132,6 +140,8 @@ Future<Response> _getPublicDeck(RequestContext context, String deckId) async {
       } else {
         final type = getMainType(card['type_line'] as String? ?? '');
         mainBoard.putIfAbsent(type, () => []).add(card);
+        typeDistribution[type] =
+            (typeDistribution[type] ?? 0) + (card['quantity'] as int);
       }
 
       final cost = card['mana_cost'] as String?;
@@ -162,8 +172,19 @@ Future<Response> _getPublicDeck(RequestContext context, String deckId) async {
             0, (sum, item) => sum + (item['quantity'] as int)),
         'unique_cards': cardsList.length,
         'mana_curve': manaCurve,
+        'type_distribution': typeDistribution,
         'color_distribution': colorDistribution,
       },
+      'comments_summary': {
+        'comment_count': deckInfo['comment_count'] ?? 0,
+      },
+      'visual_analysis': _buildVisualAnalysis(
+        manaCurve: manaCurve,
+        typeDistribution: typeDistribution,
+        colorDistribution: colorDistribution,
+        commanderName:
+            commander.isNotEmpty ? commander.first['name']?.toString() : null,
+      ),
       'commander': commander,
       'main_board': mainBoard,
       'all_cards_flat': cardsList,
@@ -184,6 +205,57 @@ Future<Response> _getPublicDeck(RequestContext context, String deckId) async {
       body: {'error': 'Failed to get public deck'},
     );
   }
+}
+
+Map<String, dynamic> _buildVisualAnalysis({
+  required Map<String, int> manaCurve,
+  required Map<String, int> typeDistribution,
+  required Map<String, int> colorDistribution,
+  String? commanderName,
+}) {
+  final nonZeroColors = colorDistribution.entries
+      .where((entry) => entry.value > 0)
+      .map((entry) => entry.key)
+      .toList(growable: false);
+  final topTypes = typeDistribution.entries.toList()
+    ..sort((a, b) => b.value.compareTo(a.value));
+  final lowCurve =
+      (manaCurve['0'] ?? 0) + (manaCurve['1'] ?? 0) + (manaCurve['2'] ?? 0);
+  final midCurve = (manaCurve['3'] ?? 0) + (manaCurve['4'] ?? 0);
+  final highCurve =
+      (manaCurve['5'] ?? 0) + (manaCurve['6'] ?? 0) + (manaCurve['7+'] ?? 0);
+
+  return {
+    'headline': commanderName == null || commanderName.isEmpty
+        ? 'Deck publico ManaLoom'
+        : 'Plano publico de $commanderName',
+    'color_identity_hint': nonZeroColors.isEmpty ? ['C'] : nonZeroColors,
+    'top_type_buckets': topTypes
+        .take(4)
+        .map((entry) => {'type': entry.key, 'count': entry.value})
+        .toList(growable: false),
+    'curve_shape': {
+      'low': lowCurve,
+      'mid': midCurve,
+      'high': highCurve,
+    },
+    'reading': _curveReading(
+        lowCurve: lowCurve, midCurve: midCurve, highCurve: highCurve),
+  };
+}
+
+String _curveReading({
+  required int lowCurve,
+  required int midCurve,
+  required int highCurve,
+}) {
+  if (highCurve > lowCurve + midCurve) {
+    return 'Curva pesada: revisar ramp e primeiros turnos antes de subir o nivel da mesa.';
+  }
+  if (lowCurve >= midCurve + highCurve) {
+    return 'Curva baixa: deck tende a agir cedo, mas precisa manter compra e recursos.';
+  }
+  return 'Curva intermediaria: boa candidata para comparar ajustes por funcao e bracket.';
 }
 
 /// POST /community/decks/:id — copiar deck público para conta do usuário (requer auth)
