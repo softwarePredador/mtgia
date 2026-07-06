@@ -1,0 +1,2651 @@
+{
+  "artifact_type": "global_commander_same_lane_stage_cut_trace_collector",
+  "battle_gate_allowed_now": false,
+  "battle_gate_performed": false,
+  "battle_or_optimization_performed": false,
+  "battle_replay_performed": false,
+  "candidate_copy_allowed_now": false,
+  "candidate_copy_blockers": [
+    "candidate_copy_closed_until_same_lane_stage_cuts_have_proof",
+    "used_stage_cuts_block_value_safe:Diabolic Intent,Ornithopter of Paradise,Professional Face-Breaker,Sunforger,Ragavan, Nimble Pilferer,Ragavan, Nimble Pilferer,Arcane Signet,Demonic Tutor,Enlightened Tutor,Lightning Greaves,Sol Ring,The One Ring,Silence,Smothering Tithe,Jeska's Will,Hammer of Nazahn,Mana Vault,Voice of Victory,Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+    "seen_stage_cuts_need_negative_review:Alicia Masters, Skilled Sculptor,Grand Abolisher,Vampiric Tutor,Blightsteel Colossus // Blightsteel Colossus",
+    "external_reference_stage_cuts_need_internal_trace:Dark Ritual",
+    "stage_cuts_need_trace_or_external_research:Ranger-Captain of Eos,The Seriema,Ranger-Captain of Eos,The Seriema"
+  ],
+  "db_resolution": {
+    "cut_pair_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_pair_collector_20260705_kaalia_value_safe_stage1_repair_scope1.json",
+    "selected_db": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_copy_materializer_20260705_kaalia_value_safe_stage1_repair_scope1_candidate/knowledge_candidate.db",
+    "selected_db_exists": true,
+    "source": "same_lane_cut_pair_report"
+  },
+  "deck_action_allowed": false,
+  "generated_at": "2026-07-05T23:58:52.530073+00:00",
+  "input_artifacts": {
+    "evidence_plan_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.json",
+    "scan_roots": [
+      "docs/hermes-analysis/master_optimizer_reports"
+    ],
+    "selected_db": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_copy_materializer_20260705_kaalia_value_safe_stage1_repair_scope1_candidate/knowledge_candidate.db",
+    "trace_generator_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_generator_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+  },
+  "mutation_allowed": false,
+  "policy": {
+    "external_boundary": "External/local corpus references do not override target-deck usage or absence of trace proof.",
+    "promotion_boundary": "Candidate copy, battle gate, and promotion stay closed.",
+    "trace_boundary": "This collector reuses existing traces and does not run a new battle.",
+    "usage_boundary": "A same-lane stage cut used by the target deck blocks value-safe reclassification."
+  },
+  "postgres_writes": false,
+  "promotion_allowed": false,
+  "review_rows": [
+    {
+      "artifact_reference_counts": {
+        "external_reference_artifact": 2,
+        "planning_reference_not_proof": 2,
+        "trace_artifact_reference": 4
+      },
+      "artifact_reference_sample": [
+        {
+          "artifact_kind": "external_reference_artifact",
+          "excerpt": "\"card_name\": \"Diabolic Intent\",",
+          "line": 679,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_value_safe_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1_external_policy.json"
+        },
+        {
+          "artifact_kind": "external_reference_artifact",
+          "excerpt": "\"card_name\": \"Diabolic Intent\",",
+          "line": 683,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_value_safe_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1_external_policy.json"
+        },
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "| 4 | `Diabolic Intent` | `tutors_access` | `contextual_staple_requires_stage_review` | `contextual_staple_usage_and_replacement_review` |",
+          "line": 35,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+        },
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "\"card_name\": \"Diabolic Intent\",",
+          "line": 38,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_stage_only_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+        },
+        {
+          "artifact_kind": "trace_artifact_reference",
+          "excerpt": "| `Diabolic Intent` | 0 | 68 |",
+          "line": 23,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_scout_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+        }
+      ],
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Diabolic Intent",
+      "current_deck_present": true,
+      "decision_trace_count": 1,
+      "event_types": {
+        "additional_cost_paid": 1,
+        "cast_announced": 1,
+        "cost_paid": 1,
+        "permanent_moved_from_battlefield": 1,
+        "priority_pass": 6,
+        "spell_cast": 1,
+        "spell_resolved": 1,
+        "tutor_resolved": 1
+      },
+      "evidence_lanes": [
+        "contextual_staple_usage_and_replacement_review"
+      ],
+      "exposure_event_count": 0,
+      "first_decision_trace": {
+        "event": "cast_spell",
+        "player": "Kaalia of the Vast",
+        "turn": 7
+      },
+      "first_exposure_event": null,
+      "first_usage_event": {
+        "card": "Diabolic Intent",
+        "event": "cast_announced",
+        "player": "Kaalia of the Vast",
+        "turn": 7
+      },
+      "format_staple": {
+        "archetype": "black",
+        "card_name": "Diabolic Intent",
+        "category": "",
+        "color_identity": "B",
+        "edhrec_rank": 265,
+        "format": "commander"
+      },
+      "maximum_evidence_burden": 4,
+      "next_evidence": "build_same_lane_replacement_or_find_new_cut_source",
+      "profile_roles": [
+        "tutors_access"
+      ],
+      "risk_flags": [
+        "tutor_access_cut"
+      ],
+      "stage_reasons": [
+        "contextual_staple_requires_stage_review"
+      ],
+      "status": "same_lane_stage_cut_usage_trace_blocks_value_safe",
+      "target_cut_role": "tutors_access",
+      "usage_event_count": 5,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "artifact_reference_counts": {
+        "external_reference_artifact": 1,
+        "planning_reference_not_proof": 3,
+        "trace_artifact_reference": 4
+      },
+      "artifact_reference_sample": [
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "| 4 | `Ornithopter of Paradise` | `mana_acceleration` | `contextual_staple_requires_stage_review` | `contextual_staple_usage_and_replacement_review` |",
+          "line": 36,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+        },
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "\"card_name\": \"Ornithopter of Paradise\",",
+          "line": 62,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_stage_only_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+        },
+        {
+          "artifact_kind": "trace_artifact_reference",
+          "excerpt": "| `Ornithopter of Paradise` | 0 | 34 |",
+          "line": 24,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_scout_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+        },
+        {
+          "artifact_kind": "trace_artifact_reference",
+          "excerpt": "| `Ornithopter of Paradise` | `usage_observed_blocks_value_safe_reclassification` | 12 | 26 | 15 | `not_value_safe_from_current_trace` |",
+          "line": 21,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_reviewer_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+        },
+        {
+          "artifact_kind": "trace_artifact_reference",
+          "excerpt": "- `contextual_cards_used_by_target_deck:Diabolic Intent,Ornithopter of Paradise,Professional Face-Breaker`",
+          "line": 26,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_reviewer_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+        }
+      ],
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Ornithopter of Paradise",
+      "current_deck_present": true,
+      "decision_trace_count": 15,
+      "event_types": {
+        "additional_cost_paid": 1,
+        "cast_announced": 4,
+        "cost_paid": 4,
+        "creature_cast": 4,
+        "land_played": 5,
+        "mana_refreshed": 17,
+        "permanent_moved_from_battlefield": 3,
+        "turn_end": 21,
+        "turn_start": 5,
+        "utility_land_activated": 1
+      },
+      "evidence_lanes": [
+        "contextual_staple_usage_and_replacement_review"
+      ],
+      "exposure_event_count": 26,
+      "first_decision_trace": {
+        "event": "cast_spell",
+        "player": "Kaalia of the Vast",
+        "turn": 6
+      },
+      "first_exposure_event": {
+        "event": "turn_end",
+        "player": "Kaalia of the Vast",
+        "turn": 6
+      },
+      "first_usage_event": {
+        "card": "Ornithopter of Paradise",
+        "event": "cast_announced",
+        "player": "Kaalia of the Vast",
+        "turn": 6
+      },
+      "format_staple": {
+        "archetype": "ramp",
+        "card_name": "Ornithopter of Paradise",
+        "category": "",
+        "color_identity": "",
+        "edhrec_rank": 227,
+        "format": "commander"
+      },
+      "maximum_evidence_burden": 4,
+      "next_evidence": "build_same_lane_replacement_or_find_new_cut_source",
+      "profile_roles": [
+        "mana_acceleration"
+      ],
+      "risk_flags": [
+        "mana_acceleration_cut"
+      ],
+      "stage_reasons": [
+        "contextual_staple_requires_stage_review"
+      ],
+      "status": "same_lane_stage_cut_usage_trace_blocks_value_safe",
+      "target_cut_role": "mana_acceleration",
+      "usage_event_count": 12,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "artifact_reference_counts": {
+        "external_reference_artifact": 1,
+        "planning_reference_not_proof": 3,
+        "trace_artifact_reference": 4
+      },
+      "artifact_reference_sample": [
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "| 5 | `Professional Face-Breaker` | `mana_acceleration` | `non_target_cut_risk:card_flow_cut, contextual_staple_requires_stage_review` | `cross_role_risk_trace_or_new_cut_source, contextual_staple_usage_and_replacement_r",
+          "line": 37,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+        },
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "\"card_name\": \"Professional Face-Breaker\",",
+          "line": 13,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_stage_only_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+        },
+        {
+          "artifact_kind": "trace_artifact_reference",
+          "excerpt": "| `Professional Face-Breaker` | 0 | 61 |",
+          "line": 22,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_scout_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+        },
+        {
+          "artifact_kind": "trace_artifact_reference",
+          "excerpt": "| `Professional Face-Breaker` | `usage_observed_blocks_value_safe_reclassification` | 6 | 12 | 14 | `not_value_safe_from_current_trace` |",
+          "line": 22,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_reviewer_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+        },
+        {
+          "artifact_kind": "trace_artifact_reference",
+          "excerpt": "- `contextual_cards_used_by_target_deck:Diabolic Intent,Ornithopter of Paradise,Professional Face-Breaker`",
+          "line": 26,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_reviewer_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+        }
+      ],
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Professional Face-Breaker",
+      "current_deck_present": true,
+      "decision_trace_count": 14,
+      "event_types": {
+        "additional_cost_paid": 1,
+        "cast_announced": 2,
+        "combat": 3,
+        "combat_step": 3,
+        "cost_paid": 2,
+        "creature_cast": 2,
+        "multi_defender_attack": 3,
+        "permanent_moved_from_battlefield": 2,
+        "turn_end": 8,
+        "turn_start": 4
+      },
+      "evidence_lanes": [
+        "cross_role_risk_trace_or_new_cut_source",
+        "contextual_staple_usage_and_replacement_review"
+      ],
+      "exposure_event_count": 12,
+      "first_decision_trace": {
+        "event": "cast_spell",
+        "player": "Kaalia of the Vast",
+        "turn": 6
+      },
+      "first_exposure_event": {
+        "event": "turn_end",
+        "player": "Kaalia of the Vast",
+        "turn": 6
+      },
+      "first_usage_event": {
+        "card": "Professional Face-Breaker",
+        "event": "cast_announced",
+        "player": "Kaalia of the Vast",
+        "turn": 6
+      },
+      "format_staple": {
+        "archetype": "red",
+        "card_name": "Professional Face-Breaker",
+        "category": "",
+        "color_identity": "R",
+        "edhrec_rank": 223,
+        "format": "commander"
+      },
+      "maximum_evidence_burden": 5,
+      "next_evidence": "build_same_lane_replacement_or_find_new_cut_source",
+      "profile_roles": [
+        "card_draw_selection",
+        "mana_acceleration"
+      ],
+      "risk_flags": [
+        "mana_acceleration_cut",
+        "card_flow_cut"
+      ],
+      "stage_reasons": [
+        "non_target_cut_risk:card_flow_cut",
+        "contextual_staple_requires_stage_review"
+      ],
+      "status": "same_lane_stage_cut_usage_trace_blocks_value_safe",
+      "target_cut_role": "mana_acceleration",
+      "usage_event_count": 6,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "artifact_reference_counts": {
+        "planning_reference_not_proof": 4,
+        "trace_artifact_reference": 4
+      },
+      "artifact_reference_sample": [
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "| 5 | `Sunforger` | `tutors_access` | `non_target_cut_risk:attack_window_or_extra_combat_cut,card_flow_cut` | `cross_role_risk_trace_or_new_cut_source` |",
+          "line": 38,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+        },
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "\"card_name\": \"Sunforger\",",
+          "line": 86,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_stage_only_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+        },
+        {
+          "artifact_kind": "trace_artifact_reference",
+          "excerpt": "| `Sunforger` | `remaining_cut_used_by_target_trace_blocks_value_safe` | 8 | 24 | 19 | `find_different_cut_or_same_lane_replacement_proof` |",
+          "line": 22,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_new_cut_source_lane_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+        },
+        {
+          "artifact_kind": "trace_artifact_reference",
+          "excerpt": "- `remaining_cut_cards_used_by_target_deck:Sunforger,Jeska's Will,Smothering Tithe,Demonic Tutor,Enlightened Tutor,Arcane Signet,Mana Vault,Sol Ring,Birgi, God of Storytelling // Harnfel, Horn of Bounty`",
+          "line": 37,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_new_cut_source_lane_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+        },
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "\"card_name\": \"Sunforger\",",
+          "line": 1257,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_pair_collector_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+        }
+      ],
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Sunforger",
+      "current_deck_present": true,
+      "decision_trace_count": 19,
+      "event_types": {
+        "cast_announced": 2,
+        "cost_paid": 2,
+        "equipment_attached": 1,
+        "equipment_unattached": 1,
+        "land_played": 1,
+        "priority_pass": 8,
+        "spell_cast": 2,
+        "spell_resolved": 2,
+        "turn_end": 16,
+        "turn_start": 8
+      },
+      "evidence_lanes": [
+        "cross_role_risk_trace_or_new_cut_source"
+      ],
+      "exposure_event_count": 24,
+      "first_decision_trace": {
+        "event": "pass_no_action",
+        "player": "Kaalia of the Vast",
+        "turn": 2
+      },
+      "first_exposure_event": {
+        "event": "turn_end",
+        "player": "Kaalia of the Vast",
+        "turn": 2
+      },
+      "first_usage_event": {
+        "card": "Sunforger",
+        "event": "cast_announced",
+        "player": "Kaalia of the Vast",
+        "turn": 3
+      },
+      "format_staple": {},
+      "maximum_evidence_burden": 5,
+      "next_evidence": "build_same_lane_replacement_or_find_new_cut_source",
+      "profile_roles": [
+        "card_draw_selection",
+        "tutors_access"
+      ],
+      "risk_flags": [
+        "attack_window_or_extra_combat_cut",
+        "tutor_access_cut",
+        "card_flow_cut"
+      ],
+      "stage_reasons": [
+        "non_target_cut_risk:attack_window_or_extra_combat_cut,card_flow_cut"
+      ],
+      "status": "same_lane_stage_cut_usage_trace_blocks_value_safe",
+      "target_cut_role": "tutors_access",
+      "usage_event_count": 8,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "artifact_reference_counts": {
+        "external_reference_artifact": 1,
+        "planning_reference_not_proof": 4,
+        "trace_artifact_reference": 3
+      },
+      "artifact_reference_sample": [
+        {
+          "artifact_kind": "external_reference_artifact",
+          "excerpt": "\"card_name\": \"Alicia Masters, Skilled Sculptor\",",
+          "line": 13,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_value_safe_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1_external_policy.json"
+        },
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "| 5 | `Alicia Masters, Skilled Sculptor` | `mana_acceleration` | `non_target_cut_risk:attack_window_or_extra_combat_cut` | `cross_role_risk_trace_or_new_cut_source` |",
+          "line": 39,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+        },
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "\"card_name\": \"Alicia Masters, Skilled Sculptor\",",
+          "line": 111,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_stage_only_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+        },
+        {
+          "artifact_kind": "trace_artifact_reference",
+          "excerpt": "| `Alicia Masters, Skilled Sculptor` | `remaining_cut_seen_without_usage_needs_negative_review` | 0 | 0 | 1 | `explain_nonuse_or_force_access_before_reclassification` |",
+          "line": 23,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_new_cut_source_lane_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+        },
+        {
+          "artifact_kind": "trace_artifact_reference",
+          "excerpt": "- `remaining_cut_cards_seen_without_usage:Alicia Masters, Skilled Sculptor,Vampiric Tutor`",
+          "line": 38,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_new_cut_source_lane_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+        }
+      ],
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Alicia Masters, Skilled Sculptor",
+      "current_deck_present": true,
+      "decision_trace_count": 1,
+      "event_types": {},
+      "evidence_lanes": [
+        "cross_role_risk_trace_or_new_cut_source"
+      ],
+      "exposure_event_count": 0,
+      "first_decision_trace": {
+        "event": "mulligan_decision",
+        "player": "Kaalia of the Vast",
+        "turn": 0
+      },
+      "first_exposure_event": null,
+      "first_usage_event": null,
+      "format_staple": {},
+      "maximum_evidence_burden": 5,
+      "next_evidence": "manual_negative_review_or_force_access_before_reclassification",
+      "profile_roles": [
+        "board_wipes_resets",
+        "mana_acceleration"
+      ],
+      "risk_flags": [
+        "attack_window_or_extra_combat_cut",
+        "mana_acceleration_cut"
+      ],
+      "stage_reasons": [
+        "non_target_cut_risk:attack_window_or_extra_combat_cut"
+      ],
+      "status": "same_lane_stage_cut_seen_without_usage_needs_negative_review",
+      "target_cut_role": "mana_acceleration",
+      "usage_event_count": 0,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "artifact_reference_counts": {
+        "external_reference_artifact": 2,
+        "planning_reference_not_proof": 4,
+        "trace_artifact_reference": 2
+      },
+      "artifact_reference_sample": [
+        {
+          "artifact_kind": "external_reference_artifact",
+          "excerpt": "\"card_name\": \"Grand Abolisher\",",
+          "line": 969,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_value_safe_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1_external_policy.json"
+        },
+        {
+          "artifact_kind": "external_reference_artifact",
+          "excerpt": "\"card_name\": \"Grand Abolisher\",",
+          "line": 973,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_value_safe_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1_external_policy.json"
+        },
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "| 6 | `Grand Abolisher` | `haste_protection_silence` | `target_role_is_protected_profile_lane_requires_trace_or_equal_gate, commander_expected_package_anchor_requires_stage_proof, contextual_staple_requires_stage_review`",
+          "line": 40,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+        },
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "\"card_name\": \"Grand Abolisher\",",
+          "line": 935,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_pair_collector_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+        },
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "\"card_name\": \"Grand Abolisher\",",
+          "line": 943,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_pair_collector_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+        }
+      ],
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Grand Abolisher",
+      "current_deck_present": true,
+      "decision_trace_count": 2,
+      "event_types": {
+        "priority_pass": 1,
+        "turn_end": 1
+      },
+      "evidence_lanes": [
+        "protected_same_lane_usage_trace_or_equal_gate",
+        "expected_package_anchor_replacement_proof",
+        "contextual_staple_usage_and_replacement_review"
+      ],
+      "exposure_event_count": 1,
+      "first_decision_trace": {
+        "event": "pass_no_action",
+        "player": "Kaalia of the Vast",
+        "turn": 8
+      },
+      "first_exposure_event": {
+        "event": "turn_end",
+        "player": "Kaalia of the Vast",
+        "turn": 8
+      },
+      "first_usage_event": null,
+      "format_staple": {
+        "archetype": "white",
+        "card_name": "Grand Abolisher",
+        "category": "",
+        "color_identity": "W",
+        "edhrec_rank": 249,
+        "format": "commander"
+      },
+      "maximum_evidence_burden": 6,
+      "next_evidence": "manual_negative_review_or_force_access_before_reclassification",
+      "profile_roles": [
+        "haste_protection_silence"
+      ],
+      "risk_flags": [
+        "haste_or_protection_cut"
+      ],
+      "stage_reasons": [
+        "target_role_is_protected_profile_lane_requires_trace_or_equal_gate",
+        "commander_expected_package_anchor_requires_stage_proof",
+        "contextual_staple_requires_stage_review"
+      ],
+      "status": "same_lane_stage_cut_seen_without_usage_needs_negative_review",
+      "target_cut_role": "haste_protection_silence",
+      "usage_event_count": 0,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "artifact_reference_counts": {
+        "planning_reference_not_proof": 8
+      },
+      "artifact_reference_sample": [
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "| 6 | `Ragavan, Nimble Pilferer` | `haste_protection_silence` | `target_role_is_protected_profile_lane_requires_trace_or_equal_gate, non_target_cut_risk:card_flow_cut,mana_acceleration_cut, contextual_staple_requires_sta",
+          "line": 41,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+        },
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "| 6 | `Ragavan, Nimble Pilferer` | `mana_acceleration` | `other_protected_profile_role_haste_protection_silence, non_target_cut_risk:card_flow_cut,haste_or_protection_cut, contextual_staple_requires_stage_review` | `mult",
+          "line": 42,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+        },
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "\"card_name\": \"Ragavan, Nimble Pilferer\",",
+          "line": 1371,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_pair_collector_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+        },
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "\"card_name\": \"Ragavan, Nimble Pilferer\",",
+          "line": 1378,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_pair_collector_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+        },
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "\"card_name\": \"Ragavan, Nimble Pilferer\",",
+          "line": 1406,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_pair_collector_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+        }
+      ],
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Ragavan, Nimble Pilferer",
+      "current_deck_present": true,
+      "decision_trace_count": 1,
+      "event_types": {
+        "cast_announced": 1,
+        "combat": 3,
+        "combat_step": 3,
+        "cost_paid": 1,
+        "creature_cast": 1,
+        "multi_defender_attack": 3,
+        "turn_end": 3
+      },
+      "evidence_lanes": [
+        "protected_same_lane_usage_trace_or_equal_gate",
+        "cross_role_risk_trace_or_new_cut_source",
+        "contextual_staple_usage_and_replacement_review"
+      ],
+      "exposure_event_count": 3,
+      "first_decision_trace": {
+        "event": "cast_spell",
+        "player": "Kaalia of the Vast",
+        "turn": 7
+      },
+      "first_exposure_event": {
+        "event": "turn_end",
+        "player": "Kaalia of the Vast",
+        "turn": 7
+      },
+      "first_usage_event": {
+        "card": "Ragavan, Nimble Pilferer",
+        "event": "cast_announced",
+        "player": "Kaalia of the Vast",
+        "turn": 7
+      },
+      "format_staple": {
+        "archetype": "commanders",
+        "card_name": "Ragavan, Nimble Pilferer",
+        "category": "",
+        "color_identity": "R",
+        "edhrec_rank": 267,
+        "format": "commander"
+      },
+      "maximum_evidence_burden": 6,
+      "next_evidence": "build_same_lane_replacement_or_find_new_cut_source",
+      "profile_roles": [
+        "card_draw_selection",
+        "haste_protection_silence",
+        "mana_acceleration"
+      ],
+      "risk_flags": [
+        "mana_acceleration_cut",
+        "haste_or_protection_cut",
+        "card_flow_cut"
+      ],
+      "stage_reasons": [
+        "target_role_is_protected_profile_lane_requires_trace_or_equal_gate",
+        "non_target_cut_risk:card_flow_cut,mana_acceleration_cut",
+        "contextual_staple_requires_stage_review"
+      ],
+      "status": "same_lane_stage_cut_usage_trace_blocks_value_safe",
+      "target_cut_role": "haste_protection_silence",
+      "usage_event_count": 3,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "artifact_reference_counts": {
+        "planning_reference_not_proof": 8
+      },
+      "artifact_reference_sample": [
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "| 6 | `Ragavan, Nimble Pilferer` | `haste_protection_silence` | `target_role_is_protected_profile_lane_requires_trace_or_equal_gate, non_target_cut_risk:card_flow_cut,mana_acceleration_cut, contextual_staple_requires_sta",
+          "line": 41,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+        },
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "| 6 | `Ragavan, Nimble Pilferer` | `mana_acceleration` | `other_protected_profile_role_haste_protection_silence, non_target_cut_risk:card_flow_cut,haste_or_protection_cut, contextual_staple_requires_stage_review` | `mult",
+          "line": 42,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+        },
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "\"card_name\": \"Ragavan, Nimble Pilferer\",",
+          "line": 1371,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_pair_collector_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+        },
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "\"card_name\": \"Ragavan, Nimble Pilferer\",",
+          "line": 1378,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_pair_collector_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+        },
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "\"card_name\": \"Ragavan, Nimble Pilferer\",",
+          "line": 1406,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_pair_collector_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+        }
+      ],
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Ragavan, Nimble Pilferer",
+      "current_deck_present": true,
+      "decision_trace_count": 1,
+      "event_types": {
+        "cast_announced": 1,
+        "combat": 3,
+        "combat_step": 3,
+        "cost_paid": 1,
+        "creature_cast": 1,
+        "multi_defender_attack": 3,
+        "turn_end": 3
+      },
+      "evidence_lanes": [
+        "multi_role_protected_lane_replacement_proof",
+        "cross_role_risk_trace_or_new_cut_source",
+        "contextual_staple_usage_and_replacement_review"
+      ],
+      "exposure_event_count": 3,
+      "first_decision_trace": {
+        "event": "cast_spell",
+        "player": "Kaalia of the Vast",
+        "turn": 7
+      },
+      "first_exposure_event": {
+        "event": "turn_end",
+        "player": "Kaalia of the Vast",
+        "turn": 7
+      },
+      "first_usage_event": {
+        "card": "Ragavan, Nimble Pilferer",
+        "event": "cast_announced",
+        "player": "Kaalia of the Vast",
+        "turn": 7
+      },
+      "format_staple": {
+        "archetype": "commanders",
+        "card_name": "Ragavan, Nimble Pilferer",
+        "category": "",
+        "color_identity": "R",
+        "edhrec_rank": 267,
+        "format": "commander"
+      },
+      "maximum_evidence_burden": 6,
+      "next_evidence": "build_same_lane_replacement_or_find_new_cut_source",
+      "profile_roles": [
+        "card_draw_selection",
+        "haste_protection_silence",
+        "mana_acceleration"
+      ],
+      "risk_flags": [
+        "mana_acceleration_cut",
+        "haste_or_protection_cut",
+        "card_flow_cut"
+      ],
+      "stage_reasons": [
+        "other_protected_profile_role_haste_protection_silence",
+        "non_target_cut_risk:card_flow_cut,haste_or_protection_cut",
+        "contextual_staple_requires_stage_review"
+      ],
+      "status": "same_lane_stage_cut_usage_trace_blocks_value_safe",
+      "target_cut_role": "mana_acceleration",
+      "usage_event_count": 3,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "artifact_reference_counts": {
+        "external_reference_artifact": 2,
+        "other_reference": 1,
+        "planning_reference_not_proof": 3,
+        "trace_artifact_reference": 2
+      },
+      "artifact_reference_sample": [
+        {
+          "artifact_kind": "external_reference_artifact",
+          "excerpt": "\"card_name\": \"Arcane Signet\",",
+          "line": 134,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_value_safe_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1_external_policy.json"
+        },
+        {
+          "artifact_kind": "external_reference_artifact",
+          "excerpt": "\"card_name\": \"Arcane Signet\",",
+          "line": 138,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_value_safe_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1_external_policy.json"
+        },
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "| 6 | `Arcane Signet` | `mana_acceleration` | `commander_expected_package_anchor_requires_stage_proof, structural_foundation_staple_requires_same_lane_or_battle_proof` | `expected_package_anchor_replacement_proof, struct",
+          "line": 43,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+        },
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "\"card_name\": \"Arcane Signet\",",
+          "line": 217,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_stage_only_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+        },
+        {
+          "artifact_kind": "other_reference",
+          "excerpt": "1 Arcane Signet",
+          "line": 56,
+          "path": "docs/hermes-analysis/master_optimizer_reports/lorehold_607_research_candidate_20260630_silence_tibalts_trickery_v1.md"
+        }
+      ],
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Arcane Signet",
+      "current_deck_present": true,
+      "decision_trace_count": 5,
+      "event_types": {
+        "cast_announced": 1,
+        "cost_paid": 1,
+        "land_played": 2,
+        "mana_refreshed": 7,
+        "spell_cast": 1,
+        "turn_end": 9,
+        "turn_start": 2
+      },
+      "evidence_lanes": [
+        "expected_package_anchor_replacement_proof",
+        "structural_staple_same_lane_or_equal_gate_proof"
+      ],
+      "exposure_event_count": 11,
+      "first_decision_trace": {
+        "event": "mulligan_decision",
+        "player": "Kaalia of the Vast",
+        "turn": 0
+      },
+      "first_exposure_event": {
+        "event": "turn_start",
+        "player": "Kaalia of the Vast",
+        "turn": 1
+      },
+      "first_usage_event": {
+        "card": "Arcane Signet",
+        "event": "cast_announced",
+        "player": "Kaalia of the Vast",
+        "turn": 2
+      },
+      "format_staple": {
+        "archetype": "ramp",
+        "card_name": "Arcane Signet",
+        "category": "",
+        "color_identity": "",
+        "edhrec_rank": 3,
+        "format": "commander"
+      },
+      "maximum_evidence_burden": 6,
+      "next_evidence": "build_same_lane_replacement_or_find_new_cut_source",
+      "profile_roles": [
+        "mana_acceleration"
+      ],
+      "risk_flags": [
+        "mana_acceleration_cut"
+      ],
+      "stage_reasons": [
+        "commander_expected_package_anchor_requires_stage_proof",
+        "structural_foundation_staple_requires_same_lane_or_battle_proof"
+      ],
+      "status": "same_lane_stage_cut_usage_trace_blocks_value_safe",
+      "target_cut_role": "mana_acceleration",
+      "usage_event_count": 3,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "artifact_reference_counts": {
+        "external_reference_artifact": 2,
+        "planning_reference_not_proof": 4,
+        "trace_artifact_reference": 2
+      },
+      "artifact_reference_sample": [
+        {
+          "artifact_kind": "external_reference_artifact",
+          "excerpt": "\"card_name\": \"Demonic Tutor\",",
+          "line": 625,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_value_safe_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1_external_policy.json"
+        },
+        {
+          "artifact_kind": "external_reference_artifact",
+          "excerpt": "\"card_name\": \"Demonic Tutor\",",
+          "line": 629,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_value_safe_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1_external_policy.json"
+        },
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "| 6 | `Demonic Tutor` | `tutors_access` | `commander_expected_package_anchor_requires_stage_proof, structural_foundation_staple_requires_same_lane_or_battle_proof` | `expected_package_anchor_replacement_proof, structural",
+          "line": 44,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+        },
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "\"card_name\": \"Demonic Tutor\",",
+          "line": 136,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_stage_only_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+        },
+        {
+          "artifact_kind": "trace_artifact_reference",
+          "excerpt": "| `Demonic Tutor` | `remaining_cut_used_by_target_trace_blocks_value_safe` | 9 | 14 | 18 | `find_different_cut_or_same_lane_replacement_proof` |",
+          "line": 26,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_new_cut_source_lane_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+        }
+      ],
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Demonic Tutor",
+      "current_deck_present": true,
+      "decision_trace_count": 18,
+      "event_types": {
+        "cast_announced": 5,
+        "cast_illegal": 4,
+        "cost_paid": 1,
+        "priority_pass": 5,
+        "spell_cast": 1,
+        "spell_resolved": 1,
+        "turn_end": 7,
+        "turn_start": 7,
+        "tutor_resolved": 1
+      },
+      "evidence_lanes": [
+        "expected_package_anchor_replacement_proof",
+        "structural_staple_same_lane_or_equal_gate_proof"
+      ],
+      "exposure_event_count": 14,
+      "first_decision_trace": {
+        "event": "mulligan_decision",
+        "player": "Kaalia of the Vast",
+        "turn": 0
+      },
+      "first_exposure_event": {
+        "event": "turn_start",
+        "player": "Kaalia of the Vast",
+        "turn": 1
+      },
+      "first_usage_event": {
+        "card": "Demonic Tutor",
+        "event": "cast_announced",
+        "player": "Kaalia of the Vast",
+        "turn": 5
+      },
+      "format_staple": {
+        "archetype": "combo",
+        "card_name": "Demonic Tutor",
+        "category": "",
+        "color_identity": "B",
+        "edhrec_rank": 58,
+        "format": "commander"
+      },
+      "maximum_evidence_burden": 6,
+      "next_evidence": "build_same_lane_replacement_or_find_new_cut_source",
+      "profile_roles": [
+        "tutors_access"
+      ],
+      "risk_flags": [
+        "tutor_access_cut"
+      ],
+      "stage_reasons": [
+        "commander_expected_package_anchor_requires_stage_proof",
+        "structural_foundation_staple_requires_same_lane_or_battle_proof"
+      ],
+      "status": "same_lane_stage_cut_usage_trace_blocks_value_safe",
+      "target_cut_role": "tutors_access",
+      "usage_event_count": 9,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "artifact_reference_counts": {
+        "external_reference_artifact": 2,
+        "planning_reference_not_proof": 4,
+        "trace_artifact_reference": 2
+      },
+      "artifact_reference_sample": [
+        {
+          "artifact_kind": "external_reference_artifact",
+          "excerpt": "\"card_name\": \"Enlightened Tutor\",",
+          "line": 747,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_value_safe_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1_external_policy.json"
+        },
+        {
+          "artifact_kind": "external_reference_artifact",
+          "excerpt": "\"card_name\": \"Enlightened Tutor\",",
+          "line": 751,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_value_safe_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1_external_policy.json"
+        },
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "| 6 | `Enlightened Tutor` | `tutors_access` | `commander_expected_package_anchor_requires_stage_proof, structural_foundation_staple_requires_same_lane_or_battle_proof` | `expected_package_anchor_replacement_proof, struct",
+          "line": 45,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+        },
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "\"card_name\": \"Enlightened Tutor\",",
+          "line": 163,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_stage_only_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+        },
+        {
+          "artifact_kind": "trace_artifact_reference",
+          "excerpt": "| `Enlightened Tutor` | `remaining_cut_used_by_target_trace_blocks_value_safe` | 2 | 10 | 14 | `find_different_cut_or_same_lane_replacement_proof` |",
+          "line": 27,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_new_cut_source_lane_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+        }
+      ],
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Enlightened Tutor",
+      "current_deck_present": true,
+      "decision_trace_count": 14,
+      "event_types": {
+        "end_step_instant": 1,
+        "spell_resolved": 1,
+        "turn_end": 5,
+        "turn_start": 5,
+        "tutor_resolved": 1
+      },
+      "evidence_lanes": [
+        "expected_package_anchor_replacement_proof",
+        "structural_staple_same_lane_or_equal_gate_proof"
+      ],
+      "exposure_event_count": 10,
+      "first_decision_trace": {
+        "event": "mulligan_decision",
+        "player": "Kaalia of the Vast",
+        "turn": 0
+      },
+      "first_exposure_event": {
+        "event": "turn_start",
+        "player": "Kaalia of the Vast",
+        "turn": 1
+      },
+      "first_usage_event": {
+        "card": "Enlightened Tutor",
+        "event": "spell_resolved",
+        "player": "Kaalia of the Vast",
+        "turn": 5
+      },
+      "format_staple": {
+        "archetype": "combo",
+        "card_name": "Enlightened Tutor",
+        "category": "",
+        "color_identity": "W",
+        "edhrec_rank": 115,
+        "format": "commander"
+      },
+      "maximum_evidence_burden": 6,
+      "next_evidence": "build_same_lane_replacement_or_find_new_cut_source",
+      "profile_roles": [
+        "tutors_access"
+      ],
+      "risk_flags": [
+        "tutor_access_cut"
+      ],
+      "stage_reasons": [
+        "commander_expected_package_anchor_requires_stage_proof",
+        "structural_foundation_staple_requires_same_lane_or_battle_proof"
+      ],
+      "status": "same_lane_stage_cut_usage_trace_blocks_value_safe",
+      "target_cut_role": "tutors_access",
+      "usage_event_count": 2,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "artifact_reference_counts": {
+        "other_reference": 1,
+        "planning_reference_not_proof": 3,
+        "trace_artifact_reference": 4
+      },
+      "artifact_reference_sample": [
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "| 6 | `Lightning Greaves` | `haste_protection_silence` | `target_role_is_protected_profile_lane_requires_trace_or_equal_gate, commander_expected_package_anchor_requires_stage_proof` | `protected_same_lane_usage_trace_or_",
+          "line": 46,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+        },
+        {
+          "artifact_kind": "other_reference",
+          "excerpt": "1 Lightning Greaves",
+          "line": 85,
+          "path": "docs/hermes-analysis/master_optimizer_reports/lorehold_607_research_candidate_20260630_silence_tibalts_trickery_v1.md"
+        },
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "\"card_name\": \"Lightning Greaves\",",
+          "line": 967,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_pair_collector_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+        },
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "\"card_name\": \"Lightning Greaves\",",
+          "line": 338,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+        },
+        {
+          "artifact_kind": "trace_artifact_reference",
+          "excerpt": "\"card_name\": \"Lightning Greaves\",",
+          "line": 17221,
+          "path": "docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260630_post_pg274_perpetual_timepiece_combined_coherence.json"
+        }
+      ],
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Lightning Greaves",
+      "current_deck_present": true,
+      "decision_trace_count": 11,
+      "event_types": {
+        "cast_announced": 2,
+        "cost_paid": 2,
+        "equipment_attached": 1,
+        "equipment_unattached": 1,
+        "land_played": 4,
+        "priority_pass": 8,
+        "spell_cast": 2,
+        "spell_resolved": 2,
+        "turn_end": 12,
+        "turn_start": 4
+      },
+      "evidence_lanes": [
+        "protected_same_lane_usage_trace_or_equal_gate",
+        "expected_package_anchor_replacement_proof"
+      ],
+      "exposure_event_count": 16,
+      "first_decision_trace": {
+        "event": "mulligan_decision",
+        "player": "Kaalia of the Vast",
+        "turn": 0
+      },
+      "first_exposure_event": {
+        "event": "turn_start",
+        "player": "Kaalia of the Vast",
+        "turn": 1
+      },
+      "first_usage_event": {
+        "card": "Lightning Greaves",
+        "event": "cast_announced",
+        "player": "Kaalia of the Vast",
+        "turn": 2
+      },
+      "format_staple": {},
+      "maximum_evidence_burden": 6,
+      "next_evidence": "build_same_lane_replacement_or_find_new_cut_source",
+      "profile_roles": [
+        "haste_protection_silence"
+      ],
+      "risk_flags": [
+        "attack_window_or_extra_combat_cut",
+        "haste_or_protection_cut"
+      ],
+      "stage_reasons": [
+        "target_role_is_protected_profile_lane_requires_trace_or_equal_gate",
+        "commander_expected_package_anchor_requires_stage_proof"
+      ],
+      "status": "same_lane_stage_cut_usage_trace_blocks_value_safe",
+      "target_cut_role": "haste_protection_silence",
+      "usage_event_count": 8,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "artifact_reference_counts": {
+        "other_reference": 1,
+        "planning_reference_not_proof": 5,
+        "trace_artifact_reference": 2
+      },
+      "artifact_reference_sample": [
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "| 6 | `Sol Ring` | `mana_acceleration` | `commander_expected_package_anchor_requires_stage_proof, structural_foundation_staple_requires_same_lane_or_battle_proof` | `expected_package_anchor_replacement_proof, structural_",
+          "line": 47,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+        },
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "\"card_name\": \"Sol Ring\",",
+          "line": 244,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_stage_only_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+        },
+        {
+          "artifact_kind": "other_reference",
+          "excerpt": "1 Sol Ring",
+          "line": 103,
+          "path": "docs/hermes-analysis/master_optimizer_reports/lorehold_607_research_candidate_20260630_silence_tibalts_trickery_v1.md"
+        },
+        {
+          "artifact_kind": "trace_artifact_reference",
+          "excerpt": "| `Sol Ring` | `remaining_cut_used_by_target_trace_blocks_value_safe` | 7 | 14 | 5 | `find_different_cut_or_same_lane_replacement_proof` |",
+          "line": 32,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_new_cut_source_lane_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+        },
+        {
+          "artifact_kind": "trace_artifact_reference",
+          "excerpt": "- `remaining_cut_cards_used_by_target_deck:Sunforger,Jeska's Will,Smothering Tithe,Demonic Tutor,Enlightened Tutor,Arcane Signet,Mana Vault,Sol Ring,Birgi, God of Storytelling // Harnfel, Horn of Bounty`",
+          "line": 37,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_new_cut_source_lane_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+        }
+      ],
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Sol Ring",
+      "current_deck_present": true,
+      "decision_trace_count": 5,
+      "event_types": {
+        "cast_announced": 5,
+        "cast_illegal": 4,
+        "cost_paid": 1,
+        "land_played": 4,
+        "spell_cast": 1,
+        "turn_end": 12,
+        "turn_start": 2
+      },
+      "evidence_lanes": [
+        "expected_package_anchor_replacement_proof",
+        "structural_staple_same_lane_or_equal_gate_proof"
+      ],
+      "exposure_event_count": 14,
+      "first_decision_trace": {
+        "event": "pass_no_action",
+        "player": "Kaalia of the Vast",
+        "turn": 9
+      },
+      "first_exposure_event": {
+        "event": "turn_start",
+        "player": "Kaalia of the Vast",
+        "turn": 10
+      },
+      "first_usage_event": {
+        "card": "Sol Ring",
+        "event": "cast_announced",
+        "player": "Kaalia of the Vast",
+        "turn": 9
+      },
+      "format_staple": {
+        "archetype": "ramp",
+        "card_name": "Sol Ring",
+        "category": "",
+        "color_identity": "",
+        "edhrec_rank": 1,
+        "format": "commander"
+      },
+      "maximum_evidence_burden": 6,
+      "next_evidence": "build_same_lane_replacement_or_find_new_cut_source",
+      "profile_roles": [
+        "mana_acceleration"
+      ],
+      "risk_flags": [
+        "mana_acceleration_cut"
+      ],
+      "stage_reasons": [
+        "commander_expected_package_anchor_requires_stage_proof",
+        "structural_foundation_staple_requires_same_lane_or_battle_proof"
+      ],
+      "status": "same_lane_stage_cut_usage_trace_blocks_value_safe",
+      "target_cut_role": "mana_acceleration",
+      "usage_event_count": 7,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "artifact_reference_counts": {
+        "planning_reference_not_proof": 5,
+        "trace_artifact_reference": 3
+      },
+      "artifact_reference_sample": [
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "| 6 | `Vampiric Tutor` | `tutors_access` | `commander_expected_package_anchor_requires_stage_proof, structural_foundation_staple_requires_same_lane_or_battle_proof` | `expected_package_anchor_replacement_proof, structura",
+          "line": 48,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+        },
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "\"card_name\": \"Vampiric Tutor\",",
+          "line": 190,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_stage_only_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+        },
+        {
+          "artifact_kind": "trace_artifact_reference",
+          "excerpt": "| `Vampiric Tutor` | `remaining_cut_seen_without_usage_needs_negative_review` | 0 | 0 | 1 | `explain_nonuse_or_force_access_before_reclassification` |",
+          "line": 28,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_new_cut_source_lane_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+        },
+        {
+          "artifact_kind": "trace_artifact_reference",
+          "excerpt": "- `remaining_cut_cards_seen_without_usage:Alicia Masters, Skilled Sculptor,Vampiric Tutor`",
+          "line": 38,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_new_cut_source_lane_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+        },
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "\"card_name\": \"Vampiric Tutor\",",
+          "line": 1085,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_pair_collector_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+        }
+      ],
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Vampiric Tutor",
+      "current_deck_present": true,
+      "decision_trace_count": 1,
+      "event_types": {
+        "priority_pass": 3
+      },
+      "evidence_lanes": [
+        "expected_package_anchor_replacement_proof",
+        "structural_staple_same_lane_or_equal_gate_proof"
+      ],
+      "exposure_event_count": 0,
+      "first_decision_trace": {
+        "event": "mulligan_decision",
+        "player": "Kaalia of the Vast",
+        "turn": 0
+      },
+      "first_exposure_event": null,
+      "first_usage_event": null,
+      "format_staple": {
+        "archetype": "combo",
+        "card_name": "Vampiric Tutor",
+        "category": "",
+        "color_identity": "B",
+        "edhrec_rank": 106,
+        "format": "commander"
+      },
+      "maximum_evidence_burden": 6,
+      "next_evidence": "manual_negative_review_or_force_access_before_reclassification",
+      "profile_roles": [
+        "tutors_access"
+      ],
+      "risk_flags": [
+        "tutor_access_cut"
+      ],
+      "stage_reasons": [
+        "commander_expected_package_anchor_requires_stage_proof",
+        "structural_foundation_staple_requires_same_lane_or_battle_proof"
+      ],
+      "status": "same_lane_stage_cut_seen_without_usage_needs_negative_review",
+      "target_cut_role": "tutors_access",
+      "usage_event_count": 0,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "artifact_reference_counts": {
+        "planning_reference_not_proof": 3,
+        "trace_artifact_reference": 5
+      },
+      "artifact_reference_sample": [
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "| 6 | `The One Ring` | `haste_protection_silence` | `target_role_is_protected_profile_lane_requires_trace_or_equal_gate, non_target_cut_risk:card_flow_cut` | `protected_same_lane_usage_trace_or_equal_gate, cross_role_ris",
+          "line": 49,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+        },
+        {
+          "artifact_kind": "trace_artifact_reference",
+          "excerpt": "\"keep Mana Vault and The One Ring blocked until same-lane trace proof exists\"",
+          "line": 15,
+          "path": "docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_floor_trace_evidence_collector_20260705_current.json"
+        },
+        {
+          "artifact_kind": "trace_artifact_reference",
+          "excerpt": "- `keep Mana Vault and The One Ring blocked until same-lane trace proof exists`",
+          "line": 57,
+          "path": "docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_floor_trace_evidence_collector_20260705_current.md"
+        },
+        {
+          "artifact_kind": "trace_artifact_reference",
+          "excerpt": "\"summary\": \"The Mana Vault ramp swap is methodologically valid. Birgi over Scarlet is same-macro but needs confirmation. The One Ring over Molecule Man is a cross-lane cut and must not be used as proof that Molecule belo",
+          "line": 15,
+          "path": "docs/hermes-analysis/master_optimizer_reports/lorehold_current_best_baseline_synthesis_20260705_brain_cut_slot_trace_current.json"
+        },
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "\"card_name\": \"The One Ring\",",
+          "line": 1200,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_pair_collector_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+        }
+      ],
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "The One Ring",
+      "current_deck_present": true,
+      "decision_trace_count": 19,
+      "event_types": {
+        "activated_ability_skipped": 5,
+        "cast_announced": 2,
+        "cost_paid": 2,
+        "land_played": 1,
+        "priority_pass": 8,
+        "protection_from_everything_granted": 2,
+        "spell_cast": 2,
+        "spell_resolved": 2,
+        "turn_end": 11,
+        "turn_start": 7,
+        "tutor_resolved": 1
+      },
+      "evidence_lanes": [
+        "protected_same_lane_usage_trace_or_equal_gate",
+        "cross_role_risk_trace_or_new_cut_source"
+      ],
+      "exposure_event_count": 18,
+      "first_decision_trace": {
+        "event": "tutor",
+        "player": "Kaalia of the Vast",
+        "turn": 5
+      },
+      "first_exposure_event": {
+        "event": "turn_start",
+        "player": "Kaalia of the Vast",
+        "turn": 1
+      },
+      "first_usage_event": {
+        "card": "The One Ring",
+        "event": "cast_announced",
+        "player": "Kaalia of the Vast",
+        "turn": 6
+      },
+      "format_staple": {},
+      "maximum_evidence_burden": 6,
+      "next_evidence": "build_same_lane_replacement_or_find_new_cut_source",
+      "profile_roles": [
+        "card_draw_selection",
+        "haste_protection_silence"
+      ],
+      "risk_flags": [
+        "haste_or_protection_cut",
+        "card_flow_cut"
+      ],
+      "stage_reasons": [
+        "target_role_is_protected_profile_lane_requires_trace_or_equal_gate",
+        "non_target_cut_risk:card_flow_cut"
+      ],
+      "status": "same_lane_stage_cut_usage_trace_blocks_value_safe",
+      "target_cut_role": "haste_protection_silence",
+      "usage_event_count": 9,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "artifact_reference_counts": {
+        "planning_reference_not_proof": 6,
+        "trace_artifact_reference": 2
+      },
+      "artifact_reference_sample": [
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "| 6 | `Ranger-Captain of Eos` | `tutors_access` | `other_protected_profile_role_haste_protection_silence, non_target_cut_risk:haste_or_protection_cut, commander_expected_package_anchor_requires_stage_proof` | `multi_role",
+          "line": 50,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+        },
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "| 6 | `Ranger-Captain of Eos` | `haste_protection_silence` | `target_role_is_protected_profile_lane_requires_trace_or_equal_gate, non_target_cut_risk:tutor_access_cut, commander_expected_package_anchor_requires_stage_pro",
+          "line": 53,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+        },
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "\"card_name\": \"Ranger-Captain of Eos\",",
+          "line": 1228,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_pair_collector_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+        },
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "\"card_name\": \"Ranger-Captain of Eos\",",
+          "line": 1441,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_pair_collector_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+        },
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "\"card_name\": \"Ranger-Captain of Eos\",",
+          "line": 453,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+        }
+      ],
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Ranger-Captain of Eos",
+      "current_deck_present": true,
+      "decision_trace_count": 0,
+      "event_types": {},
+      "evidence_lanes": [
+        "multi_role_protected_lane_replacement_proof",
+        "cross_role_risk_trace_or_new_cut_source",
+        "expected_package_anchor_replacement_proof"
+      ],
+      "exposure_event_count": 0,
+      "first_decision_trace": null,
+      "first_exposure_event": null,
+      "first_usage_event": null,
+      "format_staple": {},
+      "maximum_evidence_burden": 6,
+      "next_evidence": "generate_or_import_same_lane_stage_cut_usage_trace",
+      "profile_roles": [
+        "haste_protection_silence",
+        "tutors_access"
+      ],
+      "risk_flags": [
+        "haste_or_protection_cut",
+        "tutor_access_cut"
+      ],
+      "stage_reasons": [
+        "other_protected_profile_role_haste_protection_silence",
+        "non_target_cut_risk:haste_or_protection_cut",
+        "commander_expected_package_anchor_requires_stage_proof"
+      ],
+      "status": "same_lane_stage_cut_needs_trace_or_external_research",
+      "target_cut_role": "tutors_access",
+      "usage_event_count": 0,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "artifact_reference_counts": {
+        "planning_reference_not_proof": 6,
+        "trace_artifact_reference": 2
+      },
+      "artifact_reference_sample": [
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "| 6 | `The Seriema` | `tutors_access` | `other_protected_profile_role_haste_protection_silence, non_target_cut_risk:haste_or_protection_cut` | `multi_role_protected_lane_replacement_proof, cross_role_risk_trace_or_new_cu",
+          "line": 51,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+        },
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "| 6 | `The Seriema` | `haste_protection_silence` | `target_role_is_protected_profile_lane_requires_trace_or_equal_gate, non_target_cut_risk:tutor_access_cut` | `protected_same_lane_usage_trace_or_equal_gate, cross_role_r",
+          "line": 54,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+        },
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "\"card_name\": \"The Seriema\",",
+          "line": 1285,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_pair_collector_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+        },
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "\"card_name\": \"The Seriema\",",
+          "line": 1469,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_pair_collector_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+        },
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "\"card_name\": \"The Seriema\",",
+          "line": 486,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+        }
+      ],
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "The Seriema",
+      "current_deck_present": true,
+      "decision_trace_count": 0,
+      "event_types": {},
+      "evidence_lanes": [
+        "multi_role_protected_lane_replacement_proof",
+        "cross_role_risk_trace_or_new_cut_source"
+      ],
+      "exposure_event_count": 0,
+      "first_decision_trace": null,
+      "first_exposure_event": null,
+      "first_usage_event": null,
+      "format_staple": {},
+      "maximum_evidence_burden": 6,
+      "next_evidence": "generate_or_import_same_lane_stage_cut_usage_trace",
+      "profile_roles": [
+        "haste_protection_silence",
+        "tutors_access"
+      ],
+      "risk_flags": [
+        "haste_or_protection_cut",
+        "tutor_access_cut"
+      ],
+      "stage_reasons": [
+        "other_protected_profile_role_haste_protection_silence",
+        "non_target_cut_risk:haste_or_protection_cut"
+      ],
+      "status": "same_lane_stage_cut_needs_trace_or_external_research",
+      "target_cut_role": "tutors_access",
+      "usage_event_count": 0,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "artifact_reference_counts": {
+        "external_reference_artifact": 8
+      },
+      "artifact_reference_sample": [
+        {
+          "artifact_kind": "external_reference_artifact",
+          "excerpt": "\"protected_profile_role_haste_protection_silence,lands\"",
+          "line": 178,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_value_safe_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1_external_policy.json"
+        },
+        {
+          "artifact_kind": "external_reference_artifact",
+          "excerpt": "\"haste_protection_silence\",",
+          "line": 185,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_value_safe_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1_external_policy.json"
+        },
+        {
+          "artifact_kind": "external_reference_artifact",
+          "excerpt": "\"matches_post_forced_target_cut_role:haste_protection_silence\"",
+          "line": 189,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_value_safe_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1_external_policy.json"
+        },
+        {
+          "artifact_kind": "external_reference_artifact",
+          "excerpt": "\"protected_profile_role_angels_demons_dragons_payoffs,haste_protection_silence\"",
+          "line": 230,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_value_safe_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1_external_policy.json"
+        },
+        {
+          "artifact_kind": "external_reference_artifact",
+          "excerpt": "\"haste_protection_silence\"",
+          "line": 240,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_value_safe_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1_external_policy.json"
+        }
+      ],
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Silence",
+      "current_deck_present": true,
+      "decision_trace_count": 18,
+      "event_types": {
+        "cast_announced": 3,
+        "cost_paid": 3,
+        "priority_pass": 2,
+        "spell_cast": 3,
+        "spell_resolved": 3,
+        "turn_end": 1
+      },
+      "evidence_lanes": [
+        "protected_same_lane_usage_trace_or_equal_gate",
+        "expected_package_anchor_replacement_proof"
+      ],
+      "exposure_event_count": 1,
+      "first_decision_trace": {
+        "event": "pass_no_action",
+        "player": "Kaalia of the Vast",
+        "turn": 4
+      },
+      "first_exposure_event": {
+        "event": "turn_end",
+        "player": "Kaalia of the Vast",
+        "turn": 11
+      },
+      "first_usage_event": {
+        "card": "Voice of Victory",
+        "event": "cast_announced",
+        "player": "Kaalia of the Vast",
+        "turn": 5
+      },
+      "format_staple": {
+        "archetype": "white",
+        "card_name": "Silence",
+        "category": "",
+        "color_identity": "W",
+        "edhrec_rank": 423,
+        "format": "commander"
+      },
+      "maximum_evidence_burden": 6,
+      "next_evidence": "build_same_lane_replacement_or_find_new_cut_source",
+      "profile_roles": [
+        "haste_protection_silence"
+      ],
+      "risk_flags": [
+        "haste_or_protection_cut"
+      ],
+      "stage_reasons": [
+        "target_role_is_protected_profile_lane_requires_trace_or_equal_gate",
+        "commander_expected_package_anchor_requires_stage_proof"
+      ],
+      "status": "same_lane_stage_cut_usage_trace_blocks_value_safe",
+      "target_cut_role": "haste_protection_silence",
+      "usage_event_count": 12,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "artifact_reference_counts": {
+        "planning_reference_not_proof": 6,
+        "trace_artifact_reference": 2
+      },
+      "artifact_reference_sample": [
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "| 6 | `Ranger-Captain of Eos` | `tutors_access` | `other_protected_profile_role_haste_protection_silence, non_target_cut_risk:haste_or_protection_cut, commander_expected_package_anchor_requires_stage_proof` | `multi_role",
+          "line": 50,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+        },
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "| 6 | `Ranger-Captain of Eos` | `haste_protection_silence` | `target_role_is_protected_profile_lane_requires_trace_or_equal_gate, non_target_cut_risk:tutor_access_cut, commander_expected_package_anchor_requires_stage_pro",
+          "line": 53,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+        },
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "\"card_name\": \"Ranger-Captain of Eos\",",
+          "line": 1228,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_pair_collector_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+        },
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "\"card_name\": \"Ranger-Captain of Eos\",",
+          "line": 1441,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_pair_collector_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+        },
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "\"card_name\": \"Ranger-Captain of Eos\",",
+          "line": 453,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+        }
+      ],
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Ranger-Captain of Eos",
+      "current_deck_present": true,
+      "decision_trace_count": 0,
+      "event_types": {},
+      "evidence_lanes": [
+        "protected_same_lane_usage_trace_or_equal_gate",
+        "cross_role_risk_trace_or_new_cut_source",
+        "expected_package_anchor_replacement_proof"
+      ],
+      "exposure_event_count": 0,
+      "first_decision_trace": null,
+      "first_exposure_event": null,
+      "first_usage_event": null,
+      "format_staple": {},
+      "maximum_evidence_burden": 6,
+      "next_evidence": "generate_or_import_same_lane_stage_cut_usage_trace",
+      "profile_roles": [
+        "haste_protection_silence",
+        "tutors_access"
+      ],
+      "risk_flags": [
+        "haste_or_protection_cut",
+        "tutor_access_cut"
+      ],
+      "stage_reasons": [
+        "target_role_is_protected_profile_lane_requires_trace_or_equal_gate",
+        "non_target_cut_risk:tutor_access_cut",
+        "commander_expected_package_anchor_requires_stage_proof"
+      ],
+      "status": "same_lane_stage_cut_needs_trace_or_external_research",
+      "target_cut_role": "haste_protection_silence",
+      "usage_event_count": 0,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "artifact_reference_counts": {
+        "planning_reference_not_proof": 6,
+        "trace_artifact_reference": 2
+      },
+      "artifact_reference_sample": [
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "| 6 | `The Seriema` | `tutors_access` | `other_protected_profile_role_haste_protection_silence, non_target_cut_risk:haste_or_protection_cut` | `multi_role_protected_lane_replacement_proof, cross_role_risk_trace_or_new_cu",
+          "line": 51,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+        },
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "| 6 | `The Seriema` | `haste_protection_silence` | `target_role_is_protected_profile_lane_requires_trace_or_equal_gate, non_target_cut_risk:tutor_access_cut` | `protected_same_lane_usage_trace_or_equal_gate, cross_role_r",
+          "line": 54,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+        },
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "\"card_name\": \"The Seriema\",",
+          "line": 1285,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_pair_collector_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+        },
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "\"card_name\": \"The Seriema\",",
+          "line": 1469,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_pair_collector_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+        },
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "\"card_name\": \"The Seriema\",",
+          "line": 486,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+        }
+      ],
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "The Seriema",
+      "current_deck_present": true,
+      "decision_trace_count": 0,
+      "event_types": {},
+      "evidence_lanes": [
+        "protected_same_lane_usage_trace_or_equal_gate",
+        "cross_role_risk_trace_or_new_cut_source"
+      ],
+      "exposure_event_count": 0,
+      "first_decision_trace": null,
+      "first_exposure_event": null,
+      "first_usage_event": null,
+      "format_staple": {},
+      "maximum_evidence_burden": 6,
+      "next_evidence": "generate_or_import_same_lane_stage_cut_usage_trace",
+      "profile_roles": [
+        "haste_protection_silence",
+        "tutors_access"
+      ],
+      "risk_flags": [
+        "haste_or_protection_cut",
+        "tutor_access_cut"
+      ],
+      "stage_reasons": [
+        "target_role_is_protected_profile_lane_requires_trace_or_equal_gate",
+        "non_target_cut_risk:tutor_access_cut"
+      ],
+      "status": "same_lane_stage_cut_needs_trace_or_external_research",
+      "target_cut_role": "haste_protection_silence",
+      "usage_event_count": 0,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "artifact_reference_counts": {
+        "other_reference": 1,
+        "planning_reference_not_proof": 5,
+        "trace_artifact_reference": 2
+      },
+      "artifact_reference_sample": [
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "| 6 | `Smothering Tithe` | `mana_acceleration` | `structural_foundation_staple_requires_same_lane_or_battle_proof` | `structural_staple_same_lane_or_equal_gate_proof` |",
+          "line": 55,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+        },
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "\"card_name\": \"Smothering Tithe\",",
+          "line": 295,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_stage_only_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+        },
+        {
+          "artifact_kind": "other_reference",
+          "excerpt": "1 Smothering Tithe",
+          "line": 102,
+          "path": "docs/hermes-analysis/master_optimizer_reports/lorehold_607_research_candidate_20260630_silence_tibalts_trickery_v1.md"
+        },
+        {
+          "artifact_kind": "trace_artifact_reference",
+          "excerpt": "| `Smothering Tithe` | `remaining_cut_used_by_target_trace_blocks_value_safe` | 163 | 46 | 25 | `find_different_cut_or_same_lane_replacement_proof` |",
+          "line": 25,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_new_cut_source_lane_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+        },
+        {
+          "artifact_kind": "trace_artifact_reference",
+          "excerpt": "- `remaining_cut_cards_used_by_target_deck:Sunforger,Jeska's Will,Smothering Tithe,Demonic Tutor,Enlightened Tutor,Arcane Signet,Mana Vault,Sol Ring,Birgi, God of Storytelling // Harnfel, Horn of Bounty`",
+          "line": 37,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_new_cut_source_lane_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+        }
+      ],
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Smothering Tithe",
+      "current_deck_present": true,
+      "decision_trace_count": 25,
+      "event_types": {
+        "cast_announced": 4,
+        "cost_paid": 4,
+        "land_played": 6,
+        "priority_pass": 108,
+        "spell_cast": 4,
+        "trigger_put_on_stack": 75,
+        "trigger_resolved": 76,
+        "turn_end": 34,
+        "turn_start": 12
+      },
+      "evidence_lanes": [
+        "structural_staple_same_lane_or_equal_gate_proof"
+      ],
+      "exposure_event_count": 46,
+      "first_decision_trace": {
+        "event": "mulligan_decision",
+        "player": "Kaalia of the Vast",
+        "turn": 0
+      },
+      "first_exposure_event": {
+        "event": "turn_start",
+        "player": "Kaalia of the Vast",
+        "turn": 1
+      },
+      "first_usage_event": {
+        "card": "Smothering Tithe",
+        "event": "cast_announced",
+        "player": "Kaalia of the Vast",
+        "turn": 5
+      },
+      "format_staple": {
+        "archetype": "white",
+        "card_name": "Smothering Tithe",
+        "category": "",
+        "color_identity": "W",
+        "edhrec_rank": 57,
+        "format": "commander"
+      },
+      "maximum_evidence_burden": 6,
+      "next_evidence": "build_same_lane_replacement_or_find_new_cut_source",
+      "profile_roles": [
+        "mana_acceleration"
+      ],
+      "risk_flags": [
+        "mana_acceleration_cut"
+      ],
+      "stage_reasons": [
+        "structural_foundation_staple_requires_same_lane_or_battle_proof"
+      ],
+      "status": "same_lane_stage_cut_usage_trace_blocks_value_safe",
+      "target_cut_role": "mana_acceleration",
+      "usage_event_count": 163,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "artifact_reference_counts": {
+        "other_reference": 1,
+        "planning_reference_not_proof": 2,
+        "trace_artifact_reference": 5
+      },
+      "artifact_reference_sample": [
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "| 6 | `Jeska's Will` | `mana_acceleration` | `structural_foundation_staple_requires_same_lane_or_battle_proof` | `structural_staple_same_lane_or_equal_gate_proof` |",
+          "line": 56,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+        },
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "\"card_name\": \"Jeska's Will\",",
+          "line": 271,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_stage_only_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+        },
+        {
+          "artifact_kind": "other_reference",
+          "excerpt": "1 Jeska's Will",
+          "line": 82,
+          "path": "docs/hermes-analysis/master_optimizer_reports/lorehold_607_research_candidate_20260630_silence_tibalts_trickery_v1.md"
+        },
+        {
+          "artifact_kind": "trace_artifact_reference",
+          "excerpt": "- `spell_resolved:Jeska's Will`: `14`",
+          "line": 35,
+          "path": "docs/hermes-analysis/master_optimizer_reports/lorehold_closing_window_trace_miner_20260705_authorized_validation_current.md"
+        },
+        {
+          "artifact_kind": "trace_artifact_reference",
+          "excerpt": "{\"data\": {\"card\": \"Jeska's Will\", \"cmc\": 3, \"destination\": \"graveyard\", \"effect\": \"ramp_ritual\", \"player\": \"Active\", \"result\": \"resolved\", \"rule_alternative_count\": 1, \"rule_confidence\": 0.97, \"rule_execution_status\": \"a",
+          "line": 1,
+          "path": "docs/hermes-analysis/master_optimizer_reports/deck6_pg077_runtime_events_20260623_062156.jsonl"
+        }
+      ],
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Jeska's Will",
+      "current_deck_present": true,
+      "decision_trace_count": 11,
+      "event_types": {
+        "cast_announced": 2,
+        "cost_paid": 2,
+        "jeskas_will_resolved": 2,
+        "spell_cast": 2,
+        "spell_resolved": 2,
+        "trigger_resolved": 1,
+        "turn_end": 3,
+        "turn_start": 3
+      },
+      "evidence_lanes": [
+        "structural_staple_same_lane_or_equal_gate_proof"
+      ],
+      "exposure_event_count": 6,
+      "first_decision_trace": {
+        "event": "pass_no_action",
+        "player": "Kaalia of the Vast",
+        "turn": 6
+      },
+      "first_exposure_event": {
+        "event": "turn_end",
+        "player": "Kaalia of the Vast",
+        "turn": 6
+      },
+      "first_usage_event": {
+        "card": "Jeska's Will",
+        "event": "cast_announced",
+        "player": "Kaalia of the Vast",
+        "turn": 7
+      },
+      "format_staple": {
+        "archetype": "red",
+        "card_name": "Jeska's Will",
+        "category": "",
+        "color_identity": "R",
+        "edhrec_rank": 102,
+        "format": "commander"
+      },
+      "maximum_evidence_burden": 6,
+      "next_evidence": "build_same_lane_replacement_or_find_new_cut_source",
+      "profile_roles": [
+        "mana_acceleration"
+      ],
+      "risk_flags": [
+        "mana_acceleration_cut"
+      ],
+      "stage_reasons": [
+        "structural_foundation_staple_requires_same_lane_or_battle_proof"
+      ],
+      "status": "same_lane_stage_cut_usage_trace_blocks_value_safe",
+      "target_cut_role": "mana_acceleration",
+      "usage_event_count": 9,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "artifact_reference_counts": {
+        "planning_reference_not_proof": 3,
+        "trace_artifact_reference": 5
+      },
+      "artifact_reference_sample": [
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "| 6 | `Hammer of Nazahn` | `haste_protection_silence` | `target_role_is_protected_profile_lane_requires_trace_or_equal_gate` | `protected_same_lane_usage_trace_or_equal_gate` |",
+          "line": 57,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+        },
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "\"card_name\": \"Hammer of Nazahn\",",
+          "line": 755,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_pair_collector_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+        },
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "\"card_name\": \"Hammer of Nazahn\",",
+          "line": 657,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+        },
+        {
+          "artifact_kind": "trace_artifact_reference",
+          "excerpt": "\"card_name\": \"Hammer of Nazahn\",",
+          "line": 5897,
+          "path": "docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260626_pg228_primal_amulet_runtime_v2_proposals.json"
+        },
+        {
+          "artifact_kind": "trace_artifact_reference",
+          "excerpt": "\"normalized_name\": \"hammer of nazahn\",",
+          "line": 5919,
+          "path": "docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260626_pg228_primal_amulet_runtime_v2_proposals.json"
+        }
+      ],
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Hammer of Nazahn",
+      "current_deck_present": true,
+      "decision_trace_count": 37,
+      "event_types": {
+        "cast_announced": 1,
+        "cast_illegal": 1,
+        "turn_end": 15,
+        "turn_start": 15
+      },
+      "evidence_lanes": [
+        "protected_same_lane_usage_trace_or_equal_gate"
+      ],
+      "exposure_event_count": 30,
+      "first_decision_trace": {
+        "event": "mulligan_decision",
+        "player": "Kaalia of the Vast",
+        "turn": 0
+      },
+      "first_exposure_event": {
+        "event": "turn_start",
+        "player": "Kaalia of the Vast",
+        "turn": 1
+      },
+      "first_usage_event": {
+        "card": "Hammer of Nazahn",
+        "event": "cast_announced",
+        "player": "Kaalia of the Vast",
+        "turn": 7
+      },
+      "format_staple": {},
+      "maximum_evidence_burden": 6,
+      "next_evidence": "build_same_lane_replacement_or_find_new_cut_source",
+      "profile_roles": [
+        "haste_protection_silence"
+      ],
+      "risk_flags": [
+        "attack_window_or_extra_combat_cut",
+        "haste_or_protection_cut"
+      ],
+      "stage_reasons": [
+        "target_role_is_protected_profile_lane_requires_trace_or_equal_gate"
+      ],
+      "status": "same_lane_stage_cut_usage_trace_blocks_value_safe",
+      "target_cut_role": "haste_protection_silence",
+      "usage_event_count": 1,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "artifact_reference_counts": {
+        "external_reference_artifact": 3,
+        "planning_reference_not_proof": 3,
+        "trace_artifact_reference": 2
+      },
+      "artifact_reference_sample": [
+        {
+          "artifact_kind": "external_reference_artifact",
+          "excerpt": "\"card_name\": \"Dark Ritual\",",
+          "line": 571,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_value_safe_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1_external_policy.json"
+        },
+        {
+          "artifact_kind": "external_reference_artifact",
+          "excerpt": "\"card_name\": \"Dark Ritual\",",
+          "line": 575,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_value_safe_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1_external_policy.json"
+        },
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "| 6 | `Dark Ritual` | `mana_acceleration` | `structural_foundation_staple_requires_same_lane_or_battle_proof` | `structural_staple_same_lane_or_equal_gate_proof` |",
+          "line": 58,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+        },
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "\"card_name\": \"Dark Ritual\",",
+          "line": 319,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_stage_only_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+        },
+        {
+          "artifact_kind": "trace_artifact_reference",
+          "excerpt": "| `Dark Ritual` | `remaining_cut_not_seen_needs_forced_access_or_more_trace` | 0 | 0 | 0 | `force_access_or_expand_replay_window_before_reclassification` |",
+          "line": 30,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_new_cut_source_lane_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+        }
+      ],
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Dark Ritual",
+      "current_deck_present": true,
+      "decision_trace_count": 0,
+      "event_types": {},
+      "evidence_lanes": [
+        "structural_staple_same_lane_or_equal_gate_proof"
+      ],
+      "exposure_event_count": 0,
+      "first_decision_trace": null,
+      "first_exposure_event": null,
+      "first_usage_event": null,
+      "format_staple": {
+        "archetype": "black",
+        "card_name": "Dark Ritual",
+        "category": "",
+        "color_identity": "B",
+        "edhrec_rank": 36,
+        "format": "commander"
+      },
+      "maximum_evidence_burden": 6,
+      "next_evidence": "collect_current_scope_trace_for_external_reference_card",
+      "profile_roles": [
+        "mana_acceleration"
+      ],
+      "risk_flags": [
+        "mana_acceleration_cut"
+      ],
+      "stage_reasons": [
+        "structural_foundation_staple_requires_same_lane_or_battle_proof"
+      ],
+      "status": "same_lane_stage_cut_external_reference_needs_internal_trace",
+      "target_cut_role": "mana_acceleration",
+      "usage_event_count": 0,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "artifact_reference_counts": {
+        "planning_reference_not_proof": 2,
+        "trace_artifact_reference": 6
+      },
+      "artifact_reference_sample": [
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "| 6 | `Mana Vault` | `mana_acceleration` | `structural_foundation_staple_requires_same_lane_or_battle_proof` | `structural_staple_same_lane_or_equal_gate_proof` |",
+          "line": 59,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+        },
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "\"card_name\": \"Mana Vault\",",
+          "line": 343,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_stage_only_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+        },
+        {
+          "artifact_kind": "trace_artifact_reference",
+          "excerpt": "\"keep Mana Vault and The One Ring blocked until same-lane trace proof exists\"",
+          "line": 15,
+          "path": "docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_floor_trace_evidence_collector_20260705_current.json"
+        },
+        {
+          "artifact_kind": "trace_artifact_reference",
+          "excerpt": "- `{'card': 'Mana Vault', 'metric': 'candidate_observation', 'reason': 'candidate_card_never_observed'}`",
+          "line": 34,
+          "path": "docs/hermes-analysis/master_optimizer_reports/seventeenlands_battle_prior_compare_deck607_replay_20260628.md"
+        },
+        {
+          "artifact_kind": "trace_artifact_reference",
+          "excerpt": "- Mana Vault: `{'by_event_type': {}, 'first_turn': None, 'observed': False, 'total_events': 0}`",
+          "line": 40,
+          "path": "docs/hermes-analysis/master_optimizer_reports/seventeenlands_battle_prior_compare_deck607_replay_20260628.md"
+        }
+      ],
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Mana Vault",
+      "current_deck_present": true,
+      "decision_trace_count": 4,
+      "event_types": {
+        "cast_announced": 3,
+        "cost_paid": 3,
+        "land_played": 3,
+        "spell_cast": 3,
+        "turn_end": 16,
+        "turn_start": 1
+      },
+      "evidence_lanes": [
+        "structural_staple_same_lane_or_equal_gate_proof"
+      ],
+      "exposure_event_count": 17,
+      "first_decision_trace": {
+        "event": "cast_spell",
+        "player": "Kaalia of the Vast",
+        "turn": 3
+      },
+      "first_exposure_event": {
+        "event": "turn_end",
+        "player": "Kaalia of the Vast",
+        "turn": 3
+      },
+      "first_usage_event": {
+        "card": "Mana Vault",
+        "event": "cast_announced",
+        "player": "Kaalia of the Vast",
+        "turn": 3
+      },
+      "format_staple": {
+        "archetype": "ramp",
+        "card_name": "Mana Vault",
+        "category": "",
+        "color_identity": "",
+        "edhrec_rank": 144,
+        "format": "commander"
+      },
+      "maximum_evidence_burden": 6,
+      "next_evidence": "build_same_lane_replacement_or_find_new_cut_source",
+      "profile_roles": [
+        "mana_acceleration"
+      ],
+      "risk_flags": [
+        "mana_acceleration_cut"
+      ],
+      "stage_reasons": [
+        "structural_foundation_staple_requires_same_lane_or_battle_proof"
+      ],
+      "status": "same_lane_stage_cut_usage_trace_blocks_value_safe",
+      "target_cut_role": "mana_acceleration",
+      "usage_event_count": 9,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "artifact_reference_counts": {
+        "planning_reference_not_proof": 3,
+        "trace_artifact_reference": 5
+      },
+      "artifact_reference_sample": [
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "| 6 | `Voice of Victory` | `haste_protection_silence` | `target_role_is_protected_profile_lane_requires_trace_or_equal_gate` | `protected_same_lane_usage_trace_or_equal_gate` |",
+          "line": 60,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+        },
+        {
+          "artifact_kind": "trace_artifact_reference",
+          "excerpt": "\"card_name\": \"Voice of Victory\",",
+          "line": 610,
+          "path": "docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260626_pg219_purphoros_partial_ready_v1_proposals.json"
+        },
+        {
+          "artifact_kind": "trace_artifact_reference",
+          "excerpt": "\"normalized_name\": \"voice of victory\",",
+          "line": 626,
+          "path": "docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260626_pg219_purphoros_partial_ready_v1_proposals.json"
+        },
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "\"card_name\": \"Voice of Victory\",",
+          "line": 1116,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_pair_collector_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+        },
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "\"card_name\": \"Voice of Victory\",",
+          "line": 733,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+        }
+      ],
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Voice of Victory",
+      "current_deck_present": true,
+      "decision_trace_count": 13,
+      "event_types": {
+        "additional_cost_paid": 1,
+        "cast_announced": 3,
+        "combat": 9,
+        "combat_step": 9,
+        "cost_paid": 3,
+        "land_played": 2,
+        "multi_defender_attack": 3,
+        "permanent_moved_from_battlefield": 1,
+        "priority_pass": 12,
+        "spell_cast": 3,
+        "spell_resolved": 3,
+        "turn_end": 15,
+        "turn_start": 6
+      },
+      "evidence_lanes": [
+        "protected_same_lane_usage_trace_or_equal_gate"
+      ],
+      "exposure_event_count": 21,
+      "first_decision_trace": {
+        "event": "pass_no_action",
+        "player": "Kaalia of the Vast",
+        "turn": 4
+      },
+      "first_exposure_event": {
+        "event": "turn_end",
+        "player": "Kaalia of the Vast",
+        "turn": 4
+      },
+      "first_usage_event": {
+        "card": "Voice of Victory",
+        "event": "cast_announced",
+        "player": "Kaalia of the Vast",
+        "turn": 5
+      },
+      "format_staple": {},
+      "maximum_evidence_burden": 6,
+      "next_evidence": "build_same_lane_replacement_or_find_new_cut_source",
+      "profile_roles": [
+        "haste_protection_silence"
+      ],
+      "risk_flags": [
+        "haste_or_protection_cut"
+      ],
+      "stage_reasons": [
+        "target_role_is_protected_profile_lane_requires_trace_or_equal_gate"
+      ],
+      "status": "same_lane_stage_cut_usage_trace_blocks_value_safe",
+      "target_cut_role": "haste_protection_silence",
+      "usage_event_count": 12,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "artifact_reference_counts": {
+        "external_reference_artifact": 1,
+        "planning_reference_not_proof": 3,
+        "trace_artifact_reference": 4
+      },
+      "artifact_reference_sample": [
+        {
+          "artifact_kind": "external_reference_artifact",
+          "excerpt": "\"card_name\": \"Blightsteel Colossus // Blightsteel Colossus\",",
+          "line": 359,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_value_safe_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1_external_policy.json"
+        },
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "| 6 | `Blightsteel Colossus // Blightsteel Colossus` | `haste_protection_silence` | `target_role_is_protected_profile_lane_requires_trace_or_equal_gate` | `protected_same_lane_usage_trace_or_equal_gate` |",
+          "line": 61,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+        },
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "\"card_name\": \"Blightsteel Colossus // Blightsteel Colossus\",",
+          "line": 1174,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_pair_collector_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+        },
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "\"card_name\": \"Blightsteel Colossus // Blightsteel Colossus\",",
+          "line": 758,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+        },
+        {
+          "artifact_kind": "trace_artifact_reference",
+          "excerpt": "\"card_name\": \"Blightsteel Colossus // Blightsteel Colossus\",",
+          "line": 7539,
+          "path": "docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260626_pg228_primal_amulet_runtime_v2_proposals.json"
+        }
+      ],
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Blightsteel Colossus // Blightsteel Colossus",
+      "current_deck_present": true,
+      "decision_trace_count": 13,
+      "event_types": {
+        "turn_end": 5,
+        "turn_start": 5
+      },
+      "evidence_lanes": [
+        "protected_same_lane_usage_trace_or_equal_gate"
+      ],
+      "exposure_event_count": 10,
+      "first_decision_trace": {
+        "event": "mulligan_decision",
+        "player": "Kaalia of the Vast",
+        "turn": 0
+      },
+      "first_exposure_event": {
+        "event": "turn_start",
+        "player": "Kaalia of the Vast",
+        "turn": 1
+      },
+      "first_usage_event": null,
+      "format_staple": {},
+      "maximum_evidence_burden": 6,
+      "next_evidence": "manual_negative_review_or_force_access_before_reclassification",
+      "profile_roles": [
+        "dedicated_win_conditions",
+        "haste_protection_silence"
+      ],
+      "risk_flags": [
+        "haste_or_protection_cut"
+      ],
+      "stage_reasons": [
+        "target_role_is_protected_profile_lane_requires_trace_or_equal_gate"
+      ],
+      "status": "same_lane_stage_cut_seen_without_usage_needs_negative_review",
+      "target_cut_role": "haste_protection_silence",
+      "usage_event_count": 0,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "artifact_reference_counts": {
+        "external_reference_artifact": 1,
+        "planning_reference_not_proof": 2,
+        "trace_artifact_reference": 5
+      },
+      "artifact_reference_sample": [
+        {
+          "artifact_kind": "external_reference_artifact",
+          "excerpt": "\"card_name\": \"Birgi, God of Storytelling // Harnfel, Horn of Bounty\",",
+          "line": 337,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_value_safe_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1_external_policy.json"
+        },
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "| 7 | `Birgi, God of Storytelling // Harnfel, Horn of Bounty` | `mana_acceleration` | `global_battle_feedback_requires_new_same_lane_or_gate` | `prior_failed_gate_reopen_proof` |",
+          "line": 62,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+        },
+        {
+          "artifact_kind": "trace_artifact_reference",
+          "excerpt": "| `Birgi, God of Storytelling // Harnfel, Horn of Bounty` | `ramp_engine` | `batch_pg_candidate_after_precheck` | `battle_rule_v1:c21762e62b990dbb474be0b5764d71a7` | `5f1ed696a63cd668fd46a2fe9971a54e` | `ramp_engine` |",
+          "line": 50,
+          "path": "docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260629_1728_post_pg259_exact_ramp_runtime_promotions_proposals.md"
+        },
+        {
+          "artifact_kind": "planning_reference_not_proof",
+          "excerpt": "\"card_name\": \"Birgi, God of Storytelling // Harnfel, Horn of Bounty\",",
+          "line": 367,
+          "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_stage_only_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+        },
+        {
+          "artifact_kind": "trace_artifact_reference",
+          "excerpt": "| warn | `docs/hermes-analysis/master_optimizer_reports/global_commander_battle_feedback_model_20260705_current.md` | feedback snapshot depends on prior ignored battle probe reports | Global Commander Battle Feedback Mod",
+          "line": 130,
+          "path": "docs/hermes-analysis/master_optimizer_reports/deckbuilding_contract_surface_audit_20260705_cut_source_hypothesis_trace_current.md"
+        }
+      ],
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+      "current_deck_present": true,
+      "decision_trace_count": 7,
+      "event_types": {
+        "cast_announced": 1,
+        "combat": 8,
+        "combat_step": 8,
+        "cost_paid": 1,
+        "land_played": 2,
+        "multi_defender_attack": 4,
+        "priority_pass": 30,
+        "spell_cast": 1,
+        "trigger_put_on_stack": 9,
+        "trigger_resolved": 9,
+        "turn_end": 11,
+        "turn_start": 2
+      },
+      "evidence_lanes": [
+        "prior_failed_gate_reopen_proof"
+      ],
+      "exposure_event_count": 13,
+      "first_decision_trace": {
+        "event": "tutor",
+        "player": "Kaalia of the Vast",
+        "turn": 7
+      },
+      "first_exposure_event": {
+        "event": "turn_end",
+        "player": "Kaalia of the Vast",
+        "turn": 1
+      },
+      "first_usage_event": {
+        "card": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+        "event": "cast_announced",
+        "player": "Kaalia of the Vast",
+        "turn": 3
+      },
+      "format_staple": {},
+      "maximum_evidence_burden": 7,
+      "next_evidence": "build_same_lane_replacement_or_find_new_cut_source",
+      "profile_roles": [
+        "mana_acceleration"
+      ],
+      "risk_flags": [
+        "mana_acceleration_cut"
+      ],
+      "stage_reasons": [
+        "global_battle_feedback_requires_new_same_lane_or_gate"
+      ],
+      "status": "same_lane_stage_cut_usage_trace_blocks_value_safe",
+      "target_cut_role": "mana_acceleration",
+      "usage_event_count": 21,
+      "value_safe_reclassification_allowed": false
+    }
+  ],
+  "seed_reports": [
+    {
+      "decision_count": 121,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_42.decision_trace.jsonl",
+      "event_count": 818,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_42.events.jsonl",
+      "seed": 42
+    },
+    {
+      "decision_count": 138,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_43.decision_trace.jsonl",
+      "event_count": 832,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_43.events.jsonl",
+      "seed": 43
+    },
+    {
+      "decision_count": 139,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_44.decision_trace.jsonl",
+      "event_count": 1003,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_44.events.jsonl",
+      "seed": 44
+    },
+    {
+      "decision_count": 114,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_45.decision_trace.jsonl",
+      "event_count": 727,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_45.events.jsonl",
+      "seed": 45
+    },
+    {
+      "decision_count": 136,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_46.decision_trace.jsonl",
+      "event_count": 1074,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_46.events.jsonl",
+      "seed": 46
+    },
+    {
+      "decision_count": 134,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_47.decision_trace.jsonl",
+      "event_count": 795,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_47.events.jsonl",
+      "seed": 47
+    },
+    {
+      "decision_count": 99,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_48.decision_trace.jsonl",
+      "event_count": 661,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_48.events.jsonl",
+      "seed": 48
+    },
+    {
+      "decision_count": 147,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_49.decision_trace.jsonl",
+      "event_count": 1061,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_49.events.jsonl",
+      "seed": 49
+    }
+  ],
+  "source_db_mutated": false,
+  "status": "same_lane_stage_cut_trace_collection_blocks_used_cuts",
+  "summary": {
+    "candidate_copy_blocker_count": 5,
+    "commander": "Kaalia of the Vast",
+    "deck_id": "619",
+    "external_reference_only_count": 1,
+    "needs_trace_or_external_research_count": 4,
+    "next_gate": "build_same_lane_replacement_or_find_new_cut_source_for_used_stage_cuts",
+    "seed_report_count": 8,
+    "seen_without_usage_count": 4,
+    "stage_cut_count": 28,
+    "status_counts": {
+      "same_lane_stage_cut_external_reference_needs_internal_trace": 1,
+      "same_lane_stage_cut_needs_trace_or_external_research": 4,
+      "same_lane_stage_cut_seen_without_usage_needs_negative_review": 4,
+      "same_lane_stage_cut_usage_trace_blocks_value_safe": 19
+    },
+    "usage_blocked_count": 19
+  },
+  "trace_resolution": {
+    "available": true,
+    "seed_report_count": 8,
+    "source_status": "contextual_usage_trace_generated_all_current_usage_review_required",
+    "trace_generator_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_generator_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+  },
+  "value_safe_reclassification_allowed_now": false
+}
