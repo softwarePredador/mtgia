@@ -338,6 +338,129 @@ def test_manifest_expected_rule_preserves_target_player_draw_fields() -> None:
     }
 
 
+def test_manifest_expected_rule_preserves_partial_mana_source_fields() -> None:
+    proposal = {
+        "normalized_name": "cultivator's caravan",
+        "card_name": "Cultivator's Caravan",
+        "oracle_hash": "hash-caravan",
+        "logical_rule_key": "battle_rule_v1:hash-caravan",
+        "effect_json": {
+            "effect": "ramp_permanent",
+            "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+            "is_mana_source": True,
+            "mana_produced": 1,
+            "produces": "WUBRG",
+            "mana_activation_requires_tap": True,
+            "modeled_ability_subset": "mana_source_only",
+            "_runtime_partial": True,
+            "_runtime_partial_reason": "Only mana source is modeled.",
+            "xmage_mana_ability_classes": ["AnyColorManaAbility"],
+            "xmage_auxiliary_ability_classes": ["CrewAbility"],
+            "xmage_unmodeled_auxiliary_ability_classes": ["CrewAbility"],
+            "xmage_unmodeled_effect_classes": [],
+            "xmage_effect_classes": [],
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+
+    required = expected["required_effect_fields"]
+    assert required["modeled_ability_subset"] == "mana_source_only"
+    assert required["_runtime_partial"] is True
+    assert required["xmage_mana_ability_classes"] == ["AnyColorManaAbility"]
+    assert required["xmage_unmodeled_auxiliary_ability_classes"] == ["CrewAbility"]
+
+
+def test_simple_mana_source_execution_scenario_pays_activation_cost() -> None:
+    rule = {
+        "card_name": "Ceta Disciple",
+        "logical_rule_key": "battle_rule_v1:ceta",
+        "required_effect_fields": {
+            "effect": "ramp_permanent",
+            "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+            "is_mana_source": True,
+            "mana_produced": 1,
+            "produces": "WUBRG",
+            "mana_activation_requires_tap": True,
+            "activation_mana_cost": "{G}",
+        },
+    }
+
+    scenario = builder.simple_mana_source_execution_scenario_from_expected_rule(rule)
+
+    assert scenario["type"] == "simple_mana_source_refresh"
+    assert scenario["controller_mana"] == {
+        "generic": 0,
+        "white": 0,
+        "blue": 0,
+        "black": 0,
+        "red": 0,
+        "green": 1,
+    }
+    assert scenario["support_mana_sources"] == [
+        {
+            "name": "E2E Green Support Source 1",
+            "type_line": "Artifact",
+            "effect": "ramp_permanent",
+            "battle_model_scope": "e2e_support_mana_source_v1",
+            "is_mana_source": True,
+            "mana_produced": 1,
+            "produces": "G",
+            "produced_mana_symbols": ["G"],
+            "mana_activation_requires_tap": True,
+        }
+    ]
+    assert scenario["expected_available_mana_after_refresh"] == 1
+    assert scenario["expected_conditional_mana"] == 1
+    assert scenario["expected_sources"] == 2
+
+
+def test_simple_mana_source_execution_scenario_preserves_enters_tapped_state() -> None:
+    rule = {
+        "card_name": "Arc Reactor",
+        "logical_rule_key": "battle_rule_v1:arc",
+        "required_effect_fields": {
+            "effect": "ramp_permanent",
+            "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+            "is_mana_source": True,
+            "mana_produced": 3,
+            "produces": "C",
+            "produced_mana_symbols": ["C", "C", "C"],
+            "mana_activation_requires_tap": True,
+            "enters_tapped": True,
+        },
+    }
+
+    scenario = builder.simple_mana_source_execution_scenario_from_expected_rule(rule)
+
+    assert scenario["expected_available_mana_after_refresh"] == 0
+    assert scenario["expected_sources"] == 0
+    assert scenario["expected_tapped"] is True
+    assert scenario["source_overrides"] == {"tapped": True}
+
+
+def test_simple_mana_source_execution_scenario_tracks_two_color_choices_as_conditional() -> None:
+    rule = {
+        "card_name": "Atarka Monument",
+        "logical_rule_key": "battle_rule_v1:atarka",
+        "required_effect_fields": {
+            "effect": "ramp_permanent",
+            "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+            "is_mana_source": True,
+            "mana_produced": 1,
+            "produces": "RG",
+            "mana_activation_requires_tap": True,
+        },
+    }
+
+    scenario = builder.simple_mana_source_execution_scenario_from_expected_rule(rule)
+
+    assert scenario["expected_available_mana_after_refresh"] == 1
+    assert scenario["expected_conditional_mana"] == 1
+    assert scenario["expected_sources"] == 1
+    assert scenario["expected_tapped"] is True
+
+
 def test_manifest_expected_rule_preserves_library_bottom_pick_fields() -> None:
     proposal = {
         "normalized_name": "shimmer of possibility",

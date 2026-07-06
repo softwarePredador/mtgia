@@ -9110,7 +9110,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["activation_mana_cost"], "{R}")
         self.assertFalse(effect["mana_activation_requires_tap"])
 
-    def test_mana_source_with_etb_draw_and_food_ability_stays_blocked(self) -> None:
+    def test_mana_source_with_etb_draw_and_food_sacrifice_mana_stays_blocked(self) -> None:
         row = queue_row(
             split.RAMP_ARTIFACT_UNIT,
             effect_classes=["DrawCardSourceControllerEffect"],
@@ -9144,7 +9144,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         )
 
         self.assertIsNone(proposal)
-        self.assertEqual(reason, "mana_source_auxiliary_ability_not_supported")
+        self.assertEqual(reason, "mana_source_source_sacrifice_cost_not_supported")
 
     def test_simple_mana_source_with_hybrid_activated_draw_cost_maps(self) -> None:
         row = queue_row(
@@ -9190,7 +9190,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertTrue(effect["activated_self_sacrifice_draw"])
         self.assertEqual(effect["_activated_rule_effects"][0]["activation_cost_mana"], "{W/U}{W/U}{W/U}{W/U}")
 
-    def test_simple_mana_source_with_unsupported_auxiliary_stays_blocked(self) -> None:
+    def test_simple_mana_source_with_unmodeled_auxiliary_maps_partial_mana_rule(self) -> None:
         row = queue_row(
             split.RAMP_ARTIFACT_UNIT,
             effect_classes=[],
@@ -9214,8 +9214,17 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             ),
         )
 
-        self.assertIsNone(proposal)
-        self.assertEqual(reason, "mana_source_auxiliary_ability_not_supported")
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "ramp_permanent")
+        self.assertEqual(effect["battle_model_scope"], split.MANA_SCOPE)
+        self.assertTrue(effect["is_mana_source"])
+        self.assertTrue(effect["_runtime_partial"])
+        self.assertEqual(effect["modeled_ability_subset"], "mana_source_only")
+        self.assertEqual(effect["produces"], "WUBRG")
+        self.assertEqual(effect["xmage_mana_ability_classes"], ["AnyColorManaAbility"])
+        self.assertEqual(effect["xmage_auxiliary_ability_classes"], ["CrewAbility"])
+        self.assertEqual(effect["xmage_unmodeled_auxiliary_ability_classes"], ["CrewAbility"])
 
     def test_simple_creature_mana_source_with_activation_cost_maps_fixed_symbols(self) -> None:
         row = queue_row(

@@ -1,0 +1,15 @@
+BEGIN
+CREATE SCHEMA
+SELECT 26
+DO
+ deprecated_shadow_rows 
+------------------------
+                     26
+(1 row)
+
+ upserted_rows 
+---------------
+           143
+(1 row)
+
+COMMIT

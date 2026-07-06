@@ -1185,6 +1185,111 @@ def add_manifest_mana(player, mana: dict[str, Any]) -> None:
             player.mana_pool.add(normalized, count)
 
 
+def support_mana_sources_from_manifest(mana: dict[str, Any]) -> list[dict[str, Any]]:
+    sources: list[dict[str, Any]] = []
+    color_symbols = {
+        "white": "W",
+        "blue": "U",
+        "black": "B",
+        "red": "R",
+        "green": "G",
+        "generic": "C",
+    }
+    for color, symbol in color_symbols.items():
+        count = int((mana or {}).get(color) or 0)
+        for index in range(max(0, count)):
+            sources.append(
+                {
+                    "name": f"E2E {color.title()} Support Source {index + 1}",
+                    "type_line": "Artifact",
+                    "effect": "ramp_permanent",
+                    "battle_model_scope": "e2e_support_mana_source_v1",
+                    "is_mana_source": True,
+                    "mana_produced": 1,
+                    "produces": symbol,
+                    "produced_mana_symbols": [symbol],
+                    "mana_activation_requires_tap": True,
+                }
+            )
+    return sources
+
+
+def run_simple_mana_source_refresh(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    effect = battle.get_card_effect(card)
+    source = battle.enrich_card(
+        {
+            **card,
+            "type_line": scenario.get("type_line") or "Artifact",
+            **effect,
+            **dict(scenario.get("source_overrides") or {}),
+        }
+    )
+    active = battle.Player(str(scenario.get("player") or "Mana Source Controller"), None, [])
+    support_sources = [
+        battle.enrich_card(dict(support))
+        for support in (
+            scenario.get("support_mana_sources")
+            or support_mana_sources_from_manifest(scenario.get("controller_mana") or {})
+        )
+        if isinstance(support, dict)
+    ]
+    active.battlefield = [*support_sources, source]
+    turn = int(scenario.get("turn") or 5)
+    before_events = len(events)
+
+    active.refresh_mana_sources(turn=turn)
+
+    expected_available = int(scenario.get("expected_available_mana_after_refresh") or 0)
+    if active.available_mana() != expected_available:
+        fail(
+            "battle_execution",
+            f"{card['name']} available mana={active.available_mana()}, expected {expected_available}",
+        )
+    expected_tapped = bool(scenario.get("expected_tapped"))
+    if bool(source.get("tapped")) != expected_tapped:
+        fail("battle_execution", f"{card['name']} tapped={source.get('tapped')!r}")
+    expected_conditional = int(scenario.get("expected_conditional_mana") or 0)
+    conditional_total = sum(
+        int(item.get("amount") or 0)
+        for item in getattr(active, "conditional_mana_sources", []) or []
+        if isinstance(item, dict)
+    )
+    if conditional_total != expected_conditional:
+        fail(
+            "battle_execution",
+            f"{card['name']} conditional mana={conditional_total}, expected {expected_conditional}",
+        )
+    event = next(
+        (
+            data
+            for replay_event, data in events[before_events:]
+            if replay_event == "mana_refreshed" and data.get("player") == active.name
+        ),
+        None,
+    )
+    if event is None:
+        fail("battle_events", f"missing {card['name']} mana_refreshed event")
+    expected_sources = int(scenario.get("expected_sources") or 0)
+    if int(event.get("sources") or 0) != expected_sources:
+        fail(
+            "battle_events",
+            f"{card['name']} mana sources={event.get('sources')}, expected {expected_sources}",
+        )
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "available_mana": active.available_mana(),
+        "conditional_mana": conditional_total,
+        "tapped": bool(source.get("tapped")),
+        "sources": int(event.get("sources") or 0),
+    }
+
+
 def run_simple_activated_damage(
     battle,
     scenario: dict[str, Any],
@@ -2140,6 +2245,7 @@ SCENARIO_RUNNERS = {
     "multi_create_creature_tokens": run_multi_create_creature_tokens,
     "nonfliers_cant_block_rider": run_nonfliers_cant_block_rider,
     "remove_permanent_basic_land_compensation": run_remove_permanent_basic_land_compensation,
+    "simple_mana_source_refresh": run_simple_mana_source_refresh,
     "simple_activated_damage": run_simple_activated_damage,
     "static_global_power_toughness_boost": run_static_global_power_toughness_boost,
     "target_creature_cant_block": run_target_creature_cant_block,

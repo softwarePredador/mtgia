@@ -22731,8 +22731,85 @@ def split_row(
                 family_id="xmage_self_sacrifice_mana_source_permanent",
             ), "selected_exact_scope"
         auxiliary_abilities = mana_ability_classes - SAFE_MANA_ABILITY_CLASSES
-        if auxiliary_abilities - SAFE_MANA_AUXILIARY_ABILITY_CLASSES:
-            return None, "mana_source_auxiliary_ability_not_supported"
+        unsupported_auxiliary_abilities = auxiliary_abilities - SAFE_MANA_AUXILIARY_ABILITY_CLASSES
+        if unsupported_auxiliary_abilities:
+            mana_source_detail = simple_mana_source_detail_from_oracle(metadata)
+            if mana_source_detail is None:
+                source_blocker = simple_mana_source_source_blocker(source_text, mana_ability_classes)
+                if source_blocker:
+                    return None, source_blocker
+                return None, "mana_source_oracle_not_simple"
+            source_blocker = simple_mana_source_source_blocker(
+                source_text,
+                mana_ability_classes,
+                mana_source_detail,
+            )
+            if source_blocker:
+                return None, source_blocker
+            type_line = str(metadata.get("type_line") or "").lower()
+            permanent_type = (
+                "creature"
+                if "creature" in type_line
+                else "artifact"
+                if "artifact" in type_line
+                else "permanent"
+            )
+            mana_requires_tap = bool(mana_source_detail.get("mana_activation_requires_tap", True))
+            non_mana_effect_classes = sorted(
+                cls
+                for cls in classes
+                if cls not in {"BasicManaEffect", "AddManaOfAnyColorEffect"}
+            )
+            effect_json = {
+                "effect": "ramp_permanent",
+                "battle_model_scope": MANA_SCOPE,
+                "is_mana_source": True,
+                "mana_produced": int(mana_source_detail["mana_produced"]),
+                "produces": str(mana_source_detail["produces"]),
+                "activation_requires_tap": mana_requires_tap,
+                "mana_activation_requires_tap": mana_requires_tap,
+                "permanent_type": permanent_type,
+                "ability_kind": "activated_mana",
+                "modeled_ability_subset": "mana_source_only",
+                "_runtime_partial": True,
+                "_runtime_partial_reason": (
+                    "Only the XMage mana ability is executable in this rule; "
+                    "listed auxiliary ability/effect classes remain unmodeled."
+                ),
+                "xmage_mana_ability_classes": sorted(
+                    mana_ability_classes & SAFE_MANA_ABILITY_CLASSES
+                ),
+                "xmage_auxiliary_ability_classes": sorted(auxiliary_abilities),
+                "xmage_unmodeled_auxiliary_ability_classes": sorted(
+                    unsupported_auxiliary_abilities
+                ),
+                "xmage_unmodeled_effect_classes": non_mana_effect_classes,
+                "xmage_effect_classes": sorted(classes),
+                "xmage_ability_classes": sorted(mana_ability_classes),
+            }
+            static_keywords = sorted(
+                {
+                    STATIC_SELF_KEYWORD_ABILITY_CLASSES[ability]
+                    for ability in auxiliary_abilities
+                    if ability in STATIC_SELF_KEYWORD_ABILITY_CLASSES
+                }
+            )
+            if static_keywords:
+                effect_json["keywords"] = static_keywords
+            if "EntersBattlefieldTappedAbility" in mana_ability_classes:
+                effect_json["enters_tapped"] = True
+            if mana_source_detail.get("produced_mana_symbols"):
+                effect_json["produced_mana_symbols"] = list(
+                    mana_source_detail["produced_mana_symbols"]
+                )
+            if mana_source_detail.get("activation_mana_cost"):
+                effect_json["activation_mana_cost"] = mana_source_detail["activation_mana_cost"]
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_simple_mana_source_with_unmodeled_auxiliary",
+            ), "selected_exact_scope"
         if classes - {"BasicManaEffect", "AddManaOfAnyColorEffect"}:
             return None, "mana_source_effect_class_not_simple"
         mana_source_detail = simple_mana_source_detail_from_oracle(metadata)

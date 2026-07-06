@@ -329,7 +329,14 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "flashback_status",
     "cycling_cost",
     "cycling_status",
+    "modeled_ability_subset",
+    "_runtime_partial",
+    "_runtime_partial_reason",
     "xmage_auxiliary_ability_classes",
+    "xmage_mana_ability_classes",
+    "xmage_unmodeled_auxiliary_ability_classes",
+    "xmage_unmodeled_effect_classes",
+    "xmage_effect_classes",
     "static_effect",
     "protection_from_card_types",
     "protection_from_subtypes",
@@ -1109,6 +1116,119 @@ def creature_dies_create_tokens_execution_scenario_from_expected_rule(
     }
 
 
+def _manifest_mana_for_activation_cost(cost: str | None) -> dict[str, int]:
+    mana = {
+        "generic": 0,
+        "white": 0,
+        "blue": 0,
+        "black": 0,
+        "red": 0,
+        "green": 0,
+    }
+    for token in re.findall(r"\{([^}]+)\}", str(cost or "")):
+        token = token.strip().upper()
+        if token.isdigit():
+            mana["generic"] += int(token)
+            continue
+        if "/" in token:
+            token = token.split("/", 1)[0]
+        color = {
+            "W": "white",
+            "U": "blue",
+            "B": "black",
+            "R": "red",
+            "G": "green",
+        }.get(token)
+        if color:
+            mana[color] += 1
+    return mana
+
+
+def _manifest_has_multiple_mana_choices(value: Any) -> bool:
+    if isinstance(value, str):
+        symbols = re.findall(r"[WUBRG]", value.upper())
+    elif isinstance(value, list):
+        symbols = [
+            str(item or "").strip().upper()
+            for item in value
+            if str(item or "").strip().upper() in {"W", "U", "B", "R", "G"}
+        ]
+    else:
+        symbols = []
+    return len(set(symbols)) > 1
+
+
+def _manifest_support_sources_for_controller_mana(mana: dict[str, int]) -> list[dict[str, Any]]:
+    sources: list[dict[str, Any]] = []
+    color_symbols = {
+        "white": "W",
+        "blue": "U",
+        "black": "B",
+        "red": "R",
+        "green": "G",
+        "generic": "C",
+    }
+    for color, symbol in color_symbols.items():
+        for index in range(max(0, int(mana.get(color) or 0))):
+            sources.append(
+                {
+                    "name": f"E2E {color.title()} Support Source {index + 1}",
+                    "type_line": "Artifact",
+                    "effect": "ramp_permanent",
+                    "battle_model_scope": "e2e_support_mana_source_v1",
+                    "is_mana_source": True,
+                    "mana_produced": 1,
+                    "produces": symbol,
+                    "produced_mana_symbols": [symbol],
+                    "mana_activation_requires_tap": True,
+                }
+            )
+    return sources
+
+
+def simple_mana_source_execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("effect") != "ramp_permanent" or not required.get("is_mana_source"):
+        return None
+    if required.get("battle_model_scope") not in {
+        "xmage_simple_tap_mana_source_permanent_v1",
+        "xmage_simple_tap_mana_source_with_activated_draw_v1",
+        "xmage_simple_mana_source_with_etb_draw_v1",
+    }:
+        return None
+    mana_produced = int(required.get("mana_produced") or 0)
+    if mana_produced <= 0:
+        return None
+    controller_mana = _manifest_mana_for_activation_cost(required.get("activation_mana_cost"))
+    activation_cost_total = sum(controller_mana.values())
+    support_sources = _manifest_support_sources_for_controller_mana(controller_mana)
+    enters_tapped = bool(required.get("enters_tapped"))
+    return {
+        "name": f"{rule['card_name']} refreshes modeled mana source",
+        "type": "simple_mana_source_refresh",
+        "card": {"name": rule["card_name"]},
+        "controller_mana": controller_mana,
+        "expected_available_mana_after_refresh": (
+            activation_cost_total if enters_tapped else mana_produced
+        ),
+        "expected_tapped": (
+            enters_tapped or bool(required.get("mana_activation_requires_tap", True))
+        ),
+        "expected_sources": len(support_sources) + (0 if enters_tapped else 1),
+        "expected_produced_mana_symbols": required.get("produced_mana_symbols") or [],
+        "expected_conditional_mana": (
+            mana_produced
+            if _manifest_has_multiple_mana_choices(required.get("produces"))
+            and not required.get("produced_mana_symbols")
+            and not enters_tapped
+            else 0
+        ),
+        "support_mana_sources": support_sources,
+        "source_overrides": {"tapped": True} if enters_tapped else {},
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def simple_activated_damage_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
@@ -1162,6 +1282,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or destroy_target_create_treasure_execution_scenario_from_expected_rule(rule)
         or creature_etb_create_treasure_execution_scenario_from_expected_rule(rule)
         or creature_dies_create_tokens_execution_scenario_from_expected_rule(rule)
+        or simple_mana_source_execution_scenario_from_expected_rule(rule)
         or simple_activated_damage_execution_scenario_from_expected_rule(rule)
         or fixed_create_creature_tokens_execution_scenario_from_expected_rule(rule)
         or multi_create_creature_tokens_execution_scenario_from_expected_rule(rule)

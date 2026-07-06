@@ -143,3 +143,94 @@ def test_simple_activated_damage_runner_executes_random_discard_cost() -> None:
     assert result["damage"] == 2
     assert result["discarded_count"] == 1
     assert result["opponent_life"] == 5
+
+
+def test_simple_mana_source_refresh_runner_executes_partial_mana_rule() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "ramp_permanent",
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "is_mana_source": True,
+        "mana_produced": 1,
+        "produces": "WUBRG",
+        "mana_activation_requires_tap": True,
+        "modeled_ability_subset": "mana_source_only",
+        "_runtime_partial": True,
+        "_rule_logical_key": "battle_rule_v1:caravan",
+    }
+    try:
+        result = validator.run_simple_mana_source_refresh(
+            battle,
+            {
+                "name": "Cultivator's Caravan refreshes modeled mana source",
+                "type": "simple_mana_source_refresh",
+                "card": {"name": "Cultivator's Caravan"},
+                "expected_available_mana_after_refresh": 1,
+                "expected_tapped": True,
+                "expected_sources": 1,
+                "expected_conditional_mana": 1,
+                "logical_rule_key": "battle_rule_v1:caravan",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Cultivator's Caravan"
+    assert result["available_mana"] == 1
+    assert result["conditional_mana"] == 1
+    assert result["tapped"] is True
+
+
+def test_simple_mana_source_refresh_runner_pays_activation_cost_from_support_source() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "ramp_permanent",
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "is_mana_source": True,
+        "mana_produced": 1,
+        "produces": "WUBRG",
+        "mana_activation_requires_tap": True,
+        "activation_mana_cost": "{G}",
+        "_rule_logical_key": "battle_rule_v1:ceta",
+    }
+    try:
+        result = validator.run_simple_mana_source_refresh(
+            battle,
+            {
+                "name": "Ceta Disciple refreshes modeled mana source",
+                "type": "simple_mana_source_refresh",
+                "card": {"name": "Ceta Disciple"},
+                "controller_mana": {
+                    "generic": 0,
+                    "white": 0,
+                    "blue": 0,
+                    "black": 0,
+                    "red": 0,
+                    "green": 1,
+                },
+                "expected_available_mana_after_refresh": 1,
+                "expected_tapped": True,
+                "expected_sources": 2,
+                "expected_conditional_mana": 1,
+                "logical_rule_key": "battle_rule_v1:ceta",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Ceta Disciple"
+    assert result["available_mana"] == 1
+    assert result["conditional_mana"] == 1
+    assert result["sources"] == 2
