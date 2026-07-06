@@ -1,0 +1,859 @@
+{
+  "alternative_cut_rows": [
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Alicia Masters, Skilled Sculptor",
+      "decision_trace_count": 0,
+      "edhrec_rank": null,
+      "exposure_event_count": 0,
+      "mutation_allowed": false,
+      "next_gate": "find_different_ramp_cut",
+      "reason": "legendary_treasure_piece_carries_commander_plan_value",
+      "signatures": [
+        "treasure_ramp"
+      ],
+      "status": "alternative_cut_blocked_legendary_plan_engine",
+      "usage_event_count": 0
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Arcane Signet",
+      "decision_trace_count": 7,
+      "edhrec_rank": 3,
+      "exposure_event_count": 11,
+      "mutation_allowed": false,
+      "next_gate": "find_different_ramp_cut",
+      "reason": "already_blocked_by_natural_forced_or_structured_trace",
+      "signatures": [
+        "commander_color_mana_rock",
+        "permanent_mana_rock"
+      ],
+      "status": "alternative_cut_blocked_already_current_ramp_blocker",
+      "usage_event_count": 6
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Archaeomancer's Map",
+      "decision_trace_count": 1,
+      "edhrec_rank": null,
+      "exposure_event_count": 0,
+      "mutation_allowed": false,
+      "next_gate": "run_mana_base_or_engine_profile_review_before_cut",
+      "reason": "land_access_ramp_needs_mana_base_or_engine_profile_review",
+      "signatures": [
+        "land_access_ramp"
+      ],
+      "status": "alternative_cut_blocked_land_access_engine_needs_profile_review",
+      "usage_event_count": 0
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Basalt Monolith",
+      "decision_trace_count": 2,
+      "edhrec_rank": null,
+      "exposure_event_count": 8,
+      "mutation_allowed": false,
+      "next_gate": "find_different_ramp_cut",
+      "reason": "already_blocked_by_natural_forced_or_structured_trace",
+      "signatures": [
+        "colorless_big_mana_rock",
+        "permanent_mana_rock"
+      ],
+      "status": "alternative_cut_blocked_already_current_ramp_blocker",
+      "usage_event_count": 3
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+      "decision_trace_count": 14,
+      "edhrec_rank": null,
+      "exposure_event_count": 15,
+      "mutation_allowed": false,
+      "next_gate": "find_different_ramp_cut",
+      "reason": "already_blocked_by_natural_forced_or_structured_trace",
+      "signatures": [
+        "spell_trigger_mana_engine"
+      ],
+      "status": "alternative_cut_blocked_already_current_ramp_blocker",
+      "usage_event_count": 9
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Cabal Ritual",
+      "decision_trace_count": 5,
+      "edhrec_rank": 486,
+      "exposure_event_count": 3,
+      "mutation_allowed": false,
+      "next_gate": "find_different_ramp_cut",
+      "reason": "already_blocked_by_natural_forced_or_structured_trace",
+      "signatures": [
+        "burst_ritual"
+      ],
+      "status": "alternative_cut_blocked_already_current_ramp_blocker",
+      "usage_event_count": 3
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Culling the Weak",
+      "decision_trace_count": 0,
+      "edhrec_rank": null,
+      "exposure_event_count": 0,
+      "mutation_allowed": false,
+      "next_gate": "find_different_ramp_cut",
+      "reason": "already_blocked_by_natural_forced_or_structured_trace",
+      "signatures": [
+        "burst_ritual",
+        "sacrifice_ritual"
+      ],
+      "status": "alternative_cut_blocked_already_current_ramp_blocker",
+      "usage_event_count": 0
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Dark Ritual",
+      "decision_trace_count": 1,
+      "edhrec_rank": 36,
+      "exposure_event_count": 0,
+      "mutation_allowed": false,
+      "next_gate": "find_different_ramp_cut",
+      "reason": "already_blocked_by_natural_forced_or_structured_trace",
+      "signatures": [
+        "burst_ritual"
+      ],
+      "status": "alternative_cut_blocked_already_current_ramp_blocker",
+      "usage_event_count": 0
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Desperate Ritual",
+      "decision_trace_count": 0,
+      "edhrec_rank": null,
+      "exposure_event_count": 0,
+      "mutation_allowed": false,
+      "next_gate": "find_different_ramp_cut",
+      "reason": "already_blocked_by_natural_forced_or_structured_trace",
+      "signatures": [
+        "burst_ritual"
+      ],
+      "status": "alternative_cut_blocked_already_current_ramp_blocker",
+      "usage_event_count": 0
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Fable of the Mirror-Breaker // Reflection of Kiki-Jiki",
+      "decision_trace_count": 2,
+      "edhrec_rank": null,
+      "exposure_event_count": 1,
+      "mutation_allowed": false,
+      "next_gate": "find_different_ramp_cut",
+      "reason": "treasure_source_also_carries_card_advantage_or_commander_plan_value",
+      "signatures": [
+        "treasure_card_advantage_engine",
+        "treasure_ramp"
+      ],
+      "status": "alternative_cut_blocked_card_advantage_engine",
+      "usage_event_count": 4
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Fabled Passage",
+      "decision_trace_count": 0,
+      "edhrec_rank": 60,
+      "exposure_event_count": 16,
+      "mutation_allowed": false,
+      "next_gate": "run_mana_base_profile_before_land_cut",
+      "reason": "land_cut_requires_mana_base_profile_not_ramp_axis_shortcut",
+      "signatures": [
+        "land_access_ramp"
+      ],
+      "status": "alternative_cut_blocked_land_mana_base_gate_required",
+      "usage_event_count": 0
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Grim Monolith",
+      "decision_trace_count": 1,
+      "edhrec_rank": null,
+      "exposure_event_count": 0,
+      "mutation_allowed": false,
+      "next_gate": "find_different_ramp_cut",
+      "reason": "already_blocked_by_natural_forced_or_structured_trace",
+      "signatures": [
+        "colorless_big_mana_rock",
+        "permanent_mana_rock"
+      ],
+      "status": "alternative_cut_blocked_already_current_ramp_blocker",
+      "usage_event_count": 0
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Infernal Plunge",
+      "decision_trace_count": 23,
+      "edhrec_rank": null,
+      "exposure_event_count": 20,
+      "mutation_allowed": false,
+      "next_gate": "find_different_ramp_cut",
+      "reason": "existing_natural_trace_usage_observed",
+      "signatures": [
+        "burst_ritual",
+        "sacrifice_ritual"
+      ],
+      "status": "alternative_cut_current_trace_usage_observed_blocks_cut",
+      "usage_event_count": 3
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Jeska's Will",
+      "decision_trace_count": 19,
+      "edhrec_rank": 102,
+      "exposure_event_count": 17,
+      "mutation_allowed": false,
+      "next_gate": "find_different_ramp_cut",
+      "reason": "premium_commander_ramp_or_value_staple_rank",
+      "signatures": [
+        "burst_ritual"
+      ],
+      "status": "alternative_cut_blocked_premium_ramp_staple",
+      "usage_event_count": 4
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Mana Vault",
+      "decision_trace_count": 1,
+      "edhrec_rank": 144,
+      "exposure_event_count": 7,
+      "mutation_allowed": false,
+      "next_gate": "find_different_ramp_cut",
+      "reason": "premium_commander_ramp_or_value_staple_rank",
+      "signatures": [
+        "colorless_big_mana_rock",
+        "permanent_mana_rock"
+      ],
+      "status": "alternative_cut_blocked_premium_ramp_staple",
+      "usage_event_count": 3
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Monologue Tax",
+      "decision_trace_count": 1,
+      "edhrec_rank": null,
+      "exposure_event_count": 0,
+      "mutation_allowed": false,
+      "next_gate": "manual_negative_trace_review_for_alternative_ramp_cut",
+      "reason": "existing_natural_trace_seen_without_usage",
+      "signatures": [
+        "treasure_ramp"
+      ],
+      "status": "alternative_cut_seen_without_usage_needs_manual_negative_review",
+      "usage_event_count": 0
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Ornithopter of Paradise",
+      "decision_trace_count": 0,
+      "edhrec_rank": 227,
+      "exposure_event_count": 0,
+      "mutation_allowed": false,
+      "next_gate": "trace_alternative_ramp_cut_candidates_before_candidate_copy",
+      "reason": "no_current_scope_target_trace_for_alternative_ramp_cut",
+      "signatures": [
+        "permanent_mana_rock"
+      ],
+      "status": "alternative_cut_needs_current_scope_trace",
+      "usage_event_count": 0
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Professional Face-Breaker",
+      "decision_trace_count": 0,
+      "edhrec_rank": 223,
+      "exposure_event_count": 0,
+      "mutation_allowed": false,
+      "next_gate": "find_different_ramp_cut",
+      "reason": "treasure_source_also_carries_card_advantage_or_commander_plan_value",
+      "signatures": [
+        "treasure_card_advantage_engine",
+        "treasure_ramp"
+      ],
+      "status": "alternative_cut_blocked_card_advantage_engine",
+      "usage_event_count": 0
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Pyretic Ritual",
+      "decision_trace_count": 0,
+      "edhrec_rank": null,
+      "exposure_event_count": 0,
+      "mutation_allowed": false,
+      "next_gate": "trace_alternative_ramp_cut_candidates_before_candidate_copy",
+      "reason": "no_current_scope_target_trace_for_alternative_ramp_cut",
+      "signatures": [
+        "burst_ritual"
+      ],
+      "status": "alternative_cut_needs_current_scope_trace",
+      "usage_event_count": 0
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Ragavan, Nimble Pilferer",
+      "decision_trace_count": 0,
+      "edhrec_rank": 267,
+      "exposure_event_count": 0,
+      "mutation_allowed": false,
+      "next_gate": "find_different_ramp_cut",
+      "reason": "legendary_treasure_piece_carries_commander_plan_value",
+      "signatures": [
+        "treasure_card_advantage_engine",
+        "treasure_ramp"
+      ],
+      "status": "alternative_cut_blocked_legendary_plan_engine",
+      "usage_event_count": 0
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Smothering Tithe",
+      "decision_trace_count": 16,
+      "edhrec_rank": 57,
+      "exposure_event_count": 22,
+      "mutation_allowed": false,
+      "next_gate": "find_different_ramp_cut",
+      "reason": "premium_commander_ramp_or_value_staple_rank",
+      "signatures": [
+        "treasure_card_advantage_engine",
+        "treasure_ramp"
+      ],
+      "status": "alternative_cut_blocked_premium_ramp_staple",
+      "usage_event_count": 61
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Smuggler's Share",
+      "decision_trace_count": 1,
+      "edhrec_rank": null,
+      "exposure_event_count": 0,
+      "mutation_allowed": false,
+      "next_gate": "find_different_ramp_cut",
+      "reason": "treasure_source_also_carries_card_advantage_or_commander_plan_value",
+      "signatures": [
+        "treasure_card_advantage_engine",
+        "treasure_ramp"
+      ],
+      "status": "alternative_cut_blocked_card_advantage_engine",
+      "usage_event_count": 0
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Sol Ring",
+      "decision_trace_count": 3,
+      "edhrec_rank": 1,
+      "exposure_event_count": 13,
+      "mutation_allowed": false,
+      "next_gate": "find_different_ramp_cut",
+      "reason": "premium_commander_ramp_or_value_staple_rank",
+      "signatures": [
+        "colorless_big_mana_rock",
+        "permanent_mana_rock"
+      ],
+      "status": "alternative_cut_blocked_premium_ramp_staple",
+      "usage_event_count": 3
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Strike It Rich",
+      "decision_trace_count": 2,
+      "edhrec_rank": null,
+      "exposure_event_count": 1,
+      "mutation_allowed": false,
+      "next_gate": "manual_negative_trace_review_for_alternative_ramp_cut",
+      "reason": "existing_natural_trace_seen_without_usage",
+      "signatures": [
+        "treasure_ramp"
+      ],
+      "status": "alternative_cut_seen_without_usage_needs_manual_negative_review",
+      "usage_event_count": 0
+    }
+  ],
+  "artifact_type": "global_commander_ramp_cut_forced_recovery_router",
+  "battle_gate_allowed_now": false,
+  "battle_gate_performed": false,
+  "battle_or_optimization_performed": false,
+  "blocked_cut_rows": [
+    {
+      "block_reason": "prior_usage_scout_requires_same_lane_replacement",
+      "card_name": "Arcane Signet",
+      "status": "blocked_prior_usage_requires_replacement",
+      "usage_event_count": 0
+    },
+    {
+      "block_reason": "natural_current_scope_usage_observed",
+      "card_name": "Basalt Monolith",
+      "status": "blocked_natural_usage_observed",
+      "usage_event_count": 3
+    },
+    {
+      "block_reason": "prior_usage_scout_requires_same_lane_replacement",
+      "card_name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+      "status": "blocked_prior_usage_requires_replacement",
+      "usage_event_count": 0
+    },
+    {
+      "block_reason": "natural_current_scope_usage_observed",
+      "card_name": "Burnt Offering",
+      "status": "blocked_natural_usage_observed",
+      "usage_event_count": 1
+    },
+    {
+      "block_reason": "natural_current_scope_usage_observed",
+      "card_name": "Cabal Ritual",
+      "status": "blocked_natural_usage_observed",
+      "usage_event_count": 3
+    },
+    {
+      "block_reason": "forced_access_usage_observed",
+      "card_name": "Culling the Weak",
+      "status": "blocked_forced_usage_observed",
+      "usage_event_count": 9
+    },
+    {
+      "block_reason": "prior_usage_scout_requires_same_lane_replacement",
+      "card_name": "Dark Ritual",
+      "status": "blocked_prior_usage_requires_replacement",
+      "usage_event_count": 0
+    },
+    {
+      "block_reason": "forced_access_usage_observed",
+      "card_name": "Desperate Ritual",
+      "status": "blocked_forced_usage_observed",
+      "usage_event_count": 6
+    },
+    {
+      "block_reason": "structured_trace_review_required",
+      "card_name": "Grim Monolith",
+      "status": "blocked_structured_review_required",
+      "usage_event_count": 0
+    }
+  ],
+  "candidate_copy_allowed_now": false,
+  "candidate_copy_blockers": [
+    "no_exact_same_lane_ramp_replacement_ready",
+    "current_ramp_cut_blocked_count:9",
+    "alternative_ramp_cut_requires_trace:Ornithopter of Paradise,Pyretic Ritual",
+    "candidate_copy_closed_after_ramp_forced_recovery_router"
+  ],
+  "commander": "Kaalia of the Vast",
+  "deck_action_allowed": false,
+  "deck_id": "619",
+  "generated_at": "2026-07-06T06:02:35.904821+00:00",
+  "input_artifacts": {
+    "forced_access_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_cut_forced_access_trace_generator_20260706_current.json",
+    "ramp_trace_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_cut_trace_replacement_gate_20260706_current.json",
+    "source_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db"
+  },
+  "mutation_allowed": false,
+  "policy": {
+    "alternative_cut_boundary": "Alternative ramp cuts are trace targets only until card-level usage and negative-review evidence exists.",
+    "exact_replacement_boundary": "A replacement must cover the cut's exact ramp signature and cannot downgrade a premium used staple without further source proof.",
+    "forced_access_boundary": "Forced access usage blocks a ramp cut; it does not authorize a swap.",
+    "mutation_boundary": "This router reads reports and SQLite only; it does not mutate deck or database state."
+  },
+  "postgres_writes": false,
+  "promotion_allowed": false,
+  "replacement_exactness_rows": [
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "cut_card": "Arcane Signet",
+      "cut_edhrec_rank": 3,
+      "cut_signatures": [
+        "commander_color_mana_rock",
+        "permanent_mana_rock"
+      ],
+      "mutation_allowed": false,
+      "overlap_signatures": [
+        "permanent_mana_rock"
+      ],
+      "reason": "candidate_is_lower_rank_than_used_cut",
+      "replacement_card": "Fellwar Stone",
+      "replacement_edhrec_rank": 18,
+      "replacement_signatures": [
+        "opponent_land_color_mana_rock",
+        "permanent_mana_rock"
+      ],
+      "status": "replacement_blocked_lower_staple_rank_than_used_cut"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "cut_card": "Arcane Signet",
+      "cut_edhrec_rank": 3,
+      "cut_signatures": [
+        "commander_color_mana_rock",
+        "permanent_mana_rock"
+      ],
+      "mutation_allowed": false,
+      "overlap_signatures": [
+        "commander_color_mana_rock",
+        "permanent_mana_rock"
+      ],
+      "reason": "candidate_is_lower_rank_than_used_cut",
+      "replacement_card": "Commander's Sphere",
+      "replacement_edhrec_rank": 39,
+      "replacement_signatures": [
+        "commander_color_mana_rock",
+        "permanent_mana_rock"
+      ],
+      "status": "replacement_blocked_lower_staple_rank_than_used_cut"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "cut_card": "Basalt Monolith",
+      "cut_edhrec_rank": null,
+      "cut_signatures": [
+        "colorless_big_mana_rock",
+        "permanent_mana_rock"
+      ],
+      "mutation_allowed": false,
+      "overlap_signatures": [
+        "permanent_mana_rock"
+      ],
+      "reason": "candidate_does_not_cover_colorless_big_mana_role",
+      "replacement_card": "Fellwar Stone",
+      "replacement_edhrec_rank": 18,
+      "replacement_signatures": [
+        "opponent_land_color_mana_rock",
+        "permanent_mana_rock"
+      ],
+      "status": "replacement_blocked_not_big_mana_rock"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "cut_card": "Basalt Monolith",
+      "cut_edhrec_rank": null,
+      "cut_signatures": [
+        "colorless_big_mana_rock",
+        "permanent_mana_rock"
+      ],
+      "mutation_allowed": false,
+      "overlap_signatures": [
+        "permanent_mana_rock"
+      ],
+      "reason": "candidate_does_not_cover_colorless_big_mana_role",
+      "replacement_card": "Commander's Sphere",
+      "replacement_edhrec_rank": 39,
+      "replacement_signatures": [
+        "commander_color_mana_rock",
+        "permanent_mana_rock"
+      ],
+      "status": "replacement_blocked_not_big_mana_rock"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "cut_card": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+      "cut_edhrec_rank": null,
+      "cut_signatures": [
+        "spell_trigger_mana_engine"
+      ],
+      "mutation_allowed": false,
+      "overlap_signatures": [],
+      "reason": "replacement_signature_does_not_cover_cut_signature",
+      "replacement_card": "Fellwar Stone",
+      "replacement_edhrec_rank": 18,
+      "replacement_signatures": [
+        "opponent_land_color_mana_rock",
+        "permanent_mana_rock"
+      ],
+      "status": "replacement_blocked_not_exact_same_lane"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "cut_card": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+      "cut_edhrec_rank": null,
+      "cut_signatures": [
+        "spell_trigger_mana_engine"
+      ],
+      "mutation_allowed": false,
+      "overlap_signatures": [],
+      "reason": "replacement_signature_does_not_cover_cut_signature",
+      "replacement_card": "Commander's Sphere",
+      "replacement_edhrec_rank": 39,
+      "replacement_signatures": [
+        "commander_color_mana_rock",
+        "permanent_mana_rock"
+      ],
+      "status": "replacement_blocked_not_exact_same_lane"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "cut_card": "Burnt Offering",
+      "cut_edhrec_rank": null,
+      "cut_signatures": [],
+      "mutation_allowed": false,
+      "overlap_signatures": [],
+      "reason": "replacement_signature_does_not_cover_cut_signature",
+      "replacement_card": "Fellwar Stone",
+      "replacement_edhrec_rank": 18,
+      "replacement_signatures": [
+        "opponent_land_color_mana_rock",
+        "permanent_mana_rock"
+      ],
+      "status": "replacement_blocked_not_exact_same_lane"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "cut_card": "Burnt Offering",
+      "cut_edhrec_rank": null,
+      "cut_signatures": [],
+      "mutation_allowed": false,
+      "overlap_signatures": [],
+      "reason": "replacement_signature_does_not_cover_cut_signature",
+      "replacement_card": "Commander's Sphere",
+      "replacement_edhrec_rank": 39,
+      "replacement_signatures": [
+        "commander_color_mana_rock",
+        "permanent_mana_rock"
+      ],
+      "status": "replacement_blocked_not_exact_same_lane"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "cut_card": "Cabal Ritual",
+      "cut_edhrec_rank": 486,
+      "cut_signatures": [
+        "burst_ritual"
+      ],
+      "mutation_allowed": false,
+      "overlap_signatures": [],
+      "reason": "replacement_signature_does_not_cover_cut_signature",
+      "replacement_card": "Fellwar Stone",
+      "replacement_edhrec_rank": 18,
+      "replacement_signatures": [
+        "opponent_land_color_mana_rock",
+        "permanent_mana_rock"
+      ],
+      "status": "replacement_blocked_not_exact_same_lane"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "cut_card": "Cabal Ritual",
+      "cut_edhrec_rank": 486,
+      "cut_signatures": [
+        "burst_ritual"
+      ],
+      "mutation_allowed": false,
+      "overlap_signatures": [],
+      "reason": "replacement_signature_does_not_cover_cut_signature",
+      "replacement_card": "Commander's Sphere",
+      "replacement_edhrec_rank": 39,
+      "replacement_signatures": [
+        "commander_color_mana_rock",
+        "permanent_mana_rock"
+      ],
+      "status": "replacement_blocked_not_exact_same_lane"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "cut_card": "Culling the Weak",
+      "cut_edhrec_rank": null,
+      "cut_signatures": [
+        "burst_ritual",
+        "sacrifice_ritual"
+      ],
+      "mutation_allowed": false,
+      "overlap_signatures": [],
+      "reason": "replacement_signature_does_not_cover_cut_signature",
+      "replacement_card": "Fellwar Stone",
+      "replacement_edhrec_rank": 18,
+      "replacement_signatures": [
+        "opponent_land_color_mana_rock",
+        "permanent_mana_rock"
+      ],
+      "status": "replacement_blocked_not_exact_same_lane"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "cut_card": "Culling the Weak",
+      "cut_edhrec_rank": null,
+      "cut_signatures": [
+        "burst_ritual",
+        "sacrifice_ritual"
+      ],
+      "mutation_allowed": false,
+      "overlap_signatures": [],
+      "reason": "replacement_signature_does_not_cover_cut_signature",
+      "replacement_card": "Commander's Sphere",
+      "replacement_edhrec_rank": 39,
+      "replacement_signatures": [
+        "commander_color_mana_rock",
+        "permanent_mana_rock"
+      ],
+      "status": "replacement_blocked_not_exact_same_lane"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "cut_card": "Dark Ritual",
+      "cut_edhrec_rank": 36,
+      "cut_signatures": [
+        "burst_ritual"
+      ],
+      "mutation_allowed": false,
+      "overlap_signatures": [],
+      "reason": "replacement_signature_does_not_cover_cut_signature",
+      "replacement_card": "Fellwar Stone",
+      "replacement_edhrec_rank": 18,
+      "replacement_signatures": [
+        "opponent_land_color_mana_rock",
+        "permanent_mana_rock"
+      ],
+      "status": "replacement_blocked_not_exact_same_lane"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "cut_card": "Dark Ritual",
+      "cut_edhrec_rank": 36,
+      "cut_signatures": [
+        "burst_ritual"
+      ],
+      "mutation_allowed": false,
+      "overlap_signatures": [],
+      "reason": "replacement_signature_does_not_cover_cut_signature",
+      "replacement_card": "Commander's Sphere",
+      "replacement_edhrec_rank": 39,
+      "replacement_signatures": [
+        "commander_color_mana_rock",
+        "permanent_mana_rock"
+      ],
+      "status": "replacement_blocked_not_exact_same_lane"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "cut_card": "Desperate Ritual",
+      "cut_edhrec_rank": null,
+      "cut_signatures": [
+        "burst_ritual"
+      ],
+      "mutation_allowed": false,
+      "overlap_signatures": [],
+      "reason": "replacement_signature_does_not_cover_cut_signature",
+      "replacement_card": "Fellwar Stone",
+      "replacement_edhrec_rank": 18,
+      "replacement_signatures": [
+        "opponent_land_color_mana_rock",
+        "permanent_mana_rock"
+      ],
+      "status": "replacement_blocked_not_exact_same_lane"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "cut_card": "Desperate Ritual",
+      "cut_edhrec_rank": null,
+      "cut_signatures": [
+        "burst_ritual"
+      ],
+      "mutation_allowed": false,
+      "overlap_signatures": [],
+      "reason": "replacement_signature_does_not_cover_cut_signature",
+      "replacement_card": "Commander's Sphere",
+      "replacement_edhrec_rank": 39,
+      "replacement_signatures": [
+        "commander_color_mana_rock",
+        "permanent_mana_rock"
+      ],
+      "status": "replacement_blocked_not_exact_same_lane"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "cut_card": "Grim Monolith",
+      "cut_edhrec_rank": null,
+      "cut_signatures": [
+        "colorless_big_mana_rock",
+        "permanent_mana_rock"
+      ],
+      "mutation_allowed": false,
+      "overlap_signatures": [
+        "permanent_mana_rock"
+      ],
+      "reason": "candidate_does_not_cover_colorless_big_mana_role",
+      "replacement_card": "Fellwar Stone",
+      "replacement_edhrec_rank": 18,
+      "replacement_signatures": [
+        "opponent_land_color_mana_rock",
+        "permanent_mana_rock"
+      ],
+      "status": "replacement_blocked_not_big_mana_rock"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "cut_card": "Grim Monolith",
+      "cut_edhrec_rank": null,
+      "cut_signatures": [
+        "colorless_big_mana_rock",
+        "permanent_mana_rock"
+      ],
+      "mutation_allowed": false,
+      "overlap_signatures": [
+        "permanent_mana_rock"
+      ],
+      "reason": "candidate_does_not_cover_colorless_big_mana_role",
+      "replacement_card": "Commander's Sphere",
+      "replacement_edhrec_rank": 39,
+      "replacement_signatures": [
+        "commander_color_mana_rock",
+        "permanent_mana_rock"
+      ],
+      "status": "replacement_blocked_not_big_mana_rock"
+    }
+  ],
+  "source_db_mutated": false,
+  "status": "ramp_cut_forced_recovery_routes_alternative_cut_trace",
+  "summary": {
+    "alternative_manual_review_count": 2,
+    "alternative_ramp_card_count": 24,
+    "alternative_trace_required_count": 2,
+    "blocked_ramp_cut_count": 9,
+    "candidate_copy_blocker_count": 4,
+    "next_gate": "trace_alternative_ramp_cut_candidates_before_candidate_copy",
+    "replacement_blocked_count": 18,
+    "replacement_candidate_count": 2,
+    "replacement_exact_ready_count": 0
+  }
+}

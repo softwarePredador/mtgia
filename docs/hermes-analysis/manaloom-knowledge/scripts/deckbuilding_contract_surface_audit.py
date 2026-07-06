@@ -84,6 +84,12 @@ GLOBAL_COMMANDER_RAMP_CUT_FORCED_ACCESS_TRACE_GENERATOR = (
 GLOBAL_COMMANDER_RAMP_CUT_FORCED_ACCESS_TRACE_GENERATOR_TEST = (
     SCRIPT_DIR / "test_global_commander_ramp_cut_forced_access_trace_generator.py"
 )
+GLOBAL_COMMANDER_RAMP_CUT_FORCED_RECOVERY_ROUTER = (
+    SCRIPT_DIR / "global_commander_ramp_cut_forced_recovery_router.py"
+)
+GLOBAL_COMMANDER_RAMP_CUT_FORCED_RECOVERY_ROUTER_TEST = (
+    SCRIPT_DIR / "test_global_commander_ramp_cut_forced_recovery_router.py"
+)
 GLOBAL_COMMANDER_ENGINE_CUT_USAGE_SAME_LANE_PROOF_SCOUT = (
     SCRIPT_DIR / "global_commander_engine_cut_usage_same_lane_proof_scout.py"
 )
@@ -531,6 +537,10 @@ GLOBAL_COMMANDER_RAMP_CUT_TRACE_REPLACEMENT_GATE_REPORT = (
 GLOBAL_COMMANDER_RAMP_CUT_FORCED_ACCESS_TRACE_GENERATOR_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_cut_forced_access_trace_generator_20260706_current.md"
+)
+GLOBAL_COMMANDER_RAMP_CUT_FORCED_RECOVERY_ROUTER_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_cut_forced_recovery_router_20260706_current.md"
 )
 GLOBAL_COMMANDER_ENGINE_CUT_USAGE_SAME_LANE_PROOF_SCOUT_REPORT = (
     REPO_ROOT
@@ -4149,6 +4159,47 @@ def build_audit() -> dict[str, Any]:
                 "find_different_ramp_cut_or_exact_same_lane_replacement_after_forced_access",
                 "forced_access_usage_observed_blocks_ramp_cut:Culling the Weak,Desperate Ritual",
                 "candidate_copy_closed_after_ramp_forced_access_trace",
+            ],
+        )
+    )
+    checks.extend(
+        [
+            check_contains(
+                GLOBAL_COMMANDER_RAMP_CUT_FORCED_RECOVERY_ROUTER,
+                [
+                    "Route ramp recovery after forced access blocks unexposed ramp cuts.",
+                    "replacement_blocked_lower_staple_rank_than_used_cut",
+                    "alternative_cut_needs_current_scope_trace",
+                    "candidate_copy_allowed_now",
+                ],
+            ),
+            check_contains(
+                GLOBAL_COMMANDER_RAMP_CUT_FORCED_RECOVERY_ROUTER_TEST,
+                [
+                    "Tests for ramp cut forced recovery routing.",
+                    "test_routes_to_alternative_trace_when_replacement_downgrades_used_staple",
+                ],
+            ),
+        ]
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_RAMP_CUT_FORCED_RECOVERY_ROUTER_REPORT,
+            [
+                "Global Commander Ramp Cut Forced Recovery Router",
+                "ramp_cut_forced_recovery_routes_alternative_cut_trace",
+                "blocked_ramp_cut_count: `9`",
+                "replacement_candidate_count: `2`",
+                "replacement_exact_ready_count: `0`",
+                "replacement_blocked_count: `18`",
+                "alternative_ramp_card_count: `24`",
+                "alternative_trace_required_count: `2`",
+                "alternative_manual_review_count: `2`",
+                "candidate_copy_allowed_now: `false`",
+                "trace_alternative_ramp_cut_candidates_before_candidate_copy",
+                "replacement_blocked_lower_staple_rank_than_used_cut",
+                "alternative_ramp_cut_requires_trace:Ornithopter of Paradise,Pyretic Ritual",
+                "candidate_copy_closed_after_ramp_forced_recovery_router",
             ],
         )
     )

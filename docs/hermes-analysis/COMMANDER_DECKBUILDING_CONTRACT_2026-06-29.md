@@ -1662,6 +1662,15 @@ Current external refresh on 2026-07-05:
   must find a different ramp cut or exact same-lane replacement. Forced access
   remains diagnostic evidence only: candidate copy, battle gate, mutation, and
   promotion remain closed.
+- The ramp cut forced-recovery router must run after forced access blocks those
+  cuts. It reviews whether local replacement seeds are exact same-lane
+  replacements and whether other current-deck ramp cards are only trace targets.
+  It must keep candidate copy, battle gate, mutation, and promotion closed.
+  The current report blocks all `9` current ramp cuts in scope, finds `0` exact
+  same-lane replacements among `Fellwar Stone` and `Commander's Sphere`, and
+  routes only `Ornithopter of Paradise` and `Pyretic Ritual` to current-scope
+  trace as alternative cut targets. `Monologue Tax` and `Strike It Rich` require
+  manual negative review rather than automatic cut clearance.
 
 ## Global Commander Rollout - 2026-07-01
 
