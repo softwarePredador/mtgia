@@ -11076,6 +11076,71 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["target_constraints"]["spell_colors"], ["U"])
         self.assertTrue(effect["requires_blue_target"])
 
+    def test_counter_target_spell_ignores_neutral_auxiliary_oracle_lines(self) -> None:
+        row = queue_row(
+            split.COUNTER_UNIT,
+            effect_classes=["CounterTargetEffect"],
+            ability_classes=["CantBeCounteredSourceAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Last Word",
+                oracle_text=(
+                    "This spell can't be countered.\n"
+                    "Counter target spell."
+                ),
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new CounterTargetEffect());"
+                "this.getSpellAbility().addTarget(new TargetSpell());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        self.assertEqual(proposal["effect_json"]["target"], "spell")
+
+    def test_counter_target_spell_ignores_trailing_foretell_line(self) -> None:
+        row = queue_row(
+            split.COUNTER_UNIT,
+            effect_classes=["CounterTargetEffect"],
+            ability_classes=["ForetellAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Saw It Coming",
+                oracle_text=(
+                    "Counter target spell.\n"
+                    "Foretell {1}{U}"
+                ),
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new CounterTargetEffect());"
+                "this.getSpellAbility().addTarget(new TargetSpell());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        self.assertEqual(proposal["effect_json"]["target_constraints"], {"zone": "stack", "stack_object": "spell"})
+
+    def test_counter_target_stack_ability_or_spell_stays_blocked(self) -> None:
+        row = queue_row(split.COUNTER_UNIT, effect_classes=["CounterTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Disallow",
+                oracle_text="Counter target spell, activated ability, or triggered ability.",
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new CounterTargetEffect());"
+                "this.getSpellAbility().addTarget(new TargetStackObject());"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "counter_target_not_supported")
+
     def test_counter_target_mana_value_spell_maps_to_stack_mana_value_constraints(self) -> None:
         row = queue_row(split.COUNTER_UNIT, effect_classes=["CounterTargetEffect"])
 

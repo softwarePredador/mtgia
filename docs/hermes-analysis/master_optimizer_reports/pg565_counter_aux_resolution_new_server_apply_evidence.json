@@ -1,0 +1,102 @@
+{
+  "database_target": "143.198.230.247:5433/halder",
+  "deploy_id": "pg565",
+  "generated_at": "2026-07-06T12:07:59.027016+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg565_counter_aux_resolution_new_server_package_manifest.json",
+  "mutations_performed": [
+    "postgres_apply_pg565_counter_aux_resolution_new_server"
+  ],
+  "postcheck": {
+    "backup_rows": 0,
+    "cards": [
+      "Last Word",
+      "Out of Bounds",
+      "Saw It Coming"
+    ],
+    "failed_cards": [],
+    "promoted_oracle_hash_rows": 3,
+    "promoted_rule_rows": 3,
+    "promoted_verified_auto_rows": 3,
+    "row_count": 3
+  },
+  "postcheck_rows": [
+    {
+      "backup_rows": 0,
+      "card_name": "Last Word",
+      "logical_rule_key": "battle_rule_v1:7e29c853e44945f99da7e36251341d47",
+      "normalized_name": "last word",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Out of Bounds",
+      "logical_rule_key": "battle_rule_v1:7e29c853e44945f99da7e36251341d47",
+      "normalized_name": "out of bounds",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Saw It Coming",
+      "logical_rule_key": "battle_rule_v1:7e29c853e44945f99da7e36251341d47",
+      "normalized_name": "saw it coming",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    }
+  ],
+  "precheck": {
+    "cards": [
+      "Last Word",
+      "Out of Bounds",
+      "Saw It Coming"
+    ],
+    "existing_expected_rows_before": 0,
+    "missing_targets": [],
+    "row_count": 3,
+    "total_target_card_rows": 3,
+    "would_deprecate_shadow_rows": 0
+  },
+  "precheck_rows": [
+    {
+      "canonical_card_id": "f68898ee-9b23-4eec-9488-a886a489e7f7",
+      "card_name": "Last Word",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:7e29c853e44945f99da7e36251341d47",
+      "normalized_name": "last word",
+      "oracle_hash": "8f44e1e91118630bbdb8e630ebef291a",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "56173198-2046-44a1-920f-ca562d2f75c7",
+      "card_name": "Out of Bounds",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:7e29c853e44945f99da7e36251341d47",
+      "normalized_name": "out of bounds",
+      "oracle_hash": "3884cb403c342850d5f9ae717070018f",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "c98c020f-7cb6-4649-baba-02714b31edc1",
+      "card_name": "Saw It Coming",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:7e29c853e44945f99da7e36251341d47",
+      "normalized_name": "saw it coming",
+      "oracle_hash": "fa6da7bd1dd493bf46d84d7bb262372a",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    }
+  ],
+  "slug": "counter_aux_resolution_new_server"
+}

@@ -2843,7 +2843,11 @@ def bounce_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, str] | Non
 
 
 def counter_target_from_oracle(metadata: dict[str, Any]) -> str | None:
-    text = oracle_text(metadata)
+    text = re.sub(
+        r"\s+",
+        " ",
+        " ".join(oracle_effect_lines_without_neutral_auxiliary(metadata)),
+    ).strip().lower()
     mana_value_patterns: list[tuple[str, str]] = [
         (r"^counter target spell with mana value (?P<value>\d+) or greater\.?$", "spell_mana_value_{value}_or_greater"),
         (r"^counter target spell with mana value (?P<value>\d+) or less\.?$", "spell_mana_value_{value}_or_less"),
@@ -15381,7 +15385,7 @@ def is_resolution_neutral_auxiliary_oracle_line(line: str) -> bool:
     return bool(
         re.match(
             r"^(?:"
-            r"affinity for artifacts|assist|can't be countered|convoke|cycling|devoid|"
+            r"affinity for artifacts|assist|(?:this spell )?can['’]t be countered|convoke|cycling|devoid|"
             r"flashback|foretell|freerunning|legendary|madness|miracle|retrace|"
             r"spectacle|split second|surge|suspend|undaunted"
             r")\b",
@@ -23572,7 +23576,8 @@ def split_row(
                 family_id="xmage_dynamic_graveyard_count_damage_spell",
             ), "selected_exact_scope"
         if classes == {"RevealLibraryPickControllerEffect"}:
-            unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+            allowed_abilities = ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES - {"FlashbackAbility"}
+            unsupported_abilities = ability_classes(row) - allowed_abilities
             if unsupported_abilities:
                 return None, "library_pick_ability_class_not_simple"
             if has_oracle_complexity(metadata):

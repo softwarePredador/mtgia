@@ -1,0 +1,164 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-06T12:08:39.723855+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg565_counter_aux_resolution_new_server_package_manifest.json",
+  "package_id": "pg565_counter_aux_resolution_new_server_package_manifest",
+  "snapshot": "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 3
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "card_name": "Last Word",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7e29c853e44945f99da7e36251341d47",
+          "oracle_hash": "8f44e1e91118630bbdb8e630ebef291a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "card_name": "Out of Bounds",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7e29c853e44945f99da7e36251341d47",
+          "oracle_hash": "3884cb403c342850d5f9ae717070018f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "card_name": "Saw It Coming",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7e29c853e44945f99da7e36251341d47",
+          "oracle_hash": "fa6da7bd1dd493bf46d84d7bb262372a",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 3
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "card_name": "Last Word",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7e29c853e44945f99da7e36251341d47",
+          "oracle_hash": "8f44e1e91118630bbdb8e630ebef291a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "card_name": "Out of Bounds",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7e29c853e44945f99da7e36251341d47",
+          "oracle_hash": "3884cb403c342850d5f9ae717070018f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "card_name": "Saw It Coming",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7e29c853e44945f99da7e36251341d47",
+          "oracle_hash": "fa6da7bd1dd493bf46d84d7bb262372a",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 3
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Last Word",
+          "logical_rule_key": "battle_rule_v1:7e29c853e44945f99da7e36251341d47"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Out of Bounds",
+          "logical_rule_key": "battle_rule_v1:7e29c853e44945f99da7e36251341d47"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Saw It Coming",
+          "logical_rule_key": "battle_rule_v1:7e29c853e44945f99da7e36251341d47"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 3
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Last Word",
+          "component_keys": [],
+          "effect": "counter",
+          "logical_rule_key": "battle_rule_v1:7e29c853e44945f99da7e36251341d47"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Out of Bounds",
+          "component_keys": [],
+          "effect": "counter",
+          "logical_rule_key": "battle_rule_v1:7e29c853e44945f99da7e36251341d47"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Saw It Coming",
+          "component_keys": [],
+          "effect": "counter",
+          "logical_rule_key": "battle_rule_v1:7e29c853e44945f99da7e36251341d47"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}
