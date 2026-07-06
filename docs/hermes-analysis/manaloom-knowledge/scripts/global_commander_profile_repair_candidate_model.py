@@ -44,6 +44,7 @@ ROLE_TO_EXPECTED_PACKAGE = {
     "haste_protection_silence": "commander_attack_enablers",
     "reanimation_plan_b": "reanimation_plan_b",
 }
+PROTECTED_ANCHOR_AXIS = "protected_profile_anchor"
 AXIS_SOURCE_ALIASES = {
     "core_removal_floor": "spot_interaction",
 }
@@ -195,6 +196,9 @@ def candidate_score(axis: str, card_name: str, oracle: Mapping[str, Any], roles:
     if source == "commander_reference_profile_expected_package":
         score += 30
         reasons.append("profile_expected_package")
+    if source == "restore_protected_anchor_to_candidate_package":
+        score += 40
+        reasons.append("restores_protected_profile_anchor")
     if source == "restore_previous_attack_window_cut":
         score += 35
         reasons.append("restores_removed_attack_window")
@@ -257,6 +261,9 @@ def candidate_score(axis: str, card_name: str, oracle: Mapping[str, Any], roles:
         if "haste" in body or "commander" in body:
             score += 10
             reasons.append("land_has_commander_synergy")
+    elif axis == PROTECTED_ANCHOR_AXIS:
+        score += 25
+        reasons.append("protected_anchor_restore_axis")
     return score, reasons
 
 
@@ -505,6 +512,17 @@ def build_axis_pool(
             limit=limit,
         )
         adds = sorted(restore + expected, key=lambda row: (row["status"] != "review_only_profile_repair_add_candidate", -int(row["score"]), row["card_name"]))[:limit]
+    elif source_axis == PROTECTED_ANCHOR_AXIS:
+        adds = build_card_candidates(
+            conn=conn,
+            axis=source_axis,
+            card_names=[str(action.get("protected_card") or "")],
+            source="restore_protected_anchor_to_candidate_package",
+            existing_names=existing_names,
+            legalities=legalities,
+            commander_color_identity=commander_color_identity,
+            limit=limit,
+        )
     else:
         package_name = ROLE_TO_EXPECTED_PACKAGE.get(source_axis)
         adds = build_card_candidates(
@@ -521,6 +539,8 @@ def build_axis_pool(
     shortfall = int(action.get("shortfall_to_min") or 0)
     if axis == "angels_demons_dragons_payoffs" and shortfall > len(ready_adds):
         status = "needs_broader_commander_payoff_source_lane_before_materialization"
+    elif axis == PROTECTED_ANCHOR_AXIS and ready_adds:
+        status = "protected_anchor_restore_requires_package_resynthesis"
     elif not ready_adds:
         status = "needs_add_candidate_source_lane"
     elif not cut_candidates:
@@ -534,6 +554,7 @@ def build_axis_pool(
         "candidate_count": len(ready_adds),
         "shortfall_to_min": shortfall,
         "status": status,
+        "protected_card": action.get("protected_card"),
         "top_add_candidates": adds,
         "top_cut_candidates": cut_candidates[:limit],
         "mutation_allowed": False,
@@ -545,8 +566,22 @@ def materialization_blockers(axis_pools: list[dict[str, Any]]) -> list[str]:
     for pool in axis_pools:
         status = str(pool.get("status") or "")
         if status != "review_only_profile_repair_candidate_pool_ready":
-            blockers.append(f"{pool.get('repair_axis')}:{status}")
+            axis = str(pool.get("repair_axis") or "")
+            if axis == PROTECTED_ANCHOR_AXIS and pool.get("protected_card"):
+                blockers.append(f"{axis}:{pool.get('protected_card')}:{status}")
+            else:
+                blockers.append(f"{axis}:{status}")
     return blockers
+
+
+def next_gate_for_blockers(blockers: list[str]) -> str:
+    if not blockers:
+        return "materialize_profile_repair_candidate_copy"
+    if any(blocker.startswith(f"{PROTECTED_ANCHOR_AXIS}:") for blocker in blockers):
+        return "resynthesize_profile_repair_package_with_protected_anchor_restoration"
+    if any("angels_demons_dragons_payoffs" in blocker for blocker in blockers):
+        return "expand_commander_payoff_source_lane_before_candidate_copy"
+    return "expand_commander_repair_source_lane_before_candidate_copy"
 
 
 def build_report(
@@ -591,6 +626,7 @@ def build_report(
         ]
     blockers = materialization_blockers(axis_pools)
     candidate_copy_allowed = not blockers and bool(axis_pools)
+    next_gate = next_gate_for_blockers(blockers)
     return {
         "generated_at": utc_now(),
         "status": (
@@ -620,11 +656,7 @@ def build_report(
             "candidate_copy_blocker_count": len(blockers),
             "cut_candidate_count": len(cuts),
             "blocked_cut_candidate_count": len(blocked_cuts),
-            "next_gate": (
-                "materialize_profile_repair_candidate_copy"
-                if candidate_copy_allowed
-                else "expand_commander_payoff_source_lane_before_candidate_copy"
-            ),
+            "next_gate": next_gate,
         },
         "candidate_copy_blockers": blockers,
         "repair_axis_pools": axis_pools,
@@ -634,6 +666,7 @@ def build_report(
             "repair_boundary": "Candidates are review-only source-lane rows, not deck changes.",
             "materialization_boundary": "Candidate copy opens only when every blocker axis has enough legal candidates and reviewable cuts.",
             "payoff_boundary": "Large commander payoff shortfalls require a broader commander source lane, not a narrow interaction-style swap.",
+            "protected_anchor_boundary": "Protected commander anchors can be restored as review candidates, but package resynthesis must prove the replacement cuts before materialization.",
         },
     }
 

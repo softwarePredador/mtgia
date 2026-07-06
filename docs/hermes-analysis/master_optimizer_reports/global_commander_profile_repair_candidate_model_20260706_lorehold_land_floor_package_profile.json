@@ -1,0 +1,1975 @@
+{
+  "artifact_type": "global_commander_profile_repair_candidate_model",
+  "battle_gate_allowed_now": false,
+  "battle_or_optimization_performed": false,
+  "blocked_cut_review_pool": [
+    {
+      "block_reasons": [
+        "structural_foundation_staple_requires_same_lane_or_battle_proof"
+      ],
+      "card_name": "Arcane Signet",
+      "core_roles": [
+        "ramp"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "mana_acceleration",
+        "mana_rocks_treasure_ramp"
+      ],
+      "risk_flags": [
+        "mana_acceleration_cut"
+      ],
+      "status": "blocked_profile_repair_cut_candidate"
+    },
+    {
+      "block_reasons": [
+        "carries_blocked_role_haste_protection_silence",
+        "attack_window_cut_not_allowed"
+      ],
+      "card_name": "Boros Charm",
+      "core_roles": [
+        "protection"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "haste_protection_silence"
+      ],
+      "risk_flags": [
+        "attack_window_or_extra_combat_cut",
+        "haste_or_protection_cut"
+      ],
+      "status": "blocked_profile_repair_cut_candidate"
+    },
+    {
+      "block_reasons": [
+        "carries_blocked_role_reanimation_plan_b"
+      ],
+      "card_name": "Charmbreaker Devils",
+      "core_roles": [
+        "engine",
+        "recursion"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "graveyard_recursion",
+        "reanimation_plan_b"
+      ],
+      "risk_flags": [],
+      "status": "blocked_profile_repair_cut_candidate"
+    },
+    {
+      "block_reasons": [
+        "structural_foundation_staple_requires_same_lane_or_battle_proof"
+      ],
+      "card_name": "Enlightened Tutor",
+      "core_roles": [
+        "tutor"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "topdeck_miracle_setup",
+        "tutors_access"
+      ],
+      "risk_flags": [
+        "tutor_access_cut"
+      ],
+      "status": "blocked_profile_repair_cut_candidate"
+    },
+    {
+      "block_reasons": [
+        "carries_blocked_role_spot_interaction"
+      ],
+      "card_name": "Ephemerate",
+      "core_roles": [
+        "engine",
+        "recursion",
+        "removal"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "graveyard_recursion",
+        "spot_interaction"
+      ],
+      "risk_flags": [],
+      "status": "blocked_profile_repair_cut_candidate"
+    },
+    {
+      "block_reasons": [
+        "carries_blocked_role_angels_demons_dragons_payoffs",
+        "add_payoff_cut_not_allowed"
+      ],
+      "card_name": "Gisela, Blade of Goldnight",
+      "core_roles": [
+        "wincon"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "dedicated_win_conditions"
+      ],
+      "risk_flags": [
+        "angel_demon_dragon_payoff_cut"
+      ],
+      "status": "blocked_profile_repair_cut_candidate"
+    },
+    {
+      "block_reasons": [
+        "carries_blocked_role_haste_protection_silence"
+      ],
+      "card_name": "Heat Shimmer",
+      "core_roles": [
+        "engine",
+        "wincon"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "dedicated_win_conditions",
+        "haste_protection_silence"
+      ],
+      "risk_flags": [
+        "haste_or_protection_cut"
+      ],
+      "status": "blocked_profile_repair_cut_candidate"
+    },
+    {
+      "block_reasons": [
+        "carries_blocked_role_reanimation_plan_b"
+      ],
+      "card_name": "Increasing Vengeance",
+      "core_roles": [
+        "engine",
+        "recursion"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "graveyard_recursion",
+        "miracle_haymakers",
+        "reanimation_plan_b",
+        "spell_payoffs_copy_engines"
+      ],
+      "risk_flags": [],
+      "status": "blocked_profile_repair_cut_candidate"
+    },
+    {
+      "block_reasons": [
+        "structural_foundation_staple_requires_same_lane_or_battle_proof"
+      ],
+      "card_name": "Mana Vault",
+      "core_roles": [
+        "engine",
+        "ramp"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "mana_acceleration",
+        "mana_rocks_treasure_ramp"
+      ],
+      "risk_flags": [
+        "mana_acceleration_cut"
+      ],
+      "status": "blocked_profile_repair_cut_candidate"
+    },
+    {
+      "block_reasons": [
+        "carries_blocked_role_reanimation_plan_b",
+        "carries_blocked_role_spot_interaction"
+      ],
+      "card_name": "Mizzix's Mastery",
+      "core_roles": [
+        "engine",
+        "recursion",
+        "removal",
+        "wincon"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "dedicated_win_conditions",
+        "graveyard_recursion",
+        "miracle_haymakers",
+        "reanimation_plan_b",
+        "spot_interaction"
+      ],
+      "risk_flags": [],
+      "status": "blocked_profile_repair_cut_candidate"
+    }
+  ],
+  "candidate_copy_allowed_now": false,
+  "candidate_copy_blockers": [
+    "protected_profile_anchor:Pyromancer's Goggles:protected_anchor_restore_requires_package_resynthesis",
+    "protected_profile_anchor:Call Forth the Tempest:protected_anchor_restore_requires_package_resynthesis",
+    "protected_profile_anchor:Birgi, God of Storytelling // Harnfel, Horn of Bounty:protected_anchor_restore_requires_package_resynthesis"
+  ],
+  "deck_action_allowed": false,
+  "generated_at": "2026-07-06T06:54:30.361954+00:00",
+  "global_cut_review_pool": [
+    {
+      "card_name": "Artist's Talent",
+      "classification_source": "tag_plus_text",
+      "cmc": 2.0,
+      "core_roles": [
+        "draw",
+        "engine",
+        "ramp",
+        "wincon"
+      ],
+      "cut_reasons": [
+        "over_target_dedicated_win_conditions",
+        "over_target_draw_rummage_opponent_turn_draw",
+        "over_target_mana_rocks_treasure_ramp",
+        "over_target_spell_payoffs_copy_engines"
+      ],
+      "matching_over_target_roles": [
+        "dedicated_win_conditions",
+        "draw_rummage_opponent_turn_draw",
+        "mana_rocks_treasure_ramp",
+        "spell_payoffs_copy_engines"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "card_draw_selection",
+        "dedicated_win_conditions",
+        "draw_rummage_opponent_turn_draw",
+        "mana_acceleration",
+        "mana_rocks_treasure_ramp",
+        "spell_payoffs_copy_engines"
+      ],
+      "score": 72,
+      "status": "review_only_profile_repair_cut_candidate"
+    },
+    {
+      "card_name": "Brass's Bounty",
+      "classification_source": "tag",
+      "cmc": 7.0,
+      "core_roles": [
+        "ramp",
+        "wincon"
+      ],
+      "cut_reasons": [
+        "over_target_dedicated_win_conditions",
+        "over_target_mana_rocks_treasure_ramp"
+      ],
+      "matching_over_target_roles": [
+        "dedicated_win_conditions",
+        "mana_rocks_treasure_ramp"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "dedicated_win_conditions",
+        "mana_acceleration",
+        "mana_rocks_treasure_ramp",
+        "miracle_haymakers"
+      ],
+      "score": 56,
+      "status": "review_only_profile_repair_cut_candidate"
+    },
+    {
+      "card_name": "Starfall Invocation",
+      "classification_source": "tag_plus_text",
+      "cmc": 5.0,
+      "core_roles": [
+        "board_wipe",
+        "draw",
+        "removal"
+      ],
+      "cut_reasons": [
+        "over_target_board_wipes_resets",
+        "over_target_draw_rummage_opponent_turn_draw"
+      ],
+      "matching_over_target_roles": [
+        "board_wipes_resets",
+        "draw_rummage_opponent_turn_draw"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "board_wipes_resets",
+        "card_draw_selection",
+        "draw_rummage_opponent_turn_draw",
+        "miracle_haymakers"
+      ],
+      "score": 55,
+      "status": "review_only_profile_repair_cut_candidate"
+    },
+    {
+      "card_name": "Storm-Kiln Artist",
+      "classification_source": "tag_plus_text",
+      "cmc": 4.0,
+      "core_roles": [
+        "engine",
+        "ramp"
+      ],
+      "cut_reasons": [
+        "over_target_mana_rocks_treasure_ramp",
+        "over_target_spell_payoffs_copy_engines"
+      ],
+      "matching_over_target_roles": [
+        "mana_rocks_treasure_ramp",
+        "spell_payoffs_copy_engines"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "mana_acceleration",
+        "mana_rocks_treasure_ramp",
+        "spell_payoffs_copy_engines"
+      ],
+      "score": 54,
+      "status": "review_only_profile_repair_cut_candidate"
+    },
+    {
+      "card_name": "Jeska's Will",
+      "classification_source": "tag",
+      "cmc": 3.0,
+      "core_roles": [
+        "ramp"
+      ],
+      "cut_reasons": [
+        "over_target_draw_rummage_opponent_turn_draw",
+        "over_target_mana_rocks_treasure_ramp"
+      ],
+      "matching_over_target_roles": [
+        "draw_rummage_opponent_turn_draw",
+        "mana_rocks_treasure_ramp"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "draw_rummage_opponent_turn_draw",
+        "mana_acceleration",
+        "mana_rocks_treasure_ramp"
+      ],
+      "score": 53,
+      "status": "review_only_profile_repair_cut_candidate"
+    },
+    {
+      "card_name": "Monologue Tax",
+      "classification_source": "tag_plus_text",
+      "cmc": 3.0,
+      "core_roles": [
+        "engine",
+        "ramp"
+      ],
+      "cut_reasons": [
+        "over_target_mana_rocks_treasure_ramp",
+        "over_target_spell_payoffs_copy_engines"
+      ],
+      "matching_over_target_roles": [
+        "mana_rocks_treasure_ramp",
+        "spell_payoffs_copy_engines"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "mana_acceleration",
+        "mana_rocks_treasure_ramp",
+        "spell_payoffs_copy_engines"
+      ],
+      "score": 53,
+      "status": "review_only_profile_repair_cut_candidate"
+    },
+    {
+      "card_name": "Impact Tremors",
+      "classification_source": "tag_plus_text",
+      "cmc": 2.0,
+      "core_roles": [
+        "board_wipe",
+        "draw",
+        "engine"
+      ],
+      "cut_reasons": [
+        "over_target_board_wipes_resets",
+        "over_target_draw_rummage_opponent_turn_draw"
+      ],
+      "matching_over_target_roles": [
+        "board_wipes_resets",
+        "draw_rummage_opponent_turn_draw"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "board_wipes_resets",
+        "card_draw_selection",
+        "draw_rummage_opponent_turn_draw"
+      ],
+      "score": 52,
+      "status": "review_only_profile_repair_cut_candidate"
+    },
+    {
+      "card_name": "Scroll Rack",
+      "classification_source": "tag",
+      "cmc": 2.0,
+      "core_roles": [
+        "draw",
+        "ramp"
+      ],
+      "cut_reasons": [
+        "over_target_draw_rummage_opponent_turn_draw",
+        "over_target_mana_rocks_treasure_ramp"
+      ],
+      "matching_over_target_roles": [
+        "draw_rummage_opponent_turn_draw",
+        "mana_rocks_treasure_ramp"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "card_draw_selection",
+        "draw_rummage_opponent_turn_draw",
+        "mana_acceleration",
+        "mana_rocks_treasure_ramp",
+        "topdeck_miracle_setup"
+      ],
+      "score": 52,
+      "status": "review_only_profile_repair_cut_candidate"
+    },
+    {
+      "card_name": "Taii Wakeen, Perfect Shot",
+      "classification_source": "tag_plus_text",
+      "cmc": 2.0,
+      "core_roles": [
+        "draw",
+        "engine",
+        "wincon"
+      ],
+      "cut_reasons": [
+        "over_target_dedicated_win_conditions",
+        "over_target_draw_rummage_opponent_turn_draw"
+      ],
+      "matching_over_target_roles": [
+        "dedicated_win_conditions",
+        "draw_rummage_opponent_turn_draw"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "card_draw_selection",
+        "dedicated_win_conditions",
+        "draw_rummage_opponent_turn_draw"
+      ],
+      "score": 52,
+      "status": "review_only_profile_repair_cut_candidate"
+    },
+    {
+      "card_name": "Young Pyromancer",
+      "classification_source": "tag_plus_text",
+      "cmc": 2.0,
+      "core_roles": [
+        "engine",
+        "wincon"
+      ],
+      "cut_reasons": [
+        "over_target_dedicated_win_conditions",
+        "over_target_spell_payoffs_copy_engines"
+      ],
+      "matching_over_target_roles": [
+        "dedicated_win_conditions",
+        "spell_payoffs_copy_engines"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "dedicated_win_conditions",
+        "spell_payoffs_copy_engines"
+      ],
+      "score": 52,
+      "status": "review_only_profile_repair_cut_candidate"
+    }
+  ],
+  "input_artifacts": {
+    "candidate_db": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_copy_materializer_20260706_land_floor_deck612_package_candidate/knowledge_candidate.db",
+    "repair_plan_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_profile_blocker_repair_plan_20260706_lorehold_land_floor_package_profile.json",
+    "strategy_matrix_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_package_strategy_matrix_20260706_land_floor_deck612_package_lorehold_profile.json"
+  },
+  "mutation_allowed": false,
+  "policy": {
+    "materialization_boundary": "Candidate copy opens only when every blocker axis has enough legal candidates and reviewable cuts.",
+    "payoff_boundary": "Large commander payoff shortfalls require a broader commander source lane, not a narrow interaction-style swap.",
+    "protected_anchor_boundary": "Protected commander anchors can be restored as review candidates, but package resynthesis must prove the replacement cuts before materialization.",
+    "repair_boundary": "Candidates are review-only source-lane rows, not deck changes."
+  },
+  "postgres_writes": false,
+  "promotion_allowed": false,
+  "repair_axis_pools": [
+    {
+      "blocker": "profile_lands_below_target",
+      "candidate_count": 10,
+      "candidate_source_axis": "lands",
+      "mutation_allowed": false,
+      "protected_card": null,
+      "repair_axis": "lands",
+      "shortfall_to_min": 2,
+      "status": "review_only_profile_repair_candidate_pool_ready",
+      "top_add_candidates": [
+        {
+          "axis": "lands",
+          "card_name": "Bant Panorama",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "U",
+            "G"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "profile_roles": [
+            "lands"
+          ],
+          "score": 46,
+          "source": "global_commander_named_land_candidate_pool",
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "axis": "lands",
+          "card_name": "Brokers Hideout",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "U",
+            "G"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "profile_roles": [
+            "lands"
+          ],
+          "score": 46,
+          "source": "global_commander_named_land_candidate_pool",
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "axis": "lands",
+          "card_name": "Esper Panorama",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "U",
+            "B"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "profile_roles": [
+            "lands"
+          ],
+          "score": 46,
+          "source": "global_commander_named_land_candidate_pool",
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "axis": "lands",
+          "card_name": "Fabled Passage",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "profile_roles": [
+            "lands"
+          ],
+          "score": 46,
+          "source": "global_commander_named_land_candidate_pool",
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "axis": "lands",
+          "card_name": "Flagstones of Trokair",
+          "color_identity": [
+            "W"
+          ],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "profile_roles": [
+            "lands"
+          ],
+          "score": 46,
+          "source": "global_commander_named_land_candidate_pool",
+          "status": "review_only_named_land_candidate",
+          "utility_roles": [
+            "graveyard_utility"
+          ]
+        },
+        {
+          "axis": "lands",
+          "card_name": "Forgotten Monument",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "profile_roles": [
+            "lands"
+          ],
+          "score": 46,
+          "source": "global_commander_named_land_candidate_pool",
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "axis": "lands",
+          "card_name": "Forsaken City",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "profile_roles": [
+            "lands"
+          ],
+          "score": 46,
+          "source": "global_commander_named_land_candidate_pool",
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "axis": "lands",
+          "card_name": "Gemstone Mine",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "profile_roles": [
+            "lands"
+          ],
+          "score": 46,
+          "source": "global_commander_named_land_candidate_pool",
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "axis": "lands",
+          "card_name": "Glimmervoid",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "profile_roles": [
+            "lands"
+          ],
+          "score": 46,
+          "source": "global_commander_named_land_candidate_pool",
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "axis": "lands",
+          "card_name": "Grixis Panorama",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "U",
+            "B",
+            "R"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "profile_roles": [
+            "lands"
+          ],
+          "score": 46,
+          "source": "global_commander_named_land_candidate_pool",
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        }
+      ],
+      "top_cut_candidates": [
+        {
+          "card_name": "Artist's Talent",
+          "classification_source": "tag_plus_text",
+          "cmc": 2.0,
+          "core_roles": [
+            "draw",
+            "engine",
+            "ramp",
+            "wincon"
+          ],
+          "cut_reasons": [
+            "over_target_dedicated_win_conditions",
+            "over_target_draw_rummage_opponent_turn_draw",
+            "over_target_mana_rocks_treasure_ramp",
+            "over_target_spell_payoffs_copy_engines"
+          ],
+          "matching_over_target_roles": [
+            "dedicated_win_conditions",
+            "draw_rummage_opponent_turn_draw",
+            "mana_rocks_treasure_ramp",
+            "spell_payoffs_copy_engines"
+          ],
+          "mutation_allowed": false,
+          "profile_roles": [
+            "card_draw_selection",
+            "dedicated_win_conditions",
+            "draw_rummage_opponent_turn_draw",
+            "mana_acceleration",
+            "mana_rocks_treasure_ramp",
+            "spell_payoffs_copy_engines"
+          ],
+          "score": 72,
+          "status": "review_only_profile_repair_cut_candidate"
+        },
+        {
+          "card_name": "Brass's Bounty",
+          "classification_source": "tag",
+          "cmc": 7.0,
+          "core_roles": [
+            "ramp",
+            "wincon"
+          ],
+          "cut_reasons": [
+            "over_target_dedicated_win_conditions",
+            "over_target_mana_rocks_treasure_ramp"
+          ],
+          "matching_over_target_roles": [
+            "dedicated_win_conditions",
+            "mana_rocks_treasure_ramp"
+          ],
+          "mutation_allowed": false,
+          "profile_roles": [
+            "dedicated_win_conditions",
+            "mana_acceleration",
+            "mana_rocks_treasure_ramp",
+            "miracle_haymakers"
+          ],
+          "score": 56,
+          "status": "review_only_profile_repair_cut_candidate"
+        },
+        {
+          "card_name": "Starfall Invocation",
+          "classification_source": "tag_plus_text",
+          "cmc": 5.0,
+          "core_roles": [
+            "board_wipe",
+            "draw",
+            "removal"
+          ],
+          "cut_reasons": [
+            "over_target_board_wipes_resets",
+            "over_target_draw_rummage_opponent_turn_draw"
+          ],
+          "matching_over_target_roles": [
+            "board_wipes_resets",
+            "draw_rummage_opponent_turn_draw"
+          ],
+          "mutation_allowed": false,
+          "profile_roles": [
+            "board_wipes_resets",
+            "card_draw_selection",
+            "draw_rummage_opponent_turn_draw",
+            "miracle_haymakers"
+          ],
+          "score": 55,
+          "status": "review_only_profile_repair_cut_candidate"
+        },
+        {
+          "card_name": "Storm-Kiln Artist",
+          "classification_source": "tag_plus_text",
+          "cmc": 4.0,
+          "core_roles": [
+            "engine",
+            "ramp"
+          ],
+          "cut_reasons": [
+            "over_target_mana_rocks_treasure_ramp",
+            "over_target_spell_payoffs_copy_engines"
+          ],
+          "matching_over_target_roles": [
+            "mana_rocks_treasure_ramp",
+            "spell_payoffs_copy_engines"
+          ],
+          "mutation_allowed": false,
+          "profile_roles": [
+            "mana_acceleration",
+            "mana_rocks_treasure_ramp",
+            "spell_payoffs_copy_engines"
+          ],
+          "score": 54,
+          "status": "review_only_profile_repair_cut_candidate"
+        },
+        {
+          "card_name": "Jeska's Will",
+          "classification_source": "tag",
+          "cmc": 3.0,
+          "core_roles": [
+            "ramp"
+          ],
+          "cut_reasons": [
+            "over_target_draw_rummage_opponent_turn_draw",
+            "over_target_mana_rocks_treasure_ramp"
+          ],
+          "matching_over_target_roles": [
+            "draw_rummage_opponent_turn_draw",
+            "mana_rocks_treasure_ramp"
+          ],
+          "mutation_allowed": false,
+          "profile_roles": [
+            "draw_rummage_opponent_turn_draw",
+            "mana_acceleration",
+            "mana_rocks_treasure_ramp"
+          ],
+          "score": 53,
+          "status": "review_only_profile_repair_cut_candidate"
+        },
+        {
+          "card_name": "Monologue Tax",
+          "classification_source": "tag_plus_text",
+          "cmc": 3.0,
+          "core_roles": [
+            "engine",
+            "ramp"
+          ],
+          "cut_reasons": [
+            "over_target_mana_rocks_treasure_ramp",
+            "over_target_spell_payoffs_copy_engines"
+          ],
+          "matching_over_target_roles": [
+            "mana_rocks_treasure_ramp",
+            "spell_payoffs_copy_engines"
+          ],
+          "mutation_allowed": false,
+          "profile_roles": [
+            "mana_acceleration",
+            "mana_rocks_treasure_ramp",
+            "spell_payoffs_copy_engines"
+          ],
+          "score": 53,
+          "status": "review_only_profile_repair_cut_candidate"
+        },
+        {
+          "card_name": "Impact Tremors",
+          "classification_source": "tag_plus_text",
+          "cmc": 2.0,
+          "core_roles": [
+            "board_wipe",
+            "draw",
+            "engine"
+          ],
+          "cut_reasons": [
+            "over_target_board_wipes_resets",
+            "over_target_draw_rummage_opponent_turn_draw"
+          ],
+          "matching_over_target_roles": [
+            "board_wipes_resets",
+            "draw_rummage_opponent_turn_draw"
+          ],
+          "mutation_allowed": false,
+          "profile_roles": [
+            "board_wipes_resets",
+            "card_draw_selection",
+            "draw_rummage_opponent_turn_draw"
+          ],
+          "score": 52,
+          "status": "review_only_profile_repair_cut_candidate"
+        },
+        {
+          "card_name": "Scroll Rack",
+          "classification_source": "tag",
+          "cmc": 2.0,
+          "core_roles": [
+            "draw",
+            "ramp"
+          ],
+          "cut_reasons": [
+            "over_target_draw_rummage_opponent_turn_draw",
+            "over_target_mana_rocks_treasure_ramp"
+          ],
+          "matching_over_target_roles": [
+            "draw_rummage_opponent_turn_draw",
+            "mana_rocks_treasure_ramp"
+          ],
+          "mutation_allowed": false,
+          "profile_roles": [
+            "card_draw_selection",
+            "draw_rummage_opponent_turn_draw",
+            "mana_acceleration",
+            "mana_rocks_treasure_ramp",
+            "topdeck_miracle_setup"
+          ],
+          "score": 52,
+          "status": "review_only_profile_repair_cut_candidate"
+        },
+        {
+          "card_name": "Taii Wakeen, Perfect Shot",
+          "classification_source": "tag_plus_text",
+          "cmc": 2.0,
+          "core_roles": [
+            "draw",
+            "engine",
+            "wincon"
+          ],
+          "cut_reasons": [
+            "over_target_dedicated_win_conditions",
+            "over_target_draw_rummage_opponent_turn_draw"
+          ],
+          "matching_over_target_roles": [
+            "dedicated_win_conditions",
+            "draw_rummage_opponent_turn_draw"
+          ],
+          "mutation_allowed": false,
+          "profile_roles": [
+            "card_draw_selection",
+            "dedicated_win_conditions",
+            "draw_rummage_opponent_turn_draw"
+          ],
+          "score": 52,
+          "status": "review_only_profile_repair_cut_candidate"
+        },
+        {
+          "card_name": "Young Pyromancer",
+          "classification_source": "tag_plus_text",
+          "cmc": 2.0,
+          "core_roles": [
+            "engine",
+            "wincon"
+          ],
+          "cut_reasons": [
+            "over_target_dedicated_win_conditions",
+            "over_target_spell_payoffs_copy_engines"
+          ],
+          "matching_over_target_roles": [
+            "dedicated_win_conditions",
+            "spell_payoffs_copy_engines"
+          ],
+          "mutation_allowed": false,
+          "profile_roles": [
+            "dedicated_win_conditions",
+            "spell_payoffs_copy_engines"
+          ],
+          "score": 52,
+          "status": "review_only_profile_repair_cut_candidate"
+        }
+      ]
+    },
+    {
+      "blocker": "protected_profile_anchor_cut:Pyromancer's Goggles",
+      "candidate_count": 1,
+      "candidate_source_axis": "protected_profile_anchor",
+      "mutation_allowed": false,
+      "protected_card": "Pyromancer's Goggles",
+      "repair_axis": "protected_profile_anchor",
+      "shortfall_to_min": 0,
+      "status": "protected_anchor_restore_requires_package_resynthesis",
+      "top_add_candidates": [
+        {
+          "axis": "protected_profile_anchor",
+          "card_name": "Pyromancer's Goggles",
+          "cmc": 5.0,
+          "color_identity": [
+            "R"
+          ],
+          "color_identity_allowed": true,
+          "commander_legality": "legal",
+          "fit_reasons": [
+            "restore_protected_anchor_to_candidate_package",
+            "restores_protected_profile_anchor",
+            "protected_anchor_restore_axis"
+          ],
+          "mutation_allowed": false,
+          "profile_roles": [
+            "mana_acceleration",
+            "mana_rocks_treasure_ramp",
+            "spell_payoffs_copy_engines"
+          ],
+          "score": 115,
+          "source": "restore_protected_anchor_to_candidate_package",
+          "status": "review_only_profile_repair_add_candidate",
+          "type_line": "Legendary Artifact"
+        }
+      ],
+      "top_cut_candidates": [
+        {
+          "card_name": "Artist's Talent",
+          "classification_source": "tag_plus_text",
+          "cmc": 2.0,
+          "core_roles": [
+            "draw",
+            "engine",
+            "ramp",
+            "wincon"
+          ],
+          "cut_reasons": [
+            "over_target_dedicated_win_conditions",
+            "over_target_draw_rummage_opponent_turn_draw",
+            "over_target_mana_rocks_treasure_ramp",
+            "over_target_spell_payoffs_copy_engines"
+          ],
+          "matching_over_target_roles": [
+            "dedicated_win_conditions",
+            "draw_rummage_opponent_turn_draw",
+            "mana_rocks_treasure_ramp",
+            "spell_payoffs_copy_engines"
+          ],
+          "mutation_allowed": false,
+          "profile_roles": [
+            "card_draw_selection",
+            "dedicated_win_conditions",
+            "draw_rummage_opponent_turn_draw",
+            "mana_acceleration",
+            "mana_rocks_treasure_ramp",
+            "spell_payoffs_copy_engines"
+          ],
+          "score": 72,
+          "status": "review_only_profile_repair_cut_candidate"
+        },
+        {
+          "card_name": "Brass's Bounty",
+          "classification_source": "tag",
+          "cmc": 7.0,
+          "core_roles": [
+            "ramp",
+            "wincon"
+          ],
+          "cut_reasons": [
+            "over_target_dedicated_win_conditions",
+            "over_target_mana_rocks_treasure_ramp"
+          ],
+          "matching_over_target_roles": [
+            "dedicated_win_conditions",
+            "mana_rocks_treasure_ramp"
+          ],
+          "mutation_allowed": false,
+          "profile_roles": [
+            "dedicated_win_conditions",
+            "mana_acceleration",
+            "mana_rocks_treasure_ramp",
+            "miracle_haymakers"
+          ],
+          "score": 56,
+          "status": "review_only_profile_repair_cut_candidate"
+        },
+        {
+          "card_name": "Starfall Invocation",
+          "classification_source": "tag_plus_text",
+          "cmc": 5.0,
+          "core_roles": [
+            "board_wipe",
+            "draw",
+            "removal"
+          ],
+          "cut_reasons": [
+            "over_target_board_wipes_resets",
+            "over_target_draw_rummage_opponent_turn_draw"
+          ],
+          "matching_over_target_roles": [
+            "board_wipes_resets",
+            "draw_rummage_opponent_turn_draw"
+          ],
+          "mutation_allowed": false,
+          "profile_roles": [
+            "board_wipes_resets",
+            "card_draw_selection",
+            "draw_rummage_opponent_turn_draw",
+            "miracle_haymakers"
+          ],
+          "score": 55,
+          "status": "review_only_profile_repair_cut_candidate"
+        },
+        {
+          "card_name": "Storm-Kiln Artist",
+          "classification_source": "tag_plus_text",
+          "cmc": 4.0,
+          "core_roles": [
+            "engine",
+            "ramp"
+          ],
+          "cut_reasons": [
+            "over_target_mana_rocks_treasure_ramp",
+            "over_target_spell_payoffs_copy_engines"
+          ],
+          "matching_over_target_roles": [
+            "mana_rocks_treasure_ramp",
+            "spell_payoffs_copy_engines"
+          ],
+          "mutation_allowed": false,
+          "profile_roles": [
+            "mana_acceleration",
+            "mana_rocks_treasure_ramp",
+            "spell_payoffs_copy_engines"
+          ],
+          "score": 54,
+          "status": "review_only_profile_repair_cut_candidate"
+        },
+        {
+          "card_name": "Jeska's Will",
+          "classification_source": "tag",
+          "cmc": 3.0,
+          "core_roles": [
+            "ramp"
+          ],
+          "cut_reasons": [
+            "over_target_draw_rummage_opponent_turn_draw",
+            "over_target_mana_rocks_treasure_ramp"
+          ],
+          "matching_over_target_roles": [
+            "draw_rummage_opponent_turn_draw",
+            "mana_rocks_treasure_ramp"
+          ],
+          "mutation_allowed": false,
+          "profile_roles": [
+            "draw_rummage_opponent_turn_draw",
+            "mana_acceleration",
+            "mana_rocks_treasure_ramp"
+          ],
+          "score": 53,
+          "status": "review_only_profile_repair_cut_candidate"
+        },
+        {
+          "card_name": "Monologue Tax",
+          "classification_source": "tag_plus_text",
+          "cmc": 3.0,
+          "core_roles": [
+            "engine",
+            "ramp"
+          ],
+          "cut_reasons": [
+            "over_target_mana_rocks_treasure_ramp",
+            "over_target_spell_payoffs_copy_engines"
+          ],
+          "matching_over_target_roles": [
+            "mana_rocks_treasure_ramp",
+            "spell_payoffs_copy_engines"
+          ],
+          "mutation_allowed": false,
+          "profile_roles": [
+            "mana_acceleration",
+            "mana_rocks_treasure_ramp",
+            "spell_payoffs_copy_engines"
+          ],
+          "score": 53,
+          "status": "review_only_profile_repair_cut_candidate"
+        },
+        {
+          "card_name": "Impact Tremors",
+          "classification_source": "tag_plus_text",
+          "cmc": 2.0,
+          "core_roles": [
+            "board_wipe",
+            "draw",
+            "engine"
+          ],
+          "cut_reasons": [
+            "over_target_board_wipes_resets",
+            "over_target_draw_rummage_opponent_turn_draw"
+          ],
+          "matching_over_target_roles": [
+            "board_wipes_resets",
+            "draw_rummage_opponent_turn_draw"
+          ],
+          "mutation_allowed": false,
+          "profile_roles": [
+            "board_wipes_resets",
+            "card_draw_selection",
+            "draw_rummage_opponent_turn_draw"
+          ],
+          "score": 52,
+          "status": "review_only_profile_repair_cut_candidate"
+        },
+        {
+          "card_name": "Scroll Rack",
+          "classification_source": "tag",
+          "cmc": 2.0,
+          "core_roles": [
+            "draw",
+            "ramp"
+          ],
+          "cut_reasons": [
+            "over_target_draw_rummage_opponent_turn_draw",
+            "over_target_mana_rocks_treasure_ramp"
+          ],
+          "matching_over_target_roles": [
+            "draw_rummage_opponent_turn_draw",
+            "mana_rocks_treasure_ramp"
+          ],
+          "mutation_allowed": false,
+          "profile_roles": [
+            "card_draw_selection",
+            "draw_rummage_opponent_turn_draw",
+            "mana_acceleration",
+            "mana_rocks_treasure_ramp",
+            "topdeck_miracle_setup"
+          ],
+          "score": 52,
+          "status": "review_only_profile_repair_cut_candidate"
+        },
+        {
+          "card_name": "Taii Wakeen, Perfect Shot",
+          "classification_source": "tag_plus_text",
+          "cmc": 2.0,
+          "core_roles": [
+            "draw",
+            "engine",
+            "wincon"
+          ],
+          "cut_reasons": [
+            "over_target_dedicated_win_conditions",
+            "over_target_draw_rummage_opponent_turn_draw"
+          ],
+          "matching_over_target_roles": [
+            "dedicated_win_conditions",
+            "draw_rummage_opponent_turn_draw"
+          ],
+          "mutation_allowed": false,
+          "profile_roles": [
+            "card_draw_selection",
+            "dedicated_win_conditions",
+            "draw_rummage_opponent_turn_draw"
+          ],
+          "score": 52,
+          "status": "review_only_profile_repair_cut_candidate"
+        },
+        {
+          "card_name": "Young Pyromancer",
+          "classification_source": "tag_plus_text",
+          "cmc": 2.0,
+          "core_roles": [
+            "engine",
+            "wincon"
+          ],
+          "cut_reasons": [
+            "over_target_dedicated_win_conditions",
+            "over_target_spell_payoffs_copy_engines"
+          ],
+          "matching_over_target_roles": [
+            "dedicated_win_conditions",
+            "spell_payoffs_copy_engines"
+          ],
+          "mutation_allowed": false,
+          "profile_roles": [
+            "dedicated_win_conditions",
+            "spell_payoffs_copy_engines"
+          ],
+          "score": 52,
+          "status": "review_only_profile_repair_cut_candidate"
+        }
+      ]
+    },
+    {
+      "blocker": "protected_profile_anchor_cut:Call Forth the Tempest",
+      "candidate_count": 1,
+      "candidate_source_axis": "protected_profile_anchor",
+      "mutation_allowed": false,
+      "protected_card": "Call Forth the Tempest",
+      "repair_axis": "protected_profile_anchor",
+      "shortfall_to_min": 0,
+      "status": "protected_anchor_restore_requires_package_resynthesis",
+      "top_add_candidates": [
+        {
+          "axis": "protected_profile_anchor",
+          "card_name": "Call Forth the Tempest",
+          "cmc": 8.0,
+          "color_identity": [
+            "R"
+          ],
+          "color_identity_allowed": true,
+          "commander_legality": "legal",
+          "fit_reasons": [
+            "restore_protected_anchor_to_candidate_package",
+            "restores_protected_profile_anchor",
+            "protected_anchor_restore_axis"
+          ],
+          "mutation_allowed": false,
+          "profile_roles": [
+            "board_wipes_resets",
+            "miracle_haymakers"
+          ],
+          "score": 115,
+          "source": "restore_protected_anchor_to_candidate_package",
+          "status": "review_only_profile_repair_add_candidate",
+          "type_line": "Sorcery"
+        }
+      ],
+      "top_cut_candidates": [
+        {
+          "card_name": "Artist's Talent",
+          "classification_source": "tag_plus_text",
+          "cmc": 2.0,
+          "core_roles": [
+            "draw",
+            "engine",
+            "ramp",
+            "wincon"
+          ],
+          "cut_reasons": [
+            "over_target_dedicated_win_conditions",
+            "over_target_draw_rummage_opponent_turn_draw",
+            "over_target_mana_rocks_treasure_ramp",
+            "over_target_spell_payoffs_copy_engines"
+          ],
+          "matching_over_target_roles": [
+            "dedicated_win_conditions",
+            "draw_rummage_opponent_turn_draw",
+            "mana_rocks_treasure_ramp",
+            "spell_payoffs_copy_engines"
+          ],
+          "mutation_allowed": false,
+          "profile_roles": [
+            "card_draw_selection",
+            "dedicated_win_conditions",
+            "draw_rummage_opponent_turn_draw",
+            "mana_acceleration",
+            "mana_rocks_treasure_ramp",
+            "spell_payoffs_copy_engines"
+          ],
+          "score": 72,
+          "status": "review_only_profile_repair_cut_candidate"
+        },
+        {
+          "card_name": "Brass's Bounty",
+          "classification_source": "tag",
+          "cmc": 7.0,
+          "core_roles": [
+            "ramp",
+            "wincon"
+          ],
+          "cut_reasons": [
+            "over_target_dedicated_win_conditions",
+            "over_target_mana_rocks_treasure_ramp"
+          ],
+          "matching_over_target_roles": [
+            "dedicated_win_conditions",
+            "mana_rocks_treasure_ramp"
+          ],
+          "mutation_allowed": false,
+          "profile_roles": [
+            "dedicated_win_conditions",
+            "mana_acceleration",
+            "mana_rocks_treasure_ramp",
+            "miracle_haymakers"
+          ],
+          "score": 56,
+          "status": "review_only_profile_repair_cut_candidate"
+        },
+        {
+          "card_name": "Starfall Invocation",
+          "classification_source": "tag_plus_text",
+          "cmc": 5.0,
+          "core_roles": [
+            "board_wipe",
+            "draw",
+            "removal"
+          ],
+          "cut_reasons": [
+            "over_target_board_wipes_resets",
+            "over_target_draw_rummage_opponent_turn_draw"
+          ],
+          "matching_over_target_roles": [
+            "board_wipes_resets",
+            "draw_rummage_opponent_turn_draw"
+          ],
+          "mutation_allowed": false,
+          "profile_roles": [
+            "board_wipes_resets",
+            "card_draw_selection",
+            "draw_rummage_opponent_turn_draw",
+            "miracle_haymakers"
+          ],
+          "score": 55,
+          "status": "review_only_profile_repair_cut_candidate"
+        },
+        {
+          "card_name": "Storm-Kiln Artist",
+          "classification_source": "tag_plus_text",
+          "cmc": 4.0,
+          "core_roles": [
+            "engine",
+            "ramp"
+          ],
+          "cut_reasons": [
+            "over_target_mana_rocks_treasure_ramp",
+            "over_target_spell_payoffs_copy_engines"
+          ],
+          "matching_over_target_roles": [
+            "mana_rocks_treasure_ramp",
+            "spell_payoffs_copy_engines"
+          ],
+          "mutation_allowed": false,
+          "profile_roles": [
+            "mana_acceleration",
+            "mana_rocks_treasure_ramp",
+            "spell_payoffs_copy_engines"
+          ],
+          "score": 54,
+          "status": "review_only_profile_repair_cut_candidate"
+        },
+        {
+          "card_name": "Jeska's Will",
+          "classification_source": "tag",
+          "cmc": 3.0,
+          "core_roles": [
+            "ramp"
+          ],
+          "cut_reasons": [
+            "over_target_draw_rummage_opponent_turn_draw",
+            "over_target_mana_rocks_treasure_ramp"
+          ],
+          "matching_over_target_roles": [
+            "draw_rummage_opponent_turn_draw",
+            "mana_rocks_treasure_ramp"
+          ],
+          "mutation_allowed": false,
+          "profile_roles": [
+            "draw_rummage_opponent_turn_draw",
+            "mana_acceleration",
+            "mana_rocks_treasure_ramp"
+          ],
+          "score": 53,
+          "status": "review_only_profile_repair_cut_candidate"
+        },
+        {
+          "card_name": "Monologue Tax",
+          "classification_source": "tag_plus_text",
+          "cmc": 3.0,
+          "core_roles": [
+            "engine",
+            "ramp"
+          ],
+          "cut_reasons": [
+            "over_target_mana_rocks_treasure_ramp",
+            "over_target_spell_payoffs_copy_engines"
+          ],
+          "matching_over_target_roles": [
+            "mana_rocks_treasure_ramp",
+            "spell_payoffs_copy_engines"
+          ],
+          "mutation_allowed": false,
+          "profile_roles": [
+            "mana_acceleration",
+            "mana_rocks_treasure_ramp",
+            "spell_payoffs_copy_engines"
+          ],
+          "score": 53,
+          "status": "review_only_profile_repair_cut_candidate"
+        },
+        {
+          "card_name": "Impact Tremors",
+          "classification_source": "tag_plus_text",
+          "cmc": 2.0,
+          "core_roles": [
+            "board_wipe",
+            "draw",
+            "engine"
+          ],
+          "cut_reasons": [
+            "over_target_board_wipes_resets",
+            "over_target_draw_rummage_opponent_turn_draw"
+          ],
+          "matching_over_target_roles": [
+            "board_wipes_resets",
+            "draw_rummage_opponent_turn_draw"
+          ],
+          "mutation_allowed": false,
+          "profile_roles": [
+            "board_wipes_resets",
+            "card_draw_selection",
+            "draw_rummage_opponent_turn_draw"
+          ],
+          "score": 52,
+          "status": "review_only_profile_repair_cut_candidate"
+        },
+        {
+          "card_name": "Scroll Rack",
+          "classification_source": "tag",
+          "cmc": 2.0,
+          "core_roles": [
+            "draw",
+            "ramp"
+          ],
+          "cut_reasons": [
+            "over_target_draw_rummage_opponent_turn_draw",
+            "over_target_mana_rocks_treasure_ramp"
+          ],
+          "matching_over_target_roles": [
+            "draw_rummage_opponent_turn_draw",
+            "mana_rocks_treasure_ramp"
+          ],
+          "mutation_allowed": false,
+          "profile_roles": [
+            "card_draw_selection",
+            "draw_rummage_opponent_turn_draw",
+            "mana_acceleration",
+            "mana_rocks_treasure_ramp",
+            "topdeck_miracle_setup"
+          ],
+          "score": 52,
+          "status": "review_only_profile_repair_cut_candidate"
+        },
+        {
+          "card_name": "Taii Wakeen, Perfect Shot",
+          "classification_source": "tag_plus_text",
+          "cmc": 2.0,
+          "core_roles": [
+            "draw",
+            "engine",
+            "wincon"
+          ],
+          "cut_reasons": [
+            "over_target_dedicated_win_conditions",
+            "over_target_draw_rummage_opponent_turn_draw"
+          ],
+          "matching_over_target_roles": [
+            "dedicated_win_conditions",
+            "draw_rummage_opponent_turn_draw"
+          ],
+          "mutation_allowed": false,
+          "profile_roles": [
+            "card_draw_selection",
+            "dedicated_win_conditions",
+            "draw_rummage_opponent_turn_draw"
+          ],
+          "score": 52,
+          "status": "review_only_profile_repair_cut_candidate"
+        },
+        {
+          "card_name": "Young Pyromancer",
+          "classification_source": "tag_plus_text",
+          "cmc": 2.0,
+          "core_roles": [
+            "engine",
+            "wincon"
+          ],
+          "cut_reasons": [
+            "over_target_dedicated_win_conditions",
+            "over_target_spell_payoffs_copy_engines"
+          ],
+          "matching_over_target_roles": [
+            "dedicated_win_conditions",
+            "spell_payoffs_copy_engines"
+          ],
+          "mutation_allowed": false,
+          "profile_roles": [
+            "dedicated_win_conditions",
+            "spell_payoffs_copy_engines"
+          ],
+          "score": 52,
+          "status": "review_only_profile_repair_cut_candidate"
+        }
+      ]
+    },
+    {
+      "blocker": "protected_profile_anchor_cut:Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+      "candidate_count": 1,
+      "candidate_source_axis": "protected_profile_anchor",
+      "mutation_allowed": false,
+      "protected_card": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+      "repair_axis": "protected_profile_anchor",
+      "shortfall_to_min": 0,
+      "status": "protected_anchor_restore_requires_package_resynthesis",
+      "top_add_candidates": [
+        {
+          "axis": "protected_profile_anchor",
+          "card_name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+          "cmc": 3.0,
+          "color_identity": [
+            "R"
+          ],
+          "color_identity_allowed": true,
+          "commander_legality": "legal",
+          "fit_reasons": [
+            "restore_protected_anchor_to_candidate_package",
+            "restores_protected_profile_anchor",
+            "protected_anchor_restore_axis"
+          ],
+          "mutation_allowed": false,
+          "profile_roles": [
+            "mana_acceleration",
+            "mana_rocks_treasure_ramp"
+          ],
+          "score": 115,
+          "source": "restore_protected_anchor_to_candidate_package",
+          "status": "review_only_profile_repair_add_candidate",
+          "type_line": "Legendary Creature \u2014 God"
+        }
+      ],
+      "top_cut_candidates": [
+        {
+          "card_name": "Artist's Talent",
+          "classification_source": "tag_plus_text",
+          "cmc": 2.0,
+          "core_roles": [
+            "draw",
+            "engine",
+            "ramp",
+            "wincon"
+          ],
+          "cut_reasons": [
+            "over_target_dedicated_win_conditions",
+            "over_target_draw_rummage_opponent_turn_draw",
+            "over_target_mana_rocks_treasure_ramp",
+            "over_target_spell_payoffs_copy_engines"
+          ],
+          "matching_over_target_roles": [
+            "dedicated_win_conditions",
+            "draw_rummage_opponent_turn_draw",
+            "mana_rocks_treasure_ramp",
+            "spell_payoffs_copy_engines"
+          ],
+          "mutation_allowed": false,
+          "profile_roles": [
+            "card_draw_selection",
+            "dedicated_win_conditions",
+            "draw_rummage_opponent_turn_draw",
+            "mana_acceleration",
+            "mana_rocks_treasure_ramp",
+            "spell_payoffs_copy_engines"
+          ],
+          "score": 72,
+          "status": "review_only_profile_repair_cut_candidate"
+        },
+        {
+          "card_name": "Brass's Bounty",
+          "classification_source": "tag",
+          "cmc": 7.0,
+          "core_roles": [
+            "ramp",
+            "wincon"
+          ],
+          "cut_reasons": [
+            "over_target_dedicated_win_conditions",
+            "over_target_mana_rocks_treasure_ramp"
+          ],
+          "matching_over_target_roles": [
+            "dedicated_win_conditions",
+            "mana_rocks_treasure_ramp"
+          ],
+          "mutation_allowed": false,
+          "profile_roles": [
+            "dedicated_win_conditions",
+            "mana_acceleration",
+            "mana_rocks_treasure_ramp",
+            "miracle_haymakers"
+          ],
+          "score": 56,
+          "status": "review_only_profile_repair_cut_candidate"
+        },
+        {
+          "card_name": "Starfall Invocation",
+          "classification_source": "tag_plus_text",
+          "cmc": 5.0,
+          "core_roles": [
+            "board_wipe",
+            "draw",
+            "removal"
+          ],
+          "cut_reasons": [
+            "over_target_board_wipes_resets",
+            "over_target_draw_rummage_opponent_turn_draw"
+          ],
+          "matching_over_target_roles": [
+            "board_wipes_resets",
+            "draw_rummage_opponent_turn_draw"
+          ],
+          "mutation_allowed": false,
+          "profile_roles": [
+            "board_wipes_resets",
+            "card_draw_selection",
+            "draw_rummage_opponent_turn_draw",
+            "miracle_haymakers"
+          ],
+          "score": 55,
+          "status": "review_only_profile_repair_cut_candidate"
+        },
+        {
+          "card_name": "Storm-Kiln Artist",
+          "classification_source": "tag_plus_text",
+          "cmc": 4.0,
+          "core_roles": [
+            "engine",
+            "ramp"
+          ],
+          "cut_reasons": [
+            "over_target_mana_rocks_treasure_ramp",
+            "over_target_spell_payoffs_copy_engines"
+          ],
+          "matching_over_target_roles": [
+            "mana_rocks_treasure_ramp",
+            "spell_payoffs_copy_engines"
+          ],
+          "mutation_allowed": false,
+          "profile_roles": [
+            "mana_acceleration",
+            "mana_rocks_treasure_ramp",
+            "spell_payoffs_copy_engines"
+          ],
+          "score": 54,
+          "status": "review_only_profile_repair_cut_candidate"
+        },
+        {
+          "card_name": "Jeska's Will",
+          "classification_source": "tag",
+          "cmc": 3.0,
+          "core_roles": [
+            "ramp"
+          ],
+          "cut_reasons": [
+            "over_target_draw_rummage_opponent_turn_draw",
+            "over_target_mana_rocks_treasure_ramp"
+          ],
+          "matching_over_target_roles": [
+            "draw_rummage_opponent_turn_draw",
+            "mana_rocks_treasure_ramp"
+          ],
+          "mutation_allowed": false,
+          "profile_roles": [
+            "draw_rummage_opponent_turn_draw",
+            "mana_acceleration",
+            "mana_rocks_treasure_ramp"
+          ],
+          "score": 53,
+          "status": "review_only_profile_repair_cut_candidate"
+        },
+        {
+          "card_name": "Monologue Tax",
+          "classification_source": "tag_plus_text",
+          "cmc": 3.0,
+          "core_roles": [
+            "engine",
+            "ramp"
+          ],
+          "cut_reasons": [
+            "over_target_mana_rocks_treasure_ramp",
+            "over_target_spell_payoffs_copy_engines"
+          ],
+          "matching_over_target_roles": [
+            "mana_rocks_treasure_ramp",
+            "spell_payoffs_copy_engines"
+          ],
+          "mutation_allowed": false,
+          "profile_roles": [
+            "mana_acceleration",
+            "mana_rocks_treasure_ramp",
+            "spell_payoffs_copy_engines"
+          ],
+          "score": 53,
+          "status": "review_only_profile_repair_cut_candidate"
+        },
+        {
+          "card_name": "Impact Tremors",
+          "classification_source": "tag_plus_text",
+          "cmc": 2.0,
+          "core_roles": [
+            "board_wipe",
+            "draw",
+            "engine"
+          ],
+          "cut_reasons": [
+            "over_target_board_wipes_resets",
+            "over_target_draw_rummage_opponent_turn_draw"
+          ],
+          "matching_over_target_roles": [
+            "board_wipes_resets",
+            "draw_rummage_opponent_turn_draw"
+          ],
+          "mutation_allowed": false,
+          "profile_roles": [
+            "board_wipes_resets",
+            "card_draw_selection",
+            "draw_rummage_opponent_turn_draw"
+          ],
+          "score": 52,
+          "status": "review_only_profile_repair_cut_candidate"
+        },
+        {
+          "card_name": "Scroll Rack",
+          "classification_source": "tag",
+          "cmc": 2.0,
+          "core_roles": [
+            "draw",
+            "ramp"
+          ],
+          "cut_reasons": [
+            "over_target_draw_rummage_opponent_turn_draw",
+            "over_target_mana_rocks_treasure_ramp"
+          ],
+          "matching_over_target_roles": [
+            "draw_rummage_opponent_turn_draw",
+            "mana_rocks_treasure_ramp"
+          ],
+          "mutation_allowed": false,
+          "profile_roles": [
+            "card_draw_selection",
+            "draw_rummage_opponent_turn_draw",
+            "mana_acceleration",
+            "mana_rocks_treasure_ramp",
+            "topdeck_miracle_setup"
+          ],
+          "score": 52,
+          "status": "review_only_profile_repair_cut_candidate"
+        },
+        {
+          "card_name": "Taii Wakeen, Perfect Shot",
+          "classification_source": "tag_plus_text",
+          "cmc": 2.0,
+          "core_roles": [
+            "draw",
+            "engine",
+            "wincon"
+          ],
+          "cut_reasons": [
+            "over_target_dedicated_win_conditions",
+            "over_target_draw_rummage_opponent_turn_draw"
+          ],
+          "matching_over_target_roles": [
+            "dedicated_win_conditions",
+            "draw_rummage_opponent_turn_draw"
+          ],
+          "mutation_allowed": false,
+          "profile_roles": [
+            "card_draw_selection",
+            "dedicated_win_conditions",
+            "draw_rummage_opponent_turn_draw"
+          ],
+          "score": 52,
+          "status": "review_only_profile_repair_cut_candidate"
+        },
+        {
+          "card_name": "Young Pyromancer",
+          "classification_source": "tag_plus_text",
+          "cmc": 2.0,
+          "core_roles": [
+            "engine",
+            "wincon"
+          ],
+          "cut_reasons": [
+            "over_target_dedicated_win_conditions",
+            "over_target_spell_payoffs_copy_engines"
+          ],
+          "matching_over_target_roles": [
+            "dedicated_win_conditions",
+            "spell_payoffs_copy_engines"
+          ],
+          "mutation_allowed": false,
+          "profile_roles": [
+            "dedicated_win_conditions",
+            "spell_payoffs_copy_engines"
+          ],
+          "score": 52,
+          "status": "review_only_profile_repair_cut_candidate"
+        }
+      ]
+    }
+  ],
+  "source_db_mutated": false,
+  "status": "profile_repair_candidate_model_blocks_materialization",
+  "summary": {
+    "blocked_cut_candidate_count": 10,
+    "candidate_copy_blocker_count": 3,
+    "commander": "Lorehold, the Historian",
+    "commander_color_identity": [
+      "W",
+      "R"
+    ],
+    "cut_candidate_count": 10,
+    "deck_id": "612",
+    "next_gate": "resynthesize_profile_repair_package_with_protected_anchor_restoration",
+    "repair_axis_count": 4
+  }
+}

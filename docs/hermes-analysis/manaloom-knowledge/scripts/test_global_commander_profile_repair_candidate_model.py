@@ -37,6 +37,12 @@ def strategy_payload(*, blockers: list[str]) -> dict[str, object]:
                 "action": "cut",
                 "card": "Genji Glove",
                 "risk_flags": ["attack_window_or_extra_combat_cut"],
+            },
+            {
+                "action": "cut",
+                "card": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+                "profile_roles": ["mana_rocks_treasure_ramp"],
+                "risk_flags": ["protected_profile_anchor_cut", "mana_acceleration_cut"],
             }
         ],
     }
@@ -90,6 +96,13 @@ def repair_payload(*, add_payoff_shortfall: int = 18, axes: list[str] | None = N
             "target_max": 6,
             "shortfall_to_min": 1,
         },
+        "protected_profile_anchor": {
+            "blocker": "protected_profile_anchor_cut:Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+            "repair_axis": "protected_profile_anchor",
+            "protected_card": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+            "affected_profile_roles": ["mana_rocks_treasure_ramp"],
+            "shortfall_to_min": 0,
+        },
     }
     return {
         "status": "profile_blocker_repair_plan_ready",
@@ -100,7 +113,7 @@ def repair_payload(*, add_payoff_shortfall: int = 18, axes: list[str] | None = N
 
 
 class GlobalCommanderProfileRepairCandidateModelTests(unittest.TestCase):
-    def _db(self, root: Path) -> Path:
+    def _db(self, root: Path, *, include_birgi_in_deck: bool = True) -> Path:
         path = root / "candidate.db"
         conn = sqlite3.connect(path)
         conn.execute(
@@ -174,19 +187,22 @@ class GlobalCommanderProfileRepairCandidateModelTests(unittest.TestCase):
                 0,
                 "scheming",
             ),
-            (
-                "619",
-                "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
-                1,
-                "",
-                "[]",
-                "Legendary Creature - God",
-                "Whenever you cast a spell, add {R}.",
-                3,
-                0,
-                "birgi",
-            ),
         ]
+        if include_birgi_in_deck:
+            deck_rows.append(
+                (
+                    "619",
+                    "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+                    1,
+                    "",
+                    "[]",
+                    "Legendary Creature - God",
+                    "Whenever you cast a spell, add {R}.",
+                    3,
+                    0,
+                    "birgi",
+                )
+            )
         conn.executemany("INSERT INTO deck_cards VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", deck_rows)
         oracle_rows = [
             (
@@ -262,9 +278,29 @@ class GlobalCommanderProfileRepairCandidateModelTests(unittest.TestCase):
                 "",
                 "reanimate",
             ),
+            (
+                "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+                "birgi, god of storytelling // harnfel, horn of bounty",
+                "{2}{R}",
+                '["R"]',
+                '["R"]',
+                "Legendary Creature - God",
+                "Whenever you cast a spell, add {R}. Until end of turn, you don't lose this mana as steps and phases end.",
+                3,
+                "",
+                "birgi",
+            ),
         ]
         conn.executemany("INSERT INTO card_oracle_cache VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", oracle_rows)
-        for name in ["City of Brass", "Arena of Glory", "Ancient Copper Dragon", "Despark", "Vampiric Tutor", "Reanimate"]:
+        for name in [
+            "City of Brass",
+            "Arena of Glory",
+            "Ancient Copper Dragon",
+            "Despark",
+            "Vampiric Tutor",
+            "Reanimate",
+            "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+        ]:
             conn.execute("INSERT INTO card_legalities VALUES (?, 'commander', 'legal')", (name,))
         conn.commit()
         conn.close()
@@ -411,6 +447,42 @@ class GlobalCommanderProfileRepairCandidateModelTests(unittest.TestCase):
         self.assertIn(
             "global_battle_feedback_requires_new_same_lane_or_gate",
             blocked["Birgi, God of Storytelling // Harnfel, Horn of Bounty"],
+        )
+
+    def test_protected_anchor_restore_blocks_until_package_resynthesis(self) -> None:
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        root = Path(tmp.name)
+        db = self._db(root, include_birgi_in_deck=False)
+        strategy = self._json(
+            root,
+            "strategy.json",
+            strategy_payload(
+                blockers=[
+                    "protected_profile_anchor_cut:Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+                ]
+            ),
+        )
+        repair = self._json(
+            root,
+            "repair.json",
+            repair_payload(axes=["protected_profile_anchor"]),
+        )
+
+        report = model.build_report(repair_plan_report=repair, strategy_report=strategy, sqlite_db=db)
+
+        self.assertEqual(report["status"], "profile_repair_candidate_model_blocks_materialization")
+        self.assertFalse(report["candidate_copy_allowed_now"])
+        self.assertEqual(
+            report["summary"]["next_gate"],
+            "resynthesize_profile_repair_package_with_protected_anchor_restoration",
+        )
+        pool = report["repair_axis_pools"][0]
+        self.assertEqual(pool["status"], "protected_anchor_restore_requires_package_resynthesis")
+        self.assertEqual(pool["top_add_candidates"][0]["card_name"], "Birgi, God of Storytelling // Harnfel, Horn of Bounty")
+        self.assertIn(
+            "protected_profile_anchor:Birgi, God of Storytelling // Harnfel, Horn of Bounty:protected_anchor_restore_requires_package_resynthesis",
+            report["candidate_copy_blockers"],
         )
 
 
