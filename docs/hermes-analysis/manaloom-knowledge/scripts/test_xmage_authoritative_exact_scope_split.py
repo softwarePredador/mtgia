@@ -5095,6 +5095,72 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "target_player_draw_spell_oracle_not_exact_fixed")
 
+    def test_fixed_target_player_discard_spell_maps(self) -> None:
+        row = queue_row(
+            split.TARGET_PLAYER_DISCARD_UNIT,
+            effect_classes=["DiscardTargetEffect"],
+            xmage_signals=["targeting"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Target player discards two cards."),
+            source_text=(
+                "this.getSpellAbility().addTarget(new TargetPlayer());"
+                "this.getSpellAbility().addEffect(new DiscardTargetEffect(2));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "target_player_discard")
+        self.assertEqual(effect["battle_model_scope"], split.TARGET_PLAYER_DISCARD_SCOPE)
+        self.assertTrue(effect["target_player_discard"])
+        self.assertEqual(effect["target_controller"], "target_player")
+        self.assertEqual(effect["target"], "player")
+        self.assertEqual(effect["target_preference"], "opponent")
+        self.assertEqual(effect["discard_count"], 2)
+        self.assertEqual(effect["count"], 2)
+        self.assertFalse(effect["discard_random"])
+
+    def test_fixed_target_player_discard_spell_maps_random(self) -> None:
+        row = queue_row(
+            split.TARGET_PLAYER_DISCARD_UNIT,
+            effect_classes=["DiscardTargetEffect"],
+            xmage_signals=["targeting"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Target player discards a card at random."),
+            source_text=(
+                "this.getSpellAbility().addTarget(new TargetPlayer());"
+                "this.getSpellAbility().addEffect(new DiscardTargetEffect(1, true));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.TARGET_PLAYER_DISCARD_SCOPE)
+        self.assertEqual(effect["discard_count"], 1)
+        self.assertTrue(effect["discard_random"])
+
+    def test_fixed_target_player_discard_spell_blocks_dynamic_source_count(self) -> None:
+        row = queue_row(
+            split.TARGET_PLAYER_DISCARD_UNIT,
+            effect_classes=["DiscardTargetEffect"],
+            xmage_signals=["targeting"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Target player discards X cards at random."),
+            source_text=(
+                "this.getSpellAbility().addTarget(new TargetPlayer());"
+                "this.getSpellAbility().addEffect(new DiscardTargetEffect(GetXValue.instance, true));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "target_player_discard_spell_oracle_not_exact_fixed")
+
     def test_fixed_draw_lose_life_spell_blocks_dynamic_source_count(self) -> None:
         row = queue_row(
             split.DRAW_UNIT,

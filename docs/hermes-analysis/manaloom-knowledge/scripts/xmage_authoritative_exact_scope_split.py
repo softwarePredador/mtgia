@@ -108,6 +108,10 @@ LOOK_LIBRARY_PICK_SPELL_UNIT = (
     "xmage_signature::LookLibraryAndPickControllerEffect::no_ability_class::"
     "no_target_class::no_condition_class::no_signal"
 )
+TARGET_PLAYER_DISCARD_UNIT = (
+    "xmage_signature::DiscardTargetEffect::no_ability_class::"
+    "TargetPlayer::no_condition_class::targeting"
+)
 ETB_TOKEN_CREATURE_UNIT = (
     "token_maker::xmage_signature::CreateTokenEffect::EntersBattlefieldTriggeredAbility::"
     "no_target_class::no_condition_class::token,triggered_ability"
@@ -151,6 +155,7 @@ SUPPORTED_UNITS = {
     TOKEN_SPELL_UNIT,
     TOKEN_SPELL_FLASHBACK_UNIT,
     LOOK_LIBRARY_PICK_SPELL_UNIT,
+    TARGET_PLAYER_DISCARD_UNIT,
 }
 
 DRAW_SCOPE = "xmage_fixed_source_controller_draw_spell_v1"
@@ -158,6 +163,7 @@ DRAW_PUT_LAND_SCOPE = "xmage_fixed_draw_put_land_from_hand_spell_v1"
 DRAW_SELF_COST_REDUCTION_SCOPE = "xmage_fixed_source_controller_draw_spell_self_cost_reduction_v1"
 STATIC_GENERIC_COST_REDUCTION_SCOPE = "xmage_static_generic_cost_reduction_for_matching_spells_v1"
 TARGET_DRAW_SCOPE = "xmage_fixed_target_player_draw_spell_v1"
+TARGET_PLAYER_DISCARD_SCOPE = "xmage_fixed_target_player_discard_spell_v1"
 DRAW_DISCARD_SPELL_SCOPE = "xmage_fixed_draw_discard_spell_v1"
 DRAW_LOSE_LIFE_SPELL_SCOPE = "xmage_fixed_controller_draw_lose_life_spell_v1"
 TARGET_DRAW_LOSE_LIFE_SPELL_SCOPE = "xmage_fixed_target_player_draw_lose_life_spell_v1"
@@ -10342,6 +10348,30 @@ def fixed_target_player_draw_spell_from_oracle(metadata: dict[str, Any]) -> dict
     return {"draw_count": draw_count}
 
 
+def fixed_target_player_discard_spell_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    text = re.sub(
+        r"\s+",
+        " ",
+        " ".join(oracle_effect_lines_without_neutral_auxiliary(metadata)),
+    ).strip().lower()
+    if not text:
+        return "target_player_discard_spell_oracle_not_simple"
+    number_pattern = r"(a|one|two|three|four|five|six|seven|\d+)"
+    match = re.fullmatch(
+        rf"target player discards {number_pattern} cards?(?P<random> at random)?\.?",
+        text,
+    )
+    if not match:
+        return "target_player_discard_spell_oracle_not_exact_fixed"
+    discard_count = number_word_to_int(match.group(1))
+    if discard_count <= 0:
+        return "target_player_discard_spell_count_not_fixed"
+    return {
+        "discard_count": discard_count,
+        "discard_random": bool(match.group("random")),
+    }
+
+
 def self_cost_reduction_condition_from_oracle(condition_text: str) -> dict[str, Any] | str:
     condition = re.sub(r"\([^)]*\)", "", condition_text)
     condition = re.sub(r"\s+", " ", condition).strip().strip(".").lower()
@@ -12851,6 +12881,44 @@ def fixed_target_player_draw_spell_from_source(source: str) -> dict[str, Any] | 
     return {
         "draw_count": int(draw_count),
         "xmage_effect_class": "DrawCardTargetEffect",
+    }
+
+
+def fixed_target_player_discard_spell_from_source(source: str) -> dict[str, Any] | str:
+    text = source or ""
+    if has_additional_cost(text):
+        return "target_player_discard_spell_source_additional_cost_not_supported"
+    unsupported_markers = {
+        "ConditionalOneShotEffect",
+        "DoIfCostPaid",
+        "Mode",
+        "Modes",
+        "TargetPointer",
+        ".setTargetPointer",
+        "GetXValue",
+        "DomainValue",
+        "ColorsOfManaSpentToCastCount",
+        "GreatestAmongPermanentsValue",
+    }
+    if any(marker in text for marker in unsupported_markers):
+        return "target_player_discard_spell_source_not_simple"
+    if len(re.findall(r"new\s+TargetPlayer\s*\(\s*\)", text)) != 1:
+        return "target_player_discard_spell_source_target_not_supported"
+    matches = re.findall(
+        r"\bDiscardTargetEffect\s*\(\s*(\d+)(?:\s*,\s*(true|false))?\s*\)",
+        text,
+        re.S,
+    )
+    if len(matches) != 1:
+        return "target_player_discard_spell_source_not_simple"
+    count_raw, random_raw = matches[0]
+    discard_count = int(count_raw)
+    if discard_count <= 0:
+        return "target_player_discard_spell_source_count_not_fixed"
+    return {
+        "discard_count": discard_count,
+        "discard_random": random_raw == "true",
+        "xmage_effect_class": "DiscardTargetEffect",
     }
 
 
@@ -16885,6 +16953,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "fixed destroy-target plus controller Treasure creation spell"
     elif scope == LIFE_GAIN_DRAW_SCOPE:
         scope_kind = "fixed controller life-gain plus draw-card spell"
+    elif scope == TARGET_PLAYER_DISCARD_SCOPE:
+        scope_kind = "fixed target-player discard spell"
     elif scope == COUNTER_TARGET_CONTROLLER_LOSE_LIFE_SCOPE:
         scope_kind = "fixed counter-target spell with target-controller life loss"
     elif scope == BOOST_DRAW_SCOPE:
@@ -22291,6 +22361,44 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_bounce_scry_spell",
+        ), "selected_exact_scope"
+
+    if unit == TARGET_PLAYER_DISCARD_UNIT:
+        if classes != {"DiscardTargetEffect"}:
+            return None, "target_player_discard_spell_effect_class_not_pure"
+        unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+        if unsupported_abilities:
+            return None, "target_player_discard_spell_ability_class_not_simple"
+        oracle_discard = fixed_target_player_discard_spell_from_oracle(metadata)
+        if isinstance(oracle_discard, str):
+            return None, oracle_discard
+        source_discard = fixed_target_player_discard_spell_from_source(source_text)
+        if isinstance(source_discard, str):
+            return None, source_discard
+        for key in ("discard_count", "discard_random"):
+            if oracle_discard[key] != source_discard[key]:
+                return None, "target_player_discard_spell_source_oracle_mismatch"
+        discard_count = int(oracle_discard["discard_count"])
+        discard_random = bool(oracle_discard["discard_random"])
+        effect_json = {
+            "effect": "target_player_discard",
+            "battle_model_scope": TARGET_PLAYER_DISCARD_SCOPE,
+            "count": discard_count,
+            "discard_count": discard_count,
+            "discard_random": discard_random,
+            "target": "player",
+            "target_controller": "target_player",
+            "target_constraints": {"players": ["any"]},
+            "target_preference": "opponent",
+            "target_player_discard": True,
+            "xmage_effect_class": "DiscardTargetEffect",
+            **flags,
+        }
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_fixed_target_player_discard_spell",
         ), "selected_exact_scope"
 
     if unit == DRAW_UNIT:

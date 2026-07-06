@@ -8605,6 +8605,9 @@ CARD_EFFECT_FIELD_RULE_KEYS = (
     "amount",
     "damage",
     "count",
+    "discard_count",
+    "discard_random",
+    "target_player_discard",
     "power_delta",
     "toughness_delta",
     "power_boost",
@@ -56095,6 +56098,99 @@ def resolve_draw_lose_life_spell(
     )
 
 
+def _target_player_discard_target_player(player, opponents, effect_data):
+    preference = str((effect_data or {}).get("target_preference") or "opponent").lower()
+    if preference in {"self", "controller"}:
+        return player, "self_preference"
+    candidates = [
+        opponent
+        for opponent in prioritize_evaluation_target_opponents(player, opponents or [])
+        if getattr(opponent, "is_alive", lambda: True)()
+    ]
+    if not candidates:
+        return player, "fallback_self_no_opponent"
+    return max(
+        candidates,
+        key=lambda opponent: (
+            len(getattr(opponent, "hand", []) or []),
+            -int(getattr(opponent, "life", 0) or 0),
+            getattr(opponent, "name", ""),
+        ),
+    ), "opponent_most_cards_in_hand"
+
+
+def _target_player_discard_cards(target_player, discard_count, discard_random, rng):
+    count = max(0, int(discard_count or 0))
+    candidates = [card for card in getattr(target_player, "hand", []) or [] if isinstance(card, dict)]
+    if count <= 0 or not candidates:
+        return []
+    count = min(count, len(candidates))
+    if discard_random:
+        chooser = rng or random
+        return list(chooser.sample(candidates, count))
+    return sorted(
+        candidates,
+        key=lambda card: (
+            discard_replacement_priority(card, target_player),
+            int(_opening_hand_card_cmc(card) or 0),
+            card.get("name", "?"),
+        ),
+    )[:count]
+
+
+def resolve_target_player_discard_spell(
+    player,
+    opponents,
+    card,
+    effect_data,
+    turn,
+    rng,
+    *,
+    phase=None,
+    all_players=None,
+):
+    discard_count = max(0, int(effect_data.get("discard_count") or effect_data.get("count") or 0))
+    discard_random = bool(effect_data.get("discard_random"))
+    target_player, target_reason = _target_player_discard_target_player(player, opponents, effect_data)
+    hand_size_before = len(getattr(target_player, "hand", []) or [])
+    discard_cards = _target_player_discard_cards(target_player, discard_count, discard_random, rng)
+    removed = _remove_exact_cards_from_hand(target_player, discard_cards)
+    participants = list(all_players or [player] + list(opponents or []))
+    discard_resolution = resolve_effect_discard_cards(
+        target_player,
+        removed,
+        top_limit=0,
+        opponents=[participant for participant in participants if participant is not target_player],
+        turn=turn,
+        phase=phase or "resolution",
+        rng=rng,
+    )
+    emit_replay_event(
+        "target_player_discard_resolved",
+        player=player.name,
+        card=card.get("name", "?"),
+        target_player=getattr(target_player, "name", "?"),
+        target_reason=target_reason,
+        requested_discard_count=discard_count,
+        discarded_count=len(removed),
+        discard_random=discard_random,
+        discarded=[discarded.get("name", "?") for discarded in removed],
+        discarded_to_graveyard=[
+            discarded.get("name", "?")
+            for discarded in discard_resolution.get("to_graveyard", [])
+        ],
+        discarded_to_top=[
+            discarded.get("name", "?")
+            for discarded in discard_resolution.get("to_top", [])
+        ],
+        hand_size_before=hand_size_before,
+        hand_size_after=len(getattr(target_player, "hand", []) or []),
+        turn=turn,
+        phase=phase or "resolution",
+        **replay_rule_fields(effect_data),
+    )
+
+
 def apply_effect_immediate(
     player,
     opponents,
@@ -56957,6 +57053,18 @@ def apply_effect_immediate(
             )
             return
         finish_resolved_spell(player, card, turn=turn)
+    elif effect == "target_player_discard":
+        resolve_target_player_discard_spell(
+            player,
+            opponents,
+            card,
+            effect_data,
+            turn,
+            rng,
+            phase=phase or "resolution",
+            all_players=all_players_for_entry,
+        )
+        finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
     elif effect == "draw_cards":
         if not pay_additional_card_costs(player, card, effect_data, turn=turn):
             finish_resolved_spell(player, card, turn=turn)

@@ -1,0 +1,266 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-06T13:18:52.402985+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg569_target_player_discard_new_server_package_manifest.json",
+  "package_id": "pg569_target_player_discard_new_server_package_manifest",
+  "snapshot": "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 6
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_target_player_discard_spell_v1",
+          "card_name": "Fugue",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d4bb311eb8b3ced90c398a5ecbbed070",
+          "oracle_hash": "bfd9dc2714451de66a4651e0ab89c554",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_target_player_discard_spell_v1",
+          "card_name": "Hymn to Tourach",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ea13ba07e267cef6ac5bbe88984fe370",
+          "oracle_hash": "0f991b72f55db8267b0d6c56e60fdb74",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_target_player_discard_spell_v1",
+          "card_name": "Mind Rot",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:71979009d8aa5258bae3e3cecf7fdef9",
+          "oracle_hash": "a8ba0fcad34a4870d948f3db2310c311",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_target_player_discard_spell_v1",
+          "card_name": "Specter's Wail",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7fe2d57d80caa1dfc95a5ab0d2a8c87b",
+          "oracle_hash": "2e9666d69223a79c444c1c72f206210f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_target_player_discard_spell_v1",
+          "card_name": "Three Tragedies",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d4bb311eb8b3ced90c398a5ecbbed070",
+          "oracle_hash": "bfd9dc2714451de66a4651e0ab89c554",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_target_player_discard_spell_v1",
+          "card_name": "Waking Nightmare",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:71979009d8aa5258bae3e3cecf7fdef9",
+          "oracle_hash": "a8ba0fcad34a4870d948f3db2310c311",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 6
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_target_player_discard_spell_v1",
+          "card_name": "Fugue",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d4bb311eb8b3ced90c398a5ecbbed070",
+          "oracle_hash": "bfd9dc2714451de66a4651e0ab89c554",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_target_player_discard_spell_v1",
+          "card_name": "Hymn to Tourach",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ea13ba07e267cef6ac5bbe88984fe370",
+          "oracle_hash": "0f991b72f55db8267b0d6c56e60fdb74",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_target_player_discard_spell_v1",
+          "card_name": "Mind Rot",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:71979009d8aa5258bae3e3cecf7fdef9",
+          "oracle_hash": "a8ba0fcad34a4870d948f3db2310c311",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_target_player_discard_spell_v1",
+          "card_name": "Specter's Wail",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7fe2d57d80caa1dfc95a5ab0d2a8c87b",
+          "oracle_hash": "2e9666d69223a79c444c1c72f206210f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_target_player_discard_spell_v1",
+          "card_name": "Three Tragedies",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d4bb311eb8b3ced90c398a5ecbbed070",
+          "oracle_hash": "bfd9dc2714451de66a4651e0ab89c554",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_target_player_discard_spell_v1",
+          "card_name": "Waking Nightmare",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:71979009d8aa5258bae3e3cecf7fdef9",
+          "oracle_hash": "a8ba0fcad34a4870d948f3db2310c311",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 6
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_target_player_discard_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Fugue",
+          "logical_rule_key": "battle_rule_v1:d4bb311eb8b3ced90c398a5ecbbed070"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_target_player_discard_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Hymn to Tourach",
+          "logical_rule_key": "battle_rule_v1:ea13ba07e267cef6ac5bbe88984fe370"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_target_player_discard_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Mind Rot",
+          "logical_rule_key": "battle_rule_v1:71979009d8aa5258bae3e3cecf7fdef9"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_target_player_discard_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Specter's Wail",
+          "logical_rule_key": "battle_rule_v1:7fe2d57d80caa1dfc95a5ab0d2a8c87b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_target_player_discard_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Three Tragedies",
+          "logical_rule_key": "battle_rule_v1:d4bb311eb8b3ced90c398a5ecbbed070"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_target_player_discard_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Waking Nightmare",
+          "logical_rule_key": "battle_rule_v1:71979009d8aa5258bae3e3cecf7fdef9"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 6
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Fugue",
+          "component_keys": [],
+          "effect": "target_player_discard",
+          "logical_rule_key": "battle_rule_v1:d4bb311eb8b3ced90c398a5ecbbed070"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Hymn to Tourach",
+          "component_keys": [],
+          "effect": "target_player_discard",
+          "logical_rule_key": "battle_rule_v1:ea13ba07e267cef6ac5bbe88984fe370"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Mind Rot",
+          "component_keys": [],
+          "effect": "target_player_discard",
+          "logical_rule_key": "battle_rule_v1:71979009d8aa5258bae3e3cecf7fdef9"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Specter's Wail",
+          "component_keys": [],
+          "effect": "target_player_discard",
+          "logical_rule_key": "battle_rule_v1:7fe2d57d80caa1dfc95a5ab0d2a8c87b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Three Tragedies",
+          "component_keys": [],
+          "effect": "target_player_discard",
+          "logical_rule_key": "battle_rule_v1:d4bb311eb8b3ced90c398a5ecbbed070"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Waking Nightmare",
+          "component_keys": [],
+          "effect": "target_player_discard",
+          "logical_rule_key": "battle_rule_v1:71979009d8aa5258bae3e3cecf7fdef9"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

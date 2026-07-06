@@ -1783,6 +1783,99 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_fixed_target_player_discard_spell_discards_from_opponent(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        opponent.hand = [
+            {"name": "A Low", "type_line": "Creature", "mana_cost": "{1}"},
+            {"name": "B Mid", "type_line": "Creature", "mana_cost": "{2}"},
+            {"name": "C High", "type_line": "Creature", "mana_cost": "{3}"},
+        ]
+        effect = {
+            "effect": "target_player_discard",
+            "battle_model_scope": "xmage_fixed_target_player_discard_spell_v1",
+            "count": 2,
+            "discard_count": 2,
+            "discard_random": False,
+            "target": "player",
+            "target_controller": "target_player",
+            "target_preference": "opponent",
+            "target_player_discard": True,
+            "sorcery": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Mind Rot",
+                "type_line": "Sorcery",
+                "oracle_text": "Target player discards two cards.",
+            },
+            turn=3,
+            rng=random.Random(3),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual([card["name"] for card in opponent.hand], ["C High"])
+        self.assertEqual([card["name"] for card in opponent.graveyard], ["A Low", "B Mid"])
+        self.assertTrue(
+            any(
+                event == "target_player_discard_resolved"
+                and data.get("card") == "Fixture Mind Rot"
+                and data.get("target_player") == "Opponent"
+                and data.get("discarded_count") == 2
+                and data.get("discard_random") is False
+                for event, data in self.events
+            )
+        )
+
+    def test_fixed_target_player_discard_spell_random_uses_rng(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        opponent.hand = [
+            {"name": "Card A", "type_line": "Creature"},
+            {"name": "Card B", "type_line": "Creature"},
+            {"name": "Card C", "type_line": "Creature"},
+        ]
+        effect = {
+            "effect": "target_player_discard",
+            "battle_model_scope": "xmage_fixed_target_player_discard_spell_v1",
+            "count": 1,
+            "discard_count": 1,
+            "discard_random": True,
+            "target": "player",
+            "target_controller": "target_player",
+            "target_preference": "opponent",
+            "target_player_discard": True,
+            "sorcery": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Specter's Wail",
+                "type_line": "Sorcery",
+                "oracle_text": "Target player discards a card at random.",
+            },
+            turn=4,
+            rng=random.Random(7),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(len(opponent.hand), 2)
+        self.assertEqual(len(opponent.graveyard), 1)
+        self.assertTrue(
+            any(
+                event == "target_player_discard_resolved"
+                and data.get("card") == "Fixture Specter's Wail"
+                and data.get("discarded_count") == 1
+                and data.get("discard_random") is True
+                for event, data in self.events
+            )
+        )
+
     def test_fixed_source_controller_draw_spell_pays_creature_sacrifice_cost(self) -> None:
         active = self.battle.Player(
             "Active",
