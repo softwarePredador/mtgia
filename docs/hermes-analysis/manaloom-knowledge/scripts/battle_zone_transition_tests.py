@@ -1100,6 +1100,61 @@ def register_tests(battle, player, card):
         assert white_creature not in opponent.battlefield
         assert white_creature in opponent.graveyard
 
+    def test_skirk_prospector_sacrifices_goblin_for_contextual_mana():
+        active = player("Active")
+        skirk = battle.enrich_card(
+            {
+                "name": "Skirk Prospector",
+                "cmc": 1,
+                "type_line": "Creature - Goblin",
+                "effect": "ramp_permanent",
+                "battle_model_scope": "xmage_target_sacrifice_mana_source_permanent_v1",
+                "ability_kind": "activated_mana",
+                "is_mana_source": True,
+                "mana_source_contextual_only": True,
+                "mana_produced": 1,
+                "produces": "R",
+                "produced_mana_symbols": ["R"],
+                "activation_sacrifice_target": "goblin",
+                "mana_activation_requires_sacrifice_target": True,
+                "activation_requires_sacrifice_target": True,
+                "mana_activation_requires_tap": False,
+                "activation_requires_tap": False,
+            }
+        )
+        goblin_token = {
+            "name": "Goblin Token",
+            "type_line": "Creature - Goblin",
+            "effect": "creature",
+            "token": True,
+            "is_token": True,
+            "power": 1,
+            "toughness": 1,
+        }
+        payoff = {
+            "name": "Shock",
+            "mana_cost": "{R}",
+            "cmc": 1,
+            "type_line": "Instant",
+            "effect": "direct_damage",
+        }
+        active.battlefield = [skirk, goblin_token]
+        active.hand = [payoff]
+
+        activated = battle.activate_self_sacrifice_mana_sources(
+            active,
+            [],
+            [active],
+            turn=3,
+            phase="precombat_main",
+        )
+
+        assert activated == 1
+        assert skirk in active.battlefield
+        assert goblin_token not in active.battlefield
+        assert goblin_token not in active.graveyard
+        assert active.mana_pool.red == 1
+
     def test_weathered_wayfarer_activated_tutor_requires_opponent_more_lands():
         active = player("Active")
         opponent = player("Opponent")
@@ -1509,6 +1564,7 @@ def register_tests(battle, player, card):
         test_claws_of_gix_life_gain_sacrifices_target_permanent_cost,
         test_ravenous_baloth_life_gain_sacrifices_beast_only,
         test_attrition_activated_destroy_sacrifices_creature_cost,
+        test_skirk_prospector_sacrifices_goblin_for_contextual_mana,
         test_weathered_wayfarer_activated_tutor_requires_opponent_more_lands,
         test_spellseeker_etb_finds_cheap_instant_or_sorcery_only,
         test_trophy_mage_etb_finds_artifact_with_mana_value_three_only,

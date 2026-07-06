@@ -19914,6 +19914,10 @@ def activation_sacrifice_target_matches(permanent, target_type):
         return is_effective_land(permanent)
     if target == "forest":
         return is_effective_land(permanent) and _permanent_has_subtype(permanent, "forest")
+    if target == "goblin":
+        return is_battlefield_creature(permanent) and _permanent_has_subtype(permanent, "goblin")
+    if target == "mountain":
+        return is_effective_land(permanent) and _permanent_has_subtype(permanent, "mountain")
     if target == "beast":
         return is_battlefield_creature(permanent) and _permanent_has_subtype(permanent, "beast")
     if target == "swamp":
@@ -28698,6 +28702,7 @@ def activate_self_sacrifice_mana_sources(
     self_sacrifice_scopes = {
         "xmage_self_sacrifice_mana_source_permanent_v1",
         "xmage_tap_and_self_sacrifice_mana_source_permanent_v1",
+        "xmage_target_sacrifice_mana_source_permanent_v1",
     }
 
     sources = [
@@ -28708,8 +28713,12 @@ def activate_self_sacrifice_mana_sources(
         and (
             permanent.get("mana_activation_requires_sacrifice")
             or permanent.get("sacrifice_mana_activation_requires_sacrifice")
+            or permanent.get("mana_activation_requires_sacrifice_target")
         )
-        and not permanent.get("self_sacrifice_mana_used_this_turn")
+        and (
+            permanent.get("mana_activation_requires_sacrifice_target")
+            or not permanent.get("self_sacrifice_mana_used_this_turn")
+        )
     ]
     if not sources:
         return 0
@@ -28723,6 +28732,13 @@ def activate_self_sacrifice_mana_sources(
     )
     for permanent in sources:
         activation_source = self_sacrifice_mana_activation_source(permanent)
+        target_sacrifice_type = str(
+            activation_source.get("activation_sacrifice_target")
+            or activation_source.get("mana_activation_sacrifice_target")
+            or ""
+        ).strip()
+        sacrificed_target = None
+        sacrifice_options = []
         if activation_source.get("mana_activation_requires_tap") and permanent.get("tapped"):
             continue
         if (
@@ -28739,6 +28755,14 @@ def activate_self_sacrifice_mana_sources(
         activation_cost = activation_source.get("activation_mana_cost")
         if activation_cost and not player.can_pay(activation_cost):
             continue
+        if target_sacrifice_type:
+            sacrificed_target, sacrifice_options = choose_activation_sacrifice_target(
+                player,
+                permanent,
+                target_sacrifice_type,
+            )
+            if sacrificed_target is None:
+                continue
 
         colors = source_colors(activation_source)
         bonus_color = colors[0] if len(colors) == 1 else "generic"
@@ -28759,19 +28783,40 @@ def activate_self_sacrifice_mana_sources(
             continue
 
         chosen = candidates[0]
-        destination = move_permanent_from_battlefield(
-            player,
-            permanent,
-            reason="self_sacrifice_mana_source",
-            source=permanent,
-            all_players=all_players,
-        )
+        if target_sacrifice_type:
+            sacrifice_permanent_for_activation(player, sacrificed_target, turn)
+            destination = "graveyard" if not is_token_permanent(sacrificed_target) else "ceased_to_exist"
+            action = "activate_target_sacrifice_mana_source"
+            defer_action = "defer_target_sacrifice_mana_source"
+            decision_type = "target_sacrifice_mana_source_activation"
+            actual_outcome = "target_sacrificed_for_contextual_mana_unlock"
+            reason = "sacrifice_target_mana_source_only_when_extra_mana_unlocks_material_action"
+            strategic_principle = "do_not_spend_sacrificial_mana_targets_without_contextual_unlock"
+            risk_flags = ["sacrifice_target_for_mana"]
+            replay_event = "target_sacrifice_mana_source_activated"
+        else:
+            destination = move_permanent_from_battlefield(
+                player,
+                permanent,
+                reason="self_sacrifice_mana_source",
+                source=permanent,
+                all_players=all_players,
+            )
+            action = "activate_self_sacrifice_mana_source"
+            defer_action = "defer_self_sacrifice_mana_source"
+            decision_type = "self_sacrifice_mana_source_activation"
+            actual_outcome = "source_sacrificed_for_contextual_mana_unlock"
+            reason = "sacrifice_mana_source_only_when_extra_mana_unlocks_material_action"
+            strategic_principle = "do_not_spend_self_sacrificing_mana_sources_without_contextual_unlock"
+            risk_flags = ["sacrifice_source_for_mana"]
+            replay_event = "self_sacrifice_mana_source_activated"
         if not add_player_mana_source_to_pool(player, activation_source, turn=turn):
             continue
-        permanent["self_sacrifice_mana_used_this_turn"] = True
+        if not target_sacrifice_type:
+            permanent["self_sacrifice_mana_used_this_turn"] = True
 
         emit_decision_trace(
-            decision_type="self_sacrifice_mana_source_activation",
+            decision_type=decision_type,
             player=player,
             turn=turn,
             phase=phase,
@@ -28780,7 +28825,7 @@ def activate_self_sacrifice_mana_sources(
                     option["card"],
                     option["effect_data"],
                     score=option["score"],
-                    action="activate_self_sacrifice_mana_source",
+                    action=action,
                     unlock_reason=option["reason"],
                     unlock_type=option["unlock_type"],
                     produced_mana=produced,
@@ -28791,7 +28836,7 @@ def activate_self_sacrifice_mana_sources(
                 chosen["card"],
                 chosen["effect_data"],
                 score=chosen["score"],
-                action="activate_self_sacrifice_mana_source",
+                action=action,
                 unlock_reason=chosen["reason"],
                 unlock_type=chosen["unlock_type"],
                 produced_mana=produced,
@@ -28801,7 +28846,7 @@ def activate_self_sacrifice_mana_sources(
                     option["card"],
                     option["effect_data"],
                     score=option["score"],
-                    action="defer_self_sacrifice_mana_source",
+                    action=defer_action,
                     unlock_reason=option["reason"],
                     unlock_type=option["unlock_type"],
                     produced_mana=produced,
@@ -28810,6 +28855,12 @@ def activate_self_sacrifice_mana_sources(
             ],
             score_components={
                 "sacrificed_source": permanent.get("name", "?"),
+                "sacrifice_target": target_sacrifice_type or None,
+                "sacrificed_target": (sacrificed_target or {}).get("name"),
+                "sacrifice_options": [
+                    option.get("name", "?")
+                    for option in (sacrifice_options or [])[:6]
+                ],
                 "produced_mana": produced,
                 "bonus_color": bonus_color,
                 "activation_cost": activation_cost,
@@ -28820,9 +28871,9 @@ def activate_self_sacrifice_mana_sources(
             rule_status=permanent.get("_rule_review_status", "verified"),
             confidence="medium",
             expected_benefit_score=chosen["score"],
-            actual_outcome="source_sacrificed_for_contextual_mana_unlock",
-            reason="sacrifice_mana_source_only_when_extra_mana_unlocks_material_action",
-            strategic_principle="do_not_spend_self_sacrificing_mana_sources_without_contextual_unlock",
+            actual_outcome=actual_outcome,
+            reason=reason,
+            strategic_principle=strategic_principle,
             heuristic_version=DECISION_STRATEGY_VERSION,
             resource_delta={
                 "permanents": -1,
@@ -28831,11 +28882,11 @@ def activate_self_sacrifice_mana_sources(
                 "unlock_target": chosen["card"].get("name", "?"),
                 "unlock_type": chosen["unlock_type"],
             },
-            risk_flags=["sacrifice_source_for_mana"],
+            risk_flags=risk_flags,
             rejected_reason="lower_contextual_unlock_score",
         )
         emit_replay_event(
-            "self_sacrifice_mana_source_activated",
+            replay_event,
             player=player.name,
             card=permanent.get("name", "?"),
             produced=produced,
@@ -28843,6 +28894,8 @@ def activate_self_sacrifice_mana_sources(
             activation_cost=activation_cost,
             conditional_mana_sources_after=replay_conditional_mana_sources(player),
             destination=destination,
+            sacrifice_target=target_sacrifice_type or None,
+            sacrificed_target=(sacrificed_target or {}).get("name"),
             unlock_target=chosen["card"].get("name", "?"),
             unlock_type=chosen["unlock_type"],
             turn=turn,

@@ -11130,6 +11130,83 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["mana_produced"], 2)
         self.assertEqual(effect["produced_mana_symbols"], ["B", "B"])
 
+    def test_target_sacrifice_creature_mana_source_maps_contextual_only(self) -> None:
+        row = queue_row(
+            split.RAMP_CREATURE_UNIT,
+            effect_classes=[],
+            ability_kind="activated",
+            ability_classes=["SimpleManaAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Skirk Prospector",
+                type_line="Creature - Goblin",
+                oracle_text="Sacrifice a Goblin: Add {R}.",
+            ),
+            source_text=(
+                "private static final FilterControlledPermanent filter = "
+                "new FilterControlledPermanent(SubType.GOBLIN, \"a Goblin\");"
+                "this.addAbility(new SimpleManaAbility(Zone.BATTLEFIELD, Mana.RedMana(1), "
+                "new SacrificeTargetCost(filter), new PermanentsOnBattlefieldCount(filter)));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.TARGET_SACRIFICE_MANA_SOURCE_SCOPE)
+        self.assertTrue(effect["is_mana_source"])
+        self.assertTrue(effect["mana_source_contextual_only"])
+        self.assertEqual(effect["activation_sacrifice_target"], "goblin")
+        self.assertTrue(effect["mana_activation_requires_sacrifice_target"])
+        self.assertFalse(effect["mana_activation_requires_tap"])
+        self.assertEqual(effect["produces"], "R")
+        self.assertEqual(effect["produced_mana_symbols"], ["R"])
+        self.assertEqual(effect["xmage_cost_class"], "SacrificeTargetCost")
+
+    def test_target_sacrifice_mana_source_uses_mana_ability_window(self) -> None:
+        row = queue_row(
+            split.RAMP_CREATURE_UNIT,
+            effect_classes=["DamageTargetEffect", "ManaEffect", "ValleymakerManaEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility", "SimpleManaAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Valleymaker",
+                type_line="Creature - Giant Shaman",
+                oracle_text=(
+                    "{T}, Sacrifice a Mountain: Valleymaker deals 3 damage to target creature.\n"
+                    "{T}, Sacrifice a Forest: Choose a player. That player adds {G}{G}{G}."
+                ),
+            ),
+            source_text=(
+                "private static final FilterControlledPermanent filter = new FilterControlledPermanent(\"a Mountain\");"
+                "private static final FilterControlledPermanent filter2 = new FilterControlledPermanent(\"a Forest\");"
+                "filter.add(SubType.MOUNTAIN.getPredicate());"
+                "filter2.add(SubType.FOREST.getPredicate());"
+                "Ability ability = new SimpleActivatedAbility(new DamageTargetEffect(3), new TapSourceCost());"
+                "ability.addCost(new SacrificeTargetCost(filter));"
+                "Ability ability2 = new SimpleManaAbility(Zone.BATTLEFIELD, new ValleymakerManaEffect(), new TapSourceCost());"
+                "ability2.addCost(new SacrificeTargetCost(filter2));"
+                "this.addAbility(ability2);"
+                "class ValleymakerManaEffect extends ManaEffect {"
+                "public Mana produceMana(Game game, Ability source) { return Mana.GreenMana(3); }"
+                "}"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.TARGET_SACRIFICE_MANA_SOURCE_SCOPE)
+        self.assertEqual(effect["activation_sacrifice_target"], "forest")
+        self.assertTrue(effect["mana_activation_requires_tap"])
+        self.assertEqual(effect["produces"], "G")
+        self.assertEqual(effect["mana_produced"], 3)
+        self.assertEqual(effect["produced_mana_symbols"], ["G", "G", "G"])
+        self.assertTrue(effect["_runtime_partial"])
+
     def test_simple_artifact_sacrifice_mana_source_with_activation_cost_maps(self) -> None:
         row = queue_row(
             split.RAMP_ARTIFACT_UNIT,

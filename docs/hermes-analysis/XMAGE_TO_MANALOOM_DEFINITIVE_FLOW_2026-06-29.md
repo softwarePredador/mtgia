@@ -15908,6 +15908,76 @@ Oracle text, unsupported target filters, or non-destroy composite effects.
 Those remain blocked under exact split reason counts and require their own
 mapper/runtime package.
 
+## PG574 Target-Sacrifice Mana Source New Server Evidence
+
+PG574 evidence:
+
+- candidate split:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260706_pg574_target_sacrifice_mana_source_candidate.md`
+- package:
+  `docs/hermes-analysis/master_optimizer_reports/pg574_target_sacrifice_mana_source_package.md`
+- apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg574_target_sacrifice_mana_source_apply_evidence.md`
+- sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg574_target_sacrifice_mana_source_sync_report.json`
+- E2E:
+  `docs/hermes-analysis/master_optimizer_reports/pg574_target_sacrifice_mana_source_e2e.md`
+- post-sync queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260706_post_pg574_target_sacrifice_mana_source_commander_legal.md`
+- post split recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260706_post_pg574_target_sacrifice_mana_source_recheck.md`
+- readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260706_post_pg574_target_sacrifice_mana_source.md`
+- final audits:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260706_post_pg574_target_sacrifice_mana_source.md`,
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260706_post_pg574_target_sacrifice_mana_source.md`,
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260706_post_pg574_target_sacrifice_mana_source.md`,
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260706_post_pg574_target_sacrifice_mana_source.md`
+
+PG574 promoted `5` activated mana rows with safe `SacrificeTargetCost`
+filters on the new server under
+`xmage_target_sacrifice_mana_source_permanent_v1`.
+
+Runtime semantics:
+
+- target-sacrifice mana sources are marked contextual-only and are activated
+  only when the produced mana unlocks a real same-turn play;
+- the runtime chooses and sacrifices a valid target before adding mana;
+- supported sacrifice targets in this package are `land`, `artifact`,
+  `goblin`, `creature`, and `forest`, when Oracle and XMage agree;
+- non-tap target-sacrifice sources can activate repeatedly only when each
+  activation has a fresh legal sacrifice target and a real payoff;
+- replay/resource traces record the sacrifice target and the produced mana.
+
+Validation:
+
+- focused code checks passed: `py_compile`, `666` exact-scope unittest tests,
+  and the battle runtime suite with PG-backed rules;
+- package precheck found `5/5` target card rows, no missing targets, and
+  `0` existing expected executable rows before apply;
+- package apply verified `5/5` promoted rows with `review_status=verified`,
+  `execution_status=auto`, and matching Oracle hash;
+- PG -> Hermes/SQLite sync loaded `5` PostgreSQL rows, updated `7` SQLite
+  rows, and exported `6621` canonical snapshot rows;
+- direct PostgreSQL and SQLite verification matched scope, sacrifice target,
+  produced color, mana amount, and contextual-only flag for all five selected
+  cards;
+- post-PG574 queue moved from `target_identity_count=25375` to `25370` and
+  from `xmage_authoritative_source_count=25061` to `25056`;
+- final exact-scope recheck returned `proposal_count=0`;
+- global readiness after sync reported `battle_and_oracle_ready=5580` and
+  `battle_family_mapper_required=28293`;
+- final audits passed: XMage strategy `26/26`, PG-Hermes-SQLite `51/51`,
+  operational surface `pass`, legacy contamination `pass`, and server-target
+  `pass`.
+
+Residual boundary: PG574 does not authorize target-sacrifice mana sources with
+non-simple Oracle text, source/Oracle sacrifice-target mismatch, mana output
+mismatch, multi-sacrifice costs, discard, pay-life, exile costs, conditional
+mana, or unsupported dynamic output. The known post-PG574 residuals in this
+neighborhood are `Goblin Clearcutter`, `The Golden Throne`,
+`Slobad, Iron Goblin`, and `Overeager Apprentice`.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:
