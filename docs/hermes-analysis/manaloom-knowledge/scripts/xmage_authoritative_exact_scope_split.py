@@ -398,6 +398,7 @@ ALLOWED_TOKEN_ABILITY_KEYWORDS = {
     "MenaceAbility": "menace",
     "MountainwalkAbility": "mountainwalk",
     "PlainswalkAbility": "plainswalk",
+    "ProwessAbility": "prowess",
     "ReachAbility": "reach",
     "SwampwalkAbility": "swampwalk",
     "TrampleAbility": "trample",
@@ -418,6 +419,7 @@ TOKEN_DESCRIPTION_KEYWORDS = {
     "menace": "menace",
     "mountainwalk": "mountainwalk",
     "plainswalk": "plainswalk",
+    "prowess": "prowess",
     "reach": "reach",
     "swampwalk": "swampwalk",
     "trample": "trample",
@@ -455,7 +457,6 @@ UNSUPPORTED_TOKEN_DESCRIPTION_MARKERS = {
     "get +",
     "for each ",
     "infect",
-    "prowess",
     "toxic",
     "banding",
 }

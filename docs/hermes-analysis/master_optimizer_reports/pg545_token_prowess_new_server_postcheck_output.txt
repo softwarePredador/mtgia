@@ -1,0 +1,4 @@
+    card_name    | normalized_name |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
+-----------------+-----------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
+ Goblin Wizardry | goblin wizardry | battle_rule_v1:2e4cf4ec9bd6d362e416223bc13d185b |                  1 |                           1 |                         1 |           0
+(1 row)

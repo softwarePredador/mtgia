@@ -3189,6 +3189,41 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "token_description_keyword_not_supported")
 
+    def test_fixed_create_creature_tokens_spell_accepts_prowess_token(self) -> None:
+        row = queue_row(split.TOKEN_SPELL_UNIT, effect_classes=["CreateTokenEffect"], xmage_signals=["token"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Goblin Wizardry",
+                type_line="Instant",
+                oracle_text="Create two 1/1 red Goblin Wizard creature tokens with prowess.",
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new CreateTokenEffect(new GoblinWizardToken(), 2));
+                class GoblinWizardToken extends TokenImpl {
+                    public GoblinWizardToken() {
+                        super("Goblin Wizard Token", "1/1 red Goblin Wizard creature token with prowess");
+                        cardType.add(CardType.CREATURE);
+                        subtype.add(SubType.GOBLIN);
+                        subtype.add(SubType.WIZARD);
+                        color.setRed(true);
+                        power = new MageInt(1);
+                        toughness = new MageInt(1);
+                        this.addAbility(new ProwessAbility());
+                    }
+                }
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.TOKEN_SPELL_SCOPE)
+        self.assertEqual(effect["token_count"], 2)
+        self.assertEqual(effect["token_name"], "Goblin Wizard Token")
+        self.assertEqual(effect["token_subtype"], "Goblin Wizard")
+        self.assertEqual(effect["token_colors"], ["R"])
+        self.assertEqual(effect["token_keywords"], ["prowess"])
+
     def test_destroy_target_create_treasure_spell_maps_contract_killing_count(self) -> None:
         row = queue_row(
             split.TREASURE_UNIT,

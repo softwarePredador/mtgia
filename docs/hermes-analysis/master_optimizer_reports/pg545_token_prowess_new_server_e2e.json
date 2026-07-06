@@ -1,0 +1,104 @@
+{
+  "battle_execution": {
+    "event_count": 2,
+    "results": [
+      {
+        "card_name": "Goblin Wizardry",
+        "scenario": "Goblin Wizardry creates modeled creature tokens",
+        "token_name": "Goblin Wizard Token",
+        "token_tapped": false,
+        "tokens_created": 2
+      }
+    ],
+    "scenario_count": 1
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-06T03:09:06.443179+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg545_token_prowess_new_server_package_manifest.json",
+  "package_id": "pg545_token_prowess_new_server_package_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 1
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Goblin Wizardry",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2e4cf4ec9bd6d362e416223bc13d185b",
+          "oracle_hash": "4afb1b17f9298065435490a32cccdf87",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 1
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Goblin Wizardry",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2e4cf4ec9bd6d362e416223bc13d185b",
+          "oracle_hash": "4afb1b17f9298065435490a32cccdf87",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 1
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Goblin Wizardry",
+          "logical_rule_key": "battle_rule_v1:2e4cf4ec9bd6d362e416223bc13d185b"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 1
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Goblin Wizardry",
+          "component_keys": [],
+          "effect": "token_maker",
+          "logical_rule_key": "battle_rule_v1:2e4cf4ec9bd6d362e416223bc13d185b"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 2,
+        "scenarios": 1
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

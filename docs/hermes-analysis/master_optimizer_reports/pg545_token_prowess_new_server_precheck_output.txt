@@ -1,0 +1,4 @@
+    card_name    | normalized_name |           oracle_hash            |                logical_rule_key                 |      shadow_handling       | target_card_rows |          canonical_card_id           | existing_rule_rows | expected_rule_rows_before | would_deprecate_shadow_rows
+-----------------+-----------------+----------------------------------+-------------------------------------------------+----------------------------+------------------+--------------------------------------+--------------------+---------------------------+-----------------------------
+ Goblin Wizardry | goblin wizardry | 4afb1b17f9298065435490a32cccdf87 | battle_rule_v1:2e4cf4ec9bd6d362e416223bc13d185b | deprecate_nonmatching_rows |                1 | f283f4cf-2e95-4932-86c7-eed71f7100e5 |                  0 |                         0 |                           0
+(1 row)
