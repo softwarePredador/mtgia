@@ -1,8 +1,0 @@
-     card_name      |  normalized_name   |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
---------------------+--------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
- Common Crook       | common crook       | battle_rule_v1:3f60734db1f81ef3f3db0330478d6bd4 |                  1 |                           1 |                         1 |           0
- Dire Fleet Hoarder | dire fleet hoarder | battle_rule_v1:3f60734db1f81ef3f3db0330478d6bd4 |                  1 |                           1 |                         1 |           0
- Gleaming Barrier   | gleaming barrier   | battle_rule_v1:4b9bead4d691a3d01fc4ff09e291d0a2 |                  1 |                           1 |                         1 |           0
- Jewel-Eyed Cobra   | jewel-eyed cobra   | battle_rule_v1:1a315e264d967f5fcb1a414a841a516f |                  1 |                           1 |                         1 |           0
- Piggy Bank         | piggy bank         | battle_rule_v1:3f60734db1f81ef3f3db0330478d6bd4 |                  1 |                           1 |                         1 |           0
-(5 rows)

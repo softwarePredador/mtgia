@@ -1,5 +1,0 @@
-    card_name     | normalized_name  |           oracle_hash            |                logical_rule_key                 |      shadow_handling       | target_card_rows |          canonical_card_id           | existing_rule_rows | expected_rule_rows_before | would_deprecate_shadow_rows
-------------------+------------------+----------------------------------+-------------------------------------------------+----------------------------+------------------+--------------------------------------+--------------------+---------------------------+-----------------------------
- Carrier Thrall   | carrier thrall   | 8bbc058ce8c1f744b109316b3fd9d23b | battle_rule_v1:9862b96824b4a0eff6fa32e596659d8a | deprecate_nonmatching_rows |                1 | 4112b309-1a82-4924-967a-8bbc9b722ae0 |                  0 |                         0 |                           0
- Gravpack Monoist | gravpack monoist | 0f212ecce8904f3a29030c83e1ca15f1 | battle_rule_v1:04f881988479704e8e63231c87908d7f | deprecate_nonmatching_rows |                1 | 7bd20bf9-320e-42c9-af53-c5ecbe6e0d82 |                  0 |                         0 |                           0
-(2 rows)

@@ -1,8 +1,0 @@
-    card_name    | normalized_name |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
------------------+-----------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
- Mage il-Vec     | mage il-vec     | battle_rule_v1:7504da6d9f0cbba64663f7aa1ca8a728 |                  1 |                           1 |                         1 |           0
- Molten Vortex   | molten vortex   | battle_rule_v1:deeb2ef8fb972c498b0670db5ba1bfee |                  1 |                           1 |                         1 |           0
- Ogre Shaman     | ogre shaman     | battle_rule_v1:a6b1c355c3d7fa7cd78fb45f73843db0 |                  1 |                           1 |                         1 |           0
- Seismic Assault | seismic assault | battle_rule_v1:12ae6fda6601703f62b89b1540631311 |                  1 |                           1 |                         1 |           0
- Stormbind       | stormbind       | battle_rule_v1:82bbcf0f7e2c856359ed7560cdac1453 |                  1 |                           1 |                         1 |           0
-(5 rows)

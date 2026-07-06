@@ -1,5 +1,0 @@
-       card_name       |    normalized_name    |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
------------------------+-----------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
- Eternal Student       | eternal student       | battle_rule_v1:14a6c4f3e3b0ff2645919f71c042b467 |                  1 |                           1 |                         1 |           0
- Illustrious Historian | illustrious historian | battle_rule_v1:c1687c5ca0cc72d415cd8e171f2436e0 |                  1 |                           1 |                         1 |           0
-(2 rows)

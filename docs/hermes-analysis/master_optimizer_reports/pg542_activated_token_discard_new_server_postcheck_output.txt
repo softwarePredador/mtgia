@@ -1,7 +1,0 @@
-        card_name        |     normalized_name     |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
--------------------------+-------------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
- Icatian Crier           | icatian crier           | battle_rule_v1:7e653e91c9430d0c3b8b7dc8660447b8 |                  1 |                           1 |                         1 |           0
- Pegasus Refuge          | pegasus refuge          | battle_rule_v1:5f011aa31880ce544088c1b7dd0e7720 |                  1 |                           1 |                         1 |           0
- Sliversmith             | sliversmith             | battle_rule_v1:4a80da883d27481e71c4ef574ef01f29 |                  1 |                           1 |                         1 |           0
- Thraben Standard Bearer | thraben standard bearer | battle_rule_v1:0c5166014767e3238c8a356a1b548f0e |                  1 |                           1 |                         1 |           0
-(4 rows)

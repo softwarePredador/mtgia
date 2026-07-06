@@ -1,8 +1,0 @@
-       card_name        |    normalized_name     |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
-------------------------+------------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
- Flurry of Wings        | flurry of wings        | battle_rule_v1:a91caec6e84e9d586a9840e0c3b920f2 |                  1 |                           1 |                         1 |           0
- Ordered Migration      | ordered migration      | battle_rule_v1:86ed16a7f8dfea78058cc7433c03045c |                  1 |                           1 |                         1 |           0
- Rise from the Tides    | rise from the tides    | battle_rule_v1:8702d53c8c4cd31c2e292abb579597fe |                  1 |                           1 |                         1 |           0
- Spontaneous Generation | spontaneous generation | battle_rule_v1:47e922b3dd61e1f57d31c4518423fcd5 |                  1 |                           1 |                         1 |           0
- Spore Burst            | spore burst            | battle_rule_v1:ae6d8c0ab8584b64df647dc87a0fb320 |                  1 |                           1 |                         1 |           0
-(5 rows)
