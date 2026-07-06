@@ -36,6 +36,8 @@
   - `GET /health/commercial`: funil, IA, planos, relatorios e retencao.
 - Scripts operacionais:
   - `scripts/manaloom_product_smoke.sh`: smoke ponta a ponta no stack novo.
+  - `scripts/manaloom_ai_generation_benchmark.sh`: benchmark real de
+    `/ai/generate`, com contagem de mocks e status `pass/degraded`.
   - `scripts/manaloom_easypanel_backup.sh`: backup `pg_dump -Fc`.
   - `scripts/manaloom_validate_restore.sh`: restore em Postgres temporario.
 - Hosts publicos default alinhados para:
@@ -78,6 +80,7 @@ Esperado:
 
 ```bash
 scripts/manaloom_product_smoke.sh
+MANALOOM_AI_BENCHMARK_RUNS=3 scripts/manaloom_ai_generation_benchmark.sh
 scripts/manaloom_easypanel_backup.sh
 scripts/manaloom_validate_restore.sh backups/manaloom-postgres/<arquivo>.dump
 ```
@@ -96,3 +99,9 @@ Evidencia de 2026-07-06:
 - Backup real do Postgres novo gerado em `backups/manaloom-postgres/`.
 - Restore schema validado em Postgres 17 temporario remoto.
 - Resultado do restore: `80` tabelas publicas restauradas.
+- Deploy backend final validado no SHA
+  `7cd6fbf5eb99192bd7346933f4e3220734e1ec2e`.
+- Smoke de produto final: `status=ok`.
+- Benchmark de IA final: sem mock em producao; status pode ficar `degraded`
+  quando a IA retorna deck invalido e a API responde 422, que e o
+  comportamento esperado sem fallback mock.

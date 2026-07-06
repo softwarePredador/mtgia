@@ -24,10 +24,10 @@ Objetivo: app mobile/web usando o backend novo com prova de fluxo real.
 | Item | Status | Proxima execucao |
 | --- | --- | --- |
 | Apontar app para dominio definitivo | EM_ANDAMENTO_BLOQUEADO_EXTERNO | Trocar `--dart-define` quando o dominio final existir. |
-| Atualizar builds Android/iOS/Web para API nova | EM_ANDAMENTO | Rodar build release com API nova apos DNS final ou host temporario aprovado. |
+| Atualizar builds Android/iOS/Web para API nova | CONCLUIDO_PARCIAL | Build Flutter Web release validado com `API_BASE_URL` no host novo; Android/iOS finais dependem de assinatura/distribuicao. |
 | Revalidar login/cadastro/decks/colecao/marketplace/IA | EM_ANDAMENTO | Usar `scripts/manaloom_product_smoke.sh` e QA mobile visual. |
 | Revalidar Sentry/logs/erros reais | EM_ANDAMENTO | Rodar scripts de Sentry quando DSN/projeto estiverem configurados. |
-| Garantir ausencia de mocks em telas principais | EM_ANDAMENTO | Auditar `mock/fallback/demo/sample` antes de release. |
+| Garantir ausencia de mocks em telas principais | EM_ANDAMENTO_VALIDADO_PARCIAL | `/ai/generate` nao retorna mock 200 em producao; geracao invalida retorna 422. Falta QA visual completo. |
 | Revisar botoes, modais, loaders, empty states e erros | EM_ANDAMENTO | Rodar QA visual focado nos fluxos comerciais e IA. |
 
 ## 3. Monetizacao
@@ -94,18 +94,27 @@ Objetivo: publicar com confianca, medicao e fallback controlado.
 | Item | Status | Proxima execucao |
 | --- | --- | --- |
 | QA completo web/mobile | EM_ANDAMENTO | Rodar smoke automatizado + QA visual. |
-| Performance da geracao de decks | EM_ANDAMENTO | Monitorar `/health/commercial` e `ai_logs`. |
+| Performance da geracao de decks | EM_ANDAMENTO_VALIDADO_PARCIAL | `scripts/manaloom_ai_generation_benchmark.sh` mede `/ai/generate`; ultima rodada curta: 3,9s, sem mock, mas 422 por validacao. |
 | Tempo medio por endpoint de IA | EM_ANDAMENTO | Usar `/health/metrics` e `/health/commercial`. |
 | Metricas de conversao | EM_ANDAMENTO | Usar funil `activation_funnel_events`. |
 | Revisao de copy da landing React | EM_ANDAMENTO | Fazer rodada de copy e SEO apos dominio. |
 | SEO, sitemap, robots, paginas indexaveis | EM_ANDAMENTO | Finalizar quando dominio definitivo estiver publicado. |
-| Fallback da IA sem mock em producao | EM_ANDAMENTO | Validar `OPENAI_PROFILE=prod` e smoke sem resposta mockada. |
+| Fallback da IA sem mock em producao | CONCLUIDO_PARCIAL | Produção bloqueia fallback deterministico como 200; benchmark reporta `mock_response_count=0`. Falta elevar taxa de sucesso sem fallback. |
 
 ## Evidencia Operacional Atual
 
 - API nova validada em `https://evolution-cartinhas.2ta7qx.easypanel.host`.
 - Web publica validada em `https://evolution-manaloom-web-public.2ta7qx.easypanel.host`.
 - Migração `030` aplicada no banco novo em validacao anterior.
+- Migração `031` aplicada no banco novo para `deck_comments` e
+  `content_reports`.
+- Deploy final validado no backend novo com SHA
+  `7cd6fbf5eb99192bd7346933f4e3220734e1ec2e`.
+- Smoke final validou plano Free, checkout bloqueado por provedor ausente,
+  pos-jogo, timeline, relatorio publico, deck publico, comentarios, denuncia,
+  trade match, exclusao do deck e limpeza do usuario temporario.
+- Benchmark final de IA confirmou `mock_response_count=0`; quando a geracao
+  falha na validacao, producao responde 422 em vez de mock 200.
 - Backup real gerado em `backups/manaloom-postgres/` e restore schema validado
   em container Postgres 17 temporario com `80` tabelas publicas.
 - Scripts adicionados para repetir backup, restore e smoke sem depender de
