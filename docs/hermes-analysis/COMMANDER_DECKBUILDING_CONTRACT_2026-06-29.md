@@ -543,6 +543,7 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_engine_cut_followup_router_20260706_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_engine_cut_trace_replacement_gate_20260706_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_engine_cut_trace_replacement_reviewer_20260706_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_engine_exact_replacement_or_new_cut_finder_20260706_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_manual_negative_trace_reviewer_20260706_kaalia_value_safe_stage1_live_research.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_followup_live_source_research_expander_20260706_kaalia_value_safe_stage1_after_manual_trace.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_expanded_source_candidate_reviewer_20260706_kaalia_value_safe_stage1_followup_live_after_manual_trace.md`
@@ -1479,6 +1480,18 @@ Current external refresh on 2026-07-05:
   engines, not exact Biotransference-style artifact-spell or type-conversion
   engines (`explicit_same_lane_replacement_proof_count=0`). The next gate is
   `find_exact_artifact_spell_engine_replacement_or_new_engine_cut_before_candidate_copy`.
+- The exact replacement/new cut finder searches the local Hermes Oracle and
+  Commander legality cache before any candidate copy. It finds exact text
+  matches, but none are ready for Kaalia deck `619`: blue or green/blue color
+  identities block `Rhythm of the Wild`, `Sai, Master Thopterist`, `Forensic
+  Gadgeteer`, `Leyline of Transformation`, `Uthros Research Craft`, and
+  `Vedalken Archmage`; `Biotransference` and `Maskwood Nexus` are already in
+  the deck; `Locket of Yesterdays` and `Etherium Sculptor` are support/cost
+  reducers without Biotransference-style token/draw payoff. The remaining
+  engine cuts are protected by commander-plan signals, so
+  `exact_replacement_ready_count=0`, `new_unblocked_engine_cut_count=0`, and
+  the next gate is
+  `expand_external_exact_artifact_engine_source_lanes_or_global_axis`.
 
 ## Global Commander Rollout - 2026-07-01
 

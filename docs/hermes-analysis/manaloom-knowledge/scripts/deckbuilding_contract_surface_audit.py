@@ -78,6 +78,12 @@ GLOBAL_COMMANDER_ENGINE_CUT_TRACE_REPLACEMENT_REVIEWER = (
 GLOBAL_COMMANDER_ENGINE_CUT_TRACE_REPLACEMENT_REVIEWER_TEST = (
     SCRIPT_DIR / "test_global_commander_engine_cut_trace_replacement_reviewer.py"
 )
+GLOBAL_COMMANDER_ENGINE_EXACT_REPLACEMENT_OR_NEW_CUT_FINDER = (
+    SCRIPT_DIR / "global_commander_engine_exact_replacement_or_new_cut_finder.py"
+)
+GLOBAL_COMMANDER_ENGINE_EXACT_REPLACEMENT_OR_NEW_CUT_FINDER_TEST = (
+    SCRIPT_DIR / "test_global_commander_engine_exact_replacement_or_new_cut_finder.py"
+)
 GLOBAL_COMMANDER_CANDIDATE_COPY_MATERIALIZER = SCRIPT_DIR / "global_commander_candidate_copy_materializer.py"
 GLOBAL_COMMANDER_CANDIDATE_COPY_MATERIALIZER_TEST = (
     SCRIPT_DIR / "test_global_commander_candidate_copy_materializer.py"
@@ -455,6 +461,10 @@ GLOBAL_COMMANDER_ENGINE_CUT_TRACE_REPLACEMENT_GATE_REPORT = (
 GLOBAL_COMMANDER_ENGINE_CUT_TRACE_REPLACEMENT_REVIEWER_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_engine_cut_trace_replacement_reviewer_20260706_current.md"
+)
+GLOBAL_COMMANDER_ENGINE_EXACT_REPLACEMENT_OR_NEW_CUT_FINDER_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_engine_exact_replacement_or_new_cut_finder_20260706_current.md"
 )
 GLOBAL_COMMANDER_CANDIDATE_COPY_MATERIALIZER_REPORT = (
     REPO_ROOT
@@ -1967,6 +1977,30 @@ def build_audit() -> dict[str, Any]:
                 "test_exact_artifact_spell_engine_candidate_is_counted",
                 "engine_cut_trace_replacement_review_blocks_candidate_copy",
                 "no_exact_artifact_spell_engine_replacement_proof",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_ENGINE_EXACT_REPLACEMENT_OR_NEW_CUT_FINDER,
+            [
+                "global_commander_engine_exact_replacement_or_new_cut_finder",
+                "engine_exact_replacement_or_new_cut_not_found_locally",
+                "no_local_exact_replacement_ready_for_source_trace",
+                "no_new_unblocked_engine_cut_source",
+                "expand_external_exact_artifact_engine_source_lanes_or_global_axis",
+                "candidate_copy_allowed_now",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_ENGINE_EXACT_REPLACEMENT_OR_NEW_CUT_FINDER_TEST,
+            [
+                "test_finds_only_legal_color_allowed_not_in_deck_exact_replacements",
+                "test_report_keeps_candidate_copy_closed_and_surfaces_cut_blockers",
+                "outside_commander_color_identity",
+                "new_engine_cut_blocked_by_commander_plan_signal",
             ],
         )
     )
@@ -3669,6 +3703,21 @@ def build_audit() -> dict[str, Any]:
                 "battle_gate_allowed_now: `false`",
                 "find_exact_artifact_spell_engine_replacement_or_new_engine_cut_before_candidate_copy",
                 "no_exact_artifact_spell_engine_replacement_proof",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_ENGINE_EXACT_REPLACEMENT_OR_NEW_CUT_FINDER_REPORT,
+            [
+                "Global Commander Engine Exact Replacement Or New Cut Finder",
+                "engine_exact_replacement_or_new_cut_not_found_locally",
+                "exact_replacement_ready_count: `0`",
+                "new_unblocked_engine_cut_count: `0`",
+                "candidate_copy_allowed_now: `false`",
+                "expand_external_exact_artifact_engine_source_lanes_or_global_axis",
+                "no_local_exact_replacement_ready_for_source_trace",
+                "no_new_unblocked_engine_cut_source",
             ],
         )
     )

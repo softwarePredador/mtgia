@@ -310,6 +310,13 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     opcao de tutor com score igual ao escolhido, nao ha prova exact same-lane
     para substituir `Biotransference`, e candidate copy/battle/promocao seguem
     fechados.
+    O finder local seguinte roda em
+    `manaloom-knowledge/scripts/global_commander_engine_exact_replacement_or_new_cut_finder.py`,
+    com evidencia:
+    `master_optimizer_reports/global_commander_engine_exact_replacement_or_new_cut_finder_20260706_current.md`.
+    Resultado: nenhum replacement exacto local fica pronto para Kaalia `619`,
+    nenhum novo corte engine fica destravado, e o proximo gate passa a ser
+    `expand_external_exact_artifact_engine_source_lanes_or_global_axis`.
     Quando uma hipotese add/cut estiver pronta, rode
     `manaloom-knowledge/scripts/global_commander_candidate_copy_materializer.py`
     para materializar uma unica troca em copia isolada do Hermes SQLite. A

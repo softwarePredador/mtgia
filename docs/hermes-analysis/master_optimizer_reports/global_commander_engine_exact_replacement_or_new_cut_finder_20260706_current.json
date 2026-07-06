@@ -1,0 +1,423 @@
+{
+  "artifact_type": "global_commander_engine_exact_replacement_or_new_cut_finder",
+  "battle_gate_allowed_now": false,
+  "battle_gate_performed": false,
+  "battle_or_optimization_performed": false,
+  "candidate_copy_allowed_now": false,
+  "candidate_copy_blockers": [
+    "no_local_exact_replacement_ready_for_source_trace",
+    "no_new_unblocked_engine_cut_source",
+    "candidate_copy_closed_after_exact_replacement_or_new_cut_finder"
+  ],
+  "deck_action_allowed": false,
+  "generated_at": "2026-07-06T04:35:53.585273+00:00",
+  "input_artifacts": {
+    "engine_policy_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_engine_axis_nonland_cut_policy_model_20260706_current.json",
+    "reviewer_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_engine_cut_trace_replacement_reviewer_20260706_current.json",
+    "reviewer_status": "engine_cut_trace_replacement_review_blocks_candidate_copy",
+    "source_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db"
+  },
+  "mutation_allowed": false,
+  "new_engine_cut_rows": [
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Archaeomancer's Map",
+      "commander_plan_signals": [],
+      "cut_pressure_ready": true,
+      "mutation_allowed": false,
+      "policy_blockers": [],
+      "policy_bucket": "engine_overlap_excess_cut_pressure",
+      "policy_status": "engine_axis_policy_review_cut_pressure_ready",
+      "roles": [
+        "engine",
+        "tutor"
+      ],
+      "status": "already_reviewed_engine_cut_not_new_source"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Biotransference",
+      "commander_plan_signals": [],
+      "cut_pressure_ready": true,
+      "mutation_allowed": false,
+      "policy_blockers": [],
+      "policy_bucket": "engine_only_excess_cut_pressure",
+      "policy_status": "engine_axis_policy_review_cut_pressure_ready",
+      "roles": [
+        "engine"
+      ],
+      "status": "already_reviewed_engine_cut_not_new_source"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Ardenn, Intrepid Archaeologist",
+      "commander_plan_signals": [
+        "kaalia_equipment_support_package"
+      ],
+      "cut_pressure_ready": false,
+      "mutation_allowed": false,
+      "policy_blockers": [
+        "engine_card_has_commander_plan_signal:kaalia_equipment_support_package"
+      ],
+      "policy_bucket": "protected_engine_cut_pressure",
+      "policy_status": "engine_axis_policy_blocks_cut_until_source_lane_review",
+      "roles": [
+        "engine"
+      ],
+      "status": "new_engine_cut_blocked_by_commander_plan_signal"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Delney, Streetwise Lookout",
+      "commander_plan_signals": [
+        "kaalia_trigger_or_type_enabler"
+      ],
+      "cut_pressure_ready": false,
+      "mutation_allowed": false,
+      "policy_blockers": [
+        "engine_card_has_commander_plan_signal:kaalia_trigger_or_type_enabler"
+      ],
+      "policy_bucket": "protected_engine_cut_pressure",
+      "policy_status": "engine_axis_policy_blocks_cut_until_source_lane_review",
+      "roles": [
+        "engine"
+      ],
+      "status": "new_engine_cut_blocked_by_commander_plan_signal"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Genji Glove",
+      "commander_plan_signals": [
+        "kaalia_attack_window_or_extra_combat",
+        "kaalia_equipment_support_package"
+      ],
+      "cut_pressure_ready": false,
+      "mutation_allowed": false,
+      "policy_blockers": [
+        "engine_card_has_commander_plan_signal:kaalia_attack_window_or_extra_combat,kaalia_equipment_support_package"
+      ],
+      "policy_bucket": "protected_engine_cut_pressure",
+      "policy_status": "engine_axis_policy_blocks_cut_until_source_lane_review",
+      "roles": [
+        "engine"
+      ],
+      "status": "new_engine_cut_blocked_by_commander_plan_signal"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Karlach, Fury of Avernus",
+      "commander_plan_signals": [
+        "kaalia_attack_window_or_extra_combat"
+      ],
+      "cut_pressure_ready": false,
+      "mutation_allowed": false,
+      "policy_blockers": [
+        "engine_card_has_commander_plan_signal:kaalia_attack_window_or_extra_combat"
+      ],
+      "policy_bucket": "protected_engine_cut_pressure",
+      "policy_status": "engine_axis_policy_blocks_cut_until_source_lane_review",
+      "roles": [
+        "engine"
+      ],
+      "status": "new_engine_cut_blocked_by_commander_plan_signal"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Maskwood Nexus",
+      "commander_plan_signals": [
+        "kaalia_trigger_or_type_enabler"
+      ],
+      "cut_pressure_ready": false,
+      "mutation_allowed": false,
+      "policy_blockers": [
+        "engine_card_has_commander_plan_signal:kaalia_trigger_or_type_enabler"
+      ],
+      "policy_bucket": "protected_engine_cut_pressure",
+      "policy_status": "engine_axis_policy_blocks_cut_until_source_lane_review",
+      "roles": [
+        "engine"
+      ],
+      "status": "new_engine_cut_blocked_by_commander_plan_signal"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Sigarda's Aid",
+      "commander_plan_signals": [
+        "kaalia_equipment_support_package"
+      ],
+      "cut_pressure_ready": false,
+      "mutation_allowed": false,
+      "policy_blockers": [
+        "engine_card_has_commander_plan_signal:kaalia_equipment_support_package"
+      ],
+      "policy_bucket": "protected_engine_cut_pressure",
+      "policy_status": "engine_axis_policy_blocks_cut_until_source_lane_review",
+      "roles": [
+        "engine"
+      ],
+      "status": "new_engine_cut_blocked_by_commander_plan_signal"
+    }
+  ],
+  "policy": {
+    "cache_boundary": "This report searches local Hermes card_oracle_cache and commander legality cache only; external source expansion is a separate gate.",
+    "exact_replacement_boundary": "Biotransference replacement requires artifact-spell payoff or artifact type-conversion, not generic artifact adjacency.",
+    "mutation_boundary": "This finder reads SQLite and report artifacts only.",
+    "new_cut_boundary": "Protected commander-plan engines are not new cut sources without source-lane evidence."
+  },
+  "postgres_writes": false,
+  "promotion_allowed": false,
+  "replacement_candidate_rows": [
+    {
+      "already_in_current_deck": false,
+      "battle_gate_allowed": false,
+      "blockers": [
+        "outside_commander_color_identity"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Rhythm of the Wild",
+      "color_identity": [
+        "G",
+        "R"
+      ],
+      "commander_legality": "legal",
+      "edhrec_rank": 193,
+      "mutation_allowed": false,
+      "oracle_excerpt": "Creature spells you control can't be countered. Nontoken creatures you control have riot. (They enter with your choice of a +1/+1 counter or haste.)",
+      "raw_exact_status": "exact_type_conversion_engine_candidate",
+      "signals": [
+        "artifact_type_conversion_engine"
+      ],
+      "status": "exact_type_conversion_engine_candidate",
+      "type_line": "Enchantment"
+    },
+    {
+      "already_in_current_deck": false,
+      "battle_gate_allowed": false,
+      "blockers": [
+        "outside_commander_color_identity",
+        "support_only_no_token_or_draw_payoff"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Etherium Sculptor",
+      "color_identity": [
+        "U"
+      ],
+      "commander_legality": "legal",
+      "edhrec_rank": 431,
+      "mutation_allowed": false,
+      "oracle_excerpt": "Artifact spells you cast cost {1} less to cast.",
+      "raw_exact_status": "artifact_spell_support_not_biotransference_replacement",
+      "signals": [
+        "artifact_spell_cost_reducer"
+      ],
+      "status": "artifact_spell_support_not_biotransference_replacement",
+      "type_line": "Artifact Creature \u2014 Vedalken Artificer"
+    },
+    {
+      "already_in_current_deck": false,
+      "battle_gate_allowed": false,
+      "blockers": [
+        "outside_commander_color_identity"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Sai, Master Thopterist",
+      "color_identity": [
+        "U"
+      ],
+      "commander_legality": "legal",
+      "edhrec_rank": 783,
+      "mutation_allowed": false,
+      "oracle_excerpt": "Whenever you cast an artifact spell, create a 1/1 colorless Thopter artifact creature token with flying. {1}{U}, Sacrifice two artifacts: Draw a card.",
+      "raw_exact_status": "exact_artifact_spell_payoff_candidate",
+      "signals": [
+        "artifact_spell_draw_payoff",
+        "artifact_spell_token_payoff"
+      ],
+      "status": "exact_artifact_spell_payoff_candidate",
+      "type_line": "Legendary Creature \u2014 Human Artificer"
+    },
+    {
+      "already_in_current_deck": true,
+      "battle_gate_allowed": false,
+      "blockers": [
+        "already_in_current_deck"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Biotransference",
+      "color_identity": [
+        "B"
+      ],
+      "commander_legality": "legal",
+      "edhrec_rank": null,
+      "mutation_allowed": false,
+      "oracle_excerpt": "Creatures you control are artifacts in addition to their other types. The same is true for creature spells you control and creature cards you own that aren't on the battlefield. Whenever you cast an artifact spell, you lose 1 life and create a 2/2 black Necron Warrior artifact creature token.",
+      "raw_exact_status": "exact_type_conversion_engine_candidate",
+      "signals": [
+        "artifact_spell_token_payoff",
+        "artifact_type_conversion_engine"
+      ],
+      "status": "exact_type_conversion_engine_candidate",
+      "type_line": "Enchantment"
+    },
+    {
+      "already_in_current_deck": false,
+      "battle_gate_allowed": false,
+      "blockers": [
+        "outside_commander_color_identity"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Forensic Gadgeteer",
+      "color_identity": [
+        "U"
+      ],
+      "commander_legality": "legal",
+      "edhrec_rank": null,
+      "mutation_allowed": false,
+      "oracle_excerpt": "Whenever you cast an artifact spell, investigate. (Create a Clue token. It's an artifact with \"{2}, Sacrifice this token: Draw a card.\") Activated abilities of artifacts you control cost {1} less to activate. This effect can't reduce the mana in that cost to less than one mana.",
+      "raw_exact_status": "exact_artifact_spell_payoff_candidate",
+      "signals": [
+        "artifact_spell_cost_reducer",
+        "artifact_spell_draw_payoff",
+        "artifact_spell_token_payoff"
+      ],
+      "status": "exact_artifact_spell_payoff_candidate",
+      "type_line": "Creature \u2014 Vedalken Artificer Detective"
+    },
+    {
+      "already_in_current_deck": false,
+      "battle_gate_allowed": false,
+      "blockers": [
+        "outside_commander_color_identity"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Leyline of Transformation",
+      "color_identity": [
+        "U"
+      ],
+      "commander_legality": "legal",
+      "edhrec_rank": null,
+      "mutation_allowed": false,
+      "oracle_excerpt": "If this card is in your opening hand, you may begin the game with it on the battlefield. As this enchantment enters, choose a creature type. Creatures you control are the chosen type in addition to their other types. The same is true for creature spells you control and creature cards you own that ar",
+      "raw_exact_status": "exact_type_conversion_engine_candidate",
+      "signals": [
+        "artifact_type_conversion_engine"
+      ],
+      "status": "exact_type_conversion_engine_candidate",
+      "type_line": "Enchantment"
+    },
+    {
+      "already_in_current_deck": false,
+      "battle_gate_allowed": false,
+      "blockers": [
+        "support_only_no_token_or_draw_payoff"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Locket of Yesterdays",
+      "color_identity": [],
+      "commander_legality": "legal",
+      "edhrec_rank": null,
+      "mutation_allowed": false,
+      "oracle_excerpt": "Spells you cast cost {1} less to cast for each card with the same name as that spell in your graveyard.",
+      "raw_exact_status": "artifact_spell_support_not_biotransference_replacement",
+      "signals": [
+        "artifact_spell_cost_reducer"
+      ],
+      "status": "artifact_spell_support_not_biotransference_replacement",
+      "type_line": "Artifact"
+    },
+    {
+      "already_in_current_deck": true,
+      "battle_gate_allowed": false,
+      "blockers": [
+        "already_in_current_deck"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Maskwood Nexus",
+      "color_identity": [],
+      "commander_legality": "legal",
+      "edhrec_rank": null,
+      "mutation_allowed": false,
+      "oracle_excerpt": "Creatures you control are every creature type. The same is true for creature spells you control and creature cards you own that aren't on the battlefield. {3}, {T}: Create a 2/2 blue Shapeshifter creature token with changeling. (It is every creature type.)",
+      "raw_exact_status": "exact_type_conversion_engine_candidate",
+      "signals": [
+        "artifact_type_conversion_engine"
+      ],
+      "status": "exact_type_conversion_engine_candidate",
+      "type_line": "Artifact"
+    },
+    {
+      "already_in_current_deck": false,
+      "battle_gate_allowed": false,
+      "blockers": [
+        "outside_commander_color_identity"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Uthros Research Craft",
+      "color_identity": [
+        "U"
+      ],
+      "commander_legality": "legal",
+      "edhrec_rank": null,
+      "mutation_allowed": false,
+      "oracle_excerpt": "Station (Tap another creature you control: Put charge counters equal to its power on this Spacecraft. Station only as a sorcery. It's an artifact creature at 12+.) 3+ | Whenever you cast an artifact spell, draw a card. Put a charge counter on this Spacecraft. 12+ | Flying This Spacecraft gets +1/+0 ",
+      "raw_exact_status": "exact_artifact_spell_payoff_candidate",
+      "signals": [
+        "artifact_spell_draw_payoff"
+      ],
+      "status": "exact_artifact_spell_payoff_candidate",
+      "type_line": "Artifact \u2014 Spacecraft"
+    },
+    {
+      "already_in_current_deck": false,
+      "battle_gate_allowed": false,
+      "blockers": [
+        "outside_commander_color_identity"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Vedalken Archmage",
+      "color_identity": [
+        "U"
+      ],
+      "commander_legality": "legal",
+      "edhrec_rank": null,
+      "mutation_allowed": false,
+      "oracle_excerpt": "Whenever you cast an artifact spell, draw a card.",
+      "raw_exact_status": "exact_artifact_spell_payoff_candidate",
+      "signals": [
+        "artifact_spell_draw_payoff"
+      ],
+      "status": "exact_artifact_spell_payoff_candidate",
+      "type_line": "Creature \u2014 Vedalken Wizard"
+    }
+  ],
+  "source_db_mutated": false,
+  "status": "engine_exact_replacement_or_new_cut_not_found_locally",
+  "summary": {
+    "candidate_copy_blocker_count": 3,
+    "commander": "Kaalia of the Vast",
+    "deck_id": "619",
+    "engine_cut_row_count": 8,
+    "engine_cut_status_counts": {
+      "already_reviewed_engine_cut_not_new_source": 2,
+      "new_engine_cut_blocked_by_commander_plan_signal": 6
+    },
+    "exact_replacement_ready_count": 0,
+    "local_oracle_cache_boundary": "card_oracle_cache_rows_only",
+    "new_unblocked_engine_cut_count": 0,
+    "next_gate": "expand_external_exact_artifact_engine_source_lanes_or_global_axis",
+    "replacement_candidate_scanned_count": 10,
+    "replacement_status_counts": {
+      "artifact_spell_support_not_biotransference_replacement": 2,
+      "exact_artifact_spell_payoff_candidate": 4,
+      "exact_type_conversion_engine_candidate": 4
+    }
+  }
+}
