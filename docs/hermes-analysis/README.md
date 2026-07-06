@@ -705,6 +705,15 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `local_identity_found_count=15`, `selected_as_package_add_count=4` e
     `card_level_cut_permission_count=0`. O proximo gate e
     `review_external_nonpayoff_same_lane_source_candidates_locally_before_miner`.
+    O reviewer local desses candidatos fica em
+    `global_commander_external_nonpayoff_same_lane_source_candidate_reviewer_20260705_kaalia_value_safe_stage1_repair_scope1.md`.
+    Resultado: `external_nonpayoff_same_lane_source_candidates_reviewed_miner_seed_ready_no_deck_action`,
+    com `reviewed_candidate_count=16`, `miner_source_seed_allowed_count=5`,
+    `current_deck_trace_required_count=6`, `held_package_pair_required_count=4`,
+    `identity_resolution_required_count=1`, `role_mismatch_blocked_count=0`,
+    `card_level_cut_permission_count=0` e `candidate_copy_allowed_count=0`.
+    O proximo gate e
+    `rerun_same_lane_cut_source_miner_with_reviewed_external_nonpayoff_candidates`.
     Observacao operacional: snapshots historicos de candidate-copy, battle-probe,
     battle-feedback e package-chain dependem de artefatos locais ignorados. Se
     faltarem ou forem regenerados sem esses artefatos, a auditoria de superficie

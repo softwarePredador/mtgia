@@ -251,6 +251,13 @@ resolved, or still unresolved. Named candidates are source-lane evidence only;
 card-level cut permission, candidate copy, battle, promotion, and value-safe
 reclassification remain closed.
 
+Then run `global_commander_external_nonpayoff_same_lane_source_candidate_reviewer.py`
+after source-candidate discovery. It locally reviews identity, commander color
+identity, and role-text evidence. Only resolved outside-deck/outside-package
+candidates can become miner source seeds. These seeds still do not create
+card-level cut permission, candidate copy, battle, promotion, or value-safe
+reclassification.
+
 ## XMage Authoritative Adaptation
 
 For all-card battle-rule acceleration, use local XMage as the authoritative

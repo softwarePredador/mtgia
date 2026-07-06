@@ -246,6 +246,12 @@ GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_SAME_LANE_SOURCE_CANDIDATE_DISCOVERER = (
 GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_SAME_LANE_SOURCE_CANDIDATE_DISCOVERER_TEST = (
     SCRIPT_DIR / "test_global_commander_external_nonpayoff_same_lane_source_candidate_discoverer.py"
 )
+GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_SAME_LANE_SOURCE_CANDIDATE_REVIEWER = (
+    SCRIPT_DIR / "global_commander_external_nonpayoff_same_lane_source_candidate_reviewer.py"
+)
+GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_SAME_LANE_SOURCE_CANDIDATE_REVIEWER_TEST = (
+    SCRIPT_DIR / "test_global_commander_external_nonpayoff_same_lane_source_candidate_reviewer.py"
+)
 README = REPO_ROOT / "docs/hermes-analysis/README.md"
 
 CONTRACT_MATRIX_JSON = (
@@ -523,6 +529,10 @@ GLOBAL_COMMANDER_SCOPE1_EXTERNAL_NONPAYOFF_SAME_LANE_CUT_POLICY_MAPPER_REPORT = 
 GLOBAL_COMMANDER_SCOPE1_EXTERNAL_NONPAYOFF_SAME_LANE_SOURCE_CANDIDATE_DISCOVERER_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_same_lane_source_candidate_discoverer_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+)
+GLOBAL_COMMANDER_SCOPE1_EXTERNAL_NONPAYOFF_SAME_LANE_SOURCE_CANDIDATE_REVIEWER_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_same_lane_source_candidate_reviewer_20260705_kaalia_value_safe_stage1_repair_scope1.md"
 )
 
 REQUIRED_FOCUS_CARDS = {
@@ -908,6 +918,10 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_external_nonpayoff_same_lane_source_candidate_discoverer_20260705_kaalia_value_safe_stage1_repair_scope1.md",
                 "external_nonpayoff_same_lane_source_candidates_discovered_no_cut_permission",
                 "review_external_nonpayoff_same_lane_source_candidates_locally_before_miner",
+                "global_commander_external_nonpayoff_same_lane_source_candidate_reviewer.py",
+                "global_commander_external_nonpayoff_same_lane_source_candidate_reviewer_20260705_kaalia_value_safe_stage1_repair_scope1.md",
+                "external_nonpayoff_same_lane_source_candidates_reviewed_miner_seed_ready_no_deck_action",
+                "rerun_same_lane_cut_source_miner_with_reviewed_external_nonpayoff_candidates",
                 "battle_gate_allowed_now",
                 "Path to Exile",
                 "Terminate",
@@ -1231,6 +1245,9 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_external_nonpayoff_same_lane_source_candidate_discoverer_20260705_kaalia_value_safe_stage1_repair_scope1.md",
                 "external_nonpayoff_same_lane_source_candidates_discovered_no_cut_permission",
                 "review_external_nonpayoff_same_lane_source_candidates_locally_before_miner",
+                "global_commander_external_nonpayoff_same_lane_source_candidate_reviewer_20260705_kaalia_value_safe_stage1_repair_scope1.md",
+                "external_nonpayoff_same_lane_source_candidates_reviewed_miner_seed_ready_no_deck_action",
+                "rerun_same_lane_cut_source_miner_with_reviewed_external_nonpayoff_candidates",
                 "battle_gate_allowed_now=false",
                 "Path to Exile",
                 "Terminate",
@@ -2164,6 +2181,32 @@ def build_audit() -> dict[str, Any]:
                 "external_nonpayoff_same_lane_source_candidates_discovered_no_cut_permission",
                 "external_source_candidate_already_in_current_deck_needs_trace_policy",
                 "external_source_candidate_ready_for_local_source_lane_review",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_SAME_LANE_SOURCE_CANDIDATE_REVIEWER,
+            [
+                "global_commander_external_nonpayoff_same_lane_source_candidate_reviewer",
+                "external_nonpayoff_same_lane_source_candidates_reviewed_miner_seed_ready_no_deck_action",
+                "external_source_candidate_local_review_ready_for_miner_seed",
+                "external_source_candidate_local_review_current_deck_trace_required",
+                "rerun_same_lane_cut_source_miner_with_reviewed_external_nonpayoff_candidates",
+                "miner_source_seed_allowed",
+                "card_level_cut_permission_now",
+                "candidate_copy_allowed_now",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_SAME_LANE_SOURCE_CANDIDATE_REVIEWER_TEST,
+            [
+                "test_reviews_local_source_candidates_without_deck_action",
+                "test_role_mismatch_blocks_miner_seed",
+                "external_nonpayoff_same_lane_source_candidates_reviewed_miner_seed_ready_no_deck_action",
+                "external_source_candidate_local_review_blocks_role_mismatch",
             ],
         )
     )
@@ -3424,6 +3467,27 @@ def build_audit() -> dict[str, Any]:
                 "Lightning Greaves",
                 "Swiftfoot Boots",
                 "Gamble",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SCOPE1_EXTERNAL_NONPAYOFF_SAME_LANE_SOURCE_CANDIDATE_REVIEWER_REPORT,
+            [
+                "Global Commander External Nonpayoff Same-Lane Source Candidate Reviewer",
+                "external_nonpayoff_same_lane_source_candidates_reviewed_miner_seed_ready_no_deck_action",
+                "reviewed_candidate_count: `16`",
+                "miner_source_seed_allowed_count: `5`",
+                "current_deck_trace_required_count: `6`",
+                "held_package_pair_required_count: `4`",
+                "identity_resolution_required_count: `1`",
+                "role_mismatch_blocked_count: `0`",
+                "card_level_cut_permission_count: `0`",
+                "candidate_copy_allowed_count: `0`",
+                "rerun_same_lane_cut_source_miner_with_reviewed_external_nonpayoff_candidates",
+                "Dragon Tempest",
+                "Dihada, Binder of Wills",
+                "Simian Spirit Guide",
             ],
         )
     )

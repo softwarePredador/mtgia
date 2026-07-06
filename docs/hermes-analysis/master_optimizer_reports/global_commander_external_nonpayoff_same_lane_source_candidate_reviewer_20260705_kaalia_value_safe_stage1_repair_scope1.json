@@ -1,0 +1,512 @@
+{
+  "artifact_type": "global_commander_external_nonpayoff_same_lane_source_candidate_reviewer",
+  "battle_gate_allowed_now": false,
+  "battle_gate_performed": false,
+  "battle_or_optimization_performed": false,
+  "battle_replay_performed": false,
+  "candidate_copy_allowed_now": false,
+  "candidate_copy_blockers": [
+    "reviewed_external_candidates_are_miner_seeds_not_cut_permission",
+    "current_deck_candidates_still_need_trace_or_negative_review",
+    "held_package_candidates_still_need_value_safe_pairs",
+    "candidate_copy_closed_until_new_cut_pairs_exist"
+  ],
+  "card_level_cut_permission_now": false,
+  "deck_action_allowed": false,
+  "generated_at": "2026-07-06T01:05:47.400406+00:00",
+  "input_artifacts": {
+    "selected_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+    "source_candidate_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_same_lane_source_candidate_discoverer_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+  },
+  "miner_source_seed_rows": [
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "card_name": "Dragon Tempest",
+      "cmc": 2.0,
+      "commander_identity_legal": true,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "haste"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_evidence": "rerun_same_lane_cut_source_miner_with_reviewed_external_nonpayoff_candidates",
+      "rerun_miner_allowed_for_card": true,
+      "review_status": "external_source_candidate_local_review_ready_for_miner_seed",
+      "scryfall_id": "b9bacb46-fd1d-459b-81c2-d7d08fe73848",
+      "source_status": "external_source_candidate_ready_for_local_source_lane_review",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Enchantment",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "card_name": "Dihada, Binder of Wills",
+      "cmc": 4.0,
+      "commander_identity_legal": true,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "haste",
+        "indestructible",
+        "vigilance",
+        "lifelink"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_evidence": "rerun_same_lane_cut_source_miner_with_reviewed_external_nonpayoff_candidates",
+      "rerun_miner_allowed_for_card": true,
+      "review_status": "external_source_candidate_local_review_ready_for_miner_seed",
+      "scryfall_id": "d326de4d-6157-4586-91b8-5668e1381ac3",
+      "source_status": "external_source_candidate_ready_for_local_source_lane_review",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Legendary Planeswalker \u2014 Dihada",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "card_name": "Sword of the Animist",
+      "cmc": 2.0,
+      "commander_identity_legal": true,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "search your library for a basic land",
+        "put it onto the battlefield"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_evidence": "rerun_same_lane_cut_source_miner_with_reviewed_external_nonpayoff_candidates",
+      "rerun_miner_allowed_for_card": true,
+      "review_status": "external_source_candidate_local_review_ready_for_miner_seed",
+      "scryfall_id": "d79cbc61-6c15-48ea-bbba-3cffb819ccba",
+      "source_status": "external_source_candidate_ready_for_local_source_lane_review",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Legendary Artifact \u2014 Equipment",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "card_name": "Dihada, Binder of Wills",
+      "cmc": 4.0,
+      "commander_identity_legal": true,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "treasure"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_evidence": "rerun_same_lane_cut_source_miner_with_reviewed_external_nonpayoff_candidates",
+      "rerun_miner_allowed_for_card": true,
+      "review_status": "external_source_candidate_local_review_ready_for_miner_seed",
+      "scryfall_id": "d326de4d-6157-4586-91b8-5668e1381ac3",
+      "source_status": "external_source_candidate_ready_for_local_source_lane_review",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Legendary Planeswalker \u2014 Dihada",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "card_name": "Simian Spirit Guide",
+      "cmc": 3.0,
+      "commander_identity_legal": true,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "add {"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_evidence": "rerun_same_lane_cut_source_miner_with_reviewed_external_nonpayoff_candidates",
+      "rerun_miner_allowed_for_card": true,
+      "review_status": "external_source_candidate_local_review_ready_for_miner_seed",
+      "scryfall_id": "44e0ffa3-8915-4c1f-8f1a-4aeea1365f07",
+      "source_status": "external_source_candidate_ready_for_local_source_lane_review",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Creature \u2014 Ape Spirit",
+      "value_safe_reclassification_allowed": false
+    }
+  ],
+  "mutation_allowed": false,
+  "policy": {
+    "battle_boundary": "No battle gate opens before candidate copy and relevant card-level usage evidence.",
+    "held_package_boundary": "Cards already selected as adds remain held until value-safe same-lane cut pairs exist.",
+    "miner_seed_boundary": "Reviewed external candidates may seed miner research only; they are not cut permission.",
+    "target_deck_boundary": "Cards already in the current deck still require target trace or explicit negative review before cut consideration."
+  },
+  "postgres_writes": false,
+  "promotion_allowed": false,
+  "review_rows": [
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "card_name": "Lightning Greaves",
+      "cmc": 2.0,
+      "commander_identity_legal": true,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "haste"
+      ],
+      "miner_source_seed_allowed": false,
+      "next_evidence": "target_deck_trace_or_negative_review_before_cut_consideration",
+      "rerun_miner_allowed_for_card": false,
+      "review_status": "external_source_candidate_local_review_current_deck_trace_required",
+      "scryfall_id": "ca204b66-8d0c-431a-8d34-282f7c2d17da",
+      "source_status": "external_source_candidate_already_in_current_deck_needs_trace_policy",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Artifact \u2014 Equipment",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "card_name": "Swiftfoot Boots",
+      "cmc": 2.0,
+      "commander_identity_legal": true,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "haste",
+        "hexproof"
+      ],
+      "miner_source_seed_allowed": false,
+      "next_evidence": "same_lane_value_safe_pair_before_candidate_copy",
+      "rerun_miner_allowed_for_card": false,
+      "review_status": "external_source_candidate_local_review_held_package_pair_required",
+      "scryfall_id": "c8b143ad-43ec-4e0d-a440-e348daa31391",
+      "source_status": "external_source_candidate_already_selected_as_add_needs_pair_policy",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Artifact \u2014 Equipment",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "card_name": "Boros Charm",
+      "cmc": 2.0,
+      "commander_identity_legal": true,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "indestructible",
+        "double strike"
+      ],
+      "miner_source_seed_allowed": false,
+      "next_evidence": "same_lane_value_safe_pair_before_candidate_copy",
+      "rerun_miner_allowed_for_card": false,
+      "review_status": "external_source_candidate_local_review_held_package_pair_required",
+      "scryfall_id": "2679d0dd-ba30-4a1c-b6a0-b3ac6c790496",
+      "source_status": "external_source_candidate_already_selected_as_add_needs_pair_policy",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Instant",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "card_name": "Dragon Tempest",
+      "cmc": 2.0,
+      "commander_identity_legal": true,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "haste"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_evidence": "rerun_same_lane_cut_source_miner_with_reviewed_external_nonpayoff_candidates",
+      "rerun_miner_allowed_for_card": true,
+      "review_status": "external_source_candidate_local_review_ready_for_miner_seed",
+      "scryfall_id": "b9bacb46-fd1d-459b-81c2-d7d08fe73848",
+      "source_status": "external_source_candidate_ready_for_local_source_lane_review",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Enchantment",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "card_name": "Bitter Reunion",
+      "cmc": null,
+      "commander_identity_legal": false,
+      "local_identity_found": false,
+      "local_role_evidence_terms": [],
+      "miner_source_seed_allowed": false,
+      "next_evidence": "resolve_local_identity_before_miner_seed",
+      "rerun_miner_allowed_for_card": false,
+      "review_status": "external_source_candidate_local_review_needs_identity_resolution",
+      "scryfall_id": null,
+      "source_status": "external_source_candidate_needs_local_identity_resolution",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": null,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "card_name": "Dihada, Binder of Wills",
+      "cmc": 4.0,
+      "commander_identity_legal": true,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "haste",
+        "indestructible",
+        "vigilance",
+        "lifelink"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_evidence": "rerun_same_lane_cut_source_miner_with_reviewed_external_nonpayoff_candidates",
+      "rerun_miner_allowed_for_card": true,
+      "review_status": "external_source_candidate_local_review_ready_for_miner_seed",
+      "scryfall_id": "d326de4d-6157-4586-91b8-5668e1381ac3",
+      "source_status": "external_source_candidate_ready_for_local_source_lane_review",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Legendary Planeswalker \u2014 Dihada",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "card_name": "Arcane Signet",
+      "cmc": 2.0,
+      "commander_identity_legal": true,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "add one mana"
+      ],
+      "miner_source_seed_allowed": false,
+      "next_evidence": "target_deck_trace_or_negative_review_before_cut_consideration",
+      "rerun_miner_allowed_for_card": false,
+      "review_status": "external_source_candidate_local_review_current_deck_trace_required",
+      "scryfall_id": "0bc7f093-bef0-4f1a-852c-4b75ebf54838",
+      "source_status": "external_source_candidate_already_in_current_deck_needs_trace_policy",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Artifact",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "card_name": "Sword of the Animist",
+      "cmc": 2.0,
+      "commander_identity_legal": true,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "search your library for a basic land",
+        "put it onto the battlefield"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_evidence": "rerun_same_lane_cut_source_miner_with_reviewed_external_nonpayoff_candidates",
+      "rerun_miner_allowed_for_card": true,
+      "review_status": "external_source_candidate_local_review_ready_for_miner_seed",
+      "scryfall_id": "d79cbc61-6c15-48ea-bbba-3cffb819ccba",
+      "source_status": "external_source_candidate_ready_for_local_source_lane_review",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Legendary Artifact \u2014 Equipment",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "card_name": "Dihada, Binder of Wills",
+      "cmc": 4.0,
+      "commander_identity_legal": true,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "treasure"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_evidence": "rerun_same_lane_cut_source_miner_with_reviewed_external_nonpayoff_candidates",
+      "rerun_miner_allowed_for_card": true,
+      "review_status": "external_source_candidate_local_review_ready_for_miner_seed",
+      "scryfall_id": "d326de4d-6157-4586-91b8-5668e1381ac3",
+      "source_status": "external_source_candidate_ready_for_local_source_lane_review",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Legendary Planeswalker \u2014 Dihada",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "card_name": "Simian Spirit Guide",
+      "cmc": 3.0,
+      "commander_identity_legal": true,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "add {"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_evidence": "rerun_same_lane_cut_source_miner_with_reviewed_external_nonpayoff_candidates",
+      "rerun_miner_allowed_for_card": true,
+      "review_status": "external_source_candidate_local_review_ready_for_miner_seed",
+      "scryfall_id": "44e0ffa3-8915-4c1f-8f1a-4aeea1365f07",
+      "source_status": "external_source_candidate_ready_for_local_source_lane_review",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Creature \u2014 Ape Spirit",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "card_name": "Fellwar Stone",
+      "cmc": 2.0,
+      "commander_identity_legal": true,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "add one mana"
+      ],
+      "miner_source_seed_allowed": false,
+      "next_evidence": "same_lane_value_safe_pair_before_candidate_copy",
+      "rerun_miner_allowed_for_card": false,
+      "review_status": "external_source_candidate_local_review_held_package_pair_required",
+      "scryfall_id": "95560508-7ac9-4be9-8a3f-3c7d5b52807b",
+      "source_status": "external_source_candidate_already_selected_as_add_needs_pair_policy",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Artifact",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "card_name": "Demonic Tutor",
+      "cmc": 2.0,
+      "commander_identity_legal": true,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "search your library",
+        "put that card into your hand"
+      ],
+      "miner_source_seed_allowed": false,
+      "next_evidence": "target_deck_trace_or_negative_review_before_cut_consideration",
+      "rerun_miner_allowed_for_card": false,
+      "review_status": "external_source_candidate_local_review_current_deck_trace_required",
+      "scryfall_id": "82004860-e589-4e38-8d61-8c0210e4ea39",
+      "source_status": "external_source_candidate_already_in_current_deck_needs_trace_policy",
+      "target_cut_role": "tutors_access",
+      "type_line": "Sorcery",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "card_name": "Enlightened Tutor",
+      "cmc": 1.0,
+      "commander_identity_legal": true,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "search your library"
+      ],
+      "miner_source_seed_allowed": false,
+      "next_evidence": "target_deck_trace_or_negative_review_before_cut_consideration",
+      "rerun_miner_allowed_for_card": false,
+      "review_status": "external_source_candidate_local_review_current_deck_trace_required",
+      "scryfall_id": "c5229c17-b7be-4b05-b683-f2277edc4849",
+      "source_status": "external_source_candidate_already_in_current_deck_needs_trace_policy",
+      "target_cut_role": "tutors_access",
+      "type_line": "Instant",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "card_name": "Vampiric Tutor",
+      "cmc": 1.0,
+      "commander_identity_legal": true,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "search your library"
+      ],
+      "miner_source_seed_allowed": false,
+      "next_evidence": "target_deck_trace_or_negative_review_before_cut_consideration",
+      "rerun_miner_allowed_for_card": false,
+      "review_status": "external_source_candidate_local_review_current_deck_trace_required",
+      "scryfall_id": "ededbdae-d9dc-4206-9335-d7158f2d7700",
+      "source_status": "external_source_candidate_already_in_current_deck_needs_trace_policy",
+      "target_cut_role": "tutors_access",
+      "type_line": "Instant",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "card_name": "Diabolic Intent",
+      "cmc": 2.0,
+      "commander_identity_legal": true,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "search your library",
+        "put that card into your hand"
+      ],
+      "miner_source_seed_allowed": false,
+      "next_evidence": "target_deck_trace_or_negative_review_before_cut_consideration",
+      "rerun_miner_allowed_for_card": false,
+      "review_status": "external_source_candidate_local_review_current_deck_trace_required",
+      "scryfall_id": "038519b9-bca8-4b27-b5ac-2409595469d0",
+      "source_status": "external_source_candidate_already_in_current_deck_needs_trace_policy",
+      "target_cut_role": "tutors_access",
+      "type_line": "Sorcery",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "card_name": "Gamble",
+      "cmc": 1.0,
+      "commander_identity_legal": true,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "search your library",
+        "put that card into your hand"
+      ],
+      "miner_source_seed_allowed": false,
+      "next_evidence": "same_lane_value_safe_pair_before_candidate_copy",
+      "rerun_miner_allowed_for_card": false,
+      "review_status": "external_source_candidate_local_review_held_package_pair_required",
+      "scryfall_id": "a54f0869-94c8-42af-9080-166efb9486a4",
+      "source_status": "external_source_candidate_already_selected_as_add_needs_pair_policy",
+      "target_cut_role": "tutors_access",
+      "type_line": "Sorcery",
+      "value_safe_reclassification_allowed": false
+    }
+  ],
+  "source_db_mutated": false,
+  "status": "external_nonpayoff_same_lane_source_candidates_reviewed_miner_seed_ready_no_deck_action",
+  "summary": {
+    "candidate_copy_allowed_count": 0,
+    "card_level_cut_permission_count": 0,
+    "commander": "Kaalia of the Vast",
+    "current_deck_trace_required_count": 6,
+    "deck_id": "619",
+    "held_package_pair_required_count": 4,
+    "identity_resolution_required_count": 1,
+    "miner_seed_count_by_role": {
+      "haste_protection_silence": 2,
+      "mana_acceleration": 3
+    },
+    "miner_source_seed_allowed_count": 5,
+    "next_gate": "rerun_same_lane_cut_source_miner_with_reviewed_external_nonpayoff_candidates",
+    "review_status_counts": {
+      "external_source_candidate_local_review_current_deck_trace_required": 6,
+      "external_source_candidate_local_review_held_package_pair_required": 4,
+      "external_source_candidate_local_review_needs_identity_resolution": 1,
+      "external_source_candidate_local_review_ready_for_miner_seed": 5
+    },
+    "reviewed_candidate_count": 16,
+    "role_mismatch_blocked_count": 0
+  },
+  "value_safe_reclassification_allowed_now": false
+}
