@@ -51,6 +51,40 @@ def probe_payload(
     }
 
 
+def larger_gate_payload() -> dict[str, object]:
+    return {
+        "artifact_type": "global_commander_larger_battle_gate_audit",
+        "status": "larger_battle_gate_blocks_promotion",
+        "input_artifacts": {"strategy_report": "strategy.json"},
+        "summary": {
+            "deck_id": "612",
+            "commander": "Lorehold, the Historian",
+            "candidate_key": "candidate_profile_repair_package",
+            "protected_baseline_key": "deck_607",
+            "immediate_base_key": "deck_612",
+            "games_per_opponent": 3,
+            "opponent_count": 8,
+            "forced_access_mode": "none",
+            "candidate_vs_protected": {
+                "candidate_beats_other": False,
+                "win_delta": -3,
+                "win_rate_delta": -12.5,
+            },
+            "candidate_vs_immediate_base": {
+                "candidate_beats_other": True,
+                "win_delta": 2,
+                "win_rate_delta": 8.34,
+            },
+            "larger_gate_exercised_added_cards": ["Bant Panorama"],
+            "larger_gate_unexercised_added_cards": ["Call Forth the Tempest"],
+        },
+        "blockers": [
+            "candidate_did_not_beat_protected_baseline",
+            "larger_gate_unexercised_added_cards:Call Forth the Tempest",
+        ],
+    }
+
+
 class GlobalCommanderBattleFeedbackModelTests(unittest.TestCase):
     def test_larger_failed_gate_blocks_prior_ready_probe_for_same_pair(self) -> None:
         ready = model.observation_from_payload(
@@ -139,6 +173,46 @@ class GlobalCommanderBattleFeedbackModelTests(unittest.TestCase):
         self.assertFalse(report["promotion_allowed"])
         self.assertEqual(report["summary"]["pair_count"], 1)
         self.assertEqual(report["summary"]["blocked_pair_count"], 1)
+
+    def test_larger_gate_beating_weak_base_but_losing_protected_baseline_blocks_package(self) -> None:
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        root = Path(tmp.name)
+        gate_path = root / "larger_gate.json"
+        strategy_path = root / "strategy.json"
+        strategy_path.write_text(
+            json.dumps(
+                {
+                    "summary": {
+                        "deck_id": "612",
+                        "commander": "Lorehold, the Historian",
+                        "package_adds": ["Bant Panorama", "Call Forth the Tempest"],
+                        "package_cuts": ["Storm-Kiln Artist", "Jeska's Will"],
+                    }
+                }
+            ),
+            encoding="utf-8",
+        )
+        payload = larger_gate_payload()
+        payload["input_artifacts"] = {"strategy_report": str(strategy_path)}
+        gate_path.write_text(json.dumps(payload), encoding="utf-8")
+
+        report = model.build_report([gate_path])
+
+        self.assertEqual(report["summary"]["package_count"], 1)
+        self.assertEqual(report["summary"]["blocked_package_count"], 1)
+        self.assertEqual(
+            report["summary"]["package_classification_counts"][
+                "package_improved_weak_base_but_failed_protected_baseline"
+            ],
+            1,
+        )
+        [feedback] = report["package_feedback"]
+        self.assertEqual(feedback["package_status"], "package_blocked_by_protected_baseline_gate")
+        self.assertEqual(feedback["recommendation"], "block_package_until_new_source_lane_cut_or_strategy")
+        self.assertEqual(feedback["worst_candidate_vs_protected_win_delta"], -3)
+        self.assertEqual(feedback["best_candidate_vs_immediate_base_win_delta"], 2)
+        self.assertEqual(feedback["unexercised_added_cards"], ["Call Forth the Tempest"])
 
 
 if __name__ == "__main__":

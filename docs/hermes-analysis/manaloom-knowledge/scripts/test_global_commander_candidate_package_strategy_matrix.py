@@ -127,6 +127,57 @@ class GlobalCommanderCandidatePackageStrategyMatrixTests(unittest.TestCase):
         self.assertFalse(report["promotion_allowed"])
         self.assertEqual(report["blocker_reasons"], [])
 
+    def test_battle_feedback_blocks_exact_failed_package_before_new_battle(self) -> None:
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        root = Path(tmp.name)
+        base_rows = []
+        base_rows.append(("Land", 35, "land", '["land"]', 0, "Land", ""))
+        base_rows.append(("Ramp", 10, "ramp", '["ramp"]', 2, "Artifact", "{T}: Add one mana."))
+        base_rows.append(("Protection", 8, "protection", '["protection"]', 1, "Instant", "Target creature gains indestructible and hexproof."))
+        base_rows.append(("Angel Payoff", 22, "wincon", '["wincon"]', 6, "Creature - Angel", "Flying. Deals damage to each opponent."))
+        base_rows.append(("Removal", 8, "removal", '["removal"]', 1, "Instant", "Destroy target creature."))
+        base_rows.append(("Wipe", 2, "board_wipe", '["board_wipe"]', 4, "Sorcery", "Destroy all creatures."))
+        base_rows.append(("Draw", 7, "draw", '["draw"]', 2, "Sorcery", "Draw two cards."))
+        base_rows.append(("Tutor", 4, "tutor", '["tutor"]', 3, "Sorcery", "Search your library for a card."))
+        base_rows.append(("Reanimate", 3, "recursion", '["recursion"]', 2, "Sorcery", "Return target creature card from your graveyard to the battlefield."))
+        base_rows.append(("Win", 3, "wincon", '["wincon"]', 6, "Creature - Demon", "Each opponent loses 3 life."))
+        candidate_rows = [row for row in base_rows if row[0] != "Removal"]
+        candidate_rows.append(("Bedevil", 8, "removal", '["removal"]', 3, "Instant", "Destroy target artifact, creature, or planeswalker."))
+        base = self._db(root, "base.db", base_rows)
+        candidate = self._db(root, "candidate.db", candidate_rows)
+        chain = self._chain(root, package_chain_payload(adds=["Bedevil"], cuts=["Removal"]))
+        feedback_payload = {
+            "package_feedback": [
+                {
+                    "deck_id": "619",
+                    "commander": "Kaalia of the Vast",
+                    "added_cards": ["Bedevil"],
+                    "cut_cards": ["Removal"],
+                    "package_status": "package_blocked_by_protected_baseline_gate",
+                    "recommendation": "block_package_until_new_source_lane_cut_or_strategy",
+                    "unexercised_added_cards": ["Bedevil"],
+                    "worst_candidate_vs_protected_win_delta": -3,
+                    "primary_evidence": {"artifact_path": "larger_gate.json"},
+                }
+            ]
+        }
+
+        report = matrix.build_report(
+            package_chain_report=chain,
+            base_db=base,
+            candidate_db=candidate,
+            battle_feedback_payload=feedback_payload,
+        )
+
+        self.assertEqual(report["status"], "package_strategy_blocks_battle")
+        self.assertFalse(report["battle_gate_allowed_now"])
+        self.assertEqual(report["summary"]["battle_feedback_blocker_count"], 3)
+        self.assertIn("battle_feedback_failed_exact_package", report["blocker_reasons"])
+        self.assertIn("battle_feedback_failed_protected_baseline_package", report["blocker_reasons"])
+        self.assertIn("battle_feedback_larger_gate_unexercised_added_cards", report["blocker_reasons"])
+        self.assertEqual(report["summary"]["next_gate"], "replace_failed_package_source_lane_or_cut_set_before_battle")
+
     def test_lorehold_profile_blocks_land_floor_package_that_cuts_protected_anchor(self) -> None:
         tmp = tempfile.TemporaryDirectory()
         self.addCleanup(tmp.cleanup)

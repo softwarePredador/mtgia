@@ -624,9 +624,15 @@ class GlobalCommanderLearningPriorityAuditTests(unittest.TestCase):
                 "blocked_pair_count": 2,
                 "needs_exposure_pair_count": 1,
                 "ready_pair_count": 0,
+                "package_count": 1,
+                "blocked_package_count": 1,
+                "needs_exercise_package_count": 0,
                 "pair_status_counts": {
                     "pair_blocked_by_failed_gate": 2,
                     "pair_needs_exposure_replay_before_gate": 1,
+                },
+                "package_status_counts": {
+                    "package_blocked_by_protected_baseline_gate": 1,
                 },
             },
         }
@@ -641,11 +647,13 @@ class GlobalCommanderLearningPriorityAuditTests(unittest.TestCase):
         )
 
         self.assertEqual(report["battle_feedback_summary"]["blocked_pair_count"], 2)
+        self.assertEqual(report["battle_feedback_summary"]["blocked_package_count"], 1)
         self.assertEqual(report["summary"]["blocked_exact_add_cut_pair_count"], 2)
+        self.assertEqual(report["summary"]["blocked_exact_package_count"], 1)
         self.assertIn("battle_feedback_model_before_requeue", report["method"]["priority_order"])
         self.assertEqual(
             report["battle_feedback_summary"]["next_gate"],
-            "exclude_blocked_pairs_and_route_unexercised_packages_before_requeue",
+            "exclude_blocked_pairs_packages_and_route_unexercised_evidence_before_requeue",
         )
 
     def test_role_axis_exhaustion_after_ramp_cut_lane_blocks_same_axis_reentry(self) -> None:

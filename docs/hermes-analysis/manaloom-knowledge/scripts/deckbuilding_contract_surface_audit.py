@@ -212,6 +212,7 @@ GLOBAL_COMMANDER_LARGER_BATTLE_GATE_AUDIT_TEST = (
     SCRIPT_DIR / "test_global_commander_larger_battle_gate_audit.py"
 )
 GLOBAL_COMMANDER_BATTLE_FEEDBACK_MODEL = SCRIPT_DIR / "global_commander_battle_feedback_model.py"
+GLOBAL_COMMANDER_BATTLE_FEEDBACK_MODEL_TEST = SCRIPT_DIR / "test_global_commander_battle_feedback_model.py"
 GLOBAL_COMMANDER_CANDIDATE_PACKAGE_CHAIN_AUDIT = (
     SCRIPT_DIR / "global_commander_candidate_package_chain_audit.py"
 )
@@ -220,6 +221,9 @@ GLOBAL_COMMANDER_CANDIDATE_PACKAGE_CHAIN_AUDIT_TEST = (
 )
 GLOBAL_COMMANDER_CANDIDATE_PACKAGE_STRATEGY_MATRIX = (
     SCRIPT_DIR / "global_commander_candidate_package_strategy_matrix.py"
+)
+GLOBAL_COMMANDER_CANDIDATE_PACKAGE_STRATEGY_MATRIX_TEST = (
+    SCRIPT_DIR / "test_global_commander_candidate_package_strategy_matrix.py"
 )
 GLOBAL_COMMANDER_PROFILE_BLOCKER_REPAIR_PLAN = (
     SCRIPT_DIR / "global_commander_profile_blocker_repair_plan.py"
@@ -754,6 +758,10 @@ GLOBAL_COMMANDER_LOREHOLD_PROFILE_REPAIR_PACKAGE_STRATEGY_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_package_strategy_matrix_20260706_lorehold_profile_repair_package.md"
 )
+GLOBAL_COMMANDER_LOREHOLD_PROFILE_REPAIR_POST_LARGER_FEEDBACK_STRATEGY_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_package_strategy_matrix_20260706_lorehold_profile_repair_package_post_larger_feedback.md"
+)
 GLOBAL_COMMANDER_LOREHOLD_PROFILE_REPAIR_BATTLE_PROBE_RUNNER_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_battle_probe_runner_20260706_lorehold_profile_repair_package.md"
@@ -781,6 +789,14 @@ GLOBAL_COMMANDER_CANDIDATE_BATTLE_PROBE_REPORT = (
 GLOBAL_COMMANDER_BATTLE_FEEDBACK_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_battle_feedback_model_20260705_current.md"
+)
+GLOBAL_COMMANDER_BATTLE_FEEDBACK_LARGER_GATE_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_battle_feedback_model_20260706_larger_gate_current.md"
+)
+GLOBAL_COMMANDER_LARGER_GATE_FEEDBACK_LAND_FLOOR_PACKAGE_STRATEGY_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_package_strategy_matrix_20260706_larger_gate_feedback_land_floor_deck612.md"
 )
 GLOBAL_COMMANDER_CANDIDATE_PACKAGE_CHAIN_REPORT = (
     REPO_ROOT
@@ -1342,6 +1358,16 @@ def build_audit() -> dict[str, Any]:
                 "candidate_vs_protected_win_delta: `-3`",
                 "candidate_vs_immediate_base_win_delta: `2`",
                 "repair_package_or_convert_to_global_learning_no_promotion",
+                "global_commander_battle_feedback_model_20260706_larger_gate_current.md",
+                "package_improved_weak_base_but_failed_protected_baseline",
+                "package_blocked_by_protected_baseline_gate",
+                "block_package_until_new_source_lane_cut_or_strategy",
+                "global_commander_candidate_package_strategy_matrix_20260706_lorehold_profile_repair_package_post_larger_feedback.md",
+                "battle_feedback_blocker_count: `3`",
+                "replace_failed_package_source_lane_or_cut_set_before_battle",
+                "global_commander_learning_priority_audit_20260706_larger_gate_feedback_current.md",
+                "global_commander_candidate_copy_materializer_20260706_larger_gate_feedback_land_floor_deck612.md",
+                "global_commander_candidate_package_strategy_matrix_20260706_larger_gate_feedback_land_floor_deck612.md",
                 "commander_profile_not_available",
                 "profile_lands_below_target",
                 "protected anchor cuts",
@@ -1821,6 +1847,15 @@ def build_audit() -> dict[str, Any]:
                 "larger_battle_gate_blocks_promotion",
                 "candidate_did_not_beat_protected_baseline",
                 "larger_gate_unexercised_added_cards:Call Forth the Tempest",
+                "global_commander_battle_feedback_model_20260706_larger_gate_current.md",
+                "package_blocked_by_protected_baseline_gate",
+                "block_package_until_new_source_lane_cut_or_strategy",
+                "global_commander_candidate_package_strategy_matrix_20260706_lorehold_profile_repair_package_post_larger_feedback.md",
+                "battle_feedback_blocker_count=3",
+                "replace_failed_package_source_lane_or_cut_set_before_battle",
+                "pivot_to_cross_commander_role_axis_learning_after_ramp_axis_exhaustion",
+                "global_commander_candidate_copy_materializer_20260706_larger_gate_feedback_land_floor_deck612.md",
+                "global_commander_candidate_package_strategy_matrix_20260706_larger_gate_feedback_land_floor_deck612.md",
                 "global_commander_battle_feedback_model.py",
                 "global_commander_battle_feedback_model_20260705_current.md",
                 "pair_blocked_by_failed_gate",
@@ -2255,7 +2290,7 @@ def build_audit() -> dict[str, Any]:
                 "nonland_add_cut_pool_ready_review_only",
                 "global_commander_land_cut_candidate_model_20260705_global_goal_hermes_only",
                 "global_commander_nonland_core_candidate_model_20260705_global_goal_hermes_only",
-                "global_commander_battle_feedback_model_20260705_current",
+                "global_commander_battle_feedback_model_20260706_larger_gate_current",
                 "DEFAULT_SOURCE_EXHAUSTION_REPORT",
                 "DEFAULT_ENGINE_AXIS_PIVOT_REPORT",
                 "DEFAULT_ROLE_AXIS_EXHAUSTION_REPORT",
@@ -4160,8 +4195,26 @@ def build_audit() -> dict[str, Any]:
                 "failed_exercised_candidate_pair",
                 "ready_for_larger_equal_gate",
                 "block_pair_until_new_source_lane_or_cut",
+                "global_commander_larger_battle_gate_audit_*.json",
+                "package_improved_weak_base_but_failed_protected_baseline",
+                "package_blocked_by_protected_baseline_gate",
+                "exact_package_memory",
+                "protected_baseline_supersession",
+                "block_package_until_new_source_lane_cut_or_strategy",
                 "battle_or_optimization_performed",
                 "mutation_allowed",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_BATTLE_FEEDBACK_MODEL_TEST,
+            [
+                "test_larger_gate_beating_weak_base_but_losing_protected_baseline_blocks_package",
+                "package_improved_weak_base_but_failed_protected_baseline",
+                "package_blocked_by_protected_baseline_gate",
+                "block_package_until_new_source_lane_cut_or_strategy",
+                "Call Forth the Tempest",
             ],
         )
     )
@@ -4216,8 +4269,25 @@ def build_audit() -> dict[str, Any]:
                 "protected_profile_anchor_cut",
                 "protected_anchor_boundary",
                 "topdeck_miracle_setup",
+                "DEFAULT_BATTLE_FEEDBACK_REPORT",
+                "blocked_packages_from_battle_feedback",
+                "battle_feedback_failed_protected_baseline_package",
+                "battle_feedback_boundary",
+                "replace_failed_package_source_lane_or_cut_set_before_battle",
                 "battle_or_optimization_performed",
                 "mutation_allowed",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_CANDIDATE_PACKAGE_STRATEGY_MATRIX_TEST,
+            [
+                "test_battle_feedback_blocks_exact_failed_package_before_new_battle",
+                "package_blocked_by_protected_baseline_gate",
+                "battle_feedback_failed_exact_package",
+                "battle_feedback_failed_protected_baseline_package",
+                "replace_failed_package_source_lane_or_cut_set_before_battle",
             ],
         )
     )
@@ -5495,6 +5565,54 @@ def build_audit() -> dict[str, Any]:
                 "candidate_vs_protected_win_delta: `-3`",
                 "candidate_vs_immediate_base_win_delta: `2`",
                 "promotion_allowed: `false`",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_BATTLE_FEEDBACK_LARGER_GATE_REPORT,
+            [
+                "Global Commander Battle Feedback Model",
+                "package_count: `1`",
+                "blocked_package_count: `1`",
+                "package_blocked_by_protected_baseline_gate",
+                "package_improved_weak_base_but_failed_protected_baseline",
+                "block_package_until_new_source_lane_cut_or_strategy",
+                "protected_baseline_supersession",
+                "Call Forth the Tempest",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_LOREHOLD_PROFILE_REPAIR_POST_LARGER_FEEDBACK_STRATEGY_REPORT,
+            [
+                "Global Commander Candidate Package Strategy Matrix",
+                "package_strategy_blocks_battle",
+                "battle_gate_allowed_now: `false`",
+                "battle_feedback_blocker_count: `3`",
+                "replace_failed_package_source_lane_or_cut_set_before_battle",
+                "battle_feedback_failed_exact_package",
+                "battle_feedback_failed_protected_baseline_package",
+                "battle_feedback_larger_gate_unexercised_added_cards",
+                "package_blocked_by_protected_baseline_gate",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_LARGER_GATE_FEEDBACK_LAND_FLOOR_PACKAGE_STRATEGY_REPORT,
+            [
+                "Global Commander Candidate Package Strategy Matrix",
+                "package_strategy_blocks_battle",
+                "commander: `Lorehold, the Historian`",
+                "battle_gate_allowed_now: `false`",
+                "battle_feedback_blocker_count: `0`",
+                "profile_lands_below_target",
+                "protected_profile_anchor_cut:Pyromancer's Goggles",
+                "protected_profile_anchor_cut:Call Forth the Tempest",
+                "protected_profile_anchor_cut:Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+                "repair_commander_profile_blockers_before_battle",
             ],
         )
     )

@@ -30,7 +30,7 @@ DEFAULT_REPAIR_HYPOTHESIS_REPORT = (
     REPORT_DIR / "global_commander_core_repair_hypothesis_20260705_global_goal_hermes_only.json"
 )
 DEFAULT_CORE_ROLE_REPORT = REPORT_DIR / "global_commander_core_role_audit_20260705_global_goal_hermes_only.json"
-DEFAULT_BATTLE_FEEDBACK_REPORT = REPORT_DIR / "global_commander_battle_feedback_model_20260705_current.json"
+DEFAULT_BATTLE_FEEDBACK_REPORT = REPORT_DIR / "global_commander_battle_feedback_model_20260706_larger_gate_current.json"
 DEFAULT_OUT_PREFIX = REPORT_DIR / "global_commander_nonland_core_candidate_model_20260705_global_goal_hermes_only"
 
 SUPPORTED_CANDIDATE_ROLES = {"removal", "draw", "ramp", "board_wipe", "protection", "recursion"}

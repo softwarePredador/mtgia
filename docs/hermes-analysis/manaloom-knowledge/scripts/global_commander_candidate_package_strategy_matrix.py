@@ -30,6 +30,7 @@ DEFAULT_PACKAGE_CHAIN_REPORT = (
 DEFAULT_OUT_PREFIX = (
     REPORT_DIR / "global_commander_candidate_package_strategy_matrix_20260705_kaalia_removal_floor_step5"
 )
+DEFAULT_BATTLE_FEEDBACK_REPORT = REPORT_DIR / "global_commander_battle_feedback_model_20260706_larger_gate_current.json"
 
 KAALIA_PROFILE = {
     "commander": "Kaalia of the Vast",
@@ -250,6 +251,12 @@ def rel(path: Path) -> str:
 def load_json(path: Path) -> dict[str, Any]:
     payload = json.loads(path.read_text(encoding="utf-8"))
     return payload if isinstance(payload, dict) else {}
+
+
+def maybe_load_json(path: Path | None) -> dict[str, Any] | None:
+    if path is None or not path.exists():
+        return None
+    return load_json(path)
 
 
 def table_columns(conn: sqlite3.Connection, table: str) -> set[str]:
@@ -620,6 +627,72 @@ def protected_cut_names(profile: Mapping[str, Any] | None) -> set[str]:
     return {normalize_name(str(card)) for card in profile.get("protected_cut_cards", [])}
 
 
+def package_feedback_key(
+    *,
+    deck_id: str,
+    commander: str,
+    added_cards: list[str],
+    cut_cards: list[str],
+) -> tuple[str, str, tuple[str, ...], tuple[str, ...]]:
+    return (
+        str(deck_id),
+        normalize_name(commander),
+        tuple(sorted(normalize_name(card) for card in added_cards)),
+        tuple(sorted(normalize_name(card) for card in cut_cards)),
+    )
+
+
+def blocked_packages_from_battle_feedback(
+    payload: dict[str, Any] | None,
+) -> dict[tuple[str, str, tuple[str, ...], tuple[str, ...]], dict[str, Any]]:
+    if not payload:
+        return {}
+    blocked_statuses = {
+        "package_blocked_by_protected_baseline_gate",
+        "package_needs_all_added_cards_exercised_before_gate",
+    }
+    blocked: dict[tuple[str, str, tuple[str, ...], tuple[str, ...]], dict[str, Any]] = {}
+    for row in payload.get("package_feedback", []):
+        status = str(row.get("package_status") or "")
+        if status not in blocked_statuses:
+            continue
+        key = package_feedback_key(
+            deck_id=str(row.get("deck_id") or ""),
+            commander=str(row.get("commander") or ""),
+            added_cards=[str(card) for card in row.get("added_cards") or []],
+            cut_cards=[str(card) for card in row.get("cut_cards") or []],
+        )
+        blocked[key] = row
+    return blocked
+
+
+def package_feedback_blockers(
+    *,
+    deck_id: str,
+    commander: str,
+    package_adds: list[str],
+    package_cuts: list[str],
+    battle_feedback_payload: dict[str, Any] | None,
+) -> tuple[list[str], list[dict[str, Any]]]:
+    blocked_packages = blocked_packages_from_battle_feedback(battle_feedback_payload)
+    feedback = blocked_packages.get(
+        package_feedback_key(
+            deck_id=deck_id,
+            commander=commander,
+            added_cards=package_adds,
+            cut_cards=package_cuts,
+        )
+    )
+    if not feedback:
+        return [], []
+    blockers = ["battle_feedback_failed_exact_package"]
+    if feedback.get("package_status") == "package_blocked_by_protected_baseline_gate":
+        blockers.append("battle_feedback_failed_protected_baseline_package")
+    if feedback.get("unexercised_added_cards"):
+        blockers.append("battle_feedback_larger_gate_unexercised_added_cards")
+    return blockers, [feedback]
+
+
 def cut_risk(row: Mapping[str, Any], profile: Mapping[str, Any] | None = None) -> list[str]:
     roles, _source = core_roles.card_roles(row)
     risks: list[str] = []
@@ -719,11 +792,17 @@ def build_report(
     package_chain_report: Path,
     base_db: Path,
     candidate_db: Path | None = None,
+    battle_feedback_report: Path | None = DEFAULT_BATTLE_FEEDBACK_REPORT,
+    battle_feedback_payload: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     package_chain = load_json(package_chain_report)
+    if battle_feedback_payload is None:
+        battle_feedback_payload = maybe_load_json(battle_feedback_report)
     summary = package_chain.get("summary") or {}
     deck_id = str(summary.get("deck_id") or "")
     commander = str(summary.get("commander") or "")
+    package_adds = [str(card) for card in summary.get("package_adds") or []]
+    package_cuts = [str(card) for card in summary.get("package_cuts") or []]
     profile = PROFILE_BY_COMMANDER.get(normalize_name(commander))
     if candidate_db is None:
         candidate_db = REPO_ROOT / str(summary.get("final_candidate_db") or "")
@@ -755,6 +834,14 @@ def build_report(
             target_rows=target_rows,
             delta_rows=delta_rows,
         )
+    feedback_blockers, feedback_evidence = package_feedback_blockers(
+        deck_id=deck_id,
+        commander=commander,
+        package_adds=package_adds,
+        package_cuts=package_cuts,
+        battle_feedback_payload=battle_feedback_payload,
+    )
+    blockers.extend(feedback_blockers)
     battle_allowed = not blockers
     return {
         "generated_at": utc_now(),
@@ -771,6 +858,7 @@ def build_report(
             "package_chain_report": rel(package_chain_report),
             "base_db": rel(base_db),
             "candidate_db": rel(candidate_db),
+            "battle_feedback_report": rel(battle_feedback_report) if battle_feedback_report else None,
         },
         "summary": {
             "deck_id": deck_id,
@@ -779,15 +867,21 @@ def build_report(
             "profile_source": (profile or {}).get("source"),
             "target_count": len(target_rows),
             "blocker_count": len(blockers),
-            "package_adds": list(summary.get("package_adds") or []),
-            "package_cuts": list(summary.get("package_cuts") or []),
+            "battle_feedback_blocker_count": len(feedback_blockers),
+            "package_adds": package_adds,
+            "package_cuts": package_cuts,
             "next_gate": (
                 "run_equal_battle_probe_with_replay_exposure"
                 if battle_allowed
-                else "repair_commander_profile_blockers_before_battle"
+                else (
+                    "replace_failed_package_source_lane_or_cut_set_before_battle"
+                    if feedback_blockers
+                    else "repair_commander_profile_blockers_before_battle"
+                )
             ),
         },
         "blocker_reasons": blockers,
+        "battle_feedback_package_evidence": feedback_evidence,
         "target_evaluations": target_rows,
         "base_profile_role_counts": base_counts,
         "candidate_profile_role_counts": candidate_counts,
@@ -799,6 +893,7 @@ def build_report(
             "battle_boundary": "Only a strategy-ready package can open an equal battle probe; this matrix never promotes a deck.",
             "cut_boundary": "Interaction upgrades cannot hide cuts that weaken the commander's attack window or source-lane plan.",
             "protected_anchor_boundary": "Commander expected-package anchors require same-lane proof before a package can cut them.",
+            "battle_feedback_boundary": "A package rejected by protected-baseline larger gate feedback cannot reopen battle without a changed source lane, cut set, or strategy hypothesis.",
         },
     }
 
@@ -816,6 +911,7 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
         f"- battle_gate_allowed_now: `{str(payload['battle_gate_allowed_now']).lower()}`",
         f"- promotion_allowed: `{str(payload['promotion_allowed']).lower()}`",
         f"- blocker_count: `{summary['blocker_count']}`",
+        f"- battle_feedback_blocker_count: `{summary['battle_feedback_blocker_count']}`",
         f"- next_gate: `{summary['next_gate']}`",
         "",
         "## Target Evaluation",
@@ -838,6 +934,19 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
             lines.append(f"- `{blocker}`")
     else:
         lines.append("- none")
+    lines.extend(["", "## Battle Feedback Evidence", ""])
+    if payload["battle_feedback_package_evidence"]:
+        for row in payload["battle_feedback_package_evidence"]:
+            lines.append(
+                "- `{status}` from `{path}`; protected_delta `{delta}`; recommendation `{recommendation}`".format(
+                    status=row.get("package_status"),
+                    path=(row.get("primary_evidence") or {}).get("artifact_path"),
+                    delta=row.get("worst_candidate_vs_protected_win_delta"),
+                    recommendation=row.get("recommendation"),
+                )
+            )
+    else:
+        lines.append("- none")
     lines.extend(["", "## Policy", ""])
     for key, value in payload["policy"].items():
         lines.append(f"- {key}: {value}")
@@ -858,12 +967,14 @@ def main() -> int:
     parser.add_argument("--package-chain-report", type=Path, default=DEFAULT_PACKAGE_CHAIN_REPORT)
     parser.add_argument("--base-db", type=Path, default=DEFAULT_SQLITE_DB)
     parser.add_argument("--candidate-db", type=Path)
+    parser.add_argument("--battle-feedback-report", type=Path, default=DEFAULT_BATTLE_FEEDBACK_REPORT)
     parser.add_argument("--out-prefix", type=Path, default=DEFAULT_OUT_PREFIX)
     args = parser.parse_args()
     payload = build_report(
         package_chain_report=args.package_chain_report,
         base_db=args.base_db,
         candidate_db=args.candidate_db,
+        battle_feedback_report=args.battle_feedback_report,
     )
     json_path, md_path = write_outputs(payload, args.out_prefix)
     print(

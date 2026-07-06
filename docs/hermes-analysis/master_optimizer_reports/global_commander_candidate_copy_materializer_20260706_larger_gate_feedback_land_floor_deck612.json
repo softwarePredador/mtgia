@@ -1,0 +1,474 @@
+{
+  "artifact_type": "global_commander_candidate_copy_materializer",
+  "candidate_db": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_copy_materializer_20260706_larger_gate_feedback_land_floor_deck612_candidate/knowledge_candidate.db",
+  "generated_at": "2026-07-06T12:17:14.203510+00:00",
+  "materialization": {},
+  "materializations": [
+    {
+      "active_rule_count_for_add": 1,
+      "add": "Ash Barrens",
+      "cut": "Longshot, Rebel Bowman",
+      "deck_id": 612,
+      "role": "land",
+      "row_count": 100,
+      "total_cards": 100
+    },
+    {
+      "active_rule_count_for_add": 2,
+      "add": "Sunbaked Canyon",
+      "cut": "Agate Instigator",
+      "deck_id": 612,
+      "role": "land",
+      "row_count": 100,
+      "total_cards": 100
+    },
+    {
+      "active_rule_count_for_add": 1,
+      "add": "Battlefield Forge",
+      "cut": "Warleader's Call",
+      "deck_id": 612,
+      "role": "land",
+      "row_count": 100,
+      "total_cards": 100
+    },
+    {
+      "active_rule_count_for_add": 1,
+      "add": "Cabaretti Courtyard",
+      "cut": "Pyromancer's Goggles",
+      "deck_id": 612,
+      "role": "land",
+      "row_count": 100,
+      "total_cards": 100
+    },
+    {
+      "active_rule_count_for_add": 1,
+      "add": "Demolition Field",
+      "cut": "Call Forth the Tempest",
+      "deck_id": 612,
+      "role": "land",
+      "row_count": 100,
+      "total_cards": 100
+    },
+    {
+      "active_rule_count_for_add": 1,
+      "add": "Escape Tunnel",
+      "cut": "Ancient Gold Dragon",
+      "deck_id": 612,
+      "role": "land",
+      "row_count": 100,
+      "total_cards": 100
+    },
+    {
+      "active_rule_count_for_add": 1,
+      "add": "Evolving Wilds",
+      "cut": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+      "deck_id": 612,
+      "role": "land",
+      "row_count": 100,
+      "total_cards": 100
+    }
+  ],
+  "model_pair": {},
+  "model_pairs": [
+    {
+      "add": "Ash Barrens",
+      "candidate": {
+        "card_name": "Ash Barrens",
+        "role": "land",
+        "score": 99,
+        "source": "land_floor_package_synthesizer"
+      },
+      "commander": "Lorehold, the Historian",
+      "cut": "Longshot, Rebel Bowman",
+      "cut_candidate": {
+        "card_name": "Longshot, Rebel Bowman",
+        "matching_over_target_roles": [
+          "board_wipe",
+          "engine",
+          "ramp",
+          "wincon"
+        ],
+        "role": "land_floor_cut",
+        "score": 76
+      },
+      "deck_id": "612",
+      "pair": {
+        "add": "Ash Barrens",
+        "add_score": 99,
+        "add_status": "review_only_named_land_candidate",
+        "cut": "Longshot, Rebel Bowman",
+        "cut_roles": [
+          "board_wipe",
+          "engine",
+          "ramp",
+          "wincon"
+        ],
+        "cut_score": 76,
+        "cut_status": "review_only_cut_candidate",
+        "mutation_allowed": false,
+        "pair_score": 175,
+        "role": "land"
+      },
+      "role": "land",
+      "source_pool_status": "land_floor_package_synthesized_candidate_copy_ready"
+    },
+    {
+      "add": "Sunbaked Canyon",
+      "candidate": {
+        "card_name": "Sunbaked Canyon",
+        "role": "land",
+        "score": 99,
+        "source": "land_floor_package_synthesizer"
+      },
+      "commander": "Lorehold, the Historian",
+      "cut": "Agate Instigator",
+      "cut_candidate": {
+        "card_name": "Agate Instigator",
+        "matching_over_target_roles": [
+          "board_wipe",
+          "engine",
+          "wincon"
+        ],
+        "role": "land_floor_cut",
+        "score": 62
+      },
+      "deck_id": "612",
+      "pair": {
+        "add": "Sunbaked Canyon",
+        "add_score": 99,
+        "add_status": "review_only_named_land_candidate",
+        "cut": "Agate Instigator",
+        "cut_roles": [
+          "board_wipe",
+          "engine",
+          "wincon"
+        ],
+        "cut_score": 62,
+        "cut_status": "review_only_cut_candidate",
+        "mutation_allowed": false,
+        "pair_score": 161,
+        "role": "land"
+      },
+      "role": "land",
+      "source_pool_status": "land_floor_package_synthesized_candidate_copy_ready"
+    },
+    {
+      "add": "Battlefield Forge",
+      "candidate": {
+        "card_name": "Battlefield Forge",
+        "role": "land",
+        "score": 94,
+        "source": "land_floor_package_synthesizer"
+      },
+      "commander": "Lorehold, the Historian",
+      "cut": "Warleader's Call",
+      "cut_candidate": {
+        "card_name": "Warleader's Call",
+        "matching_over_target_roles": [
+          "board_wipe",
+          "engine",
+          "wincon"
+        ],
+        "role": "land_floor_cut",
+        "score": 62
+      },
+      "deck_id": "612",
+      "pair": {
+        "add": "Battlefield Forge",
+        "add_score": 94,
+        "add_status": "review_only_named_land_candidate",
+        "cut": "Warleader's Call",
+        "cut_roles": [
+          "board_wipe",
+          "engine",
+          "wincon"
+        ],
+        "cut_score": 62,
+        "cut_status": "review_only_cut_candidate",
+        "mutation_allowed": false,
+        "pair_score": 156,
+        "role": "land"
+      },
+      "role": "land",
+      "source_pool_status": "land_floor_package_synthesized_candidate_copy_ready"
+    },
+    {
+      "add": "Cabaretti Courtyard",
+      "candidate": {
+        "card_name": "Cabaretti Courtyard",
+        "role": "land",
+        "score": 94,
+        "source": "land_floor_package_synthesizer"
+      },
+      "commander": "Lorehold, the Historian",
+      "cut": "Pyromancer's Goggles",
+      "cut_candidate": {
+        "card_name": "Pyromancer's Goggles",
+        "matching_over_target_roles": [
+          "engine",
+          "ramp"
+        ],
+        "role": "land_floor_cut",
+        "score": 58
+      },
+      "deck_id": "612",
+      "pair": {
+        "add": "Cabaretti Courtyard",
+        "add_score": 94,
+        "add_status": "review_only_named_land_candidate",
+        "cut": "Pyromancer's Goggles",
+        "cut_roles": [
+          "engine",
+          "ramp"
+        ],
+        "cut_score": 58,
+        "cut_status": "review_only_cut_candidate",
+        "mutation_allowed": false,
+        "pair_score": 152,
+        "role": "land"
+      },
+      "role": "land",
+      "source_pool_status": "land_floor_package_synthesized_candidate_copy_ready"
+    },
+    {
+      "add": "Demolition Field",
+      "candidate": {
+        "card_name": "Demolition Field",
+        "role": "land",
+        "score": 94,
+        "source": "land_floor_package_synthesizer"
+      },
+      "commander": "Lorehold, the Historian",
+      "cut": "Call Forth the Tempest",
+      "cut_candidate": {
+        "card_name": "Call Forth the Tempest",
+        "matching_over_target_roles": [
+          "board_wipe",
+          "engine"
+        ],
+        "role": "land_floor_cut",
+        "score": 57
+      },
+      "deck_id": "612",
+      "pair": {
+        "add": "Demolition Field",
+        "add_score": 94,
+        "add_status": "review_only_named_land_candidate",
+        "cut": "Call Forth the Tempest",
+        "cut_roles": [
+          "board_wipe",
+          "engine"
+        ],
+        "cut_score": 57,
+        "cut_status": "review_only_cut_candidate",
+        "mutation_allowed": false,
+        "pair_score": 151,
+        "role": "land"
+      },
+      "role": "land",
+      "source_pool_status": "land_floor_package_synthesized_candidate_copy_ready"
+    },
+    {
+      "add": "Escape Tunnel",
+      "candidate": {
+        "card_name": "Escape Tunnel",
+        "role": "land",
+        "score": 94,
+        "source": "land_floor_package_synthesizer"
+      },
+      "commander": "Lorehold, the Historian",
+      "cut": "Ancient Gold Dragon",
+      "cut_candidate": {
+        "card_name": "Ancient Gold Dragon",
+        "matching_over_target_roles": [
+          "engine",
+          "wincon"
+        ],
+        "role": "land_floor_cut",
+        "score": 54
+      },
+      "deck_id": "612",
+      "pair": {
+        "add": "Escape Tunnel",
+        "add_score": 94,
+        "add_status": "review_only_named_land_candidate",
+        "cut": "Ancient Gold Dragon",
+        "cut_roles": [
+          "engine",
+          "wincon"
+        ],
+        "cut_score": 54,
+        "cut_status": "review_only_cut_candidate",
+        "mutation_allowed": false,
+        "pair_score": 148,
+        "role": "land"
+      },
+      "role": "land",
+      "source_pool_status": "land_floor_package_synthesized_candidate_copy_ready"
+    },
+    {
+      "add": "Evolving Wilds",
+      "candidate": {
+        "card_name": "Evolving Wilds",
+        "role": "land",
+        "score": 94,
+        "source": "land_floor_package_synthesizer"
+      },
+      "commander": "Lorehold, the Historian",
+      "cut": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+      "cut_candidate": {
+        "card_name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+        "matching_over_target_roles": [
+          "engine",
+          "ramp"
+        ],
+        "role": "land_floor_cut",
+        "score": 53
+      },
+      "deck_id": "612",
+      "pair": {
+        "add": "Evolving Wilds",
+        "add_score": 94,
+        "add_status": "review_only_named_land_candidate",
+        "cut": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+        "cut_roles": [
+          "engine",
+          "ramp"
+        ],
+        "cut_score": 53,
+        "cut_status": "review_only_cut_candidate",
+        "mutation_allowed": false,
+        "pair_score": 147,
+        "role": "land"
+      },
+      "role": "land",
+      "source_pool_status": "land_floor_package_synthesized_candidate_copy_ready"
+    }
+  ],
+  "policy": {
+    "candidate_scope": "The swap or value-safe stage exists only inside the copied Hermes SQLite candidate DB.",
+    "promotion_gate": "Promotion stays closed until structure, strategy matrix, battle gate, and replay trace pass.",
+    "source_boundary": "Source DB and PostgreSQL are not mutated by this materializer."
+  },
+  "postgres_writes": false,
+  "source_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "source_db_mutated": false,
+  "source_deck_summary_after": {
+    "avg_cmc": 3.178,
+    "cards": 100,
+    "deck_id": 612,
+    "hash": "3e97c3d9c9ed8e2d8857d5ce9302cf50c9ea51e83dfad50e2bdb627d8982123d",
+    "lands": 27,
+    "nonlands": 73,
+    "ruleset_hash": "8e59ec26baf0b07c9145b56971dada6fb4221e9bd60530057a1a29e6602497af",
+    "semantics_hash": "cf546942ae7776afe37277dbe39715a37ea34059047b01c564e6e2cddd769254"
+  },
+  "source_deck_summary_before": {
+    "avg_cmc": 3.178,
+    "cards": 100,
+    "deck_id": 612,
+    "hash": "3e97c3d9c9ed8e2d8857d5ce9302cf50c9ea51e83dfad50e2bdb627d8982123d",
+    "lands": 27,
+    "nonlands": 73,
+    "ruleset_hash": "8e59ec26baf0b07c9145b56971dada6fb4221e9bd60530057a1a29e6602497af",
+    "semantics_hash": "cf546942ae7776afe37277dbe39715a37ea34059047b01c564e6e2cddd769254"
+  },
+  "source_pair_guard": {
+    "actual_source_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+    "allow_chained_source": false,
+    "already_present_stage_add_cards": [],
+    "expected_source_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+    "missing_protected_blocked_cut_cards": [],
+    "missing_stage_cut_cards": [],
+    "protected_blocked_cut_cards": [],
+    "source_matches_pair_report": true
+  },
+  "source_reports": [
+    "docs/hermes-analysis/master_optimizer_reports/global_commander_land_floor_package_synthesizer_20260706_larger_gate_feedback_deck612.json"
+  ],
+  "status": "candidate_materialized_structure_ready_next_gate_closed",
+  "structure_validation": {
+    "add_cards": [
+      "Ash Barrens",
+      "Sunbaked Canyon",
+      "Battlefield Forge",
+      "Cabaretti Courtyard",
+      "Demolition Field",
+      "Escape Tunnel",
+      "Evolving Wilds"
+    ],
+    "checks": {
+      "added_roles_present": true,
+      "all_adds_present_once": true,
+      "all_cuts_absent": true,
+      "commander_count_1": true,
+      "nonbasic_singleton_ok": true,
+      "total_cards_100": true,
+      "unresolved_card_rows_0": true
+    },
+    "commander_count": 1,
+    "cut_cards": [
+      "Longshot, Rebel Bowman",
+      "Agate Instigator",
+      "Warleader's Call",
+      "Pyromancer's Goggles",
+      "Call Forth the Tempest",
+      "Ancient Gold Dragon",
+      "Birgi, God of Storytelling // Harnfel, Horn of Bounty"
+    ],
+    "deck_summary": {
+      "avg_cmc": 3.03,
+      "cards": 100,
+      "deck_id": 612,
+      "hash": "a5c2900f3344fda8cbfd2b40cd628e3415974ab4b33b987c270e56a4b585170b",
+      "lands": 34,
+      "nonlands": 66,
+      "ruleset_hash": "5fd1940c63e2b3489fa5d2fa1d545ac2fcce87b0bcb8d811a6c06b5cc60c89a7",
+      "semantics_hash": "ed40a6d6e3f97ad764b35c51f1de3d10bc375e480d81f1a1dae122673206ea3e"
+    },
+    "duplicate_or_missing_add_cards": [],
+    "missing_added_role_cards": [],
+    "nonbasic_singleton_violations": [],
+    "retained_cut_cards": [],
+    "status": "pass",
+    "unresolved_card_rows": []
+  },
+  "summary": {
+    "add": "Ash Barrens",
+    "adds": [
+      "Ash Barrens",
+      "Sunbaked Canyon",
+      "Battlefield Forge",
+      "Cabaretti Courtyard",
+      "Demolition Field",
+      "Escape Tunnel",
+      "Evolving Wilds"
+    ],
+    "allow_battle_gate_now": false,
+    "allow_next_strategy_matrix": true,
+    "candidate_deck_hash": "a5c2900f3344fda8cbfd2b40cd628e3415974ab4b33b987c270e56a4b585170b",
+    "commander": "Lorehold, the Historian",
+    "cut": "Longshot, Rebel Bowman",
+    "cuts": [
+      "Longshot, Rebel Bowman",
+      "Agate Instigator",
+      "Warleader's Call",
+      "Pyromancer's Goggles",
+      "Call Forth the Tempest",
+      "Ancient Gold Dragon",
+      "Birgi, God of Storytelling // Harnfel, Horn of Bounty"
+    ],
+    "deck_id": 612,
+    "pair_count": 7,
+    "promotion_allowed": false,
+    "role": "land_floor_package",
+    "source_artifact_type": "global_commander_land_floor_package_synthesizer",
+    "source_candidate_hash_differs": true,
+    "source_deck_hash_after": "3e97c3d9c9ed8e2d8857d5ce9302cf50c9ea51e83dfad50e2bdb627d8982123d",
+    "source_deck_hash_before": "3e97c3d9c9ed8e2d8857d5ce9302cf50c9ea51e83dfad50e2bdb627d8982123d",
+    "source_matches_pair_report": true,
+    "source_unchanged": true,
+    "stage": null,
+    "stage_next_gate": "materialize_land_floor_package_candidate_copy"
+  }
+}

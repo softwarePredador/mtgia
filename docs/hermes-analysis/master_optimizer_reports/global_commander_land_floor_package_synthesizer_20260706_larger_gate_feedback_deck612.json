@@ -1,0 +1,149 @@
+{
+  "artifact_type": "global_commander_land_floor_package_synthesizer",
+  "battle_gate_allowed_now": false,
+  "battle_or_optimization_performed": false,
+  "candidate_copy_allowed_now": true,
+  "candidate_copy_blockers": [],
+  "deck_action_allowed": false,
+  "generated_at": "2026-07-06T12:16:40.393978+00:00",
+  "input_artifacts": {
+    "land_cut_model_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_land_cut_candidate_model_20260705_global_goal_hermes_only.json",
+    "land_floor_policy_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_land_floor_policy_builder_20260706_larger_gate_feedback_current.json",
+    "named_land_pool_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_named_land_candidate_pool_20260705_global_goal_hermes_only.json"
+  },
+  "mutation_allowed": false,
+  "pairs": [
+    {
+      "add": "Ash Barrens",
+      "add_score": 99,
+      "add_status": "review_only_named_land_candidate",
+      "cut": "Longshot, Rebel Bowman",
+      "cut_roles": [
+        "board_wipe",
+        "engine",
+        "ramp",
+        "wincon"
+      ],
+      "cut_score": 76,
+      "cut_status": "review_only_cut_candidate",
+      "mutation_allowed": false,
+      "pair_score": 175,
+      "role": "land"
+    },
+    {
+      "add": "Sunbaked Canyon",
+      "add_score": 99,
+      "add_status": "review_only_named_land_candidate",
+      "cut": "Agate Instigator",
+      "cut_roles": [
+        "board_wipe",
+        "engine",
+        "wincon"
+      ],
+      "cut_score": 62,
+      "cut_status": "review_only_cut_candidate",
+      "mutation_allowed": false,
+      "pair_score": 161,
+      "role": "land"
+    },
+    {
+      "add": "Battlefield Forge",
+      "add_score": 94,
+      "add_status": "review_only_named_land_candidate",
+      "cut": "Warleader's Call",
+      "cut_roles": [
+        "board_wipe",
+        "engine",
+        "wincon"
+      ],
+      "cut_score": 62,
+      "cut_status": "review_only_cut_candidate",
+      "mutation_allowed": false,
+      "pair_score": 156,
+      "role": "land"
+    },
+    {
+      "add": "Cabaretti Courtyard",
+      "add_score": 94,
+      "add_status": "review_only_named_land_candidate",
+      "cut": "Pyromancer's Goggles",
+      "cut_roles": [
+        "engine",
+        "ramp"
+      ],
+      "cut_score": 58,
+      "cut_status": "review_only_cut_candidate",
+      "mutation_allowed": false,
+      "pair_score": 152,
+      "role": "land"
+    },
+    {
+      "add": "Demolition Field",
+      "add_score": 94,
+      "add_status": "review_only_named_land_candidate",
+      "cut": "Call Forth the Tempest",
+      "cut_roles": [
+        "board_wipe",
+        "engine"
+      ],
+      "cut_score": 57,
+      "cut_status": "review_only_cut_candidate",
+      "mutation_allowed": false,
+      "pair_score": 151,
+      "role": "land"
+    },
+    {
+      "add": "Escape Tunnel",
+      "add_score": 94,
+      "add_status": "review_only_named_land_candidate",
+      "cut": "Ancient Gold Dragon",
+      "cut_roles": [
+        "engine",
+        "wincon"
+      ],
+      "cut_score": 54,
+      "cut_status": "review_only_cut_candidate",
+      "mutation_allowed": false,
+      "pair_score": 148,
+      "role": "land"
+    },
+    {
+      "add": "Evolving Wilds",
+      "add_score": 94,
+      "add_status": "review_only_named_land_candidate",
+      "cut": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+      "cut_roles": [
+        "engine",
+        "ramp"
+      ],
+      "cut_score": 53,
+      "cut_status": "review_only_cut_candidate",
+      "mutation_allowed": false,
+      "pair_score": 147,
+      "role": "land"
+    }
+  ],
+  "policy": {
+    "battle_boundary": "Battle gate and promotion stay closed after materialization until core, strategy, battle, and replay gates pass.",
+    "floor_boundary": "The package must cover the full land gap; single swaps are blocked when the floor remains unrepaired.",
+    "package_boundary": "This is a review-only land-floor package for isolated candidate copy."
+  },
+  "postgres_writes": false,
+  "promotion_allowed": false,
+  "source_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "source_db_mutated": false,
+  "status": "land_floor_package_synthesized_candidate_copy_ready",
+  "summary": {
+    "available_cut_count": 12,
+    "available_named_land_count": 12,
+    "candidate_copy_allowed_now": true,
+    "commander": "Lorehold, the Historian",
+    "current_land_count": 27,
+    "deck_id": "612",
+    "deck_name": "VARIANT Lorehold Variant 07 - Rafael Paste 2026-06-24",
+    "land_gap": 7,
+    "next_gate": "materialize_land_floor_package_candidate_copy",
+    "selected_pair_count": 7,
+    "target_land_floor": 34
+  }
+}

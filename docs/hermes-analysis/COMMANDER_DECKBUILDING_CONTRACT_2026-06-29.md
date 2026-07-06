@@ -254,11 +254,13 @@ Operational priority after this pivot:
    tracking, and may open only `larger_battle_gate_allowed_next`; promotion,
    mutation, and candidate-copy actions remain closed;
 14. run `global_commander_battle_feedback_model.py` after battle probe/gate
-   audit artifacts exist; it consolidates exact add/cut signatures into
-   reusable learning feedback, blocks pairs with failed exercised equal-gate
-   evidence, supersedes smaller positive probes when a larger gate rejects the
-   same pair, and routes unexercised packages to exposure replay instead of
-   requeueing them as fresh hypotheses;
+   audit artifacts exist; it consolidates exact add/cut signatures and exact
+   package signatures into reusable learning feedback, blocks pairs with failed
+   exercised equal-gate evidence, blocks packages that improve only a weak
+   immediate shell but fail a protected benchmark, supersedes smaller positive
+   probes when a larger gate rejects the same pair or package, and routes
+   unexercised packages to exposure replay instead of requeueing them as fresh
+   hypotheses;
 15. run `global_commander_candidate_package_chain_audit.py` when multiple
    isolated candidate-copy swaps are chained into one package; it must prove
    every source DB stayed unchanged, every pair report matched its source,
@@ -1881,6 +1883,34 @@ Current external refresh on 2026-07-05:
   candidate_vs_immediate_base_win_delta: `2`. Next gate is
   `repair_package_or_convert_to_global_learning_no_promotion`, not deck
   promotion.
+  Feedback-model follow-up:
+  `global_commander_battle_feedback_model.py` generated
+  `global_commander_battle_feedback_model_20260706_larger_gate_current.md`.
+  It now emits `package_feedback` and classifies this exact package as
+  `package_improved_weak_base_but_failed_protected_baseline`, aggregated to
+  `package_blocked_by_protected_baseline_gate` with recommendation
+  `block_package_until_new_source_lane_cut_or_strategy`. Rerunning
+  `global_commander_candidate_package_strategy_matrix.py` with that feedback
+  produced
+  `global_commander_candidate_package_strategy_matrix_20260706_lorehold_profile_repair_package_post_larger_feedback.md`,
+  status `package_strategy_blocks_battle`, battle_feedback_blocker_count: `3`,
+  and next gate `replace_failed_package_source_lane_or_cut_set_before_battle`.
+  The same package cannot reopen battle just because it improved deck `612`; it
+  needs a changed source lane, cut set, or strategy hypothesis.
+- The current global-learning rerun after that feedback produced
+  `global_commander_learning_priority_audit_20260706_larger_gate_feedback_current.md`,
+  which pivots to cross-commander role-axis learning after ramp-axis exhaustion.
+  The role-axis policy selects `land`, the land-floor policy selects deck `612`,
+  and the `7`-swap candidate copy in
+  `global_commander_candidate_copy_materializer_20260706_larger_gate_feedback_land_floor_deck612.md`
+  keeps the source DB unchanged and opens only the next strategy-matrix gate.
+  Its package chain passes, but
+  `global_commander_candidate_package_strategy_matrix_20260706_larger_gate_feedback_land_floor_deck612.md`
+  blocks battle with `profile_lands_below_target` and protected anchor cuts for
+  `Pyromancer's Goggles`, `Call Forth the Tempest`, and `Birgi, God of
+  Storytelling // Harnfel, Horn of Bounty`. The next goal is to repair or
+  resynthesize the land-floor package so Lorehold reaches `36-38` lands without
+  cutting those anchors; replay, battle, mutation, and promotion remain closed.
 
 ## Global Commander Rollout - 2026-07-01
 

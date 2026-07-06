@@ -21,7 +21,7 @@ DEFAULT_CORE_REPORT = REPORT_DIR / "global_commander_core_role_audit_20260705_gl
 DEFAULT_STRATEGY_REPORT = REPORT_DIR / "global_commander_strategy_matrix_20260701_current.json"
 DEFAULT_LAND_CUT_REPORT = REPORT_DIR / "global_commander_land_cut_candidate_model_20260705_global_goal_hermes_only.json"
 DEFAULT_NONLAND_REPORT = REPORT_DIR / "global_commander_nonland_core_candidate_model_20260705_global_goal_hermes_only.json"
-DEFAULT_BATTLE_FEEDBACK_REPORT = REPORT_DIR / "global_commander_battle_feedback_model_20260705_current.json"
+DEFAULT_BATTLE_FEEDBACK_REPORT = REPORT_DIR / "global_commander_battle_feedback_model_20260706_larger_gate_current.json"
 DEFAULT_SOURCE_EXHAUSTION_REPORT = (
     REPORT_DIR
     / "global_commander_external_nonpayoff_seed_exhaustion_recovery_router_20260706_kaalia_value_safe_stage1_followup_live_after_manual_trace.json"
@@ -631,15 +631,22 @@ def battle_feedback_summary(payload: dict[str, Any] | None) -> dict[str, Any]:
             "blocked_pair_count": 0,
             "needs_exposure_pair_count": 0,
             "ready_pair_count": 0,
+            "package_count": 0,
+            "blocked_package_count": 0,
+            "needs_exercise_package_count": 0,
             "pair_status_counts": {},
+            "package_status_counts": {},
             "next_gate": "run_global_commander_battle_feedback_model_before_requeueing_tested_pairs",
         }
     summary = payload.get("summary") or {}
     pair_status_counts = summary.get("pair_status_counts") or {}
+    package_status_counts = summary.get("package_status_counts") or {}
     blocked = int(summary.get("blocked_pair_count") or 0)
     needs_exposure = int(summary.get("needs_exposure_pair_count") or 0)
-    next_gate = "exclude_blocked_pairs_and_route_unexercised_packages_before_requeue"
-    if not blocked and not needs_exposure:
+    blocked_packages = int(summary.get("blocked_package_count") or 0)
+    needs_exercise_packages = int(summary.get("needs_exercise_package_count") or 0)
+    next_gate = "exclude_blocked_pairs_packages_and_route_unexercised_evidence_before_requeue"
+    if not blocked and not needs_exposure and not blocked_packages and not needs_exercise_packages:
         next_gate = "no_battle_feedback_blockers_currently_known"
     return {
         "status": payload.get("status") or "unknown",
@@ -647,7 +654,11 @@ def battle_feedback_summary(payload: dict[str, Any] | None) -> dict[str, Any]:
         "blocked_pair_count": blocked,
         "needs_exposure_pair_count": needs_exposure,
         "ready_pair_count": int(summary.get("ready_pair_count") or 0),
+        "package_count": int(summary.get("package_count") or 0),
+        "blocked_package_count": blocked_packages,
+        "needs_exercise_package_count": needs_exercise_packages,
         "pair_status_counts": pair_status_counts,
+        "package_status_counts": package_status_counts,
         "next_gate": next_gate,
     }
 
@@ -753,6 +764,7 @@ def build_report(
             "bracket_policy_status": bracket_status["status"],
             "battle_feedback_status": feedback_summary["status"],
             "blocked_exact_add_cut_pair_count": feedback_summary["blocked_pair_count"],
+            "blocked_exact_package_count": feedback_summary["blocked_package_count"],
             "source_exhaustion_blocked_deck_count": sum(
                 1 for row in deck_priorities if source_exhaustion_blocks_candidate_copy(row)
             ),
@@ -763,6 +775,7 @@ def build_report(
                 1 for row in deck_priorities if role_axis_exhaustion_blocks_candidate_copy(row)
             ),
             "battle_feedback_pair_status_counts": feedback_summary["pair_status_counts"],
+            "battle_feedback_package_status_counts": feedback_summary["package_status_counts"],
         },
         "battle_feedback_summary": feedback_summary,
         "commander_queue": commander_queue,
@@ -843,6 +856,7 @@ def write_markdown(payload: dict[str, Any], path: Path) -> None:
             "",
             f"- Status: `{battle_feedback['status']}`.",
             f"- Pair status counts: `{battle_feedback['pair_status_counts']}`.",
+            f"- Package status counts: `{battle_feedback['package_status_counts']}`.",
             f"- Next gate: `{battle_feedback['next_gate']}`.",
             "",
             "## Method Notes",

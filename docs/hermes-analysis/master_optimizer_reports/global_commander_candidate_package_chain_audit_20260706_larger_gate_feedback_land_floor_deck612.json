@@ -1,0 +1,460 @@
+{
+  "artifact_type": "global_commander_candidate_package_chain_audit",
+  "battle_gate_allowed_now": false,
+  "battle_or_optimization_performed": false,
+  "blocker_reasons": [
+    "commander_specific_strategy_matrix_not_run_for_package",
+    "package_battle_probe_not_run"
+  ],
+  "deck_action_allowed": false,
+  "final_core_deck_row": {
+    "classification_source_counts": {
+      "tag": 57,
+      "tag_plus_text": 34,
+      "text_inferred": 9
+    },
+    "commander": "Lorehold, the Historian",
+    "core_repair_plan": {
+      "excess_role_slots": [
+        {
+          "count": 21,
+          "excess": 5,
+          "role": "ramp",
+          "severity": "critical",
+          "target_max": 16
+        },
+        {
+          "count": 8,
+          "excess": 3,
+          "role": "board_wipe",
+          "severity": "critical",
+          "target_max": 5
+        },
+        {
+          "count": 40,
+          "excess": 16,
+          "role": "engine",
+          "severity": "support",
+          "target_max": 24
+        }
+      ],
+      "first_action": "review_role_extremes",
+      "missing_role_slots": [],
+      "mutation_policy": "repair_missing_critical_floor_before_strategy_matrix;treat_excess_roles_as_review_signals_not_auto_cuts;classify_unknown_cards_before_physical_swaps",
+      "unknown_count": 0
+    },
+    "core_status": "core_review_ready",
+    "deck_id": "612",
+    "deck_name": "VARIANT Lorehold Variant 07 - Rafael Paste 2026-06-24",
+    "next_gate": "review_role_extremes_before_strategy_matrix",
+    "role_bands": [
+      {
+        "count": 34,
+        "max": 39,
+        "min": 34,
+        "role": "land",
+        "severity": "critical",
+        "status": "in_range"
+      },
+      {
+        "count": 21,
+        "max": 16,
+        "min": 8,
+        "role": "ramp",
+        "severity": "critical",
+        "status": "above_range_review"
+      },
+      {
+        "count": 11,
+        "max": 16,
+        "min": 8,
+        "role": "draw",
+        "severity": "critical",
+        "status": "in_range"
+      },
+      {
+        "count": 10,
+        "max": 14,
+        "min": 6,
+        "role": "removal",
+        "severity": "critical",
+        "status": "in_range"
+      },
+      {
+        "count": 8,
+        "max": 5,
+        "min": 2,
+        "role": "board_wipe",
+        "severity": "critical",
+        "status": "above_range_review"
+      },
+      {
+        "count": 10,
+        "max": 10,
+        "min": 3,
+        "role": "protection",
+        "severity": "support",
+        "status": "in_range"
+      },
+      {
+        "count": 8,
+        "max": 8,
+        "min": 1,
+        "role": "recursion",
+        "severity": "support",
+        "status": "in_range"
+      },
+      {
+        "count": 2,
+        "max": 8,
+        "min": 0,
+        "role": "tutor",
+        "severity": "support",
+        "status": "in_range"
+      },
+      {
+        "count": 14,
+        "max": 14,
+        "min": 3,
+        "role": "wincon",
+        "severity": "critical",
+        "status": "in_range"
+      },
+      {
+        "count": 40,
+        "max": 24,
+        "min": 4,
+        "role": "engine",
+        "severity": "support",
+        "status": "above_range_review"
+      }
+    ],
+    "role_counts": {
+      "board_wipe": 8,
+      "draw": 11,
+      "engine": 40,
+      "land": 34,
+      "protection": 10,
+      "ramp": 21,
+      "recursion": 8,
+      "removal": 10,
+      "tutor": 2,
+      "unknown": 0,
+      "wincon": 14
+    },
+    "scope": "hermes_lorehold_variant",
+    "shape_status": "structure_ready",
+    "total_cards": 100,
+    "unknown_card_sample": []
+  },
+  "final_strategy_commander_row": {
+    "blocked_issue_counts": {},
+    "blocked_product_deck_count": 0,
+    "blocked_product_decks": [],
+    "commander": "Lorehold, the Historian",
+    "commander_key": "lorehold, the historian",
+    "lab_ready_deck_count": 12,
+    "next_gate": "run_commander_specific_strategy_matrix_before_battle_gate",
+    "product_ready_deck_count": 0,
+    "ready_deck_count": 12,
+    "ready_decks": [
+      {
+        "deck_id": "6",
+        "deck_name": "Runtime Lorehold Learned 19e93de3cca",
+        "scope": "hermes_lorehold_baseline",
+        "source": "hermes"
+      },
+      {
+        "deck_id": "606",
+        "deck_name": "VARIANT Lorehold Variant 01 - Rafael Paste 2026-06-22",
+        "scope": "hermes_lorehold_variant",
+        "source": "hermes"
+      },
+      {
+        "deck_id": "607",
+        "deck_name": "VARIANT Lorehold Variant 02 - Rafael Paste 2026-06-23",
+        "scope": "hermes_lorehold_variant",
+        "source": "hermes"
+      },
+      {
+        "deck_id": "608",
+        "deck_name": "VARIANT Lorehold Variant 03 - Rafael Paste 2026-06-23",
+        "scope": "hermes_lorehold_variant",
+        "source": "hermes"
+      },
+      {
+        "deck_id": "609",
+        "deck_name": "VARIANT Lorehold Variant 04 - Rafael Paste 2026-06-24",
+        "scope": "hermes_lorehold_variant",
+        "source": "hermes"
+      },
+      {
+        "deck_id": "610",
+        "deck_name": "VARIANT Lorehold Variant 05 - Rafael Paste 2026-06-24",
+        "scope": "hermes_lorehold_variant",
+        "source": "hermes"
+      },
+      {
+        "deck_id": "611",
+        "deck_name": "VARIANT Lorehold Variant 06 - Rafael Paste 2026-06-24",
+        "scope": "hermes_lorehold_variant",
+        "source": "hermes"
+      },
+      {
+        "deck_id": "612",
+        "deck_name": "VARIANT Lorehold Variant 07 - Rafael Paste 2026-06-24",
+        "scope": "hermes_lorehold_variant",
+        "source": "hermes"
+      },
+      {
+        "deck_id": "613",
+        "deck_name": "VARIANT Lorehold Variant 08 - Rafael Paste 2026-06-24",
+        "scope": "hermes_lorehold_variant",
+        "source": "hermes"
+      },
+      {
+        "deck_id": "614",
+        "deck_name": "VARIANT Lorehold Variant 09 - Rafael Paste 2026-06-24",
+        "scope": "hermes_lorehold_variant",
+        "source": "hermes"
+      },
+      {
+        "deck_id": "615",
+        "deck_name": "VARIANT Lorehold Variant 10 - Rafael Paste 2026-06-24",
+        "scope": "hermes_lorehold_variant",
+        "source": "hermes"
+      },
+      {
+        "deck_id": "616",
+        "deck_name": "VARIANT Lorehold Variant 11 - Rafael Paste 2026-06-24",
+        "scope": "hermes_lorehold_variant",
+        "source": "hermes"
+      }
+    ],
+    "ready_scope_counts": {
+      "hermes_lorehold_baseline": 1,
+      "hermes_lorehold_variant": 11
+    },
+    "scope_counts": {
+      "hermes_lorehold_baseline": 1,
+      "hermes_lorehold_variant": 11
+    },
+    "source_lane_count": 1,
+    "source_signals": {
+      "card_usage_count": 0,
+      "learned_deck_count": 0,
+      "local_runtime_profile_count": 1,
+      "reference_card_stats_count": 0,
+      "reference_deck_analysis_count": 0,
+      "reference_deck_count": 0,
+      "reference_profile_count": 0
+    },
+    "status": "ready_for_strategy_matrix"
+  },
+  "generated_at": "2026-07-06T12:20:50.882410+00:00",
+  "input_artifacts": {
+    "final_core_role_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_core_role_audit_20260706_larger_gate_feedback_land_floor_deck612_hermes_only.json",
+    "final_strategy_matrix_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_strategy_matrix_20260706_larger_gate_feedback_land_floor_deck612_hermes_only.json",
+    "materializer_reports": [
+      "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_copy_materializer_20260706_larger_gate_feedback_land_floor_deck612.json"
+    ]
+  },
+  "materializer_steps": [
+    {
+      "add": "Ash Barrens",
+      "allow_battle_gate_now": false,
+      "allow_chained_source": false,
+      "allow_next_strategy_matrix": true,
+      "candidate_db": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_copy_materializer_20260706_larger_gate_feedback_land_floor_deck612_candidate/knowledge_candidate.db",
+      "commander": "Lorehold, the Historian",
+      "cut": "Longshot, Rebel Bowman",
+      "deck_id": 612,
+      "materializer_pair_index": 1,
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_copy_materializer_20260706_larger_gate_feedback_land_floor_deck612.json",
+      "promotion_allowed": false,
+      "role": "land",
+      "source_candidate_hash_differs": true,
+      "source_matches_pair_report": true,
+      "source_reference_accepted": true,
+      "source_unchanged": true,
+      "status": "candidate_materialized_structure_ready_next_gate_closed"
+    },
+    {
+      "add": "Sunbaked Canyon",
+      "allow_battle_gate_now": false,
+      "allow_chained_source": false,
+      "allow_next_strategy_matrix": true,
+      "candidate_db": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_copy_materializer_20260706_larger_gate_feedback_land_floor_deck612_candidate/knowledge_candidate.db",
+      "commander": "Lorehold, the Historian",
+      "cut": "Agate Instigator",
+      "deck_id": 612,
+      "materializer_pair_index": 2,
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_copy_materializer_20260706_larger_gate_feedback_land_floor_deck612.json",
+      "promotion_allowed": false,
+      "role": "land",
+      "source_candidate_hash_differs": true,
+      "source_matches_pair_report": true,
+      "source_reference_accepted": true,
+      "source_unchanged": true,
+      "status": "candidate_materialized_structure_ready_next_gate_closed"
+    },
+    {
+      "add": "Battlefield Forge",
+      "allow_battle_gate_now": false,
+      "allow_chained_source": false,
+      "allow_next_strategy_matrix": true,
+      "candidate_db": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_copy_materializer_20260706_larger_gate_feedback_land_floor_deck612_candidate/knowledge_candidate.db",
+      "commander": "Lorehold, the Historian",
+      "cut": "Warleader's Call",
+      "deck_id": 612,
+      "materializer_pair_index": 3,
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_copy_materializer_20260706_larger_gate_feedback_land_floor_deck612.json",
+      "promotion_allowed": false,
+      "role": "land",
+      "source_candidate_hash_differs": true,
+      "source_matches_pair_report": true,
+      "source_reference_accepted": true,
+      "source_unchanged": true,
+      "status": "candidate_materialized_structure_ready_next_gate_closed"
+    },
+    {
+      "add": "Cabaretti Courtyard",
+      "allow_battle_gate_now": false,
+      "allow_chained_source": false,
+      "allow_next_strategy_matrix": true,
+      "candidate_db": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_copy_materializer_20260706_larger_gate_feedback_land_floor_deck612_candidate/knowledge_candidate.db",
+      "commander": "Lorehold, the Historian",
+      "cut": "Pyromancer's Goggles",
+      "deck_id": 612,
+      "materializer_pair_index": 4,
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_copy_materializer_20260706_larger_gate_feedback_land_floor_deck612.json",
+      "promotion_allowed": false,
+      "role": "land",
+      "source_candidate_hash_differs": true,
+      "source_matches_pair_report": true,
+      "source_reference_accepted": true,
+      "source_unchanged": true,
+      "status": "candidate_materialized_structure_ready_next_gate_closed"
+    },
+    {
+      "add": "Demolition Field",
+      "allow_battle_gate_now": false,
+      "allow_chained_source": false,
+      "allow_next_strategy_matrix": true,
+      "candidate_db": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_copy_materializer_20260706_larger_gate_feedback_land_floor_deck612_candidate/knowledge_candidate.db",
+      "commander": "Lorehold, the Historian",
+      "cut": "Call Forth the Tempest",
+      "deck_id": 612,
+      "materializer_pair_index": 5,
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_copy_materializer_20260706_larger_gate_feedback_land_floor_deck612.json",
+      "promotion_allowed": false,
+      "role": "land",
+      "source_candidate_hash_differs": true,
+      "source_matches_pair_report": true,
+      "source_reference_accepted": true,
+      "source_unchanged": true,
+      "status": "candidate_materialized_structure_ready_next_gate_closed"
+    },
+    {
+      "add": "Escape Tunnel",
+      "allow_battle_gate_now": false,
+      "allow_chained_source": false,
+      "allow_next_strategy_matrix": true,
+      "candidate_db": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_copy_materializer_20260706_larger_gate_feedback_land_floor_deck612_candidate/knowledge_candidate.db",
+      "commander": "Lorehold, the Historian",
+      "cut": "Ancient Gold Dragon",
+      "deck_id": 612,
+      "materializer_pair_index": 6,
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_copy_materializer_20260706_larger_gate_feedback_land_floor_deck612.json",
+      "promotion_allowed": false,
+      "role": "land",
+      "source_candidate_hash_differs": true,
+      "source_matches_pair_report": true,
+      "source_reference_accepted": true,
+      "source_unchanged": true,
+      "status": "candidate_materialized_structure_ready_next_gate_closed"
+    },
+    {
+      "add": "Evolving Wilds",
+      "allow_battle_gate_now": false,
+      "allow_chained_source": false,
+      "allow_next_strategy_matrix": true,
+      "candidate_db": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_copy_materializer_20260706_larger_gate_feedback_land_floor_deck612_candidate/knowledge_candidate.db",
+      "commander": "Lorehold, the Historian",
+      "cut": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+      "deck_id": 612,
+      "materializer_pair_index": 7,
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_copy_materializer_20260706_larger_gate_feedback_land_floor_deck612.json",
+      "promotion_allowed": false,
+      "role": "land",
+      "source_candidate_hash_differs": true,
+      "source_matches_pair_report": true,
+      "source_reference_accepted": true,
+      "source_unchanged": true,
+      "status": "candidate_materialized_structure_ready_next_gate_closed"
+    }
+  ],
+  "mutation_allowed": false,
+  "policy": {
+    "battle_boundary": "Core floor repair and global readiness do not authorize battle until a commander-specific package strategy matrix exists.",
+    "package_scope": "This is an isolated copied-DB package candidate, not a real deck change.",
+    "promotion_boundary": "Promotion remains closed until strategy matrix, equal battle gate, and replay trace pass."
+  },
+  "postgres_writes": false,
+  "promotion_allowed": false,
+  "source_db_mutated": false,
+  "status": "pass",
+  "summary": {
+    "commander": "Lorehold, the Historian",
+    "core_floor_repaired": true,
+    "deck_id": "612",
+    "final_candidate_db": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_copy_materializer_20260706_larger_gate_feedback_land_floor_deck612_candidate/knowledge_candidate.db",
+    "final_core_status": "core_review_ready",
+    "final_role_counts": {
+      "board_wipe": 8,
+      "draw": 11,
+      "engine": 40,
+      "land": 34,
+      "protection": 10,
+      "ramp": 21,
+      "recursion": 8,
+      "removal": 10,
+      "tutor": 2,
+      "wincon": 14
+    },
+    "final_role_statuses": {
+      "board_wipe": "above_range_review",
+      "draw": "in_range",
+      "engine": "above_range_review",
+      "land": "in_range",
+      "protection": "in_range",
+      "ramp": "above_range_review",
+      "recursion": "in_range",
+      "removal": "in_range",
+      "tutor": "in_range",
+      "wincon": "in_range"
+    },
+    "materializer_chain_pass": true,
+    "next_gate": "run_commander_specific_strategy_matrix_for_package_before_battle",
+    "package_adds": [
+      "Ash Barrens",
+      "Sunbaked Canyon",
+      "Battlefield Forge",
+      "Cabaretti Courtyard",
+      "Demolition Field",
+      "Escape Tunnel",
+      "Evolving Wilds"
+    ],
+    "package_cuts": [
+      "Longshot, Rebel Bowman",
+      "Agate Instigator",
+      "Warleader's Call",
+      "Pyromancer's Goggles",
+      "Call Forth the Tempest",
+      "Ancient Gold Dragon",
+      "Birgi, God of Storytelling // Harnfel, Horn of Bounty"
+    ],
+    "strategy_ready": true,
+    "swap_count": 7
+  }
+}
