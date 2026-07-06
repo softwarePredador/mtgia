@@ -462,6 +462,18 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `forced_access_used=false` e `larger_battle_gate_allowed_next=true`. Isso
     libera apenas o proximo gate maior (`run_larger_equal_battle_gate`);
     `promotion_allowed=false` permanece.
+    O gate maior foi consolidado por
+    `manaloom-knowledge/scripts/global_commander_larger_battle_gate_audit.py`
+    em
+    `master_optimizer_reports/global_commander_larger_battle_gate_audit_20260706_lorehold_profile_repair_vs607.md`.
+    Resultado: `larger_battle_gate_blocks_promotion`. A candidata melhorou a
+    base imediata `612` (`4W/20L/0S` contra `2W/22L/0S`), mas perdeu para o
+    baseline protegido `607` (`7W/17L/0S`) e `Call Forth the Tempest` ficou sem
+    exercicio no gate maior. Bloqueios:
+    `candidate_did_not_beat_protected_baseline` e
+    `larger_gate_unexercised_added_cards:Call Forth the Tempest`; a saida agora
+    e reparar o pacote ou converter o resultado em aprendizado global, sem
+    promocao.
     O modelo nonland agora bloqueia cortes cross-lane de ramp com
     `cross_lane_ramp_cut_requires_same_lane_source_or_gate`, removendo `Birgi`
     dos cuts genericos de removal. O novo top pair `+Feed the Swarm /

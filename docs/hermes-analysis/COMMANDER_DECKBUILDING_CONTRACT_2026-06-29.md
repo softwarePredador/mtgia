@@ -1866,6 +1866,21 @@ Current external refresh on 2026-07-05:
   the natural replay seed window. This only sets
   `larger_battle_gate_allowed_next=true` and `forced_access_used=false`; it
   keeps `promotion_allowed=false` and routes to `run_larger_equal_battle_gate`.
+  Larger gate follow-up:
+  `global_commander_larger_battle_gate_audit.py` generated
+  `global_commander_larger_battle_gate_audit_20260706_lorehold_profile_repair_vs607.md`.
+  Its status is `larger_battle_gate_blocks_promotion`: the candidate repaired
+  the immediate base deck `612` (`4W/20L/0S` versus `2W/22L/0S`) but did not
+  beat the protected baseline `607` (`7W/17L/0S`), and
+  `Call Forth the Tempest` was accessed without larger-gate exercise. Promotion
+  remains blocked by `candidate_did_not_beat_protected_baseline` and
+  `larger_gate_unexercised_added_cards:Call Forth the Tempest`. Reusable
+  learning: a package can improve a weaker shell without being a protected
+  baseline replacement. Literal audit deltas:
+  candidate_vs_protected_win_delta: `-3` and
+  candidate_vs_immediate_base_win_delta: `2`. Next gate is
+  `repair_package_or_convert_to_global_learning_no_promotion`, not deck
+  promotion.
 
 ## Global Commander Rollout - 2026-07-01
 

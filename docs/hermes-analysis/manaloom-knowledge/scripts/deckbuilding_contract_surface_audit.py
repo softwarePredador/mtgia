@@ -207,6 +207,10 @@ GLOBAL_COMMANDER_CANDIDATE_ADDED_CARD_NATURAL_REPLAY_TRACE_GENERATOR = (
 GLOBAL_COMMANDER_CANDIDATE_ADDED_CARD_NATURAL_REPLAY_TRACE_GENERATOR_TEST = (
     SCRIPT_DIR / "test_global_commander_candidate_added_card_natural_replay_trace_generator.py"
 )
+GLOBAL_COMMANDER_LARGER_BATTLE_GATE_AUDIT = SCRIPT_DIR / "global_commander_larger_battle_gate_audit.py"
+GLOBAL_COMMANDER_LARGER_BATTLE_GATE_AUDIT_TEST = (
+    SCRIPT_DIR / "test_global_commander_larger_battle_gate_audit.py"
+)
 GLOBAL_COMMANDER_BATTLE_FEEDBACK_MODEL = SCRIPT_DIR / "global_commander_battle_feedback_model.py"
 GLOBAL_COMMANDER_CANDIDATE_PACKAGE_CHAIN_AUDIT = (
     SCRIPT_DIR / "global_commander_candidate_package_chain_audit.py"
@@ -766,6 +770,10 @@ GLOBAL_COMMANDER_LOREHOLD_PROFILE_REPAIR_ADDED_CARD_NATURAL_REPLAY_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_added_card_natural_replay_trace_generator_20260706_lorehold_profile_repair_package.md"
 )
+GLOBAL_COMMANDER_LOREHOLD_PROFILE_REPAIR_LARGER_BATTLE_AUDIT_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_larger_battle_gate_audit_20260706_lorehold_profile_repair_vs607.md"
+)
 GLOBAL_COMMANDER_CANDIDATE_BATTLE_PROBE_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_battle_probe_audit_20260705_kaalia_nonland_floor_dynamic_target.md"
@@ -1323,6 +1331,17 @@ def build_audit() -> dict[str, Any]:
                 "candidate_added_card_forced_exposure_all_exercised_diagnostic_only",
                 "forced_access_is_diagnostic_not_natural_gate",
                 "seek_natural_replay_confirmation_before_larger_equal_gate",
+                "global_commander_candidate_added_card_natural_replay_trace_generator.py",
+                "global_commander_candidate_added_card_natural_replay_trace_generator_20260706_lorehold_profile_repair_package.md",
+                "candidate_added_card_natural_replay_all_exercised_ready_for_larger_gate",
+                "global_commander_larger_battle_gate_audit.py",
+                "global_commander_larger_battle_gate_audit_20260706_lorehold_profile_repair_vs607.md",
+                "larger_battle_gate_blocks_promotion",
+                "candidate_did_not_beat_protected_baseline",
+                "larger_gate_unexercised_added_cards:Call Forth the Tempest",
+                "candidate_vs_protected_win_delta: `-3`",
+                "candidate_vs_immediate_base_win_delta: `2`",
+                "repair_package_or_convert_to_global_learning_no_promotion",
                 "commander_profile_not_available",
                 "profile_lands_below_target",
                 "protected anchor cuts",
@@ -1795,6 +1814,13 @@ def build_audit() -> dict[str, Any]:
                 "candidate_added_card_forced_exposure_all_exercised_diagnostic_only",
                 "forced_access_is_diagnostic_not_natural_gate",
                 "seek_natural_replay_confirmation_before_larger_equal_gate",
+                "global_commander_candidate_added_card_natural_replay_trace_generator.py",
+                "candidate_added_card_natural_replay_all_exercised_ready_for_larger_gate",
+                "global_commander_larger_battle_gate_audit.py",
+                "global_commander_larger_battle_gate_audit_20260706_lorehold_profile_repair_vs607.md",
+                "larger_battle_gate_blocks_promotion",
+                "candidate_did_not_beat_protected_baseline",
+                "larger_gate_unexercised_added_cards:Call Forth the Tempest",
                 "global_commander_battle_feedback_model.py",
                 "global_commander_battle_feedback_model_20260705_current.md",
                 "pair_blocked_by_failed_gate",
@@ -4100,6 +4126,32 @@ def build_audit() -> dict[str, Any]:
     )
     checks.append(
         check_contains(
+            GLOBAL_COMMANDER_LARGER_BATTLE_GATE_AUDIT,
+            [
+                "global_commander_larger_battle_gate_audit",
+                "larger_battle_gate_blocks_promotion",
+                "candidate_did_not_beat_protected_baseline",
+                "larger_gate_unexercised_added_cards",
+                "promotion_allowed",
+                "protected_baseline_key",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_LARGER_BATTLE_GATE_AUDIT_TEST,
+            [
+                "test_candidate_can_improve_base_but_still_block_against_protected_607",
+                "test_wrong_forced_access_or_small_sample_blocks",
+                "test_explicit_invalid_construction_blocks_even_when_candidate_wins",
+                "candidate_did_not_beat_protected_baseline",
+                "larger_gate_unexercised_added_cards:Call Forth the Tempest",
+                "candidate_construction_invalid",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
             GLOBAL_COMMANDER_BATTLE_FEEDBACK_MODEL,
             [
                 "global_commander_battle_feedback_model",
@@ -5427,6 +5479,22 @@ def build_audit() -> dict[str, Any]:
                 "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
                 "Brokers Hideout",
                 "Pyromancer's Goggles",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_LOREHOLD_PROFILE_REPAIR_LARGER_BATTLE_AUDIT_REPORT,
+            [
+                "Global Commander Larger Battle Gate Audit",
+                "larger_battle_gate_blocks_promotion",
+                "candidate_did_not_beat_protected_baseline",
+                "larger_gate_unexercised_added_cards:Call Forth the Tempest",
+                "protected baseline: `7W/17L/0S`",
+                "candidate: `4W/20L/0S`",
+                "candidate_vs_protected_win_delta: `-3`",
+                "candidate_vs_immediate_base_win_delta: `2`",
+                "promotion_allowed: `false`",
             ],
         )
     )
