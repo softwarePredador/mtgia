@@ -129,6 +129,8 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "controller_treasure_tokens",
     "treasure_recipient",
     "treasure_trigger",
+    "dies_or_graveyard_from_battlefield_treasure",
+    "dies_treasure_count",
     "token_produces",
     "token_produced_mana_symbols",
     "artifact_tokens",
@@ -1016,6 +1018,30 @@ def creature_etb_create_treasure_execution_scenario_from_expected_rule(
     return scenario
 
 
+def creature_dies_create_treasure_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_creature_dies_create_treasure_v1":
+        return None
+    return {
+        "name": f"{rule['card_name']} dies and creates Treasure",
+        "type": "creature_dies_create_treasure",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": "Creature",
+            "effect": "creature",
+        },
+        "expected_treasure_count": int(
+            required.get("dies_treasure_count")
+            or required.get("treasure_count")
+            or 1
+        ),
+        "expected_keywords": list(required.get("keywords") or []),
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def fixed_create_creature_tokens_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
@@ -1281,6 +1307,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or aura_static_pt_execution_scenario_from_expected_rule(rule)
         or destroy_target_create_treasure_execution_scenario_from_expected_rule(rule)
         or creature_etb_create_treasure_execution_scenario_from_expected_rule(rule)
+        or creature_dies_create_treasure_execution_scenario_from_expected_rule(rule)
         or creature_dies_create_tokens_execution_scenario_from_expected_rule(rule)
         or simple_mana_source_execution_scenario_from_expected_rule(rule)
         or simple_activated_damage_execution_scenario_from_expected_rule(rule)

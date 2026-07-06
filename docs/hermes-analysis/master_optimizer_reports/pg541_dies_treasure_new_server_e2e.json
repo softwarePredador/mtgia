@@ -1,0 +1,272 @@
+{
+  "battle_execution": {
+    "event_count": 10,
+    "results": [
+      {
+        "card_name": "Common Crook",
+        "controller_treasures_after": 1,
+        "scenario": "Common Crook dies and creates Treasure",
+        "treasures_created": 1,
+        "validated_keywords": []
+      },
+      {
+        "card_name": "Dire Fleet Hoarder",
+        "controller_treasures_after": 1,
+        "scenario": "Dire Fleet Hoarder dies and creates Treasure",
+        "treasures_created": 1,
+        "validated_keywords": []
+      },
+      {
+        "card_name": "Gleaming Barrier",
+        "controller_treasures_after": 1,
+        "scenario": "Gleaming Barrier dies and creates Treasure",
+        "treasures_created": 1,
+        "validated_keywords": [
+          "defender"
+        ]
+      },
+      {
+        "card_name": "Jewel-Eyed Cobra",
+        "controller_treasures_after": 1,
+        "scenario": "Jewel-Eyed Cobra dies and creates Treasure",
+        "treasures_created": 1,
+        "validated_keywords": [
+          "deathtouch"
+        ]
+      },
+      {
+        "card_name": "Piggy Bank",
+        "controller_treasures_after": 1,
+        "scenario": "Piggy Bank dies and creates Treasure",
+        "treasures_created": 1,
+        "validated_keywords": []
+      }
+    ],
+    "scenario_count": 5
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-06T01:36:52.010794+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg541_dies_treasure_new_server_package_manifest.json",
+  "package_id": "pg541_dies_treasure_new_server_package_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 5
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_treasure_v1",
+          "card_name": "Common Crook",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3f60734db1f81ef3f3db0330478d6bd4",
+          "oracle_hash": "4ecd7b3c63f82113a4a6cf0fff0e719a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_treasure_v1",
+          "card_name": "Dire Fleet Hoarder",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3f60734db1f81ef3f3db0330478d6bd4",
+          "oracle_hash": "4ecd7b3c63f82113a4a6cf0fff0e719a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_treasure_v1",
+          "card_name": "Gleaming Barrier",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4b9bead4d691a3d01fc4ff09e291d0a2",
+          "oracle_hash": "c6f82a18e52f76576a5b561153641e7f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_treasure_v1",
+          "card_name": "Jewel-Eyed Cobra",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1a315e264d967f5fcb1a414a841a516f",
+          "oracle_hash": "ab78078547fc4b0f1454608df265691e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_treasure_v1",
+          "card_name": "Piggy Bank",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3f60734db1f81ef3f3db0330478d6bd4",
+          "oracle_hash": "4ecd7b3c63f82113a4a6cf0fff0e719a",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 5
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_treasure_v1",
+          "card_name": "Common Crook",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3f60734db1f81ef3f3db0330478d6bd4",
+          "oracle_hash": "4ecd7b3c63f82113a4a6cf0fff0e719a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_treasure_v1",
+          "card_name": "Dire Fleet Hoarder",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3f60734db1f81ef3f3db0330478d6bd4",
+          "oracle_hash": "4ecd7b3c63f82113a4a6cf0fff0e719a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_treasure_v1",
+          "card_name": "Gleaming Barrier",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4b9bead4d691a3d01fc4ff09e291d0a2",
+          "oracle_hash": "c6f82a18e52f76576a5b561153641e7f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_treasure_v1",
+          "card_name": "Jewel-Eyed Cobra",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1a315e264d967f5fcb1a414a841a516f",
+          "oracle_hash": "ab78078547fc4b0f1454608df265691e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_treasure_v1",
+          "card_name": "Piggy Bank",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3f60734db1f81ef3f3db0330478d6bd4",
+          "oracle_hash": "4ecd7b3c63f82113a4a6cf0fff0e719a",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 5
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_treasure_v1",
+          "battle_rule_version": 2,
+          "card_name": "Common Crook",
+          "logical_rule_key": "battle_rule_v1:3f60734db1f81ef3f3db0330478d6bd4"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_treasure_v1",
+          "battle_rule_version": 2,
+          "card_name": "Dire Fleet Hoarder",
+          "logical_rule_key": "battle_rule_v1:3f60734db1f81ef3f3db0330478d6bd4"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_treasure_v1",
+          "battle_rule_version": 2,
+          "card_name": "Gleaming Barrier",
+          "logical_rule_key": "battle_rule_v1:4b9bead4d691a3d01fc4ff09e291d0a2"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_treasure_v1",
+          "battle_rule_version": 2,
+          "card_name": "Jewel-Eyed Cobra",
+          "logical_rule_key": "battle_rule_v1:1a315e264d967f5fcb1a414a841a516f"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_treasure_v1",
+          "battle_rule_version": 2,
+          "card_name": "Piggy Bank",
+          "logical_rule_key": "battle_rule_v1:3f60734db1f81ef3f3db0330478d6bd4"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 5
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Common Crook",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:3f60734db1f81ef3f3db0330478d6bd4"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Dire Fleet Hoarder",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:3f60734db1f81ef3f3db0330478d6bd4"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Gleaming Barrier",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:4b9bead4d691a3d01fc4ff09e291d0a2"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Jewel-Eyed Cobra",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:1a315e264d967f5fcb1a414a841a516f"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Piggy Bank",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:3f60734db1f81ef3f3db0330478d6bd4"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 10,
+        "scenarios": 5
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

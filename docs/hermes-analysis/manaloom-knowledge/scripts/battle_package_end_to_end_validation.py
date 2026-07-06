@@ -719,6 +719,79 @@ def run_creature_dies_create_tokens(
     }
 
 
+def run_creature_dies_create_treasure(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    active = battle.Player(str(scenario.get("player") or "Dies Treasure Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
+    effect_data = battle.get_card_effect(card)
+    permanent = battle.enrich_card({**card, **effect_data})
+    active.battlefield.append(permanent)
+
+    expected_keywords = [str(value) for value in (scenario.get("expected_keywords") or [])]
+    missing_keywords = [
+        keyword
+        for keyword in expected_keywords
+        if not battle.card_has_keyword(permanent, keyword)
+    ]
+    if missing_keywords:
+        fail(
+            "battle_execution",
+            f"{card['name']} missing expected permanent keywords: {missing_keywords}",
+        )
+
+    before_treasures = int(getattr(active, "treasures", 0) or 0)
+    before_events = len(events)
+    expected_treasure_count = int(scenario.get("expected_treasure_count") or 1)
+    destination = battle.move_creature_from_battlefield(
+        active,
+        permanent,
+        reason=str(scenario.get("reason") or "package_e2e_destroy"),
+        source=dict(scenario.get("source") or {"name": "Package E2E Removal"}),
+        all_players=[active, opponent],
+    )
+    if destination != "graveyard":
+        fail("battle_execution", f"{card['name']} destination={destination!r}")
+    if permanent not in active.graveyard:
+        fail("battle_execution", f"{card['name']} not moved to controller graveyard")
+
+    treasure_delta = int(active.treasures or 0) - before_treasures
+    if treasure_delta != expected_treasure_count:
+        fail(
+            "battle_execution",
+            f"{card['name']} dies treasure delta={treasure_delta}, expected {expected_treasure_count}",
+        )
+    treasure_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "trigger_resolved"
+            and data.get("card") == card.get("name")
+            and data.get("trigger") == "dies_or_graveyard_from_battlefield"
+            and data.get("effect") == "create_treasure"
+        ),
+        None,
+    )
+    if treasure_event is None:
+        fail("battle_events", f"missing {card['name']} dies create_treasure trigger")
+    if int(treasure_event.get("treasures_created") or 0) != expected_treasure_count:
+        fail(
+            "battle_events",
+            f"{card['name']} event treasures_created={treasure_event.get('treasures_created')}",
+        )
+
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "treasures_created": treasure_delta,
+        "controller_treasures_after": active.treasures,
+        "validated_keywords": expected_keywords,
+    }
+
+
 def run_tempting_offer_decline(battle, scenario: dict[str, Any], events: list[tuple[str, dict[str, Any]]]) -> dict[str, Any]:
     card = scenario["card"]
     active = battle.Player(
@@ -2237,6 +2310,7 @@ SCENARIO_RUNNERS = {
     "copy_stack_ability_response": run_copy_stack_ability_response,
     "copy_spell_choose_new_targets": run_copy_spell_choose_new_targets,
     "change_single_target_response": run_change_single_target_response,
+    "creature_dies_create_treasure": run_creature_dies_create_treasure,
     "creature_dies_create_tokens": run_creature_dies_create_tokens,
     "creature_etb_create_treasure": run_creature_etb_create_treasure,
     "destroy_target_create_treasure": run_destroy_target_create_treasure,

@@ -3785,7 +3785,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["dies_token_toughness"], 1)
         self.assertEqual(effect["dies_token_colors"], ["W"])
 
-    def test_creature_dies_create_tokens_blocks_non_creature_token(self) -> None:
+    def test_creature_dies_create_treasure_maps_exact_scope(self) -> None:
         row = queue_row(
             split.DIES_TOKEN_CREATURE_UNIT,
             effect_classes=["CreateTokenEffect"],
@@ -3806,6 +3806,80 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                 class TreasureToken extends TokenImpl {
                     public TreasureToken() {
                         super("Treasure Token", "colorless Treasure artifact token");
+                        cardType.add(CardType.ARTIFACT);
+                    }
+                }
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DIES_TREASURE_CREATURE_SCOPE)
+        self.assertEqual(effect["dies_trigger_effect"], "treasure_maker")
+        self.assertTrue(effect["dies_or_graveyard_from_battlefield_treasure"])
+        self.assertEqual(effect["dies_treasure_count"], 1)
+        self.assertEqual(effect["treasure_count"], 1)
+        self.assertEqual(effect["treasure_trigger"], "dies")
+        self.assertEqual(effect["xmage_token_class"], "TreasureToken")
+
+    def test_creature_dies_create_treasure_preserves_static_keyword(self) -> None:
+        row = queue_row(
+            split.DIES_TOKEN_CREATURE_UNIT,
+            effect_classes=["CreateTokenEffect"],
+            ability_kind="triggered",
+            ability_classes=["DefenderAbility", "DiesSourceTriggeredAbility"],
+            xmage_signals=["token", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Gleaming Barrier",
+                type_line="Artifact Creature - Wall",
+                oracle_text=(
+                    "Defender\n"
+                    "When Gleaming Barrier dies, create a Treasure token."
+                ),
+            ),
+            source_text="""
+                this.addAbility(DefenderAbility.getInstance());
+                this.addAbility(new DiesSourceTriggeredAbility(
+                    new CreateTokenEffect(new TreasureToken())));
+                class TreasureToken extends TokenImpl {
+                    public TreasureToken() {
+                        super("Treasure Token", "colorless Treasure artifact token");
+                        cardType.add(CardType.ARTIFACT);
+                    }
+                }
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DIES_TREASURE_CREATURE_SCOPE)
+        self.assertEqual(effect["keywords"], ["defender"])
+        self.assertTrue(effect["defender"])
+
+    def test_creature_dies_create_tokens_blocks_non_treasure_artifact_token(self) -> None:
+        row = queue_row(
+            split.DIES_TOKEN_CREATURE_UNIT,
+            effect_classes=["CreateTokenEffect"],
+            ability_kind="triggered",
+            ability_classes=["DiesSourceTriggeredAbility"],
+            xmage_signals=["token", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Blood Servitor",
+                type_line="Creature - Vampire",
+                oracle_text="When Fixture Blood Servitor dies, create a Blood token.",
+            ),
+            source_text="""
+                this.addAbility(new DiesSourceTriggeredAbility(
+                    new CreateTokenEffect(new BloodToken())));
+                class BloodToken extends TokenImpl {
+                    public BloodToken() {
+                        super("Blood Token", "colorless Blood artifact token");
                         cardType.add(CardType.ARTIFACT);
                     }
                 }

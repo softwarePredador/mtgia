@@ -14748,6 +14748,84 @@ dynamic token counts, token choices, activated token makers, named legendary
 token exceptions, recursion tokens, or token ability payloads outside the
 fields validated in the package E2E.
 
+## 2026-07-06 PG541 Creature Dies Treasure Checkpoint
+
+Applied package: `PG541 dies_treasure_new_server`.
+
+Scope closed:
+
+- Added exact XMage -> ManaLoom mapping for fixed creature dies triggers that
+  create Treasure tokens under `xmage_creature_dies_create_treasure_v1`.
+- Promoted `Common Crook`, `Dire Fleet Hoarder`, `Gleaming Barrier`,
+  `Jewel-Eyed Cobra`, and `Piggy Bank` from local XMage source classes.
+- Preserved self static keywords from XMage while keeping the dies Treasure
+  trigger executable:
+  - `Gleaming Barrier`: `defender`.
+  - `Jewel-Eyed Cobra`: `deathtouch`.
+- Added package E2E support for `creature_dies_create_treasure` scenarios so a
+  package can prove the source creature moved to graveyard and the Treasure was
+  actually created by the dies trigger.
+
+Evidence:
+
+- exact split:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260706_pg541_dies_treasure_candidate.md`
+- package:
+  `docs/hermes-analysis/master_optimizer_reports/pg541_dies_treasure_new_server_package_package.md`
+- apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg541_dies_treasure_new_server_apply_evidence.md`
+- PG -> SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg541_dies_treasure_new_server_sync_report.json`
+- E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg541_dies_treasure_new_server_e2e.md`
+- post-sync queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260706_post_pg541_dies_treasure_new_server_commander_legal.md`
+- final exact-scope recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260706_post_pg541_dies_treasure_new_server_final.md`
+- readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260706_post_pg541_dies_treasure_new_server.md`
+- final audits:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260706_post_pg541_dies_treasure_new_server_final.md`,
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260706_post_pg541_dies_treasure_new_server_with_pg.md`,
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260706_post_pg541_dies_treasure_new_server_final.md`,
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260706_post_pg541_dies_treasure_new_server_final.md`
+
+Validation:
+
+- focused split/package/E2E/runtime tests passed: `592`, `33`, `6`, and `327`
+  tests respectively;
+- package precheck found `1` target card row for each promoted card and `0`
+  existing expected rows;
+- package apply upserted `5` rows and deprecated `0` shadow rows;
+- PostgreSQL postcheck confirmed `5/5` promoted rows, `5/5` verified/auto, and
+  `5/5` oracle hash rows;
+- PG -> SQLite sync loaded `8,832` PostgreSQL rows, updated `8,596` SQLite
+  rows, and exported `6,338` canonical snapshot rows;
+- package E2E: `status=pass`, `scenario_count=5`, and every promoted card
+  created `1` Treasure after moving to graveyard; self `defender` and
+  `deathtouch` keyword checks passed where applicable;
+- final exact-scope recheck has `proposal_count=0` and
+  `safe_for_batch_pg_package_count=0`;
+- final audits passed: XMage strategy `26/26`, PG-Hermes-SQLite `51/51`,
+  operational surface `pass`, legacy contamination `pass`.
+
+Post-sync queue evidence:
+
+- pre-cycle `target_identity_count=25664`
+- post-cycle `target_identity_count=25659`
+- post-cycle `xmage_authoritative_source_count=25345`
+- post-cycle `xmage_missing_source_exception_count=314`
+- post-cycle `xmage_authoritative_adapter_required_count=25345`
+- `token_maker` reduced from `2373` to `2368`
+- final exact-scope recheck residual `dies_treasure_oracle_not_exact` is `1`
+  (`Undercity Dire Rat`)
+
+Residual boundary: PG541 does not authorize conditional dies Treasure triggers,
+dynamic Treasure counts, Treasure creation from non-source death triggers,
+activated Treasure makers, non-Treasure artifact tokens such as Blood, Clue,
+Food, Map, or Powerstone, or any dies trigger with extra behavior beyond fixed
+controller Treasure creation.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

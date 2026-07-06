@@ -187,6 +187,48 @@ def test_simple_mana_source_refresh_runner_executes_partial_mana_rule() -> None:
     assert result["tapped"] is True
 
 
+def test_creature_dies_create_treasure_runner_executes_trigger() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "creature",
+        "battle_model_scope": "xmage_creature_dies_create_treasure_v1",
+        "ability_kind": "triggered",
+        "trigger": "dies",
+        "dies_trigger_effect": "treasure_maker",
+        "dies_or_graveyard_from_battlefield_treasure": True,
+        "dies_treasure_count": 1,
+        "treasure_count": 1,
+        "keywords": ["defender"],
+        "defender": True,
+        "_rule_logical_key": "battle_rule_v1:gleaming-barrier",
+    }
+    try:
+        result = validator.run_creature_dies_create_treasure(
+            battle,
+            {
+                "name": "Gleaming Barrier dies and creates Treasure",
+                "type": "creature_dies_create_treasure",
+                "card": {"name": "Gleaming Barrier", "type_line": "Creature", "effect": "creature"},
+                "expected_treasure_count": 1,
+                "expected_keywords": ["defender"],
+                "logical_rule_key": "battle_rule_v1:gleaming-barrier",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Gleaming Barrier"
+    assert result["treasures_created"] == 1
+    assert result["controller_treasures_after"] == 1
+    assert result["validated_keywords"] == ["defender"]
+
+
 def test_simple_mana_source_refresh_runner_pays_activation_cost_from_support_source() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

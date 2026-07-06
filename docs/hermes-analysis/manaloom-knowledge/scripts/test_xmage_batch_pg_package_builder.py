@@ -1234,6 +1234,38 @@ def test_creature_dies_create_tokens_execution_scenario_preserves_artifact_tappe
     assert scenario["expected_keywords"] == ["flying"]
 
 
+def test_creature_dies_create_treasure_execution_scenario() -> None:
+    rule = {
+        "normalized_name": "gleaming barrier",
+        "card_name": "Gleaming Barrier",
+        "logical_rule_key": "battle_rule_v1:gleaming-barrier",
+        "required_effect_fields": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_dies_create_treasure_v1",
+            "dies_trigger_effect": "treasure_maker",
+            "dies_or_graveyard_from_battlefield_treasure": True,
+            "dies_treasure_count": 1,
+            "treasure_count": 1,
+            "keywords": ["defender"],
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario == {
+        "name": "Gleaming Barrier dies and creates Treasure",
+        "type": "creature_dies_create_treasure",
+        "card": {
+            "name": "Gleaming Barrier",
+            "type_line": "Creature",
+            "effect": "creature",
+        },
+        "expected_treasure_count": 1,
+        "expected_keywords": ["defender"],
+        "logical_rule_key": "battle_rule_v1:gleaming-barrier",
+    }
+
+
 def test_manifest_checks_from_expected_rule_split_snapshot_and_runtime_fields() -> None:
     rule = {
         "normalized_name": "verge rangers",

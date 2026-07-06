@@ -299,6 +299,7 @@ X_TOKEN_SPELL_SCOPE = "xmage_x_create_creature_tokens_spell_v1"
 MULTI_TOKEN_SPELL_SCOPE = "xmage_multi_create_creature_tokens_spell_v1"
 ETB_TOKEN_CREATURE_SCOPE = "xmage_creature_etb_create_tokens_v1"
 ETB_TREASURE_CREATURE_SCOPE = "xmage_creature_etb_create_treasure_v1"
+DIES_TREASURE_CREATURE_SCOPE = "xmage_creature_dies_create_treasure_v1"
 DIES_TOKEN_CREATURE_SCOPE = "xmage_creature_dies_create_tokens_v1"
 PERMANENT_ACTIVATED_TOKEN_SCOPE = "xmage_permanent_simple_activated_create_token_v1"
 ETB_ADD_COUNTERS_CREATURE_SCOPE = "xmage_creature_etb_add_counters_target_creature_v1"
@@ -1825,6 +1826,23 @@ def creature_etb_treasure_count_and_condition_from_oracle(
     if isinstance(parsed, dict):
         return int(parsed["count"]), str(parsed.get("condition") or "") or None
     return int(parsed), None
+
+
+def creature_dies_create_treasure_from_oracle(metadata: dict[str, Any]) -> int | str:
+    text = normalized_token_oracle_phrase(oracle_text_after_leading_static_keywords(metadata))
+    match = re.fullmatch(
+        r"(?:when|whenever) (?:this creature|[a-z0-9 ,'-]+) dies, create "
+        r"(?P<count>a|an|one|two|three|four|five|\d+) treasure tokens?",
+        text,
+    )
+    if not match:
+        return "dies_treasure_oracle_not_exact"
+    if any(marker in text for marker in (" if ", " for each ", " unless ", " instead ")):
+        return "dies_treasure_oracle_not_simple"
+    count = fixed_treasure_count_word(match.group("count"))
+    if count is None or count <= 0:
+        return "dies_treasure_oracle_count_not_fixed_positive"
+    return int(count)
 
 
 def simple_destroy_gain_life_from_source(source: str) -> tuple[str, int] | None:
@@ -15238,6 +15256,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "creature dies triggered fixed life-gain ability"
     elif scope == DIES_DAMAGE_CREATURE_SCOPE:
         scope_kind = "creature dies triggered fixed damage ability"
+    elif scope == DIES_TREASURE_CREATURE_SCOPE:
+        scope_kind = "creature dies triggered fixed Treasure creation ability"
     elif scope == DIES_TOKEN_CREATURE_SCOPE:
         scope_kind = "creature dies triggered fixed creature-token ability"
     elif scope == PERMANENT_ACTIVATED_TOKEN_SCOPE:
@@ -17822,6 +17842,39 @@ def split_row(
         if isinstance(parsed_parts, str):
             return None, parsed_parts
         token_class, token_count, parsed_token_fields = parsed_parts
+        if token_class == "TreasureToken":
+            oracle_treasure_count = creature_dies_create_treasure_from_oracle(metadata)
+            if isinstance(oracle_treasure_count, str):
+                return None, oracle_treasure_count
+            if int(token_count) != int(oracle_treasure_count):
+                return None, "dies_treasure_source_oracle_count_mismatch"
+            keyword_list = ordered_keywords(keywords_from_ability_classes(row))
+            effect_json = {
+                "effect": "creature",
+                "battle_model_scope": DIES_TREASURE_CREATURE_SCOPE,
+                "ability_kind": "triggered",
+                "trigger": "dies",
+                "dies_trigger_effect": "treasure_maker",
+                "dies_or_graveyard_from_battlefield_treasure": True,
+                "dies_treasure_count": int(oracle_treasure_count),
+                "treasure_count": int(oracle_treasure_count),
+                "treasure_recipient": "controller",
+                "treasure_trigger": "dies",
+                "xmage_effect_class": "CreateTokenEffect",
+                "xmage_ability_class": "DiesSourceTriggeredAbility",
+                "xmage_token_class": "TreasureToken",
+            }
+            if keyword_list:
+                effect_json["keywords"] = keyword_list
+                effect_json["_keywords_are_self"] = True
+                for keyword in keyword_list:
+                    effect_json[keyword] = True
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_creature_dies_create_treasure",
+            ), "selected_exact_scope"
         token_data, token_reason = parse_simple_token_class(
             token_class_source(row, source_text, token_class),
             token_class,

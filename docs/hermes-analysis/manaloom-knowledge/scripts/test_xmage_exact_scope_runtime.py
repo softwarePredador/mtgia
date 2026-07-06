@@ -12241,6 +12241,46 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_creature_dies_create_treasure_triggers_when_moved_to_graveyard(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        permanent = {
+            "name": "Gleaming Barrier",
+            "type_line": "Artifact Creature - Wall",
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_dies_create_treasure_v1",
+            "ability_kind": "triggered",
+            "trigger": "dies",
+            "dies_trigger_effect": "treasure_maker",
+            "dies_or_graveyard_from_battlefield_treasure": True,
+            "dies_treasure_count": 1,
+            "treasure_count": 1,
+            "_rule_logical_key": "battle_rule_v1:fixture_dies_treasure",
+        }
+        active.battlefield.append(permanent)
+
+        destination = self.battle.move_creature_from_battlefield(
+            active,
+            permanent,
+            reason="test_destroy",
+            source={"name": "Fixture Removal"},
+            all_players=[active, opponent],
+        )
+
+        self.assertEqual(destination, "graveyard")
+        self.assertEqual(active.treasures, 1)
+        self.assertTrue(
+            any(
+                event == "trigger_resolved"
+                and data.get("card") == "Gleaming Barrier"
+                and data.get("trigger") == "dies_or_graveyard_from_battlefield"
+                and data.get("effect") == "create_treasure"
+                and data.get("treasures_created") == 1
+                and data.get("rule_logical_key") == "battle_rule_v1:fixture_dies_treasure"
+                for event, data in self.events
+            )
+        )
+
     def test_creature_etb_graveyard_recursion_returns_matching_card_only(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])
