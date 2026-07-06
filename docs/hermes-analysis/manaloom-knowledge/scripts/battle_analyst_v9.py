@@ -18355,7 +18355,40 @@ def resolve_generic_permanent_etb(
                     phase=phase,
                     **replay_rule_fields(effect_data),
                 )
-    if effect_data.get("etb_token_count"):
+    etb_token_components = [
+        component
+        for component in (effect_data.get("_composite_rule_components") or [])
+        if isinstance(component, dict) and component.get("effect") == "token_maker"
+    ]
+    if etb_token_components:
+        participants = list(all_players or [player, *list(opponents or [])])
+        tokens_created = 0
+        for component in etb_token_components:
+            tokens_created += create_creature_tokens_from_effect(
+                player,
+                component,
+                opponents=opponents,
+                turn=turn,
+                source_event="etb_token_created",
+                active_player=player,
+                all_players=participants,
+            )
+        emit_replay_event(
+            "etb_token_maker_resolved",
+            player=player.name,
+            card=permanent.get("name", "?"),
+            token_count=tokens_created,
+            token_component_count=len(etb_token_components),
+            token_names=[
+                component.get("token_name", "Token")
+                for component in etb_token_components
+            ],
+            trigger="enters_battlefield",
+            turn=turn,
+            phase=phase,
+            **replay_rule_fields(effect_data),
+        )
+    elif effect_data.get("etb_token_count"):
         for _ in range(min(int(effect_data.get("etb_token_count") or 1), 20)):
             create_creature_token(
                 player,
@@ -18391,6 +18424,18 @@ def resolve_generic_permanent_etb(
                 turn=turn,
                 source_event="etb_token_created",
             )
+        emit_replay_event(
+            "etb_token_maker_resolved",
+            player=player.name,
+            card=permanent.get("name", "?"),
+            token_count=int(effect_data.get("etb_token_count") or 1),
+            token_component_count=1,
+            token_names=[effect_data.get("etb_token_name", "Token")],
+            trigger="enters_battlefield",
+            turn=turn,
+            phase=phase,
+            **replay_rule_fields(effect_data),
+        )
     if effect_data.get("hazel_brewmaster_etb_or_attack_exile_graveyard_card_create_food"):
         resolve_hazels_brewmaster_trigger(
             player,
@@ -19216,8 +19261,49 @@ def resolve_permanent_dies_token_maker(
 ):
     if destination != "graveyard" or not isinstance(permanent, dict):
         return 0
-    if permanent.get("dies_trigger_effect") != "token_maker" and not permanent.get("dies_token_count"):
+    dies_token_components = [
+        component
+        for component in (permanent.get("_composite_rule_components") or [])
+        if isinstance(component, dict) and component.get("effect") == "token_maker"
+    ]
+    if (
+        permanent.get("dies_trigger_effect") != "token_maker"
+        and not permanent.get("dies_token_count")
+        and not dies_token_components
+    ):
         return 0
+    participants = list(all_players or [])
+    if not participants:
+        participants = [owner] + list(opponents or [])
+    resolved_opponents = list(opponents or [player for player in participants if player is not owner])
+    if dies_token_components:
+        created = 0
+        for component in dies_token_components:
+            created += create_creature_tokens_from_effect(
+                owner,
+                component,
+                opponents=resolved_opponents,
+                turn=CURRENT_REPLAY_TURN,
+                source_event="dies_token_created",
+                active_player=owner,
+                all_players=participants,
+            )
+        emit_replay_event(
+            "dies_token_maker_resolved",
+            player=getattr(owner, "name", "?"),
+            card=permanent.get("name", "?"),
+            token_count=created,
+            token_component_count=len(dies_token_components),
+            token_names=[
+                component.get("token_name", "Token")
+                for component in dies_token_components
+            ],
+            reason=reason,
+            source=source.get("name", "?") if isinstance(source, dict) else source,
+            turn=CURRENT_REPLAY_TURN,
+            **replay_rule_fields(permanent),
+        )
+        return created
     token_count = max(0, int(permanent.get("dies_token_count") or permanent.get("token_count") or 0))
     if token_count <= 0:
         return 0
@@ -19246,10 +19332,6 @@ def resolve_permanent_dies_token_maker(
     for dies_key, token_key in dies_field_map.items():
         if dies_key in permanent:
             effect_data[token_key] = permanent[dies_key]
-    participants = list(all_players or [])
-    if not participants:
-        participants = [owner] + list(opponents or [])
-    resolved_opponents = list(opponents or [player for player in participants if player is not owner])
     created = create_creature_tokens_from_effect(
         owner,
         effect_data,

@@ -1234,6 +1234,112 @@ def test_creature_dies_create_tokens_execution_scenario_preserves_artifact_tappe
     assert scenario["expected_keywords"] == ["flying"]
 
 
+def test_creature_etb_create_multi_tokens_execution_scenario() -> None:
+    rule = {
+        "normalized_name": "trostanis summoner",
+        "card_name": "Trostani's Summoner",
+        "logical_rule_key": "battle_rule_v1:trostanis-summoner",
+        "required_effect_fields": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+            "trigger": "enters_battlefield",
+            "etb_trigger_effect": "token_maker",
+            "token_component_count": 3,
+            "token_total_count": 3,
+            "_composite_rule_components": [
+                {
+                    "effect": "token_maker",
+                    "token_count": 1,
+                    "token_name": "Knight Token",
+                    "token_power": 2,
+                    "token_toughness": 2,
+                    "token_subtype": "Knight",
+                    "token_colors": ["W"],
+                    "token_keywords": ["vigilance"],
+                },
+                {
+                    "effect": "token_maker",
+                    "token_count": 1,
+                    "token_name": "Centaur Token",
+                    "token_power": 3,
+                    "token_toughness": 3,
+                    "token_subtype": "Centaur",
+                    "token_colors": ["G"],
+                },
+                {
+                    "effect": "token_maker",
+                    "token_count": 1,
+                    "token_name": "Rhino Token",
+                    "token_power": 4,
+                    "token_toughness": 4,
+                    "token_subtype": "Rhino",
+                    "token_colors": ["G"],
+                    "token_keywords": ["trample"],
+                },
+            ],
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario["type"] == "creature_etb_create_tokens"
+    assert scenario["expected_component_count"] == 3
+    assert scenario["expected_total_tokens"] == 3
+    assert [token["name"] for token in scenario["expected_tokens"]] == [
+        "Knight Token",
+        "Centaur Token",
+        "Rhino Token",
+    ]
+
+
+def test_creature_dies_create_multi_tokens_execution_scenario() -> None:
+    rule = {
+        "normalized_name": "wurmcoil engine",
+        "card_name": "Wurmcoil Engine",
+        "logical_rule_key": "battle_rule_v1:wurmcoil-engine",
+        "required_effect_fields": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+            "dies_trigger_effect": "token_maker",
+            "token_component_count": 2,
+            "token_total_count": 2,
+            "keywords": ["deathtouch", "lifelink"],
+            "_composite_rule_components": [
+                {
+                    "effect": "token_maker",
+                    "token_count": 1,
+                    "token_name": "Phyrexian Wurm Token",
+                    "token_power": 3,
+                    "token_toughness": 3,
+                    "token_subtype": "Phyrexian Wurm",
+                    "token_colors": [],
+                    "token_keywords": ["deathtouch"],
+                    "artifact_tokens": True,
+                },
+                {
+                    "effect": "token_maker",
+                    "token_count": 1,
+                    "token_name": "Phyrexian Wurm Token",
+                    "token_power": 3,
+                    "token_toughness": 3,
+                    "token_subtype": "Phyrexian Wurm",
+                    "token_colors": [],
+                    "token_keywords": ["lifelink"],
+                    "artifact_tokens": True,
+                },
+            ],
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario["type"] == "creature_dies_create_tokens"
+    assert scenario["expected_component_count"] == 2
+    assert scenario["expected_total_tokens"] == 2
+    assert scenario["expected_keywords"] == ["deathtouch", "lifelink"]
+    assert [token["keywords"] for token in scenario["expected_tokens"]] == [["deathtouch"], ["lifelink"]]
+
+
 def test_creature_dies_create_treasure_execution_scenario() -> None:
     rule = {
         "normalized_name": "gleaming barrier",

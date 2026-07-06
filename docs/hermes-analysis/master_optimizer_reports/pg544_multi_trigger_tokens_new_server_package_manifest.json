@@ -1,0 +1,980 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg544_multi_trigger_tokens_new_server_pg_20260706_024814",
+  "deploy_id": "pg544_multi_trigger_tokens_new_server",
+  "execution_scenarios": [
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Triplicate Titan",
+        "type_line": "Creature"
+      },
+      "expected_component_count": 3,
+      "expected_keywords": [
+        "flying",
+        "trample",
+        "vigilance"
+      ],
+      "expected_tokens": [
+        {
+          "artifact": true,
+          "colors": [],
+          "count": 1,
+          "keywords": [
+            "flying"
+          ],
+          "mana_produced": null,
+          "name": "Golem Token",
+          "power": 3,
+          "produced_mana_symbols": [],
+          "produces": null,
+          "sacrifice_for_colorless_mana": false,
+          "subtype": "Golem",
+          "tapped": false,
+          "toughness": 3
+        },
+        {
+          "artifact": true,
+          "colors": [],
+          "count": 1,
+          "keywords": [
+            "vigilance"
+          ],
+          "mana_produced": null,
+          "name": "Golem Token",
+          "power": 3,
+          "produced_mana_symbols": [],
+          "produces": null,
+          "sacrifice_for_colorless_mana": false,
+          "subtype": "Golem",
+          "tapped": false,
+          "toughness": 3
+        },
+        {
+          "artifact": true,
+          "colors": [],
+          "count": 1,
+          "keywords": [
+            "trample"
+          ],
+          "mana_produced": null,
+          "name": "Golem Token",
+          "power": 3,
+          "produced_mana_symbols": [],
+          "produces": null,
+          "sacrifice_for_colorless_mana": false,
+          "subtype": "Golem",
+          "tapped": false,
+          "toughness": 3
+        }
+      ],
+      "expected_total_tokens": 3,
+      "logical_rule_key": "battle_rule_v1:65042d3af7a906fc248edf593ed498f5",
+      "name": "Triplicate Titan dies and creates modeled creature tokens",
+      "type": "creature_dies_create_tokens"
+    },
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Trostani's Summoner",
+        "type_line": "Creature"
+      },
+      "expected_component_count": 3,
+      "expected_keywords": [],
+      "expected_tokens": [
+        {
+          "artifact": false,
+          "colors": [
+            "W"
+          ],
+          "count": 1,
+          "keywords": [
+            "vigilance"
+          ],
+          "mana_produced": null,
+          "name": "Knight Token",
+          "power": 2,
+          "produced_mana_symbols": [],
+          "produces": null,
+          "sacrifice_for_colorless_mana": false,
+          "subtype": "Knight",
+          "tapped": false,
+          "toughness": 2
+        },
+        {
+          "artifact": false,
+          "colors": [
+            "G"
+          ],
+          "count": 1,
+          "keywords": [],
+          "mana_produced": null,
+          "name": "Centaur Token",
+          "power": 3,
+          "produced_mana_symbols": [],
+          "produces": null,
+          "sacrifice_for_colorless_mana": false,
+          "subtype": "Centaur",
+          "tapped": false,
+          "toughness": 3
+        },
+        {
+          "artifact": false,
+          "colors": [
+            "G"
+          ],
+          "count": 1,
+          "keywords": [
+            "trample"
+          ],
+          "mana_produced": null,
+          "name": "Rhino Token",
+          "power": 4,
+          "produced_mana_symbols": [],
+          "produces": null,
+          "sacrifice_for_colorless_mana": false,
+          "subtype": "Rhino",
+          "tapped": false,
+          "toughness": 4
+        }
+      ],
+      "expected_total_tokens": 3,
+      "logical_rule_key": "battle_rule_v1:4f9b05e8bcdb35281142ce7f97b330a2",
+      "name": "Trostani's Summoner enters and creates modeled creature tokens",
+      "type": "creature_etb_create_tokens"
+    },
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Wurmcoil Engine",
+        "type_line": "Creature"
+      },
+      "expected_component_count": 2,
+      "expected_keywords": [
+        "deathtouch",
+        "lifelink"
+      ],
+      "expected_tokens": [
+        {
+          "artifact": true,
+          "colors": [],
+          "count": 1,
+          "keywords": [
+            "deathtouch"
+          ],
+          "mana_produced": null,
+          "name": "Phyrexian Wurm Token",
+          "power": 3,
+          "produced_mana_symbols": [],
+          "produces": null,
+          "sacrifice_for_colorless_mana": false,
+          "subtype": "Phyrexian Wurm",
+          "tapped": false,
+          "toughness": 3
+        },
+        {
+          "artifact": true,
+          "colors": [],
+          "count": 1,
+          "keywords": [
+            "lifelink"
+          ],
+          "mana_produced": null,
+          "name": "Phyrexian Wurm Token",
+          "power": 3,
+          "produced_mana_symbols": [],
+          "produces": null,
+          "sacrifice_for_colorless_mana": false,
+          "subtype": "Phyrexian Wurm",
+          "tapped": false,
+          "toughness": 3
+        }
+      ],
+      "expected_total_tokens": 2,
+      "logical_rule_key": "battle_rule_v1:a4849985e57e30c0d9e6283e9a48cfb6",
+      "name": "Wurmcoil Engine dies and creates modeled creature tokens",
+      "type": "creature_dies_create_tokens"
+    },
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Wurmcoil Larva",
+        "type_line": "Creature"
+      },
+      "expected_component_count": 2,
+      "expected_keywords": [
+        "deathtouch",
+        "lifelink"
+      ],
+      "expected_tokens": [
+        {
+          "artifact": true,
+          "colors": [
+            "B"
+          ],
+          "count": 1,
+          "keywords": [
+            "deathtouch"
+          ],
+          "mana_produced": null,
+          "name": "Phyrexian Wurm Token",
+          "power": 1,
+          "produced_mana_symbols": [],
+          "produces": null,
+          "sacrifice_for_colorless_mana": false,
+          "subtype": "Phyrexian Wurm",
+          "tapped": false,
+          "toughness": 2
+        },
+        {
+          "artifact": true,
+          "colors": [
+            "B"
+          ],
+          "count": 1,
+          "keywords": [
+            "lifelink"
+          ],
+          "mana_produced": null,
+          "name": "Phyrexian Wurm Token",
+          "power": 2,
+          "produced_mana_symbols": [],
+          "produces": null,
+          "sacrifice_for_colorless_mana": false,
+          "subtype": "Phyrexian Wurm",
+          "tapped": false,
+          "toughness": 1
+        }
+      ],
+      "expected_total_tokens": 2,
+      "logical_rule_key": "battle_rule_v1:e2a1c5e81f46a15a6080f1c929b4b70a",
+      "name": "Wurmcoil Larva dies and creates modeled creature tokens",
+      "type": "creature_dies_create_tokens"
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Triplicate Titan",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:65042d3af7a906fc248edf593ed498f5",
+      "min_rule_version": 2,
+      "normalized_name": "triplicate titan",
+      "oracle_hash": "748500ed50946b0e051c59e82fb6f204",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "ability_kind": "triggered",
+            "artifact_tokens": true,
+            "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+            "compose_on_resolution": true,
+            "effect": "token_maker",
+            "token_count": 1,
+            "token_description": "3/3 colorless Golem artifact creature token with flying",
+            "token_flying": true,
+            "token_keywords": [
+              "flying"
+            ],
+            "token_name": "Golem Token",
+            "token_power": 3,
+            "token_subtype": "Golem",
+            "token_toughness": 3,
+            "trigger": "dies",
+            "xmage_effect_class": "CreateTokenEffect",
+            "xmage_token_class": "GolemFlyingToken"
+          },
+          {
+            "ability_kind": "triggered",
+            "artifact_tokens": true,
+            "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+            "compose_on_resolution": true,
+            "effect": "token_maker",
+            "token_count": 1,
+            "token_description": "3/3 colorless Golem artifact creature token with vigilance",
+            "token_keywords": [
+              "vigilance"
+            ],
+            "token_name": "Golem Token",
+            "token_power": 3,
+            "token_subtype": "Golem",
+            "token_toughness": 3,
+            "trigger": "dies",
+            "xmage_effect_class": "CreateTokenEffect",
+            "xmage_token_class": "GolemVigilanceToken"
+          },
+          {
+            "ability_kind": "triggered",
+            "artifact_tokens": true,
+            "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+            "compose_on_resolution": true,
+            "effect": "token_maker",
+            "token_count": 1,
+            "token_description": "3/3 colorless Golem artifact creature token with trample",
+            "token_keywords": [
+              "trample"
+            ],
+            "token_name": "Golem Token",
+            "token_power": 3,
+            "token_subtype": "Golem",
+            "token_toughness": 3,
+            "trigger": "dies",
+            "xmage_effect_class": "CreateTokenEffect",
+            "xmage_token_class": "GolemTrampleToken"
+          }
+        ],
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying",
+          "trample",
+          "vigilance"
+        ],
+        "token_component_count": 3,
+        "token_total_count": 3,
+        "trigger": "dies",
+        "xmage_ability_class": "DiesSourceTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_classes": [
+          "GolemFlyingToken",
+          "GolemVigilanceToken",
+          "GolemTrampleToken"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Trostani's Summoner",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4f9b05e8bcdb35281142ce7f97b330a2",
+      "min_rule_version": 2,
+      "normalized_name": "trostani's summoner",
+      "oracle_hash": "28ab52a54939a877dbfa059d057fb9ce",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "ability_kind": "triggered",
+            "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+            "compose_on_resolution": true,
+            "effect": "token_maker",
+            "token_colors": [
+              "W"
+            ],
+            "token_count": 1,
+            "token_description": "2/2 white Knight creature token with vigilance",
+            "token_keywords": [
+              "vigilance"
+            ],
+            "token_name": "Knight Token",
+            "token_power": 2,
+            "token_subtype": "Knight",
+            "token_toughness": 2,
+            "trigger": "enters_battlefield",
+            "xmage_effect_class": "CreateTokenEffect",
+            "xmage_token_class": "KnightToken"
+          },
+          {
+            "ability_kind": "triggered",
+            "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+            "compose_on_resolution": true,
+            "effect": "token_maker",
+            "token_colors": [
+              "G"
+            ],
+            "token_count": 1,
+            "token_description": "3/3 green Centaur creature token",
+            "token_name": "Centaur Token",
+            "token_power": 3,
+            "token_subtype": "Centaur",
+            "token_toughness": 3,
+            "trigger": "enters_battlefield",
+            "xmage_effect_class": "CreateTokenEffect",
+            "xmage_token_class": "CentaurToken"
+          },
+          {
+            "ability_kind": "triggered",
+            "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+            "compose_on_resolution": true,
+            "effect": "token_maker",
+            "token_colors": [
+              "G"
+            ],
+            "token_count": 1,
+            "token_description": "4/4 green Rhino creature token with trample",
+            "token_keywords": [
+              "trample"
+            ],
+            "token_name": "Rhino Token",
+            "token_power": 4,
+            "token_subtype": "Rhino",
+            "token_toughness": 4,
+            "trigger": "enters_battlefield",
+            "xmage_effect_class": "CreateTokenEffect",
+            "xmage_token_class": "RhinoToken"
+          }
+        ],
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+        "effect": "creature",
+        "token_component_count": 3,
+        "token_total_count": 3,
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_classes": [
+          "KnightToken",
+          "CentaurToken",
+          "RhinoToken"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Wurmcoil Engine",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a4849985e57e30c0d9e6283e9a48cfb6",
+      "min_rule_version": 2,
+      "normalized_name": "wurmcoil engine",
+      "oracle_hash": "20dd9364033ef7f4db0bbe2d7effa383",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "ability_kind": "triggered",
+            "artifact_tokens": true,
+            "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+            "compose_on_resolution": true,
+            "effect": "token_maker",
+            "token_count": 1,
+            "token_description": "3/3 colorless Phyrexian Wurm artifact creature token with deathtouch",
+            "token_keywords": [
+              "deathtouch"
+            ],
+            "token_name": "Phyrexian Wurm Token",
+            "token_power": 3,
+            "token_subtype": "Phyrexian Wurm",
+            "token_toughness": 3,
+            "trigger": "dies",
+            "xmage_effect_class": "CreateTokenEffect",
+            "xmage_token_class": "WurmWithDeathtouchToken"
+          },
+          {
+            "ability_kind": "triggered",
+            "artifact_tokens": true,
+            "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+            "compose_on_resolution": true,
+            "effect": "token_maker",
+            "token_count": 1,
+            "token_description": "3/3 colorless Phyrexian Wurm artifact creature token with lifelink",
+            "token_keywords": [
+              "lifelink"
+            ],
+            "token_name": "Phyrexian Wurm Token",
+            "token_power": 3,
+            "token_subtype": "Phyrexian Wurm",
+            "token_toughness": 3,
+            "trigger": "dies",
+            "xmage_effect_class": "CreateTokenEffect",
+            "xmage_token_class": "WurmWithLifelinkToken"
+          }
+        ],
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+        "effect": "creature",
+        "keywords": [
+          "deathtouch",
+          "lifelink"
+        ],
+        "token_component_count": 2,
+        "token_total_count": 2,
+        "trigger": "dies",
+        "xmage_ability_class": "DiesSourceTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_classes": [
+          "WurmWithDeathtouchToken",
+          "WurmWithLifelinkToken"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Wurmcoil Larva",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e2a1c5e81f46a15a6080f1c929b4b70a",
+      "min_rule_version": 2,
+      "normalized_name": "wurmcoil larva",
+      "oracle_hash": "c280486479b469cc2588bc75649b6bd8",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "ability_kind": "triggered",
+            "artifact_tokens": true,
+            "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+            "compose_on_resolution": true,
+            "effect": "token_maker",
+            "token_colors": [
+              "B"
+            ],
+            "token_count": 1,
+            "token_description": "1/2 black Phyrexian Wurm artifact creature token with deathtouch",
+            "token_keywords": [
+              "deathtouch"
+            ],
+            "token_name": "Phyrexian Wurm Token",
+            "token_power": 1,
+            "token_subtype": "Phyrexian Wurm",
+            "token_toughness": 2,
+            "trigger": "dies",
+            "xmage_effect_class": "CreateTokenEffect",
+            "xmage_token_class": "PhyrexianWurm12DeathtouchToken"
+          },
+          {
+            "ability_kind": "triggered",
+            "artifact_tokens": true,
+            "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+            "compose_on_resolution": true,
+            "effect": "token_maker",
+            "token_colors": [
+              "B"
+            ],
+            "token_count": 1,
+            "token_description": "2/1 black Phyrexian Wurm artifact creature token with lifelink",
+            "token_keywords": [
+              "lifelink"
+            ],
+            "token_name": "Phyrexian Wurm Token",
+            "token_power": 2,
+            "token_subtype": "Phyrexian Wurm",
+            "token_toughness": 1,
+            "trigger": "dies",
+            "xmage_effect_class": "CreateTokenEffect",
+            "xmage_token_class": "PhyrexianWurm21LifelinkToken"
+          }
+        ],
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+        "effect": "creature",
+        "keywords": [
+          "deathtouch",
+          "lifelink"
+        ],
+        "token_component_count": 2,
+        "token_total_count": 2,
+        "trigger": "dies",
+        "xmage_ability_class": "DiesSourceTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_classes": [
+          "PhyrexianWurm12DeathtouchToken",
+          "PhyrexianWurm21LifelinkToken"
+        ]
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_creature_dies_create_multi_tokens": 3,
+    "xmage_creature_etb_create_multi_tokens": 1
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg544_multi_trigger_tokens_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg544_multi_trigger_tokens_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg544_multi_trigger_tokens_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg544_multi_trigger_tokens_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg544_multi_trigger_tokens_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg544_multi_trigger_tokens_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-06T02:48:14+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Triplicate Titan"
+      },
+      "card_name": "Triplicate Titan",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:65042d3af7a906fc248edf593ed498f5",
+      "normalized_name": "triplicate titan",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "ability_kind": "triggered",
+            "artifact_tokens": true,
+            "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+            "compose_on_resolution": true,
+            "effect": "token_maker",
+            "token_count": 1,
+            "token_description": "3/3 colorless Golem artifact creature token with flying",
+            "token_flying": true,
+            "token_keywords": [
+              "flying"
+            ],
+            "token_name": "Golem Token",
+            "token_power": 3,
+            "token_subtype": "Golem",
+            "token_toughness": 3,
+            "trigger": "dies",
+            "xmage_effect_class": "CreateTokenEffect",
+            "xmage_token_class": "GolemFlyingToken"
+          },
+          {
+            "ability_kind": "triggered",
+            "artifact_tokens": true,
+            "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+            "compose_on_resolution": true,
+            "effect": "token_maker",
+            "token_count": 1,
+            "token_description": "3/3 colorless Golem artifact creature token with vigilance",
+            "token_keywords": [
+              "vigilance"
+            ],
+            "token_name": "Golem Token",
+            "token_power": 3,
+            "token_subtype": "Golem",
+            "token_toughness": 3,
+            "trigger": "dies",
+            "xmage_effect_class": "CreateTokenEffect",
+            "xmage_token_class": "GolemVigilanceToken"
+          },
+          {
+            "ability_kind": "triggered",
+            "artifact_tokens": true,
+            "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+            "compose_on_resolution": true,
+            "effect": "token_maker",
+            "token_count": 1,
+            "token_description": "3/3 colorless Golem artifact creature token with trample",
+            "token_keywords": [
+              "trample"
+            ],
+            "token_name": "Golem Token",
+            "token_power": 3,
+            "token_subtype": "Golem",
+            "token_toughness": 3,
+            "trigger": "dies",
+            "xmage_effect_class": "CreateTokenEffect",
+            "xmage_token_class": "GolemTrampleToken"
+          }
+        ],
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying",
+          "trample",
+          "vigilance"
+        ],
+        "token_component_count": 3,
+        "token_total_count": 3,
+        "trigger": "dies",
+        "xmage_ability_class": "DiesSourceTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_classes": [
+          "GolemFlyingToken",
+          "GolemVigilanceToken",
+          "GolemTrampleToken"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Trostani's Summoner"
+      },
+      "card_name": "Trostani's Summoner",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4f9b05e8bcdb35281142ce7f97b330a2",
+      "normalized_name": "trostani's summoner",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "ability_kind": "triggered",
+            "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+            "compose_on_resolution": true,
+            "effect": "token_maker",
+            "token_colors": [
+              "W"
+            ],
+            "token_count": 1,
+            "token_description": "2/2 white Knight creature token with vigilance",
+            "token_keywords": [
+              "vigilance"
+            ],
+            "token_name": "Knight Token",
+            "token_power": 2,
+            "token_subtype": "Knight",
+            "token_toughness": 2,
+            "trigger": "enters_battlefield",
+            "xmage_effect_class": "CreateTokenEffect",
+            "xmage_token_class": "KnightToken"
+          },
+          {
+            "ability_kind": "triggered",
+            "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+            "compose_on_resolution": true,
+            "effect": "token_maker",
+            "token_colors": [
+              "G"
+            ],
+            "token_count": 1,
+            "token_description": "3/3 green Centaur creature token",
+            "token_name": "Centaur Token",
+            "token_power": 3,
+            "token_subtype": "Centaur",
+            "token_toughness": 3,
+            "trigger": "enters_battlefield",
+            "xmage_effect_class": "CreateTokenEffect",
+            "xmage_token_class": "CentaurToken"
+          },
+          {
+            "ability_kind": "triggered",
+            "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+            "compose_on_resolution": true,
+            "effect": "token_maker",
+            "token_colors": [
+              "G"
+            ],
+            "token_count": 1,
+            "token_description": "4/4 green Rhino creature token with trample",
+            "token_keywords": [
+              "trample"
+            ],
+            "token_name": "Rhino Token",
+            "token_power": 4,
+            "token_subtype": "Rhino",
+            "token_toughness": 4,
+            "trigger": "enters_battlefield",
+            "xmage_effect_class": "CreateTokenEffect",
+            "xmage_token_class": "RhinoToken"
+          }
+        ],
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+        "effect": "creature",
+        "token_component_count": 3,
+        "token_total_count": 3,
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_classes": [
+          "KnightToken",
+          "CentaurToken",
+          "RhinoToken"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Wurmcoil Engine"
+      },
+      "card_name": "Wurmcoil Engine",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a4849985e57e30c0d9e6283e9a48cfb6",
+      "normalized_name": "wurmcoil engine",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "ability_kind": "triggered",
+            "artifact_tokens": true,
+            "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+            "compose_on_resolution": true,
+            "effect": "token_maker",
+            "token_count": 1,
+            "token_description": "3/3 colorless Phyrexian Wurm artifact creature token with deathtouch",
+            "token_keywords": [
+              "deathtouch"
+            ],
+            "token_name": "Phyrexian Wurm Token",
+            "token_power": 3,
+            "token_subtype": "Phyrexian Wurm",
+            "token_toughness": 3,
+            "trigger": "dies",
+            "xmage_effect_class": "CreateTokenEffect",
+            "xmage_token_class": "WurmWithDeathtouchToken"
+          },
+          {
+            "ability_kind": "triggered",
+            "artifact_tokens": true,
+            "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+            "compose_on_resolution": true,
+            "effect": "token_maker",
+            "token_count": 1,
+            "token_description": "3/3 colorless Phyrexian Wurm artifact creature token with lifelink",
+            "token_keywords": [
+              "lifelink"
+            ],
+            "token_name": "Phyrexian Wurm Token",
+            "token_power": 3,
+            "token_subtype": "Phyrexian Wurm",
+            "token_toughness": 3,
+            "trigger": "dies",
+            "xmage_effect_class": "CreateTokenEffect",
+            "xmage_token_class": "WurmWithLifelinkToken"
+          }
+        ],
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+        "effect": "creature",
+        "keywords": [
+          "deathtouch",
+          "lifelink"
+        ],
+        "token_component_count": 2,
+        "token_total_count": 2,
+        "trigger": "dies",
+        "xmage_ability_class": "DiesSourceTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_classes": [
+          "WurmWithDeathtouchToken",
+          "WurmWithLifelinkToken"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Wurmcoil Larva"
+      },
+      "card_name": "Wurmcoil Larva",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e2a1c5e81f46a15a6080f1c929b4b70a",
+      "normalized_name": "wurmcoil larva",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "ability_kind": "triggered",
+            "artifact_tokens": true,
+            "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+            "compose_on_resolution": true,
+            "effect": "token_maker",
+            "token_colors": [
+              "B"
+            ],
+            "token_count": 1,
+            "token_description": "1/2 black Phyrexian Wurm artifact creature token with deathtouch",
+            "token_keywords": [
+              "deathtouch"
+            ],
+            "token_name": "Phyrexian Wurm Token",
+            "token_power": 1,
+            "token_subtype": "Phyrexian Wurm",
+            "token_toughness": 2,
+            "trigger": "dies",
+            "xmage_effect_class": "CreateTokenEffect",
+            "xmage_token_class": "PhyrexianWurm12DeathtouchToken"
+          },
+          {
+            "ability_kind": "triggered",
+            "artifact_tokens": true,
+            "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+            "compose_on_resolution": true,
+            "effect": "token_maker",
+            "token_colors": [
+              "B"
+            ],
+            "token_count": 1,
+            "token_description": "2/1 black Phyrexian Wurm artifact creature token with lifelink",
+            "token_keywords": [
+              "lifelink"
+            ],
+            "token_name": "Phyrexian Wurm Token",
+            "token_power": 2,
+            "token_subtype": "Phyrexian Wurm",
+            "token_toughness": 1,
+            "trigger": "dies",
+            "xmage_effect_class": "CreateTokenEffect",
+            "xmage_token_class": "PhyrexianWurm21LifelinkToken"
+          }
+        ],
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+        "effect": "creature",
+        "keywords": [
+          "deathtouch",
+          "lifelink"
+        ],
+        "token_component_count": 2,
+        "token_total_count": 2,
+        "trigger": "dies",
+        "xmage_ability_class": "DiesSourceTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_classes": [
+          "PhyrexianWurm12DeathtouchToken",
+          "PhyrexianWurm21LifelinkToken"
+        ]
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Triplicate Titan",
+    "Trostani's Summoner",
+    "Wurmcoil Engine",
+    "Wurmcoil Larva"
+  ],
+  "selected_count": 4,
+  "slug": "pg544_multi_trigger_tokens_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Triplicate Titan",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:65042d3af7a906fc248edf593ed498f5",
+      "min_rule_version": 2,
+      "normalized_name": "triplicate titan",
+      "oracle_hash": "748500ed50946b0e051c59e82fb6f204",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_dies_create_tokens_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Trostani's Summoner",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4f9b05e8bcdb35281142ce7f97b330a2",
+      "min_rule_version": 2,
+      "normalized_name": "trostani's summoner",
+      "oracle_hash": "28ab52a54939a877dbfa059d057fb9ce",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Wurmcoil Engine",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a4849985e57e30c0d9e6283e9a48cfb6",
+      "min_rule_version": 2,
+      "normalized_name": "wurmcoil engine",
+      "oracle_hash": "20dd9364033ef7f4db0bbe2d7effa383",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_dies_create_tokens_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Wurmcoil Larva",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e2a1c5e81f46a15a6080f1c929b4b70a",
+      "min_rule_version": 2,
+      "normalized_name": "wurmcoil larva",
+      "oracle_hash": "c280486479b469cc2588bc75649b6bd8",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_dies_create_tokens_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

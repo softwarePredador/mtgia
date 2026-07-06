@@ -3877,6 +3877,72 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["etb_token_name"], "Merfolk Token")
         self.assertEqual(effect["etb_token_keywords"], ["hexproof"])
 
+    def test_creature_etb_create_multi_tokens_maps_trostanis_summoner(self) -> None:
+        row = queue_row(
+            split.ETB_TOKEN_CREATURE_UNIT,
+            effect_classes=["CreateTokenEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["token", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Trostani's Summoner",
+                type_line="Creature - Elf Shaman",
+                oracle_text=(
+                    "When this creature enters, create a 2/2 white Knight creature token "
+                    "with vigilance, a 3/3 green Centaur creature token, and a 4/4 green Rhino creature token "
+                    "with trample."
+                ),
+            ),
+            source_text="""
+                this.addAbility(new EntersBattlefieldTriggeredAbility(new CreateTokenEffect(new KnightToken()).withAdditionalTokens(new CentaurToken(), new RhinoToken())));
+                public final class KnightToken extends TokenImpl {
+                    public KnightToken() {
+                        super("Knight Token", "2/2 white Knight creature token with vigilance");
+                        cardType.add(CardType.CREATURE);
+                        color.setWhite(true);
+                        subtype.add(SubType.KNIGHT);
+                        power = new MageInt(2);
+                        toughness = new MageInt(2);
+                        addAbility(VigilanceAbility.getInstance());
+                    }
+                }
+                public final class CentaurToken extends TokenImpl {
+                    public CentaurToken() {
+                        super("Centaur Token", "3/3 green Centaur creature token");
+                        cardType.add(CardType.CREATURE);
+                        color.setGreen(true);
+                        subtype.add(SubType.CENTAUR);
+                        power = new MageInt(3);
+                        toughness = new MageInt(3);
+                    }
+                }
+                public final class RhinoToken extends TokenImpl {
+                    public RhinoToken() {
+                        super("Rhino Token", "4/4 green Rhino creature token with trample");
+                        cardType.add(CardType.CREATURE);
+                        color.setGreen(true);
+                        subtype.add(SubType.RHINO);
+                        power = new MageInt(4);
+                        toughness = new MageInt(4);
+                        addAbility(TrampleAbility.getInstance());
+                    }
+                }
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.ETB_TOKEN_CREATURE_SCOPE)
+        self.assertEqual(proposal["family_id"], "xmage_creature_etb_create_multi_tokens")
+        self.assertEqual(effect["token_component_count"], 3)
+        self.assertEqual(effect["token_total_count"], 3)
+        components = effect["_composite_rule_components"]
+        self.assertEqual([component["token_name"] for component in components], ["Knight Token", "Centaur Token", "Rhino Token"])
+        self.assertEqual([component.get("token_keywords", []) for component in components], [["vigilance"], [], ["trample"]])
+
     def test_creature_dies_create_tokens_is_package_safe(self) -> None:
         row = queue_row(
             split.DIES_TOKEN_CREATURE_UNIT,
@@ -3921,6 +3987,71 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["dies_token_power"], 1)
         self.assertEqual(effect["dies_token_toughness"], 1)
         self.assertEqual(effect["dies_token_colors"], ["W"])
+
+    def test_creature_dies_create_multi_tokens_maps_wurmcoil_engine(self) -> None:
+        row = queue_row(
+            split.DIES_TOKEN_CREATURE_UNIT,
+            effect_classes=["CreateTokenEffect"],
+            ability_kind="triggered",
+            ability_classes=[
+                "DeathtouchAbility",
+                "DiesSourceTriggeredAbility",
+                "LifelinkAbility",
+            ],
+            xmage_signals=["token", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Wurmcoil Engine",
+                type_line="Artifact Creature - Phyrexian Wurm",
+                oracle_text=(
+                    "When Wurmcoil Engine dies, create a 3/3 colorless Phyrexian Wurm artifact creature token "
+                    "with deathtouch and a 3/3 colorless Phyrexian Wurm artifact creature token with lifelink."
+                ),
+            ),
+            source_text="""
+                this.addAbility(DeathtouchAbility.getInstance());
+                this.addAbility(LifelinkAbility.getInstance());
+                Ability ability = new DiesSourceTriggeredAbility(new CreateTokenEffect(new WurmWithDeathtouchToken()).withAdditionalTokens(new WurmWithLifelinkToken()), false);
+                this.addAbility(ability);
+                public final class WurmWithDeathtouchToken extends TokenImpl {
+                    public WurmWithDeathtouchToken() {
+                        super("Phyrexian Wurm Token", "3/3 colorless Phyrexian Wurm artifact creature token with deathtouch");
+                        cardType.add(CardType.ARTIFACT);
+                        cardType.add(CardType.CREATURE);
+                        subtype.add(SubType.PHYREXIAN);
+                        subtype.add(SubType.WURM);
+                        power = new MageInt(3);
+                        toughness = new MageInt(3);
+                        addAbility(DeathtouchAbility.getInstance());
+                    }
+                }
+                public final class WurmWithLifelinkToken extends TokenImpl {
+                    public WurmWithLifelinkToken() {
+                        super("Phyrexian Wurm Token", "3/3 colorless Phyrexian Wurm artifact creature token with lifelink");
+                        cardType.add(CardType.ARTIFACT);
+                        cardType.add(CardType.CREATURE);
+                        subtype.add(SubType.PHYREXIAN);
+                        subtype.add(SubType.WURM);
+                        power = new MageInt(3);
+                        toughness = new MageInt(3);
+                        addAbility(LifelinkAbility.getInstance());
+                    }
+                }
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DIES_TOKEN_CREATURE_SCOPE)
+        self.assertEqual(proposal["family_id"], "xmage_creature_dies_create_multi_tokens")
+        self.assertEqual(effect["token_component_count"], 2)
+        self.assertEqual(effect["token_total_count"], 2)
+        self.assertEqual(effect["keywords"], ["deathtouch", "lifelink"])
+        components = effect["_composite_rule_components"]
+        self.assertEqual([component["token_name"] for component in components], ["Phyrexian Wurm Token", "Phyrexian Wurm Token"])
+        self.assertEqual([component["token_keywords"] for component in components], [["deathtouch"], ["lifelink"]])
 
     def test_creature_dies_create_treasure_maps_exact_scope(self) -> None:
         row = queue_row(

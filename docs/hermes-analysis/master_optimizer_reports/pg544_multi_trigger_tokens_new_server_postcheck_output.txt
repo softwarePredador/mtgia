@@ -1,0 +1,7 @@
+      card_name      |   normalized_name   |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
+---------------------+---------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
+ Triplicate Titan    | triplicate titan    | battle_rule_v1:65042d3af7a906fc248edf593ed498f5 |                  1 |                           1 |                         1 |           2
+ Trostani's Summoner | trostani's summoner | battle_rule_v1:4f9b05e8bcdb35281142ce7f97b330a2 |                  1 |                           1 |                         1 |           2
+ Wurmcoil Engine     | wurmcoil engine     | battle_rule_v1:a4849985e57e30c0d9e6283e9a48cfb6 |                  1 |                           1 |                         1 |           2
+ Wurmcoil Larva      | wurmcoil larva      | battle_rule_v1:e2a1c5e81f46a15a6080f1c929b4b70a |                  1 |                           1 |                         1 |           2
+(4 rows)

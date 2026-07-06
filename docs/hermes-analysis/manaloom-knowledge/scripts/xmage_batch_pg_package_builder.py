@@ -1020,6 +1020,81 @@ def creature_etb_create_treasure_execution_scenario_from_expected_rule(
     return scenario
 
 
+def expected_token_from_component(component: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "name": component.get("token_name"),
+        "count": int(component.get("token_count") or 1),
+        "power": component.get("token_power"),
+        "toughness": component.get("token_toughness"),
+        "subtype": component.get("token_subtype"),
+        "colors": component.get("token_colors") or [],
+        "keywords": component.get("token_keywords") or [],
+        "artifact": bool(component.get("artifact_tokens")),
+        "tapped": bool(component.get("token_tapped")),
+        "sacrifice_for_colorless_mana": bool(
+            component.get("token_sacrifice_for_colorless_mana")
+        ),
+        "mana_produced": component.get("token_mana_produced"),
+        "produces": component.get("token_produces"),
+        "produced_mana_symbols": component.get("token_produced_mana_symbols") or [],
+    }
+
+
+def creature_etb_create_tokens_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_creature_etb_create_tokens_v1":
+        return None
+    components = required.get("_composite_rule_components") or []
+    scenario = {
+        "name": f"{rule['card_name']} enters and creates modeled creature tokens",
+        "type": "creature_etb_create_tokens",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": "Creature",
+            "effect": "creature",
+        },
+        "expected_keywords": list(required.get("keywords") or []),
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+    if isinstance(components, list) and components:
+        expected_tokens = [
+            expected_token_from_component(component)
+            for component in components
+            if isinstance(component, dict) and component.get("effect") == "token_maker"
+        ]
+        if not expected_tokens:
+            return None
+        scenario["expected_tokens"] = expected_tokens
+        scenario["expected_component_count"] = int(
+            required.get("token_component_count") or len(expected_tokens)
+        )
+        scenario["expected_total_tokens"] = int(
+            required.get("token_total_count")
+            or sum(int(token.get("count") or 0) for token in expected_tokens)
+        )
+        return scenario
+    scenario["expected_token"] = {
+        "name": required.get("etb_token_name"),
+        "count": int(required.get("etb_token_count") or 1),
+        "power": required.get("etb_token_power"),
+        "toughness": required.get("etb_token_toughness"),
+        "subtype": required.get("etb_token_subtype"),
+        "colors": required.get("etb_token_colors") or [],
+        "keywords": required.get("etb_token_keywords") or [],
+        "artifact": bool(required.get("etb_artifact_tokens")),
+        "tapped": bool(required.get("etb_token_tapped")),
+        "sacrifice_for_colorless_mana": bool(
+            required.get("etb_token_sacrifice_for_colorless_mana")
+        ),
+        "mana_produced": required.get("etb_token_mana_produced"),
+        "produces": required.get("etb_token_produces"),
+        "produced_mana_symbols": required.get("etb_token_produced_mana_symbols") or [],
+    }
+    return scenario
+
+
 def creature_dies_create_treasure_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
@@ -1114,7 +1189,7 @@ def creature_dies_create_tokens_execution_scenario_from_expected_rule(
     required = dict(rule.get("required_effect_fields") or {})
     if required.get("battle_model_scope") != "xmage_creature_dies_create_tokens_v1":
         return None
-    return {
+    scenario = {
         "name": f"{rule['card_name']} dies and creates modeled creature tokens",
         "type": "creature_dies_create_tokens",
         "card": {
@@ -1122,26 +1197,45 @@ def creature_dies_create_tokens_execution_scenario_from_expected_rule(
             "type_line": "Creature",
             "effect": "creature",
         },
-        "expected_token": {
-            "name": required.get("dies_token_name"),
-            "count": int(required.get("dies_token_count") or 1),
-            "power": required.get("dies_token_power"),
-            "toughness": required.get("dies_token_toughness"),
-            "subtype": required.get("dies_token_subtype"),
-            "colors": required.get("dies_token_colors") or [],
-            "keywords": required.get("dies_token_keywords") or [],
-            "artifact": bool(required.get("dies_artifact_tokens")),
-            "tapped": bool(required.get("dies_token_tapped")),
-            "sacrifice_for_colorless_mana": bool(
-                required.get("dies_token_sacrifice_for_colorless_mana")
-            ),
-            "mana_produced": required.get("dies_token_mana_produced"),
-            "produces": required.get("dies_token_produces"),
-            "produced_mana_symbols": required.get("dies_token_produced_mana_symbols") or [],
-        },
         "expected_keywords": list(required.get("keywords") or []),
         "logical_rule_key": rule["logical_rule_key"],
     }
+    components = required.get("_composite_rule_components") or []
+    if isinstance(components, list) and components:
+        expected_tokens = [
+            expected_token_from_component(component)
+            for component in components
+            if isinstance(component, dict) and component.get("effect") == "token_maker"
+        ]
+        if not expected_tokens:
+            return None
+        scenario["expected_tokens"] = expected_tokens
+        scenario["expected_component_count"] = int(
+            required.get("token_component_count") or len(expected_tokens)
+        )
+        scenario["expected_total_tokens"] = int(
+            required.get("token_total_count")
+            or sum(int(token.get("count") or 0) for token in expected_tokens)
+        )
+        return scenario
+    scenario["expected_token"] = {
+        "name": required.get("dies_token_name"),
+        "count": int(required.get("dies_token_count") or 1),
+        "power": required.get("dies_token_power"),
+        "toughness": required.get("dies_token_toughness"),
+        "subtype": required.get("dies_token_subtype"),
+        "colors": required.get("dies_token_colors") or [],
+        "keywords": required.get("dies_token_keywords") or [],
+        "artifact": bool(required.get("dies_artifact_tokens")),
+        "tapped": bool(required.get("dies_token_tapped")),
+        "sacrifice_for_colorless_mana": bool(
+            required.get("dies_token_sacrifice_for_colorless_mana")
+        ),
+        "mana_produced": required.get("dies_token_mana_produced"),
+        "produces": required.get("dies_token_produces"),
+        "produced_mana_symbols": required.get("dies_token_produced_mana_symbols") or [],
+    }
+    return scenario
 
 
 def simple_activated_create_token_execution_scenario_from_expected_rule(
@@ -1373,6 +1467,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or destroy_target_create_treasure_execution_scenario_from_expected_rule(rule)
         or creature_etb_create_treasure_execution_scenario_from_expected_rule(rule)
         or creature_dies_create_treasure_execution_scenario_from_expected_rule(rule)
+        or creature_etb_create_tokens_execution_scenario_from_expected_rule(rule)
         or creature_dies_create_tokens_execution_scenario_from_expected_rule(rule)
         or simple_mana_source_execution_scenario_from_expected_rule(rule)
         or simple_activated_damage_execution_scenario_from_expected_rule(rule)

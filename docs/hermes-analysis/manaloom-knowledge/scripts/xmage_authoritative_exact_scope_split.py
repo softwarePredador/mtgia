@@ -986,6 +986,125 @@ def multi_create_token_effects_from_source(source: str) -> list[dict[str, Any]] 
     return [{"token_class": token_class, "token_count": 1} for token_class in token_classes]
 
 
+def token_count_phrase_options(token_data: dict[str, Any], token_count: int) -> set[str]:
+    token_descriptions = token_oracle_description_variants(token_data)
+    if token_count == 1:
+        expected: set[str] = set()
+        for token_description in token_descriptions:
+            expected.update(
+                {
+                    f"a {token_description}",
+                    f"an {token_description}",
+                    f"one {token_description}",
+                }
+            )
+        return expected
+    expected = set()
+    for token_description in token_descriptions:
+        plural_description = plural_token_description(token_description)
+        expected.update(
+            {
+                f"{token_count} {plural_description}",
+                f"{count_word_for_oracle(token_count)} {plural_description}",
+            }
+        )
+    return expected
+
+
+def token_component_from_parsed_token(
+    row: dict[str, Any],
+    source_text: str,
+    parsed_token: dict[str, Any],
+    *,
+    component_scope: str,
+    ability_kind: str,
+    trigger: str | None = None,
+) -> tuple[dict[str, Any] | None, str | None]:
+    token_class = str(parsed_token["token_class"])
+    token_data, token_reason = parse_simple_token_class(
+        token_class_source(row, source_text, token_class),
+        token_class,
+    )
+    if token_reason:
+        return None, token_reason
+    token_count = int(parsed_token.get("token_count") or 1)
+    component = {
+        "effect": "token_maker",
+        "battle_model_scope": component_scope,
+        "ability_kind": ability_kind,
+        "compose_on_resolution": True,
+        "token_count": token_count,
+        "xmage_effect_class": "CreateTokenEffect",
+        **token_data,
+    }
+    if trigger:
+        component["trigger"] = trigger
+    if parsed_token.get("token_tapped"):
+        component["token_tapped"] = True
+    return component, None
+
+
+def token_components_from_parsed_tokens(
+    row: dict[str, Any],
+    source_text: str,
+    parsed_tokens: list[dict[str, Any]],
+    *,
+    component_scope: str,
+    ability_kind: str,
+    trigger: str | None = None,
+) -> tuple[list[dict[str, Any]] | None, list[str], str | None]:
+    components: list[dict[str, Any]] = []
+    token_classes: list[str] = []
+    for parsed_token in parsed_tokens:
+        component, reason = token_component_from_parsed_token(
+            row,
+            source_text,
+            parsed_token,
+            component_scope=component_scope,
+            ability_kind=ability_kind,
+            trigger=trigger,
+        )
+        if reason:
+            return None, token_classes, reason
+        token_classes.append(str(parsed_token["token_class"]))
+        components.append(component or {})
+    return components, token_classes, None
+
+
+def multi_create_token_oracle_blocker(
+    metadata: dict[str, Any],
+    components: list[dict[str, Any]],
+    *,
+    trigger: str | None,
+) -> str | None:
+    text = normalized_token_oracle_phrase(oracle_text_after_leading_static_keywords(metadata))
+    if any(marker in text for marker in (" if ", " for each ", " where x ", " equal to ", " instead ")):
+        return f"{trigger or 'token'}_multi_token_oracle_not_simple"
+    if trigger == "enters_battlefield":
+        match = re.match(
+            r"^(?:when|whenever) (?:this creature|[^,.]+) enters(?: the battlefield)?, create (?P<phrase>.+)$",
+            text,
+        )
+        blocker = "etb_token_oracle_not_simple"
+    elif trigger == "dies":
+        match = re.match(
+            r"^(?:when|whenever) (?:this creature|[^,.]+) dies, create (?P<phrase>.+)$",
+            text,
+        )
+        blocker = "dies_token_oracle_not_simple"
+    else:
+        match = re.match(r"^create (?P<phrase>.+)$", text)
+        blocker = "token_oracle_not_simple"
+    if not match:
+        return blocker
+    phrase = match.group("phrase").strip().rstrip(".")
+    for component in components:
+        token_count = int(component.get("token_count") or 1)
+        if not any(option in phrase for option in token_count_phrase_options(component, token_count)):
+            return blocker
+    return None
+
+
 def token_class_source(row: dict[str, Any], source_text: str, token_class: str) -> str:
     if re.search(rf"\bclass\s+{re.escape(token_class)}\b", source_text or ""):
         return source_text
@@ -17833,6 +17952,47 @@ def split_row(
     if etb_token_creature_unit:
         if not is_creature_metadata(metadata):
             return None, "etb_token_not_creature"
+        multi_tokens = multi_create_token_effects_from_source(source_text)
+        if not isinstance(multi_tokens, str):
+            components, token_classes, component_reason = token_components_from_parsed_tokens(
+                row,
+                source_text,
+                multi_tokens,
+                component_scope=ETB_TOKEN_CREATURE_SCOPE,
+                ability_kind="triggered",
+                trigger="enters_battlefield",
+            )
+            if component_reason:
+                return None, component_reason
+            components = components or []
+            oracle_blocker = multi_create_token_oracle_blocker(
+                metadata,
+                components,
+                trigger="enters_battlefield",
+            )
+            if oracle_blocker:
+                return None, oracle_blocker
+            effect_json = {
+                "effect": "creature",
+                "battle_model_scope": ETB_TOKEN_CREATURE_SCOPE,
+                "ability_kind": "triggered",
+                "trigger": "enters_battlefield",
+                "etb_trigger_effect": "token_maker",
+                "token_component_count": len(components),
+                "token_total_count": sum(int(component.get("token_count") or 0) for component in components),
+                "xmage_effect_class": "CreateTokenEffect",
+                "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+                "xmage_token_classes": token_classes,
+                "_composite_rule_components": components,
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_creature_etb_create_multi_tokens",
+            ), "selected_exact_scope"
+        if multi_tokens != "multi_token_source_no_additional_tokens":
+            return None, multi_tokens.replace("multi_token_", "token_", 1)
         parsed_effect = fixed_create_token_effect_from_source(source_text)
         if isinstance(parsed_effect, str):
             return None, parsed_effect
@@ -17920,6 +18080,53 @@ def split_row(
     if dies_token_creature_unit:
         if not is_creature_metadata(metadata):
             return None, "dies_token_not_creature"
+        multi_tokens = multi_create_token_effects_from_source(source_text)
+        if not isinstance(multi_tokens, str):
+            components, token_classes, component_reason = token_components_from_parsed_tokens(
+                row,
+                source_text,
+                multi_tokens,
+                component_scope=DIES_TOKEN_CREATURE_SCOPE,
+                ability_kind="triggered",
+                trigger="dies",
+            )
+            if component_reason:
+                return None, component_reason
+            components = components or []
+            oracle_blocker = multi_create_token_oracle_blocker(
+                metadata,
+                components,
+                trigger="dies",
+            )
+            if oracle_blocker:
+                return None, oracle_blocker
+            keyword_list = ordered_keywords(keywords_from_ability_classes(row))
+            effect_json = {
+                "effect": "creature",
+                "battle_model_scope": DIES_TOKEN_CREATURE_SCOPE,
+                "ability_kind": "triggered",
+                "trigger": "dies",
+                "dies_trigger_effect": "token_maker",
+                "token_component_count": len(components),
+                "token_total_count": sum(int(component.get("token_count") or 0) for component in components),
+                "xmage_effect_class": "CreateTokenEffect",
+                "xmage_ability_class": "DiesSourceTriggeredAbility",
+                "xmage_token_classes": token_classes,
+                "_composite_rule_components": components,
+            }
+            if keyword_list:
+                effect_json["keywords"] = keyword_list
+                effect_json["_keywords_are_self"] = True
+                for keyword in keyword_list:
+                    effect_json[keyword] = True
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_creature_dies_create_multi_tokens",
+            ), "selected_exact_scope"
+        if multi_tokens != "multi_token_source_no_additional_tokens":
+            return None, multi_tokens.replace("multi_token_", "token_", 1)
         parsed_effect = fixed_create_token_effect_from_source(source_text)
         if isinstance(parsed_effect, str):
             return None, parsed_effect
