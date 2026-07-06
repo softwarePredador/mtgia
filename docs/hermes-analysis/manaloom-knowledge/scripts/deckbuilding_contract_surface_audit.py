@@ -36,6 +36,10 @@ GLOBAL_COMMANDER_CORE_REPAIR_HYPOTHESIS = SCRIPT_DIR / "global_commander_core_re
 GLOBAL_COMMANDER_MANA_BASE_PROFILE = SCRIPT_DIR / "global_commander_mana_base_profile.py"
 GLOBAL_COMMANDER_NAMED_LAND_CANDIDATE_POOL = SCRIPT_DIR / "global_commander_named_land_candidate_pool.py"
 GLOBAL_COMMANDER_LAND_CUT_CANDIDATE_MODEL = SCRIPT_DIR / "global_commander_land_cut_candidate_model.py"
+GLOBAL_COMMANDER_LAND_FLOOR_POLICY_BUILDER = SCRIPT_DIR / "global_commander_land_floor_policy_builder.py"
+GLOBAL_COMMANDER_LAND_FLOOR_POLICY_BUILDER_TEST = (
+    SCRIPT_DIR / "test_global_commander_land_floor_policy_builder.py"
+)
 GLOBAL_COMMANDER_NONLAND_CORE_CANDIDATE_MODEL = SCRIPT_DIR / "global_commander_nonland_core_candidate_model.py"
 GLOBAL_COMMANDER_LEARNING_PRIORITY_AUDIT = SCRIPT_DIR / "global_commander_learning_priority_audit.py"
 GLOBAL_COMMANDER_CROSS_COMMANDER_ROLE_AXIS_LEARNING_PIVOT = (
@@ -515,6 +519,10 @@ GLOBAL_COMMANDER_NAMED_LAND_CANDIDATE_POOL_REPORT = (
 GLOBAL_COMMANDER_LAND_CUT_CANDIDATE_MODEL_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_land_cut_candidate_model_20260705_global_goal_hermes_only.md"
+)
+GLOBAL_COMMANDER_LAND_FLOOR_POLICY_BUILDER_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_land_floor_policy_builder_20260706_current.md"
 )
 GLOBAL_COMMANDER_NONLAND_CORE_CANDIDATE_MODEL_REPORT = (
     REPO_ROOT
@@ -1159,6 +1167,9 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_cross_commander_role_axis_learning_pivot_20260706_ramp_axis_exhaustion_current.md",
                 "global_commander_role_axis_policy_builder_20260706_post_ramp_axis_exhaustion_current.md",
                 "calibrate_land_floor_policy_before_candidate_copy",
+                "global_commander_land_floor_policy_builder.py",
+                "global_commander_land_floor_policy_builder_20260706_current.md",
+                "run_candidate_copy_materializer_for_land_floor_pair_after_commander_source_lane",
                 "global_commander_external_exact_artifact_engine_source_expander.py",
                 "global_commander_external_exact_artifact_engine_source_expander_20260706_current.md",
                 "review_external_exact_artifact_engine_candidates_locally_before_candidate_copy",
@@ -1954,6 +1965,32 @@ def build_audit() -> dict[str, Any]:
                 "printed_deck_construction_exception_requires_source_lane",
                 "potential_topdeck_engine_anchor_requires_commander_source_lane",
                 "mutation_allowed",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_LAND_FLOOR_POLICY_BUILDER,
+            [
+                "global_commander_land_floor_policy_builder",
+                "calibrate_land_floor_policy_before_candidate_copy",
+                "LAND_POLICY_READY_STATUS",
+                "land_floor_policy_ready_for_pair_preflight_no_deck_action",
+                "run_candidate_copy_materializer_for_land_floor_pair_after_commander_source_lane",
+                "candidate_copy_allowed_now",
+                "land_floor_policy_is_not_materialization_permission",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_LAND_FLOOR_POLICY_BUILDER_TEST,
+            [
+                "test_land_floor_policy_builds_preflight_queue_without_opening_copy",
+                "test_non_land_role_axis_policy_blocks_land_floor_calibration",
+                "test_missing_reviewable_cut_pool_blocks_candidate_copy_preflight",
+                "Battlefield Forge",
+                "Expensive Engine",
             ],
         )
     )
@@ -4026,6 +4063,22 @@ def build_audit() -> dict[str, Any]:
             if GLOBAL_COMMANDER_LAND_CUT_CANDIDATE_MODEL_REPORT.exists()
             else ["global_commander_land_cut_candidate_model_report"],
         }
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_LAND_FLOOR_POLICY_BUILDER_REPORT,
+            [
+                "Global Commander Land Floor Policy Builder",
+                "land_floor_policy_ready_no_deck_action",
+                "ready_pair_preflight_deck_count: `9`",
+                "top_deck_id: `612`",
+                "top_pair_add: `Ash Barrens`",
+                "top_pair_cut: `Longshot, Rebel Bowman`",
+                "candidate_copy_allowed_now: `false`",
+                "run_candidate_copy_materializer_for_land_floor_pair_after_commander_source_lane",
+                "land_floor_policy_is_not_materialization_permission",
+            ],
+        )
     )
     checks.append(
         {

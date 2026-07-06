@@ -195,6 +195,13 @@ Operational priority after this pivot:
    lanes, while keeping same-deck source expansion, candidate copy, battle,
    mutation, and promotion closed; when a role axis was exhausted, the builder
    must hold that axis as evidence and route the next non-exhausted axis; if the
+   chosen axis is `land`, then run
+   `global_commander_land_floor_policy_builder.py` to join the role-axis policy
+   with the mana-base profile, named land candidate pool, and land cut candidate
+   model; it may create a read-only pair preflight queue, but candidate copy
+   remains closed until the isolated materializer, commander-source-lane
+   requirement, structure/legal recheck, strategy matrix, battle gate, and replay
+   trace gates are satisfied; if the
    chosen axis is `ramp`, then run
    `global_commander_ramp_axis_nonland_cut_policy_model.py` to apply ramp
    ceiling policy to blocked nonland ramp cuts before any same-deck source
@@ -1708,11 +1715,18 @@ Current external refresh on 2026-07-05:
   then holds `ramp` and `engine` as exhausted evidence, selects `land` floor
   calibration, and routes the next gate to
   `calibrate_land_floor_policy_before_candidate_copy`.
+  The land floor policy builder consumes that gate and confirms `9` decks have
+  review-only pair preflight ready while candidate copy, battle, mutation, and
+  promotion remain closed; current top preflight is deck `612` with `Ash Barrens`
+  as add and `Longshot, Rebel Bowman` as cut. Its next gate is
+  `run_candidate_copy_materializer_for_land_floor_pair_after_commander_source_lane`.
   Current evidence:
   `global_commander_learning_priority_audit_20260706_ramp_axis_exhaustion_current.md`,
   `global_commander_cross_commander_role_axis_learning_pivot_20260706_ramp_axis_exhaustion_current.md`,
   and
-  `global_commander_role_axis_policy_builder_20260706_post_ramp_axis_exhaustion_current.md`.
+  `global_commander_role_axis_policy_builder_20260706_post_ramp_axis_exhaustion_current.md`,
+  plus
+  `global_commander_land_floor_policy_builder_20260706_current.md`.
 
 ## Global Commander Rollout - 2026-07-01
 
