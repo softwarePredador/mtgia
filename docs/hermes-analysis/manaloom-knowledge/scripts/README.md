@@ -335,6 +335,19 @@ candidate such as `Mana Vault`, run
 `global_commander_external_nonpayoff_current_deck_negative_review_collector.py`;
 target-deck usage blocks that card from becoming a safe cut.
 
+After that blocker, run
+`global_commander_external_nonpayoff_followup_source_candidate_expander.py`.
+It treats every prior finder, reviewer, and expander row as cumulative recycled
+history, then uses current external snapshots plus local DB validation to build
+a genuinely fresh follow-up source pool. Feed that report back into
+`global_commander_external_nonpayoff_expanded_source_candidate_reviewer.py`,
+then rerun `global_commander_reviewed_external_nonpayoff_seeded_cut_source_miner.py`
+and `global_commander_external_nonpayoff_seed_exhaustion_recovery_router.py`.
+The 2026-07-06 Mana Vault follow-up produced 34 reviewed seeds, but the seeded
+miner still found `fresh_seeded_same_lane_cut_source_count=0` and
+`blocked_recycled_seeded_cut_source_count=47`; candidate copy, battle,
+promotion, and value-safe reclassification remain closed.
+
 ## XMage Authoritative Adaptation
 
 For all-card battle-rule acceleration, use local XMage as the authoritative

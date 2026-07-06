@@ -837,6 +837,26 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `seen_without_usage_count=0`, `not_seen_count=0` e
     `candidate_copy_allowed_now=false`. Mana Vault foi usada pelo alvo nos
     traces atuais, entao nao e safe cut nem justificativa para copy.
+    O gate follow-up fica em
+    `global_commander_external_nonpayoff_followup_source_candidate_expander_20260706_kaalia_value_safe_stage1_repair_scope1_after_mana_vault.md`.
+    Resultado:
+    `external_nonpayoff_followup_source_candidate_pool_expanded_ready_for_local_review`,
+    com `cumulative_previous_candidate_name_count=55`,
+    `followup_candidate_count=34` e `followup_ready_for_review_count=34`.
+    O reviewer follow-up fica em
+    `global_commander_external_nonpayoff_expanded_source_candidate_reviewer_20260706_kaalia_value_safe_stage1_repair_scope1_followup_after_mana_vault.md`.
+    Resultado:
+    `expanded_external_source_candidates_reviewed_seed_ready_no_deck_action`,
+    com `miner_source_seed_allowed_count=34` e cobertura dos tres roles
+    alvo. A rerodada do minerador fica em
+    `global_commander_reviewed_external_nonpayoff_seeded_cut_source_miner_20260706_kaalia_value_safe_stage1_repair_scope1_followup_after_mana_vault.md`.
+    Resultado:
+    `reviewed_external_seeded_cut_source_mining_exhausted_current_deck_no_cut_permission`,
+    com `reviewed_seed_count=34`, `fresh_seeded_same_lane_cut_source_count=0`
+    e `blocked_recycled_seeded_cut_source_count=47`. O router follow-up fica em
+    `global_commander_external_nonpayoff_seed_exhaustion_recovery_router_20260706_kaalia_value_safe_stage1_repair_scope1_followup_after_mana_vault.md`
+    e volta para `expand_external_nonpayoff_source_candidate_pool`, sem abrir
+    candidate copy, battle, promocao ou value-safe reclassification.
     Observacao operacional: snapshots historicos de candidate-copy, battle-probe,
     battle-feedback e package-chain dependem de artefatos locais ignorados. Se
     faltarem ou forem regenerados sem esses artefatos, a auditoria de superficie
