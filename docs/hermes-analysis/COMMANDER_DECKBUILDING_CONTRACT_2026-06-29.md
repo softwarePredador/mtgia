@@ -193,7 +193,11 @@ Operational priority after this pivot:
    `global_commander_engine_axis_nonland_cut_policy_model.py` to apply that
    policy to the current nonland cut model, split engine-only and
    excess-overlap cut pressure from protected commander-plan engines, and route
-   all pairs to card-level usage/same-lane proof before candidate copy;
+   all pairs to card-level usage/same-lane proof before candidate copy; then
+   run `global_commander_engine_cut_usage_same_lane_proof_scout.py` to consume
+   existing current-scope trace/proof artifacts for those cut-pressure cards,
+   block used cuts, and require explicit same-lane replacement before any
+   candidate copy can open;
 12. run `global_commander_candidate_copy_materializer.py` only after a named
    add/cut pool is ready; it may materialize one hypothesis inside an isolated
    copied Hermes SQLite DB, must prove the source DB hash is unchanged, and
@@ -532,6 +536,7 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_cross_commander_role_axis_learning_pivot_20260706_source_expansion_cycle_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_role_axis_policy_builder_20260706_engine_axis_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_engine_axis_nonland_cut_policy_model_20260706_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_engine_cut_usage_same_lane_proof_scout_20260706_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_manual_negative_trace_reviewer_20260706_kaalia_value_safe_stage1_live_research.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_followup_live_source_research_expander_20260706_kaalia_value_safe_stage1_after_manual_trace.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_expanded_source_candidate_reviewer_20260706_kaalia_value_safe_stage1_followup_live_after_manual_trace.md`
@@ -1437,6 +1442,13 @@ Current external refresh on 2026-07-05:
   non-engine tutor cuts outside this axis, and exposes only `2` review-only
   engine cut-pressure rows. Candidate copy remains closed; the next gate is
   `collect_card_level_usage_and_same_lane_proof_for_engine_policy_cut_pressure`.
+- The engine cut usage/same-lane scout keeps all `6` candidate pairs blocked:
+  `Biotransference` has current-scope usage evidence, `Archaeomancer's Map`
+  lacks current-scope usage/negative trace, and no pair has an explicit
+  same-lane replacement route (`explicit_same_lane_route_count=0`,
+  `pair_ready_count=0`). Candidate copy, battle, and promotion remain closed;
+  the next gate is
+  `generate_current_scope_trace_or_find_explicit_same_lane_engine_replacement_before_candidate_copy`.
 
 ## Global Commander Rollout - 2026-07-01
 

@@ -1,0 +1,482 @@
+{
+  "artifact_type": "global_commander_engine_cut_usage_same_lane_proof_scout",
+  "battle_gate_allowed_now": false,
+  "battle_or_optimization_performed": false,
+  "battle_run_performed": false,
+  "candidate_copy_allowed_now": false,
+  "candidate_copy_blockers": [
+    "usage_observed_blocks_engine_cuts:Biotransference",
+    "missing_current_scope_usage_trace_for_engine_cuts:Archaeomancer's Map",
+    "no_explicit_same_lane_replacement_route_for_engine_cut_pairs"
+  ],
+  "cut_evidence_rows": [
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Archaeomancer's Map",
+      "commander": "Kaalia of the Vast",
+      "deck_id": "619",
+      "matching_excess_roles": [
+        "engine",
+        "tutor"
+      ],
+      "mutation_allowed": false,
+      "next_required_evidence": "generate_or_import_current_scope_usage_trace_for_engine_cut",
+      "policy_bucket": "engine_overlap_excess_cut_pressure",
+      "promotion_allowed": false,
+      "roles": [
+        "engine",
+        "tutor"
+      ],
+      "same_lane_replacement_route_count": 0,
+      "status": "engine_cut_missing_current_scope_usage_trace",
+      "structured_evidence_count": 0,
+      "structured_evidence_sample": [],
+      "text_usage_candidate_count": 0,
+      "trace_group": "not_seen_or_no_trace"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Biotransference",
+      "commander": "Kaalia of the Vast",
+      "deck_id": "619",
+      "matching_excess_roles": [
+        "engine"
+      ],
+      "mutation_allowed": false,
+      "next_required_evidence": "find_different_cut_or_explicit_same_lane_replacement",
+      "policy_bucket": "engine_only_excess_cut_pressure",
+      "promotion_allowed": false,
+      "roles": [
+        "engine"
+      ],
+      "same_lane_replacement_route_count": 0,
+      "status": "engine_cut_usage_observed_blocks_candidate_copy",
+      "structured_evidence_count": 2,
+      "structured_evidence_sample": [
+        {
+          "artifact_type": "global_commander_cut_hypothesis_same_lane_proof",
+          "decision": "blocked_no_explicit_same_lane_route_for_used_hypothesis",
+          "decision_trace_count": 15,
+          "exposure_event_count": 11,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "same_lane_replacement_routes": [],
+          "source_artifact": "docs/hermes-analysis/master_optimizer_reports/global_commander_cut_hypothesis_same_lane_proof_20260705_kaalia_value_safe_stage1_repair_scope1.json",
+          "status": "hypothesis_used_by_target_trace_blocks_value_safe",
+          "trace_group": "usage_blocked",
+          "usage_event_count": 1
+        },
+        {
+          "artifact_type": "global_commander_cut_source_hypothesis_trace_collector",
+          "decision": "not_value_safe_from_existing_hypothesis_trace",
+          "decision_trace_count": 15,
+          "exposure_event_count": 11,
+          "first_decision_trace": {
+            "event": "tutor",
+            "player": "Kaalia of the Vast",
+            "turn": 5
+          },
+          "first_exposure_event": {
+            "event": "turn_end",
+            "player": "Kaalia of the Vast",
+            "turn": 2
+          },
+          "first_usage_event": {
+            "card": "Biotransference",
+            "event": "cast_announced",
+            "player": "Kaalia of the Vast",
+            "turn": 7
+          },
+          "same_lane_replacement_routes": [],
+          "source_artifact": "docs/hermes-analysis/master_optimizer_reports/global_commander_cut_source_hypothesis_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.json",
+          "status": "hypothesis_used_by_target_trace_blocks_value_safe",
+          "trace_group": "usage_blocked",
+          "usage_event_count": 1
+        }
+      ],
+      "text_usage_candidate_count": 3,
+      "trace_group": "usage_blocked"
+    }
+  ],
+  "deck_action_allowed": false,
+  "generated_at": "2026-07-06T04:07:10.263548+00:00",
+  "input_artifacts": {
+    "engine_policy_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_engine_axis_nonland_cut_policy_model_20260706_current.json",
+    "scan_roots": [
+      "docs/hermes-analysis/master_optimizer_reports"
+    ]
+  },
+  "mutation_allowed": false,
+  "pair_review_rows": [
+    {
+      "add": "Feed the Swarm",
+      "battle_gate_allowed": false,
+      "blockers": [
+        "cut_card_missing_current_scope_usage_trace",
+        "no_explicit_same_lane_replacement_route"
+      ],
+      "candidate_copy_allowed": false,
+      "candidate_role": "removal",
+      "cut": "Archaeomancer's Map",
+      "cut_evidence_status": "engine_cut_missing_current_scope_usage_trace",
+      "cut_roles": [
+        "engine",
+        "tutor"
+      ],
+      "explicit_same_lane_roles": [],
+      "mutation_allowed": false,
+      "promotion_allowed": false,
+      "status": "engine_cut_pair_blocks_candidate_copy"
+    },
+    {
+      "add": "Feed the Swarm",
+      "battle_gate_allowed": false,
+      "blockers": [
+        "cut_card_used_by_target_trace",
+        "no_explicit_same_lane_replacement_route"
+      ],
+      "candidate_copy_allowed": false,
+      "candidate_role": "removal",
+      "cut": "Biotransference",
+      "cut_evidence_status": "engine_cut_usage_observed_blocks_candidate_copy",
+      "cut_roles": [
+        "engine"
+      ],
+      "explicit_same_lane_roles": [],
+      "mutation_allowed": false,
+      "promotion_allowed": false,
+      "status": "engine_cut_pair_blocks_candidate_copy"
+    },
+    {
+      "add": "Path to Exile",
+      "battle_gate_allowed": false,
+      "blockers": [
+        "cut_card_missing_current_scope_usage_trace",
+        "no_explicit_same_lane_replacement_route"
+      ],
+      "candidate_copy_allowed": false,
+      "candidate_role": "removal",
+      "cut": "Archaeomancer's Map",
+      "cut_evidence_status": "engine_cut_missing_current_scope_usage_trace",
+      "cut_roles": [
+        "engine",
+        "tutor"
+      ],
+      "explicit_same_lane_roles": [],
+      "mutation_allowed": false,
+      "promotion_allowed": false,
+      "status": "engine_cut_pair_blocks_candidate_copy"
+    },
+    {
+      "add": "Path to Exile",
+      "battle_gate_allowed": false,
+      "blockers": [
+        "cut_card_used_by_target_trace",
+        "no_explicit_same_lane_replacement_route"
+      ],
+      "candidate_copy_allowed": false,
+      "candidate_role": "removal",
+      "cut": "Biotransference",
+      "cut_evidence_status": "engine_cut_usage_observed_blocks_candidate_copy",
+      "cut_roles": [
+        "engine"
+      ],
+      "explicit_same_lane_roles": [],
+      "mutation_allowed": false,
+      "promotion_allowed": false,
+      "status": "engine_cut_pair_blocks_candidate_copy"
+    },
+    {
+      "add": "Swords to Plowshares",
+      "battle_gate_allowed": false,
+      "blockers": [
+        "cut_card_missing_current_scope_usage_trace",
+        "no_explicit_same_lane_replacement_route"
+      ],
+      "candidate_copy_allowed": false,
+      "candidate_role": "removal",
+      "cut": "Archaeomancer's Map",
+      "cut_evidence_status": "engine_cut_missing_current_scope_usage_trace",
+      "cut_roles": [
+        "engine",
+        "tutor"
+      ],
+      "explicit_same_lane_roles": [],
+      "mutation_allowed": false,
+      "promotion_allowed": false,
+      "status": "engine_cut_pair_blocks_candidate_copy"
+    },
+    {
+      "add": "Swords to Plowshares",
+      "battle_gate_allowed": false,
+      "blockers": [
+        "cut_card_used_by_target_trace",
+        "no_explicit_same_lane_replacement_route"
+      ],
+      "candidate_copy_allowed": false,
+      "candidate_role": "removal",
+      "cut": "Biotransference",
+      "cut_evidence_status": "engine_cut_usage_observed_blocks_candidate_copy",
+      "cut_roles": [
+        "engine"
+      ],
+      "explicit_same_lane_roles": [],
+      "mutation_allowed": false,
+      "promotion_allowed": false,
+      "status": "engine_cut_pair_blocks_candidate_copy"
+    }
+  ],
+  "policy": {
+    "mutation_boundary": "This scout does not copy decks, run battles, mutate DBs, or promote packages.",
+    "same_lane_boundary": "A removal add does not replace an engine or tutor cut unless an explicit same-lane route is proven.",
+    "trace_boundary": "Textual trace references are scout evidence only; structured trace/proof rows drive this decision.",
+    "usage_boundary": "Observed use by the target deck blocks treating an engine cut as safe."
+  },
+  "pool_summaries": [
+    {
+      "commander": "Kaalia of the Vast",
+      "cut_count": 2,
+      "deck_id": "619",
+      "pair_count": 6,
+      "role": "removal"
+    }
+  ],
+  "postgres_writes": false,
+  "promotion_allowed": false,
+  "source_db_mutated": false,
+  "status": "engine_cut_usage_same_lane_proof_blocks_candidate_copy",
+  "summary": {
+    "candidate_copy_blocker_count": 3,
+    "cut_card_count": 2,
+    "cut_status_counts": {
+      "engine_cut_missing_current_scope_usage_trace": 1,
+      "engine_cut_usage_observed_blocks_candidate_copy": 1
+    },
+    "explicit_same_lane_route_count": 0,
+    "missing_trace_cut_count": 1,
+    "next_gate": "generate_current_scope_trace_or_find_explicit_same_lane_engine_replacement_before_candidate_copy",
+    "pair_count": 6,
+    "pair_ready_count": 0,
+    "pair_status_counts": {
+      "engine_cut_pair_blocks_candidate_copy": 6
+    },
+    "pool_count": 1,
+    "text_occurrence_count": 228,
+    "usage_blocked_cut_count": 1
+  },
+  "text_occurrence_sample": [
+    {
+      "card_name": "Biotransference",
+      "classification": "current_scope_text_usage_reference_candidate",
+      "excerpt": "\"hypothesis_cards_used_by_target_deck:Biotransference,Maskwood Nexus,Sigarda's Aid,Necromancy,Necropotence,Sram, Senior Edificer\",",
+      "line": 9,
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_cut_source_hypothesis_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+    },
+    {
+      "card_name": "Biotransference",
+      "classification": "current_scope_text_usage_reference_candidate",
+      "excerpt": "| `Biotransference` | `hypothesis_used_by_target_trace_blocks_value_safe` | 1 | 11 | 15 | `find_different_cut_or_same_lane_replacement_proof` |",
+      "line": 22,
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_cut_source_hypothesis_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+    },
+    {
+      "card_name": "Biotransference",
+      "classification": "current_scope_text_usage_reference_candidate",
+      "excerpt": "- `hypothesis_cards_used_by_target_deck:Biotransference,Maskwood Nexus,Sigarda's Aid,Necromancy,Necropotence,Sram, Senior Edificer`",
+      "line": 33,
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_cut_source_hypothesis_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+    },
+    {
+      "card_name": "Archaeomancer's Map",
+      "classification": "historical_or_cross_scope_trace_reference_not_proof",
+      "excerpt": "# PG047 Archaeomancer's Map Focused Replay Summary",
+      "line": 1,
+      "path": "docs/hermes-analysis/master_optimizer_reports/archaeomancers_map_pg047_focused_replay_summary_20260623_001244.md"
+    },
+    {
+      "card_name": "Archaeomancer's Map",
+      "classification": "historical_or_cross_scope_trace_reference_not_proof",
+      "excerpt": "- Card: `Archaeomancer's Map`",
+      "line": 6,
+      "path": "docs/hermes-analysis/master_optimizer_reports/archaeomancers_map_pg047_focused_replay_summary_20260623_001244.md"
+    },
+    {
+      "card_name": "Archaeomancer's Map",
+      "classification": "historical_or_cross_scope_trace_reference_not_proof",
+      "excerpt": "1. Resolved Archaeomancer's Map using the synced SQLite rule and tutored up to two basic Plains cards to hand.",
+      "line": 13,
+      "path": "docs/hermes-analysis/master_optimizer_reports/archaeomancers_map_pg047_focused_replay_summary_20260623_001244.md"
+    },
+    {
+      "card_name": "Archaeomancer's Map",
+      "classification": "current_scope_non_trace_reference_not_proof",
+      "excerpt": "\"card_name\": \"Archaeomancer's Map\",",
+      "line": 1787,
+      "path": "docs/hermes-analysis/master_optimizer_reports/deck619_battle_rule_coherence_pg200_trouble_in_pairs_postsync_v1.json"
+    },
+    {
+      "card_name": "Archaeomancer's Map",
+      "classification": "current_scope_non_trace_reference_not_proof",
+      "excerpt": "\"normalized_name\": \"archaeomancer's map\",",
+      "line": 1810,
+      "path": "docs/hermes-analysis/master_optimizer_reports/deck619_battle_rule_coherence_pg200_trouble_in_pairs_postsync_v1.json"
+    },
+    {
+      "card_name": "Archaeomancer's Map",
+      "classification": "planning_reference_not_proof",
+      "excerpt": "\"Archaeomancer's Map\",",
+      "line": 551,
+      "path": "docs/hermes-analysis/master_optimizer_reports/deckbuilding_contract_surface_audit_20260705_contextual_trace_generation_review_current.json"
+    },
+    {
+      "card_name": "Archaeomancer's Map",
+      "classification": "planning_reference_not_proof",
+      "excerpt": "\"Archaeomancer's Map\",",
+      "line": 634,
+      "path": "docs/hermes-analysis/master_optimizer_reports/deckbuilding_contract_surface_audit_20260705_contextual_trace_generation_review_current.json"
+    },
+    {
+      "card_name": "Archaeomancer's Map",
+      "classification": "planning_reference_not_proof",
+      "excerpt": "| warn | `docs/hermes-analysis/master_optimizer_reports/global_commander_battle_feedback_model_20260705_current.md` | feedback snapshot depends on prior ignored battle probe reports | Global Commander Battle Feedback Model, pair_blocked_by_failed_gate, pair_ne",
+      "line": 107,
+      "path": "docs/hermes-analysis/master_optimizer_reports/deckbuilding_contract_surface_audit_20260705_contextual_trace_generation_review_current.md"
+    },
+    {
+      "card_name": "Archaeomancer's Map",
+      "classification": "planning_reference_not_proof",
+      "excerpt": "\"Archaeomancer's Map\",",
+      "line": 515,
+      "path": "docs/hermes-analysis/master_optimizer_reports/deckbuilding_contract_surface_audit_20260705_contextual_usage_trace_current.json"
+    },
+    {
+      "card_name": "Archaeomancer's Map",
+      "classification": "planning_reference_not_proof",
+      "excerpt": "\"Archaeomancer's Map\",",
+      "line": 598,
+      "path": "docs/hermes-analysis/master_optimizer_reports/deckbuilding_contract_surface_audit_20260705_contextual_usage_trace_current.json"
+    },
+    {
+      "card_name": "Archaeomancer's Map",
+      "classification": "planning_reference_not_proof",
+      "excerpt": "| warn | `docs/hermes-analysis/master_optimizer_reports/global_commander_battle_feedback_model_20260705_current.md` | feedback snapshot depends on prior ignored battle probe reports | Global Commander Battle Feedback Model, pair_blocked_by_failed_gate, pair_ne",
+      "line": 101,
+      "path": "docs/hermes-analysis/master_optimizer_reports/deckbuilding_contract_surface_audit_20260705_contextual_usage_trace_current.md"
+    },
+    {
+      "card_name": "Archaeomancer's Map",
+      "classification": "planning_reference_not_proof",
+      "excerpt": "\"Archaeomancer's Map\",",
+      "line": 707,
+      "path": "docs/hermes-analysis/master_optimizer_reports/deckbuilding_contract_surface_audit_20260705_cut_hypothesis_same_lane_proof_current.json"
+    },
+    {
+      "card_name": "Archaeomancer's Map",
+      "classification": "planning_reference_not_proof",
+      "excerpt": "\"Archaeomancer's Map\",",
+      "line": 790,
+      "path": "docs/hermes-analysis/master_optimizer_reports/deckbuilding_contract_surface_audit_20260705_cut_hypothesis_same_lane_proof_current.json"
+    },
+    {
+      "card_name": "Archaeomancer's Map",
+      "classification": "planning_reference_not_proof",
+      "excerpt": "| warn | `docs/hermes-analysis/master_optimizer_reports/global_commander_battle_feedback_model_20260705_current.md` | feedback snapshot depends on prior ignored battle probe reports | Global Commander Battle Feedback Model, pair_blocked_by_failed_gate, pair_ne",
+      "line": 133,
+      "path": "docs/hermes-analysis/master_optimizer_reports/deckbuilding_contract_surface_audit_20260705_cut_hypothesis_same_lane_proof_current.md"
+    },
+    {
+      "card_name": "Archaeomancer's Map",
+      "classification": "planning_reference_not_proof",
+      "excerpt": "\"Archaeomancer's Map\",",
+      "line": 689,
+      "path": "docs/hermes-analysis/master_optimizer_reports/deckbuilding_contract_surface_audit_20260705_cut_source_hypothesis_trace_current.json"
+    },
+    {
+      "card_name": "Archaeomancer's Map",
+      "classification": "planning_reference_not_proof",
+      "excerpt": "\"Archaeomancer's Map\",",
+      "line": 772,
+      "path": "docs/hermes-analysis/master_optimizer_reports/deckbuilding_contract_surface_audit_20260705_cut_source_hypothesis_trace_current.json"
+    },
+    {
+      "card_name": "Archaeomancer's Map",
+      "classification": "planning_reference_not_proof",
+      "excerpt": "| warn | `docs/hermes-analysis/master_optimizer_reports/global_commander_battle_feedback_model_20260705_current.md` | feedback snapshot depends on prior ignored battle probe reports | Global Commander Battle Feedback Model, pair_blocked_by_failed_gate, pair_ne",
+      "line": 130,
+      "path": "docs/hermes-analysis/master_optimizer_reports/deckbuilding_contract_surface_audit_20260705_cut_source_hypothesis_trace_current.md"
+    },
+    {
+      "card_name": "Archaeomancer's Map",
+      "classification": "planning_reference_not_proof",
+      "excerpt": "\"Archaeomancer's Map\",",
+      "line": 965,
+      "path": "docs/hermes-analysis/master_optimizer_reports/deckbuilding_contract_surface_audit_20260705_external_nonpayoff_same_lane_corpus_current.json"
+    },
+    {
+      "card_name": "Archaeomancer's Map",
+      "classification": "planning_reference_not_proof",
+      "excerpt": "\"Archaeomancer's Map\",",
+      "line": 1048,
+      "path": "docs/hermes-analysis/master_optimizer_reports/deckbuilding_contract_surface_audit_20260705_external_nonpayoff_same_lane_corpus_current.json"
+    },
+    {
+      "card_name": "Archaeomancer's Map",
+      "classification": "planning_reference_not_proof",
+      "excerpt": "| warn | `docs/hermes-analysis/master_optimizer_reports/global_commander_battle_feedback_model_20260705_current.md` | feedback snapshot depends on prior ignored battle probe reports | Global Commander Battle Feedback Model, pair_blocked_by_failed_gate, pair_ne",
+      "line": 176,
+      "path": "docs/hermes-analysis/master_optimizer_reports/deckbuilding_contract_surface_audit_20260705_external_nonpayoff_same_lane_corpus_current.md"
+    },
+    {
+      "card_name": "Archaeomancer's Map",
+      "classification": "planning_reference_not_proof",
+      "excerpt": "\"Archaeomancer's Map\",",
+      "line": 983,
+      "path": "docs/hermes-analysis/master_optimizer_reports/deckbuilding_contract_surface_audit_20260705_external_nonpayoff_same_lane_policy_current.json"
+    },
+    {
+      "card_name": "Archaeomancer's Map",
+      "classification": "planning_reference_not_proof",
+      "excerpt": "\"Archaeomancer's Map\",",
+      "line": 1066,
+      "path": "docs/hermes-analysis/master_optimizer_reports/deckbuilding_contract_surface_audit_20260705_external_nonpayoff_same_lane_policy_current.json"
+    },
+    {
+      "card_name": "Archaeomancer's Map",
+      "classification": "planning_reference_not_proof",
+      "excerpt": "| warn | `docs/hermes-analysis/master_optimizer_reports/global_commander_battle_feedback_model_20260705_current.md` | feedback snapshot depends on prior ignored battle probe reports | Global Commander Battle Feedback Model, pair_blocked_by_failed_gate, pair_ne",
+      "line": 179,
+      "path": "docs/hermes-analysis/master_optimizer_reports/deckbuilding_contract_surface_audit_20260705_external_nonpayoff_same_lane_policy_current.md"
+    },
+    {
+      "card_name": "Archaeomancer's Map",
+      "classification": "planning_reference_not_proof",
+      "excerpt": "\"Archaeomancer's Map\",",
+      "line": 587,
+      "path": "docs/hermes-analysis/master_optimizer_reports/deckbuilding_contract_surface_audit_20260705_new_cut_source_lane_trace_current.json"
+    },
+    {
+      "card_name": "Archaeomancer's Map",
+      "classification": "planning_reference_not_proof",
+      "excerpt": "\"Archaeomancer's Map\",",
+      "line": 670,
+      "path": "docs/hermes-analysis/master_optimizer_reports/deckbuilding_contract_surface_audit_20260705_new_cut_source_lane_trace_current.json"
+    },
+    {
+      "card_name": "Archaeomancer's Map",
+      "classification": "planning_reference_not_proof",
+      "excerpt": "| warn | `docs/hermes-analysis/master_optimizer_reports/global_commander_battle_feedback_model_20260705_current.md` | feedback snapshot depends on prior ignored battle probe reports | Global Commander Battle Feedback Model, pair_blocked_by_failed_gate, pair_ne",
+      "line": 113,
+      "path": "docs/hermes-analysis/master_optimizer_reports/deckbuilding_contract_surface_audit_20260705_new_cut_source_lane_trace_current.md"
+    },
+    {
+      "card_name": "Archaeomancer's Map",
+      "classification": "planning_reference_not_proof",
+      "excerpt": "\"Archaeomancer's Map\",",
+      "line": 821,
+      "path": "docs/hermes-analysis/master_optimizer_reports/deckbuilding_contract_surface_audit_20260705_same_lane_add_source_lane_current.json"
+    }
+  ]
+}

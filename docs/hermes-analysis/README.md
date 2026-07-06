@@ -278,6 +278,13 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     corte engine; `6` engines ficam protegidas por sinal de plano da Kaalia e
     `4` cortes tutor ficam fora desse eixo. O proximo gate e
     `collect_card_level_usage_and_same_lane_proof_for_engine_policy_cut_pressure`.
+    Esse gate agora e coletado por
+    `manaloom-knowledge/scripts/global_commander_engine_cut_usage_same_lane_proof_scout.py`,
+    com evidencia:
+    `master_optimizer_reports/global_commander_engine_cut_usage_same_lane_proof_scout_20260706_current.md`.
+    Resultado: `Biotransference` fica bloqueada por uso observado,
+    `Archaeomancer's Map` fica bloqueado por falta de trace atual, nenhum dos
+    `6` pares tem rota same-lane explicita, e candidate copy continua fechado.
     Quando uma hipotese add/cut estiver pronta, rode
     `manaloom-knowledge/scripts/global_commander_candidate_copy_materializer.py`
     para materializar uma unica troca em copia isolada do Hermes SQLite. A
