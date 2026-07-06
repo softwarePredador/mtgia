@@ -556,6 +556,24 @@ def run_fixed_create_creature_tokens(
         add_support_creature(active, f"Tapped Creature {index + 1}", tapped=True)
     for index, power in enumerate(scenario.get("controlled_creature_powers") or []):
         add_support_creature(active, f"Powered Creature {index + 1}", power=int(power or 0), toughness=max(1, int(power or 0)))
+    for index in range(max(0, int(scenario.get("controller_hand_card_count") or 0))):
+        active.hand.append({"name": f"Hand Support {index + 1}", "type_line": "Sorcery"})
+    for subtype in scenario.get("domain_basic_land_subtypes") or []:
+        subtype_name = str(subtype or "").strip()
+        if subtype_name:
+            active.battlefield.append(
+                {
+                    "name": subtype_name,
+                    "type_line": f"Basic Land - {subtype_name}",
+                    "subtypes": [subtype_name],
+                    "effect": "land",
+                }
+            )
+    for index in range(max(0, int(scenario.get("controller_graveyard_creature_count") or 0))):
+        active.graveyard.append({"name": f"Graveyard Creature {index + 1}", "type_line": "Creature - Scout"})
+    for index in range(max(0, int(scenario.get("controller_graveyard_instant_sorcery_count") or 0))):
+        type_line = "Instant" if index % 2 == 0 else "Sorcery"
+        active.graveyard.append({"name": f"Graveyard {type_line} {index + 1}", "type_line": type_line})
     named_graveyard_card = str(scenario.get("controller_graveyard_named_card") or "").strip()
     for index in range(max(0, int(scenario.get("controller_graveyard_named_card_count") or 0))):
         active.graveyard.append({"name": named_graveyard_card or card["name"], "type_line": "Sorcery"})

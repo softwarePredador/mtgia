@@ -1474,6 +1474,11 @@ def test_dynamic_count_token_spell_execution_scenarios_seed_support_state() -> N
             {"expected_count": 4, "controlled_battlefield_creature_count": 2, "opponent_battlefield_creature_count": 2},
         ),
         (
+            "Flurry of Wings",
+            {"token_count_source": "attacking_creatures"},
+            {"expected_count": 3, "attacking_creature_count": 3},
+        ),
+        (
             "Crash the Party",
             {"token_count_source": "controlled_tapped_creatures", "token_tapped": True},
             {"expected_count": 3, "controlled_tapped_creature_count": 3},
@@ -1482,6 +1487,26 @@ def test_dynamic_count_token_spell_execution_scenarios_seed_support_state() -> N
             "Fungal Sprouting",
             {"token_count_source": "greatest_power_among_controlled_creatures"},
             {"expected_count": 4, "controlled_creature_powers": [1, 4, 2]},
+        ),
+        (
+            "Spontaneous Generation",
+            {"token_count_source": "controller_hand_count"},
+            {"expected_count": 4, "controller_hand_card_count": 4},
+        ),
+        (
+            "Ordered Migration",
+            {"token_count_source": "domain_basic_land_types"},
+            {"expected_count": 3, "domain_basic_land_subtypes": ["Plains", "Island", "Mountain"]},
+        ),
+        (
+            "Fixture Graveborn",
+            {"token_count_source": "controller_graveyard_creature_count"},
+            {"expected_count": 3, "controller_graveyard_creature_count": 3},
+        ),
+        (
+            "Rise from the Tides",
+            {"token_count_source": "controller_graveyard_instant_sorcery_count"},
+            {"expected_count": 3, "controller_graveyard_instant_sorcery_count": 3},
         ),
         (
             "Goblin Gathering",

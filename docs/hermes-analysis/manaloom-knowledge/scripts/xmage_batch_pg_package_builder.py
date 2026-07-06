@@ -1171,6 +1171,22 @@ def fixed_create_creature_tokens_execution_scenario_from_expected_rule(
     elif required.get("token_count_source") == "greatest_power_among_controlled_creatures":
         scenario["controlled_creature_powers"] = [1, 4, 2]
         scenario["expected_token"]["count"] = 4
+    elif required.get("token_count_source") == "controller_hand_count":
+        expected_count = 4
+        scenario["expected_token"]["count"] = expected_count
+        scenario["controller_hand_card_count"] = expected_count
+    elif required.get("token_count_source") == "domain_basic_land_types":
+        domain_subtypes = ["Plains", "Island", "Mountain"]
+        scenario["expected_token"]["count"] = len(domain_subtypes)
+        scenario["domain_basic_land_subtypes"] = domain_subtypes
+    elif required.get("token_count_source") == "controller_graveyard_creature_count":
+        expected_count = 3
+        scenario["expected_token"]["count"] = expected_count
+        scenario["controller_graveyard_creature_count"] = expected_count
+    elif required.get("token_count_source") == "controller_graveyard_instant_sorcery_count":
+        expected_count = 3
+        scenario["expected_token"]["count"] = expected_count
+        scenario["controller_graveyard_instant_sorcery_count"] = expected_count
     elif required.get("token_count_source") == "named_cards_in_controller_graveyard_plus_base":
         graveyard_count = 2
         base_count = int(required.get("token_count_base") or 0)

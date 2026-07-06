@@ -288,6 +288,12 @@ def test_fixed_create_tokens_runner_counts_dynamic_support_state() -> None:
             4,
         ),
         (
+            "Flurry of Wings",
+            {"token_count_source": "attacking_creatures"},
+            {"attacking_creature_count": 3},
+            3,
+        ),
+        (
             "Crash the Party",
             {"token_count_source": "controlled_tapped_creatures", "token_tapped": True},
             {"controlled_tapped_creature_count": 3},
@@ -298,6 +304,30 @@ def test_fixed_create_tokens_runner_counts_dynamic_support_state() -> None:
             {"token_count_source": "greatest_power_among_controlled_creatures"},
             {"controlled_creature_powers": [1, 4, 2]},
             4,
+        ),
+        (
+            "Spontaneous Generation",
+            {"token_count_source": "controller_hand_count"},
+            {"controller_hand_card_count": 4},
+            4,
+        ),
+        (
+            "Ordered Migration",
+            {"token_count_source": "domain_basic_land_types"},
+            {"domain_basic_land_subtypes": ["Plains", "Island", "Mountain"]},
+            3,
+        ),
+        (
+            "Fixture Graveborn",
+            {"token_count_source": "controller_graveyard_creature_count"},
+            {"controller_graveyard_creature_count": 3},
+            3,
+        ),
+        (
+            "Rise from the Tides",
+            {"token_count_source": "controller_graveyard_instant_sorcery_count"},
+            {"controller_graveyard_instant_sorcery_count": 3},
+            3,
         ),
         (
             "Goblin Gathering",

@@ -1,0 +1,268 @@
+{
+  "battle_execution": {
+    "event_count": 10,
+    "results": [
+      {
+        "card_name": "Flurry of Wings",
+        "scenario": "Flurry of Wings creates modeled creature tokens",
+        "token_name": "Bird Soldier Token",
+        "token_tapped": false,
+        "tokens_created": 3
+      },
+      {
+        "card_name": "Ordered Migration",
+        "scenario": "Ordered Migration creates modeled creature tokens",
+        "token_name": "Bird Token",
+        "token_tapped": false,
+        "tokens_created": 3
+      },
+      {
+        "card_name": "Rise from the Tides",
+        "scenario": "Rise from the Tides creates modeled creature tokens",
+        "token_name": "Zombie Token",
+        "token_tapped": true,
+        "tokens_created": 3
+      },
+      {
+        "card_name": "Spontaneous Generation",
+        "scenario": "Spontaneous Generation creates modeled creature tokens",
+        "token_name": "Saproling Token",
+        "token_tapped": false,
+        "tokens_created": 4
+      },
+      {
+        "card_name": "Spore Burst",
+        "scenario": "Spore Burst creates modeled creature tokens",
+        "token_name": "Saproling Token",
+        "token_tapped": false,
+        "tokens_created": 3
+      }
+    ],
+    "scenario_count": 5
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-06T04:06:15.546095+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg548_dynamic_token_extended_new_server_package_manifest.json",
+  "package_id": "pg548_dynamic_token_extended_new_server_package_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 5
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_create_creature_tokens_spell_v1",
+          "card_name": "Flurry of Wings",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a91caec6e84e9d586a9840e0c3b920f2",
+          "oracle_hash": "72f8eaf4e66233d8fee70bdc89b0d9e8",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_create_creature_tokens_spell_v1",
+          "card_name": "Ordered Migration",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:86ed16a7f8dfea78058cc7433c03045c",
+          "oracle_hash": "1b5c3336a9ee95c0a884e68cefd3125b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_create_creature_tokens_spell_v1",
+          "card_name": "Rise from the Tides",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8702d53c8c4cd31c2e292abb579597fe",
+          "oracle_hash": "5c3cc3549eb1d78a63802563e6421d4d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_create_creature_tokens_spell_v1",
+          "card_name": "Spontaneous Generation",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:47e922b3dd61e1f57d31c4518423fcd5",
+          "oracle_hash": "46e11b6dffc19a0d146cf67ef7478f98",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_create_creature_tokens_spell_v1",
+          "card_name": "Spore Burst",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ae6d8c0ab8584b64df647dc87a0fb320",
+          "oracle_hash": "a2b75ca550ba7fa0f34e5d925329a95f",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 5
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_create_creature_tokens_spell_v1",
+          "card_name": "Flurry of Wings",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a91caec6e84e9d586a9840e0c3b920f2",
+          "oracle_hash": "72f8eaf4e66233d8fee70bdc89b0d9e8",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_create_creature_tokens_spell_v1",
+          "card_name": "Ordered Migration",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:86ed16a7f8dfea78058cc7433c03045c",
+          "oracle_hash": "1b5c3336a9ee95c0a884e68cefd3125b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_create_creature_tokens_spell_v1",
+          "card_name": "Rise from the Tides",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8702d53c8c4cd31c2e292abb579597fe",
+          "oracle_hash": "5c3cc3549eb1d78a63802563e6421d4d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_create_creature_tokens_spell_v1",
+          "card_name": "Spontaneous Generation",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:47e922b3dd61e1f57d31c4518423fcd5",
+          "oracle_hash": "46e11b6dffc19a0d146cf67ef7478f98",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_create_creature_tokens_spell_v1",
+          "card_name": "Spore Burst",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ae6d8c0ab8584b64df647dc87a0fb320",
+          "oracle_hash": "a2b75ca550ba7fa0f34e5d925329a95f",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 5
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_create_creature_tokens_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Flurry of Wings",
+          "logical_rule_key": "battle_rule_v1:a91caec6e84e9d586a9840e0c3b920f2"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_create_creature_tokens_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Ordered Migration",
+          "logical_rule_key": "battle_rule_v1:86ed16a7f8dfea78058cc7433c03045c"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_create_creature_tokens_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Rise from the Tides",
+          "logical_rule_key": "battle_rule_v1:8702d53c8c4cd31c2e292abb579597fe"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_create_creature_tokens_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Spontaneous Generation",
+          "logical_rule_key": "battle_rule_v1:47e922b3dd61e1f57d31c4518423fcd5"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_create_creature_tokens_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Spore Burst",
+          "logical_rule_key": "battle_rule_v1:ae6d8c0ab8584b64df647dc87a0fb320"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 5
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Flurry of Wings",
+          "component_keys": [],
+          "effect": "token_maker",
+          "logical_rule_key": "battle_rule_v1:a91caec6e84e9d586a9840e0c3b920f2"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Ordered Migration",
+          "component_keys": [],
+          "effect": "token_maker",
+          "logical_rule_key": "battle_rule_v1:86ed16a7f8dfea78058cc7433c03045c"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Rise from the Tides",
+          "component_keys": [],
+          "effect": "token_maker",
+          "logical_rule_key": "battle_rule_v1:8702d53c8c4cd31c2e292abb579597fe"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Spontaneous Generation",
+          "component_keys": [],
+          "effect": "token_maker",
+          "logical_rule_key": "battle_rule_v1:47e922b3dd61e1f57d31c4518423fcd5"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Spore Burst",
+          "component_keys": [],
+          "effect": "token_maker",
+          "logical_rule_key": "battle_rule_v1:ae6d8c0ab8584b64df647dc87a0fb320"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 10,
+        "scenarios": 5
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

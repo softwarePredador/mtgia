@@ -977,6 +977,41 @@ def permanents_count_token_count_from_expression(source: str, count_expression: 
     return None
 
 
+def graveyard_count_token_count_from_expression(count_expression: str) -> dict[str, Any] | None:
+    args = extract_java_call_args(str(count_expression or ""), "CardsInControllerGraveyardCount")
+    if args is None:
+        return None
+    parts = split_java_args(args)
+    if not parts:
+        return None
+    filter_expression = parts[0].strip()
+    if filter_expression == "StaticFilters.FILTER_CARD_INSTANT_AND_SORCERY":
+        return {"token_count_source": "controller_graveyard_instant_sorcery_count"}
+    if filter_expression == "StaticFilters.FILTER_CARD_CREATURES":
+        return {"token_count_source": "controller_graveyard_creature_count"}
+    return None
+
+
+def variable_dynamic_token_count_from_source(source: str, variable_name: str) -> dict[str, Any] | None:
+    text = source or ""
+    var = str(variable_name or "").strip()
+    if not var or not re.match(r"^[A-Za-z_]\w*$", var):
+        return None
+    assignment_match = re.search(
+        rf"(?:private\s+static\s+final\s+)?(?:DynamicValue|PermanentsOnBattlefieldCount|CardsInControllerGraveyardCount)\s+"
+        rf"{re.escape(var)}\s*=\s*(?P<expr>new\s+(?:PermanentsOnBattlefieldCount|CardsInControllerGraveyardCount)\s*\([^;]+?\))\s*;",
+        text,
+        re.S,
+    )
+    if not assignment_match:
+        return None
+    expression = assignment_match.group("expr")
+    return (
+        permanents_count_token_count_from_expression(text, expression)
+        or graveyard_count_token_count_from_expression(expression)
+    )
+
+
 def named_graveyard_plus_base_token_count_from_source(source: str, count_expression: str) -> dict[str, Any] | None:
     text = source or ""
     match = re.fullmatch(r"(?P<class>\w+)\.instance", str(count_expression or "").strip())
@@ -1006,10 +1041,19 @@ def dynamic_token_count_from_source(source: str, count_expression: str) -> dict[
         return {"token_count_source": "x_value", "token_count_per_x": 1}
     if expression == "GreatestAmongPermanentsValue.POWER_CONTROLLED_CREATURES":
         return {"token_count_source": "greatest_power_among_controlled_creatures"}
+    if expression == "DomainValue.REGULAR":
+        return {"token_count_source": "domain_basic_land_types"}
+    if expression == "CardsInControllerHandCount.ANY":
+        return {"token_count_source": "controller_hand_count"}
     if re.fullmatch(r"\w+", expression):
-        return controlled_subtype_token_count_from_source(source, expression)
+        return (
+            controlled_subtype_token_count_from_source(source, expression)
+            or variable_dynamic_token_count_from_source(source, expression)
+        )
     if "PermanentsOnBattlefieldCount" in expression:
         return permanents_count_token_count_from_expression(source, expression)
+    if "CardsInControllerGraveyardCount" in expression:
+        return graveyard_count_token_count_from_expression(expression)
     return named_graveyard_plus_base_token_count_from_source(source, expression)
 
 
@@ -17968,6 +18012,10 @@ def split_row(
                 "all_creatures_on_battlefield",
                 "attacking_creatures",
                 "controlled_tapped_creatures",
+                "controller_graveyard_creature_count",
+                "controller_graveyard_instant_sorcery_count",
+                "controller_hand_count",
+                "domain_basic_land_types",
                 "greatest_power_among_controlled_creatures",
                 "named_cards_in_controller_graveyard_plus_base",
             }:

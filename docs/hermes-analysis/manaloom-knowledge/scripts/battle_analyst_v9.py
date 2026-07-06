@@ -38773,6 +38773,22 @@ def token_count_for_effect(player, effect_data, default=5, opponents=None):
             if isinstance(permanent, dict) and is_battlefield_creature(permanent)
         ]
         return max([0, *powers])
+    if isinstance(effect_data, dict) and token_count_source == "controller_hand_count":
+        return len(getattr(player, "hand", []) or [])
+    if isinstance(effect_data, dict) and token_count_source == "domain_basic_land_types":
+        return _domain_basic_land_type_count(player)
+    if isinstance(effect_data, dict) and token_count_source == "controller_graveyard_creature_count":
+        return sum(
+            1
+            for card in getattr(player, "graveyard", []) or []
+            if isinstance(card, dict) and _card_type_matches(card, ["creature"])
+        )
+    if isinstance(effect_data, dict) and token_count_source == "controller_graveyard_instant_sorcery_count":
+        return sum(
+            1
+            for card in getattr(player, "graveyard", []) or []
+            if isinstance(card, dict) and _card_type_matches(card, ["instant", "sorcery"])
+        )
     if isinstance(effect_data, dict) and token_count_source == "named_cards_in_controller_graveyard_plus_base":
         target_name = normalize_card_name(effect_data.get("token_count_card_name") or effect_data.get("card_name") or "")
         base = int(effect_data.get("token_count_base") or 0)
