@@ -7292,10 +7292,15 @@ def is_creature_etb_draw_unit(row: dict[str, Any]) -> bool:
 
 
 def is_creature_etb_scry_unit(row: dict[str, Any]) -> bool:
+    unit = str(row.get("adapter_work_unit") or "")
+    abilities = ability_classes(row)
+    remaining = abilities - {"EntersBattlefieldTriggeredAbility"}
     return (
-        str(row.get("adapter_work_unit") or "") == ETB_SCRY_CREATURE_UNIT
+        unit.startswith("xmage_signature::ScryEffect::")
+        and "::no_target_class::no_condition_class::triggered_ability" in unit
         and effect_classes(row) == {"ScryEffect"}
-        and ability_classes(row) == {"EntersBattlefieldTriggeredAbility"}
+        and "EntersBattlefieldTriggeredAbility" in abilities
+        and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
         and set(row.get("xmage_signals") or []).issubset({"triggered_ability"})
     )
 
@@ -19106,6 +19111,7 @@ def split_row(
     if etb_scry_creature_unit:
         if not is_creature_metadata(metadata):
             return None, "etb_scry_not_creature"
+        keyword_list = ordered_keywords(keywords_from_ability_classes(row))
         oracle_count = etb_scry_count_from_oracle(metadata)
         if isinstance(oracle_count, str):
             return None, oracle_count
@@ -19127,6 +19133,11 @@ def split_row(
             "xmage_effect_class": "ScryEffect",
             "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
         }
+        if keyword_list:
+            effect_json["keywords"] = keyword_list
+            effect_json["_keywords_are_self"] = True
+            for keyword in keyword_list:
+                effect_json[keyword] = True
         return build_proposal(
             row,
             metadata,

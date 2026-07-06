@@ -823,6 +823,17 @@ def run_creature_etb_scry(
         turn=int(scenario.get("turn") or 6),
     )
     active.battlefield.append(permanent)
+    expected_keywords = [str(value) for value in (scenario.get("expected_keywords") or [])]
+    missing_keywords = [
+        keyword
+        for keyword in expected_keywords
+        if not battle.card_has_keyword(permanent, keyword)
+    ]
+    if missing_keywords:
+        fail(
+            "battle_execution",
+            f"{card['name']} missing expected ETB permanent keywords: {missing_keywords}",
+        )
 
     before_events = len(events)
     library_before = len(active.library)
@@ -859,6 +870,7 @@ def run_creature_etb_scry(
         "scry_count": expected_scry_count,
         "looked_at": scry_event.get("scry_looked_at") or [],
         "top_after": scry_event.get("scry_top_after") or [],
+        "validated_keywords": expected_keywords,
     }
 
 

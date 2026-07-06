@@ -244,6 +244,8 @@ def test_creature_etb_scry_runner_executes_trigger() -> None:
         "etb_trigger_effect": "scry",
         "etb_scry_count": 2,
         "trigger_scry_count": 2,
+        "keywords": ["flying"],
+        "flying": True,
         "_rule_logical_key": "battle_rule_v1:omenspeaker",
     }
     try:
@@ -254,6 +256,7 @@ def test_creature_etb_scry_runner_executes_trigger() -> None:
                 "type": "creature_etb_scry",
                 "card": {"name": "Omenspeaker", "type_line": "Creature", "effect": "creature"},
                 "expected_scry_count": 2,
+                "expected_keywords": ["flying"],
                 "library_top_names": ["E2E Land", "E2E Action", "E2E Reserve"],
                 "logical_rule_key": "battle_rule_v1:omenspeaker",
             },
@@ -265,6 +268,7 @@ def test_creature_etb_scry_runner_executes_trigger() -> None:
 
     assert result["card_name"] == "Omenspeaker"
     assert result["scry_count"] == 2
+    assert result["validated_keywords"] == ["flying"]
     assert result["looked_at"] == ["E2E Land", "E2E Action"]
     assert any(event == "etb_scry_resolved" for event, _ in events)
 

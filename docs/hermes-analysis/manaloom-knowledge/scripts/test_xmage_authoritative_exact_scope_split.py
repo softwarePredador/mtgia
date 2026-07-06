@@ -6968,6 +6968,42 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["trigger_scry_count"], 2)
         self.assertEqual(effect["xmage_effect_class"], "ScryEffect")
 
+    def test_creature_etb_scry_maps_static_self_keyword(self) -> None:
+        row = queue_row(
+            "xmage_signature::ScryEffect::EntersBattlefieldTriggeredAbility,FlyingAbility::"
+            "no_target_class::no_condition_class::triggered_ability",
+            effect_classes=["ScryEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility", "FlyingAbility"],
+            xmage_signals=["triggered_ability"],
+        )
+
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Augury Owl",
+                type_line="Creature - Bird",
+                oracle_text=(
+                    "Flying\n"
+                    "When this creature enters, scry 3. "
+                    "(Look at the top three cards of your library, then put any number "
+                    "of them on the bottom and the rest on top in any order.)"
+                ),
+            ),
+            source_text="""
+                this.addAbility(FlyingAbility.getInstance());
+                this.addAbility(new EntersBattlefieldTriggeredAbility(new ScryEffect(3)));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.ETB_SCRY_CREATURE_SCOPE)
+        self.assertEqual(effect["etb_scry_count"], 3)
+        self.assertEqual(effect["keywords"], ["flying"])
+        self.assertTrue(effect["flying"])
+        self.assertTrue(effect["_keywords_are_self"])
+
     def test_creature_etb_scry_blocks_dynamic_oracle_count(self) -> None:
         row = queue_row(
             split.ETB_SCRY_CREATURE_UNIT,

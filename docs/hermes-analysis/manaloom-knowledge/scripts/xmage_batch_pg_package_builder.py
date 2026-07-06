@@ -1124,6 +1124,7 @@ def creature_etb_scry_execution_scenario_from_expected_rule(
             "effect": "creature",
         },
         "expected_scry_count": scry_count,
+        "expected_keywords": list(required.get("keywords") or []),
         "library_top_names": [
             "Low Priority Land",
             "High Priority Spell",

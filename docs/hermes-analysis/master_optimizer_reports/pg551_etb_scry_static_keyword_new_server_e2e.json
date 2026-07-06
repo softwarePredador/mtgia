@@ -1,0 +1,603 @@
+{
+  "battle_execution": {
+    "event_count": 11,
+    "results": [
+      {
+        "card_name": "Augury Owl",
+        "looked_at": [
+          "Low Priority Land",
+          "High Priority Spell",
+          "Medium Priority Creature"
+        ],
+        "scenario": "Augury Owl enters and scries 3",
+        "scry_count": 3,
+        "top_after": [
+          "Medium Priority Creature",
+          "High Priority Spell",
+          "Low Priority Land"
+        ],
+        "validated_keywords": [
+          "flying"
+        ]
+      },
+      {
+        "card_name": "Cloudreader Sphinx",
+        "looked_at": [
+          "Low Priority Land",
+          "High Priority Spell"
+        ],
+        "scenario": "Cloudreader Sphinx enters and scries 2",
+        "scry_count": 2,
+        "top_after": [
+          "High Priority Spell",
+          "Low Priority Land"
+        ],
+        "validated_keywords": [
+          "flying"
+        ]
+      },
+      {
+        "card_name": "Faerie Seer",
+        "looked_at": [
+          "Low Priority Land",
+          "High Priority Spell"
+        ],
+        "scenario": "Faerie Seer enters and scries 2",
+        "scry_count": 2,
+        "top_after": [
+          "High Priority Spell",
+          "Low Priority Land"
+        ],
+        "validated_keywords": [
+          "flying"
+        ]
+      },
+      {
+        "card_name": "Glider Kids",
+        "looked_at": [
+          "Low Priority Land"
+        ],
+        "scenario": "Glider Kids enters and scries 1",
+        "scry_count": 1,
+        "top_after": [
+          "Low Priority Land"
+        ],
+        "validated_keywords": [
+          "flying"
+        ]
+      },
+      {
+        "card_name": "Grey Havens Navigator",
+        "looked_at": [
+          "Low Priority Land"
+        ],
+        "scenario": "Grey Havens Navigator enters and scries 1",
+        "scry_count": 1,
+        "top_after": [
+          "Low Priority Land"
+        ],
+        "validated_keywords": [
+          "flash"
+        ]
+      },
+      {
+        "card_name": "Horizon Scholar",
+        "looked_at": [
+          "Low Priority Land",
+          "High Priority Spell"
+        ],
+        "scenario": "Horizon Scholar enters and scries 2",
+        "scry_count": 2,
+        "top_after": [
+          "High Priority Spell",
+          "Low Priority Land"
+        ],
+        "validated_keywords": [
+          "flying"
+        ]
+      },
+      {
+        "card_name": "Senate Griffin",
+        "looked_at": [
+          "Low Priority Land"
+        ],
+        "scenario": "Senate Griffin enters and scries 1",
+        "scry_count": 1,
+        "top_after": [
+          "Low Priority Land"
+        ],
+        "validated_keywords": [
+          "flying"
+        ]
+      },
+      {
+        "card_name": "Silver Raven",
+        "looked_at": [
+          "Low Priority Land"
+        ],
+        "scenario": "Silver Raven enters and scries 1",
+        "scry_count": 1,
+        "top_after": [
+          "Low Priority Land"
+        ],
+        "validated_keywords": [
+          "flying"
+        ]
+      },
+      {
+        "card_name": "Thaumaturge's Familiar",
+        "looked_at": [
+          "Low Priority Land"
+        ],
+        "scenario": "Thaumaturge's Familiar enters and scries 1",
+        "scry_count": 1,
+        "top_after": [
+          "Low Priority Land"
+        ],
+        "validated_keywords": [
+          "flying"
+        ]
+      },
+      {
+        "card_name": "Wall of Runes",
+        "looked_at": [
+          "Low Priority Land"
+        ],
+        "scenario": "Wall of Runes enters and scries 1",
+        "scry_count": 1,
+        "top_after": [
+          "Low Priority Land"
+        ],
+        "validated_keywords": [
+          "defender"
+        ]
+      },
+      {
+        "card_name": "Willow-Wind",
+        "looked_at": [
+          "Low Priority Land",
+          "High Priority Spell"
+        ],
+        "scenario": "Willow-Wind enters and scries 2",
+        "scry_count": 2,
+        "top_after": [
+          "High Priority Spell",
+          "Low Priority Land"
+        ],
+        "validated_keywords": [
+          "flying"
+        ]
+      }
+    ],
+    "scenario_count": 11
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-06T05:01:26.940588+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg551_etb_scry_static_keyword_new_server_package_manifest.json",
+  "package_id": "pg551_etb_scry_static_keyword_new_server_package_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 11
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_scry_v1",
+          "card_name": "Augury Owl",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:575ffe521a678ebd6048179921e143c4",
+          "oracle_hash": "b7c450e1cc1c7574009f6120b406d00f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_scry_v1",
+          "card_name": "Cloudreader Sphinx",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8c424968cc1906699fad2ba5866d5ef7",
+          "oracle_hash": "68d074a48c8f785d82b12014eb8b3f41",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_scry_v1",
+          "card_name": "Faerie Seer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8c424968cc1906699fad2ba5866d5ef7",
+          "oracle_hash": "68d074a48c8f785d82b12014eb8b3f41",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_scry_v1",
+          "card_name": "Glider Kids",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:83bb17942e6f86ca784d1785783c02f8",
+          "oracle_hash": "ad26d1495915babc0e86243a49761178",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_scry_v1",
+          "card_name": "Grey Havens Navigator",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:13d75d87933e5b87f6584ce7d870f88b",
+          "oracle_hash": "3446d3cb3c4454d8bcaef4afb24a03aa",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_scry_v1",
+          "card_name": "Horizon Scholar",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8c424968cc1906699fad2ba5866d5ef7",
+          "oracle_hash": "68d074a48c8f785d82b12014eb8b3f41",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_scry_v1",
+          "card_name": "Senate Griffin",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:83bb17942e6f86ca784d1785783c02f8",
+          "oracle_hash": "6d564a66429df23676e0a2d72d667473",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_scry_v1",
+          "card_name": "Silver Raven",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:83bb17942e6f86ca784d1785783c02f8",
+          "oracle_hash": "d70888b658f8ccdbcf9730d995915e7b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_scry_v1",
+          "card_name": "Thaumaturge's Familiar",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:83bb17942e6f86ca784d1785783c02f8",
+          "oracle_hash": "6d564a66429df23676e0a2d72d667473",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_scry_v1",
+          "card_name": "Wall of Runes",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f02e41ac1bd0430218b795975f29fb9d",
+          "oracle_hash": "d3d9386b475168e08a8a86ad8f75d8a2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_scry_v1",
+          "card_name": "Willow-Wind",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8c424968cc1906699fad2ba5866d5ef7",
+          "oracle_hash": "e50f14b80485abf7b731a36129db45f4",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 11
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_scry_v1",
+          "card_name": "Augury Owl",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:575ffe521a678ebd6048179921e143c4",
+          "oracle_hash": "b7c450e1cc1c7574009f6120b406d00f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_scry_v1",
+          "card_name": "Cloudreader Sphinx",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8c424968cc1906699fad2ba5866d5ef7",
+          "oracle_hash": "68d074a48c8f785d82b12014eb8b3f41",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_scry_v1",
+          "card_name": "Faerie Seer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8c424968cc1906699fad2ba5866d5ef7",
+          "oracle_hash": "68d074a48c8f785d82b12014eb8b3f41",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_scry_v1",
+          "card_name": "Glider Kids",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:83bb17942e6f86ca784d1785783c02f8",
+          "oracle_hash": "ad26d1495915babc0e86243a49761178",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_scry_v1",
+          "card_name": "Grey Havens Navigator",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:13d75d87933e5b87f6584ce7d870f88b",
+          "oracle_hash": "3446d3cb3c4454d8bcaef4afb24a03aa",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_scry_v1",
+          "card_name": "Horizon Scholar",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8c424968cc1906699fad2ba5866d5ef7",
+          "oracle_hash": "68d074a48c8f785d82b12014eb8b3f41",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_scry_v1",
+          "card_name": "Senate Griffin",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:83bb17942e6f86ca784d1785783c02f8",
+          "oracle_hash": "6d564a66429df23676e0a2d72d667473",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_scry_v1",
+          "card_name": "Silver Raven",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:83bb17942e6f86ca784d1785783c02f8",
+          "oracle_hash": "d70888b658f8ccdbcf9730d995915e7b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_scry_v1",
+          "card_name": "Thaumaturge's Familiar",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:83bb17942e6f86ca784d1785783c02f8",
+          "oracle_hash": "6d564a66429df23676e0a2d72d667473",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_scry_v1",
+          "card_name": "Wall of Runes",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f02e41ac1bd0430218b795975f29fb9d",
+          "oracle_hash": "d3d9386b475168e08a8a86ad8f75d8a2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_scry_v1",
+          "card_name": "Willow-Wind",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8c424968cc1906699fad2ba5866d5ef7",
+          "oracle_hash": "e50f14b80485abf7b731a36129db45f4",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 11
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_scry_v1",
+          "battle_rule_version": 2,
+          "card_name": "Augury Owl",
+          "logical_rule_key": "battle_rule_v1:575ffe521a678ebd6048179921e143c4"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_scry_v1",
+          "battle_rule_version": 2,
+          "card_name": "Cloudreader Sphinx",
+          "logical_rule_key": "battle_rule_v1:8c424968cc1906699fad2ba5866d5ef7"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_scry_v1",
+          "battle_rule_version": 2,
+          "card_name": "Faerie Seer",
+          "logical_rule_key": "battle_rule_v1:8c424968cc1906699fad2ba5866d5ef7"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_scry_v1",
+          "battle_rule_version": 2,
+          "card_name": "Glider Kids",
+          "logical_rule_key": "battle_rule_v1:83bb17942e6f86ca784d1785783c02f8"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_scry_v1",
+          "battle_rule_version": 2,
+          "card_name": "Grey Havens Navigator",
+          "logical_rule_key": "battle_rule_v1:13d75d87933e5b87f6584ce7d870f88b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_scry_v1",
+          "battle_rule_version": 2,
+          "card_name": "Horizon Scholar",
+          "logical_rule_key": "battle_rule_v1:8c424968cc1906699fad2ba5866d5ef7"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_scry_v1",
+          "battle_rule_version": 2,
+          "card_name": "Senate Griffin",
+          "logical_rule_key": "battle_rule_v1:83bb17942e6f86ca784d1785783c02f8"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_scry_v1",
+          "battle_rule_version": 2,
+          "card_name": "Silver Raven",
+          "logical_rule_key": "battle_rule_v1:83bb17942e6f86ca784d1785783c02f8"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_scry_v1",
+          "battle_rule_version": 2,
+          "card_name": "Thaumaturge's Familiar",
+          "logical_rule_key": "battle_rule_v1:83bb17942e6f86ca784d1785783c02f8"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_scry_v1",
+          "battle_rule_version": 2,
+          "card_name": "Wall of Runes",
+          "logical_rule_key": "battle_rule_v1:f02e41ac1bd0430218b795975f29fb9d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_scry_v1",
+          "battle_rule_version": 2,
+          "card_name": "Willow-Wind",
+          "logical_rule_key": "battle_rule_v1:8c424968cc1906699fad2ba5866d5ef7"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 11
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Augury Owl",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:575ffe521a678ebd6048179921e143c4"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Cloudreader Sphinx",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:8c424968cc1906699fad2ba5866d5ef7"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Faerie Seer",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:8c424968cc1906699fad2ba5866d5ef7"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Glider Kids",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:83bb17942e6f86ca784d1785783c02f8"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Grey Havens Navigator",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:13d75d87933e5b87f6584ce7d870f88b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Horizon Scholar",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:8c424968cc1906699fad2ba5866d5ef7"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Senate Griffin",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:83bb17942e6f86ca784d1785783c02f8"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Silver Raven",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:83bb17942e6f86ca784d1785783c02f8"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Thaumaturge's Familiar",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:83bb17942e6f86ca784d1785783c02f8"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Wall of Runes",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:f02e41ac1bd0430218b795975f29fb9d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Willow-Wind",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:8c424968cc1906699fad2ba5866d5ef7"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 11,
+        "scenarios": 11
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

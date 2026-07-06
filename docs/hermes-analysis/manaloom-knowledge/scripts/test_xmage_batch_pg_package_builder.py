@@ -1165,6 +1165,7 @@ def test_creature_etb_scry_execution_scenario() -> None:
             "etb_trigger_effect": "scry",
             "etb_scry_count": 2,
             "trigger_scry_count": 2,
+            "keywords": ["flying"],
         },
     }
 
@@ -1172,6 +1173,7 @@ def test_creature_etb_scry_execution_scenario() -> None:
 
     assert scenario["type"] == "creature_etb_scry"
     assert scenario["expected_scry_count"] == 2
+    assert scenario["expected_keywords"] == ["flying"]
     assert scenario["card"]["name"] == "Omenspeaker"
     assert scenario["logical_rule_key"] == "battle_rule_v1:omenspeaker"
 
