@@ -46,6 +46,36 @@ class PlanService {
     );
   }
 
+  Future<UserPlanSnapshot> activatePro(String userId) async {
+    await pool.execute(
+      Sql.named('''
+        INSERT INTO user_plans (
+          user_id,
+          plan_name,
+          status,
+          started_at,
+          renews_at,
+          updated_at
+        )
+        VALUES (
+          @userId,
+          'pro',
+          'active',
+          NOW(),
+          NOW() + INTERVAL '30 days',
+          NOW()
+        )
+        ON CONFLICT (user_id) DO UPDATE SET
+          plan_name = 'pro',
+          status = 'active',
+          renews_at = NOW() + INTERVAL '30 days',
+          updated_at = NOW()
+      '''),
+      parameters: {'userId': userId},
+    );
+    return getSnapshot(userId);
+  }
+
   Future<UserPlanSnapshot> getSnapshot(String userId) async {
     await ensureFreePlan(userId);
 
@@ -59,10 +89,12 @@ class PlanService {
       parameters: {'userId': userId},
     );
 
-    final planName =
-        planResult.isNotEmpty ? (planResult.first[0] as String? ?? 'free') : 'free';
-    final status =
-        planResult.isNotEmpty ? (planResult.first[1] as String? ?? 'active') : 'active';
+    final planName = planResult.isNotEmpty
+        ? (planResult.first[0] as String? ?? 'free')
+        : 'free';
+    final status = planResult.isNotEmpty
+        ? (planResult.first[1] as String? ?? 'active')
+        : 'active';
 
     final aiMonthlyLimit = planName == 'pro' ? _proLimit : _defaultFreeLimit;
 
@@ -78,8 +110,10 @@ class PlanService {
       parameters: {'userId': userId},
     );
 
-    final requestsUsed = usageResult.isNotEmpty ? (usageResult.first[0] as int? ?? 0) : 0;
-    final totalTokens = usageResult.isNotEmpty ? (usageResult.first[1] as int? ?? 0) : 0;
+    final requestsUsed =
+        usageResult.isNotEmpty ? (usageResult.first[0] as int? ?? 0) : 0;
+    final totalTokens =
+        usageResult.isNotEmpty ? (usageResult.first[1] as int? ?? 0) : 0;
 
     final remaining = (aiMonthlyLimit - requestsUsed).clamp(0, aiMonthlyLimit);
 

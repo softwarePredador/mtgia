@@ -76,11 +76,11 @@ class OptimizeRecommendationContext {
       if (unknownKeys.isNotEmpty) 'unknown_keys': unknownKeys,
       'server_support': {
         'prefer_collection': preferCollection == true
-            ? 'pending_collection_inventory_join'
+            ? 'accepted_for_binder_priority'
             : 'accepted',
         'budget_limit_brl': budgetLimitBrl == null
             ? 'not_requested'
-            : 'accepted_for_cache_scope',
+            : 'accepted_for_budget_filter',
         'rebuild_intent': rebuildIntent == null ? 'not_requested' : 'accepted',
         'report': report == null ? 'not_requested' : 'accepted',
         'explain_swaps': explainSwaps == true ? 'requested' : 'not_requested',
@@ -89,11 +89,6 @@ class OptimizeRecommendationContext {
             : 'not_requested',
       },
     };
-    if (preferCollection == true) {
-      diagnostics['limitations'] = [
-        'collection inventory data is not joined in this optimize route yet',
-      ];
-    }
     return diagnostics;
   }
 

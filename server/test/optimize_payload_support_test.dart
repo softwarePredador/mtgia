@@ -44,6 +44,10 @@ void main() {
             'add': 'Arcane Signet',
             'role': 'ramp',
             'candidate_quality_sources': ['deterministic_semantic_v2'],
+            'collection_match': true,
+            'owned_quantity': 1,
+            'purchase_required': false,
+            'estimated_price_brl': 12.34,
           },
         ],
         targetArchetype: 'Spellslinger',
@@ -69,6 +73,10 @@ void main() {
         (response['swaps'] as List).single['reason'],
         contains('Sinal semântico v2'),
       );
+      expect((response['swaps'] as List).single['collection_match'], isTrue);
+      expect((response['swaps'] as List).single['owned_quantity'], 1);
+      expect((response['swaps'] as List).single['purchase_required'], isFalse);
+      expect((response['swaps'] as List).single['estimated_price_brl'], 12.34);
       expect(detail['reason'], contains('Sugestão de saída'));
       expect(detail['role'], 'ramp');
       expect(detail['function'], 'ramp');

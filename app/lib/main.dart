@@ -554,6 +554,7 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
       unawaited(AppObservability.instance.setUserContext(_authProvider.user));
       _notificationProvider.startPolling();
       _messageProvider.startPolling();
+      unawaited(_commercialProvider.refreshFromServer());
 
       // Registra FCM token para push notifications
       if (!_disableFirebaseStartup && !_disablePushInit) {
@@ -598,6 +599,7 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
     _tradeProvider.clearAllState();
     _messageProvider.clearAllState();
     _notificationProvider.clearAllState();
+    unawaited(_commercialProvider.clearRemoteSnapshot());
   }
 
   @override

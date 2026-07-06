@@ -58,12 +58,12 @@ class ManaLoomPlan {
 
   static const free = ManaLoomPlan(
     tier: ManaLoomPlanTier.free,
-    monthlyAiLimit: 5,
+    monthlyAiLimit: 120,
     priceLabel: 'R\$ 0',
     description:
         'Para testar ManaLoom, criar listas iniciais e validar se o fluxo serve para sua mesa.',
     features: [
-      '5 ações de IA por mês',
+      '120 ações de IA por mês',
       'Gerador de decks revisável',
       'Otimização com preview antes de aplicar',
       'Coleção, fichário e trocas básicos',
@@ -77,12 +77,12 @@ class ManaLoomPlan {
 
   static const pro = ManaLoomPlan(
     tier: ManaLoomPlanTier.pro,
-    monthlyAiLimit: 200,
-    priceLabel: 'Pro',
+    monthlyAiLimit: 2500,
+    priceLabel: 'R\$ 19,90/mês',
     description:
         'Para acompanhar decks vivos, otimizar por coleção/orçamento e voltar depois de cada partida.',
     features: [
-      '200 ações de IA por mês',
+      '2.500 ações de IA por mês',
       'Otimização por coleção e orçamento',
       'Relatório antes/depois compartilhável',
       'Histórico pós-jogo e alertas de evolução',
@@ -106,14 +106,16 @@ class AiUsageSnapshot {
   final ManaLoomPlan plan;
   final String periodKey;
   final int used;
+  final int? limitOverride;
 
   const AiUsageSnapshot({
     required this.plan,
     required this.periodKey,
     required this.used,
+    this.limitOverride,
   });
 
-  int get limit => plan.monthlyAiLimit;
+  int get limit => limitOverride ?? plan.monthlyAiLimit;
   int get remaining => (limit - used).clamp(0, limit);
   bool get isExhausted => remaining <= 0;
   bool get isNearLimit => !isExhausted && remaining <= 2;

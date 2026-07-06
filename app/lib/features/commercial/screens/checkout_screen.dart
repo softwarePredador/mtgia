@@ -3,7 +3,6 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/theme/app_theme.dart';
-import '../models/manaloom_plan.dart';
 import '../providers/commercial_provider.dart';
 
 class CheckoutScreen extends StatefulWidget {
@@ -15,15 +14,38 @@ class CheckoutScreen extends StatefulWidget {
 
 class _CheckoutScreenState extends State<CheckoutScreen> {
   bool _isProcessing = false;
+  String? _statusMessage;
+  bool _requiresExternalPayment = false;
 
   Future<void> _confirm() async {
-    setState(() => _isProcessing = true);
-    await context.read<CommercialProvider>().setPlan(ManaLoomPlanTier.pro);
+    setState(() {
+      _isProcessing = true;
+      _statusMessage = null;
+      _requiresExternalPayment = false;
+    });
+    final result = await context.read<CommercialProvider>().startProCheckout();
     if (!mounted) return;
-    setState(() => _isProcessing = false);
+    setState(() {
+      _isProcessing = false;
+      _statusMessage = result.message;
+      _requiresExternalPayment = result.requiresExternalPayment;
+    });
+    if (!result.activated) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(result.message),
+          backgroundColor:
+              result.requiresExternalPayment
+                  ? AppTheme.warning
+                  : AppTheme.error,
+        ),
+      );
+      return;
+    }
+
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('Plano Pro ativado para este ambiente.'),
+        content: Text('Plano Pro ativado.'),
         backgroundColor: AppTheme.success,
       ),
     );
@@ -62,19 +84,26 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 ),
                 const SizedBox(height: 12),
                 const _CheckoutLine(label: 'Plano', value: 'ManaLoom Pro'),
-                const _CheckoutLine(label: 'Uso de IA', value: '200 ações/mês'),
                 const _CheckoutLine(
-                  label: 'Status',
-                  value: 'Checkout interno MVP',
+                  label: 'Uso de IA',
+                  value: '2.500 ações/mês',
                 ),
+                const _CheckoutLine(label: 'Status', value: 'Checkout backend'),
                 const SizedBox(height: 12),
                 const Text(
-                  'Este fluxo valida produto, paywall e upgrade. A cobrança real deve ser feita por integração de pagamento no backend antes de produção.',
+                  'Este fluxo chama o backend para ativar o Pro somente quando o checkout interno ou provedor de pagamento estiver configurado.',
                   style: TextStyle(color: AppTheme.textSecondary, height: 1.4),
                 ),
               ],
             ),
           ),
+          if (_statusMessage != null) ...[
+            const SizedBox(height: 12),
+            _CheckoutStatusPanel(
+              message: _statusMessage!,
+              requiresExternalPayment: _requiresExternalPayment,
+            ),
+          ],
           const SizedBox(height: 16),
           ElevatedButton.icon(
             key: const Key('checkout-confirm-button'),
@@ -92,6 +121,51 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           TextButton(
             onPressed: _isProcessing ? null : () => context.go('/plans'),
             child: const Text('Voltar aos planos'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CheckoutStatusPanel extends StatelessWidget {
+  const _CheckoutStatusPanel({
+    required this.message,
+    required this.requiresExternalPayment,
+  });
+
+  final String message;
+  final bool requiresExternalPayment;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = requiresExternalPayment ? AppTheme.warning : AppTheme.error;
+    return Container(
+      key: const Key('checkout-status-panel'),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceElevated,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        border: Border.all(color: color.withValues(alpha: 0.55)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            requiresExternalPayment
+                ? Icons.payments_outlined
+                : Icons.error_outline,
+            color: color,
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              message,
+              style: const TextStyle(
+                color: AppTheme.textSecondary,
+                height: 1.4,
+              ),
+            ),
           ),
         ],
       ),

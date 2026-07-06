@@ -312,6 +312,14 @@ Map<String, dynamic> buildDeterministicOptimizeResponse({
         'candidate_quality_signal': candidate['candidate_quality_signal'],
       if (candidate['candidate_quality_sources'] != null)
         'candidate_quality_sources': candidate['candidate_quality_sources'],
+      if (candidate['collection_match'] != null)
+        'collection_match': candidate['collection_match'],
+      if (candidate['owned_quantity'] != null)
+        'owned_quantity': candidate['owned_quantity'],
+      if (candidate['purchase_required'] != null)
+        'purchase_required': candidate['purchase_required'],
+      if (candidate['estimated_price_brl'] != null)
+        'estimated_price_brl': candidate['estimated_price_brl'],
     };
   }).toList();
 

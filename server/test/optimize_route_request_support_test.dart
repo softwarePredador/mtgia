@@ -174,7 +174,11 @@ void main() {
     expect((diagnostics['values'] as Map)['rebuild_intent'], 'optimized');
     expect(
       (diagnostics['server_support'] as Map)['prefer_collection'],
-      'pending_collection_inventory_join',
+      'accepted_for_binder_priority',
+    );
+    expect(
+      (diagnostics['server_support'] as Map)['budget_limit_brl'],
+      'accepted_for_budget_filter',
     );
     expect((response['optimize_diagnostics'] as Map)['existing'], isTrue);
   });

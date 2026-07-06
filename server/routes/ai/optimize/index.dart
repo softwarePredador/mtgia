@@ -28,6 +28,8 @@ import '../../../lib/ai/optimize_route_land_removal_protection_support.dart'
     as optimize_route_land_removal_protection;
 import '../../../lib/ai/optimize_route_payload_support.dart'
     as optimize_route_payload;
+import '../../../lib/ai/optimize_route_recommendation_context_support.dart'
+    as optimize_route_recommendation_context;
 import '../../../lib/ai/optimize_route_rebalance_support.dart'
     as optimize_route_rebalance;
 import '../../../lib/ai/optimize_route_diagnostics_support.dart'
@@ -217,6 +219,9 @@ Future<List<Map<String, dynamic>>> buildDeterministicOptimizeSwapCandidates({
   int swapLimit = 6,
   String intensity = 'focused',
   Map<String, dynamic>? diagnosticsOut,
+  String? userId,
+  bool preferCollection = false,
+  int? budgetLimitBrl,
 }) =>
     optimize_support.buildDeterministicOptimizeSwapCandidates(
       pool: pool,
@@ -232,6 +237,9 @@ Future<List<Map<String, dynamic>>> buildDeterministicOptimizeSwapCandidates({
       swapLimit: swapLimit,
       intensity: intensity,
       diagnosticsOut: diagnosticsOut,
+      userId: userId,
+      preferCollection: preferCollection,
+      budgetLimitBrl: budgetLimitBrl,
     );
 
 Map<String, dynamic> buildOptimizationAnalysisLogEntry({
@@ -991,6 +999,9 @@ Future<Response> onRequest(RequestContext context) async {
           swapLimit: intensity.targetMax,
           intensity: intensity.selected,
           diagnosticsOut: aggressiveCandidateQualityDiagnostics,
+          userId: authenticatedUserId,
+          preferCollection: recommendationContext.preferCollection == true,
+          budgetLimitBrl: recommendationContext.budgetLimitBrl,
         ),
       ));
       if (deterministicSwapCandidates.isNotEmpty) {
@@ -1254,6 +1265,9 @@ Future<Response> onRequest(RequestContext context) async {
       final coreLower =
           themeProfile.coreCards.map((c) => c.toLowerCase()).toSet();
       final blockedByTheme = <String>[];
+      final recommendationDetailsByName = <String, Map<String, dynamic>>{};
+      final recommendationConstraintWarnings = <String>[];
+      Map<String, dynamic>? recommendationConstraintDiagnostics;
 
       final isComplete = jsonResponse['mode'] == 'complete';
 
@@ -1286,6 +1300,9 @@ Future<Response> onRequest(RequestContext context) async {
             preferredNames: optimizeCommanderPriorityNames
                 .map((name) => name.toLowerCase())
                 .toSet(),
+            userId: authenticatedUserId,
+            preferCollection: recommendationContext.preferCollection == true,
+            budgetLimitBrl: recommendationContext.budgetLimitBrl,
           );
           final fallbackApplication = optimize_route_empty_fallback
               .buildEmptySuggestionFallbackApplication(
@@ -1571,6 +1588,9 @@ Future<Response> onRequest(RequestContext context) async {
               preferredNames: optimizeCommanderPriorityNames
                   .map((name) => name.toLowerCase())
                   .toSet(),
+              userId: authenticatedUserId,
+              preferCollection: recommendationContext.preferCollection == true,
+              budgetLimitBrl: recommendationContext.budgetLimitBrl,
             );
 
             if (replacementResult.isNotEmpty) {
@@ -1627,6 +1647,40 @@ Future<Response> onRequest(RequestContext context) async {
             '  Depois: removals=${validRemovals.length}, additions=${validAdditions.length}');
       }
 
+      if (!isComplete &&
+          (recommendationContext.preferCollection == true ||
+              recommendationContext.budgetLimitBrl != null) &&
+          validAdditions.isNotEmpty) {
+        final recommendationConstraintResult =
+            await optimize_route_recommendation_context
+                .applyOptimizeRecommendationConstraints(
+          pool: pool,
+          userId: authenticatedUserId,
+          validAdditions: validAdditions,
+          context: recommendationContext,
+        );
+        recommendationDetailsByName
+          ..clear()
+          ..addAll(recommendationConstraintResult.detailsByNameLower);
+        recommendationConstraintWarnings
+          ..clear()
+          ..addAll(recommendationConstraintResult.validationWarnings);
+        if (recommendationConstraintResult.diagnostics.isNotEmpty) {
+          recommendationConstraintDiagnostics =
+              recommendationConstraintResult.diagnostics;
+        }
+        validAdditions = recommendationConstraintResult.additions;
+        if (validAdditions.length < validRemovals.length) {
+          final trimResult =
+              optimize_route_rebalance.trimOptimizeRebalanceToPairs(
+            removals: validRemovals,
+            additions: validAdditions,
+          );
+          validRemovals = trimResult.removals;
+          validAdditions = trimResult.additions;
+        }
+      }
+
       if (!isComplete && (validRemovals.isEmpty || validAdditions.isEmpty)) {
         return respondWithOptimizeTelemetry(
           statusCode: HttpStatus.unprocessableEntity,
@@ -1656,6 +1710,7 @@ Future<Response> onRequest(RequestContext context) async {
       // Simular o deck como ficaria se as mudanÃ§as fossem aplicadas e re-analisar
       Map<String, dynamic>? postAnalysis;
       List<String> validationWarnings = [];
+      validationWarnings.addAll(recommendationConstraintWarnings);
 
       // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
       // VALIDAÃ‡ÃƒO PÃ“S-PROCESSAMENTO: Color Identity + EDHREC + Tema
@@ -2183,7 +2238,10 @@ Future<Response> onRequest(RequestContext context) async {
                   keepTheme: keepTheme,
                   priority: detailPriority,
                   risk: detailRisk,
-                );
+                )..addAll(
+                    recommendationDetailsByName[name.toLowerCase()] ??
+                        const <String, dynamic>{},
+                  );
               })
               .where((e) => e != null)
               .toList()
@@ -2203,7 +2261,10 @@ Future<Response> onRequest(RequestContext context) async {
                   keepTheme: keepTheme,
                   priority: detailPriority,
                   risk: detailRisk,
-                );
+                )..addAll(
+                    recommendationDetailsByName[name.toLowerCase()] ??
+                        const <String, dynamic>{},
+                  );
               })
               .where((e) => e != null)
               .toList();
@@ -2287,6 +2348,13 @@ Future<Response> onRequest(RequestContext context) async {
               effectiveMode: effectiveMode,
             ),
           ),
+        );
+      }
+      if (recommendationConstraintDiagnostics != null) {
+        optimize_route_diagnostics.attachOptimizeDiagnostic(
+          responseBody,
+          key: 'recommendation_constraints',
+          value: recommendationConstraintDiagnostics,
         );
       }
 

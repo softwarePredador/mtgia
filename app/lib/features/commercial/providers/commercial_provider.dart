@@ -1,16 +1,33 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../core/api/api_client.dart';
 import '../models/manaloom_plan.dart';
 
 typedef SharedPreferencesLoader = Future<SharedPreferences> Function();
+
+class CommercialCheckoutResult {
+  const CommercialCheckoutResult({
+    required this.activated,
+    required this.requiresExternalPayment,
+    required this.message,
+    this.checkoutUrl,
+  });
+
+  final bool activated;
+  final bool requiresExternalPayment;
+  final String message;
+  final String? checkoutUrl;
+}
 
 class CommercialProvider extends ChangeNotifier {
   CommercialProvider({
     SharedPreferencesLoader? preferencesLoader,
     DateTime Function()? now,
+    ApiClient? apiClient,
   }) : _preferencesLoader = preferencesLoader ?? SharedPreferences.getInstance,
-       _now = now ?? DateTime.now;
+       _now = now ?? DateTime.now,
+       _apiClient = apiClient ?? ApiClient();
 
   static const _planKey = 'manaloom.commercial.plan';
   static const _usagePeriodKey = 'manaloom.commercial.ai_usage_period';
@@ -18,27 +35,39 @@ class CommercialProvider extends ChangeNotifier {
 
   final SharedPreferencesLoader _preferencesLoader;
   final DateTime Function() _now;
+  final ApiClient _apiClient;
 
   SharedPreferences? _preferences;
   Future<void>? _loadFuture;
   bool _isLoaded = false;
+  bool _isRemoteSynced = false;
+  bool _isRefreshingRemote = false;
+  String? _lastRemoteError;
   ManaLoomPlanTier _tier = ManaLoomPlanTier.free;
   String _periodKey = _periodFrom(DateTime.now());
   int _usedAiActions = 0;
+  int? _monthlyAiLimitOverride;
 
   bool get isLoaded => _isLoaded;
+  bool get isRemoteSynced => _isRemoteSynced;
+  bool get isRefreshingRemote => _isRefreshingRemote;
+  String? get lastRemoteError => _lastRemoteError;
   ManaLoomPlanTier get tier => _tier;
   ManaLoomPlan get plan => ManaLoomPlan.forTier(_tier);
   bool get isPro => _tier == ManaLoomPlanTier.pro;
   String get periodKey => _periodKey;
   int get usedAiActions => _usedAiActions;
-  int get monthlyAiLimit => plan.monthlyAiLimit;
+  int get monthlyAiLimit => _monthlyAiLimitOverride ?? plan.monthlyAiLimit;
   int get remainingAiActions =>
       (monthlyAiLimit - _usedAiActions).clamp(0, monthlyAiLimit);
   bool get canUseAi => remainingAiActions > 0;
 
-  AiUsageSnapshot get usageSnapshot =>
-      AiUsageSnapshot(plan: plan, periodKey: _periodKey, used: _usedAiActions);
+  AiUsageSnapshot get usageSnapshot => AiUsageSnapshot(
+    plan: plan,
+    periodKey: _periodKey,
+    used: _usedAiActions,
+    limitOverride: _monthlyAiLimitOverride,
+  );
 
   Future<void> load() {
     if (_isLoaded) return Future<void>.value();
@@ -56,10 +85,44 @@ class CommercialProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> refreshFromServer() async {
+    await load();
+    if (_isRefreshingRemote) return;
+    _isRefreshingRemote = true;
+    _lastRemoteError = null;
+    notifyListeners();
+
+    try {
+      final response = await _apiClient.get('/users/me/plan');
+      if (response.statusCode == 200 && response.data is Map<String, dynamic>) {
+        final payload = response.data as Map<String, dynamic>;
+        final planPayload = payload['plan'];
+        if (planPayload is Map<String, dynamic>) {
+          await _applyRemotePlan(planPayload);
+          _isRemoteSynced = true;
+          _lastRemoteError = null;
+        }
+      } else if (response.statusCode == 401 || response.statusCode == 403) {
+        _isRemoteSynced = false;
+      } else {
+        _isRemoteSynced = false;
+        _lastRemoteError = 'Falha ao carregar plano (${response.statusCode}).';
+      }
+    } catch (error) {
+      _isRemoteSynced = false;
+      _lastRemoteError = 'Plano remoto indisponível.';
+      debugPrint('[CommercialProvider] refreshFromServer failed: $error');
+    } finally {
+      _isRefreshingRemote = false;
+      notifyListeners();
+    }
+  }
+
   Future<bool> consumeAiAction(AiUsageKind kind) async {
     await load();
     await _rolloverIfNeeded();
     if (!canUseAi) return false;
+    if (_isRemoteSynced) return true;
     _usedAiActions += 1;
     await _saveUsage();
     notifyListeners();
@@ -70,8 +133,67 @@ class CommercialProvider extends ChangeNotifier {
     await load();
     if (_tier == tier) return;
     _tier = tier;
+    _monthlyAiLimitOverride = null;
+    _isRemoteSynced = false;
     final prefs = _preferences ?? await _preferencesLoader();
     await prefs.setString(_planKey, tier.id);
+    await _rolloverIfNeeded();
+    notifyListeners();
+  }
+
+  Future<CommercialCheckoutResult> startProCheckout() async {
+    await load();
+    try {
+      final response = await _apiClient.post('/users/me/plan/checkout', {
+        'plan_name': ManaLoomPlanTier.pro.id,
+      });
+      final data =
+          response.data is Map<String, dynamic>
+              ? response.data as Map<String, dynamic>
+              : const <String, dynamic>{};
+
+      final planPayload = data['plan'];
+      if ((response.statusCode == 200 || response.statusCode == 201) &&
+          planPayload is Map<String, dynamic>) {
+        await _applyRemotePlan(planPayload);
+        _isRemoteSynced = true;
+        notifyListeners();
+        return CommercialCheckoutResult(
+          activated: true,
+          requiresExternalPayment: false,
+          message: data['message']?.toString() ?? 'Plano Pro ativado.',
+          checkoutUrl: data['checkout_url']?.toString(),
+        );
+      }
+
+      final checkoutUrl = data['checkout_url']?.toString();
+      return CommercialCheckoutResult(
+        activated: false,
+        requiresExternalPayment: true,
+        checkoutUrl:
+            checkoutUrl == null || checkoutUrl.trim().isEmpty
+                ? null
+                : checkoutUrl,
+        message:
+            data['message']?.toString() ??
+            'Checkout de pagamento ainda precisa ser configurado.',
+      );
+    } catch (error) {
+      debugPrint('[CommercialProvider] startProCheckout failed: $error');
+      return const CommercialCheckoutResult(
+        activated: false,
+        requiresExternalPayment: true,
+        message: 'Não foi possível iniciar o checkout agora.',
+      );
+    }
+  }
+
+  Future<void> clearRemoteSnapshot() async {
+    await load();
+    _isRemoteSynced = false;
+    _isRefreshingRemote = false;
+    _lastRemoteError = null;
+    _monthlyAiLimitOverride = null;
     await _rolloverIfNeeded();
     notifyListeners();
   }
@@ -97,6 +219,32 @@ class CommercialProvider extends ChangeNotifier {
     _preferences = prefs;
     await prefs.setString(_usagePeriodKey, _periodKey);
     await prefs.setInt(_usageCountKey, _usedAiActions);
+  }
+
+  Future<void> _applyRemotePlan(Map<String, dynamic> planPayload) async {
+    final tier = ManaLoomPlanTierLabel.fromId(
+      planPayload['plan_name']?.toString(),
+    );
+    final used = _readInt(planPayload['ai_requests_used']) ?? 0;
+    final limit =
+        _readInt(planPayload['ai_monthly_limit']) ??
+        ManaLoomPlan.forTier(tier).monthlyAiLimit;
+
+    _tier = tier;
+    _usedAiActions = used.clamp(0, limit);
+    _monthlyAiLimitOverride = limit;
+    _periodKey = _periodFrom(_now());
+
+    final prefs = _preferences ?? await _preferencesLoader();
+    _preferences = prefs;
+    await prefs.setString(_planKey, tier.id);
+    await _saveUsage();
+  }
+
+  static int? _readInt(dynamic value) {
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    return int.tryParse(value?.toString() ?? '');
   }
 
   static String _periodFrom(DateTime date) {

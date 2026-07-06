@@ -6,6 +6,7 @@ import 'optimize_candidate_quality_support.dart';
 import 'optimize_filler_loader_support.dart';
 import 'optimize_functional_role_support.dart';
 import 'optimize_removal_candidate_support.dart';
+import 'optimize_route_recommendation_context_support.dart';
 import 'optimization_functional_roles.dart';
 
 Future<List<Map<String, dynamic>>> findSynergyReplacements({
@@ -24,6 +25,10 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
   required List<Map<String, dynamic>> allCardData,
   Set<String> preferredNames = const <String>{},
   bool preferLowCurve = false,
+  String? userId,
+  bool preferCollection = false,
+  int? budgetLimitBrl,
+  double usdToBrlRate = defaultOptimizeUsdToBrlRate,
 }) async {
   final results = <Map<String, dynamic>>[];
 
@@ -103,7 +108,8 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
     Sql.named('''
       SELECT sub.id, sub.name, sub.type_line, sub.oracle_text, sub.mana_cost,
              sub.colors, sub.color_identity, sub.pop_score,
-             sub.functional_tags, sub.semantic_tags_v2, sub.best_role_score
+             sub.functional_tags, sub.semantic_tags_v2, sub.best_role_score,
+             sub.price_usd, sub.price_usd_foil, sub.owned_quantity
       FROM (
         SELECT DISTINCT ON (LOWER(c.name))
           c.id::text, c.name, c.type_line, c.oracle_text, c.mana_cost, c.colors, c.color_identity,
@@ -117,11 +123,23 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
             WHERE value IS NOT NULL AND TRIM(value) <> ''
           ) AS functional_tags,
           COALESCE(cis.semantic_tags_v2, '[]'::jsonb) AS semantic_tags_v2,
-          COALESCE(cis.best_role_score, 0) AS best_role_score
+          COALESCE(cis.best_role_score, 0) AS best_role_score,
+          c.price_usd,
+          c.price_usd_foil,
+          COALESCE(owned.owned_quantity, 0)::int AS owned_quantity
         FROM cards c
         LEFT JOIN card_legalities cl ON cl.card_id = c.id AND cl.format = 'commander'
         LEFT JOIN card_meta_insights cmi ON LOWER(cmi.card_name) = LOWER(c.name)
         LEFT JOIN card_intelligence_snapshot cis ON cis.card_id = c.id
+        LEFT JOIN LATERAL (
+          SELECT COALESCE(SUM(bi.quantity), 0)::int AS owned_quantity
+          FROM user_binder_items bi
+          WHERE bi.card_id = c.id
+            AND @prefer_collection = TRUE
+            AND @user_id IS NOT NULL
+            AND bi.user_id = CAST(@user_id AS uuid)
+            AND COALESCE(bi.list_type, 'have') = 'have'
+        ) owned ON TRUE
         WHERE (cl.status = 'legal' OR cl.status = 'restricted' OR cl.status IS NULL)
           AND LOWER(c.name) NOT IN (SELECT LOWER(unnest(@exclude::text[])))
           AND c.type_line NOT ILIKE '%land%'
@@ -136,18 +154,26 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
             OR c.color_identity = '{}'
             OR c.color_identity IS NULL
           )
-        ORDER BY LOWER(c.name), COALESCE(cmi.usage_count, 0) DESC
+        ORDER BY LOWER(c.name),
+                 COALESCE(owned.owned_quantity, 0) DESC,
+                 COALESCE(cmi.usage_count, 0) DESC
       ) sub
-      ORDER BY sub.pop_score DESC, LOWER(sub.name) ASC
+      ORDER BY CASE WHEN sub.owned_quantity > 0 THEN 1 ELSE 0 END DESC,
+               sub.pop_score DESC,
+               LOWER(sub.name) ASC
       LIMIT 300
     '''),
     parameters: {
       'exclude': excludeNames.toList(),
       'identity': colorIdentityArr,
+      'prefer_collection': preferCollection,
+      'user_id': userId,
     },
   );
 
   final candidatePool = <Map<String, dynamic>>[];
+  final effectiveBudgetLimit =
+      (budgetLimitBrl != null && budgetLimitBrl > 0) ? budgetLimitBrl : null;
   for (final row in candidatesResult) {
     final id = row[0] as String;
     final name = row[1] as String;
@@ -162,6 +188,20 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
             const <String>[];
     final semanticTagsV2 = row[9];
     final bestRoleScore = (row[10] as num?)?.toInt() ?? 0;
+    final priceUsd = row[11];
+    final priceUsdFoil = row[12];
+    final ownedQuantity = (row[13] as num?)?.toInt() ?? 0;
+    final estimatedPriceBrl = estimateOptimizePriceBrl(
+      priceUsd: priceUsd,
+      priceUsdFoil: priceUsdFoil,
+      usdToBrlRate: usdToBrlRate,
+    );
+    if (effectiveBudgetLimit != null &&
+        ownedQuantity <= 0 &&
+        estimatedPriceBrl != null &&
+        estimatedPriceBrl > effectiveBudgetLimit) {
+      continue;
+    }
 
     if (!isWithinCommanderIdentity(
       cardIdentity: resolvedCardIdentityFromParts(
@@ -185,10 +225,35 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
       'functional_tags': functionalTags,
       'semantic_tags_v2': semanticTagsV2,
       'best_role_score': bestRoleScore,
+      'price_usd': priceUsd,
+      'price_usd_foil': priceUsdFoil,
+      'estimated_price_brl': estimatedPriceBrl,
+      'owned_quantity': ownedQuantity,
     });
   }
 
   final usedNames = <String>{};
+  var budgetUsedBrl = 0.0;
+
+  bool canUseCandidate(Map<String, dynamic> candidate) {
+    if (effectiveBudgetLimit == null) return true;
+    final ownedQuantity = (candidate['owned_quantity'] as num?)?.toInt() ?? 0;
+    if (ownedQuantity > 0) return true;
+    final estimatedPrice =
+        (candidate['estimated_price_brl'] as num?)?.toDouble();
+    if (estimatedPrice == null || estimatedPrice <= 0) return true;
+    return budgetUsedBrl + estimatedPrice <= effectiveBudgetLimit + 0.01;
+  }
+
+  void consumeCandidateBudget(Map<String, dynamic> candidate) {
+    if (effectiveBudgetLimit == null) return;
+    final ownedQuantity = (candidate['owned_quantity'] as num?)?.toInt() ?? 0;
+    if (ownedQuantity > 0) return;
+    final estimatedPrice =
+        (candidate['estimated_price_brl'] as num?)?.toDouble();
+    if (estimatedPrice == null || estimatedPrice <= 0) return;
+    budgetUsedBrl += estimatedPrice;
+  }
 
   final needs =
       (functionalNeedsOverride != null && functionalNeedsOverride.isNotEmpty)
@@ -205,6 +270,7 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
     for (final candidate in candidatePool) {
       final name = (candidate['name'] as String).toLowerCase();
       if (usedNames.contains(name)) continue;
+      if (!canUseCandidate(candidate)) continue;
       final score = scoreOptimizeReplacementCandidate(
             functionalNeed: need,
             cardName: candidate['name'] as String? ?? '',
@@ -219,7 +285,11 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
           semanticReplacementScoreBoost(
             functionalNeed: need,
             candidate: candidate,
-          );
+          ) +
+          ((preferCollection &&
+                  ((candidate['owned_quantity'] as num?)?.toInt() ?? 0) > 0)
+              ? 220
+              : 0);
       final matches = matchesFunctionalNeedForCandidate(
         need,
         candidate: candidate,
@@ -232,8 +302,9 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
     }
 
     if (best != null) {
-      results.add({'id': best['id'], 'name': best['name']});
+      results.add(_buildReplacementResult(best));
       usedNames.add((best['name'] as String).toLowerCase());
+      consumeCandidateBudget(best);
     }
   }
 
@@ -280,13 +351,29 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
       if (results.length >= missingCount) break;
       final name = (candidate['name'] as String).toLowerCase();
       if (usedNames.contains(name)) continue;
+      if (!canUseCandidate(candidate)) continue;
 
-      results.add({'id': candidate['id'], 'name': candidate['name']});
+      results.add(_buildReplacementResult(candidate));
       usedNames.add(name);
+      consumeCandidateBudget(candidate);
     }
   }
 
   return results;
+}
+
+Map<String, dynamic> _buildReplacementResult(Map<String, dynamic> candidate) {
+  final ownedQuantity = (candidate['owned_quantity'] as num?)?.toInt() ?? 0;
+  final estimatedPrice = (candidate['estimated_price_brl'] as num?)?.toDouble();
+  return {
+    'id': candidate['id'],
+    'name': candidate['name'],
+    'owned_quantity': ownedQuantity,
+    'collection_match': ownedQuantity > 0,
+    'purchase_required': ownedQuantity <= 0,
+    if (estimatedPrice != null)
+      'estimated_price_brl': double.parse(estimatedPrice.toStringAsFixed(2)),
+  };
 }
 
 bool matchesFunctionalNeedForCandidate(
@@ -351,6 +438,10 @@ Future<List<Map<String, dynamic>>> buildDeterministicOptimizeSwapCandidates({
   int swapLimit = 6,
   String intensity = 'focused',
   Map<String, dynamic>? diagnosticsOut,
+  String? userId,
+  bool preferCollection = false,
+  int? budgetLimitBrl,
+  double usdToBrlRate = defaultOptimizeUsdToBrlRate,
 }) async {
   if (allCardData.isEmpty) return const [];
   final effectiveSwapLimit = swapLimit.clamp(1, 20).toInt();
@@ -418,6 +509,10 @@ Future<List<Map<String, dynamic>>> buildDeterministicOptimizeSwapCandidates({
     allCardData: allCardData,
     preferredNames: preferredNames,
     preferLowCurve: structuralRecoveryScenario,
+    userId: userId,
+    preferCollection: preferCollection,
+    budgetLimitBrl: budgetLimitBrl,
+    usdToBrlRate: usdToBrlRate,
   );
   if (replacements.length < removalList.length) {
     final usedReplacementNames = replacements
@@ -445,6 +540,9 @@ Future<List<Map<String, dynamic>>> buildDeterministicOptimizeSwapCandidates({
       replacements.add({
         'id': filler['id'],
         'name': filler['name'],
+        'owned_quantity': 0,
+        'collection_match': false,
+        'purchase_required': true,
       });
       usedReplacementNames.add(lowerName);
     }
@@ -467,6 +565,11 @@ Future<List<Map<String, dynamic>>> buildDeterministicOptimizeSwapCandidates({
       'add': replacement['name'],
       'remove_role': removalMeta['role'],
       'remove_score': removalMeta['score'],
+      'owned_quantity': replacement['owned_quantity'],
+      'collection_match': replacement['collection_match'] == true,
+      'purchase_required': replacement['purchase_required'] != false,
+      if (replacement['estimated_price_brl'] != null)
+        'estimated_price_brl': replacement['estimated_price_brl'],
       'reason':
           'swap deterministico priorizando funcao ${removalMeta['role'] ?? 'utility'} e pool competitivo do comandante',
     });

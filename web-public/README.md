@@ -31,6 +31,12 @@ Para apontar para outro backend público:
 NEXT_PUBLIC_MANALOOM_API_BASE_URL=https://seu-backend.example.com npm run dev
 ```
 
+## Deploy atual
+
+- Public web: `https://evolution-manaloom-web-public.2ta7qx.easypanel.host`
+- API ManaLoom: `https://evolution-cartinhas.2ta7qx.easypanel.host`
+- Serviço EasyPanel/Swarm: `evolution_manaloom-web-public`
+
 ## Build
 
 ```bash

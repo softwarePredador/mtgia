@@ -32,7 +32,10 @@ class PlanScreen extends StatelessWidget {
           _PlanComparisonCard(
             plan: ManaLoomPlan.free,
             active: provider.tier == ManaLoomPlanTier.free,
-            onAction: () => provider.setPlan(ManaLoomPlanTier.free),
+            onAction:
+                provider.isRemoteSynced
+                    ? null
+                    : () => provider.setPlan(ManaLoomPlanTier.free),
           ),
           const SizedBox(height: 12),
           _PlanComparisonCard(
@@ -42,6 +45,10 @@ class PlanScreen extends StatelessWidget {
             onAction: () => context.push('/upgrade'),
           ),
           const SizedBox(height: 16),
+          if (provider.isRemoteSynced || provider.lastRemoteError != null) ...[
+            _RemotePlanStatusPanel(provider: provider),
+            const SizedBox(height: 16),
+          ],
           _LegalShortcutPanel(),
         ],
       ),
@@ -60,7 +67,7 @@ class _PlanComparisonCard extends StatelessWidget {
   final ManaLoomPlan plan;
   final bool active;
   final bool featured;
-  final VoidCallback onAction;
+  final VoidCallback? onAction;
 
   @override
   Widget build(BuildContext context) {
@@ -132,6 +139,45 @@ class _PlanComparisonCard extends StatelessWidget {
                       onPressed: active ? null : onAction,
                       child: Text(active ? 'Free ativo' : 'Usar Free'),
                     ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _RemotePlanStatusPanel extends StatelessWidget {
+  const _RemotePlanStatusPanel({required this.provider});
+
+  final CommercialProvider provider;
+
+  @override
+  Widget build(BuildContext context) {
+    final synced = provider.isRemoteSynced;
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceElevated,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        border: Border.all(color: synced ? AppTheme.success : AppTheme.warning),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            synced ? Icons.cloud_done_outlined : Icons.cloud_off_outlined,
+            color: synced ? AppTheme.success : AppTheme.warning,
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              synced
+                  ? 'Plano sincronizado com o backend. O limite exibido é o que bloqueia os endpoints de IA.'
+                  : provider.lastRemoteError ?? 'Plano remoto indisponível.',
+              style: const TextStyle(
+                color: AppTheme.textSecondary,
+                height: 1.35,
+              ),
+            ),
           ),
         ],
       ),
