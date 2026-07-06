@@ -121,6 +121,42 @@ class GlobalCommanderExternalNonpayoffSourceCandidatePoolExpanderTests(unittest.
             "expanded_source_candidate_recycled_from_prior_seed_blocked",
         )
 
+    def test_cumulative_previous_reports_block_old_expanded_candidates(self) -> None:
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        root = Path(tmp.name)
+        db = root / "knowledge.db"
+        make_db(db)
+
+        cumulative_report = write_json(
+            root,
+            "previous_expander.json",
+            {"expanded_source_candidate_rows": [{"card_name": "Boros Charm"}]},
+        )
+
+        report = expander.build_report(
+            recovery_router_report=write_json(root, "router.json", router_payload()),
+            previous_reviewer_report=write_json(root, "reviewer.json", {"review_rows": []}),
+            previous_finder_report=write_json(root, "finder.json", {"new_external_source_rows": []}),
+            previous_reports=[cumulative_report],
+            selected_db=db,
+            candidate_rows=[
+                {
+                    "target_cut_role": "haste_protection_silence",
+                    "card_name": "Boros Charm",
+                    "candidate_signal": "already expanded before",
+                    "source_ids": ["test"],
+                }
+            ],
+        )
+
+        self.assertEqual(report["summary"]["previous_report_count"], 1)
+        self.assertEqual(report["summary"]["expanded_ready_for_review_count"], 0)
+        self.assertEqual(
+            report["expanded_source_candidate_rows"][0]["status"],
+            "expanded_source_candidate_recycled_from_prior_seed_blocked",
+        )
+
     def test_current_deck_and_banned_candidates_stay_blocked(self) -> None:
         tmp = tempfile.TemporaryDirectory()
         self.addCleanup(tmp.cleanup)

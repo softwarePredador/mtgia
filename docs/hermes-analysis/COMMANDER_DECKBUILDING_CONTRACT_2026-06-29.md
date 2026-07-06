@@ -1329,6 +1329,15 @@ Current external refresh on 2026-07-05:
   because `prior_fresh_seeded_same_lane_cut_source_count=0` and
   `prior_blocked_recycled_seeded_cut_source_count=47`. This is a global
   candidate-copy guardrail, not a Kaalia-only exception.
+- The source-candidate pool expander now accepts cumulative `--previous-report`
+  history. Rerunning it against the follow-up seed-exhaustion router and seven
+  previous source/reviewer reports returns
+  `external_nonpayoff_source_candidate_pool_expansion_found_no_ready_candidates`
+  with `cumulative_previous_candidate_name_count=84`,
+  `expanded_candidate_count=26`, `expanded_ready_for_review_count=0`, and
+  `status_counts` split as `22` recycled, `1` already in the current deck, and
+  `3` banned. The next gate is
+  `broaden_external_nonpayoff_source_research_live`.
 
 ## Global Commander Rollout - 2026-07-01
 

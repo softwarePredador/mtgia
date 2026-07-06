@@ -40,6 +40,15 @@ DEFAULT_OUT_PREFIX = (
     / "global_commander_external_nonpayoff_source_candidate_pool_expander_20260706_kaalia_value_safe_stage1_repair_scope1_new_sources"
 )
 
+PREVIOUS_REPORT_RECYCLING_KEYS = (
+    "new_external_source_rows",
+    "ready_new_external_source_rows",
+    "review_rows",
+    "miner_source_seed_rows",
+    "expanded_source_candidate_rows",
+    "ready_expanded_source_candidate_rows",
+)
+
 COMMANDER_IDENTITY = finder.COMMANDER_IDENTITY
 
 EXPANSION_SOURCE_SNAPSHOTS: tuple[dict[str, Any], ...] = (
@@ -327,6 +336,14 @@ def row_names(payload: Mapping[str, Any], keys: Iterable[str]) -> set[str]:
     return {name for name in names if name}
 
 
+def previous_report_names(paths: Iterable[Path]) -> set[str]:
+    names: set[str] = set()
+    for path in paths:
+        if path.exists():
+            names.update(row_names(load_json(path), PREVIOUS_REPORT_RECYCLING_KEYS))
+    return names
+
+
 def role_terms(role: str, oracle_row: Mapping[str, Any] | None) -> list[str]:
     terms = list(finder.role_terms(role, oracle_row))
     if not oracle_row:
@@ -493,22 +510,24 @@ def build_report(
     previous_finder_report: Path,
     selected_db: Path,
     candidate_rows: Iterable[Mapping[str, Any]] = EXPANDED_SOURCE_CANDIDATES,
+    previous_reports: Iterable[Path] | None = None,
 ) -> dict[str, Any]:
     router_payload = load_json(recovery_router_report)
-    previous_reviewer_payload = load_json(previous_reviewer_report)
-    previous_finder_payload = load_json(previous_finder_report)
     router_summary = router_payload.get("summary") or {}
     deck_id = str(router_summary.get("deck_id") or "")
     resolved_db = resolve_selected_db(selected_db)
     indexes = finder.db_indexes(resolved_db, deck_id)
-    reviewed_names = row_names(previous_reviewer_payload, ("miner_source_seed_rows", "review_rows"))
-    finder_names = row_names(previous_finder_payload, ("ready_new_external_source_rows", "new_external_source_rows"))
+    previous_paths = tuple(previous_reports) if previous_reports is not None else (
+        previous_reviewer_report,
+        previous_finder_report,
+    )
+    recycled_names = previous_report_names(previous_paths)
     expansion_rows = [
         classify_candidate(
             candidate,
             indexes=indexes,
-            reviewed_names=reviewed_names,
-            finder_names=finder_names,
+            reviewed_names=recycled_names,
+            finder_names=set(),
         )
         for candidate in candidate_rows
     ]
@@ -534,6 +553,7 @@ def build_report(
             "recovery_router_report": rel(recovery_router_report),
             "previous_reviewer_report": rel(previous_reviewer_report),
             "previous_finder_report": rel(previous_finder_report),
+            "previous_reports": [rel(path) for path in previous_paths],
             "selected_db": rel(resolved_db),
         },
         "source_snapshots": EXPANSION_SOURCE_SNAPSHOTS,
@@ -541,6 +561,8 @@ def build_report(
             "deck_id": deck_id,
             "commander": str(router_summary.get("commander") or ""),
             "prior_router_status": str(router_payload.get("status") or ""),
+            "previous_report_count": len(previous_paths),
+            "cumulative_previous_candidate_name_count": len(recycled_names),
             "expanded_candidate_count": len(expansion_rows),
             "expanded_ready_for_review_count": len(ready_rows),
             "ready_count_by_role": count_by(ready_rows, "target_cut_role"),
@@ -637,14 +659,17 @@ def main() -> int:
     parser.add_argument("--recovery-router-report", type=Path, default=DEFAULT_RECOVERY_ROUTER_REPORT)
     parser.add_argument("--previous-reviewer-report", type=Path, default=DEFAULT_PREVIOUS_REVIEWER_REPORT)
     parser.add_argument("--previous-finder-report", type=Path, default=DEFAULT_PREVIOUS_FINDER_REPORT)
+    parser.add_argument("--previous-report", type=Path, action="append")
     parser.add_argument("--selected-db", type=Path, default=DEFAULT_SELECTED_DB)
     parser.add_argument("--out-prefix", type=Path, default=DEFAULT_OUT_PREFIX)
     args = parser.parse_args()
+    previous_reports = tuple(args.previous_report) if args.previous_report else None
     payload = build_report(
         recovery_router_report=args.recovery_router_report,
         previous_reviewer_report=args.previous_reviewer_report,
         previous_finder_report=args.previous_finder_report,
         selected_db=args.selected_db,
+        previous_reports=previous_reports,
     )
     json_path, md_path = write_outputs(payload, args.out_prefix)
     print(

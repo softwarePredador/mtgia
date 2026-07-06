@@ -862,6 +862,15 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `global_commander_external_nonpayoff_seed_exhaustion_recovery_router_20260706_kaalia_value_safe_stage1_repair_scope1_followup_after_mana_vault.md`
     e volta para `expand_external_nonpayoff_source_candidate_pool`, sem abrir
     candidate copy, battle, promocao ou value-safe reclassification.
+    O expander cumulativo fica em
+    `global_commander_external_nonpayoff_source_candidate_pool_expander_20260706_kaalia_value_safe_stage1_repair_scope1_followup_cumulative.md`.
+    Resultado:
+    `external_nonpayoff_source_candidate_pool_expansion_found_no_ready_candidates`,
+    com `previous_report_count=7`,
+    `cumulative_previous_candidate_name_count=84`,
+    `expanded_candidate_count=26`, `expanded_ready_for_review_count=0`, `22`
+    candidatos reciclados, `1` ja presente no deck e `3` banidos. O proximo
+    gate e `broaden_external_nonpayoff_source_research_live`.
     Observacao operacional: snapshots historicos de candidate-copy, battle-probe,
     battle-feedback e package-chain dependem de artefatos locais ignorados. Se
     faltarem ou forem regenerados sem esses artefatos, a auditoria de superficie

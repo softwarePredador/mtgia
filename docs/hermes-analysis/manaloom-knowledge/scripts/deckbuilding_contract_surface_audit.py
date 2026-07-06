@@ -638,6 +638,10 @@ GLOBAL_COMMANDER_SCOPE1_EXTERNAL_NONPAYOFF_SOURCE_CANDIDATE_POOL_EXPANDER_REPORT
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_source_candidate_pool_expander_20260706_kaalia_value_safe_stage1_repair_scope1_new_sources.md"
 )
+GLOBAL_COMMANDER_SCOPE1_EXTERNAL_NONPAYOFF_SOURCE_CANDIDATE_POOL_EXPANDER_FOLLOWUP_CUMULATIVE_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_source_candidate_pool_expander_20260706_kaalia_value_safe_stage1_repair_scope1_followup_cumulative.md"
+)
 GLOBAL_COMMANDER_SCOPE1_EXTERNAL_NONPAYOFF_EXPANDED_SOURCE_CANDIDATE_REVIEWER_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_expanded_source_candidate_reviewer_20260706_kaalia_value_safe_stage1_repair_scope1_new_sources.md"
@@ -2652,6 +2656,9 @@ def build_audit() -> dict[str, Any]:
                 "expanded_source_candidate_already_in_current_deck_blocked",
                 "expanded_source_candidate_blocks_commander_banned",
                 "review_expanded_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+                "PREVIOUS_REPORT_RECYCLING_KEYS",
+                "previous_report_count",
+                "--previous-report",
                 "wizards_commander_bans_2024_09_23",
                 "candidate_copy_allowed_now",
                 "card_level_cut_permission_now",
@@ -2664,6 +2671,7 @@ def build_audit() -> dict[str, Any]:
             [
                 "test_legal_outside_deck_candidate_is_ready_for_review",
                 "test_previous_seed_is_blocked_as_recycled",
+                "test_cumulative_previous_reports_block_old_expanded_candidates",
                 "test_current_deck_and_banned_candidates_stay_blocked",
                 "Boros Charm",
                 "Swiftfoot Boots",
@@ -4238,6 +4246,26 @@ def build_audit() -> dict[str, Any]:
                 "Jeweled Lotus",
                 "Dockside Extortionist",
                 "review_expanded_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SCOPE1_EXTERNAL_NONPAYOFF_SOURCE_CANDIDATE_POOL_EXPANDER_FOLLOWUP_CUMULATIVE_REPORT,
+            [
+                "Global Commander External Nonpayoff Source Candidate Pool Expander",
+                "external_nonpayoff_source_candidate_pool_expansion_found_no_ready_candidates",
+                "expanded_candidate_count: `26`",
+                "expanded_ready_for_review_count: `0`",
+                "candidate_copy_allowed_count: `0`",
+                "card_level_cut_permission_count: `0`",
+                "candidate_copy_allowed_now: `false`",
+                "broaden_external_nonpayoff_source_research_live",
+                "Swiftfoot Boots",
+                "Boros Charm",
+                "expanded_source_candidate_recycled_from_prior_seed_blocked",
+                "Mana Vault",
+                "Mana Crypt",
             ],
         )
     )
