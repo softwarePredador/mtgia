@@ -1,7 +1,7 @@
 #!/bin/bash
 # Teste de fluxo: 3 decks diferentes
 
-API="https://evolution-cartinhas.8ktevp.easypanel.host"
+API="https://evolution-cartinhas.2ta7qx.easypanel.host"
 TOKEN="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJkNTVjNzRjNi04ZTJlLTQ2ZDktODc1ZC0yMzY5ZmE3ZmMyNGYiLCJ1c2VybmFtZSI6ImRlY2t0ZXN0MTczOSIsImlhdCI6MTc3MDkyNDM0MiwiZXhwIjoxNzcxMDEwNzQyfQ.tEgJdsGI_OxXMac6UpAww_00Ch3cJbQ-FPxL5DiWHRA"
 
 echo "══════════════════════════════════════════════════════════════"

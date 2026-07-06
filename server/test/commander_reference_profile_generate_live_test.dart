@@ -14,7 +14,7 @@ void main() {
       ? null
       : 'Defina RUN_LOREHOLD_REFERENCE_PROFILE_LIVE=1 para provar /ai/generate live.';
   final baseUrl = Platform.environment['TEST_API_BASE_URL'] ??
-      'https://evolution-cartinhas.8ktevp.easypanel.host';
+      'https://evolution-cartinhas.2ta7qx.easypanel.host';
   final expectCardStats =
       Platform.environment['LIVE_REFERENCE_CARD_STATS'] == '1';
 

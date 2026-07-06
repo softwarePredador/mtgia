@@ -148,7 +148,7 @@ void main() {
       expect(joined, contains('GET /ready'));
       expect(
         joined,
-        isNot(contains('https://evolution-cartinhas.8ktevp.easypanel.host')),
+        isNot(contains('https://evolution-cartinhas.2ta7qx.easypanel.host')),
       );
     });
 

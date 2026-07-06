@@ -18,35 +18,35 @@ void main() {
     test('honors forwarded https protocol behind reverse proxy', () {
       final uri = resolveAiGenerateInternalUrl(
         headers: const {
-          'host': 'evolution-cartinhas.8ktevp.easypanel.host',
+          'host': 'evolution-cartinhas.2ta7qx.easypanel.host',
           'x-forwarded-proto': 'https',
         },
         requestUri: Uri.parse(
-          'http://evolution-cartinhas.8ktevp.easypanel.host/ai/generate',
+          'http://evolution-cartinhas.2ta7qx.easypanel.host/ai/generate',
         ),
       );
 
       expect(
         uri.toString(),
-        'https://evolution-cartinhas.8ktevp.easypanel.host/ai/generate',
+        'https://evolution-cartinhas.2ta7qx.easypanel.host/ai/generate',
       );
     });
 
     test('resolves arbitrary AI route with forwarded https protocol', () {
       final uri = resolveInternalAiRouteUrl(
         headers: const {
-          'host': 'evolution-cartinhas.8ktevp.easypanel.host',
+          'host': 'evolution-cartinhas.2ta7qx.easypanel.host',
           'x-forwarded-proto': 'https',
         },
         requestUri: Uri.parse(
-          'http://evolution-cartinhas.8ktevp.easypanel.host/ai/optimize',
+          'http://evolution-cartinhas.2ta7qx.easypanel.host/ai/optimize',
         ),
         routePath: '/ai/optimize',
       );
 
       expect(
         uri.toString(),
-        'https://evolution-cartinhas.8ktevp.easypanel.host/ai/optimize',
+        'https://evolution-cartinhas.2ta7qx.easypanel.host/ai/optimize',
       );
     });
 

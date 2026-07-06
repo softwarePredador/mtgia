@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-API="https://evolution-cartinhas.8ktevp.easypanel.host"
+API="https://evolution-cartinhas.2ta7qx.easypanel.host"
 
 # 1. Login
 echo "=== LOGIN ==="

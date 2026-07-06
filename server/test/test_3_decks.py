@@ -5,7 +5,7 @@ import requests
 import json
 import time
 
-API = "https://evolution-cartinhas.8ktevp.easypanel.host"
+API = "https://evolution-cartinhas.2ta7qx.easypanel.host"
 TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIxOGRmMDE4OC05ZjI3LTRlMjAtODRmZS1hOWZhMmMzOTk1MWMiLCJ1c2VybmFtZSI6InJhZmEiLCJpYXQiOjE3NzA5Mjk4MjMsImV4cCI6MTc3MTAxNjIyM30.D_z6_dyOvnfMBmGSLd3fb73NHBQVLaU06BSHC7ajZRs"
 
 headers = {

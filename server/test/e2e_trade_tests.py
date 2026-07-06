@@ -20,7 +20,7 @@ from dataclasses import dataclass, field
 from typing import Optional
 
 # ─── Config ────────────────────────────────────────────────────────
-DEFAULT_API = "https://evolution-cartinhas.8ktevp.easypanel.host"
+DEFAULT_API = "https://evolution-cartinhas.2ta7qx.easypanel.host"
 VERBOSE = False
 
 # ─── Resultado de teste ────────────────────────────────────────────

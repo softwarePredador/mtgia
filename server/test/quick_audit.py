@@ -4,7 +4,7 @@ import requests
 import time
 import json
 
-API = "https://evolution-cartinhas.8ktevp.easypanel.host"
+API = "https://evolution-cartinhas.2ta7qx.easypanel.host"
 ts = str(int(time.time()))
 
 results = []

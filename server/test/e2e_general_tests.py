@@ -19,7 +19,7 @@ from typing import Any, Optional
 
 import requests
 
-DEFAULT_API = "https://evolution-cartinhas.8ktevp.easypanel.host"
+DEFAULT_API = "https://evolution-cartinhas.2ta7qx.easypanel.host"
 VERBOSE = False
 
 # Rate-limit safe delay between auth requests

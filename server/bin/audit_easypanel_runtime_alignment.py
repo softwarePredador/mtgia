@@ -25,7 +25,7 @@ from typing import Any
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SERVER_DIR = REPO_ROOT / "server"
 DEFAULT_ARTIFACT_DIR = REPO_ROOT / "server" / "test" / "artifacts" / "easypanel_runtime_alignment"
-DEFAULT_HEALTH_URL = "https://evolution-cartinhas.8ktevp.easypanel.host/health"
+DEFAULT_HEALTH_URL = "https://evolution-cartinhas.2ta7qx.easypanel.host/health"
 DEFAULT_SERVICES = ("manaloom-ops", "hermes-lab")
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))

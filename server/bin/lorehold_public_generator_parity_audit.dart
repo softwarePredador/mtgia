@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:http/http.dart' as http;
 
-const _defaultBaseUrl = 'https://evolution-cartinhas.8ktevp.easypanel.host';
+const _defaultBaseUrl = 'https://evolution-cartinhas.2ta7qx.easypanel.host';
 const _defaultCommander = 'Lorehold, the Historian';
 const _defaultPrompt =
     'Boros miracle big spells with topdeck setup and interaction';
@@ -15,7 +15,7 @@ Future<void> main(List<String> args) async {
     stdout.writeln('''
 Uso:
   dart run bin/lorehold_public_generator_parity_audit.dart \\
-    [--base-url=https://evolution-cartinhas.8ktevp.easypanel.host] \\
+    [--base-url=https://evolution-cartinhas.2ta7qx.easypanel.host] \\
     [--commander=Lorehold, the Historian] \\
     [--prompt=Boros miracle big spells with topdeck setup and interaction] \\
     [--artifact-dir=test/artifacts/lorehold_public_generator_parity_2026-06-16]
