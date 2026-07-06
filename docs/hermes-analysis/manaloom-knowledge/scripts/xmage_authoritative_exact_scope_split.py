@@ -302,6 +302,7 @@ ETB_TREASURE_CREATURE_SCOPE = "xmage_creature_etb_create_treasure_v1"
 DIES_TREASURE_CREATURE_SCOPE = "xmage_creature_dies_create_treasure_v1"
 DIES_TOKEN_CREATURE_SCOPE = "xmage_creature_dies_create_tokens_v1"
 PERMANENT_ACTIVATED_TOKEN_SCOPE = "xmage_permanent_simple_activated_create_token_v1"
+GRAVEYARD_SELF_EXILE_ACTIVATED_TOKEN_SCOPE = "xmage_graveyard_self_exile_activated_create_token_v1"
 ETB_ADD_COUNTERS_CREATURE_SCOPE = "xmage_creature_etb_add_counters_target_creature_v1"
 
 SPELL_UNITS = {
@@ -1443,12 +1444,15 @@ def activated_create_token_from_source(source: str) -> dict[str, Any] | str:
     if ability_index < 0:
         return "activated_token_source_not_simple_activated"
     window = text[ability_index : effect_match.start() + 1800]
+    graveyard_self_exile = (
+        re.search(r"new\s+SimpleActivatedAbility\s*\(\s*Zone\.GRAVEYARD", window, re.S) is not None
+        and "ExileSourceFromGraveCost" in window
+    )
     risky_cost_classes = {
         "CompositeCost",
         "ExileFrom",
         "ExileFromGraveCost",
         "ExileFromTopOfLibraryCost",
-        "ExileSourceFromGraveCost",
         "MillCardsCost",
         "OrCost",
         "PayLifeCost",
@@ -1460,8 +1464,12 @@ def activated_create_token_from_source(source: str) -> dict[str, Any] | str:
         "TapTargetCost",
         "UntapSourceCost",
     }
+    if not graveyard_self_exile:
+        risky_cost_classes.add("ExileSourceFromGraveCost")
     present_risky = sorted(cost for cost in risky_cost_classes if cost in window)
     if present_risky:
+        return "activated_token_source_cost_not_supported"
+    if graveyard_self_exile and ("TapSourceCost" in window or "SacrificeSourceCost" in window):
         return "activated_token_source_cost_not_supported"
     discard_cost = activation_discard_cost_from_source(window)
     if isinstance(discard_cost, str):
@@ -1485,7 +1493,7 @@ def activated_create_token_from_source(source: str) -> dict[str, Any] | str:
     if parsed_cost is None:
         return "activated_token_source_mana_cost_not_supported"
     activation_cost_generic, activation_cost_colors = parsed_cost
-    return {
+    activation = {
         "activation_cost_mana": cost_text,
         "activation_cost_generic": activation_cost_generic,
         "activation_cost_colors": activation_cost_colors,
@@ -1493,9 +1501,21 @@ def activated_create_token_from_source(source: str) -> dict[str, Any] | str:
         "activation_requires_sacrifice": "SacrificeSourceCost" in window,
         **(discard_cost or {}),
     }
+    if graveyard_self_exile:
+        activation.update(
+            {
+                "activation_zone": "graveyard",
+                "activation_requires_exile_source_from_graveyard": True,
+            }
+        )
+    return activation
 
 
-def activated_token_activation_cost_from_oracle_prefix(cost_text: str) -> dict[str, Any] | str:
+def activated_token_activation_cost_from_oracle_prefix(
+    cost_text: str,
+    *,
+    source_name: str | None = None,
+) -> dict[str, Any] | str:
     text = re.sub(r"\s+", " ", str(cost_text or "").strip().lower())
     discard_cost = activation_discard_cost_from_oracle(text)
     if discard_cost:
@@ -1505,9 +1525,24 @@ def activated_token_activation_cost_from_oracle_prefix(cost_text: str) -> dict[s
             r"(?:\s*,?|$)"
         )
         text = re.sub(discard_pattern, ",", text).strip(" ,")
+    graveyard_self_exile = False
+    if "exile " in text and " from your graveyard" in text:
+        source_pattern = re.escape(normalize_name(source_name or ""))
+        source_phrase = rf"(?:this card|{source_pattern})" if source_pattern else r"this card"
+        exile_pattern = rf"(?:^|,\s*)exile {source_phrase} from your graveyard(?:\s*,?|$)"
+        if re.search(exile_pattern, text):
+            text = re.sub(exile_pattern, ",", text).strip(" ,")
+            graveyard_self_exile = True
     activation = activation_cost_from_oracle_prefix(text, allow_source_sacrifice=True)
     if isinstance(activation, str):
         return activation.replace("activated_self_boost", "activated_token")
+    if graveyard_self_exile:
+        activation.update(
+            {
+                "activation_zone": "graveyard",
+                "activation_requires_exile_source_from_graveyard": True,
+            }
+        )
     return {**activation, **(discard_cost or {})}
 
 
@@ -1521,7 +1556,10 @@ def activated_create_token_oracle_blocker(
     if text.count(":") != 1:
         return "activated_token_oracle_not_simple"
     cost_text, effect_text = [part.strip() for part in text.split(":", 1)]
-    activation = activated_token_activation_cost_from_oracle_prefix(cost_text)
+    activation = activated_token_activation_cost_from_oracle_prefix(
+        cost_text,
+        source_name=str(metadata.get("name") or ""),
+    )
     if isinstance(activation, str):
         return activation
     for key in (
@@ -1534,6 +1572,8 @@ def activated_create_token_oracle_blocker(
         "activation_discard_target",
         "activation_requires_discard_card",
         "activation_discard_random",
+        "activation_zone",
+        "activation_requires_exile_source_from_graveyard",
     ):
         if activation.get(key) != source_activation.get(key):
             return "activated_token_source_oracle_cost_mismatch"
@@ -1541,20 +1581,28 @@ def activated_create_token_oracle_blocker(
         return "activated_token_oracle_not_simple"
     if not effect_text.startswith("create "):
         return "activated_token_oracle_not_simple"
-    phrase = effect_text.removeprefix("create ").strip()
-    token_description = normalized_token_oracle_phrase(token_data.get("token_description"))
+    phrase = effect_text.removeprefix("create ").strip().rstrip(".")
+    token_descriptions = token_oracle_description_variants(token_data)
     if token_count == 1:
-        expected = {
-            f"a {token_description}",
-            f"an {token_description}",
-            f"one {token_description}",
-        }
+        expected = set()
+        for token_description in token_descriptions:
+            expected.update(
+                {
+                    f"a {token_description}",
+                    f"an {token_description}",
+                    f"one {token_description}",
+                }
+            )
     else:
-        plural_description = plural_token_description(token_description)
-        expected = {
-            f"{token_count} {plural_description}",
-            f"{count_word_for_oracle(token_count)} {plural_description}",
-        }
+        expected = set()
+        for token_description in token_descriptions:
+            plural_description = plural_token_description(token_description)
+            expected.update(
+                {
+                    f"{token_count} {plural_description}",
+                    f"{count_word_for_oracle(token_count)} {plural_description}",
+                }
+            )
     if phrase not in expected:
         return "activated_token_oracle_not_simple"
     return None
@@ -15287,6 +15335,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "creature dies triggered fixed creature-token ability"
     elif scope == PERMANENT_ACTIVATED_TOKEN_SCOPE:
         scope_kind = "permanent with a simple activated fixed creature-token ability"
+    elif scope == GRAVEYARD_SELF_EXILE_ACTIVATED_TOKEN_SCOPE:
+        scope_kind = "card with a graveyard self-exile activated fixed creature-token ability"
     elif scope == DIES_RECURSION_CREATURE_SCOPE:
         scope_kind = "creature dies triggered graveyard-to-hand ability"
     elif scope == COMBAT_DAMAGE_DRAW_CREATURE_SCOPE:
@@ -17718,7 +17768,7 @@ def split_row(
             return None, source_activation
         oracle_blocker = activated_create_token_oracle_blocker(
             metadata,
-            token_data,
+            {**token_data, **parsed_token_fields},
             token_count,
             source_activation,
         )
@@ -17736,9 +17786,19 @@ def split_row(
             if "planeswalker" in type_line
             else "permanent"
         )
+        activated_scope = (
+            GRAVEYARD_SELF_EXILE_ACTIVATED_TOKEN_SCOPE
+            if source_activation.get("activation_requires_exile_source_from_graveyard")
+            else PERMANENT_ACTIVATED_TOKEN_SCOPE
+        )
+        family_id = (
+            "xmage_graveyard_self_exile_activated_create_token"
+            if activated_scope == GRAVEYARD_SELF_EXILE_ACTIVATED_TOKEN_SCOPE
+            else "xmage_permanent_simple_activated_create_token"
+        )
         activated_effect = {
             "effect": "token_maker",
-            "battle_model_scope": PERMANENT_ACTIVATED_TOKEN_SCOPE,
+            "battle_model_scope": activated_scope,
             "ability_kind": "activated",
             "activated_effect": "token_maker",
             "token_count": token_count,
@@ -17750,10 +17810,10 @@ def split_row(
         }
         effect_json = {
             "effect": permanent_effect,
-            "battle_model_scope": PERMANENT_ACTIVATED_TOKEN_SCOPE,
+            "battle_model_scope": activated_scope,
             "ability_kind": "static_and_activated",
             "activated_effect": "token_maker",
-            "activated_battle_model_scope": PERMANENT_ACTIVATED_TOKEN_SCOPE,
+            "activated_battle_model_scope": activated_scope,
             "activated_create_token": True,
             "token_count": token_count,
             "xmage_effect_class": "CreateTokenEffect",
@@ -17767,7 +17827,7 @@ def split_row(
             row,
             metadata,
             effect_json,
-            family_id="xmage_permanent_simple_activated_create_token",
+            family_id=family_id,
         ), "selected_exact_scope"
 
     if etb_token_creature_unit:

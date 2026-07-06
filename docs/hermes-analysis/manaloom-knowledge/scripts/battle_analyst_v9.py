@@ -43591,6 +43591,11 @@ SIMPLE_ACTIVATED_TARGET_BOOST_SCOPE = "xmage_permanent_simple_activated_target_b
 SIMPLE_ACTIVATED_TARGET_KEYWORD_SCOPE = "xmage_permanent_simple_activated_target_keyword_until_eot_v1"
 PERMANENT_ACTIVATED_LIFE_GAIN_SCOPE = "xmage_permanent_simple_activated_life_gain_v1"
 SIMPLE_ACTIVATED_TOKEN_SCOPE = "xmage_permanent_simple_activated_create_token_v1"
+GRAVEYARD_SELF_EXILE_ACTIVATED_TOKEN_SCOPE = "xmage_graveyard_self_exile_activated_create_token_v1"
+SIMPLE_ACTIVATED_TOKEN_SCOPES = {
+    SIMPLE_ACTIVATED_TOKEN_SCOPE,
+    GRAVEYARD_SELF_EXILE_ACTIVATED_TOKEN_SCOPE,
+}
 SIMPLE_ACTIVATED_GRAVEYARD_EXILE_SCOPE = "xmage_permanent_simple_activated_exile_graveyard_card_v1"
 SIMPLE_ACTIVATED_GRAVEYARD_TO_LIBRARY_SCOPE = "xmage_permanent_simple_activated_graveyard_to_library_v1"
 SIMPLE_ACTIVATED_TUTOR_BATTLEFIELD_SCOPE = (
@@ -43687,9 +43692,9 @@ def _activated_rule_effects_for_permanent(permanent):
             destroy_effect[key] = permanent.get(key)
         effects.append(destroy_effect)
     if (
-        not any(effect.get("battle_model_scope") == SIMPLE_ACTIVATED_TOKEN_SCOPE for effect in effects)
+        not any(effect.get("battle_model_scope") in SIMPLE_ACTIVATED_TOKEN_SCOPES for effect in effects)
         and permanent.get("activated_effect") == "token_maker"
-        and permanent.get("activated_battle_model_scope") == SIMPLE_ACTIVATED_TOKEN_SCOPE
+        and permanent.get("activated_battle_model_scope") in SIMPLE_ACTIVATED_TOKEN_SCOPES
     ):
         token_effect = {
             "effect": "token_maker",
@@ -43705,6 +43710,10 @@ def _activated_rule_effects_for_permanent(permanent):
             "activation_discard_target": permanent.get("activation_discard_target"),
             "activation_requires_discard_card": permanent.get("activation_requires_discard_card"),
             "activation_discard_random": permanent.get("activation_discard_random"),
+            "activation_zone": permanent.get("activation_zone"),
+            "activation_requires_exile_source_from_graveyard": permanent.get(
+                "activation_requires_exile_source_from_graveyard"
+            ),
             "token_count": permanent.get("token_count") or 1,
             "token_name": permanent.get("token_name") or "Token",
             "token_subtype": permanent.get("token_subtype"),
@@ -44419,7 +44428,7 @@ def activated_token_maker_effect_for_permanent(permanent):
         return None
     for effect_data in _activated_rule_effects_for_permanent(permanent):
         if (
-            effect_data.get("battle_model_scope") == SIMPLE_ACTIVATED_TOKEN_SCOPE
+            effect_data.get("battle_model_scope") in SIMPLE_ACTIVATED_TOKEN_SCOPES
             and effect_data.get("ability_kind") == "activated"
             and effect_data.get("activated_effect") == "token_maker"
             and effect_data.get("effect") == "token_maker"
@@ -44461,6 +44470,8 @@ def _activated_token_expected_score(effect_data, activation_cost_generic=0):
     score -= int((effect_data or {}).get("activation_discard_count") or 0) * 2
     if (effect_data or {}).get("activation_requires_sacrifice"):
         score -= 2
+    if (effect_data or {}).get("activation_requires_exile_source_from_graveyard"):
+        score -= 1
     return score
 
 
@@ -44468,7 +44479,14 @@ def can_activate_generic_token_maker_permanent(player, permanent, *, effect_data
     effect_data = effect_data or activated_token_maker_effect_for_permanent(permanent)
     if effect_data is None:
         return False
-    if permanent not in getattr(player, "battlefield", []):
+    activation_from_graveyard = (
+        effect_data.get("activation_zone") == "graveyard"
+        or bool(effect_data.get("activation_requires_exile_source_from_graveyard"))
+    )
+    if activation_from_graveyard:
+        if permanent not in getattr(player, "graveyard", []):
+            return False
+    elif permanent not in getattr(player, "battlefield", []):
         return False
     if effect_data.get("activation_requires_tap") and permanent.get("tapped"):
         return False
@@ -44537,6 +44555,13 @@ def activate_generic_token_maker_permanent(player, opponents, all_players, perma
             phase=phase,
             rng=rng,
         )
+    exiled_source_from_graveyard = False
+    if effect_data.get("activation_requires_exile_source_from_graveyard"):
+        if permanent not in getattr(player, "graveyard", []):
+            return False
+        player.graveyard.remove(permanent)
+        move_to_exile(player, permanent, reason="activated_token_maker_graveyard_cost", turn=turn)
+        exiled_source_from_graveyard = True
     if effect_data.get("activation_requires_tap"):
         permanent["tapped"] = True
     sacrificed_source = False
@@ -44590,6 +44615,7 @@ def activate_generic_token_maker_permanent(player, opponents, all_players, perma
             "discarded": [card.get("name", "?") for card in discard_cards],
             "discarded_count": activation_discard_count,
             "discard_target": activation_discard_target if activation_discard_count else None,
+            "exiled_source_from_graveyard": 1 if exiled_source_from_graveyard else 0,
         },
         rule_source=fields.get("rule_source", "battle_rule"),
         rule_status=fields.get("rule_review_status", "verified"),
@@ -44604,6 +44630,7 @@ def activate_generic_token_maker_permanent(player, opponents, all_players, perma
             "permanents": -1 if sacrificed_source else 0,
             "tapped": 1 if effect_data.get("activation_requires_tap") else 0,
             "graveyard": len(discard_resolution.get("to_graveyard") or []),
+            "exile": 1 if exiled_source_from_graveyard else 0,
             "cards_discarded": activation_discard_count,
         },
         risk_flags=[
@@ -44612,6 +44639,7 @@ def activate_generic_token_maker_permanent(player, opponents, all_players, perma
                 "tap_ability": bool(effect_data.get("activation_requires_tap")),
                 "sacrifice_source": sacrificed_source,
                 "discard_cost": activation_discard_count > 0,
+                "graveyard_self_exile_cost": exiled_source_from_graveyard,
                 "token_cap_possible": token_count > 20,
             }.items()
             if active
@@ -44629,6 +44657,7 @@ def activate_generic_token_maker_permanent(player, opponents, all_players, perma
         discarded=[card.get("name", "?") for card in discard_cards],
         discarded_count=activation_discard_count,
         discard_target=activation_discard_target if activation_discard_count else None,
+        exiled_source_from_graveyard=exiled_source_from_graveyard,
         discard_to_graveyard=[card.get("name", "?") for card in discard_resolution.get("to_graveyard") or []],
         discard_to_library_top=[card.get("name", "?") for card in discard_resolution.get("to_top") or []],
         discard_replacement_used=bool(discard_resolution.get("used_replacement")),

@@ -3971,6 +3971,68 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertTrue(tokens[0].get("flying"))
         self.assertIn("flying", tokens[0].get("keywords", []))
 
+    def test_graveyard_self_exile_activated_create_token_exiles_source(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.mana_pool.add_generic(1)
+        active.mana_pool.add("black", 1)
+        source_card = {
+            "name": "Eternal Student",
+            "type_line": "Creature - Zombie Warlock",
+            "effect": "creature",
+            "_activated_rule_effects": [
+                {
+                    "effect": "token_maker",
+                    "battle_model_scope": "xmage_graveyard_self_exile_activated_create_token_v1",
+                    "ability_kind": "activated",
+                    "activated_effect": "token_maker",
+                    "activation_cost_mana": "{1}{B}",
+                    "activation_cost_generic": 1,
+                    "activation_cost_colors": ["B"],
+                    "activation_zone": "graveyard",
+                    "activation_requires_exile_source_from_graveyard": True,
+                    "token_count": 2,
+                    "token_name": "Inkling Token",
+                    "token_subtype": "Inkling",
+                    "token_power": 1,
+                    "token_toughness": 1,
+                    "token_colors": ["W", "B"],
+                    "token_keywords": ["flying"],
+                    "token_flying": True,
+                    "_rule_logical_key": "battle_rule_v1:fixture_graveyard_token",
+                }
+            ],
+        }
+        active.graveyard.append(source_card)
+
+        activated = self.battle.activate_generic_token_maker_permanent(
+            active,
+            [opponent],
+            [active, opponent],
+            source_card,
+            turn=6,
+            rng=random.Random(6),
+            phase="precombat_main",
+        )
+
+        self.assertTrue(activated)
+        self.assertNotIn(source_card, active.graveyard)
+        self.assertIn(source_card, active.exile)
+        tokens = [card for card in active.battlefield if card.get("name") == "Inkling Token"]
+        self.assertEqual(len(tokens), 2)
+        self.assertTrue(all(token.get("flying") for token in tokens))
+        self.assertTrue(
+            any(
+                event == "activated_ability"
+                and data.get("card") == "Eternal Student"
+                and data.get("activation_kind") == "simple_activated_create_token"
+                and data.get("tokens_created") == 2
+                and data.get("exiled_source_from_graveyard") is True
+                and data.get("rule_logical_key") == "battle_rule_v1:fixture_graveyard_token"
+                for event, data in self.events
+            )
+        )
+
     def test_fixed_create_creature_tokens_spell_preserves_static_token_keywords(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

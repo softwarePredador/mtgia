@@ -304,6 +304,8 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "activation_discard_target",
     "activation_requires_discard_card",
     "activation_discard_random",
+    "activation_zone",
+    "activation_requires_exile_source_from_graveyard",
     "activation_sacrifice_target",
     "activation_requires_sacrifice_target",
     "permanent_type",
@@ -1146,7 +1148,10 @@ def simple_activated_create_token_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
     required = dict(rule.get("required_effect_fields") or {})
-    if required.get("battle_model_scope") != "xmage_permanent_simple_activated_create_token_v1":
+    if required.get("battle_model_scope") not in {
+        "xmage_permanent_simple_activated_create_token_v1",
+        "xmage_graveyard_self_exile_activated_create_token_v1",
+    }:
         return None
     discard_target = str(required.get("activation_discard_target") or "any_card")
     discard_hand = []
@@ -1194,6 +1199,10 @@ def simple_activated_create_token_execution_scenario_from_expected_rule(
         "expected_discard_count": int(required.get("activation_discard_count") or 0),
         "expected_discard_target": discard_target,
         "expected_discard_random": bool(required.get("activation_discard_random")),
+        "source_zone": required.get("activation_zone") or "battlefield",
+        "expected_exiled_source_from_graveyard": bool(
+            required.get("activation_requires_exile_source_from_graveyard")
+        ),
         "logical_rule_key": rule["logical_rule_key"],
     }
 

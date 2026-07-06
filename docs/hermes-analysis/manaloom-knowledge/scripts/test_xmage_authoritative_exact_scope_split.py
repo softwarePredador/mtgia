@@ -2861,6 +2861,114 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["token_count"], 2)
         self.assertEqual(effect["token_name"], "Citizen Token")
 
+    def test_graveyard_self_exile_activated_create_token_maps_source_cost(self) -> None:
+        unit = (
+            split.ACTIVATED_TOKEN_PERMANENT_UNIT_PREFIX
+            + "no_target_class::no_condition_class::token,activated_ability"
+        )
+        row = queue_row(
+            unit,
+            effect_classes=["CreateTokenEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["token", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Eternal Student",
+                type_line="Creature - Zombie Warlock",
+                oracle_text=(
+                    "{1}{B}, Exile this card from your graveyard: "
+                    "Create two 1/1 white and black Inkling creature tokens with flying."
+                ),
+            ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(
+                    Zone.GRAVEYARD,
+                    new CreateTokenEffect(new Inkling11Token(), 2),
+                    new ManaCostsImpl<>("{1}{B}")
+                );
+                ability.addCost(new ExileSourceFromGraveCost());
+                this.addAbility(ability);
+                class Inkling11Token extends TokenImpl {
+                    public Inkling11Token() {
+                        super("Inkling Token", "1/1 white and black Inkling creature token with flying");
+                        cardType.add(CardType.CREATURE);
+                        subtype.add(SubType.INKLING);
+                        color.setWhite(true);
+                        color.setBlack(true);
+                        power = new MageInt(1);
+                        toughness = new MageInt(1);
+                        addAbility(new FlyingAbility());
+                    }
+                }
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.GRAVEYARD_SELF_EXILE_ACTIVATED_TOKEN_SCOPE)
+        self.assertEqual(effect["activated_battle_model_scope"], split.GRAVEYARD_SELF_EXILE_ACTIVATED_TOKEN_SCOPE)
+        self.assertEqual(effect["activation_zone"], "graveyard")
+        self.assertTrue(effect["activation_requires_exile_source_from_graveyard"])
+        self.assertEqual(effect["activation_cost_mana"], "{1}{B}")
+        self.assertEqual(effect["token_count"], 2)
+        self.assertEqual(effect["token_name"], "Inkling Token")
+        self.assertEqual(effect["token_colors"], ["W", "B"])
+        self.assertTrue(effect["token_flying"])
+
+    def test_graveyard_self_exile_activated_create_token_accepts_tapped_token(self) -> None:
+        unit = (
+            split.ACTIVATED_TOKEN_PERMANENT_UNIT_PREFIX
+            + "no_target_class::no_condition_class::token,activated_ability"
+        )
+        row = queue_row(
+            unit,
+            effect_classes=["CreateTokenEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["token", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Illustrious Historian",
+                type_line="Creature - Human Shaman",
+                oracle_text=(
+                    "{5}, Exile Illustrious Historian from your graveyard: "
+                    "Create a tapped 3/2 red and white Spirit creature token."
+                ),
+            ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(
+                    Zone.GRAVEYARD,
+                    new CreateTokenEffect(new Spirit32Token(), 1, true, false),
+                    new GenericManaCost(5)
+                );
+                ability.addCost(new ExileSourceFromGraveCost());
+                this.addAbility(ability);
+                class Spirit32Token extends TokenImpl {
+                    public Spirit32Token() {
+                        super("Spirit Token", "3/2 red and white Spirit creature token");
+                        cardType.add(CardType.CREATURE);
+                        subtype.add(SubType.SPIRIT);
+                        color.setRed(true);
+                        color.setWhite(true);
+                        power = new MageInt(3);
+                        toughness = new MageInt(2);
+                    }
+                }
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.GRAVEYARD_SELF_EXILE_ACTIVATED_TOKEN_SCOPE)
+        self.assertTrue(effect["token_tapped"])
+        self.assertEqual(effect["activation_cost_mana"], "{5}")
+        self.assertEqual(effect["activation_zone"], "graveyard")
+
     def test_token_class_blocks_new_unmodeled_ability(self) -> None:
         token_data, reason = split.parse_simple_token_class(
             """

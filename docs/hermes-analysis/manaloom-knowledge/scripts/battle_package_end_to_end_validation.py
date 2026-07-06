@@ -1387,7 +1387,11 @@ def run_simple_activated_create_token(
     )
     active = battle.Player(str(scenario.get("player") or "Activated Token Controller"), None, [])
     opponent = battle.Player(str(scenario.get("opponent") or "Activated Token Opponent"), None, [])
-    active.battlefield = [source]
+    source_zone = str(scenario.get("source_zone") or "battlefield")
+    if source_zone == "graveyard":
+        active.graveyard = [source]
+    else:
+        active.battlefield = [source]
     active.hand = [dict(card) for card in scenario.get("controller_hand", [])]
     add_manifest_mana(active, scenario.get("controller_mana") or {})
     starting_hand_names = [card.get("name", "?") for card in active.hand if isinstance(card, dict)]
@@ -1412,6 +1416,12 @@ def run_simple_activated_create_token(
         fail("battle_execution", f"{card['name']} simple activated token ability activation failed")
     if bool(source.get("tapped")) != bool(scenario.get("expected_tapped_source")):
         fail("battle_execution", f"{card['name']} source tapped={source.get('tapped')}")
+    expected_exiled_source = bool(scenario.get("expected_exiled_source_from_graveyard"))
+    if expected_exiled_source:
+        if source in active.graveyard:
+            fail("battle_execution", f"{card['name']} source remained in graveyard after activation")
+        if source not in active.exile:
+            fail("battle_execution", f"{card['name']} source was not exiled from graveyard")
 
     actual_tokens = [
         permanent
@@ -1459,6 +1469,11 @@ def run_simple_activated_create_token(
             "battle_events",
             f"{card['name']} discarded_count={activation_event.get('discarded_count')}, expected {expected_discard_count}",
         )
+    if bool(activation_event.get("exiled_source_from_graveyard")) != expected_exiled_source:
+        fail(
+            "battle_events",
+            f"{card['name']} exiled_source_from_graveyard={activation_event.get('exiled_source_from_graveyard')}",
+        )
     if expected_discard_count:
         discarded = list(activation_event.get("discarded") or [])
         if len(discarded) != expected_discard_count:
@@ -1485,6 +1500,7 @@ def run_simple_activated_create_token(
         "token_name": expected_name,
         "discarded_count": expected_discard_count,
         "discard_target": expected_discard_target if expected_discard_count else None,
+        "exiled_source_from_graveyard": expected_exiled_source,
     }
 
 

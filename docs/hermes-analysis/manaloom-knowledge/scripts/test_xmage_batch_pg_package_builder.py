@@ -1331,3 +1331,43 @@ def test_simple_activated_create_token_execution_scenario_includes_discard_cost(
     assert scenario["expected_discard_target"] == "any_card"
     assert scenario["expected_token"]["name"] == "Citizen Token"
     assert scenario["expected_token"]["count"] == 2
+
+
+def test_graveyard_self_exile_activated_create_token_execution_scenario_marks_source_zone() -> None:
+    rule = {
+        "normalized_name": "eternal student",
+        "card_name": "Eternal Student",
+        "logical_rule_key": "battle_rule_v1:eternal-student",
+        "required_effect_fields": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_graveyard_self_exile_activated_create_token_v1",
+            "activation_cost_mana": "{1}{B}",
+            "activation_cost_generic": 1,
+            "activation_cost_colors": ["B"],
+            "activation_zone": "graveyard",
+            "activation_requires_exile_source_from_graveyard": True,
+            "token_count": 2,
+            "token_name": "Inkling Token",
+            "token_power": 1,
+            "token_toughness": 1,
+            "token_subtype": "Inkling",
+            "token_colors": ["W", "B"],
+            "token_keywords": ["flying"],
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario["type"] == "simple_activated_create_token"
+    assert scenario["source_zone"] == "graveyard"
+    assert scenario["expected_exiled_source_from_graveyard"] is True
+    assert scenario["controller_mana"] == {
+        "generic": 1,
+        "white": 0,
+        "blue": 0,
+        "black": 1,
+        "red": 0,
+        "green": 0,
+    }
+    assert scenario["expected_token"]["name"] == "Inkling Token"
+    assert scenario["expected_token"]["keywords"] == ["flying"]
