@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Pivot repeated same-deck source exhaustion into cross-commander role learning.
+"""Pivot blocked same-deck loops into cross-commander role learning.
 
 This read-only report follows ``global_commander_learning_priority_audit`` when
-the top action is a source-expansion cycle. It groups role floor gaps and role
-excesses across commanders so the next learning action improves the global deck
-model instead of repeating the same deck-specific source search.
+the top action is a source-expansion cycle or an exhausted engine axis. It
+groups role floor gaps and role excesses across commanders so the next learning
+action improves the global deck model instead of repeating the same deck-specific
+source search or re-entering an exhausted engine loop.
 """
 
 from __future__ import annotations
@@ -24,13 +25,14 @@ from global_commander_deck_contract_audit import REPO_ROOT, rel
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 COMMANDER_CONTRACT = REPO_ROOT / "docs/hermes-analysis/COMMANDER_DECKBUILDING_CONTRACT_2026-06-29.md"
 DEFAULT_PRIORITY_REPORT = (
-    REPORT_DIR / "global_commander_learning_priority_audit_20260706_source_expansion_cycle_current.json"
+    REPORT_DIR / "global_commander_learning_priority_audit_20260706_engine_axis_exhaustion_current.json"
 )
 DEFAULT_OUT_PREFIX = (
-    REPORT_DIR / "global_commander_cross_commander_role_axis_learning_pivot_20260706_source_expansion_cycle_current"
+    REPORT_DIR / "global_commander_cross_commander_role_axis_learning_pivot_20260706_engine_axis_exhaustion_current"
 )
 ROLE_LABEL_RE = re.compile(r"^(?P<role>[^=]+)=(?P<count>-?\d+) target (?P<min>-?\d+)-(?P<max>-?\d+)$")
 SOURCE_CYCLE_STATE = "source_expansion_cycle_requires_global_learning_pivot"
+ENGINE_AXIS_EXHAUSTED_STATE = "engine_axis_exhausted_requires_global_learning_pivot"
 
 
 def utc_now() -> str:
@@ -65,11 +67,16 @@ def parse_role_label(value: object) -> dict[str, Any] | None:
 def evidence_row(deck_row: Mapping[str, Any], parsed: Mapping[str, Any], direction: str) -> dict[str, Any]:
     deck_id = str(deck_row.get("deck_id") or "")
     source_cycle = str(deck_row.get("source_exhaustion_state") or "") == SOURCE_CYCLE_STATE
+    role = str(parsed.get("role") or "")
+    deck_engine_axis_exhausted = (
+        str(deck_row.get("engine_axis_pivot_state") or "") == ENGINE_AXIS_EXHAUSTED_STATE
+    )
+    engine_axis_exhaustion_blocks_this_axis = role == "engine" and deck_engine_axis_exhausted
     return {
         "deck_id": deck_id,
         "deck_name": deck_row.get("deck_name"),
         "commander": deck_row.get("commander"),
-        "role": parsed.get("role"),
+        "role": role,
         "direction": direction,
         "count": parsed.get("count"),
         "min": parsed.get("min"),
@@ -77,9 +84,15 @@ def evidence_row(deck_row: Mapping[str, Any], parsed: Mapping[str, Any], directi
         "stage": deck_row.get("stage"),
         "repair_gate_state": deck_row.get("repair_gate_state"),
         "source_exhaustion_state": deck_row.get("source_exhaustion_state"),
+        "engine_axis_pivot_state": deck_row.get("engine_axis_pivot_state"),
         "source_cycle_blocks_same_deck_search": source_cycle,
+        "deck_engine_axis_exhausted_requires_global_pivot": deck_engine_axis_exhausted,
+        "engine_axis_exhaustion_blocks_this_axis": engine_axis_exhaustion_blocks_this_axis,
         "source_exhaustion_prior_blocked_recycled_cut_source_count": int(
             deck_row.get("source_exhaustion_prior_blocked_recycled_cut_source_count") or 0
+        ),
+        "engine_axis_viable_non_biotransference_cut_count": int(
+            deck_row.get("engine_axis_viable_non_biotransference_cut_count") or 0
         ),
         "next_action": deck_row.get("next_action"),
         "benchmark_only": deck_id == "607",
@@ -104,7 +117,15 @@ def collect_axis_evidence(deck_rows: Iterable[Mapping[str, Any]]) -> dict[str, l
     return axes
 
 
-def axis_next_gate(role: str, cycle_blocked_count: int, below_count: int, above_count: int) -> str:
+def axis_next_gate(
+    role: str,
+    cycle_blocked_count: int,
+    below_count: int,
+    above_count: int,
+    engine_axis_exhausted_count: int,
+) -> str:
+    if role == "engine" and engine_axis_exhausted_count:
+        return "choose_next_non_exhausted_role_axis_after_engine_axis_exhaustion"
     if cycle_blocked_count:
         return "build_cross_commander_role_axis_policy_before_more_same_deck_source_expansion"
     if below_count and above_count:
@@ -119,6 +140,9 @@ def axis_next_gate(role: str, cycle_blocked_count: int, below_count: int, above_
 def axis_priority(role: str, rows: list[Mapping[str, Any]]) -> int:
     actionable = [row for row in rows if not row.get("benchmark_only")]
     cycle_blocked_count = sum(1 for row in actionable if row.get("source_cycle_blocks_same_deck_search"))
+    engine_axis_exhausted_count = sum(
+        1 for row in actionable if row.get("engine_axis_exhaustion_blocks_this_axis")
+    )
     below_count = sum(1 for row in actionable if row.get("direction") == "below_floor")
     above_count = sum(1 for row in actionable if row.get("direction") == "above_range")
     commander_count = len({str(row.get("commander") or "") for row in actionable})
@@ -129,6 +153,8 @@ def axis_priority(role: str, rows: list[Mapping[str, Any]]) -> int:
         score += 25
     if role == "land":
         score += 10
+    if role == "engine" and engine_axis_exhausted_count:
+        score -= 500
     return score
 
 
@@ -140,9 +166,14 @@ def build_axis_rows(axes: Mapping[str, list[dict[str, Any]]]) -> list[dict[str, 
         below_count = sum(1 for row in actionable if row.get("direction") == "below_floor")
         above_count = sum(1 for row in actionable if row.get("direction") == "above_range")
         cycle_blocked = [row for row in actionable if row.get("source_cycle_blocks_same_deck_search")]
+        engine_exhausted = [
+            row for row in actionable if row.get("engine_axis_exhaustion_blocks_this_axis")
+        ]
         commander_count = len({str(row.get("commander") or "") for row in actionable})
         status = "cross_commander_role_axis_ready_no_deck_action"
-        if cycle_blocked:
+        if engine_exhausted and role == "engine":
+            status = "cross_commander_role_axis_suppressed_engine_axis_exhausted"
+        elif cycle_blocked:
             status = "cross_commander_role_axis_blocks_same_deck_source_cycle"
         rows.append(
             {
@@ -156,7 +187,18 @@ def build_axis_rows(axes: Mapping[str, list[dict[str, Any]]]) -> list[dict[str, 
                 "above_range_deck_count": above_count,
                 "source_cycle_blocked_deck_count": len(cycle_blocked),
                 "source_cycle_blocked_decks": [row["deck_id"] for row in cycle_blocked],
-                "next_gate": axis_next_gate(role, len(cycle_blocked), below_count, above_count),
+                "engine_axis_exhausted_deck_count": len(engine_exhausted),
+                "engine_axis_exhausted_decks": [row["deck_id"] for row in engine_exhausted],
+                "axis_suppressed_by_engine_axis_exhaustion": bool(
+                    engine_exhausted and role == "engine"
+                ),
+                "next_gate": axis_next_gate(
+                    role,
+                    len(cycle_blocked),
+                    below_count,
+                    above_count,
+                    len(engine_exhausted),
+                ),
                 "evidence_rows": evidence,
                 "deck_action_allowed": False,
                 "candidate_copy_allowed": False,
@@ -173,6 +215,11 @@ def choose_status(axis_rows: list[Mapping[str, Any]]) -> tuple[str, str]:
         return (
             "cross_commander_role_axis_learning_pivot_blocks_no_axes",
             "recheck_global_commander_learning_priority_inputs",
+        )
+    if any(row.get("axis_suppressed_by_engine_axis_exhaustion") for row in axis_rows):
+        return (
+            "cross_commander_role_axis_learning_pivot_ready_after_engine_axis_exhaustion_no_deck_action",
+            str(axis_rows[0].get("next_gate") or ""),
         )
     if any(row.get("source_cycle_blocked_deck_count") for row in axis_rows):
         return (
@@ -218,6 +265,12 @@ def build_report(*, priority_report: Path) -> dict[str, Any]:
             "top_axis_status": top_axis.get("status", ""),
             "top_axis_priority_score": int(top_axis.get("priority_score") or 0),
             "source_cycle_axis_count": sum(1 for row in axis_rows if row.get("source_cycle_blocked_deck_count")),
+            "engine_axis_exhausted_axis_count": sum(
+                1 for row in axis_rows if row.get("engine_axis_exhausted_deck_count")
+            ),
+            "engine_axis_suppressed_axis_count": sum(
+                1 for row in axis_rows if row.get("axis_suppressed_by_engine_axis_exhaustion")
+            ),
             "benchmark_only_excluded_from_action_count": sum(
                 int(row.get("benchmark_only_deck_count") or 0) for row in axis_rows
             ),
@@ -230,12 +283,14 @@ def build_report(*, priority_report: Path) -> dict[str, Any]:
         "candidate_copy_blockers": [
             "cross_commander_role_axis_learning_is_not_cut_permission",
             "source_cycle_decks_need_role_axis_policy_before_more_same_deck_source_expansion",
+            "engine_axis_exhaustion_suppresses_engine_reentry_until_new_card_level_evidence",
             "deck_607_is_benchmark_evidence_only_not_action_source",
             "battle_gate_closed_until_candidate_copy_and_card_level_usage_evidence_exist",
         ],
         "policy": {
             "pivot_boundary": "This report chooses a learning axis only; it does not add, cut, copy, battle, or promote decks.",
             "cycle_boundary": "High recycled cut-source counts with all seeded roles exhausted require role-axis learning before more same-deck source search.",
+            "engine_axis_boundary": "An exhausted engine axis remains evidence, but it is suppressed as the next action until new card-level evidence exists.",
             "benchmark_boundary": "Deck 607 evidence is retained as benchmark context but excluded from actionable axis counts.",
             "global_boundary": "Axis evidence groups multiple commanders and variants so one deck cannot become the global objective function.",
         },
@@ -254,6 +309,8 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
         f"- top_axis_status: `{summary['top_axis_status']}`",
         f"- top_axis_priority_score: `{summary['top_axis_priority_score']}`",
         f"- source_cycle_axis_count: `{summary['source_cycle_axis_count']}`",
+        f"- engine_axis_exhausted_axis_count: `{summary['engine_axis_exhausted_axis_count']}`",
+        f"- engine_axis_suppressed_axis_count: `{summary['engine_axis_suppressed_axis_count']}`",
         f"- benchmark_only_excluded_from_action_count: `{summary['benchmark_only_excluded_from_action_count']}`",
         f"- candidate_copy_allowed_now: `{str(payload['candidate_copy_allowed_now']).lower()}`",
         f"- battle_gate_allowed_now: `{str(payload['battle_gate_allowed_now']).lower()}`",
@@ -262,13 +319,14 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
         "",
         "## Axis Queue",
         "",
-        "| Role | Status | Score | Decks | Commanders | Below | Above | Cycle Decks | Next Gate |",
-        "| --- | --- | ---: | ---: | ---: | ---: | ---: | --- | --- |",
+        "| Role | Status | Score | Decks | Commanders | Below | Above | Cycle Decks | Engine Exhausted Decks | Next Gate |",
+        "| --- | --- | ---: | ---: | ---: | ---: | ---: | --- | --- | --- |",
     ]
     for row in payload["axis_rows"]:
         cycle = ", ".join(row.get("source_cycle_blocked_decks") or []) or "-"
+        engine_exhausted = ", ".join(row.get("engine_axis_exhausted_decks") or []) or "-"
         lines.append(
-            "| `{role}` | `{status}` | {score} | {decks} | {commanders} | {below} | {above} | `{cycle}` | `{next}` |".format(
+            "| `{role}` | `{status}` | {score} | {decks} | {commanders} | {below} | {above} | `{cycle}` | `{engine}` | `{next}` |".format(
                 role=row.get("role"),
                 status=row.get("status"),
                 score=row.get("priority_score"),
@@ -277,26 +335,28 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
                 below=row.get("below_floor_deck_count"),
                 above=row.get("above_range_deck_count"),
                 cycle=cycle,
+                engine=engine_exhausted,
                 next=row.get("next_gate"),
             )
         )
     lines.extend(["", "## Top Axis Evidence", ""])
     top = payload["axis_rows"][0] if payload["axis_rows"] else None
     if top:
-        lines.append("| Deck | Commander | Direction | Count | Target | Source Cycle |")
-        lines.append("| --- | --- | --- | ---: | --- | ---: |")
+        lines.append("| Deck | Commander | Direction | Count | Target | Source Cycle | Engine Axis Exhausted |")
+        lines.append("| --- | --- | --- | ---: | --- | ---: | ---: |")
         for row in top.get("evidence_rows") or []:
             if row.get("benchmark_only"):
                 continue
             target = f"{row.get('min')}-{row.get('max')}"
             lines.append(
-                "| `{deck}` | `{commander}` | `{direction}` | {count} | `{target}` | {cycle} |".format(
+                "| `{deck}` | `{commander}` | `{direction}` | {count} | `{target}` | {cycle} | {engine} |".format(
                     deck=f"{row.get('deck_name')} ({row.get('deck_id')})".replace("|", "/"),
                     commander=str(row.get("commander") or "").replace("|", "/"),
                     direction=row.get("direction"),
                     count=row.get("count"),
                     target=target,
                     cycle=str(row.get("source_cycle_blocks_same_deck_search")).lower(),
+                    engine=str(row.get("deck_engine_axis_exhausted_requires_global_pivot")).lower(),
                 )
             )
     else:

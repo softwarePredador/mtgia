@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build role-axis policy before repeating same-deck source expansion.
+"""Build role-axis policy before repeating blocked same-deck loops.
 
 This read-only gate follows
 ``global_commander_cross_commander_role_axis_learning_pivot``. It turns a
@@ -24,13 +24,14 @@ from global_commander_deck_contract_audit import REPO_ROOT, rel
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 COMMANDER_CONTRACT = REPO_ROOT / "docs/hermes-analysis/COMMANDER_DECKBUILDING_CONTRACT_2026-06-29.md"
 DEFAULT_PIVOT_REPORT = (
-    REPORT_DIR / "global_commander_cross_commander_role_axis_learning_pivot_20260706_source_expansion_cycle_current.json"
+    REPORT_DIR / "global_commander_cross_commander_role_axis_learning_pivot_20260706_engine_axis_exhaustion_current.json"
 )
-DEFAULT_OUT_PREFIX = REPORT_DIR / "global_commander_role_axis_policy_builder_20260706_engine_axis_current"
+DEFAULT_OUT_PREFIX = REPORT_DIR / "global_commander_role_axis_policy_builder_20260706_post_engine_axis_exhaustion_current"
 
 CAPACITY_ROLES = {"engine", "ramp", "draw", "tutor", "board_wipe", "recursion", "protection"}
 FOUNDATION_FLOOR_ROLES = {"land", "removal", "wincon"}
 SOURCE_CYCLE_STATUS = "cross_commander_role_axis_blocks_same_deck_source_cycle"
+ENGINE_AXIS_SUPPRESSED_STATUS = "cross_commander_role_axis_suppressed_engine_axis_exhausted"
 
 
 def utc_now() -> str:
@@ -59,6 +60,15 @@ def cycle_deck_ids(axis_rows: list[Mapping[str, Any]]) -> list[str]:
     return ids
 
 
+def engine_axis_exhausted_deck_ids(axis_rows: list[Mapping[str, Any]]) -> list[str]:
+    ids: list[str] = []
+    for row in axis_rows:
+        for deck_id in row.get("engine_axis_exhausted_decks") or []:
+            if deck_id and deck_id not in ids:
+                ids.append(str(deck_id))
+    return ids
+
+
 def evidence_for_deck(axis_rows: list[Mapping[str, Any]], deck_id: str) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
     for axis in axis_rows:
@@ -75,6 +85,12 @@ def evidence_for_deck(axis_rows: list[Mapping[str, Any]], deck_id: str) -> list[
                         "deck_name": evidence.get("deck_name"),
                         "source_cycle_blocks_same_deck_search": bool(
                             evidence.get("source_cycle_blocks_same_deck_search")
+                        ),
+                        "deck_engine_axis_exhausted_requires_global_pivot": bool(
+                            evidence.get("deck_engine_axis_exhausted_requires_global_pivot")
+                        ),
+                        "engine_axis_exhaustion_blocks_this_axis": bool(
+                            evidence.get("engine_axis_exhaustion_blocks_this_axis")
                         ),
                     }
                 )
@@ -100,6 +116,11 @@ def pressure_class(axis: Mapping[str, Any]) -> str:
 
 
 def axis_policy_status(axis: Mapping[str, Any], cls: str) -> str:
+    if (
+        axis.get("status") == ENGINE_AXIS_SUPPRESSED_STATUS
+        or axis.get("axis_suppressed_by_engine_axis_exhaustion")
+    ):
+        return "role_axis_policy_holds_exhausted_engine_axis"
     if int(axis.get("source_cycle_blocked_deck_count") or 0):
         return "role_axis_policy_blocks_same_deck_source_cycle"
     if cls == "ceiling_saturation_axis":
@@ -112,7 +133,18 @@ def axis_policy_status(axis: Mapping[str, Any], cls: str) -> str:
 def policy_actions(axis: Mapping[str, Any], cls: str) -> list[str]:
     role = str(axis.get("role") or "")
     actions: list[str] = []
-    if role == "engine":
+    if role == "engine" and (
+        axis.get("status") == ENGINE_AXIS_SUPPRESSED_STATUS
+        or axis.get("axis_suppressed_by_engine_axis_exhaustion")
+    ):
+        actions.extend(
+            [
+                "hold_engine_axis_after_biotransference_protection_exhaustion",
+                "choose_next_non_exhausted_role_axis_policy",
+                "require_new_card_level_usage_or_same_lane_evidence_before_engine_reentry",
+            ]
+        )
+    elif role == "engine":
         actions.extend(
             [
                 "treat_engine_as_capacity_ceiling_not_missing_role",
@@ -144,6 +176,11 @@ def policy_actions(axis: Mapping[str, Any], cls: str) -> list[str]:
 
 def next_gate_for_axis(axis: Mapping[str, Any], cls: str) -> str:
     role = str(axis.get("role") or "")
+    if role == "engine" and (
+        axis.get("status") == ENGINE_AXIS_SUPPRESSED_STATUS
+        or axis.get("axis_suppressed_by_engine_axis_exhaustion")
+    ):
+        return "choose_next_non_exhausted_role_axis_after_engine_axis_exhaustion"
     if int(axis.get("source_cycle_blocked_deck_count") or 0):
         if role == "engine":
             return "apply_engine_axis_policy_to_nonland_cut_model_before_more_same_deck_source_expansion"
@@ -170,6 +207,11 @@ def build_axis_policy_rows(axis_rows: list[Mapping[str, Any]]) -> list[dict[str,
             "above_range_deck_count": int(axis.get("above_range_deck_count") or 0),
             "source_cycle_blocked_deck_count": int(axis.get("source_cycle_blocked_deck_count") or 0),
             "source_cycle_blocked_decks": list(axis.get("source_cycle_blocked_decks") or []),
+            "engine_axis_exhausted_deck_count": int(axis.get("engine_axis_exhausted_deck_count") or 0),
+            "engine_axis_exhausted_decks": list(axis.get("engine_axis_exhausted_decks") or []),
+            "axis_suppressed_by_engine_axis_exhaustion": bool(
+                axis.get("axis_suppressed_by_engine_axis_exhaustion")
+            ),
             "policy_actions": policy_actions(axis, cls),
             "next_gate": next_gate_for_axis(axis, cls),
             "deck_action_allowed": False,
@@ -185,6 +227,16 @@ def build_axis_policy_rows(axis_rows: list[Mapping[str, Any]]) -> list[dict[str,
 def choose_status(policy_rows: list[Mapping[str, Any]]) -> tuple[str, str]:
     if not policy_rows:
         return ("role_axis_policy_builder_blocks_no_axis", "recheck_cross_commander_role_axis_pivot")
+    if any(row.get("status") == "role_axis_policy_holds_exhausted_engine_axis" for row in policy_rows):
+        if any(row.get("status") == "role_axis_policy_blocks_same_deck_source_cycle" for row in policy_rows):
+            return (
+                "role_axis_policy_ready_after_engine_axis_exhaustion_blocks_same_deck_source_cycle",
+                str(policy_rows[0].get("next_gate") or ""),
+            )
+        return (
+            "role_axis_policy_ready_after_engine_axis_exhaustion_no_deck_action",
+            str(policy_rows[0].get("next_gate") or ""),
+        )
     if any(row.get("status") == "role_axis_policy_blocks_same_deck_source_cycle" for row in policy_rows):
         return ("role_axis_policy_ready_blocks_same_deck_source_cycle", str(policy_rows[0].get("next_gate") or ""))
     return ("role_axis_policy_ready_no_deck_action", str(policy_rows[0].get("next_gate") or ""))
@@ -200,7 +252,11 @@ def build_report(*, pivot_report: Path) -> dict[str, Any]:
     policy_rows = build_axis_policy_rows(axis_rows)
     status, next_gate = choose_status(policy_rows)
     cycle_ids = cycle_deck_ids(axis_rows)
+    engine_axis_ids = engine_axis_exhausted_deck_ids(axis_rows)
     cycle_evidence = {deck_id: evidence_for_deck(axis_rows, deck_id) for deck_id in cycle_ids}
+    engine_axis_evidence = {
+        deck_id: evidence_for_deck(axis_rows, deck_id) for deck_id in engine_axis_ids
+    }
     policy_status_counts = Counter(str(row.get("status") or "unknown") for row in policy_rows)
     pressure_counts = Counter(str(row.get("pressure_class") or "unknown") for row in policy_rows)
     top = policy_rows[0] if policy_rows else {}
@@ -224,6 +280,10 @@ def build_report(*, pivot_report: Path) -> dict[str, Any]:
             "top_policy_status": top.get("status", ""),
             "top_pressure_class": top.get("pressure_class", ""),
             "source_cycle_deck_count": len(cycle_ids),
+            "engine_axis_exhausted_deck_count": len(engine_axis_ids),
+            "held_engine_axis_count": sum(
+                1 for row in policy_rows if row.get("status") == "role_axis_policy_holds_exhausted_engine_axis"
+            ),
             "candidate_copy_allowed_count": 0,
             "battle_gate_allowed_count": 0,
             "policy_status_counts": dict(sorted(policy_status_counts.items())),
@@ -232,14 +292,17 @@ def build_report(*, pivot_report: Path) -> dict[str, Any]:
         },
         "axis_policy_rows": policy_rows,
         "source_cycle_deck_role_pressure": cycle_evidence,
+        "engine_axis_exhausted_deck_role_pressure": engine_axis_evidence,
         "candidate_copy_blockers": [
             "role_axis_policy_is_not_card_level_cut_permission",
             "engine_saturation_policy_must_be_applied_before_more_same_deck_source_expansion",
             "source_cycle_decks_need_axis_policy_applied_to_cut_model",
+            "exhausted_engine_axis_cannot_reenter_without_new_card_level_evidence",
             "battle_gate_closed_until_candidate_copy_and_card_level_usage_evidence_exist",
         ],
         "policy": {
             "engine_boundary": "Engine is a capacity/ceiling role when globally above range; it is not a missing-role add lane by itself.",
+            "engine_axis_exhaustion_boundary": "A protected and exhausted engine axis is held as evidence, not chosen again as the top policy axis without new proof.",
             "cut_boundary": "Cut pressure may target engine-only or excess-overlap cards only after protecting cards that cover missing floors or commander plan.",
             "cycle_boundary": "A source-cycle deck cannot repeat same-deck source expansion until the axis policy is applied to its cut model.",
             "mutation_boundary": "This builder does not choose cards, copy decks, run battles, mutate DBs, or promote packages.",
@@ -259,6 +322,8 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
         f"- top_policy_status: `{summary['top_policy_status']}`",
         f"- top_pressure_class: `{summary['top_pressure_class']}`",
         f"- source_cycle_deck_count: `{summary['source_cycle_deck_count']}`",
+        f"- engine_axis_exhausted_deck_count: `{summary['engine_axis_exhausted_deck_count']}`",
+        f"- held_engine_axis_count: `{summary['held_engine_axis_count']}`",
         f"- candidate_copy_allowed_now: `{str(payload['candidate_copy_allowed_now']).lower()}`",
         f"- battle_gate_allowed_now: `{str(payload['battle_gate_allowed_now']).lower()}`",
         f"- promotion_allowed: `{str(payload['promotion_allowed']).lower()}`",
@@ -266,13 +331,14 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
         "",
         "## Axis Policy Queue",
         "",
-        "| Role | Status | Class | Decks | Commanders | Below | Above | Cycle Decks | Next Gate |",
-        "| --- | --- | --- | ---: | ---: | ---: | ---: | --- | --- |",
+        "| Role | Status | Class | Decks | Commanders | Below | Above | Cycle Decks | Engine Exhausted Decks | Next Gate |",
+        "| --- | --- | --- | ---: | ---: | ---: | ---: | --- | --- | --- |",
     ]
     for row in payload["axis_policy_rows"]:
         cycle = ", ".join(row.get("source_cycle_blocked_decks") or []) or "-"
+        engine_exhausted = ", ".join(row.get("engine_axis_exhausted_decks") or []) or "-"
         lines.append(
-            "| `{role}` | `{status}` | `{cls}` | {decks} | {commanders} | {below} | {above} | `{cycle}` | `{next}` |".format(
+            "| `{role}` | `{status}` | `{cls}` | {decks} | {commanders} | {below} | {above} | `{cycle}` | `{engine}` | `{next}` |".format(
                 role=row.get("role"),
                 status=row.get("status"),
                 cls=row.get("pressure_class"),
@@ -281,6 +347,7 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
                 below=row.get("below_floor_deck_count"),
                 above=row.get("above_range_deck_count"),
                 cycle=cycle,
+                engine=engine_exhausted,
                 next=row.get("next_gate"),
             )
         )

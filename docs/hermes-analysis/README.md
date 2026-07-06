@@ -258,19 +258,22 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     Brackets + Game Changers; o backend agora aceita `1..5` em
     `server/lib/edh_bracket_policy.dart`, mas bracket continua sendo sinal de
     pregame/power e nao prova final de qualidade estrategica.
-    Quando a fila de aprendizado detectar ciclo de expansao no mesmo deck,
+    Quando a fila de aprendizado detectar ciclo de expansao no mesmo deck ou
+    exaustao do eixo engine apos protecao de `Biotransference`,
     rode `manaloom-knowledge/scripts/global_commander_cross_commander_role_axis_learning_pivot.py`
     antes de novas fontes do mesmo deck. Evidencia atual:
-    `master_optimizer_reports/global_commander_cross_commander_role_axis_learning_pivot_20260706_source_expansion_cycle_current.md`.
-    O pivot escolheu `engine` como eixo global superior e excluiu o `607` de
-    contagens acionaveis. Em seguida, rode
+    `master_optimizer_reports/global_commander_cross_commander_role_axis_learning_pivot_20260706_engine_axis_exhaustion_current.md`.
+    O pivot agora mantem `engine` como evidencia, mas suprime esse eixo como
+    proxima acao quando ele ja foi esgotado; o proximo eixo global acionavel
+    virou `ramp`, e o `607` segue excluido das contagens acionaveis. Em
+    seguida, rode
     `manaloom-knowledge/scripts/global_commander_role_axis_policy_builder.py`
     para transformar o eixo em politica de teto/piso/corte. Evidencia atual:
-    `master_optimizer_reports/global_commander_role_axis_policy_builder_20260706_engine_axis_current.md`.
-    Resultado: `engine` e tratado como pressao de capacidade/teto, nao como
-    lane de adicionar carta; candidate copy, battle e promocao seguem fechados
-    ate aplicar essa politica ao modelo de corte nonland. A aplicacao atual
-    fica em
+    `master_optimizer_reports/global_commander_role_axis_policy_builder_20260706_post_engine_axis_exhaustion_current.md`.
+    Resultado: `ramp` e tratado como pressao de capacidade/teto, `engine`
+    fica retido ate surgir nova evidencia card-level, e candidate copy, battle
+    e promocao seguem fechados. Historicamente, a politica de `engine` ja foi
+    aplicada em
     `manaloom-knowledge/scripts/global_commander_engine_axis_nonland_cut_policy_model.py`
     com evidencia:
     `master_optimizer_reports/global_commander_engine_axis_nonland_cut_policy_model_20260706_current.md`.
@@ -1032,6 +1035,17 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     ele transforma o eixo `engine` em politica de capacidade/teto, mantem
     candidate copy, battle, mutacao e promocao fechados e roteia para
     `apply_engine_axis_policy_to_nonland_cut_model_before_more_same_deck_source_expansion`.
+    Apos a trilha de engine proteger `Biotransference` e esgotar cortes
+    non-Biotransference, a fila atualizada fica em
+    `global_commander_learning_priority_audit_20260706_engine_axis_exhaustion_current.md`.
+    O pivot posterior fica em
+    `global_commander_cross_commander_role_axis_learning_pivot_20260706_engine_axis_exhaustion_current.md`:
+    ele suprime reentrada em `engine`, escolhe `ramp` como proximo eixo global
+    e mantem o `607` fora das contagens acionaveis. O builder posterior fica em
+    `global_commander_role_axis_policy_builder_20260706_post_engine_axis_exhaustion_current.md`:
+    ele trata `ramp` como pressao de teto/capacidade, segura `engine` ate nova
+    evidencia card-level e roteia para
+    `apply_ramp_axis_policy_before_more_same_deck_source_expansion`.
     Observacao operacional: snapshots historicos de candidate-copy, battle-probe,
     battle-feedback e package-chain dependem de artefatos locais ignorados. Se
     faltarem ou forem regenerados sem esses artefatos, a auditoria de superficie

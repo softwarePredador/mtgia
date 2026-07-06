@@ -181,15 +181,18 @@ Operational priority after this pivot:
    detection, staple/bracket guardrails, and the Lorehold benchmark rule into
    one global next-action queue;
 11. run `global_commander_cross_commander_role_axis_learning_pivot.py` whenever
-   the learning queue reports `source_expansion_cycle_requires_global_learning_pivot`;
+   the learning queue reports `source_expansion_cycle_requires_global_learning_pivot`
+   or `engine_axis_exhausted_requires_global_learning_pivot`;
    it must group role floor/excess evidence across commanders, exclude deck
-   `607` from actionable counts, and choose a global role axis before any
+   `607` from actionable counts, suppress any exhausted `engine` re-entry
+   until new card-level proof exists, and choose a global role axis before any
    further same-deck source expansion, candidate copy, battle, or promotion;
    then run `global_commander_role_axis_policy_builder.py` to convert the
    chosen role axis into explicit floor/ceiling/cut-pressure policy, treating
-   above-range `engine` as capacity pressure rather than a missing-role add
-   lane, while keeping same-deck source expansion, candidate copy, battle,
-   mutation, and promotion closed; then run
+   above-range capacity roles as cut pressure rather than missing-role add
+   lanes, while keeping same-deck source expansion, candidate copy, battle,
+   mutation, and promotion closed; when `engine` was exhausted, the builder
+   must hold `engine` as evidence and route the next non-exhausted axis; then run
    `global_commander_engine_axis_nonland_cut_policy_model.py` to apply that
    policy to the current nonland cut model, split engine-only and
    excess-overlap cut pressure from protected commander-plan engines, and route
@@ -572,7 +575,9 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_learning_priority_audit_20260706_source_expansion_cycle_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_learning_priority_audit_20260706_engine_axis_exhaustion_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_cross_commander_role_axis_learning_pivot_20260706_source_expansion_cycle_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_cross_commander_role_axis_learning_pivot_20260706_engine_axis_exhaustion_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_role_axis_policy_builder_20260706_engine_axis_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_role_axis_policy_builder_20260706_post_engine_axis_exhaustion_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_engine_axis_nonland_cut_policy_model_20260706_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_engine_cut_usage_same_lane_proof_scout_20260706_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_engine_cut_followup_router_20260706_current.md`
@@ -1582,6 +1587,15 @@ Current external refresh on 2026-07-05:
   `pivot_to_cross_commander_role_axis_learning_after_engine_axis_exhaustion`.
   The audit records `engine_axis_exhausted_requires_global_learning_pivot=1`
   and keeps deck `607` as benchmark/regression only.
+- The refreshed cross-commander role-axis pivot now consumes that engine-axis
+  exhaustion state. It keeps `engine` as evidence, but suppresses re-entry into
+  the exhausted engine lane (`engine_axis_suppressed_axis_count=1`), selects
+  `ramp` as the next non-exhausted global axis (`top_axis_priority_score=321`),
+  and keeps candidate copy, battle, and promotion closed. The corresponding
+  role-axis policy builder treats `ramp` as ceiling/capacity pressure, holds
+  `engine` until new card-level evidence exists (`held_engine_axis_count=1`),
+  and routes the next gate to
+  `apply_ramp_axis_policy_before_more_same_deck_source_expansion`.
 
 ## Global Commander Rollout - 2026-07-01
 

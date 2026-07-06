@@ -102,6 +102,95 @@ class GlobalCommanderRoleAxisPolicyBuilderTests(unittest.TestCase):
         self.assertEqual(builder.pressure_class(axis), "floor_repair_axis")
         self.assertEqual(builder.next_gate_for_axis(axis, "floor_repair_axis"), "calibrate_land_floor_policy_before_candidate_copy")
 
+    def test_engine_axis_exhaustion_holds_engine_and_routes_next_axis(self) -> None:
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        root = Path(tmp.name)
+        pivot = write_json(
+            root,
+            "pivot.json",
+            {
+                "axis_rows": [
+                    {
+                        "role": "ramp",
+                        "status": "cross_commander_role_axis_blocks_same_deck_source_cycle",
+                        "priority_score": 321,
+                        "actionable_deck_count": 10,
+                        "commander_count": 3,
+                        "below_floor_deck_count": 0,
+                        "above_range_deck_count": 10,
+                        "source_cycle_blocked_deck_count": 1,
+                        "source_cycle_blocked_decks": ["619"],
+                        "engine_axis_exhausted_deck_count": 0,
+                        "engine_axis_exhausted_decks": [],
+                        "axis_suppressed_by_engine_axis_exhaustion": False,
+                        "evidence_rows": [
+                            {
+                                "deck_id": "619",
+                                "deck_name": "Kaalia Variant",
+                                "commander": "Kaalia of the Vast",
+                                "direction": "above_range",
+                                "count": 23,
+                                "min": 8,
+                                "max": 16,
+                                "source_cycle_blocks_same_deck_search": True,
+                                "deck_engine_axis_exhausted_requires_global_pivot": True,
+                                "engine_axis_exhaustion_blocks_this_axis": False,
+                            }
+                        ],
+                    },
+                    {
+                        "role": "engine",
+                        "status": "cross_commander_role_axis_suppressed_engine_axis_exhausted",
+                        "priority_score": -98,
+                        "actionable_deck_count": 16,
+                        "commander_count": 6,
+                        "below_floor_deck_count": 0,
+                        "above_range_deck_count": 16,
+                        "source_cycle_blocked_deck_count": 1,
+                        "source_cycle_blocked_decks": ["619"],
+                        "engine_axis_exhausted_deck_count": 1,
+                        "engine_axis_exhausted_decks": ["619"],
+                        "axis_suppressed_by_engine_axis_exhaustion": True,
+                        "evidence_rows": [
+                            {
+                                "deck_id": "619",
+                                "deck_name": "Kaalia Variant",
+                                "commander": "Kaalia of the Vast",
+                                "direction": "above_range",
+                                "count": 35,
+                                "min": 4,
+                                "max": 24,
+                                "source_cycle_blocks_same_deck_search": True,
+                                "deck_engine_axis_exhausted_requires_global_pivot": True,
+                                "engine_axis_exhaustion_blocks_this_axis": True,
+                            }
+                        ],
+                    },
+                ]
+            },
+        )
+
+        report = builder.build_report(pivot_report=pivot)
+
+        self.assertEqual(
+            report["status"],
+            "role_axis_policy_ready_after_engine_axis_exhaustion_blocks_same_deck_source_cycle",
+        )
+        self.assertEqual(report["summary"]["top_policy_role"], "ramp")
+        self.assertEqual(report["summary"]["held_engine_axis_count"], 1)
+        self.assertEqual(
+            report["summary"]["next_gate"],
+            "apply_ramp_axis_policy_before_more_same_deck_source_expansion",
+        )
+        held = next(row for row in report["axis_policy_rows"] if row["role"] == "engine")
+        self.assertEqual(held["status"], "role_axis_policy_holds_exhausted_engine_axis")
+        self.assertIn(
+            "hold_engine_axis_after_biotransference_protection_exhaustion",
+            held["policy_actions"],
+        )
+        self.assertIn("619", report["engine_axis_exhausted_deck_role_pressure"])
+
 
 if __name__ == "__main__":
     unittest.main()
