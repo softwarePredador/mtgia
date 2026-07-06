@@ -17,6 +17,8 @@ Execution contract:
   this flow day to day.
 - `XMAGE_GLOBAL_ALL_CARD_COMPLETION_GOAL_2026-07-01.md` freezes the global
   all-card completion goal, current baseline, and stop criteria.
+- `NEW_SERVER_POSTGRES_WORKFLOW_2026-07-06.md` freezes the current PostgreSQL
+  access target for local package apply/sync work on the new EasyPanel server.
 - If the contract checkpoint passes, do not revalidate the full strategy again;
   rebuild the queue and continue family/subpattern work.
 
