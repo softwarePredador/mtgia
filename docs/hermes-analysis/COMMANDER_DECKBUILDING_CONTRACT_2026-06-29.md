@@ -1742,6 +1742,10 @@ Current external refresh on 2026-07-05:
   exact protected-anchor restore adds, but keeps candidate copy closed on
   `protected_anchor_restore_requires_package_resynthesis`; the next gate is
   `resynthesize_profile_repair_package_with_protected_anchor_restoration`.
+  The repair package resynthesizer names a 5-add/5-cut review package
+  (`Bant Panorama`, `Brokers Hideout`, and the three restored anchors), but
+  keeps candidate copy closed on `cut_pair_review_required_before_candidate_copy`
+  until the selected cuts are reviewed as coherent pairs.
   Current evidence:
   `global_commander_learning_priority_audit_20260706_ramp_axis_exhaustion_current.md`,
   `global_commander_cross_commander_role_axis_learning_pivot_20260706_ramp_axis_exhaustion_current.md`,
@@ -1759,7 +1763,9 @@ Current external refresh on 2026-07-05:
   and
   `global_commander_profile_blocker_repair_plan_20260706_lorehold_land_floor_package_profile.md`,
   then
-  `global_commander_profile_repair_candidate_model_20260706_lorehold_land_floor_package_profile.md`.
+  `global_commander_profile_repair_candidate_model_20260706_lorehold_land_floor_package_profile.md`,
+  and
+  `global_commander_profile_repair_package_resynthesizer_20260706_lorehold_land_floor_package_profile.md`.
 
 ## Global Commander Rollout - 2026-07-01
 

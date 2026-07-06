@@ -205,6 +205,12 @@ GLOBAL_COMMANDER_PROFILE_BLOCKER_REPAIR_PLAN = (
 GLOBAL_COMMANDER_PROFILE_REPAIR_CANDIDATE_MODEL = (
     SCRIPT_DIR / "global_commander_profile_repair_candidate_model.py"
 )
+GLOBAL_COMMANDER_PROFILE_REPAIR_PACKAGE_RESYNTHESIZER = (
+    SCRIPT_DIR / "global_commander_profile_repair_package_resynthesizer.py"
+)
+GLOBAL_COMMANDER_PROFILE_REPAIR_PACKAGE_RESYNTHESIZER_TEST = (
+    SCRIPT_DIR / "test_global_commander_profile_repair_package_resynthesizer.py"
+)
 GLOBAL_COMMANDER_PAYOFF_SOURCE_LANE_EXPANDER = (
     SCRIPT_DIR / "global_commander_payoff_source_lane_expander.py"
 )
@@ -671,6 +677,10 @@ GLOBAL_COMMANDER_LAND_FLOOR_PACKAGE_PROFILE_BLOCKER_REPAIR_REPORT = (
 GLOBAL_COMMANDER_LAND_FLOOR_PACKAGE_PROFILE_REPAIR_CANDIDATE_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_profile_repair_candidate_model_20260706_lorehold_land_floor_package_profile.md"
+)
+GLOBAL_COMMANDER_LAND_FLOOR_PACKAGE_PROFILE_REPAIR_PACKAGE_RESYNTHESIS_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_profile_repair_package_resynthesizer_20260706_lorehold_land_floor_package_profile.md"
 )
 GLOBAL_COMMANDER_CANDIDATE_BATTLE_PROBE_REPORT = (
     REPO_ROOT
@@ -1210,12 +1220,14 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_candidate_package_strategy_matrix_20260706_land_floor_deck612_package_lorehold_profile.md",
                 "global_commander_profile_blocker_repair_plan_20260706_lorehold_land_floor_package_profile.md",
                 "global_commander_profile_repair_candidate_model_20260706_lorehold_land_floor_package_profile.md",
+                "global_commander_profile_repair_package_resynthesizer_20260706_lorehold_land_floor_package_profile.md",
                 "commander_profile_not_available",
                 "profile_lands_below_target",
                 "protected anchor cuts",
                 "restore or prove same-lane replacements",
                 "protected_anchor_restore_requires_package_resynthesis",
                 "resynthesize_profile_repair_package_with_protected_anchor_restoration",
+                "cut_pair_review_required_before_candidate_copy",
                 "repair_commander_profile_blockers_before_battle",
                 "global_commander_external_exact_artifact_engine_source_expander.py",
                 "global_commander_external_exact_artifact_engine_source_expander_20260706_current.md",
@@ -4004,6 +4016,33 @@ def build_audit() -> dict[str, Any]:
     )
     checks.append(
         check_contains(
+            GLOBAL_COMMANDER_PROFILE_REPAIR_PACKAGE_RESYNTHESIZER,
+            [
+                "global_commander_profile_repair_package_resynthesizer",
+                "profile_repair_package_resynthesis_ready_for_cut_pair_review",
+                "profile_repair_package_resynthesis_blocks_candidate_copy",
+                "review_resynthesized_profile_repair_cut_pairs_before_candidate_copy",
+                "cut_pair_review_required_before_candidate_copy",
+                "review_only_resynthesized_profile_repair_add",
+                "review_only_resynthesized_profile_repair_cut",
+                "protected_anchor_boundary",
+                "battle_or_optimization_performed",
+                "candidate_copy_allowed_now",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_PROFILE_REPAIR_PACKAGE_RESYNTHESIZER_TEST,
+            [
+                "test_ready_adds_and_cuts_route_to_cut_pair_review_without_candidate_copy",
+                "test_insufficient_cut_pool_blocks_resynthesis",
+                "cut_pair_review_required_before_candidate_copy",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
             GLOBAL_COMMANDER_PAYOFF_SOURCE_LANE_EXPANDER,
             [
                 "global_commander_payoff_source_lane_expander",
@@ -4874,6 +4913,28 @@ def build_audit() -> dict[str, Any]:
                 "Call Forth the Tempest",
                 "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
                 "protected_anchor_boundary",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_LAND_FLOOR_PACKAGE_PROFILE_REPAIR_PACKAGE_RESYNTHESIS_REPORT,
+            [
+                "Global Commander Profile Repair Package Resynthesizer",
+                "profile_repair_package_resynthesis_ready_for_cut_pair_review",
+                "commander: `Lorehold, the Historian`",
+                "selected_add_count: `5`",
+                "selected_cut_count: `5`",
+                "candidate_copy_allowed_now: `false`",
+                "battle_gate_allowed_now: `false`",
+                "promotion_allowed: `false`",
+                "next_gate: `review_resynthesized_profile_repair_cut_pairs_before_candidate_copy`",
+                "Bant Panorama",
+                "Brokers Hideout",
+                "Pyromancer's Goggles",
+                "Call Forth the Tempest",
+                "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+                "cut_pair_review_required_before_candidate_copy",
             ],
         )
     )
