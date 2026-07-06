@@ -45,7 +45,15 @@ Resolution order:
 Do not hardcode `SCRIPT_DIR / "knowledge.db"` in new operational scripts. That
 can create or read an empty worktree SQLite file.
 
-When PostgreSQL env is unavailable and the task is a local contract check, use:
+For live PostgreSQL/Hermes/SQLite contract validation, use the new-server
+wrapper so local runs do not try to resolve the internal EasyPanel host:
+
+```bash
+./scripts/quality_gate.sh pg-contract
+```
+
+When live PostgreSQL is intentionally unavailable and the task is only a local
+SQLite drift triage, use:
 
 ```bash
 python3 docs/hermes-analysis/manaloom-knowledge/scripts/pg_hermes_sqlite_contract_audit.py \

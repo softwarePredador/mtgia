@@ -112,6 +112,11 @@ run_report_retention_audit() {
   "$ROOT_DIR/scripts/manaloom_report_retention_audit.sh"
 }
 
+run_pg_hermes_sqlite_contract_audit() {
+  print_header "ManaLoom PostgreSQL/Hermes/SQLite contract audit"
+  "$ROOT_DIR/scripts/manaloom_pg_hermes_sqlite_contract_audit.sh"
+}
+
 run_deep_ai_alignment() {
   print_header "ManaLoom deep AI alignment tester"
   "$ROOT_DIR/scripts/manaloom_deep_ai_alignment_tester.sh"
@@ -139,6 +144,7 @@ Uso:
   ./scripts/quality_gate.sh ai-bridge # ponte app/IA: auditoria + eval Commander
   ./scripts/quality_gate.sh server-target # bloqueia referencias ativas ao servidor antigo
   ./scripts/quality_gate.sh report-retention # bloqueia dados brutos/locais sem uso em reports
+  ./scripts/quality_gate.sh pg-contract # valida PG/Hermes/SQLite pelo wrapper do servidor novo
   ./scripts/quality_gate.sh deep-ai # tester profundo IA + dados + battle/deckbuilder
 
 Dica:
@@ -156,6 +162,7 @@ Exemplos:
   ./scripts/quality_gate.sh ai-bridge
   ./scripts/quality_gate.sh server-target
   ./scripts/quality_gate.sh report-retention
+  ./scripts/quality_gate.sh pg-contract
   ./scripts/quality_gate.sh deep-ai
 EOF
 }
@@ -186,6 +193,9 @@ main() {
       ;;
     report-retention)
       run_report_retention_audit
+      ;;
+    pg-contract)
+      run_pg_hermes_sqlite_contract_audit
       ;;
     deep-ai)
       run_deep_ai_alignment

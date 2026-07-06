@@ -42,7 +42,7 @@ aligned with the current XMage and Commander deckbuilding contracts:
 
 ```bash
 python3 docs/hermes-analysis/manaloom-knowledge/scripts/operational_surface_alignment_audit.py \
-  --out-prefix docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260629_current
+  --out-prefix /tmp/operational_surface_alignment_audit_current
 ```
 
 Run the legacy contamination compatibility audit before merging broad branch
@@ -50,7 +50,7 @@ work into `master`:
 
 ```bash
 python3 docs/hermes-analysis/manaloom-knowledge/scripts/legacy_contamination_audit.py \
-  --out-prefix docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_current
+  --out-prefix /tmp/legacy_contamination_audit_current
 ```
 
 Run the v9 regression harness explicitly:
@@ -358,7 +358,7 @@ current global queue with:
 python3 docs/hermes-analysis/manaloom-knowledge/scripts/xmage_authoritative_adaptation_queue.py \
   --xmage-root /Users/desenvolvimentomobile/Downloads/mage-master \
   --scope all_battle_gap \
-  --out-prefix docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_$(date -u +%Y%m%d)_current_all_battle_gap
+  --out-prefix /tmp/xmage_authoritative_adaptation_queue_$(date -u +%Y%m%d)_current_all_battle_gap
 ```
 
 This queue separates source truth from runtime execution: resolved XMage cards
@@ -370,8 +370,8 @@ units into exact runtime-backed scopes:
 
 ```bash
 python3 docs/hermes-analysis/manaloom-knowledge/scripts/xmage_authoritative_exact_scope_split.py \
-  --queue docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg323_creature_etb_add_counters_wave_commander_legal.json \
-  --output-prefix docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_$(date -u +%Y%m%d)_next_wave
+  --queue /tmp/xmage_authoritative_adaptation_queue_$(date -u +%Y%m%d)_current_all_battle_gap.json \
+  --output-prefix /tmp/xmage_authoritative_exact_scope_split_$(date -u +%Y%m%d)_next_wave
 ```
 
 Only proposals marked `safe_for_batch_pg_package=true` may feed

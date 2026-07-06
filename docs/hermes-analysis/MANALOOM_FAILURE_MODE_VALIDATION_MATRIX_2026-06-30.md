@@ -19,7 +19,7 @@ Canonical contracts:
 
 | Gate | Old bug class blocked | Required evidence |
 | --- | --- | --- |
-| Field aliases | Duplicate `oracle*`, `card_id`, `scryfall_id`, name, or `logical_rule_key` paths drift | `pg_hermes_sqlite_contract_audit.py` passes, or residual drift is listed explicitly |
+| Field aliases | Duplicate `oracle*`, `card_id`, `scryfall_id`, name, or `logical_rule_key` paths drift | `./scripts/quality_gate.sh pg-contract` passes, or residual drift is listed explicitly |
 | Intelligence fanout | Raw multi-row intelligence joins multiply deck rows; block raw multi-row intelligence joins in product deck queries | Consumers join `card_intelligence_snapshot` or aggregate `card_battle_rules`, `card_function_tags`, and `card_semantic_tags_v2` by `card_id` first |
 | PostgreSQL -> Hermes/SQLite | SQLite cache or Hermes artifact overwrites durable PostgreSQL truth | PostgreSQL apply/postcheck evidence exists before sync; SQLite is treated as cache/lab/runtime evidence |
 | XMage promotion | Broad XMage extraction becomes executable truth | Only exact `battle_model_scope` rows with focused tests and package precheck can enter PostgreSQL |
@@ -40,31 +40,30 @@ Run these before reporting cross-surface alignment:
 
 ```bash
 python3 docs/hermes-analysis/manaloom-knowledge/scripts/operational_surface_alignment_audit.py \
-  --out-prefix docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_$(date -u +%Y%m%d_%H%M%S)_current
+  --out-prefix /tmp/operational_surface_alignment_audit_$(date -u +%Y%m%d_%H%M%S)_current
 
 python3 docs/hermes-analysis/manaloom-knowledge/scripts/deckbuilding_contract_surface_audit.py \
-  --out-prefix docs/hermes-analysis/master_optimizer_reports/deckbuilding_contract_surface_audit_$(date -u +%Y%m%d_%H%M%S)_current
+  --out-prefix /tmp/deckbuilding_contract_surface_audit_$(date -u +%Y%m%d_%H%M%S)_current
 
 python3 docs/hermes-analysis/manaloom-knowledge/scripts/xmage_strategy_consistency_audit.py \
-  --output-prefix docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_$(date -u +%Y%m%d_%H%M%S)_current
+  --output-prefix /tmp/xmage_strategy_consistency_audit_$(date -u +%Y%m%d_%H%M%S)_current
 
 python3 docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_artifact_contract_audit.py \
-  --out-prefix docs/hermes-analysis/master_optimizer_reports/lorehold_artifact_contract_audit_$(date -u +%Y%m%d_%H%M%S)_current
+  --out-prefix /tmp/lorehold_artifact_contract_audit_$(date -u +%Y%m%d_%H%M%S)_current
 
 python3 docs/hermes-analysis/manaloom-knowledge/scripts/legacy_contamination_audit.py \
-  --out-prefix docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_$(date -u +%Y%m%d_%H%M%S)_current
+  --out-prefix /tmp/legacy_contamination_audit_$(date -u +%Y%m%d_%H%M%S)_current
 ```
 
 Run this when the claim includes PostgreSQL/Hermes/SQLite field alignment:
 
 ```bash
-python3 docs/hermes-analysis/manaloom-knowledge/scripts/pg_hermes_sqlite_contract_audit.py \
-  --out-prefix docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_$(date -u +%Y%m%d_%H%M%S)_current
+./scripts/quality_gate.sh pg-contract
 ```
 
-If PostgreSQL credentials are not available in the current environment, use
-the script's read-only/SQLite-safe options only for local drift triage and state
-that live PostgreSQL was not proven.
+If live PostgreSQL is intentionally unavailable, use the script's
+read-only/SQLite-safe options only for local drift triage and state that live
+PostgreSQL was not proven.
 
 ## Stop Rules
 

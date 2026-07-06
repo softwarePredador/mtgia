@@ -4,7 +4,7 @@
 > Esta e a porta de entrada para decidir quais docs ler e quais ignorar em
 > tarefas Hermes.
 
-Updated: 2026-07-05
+Updated: 2026-07-06
 
 Esta pasta mistura contrato operacional, historico de auditoria, relatorios de
 rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
@@ -86,8 +86,11 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     efeito; `oracle_hash` e o campo de drift para regra de battle.
   - Auditoria ativa:
     `manaloom-knowledge/scripts/pg_hermes_sqlite_contract_audit.py`.
-    Evidencia atual:
-    `master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260630_alias_guardrail_final.md`.
+  - Para validar o PostgreSQL atual, rode sempre pelo wrapper do servidor novo:
+    `./scripts/quality_gate.sh pg-contract`.
+  - Saidas diagnosticas devem ir para `/tmp` por padrao; retenha evidencia em
+    `master_optimizer_reports` apenas quando houver decisao explicita de
+    publicar um pacote/auditoria.
 
 ## Decisoes atuais XMage -> ManaLoom
 

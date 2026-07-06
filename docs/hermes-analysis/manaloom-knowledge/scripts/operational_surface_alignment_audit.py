@@ -60,6 +60,7 @@ DECKBUILDING_SUPPORT = REPO_ROOT / "server" / "lib" / "ai" / "commander_deckbuil
 QUALITY_GATE = REPO_ROOT / "scripts" / "quality_gate.sh"
 OLD_SERVER_REFERENCE_WRAPPER = REPO_ROOT / "scripts" / "manaloom_old_server_reference_audit.sh"
 REPORT_RETENTION_WRAPPER = REPO_ROOT / "scripts" / "manaloom_report_retention_audit.sh"
+PG_HERMES_SQLITE_CONTRACT_WRAPPER = REPO_ROOT / "scripts" / "manaloom_pg_hermes_sqlite_contract_audit.sh"
 LEGACY_CONTAMINATION_BASELINE = DOCS_DIR / "LEGACY_CONTAMINATION_BASELINE_2026-06-30.json"
 
 CURRENT_XMAGE_MANIFEST = (
@@ -157,6 +158,7 @@ def build_checks() -> list[Check]:
                 "app_ai_knowledge_bridge_audit.py",
                 "old_server_reference_audit.py",
                 "report_retention_audit.py",
+                "./scripts/quality_gate.sh pg-contract",
                 "legacy_contamination_audit.py",
                 CURRENT_XMAGE_MANIFEST,
                 "global_commander_deck_contract_audit.py",
@@ -190,6 +192,8 @@ def build_checks() -> list[Check]:
                 "PostgreSQL -> Hermes/SQLite",
                 "Legacy contamination",
                 "legacy_contamination_audit.py",
+                "./scripts/quality_gate.sh pg-contract",
+                "--out-prefix /tmp/",
             ],
             "docs.failure_mode_matrix_exists_and_covers_old_bug_classes",
         ),
@@ -215,7 +219,7 @@ def build_checks() -> list[Check]:
                 "historical-only quarantine",
                 "evolution-cartinhas.8ktevp.easypanel.host",
                 "143.198.230.247",
-                ".credentials.env",
+                ".credentials.env` must not exist",
                 "./scripts/quality_gate.sh server-target",
             ],
             "docs.new_server_workflow_quarantines_old_target",
@@ -263,6 +267,9 @@ def build_checks() -> list[Check]:
                 "Legacy engines",
                 "Refresh the SQLite battle cache from PostgreSQL first",
                 "legacy_contamination_audit.py",
+                "--out-prefix /tmp/operational_surface_alignment_audit_current",
+                "--out-prefix /tmp/legacy_contamination_audit_current",
+                "--out-prefix /tmp/xmage_authoritative_adaptation_queue_$(date -u +%Y%m%d)_current_all_battle_gap",
             ],
             "scripts.readme_names_active_engine_and_cache_boundary",
         ),
@@ -325,6 +332,16 @@ def build_checks() -> list[Check]:
             "scripts.report_retention_audit_wrapper_exists",
         ),
         check_contains(
+            PG_HERMES_SQLITE_CONTRACT_WRAPPER,
+            [
+                "with_new_server_pg.sh",
+                "pg_hermes_sqlite_contract_audit.py",
+                "MANALOOM_PG_HERMES_SQLITE_CONTRACT_AUDIT_OUT_PREFIX",
+                "--out-prefix",
+            ],
+            "scripts.pg_hermes_sqlite_contract_wrapper_uses_new_server",
+        ),
+        check_contains(
             QUALITY_GATE,
             [
                 "run_app_ai_bridge",
@@ -336,6 +353,8 @@ def build_checks() -> list[Check]:
                 "manaloom_old_server_reference_audit.sh",
                 "report-retention",
                 "manaloom_report_retention_audit.sh",
+                "pg-contract",
+                "manaloom_pg_hermes_sqlite_contract_audit.sh",
             ],
             "scripts.quality_gate_exposes_app_ai_bridge",
         ),

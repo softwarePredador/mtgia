@@ -79,14 +79,15 @@ Validated on 2026-07-06 from this checkout:
 
 `docs/hermes-analysis/master_optimizer_reports/` is historical/audit evidence,
 not runtime input. New generated `.md`/`.json` reports in that folder are
-ignored by `.gitignore`, but thousands of older reports remain tracked from
-before the ignore rule.
+ignored by `.gitignore`; recurring wrappers should write diagnostics to `/tmp`
+unless a package explicitly needs retained evidence.
 
-As measured on 2026-07-06:
+After the 2026-07-06 retention cleanup:
 
-- `docs/hermes-analysis/master_optimizer_reports/`: about `710 MB` on disk.
-- Tracked files under that folder: `9889`, about `434 MB`.
-- Tracked markdown files in the repo: `4194`, about `66 MB` total.
+- `docs/hermes-analysis/master_optimizer_reports/`: about `122 MB` on disk.
+- Unreferenced tracked raw reports were removed.
+- Remaining report files are primarily markdown summaries plus referenced raw
+  artifacts needed by current scripts/tests/contracts.
 
 Cleanup should be a separate evidence-retention commit: keep living contracts,
 deploy registers, latest/current summaries, and applied package evidence; remove
@@ -103,8 +104,8 @@ python3 docs/hermes-analysis/manaloom-knowledge/scripts/legacy_contamination_aud
 ## Guardrails
 
 - `server/.env` is the local source for new server credentials.
-- `.credentials.env` may still contain an old-server target and must not be used
-  for current ManaLoom PostgreSQL writes.
+- `.credentials.env` must not exist as an operational entrypoint; if a local
+  ignored copy appears, delete it instead of using it.
 - The wrapper exports `DATABASE_URL`, `PGHOST`, `PGPORT`, `PGDATABASE`,
   `PGUSER`, and `PGPASSWORD` only inside the child process.
 - PostgreSQL remains the product source of truth; Hermes SQLite remains cache
