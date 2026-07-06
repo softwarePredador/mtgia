@@ -709,6 +709,72 @@ def run_multi_create_creature_tokens(
     }
 
 
+def run_dynamic_life_gain(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    active = battle.Player(str(scenario.get("player") or "Life Gain Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
+    active.life = int(scenario.get("starting_life") or 20)
+    active.hand = [dict(item) for item in scenario.get("controller_hand") or []]
+    active.battlefield = [dict(item) for item in scenario.get("controller_battlefield") or []]
+    active.graveyard = [dict(item) for item in scenario.get("controller_graveyard") or []]
+    opponent.battlefield = [dict(item) for item in scenario.get("opponent_battlefield") or []]
+    opponent.graveyard = [dict(item) for item in scenario.get("opponent_graveyard") or []]
+
+    before_events = len(events)
+    battle.apply_effect_immediate(
+        active,
+        [opponent],
+        card,
+        turn=int(scenario.get("turn") or 5),
+        rng=random.Random(int(scenario.get("seed") or 6069)),
+    )
+
+    expected_life_after = int(scenario.get("expected_life_after") or active.life)
+    expected_life_gain = int(scenario.get("expected_life_gain") or 0)
+    if active.life != expected_life_after:
+        fail(
+            "battle_execution",
+            f"{card['name']} life after dynamic gain={active.life}, expected {expected_life_after}",
+        )
+    life_events = [
+        data
+        for event, data in events[before_events:]
+        if event == "life_total_changed" and data.get("card") == card.get("name")
+    ]
+    if not life_events:
+        fail("battle_events", f"missing {card['name']} life_total_changed event")
+    event = life_events[-1]
+    if int(event.get("requested_delta") or 0) != expected_life_gain:
+        fail(
+            "battle_events",
+            f"{card['name']} requested_delta={event.get('requested_delta')}, expected {expected_life_gain}",
+        )
+    expected_source = scenario.get("expected_life_gain_source")
+    if expected_source and event.get("life_gain_amount_source") != expected_source:
+        fail(
+            "battle_events",
+            f"{card['name']} life_gain_amount_source={event.get('life_gain_amount_source')!r}",
+        )
+    expected_count = scenario.get("expected_dynamic_count")
+    if expected_count is not None and int(event.get("dynamic_life_gain_count") or 0) != int(expected_count):
+        fail(
+            "battle_events",
+            f"{card['name']} dynamic_life_gain_count={event.get('dynamic_life_gain_count')}",
+        )
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "life_after": active.life,
+        "life_gained": expected_life_gain,
+        "life_gain_amount_source": event.get("life_gain_amount_source"),
+        "dynamic_life_gain_count": event.get("dynamic_life_gain_count"),
+    }
+
+
 def run_creature_etb_create_tokens(
     battle,
     scenario: dict[str, Any],
@@ -2906,6 +2972,7 @@ SCENARIO_RUNNERS = {
     "creature_etb_create_tokens": run_creature_etb_create_tokens,
     "creature_etb_scry": run_creature_etb_scry,
     "destroy_target_create_treasure": run_destroy_target_create_treasure,
+    "dynamic_life_gain": run_dynamic_life_gain,
     "fixed_create_creature_tokens": run_fixed_create_creature_tokens,
     "mana_source_life_cost_spend": run_mana_source_life_cost_spend,
     "multi_create_creature_tokens": run_multi_create_creature_tokens,

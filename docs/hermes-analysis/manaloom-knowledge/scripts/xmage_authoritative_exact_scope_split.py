@@ -181,6 +181,7 @@ GRAVEYARD_SELF_RETURN_TO_BATTLEFIELD_SCOPE = (
 DESTROY_SCOPE = "xmage_destroy_target_spell_v1"
 DESTROY_CREATE_TREASURE_SCOPE = "xmage_destroy_target_create_treasure_spell_v1"
 LIFE_SCOPE = "xmage_fixed_controller_gain_life_spell_v1"
+DYNAMIC_LIFE_GAIN_SCOPE = "xmage_dynamic_controller_gain_life_spell_v1"
 LIFE_GAIN_DRAW_SCOPE = "xmage_fixed_controller_gain_life_draw_card_spell_v1"
 SCRY_SCOPE = "xmage_fixed_scry_spell_v1"
 SCRY_DRAW_SCOPE = "xmage_fixed_scry_and_draw_cards_spell_v1"
@@ -13488,6 +13489,258 @@ def life_gain_amount_from_oracle(metadata: dict[str, Any]) -> int | None:
     return int(match.group(1))
 
 
+def _dynamic_life_gain_dict(
+    amount_source: str,
+    *,
+    base: int = 0,
+    per: int = 1,
+    **count_fields: Any,
+) -> dict[str, Any]:
+    return {
+        "life_gain_amount_source": amount_source,
+        "life_gain_base_amount": int(base),
+        "life_gain_per_count": int(per),
+        **count_fields,
+    }
+
+
+def _life_gain_count_fields_from_filter(filter_text: str) -> dict[str, Any] | str | None:
+    token = re.sub(r"\s+", " ", str(filter_text or "").strip().lower())
+    if token == "creature attacking you":
+        return {
+            "life_gain_amount_source": "battlefield_permanent_count",
+            "battlefield_count_scope": "opponents_battlefield",
+            "battlefield_count_card_types": ["creature"],
+            "battlefield_count_combat_state": "attacking",
+        }
+    if token in {"land you control", "lands you control"}:
+        return {
+            "life_gain_amount_source": "battlefield_permanent_count",
+            "battlefield_count_scope": "controller_battlefield",
+            "battlefield_count_card_types": ["land"],
+        }
+    if token in {"creature you control", "creatures you control"}:
+        return {
+            "life_gain_amount_source": "battlefield_permanent_count",
+            "battlefield_count_scope": "controller_battlefield",
+            "battlefield_count_card_types": ["creature"],
+        }
+    if token in {"forest on the battlefield", "forests on the battlefield"}:
+        return {
+            "life_gain_amount_source": "battlefield_permanent_count",
+            "battlefield_count_scope": "all_battlefields",
+            "battlefield_count_card_types": ["land"],
+            "battlefield_count_subtypes": ["forest"],
+        }
+    if token in {"plains you control", "plains land you control"}:
+        return {
+            "life_gain_amount_source": "battlefield_permanent_count",
+            "battlefield_count_scope": "controller_battlefield",
+            "battlefield_count_card_types": ["land"],
+            "battlefield_count_subtypes": ["plains"],
+        }
+    if token in {"card in your hand", "cards in your hand"}:
+        return {"life_gain_amount_source": "controller_hand_count"}
+    if token == "creature cards in all graveyards":
+        return {
+            "life_gain_amount_source": "graveyard_card_count",
+            "graveyard_count_scope": "all_graveyards",
+            "graveyard_count_card_types": ["creature"],
+        }
+    if token == "tapped artifact, creature, and land you control":
+        return {
+            "life_gain_amount_source": "battlefield_permanent_count",
+            "battlefield_count_scope": "controller_battlefield",
+            "battlefield_count_card_types": ["artifact", "creature", "land"],
+            "battlefield_count_tapped_state": "tapped",
+        }
+    if token == "basic land type among lands you control":
+        return {"life_gain_amount_source": "domain_basic_land_types"}
+    if "target opponent controls" in token:
+        return "dynamic_life_gain_target_opponent_count_not_supported"
+    if "that creature's power plus its toughness" in token:
+        return "dynamic_life_gain_target_power_toughness_not_supported"
+    return None
+
+
+def dynamic_life_gain_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str | None:
+    text = strip_parenthetical_reminders(oracle_text(metadata))
+    normalized = re.sub(r"\s+", " ", text).strip().lower()
+    if "colors of mana spent to cast this spell" in normalized:
+        return "dynamic_life_gain_mana_spent_colors_not_supported"
+    if "damage dealt to you so far this turn" in normalized:
+        return "dynamic_life_gain_damage_dealt_to_you_not_supported"
+    if re.match(r"^you gain x plus \d+ life\.?$", normalized):
+        return "dynamic_life_gain_x_value_not_supported"
+    if "target opponent controls" in normalized:
+        return "dynamic_life_gain_target_opponent_count_not_supported"
+    if "that creature's power plus its toughness" in normalized:
+        return "dynamic_life_gain_target_power_toughness_not_supported"
+
+    each_match = re.match(
+        r"^(?:domain — )?you gain (?P<per>\d+) life for each (?P<filter>.+?)\.?$",
+        normalized,
+    )
+    if each_match:
+        count_fields = _life_gain_count_fields_from_filter(each_match.group("filter"))
+        if isinstance(count_fields, str):
+            return count_fields
+        if count_fields is None:
+            return "dynamic_life_gain_oracle_filter_not_supported"
+        amount_source = str(count_fields.pop("life_gain_amount_source"))
+        return _dynamic_life_gain_dict(
+            amount_source,
+            per=int(each_match.group("per")),
+            **count_fields,
+        )
+
+    equal_match = re.match(
+        r"^you gain life equal to the number of (?P<filter>.+?)\.?$",
+        normalized,
+    )
+    if equal_match:
+        count_fields = _life_gain_count_fields_from_filter(equal_match.group("filter"))
+        if isinstance(count_fields, str):
+            return count_fields
+        if count_fields is None:
+            return "dynamic_life_gain_oracle_filter_not_supported"
+        amount_source = str(count_fields.pop("life_gain_amount_source"))
+        return _dynamic_life_gain_dict(amount_source, **count_fields)
+
+    return None
+
+
+def _dynamic_life_gain_source_spec_from_expr(source: str, expr: str) -> dict[str, Any] | str | None:
+    text = source or ""
+    token = re.sub(r"\s+", " ", str(expr or "")).strip()
+    parts = split_top_level_args(token)
+    if len(parts) > 1 and any(part.strip().startswith('"') for part in parts[1:]):
+        token = parts[0].strip()
+    multiplied_args = extract_constructor_args(token, "MultipliedValue")
+    if multiplied_args is not None:
+        multiplied_parts = split_top_level_args(multiplied_args)
+        if len(multiplied_parts) < 2 or not multiplied_parts[1].strip().isdigit():
+            return "dynamic_life_gain_multiplier_not_supported"
+        nested = _dynamic_life_gain_source_spec_from_expr(text, multiplied_parts[0])
+        if isinstance(nested, str) or nested is None:
+            return nested
+        return {
+            **nested,
+            "life_gain_per_count": int(nested.get("life_gain_per_count") or 1)
+            * int(multiplied_parts[1].strip()),
+        }
+    if "GetXValue" in token or "IntPlusDynamicValue" in token:
+        return "dynamic_life_gain_x_value_not_supported"
+    if "ColorsOfManaSpentToCastCount" in token or (
+        token in {"amount", "xValue"} and "ColorsOfManaSpentToCastCount" in text
+    ):
+        return "dynamic_life_gain_mana_spent_colors_not_supported"
+    if "ReversePolarityAmount" in token or (
+        token in {"amount", "xValue"} and "ReversePolarityAmount" in text
+    ):
+        return "dynamic_life_gain_damage_dealt_to_you_not_supported"
+    if "TargetPermanentPowerPlusToughnessCount" in token or (
+        token in {"amount", "xValue"} and "TargetPermanentPowerPlusToughnessCount" in text
+    ):
+        return "dynamic_life_gain_target_power_toughness_not_supported"
+    if "PermanentsTargetOpponentControlsCount" in token or (
+        token in {"amount", "xValue"} and "PermanentsTargetOpponentControlsCount" in text
+    ):
+        return "dynamic_life_gain_target_opponent_count_not_supported"
+
+    search_text = text if token in {"amount", "xValue"} else token
+    if "CreaturesAttackingYouCount.instance" in search_text:
+        return _dynamic_life_gain_dict(
+            "battlefield_permanent_count",
+            battlefield_count_scope="opponents_battlefield",
+            battlefield_count_card_types=["creature"],
+            battlefield_count_combat_state="attacking",
+        )
+    if "CardsInAllGraveyardsCount" in search_text and "FILTER_CARD_CREATURE" in text:
+        return _dynamic_life_gain_dict(
+            "graveyard_card_count",
+            graveyard_count_scope="all_graveyards",
+            graveyard_count_card_types=["creature"],
+        )
+    if "DomainValue.REGULAR" in search_text:
+        return _dynamic_life_gain_dict("domain_basic_land_types")
+    if "CardsInControllerHandCount.ANY" in search_text:
+        return _dynamic_life_gain_dict("controller_hand_count")
+    if "LandsYouControlCount.instance" in search_text:
+        return _dynamic_life_gain_dict(
+            "battlefield_permanent_count",
+            battlefield_count_scope="controller_battlefield",
+            battlefield_count_card_types=["land"],
+        )
+    if "TappedPredicate.TAPPED" in text and "Predicates.or" in text and "PermanentsOnBattlefieldCount" in search_text:
+        return _dynamic_life_gain_dict(
+            "battlefield_permanent_count",
+            battlefield_count_scope="controller_battlefield",
+            battlefield_count_card_types=["artifact", "creature", "land"],
+            battlefield_count_tapped_state="tapped",
+        )
+    if "PermanentsOnBattlefieldCount" in search_text:
+        per = 1
+        count_args = extract_constructor_args(search_text, "PermanentsOnBattlefieldCount") or ""
+        count_parts = split_top_level_args(count_args)
+        if len(count_parts) >= 2 and count_parts[1].strip().lstrip("-").isdigit():
+            per = int(count_parts[1].strip())
+        if "FilterControlledCreaturePermanent" in search_text or "FILTER_CONTROLLED_CREATURE" in text:
+            return _dynamic_life_gain_dict(
+                "battlefield_permanent_count",
+                per=per,
+                battlefield_count_scope="controller_battlefield",
+                battlefield_count_card_types=["creature"],
+            )
+        if "FilterControlledLandPermanent" in text:
+            return _dynamic_life_gain_dict(
+                "battlefield_permanent_count",
+                per=per,
+                battlefield_count_scope="controller_battlefield",
+                battlefield_count_card_types=["land"],
+            )
+        if "SubType.PLAINS" in text and "TargetController.YOU" in text:
+            return _dynamic_life_gain_dict(
+                "battlefield_permanent_count",
+                per=per,
+                battlefield_count_scope="controller_battlefield",
+                battlefield_count_card_types=["land"],
+                battlefield_count_subtypes=["plains"],
+            )
+        if "SubType.FOREST" in text:
+            return _dynamic_life_gain_dict(
+                "battlefield_permanent_count",
+                per=per,
+                battlefield_count_scope="all_battlefields",
+                battlefield_count_card_types=["land"],
+                battlefield_count_subtypes=["forest"],
+            )
+    return "dynamic_life_gain_source_filter_not_supported"
+
+
+def dynamic_life_gain_from_source(source: str) -> dict[str, Any] | str | None:
+    text = source or ""
+    if "getSpellAbility().addCost" in text or "addCost(" in text:
+        return "dynamic_life_gain_additional_cost_not_supported"
+    if len(re.findall(r"new\s+GainLifeEffect\s*\(", text)) != 1:
+        return "dynamic_life_gain_source_not_single"
+    constructor_args = extract_constructor_args(text, "GainLifeEffect")
+    if constructor_args is None:
+        return None
+    spec = _dynamic_life_gain_source_spec_from_expr(text, constructor_args)
+    if isinstance(spec, str) or spec is None:
+        return spec
+    return {
+        "life_gain_base_amount": int(spec.get("life_gain_base_amount") or 0),
+        "life_gain_per_count": int(spec.get("life_gain_per_count") or 1),
+        **{
+            key: value
+            for key, value in spec.items()
+            if key not in {"life_gain_base_amount", "life_gain_per_count"}
+        },
+    }
+
+
 def fixed_life_gain_draw_from_oracle(metadata: dict[str, Any]) -> tuple[int, int] | None:
     match = re.match(r"^you gain (\d+) life\. draw a card\.?$", oracle_text(metadata))
     if not match:
@@ -22108,6 +22361,44 @@ def split_row(
     if unit == LIFE_UNIT:
         if classes != {"GainLifeEffect"}:
             return None, "life_gain_effect_class_not_pure"
+        dynamic_life_gain = dynamic_life_gain_from_oracle(metadata)
+        if isinstance(dynamic_life_gain, str):
+            return None, dynamic_life_gain
+        if dynamic_life_gain is not None:
+            source_dynamic_life_gain = dynamic_life_gain_from_source(source_text)
+            if isinstance(source_dynamic_life_gain, str):
+                return None, source_dynamic_life_gain
+            if source_dynamic_life_gain is None:
+                return None, "dynamic_life_gain_source_not_supported"
+            compare_keys = {
+                "life_gain_amount_source",
+                "life_gain_base_amount",
+                "life_gain_per_count",
+                "battlefield_count_scope",
+                "battlefield_count_card_types",
+                "battlefield_count_subtypes",
+                "battlefield_count_combat_state",
+                "battlefield_count_tapped_state",
+                "graveyard_count_scope",
+                "graveyard_count_card_types",
+            }
+            for key in compare_keys:
+                if dynamic_life_gain.get(key) != source_dynamic_life_gain.get(key):
+                    return None, "dynamic_life_gain_source_oracle_mismatch"
+            effect_json = {
+                "effect": "life_total_change",
+                "battle_model_scope": DYNAMIC_LIFE_GAIN_SCOPE,
+                "target": "self",
+                "xmage_effect_class": "GainLifeEffect",
+                **dynamic_life_gain,
+                **flags,
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_dynamic_life_gain_spell",
+            ), "selected_exact_scope"
         if has_oracle_complexity(metadata):
             return None, "life_gain_oracle_not_simple"
         amount = life_gain_amount_from_oracle(metadata)

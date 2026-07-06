@@ -46737,6 +46737,11 @@ def _battlefield_count_card_matches(card, effect_data):
         return False
     if combat_state == "attacking_or_blocking" and not (bool(card.get("attacking")) or bool(card.get("blocking"))):
         return False
+    tapped_state = str(effect_data.get("battlefield_count_tapped_state") or "").strip().lower()
+    if tapped_state == "tapped" and not bool(card.get("tapped")):
+        return False
+    if tapped_state == "untapped" and bool(card.get("tapped")):
+        return False
     return bool(allowed_types or allowed_subtypes)
 
 
@@ -47037,6 +47042,63 @@ def dynamic_damage_amount(player, opponents, effect_data):
         "damage_base_amount": base_amount,
         "damage_per_count": per_count,
         "damage_per_graveyard_count": per_count,
+    }
+
+
+def _dynamic_life_gain_count_from_source(player, opponents, effect_data):
+    amount_source = str(effect_data.get("life_gain_amount_source") or "").lower()
+    if amount_source not in {
+        "graveyard_card_count",
+        "battlefield_permanent_count",
+        "controller_hand_count",
+        "domain_basic_land_types",
+    }:
+        return None, {}
+    count_effect_data = {**effect_data, "damage_amount_source": amount_source}
+    count, replay_fields = _dynamic_damage_count_from_source(player, opponents, count_effect_data)
+    if count is None:
+        return None, replay_fields
+    renamed_fields = {}
+    for key, value in dict(replay_fields).items():
+        if key == "damage_amount_source":
+            renamed_fields["life_gain_amount_source"] = value
+        elif key == "graveyard_damage_count":
+            renamed_fields["graveyard_life_gain_count"] = value
+        elif key == "battlefield_damage_count":
+            renamed_fields["battlefield_life_gain_count"] = value
+        elif key == "hand_damage_count":
+            renamed_fields["hand_life_gain_count"] = value
+        else:
+            renamed_fields[key] = value
+    renamed_fields.setdefault("life_gain_amount_source", amount_source)
+    return count, renamed_fields
+
+
+def dynamic_life_gain_amount(player, opponents, effect_data):
+    amount_source = str(effect_data.get("life_gain_amount_source") or "").lower()
+    if amount_source == "x_value":
+        amount = x_value_from_effect_context(effect_data)
+        return amount, {
+            "life_gain_amount_source": "x_value",
+            "x_value": amount,
+        }
+    count, replay_fields = _dynamic_life_gain_count_from_source(player, opponents, effect_data)
+    if count is None:
+        return None, replay_fields
+    try:
+        base_amount = int(float(effect_data.get("life_gain_base_amount") or 0))
+    except Exception:
+        base_amount = 0
+    try:
+        per_count = int(float(effect_data.get("life_gain_per_count") or 1))
+    except Exception:
+        per_count = 1
+    amount = max(0, base_amount + (count * per_count))
+    return amount, {
+        **replay_fields,
+        "life_gain_base_amount": base_amount,
+        "life_gain_per_count": per_count,
+        "dynamic_life_gain_count": count,
     }
 
 
@@ -54867,7 +54929,12 @@ def resolve_composite_resolution_effect(player, opponents, card, effect_data, tu
         elif component_effect == "life_total_change":
             target = _life_total_change_target(player, opponents, component)
             life_before = int(getattr(target, "life", 0) or 0)
-            requested_delta = int(component.get("life_gain_amount") or 0)
+            dynamic_replay_fields = {}
+            if component.get("life_gain_amount_source"):
+                dynamic_amount, dynamic_replay_fields = dynamic_life_gain_amount(player, opponents, component)
+                requested_delta = int(dynamic_amount or 0)
+            else:
+                requested_delta = int(component.get("life_gain_amount") or 0)
             changed = gain_life(target, requested_delta, cap=999) if requested_delta else False
             life_after = int(getattr(target, "life", life_before) or 0)
             outcome = "life_total_changed"
@@ -54891,6 +54958,7 @@ def resolve_composite_resolution_effect(player, opponents, card, effect_data, tu
                 changed=changed,
                 component_index=index,
                 turn=turn,
+                **dynamic_replay_fields,
                 **component_fields,
             )
         elif component_effect == "stat_modifier_until_eot":
@@ -55165,6 +55233,7 @@ def resolve_life_total_change(player, opponents, card, effect_data, turn, rng):
     mode = "unknown"
     requested_delta = 0
     expected_life_after = life_before
+    dynamic_replay_fields = {}
 
     if effect_data.get("life_total_becomes_library_size"):
         mode = "life_total_becomes_library_size"
@@ -55174,6 +55243,11 @@ def resolve_life_total_change(player, opponents, card, effect_data, turn, rng):
         mode = "double_target_player_life_total"
         expected_life_after = life_before * 2
         requested_delta = expected_life_after - life_before
+    elif effect_data.get("life_gain_amount_source"):
+        mode = "gain_life"
+        dynamic_amount, dynamic_replay_fields = dynamic_life_gain_amount(player, opponents, effect_data)
+        requested_delta = int(dynamic_amount or 0)
+        expected_life_after = life_before + requested_delta
     else:
         mode = "gain_life"
         requested_delta = int(effect_data.get("life_gain_amount") or 0)
@@ -55196,6 +55270,7 @@ def resolve_life_total_change(player, opponents, card, effect_data, turn, rng):
         life_after=life_after,
         changed=changed,
         turn=turn,
+        **dynamic_replay_fields,
         **replay_rule_fields(effect_data),
     )
 

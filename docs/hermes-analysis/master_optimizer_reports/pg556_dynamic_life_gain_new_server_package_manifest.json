@@ -1,0 +1,1142 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg556_dynamic_life_gain_new_server_dynam_20260706_065301",
+  "deploy_id": "pg556_dynamic_life_gain_new_server",
+  "execution_scenarios": [
+    {
+      "card": {
+        "name": "Blessed Reversal"
+      },
+      "expected_dynamic_count": 3,
+      "expected_life_after": 29,
+      "expected_life_gain": 9,
+      "expected_life_gain_source": "battlefield_permanent_count",
+      "logical_rule_key": "battle_rule_v1:a30d89079274b0aeb350157489c02bee",
+      "name": "Blessed Reversal resolves dynamic life gain",
+      "opponent_battlefield": [
+        {
+          "attacking": true,
+          "name": "E2E Attacking Creature 1",
+          "type_line": "Creature - Warrior"
+        },
+        {
+          "attacking": true,
+          "name": "E2E Attacking Creature 2",
+          "type_line": "Creature - Warrior"
+        },
+        {
+          "attacking": true,
+          "name": "E2E Attacking Creature 3",
+          "type_line": "Creature - Warrior"
+        }
+      ],
+      "starting_life": 20,
+      "type": "dynamic_life_gain"
+    },
+    {
+      "card": {
+        "name": "Bountiful Harvest"
+      },
+      "controller_battlefield": [
+        {
+          "name": "E2E Plains 1",
+          "subtypes": [
+            "Plains"
+          ],
+          "type_line": "Basic Land - Plains"
+        },
+        {
+          "name": "E2E Plains 2",
+          "subtypes": [
+            "Plains"
+          ],
+          "type_line": "Basic Land - Plains"
+        },
+        {
+          "name": "E2E Plains 3",
+          "subtypes": [
+            "Plains"
+          ],
+          "type_line": "Basic Land - Plains"
+        }
+      ],
+      "expected_dynamic_count": 3,
+      "expected_life_after": 23,
+      "expected_life_gain": 3,
+      "expected_life_gain_source": "battlefield_permanent_count",
+      "logical_rule_key": "battle_rule_v1:f609e13e36e1e99fd47c17fe7ea088d2",
+      "name": "Bountiful Harvest resolves dynamic life gain",
+      "starting_life": 20,
+      "type": "dynamic_life_gain"
+    },
+    {
+      "card": {
+        "name": "Festival of Trokin"
+      },
+      "controller_battlefield": [
+        {
+          "name": "E2E Creature 1",
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "name": "E2E Creature 2",
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "name": "E2E Creature 3",
+          "type_line": "Creature - Soldier"
+        }
+      ],
+      "expected_dynamic_count": 3,
+      "expected_life_after": 26,
+      "expected_life_gain": 6,
+      "expected_life_gain_source": "battlefield_permanent_count",
+      "logical_rule_key": "battle_rule_v1:898aa76651becdc5799867dd5c4a71b7",
+      "name": "Festival of Trokin resolves dynamic life gain",
+      "starting_life": 20,
+      "type": "dynamic_life_gain"
+    },
+    {
+      "card": {
+        "name": "Fruition"
+      },
+      "controller_battlefield": [
+        {
+          "name": "E2E Forest A",
+          "subtypes": [
+            "Forest"
+          ],
+          "type_line": "Basic Land - Forest"
+        },
+        {
+          "name": "E2E Forest B",
+          "subtypes": [
+            "Forest"
+          ],
+          "type_line": "Basic Land - Forest"
+        }
+      ],
+      "expected_dynamic_count": 3,
+      "expected_life_after": 23,
+      "expected_life_gain": 3,
+      "expected_life_gain_source": "battlefield_permanent_count",
+      "logical_rule_key": "battle_rule_v1:4be0feca617880d6fd5d2b94dd07eee4",
+      "name": "Fruition resolves dynamic life gain",
+      "opponent_battlefield": [
+        {
+          "name": "E2E Opponent Forest",
+          "subtypes": [
+            "Forest"
+          ],
+          "type_line": "Basic Land - Forest"
+        }
+      ],
+      "starting_life": 20,
+      "type": "dynamic_life_gain"
+    },
+    {
+      "card": {
+        "name": "Gerrard's Wisdom"
+      },
+      "controller_hand": [
+        {
+          "name": "E2E Hand Card 1",
+          "type_line": "Sorcery"
+        },
+        {
+          "name": "E2E Hand Card 2",
+          "type_line": "Sorcery"
+        },
+        {
+          "name": "E2E Hand Card 3",
+          "type_line": "Sorcery"
+        }
+      ],
+      "expected_dynamic_count": 3,
+      "expected_life_after": 26,
+      "expected_life_gain": 6,
+      "expected_life_gain_source": "controller_hand_count",
+      "logical_rule_key": "battle_rule_v1:0dc75e25a69cb2c92abdc1358e2ce3b5",
+      "name": "Gerrard's Wisdom resolves dynamic life gain",
+      "starting_life": 20,
+      "type": "dynamic_life_gain"
+    },
+    {
+      "card": {
+        "name": "Invigorating Falls"
+      },
+      "controller_graveyard": [
+        {
+          "name": "E2E Graveyard Creature A",
+          "type_line": "Creature - Spirit"
+        },
+        {
+          "name": "E2E Graveyard Creature B",
+          "type_line": "Creature - Soldier"
+        }
+      ],
+      "expected_dynamic_count": 3,
+      "expected_life_after": 23,
+      "expected_life_gain": 3,
+      "expected_life_gain_source": "graveyard_card_count",
+      "logical_rule_key": "battle_rule_v1:8cc8c8b01bba9fe02e7c3a27f2b387ee",
+      "name": "Invigorating Falls resolves dynamic life gain",
+      "opponent_graveyard": [
+        {
+          "name": "E2E Opponent Graveyard Creature",
+          "type_line": "Creature - Zombie"
+        },
+        {
+          "name": "E2E Opponent Graveyard Instant",
+          "type_line": "Instant"
+        }
+      ],
+      "starting_life": 20,
+      "type": "dynamic_life_gain"
+    },
+    {
+      "card": {
+        "name": "Joyous Respite"
+      },
+      "controller_battlefield": [
+        {
+          "name": "E2E Plains 1",
+          "subtypes": [
+            "Plains"
+          ],
+          "type_line": "Basic Land - Plains"
+        },
+        {
+          "name": "E2E Plains 2",
+          "subtypes": [
+            "Plains"
+          ],
+          "type_line": "Basic Land - Plains"
+        },
+        {
+          "name": "E2E Plains 3",
+          "subtypes": [
+            "Plains"
+          ],
+          "type_line": "Basic Land - Plains"
+        }
+      ],
+      "expected_dynamic_count": 3,
+      "expected_life_after": 23,
+      "expected_life_gain": 3,
+      "expected_life_gain_source": "battlefield_permanent_count",
+      "logical_rule_key": "battle_rule_v1:f609e13e36e1e99fd47c17fe7ea088d2",
+      "name": "Joyous Respite resolves dynamic life gain",
+      "starting_life": 20,
+      "type": "dynamic_life_gain"
+    },
+    {
+      "card": {
+        "name": "Landbind Ritual"
+      },
+      "controller_battlefield": [
+        {
+          "name": "E2E Plains 1",
+          "subtypes": [
+            "Plains"
+          ],
+          "type_line": "Basic Land - Plains"
+        },
+        {
+          "name": "E2E Plains 2",
+          "subtypes": [
+            "Plains"
+          ],
+          "type_line": "Basic Land - Plains"
+        },
+        {
+          "name": "E2E Plains 3",
+          "subtypes": [
+            "Plains"
+          ],
+          "type_line": "Basic Land - Plains"
+        }
+      ],
+      "expected_dynamic_count": 3,
+      "expected_life_after": 26,
+      "expected_life_gain": 6,
+      "expected_life_gain_source": "battlefield_permanent_count",
+      "logical_rule_key": "battle_rule_v1:9e929643503771dc1bec7ee764f4e2c3",
+      "name": "Landbind Ritual resolves dynamic life gain",
+      "starting_life": 20,
+      "type": "dynamic_life_gain"
+    },
+    {
+      "card": {
+        "name": "Peach Garden Oath"
+      },
+      "controller_battlefield": [
+        {
+          "name": "E2E Creature 1",
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "name": "E2E Creature 2",
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "name": "E2E Creature 3",
+          "type_line": "Creature - Soldier"
+        }
+      ],
+      "expected_dynamic_count": 3,
+      "expected_life_after": 26,
+      "expected_life_gain": 6,
+      "expected_life_gain_source": "battlefield_permanent_count",
+      "logical_rule_key": "battle_rule_v1:898aa76651becdc5799867dd5c4a71b7",
+      "name": "Peach Garden Oath resolves dynamic life gain",
+      "starting_life": 20,
+      "type": "dynamic_life_gain"
+    },
+    {
+      "card": {
+        "name": "Presence of the Wise"
+      },
+      "controller_hand": [
+        {
+          "name": "E2E Hand Card 1",
+          "type_line": "Sorcery"
+        },
+        {
+          "name": "E2E Hand Card 2",
+          "type_line": "Sorcery"
+        },
+        {
+          "name": "E2E Hand Card 3",
+          "type_line": "Sorcery"
+        }
+      ],
+      "expected_dynamic_count": 3,
+      "expected_life_after": 26,
+      "expected_life_gain": 6,
+      "expected_life_gain_source": "controller_hand_count",
+      "logical_rule_key": "battle_rule_v1:0dc75e25a69cb2c92abdc1358e2ce3b5",
+      "name": "Presence of the Wise resolves dynamic life gain",
+      "starting_life": 20,
+      "type": "dynamic_life_gain"
+    },
+    {
+      "card": {
+        "name": "Toil to Renown"
+      },
+      "controller_battlefield": [
+        {
+          "name": "E2E Tapped Artifact",
+          "tapped": true,
+          "type_line": "Artifact"
+        },
+        {
+          "name": "E2E Tapped Creature",
+          "tapped": true,
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "name": "E2E Tapped Land",
+          "tapped": true,
+          "type_line": "Basic Land - Plains"
+        },
+        {
+          "name": "E2E Untapped Land",
+          "tapped": false,
+          "type_line": "Basic Land - Island"
+        }
+      ],
+      "expected_dynamic_count": 3,
+      "expected_life_after": 23,
+      "expected_life_gain": 3,
+      "expected_life_gain_source": "battlefield_permanent_count",
+      "logical_rule_key": "battle_rule_v1:7cde60c98e70c669b462ea5874e17232",
+      "name": "Toil to Renown resolves dynamic life gain",
+      "starting_life": 20,
+      "type": "dynamic_life_gain"
+    },
+    {
+      "card": {
+        "name": "Wandering Stream"
+      },
+      "controller_battlefield": [
+        {
+          "name": "Plains",
+          "subtypes": [
+            "Plains"
+          ],
+          "type_line": "Basic Land - Plains"
+        },
+        {
+          "name": "Island",
+          "subtypes": [
+            "Island"
+          ],
+          "type_line": "Basic Land - Island"
+        },
+        {
+          "name": "Swamp",
+          "subtypes": [
+            "Swamp"
+          ],
+          "type_line": "Basic Land - Swamp"
+        },
+        {
+          "name": "Mountain",
+          "subtypes": [
+            "Mountain"
+          ],
+          "type_line": "Basic Land - Mountain"
+        }
+      ],
+      "expected_dynamic_count": 4,
+      "expected_life_after": 28,
+      "expected_life_gain": 8,
+      "expected_life_gain_source": "domain_basic_land_types",
+      "logical_rule_key": "battle_rule_v1:2672dfc54371d68650a2f9ea851b5990",
+      "name": "Wandering Stream resolves dynamic life gain",
+      "starting_life": 20,
+      "type": "dynamic_life_gain"
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Blessed Reversal",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a30d89079274b0aeb350157489c02bee",
+      "min_rule_version": 2,
+      "normalized_name": "blessed reversal",
+      "oracle_hash": "823a9c3aa2094d20b96fd4ccb747bbb5",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1",
+        "battlefield_count_card_types": [
+          "creature"
+        ],
+        "battlefield_count_combat_state": "attacking",
+        "battlefield_count_scope": "opponents_battlefield",
+        "effect": "life_total_change",
+        "life_gain_amount_source": "battlefield_permanent_count",
+        "life_gain_base_amount": 0,
+        "life_gain_per_count": 3,
+        "target": "self",
+        "xmage_effect_class": "GainLifeEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Bountiful Harvest",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f609e13e36e1e99fd47c17fe7ea088d2",
+      "min_rule_version": 2,
+      "normalized_name": "bountiful harvest",
+      "oracle_hash": "80024b4cf516a43e6d18839cf03860e6",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1",
+        "battlefield_count_card_types": [
+          "land"
+        ],
+        "battlefield_count_scope": "controller_battlefield",
+        "effect": "life_total_change",
+        "life_gain_amount_source": "battlefield_permanent_count",
+        "life_gain_base_amount": 0,
+        "life_gain_per_count": 1,
+        "target": "self",
+        "xmage_effect_class": "GainLifeEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Festival of Trokin",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:898aa76651becdc5799867dd5c4a71b7",
+      "min_rule_version": 2,
+      "normalized_name": "festival of trokin",
+      "oracle_hash": "c854e6479f1427e2b5d0c823a7244f19",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1",
+        "battlefield_count_card_types": [
+          "creature"
+        ],
+        "battlefield_count_scope": "controller_battlefield",
+        "effect": "life_total_change",
+        "life_gain_amount_source": "battlefield_permanent_count",
+        "life_gain_base_amount": 0,
+        "life_gain_per_count": 2,
+        "target": "self",
+        "xmage_effect_class": "GainLifeEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Fruition",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4be0feca617880d6fd5d2b94dd07eee4",
+      "min_rule_version": 2,
+      "normalized_name": "fruition",
+      "oracle_hash": "1d7d5ee9cf5d1d8f0868d99d5f795919",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1",
+        "battlefield_count_card_types": [
+          "land"
+        ],
+        "battlefield_count_scope": "all_battlefields",
+        "battlefield_count_subtypes": [
+          "forest"
+        ],
+        "effect": "life_total_change",
+        "life_gain_amount_source": "battlefield_permanent_count",
+        "life_gain_base_amount": 0,
+        "life_gain_per_count": 1,
+        "target": "self",
+        "xmage_effect_class": "GainLifeEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Gerrard's Wisdom",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0dc75e25a69cb2c92abdc1358e2ce3b5",
+      "min_rule_version": 2,
+      "normalized_name": "gerrard's wisdom",
+      "oracle_hash": "2f3b5a81795c702888749982471cc0b0",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1",
+        "effect": "life_total_change",
+        "life_gain_amount_source": "controller_hand_count",
+        "life_gain_base_amount": 0,
+        "life_gain_per_count": 2,
+        "target": "self",
+        "xmage_effect_class": "GainLifeEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Invigorating Falls",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8cc8c8b01bba9fe02e7c3a27f2b387ee",
+      "min_rule_version": 2,
+      "normalized_name": "invigorating falls",
+      "oracle_hash": "ade29be2af80d9a21039a33b8d862a31",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1",
+        "effect": "life_total_change",
+        "graveyard_count_card_types": [
+          "creature"
+        ],
+        "graveyard_count_scope": "all_graveyards",
+        "life_gain_amount_source": "graveyard_card_count",
+        "life_gain_base_amount": 0,
+        "life_gain_per_count": 1,
+        "target": "self",
+        "xmage_effect_class": "GainLifeEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Joyous Respite",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f609e13e36e1e99fd47c17fe7ea088d2",
+      "min_rule_version": 2,
+      "normalized_name": "joyous respite",
+      "oracle_hash": "80024b4cf516a43e6d18839cf03860e6",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1",
+        "battlefield_count_card_types": [
+          "land"
+        ],
+        "battlefield_count_scope": "controller_battlefield",
+        "effect": "life_total_change",
+        "life_gain_amount_source": "battlefield_permanent_count",
+        "life_gain_base_amount": 0,
+        "life_gain_per_count": 1,
+        "target": "self",
+        "xmage_effect_class": "GainLifeEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Landbind Ritual",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9e929643503771dc1bec7ee764f4e2c3",
+      "min_rule_version": 2,
+      "normalized_name": "landbind ritual",
+      "oracle_hash": "d84556b6708d3cf7331b93ece9875ae6",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1",
+        "battlefield_count_card_types": [
+          "land"
+        ],
+        "battlefield_count_scope": "controller_battlefield",
+        "battlefield_count_subtypes": [
+          "plains"
+        ],
+        "effect": "life_total_change",
+        "life_gain_amount_source": "battlefield_permanent_count",
+        "life_gain_base_amount": 0,
+        "life_gain_per_count": 2,
+        "target": "self",
+        "xmage_effect_class": "GainLifeEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Peach Garden Oath",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:898aa76651becdc5799867dd5c4a71b7",
+      "min_rule_version": 2,
+      "normalized_name": "peach garden oath",
+      "oracle_hash": "c854e6479f1427e2b5d0c823a7244f19",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1",
+        "battlefield_count_card_types": [
+          "creature"
+        ],
+        "battlefield_count_scope": "controller_battlefield",
+        "effect": "life_total_change",
+        "life_gain_amount_source": "battlefield_permanent_count",
+        "life_gain_base_amount": 0,
+        "life_gain_per_count": 2,
+        "target": "self",
+        "xmage_effect_class": "GainLifeEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Presence of the Wise",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0dc75e25a69cb2c92abdc1358e2ce3b5",
+      "min_rule_version": 2,
+      "normalized_name": "presence of the wise",
+      "oracle_hash": "2f3b5a81795c702888749982471cc0b0",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1",
+        "effect": "life_total_change",
+        "life_gain_amount_source": "controller_hand_count",
+        "life_gain_base_amount": 0,
+        "life_gain_per_count": 2,
+        "target": "self",
+        "xmage_effect_class": "GainLifeEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Toil to Renown",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7cde60c98e70c669b462ea5874e17232",
+      "min_rule_version": 2,
+      "normalized_name": "toil to renown",
+      "oracle_hash": "4521866f2c0302b96432f72194b560b8",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1",
+        "battlefield_count_card_types": [
+          "artifact",
+          "creature",
+          "land"
+        ],
+        "battlefield_count_scope": "controller_battlefield",
+        "battlefield_count_tapped_state": "tapped",
+        "effect": "life_total_change",
+        "life_gain_amount_source": "battlefield_permanent_count",
+        "life_gain_base_amount": 0,
+        "life_gain_per_count": 1,
+        "target": "self",
+        "xmage_effect_class": "GainLifeEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Wandering Stream",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2672dfc54371d68650a2f9ea851b5990",
+      "min_rule_version": 2,
+      "normalized_name": "wandering stream",
+      "oracle_hash": "fb473dc7cf9f74523c04b406b6d36a8e",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1",
+        "effect": "life_total_change",
+        "life_gain_amount_source": "domain_basic_land_types",
+        "life_gain_base_amount": 0,
+        "life_gain_per_count": 2,
+        "target": "self",
+        "xmage_effect_class": "GainLifeEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_dynamic_life_gain_spell": 12
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg556_dynamic_life_gain_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg556_dynamic_life_gain_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg556_dynamic_life_gain_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg556_dynamic_life_gain_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg556_dynamic_life_gain_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg556_dynamic_life_gain_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-06T06:53:01+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Blessed Reversal"
+      },
+      "card_name": "Blessed Reversal",
+      "effect": "life_total_change",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a30d89079274b0aeb350157489c02bee",
+      "normalized_name": "blessed reversal",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1",
+        "battlefield_count_card_types": [
+          "creature"
+        ],
+        "battlefield_count_combat_state": "attacking",
+        "battlefield_count_scope": "opponents_battlefield",
+        "effect": "life_total_change",
+        "life_gain_amount_source": "battlefield_permanent_count",
+        "life_gain_base_amount": 0,
+        "life_gain_per_count": 3,
+        "target": "self",
+        "xmage_effect_class": "GainLifeEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Bountiful Harvest"
+      },
+      "card_name": "Bountiful Harvest",
+      "effect": "life_total_change",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f609e13e36e1e99fd47c17fe7ea088d2",
+      "normalized_name": "bountiful harvest",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1",
+        "battlefield_count_card_types": [
+          "land"
+        ],
+        "battlefield_count_scope": "controller_battlefield",
+        "effect": "life_total_change",
+        "life_gain_amount_source": "battlefield_permanent_count",
+        "life_gain_base_amount": 0,
+        "life_gain_per_count": 1,
+        "target": "self",
+        "xmage_effect_class": "GainLifeEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Festival of Trokin"
+      },
+      "card_name": "Festival of Trokin",
+      "effect": "life_total_change",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:898aa76651becdc5799867dd5c4a71b7",
+      "normalized_name": "festival of trokin",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1",
+        "battlefield_count_card_types": [
+          "creature"
+        ],
+        "battlefield_count_scope": "controller_battlefield",
+        "effect": "life_total_change",
+        "life_gain_amount_source": "battlefield_permanent_count",
+        "life_gain_base_amount": 0,
+        "life_gain_per_count": 2,
+        "target": "self",
+        "xmage_effect_class": "GainLifeEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Fruition"
+      },
+      "card_name": "Fruition",
+      "effect": "life_total_change",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4be0feca617880d6fd5d2b94dd07eee4",
+      "normalized_name": "fruition",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1",
+        "battlefield_count_card_types": [
+          "land"
+        ],
+        "battlefield_count_scope": "all_battlefields",
+        "battlefield_count_subtypes": [
+          "forest"
+        ],
+        "effect": "life_total_change",
+        "life_gain_amount_source": "battlefield_permanent_count",
+        "life_gain_base_amount": 0,
+        "life_gain_per_count": 1,
+        "target": "self",
+        "xmage_effect_class": "GainLifeEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Gerrard's Wisdom"
+      },
+      "card_name": "Gerrard's Wisdom",
+      "effect": "life_total_change",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0dc75e25a69cb2c92abdc1358e2ce3b5",
+      "normalized_name": "gerrard's wisdom",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1",
+        "effect": "life_total_change",
+        "life_gain_amount_source": "controller_hand_count",
+        "life_gain_base_amount": 0,
+        "life_gain_per_count": 2,
+        "target": "self",
+        "xmage_effect_class": "GainLifeEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Invigorating Falls"
+      },
+      "card_name": "Invigorating Falls",
+      "effect": "life_total_change",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8cc8c8b01bba9fe02e7c3a27f2b387ee",
+      "normalized_name": "invigorating falls",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1",
+        "effect": "life_total_change",
+        "graveyard_count_card_types": [
+          "creature"
+        ],
+        "graveyard_count_scope": "all_graveyards",
+        "life_gain_amount_source": "graveyard_card_count",
+        "life_gain_base_amount": 0,
+        "life_gain_per_count": 1,
+        "target": "self",
+        "xmage_effect_class": "GainLifeEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Joyous Respite"
+      },
+      "card_name": "Joyous Respite",
+      "effect": "life_total_change",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f609e13e36e1e99fd47c17fe7ea088d2",
+      "normalized_name": "joyous respite",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1",
+        "battlefield_count_card_types": [
+          "land"
+        ],
+        "battlefield_count_scope": "controller_battlefield",
+        "effect": "life_total_change",
+        "life_gain_amount_source": "battlefield_permanent_count",
+        "life_gain_base_amount": 0,
+        "life_gain_per_count": 1,
+        "target": "self",
+        "xmage_effect_class": "GainLifeEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Landbind Ritual"
+      },
+      "card_name": "Landbind Ritual",
+      "effect": "life_total_change",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9e929643503771dc1bec7ee764f4e2c3",
+      "normalized_name": "landbind ritual",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1",
+        "battlefield_count_card_types": [
+          "land"
+        ],
+        "battlefield_count_scope": "controller_battlefield",
+        "battlefield_count_subtypes": [
+          "plains"
+        ],
+        "effect": "life_total_change",
+        "life_gain_amount_source": "battlefield_permanent_count",
+        "life_gain_base_amount": 0,
+        "life_gain_per_count": 2,
+        "target": "self",
+        "xmage_effect_class": "GainLifeEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Peach Garden Oath"
+      },
+      "card_name": "Peach Garden Oath",
+      "effect": "life_total_change",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:898aa76651becdc5799867dd5c4a71b7",
+      "normalized_name": "peach garden oath",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1",
+        "battlefield_count_card_types": [
+          "creature"
+        ],
+        "battlefield_count_scope": "controller_battlefield",
+        "effect": "life_total_change",
+        "life_gain_amount_source": "battlefield_permanent_count",
+        "life_gain_base_amount": 0,
+        "life_gain_per_count": 2,
+        "target": "self",
+        "xmage_effect_class": "GainLifeEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Presence of the Wise"
+      },
+      "card_name": "Presence of the Wise",
+      "effect": "life_total_change",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0dc75e25a69cb2c92abdc1358e2ce3b5",
+      "normalized_name": "presence of the wise",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1",
+        "effect": "life_total_change",
+        "life_gain_amount_source": "controller_hand_count",
+        "life_gain_base_amount": 0,
+        "life_gain_per_count": 2,
+        "target": "self",
+        "xmage_effect_class": "GainLifeEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Toil to Renown"
+      },
+      "card_name": "Toil to Renown",
+      "effect": "life_total_change",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7cde60c98e70c669b462ea5874e17232",
+      "normalized_name": "toil to renown",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1",
+        "battlefield_count_card_types": [
+          "artifact",
+          "creature",
+          "land"
+        ],
+        "battlefield_count_scope": "controller_battlefield",
+        "battlefield_count_tapped_state": "tapped",
+        "effect": "life_total_change",
+        "life_gain_amount_source": "battlefield_permanent_count",
+        "life_gain_base_amount": 0,
+        "life_gain_per_count": 1,
+        "target": "self",
+        "xmage_effect_class": "GainLifeEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Wandering Stream"
+      },
+      "card_name": "Wandering Stream",
+      "effect": "life_total_change",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2672dfc54371d68650a2f9ea851b5990",
+      "normalized_name": "wandering stream",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1",
+        "effect": "life_total_change",
+        "life_gain_amount_source": "domain_basic_land_types",
+        "life_gain_base_amount": 0,
+        "life_gain_per_count": 2,
+        "target": "self",
+        "xmage_effect_class": "GainLifeEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Blessed Reversal",
+    "Bountiful Harvest",
+    "Festival of Trokin",
+    "Fruition",
+    "Gerrard's Wisdom",
+    "Invigorating Falls",
+    "Joyous Respite",
+    "Landbind Ritual",
+    "Peach Garden Oath",
+    "Presence of the Wise",
+    "Toil to Renown",
+    "Wandering Stream"
+  ],
+  "selected_count": 12,
+  "slug": "dynamic_life_gain",
+  "snapshot_checks": [
+    {
+      "card_name": "Blessed Reversal",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a30d89079274b0aeb350157489c02bee",
+      "min_rule_version": 2,
+      "normalized_name": "blessed reversal",
+      "oracle_hash": "823a9c3aa2094d20b96fd4ccb747bbb5",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Bountiful Harvest",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f609e13e36e1e99fd47c17fe7ea088d2",
+      "min_rule_version": 2,
+      "normalized_name": "bountiful harvest",
+      "oracle_hash": "80024b4cf516a43e6d18839cf03860e6",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Festival of Trokin",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:898aa76651becdc5799867dd5c4a71b7",
+      "min_rule_version": 2,
+      "normalized_name": "festival of trokin",
+      "oracle_hash": "c854e6479f1427e2b5d0c823a7244f19",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Fruition",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4be0feca617880d6fd5d2b94dd07eee4",
+      "min_rule_version": 2,
+      "normalized_name": "fruition",
+      "oracle_hash": "1d7d5ee9cf5d1d8f0868d99d5f795919",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Gerrard's Wisdom",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0dc75e25a69cb2c92abdc1358e2ce3b5",
+      "min_rule_version": 2,
+      "normalized_name": "gerrard's wisdom",
+      "oracle_hash": "2f3b5a81795c702888749982471cc0b0",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Invigorating Falls",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8cc8c8b01bba9fe02e7c3a27f2b387ee",
+      "min_rule_version": 2,
+      "normalized_name": "invigorating falls",
+      "oracle_hash": "ade29be2af80d9a21039a33b8d862a31",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Joyous Respite",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f609e13e36e1e99fd47c17fe7ea088d2",
+      "min_rule_version": 2,
+      "normalized_name": "joyous respite",
+      "oracle_hash": "80024b4cf516a43e6d18839cf03860e6",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Landbind Ritual",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9e929643503771dc1bec7ee764f4e2c3",
+      "min_rule_version": 2,
+      "normalized_name": "landbind ritual",
+      "oracle_hash": "d84556b6708d3cf7331b93ece9875ae6",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Peach Garden Oath",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:898aa76651becdc5799867dd5c4a71b7",
+      "min_rule_version": 2,
+      "normalized_name": "peach garden oath",
+      "oracle_hash": "c854e6479f1427e2b5d0c823a7244f19",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Presence of the Wise",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0dc75e25a69cb2c92abdc1358e2ce3b5",
+      "min_rule_version": 2,
+      "normalized_name": "presence of the wise",
+      "oracle_hash": "2f3b5a81795c702888749982471cc0b0",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Toil to Renown",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7cde60c98e70c669b462ea5874e17232",
+      "min_rule_version": 2,
+      "normalized_name": "toil to renown",
+      "oracle_hash": "4521866f2c0302b96432f72194b560b8",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Wandering Stream",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2672dfc54371d68650a2f9ea851b5990",
+      "min_rule_version": 2,
+      "normalized_name": "wandering stream",
+      "oracle_hash": "fb473dc7cf9f74523c04b406b6d36a8e",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

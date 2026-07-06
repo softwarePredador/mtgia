@@ -1,0 +1,567 @@
+{
+  "battle_execution": {
+    "event_count": 24,
+    "results": [
+      {
+        "card_name": "Blessed Reversal",
+        "dynamic_life_gain_count": 3,
+        "life_after": 29,
+        "life_gain_amount_source": "battlefield_permanent_count",
+        "life_gained": 9,
+        "scenario": "Blessed Reversal resolves dynamic life gain"
+      },
+      {
+        "card_name": "Bountiful Harvest",
+        "dynamic_life_gain_count": 3,
+        "life_after": 23,
+        "life_gain_amount_source": "battlefield_permanent_count",
+        "life_gained": 3,
+        "scenario": "Bountiful Harvest resolves dynamic life gain"
+      },
+      {
+        "card_name": "Festival of Trokin",
+        "dynamic_life_gain_count": 3,
+        "life_after": 26,
+        "life_gain_amount_source": "battlefield_permanent_count",
+        "life_gained": 6,
+        "scenario": "Festival of Trokin resolves dynamic life gain"
+      },
+      {
+        "card_name": "Fruition",
+        "dynamic_life_gain_count": 3,
+        "life_after": 23,
+        "life_gain_amount_source": "battlefield_permanent_count",
+        "life_gained": 3,
+        "scenario": "Fruition resolves dynamic life gain"
+      },
+      {
+        "card_name": "Gerrard's Wisdom",
+        "dynamic_life_gain_count": 3,
+        "life_after": 26,
+        "life_gain_amount_source": "controller_hand_count",
+        "life_gained": 6,
+        "scenario": "Gerrard's Wisdom resolves dynamic life gain"
+      },
+      {
+        "card_name": "Invigorating Falls",
+        "dynamic_life_gain_count": 3,
+        "life_after": 23,
+        "life_gain_amount_source": "graveyard_card_count",
+        "life_gained": 3,
+        "scenario": "Invigorating Falls resolves dynamic life gain"
+      },
+      {
+        "card_name": "Joyous Respite",
+        "dynamic_life_gain_count": 3,
+        "life_after": 23,
+        "life_gain_amount_source": "battlefield_permanent_count",
+        "life_gained": 3,
+        "scenario": "Joyous Respite resolves dynamic life gain"
+      },
+      {
+        "card_name": "Landbind Ritual",
+        "dynamic_life_gain_count": 3,
+        "life_after": 26,
+        "life_gain_amount_source": "battlefield_permanent_count",
+        "life_gained": 6,
+        "scenario": "Landbind Ritual resolves dynamic life gain"
+      },
+      {
+        "card_name": "Peach Garden Oath",
+        "dynamic_life_gain_count": 3,
+        "life_after": 26,
+        "life_gain_amount_source": "battlefield_permanent_count",
+        "life_gained": 6,
+        "scenario": "Peach Garden Oath resolves dynamic life gain"
+      },
+      {
+        "card_name": "Presence of the Wise",
+        "dynamic_life_gain_count": 3,
+        "life_after": 26,
+        "life_gain_amount_source": "controller_hand_count",
+        "life_gained": 6,
+        "scenario": "Presence of the Wise resolves dynamic life gain"
+      },
+      {
+        "card_name": "Toil to Renown",
+        "dynamic_life_gain_count": 3,
+        "life_after": 23,
+        "life_gain_amount_source": "battlefield_permanent_count",
+        "life_gained": 3,
+        "scenario": "Toil to Renown resolves dynamic life gain"
+      },
+      {
+        "card_name": "Wandering Stream",
+        "dynamic_life_gain_count": 4,
+        "life_after": 28,
+        "life_gain_amount_source": "domain_basic_land_types",
+        "life_gained": 8,
+        "scenario": "Wandering Stream resolves dynamic life gain"
+      }
+    ],
+    "scenario_count": 12
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-06T06:56:15.978237+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg556_dynamic_life_gain_new_server_package_manifest.json",
+  "package_id": "pg556_dynamic_life_gain_new_server_package_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 12
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1",
+          "card_name": "Blessed Reversal",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a30d89079274b0aeb350157489c02bee",
+          "oracle_hash": "823a9c3aa2094d20b96fd4ccb747bbb5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1",
+          "card_name": "Bountiful Harvest",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f609e13e36e1e99fd47c17fe7ea088d2",
+          "oracle_hash": "80024b4cf516a43e6d18839cf03860e6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1",
+          "card_name": "Festival of Trokin",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:898aa76651becdc5799867dd5c4a71b7",
+          "oracle_hash": "c854e6479f1427e2b5d0c823a7244f19",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1",
+          "card_name": "Fruition",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4be0feca617880d6fd5d2b94dd07eee4",
+          "oracle_hash": "1d7d5ee9cf5d1d8f0868d99d5f795919",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1",
+          "card_name": "Gerrard's Wisdom",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0dc75e25a69cb2c92abdc1358e2ce3b5",
+          "oracle_hash": "2f3b5a81795c702888749982471cc0b0",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1",
+          "card_name": "Invigorating Falls",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8cc8c8b01bba9fe02e7c3a27f2b387ee",
+          "oracle_hash": "ade29be2af80d9a21039a33b8d862a31",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1",
+          "card_name": "Joyous Respite",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f609e13e36e1e99fd47c17fe7ea088d2",
+          "oracle_hash": "80024b4cf516a43e6d18839cf03860e6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1",
+          "card_name": "Landbind Ritual",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9e929643503771dc1bec7ee764f4e2c3",
+          "oracle_hash": "d84556b6708d3cf7331b93ece9875ae6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1",
+          "card_name": "Peach Garden Oath",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:898aa76651becdc5799867dd5c4a71b7",
+          "oracle_hash": "c854e6479f1427e2b5d0c823a7244f19",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1",
+          "card_name": "Presence of the Wise",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0dc75e25a69cb2c92abdc1358e2ce3b5",
+          "oracle_hash": "2f3b5a81795c702888749982471cc0b0",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1",
+          "card_name": "Toil to Renown",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7cde60c98e70c669b462ea5874e17232",
+          "oracle_hash": "4521866f2c0302b96432f72194b560b8",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1",
+          "card_name": "Wandering Stream",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2672dfc54371d68650a2f9ea851b5990",
+          "oracle_hash": "fb473dc7cf9f74523c04b406b6d36a8e",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 12
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1",
+          "card_name": "Blessed Reversal",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a30d89079274b0aeb350157489c02bee",
+          "oracle_hash": "823a9c3aa2094d20b96fd4ccb747bbb5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1",
+          "card_name": "Bountiful Harvest",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f609e13e36e1e99fd47c17fe7ea088d2",
+          "oracle_hash": "80024b4cf516a43e6d18839cf03860e6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1",
+          "card_name": "Festival of Trokin",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:898aa76651becdc5799867dd5c4a71b7",
+          "oracle_hash": "c854e6479f1427e2b5d0c823a7244f19",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1",
+          "card_name": "Fruition",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4be0feca617880d6fd5d2b94dd07eee4",
+          "oracle_hash": "1d7d5ee9cf5d1d8f0868d99d5f795919",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1",
+          "card_name": "Gerrard's Wisdom",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0dc75e25a69cb2c92abdc1358e2ce3b5",
+          "oracle_hash": "2f3b5a81795c702888749982471cc0b0",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1",
+          "card_name": "Invigorating Falls",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8cc8c8b01bba9fe02e7c3a27f2b387ee",
+          "oracle_hash": "ade29be2af80d9a21039a33b8d862a31",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1",
+          "card_name": "Joyous Respite",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f609e13e36e1e99fd47c17fe7ea088d2",
+          "oracle_hash": "80024b4cf516a43e6d18839cf03860e6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1",
+          "card_name": "Landbind Ritual",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9e929643503771dc1bec7ee764f4e2c3",
+          "oracle_hash": "d84556b6708d3cf7331b93ece9875ae6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1",
+          "card_name": "Peach Garden Oath",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:898aa76651becdc5799867dd5c4a71b7",
+          "oracle_hash": "c854e6479f1427e2b5d0c823a7244f19",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1",
+          "card_name": "Presence of the Wise",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0dc75e25a69cb2c92abdc1358e2ce3b5",
+          "oracle_hash": "2f3b5a81795c702888749982471cc0b0",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1",
+          "card_name": "Toil to Renown",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7cde60c98e70c669b462ea5874e17232",
+          "oracle_hash": "4521866f2c0302b96432f72194b560b8",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1",
+          "card_name": "Wandering Stream",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2672dfc54371d68650a2f9ea851b5990",
+          "oracle_hash": "fb473dc7cf9f74523c04b406b6d36a8e",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 12
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Blessed Reversal",
+          "logical_rule_key": "battle_rule_v1:a30d89079274b0aeb350157489c02bee"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Bountiful Harvest",
+          "logical_rule_key": "battle_rule_v1:f609e13e36e1e99fd47c17fe7ea088d2"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Festival of Trokin",
+          "logical_rule_key": "battle_rule_v1:898aa76651becdc5799867dd5c4a71b7"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Fruition",
+          "logical_rule_key": "battle_rule_v1:4be0feca617880d6fd5d2b94dd07eee4"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Gerrard's Wisdom",
+          "logical_rule_key": "battle_rule_v1:0dc75e25a69cb2c92abdc1358e2ce3b5"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Invigorating Falls",
+          "logical_rule_key": "battle_rule_v1:8cc8c8b01bba9fe02e7c3a27f2b387ee"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Joyous Respite",
+          "logical_rule_key": "battle_rule_v1:f609e13e36e1e99fd47c17fe7ea088d2"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Landbind Ritual",
+          "logical_rule_key": "battle_rule_v1:9e929643503771dc1bec7ee764f4e2c3"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Peach Garden Oath",
+          "logical_rule_key": "battle_rule_v1:898aa76651becdc5799867dd5c4a71b7"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Presence of the Wise",
+          "logical_rule_key": "battle_rule_v1:0dc75e25a69cb2c92abdc1358e2ce3b5"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Toil to Renown",
+          "logical_rule_key": "battle_rule_v1:7cde60c98e70c669b462ea5874e17232"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Wandering Stream",
+          "logical_rule_key": "battle_rule_v1:2672dfc54371d68650a2f9ea851b5990"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 12
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Blessed Reversal",
+          "component_keys": [],
+          "effect": "life_total_change",
+          "logical_rule_key": "battle_rule_v1:a30d89079274b0aeb350157489c02bee"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Bountiful Harvest",
+          "component_keys": [],
+          "effect": "life_total_change",
+          "logical_rule_key": "battle_rule_v1:f609e13e36e1e99fd47c17fe7ea088d2"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Festival of Trokin",
+          "component_keys": [],
+          "effect": "life_total_change",
+          "logical_rule_key": "battle_rule_v1:898aa76651becdc5799867dd5c4a71b7"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Fruition",
+          "component_keys": [],
+          "effect": "life_total_change",
+          "logical_rule_key": "battle_rule_v1:4be0feca617880d6fd5d2b94dd07eee4"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Gerrard's Wisdom",
+          "component_keys": [],
+          "effect": "life_total_change",
+          "logical_rule_key": "battle_rule_v1:0dc75e25a69cb2c92abdc1358e2ce3b5"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Invigorating Falls",
+          "component_keys": [],
+          "effect": "life_total_change",
+          "logical_rule_key": "battle_rule_v1:8cc8c8b01bba9fe02e7c3a27f2b387ee"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Joyous Respite",
+          "component_keys": [],
+          "effect": "life_total_change",
+          "logical_rule_key": "battle_rule_v1:f609e13e36e1e99fd47c17fe7ea088d2"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Landbind Ritual",
+          "component_keys": [],
+          "effect": "life_total_change",
+          "logical_rule_key": "battle_rule_v1:9e929643503771dc1bec7ee764f4e2c3"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Peach Garden Oath",
+          "component_keys": [],
+          "effect": "life_total_change",
+          "logical_rule_key": "battle_rule_v1:898aa76651becdc5799867dd5c4a71b7"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Presence of the Wise",
+          "component_keys": [],
+          "effect": "life_total_change",
+          "logical_rule_key": "battle_rule_v1:0dc75e25a69cb2c92abdc1358e2ce3b5"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Toil to Renown",
+          "component_keys": [],
+          "effect": "life_total_change",
+          "logical_rule_key": "battle_rule_v1:7cde60c98e70c669b462ea5874e17232"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Wandering Stream",
+          "component_keys": [],
+          "effect": "life_total_change",
+          "logical_rule_key": "battle_rule_v1:2672dfc54371d68650a2f9ea851b5990"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 24,
+        "scenarios": 12
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

@@ -6265,6 +6265,130 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_dynamic_hand_count_life_gain_uses_current_hand_size(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.life = 10
+        active.hand = [
+            {"name": "Card A", "type_line": "Instant"},
+            {"name": "Card B", "type_line": "Creature"},
+            {"name": "Card C", "type_line": "Land"},
+        ]
+        effect = {
+            "effect": "life_total_change",
+            "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1",
+            "life_gain_amount_source": "controller_hand_count",
+            "life_gain_base_amount": 0,
+            "life_gain_per_count": 2,
+            "target": "self",
+            "sorcery": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Gerrard's Wisdom", "type_line": "Sorcery"},
+            turn=4,
+            rng=random.Random(404),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(active.life, 16)
+        self.assertTrue(
+            any(
+                event == "life_total_changed"
+                and data.get("card") == "Gerrard's Wisdom"
+                and data.get("requested_delta") == 6
+                and data.get("hand_life_gain_count") == 3
+                and data.get("dynamic_life_gain_count") == 3
+                for event, data in self.events
+            )
+        )
+
+    def test_dynamic_domain_life_gain_counts_basic_land_types(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.life = 20
+        active.battlefield = [
+            {"name": "Savannah", "type_line": "Land - Forest Plains"},
+            {"name": "Watery Grave", "type_line": "Land - Island Swamp"},
+            {"name": "Mountain", "type_line": "Basic Land - Mountain"},
+            {"name": "Duplicate Forest", "type_line": "Basic Land - Forest"},
+        ]
+        effect = {
+            "effect": "life_total_change",
+            "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1",
+            "life_gain_amount_source": "domain_basic_land_types",
+            "life_gain_base_amount": 0,
+            "life_gain_per_count": 2,
+            "target": "self",
+            "sorcery": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Wandering Stream", "type_line": "Sorcery"},
+            turn=4,
+            rng=random.Random(405),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(active.life, 30)
+        self.assertTrue(
+            any(
+                event == "life_total_changed"
+                and data.get("card") == "Wandering Stream"
+                and data.get("requested_delta") == 10
+                and data.get("domain_basic_land_type_count") == 5
+                for event, data in self.events
+            )
+        )
+
+    def test_dynamic_tapped_battlefield_life_gain_counts_only_tapped_supported_types(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.life = 20
+        active.battlefield = [
+            {"name": "Tapped Artifact", "type_line": "Artifact", "tapped": True},
+            {"name": "Tapped Creature", "type_line": "Creature - Soldier", "tapped": True},
+            {"name": "Tapped Land", "type_line": "Basic Land - Plains", "tapped": True},
+            {"name": "Untapped Land", "type_line": "Basic Land - Island", "tapped": False},
+            {"name": "Tapped Enchantment", "type_line": "Enchantment", "tapped": True},
+        ]
+        effect = {
+            "effect": "life_total_change",
+            "battle_model_scope": "xmage_dynamic_controller_gain_life_spell_v1",
+            "life_gain_amount_source": "battlefield_permanent_count",
+            "battlefield_count_scope": "controller_battlefield",
+            "battlefield_count_card_types": ["artifact", "creature", "land"],
+            "battlefield_count_tapped_state": "tapped",
+            "life_gain_base_amount": 0,
+            "life_gain_per_count": 1,
+            "target": "self",
+            "sorcery": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Toil to Renown", "type_line": "Sorcery"},
+            turn=4,
+            rng=random.Random(406),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(active.life, 23)
+        self.assertTrue(
+            any(
+                event == "life_total_changed"
+                and data.get("card") == "Toil to Renown"
+                and data.get("requested_delta") == 3
+                and data.get("battlefield_life_gain_count") == 3
+                for event, data in self.events
+            )
+        )
+
     def test_composite_life_gain_draw_spell_resolves_both_components_once(self) -> None:
         active = self.battle.Player("Active", None, [{"name": "Drawn Card"}])
         opponent = self.battle.Player("Opponent", None, [])

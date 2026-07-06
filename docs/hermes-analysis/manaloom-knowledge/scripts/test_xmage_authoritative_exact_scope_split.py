@@ -9728,6 +9728,104 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["life_gain_amount"], 7)
         self.assertEqual(effect["target"], "self")
 
+    def test_dynamic_life_gain_spell_maps_controller_hand_count(self) -> None:
+        row = queue_row(split.LIFE_UNIT, effect_classes=["GainLifeEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="You gain 2 life for each card in your hand."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new GainLifeEffect("
+                "new MultipliedValue(CardsInControllerHandCount.ANY, 2),"
+                "\"You gain 2 life for each card in your hand\"));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "life_total_change")
+        self.assertEqual(effect["battle_model_scope"], split.DYNAMIC_LIFE_GAIN_SCOPE)
+        self.assertEqual(effect["life_gain_amount_source"], "controller_hand_count")
+        self.assertEqual(effect["life_gain_per_count"], 2)
+        self.assertEqual(effect["life_gain_base_amount"], 0)
+
+    def test_dynamic_life_gain_spell_maps_domain_count(self) -> None:
+        row = queue_row(split.LIFE_UNIT, effect_classes=["GainLifeEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                oracle_text=(
+                    "Domain — You gain 2 life for each basic land type among lands you control."
+                )
+            ),
+            source_text=(
+                "Effect effect = new GainLifeEffect(new MultipliedValue(DomainValue.REGULAR, 2));"
+                "this.getSpellAbility().addEffect(effect);"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DYNAMIC_LIFE_GAIN_SCOPE)
+        self.assertEqual(effect["life_gain_amount_source"], "domain_basic_land_types")
+        self.assertEqual(effect["life_gain_per_count"], 2)
+
+    def test_dynamic_life_gain_spell_maps_tapped_artifact_creature_land_count(self) -> None:
+        row = queue_row(split.LIFE_UNIT, effect_classes=["GainLifeEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="You gain 1 life for each tapped artifact, creature, and land you control."),
+            source_text=(
+                "private static final FilterControlledPermanent filter = "
+                "new FilterControlledPermanent(\"tapped artifact, creature, and land you control\");"
+                "filter.add(TappedPredicate.TAPPED);"
+                "filter.add(Predicates.or(CardType.ARTIFACT.getPredicate(), "
+                "CardType.CREATURE.getPredicate(), CardType.LAND.getPredicate()));"
+                "DynamicValue xValue = new PermanentsOnBattlefieldCount(filter);"
+                "this.getSpellAbility().addEffect(new GainLifeEffect(xValue));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DYNAMIC_LIFE_GAIN_SCOPE)
+        self.assertEqual(effect["life_gain_amount_source"], "battlefield_permanent_count")
+        self.assertEqual(effect["battlefield_count_scope"], "controller_battlefield")
+        self.assertEqual(effect["battlefield_count_card_types"], ["artifact", "creature", "land"])
+        self.assertEqual(effect["battlefield_count_tapped_state"], "tapped")
+
+    def test_dynamic_life_gain_spell_blocks_target_power_plus_toughness(self) -> None:
+        row = queue_row(split.LIFE_UNIT, effect_classes=["GainLifeEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                oracle_text=(
+                    "Choose target creature you control. You gain life equal to that creature's "
+                    "power plus its toughness."
+                )
+            ),
+            source_text=(
+                "Effect effect = new GainLifeEffect(new TargetPermanentPowerPlusToughnessCount());"
+                "this.getSpellAbility().addTarget(new TargetControlledCreaturePermanent());"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "dynamic_life_gain_target_power_toughness_not_supported")
+
+    def test_dynamic_life_gain_spell_blocks_x_value(self) -> None:
+        row = queue_row(split.LIFE_UNIT, effect_classes=["GainLifeEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="You gain X plus 3 life."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new GainLifeEffect("
+                "new IntPlusDynamicValue(3, GetXValue.instance)));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "dynamic_life_gain_x_value_not_supported")
+
     def test_life_gain_spell_with_condition_stays_blocked(self) -> None:
         row = queue_row(split.LIFE_UNIT, effect_classes=["GainLifeEffect"])
         proposal, reason = split.split_row(

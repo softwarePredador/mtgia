@@ -1814,6 +1814,18 @@ Immediate checkpoint after PG361:
     mapper/runtime subpattern before generating a new PostgreSQL package.
     Current evidence:
     `docs/hermes-analysis/master_optimizer_reports/pg555_independent_mana_aux_new_server_apply_evidence.md`.
+82. PG556 promoted `12` dynamic controller life-gain spell rows on the new
+    server after adding the exact
+    `xmage_dynamic_controller_gain_life_spell_v1` mapper/runtime lane for
+    battlefield permanent counts, controller hand counts, graveyard card
+    counts, and domain basic-land-type counts. The cycle reduced
+    Commander-legal battle-gap identities from `25538` to `25526`, reduced
+    XMage-authoritative adapter-required identities from `25224` to `25212`,
+    and reduced `life_gain::xmage_life_gain_variant_review_v1` work units from
+    `726` to `714`. The final split returned `proposal_count=0`, so the next
+    cycle must implement another mapper/runtime subpattern before generating a
+    new PostgreSQL package. Current evidence:
+    `docs/hermes-analysis/master_optimizer_reports/pg556_dynamic_life_gain_new_server_apply_evidence.md`.
 
 ## Non-Goals
 

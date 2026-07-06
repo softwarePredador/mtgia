@@ -15236,6 +15236,79 @@ abilities where sacrifice/draw is coupled to mana production, conditional mana
 families, unsafe `SimpleManaAbility` cost shapes, or the separate auxiliary
 effect. Those require their own exact runtime adapter and focused evidence.
 
+## PG556 Dynamic Life Gain New Server Evidence
+
+PG556 evidence:
+
+- exact split report:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260706_pg556_dynamic_life_gain_candidate.md`
+- package:
+  `docs/hermes-analysis/master_optimizer_reports/pg556_dynamic_life_gain_new_server_package_package.md`
+- apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg556_dynamic_life_gain_new_server_apply_evidence.md`
+- PG -> SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg556_dynamic_life_gain_new_server_sync_report.json`
+- E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg556_dynamic_life_gain_new_server_e2e.md`
+- post-sync queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260706_post_pg556_dynamic_life_gain_new_server.md`
+- final exact-scope recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260706_post_pg556_dynamic_life_gain_new_server_final.md`
+- readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260706_post_pg556_dynamic_life_gain_new_server.md`
+- final audits:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260706_post_pg556_dynamic_life_gain_new_server_final.md`,
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260706_post_pg556_dynamic_life_gain_new_server_final.md`,
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260706_post_pg556_dynamic_life_gain_new_server_final.md`,
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260706_post_pg556_dynamic_life_gain_new_server_final.md`
+
+Validation:
+
+- focused code checks passed: `py_compile`, `54` package/E2E pytest tests, and
+  `958` exact-scope/runtime unittest tests;
+- exact split selected `12` cards for `xmage_dynamic_life_gain_spell` under
+  `xmage_dynamic_controller_gain_life_spell_v1`;
+- package precheck found `12/12` target card rows and no existing matching
+  expected rules;
+- package apply upserted `12` rows and deprecated `2` nonmatching shadow rows;
+- PostgreSQL postcheck confirmed `12/12` promoted rows, `12/12`
+  verified/auto rows, and `12/12` oracle-hash rows;
+- PG -> SQLite sync loaded `8,965` PostgreSQL rows, updated `8,729` SQLite
+  rows, and exported `6,466` canonical snapshot rows;
+- package E2E: `status=pass`, `scenario_count=12`, `event_count=24`, and
+  every promoted card refreshed through PostgreSQL, Hermes SQLite, canonical
+  snapshot fallback, runtime `get_card_effect`, and battle execution;
+- final exact-scope recheck has `proposal_count=0` and
+  `safe_for_batch_pg_package_count=0`;
+- final audits passed: XMage strategy `pass`, PG-Hermes-SQLite `pass`,
+  operational surface `pass`, legacy contamination `pass`.
+
+Post-sync queue evidence:
+
+- pre-cycle `target_identity_count=25538`
+- post-cycle `target_identity_count=25526`
+- post-cycle `xmage_authoritative_source_count=25212`
+- post-cycle `xmage_missing_source_exception_count=314`
+- post-cycle `xmage_authoritative_parser_gap_count=0`
+- post-cycle `xmage_authoritative_adapter_required_count=25212`
+- post-cycle `adapter_work_unit_count=11354`
+
+Runtime semantics:
+
+- the splitter now accepts exact dynamic life-gain spells backed by XMage
+  `GainLifeEffect` where the amount comes from battlefield permanent count,
+  controller hand count, graveyard card count, or domain basic-land-type count;
+- battlefield permanent count supports card-type, subtype, combat-state, and
+  tapped-state filters;
+- the runtime computes the dynamic count at resolution time and records replay
+  evidence for count source, computed count, and gained life.
+
+Residual boundary: PG556 does not authorize life-gain patterns that depend on
+target opponent counts, target creature power/toughness, X values,
+converge/colors spent, damage dealt to the controller, or broader non-simple
+Oracle text. Those require their own exact runtime adapter and focused package
+evidence.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:
