@@ -11329,6 +11329,62 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "not_instant_or_sorcery_spell")
 
+    def test_counter_life_loss_spell_maps_to_counter_runtime_with_target_controller_loss(self) -> None:
+        row = queue_row(
+            split.COUNTER_UNIT,
+            effect_classes=["CounterTargetEffect", "LoseLifeTargetControllerEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Counter target noncreature spell. Its controller loses 2 life."),
+            source_text=(
+                "this.getSpellAbility().addTarget("
+                "new TargetSpell(StaticFilters.FILTER_SPELL_NON_CREATURE));"
+                "this.getSpellAbility().addEffect(new CounterTargetEffect());"
+                "this.getSpellAbility().addEffect(new LoseLifeTargetControllerEffect(2));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "counter")
+        self.assertEqual(effect["battle_model_scope"], split.COUNTER_TARGET_CONTROLLER_LOSE_LIFE_SCOPE)
+        self.assertEqual(effect["target"], "noncreature_spell")
+        self.assertEqual(effect["life_loss_on_counter"], 2)
+        self.assertEqual(effect["resolution_order"], "counter_then_target_controller_life_loss")
+        self.assertEqual(
+            effect["target_constraints"],
+            {"zone": "stack", "stack_object": "spell", "exclude_card_types": ["creature"]},
+        )
+        self.assertEqual(
+            [component["effect"] for component in effect["_composite_rule_components"]],
+            ["counter", "life_total_change"],
+        )
+
+    def test_counter_life_loss_spell_blocks_dynamic_life_loss(self) -> None:
+        row = queue_row(
+            split.COUNTER_UNIT,
+            effect_classes=["CounterTargetEffect", "LoseLifeTargetControllerEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                oracle_text=(
+                    "Counter target spell, activated ability, or triggered ability. "
+                    "Its controller loses life equal to the number of creatures you control."
+                )
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new CounterTargetEffect());"
+                "this.getSpellAbility().addTarget(new TargetStackObject());"
+                "this.getSpellAbility().addEffect("
+                "new LoseLifeTargetControllerEffect(CreaturesYouControlCount.PLURAL));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "counter_life_loss_oracle_not_exact_fixed")
+
     def test_counter_gain_life_spell_maps_to_counter_runtime_with_life_gain(self) -> None:
         row = queue_row(
             split.LIFE_UNIT,

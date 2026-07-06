@@ -211,6 +211,9 @@ COUNTER_SCOPE = "xmage_counter_target_spell_v1"
 COUNTER_DRAW_SCOPE = "xmage_counter_target_and_draw_card_spell_v1"
 COUNTER_SCRY_SCOPE = "xmage_counter_target_and_scry_spell_v1"
 COUNTER_GAIN_LIFE_SCOPE = "xmage_counter_target_and_controller_gain_life_spell_v1"
+COUNTER_TARGET_CONTROLLER_LOSE_LIFE_SCOPE = (
+    "xmage_counter_target_and_target_controller_loses_life_spell_v1"
+)
 COUNTER_UNLESS_PAYS_SCOPE = "xmage_counter_target_spell_unless_controller_pays_generic_v1"
 BOUNCE_SCOPE = "xmage_return_target_to_hand_spell_v1"
 RECURSION_SCOPE = "xmage_return_target_graveyard_card_to_hand_spell_v1"
@@ -2951,6 +2954,69 @@ def fixed_counter_gain_life_from_source(source_text: str) -> tuple[int, str] | N
     else:
         return None
     return life_gain, target
+
+
+def counter_target_from_source(source_text: str) -> str | None:
+    text = str(source_text or "")
+    if "new TargetSpell()" in text or "new TargetSpell(StaticFilters.FILTER_SPELL)" in text:
+        return "spell"
+    if (
+        "FILTER_SPELL_NON_CREATURE" in text
+        or "FILTER_SPELL_A_NON_CREATURE" in text
+        or "FilterNonCreatureSpell" in text
+    ):
+        return "noncreature_spell"
+    if (
+        "FILTER_SPELL_CREATURE" in text
+        or "FILTER_SPELL_A_CREATURE" in text
+        or "FilterCreatureSpell" in text
+    ):
+        return "creature_spell"
+    if "FILTER_SPELL_AN_ARTIFACT" in text:
+        return "artifact_spell"
+    if "FILTER_SPELL_AN_ENCHANTMENT" in text:
+        return "enchantment_spell"
+    if "FILTER_SPELL_AN_INSTANT_OR_SORCERY" in text or "FilterInstantOrSorcerySpell" in text:
+        return "instant_or_sorcery_spell"
+    if "FILTER_SPELL_A_MULTICOLORED" in text:
+        return "multicolored_spell"
+    return None
+
+
+def fixed_counter_target_controller_life_loss_from_oracle(
+    metadata: dict[str, Any],
+) -> tuple[str, int] | None:
+    text = strip_parenthetical_reminders(oracle_text(metadata))
+    text = re.sub(r"\s+", " ", text).strip()
+    match = re.match(
+        r"^(?P<counter>counter target .+?)\. its controller loses (?P<life>\d+) life\.?$",
+        text,
+    )
+    if not match:
+        return None
+    target = counter_target_from_oracle({"oracle_text": match.group("counter")})
+    if target is None:
+        return None
+    return target, int(match.group("life"))
+
+
+def fixed_counter_target_controller_life_loss_from_source(
+    source_text: str,
+) -> tuple[str, int] | None:
+    text = str(source_text or "")
+    counter_matches = list(re.finditer(r"new\s+CounterTargetEffect\s*\(", text))
+    life_matches = list(re.finditer(r"new\s+LoseLifeTargetControllerEffect\s*\(", text))
+    if len(counter_matches) != 1 or len(life_matches) != 1:
+        return None
+    if counter_matches[0].start() > life_matches[0].start():
+        return None
+    life_loss = java_constructor_int(text, "LoseLifeTargetControllerEffect")
+    if life_loss is None or life_loss <= 0:
+        return None
+    target = counter_target_from_source(text)
+    if target is None:
+        return None
+    return target, life_loss
 
 
 def fixed_counter_unless_pays_from_oracle(metadata: dict[str, Any]) -> tuple[str, int, bool] | None:
@@ -16777,6 +16843,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "fixed destroy-target plus controller Treasure creation spell"
     elif scope == LIFE_GAIN_DRAW_SCOPE:
         scope_kind = "fixed controller life-gain plus draw-card spell"
+    elif scope == COUNTER_TARGET_CONTROLLER_LOSE_LIFE_SCOPE:
+        scope_kind = "fixed counter-target spell with target-controller life loss"
     elif scope == BOOST_DRAW_SCOPE:
         scope_kind = "fixed target-creature boost plus draw-card spell"
     elif scope == KEYWORD_DRAW_SCOPE:
@@ -23420,6 +23488,57 @@ def split_row(
                 metadata,
                 effect_json,
                 family_id="xmage_counter_target_scry_spell",
+            ), "selected_exact_scope"
+
+        if classes == {"CounterTargetEffect", "LoseLifeTargetControllerEffect"}:
+            unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+            if unsupported_abilities:
+                return None, "counter_life_loss_ability_class_not_simple"
+            oracle_counter_life_loss = fixed_counter_target_controller_life_loss_from_oracle(metadata)
+            if oracle_counter_life_loss is None:
+                return None, "counter_life_loss_oracle_not_exact_fixed"
+            source_counter_life_loss = fixed_counter_target_controller_life_loss_from_source(source_text)
+            if source_counter_life_loss is None:
+                return None, "counter_life_loss_source_not_fixed"
+            target, life_loss = oracle_counter_life_loss
+            if source_counter_life_loss != (target, life_loss):
+                return None, "counter_life_loss_source_oracle_mismatch"
+            counter_component = {
+                "effect": "counter",
+                "battle_model_scope": COUNTER_SCOPE,
+                "target": target,
+                "target_constraints": counter_target_constraints_for(target),
+                "xmage_effect_class": "CounterTargetEffect",
+            }
+            life_loss_component = {
+                "effect": "life_total_change",
+                "battle_model_scope": LIFE_SCOPE,
+                "life_loss_amount": life_loss,
+                "target": "target_controller",
+                "compose_on_resolution": True,
+                "xmage_effect_class": "LoseLifeTargetControllerEffect",
+            }
+            effect_json = {
+                "effect": "counter",
+                "battle_model_scope": COUNTER_TARGET_CONTROLLER_LOSE_LIFE_SCOPE,
+                "target": target,
+                "target_constraints": counter_target_constraints_for(target),
+                "life_loss_on_counter": life_loss,
+                "target_controller_life_loss_on_counter": life_loss,
+                "life_loss_amount": life_loss,
+                "resolution_order": "counter_then_target_controller_life_loss",
+                "_composite_rule_components": [counter_component, life_loss_component],
+                "xmage_effect_classes": [
+                    "CounterTargetEffect",
+                    "LoseLifeTargetControllerEffect",
+                ],
+                **flags,
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_counter_target_controller_life_loss_spell",
             ), "selected_exact_scope"
 
         if classes != {"CounterTargetEffect"}:

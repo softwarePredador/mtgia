@@ -11242,6 +11242,87 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_counter_life_loss_scope_is_stack_response_and_makes_target_controller_lose_life(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        responder = self.battle.Player("Responder", None, [])
+        active.life = 20
+        responder.mana_pool.add("blue", 2)
+        responder.mana_pool.add("black", 1)
+        counter = {
+            "name": "Fixture Undermine",
+            "type_line": "Instant",
+            "mana_cost": "{U}{U}{B}",
+            "cmc": 3,
+            "effect": "counter",
+            "battle_model_scope": "xmage_counter_target_and_target_controller_loses_life_spell_v1",
+            "target": "spell",
+            "target_constraints": {"zone": "stack", "stack_object": "spell"},
+            "life_loss_on_counter": 3,
+            "target_controller_life_loss_on_counter": 3,
+            "_composite_rule_components": [
+                {
+                    "effect": "counter",
+                    "battle_model_scope": "xmage_counter_target_spell_v1",
+                    "target": "spell",
+                    "target_constraints": {"zone": "stack", "stack_object": "spell"},
+                },
+                {
+                    "effect": "life_total_change",
+                    "battle_model_scope": "xmage_fixed_controller_gain_life_spell_v1",
+                    "life_loss_amount": 3,
+                    "target": "target_controller",
+                    "compose_on_resolution": True,
+                },
+            ],
+            "instant": True,
+        }
+        responder.hand.append(counter)
+        target_spell = {
+            "name": "Target Scheme",
+            "type_line": "Sorcery",
+            "cmc": 4,
+            "effect": "finisher",
+        }
+        stack = self.battle.Stack()
+        stack.push(target_spell, active, {"effect": "finisher"})
+
+        self.assertTrue(
+            self.battle.priority_round(
+                active,
+                [active, responder],
+                stack,
+                turn=8,
+                rng=random.Random(8),
+                phase="precombat_main",
+            )
+        )
+
+        self.assertTrue(stack.items[-1].countered)
+        self.assertEqual(active.life, 17)
+        self.assertEqual([card["name"] for card in responder.graveyard], ["Fixture Undermine"])
+        self.assertTrue(
+            any(
+                event == "life_loss_on_counter_resolved"
+                and data.get("card") == "Fixture Undermine"
+                and data.get("target_controller") == "Active"
+                and data.get("life_loss_on_counter") == 3
+                and data.get("target_controller_life_before") == 20
+                and data.get("target_controller_life_after") == 17
+                for event, data in self.events
+            )
+        )
+        self.assertTrue(
+            any(
+                event == "spell_countered"
+                and data.get("counter") == "Fixture Undermine"
+                and data.get("target") == "Target Scheme"
+                and data.get("life_loss_on_counter") == 3
+                and data.get("target_controller_life_lost") == 3
+                and data.get("target_controller_life_after") == 17
+                for event, data in self.events
+            )
+        )
+
     def test_counter_unless_pays_counters_when_target_controller_cannot_pay(self) -> None:
         active = self.battle.Player("Active", None, [])
         responder = self.battle.Player("Responder", None, [])

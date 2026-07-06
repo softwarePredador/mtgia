@@ -8634,6 +8634,8 @@ CARD_EFFECT_FIELD_RULE_KEYS = (
     "counter_target_mana_value_min",
     "draw_on_counter",
     "life_gain_on_counter",
+    "life_loss_on_counter",
+    "target_controller_life_loss_on_counter",
     "scry_on_counter",
     "scry_count",
     "counter_unless_pays_generic",
@@ -10094,6 +10096,7 @@ class Player:
         self.counters_available = len(self.counterspell_cards())
         effect = get_card_effect(counter)
         target_controller_obj = getattr(stack_item, "controller", None)
+        counter_target_name = (target_card or {}).get("name", "?")
         counter_unless_pays_generic = int(effect.get("counter_unless_pays_generic") or 0)
         counter_tax_paid = False
         counter_tax_paid_by = None
@@ -10116,6 +10119,36 @@ class Player:
         if life_gain_on_counter:
             gain_life(self, life_gain_on_counter, cap=999)
         life_after = int(getattr(self, "life", life_before) or 0)
+        life_loss_on_counter = (
+            int(effect.get("life_loss_on_counter") or effect.get("target_controller_life_loss_on_counter") or 0)
+            if not counter_tax_paid and target_controller_obj is not None
+            else 0
+        )
+        target_controller_life_before = (
+            int(getattr(target_controller_obj, "life", 0) or 0)
+            if life_loss_on_counter
+            else None
+        )
+        if life_loss_on_counter:
+            change_life(target_controller_obj, -life_loss_on_counter)
+            emit_replay_event(
+                "life_loss_on_counter_resolved",
+                player=self.name,
+                card=counter.get("name", "?"),
+                target=counter_target_name,
+                target_controller=getattr(target_controller_obj, "name", None),
+                life_loss_on_counter=life_loss_on_counter,
+                target_controller_life_before=target_controller_life_before,
+                target_controller_life_after=int(getattr(target_controller_obj, "life", 0) or 0),
+                turn=turn,
+                phase=phase,
+                **replay_rule_fields(effect),
+            )
+        target_controller_life_after = (
+            int(getattr(target_controller_obj, "life", 0) or 0)
+            if life_loss_on_counter
+            else target_controller_life_before
+        )
         scry_on_counter = int(effect.get("scry_on_counter") or 0) if not counter_tax_paid else 0
         scry_result = None
         if scry_on_counter:
@@ -10144,7 +10177,7 @@ class Player:
                 effect.get("countered_spell_to_exile_reason")
                 or "counter_unless_pays_exile_replacement"
             )
-        target_name = (target_card or {}).get("name", "?")
+        target_name = counter_target_name
         target_controller = getattr(target_controller_obj, "name", None)
         target_effect = (getattr(stack_item, "effect_data", None) or {}).get("effect")
         if target_controller_obj is not None and target_controller_obj is not self:
@@ -10181,6 +10214,14 @@ class Player:
             life_before=life_before,
             life_after=life_after,
             life_gained=max(0, life_after - life_before),
+            life_loss_on_counter=life_loss_on_counter,
+            target_controller_life_before=target_controller_life_before,
+            target_controller_life_after=target_controller_life_after,
+            target_controller_life_lost=(
+                max(0, int(target_controller_life_before or 0) - int(target_controller_life_after or 0))
+                if target_controller_life_before is not None and target_controller_life_after is not None
+                else 0
+            ),
             scry_on_counter=scry_on_counter,
             scry_looked_at=(scry_result or {}).get("looked_at", []),
             scry_kept_on_top=(scry_result or {}).get("kept_on_top", []),
