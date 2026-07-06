@@ -522,6 +522,13 @@ Operational priority after this pivot:
 68. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
     probes, as regression evidence only unless they produce a named safe cut and
     equal-gate proof under the Lorehold promotion gate.
+69. run `global_commander_external_exact_artifact_engine_source_expander.py`
+    after the local exact replacement/new cut finder closes with no ready local
+    exact replacement. It may use live Scryfall Oracle search to broaden exact
+    artifact-spell payoff/type-conversion source lanes, but it must reject
+    false type-conversion matches, mark already-current and support-only cards,
+    and keep candidate copy, battle, mutation, and promotion closed until local
+    review proves same-lane add/cut fit.
 
 Current pivot evidence:
 
@@ -544,6 +551,7 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_engine_cut_trace_replacement_gate_20260706_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_engine_cut_trace_replacement_reviewer_20260706_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_engine_exact_replacement_or_new_cut_finder_20260706_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_external_exact_artifact_engine_source_expander_20260706_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_manual_negative_trace_reviewer_20260706_kaalia_value_safe_stage1_live_research.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_followup_live_source_research_expander_20260706_kaalia_value_safe_stage1_after_manual_trace.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_expanded_source_candidate_reviewer_20260706_kaalia_value_safe_stage1_followup_live_after_manual_trace.md`
@@ -1492,6 +1500,16 @@ Current external refresh on 2026-07-05:
   `exact_replacement_ready_count=0`, `new_unblocked_engine_cut_count=0`, and
   the next gate is
   `expand_external_exact_artifact_engine_source_lanes_or_global_axis`.
+- The external exact artifact-engine source expander uses live Scryfall Oracle
+  lanes after local cache exhaustion. After tightening the shared classifier so
+  generic `creature spells you control` text is not treated as artifact
+  conversion, it finds five review-ready external seeds for Kaalia deck `619`:
+  `Digsite Engineer`, `Golem Foundry`, `Myrsmith`, `Poetic Ingenuity`, and
+  `Ravenous Robots`. `Biotransference` is already in the current deck, while
+  `Foundry Inspector` and `Voyager Quickwelder` are support/cost reducers, not
+  Biotransference-style payoff replacements. Candidate copy, battle, and
+  promotion remain closed; the next gate is
+  `review_external_exact_artifact_engine_candidates_locally_before_candidate_copy`.
 
 ## Global Commander Rollout - 2026-07-01
 

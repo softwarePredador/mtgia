@@ -84,6 +84,12 @@ GLOBAL_COMMANDER_ENGINE_EXACT_REPLACEMENT_OR_NEW_CUT_FINDER = (
 GLOBAL_COMMANDER_ENGINE_EXACT_REPLACEMENT_OR_NEW_CUT_FINDER_TEST = (
     SCRIPT_DIR / "test_global_commander_engine_exact_replacement_or_new_cut_finder.py"
 )
+GLOBAL_COMMANDER_EXTERNAL_EXACT_ARTIFACT_ENGINE_SOURCE_EXPANDER = (
+    SCRIPT_DIR / "global_commander_external_exact_artifact_engine_source_expander.py"
+)
+GLOBAL_COMMANDER_EXTERNAL_EXACT_ARTIFACT_ENGINE_SOURCE_EXPANDER_TEST = (
+    SCRIPT_DIR / "test_global_commander_external_exact_artifact_engine_source_expander.py"
+)
 GLOBAL_COMMANDER_CANDIDATE_COPY_MATERIALIZER = SCRIPT_DIR / "global_commander_candidate_copy_materializer.py"
 GLOBAL_COMMANDER_CANDIDATE_COPY_MATERIALIZER_TEST = (
     SCRIPT_DIR / "test_global_commander_candidate_copy_materializer.py"
@@ -465,6 +471,10 @@ GLOBAL_COMMANDER_ENGINE_CUT_TRACE_REPLACEMENT_REVIEWER_REPORT = (
 GLOBAL_COMMANDER_ENGINE_EXACT_REPLACEMENT_OR_NEW_CUT_FINDER_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_engine_exact_replacement_or_new_cut_finder_20260706_current.md"
+)
+GLOBAL_COMMANDER_EXTERNAL_EXACT_ARTIFACT_ENGINE_SOURCE_EXPANDER_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_external_exact_artifact_engine_source_expander_20260706_current.md"
 )
 GLOBAL_COMMANDER_CANDIDATE_COPY_MATERIALIZER_REPORT = (
     REPO_ROOT
@@ -991,6 +1001,9 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_learning_priority_audit.py",
                 "global_commander_learning_priority_audit_20260706_source_exhaustion_current.md",
                 "expand_external_nonpayoff_source_candidate_pool_before_candidate_copy",
+                "global_commander_external_exact_artifact_engine_source_expander.py",
+                "global_commander_external_exact_artifact_engine_source_expander_20260706_current.md",
+                "review_external_exact_artifact_engine_candidates_locally_before_candidate_copy",
                 "global_commander_candidate_copy_materializer.py",
                 "global_commander_candidate_copy_materializer_20260705_kaalia_nonland_top_pair.md",
                 "must reject stale chained sources",
@@ -1990,6 +2003,7 @@ def build_audit() -> dict[str, Any]:
                 "no_new_unblocked_engine_cut_source",
                 "expand_external_exact_artifact_engine_source_lanes_or_global_axis",
                 "candidate_copy_allowed_now",
+                "creature spells you control are artifacts",
             ],
         )
     )
@@ -2001,6 +2015,33 @@ def build_audit() -> dict[str, Any]:
                 "test_report_keeps_candidate_copy_closed_and_surfaces_cut_blockers",
                 "outside_commander_color_identity",
                 "new_engine_cut_blocked_by_commander_plan_signal",
+                "Not Artifact Conversion",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_EXTERNAL_EXACT_ARTIFACT_ENGINE_SOURCE_EXPANDER,
+            [
+                "global_commander_external_exact_artifact_engine_source_expander",
+                "external_exact_artifact_engine_source_lanes_expanded_no_deck_action",
+                "review_external_exact_artifact_engine_candidates_locally_before_candidate_copy",
+                "candidate_copy_allowed_now",
+                "battle_gate_allowed_now",
+                "promotion_allowed",
+                "fetch_scryfall_cards",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_EXTERNAL_EXACT_ARTIFACT_ENGINE_SOURCE_EXPANDER_TEST,
+            [
+                "test_external_candidates_filter_color_and_current_deck",
+                "external_exact_engine_candidate_ready_for_local_review",
+                "outside_commander_color_identity",
+                "already_in_current_deck",
+                "Conspiracy",
             ],
         )
     )
@@ -3718,6 +3759,23 @@ def build_audit() -> dict[str, Any]:
                 "expand_external_exact_artifact_engine_source_lanes_or_global_axis",
                 "no_local_exact_replacement_ready_for_source_trace",
                 "no_new_unblocked_engine_cut_source",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_EXTERNAL_EXACT_ARTIFACT_ENGINE_SOURCE_EXPANDER_REPORT,
+            [
+                "Global Commander External Exact Artifact Engine Source Expander",
+                "external_exact_artifact_engine_source_lanes_expanded_no_deck_action",
+                "ready_for_local_review_count: `5`",
+                "candidate_copy_allowed_now: `false`",
+                "battle_gate_allowed_now: `false`",
+                "promotion_allowed: `false`",
+                "review_external_exact_artifact_engine_candidates_locally_before_candidate_copy",
+                "Digsite Engineer",
+                "Golem Foundry",
+                "Poetic Ingenuity",
             ],
         )
     )

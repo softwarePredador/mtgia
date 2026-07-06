@@ -317,6 +317,15 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     Resultado: nenhum replacement exacto local fica pronto para Kaalia `619`,
     nenhum novo corte engine fica destravado, e o proximo gate passa a ser
     `expand_external_exact_artifact_engine_source_lanes_or_global_axis`.
+    O expander externo seguinte roda em
+    `manaloom-knowledge/scripts/global_commander_external_exact_artifact_engine_source_expander.py`,
+    com evidencia:
+    `master_optimizer_reports/global_commander_external_exact_artifact_engine_source_expander_20260706_current.md`.
+    Resultado: a busca live Scryfall, ja com falso positivo de `creature spells
+    you control` bloqueado, encontrou cinco seeds para revisao local
+    (`Digsite Engineer`, `Golem Foundry`, `Myrsmith`, `Poetic Ingenuity`,
+    `Ravenous Robots`); candidate copy, battle e promocao continuam fechados
+    ate `review_external_exact_artifact_engine_candidates_locally_before_candidate_copy`.
     Quando uma hipotese add/cut estiver pronta, rode
     `manaloom-knowledge/scripts/global_commander_candidate_copy_materializer.py`
     para materializar uma unica troca em copia isolada do Hermes SQLite. A

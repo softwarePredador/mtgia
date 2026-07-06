@@ -83,6 +83,13 @@ def create_db(path: Path) -> None:
                 "Enchantment",
                 "Creatures you control are artifacts in addition to their other types.",
             ),
+            (
+                "not artifact conversion",
+                "Not Artifact Conversion",
+                '["B"]',
+                "Enchantment",
+                "As this enters, choose a creature type. Creature spells you control are the chosen type.",
+            ),
         ]
         conn.executemany(
             "INSERT INTO card_oracle_cache(normalized_name, name, color_identity_json, type_line, oracle_text) VALUES (?, ?, ?, ?, ?)",
@@ -94,7 +101,13 @@ def create_db(path: Path) -> None:
         )
         conn.executemany(
             "INSERT INTO format_staples(card_name, format, edhrec_rank) VALUES (?, 'commander', ?)",
-            [("Exact Engine", 10), ("Blue Engine", 20), ("Support Reducer", 30), ("Current Exact", 40)],
+            [
+                ("Exact Engine", 10),
+                ("Blue Engine", 20),
+                ("Support Reducer", 30),
+                ("Current Exact", 40),
+                ("Not Artifact Conversion", 50),
+            ],
         )
         conn.execute("INSERT INTO deck_cards(deck_id, card_name) VALUES (619, 'Current Exact')")
 
@@ -145,6 +158,7 @@ class GlobalCommanderEngineExactReplacementOrNewCutFinderTests(unittest.TestCase
         self.assertIn("outside_commander_color_identity", by_name["Blue Engine"]["blockers"])
         self.assertIn("support_only_no_token_or_draw_payoff", by_name["Support Reducer"]["blockers"])
         self.assertIn("already_in_current_deck", by_name["Current Exact"]["blockers"])
+        self.assertNotIn("Not Artifact Conversion", by_name)
 
     def test_report_keeps_candidate_copy_closed_and_surfaces_cut_blockers(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

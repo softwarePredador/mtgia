@@ -1,10 +1,10 @@
 # Global Commander Engine Exact Replacement Or New Cut Finder
 
-- generated_at: `2026-07-06T04:35:53.585273+00:00`
+- generated_at: `2026-07-06T04:43:06.568175+00:00`
 - status: `engine_exact_replacement_or_new_cut_not_found_locally`
 - commander: `Kaalia of the Vast`
 - deck_id: `619`
-- replacement_candidate_scanned_count: `10`
+- replacement_candidate_scanned_count: `7`
 - exact_replacement_ready_count: `0`
 - engine_cut_row_count: `8`
 - new_unblocked_engine_cut_count: `0`
@@ -17,14 +17,11 @@
 
 | Card | Status | Signals | Color | Legality | Blockers |
 | --- | --- | --- | --- | --- | --- |
-| `Rhythm of the Wild` | `exact_type_conversion_engine_candidate` | `artifact_type_conversion_engine` | `G,R` | `legal` | outside_commander_color_identity |
 | `Etherium Sculptor` | `artifact_spell_support_not_biotransference_replacement` | `artifact_spell_cost_reducer` | `U` | `legal` | outside_commander_color_identity, support_only_no_token_or_draw_payoff |
 | `Sai, Master Thopterist` | `exact_artifact_spell_payoff_candidate` | `artifact_spell_draw_payoff,artifact_spell_token_payoff` | `U` | `legal` | outside_commander_color_identity |
 | `Biotransference` | `exact_type_conversion_engine_candidate` | `artifact_spell_token_payoff,artifact_type_conversion_engine` | `B` | `legal` | already_in_current_deck |
 | `Forensic Gadgeteer` | `exact_artifact_spell_payoff_candidate` | `artifact_spell_cost_reducer,artifact_spell_draw_payoff,artifact_spell_token_payoff` | `U` | `legal` | outside_commander_color_identity |
-| `Leyline of Transformation` | `exact_type_conversion_engine_candidate` | `artifact_type_conversion_engine` | `U` | `legal` | outside_commander_color_identity |
 | `Locket of Yesterdays` | `artifact_spell_support_not_biotransference_replacement` | `artifact_spell_cost_reducer` | `` | `legal` | support_only_no_token_or_draw_payoff |
-| `Maskwood Nexus` | `exact_type_conversion_engine_candidate` | `artifact_type_conversion_engine` | `` | `legal` | already_in_current_deck |
 | `Uthros Research Craft` | `exact_artifact_spell_payoff_candidate` | `artifact_spell_draw_payoff` | `U` | `legal` | outside_commander_color_identity |
 | `Vedalken Archmage` | `exact_artifact_spell_payoff_candidate` | `artifact_spell_draw_payoff` | `U` | `legal` | outside_commander_color_identity |
 

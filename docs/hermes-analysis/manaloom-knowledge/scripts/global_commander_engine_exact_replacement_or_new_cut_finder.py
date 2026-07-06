@@ -109,7 +109,11 @@ def exact_engine_signals(type_line: str, oracle_text: str) -> list[str]:
             signals.append("artifact_spell_cost_reducer")
     if "artifact spells you cast cost" in text:
         signals.append("artifact_spell_cost_reducer")
-    if "creatures you control are artifacts" in text or "creature spells you control" in text:
+    if (
+        "creatures you control are artifacts" in text
+        or "creature spells you control are artifacts" in text
+        or ("creature cards you own" in text and "are artifacts" in text)
+    ):
         signals.append("artifact_type_conversion_engine")
     return sorted(set(signals))
 

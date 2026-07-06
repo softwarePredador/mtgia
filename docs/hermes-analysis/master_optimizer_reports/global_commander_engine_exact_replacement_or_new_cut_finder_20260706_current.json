@@ -10,7 +10,7 @@
     "candidate_copy_closed_after_exact_replacement_or_new_cut_finder"
   ],
   "deck_action_allowed": false,
-  "generated_at": "2026-07-06T04:35:53.585273+00:00",
+  "generated_at": "2026-07-06T04:43:06.568175+00:00",
   "input_artifacts": {
     "engine_policy_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_engine_axis_nonland_cut_policy_model_20260706_current.json",
     "reviewer_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_engine_cut_trace_replacement_reviewer_20260706_current.json",
@@ -179,29 +179,6 @@
       "already_in_current_deck": false,
       "battle_gate_allowed": false,
       "blockers": [
-        "outside_commander_color_identity"
-      ],
-      "candidate_copy_allowed": false,
-      "card_name": "Rhythm of the Wild",
-      "color_identity": [
-        "G",
-        "R"
-      ],
-      "commander_legality": "legal",
-      "edhrec_rank": 193,
-      "mutation_allowed": false,
-      "oracle_excerpt": "Creature spells you control can't be countered. Nontoken creatures you control have riot. (They enter with your choice of a +1/+1 counter or haste.)",
-      "raw_exact_status": "exact_type_conversion_engine_candidate",
-      "signals": [
-        "artifact_type_conversion_engine"
-      ],
-      "status": "exact_type_conversion_engine_candidate",
-      "type_line": "Enchantment"
-    },
-    {
-      "already_in_current_deck": false,
-      "battle_gate_allowed": false,
-      "blockers": [
         "outside_commander_color_identity",
         "support_only_no_token_or_draw_payoff"
       ],
@@ -295,28 +272,6 @@
       "already_in_current_deck": false,
       "battle_gate_allowed": false,
       "blockers": [
-        "outside_commander_color_identity"
-      ],
-      "candidate_copy_allowed": false,
-      "card_name": "Leyline of Transformation",
-      "color_identity": [
-        "U"
-      ],
-      "commander_legality": "legal",
-      "edhrec_rank": null,
-      "mutation_allowed": false,
-      "oracle_excerpt": "If this card is in your opening hand, you may begin the game with it on the battlefield. As this enchantment enters, choose a creature type. Creatures you control are the chosen type in addition to their other types. The same is true for creature spells you control and creature cards you own that ar",
-      "raw_exact_status": "exact_type_conversion_engine_candidate",
-      "signals": [
-        "artifact_type_conversion_engine"
-      ],
-      "status": "exact_type_conversion_engine_candidate",
-      "type_line": "Enchantment"
-    },
-    {
-      "already_in_current_deck": false,
-      "battle_gate_allowed": false,
-      "blockers": [
         "support_only_no_token_or_draw_payoff"
       ],
       "candidate_copy_allowed": false,
@@ -331,26 +286,6 @@
         "artifact_spell_cost_reducer"
       ],
       "status": "artifact_spell_support_not_biotransference_replacement",
-      "type_line": "Artifact"
-    },
-    {
-      "already_in_current_deck": true,
-      "battle_gate_allowed": false,
-      "blockers": [
-        "already_in_current_deck"
-      ],
-      "candidate_copy_allowed": false,
-      "card_name": "Maskwood Nexus",
-      "color_identity": [],
-      "commander_legality": "legal",
-      "edhrec_rank": null,
-      "mutation_allowed": false,
-      "oracle_excerpt": "Creatures you control are every creature type. The same is true for creature spells you control and creature cards you own that aren't on the battlefield. {3}, {T}: Create a 2/2 blue Shapeshifter creature token with changeling. (It is every creature type.)",
-      "raw_exact_status": "exact_type_conversion_engine_candidate",
-      "signals": [
-        "artifact_type_conversion_engine"
-      ],
-      "status": "exact_type_conversion_engine_candidate",
       "type_line": "Artifact"
     },
     {
@@ -413,11 +348,11 @@
     "local_oracle_cache_boundary": "card_oracle_cache_rows_only",
     "new_unblocked_engine_cut_count": 0,
     "next_gate": "expand_external_exact_artifact_engine_source_lanes_or_global_axis",
-    "replacement_candidate_scanned_count": 10,
+    "replacement_candidate_scanned_count": 7,
     "replacement_status_counts": {
       "artifact_spell_support_not_biotransference_replacement": 2,
       "exact_artifact_spell_payoff_candidate": 4,
-      "exact_type_conversion_engine_candidate": 4
+      "exact_type_conversion_engine_candidate": 1
     }
   }
 }

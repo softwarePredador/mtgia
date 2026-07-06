@@ -1,0 +1,295 @@
+{
+  "artifact_type": "global_commander_external_exact_artifact_engine_source_expander",
+  "battle_gate_allowed_now": false,
+  "battle_gate_performed": false,
+  "battle_or_optimization_performed": false,
+  "candidate_copy_allowed_now": false,
+  "candidate_copy_blockers": [
+    "candidate_copy_closed_after_external_exact_engine_source_expansion"
+  ],
+  "deck_action_allowed": false,
+  "external_candidate_rows": [
+    {
+      "already_in_current_deck": false,
+      "battle_gate_allowed": false,
+      "blockers": [],
+      "candidate_copy_allowed": false,
+      "card_name": "Digsite Engineer",
+      "color_identity": [
+        "W"
+      ],
+      "commander_legality": "legal",
+      "mutation_allowed": false,
+      "oracle_excerpt": "Whenever you cast an artifact spell, you may pay {2}. If you do, create a 0/0 colorless Construct artifact creature token with \"This token gets +1/+1 for each artifact you control.\"",
+      "oracle_id": "e57025ed-3de6-4b2f-92bd-5481fd33b7f1",
+      "raw_exact_status": "exact_artifact_spell_payoff_candidate",
+      "scryfall_uri": "https://scryfall.com/card/c21/15/digsite-engineer?utm_source=api",
+      "signals": [
+        "artifact_spell_token_payoff"
+      ],
+      "source_queries": [
+        "legal:commander id<=wbr o:\"whenever you cast an artifact spell\"",
+        "legal:commander id<=wbr o:\"artifact spell\""
+      ],
+      "source_query": "legal:commander id<=wbr o:\"whenever you cast an artifact spell\"",
+      "status": "external_exact_engine_candidate_ready_for_local_review",
+      "type_line": "Creature \u2014 Dwarf Artificer"
+    },
+    {
+      "already_in_current_deck": false,
+      "battle_gate_allowed": false,
+      "blockers": [],
+      "candidate_copy_allowed": false,
+      "card_name": "Golem Foundry",
+      "color_identity": [],
+      "commander_legality": "legal",
+      "mutation_allowed": false,
+      "oracle_excerpt": "Whenever you cast an artifact spell, you may put a charge counter on this artifact. Remove three charge counters from this artifact: Create a 3/3 colorless Golem artifact creature token.",
+      "oracle_id": "8e96c09f-c064-4dd8-85ee-0f48d86ab670",
+      "raw_exact_status": "exact_artifact_spell_payoff_candidate",
+      "scryfall_uri": "https://scryfall.com/card/eoc/138/golem-foundry?utm_source=api",
+      "signals": [
+        "artifact_spell_token_payoff"
+      ],
+      "source_queries": [
+        "legal:commander id<=wbr o:\"whenever you cast an artifact spell\"",
+        "legal:commander id<=wbr o:\"artifact spell\""
+      ],
+      "source_query": "legal:commander id<=wbr o:\"whenever you cast an artifact spell\"",
+      "status": "external_exact_engine_candidate_ready_for_local_review",
+      "type_line": "Artifact"
+    },
+    {
+      "already_in_current_deck": false,
+      "battle_gate_allowed": false,
+      "blockers": [],
+      "candidate_copy_allowed": false,
+      "card_name": "Myrsmith",
+      "color_identity": [
+        "W"
+      ],
+      "commander_legality": "legal",
+      "mutation_allowed": false,
+      "oracle_excerpt": "Whenever you cast an artifact spell, you may pay {1}. If you do, create a 1/1 colorless Myr artifact creature token.",
+      "oracle_id": "7fc3798a-3907-4f50-98a1-25b8e1977197",
+      "raw_exact_status": "exact_artifact_spell_payoff_candidate",
+      "scryfall_uri": "https://scryfall.com/card/cmm/44/myrsmith?utm_source=api",
+      "signals": [
+        "artifact_spell_token_payoff"
+      ],
+      "source_queries": [
+        "legal:commander id<=wbr o:\"whenever you cast an artifact spell\"",
+        "legal:commander id<=wbr o:\"artifact spell\""
+      ],
+      "source_query": "legal:commander id<=wbr o:\"whenever you cast an artifact spell\"",
+      "status": "external_exact_engine_candidate_ready_for_local_review",
+      "type_line": "Creature \u2014 Human Artificer"
+    },
+    {
+      "already_in_current_deck": false,
+      "battle_gate_allowed": false,
+      "blockers": [],
+      "candidate_copy_allowed": false,
+      "card_name": "Poetic Ingenuity",
+      "color_identity": [
+        "R"
+      ],
+      "commander_legality": "legal",
+      "mutation_allowed": false,
+      "oracle_excerpt": "Whenever one or more Dinosaurs you control attack, create that many Treasure tokens. Whenever you cast an artifact spell, create a 3/1 red Dinosaur creature token. This ability triggers only once each turn.",
+      "oracle_id": "9780d975-acbe-40c6-b444-1e1e6b772788",
+      "raw_exact_status": "exact_artifact_spell_payoff_candidate",
+      "scryfall_uri": "https://scryfall.com/card/lci/161/poetic-ingenuity?utm_source=api",
+      "signals": [
+        "artifact_spell_token_payoff"
+      ],
+      "source_queries": [
+        "legal:commander id<=wbr o:\"whenever you cast an artifact spell\"",
+        "legal:commander id<=wbr o:\"artifact spell\""
+      ],
+      "source_query": "legal:commander id<=wbr o:\"whenever you cast an artifact spell\"",
+      "status": "external_exact_engine_candidate_ready_for_local_review",
+      "type_line": "Enchantment"
+    },
+    {
+      "already_in_current_deck": false,
+      "battle_gate_allowed": false,
+      "blockers": [],
+      "candidate_copy_allowed": false,
+      "card_name": "Ravenous Robots",
+      "color_identity": [
+        "R"
+      ],
+      "commander_legality": "legal",
+      "mutation_allowed": false,
+      "oracle_excerpt": "Whenever you cast an artifact spell, create a 1/1 colorless Robot artifact creature token. {R}, {T}: Creature tokens you control gain haste until end of turn.",
+      "oracle_id": "45873747-f2a4-4d83-9492-bfc97df7b605",
+      "raw_exact_status": "exact_artifact_spell_payoff_candidate",
+      "scryfall_uri": "https://scryfall.com/card/tmt/106/ravenous-robots?utm_source=api",
+      "signals": [
+        "artifact_spell_token_payoff"
+      ],
+      "source_queries": [
+        "legal:commander id<=wbr o:\"whenever you cast an artifact spell\"",
+        "legal:commander id<=wbr o:\"artifact spell\""
+      ],
+      "source_query": "legal:commander id<=wbr o:\"whenever you cast an artifact spell\"",
+      "status": "external_exact_engine_candidate_ready_for_local_review",
+      "type_line": "Artifact Creature \u2014 Robot"
+    },
+    {
+      "already_in_current_deck": true,
+      "battle_gate_allowed": false,
+      "blockers": [
+        "already_in_current_deck"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Biotransference",
+      "color_identity": [
+        "B"
+      ],
+      "commander_legality": "legal",
+      "mutation_allowed": false,
+      "oracle_excerpt": "Creatures you control are artifacts in addition to their other types. The same is true for creature spells you control and creature cards you own that aren't on the battlefield. Whenever you cast an artifact spell, you lose 1 life and create a 2/2 black Necron Warrior artifact creature token.",
+      "oracle_id": "5443557e-440f-4fdd-a29b-7740d7cec085",
+      "raw_exact_status": "exact_type_conversion_engine_candidate",
+      "scryfall_uri": "https://scryfall.com/card/40k/30/biotransference?utm_source=api",
+      "signals": [
+        "artifact_spell_token_payoff",
+        "artifact_type_conversion_engine"
+      ],
+      "source_queries": [
+        "legal:commander id<=wbr o:\"whenever you cast an artifact spell\"",
+        "legal:commander id<=wbr o:\"creatures you control are artifacts\"",
+        "legal:commander id<=wbr o:\"creature spells you control\"",
+        "legal:commander id<=wbr o:\"artifact spell\""
+      ],
+      "source_query": "legal:commander id<=wbr o:\"whenever you cast an artifact spell\"",
+      "status": "exact_type_conversion_engine_candidate",
+      "type_line": "Enchantment"
+    },
+    {
+      "already_in_current_deck": false,
+      "battle_gate_allowed": false,
+      "blockers": [
+        "support_only_no_token_or_draw_payoff"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Foundry Inspector",
+      "color_identity": [],
+      "commander_legality": "legal",
+      "mutation_allowed": false,
+      "oracle_excerpt": "Artifact spells you cast cost {1} less to cast.",
+      "oracle_id": "18f22960-87ec-43cd-82ea-ec5cabf49ad3",
+      "raw_exact_status": "artifact_spell_support_not_biotransference_replacement",
+      "scryfall_uri": "https://scryfall.com/card/cmm/385/foundry-inspector?utm_source=api",
+      "signals": [
+        "artifact_spell_cost_reducer"
+      ],
+      "source_queries": [
+        "legal:commander id<=wbr o:\"artifact spells you cast\"",
+        "legal:commander id<=wbr o:\"artifact spell\""
+      ],
+      "source_query": "legal:commander id<=wbr o:\"artifact spells you cast\"",
+      "status": "artifact_spell_support_not_biotransference_replacement",
+      "type_line": "Artifact Creature \u2014 Construct"
+    },
+    {
+      "already_in_current_deck": false,
+      "battle_gate_allowed": false,
+      "blockers": [
+        "support_only_no_token_or_draw_payoff"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Voyager Quickwelder",
+      "color_identity": [
+        "W"
+      ],
+      "commander_legality": "legal",
+      "mutation_allowed": false,
+      "oracle_excerpt": "Artifact spells you cast cost {1} less to cast.",
+      "oracle_id": "87e8c044-5f83-437d-a89e-8a95559045f6",
+      "raw_exact_status": "artifact_spell_support_not_biotransference_replacement",
+      "scryfall_uri": "https://scryfall.com/card/dft/37/voyager-quickwelder?utm_source=api",
+      "signals": [
+        "artifact_spell_cost_reducer"
+      ],
+      "source_queries": [
+        "legal:commander id<=wbr o:\"artifact spells you cast\"",
+        "legal:commander id<=wbr o:\"artifact spell\""
+      ],
+      "source_query": "legal:commander id<=wbr o:\"artifact spells you cast\"",
+      "status": "artifact_spell_support_not_biotransference_replacement",
+      "type_line": "Artifact Creature \u2014 Robot Artificer"
+    }
+  ],
+  "generated_at": "2026-07-06T04:43:11.362113+00:00",
+  "input_artifacts": {
+    "engine_policy_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_engine_axis_nonland_cut_policy_model_20260706_current.json",
+    "finder_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_engine_exact_replacement_or_new_cut_finder_20260706_current.json",
+    "finder_status": "engine_exact_replacement_or_new_cut_not_found_locally",
+    "source_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db"
+  },
+  "mutation_allowed": false,
+  "policy": {
+    "external_source_boundary": "Scryfall Oracle search is external source-lane evidence, not deck permission.",
+    "mutation_boundary": "This expander reads local deck membership and remote Scryfall data only.",
+    "same_lane_boundary": "Candidates still need local review, current-deck trace, and exact add/cut proof before candidate copy."
+  },
+  "postgres_writes": false,
+  "promotion_allowed": false,
+  "source_db_mutated": false,
+  "source_query_rows": [
+    {
+      "error": null,
+      "query": "legal:commander id<=wbr o:\"whenever you cast an artifact spell\"",
+      "status": "fetched",
+      "total_cards": 9,
+      "url": "https://api.scryfall.com/cards/search?unique=cards&order=name&q=legal%3Acommander%20id%3C%3Dwbr%20o%3A%22whenever%20you%20cast%20an%20artifact%20spell%22"
+    },
+    {
+      "error": null,
+      "query": "legal:commander id<=wbr o:\"artifact spells you cast\"",
+      "status": "fetched",
+      "total_cards": 3,
+      "url": "https://api.scryfall.com/cards/search?unique=cards&order=name&q=legal%3Acommander%20id%3C%3Dwbr%20o%3A%22artifact%20spells%20you%20cast%22"
+    },
+    {
+      "error": null,
+      "query": "legal:commander id<=wbr o:\"creatures you control are artifacts\"",
+      "status": "fetched",
+      "total_cards": 1,
+      "url": "https://api.scryfall.com/cards/search?unique=cards&order=name&q=legal%3Acommander%20id%3C%3Dwbr%20o%3A%22creatures%20you%20control%20are%20artifacts%22"
+    },
+    {
+      "error": null,
+      "query": "legal:commander id<=wbr o:\"creature spells you control\"",
+      "status": "fetched",
+      "total_cards": 4,
+      "url": "https://api.scryfall.com/cards/search?unique=cards&order=name&q=legal%3Acommander%20id%3C%3Dwbr%20o%3A%22creature%20spells%20you%20control%22"
+    },
+    {
+      "error": null,
+      "query": "legal:commander id<=wbr o:\"artifact spell\"",
+      "status": "fetched",
+      "total_cards": 37,
+      "url": "https://api.scryfall.com/cards/search?unique=cards&order=name&q=legal%3Acommander%20id%3C%3Dwbr%20o%3A%22artifact%20spell%22"
+    }
+  ],
+  "status": "external_exact_artifact_engine_source_lanes_expanded_no_deck_action",
+  "summary": {
+    "candidate_copy_blocker_count": 1,
+    "commander": "Kaalia of the Vast",
+    "deck_id": "619",
+    "external_candidate_count": 8,
+    "fetched_query_count": 5,
+    "next_gate": "review_external_exact_artifact_engine_candidates_locally_before_candidate_copy",
+    "ready_for_local_review_count": 5,
+    "source_query_count": 5,
+    "status_counts": {
+      "artifact_spell_support_not_biotransference_replacement": 2,
+      "exact_type_conversion_engine_candidate": 1,
+      "external_exact_engine_candidate_ready_for_local_review": 5
+    }
+  }
+}
