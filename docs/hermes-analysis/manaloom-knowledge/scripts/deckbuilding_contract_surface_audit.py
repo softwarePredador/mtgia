@@ -468,7 +468,7 @@ GLOBAL_COMMANDER_NONLAND_CORE_CANDIDATE_MODEL_REPORT = (
 )
 GLOBAL_COMMANDER_LEARNING_PRIORITY_REPORT = (
     REPO_ROOT
-    / "docs/hermes-analysis/master_optimizer_reports/global_commander_learning_priority_audit_20260706_source_expansion_cycle_current.md"
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_learning_priority_audit_20260706_engine_axis_exhaustion_current.md"
 )
 GLOBAL_COMMANDER_CROSS_COMMANDER_ROLE_AXIS_LEARNING_PIVOT_REPORT = (
     REPO_ROOT
@@ -1049,8 +1049,8 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_nonland_core_candidate_model_20260705_global_goal_hermes_only.md",
                 "Kaalia Angel/Demon/Dragon creatures are blocked",
                 "global_commander_learning_priority_audit.py",
-                "global_commander_learning_priority_audit_20260706_source_exhaustion_current.md",
-                "expand_external_nonpayoff_source_candidate_pool_before_candidate_copy",
+                "global_commander_learning_priority_audit_20260706_engine_axis_exhaustion_current.md",
+                "pivot_to_cross_commander_role_axis_learning_after_engine_axis_exhaustion",
                 "global_commander_external_exact_artifact_engine_source_expander.py",
                 "global_commander_external_exact_artifact_engine_source_expander_20260706_current.md",
                 "review_external_exact_artifact_engine_candidates_locally_before_candidate_copy",
@@ -1881,11 +1881,13 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_nonland_core_candidate_model_20260705_global_goal_hermes_only",
                 "global_commander_battle_feedback_model_20260705_current",
                 "DEFAULT_SOURCE_EXHAUSTION_REPORT",
+                "DEFAULT_ENGINE_AXIS_PIVOT_REPORT",
                 "source_exhaustion_router_before_candidate_copy",
-                "source_expansion_cycle_detection_before_more_same_deck_research",
-                "source_expansion_cycle_requires_global_learning_pivot",
-                "pivot_to_cross_commander_role_axis_learning_before_more_same_deck_source_expansion",
+                "engine_axis_exhaustion_router_before_more_same_deck_engine_research",
+                "engine_axis_exhausted_requires_global_learning_pivot",
+                "pivot_to_cross_commander_role_axis_learning_after_engine_axis_exhaustion",
                 "source_exhaustion_gate_counts",
+                "engine_axis_pivot_gate_counts",
                 "battle_feedback_model_before_requeue",
                 "blocked_exact_add_cut_pair_count",
                 "current_official_bracket_model_has_five_brackets_and_game_changers",
@@ -3821,8 +3823,9 @@ def build_audit() -> dict[str, Any]:
             [
                 "Global Commander Learning Priority Audit",
                 "source_expansion_cycle_requires_global_learning_pivot",
-                "pivot_to_cross_commander_role_axis_learning_before_more_same_deck_source_expansion",
-                "source_expansion_cycle_detection_before_more_same_deck_research",
+                "engine_axis_exhausted_requires_global_learning_pivot",
+                "pivot_to_cross_commander_role_axis_learning_after_engine_axis_exhaustion",
+                "engine_axis_exhaustion_router_before_more_same_deck_engine_research",
                 "Deck 607 is ranked only as a regression benchmark",
             ],
         )

@@ -570,6 +570,7 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_nonland_core_candidate_model_20260705_global_goal_hermes_only.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_learning_priority_audit_20260706_source_exhaustion_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_learning_priority_audit_20260706_source_expansion_cycle_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_learning_priority_audit_20260706_engine_axis_exhaustion_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_cross_commander_role_axis_learning_pivot_20260706_source_expansion_cycle_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_role_axis_policy_builder_20260706_engine_axis_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_engine_axis_nonland_cut_policy_model_20260706_current.md`
@@ -1575,6 +1576,12 @@ Current external refresh on 2026-07-05:
   `viable_non_biotransference_engine_cut_count=0`, so candidate copy, battle,
   and promotion remain closed; the next gate is
   `return_to_global_role_axis_learning_priority_after_engine_axis_exhaustion`.
+- The refreshed global learning priority audit now consumes that pivot router.
+  Kaalia deck `619` remains the top global learning item, but its next action
+  changes from more same-deck engine searching to
+  `pivot_to_cross_commander_role_axis_learning_after_engine_axis_exhaustion`.
+  The audit records `engine_axis_exhausted_requires_global_learning_pivot=1`
+  and keeps deck `607` as benchmark/regression only.
 
 ## Global Commander Rollout - 2026-07-01
 

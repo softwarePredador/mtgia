@@ -499,6 +499,101 @@ class GlobalCommanderLearningPriorityAuditTests(unittest.TestCase):
             report["method"]["priority_order"],
         )
 
+    def test_engine_axis_exhaustion_after_biotransference_protection_pivots_to_global_learning(self) -> None:
+        core_payload = {
+            "decks": [
+                {
+                    "deck_id": "619",
+                    "deck_name": "Kaalia Variant",
+                    "commander": "Kaalia of the Vast",
+                    "scope": "hermes_registered_variant",
+                    "shape_status": "structure_ready",
+                    "core_status": "core_role_gap",
+                    "role_bands": [
+                        {
+                            "role": "removal",
+                            "count": 1,
+                            "min": 6,
+                            "max": 14,
+                            "severity": "critical",
+                            "status": "below_floor",
+                        }
+                    ],
+                }
+            ]
+        }
+        strategy_payload = {
+            "commanders": [
+                {
+                    "commander_key": "kaalia of the vast",
+                    "status": "ready_for_strategy_matrix",
+                    "source_lane_count": 1,
+                }
+            ]
+        }
+        nonland_payload = {
+            "nonland_pools": [
+                {
+                    "deck_id": "619",
+                    "role": "removal",
+                    "status": "review_nonland_add_cut_pool_ready",
+                    "candidate_count": 12,
+                    "cut_candidate_count": 12,
+                    "pair_hypotheses": [{"add": "Feed the Swarm", "cut": "Birgi"}],
+                }
+            ]
+        }
+        engine_axis_pivot_payload = {
+            "artifact_type": "global_commander_biotransference_protection_pivot_router",
+            "status": "biotransference_protected_engine_axis_exhausted_pivot_required",
+            "candidate_copy_allowed_now": False,
+            "battle_gate_allowed_now": False,
+            "summary": {
+                "deck_id": "619",
+                "commander": "Kaalia of the Vast",
+                "next_gate": "return_to_global_role_axis_learning_priority_after_engine_axis_exhaustion",
+                "type_conversion_lane_exhausted": True,
+                "biotransference_protected": True,
+                "viable_non_biotransference_engine_cut_count": 0,
+                "blocker_counts": {"no_outside_artifact_type_conversion_candidate": 1},
+            },
+        }
+
+        report = audit.build_report(
+            core_payload=core_payload,
+            strategy_payload=strategy_payload,
+            nonland_payload=nonland_payload,
+            engine_axis_pivot_payload=engine_axis_pivot_payload,
+            bracket_status=audit.bracket_policy_status_from_text(""),
+            core_report_path=Path("docs/hermes-analysis/master_optimizer_reports/core.json"),
+            strategy_report_path=Path("docs/hermes-analysis/master_optimizer_reports/strategy.json"),
+            nonland_report_path=Path("docs/hermes-analysis/master_optimizer_reports/nonland.json"),
+            engine_axis_pivot_report_path=Path("docs/hermes-analysis/master_optimizer_reports/engine_axis.json"),
+        )
+
+        [row] = report["deck_priorities"]
+        self.assertEqual(
+            row["engine_axis_pivot_state"],
+            "engine_axis_exhausted_requires_global_learning_pivot",
+        )
+        self.assertTrue(row["engine_axis_biotransference_protected"])
+        self.assertEqual(row["engine_axis_viable_non_biotransference_cut_count"], 0)
+        self.assertEqual(
+            row["next_action"],
+            "pivot_to_cross_commander_role_axis_learning_after_engine_axis_exhaustion",
+        )
+        self.assertEqual(report["summary"]["engine_axis_pivot_blocked_deck_count"], 1)
+        self.assertEqual(
+            report["summary"]["engine_axis_pivot_gate_counts"][
+                "engine_axis_exhausted_requires_global_learning_pivot"
+            ],
+            1,
+        )
+        self.assertIn(
+            "engine_axis_exhaustion_router_before_more_same_deck_engine_research",
+            report["method"]["priority_order"],
+        )
+
     def test_battle_feedback_summary_blocks_exact_pair_requeue(self) -> None:
         core_payload = {
             "decks": [

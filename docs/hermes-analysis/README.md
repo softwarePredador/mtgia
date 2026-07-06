@@ -248,12 +248,12 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     Para ordenar o proximo aprendizado global sem voltar a focar no `607`,
     rode `manaloom-knowledge/scripts/global_commander_learning_priority_audit.py`;
     evidencia local atual:
-    `master_optimizer_reports/global_commander_learning_priority_audit_20260706_source_exhaustion_current.md`.
-    Essa fila agora consome o router de exaustao de fontes externas/nonpayoff:
-    quando o minerador revisado encontra `fresh_seeded_same_lane_cut_source_count=0`
-    e o router volta para `expand_external_nonpayoff_source_candidate_pool`,
-    o proximo passo global passa a ser expansao de fonte antes de qualquer
-    candidate-copy.
+    `master_optimizer_reports/global_commander_learning_priority_audit_20260706_engine_axis_exhaustion_current.md`.
+    Essa fila agora consome o router de exaustao de fontes externas/nonpayoff
+    e o router de protecao de `Biotransference`: quando o eixo engine fica sem
+    corte viavel, o proximo passo global passa a ser
+    `pivot_to_cross_commander_role_axis_learning_after_engine_axis_exhaustion`,
+    nao mais expansao de fonte dentro do mesmo deck.
     Essa auditoria tambem registra que a fonte oficial atual usa 5 Commander
     Brackets + Game Changers; o backend agora aceita `1..5` em
     `server/lib/edh_bracket_policy.dart`, mas bracket continua sendo sinal de
@@ -365,6 +365,10 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     por trace review, os demais engine cuts protegidos por sinais do plano de
     Kaalia, `viable_non_biotransference_engine_cut_count=0`, e o proximo gate e
     `return_to_global_role_axis_learning_priority_after_engine_axis_exhaustion`.
+    A fila global foi rerodada em
+    `master_optimizer_reports/global_commander_learning_priority_audit_20260706_engine_axis_exhaustion_current.md`;
+    resultado: Kaalia `619` segue como topo, agora com
+    `pivot_to_cross_commander_role_axis_learning_after_engine_axis_exhaustion`.
     Quando uma hipotese add/cut estiver pronta, rode
     `manaloom-knowledge/scripts/global_commander_candidate_copy_materializer.py`
     para materializar uma unica troca em copia isolada do Hermes SQLite. A

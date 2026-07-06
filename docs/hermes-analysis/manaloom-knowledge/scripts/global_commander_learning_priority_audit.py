@@ -26,6 +26,9 @@ DEFAULT_SOURCE_EXHAUSTION_REPORT = (
     REPORT_DIR
     / "global_commander_external_nonpayoff_seed_exhaustion_recovery_router_20260706_kaalia_value_safe_stage1_followup_live_after_manual_trace.json"
 )
+DEFAULT_ENGINE_AXIS_PIVOT_REPORT = (
+    REPORT_DIR / "global_commander_biotransference_protection_pivot_router_20260706_current.json"
+)
 BRACKET_POLICY_FILE = REPO_ROOT / "server/lib/edh_bracket_policy.dart"
 SOURCE_EXPANSION_CYCLE_RECYCLED_CUT_SOURCE_THRESHOLD = 40
 
@@ -258,6 +261,50 @@ def source_exhaustion_blocks_candidate_copy(source_exhaustion_summary: dict[str,
     }
 
 
+def engine_axis_pivot_summary_by_deck(engine_axis_payload: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    if not engine_axis_payload:
+        return {}
+    summary = engine_axis_payload.get("summary") or {}
+    deck_id = str(summary.get("deck_id") or "")
+    if not deck_id:
+        return {}
+    raw_status = str(engine_axis_payload.get("status") or "unknown")
+    state = "not_applicable"
+    if raw_status == "biotransference_protected_engine_axis_exhausted_pivot_required":
+        state = "engine_axis_exhausted_requires_global_learning_pivot"
+    elif bool(engine_axis_payload.get("candidate_copy_allowed_now")):
+        state = "engine_axis_cleared_for_candidate_copy"
+    elif raw_status:
+        state = "engine_axis_unresolved_before_candidate_copy"
+    return {
+        deck_id: {
+            "artifact_type": engine_axis_payload.get("artifact_type"),
+            "status": raw_status,
+            "state": state,
+            "commander": summary.get("commander"),
+            "candidate_copy_allowed_now": bool(engine_axis_payload.get("candidate_copy_allowed_now")),
+            "battle_gate_allowed_now": bool(engine_axis_payload.get("battle_gate_allowed_now")),
+            "next_gate": summary.get("next_gate") or "none",
+            "type_conversion_lane_exhausted": bool(summary.get("type_conversion_lane_exhausted")),
+            "biotransference_protected": bool(summary.get("biotransference_protected")),
+            "viable_non_biotransference_engine_cut_count": int(
+                summary.get("viable_non_biotransference_engine_cut_count") or 0
+            ),
+            "blocker_counts": summary.get("blocker_counts") or {},
+        }
+    }
+
+
+def engine_axis_pivot_blocks_candidate_copy(engine_axis_summary: dict[str, Any] | None) -> bool:
+    if not engine_axis_summary:
+        return False
+    state = engine_axis_summary.get("state") or engine_axis_summary.get("engine_axis_pivot_state")
+    return str(state or "") in {
+        "engine_axis_exhausted_requires_global_learning_pivot",
+        "engine_axis_unresolved_before_candidate_copy",
+    }
+
+
 def preferred_nonland_pool(core_row: dict[str, Any], pools: list[dict[str, Any]]) -> dict[str, Any] | None:
     missing = {row.get("role") for row in role_rows_by_status(core_row, "below_floor")} - {"land"}
     if not missing:
@@ -313,8 +360,13 @@ def next_action_for_deck(
     nonland_pool: dict[str, Any] | None = None,
     has_commander_source_lane: bool = False,
     source_exhaustion_summary: dict[str, Any] | None = None,
+    engine_axis_pivot_summary: dict[str, Any] | None = None,
 ) -> str:
     gate_state = repair_gate_state(core_row, land_cut_pool, nonland_pool)
+    if stage == "core_floor_repair" and engine_axis_pivot_blocks_candidate_copy(engine_axis_pivot_summary):
+        if str((engine_axis_pivot_summary or {}).get("state")) == "engine_axis_exhausted_requires_global_learning_pivot":
+            return "pivot_to_cross_commander_role_axis_learning_after_engine_axis_exhaustion"
+        return "resolve_engine_axis_pivot_before_candidate_copy"
     if stage == "core_floor_repair" and source_exhaustion_blocks_candidate_copy(source_exhaustion_summary):
         if str((source_exhaustion_summary or {}).get("state")) == "current_deck_negative_review_required_before_candidate_copy":
             return "collect_current_deck_negative_review_before_candidate_copy"
@@ -353,6 +405,7 @@ def build_deck_priorities(
     land_cut_payload: dict[str, Any] | None = None,
     nonland_payload: dict[str, Any] | None = None,
     source_exhaustion_payload: dict[str, Any] | None = None,
+    engine_axis_pivot_payload: dict[str, Any] | None = None,
 ) -> list[dict[str, Any]]:
     commander_rows = {
         row["commander_key"]: row
@@ -362,6 +415,7 @@ def build_deck_priorities(
     cut_pools = land_cut_pools_by_deck(land_cut_payload or {})
     nonland_pools = nonland_pools_by_deck(nonland_payload or {})
     source_exhaustion_by_deck = source_exhaustion_summary_by_deck(source_exhaustion_payload or {})
+    engine_axis_by_deck = engine_axis_pivot_summary_by_deck(engine_axis_pivot_payload or {})
     priorities = []
     for core_row in core_payload.get("decks", []):
         commander_key = normalize_commander(str(core_row.get("commander") or ""))
@@ -374,6 +428,7 @@ def build_deck_priorities(
             nonland_pools.get(str(core_row.get("deck_id") or ""), []),
         )
         source_exhaustion_summary = source_exhaustion_by_deck.get(str(core_row.get("deck_id") or ""))
+        engine_axis_pivot_summary = engine_axis_by_deck.get(str(core_row.get("deck_id") or ""))
         gate_state = repair_gate_state(core_row, land_cut_pool, nonland_pool)
         below = role_rows_by_status(core_row, "below_floor")
         above = role_rows_by_status(core_row, "above_range_review")
@@ -424,6 +479,19 @@ def build_deck_priorities(
                     (source_exhaustion_summary or {}).get("candidate_copy_allowed_now")
                 ),
                 "source_exhaustion_blockers": (source_exhaustion_summary or {}).get("candidate_copy_blockers", []),
+                "engine_axis_pivot_state": (engine_axis_pivot_summary or {}).get("state", "not_applicable"),
+                "engine_axis_pivot_status": (engine_axis_pivot_summary or {}).get("status"),
+                "engine_axis_pivot_next_gate": (engine_axis_pivot_summary or {}).get("next_gate"),
+                "engine_axis_type_conversion_lane_exhausted": bool(
+                    (engine_axis_pivot_summary or {}).get("type_conversion_lane_exhausted")
+                ),
+                "engine_axis_biotransference_protected": bool(
+                    (engine_axis_pivot_summary or {}).get("biotransference_protected")
+                ),
+                "engine_axis_viable_non_biotransference_cut_count": int(
+                    (engine_axis_pivot_summary or {}).get("viable_non_biotransference_engine_cut_count") or 0
+                ),
+                "engine_axis_blocker_counts": (engine_axis_pivot_summary or {}).get("blocker_counts", {}),
                 "next_action": next_action_for_deck(
                     stage,
                     core_row,
@@ -431,6 +499,7 @@ def build_deck_priorities(
                     nonland_pool,
                     has_commander_source_lane=has_commander_source_lane,
                     source_exhaustion_summary=source_exhaustion_summary,
+                    engine_axis_pivot_summary=engine_axis_pivot_summary,
                 ),
             }
         )
@@ -518,6 +587,7 @@ def build_report(
     nonland_payload: dict[str, Any] | None = None,
     battle_feedback_payload: dict[str, Any] | None = None,
     source_exhaustion_payload: dict[str, Any] | None = None,
+    engine_axis_pivot_payload: dict[str, Any] | None = None,
     bracket_status: dict[str, Any],
     core_report_path: Path,
     strategy_report_path: Path,
@@ -525,21 +595,25 @@ def build_report(
     nonland_report_path: Path | None = None,
     battle_feedback_report_path: Path | None = None,
     source_exhaustion_report_path: Path | None = None,
+    engine_axis_pivot_report_path: Path | None = None,
 ) -> dict[str, Any]:
     land_cut_payload = land_cut_payload or {}
     nonland_payload = nonland_payload or {}
     source_exhaustion_payload = source_exhaustion_payload or {}
+    engine_axis_pivot_payload = engine_axis_pivot_payload or {}
     deck_priorities = build_deck_priorities(
         core_payload,
         strategy_payload,
         land_cut_payload,
         nonland_payload,
         source_exhaustion_payload,
+        engine_axis_pivot_payload,
     )
     commander_queue = build_commander_queue(deck_priorities)
     stage_counts = Counter(row["stage"] for row in deck_priorities)
     repair_gate_counts = Counter(row["repair_gate_state"] for row in deck_priorities)
     source_exhaustion_gate_counts = Counter(row["source_exhaustion_state"] for row in deck_priorities)
+    engine_axis_pivot_gate_counts = Counter(row["engine_axis_pivot_state"] for row in deck_priorities)
     input_artifacts = {
         "core_role_report": artifact_rel(core_report_path),
         "strategy_matrix_report": artifact_rel(strategy_report_path),
@@ -552,6 +626,8 @@ def build_report(
         input_artifacts["battle_feedback_model"] = artifact_rel(battle_feedback_report_path)
     if source_exhaustion_report_path is not None and source_exhaustion_report_path.exists():
         input_artifacts["source_exhaustion_router"] = artifact_rel(source_exhaustion_report_path)
+    if engine_axis_pivot_report_path is not None and engine_axis_pivot_report_path.exists():
+        input_artifacts["engine_axis_pivot_router"] = artifact_rel(engine_axis_pivot_report_path)
     feedback_summary = battle_feedback_summary(battle_feedback_payload)
     return {
         "generated_at": utc_now(),
@@ -574,6 +650,7 @@ def build_report(
                 "nonland_candidate_pool_and_cut_model",
                 "source_exhaustion_router_before_candidate_copy",
                 "source_expansion_cycle_detection_before_more_same_deck_research",
+                "engine_axis_exhaustion_router_before_more_same_deck_engine_research",
                 "role_extreme_review",
                 "commander_profile_and_source_lanes",
                 "commander_specific_strategy_matrix",
@@ -589,12 +666,16 @@ def build_report(
             "stage_counts": dict(sorted(stage_counts.items())),
             "repair_gate_counts": dict(sorted(repair_gate_counts.items())),
             "source_exhaustion_gate_counts": dict(sorted(source_exhaustion_gate_counts.items())),
+            "engine_axis_pivot_gate_counts": dict(sorted(engine_axis_pivot_gate_counts.items())),
             "top_next_action": commander_queue[0]["next_action"] if commander_queue else "none",
             "bracket_policy_status": bracket_status["status"],
             "battle_feedback_status": feedback_summary["status"],
             "blocked_exact_add_cut_pair_count": feedback_summary["blocked_pair_count"],
             "source_exhaustion_blocked_deck_count": sum(
                 1 for row in deck_priorities if source_exhaustion_blocks_candidate_copy(row)
+            ),
+            "engine_axis_pivot_blocked_deck_count": sum(
+                1 for row in deck_priorities if engine_axis_pivot_blocks_candidate_copy(row)
             ),
             "battle_feedback_pair_status_counts": feedback_summary["pair_status_counts"],
         },
@@ -631,6 +712,10 @@ def write_markdown(payload: dict[str, Any], path: Path) -> None:
     for state, count in payload["summary"]["source_exhaustion_gate_counts"].items():
         lines.append(f"| `{state}` | {count} |")
 
+    lines.extend(["", "## Engine Axis Pivot Counts", "", "| Gate State | Decks |", "| --- | ---: |"])
+    for state, count in payload["summary"]["engine_axis_pivot_gate_counts"].items():
+        lines.append(f"| `{state}` | {count} |")
+
     lines.extend(["", "## Commander Queue", "", "| Commander | Top Stage | Decks | Next Action |", "| --- | --- | ---: | --- |"])
     for row in payload["commander_queue"]:
         lines.append(
@@ -642,7 +727,7 @@ def write_markdown(payload: dict[str, Any], path: Path) -> None:
             "",
             "## Top Deck Priorities",
             "",
-            "| Score | Deck | Commander | Stage | Repair Gate | Source Exhaustion | Below Floor | Above Range | Next Action |",
+            "| Score | Deck | Commander | Stage | Repair Gate | Source/Pivot Gates | Below Floor | Above Range | Next Action |",
             "| ---: | --- | --- | --- | --- | --- | --- | --- | --- |",
         ]
     )
@@ -652,7 +737,7 @@ def write_markdown(payload: dict[str, Any], path: Path) -> None:
         below = ", ".join(f"`{item}`" for item in row["below_floor_roles"]) or "-"
         above = ", ".join(f"`{item}`" for item in row["above_range_roles"]) or "-"
         lines.append(
-            f"| {row['priority_score']} | `{deck}` | `{commander}` | `{row['stage']}` | `{row['repair_gate_state']}` | `{row['source_exhaustion_state']}` | {below} | {above} | `{row['next_action']}` |"
+            f"| {row['priority_score']} | `{deck}` | `{commander}` | `{row['stage']}` | `{row['repair_gate_state']}` | `{row['source_exhaustion_state']} / {row['engine_axis_pivot_state']}` | {below} | {above} | `{row['next_action']}` |"
         )
 
     bracket_policy = payload["backend_contract_gaps"]["bracket_policy"]
@@ -677,6 +762,7 @@ def write_markdown(payload: dict[str, Any], path: Path) -> None:
             "- This is a learning queue, not a deck mutation permit.",
             "- Exact add/cut pairs blocked by battle feedback must not be requeued as fresh hypotheses.",
             "- Source-exhaustion routers override candidate-copy routing until a fresh same-lane cut source or required negative review exists.",
+            "- Engine-axis exhaustion after Biotransference protection routes back to global role-axis learning instead of forcing same-deck cuts.",
             "- Repeated source expansion with all seeded roles exhausted and high recycled cut-source counts pivots to cross-commander role-axis learning before more same-deck research.",
             "- External sources calibrate priorities; PostgreSQL/backend remains product truth.",
             "- Deck 607 is ranked only as a regression benchmark and must not become the global objective function.",
@@ -694,6 +780,7 @@ def main() -> int:
     parser.add_argument("--nonland-report", type=Path, default=DEFAULT_NONLAND_REPORT)
     parser.add_argument("--battle-feedback-report", type=Path, default=DEFAULT_BATTLE_FEEDBACK_REPORT)
     parser.add_argument("--source-exhaustion-report", type=Path, default=DEFAULT_SOURCE_EXHAUSTION_REPORT)
+    parser.add_argument("--engine-axis-pivot-report", type=Path, default=DEFAULT_ENGINE_AXIS_PIVOT_REPORT)
     parser.add_argument(
         "--out-prefix",
         type=Path,
@@ -707,6 +794,7 @@ def main() -> int:
         nonland_payload=load_optional_json(args.nonland_report),
         battle_feedback_payload=load_optional_json(args.battle_feedback_report),
         source_exhaustion_payload=load_optional_json(args.source_exhaustion_report),
+        engine_axis_pivot_payload=load_optional_json(args.engine_axis_pivot_report),
         bracket_status=bracket_policy_status(),
         core_report_path=args.core_report,
         strategy_report_path=args.strategy_report,
@@ -714,6 +802,7 @@ def main() -> int:
         nonland_report_path=args.nonland_report,
         battle_feedback_report_path=args.battle_feedback_report,
         source_exhaustion_report_path=args.source_exhaustion_report,
+        engine_axis_pivot_report_path=args.engine_axis_pivot_report,
     )
     args.out_prefix.parent.mkdir(parents=True, exist_ok=True)
     json_path = args.out_prefix.with_suffix(".json")
