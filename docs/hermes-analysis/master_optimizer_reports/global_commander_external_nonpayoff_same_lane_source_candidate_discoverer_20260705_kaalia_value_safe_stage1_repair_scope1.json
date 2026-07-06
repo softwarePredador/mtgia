@@ -1,0 +1,518 @@
+{
+  "artifact_type": "global_commander_external_nonpayoff_same_lane_source_candidate_discoverer",
+  "battle_gate_allowed_now": false,
+  "battle_gate_performed": false,
+  "battle_or_optimization_performed": false,
+  "battle_replay_performed": false,
+  "candidate_copy_allowed_now": false,
+  "candidate_copy_blockers": [
+    "named_external_candidates_are_not_cut_permission",
+    "current_deck_present_candidates_need_trace_policy_before_cut_consideration",
+    "outside_deck_candidates_need_local_source_lane_review_before_miner",
+    "candidate_copy_closed_until_value_safe_same_lane_pair_exists"
+  ],
+  "card_level_cut_permission_now": false,
+  "deck_action_allowed": false,
+  "generated_at": "2026-07-06T00:58:17.094628+00:00",
+  "input_artifacts": {
+    "corpus_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_same_lane_cut_corpus_collector_20260705_kaalia_value_safe_stage1_repair_scope1.json",
+    "package_source_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_package_source_synthesizer_20260705_kaalia_value_safe_stage1_repair_scope1.json",
+    "policy_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_same_lane_cut_policy_mapper_20260705_kaalia_value_safe_stage1_repair_scope1.json",
+    "selected_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db"
+  },
+  "mutation_allowed": false,
+  "policy": {
+    "battle_boundary": "No battle gate opens before candidate copy and relevant card-level usage evidence.",
+    "candidate_boundary": "Named external candidates are source-lane evidence, not card-level cut permission.",
+    "current_deck_boundary": "Candidates already in the current deck need trace/negative-review policy before any cut consideration.",
+    "outside_deck_boundary": "Candidates outside the current deck can inform future add/source lanes, but do not solve current cuts."
+  },
+  "postgres_writes": false,
+  "promotion_allowed": false,
+  "source_candidate_rows": [
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "direct_external_haste_protection_staple",
+      "card_level_cut_permission_now": false,
+      "card_name": "Lightning Greaves",
+      "cmc": 2.0,
+      "current_deck_present": true,
+      "local_identity_found": true,
+      "next_evidence": "target_deck_trace_or_negative_review_before_cut_consideration",
+      "policy_required_evidence": [
+        "named_external_source_candidate_rows",
+        "local_identity_and_legality_check",
+        "target_deck_trace_or_negative_review_before_cut_consideration",
+        "same_lane_value_safe_pair_before_candidate_copy"
+      ],
+      "rerun_miner_allowed_for_card": false,
+      "scryfall_id": "ca204b66-8d0c-431a-8d34-282f7c2d17da",
+      "selected_as_package_add": false,
+      "source_ids": [
+        "edhrec_kaalia_current_2026_07_05",
+        "edhrec_kaalia_upgraded_demons_2026_07_05"
+      ],
+      "source_observation": "Named external source candidate for this nonpayoff same-lane role.",
+      "status": "external_source_candidate_already_in_current_deck_needs_trace_policy",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Artifact \u2014 Equipment",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "direct_external_haste_protection_staple",
+      "card_level_cut_permission_now": false,
+      "card_name": "Swiftfoot Boots",
+      "cmc": 2.0,
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "next_evidence": "same_lane_value_safe_pair_before_candidate_copy",
+      "policy_required_evidence": [
+        "named_external_source_candidate_rows",
+        "local_identity_and_legality_check",
+        "target_deck_trace_or_negative_review_before_cut_consideration",
+        "same_lane_value_safe_pair_before_candidate_copy"
+      ],
+      "rerun_miner_allowed_for_card": false,
+      "scryfall_id": "c8b143ad-43ec-4e0d-a440-e348daa31391",
+      "selected_as_package_add": true,
+      "source_ids": [
+        "edhrec_kaalia_upgraded_demons_2026_07_05",
+        "flipside_kaalia_deck_tech_2026"
+      ],
+      "source_observation": "Named external source candidate for this nonpayoff same-lane role.",
+      "status": "external_source_candidate_already_selected_as_add_needs_pair_policy",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Artifact \u2014 Equipment",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "direct_external_protection_spell",
+      "card_level_cut_permission_now": false,
+      "card_name": "Boros Charm",
+      "cmc": 2.0,
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "next_evidence": "same_lane_value_safe_pair_before_candidate_copy",
+      "policy_required_evidence": [
+        "named_external_source_candidate_rows",
+        "local_identity_and_legality_check",
+        "target_deck_trace_or_negative_review_before_cut_consideration",
+        "same_lane_value_safe_pair_before_candidate_copy"
+      ],
+      "rerun_miner_allowed_for_card": false,
+      "scryfall_id": "2679d0dd-ba30-4a1c-b6a0-b3ac6c790496",
+      "selected_as_package_add": true,
+      "source_ids": [
+        "edhrec_kaalia_upgraded_demons_2026_07_05"
+      ],
+      "source_observation": "Named external source candidate for this nonpayoff same-lane role.",
+      "status": "external_source_candidate_already_selected_as_add_needs_pair_policy",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Instant",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "direct_external_haste_source",
+      "card_level_cut_permission_now": false,
+      "card_name": "Dragon Tempest",
+      "cmc": 2.0,
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "next_evidence": "review_external_nonpayoff_same_lane_source_candidate_locally",
+      "policy_required_evidence": [
+        "named_external_source_candidate_rows",
+        "local_identity_and_legality_check",
+        "target_deck_trace_or_negative_review_before_cut_consideration",
+        "same_lane_value_safe_pair_before_candidate_copy"
+      ],
+      "rerun_miner_allowed_for_card": false,
+      "scryfall_id": "b9bacb46-fd1d-459b-81c2-d7d08fe73848",
+      "selected_as_package_add": false,
+      "source_ids": [
+        "edhrec_kaalia_current_2026_07_05",
+        "draftsim_kaalia_deck_guide_2025"
+      ],
+      "source_observation": "Named external source candidate for this nonpayoff same-lane role.",
+      "status": "external_source_candidate_ready_for_local_source_lane_review",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Enchantment",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "direct_external_haste_source",
+      "card_level_cut_permission_now": false,
+      "card_name": "Bitter Reunion",
+      "cmc": null,
+      "current_deck_present": false,
+      "local_identity_found": false,
+      "next_evidence": "resolve_local_identity_before_source_lane_review",
+      "policy_required_evidence": [
+        "named_external_source_candidate_rows",
+        "local_identity_and_legality_check",
+        "target_deck_trace_or_negative_review_before_cut_consideration",
+        "same_lane_value_safe_pair_before_candidate_copy"
+      ],
+      "rerun_miner_allowed_for_card": false,
+      "scryfall_id": null,
+      "selected_as_package_add": false,
+      "source_ids": [
+        "edhrec_kaalia_hidden_gems_2026_07_05"
+      ],
+      "source_observation": "Named external source candidate for this nonpayoff same-lane role.",
+      "status": "external_source_candidate_needs_local_identity_resolution",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": null,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "external_attack_window_planeswalker_support",
+      "card_level_cut_permission_now": false,
+      "card_name": "Dihada, Binder of Wills",
+      "cmc": 4.0,
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "next_evidence": "review_external_nonpayoff_same_lane_source_candidate_locally",
+      "policy_required_evidence": [
+        "named_external_source_candidate_rows",
+        "local_identity_and_legality_check",
+        "target_deck_trace_or_negative_review_before_cut_consideration",
+        "same_lane_value_safe_pair_before_candidate_copy"
+      ],
+      "rerun_miner_allowed_for_card": false,
+      "scryfall_id": "d326de4d-6157-4586-91b8-5668e1381ac3",
+      "selected_as_package_add": false,
+      "source_ids": [
+        "flipside_kaalia_deck_tech_2026"
+      ],
+      "source_observation": "Named external source candidate for this nonpayoff same-lane role.",
+      "status": "external_source_candidate_ready_for_local_source_lane_review",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Legendary Planeswalker \u2014 Dihada",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "direct_external_mana_rock_staple",
+      "card_level_cut_permission_now": false,
+      "card_name": "Arcane Signet",
+      "cmc": 2.0,
+      "current_deck_present": true,
+      "local_identity_found": true,
+      "next_evidence": "target_deck_trace_or_negative_review_before_cut_consideration",
+      "policy_required_evidence": [
+        "named_external_source_candidate_rows",
+        "local_identity_and_legality_check",
+        "target_deck_trace_or_negative_review_before_cut_consideration",
+        "same_lane_value_safe_pair_before_candidate_copy"
+      ],
+      "rerun_miner_allowed_for_card": false,
+      "scryfall_id": "0bc7f093-bef0-4f1a-852c-4b75ebf54838",
+      "selected_as_package_add": false,
+      "source_ids": [
+        "edhrec_kaalia_current_2026_07_05",
+        "wizards_commander_brackets_2026_02_09"
+      ],
+      "source_observation": "Named external source candidate for this nonpayoff same-lane role.",
+      "status": "external_source_candidate_already_in_current_deck_needs_trace_policy",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Artifact",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "external_repeatable_land_ramp_source",
+      "card_level_cut_permission_now": false,
+      "card_name": "Sword of the Animist",
+      "cmc": 2.0,
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "next_evidence": "review_external_nonpayoff_same_lane_source_candidate_locally",
+      "policy_required_evidence": [
+        "named_external_source_candidate_rows",
+        "local_identity_and_legality_check",
+        "target_deck_trace_or_negative_review_before_cut_consideration",
+        "same_lane_value_safe_pair_before_candidate_copy"
+      ],
+      "rerun_miner_allowed_for_card": false,
+      "scryfall_id": "d79cbc61-6c15-48ea-bbba-3cffb819ccba",
+      "selected_as_package_add": false,
+      "source_ids": [
+        "edhrec_kaalia_current_2026_07_05"
+      ],
+      "source_observation": "Named external source candidate for this nonpayoff same-lane role.",
+      "status": "external_source_candidate_ready_for_local_source_lane_review",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Legendary Artifact \u2014 Equipment",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "external_treasure_or_selection_support",
+      "card_level_cut_permission_now": false,
+      "card_name": "Dihada, Binder of Wills",
+      "cmc": 4.0,
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "next_evidence": "review_external_nonpayoff_same_lane_source_candidate_locally",
+      "policy_required_evidence": [
+        "named_external_source_candidate_rows",
+        "local_identity_and_legality_check",
+        "target_deck_trace_or_negative_review_before_cut_consideration",
+        "same_lane_value_safe_pair_before_candidate_copy"
+      ],
+      "rerun_miner_allowed_for_card": false,
+      "scryfall_id": "d326de4d-6157-4586-91b8-5668e1381ac3",
+      "selected_as_package_add": false,
+      "source_ids": [
+        "flipside_kaalia_deck_tech_2026"
+      ],
+      "source_observation": "Named external source candidate for this nonpayoff same-lane role.",
+      "status": "external_source_candidate_ready_for_local_source_lane_review",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Legendary Planeswalker \u2014 Dihada",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "external_fast_mana_context",
+      "card_level_cut_permission_now": false,
+      "card_name": "Simian Spirit Guide",
+      "cmc": 3.0,
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "next_evidence": "review_external_nonpayoff_same_lane_source_candidate_locally",
+      "policy_required_evidence": [
+        "named_external_source_candidate_rows",
+        "local_identity_and_legality_check",
+        "target_deck_trace_or_negative_review_before_cut_consideration",
+        "same_lane_value_safe_pair_before_candidate_copy"
+      ],
+      "rerun_miner_allowed_for_card": false,
+      "scryfall_id": "44e0ffa3-8915-4c1f-8f1a-4aeea1365f07",
+      "selected_as_package_add": false,
+      "source_ids": [
+        "wizards_commander_brackets_2026_02_09"
+      ],
+      "source_observation": "Named external source candidate for this nonpayoff same-lane role.",
+      "status": "external_source_candidate_ready_for_local_source_lane_review",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Creature \u2014 Ape Spirit",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "direct_external_mana_rock_staple",
+      "card_level_cut_permission_now": false,
+      "card_name": "Fellwar Stone",
+      "cmc": 2.0,
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "next_evidence": "same_lane_value_safe_pair_before_candidate_copy",
+      "policy_required_evidence": [
+        "named_external_source_candidate_rows",
+        "local_identity_and_legality_check",
+        "target_deck_trace_or_negative_review_before_cut_consideration",
+        "same_lane_value_safe_pair_before_candidate_copy"
+      ],
+      "rerun_miner_allowed_for_card": false,
+      "scryfall_id": "95560508-7ac9-4be9-8a3f-3c7d5b52807b",
+      "selected_as_package_add": true,
+      "source_ids": [
+        "edhrec_kaalia_current_2026_07_05"
+      ],
+      "source_observation": "Named external source candidate for this nonpayoff same-lane role.",
+      "status": "external_source_candidate_already_selected_as_add_needs_pair_policy",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Artifact",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "direct_external_tutor_staple",
+      "card_level_cut_permission_now": false,
+      "card_name": "Demonic Tutor",
+      "cmc": 2.0,
+      "current_deck_present": true,
+      "local_identity_found": true,
+      "next_evidence": "target_deck_trace_or_negative_review_before_cut_consideration",
+      "policy_required_evidence": [
+        "named_external_source_candidate_rows",
+        "local_identity_and_legality_check",
+        "target_deck_trace_or_negative_review_before_cut_consideration",
+        "same_lane_value_safe_pair_before_candidate_copy"
+      ],
+      "rerun_miner_allowed_for_card": false,
+      "scryfall_id": "82004860-e589-4e38-8d61-8c0210e4ea39",
+      "selected_as_package_add": false,
+      "source_ids": [
+        "edhrec_kaalia_current_2026_07_05",
+        "edhrec_kaalia_combos_2026_07_05"
+      ],
+      "source_observation": "Named external source candidate for this nonpayoff same-lane role.",
+      "status": "external_source_candidate_already_in_current_deck_needs_trace_policy",
+      "target_cut_role": "tutors_access",
+      "type_line": "Sorcery",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "direct_external_tutor_staple",
+      "card_level_cut_permission_now": false,
+      "card_name": "Enlightened Tutor",
+      "cmc": 1.0,
+      "current_deck_present": true,
+      "local_identity_found": true,
+      "next_evidence": "target_deck_trace_or_negative_review_before_cut_consideration",
+      "policy_required_evidence": [
+        "named_external_source_candidate_rows",
+        "local_identity_and_legality_check",
+        "target_deck_trace_or_negative_review_before_cut_consideration",
+        "same_lane_value_safe_pair_before_candidate_copy"
+      ],
+      "rerun_miner_allowed_for_card": false,
+      "scryfall_id": "c5229c17-b7be-4b05-b683-f2277edc4849",
+      "selected_as_package_add": false,
+      "source_ids": [
+        "edhrec_kaalia_current_2026_07_05",
+        "edhrec_kaalia_combos_2026_07_05"
+      ],
+      "source_observation": "Named external source candidate for this nonpayoff same-lane role.",
+      "status": "external_source_candidate_already_in_current_deck_needs_trace_policy",
+      "target_cut_role": "tutors_access",
+      "type_line": "Instant",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "direct_external_tutor_staple",
+      "card_level_cut_permission_now": false,
+      "card_name": "Vampiric Tutor",
+      "cmc": 1.0,
+      "current_deck_present": true,
+      "local_identity_found": true,
+      "next_evidence": "target_deck_trace_or_negative_review_before_cut_consideration",
+      "policy_required_evidence": [
+        "named_external_source_candidate_rows",
+        "local_identity_and_legality_check",
+        "target_deck_trace_or_negative_review_before_cut_consideration",
+        "same_lane_value_safe_pair_before_candidate_copy"
+      ],
+      "rerun_miner_allowed_for_card": false,
+      "scryfall_id": "ededbdae-d9dc-4206-9335-d7158f2d7700",
+      "selected_as_package_add": false,
+      "source_ids": [
+        "edhrec_kaalia_current_2026_07_05",
+        "edhrec_kaalia_combos_2026_07_05"
+      ],
+      "source_observation": "Named external source candidate for this nonpayoff same-lane role.",
+      "status": "external_source_candidate_already_in_current_deck_needs_trace_policy",
+      "target_cut_role": "tutors_access",
+      "type_line": "Instant",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "direct_external_tutor_staple",
+      "card_level_cut_permission_now": false,
+      "card_name": "Diabolic Intent",
+      "cmc": 2.0,
+      "current_deck_present": true,
+      "local_identity_found": true,
+      "next_evidence": "target_deck_trace_or_negative_review_before_cut_consideration",
+      "policy_required_evidence": [
+        "named_external_source_candidate_rows",
+        "local_identity_and_legality_check",
+        "target_deck_trace_or_negative_review_before_cut_consideration",
+        "same_lane_value_safe_pair_before_candidate_copy"
+      ],
+      "rerun_miner_allowed_for_card": false,
+      "scryfall_id": "038519b9-bca8-4b27-b5ac-2409595469d0",
+      "selected_as_package_add": false,
+      "source_ids": [
+        "edhrec_kaalia_current_2026_07_05",
+        "edhrec_kaalia_combos_2026_07_05"
+      ],
+      "source_observation": "Named external source candidate for this nonpayoff same-lane role.",
+      "status": "external_source_candidate_already_in_current_deck_needs_trace_policy",
+      "target_cut_role": "tutors_access",
+      "type_line": "Sorcery",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "external_tutor_or_access_staple",
+      "card_level_cut_permission_now": false,
+      "card_name": "Gamble",
+      "cmc": 1.0,
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "next_evidence": "same_lane_value_safe_pair_before_candidate_copy",
+      "policy_required_evidence": [
+        "named_external_source_candidate_rows",
+        "local_identity_and_legality_check",
+        "target_deck_trace_or_negative_review_before_cut_consideration",
+        "same_lane_value_safe_pair_before_candidate_copy"
+      ],
+      "rerun_miner_allowed_for_card": false,
+      "scryfall_id": "a54f0869-94c8-42af-9080-166efb9486a4",
+      "selected_as_package_add": true,
+      "source_ids": [
+        "edhrec_kaalia_current_2026_07_05"
+      ],
+      "source_observation": "Named external source candidate for this nonpayoff same-lane role.",
+      "status": "external_source_candidate_already_selected_as_add_needs_pair_policy",
+      "target_cut_role": "tutors_access",
+      "type_line": "Sorcery",
+      "value_safe_reclassification_allowed": false
+    }
+  ],
+  "source_db_mutated": false,
+  "status": "external_nonpayoff_same_lane_source_candidates_discovered_no_cut_permission",
+  "summary": {
+    "candidate_copy_blocker_count": 4,
+    "candidate_count_by_role": {
+      "haste_protection_silence": 6,
+      "mana_acceleration": 5,
+      "tutors_access": 5
+    },
+    "card_level_cut_permission_count": 0,
+    "commander": "Kaalia of the Vast",
+    "current_deck_present_count": 6,
+    "deck_id": "619",
+    "local_identity_found_count": 15,
+    "next_gate": "review_external_nonpayoff_same_lane_source_candidates_locally_before_miner",
+    "outside_current_deck_count": 10,
+    "rerun_miner_allowed_card_count": 0,
+    "role_count": 3,
+    "selected_as_package_add_count": 4,
+    "source_candidate_count": 16,
+    "status_counts": {
+      "external_source_candidate_already_in_current_deck_needs_trace_policy": 6,
+      "external_source_candidate_already_selected_as_add_needs_pair_policy": 4,
+      "external_source_candidate_needs_local_identity_resolution": 1,
+      "external_source_candidate_ready_for_local_source_lane_review": 5
+    }
+  },
+  "value_safe_reclassification_allowed_now": false
+}

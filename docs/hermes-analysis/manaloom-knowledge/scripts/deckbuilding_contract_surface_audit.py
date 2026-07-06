@@ -240,6 +240,12 @@ GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_SAME_LANE_CUT_POLICY_MAPPER = (
 GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_SAME_LANE_CUT_POLICY_MAPPER_TEST = (
     SCRIPT_DIR / "test_global_commander_external_nonpayoff_same_lane_cut_policy_mapper.py"
 )
+GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_SAME_LANE_SOURCE_CANDIDATE_DISCOVERER = (
+    SCRIPT_DIR / "global_commander_external_nonpayoff_same_lane_source_candidate_discoverer.py"
+)
+GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_SAME_LANE_SOURCE_CANDIDATE_DISCOVERER_TEST = (
+    SCRIPT_DIR / "test_global_commander_external_nonpayoff_same_lane_source_candidate_discoverer.py"
+)
 README = REPO_ROOT / "docs/hermes-analysis/README.md"
 
 CONTRACT_MATRIX_JSON = (
@@ -513,6 +519,10 @@ GLOBAL_COMMANDER_SCOPE1_EXTERNAL_NONPAYOFF_SAME_LANE_CUT_CORPUS_COLLECTOR_REPORT
 GLOBAL_COMMANDER_SCOPE1_EXTERNAL_NONPAYOFF_SAME_LANE_CUT_POLICY_MAPPER_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_same_lane_cut_policy_mapper_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+)
+GLOBAL_COMMANDER_SCOPE1_EXTERNAL_NONPAYOFF_SAME_LANE_SOURCE_CANDIDATE_DISCOVERER_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_same_lane_source_candidate_discoverer_20260705_kaalia_value_safe_stage1_repair_scope1.md"
 )
 
 REQUIRED_FOCUS_CARDS = {
@@ -894,6 +904,10 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_external_nonpayoff_same_lane_cut_policy_mapper_20260705_kaalia_value_safe_stage1_repair_scope1.md",
                 "external_nonpayoff_same_lane_policy_ready_no_cut_permission",
                 "discover_external_nonpayoff_same_lane_source_candidates_before_miner",
+                "global_commander_external_nonpayoff_same_lane_source_candidate_discoverer.py",
+                "global_commander_external_nonpayoff_same_lane_source_candidate_discoverer_20260705_kaalia_value_safe_stage1_repair_scope1.md",
+                "external_nonpayoff_same_lane_source_candidates_discovered_no_cut_permission",
+                "review_external_nonpayoff_same_lane_source_candidates_locally_before_miner",
                 "battle_gate_allowed_now",
                 "Path to Exile",
                 "Terminate",
@@ -1214,6 +1228,9 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_external_nonpayoff_same_lane_cut_policy_mapper_20260705_kaalia_value_safe_stage1_repair_scope1.md",
                 "external_nonpayoff_same_lane_policy_ready_no_cut_permission",
                 "discover_external_nonpayoff_same_lane_source_candidates_before_miner",
+                "global_commander_external_nonpayoff_same_lane_source_candidate_discoverer_20260705_kaalia_value_safe_stage1_repair_scope1.md",
+                "external_nonpayoff_same_lane_source_candidates_discovered_no_cut_permission",
+                "review_external_nonpayoff_same_lane_source_candidates_locally_before_miner",
                 "battle_gate_allowed_now=false",
                 "Path to Exile",
                 "Terminate",
@@ -2120,6 +2137,33 @@ def build_audit() -> dict[str, Any]:
                 "test_fresh_sources_block_policy_until_trace",
                 "external_nonpayoff_same_lane_policy_ready_no_cut_permission",
                 "discover_external_nonpayoff_same_lane_source_candidates_before_miner",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_SAME_LANE_SOURCE_CANDIDATE_DISCOVERER,
+            [
+                "global_commander_external_nonpayoff_same_lane_source_candidate_discoverer",
+                "external_nonpayoff_same_lane_source_candidates_discovered_no_cut_permission",
+                "external_source_candidate_already_in_current_deck_needs_trace_policy",
+                "external_source_candidate_ready_for_local_source_lane_review",
+                "review_external_nonpayoff_same_lane_source_candidates_locally_before_miner",
+                "card_level_cut_permission_now",
+                "candidate_copy_allowed_now",
+                "value_safe_reclassification_allowed_now",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_SAME_LANE_SOURCE_CANDIDATE_DISCOVERER_TEST,
+            [
+                "test_discovers_named_candidates_without_cut_permission",
+                "test_non_discovery_policy_roles_are_skipped",
+                "external_nonpayoff_same_lane_source_candidates_discovered_no_cut_permission",
+                "external_source_candidate_already_in_current_deck_needs_trace_policy",
+                "external_source_candidate_ready_for_local_source_lane_review",
             ],
         )
     )
@@ -3359,6 +3403,27 @@ def build_audit() -> dict[str, Any]:
                 "haste_protection_silence",
                 "mana_acceleration",
                 "tutors_access",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SCOPE1_EXTERNAL_NONPAYOFF_SAME_LANE_SOURCE_CANDIDATE_DISCOVERER_REPORT,
+            [
+                "Global Commander External Nonpayoff Same-Lane Source Candidate Discoverer",
+                "external_nonpayoff_same_lane_source_candidates_discovered_no_cut_permission",
+                "source_candidate_count: `16`",
+                "role_count: `3`",
+                "current_deck_present_count: `6`",
+                "outside_current_deck_count: `10`",
+                "local_identity_found_count: `15`",
+                "selected_as_package_add_count: `4`",
+                "card_level_cut_permission_count: `0`",
+                "candidate_copy_allowed_now: `false`",
+                "review_external_nonpayoff_same_lane_source_candidates_locally_before_miner",
+                "Lightning Greaves",
+                "Swiftfoot Boots",
+                "Gamble",
             ],
         )
     )

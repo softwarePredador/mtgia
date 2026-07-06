@@ -697,6 +697,14 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `rerun_miner_allowed_role_count=0` e
     `card_level_cut_permission_count=0`. O proximo gate e
     `discover_external_nonpayoff_same_lane_source_candidates_before_miner`.
+    O descobridor de candidatos externos/nonpayoff fica em
+    `global_commander_external_nonpayoff_same_lane_source_candidate_discoverer_20260705_kaalia_value_safe_stage1_repair_scope1.md`.
+    Resultado: `external_nonpayoff_same_lane_source_candidates_discovered_no_cut_permission`,
+    com `source_candidate_count=16`, `role_count=3`,
+    `current_deck_present_count=6`, `outside_current_deck_count=10`,
+    `local_identity_found_count=15`, `selected_as_package_add_count=4` e
+    `card_level_cut_permission_count=0`. O proximo gate e
+    `review_external_nonpayoff_same_lane_source_candidates_locally_before_miner`.
     Observacao operacional: snapshots historicos de candidate-copy, battle-probe,
     battle-feedback e package-chain dependem de artefatos locais ignorados. Se
     faltarem ou forem regenerados sem esses artefatos, a auditoria de superficie

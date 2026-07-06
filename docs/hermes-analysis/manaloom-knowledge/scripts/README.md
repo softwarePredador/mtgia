@@ -243,6 +243,14 @@ source-discovery policy and requires named external source candidates before
 any miner rerun. It still does not create card-level cut permission, candidate
 copy, battle, promotion, or value-safe reclassification.
 
+Then run `global_commander_external_nonpayoff_same_lane_source_candidate_discoverer.py`
+after external nonpayoff policy mapping. It converts only eligible role-level
+source-discovery policy into named source-candidate rows and classifies whether
+each card is already in the current deck, already in the held package, locally
+resolved, or still unresolved. Named candidates are source-lane evidence only;
+card-level cut permission, candidate copy, battle, promotion, and value-safe
+reclassification remain closed.
+
 ## XMage Authoritative Adaptation
 
 For all-card battle-rule acceleration, use local XMage as the authoritative
