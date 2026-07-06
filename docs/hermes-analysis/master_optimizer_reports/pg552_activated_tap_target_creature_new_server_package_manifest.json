@@ -1,0 +1,1897 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg552_activated_tap_target_creature_new_20260706_052155",
+  "deploy_id": "pg552_activated_tap_target_creature_new_server",
+  "execution_scenarios": [
+    {
+      "card": {
+        "name": "Akroan Jailer"
+      },
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 2,
+        "green": 0,
+        "red": 0,
+        "white": 1
+      },
+      "expected_tapped_source": true,
+      "expected_target": "creature",
+      "logical_rule_key": "battle_rule_v1:ed9ab618dc824b90a192ac472d5e1fc3",
+      "name": "Akroan Jailer activates tap target ability",
+      "type": "simple_activated_tap_target"
+    },
+    {
+      "card": {
+        "name": "Akroan Mastiff"
+      },
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 0,
+        "green": 0,
+        "red": 0,
+        "white": 1
+      },
+      "expected_tapped_source": true,
+      "expected_target": "creature",
+      "logical_rule_key": "battle_rule_v1:872ba81bfcbb932c8efaf4d38c65bf95",
+      "name": "Akroan Mastiff activates tap target ability",
+      "type": "simple_activated_tap_target"
+    },
+    {
+      "card": {
+        "name": "Blinding Mage"
+      },
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 0,
+        "green": 0,
+        "red": 0,
+        "white": 1
+      },
+      "expected_tapped_source": true,
+      "expected_target": "creature",
+      "logical_rule_key": "battle_rule_v1:872ba81bfcbb932c8efaf4d38c65bf95",
+      "name": "Blinding Mage activates tap target ability",
+      "type": "simple_activated_tap_target"
+    },
+    {
+      "card": {
+        "name": "Checkpoint Officer"
+      },
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 1,
+        "green": 0,
+        "red": 0,
+        "white": 1
+      },
+      "expected_tapped_source": true,
+      "expected_target": "creature",
+      "logical_rule_key": "battle_rule_v1:50fc34be177c08978c487ef63a8b9577",
+      "name": "Checkpoint Officer activates tap target ability",
+      "type": "simple_activated_tap_target"
+    },
+    {
+      "card": {
+        "name": "Elite Arrester"
+      },
+      "controller_mana": {
+        "black": 0,
+        "blue": 1,
+        "generic": 1,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_tapped_source": true,
+      "expected_target": "creature",
+      "logical_rule_key": "battle_rule_v1:053f80926e5a3504db85ee6863cfacff",
+      "name": "Elite Arrester activates tap target ability",
+      "type": "simple_activated_tap_target"
+    },
+    {
+      "card": {
+        "name": "Fan Bearer"
+      },
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 2,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_tapped_source": true,
+      "expected_target": "creature",
+      "logical_rule_key": "battle_rule_v1:bfb6c9cae4f0e752ef8eafa65cb5ef58",
+      "name": "Fan Bearer activates tap target ability",
+      "type": "simple_activated_tap_target"
+    },
+    {
+      "card": {
+        "name": "Frostbridge Guard"
+      },
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 2,
+        "green": 0,
+        "red": 0,
+        "white": 1
+      },
+      "expected_tapped_source": true,
+      "expected_target": "creature",
+      "logical_rule_key": "battle_rule_v1:ed9ab618dc824b90a192ac472d5e1fc3",
+      "name": "Frostbridge Guard activates tap target ability",
+      "type": "simple_activated_tap_target"
+    },
+    {
+      "card": {
+        "name": "Gavony Trapper"
+      },
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 2,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_tapped_source": true,
+      "expected_target": "creature",
+      "logical_rule_key": "battle_rule_v1:bfb6c9cae4f0e752ef8eafa65cb5ef58",
+      "name": "Gavony Trapper activates tap target ability",
+      "type": "simple_activated_tap_target"
+    },
+    {
+      "card": {
+        "name": "Goldmeadow Harrier"
+      },
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 0,
+        "green": 0,
+        "red": 0,
+        "white": 1
+      },
+      "expected_tapped_source": true,
+      "expected_target": "creature",
+      "logical_rule_key": "battle_rule_v1:872ba81bfcbb932c8efaf4d38c65bf95",
+      "name": "Goldmeadow Harrier activates tap target ability",
+      "type": "simple_activated_tap_target"
+    },
+    {
+      "card": {
+        "name": "Nebelgast Beguiler"
+      },
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 0,
+        "green": 0,
+        "red": 0,
+        "white": 1
+      },
+      "expected_tapped_source": true,
+      "expected_target": "creature",
+      "logical_rule_key": "battle_rule_v1:872ba81bfcbb932c8efaf4d38c65bf95",
+      "name": "Nebelgast Beguiler activates tap target ability",
+      "type": "simple_activated_tap_target"
+    },
+    {
+      "card": {
+        "name": "Rathi Trapper"
+      },
+      "controller_mana": {
+        "black": 1,
+        "blue": 0,
+        "generic": 0,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_tapped_source": true,
+      "expected_target": "creature",
+      "logical_rule_key": "battle_rule_v1:180efc6b0638d4008d56fc8e745afe23",
+      "name": "Rathi Trapper activates tap target ability",
+      "type": "simple_activated_tap_target"
+    },
+    {
+      "card": {
+        "name": "Trip Noose"
+      },
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 2,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_tapped_source": true,
+      "expected_target": "creature",
+      "logical_rule_key": "battle_rule_v1:6c83d6f9677e2353221c70419597e18d",
+      "name": "Trip Noose activates tap target ability",
+      "type": "simple_activated_tap_target"
+    },
+    {
+      "card": {
+        "name": "Tyrant's Machine"
+      },
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 4,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_tapped_source": true,
+      "expected_target": "creature",
+      "logical_rule_key": "battle_rule_v1:aae0f01b2713fb6dc5aef5c2785ab861",
+      "name": "Tyrant's Machine activates tap target ability",
+      "type": "simple_activated_tap_target"
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Akroan Jailer",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ed9ab618dc824b90a192ac472d5e1fc3",
+      "min_rule_version": 2,
+      "normalized_name": "akroan jailer",
+      "oracle_hash": "c929f851b4fdda8e236cff1b581e868c",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "tap_target",
+            "activated_tap_target": "creature",
+            "activation_cost_colors": [
+              "W"
+            ],
+            "activation_cost_generic": 2,
+            "activation_cost_mana": "{2}{W}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+            "effect": "tap_target",
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "TapTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+        "activated_effect": "tap_target",
+        "activated_tap_target": "creature",
+        "activation_cost_colors": [
+          "W"
+        ],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}{W}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+        "effect": "creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "TapTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Akroan Mastiff",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:872ba81bfcbb932c8efaf4d38c65bf95",
+      "min_rule_version": 2,
+      "normalized_name": "akroan mastiff",
+      "oracle_hash": "395ee92e1d81b2dd12ea924bf8824740",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "tap_target",
+            "activated_tap_target": "creature",
+            "activation_cost_colors": [
+              "W"
+            ],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{W}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+            "effect": "tap_target",
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "TapTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+        "activated_effect": "tap_target",
+        "activated_tap_target": "creature",
+        "activation_cost_colors": [
+          "W"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{W}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+        "effect": "creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "TapTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Blinding Mage",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:872ba81bfcbb932c8efaf4d38c65bf95",
+      "min_rule_version": 2,
+      "normalized_name": "blinding mage",
+      "oracle_hash": "395ee92e1d81b2dd12ea924bf8824740",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "tap_target",
+            "activated_tap_target": "creature",
+            "activation_cost_colors": [
+              "W"
+            ],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{W}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+            "effect": "tap_target",
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "TapTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+        "activated_effect": "tap_target",
+        "activated_tap_target": "creature",
+        "activation_cost_colors": [
+          "W"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{W}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+        "effect": "creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "TapTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Checkpoint Officer",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:50fc34be177c08978c487ef63a8b9577",
+      "min_rule_version": 2,
+      "normalized_name": "checkpoint officer",
+      "oracle_hash": "ca234b277c0d6e4ed6d2cbf7a4a5ab71",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "tap_target",
+            "activated_tap_target": "creature",
+            "activation_cost_colors": [
+              "W"
+            ],
+            "activation_cost_generic": 1,
+            "activation_cost_mana": "{1}{W}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+            "effect": "tap_target",
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "TapTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+        "activated_effect": "tap_target",
+        "activated_tap_target": "creature",
+        "activation_cost_colors": [
+          "W"
+        ],
+        "activation_cost_generic": 1,
+        "activation_cost_mana": "{1}{W}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+        "effect": "creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "TapTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Elite Arrester",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:053f80926e5a3504db85ee6863cfacff",
+      "min_rule_version": 2,
+      "normalized_name": "elite arrester",
+      "oracle_hash": "1e967b03565eb8823dbd236bd46a6109",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "tap_target",
+            "activated_tap_target": "creature",
+            "activation_cost_colors": [
+              "U"
+            ],
+            "activation_cost_generic": 1,
+            "activation_cost_mana": "{1}{U}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+            "effect": "tap_target",
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "TapTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+        "activated_effect": "tap_target",
+        "activated_tap_target": "creature",
+        "activation_cost_colors": [
+          "U"
+        ],
+        "activation_cost_generic": 1,
+        "activation_cost_mana": "{1}{U}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+        "effect": "creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "TapTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Fan Bearer",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:bfb6c9cae4f0e752ef8eafa65cb5ef58",
+      "min_rule_version": 2,
+      "normalized_name": "fan bearer",
+      "oracle_hash": "0ce7ca7311d86a3436110c13d3c14ac3",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "tap_target",
+            "activated_tap_target": "creature",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 2,
+            "activation_cost_mana": "{2}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+            "effect": "tap_target",
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "TapTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+        "activated_effect": "tap_target",
+        "activated_tap_target": "creature",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+        "effect": "creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "TapTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Frostbridge Guard",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ed9ab618dc824b90a192ac472d5e1fc3",
+      "min_rule_version": 2,
+      "normalized_name": "frostbridge guard",
+      "oracle_hash": "c929f851b4fdda8e236cff1b581e868c",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "tap_target",
+            "activated_tap_target": "creature",
+            "activation_cost_colors": [
+              "W"
+            ],
+            "activation_cost_generic": 2,
+            "activation_cost_mana": "{2}{W}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+            "effect": "tap_target",
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "TapTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+        "activated_effect": "tap_target",
+        "activated_tap_target": "creature",
+        "activation_cost_colors": [
+          "W"
+        ],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}{W}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+        "effect": "creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "TapTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Gavony Trapper",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:bfb6c9cae4f0e752ef8eafa65cb5ef58",
+      "min_rule_version": 2,
+      "normalized_name": "gavony trapper",
+      "oracle_hash": "0ce7ca7311d86a3436110c13d3c14ac3",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "tap_target",
+            "activated_tap_target": "creature",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 2,
+            "activation_cost_mana": "{2}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+            "effect": "tap_target",
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "TapTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+        "activated_effect": "tap_target",
+        "activated_tap_target": "creature",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+        "effect": "creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "TapTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Goldmeadow Harrier",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:872ba81bfcbb932c8efaf4d38c65bf95",
+      "min_rule_version": 2,
+      "normalized_name": "goldmeadow harrier",
+      "oracle_hash": "395ee92e1d81b2dd12ea924bf8824740",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "tap_target",
+            "activated_tap_target": "creature",
+            "activation_cost_colors": [
+              "W"
+            ],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{W}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+            "effect": "tap_target",
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "TapTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+        "activated_effect": "tap_target",
+        "activated_tap_target": "creature",
+        "activation_cost_colors": [
+          "W"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{W}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+        "effect": "creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "TapTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Nebelgast Beguiler",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:872ba81bfcbb932c8efaf4d38c65bf95",
+      "min_rule_version": 2,
+      "normalized_name": "nebelgast beguiler",
+      "oracle_hash": "395ee92e1d81b2dd12ea924bf8824740",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "tap_target",
+            "activated_tap_target": "creature",
+            "activation_cost_colors": [
+              "W"
+            ],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{W}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+            "effect": "tap_target",
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "TapTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+        "activated_effect": "tap_target",
+        "activated_tap_target": "creature",
+        "activation_cost_colors": [
+          "W"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{W}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+        "effect": "creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "TapTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Rathi Trapper",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:180efc6b0638d4008d56fc8e745afe23",
+      "min_rule_version": 2,
+      "normalized_name": "rathi trapper",
+      "oracle_hash": "c56d4aac53005f5f2ce62437b2bd1ab3",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "tap_target",
+            "activated_tap_target": "creature",
+            "activation_cost_colors": [
+              "B"
+            ],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{B}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+            "effect": "tap_target",
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "TapTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+        "activated_effect": "tap_target",
+        "activated_tap_target": "creature",
+        "activation_cost_colors": [
+          "B"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{B}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+        "effect": "creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "TapTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Trip Noose",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6c83d6f9677e2353221c70419597e18d",
+      "min_rule_version": 2,
+      "normalized_name": "trip noose",
+      "oracle_hash": "0ce7ca7311d86a3436110c13d3c14ac3",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "tap_target",
+            "activated_tap_target": "creature",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 2,
+            "activation_cost_mana": "{2}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+            "effect": "tap_target",
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "TapTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+        "activated_effect": "tap_target",
+        "activated_tap_target": "creature",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+        "effect": "artifact",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "TapTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Tyrant's Machine",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:aae0f01b2713fb6dc5aef5c2785ab861",
+      "min_rule_version": 2,
+      "normalized_name": "tyrant's machine",
+      "oracle_hash": "8ac6483ddcdf43c0c35572203ef2da99",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "tap_target",
+            "activated_tap_target": "creature",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 4,
+            "activation_cost_mana": "{4}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+            "effect": "tap_target",
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "TapTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+        "activated_effect": "tap_target",
+        "activated_tap_target": "creature",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 4,
+        "activation_cost_mana": "{4}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+        "effect": "artifact",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "TapTargetEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_permanent_simple_activated_tap_target": 13
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg552_activated_tap_target_creature_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg552_activated_tap_target_creature_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg552_activated_tap_target_creature_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg552_activated_tap_target_creature_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg552_activated_tap_target_creature_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg552_activated_tap_target_creature_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-06T05:21:55+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Akroan Jailer"
+      },
+      "card_name": "Akroan Jailer",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ed9ab618dc824b90a192ac472d5e1fc3",
+      "normalized_name": "akroan jailer",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "tap_target",
+            "activated_tap_target": "creature",
+            "activation_cost_colors": [
+              "W"
+            ],
+            "activation_cost_generic": 2,
+            "activation_cost_mana": "{2}{W}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+            "effect": "tap_target",
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "TapTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+        "activated_effect": "tap_target",
+        "activated_tap_target": "creature",
+        "activation_cost_colors": [
+          "W"
+        ],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}{W}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+        "effect": "creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "TapTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Akroan Mastiff"
+      },
+      "card_name": "Akroan Mastiff",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:872ba81bfcbb932c8efaf4d38c65bf95",
+      "normalized_name": "akroan mastiff",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "tap_target",
+            "activated_tap_target": "creature",
+            "activation_cost_colors": [
+              "W"
+            ],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{W}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+            "effect": "tap_target",
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "TapTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+        "activated_effect": "tap_target",
+        "activated_tap_target": "creature",
+        "activation_cost_colors": [
+          "W"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{W}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+        "effect": "creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "TapTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Blinding Mage"
+      },
+      "card_name": "Blinding Mage",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:872ba81bfcbb932c8efaf4d38c65bf95",
+      "normalized_name": "blinding mage",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "tap_target",
+            "activated_tap_target": "creature",
+            "activation_cost_colors": [
+              "W"
+            ],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{W}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+            "effect": "tap_target",
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "TapTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+        "activated_effect": "tap_target",
+        "activated_tap_target": "creature",
+        "activation_cost_colors": [
+          "W"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{W}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+        "effect": "creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "TapTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Checkpoint Officer"
+      },
+      "card_name": "Checkpoint Officer",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:50fc34be177c08978c487ef63a8b9577",
+      "normalized_name": "checkpoint officer",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "tap_target",
+            "activated_tap_target": "creature",
+            "activation_cost_colors": [
+              "W"
+            ],
+            "activation_cost_generic": 1,
+            "activation_cost_mana": "{1}{W}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+            "effect": "tap_target",
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "TapTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+        "activated_effect": "tap_target",
+        "activated_tap_target": "creature",
+        "activation_cost_colors": [
+          "W"
+        ],
+        "activation_cost_generic": 1,
+        "activation_cost_mana": "{1}{W}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+        "effect": "creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "TapTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Elite Arrester"
+      },
+      "card_name": "Elite Arrester",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:053f80926e5a3504db85ee6863cfacff",
+      "normalized_name": "elite arrester",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "tap_target",
+            "activated_tap_target": "creature",
+            "activation_cost_colors": [
+              "U"
+            ],
+            "activation_cost_generic": 1,
+            "activation_cost_mana": "{1}{U}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+            "effect": "tap_target",
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "TapTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+        "activated_effect": "tap_target",
+        "activated_tap_target": "creature",
+        "activation_cost_colors": [
+          "U"
+        ],
+        "activation_cost_generic": 1,
+        "activation_cost_mana": "{1}{U}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+        "effect": "creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "TapTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Fan Bearer"
+      },
+      "card_name": "Fan Bearer",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:bfb6c9cae4f0e752ef8eafa65cb5ef58",
+      "normalized_name": "fan bearer",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "tap_target",
+            "activated_tap_target": "creature",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 2,
+            "activation_cost_mana": "{2}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+            "effect": "tap_target",
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "TapTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+        "activated_effect": "tap_target",
+        "activated_tap_target": "creature",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+        "effect": "creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "TapTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Frostbridge Guard"
+      },
+      "card_name": "Frostbridge Guard",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ed9ab618dc824b90a192ac472d5e1fc3",
+      "normalized_name": "frostbridge guard",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "tap_target",
+            "activated_tap_target": "creature",
+            "activation_cost_colors": [
+              "W"
+            ],
+            "activation_cost_generic": 2,
+            "activation_cost_mana": "{2}{W}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+            "effect": "tap_target",
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "TapTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+        "activated_effect": "tap_target",
+        "activated_tap_target": "creature",
+        "activation_cost_colors": [
+          "W"
+        ],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}{W}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+        "effect": "creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "TapTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Gavony Trapper"
+      },
+      "card_name": "Gavony Trapper",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:bfb6c9cae4f0e752ef8eafa65cb5ef58",
+      "normalized_name": "gavony trapper",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "tap_target",
+            "activated_tap_target": "creature",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 2,
+            "activation_cost_mana": "{2}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+            "effect": "tap_target",
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "TapTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+        "activated_effect": "tap_target",
+        "activated_tap_target": "creature",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+        "effect": "creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "TapTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Goldmeadow Harrier"
+      },
+      "card_name": "Goldmeadow Harrier",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:872ba81bfcbb932c8efaf4d38c65bf95",
+      "normalized_name": "goldmeadow harrier",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "tap_target",
+            "activated_tap_target": "creature",
+            "activation_cost_colors": [
+              "W"
+            ],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{W}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+            "effect": "tap_target",
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "TapTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+        "activated_effect": "tap_target",
+        "activated_tap_target": "creature",
+        "activation_cost_colors": [
+          "W"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{W}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+        "effect": "creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "TapTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Nebelgast Beguiler"
+      },
+      "card_name": "Nebelgast Beguiler",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:872ba81bfcbb932c8efaf4d38c65bf95",
+      "normalized_name": "nebelgast beguiler",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "tap_target",
+            "activated_tap_target": "creature",
+            "activation_cost_colors": [
+              "W"
+            ],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{W}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+            "effect": "tap_target",
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "TapTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+        "activated_effect": "tap_target",
+        "activated_tap_target": "creature",
+        "activation_cost_colors": [
+          "W"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{W}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+        "effect": "creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "TapTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Rathi Trapper"
+      },
+      "card_name": "Rathi Trapper",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:180efc6b0638d4008d56fc8e745afe23",
+      "normalized_name": "rathi trapper",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "tap_target",
+            "activated_tap_target": "creature",
+            "activation_cost_colors": [
+              "B"
+            ],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{B}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+            "effect": "tap_target",
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "TapTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+        "activated_effect": "tap_target",
+        "activated_tap_target": "creature",
+        "activation_cost_colors": [
+          "B"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{B}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+        "effect": "creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "TapTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Trip Noose"
+      },
+      "card_name": "Trip Noose",
+      "effect": "artifact",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6c83d6f9677e2353221c70419597e18d",
+      "normalized_name": "trip noose",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "tap_target",
+            "activated_tap_target": "creature",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 2,
+            "activation_cost_mana": "{2}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+            "effect": "tap_target",
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "TapTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+        "activated_effect": "tap_target",
+        "activated_tap_target": "creature",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+        "effect": "artifact",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "TapTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Tyrant's Machine"
+      },
+      "card_name": "Tyrant's Machine",
+      "effect": "artifact",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:aae0f01b2713fb6dc5aef5c2785ab861",
+      "normalized_name": "tyrant's machine",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "tap_target",
+            "activated_tap_target": "creature",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 4,
+            "activation_cost_mana": "{4}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+            "effect": "tap_target",
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "TapTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+        "activated_effect": "tap_target",
+        "activated_tap_target": "creature",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 4,
+        "activation_cost_mana": "{4}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+        "effect": "artifact",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "TapTargetEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Akroan Jailer",
+    "Akroan Mastiff",
+    "Blinding Mage",
+    "Checkpoint Officer",
+    "Elite Arrester",
+    "Fan Bearer",
+    "Frostbridge Guard",
+    "Gavony Trapper",
+    "Goldmeadow Harrier",
+    "Nebelgast Beguiler",
+    "Rathi Trapper",
+    "Trip Noose",
+    "Tyrant's Machine"
+  ],
+  "selected_count": 13,
+  "slug": "activated_tap_target_creature_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Akroan Jailer",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ed9ab618dc824b90a192ac472d5e1fc3",
+      "min_rule_version": 2,
+      "normalized_name": "akroan jailer",
+      "oracle_hash": "c929f851b4fdda8e236cff1b581e868c",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Akroan Mastiff",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:872ba81bfcbb932c8efaf4d38c65bf95",
+      "min_rule_version": 2,
+      "normalized_name": "akroan mastiff",
+      "oracle_hash": "395ee92e1d81b2dd12ea924bf8824740",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Blinding Mage",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:872ba81bfcbb932c8efaf4d38c65bf95",
+      "min_rule_version": 2,
+      "normalized_name": "blinding mage",
+      "oracle_hash": "395ee92e1d81b2dd12ea924bf8824740",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Checkpoint Officer",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:50fc34be177c08978c487ef63a8b9577",
+      "min_rule_version": 2,
+      "normalized_name": "checkpoint officer",
+      "oracle_hash": "ca234b277c0d6e4ed6d2cbf7a4a5ab71",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Elite Arrester",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:053f80926e5a3504db85ee6863cfacff",
+      "min_rule_version": 2,
+      "normalized_name": "elite arrester",
+      "oracle_hash": "1e967b03565eb8823dbd236bd46a6109",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Fan Bearer",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:bfb6c9cae4f0e752ef8eafa65cb5ef58",
+      "min_rule_version": 2,
+      "normalized_name": "fan bearer",
+      "oracle_hash": "0ce7ca7311d86a3436110c13d3c14ac3",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Frostbridge Guard",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ed9ab618dc824b90a192ac472d5e1fc3",
+      "min_rule_version": 2,
+      "normalized_name": "frostbridge guard",
+      "oracle_hash": "c929f851b4fdda8e236cff1b581e868c",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Gavony Trapper",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:bfb6c9cae4f0e752ef8eafa65cb5ef58",
+      "min_rule_version": 2,
+      "normalized_name": "gavony trapper",
+      "oracle_hash": "0ce7ca7311d86a3436110c13d3c14ac3",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Goldmeadow Harrier",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:872ba81bfcbb932c8efaf4d38c65bf95",
+      "min_rule_version": 2,
+      "normalized_name": "goldmeadow harrier",
+      "oracle_hash": "395ee92e1d81b2dd12ea924bf8824740",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Nebelgast Beguiler",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:872ba81bfcbb932c8efaf4d38c65bf95",
+      "min_rule_version": 2,
+      "normalized_name": "nebelgast beguiler",
+      "oracle_hash": "395ee92e1d81b2dd12ea924bf8824740",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Rathi Trapper",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:180efc6b0638d4008d56fc8e745afe23",
+      "min_rule_version": 2,
+      "normalized_name": "rathi trapper",
+      "oracle_hash": "c56d4aac53005f5f2ce62437b2bd1ab3",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Trip Noose",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6c83d6f9677e2353221c70419597e18d",
+      "min_rule_version": 2,
+      "normalized_name": "trip noose",
+      "oracle_hash": "0ce7ca7311d86a3436110c13d3c14ac3",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Tyrant's Machine",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:aae0f01b2713fb6dc5aef5c2785ab861",
+      "min_rule_version": 2,
+      "normalized_name": "tyrant's machine",
+      "oracle_hash": "8ac6483ddcdf43c0c35572203ef2da99",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

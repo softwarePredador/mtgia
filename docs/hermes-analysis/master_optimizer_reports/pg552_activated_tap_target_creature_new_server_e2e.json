@@ -1,0 +1,596 @@
+{
+  "battle_execution": {
+    "event_count": 26,
+    "results": [
+      {
+        "card_name": "Akroan Jailer",
+        "scenario": "Akroan Jailer activates tap target ability",
+        "source_tapped": true,
+        "target": "E2E Creature Target for Akroan Jailer",
+        "target_tapped": true
+      },
+      {
+        "card_name": "Akroan Mastiff",
+        "scenario": "Akroan Mastiff activates tap target ability",
+        "source_tapped": true,
+        "target": "E2E Creature Target for Akroan Mastiff",
+        "target_tapped": true
+      },
+      {
+        "card_name": "Blinding Mage",
+        "scenario": "Blinding Mage activates tap target ability",
+        "source_tapped": true,
+        "target": "E2E Creature Target for Blinding Mage",
+        "target_tapped": true
+      },
+      {
+        "card_name": "Checkpoint Officer",
+        "scenario": "Checkpoint Officer activates tap target ability",
+        "source_tapped": true,
+        "target": "E2E Creature Target for Checkpoint Officer",
+        "target_tapped": true
+      },
+      {
+        "card_name": "Elite Arrester",
+        "scenario": "Elite Arrester activates tap target ability",
+        "source_tapped": true,
+        "target": "E2E Creature Target for Elite Arrester",
+        "target_tapped": true
+      },
+      {
+        "card_name": "Fan Bearer",
+        "scenario": "Fan Bearer activates tap target ability",
+        "source_tapped": true,
+        "target": "E2E Creature Target for Fan Bearer",
+        "target_tapped": true
+      },
+      {
+        "card_name": "Frostbridge Guard",
+        "scenario": "Frostbridge Guard activates tap target ability",
+        "source_tapped": true,
+        "target": "E2E Creature Target for Frostbridge Guard",
+        "target_tapped": true
+      },
+      {
+        "card_name": "Gavony Trapper",
+        "scenario": "Gavony Trapper activates tap target ability",
+        "source_tapped": true,
+        "target": "E2E Creature Target for Gavony Trapper",
+        "target_tapped": true
+      },
+      {
+        "card_name": "Goldmeadow Harrier",
+        "scenario": "Goldmeadow Harrier activates tap target ability",
+        "source_tapped": true,
+        "target": "E2E Creature Target for Goldmeadow Harrier",
+        "target_tapped": true
+      },
+      {
+        "card_name": "Nebelgast Beguiler",
+        "scenario": "Nebelgast Beguiler activates tap target ability",
+        "source_tapped": true,
+        "target": "E2E Creature Target for Nebelgast Beguiler",
+        "target_tapped": true
+      },
+      {
+        "card_name": "Rathi Trapper",
+        "scenario": "Rathi Trapper activates tap target ability",
+        "source_tapped": true,
+        "target": "E2E Creature Target for Rathi Trapper",
+        "target_tapped": true
+      },
+      {
+        "card_name": "Trip Noose",
+        "scenario": "Trip Noose activates tap target ability",
+        "source_tapped": true,
+        "target": "E2E Creature Target for Trip Noose",
+        "target_tapped": true
+      },
+      {
+        "card_name": "Tyrant's Machine",
+        "scenario": "Tyrant's Machine activates tap target ability",
+        "source_tapped": true,
+        "target": "E2E Creature Target for Tyrant's Machine",
+        "target_tapped": true
+      }
+    ],
+    "scenario_count": 13
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-06T05:25:21.435784+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg552_activated_tap_target_creature_new_server_package_manifest.json",
+  "package_id": "pg552_activated_tap_target_creature_new_server_package_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 13
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+          "card_name": "Akroan Jailer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ed9ab618dc824b90a192ac472d5e1fc3",
+          "oracle_hash": "c929f851b4fdda8e236cff1b581e868c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+          "card_name": "Akroan Mastiff",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:872ba81bfcbb932c8efaf4d38c65bf95",
+          "oracle_hash": "395ee92e1d81b2dd12ea924bf8824740",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+          "card_name": "Blinding Mage",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:872ba81bfcbb932c8efaf4d38c65bf95",
+          "oracle_hash": "395ee92e1d81b2dd12ea924bf8824740",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+          "card_name": "Checkpoint Officer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:50fc34be177c08978c487ef63a8b9577",
+          "oracle_hash": "ca234b277c0d6e4ed6d2cbf7a4a5ab71",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+          "card_name": "Elite Arrester",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:053f80926e5a3504db85ee6863cfacff",
+          "oracle_hash": "1e967b03565eb8823dbd236bd46a6109",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+          "card_name": "Fan Bearer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:bfb6c9cae4f0e752ef8eafa65cb5ef58",
+          "oracle_hash": "0ce7ca7311d86a3436110c13d3c14ac3",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+          "card_name": "Frostbridge Guard",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ed9ab618dc824b90a192ac472d5e1fc3",
+          "oracle_hash": "c929f851b4fdda8e236cff1b581e868c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+          "card_name": "Gavony Trapper",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:bfb6c9cae4f0e752ef8eafa65cb5ef58",
+          "oracle_hash": "0ce7ca7311d86a3436110c13d3c14ac3",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+          "card_name": "Goldmeadow Harrier",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:872ba81bfcbb932c8efaf4d38c65bf95",
+          "oracle_hash": "395ee92e1d81b2dd12ea924bf8824740",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+          "card_name": "Nebelgast Beguiler",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:872ba81bfcbb932c8efaf4d38c65bf95",
+          "oracle_hash": "395ee92e1d81b2dd12ea924bf8824740",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+          "card_name": "Rathi Trapper",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:180efc6b0638d4008d56fc8e745afe23",
+          "oracle_hash": "c56d4aac53005f5f2ce62437b2bd1ab3",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+          "card_name": "Trip Noose",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6c83d6f9677e2353221c70419597e18d",
+          "oracle_hash": "0ce7ca7311d86a3436110c13d3c14ac3",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+          "card_name": "Tyrant's Machine",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:aae0f01b2713fb6dc5aef5c2785ab861",
+          "oracle_hash": "8ac6483ddcdf43c0c35572203ef2da99",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 13
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+          "card_name": "Akroan Jailer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ed9ab618dc824b90a192ac472d5e1fc3",
+          "oracle_hash": "c929f851b4fdda8e236cff1b581e868c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+          "card_name": "Akroan Mastiff",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:872ba81bfcbb932c8efaf4d38c65bf95",
+          "oracle_hash": "395ee92e1d81b2dd12ea924bf8824740",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+          "card_name": "Blinding Mage",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:872ba81bfcbb932c8efaf4d38c65bf95",
+          "oracle_hash": "395ee92e1d81b2dd12ea924bf8824740",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+          "card_name": "Checkpoint Officer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:50fc34be177c08978c487ef63a8b9577",
+          "oracle_hash": "ca234b277c0d6e4ed6d2cbf7a4a5ab71",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+          "card_name": "Elite Arrester",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:053f80926e5a3504db85ee6863cfacff",
+          "oracle_hash": "1e967b03565eb8823dbd236bd46a6109",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+          "card_name": "Fan Bearer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:bfb6c9cae4f0e752ef8eafa65cb5ef58",
+          "oracle_hash": "0ce7ca7311d86a3436110c13d3c14ac3",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+          "card_name": "Frostbridge Guard",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ed9ab618dc824b90a192ac472d5e1fc3",
+          "oracle_hash": "c929f851b4fdda8e236cff1b581e868c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+          "card_name": "Gavony Trapper",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:bfb6c9cae4f0e752ef8eafa65cb5ef58",
+          "oracle_hash": "0ce7ca7311d86a3436110c13d3c14ac3",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+          "card_name": "Goldmeadow Harrier",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:872ba81bfcbb932c8efaf4d38c65bf95",
+          "oracle_hash": "395ee92e1d81b2dd12ea924bf8824740",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+          "card_name": "Nebelgast Beguiler",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:872ba81bfcbb932c8efaf4d38c65bf95",
+          "oracle_hash": "395ee92e1d81b2dd12ea924bf8824740",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+          "card_name": "Rathi Trapper",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:180efc6b0638d4008d56fc8e745afe23",
+          "oracle_hash": "c56d4aac53005f5f2ce62437b2bd1ab3",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+          "card_name": "Trip Noose",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6c83d6f9677e2353221c70419597e18d",
+          "oracle_hash": "0ce7ca7311d86a3436110c13d3c14ac3",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+          "card_name": "Tyrant's Machine",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:aae0f01b2713fb6dc5aef5c2785ab861",
+          "oracle_hash": "8ac6483ddcdf43c0c35572203ef2da99",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 13
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+          "battle_rule_version": 2,
+          "card_name": "Akroan Jailer",
+          "logical_rule_key": "battle_rule_v1:ed9ab618dc824b90a192ac472d5e1fc3"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+          "battle_rule_version": 2,
+          "card_name": "Akroan Mastiff",
+          "logical_rule_key": "battle_rule_v1:872ba81bfcbb932c8efaf4d38c65bf95"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+          "battle_rule_version": 2,
+          "card_name": "Blinding Mage",
+          "logical_rule_key": "battle_rule_v1:872ba81bfcbb932c8efaf4d38c65bf95"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+          "battle_rule_version": 2,
+          "card_name": "Checkpoint Officer",
+          "logical_rule_key": "battle_rule_v1:50fc34be177c08978c487ef63a8b9577"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+          "battle_rule_version": 2,
+          "card_name": "Elite Arrester",
+          "logical_rule_key": "battle_rule_v1:053f80926e5a3504db85ee6863cfacff"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+          "battle_rule_version": 2,
+          "card_name": "Fan Bearer",
+          "logical_rule_key": "battle_rule_v1:bfb6c9cae4f0e752ef8eafa65cb5ef58"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+          "battle_rule_version": 2,
+          "card_name": "Frostbridge Guard",
+          "logical_rule_key": "battle_rule_v1:ed9ab618dc824b90a192ac472d5e1fc3"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+          "battle_rule_version": 2,
+          "card_name": "Gavony Trapper",
+          "logical_rule_key": "battle_rule_v1:bfb6c9cae4f0e752ef8eafa65cb5ef58"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+          "battle_rule_version": 2,
+          "card_name": "Goldmeadow Harrier",
+          "logical_rule_key": "battle_rule_v1:872ba81bfcbb932c8efaf4d38c65bf95"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+          "battle_rule_version": 2,
+          "card_name": "Nebelgast Beguiler",
+          "logical_rule_key": "battle_rule_v1:872ba81bfcbb932c8efaf4d38c65bf95"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+          "battle_rule_version": 2,
+          "card_name": "Rathi Trapper",
+          "logical_rule_key": "battle_rule_v1:180efc6b0638d4008d56fc8e745afe23"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+          "battle_rule_version": 2,
+          "card_name": "Trip Noose",
+          "logical_rule_key": "battle_rule_v1:6c83d6f9677e2353221c70419597e18d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+          "battle_rule_version": 2,
+          "card_name": "Tyrant's Machine",
+          "logical_rule_key": "battle_rule_v1:aae0f01b2713fb6dc5aef5c2785ab861"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 13
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Akroan Jailer",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:ed9ab618dc824b90a192ac472d5e1fc3"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Akroan Mastiff",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:872ba81bfcbb932c8efaf4d38c65bf95"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Blinding Mage",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:872ba81bfcbb932c8efaf4d38c65bf95"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Checkpoint Officer",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:50fc34be177c08978c487ef63a8b9577"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Elite Arrester",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:053f80926e5a3504db85ee6863cfacff"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Fan Bearer",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:bfb6c9cae4f0e752ef8eafa65cb5ef58"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Frostbridge Guard",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:ed9ab618dc824b90a192ac472d5e1fc3"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Gavony Trapper",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:bfb6c9cae4f0e752ef8eafa65cb5ef58"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Goldmeadow Harrier",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:872ba81bfcbb932c8efaf4d38c65bf95"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Nebelgast Beguiler",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:872ba81bfcbb932c8efaf4d38c65bf95"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Rathi Trapper",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:180efc6b0638d4008d56fc8e745afe23"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Trip Noose",
+          "component_keys": [],
+          "effect": "artifact",
+          "logical_rule_key": "battle_rule_v1:6c83d6f9677e2353221c70419597e18d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Tyrant's Machine",
+          "component_keys": [],
+          "effect": "artifact",
+          "logical_rule_key": "battle_rule_v1:aae0f01b2713fb6dc5aef5c2785ab861"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 26,
+        "scenarios": 13
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

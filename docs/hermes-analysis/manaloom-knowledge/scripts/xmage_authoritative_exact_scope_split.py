@@ -39,6 +39,10 @@ DRAW_UNIT = "draw_cards::xmage_draw_card_variant_review_v1"
 DRAW_ENGINE_UNIT = "draw_engine::xmage_draw_card_variant_review_v1"
 DAMAGE_UNIT = "direct_damage::targeted_damage_variant_v1"
 DESTROY_UNIT = "removal_destroy::targeted_destroy_variant_v1"
+TAP_TARGET_CREATURE_UNIT = (
+    "xmage_signature::TapTargetEffect::SimpleActivatedAbility::"
+    "TargetCreaturePermanent::no_condition_class::targeting,activated_ability"
+)
 TREASURE_UNIT = "treasure_maker::single_treasure_creation_v1"
 LIFE_UNIT = "life_gain::xmage_life_gain_variant_review_v1"
 EXILE_UNIT = "removal_exile::targeted_exile_variant_v1"
@@ -122,6 +126,7 @@ SUPPORTED_UNITS = {
     DRAW_UNIT,
     DAMAGE_UNIT,
     DESTROY_UNIT,
+    TAP_TARGET_CREATURE_UNIT,
     TREASURE_UNIT,
     LIFE_UNIT,
     EXILE_UNIT,
@@ -163,6 +168,7 @@ CREATURE_TAP_DAMAGE_SCOPE = "xmage_creature_tap_fixed_damage_target_activated_v1
 TAP_DAMAGE_ACTIVATED_SCOPE = "xmage_tap_fixed_damage_target_activated_ability_v1"
 PERMANENT_ACTIVATED_DAMAGE_SCOPE = "xmage_permanent_simple_activated_damage_v1"
 PERMANENT_ACTIVATED_DESTROY_SCOPE = "xmage_permanent_simple_activated_destroy_target_v1"
+PERMANENT_ACTIVATED_TAP_TARGET_SCOPE = "xmage_permanent_simple_activated_tap_target_v1"
 PERMANENT_ACTIVATED_RECURSION_TO_HAND_SCOPE = "xmage_permanent_simple_activated_graveyard_to_hand_v1"
 PERMANENT_ACTIVATED_RECURSION_TO_BATTLEFIELD_SCOPE = "xmage_permanent_simple_activated_graveyard_to_battlefield_v1"
 PERMANENT_ACTIVATED_GRAVEYARD_EXILE_SCOPE = "xmage_permanent_simple_activated_exile_graveyard_card_v1"
@@ -7361,6 +7367,16 @@ def is_permanent_activated_destroy_unit(row: dict[str, Any]) -> bool:
     )
 
 
+def is_permanent_activated_tap_target_unit(row: dict[str, Any]) -> bool:
+    unit = str(row.get("adapter_work_unit") or "")
+    return (
+        unit == TAP_TARGET_CREATURE_UNIT
+        and effect_classes(row) == {"TapTargetEffect"}
+        and ability_classes(row) == {"SimpleActivatedAbility"}
+        and {"targeting", "activated_ability"}.issubset(set(row.get("xmage_signals") or []))
+    )
+
+
 def is_permanent_activated_tutor_battlefield_unit(row: dict[str, Any]) -> bool:
     if str(row.get("adapter_work_unit") or "") != TUTOR_UNIT:
         return False
@@ -11943,6 +11959,77 @@ def activated_destroy_from_source(source: str) -> dict[str, Any] | str:
     }
 
 
+def activated_tap_target_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    text = re.sub(r"\s+", " ", oracle_text(metadata)).strip().lower()
+    if text.count(":") != 1:
+        return "activated_tap_target_oracle_not_simple"
+    cost_text, effect_text = [part.strip() for part in text.split(":", 1)]
+    if not re.fullmatch(r"tap target creature\.?", effect_text):
+        return "activated_tap_target_oracle_not_simple"
+    activation = activation_cost_from_oracle_prefix(cost_text)
+    if isinstance(activation, str):
+        return activation.replace("activated_self_boost", "activated_tap_target")
+    return {
+        "target": "creature",
+        "target_constraints": {"card_types": ["creature"]},
+        **activation,
+    }
+
+
+def activated_tap_target_from_source(source: str) -> dict[str, Any] | str:
+    text = source or ""
+    risky_cost_classes = {
+        "CompositeCost",
+        "DiscardCardCost",
+        "DiscardTargetCost",
+        "ExileFrom",
+        "ExileFromGraveCost",
+        "ExileSourceFromGraveCost",
+        "MillCardsCost",
+        "OrCost",
+        "PayLifeCost",
+        "RemoveCounterCost",
+        "ReturnToHandSourceCost",
+        "RevealTargetFromHandCost",
+        "SacrificeSourceCost",
+        "SacrificeTargetCost",
+        "TapTargetCost",
+    }
+    if "Zone.GRAVEYARD" in text:
+        return "activated_tap_target_source_not_battlefield"
+    present_risky = sorted(cost for cost in risky_cost_classes if cost in text)
+    if present_risky:
+        return "activated_tap_target_source_cost_not_supported"
+    if len(re.findall(r"new\s+TapTargetEffect\s*\(\s*\)", text, re.S)) != 1:
+        return "activated_tap_target_source_not_simple_tap_effect"
+    tap_index = text.find("TapTargetEffect")
+    window = text[max(0, tap_index - 500) : tap_index + 2000]
+    if "SimpleActivatedAbility" not in window:
+        return "activated_tap_target_source_not_simple_activated"
+    if not re.search(r"new\s+TargetCreaturePermanent\s*\(\s*\)", text, re.S):
+        return "activated_tap_target_source_target_not_supported"
+    cost_text = "{0}"
+    mana_match = re.search(r'ManaCostsImpl<[^>]*>\s*\(\s*"([^"]+)"\s*\)', window)
+    generic_match = re.search(r"GenericManaCost\s*\(\s*(\d+)\s*\)", window)
+    if mana_match:
+        cost_text = canonical_mana_cost_text(mana_match.group(1))
+    elif generic_match:
+        cost_text = "{" + generic_match.group(1) + "}"
+    parsed_cost = parse_mana_cost_text(cost_text)
+    if parsed_cost is None:
+        return "activated_tap_target_source_mana_cost_not_supported"
+    activation_cost_generic, activation_cost_colors = parsed_cost
+    return {
+        "target": "creature",
+        "target_constraints": {"card_types": ["creature"]},
+        "activation_cost_mana": cost_text,
+        "activation_cost_generic": activation_cost_generic,
+        "activation_cost_colors": activation_cost_colors,
+        "activation_requires_tap": "TapSourceCost" in window,
+        "activation_requires_sacrifice": False,
+    }
+
+
 def activated_draw_from_source(source: str) -> dict[str, Any] | str:
     text = source or ""
     if "Zone.GRAVEYARD" in text:
@@ -15828,6 +15915,7 @@ def split_row(
     permanent_activated_draw_unit = is_permanent_activated_draw_unit(row)
     permanent_activated_damage_unit = is_permanent_activated_damage_unit(row)
     permanent_activated_destroy_unit = is_permanent_activated_destroy_unit(row)
+    permanent_activated_tap_target_unit = is_permanent_activated_tap_target_unit(row)
     permanent_activated_life_gain_unit = is_permanent_activated_life_gain_unit(row)
     permanent_activated_self_boost_unit = is_permanent_activated_self_boost_unit(row)
     permanent_activated_target_boost_unit = is_permanent_activated_target_boost_unit(row)
@@ -16851,6 +16939,68 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_permanent_simple_activated_destroy_target",
+        ), "selected_exact_scope"
+
+    if permanent_activated_tap_target_unit:
+        if not is_permanent_metadata(metadata) or is_spell(metadata):
+            return None, "activated_tap_target_not_permanent"
+        oracle_activation = activated_tap_target_from_oracle(metadata)
+        if isinstance(oracle_activation, str):
+            return None, oracle_activation
+        parsed_activation = activated_tap_target_from_source(source_text)
+        if isinstance(parsed_activation, str):
+            return None, parsed_activation
+        for key in (
+            "target",
+            "activation_cost_mana",
+            "activation_cost_generic",
+            "activation_cost_colors",
+            "activation_requires_tap",
+            "activation_requires_sacrifice",
+        ):
+            if parsed_activation.get(key) != oracle_activation.get(key):
+                return None, "activated_tap_target_source_oracle_mismatch"
+        type_line = str(metadata.get("type_line") or "").lower()
+        permanent_effect = (
+            "creature"
+            if "creature" in type_line
+            else "artifact"
+            if "artifact" in type_line
+            else "enchantment"
+            if "enchantment" in type_line
+            else "permanent"
+        )
+        activated_effect = {
+            "effect": "tap_target",
+            "battle_model_scope": PERMANENT_ACTIVATED_TAP_TARGET_SCOPE,
+            "ability_kind": "activated",
+            "activated_effect": "tap_target",
+            "activated_tap_target": "creature",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "xmage_effect_class": "TapTargetEffect",
+            "xmage_ability_class": "SimpleActivatedAbility",
+            **parsed_activation,
+        }
+        effect_json = {
+            "effect": permanent_effect,
+            "battle_model_scope": PERMANENT_ACTIVATED_TAP_TARGET_SCOPE,
+            "ability_kind": "static_and_activated",
+            "activated_effect": "tap_target",
+            "activated_battle_model_scope": PERMANENT_ACTIVATED_TAP_TARGET_SCOPE,
+            "activated_tap_target": "creature",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "_activated_rule_effects": [activated_effect],
+            "xmage_effect_class": "TapTargetEffect",
+            "xmage_ability_class": "SimpleActivatedAbility",
+            **parsed_activation,
+        }
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_permanent_simple_activated_tap_target",
         ), "selected_exact_scope"
 
     if permanent_activated_life_gain_unit:

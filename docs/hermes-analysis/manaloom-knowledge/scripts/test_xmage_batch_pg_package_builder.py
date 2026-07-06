@@ -645,6 +645,37 @@ def test_manifest_builds_simple_activated_damage_execution_scenario() -> None:
     assert len(scenario["controller_hand"]) == 2
 
 
+def test_manifest_builds_simple_activated_tap_target_execution_scenario() -> None:
+    rule = {
+        "normalized_name": "akroan jailer",
+        "card_name": "Akroan Jailer",
+        "oracle_hash": "hash-akroan-jailer",
+        "logical_rule_key": "battle_rule_v1:hash-akroan-jailer",
+        "required_effect_fields": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+            "activated_effect": "tap_target",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+            "activated_tap_target": "creature",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "activation_cost_mana": "{2}{W}",
+            "activation_cost_generic": 2,
+            "activation_cost_colors": ["W"],
+            "activation_requires_tap": True,
+        },
+    }
+
+    scenario = builder.simple_activated_tap_target_execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "simple_activated_tap_target"
+    assert scenario["expected_target"] == "creature"
+    assert scenario["expected_tapped_source"] is True
+    assert scenario["controller_mana"]["generic"] == 2
+    assert scenario["controller_mana"]["white"] == 1
+
+
 def test_manifest_expected_rule_preserves_spell_additional_sacrifice_cost_fields() -> None:
     proposal = {
         "normalized_name": "bone splinters",

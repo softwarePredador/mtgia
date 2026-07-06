@@ -145,6 +145,49 @@ def test_simple_activated_damage_runner_executes_random_discard_cost() -> None:
     assert result["opponent_life"] == 5
 
 
+def test_simple_activated_tap_target_runner_executes_tap_effect() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "creature",
+        "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+        "activated_effect": "tap_target",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+        "activated_tap_target": "creature",
+        "target": "creature",
+        "target_constraints": {"card_types": ["creature"]},
+        "activation_cost_mana": "{1}",
+        "activation_cost_generic": 1,
+        "activation_cost_colors": [],
+        "activation_requires_tap": True,
+        "activation_requires_sacrifice": False,
+        "_rule_logical_key": "battle_rule_v1:akroan-jailer",
+    }
+    try:
+        result = validator.run_simple_activated_tap_target(
+            battle,
+            {
+                "name": "Akroan Jailer taps target creature",
+                "type": "simple_activated_tap_target",
+                "card": {"name": "Akroan Jailer"},
+                "controller_mana": {"generic": 1},
+                "expected_tapped_source": True,
+                "logical_rule_key": "battle_rule_v1:akroan-jailer",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Akroan Jailer"
+    assert result["target_tapped"] is True
+    assert result["source_tapped"] is True
+
+
 def test_simple_mana_source_refresh_runner_executes_partial_mana_rule() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

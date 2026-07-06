@@ -7488,6 +7488,45 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["activation_cost_mana"], "{B}{B}")
         self.assertTrue(effect["activation_requires_tap"])
 
+    def test_permanent_activated_tap_target_creature_maps_exact_scope(self) -> None:
+        row = queue_row(
+            split.TAP_TARGET_CREATURE_UNIT,
+            effect_classes=["TapTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Akroan Jailer",
+                type_line="Creature - Human Soldier",
+                oracle_text="{2}{W}, {T}: Tap target creature.",
+            ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(
+                    new TapTargetEffect(),
+                    new ManaCostsImpl<>("{2}{W}")
+                );
+                ability.addCost(new TapSourceCost());
+                ability.addTarget(new TargetCreaturePermanent());
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_TAP_TARGET_SCOPE)
+        self.assertEqual(effect["activated_effect"], "tap_target")
+        self.assertEqual(effect["activated_tap_target"], "creature")
+        self.assertEqual(effect["target"], "creature")
+        self.assertEqual(effect["target_constraints"], {"card_types": ["creature"]})
+        self.assertEqual(effect["activation_cost_mana"], "{2}{W}")
+        self.assertEqual(effect["activation_cost_generic"], 2)
+        self.assertEqual(effect["activation_cost_colors"], ["W"])
+        self.assertTrue(effect["activation_requires_tap"])
+        self.assertEqual(effect["_activated_rule_effects"][0]["battle_model_scope"], split.PERMANENT_ACTIVATED_TAP_TARGET_SCOPE)
+
     def test_fixed_destroy_draw_spell_blocks_dynamic_source_draw(self) -> None:
         row = queue_row(
             split.DRAW_UNIT,

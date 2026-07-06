@@ -14951,6 +14951,74 @@ sequences, target-based scry, conditional scry, surveil, scry plus another ETB
 effect, unsafe non-keyword auxiliary abilities, or non-ETB
 activated/static scry abilities.
 
+## PG552 Activated Tap Target Creature New Server Evidence
+
+PG552 evidence:
+
+- exact split report:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260706_pg552_activated_tap_target_creature_candidate.md`
+- package:
+  `docs/hermes-analysis/master_optimizer_reports/pg552_activated_tap_target_creature_new_server_package_package.md`
+- apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg552_activated_tap_target_creature_new_server_apply_evidence.md`
+- PG -> SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg552_activated_tap_target_creature_new_server_sync_report.json`
+- E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg552_activated_tap_target_creature_new_server_e2e.md`
+- post-sync queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260706_post_pg552_activated_tap_target_creature_new_server.md`
+- final exact-scope recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260706_post_pg552_activated_tap_target_creature_new_server_final.md`
+- readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260706_post_pg552_activated_tap_target_creature_new_server.md`
+- final audits:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260706_post_pg552_activated_tap_target_creature_new_server_final.md`,
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260706_post_pg552_activated_tap_target_creature_new_server_final.md`,
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260706_post_pg552_activated_tap_target_creature_new_server_final.md`,
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260706_post_pg552_activated_tap_target_creature_new_server_final.md`
+
+Validation:
+
+- focused split/package/E2E tests passed: `616` splitter tests and `52`
+  package/E2E tests;
+- exact split selected `13` cards for
+  `xmage_permanent_simple_activated_tap_target_v1`;
+- package precheck found `1` target card row for each promoted card, `0`
+  existing expected rows, and `0` shadow rows scheduled for deprecation;
+- package apply upserted `13` rows and deprecated `0` shadow rows;
+- PostgreSQL postcheck confirmed `13/13` promoted rows, `13/13`
+  verified/auto, and `13/13` oracle hash rows;
+- PG -> SQLite sync loaded `8,900` PostgreSQL rows, updated `8,664` SQLite
+  rows, and exported `6,403` canonical snapshot rows;
+- package E2E: `status=pass`, `scenario_count=13`, `event_count=26`, and
+  every promoted card tapped its source and tapped a real creature target;
+- final exact-scope recheck has `proposal_count=0` and
+  `safe_for_batch_pg_package_count=0`;
+- final audits passed: XMage strategy `26/26`, PG-Hermes-SQLite `51/51`,
+  operational surface `pass`, legacy contamination `pass`.
+
+Post-sync queue evidence:
+
+- post-cycle `target_identity_count=25591`
+- post-cycle `xmage_authoritative_source_count=25277`
+- post-cycle `xmage_missing_source_exception_count=314`
+- post-cycle `xmage_authoritative_parser_gap_count=0`
+- post-cycle `xmage_authoritative_adapter_required_count=25277`
+
+Runtime semantics:
+
+- the runtime adapter only executes when an untapped opponent creature target is
+  available;
+- activation pays the parsed mana cost, taps the source when XMage has
+  `TapSourceCost`, emits `activated_ability`, and then emits
+  `tap_target_resolved`;
+- this scope is permanent-only and creature-target-only.
+
+Residual boundary: PG552 does not authorize tap-target-permanent variants,
+hybrid/life/special activation costs, "does not untap" clauses, source/Oracle
+mismatches, activated target untap, stun counters, or any `TargetPermanent`
+filter beyond plain `TargetCreaturePermanent`.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

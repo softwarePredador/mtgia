@@ -1,0 +1,16 @@
+     card_name      |  normalized_name   |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
+--------------------+--------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
+ Akroan Jailer      | akroan jailer      | battle_rule_v1:ed9ab618dc824b90a192ac472d5e1fc3 |                  1 |                           1 |                         1 |           0
+ Akroan Mastiff     | akroan mastiff     | battle_rule_v1:872ba81bfcbb932c8efaf4d38c65bf95 |                  1 |                           1 |                         1 |           0
+ Blinding Mage      | blinding mage      | battle_rule_v1:872ba81bfcbb932c8efaf4d38c65bf95 |                  1 |                           1 |                         1 |           0
+ Checkpoint Officer | checkpoint officer | battle_rule_v1:50fc34be177c08978c487ef63a8b9577 |                  1 |                           1 |                         1 |           0
+ Elite Arrester     | elite arrester     | battle_rule_v1:053f80926e5a3504db85ee6863cfacff |                  1 |                           1 |                         1 |           0
+ Fan Bearer         | fan bearer         | battle_rule_v1:bfb6c9cae4f0e752ef8eafa65cb5ef58 |                  1 |                           1 |                         1 |           0
+ Frostbridge Guard  | frostbridge guard  | battle_rule_v1:ed9ab618dc824b90a192ac472d5e1fc3 |                  1 |                           1 |                         1 |           0
+ Gavony Trapper     | gavony trapper     | battle_rule_v1:bfb6c9cae4f0e752ef8eafa65cb5ef58 |                  1 |                           1 |                         1 |           0
+ Goldmeadow Harrier | goldmeadow harrier | battle_rule_v1:872ba81bfcbb932c8efaf4d38c65bf95 |                  1 |                           1 |                         1 |           0
+ Nebelgast Beguiler | nebelgast beguiler | battle_rule_v1:872ba81bfcbb932c8efaf4d38c65bf95 |                  1 |                           1 |                         1 |           0
+ Rathi Trapper      | rathi trapper      | battle_rule_v1:180efc6b0638d4008d56fc8e745afe23 |                  1 |                           1 |                         1 |           0
+ Trip Noose         | trip noose         | battle_rule_v1:6c83d6f9677e2353221c70419597e18d |                  1 |                           1 |                         1 |           0
+ Tyrant's Machine   | tyrant's machine   | battle_rule_v1:aae0f01b2713fb6dc5aef5c2785ab861 |                  1 |                           1 |                         1 |           0
+(13 rows)

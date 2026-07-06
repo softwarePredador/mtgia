@@ -289,6 +289,7 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "ability_kind",
     "activated_effect",
     "activated_battle_model_scope",
+    "activated_tap_target",
     "activated_add_counters",
     "activated_add_counters_target",
     "activated_add_counters_counter_type",
@@ -1549,6 +1550,35 @@ def simple_activated_damage_execution_scenario_from_expected_rule(
     }
 
 
+def simple_activated_tap_target_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_permanent_simple_activated_tap_target_v1":
+        return None
+    return {
+        "name": f"{rule['card_name']} activates tap target ability",
+        "type": "simple_activated_tap_target",
+        "card": {"name": rule["card_name"]},
+        "controller_mana": {
+            "generic": int(required.get("activation_cost_generic") or 0),
+            **{
+                color_name: list(required.get("activation_cost_colors") or []).count(symbol)
+                for symbol, color_name in {
+                    "W": "white",
+                    "U": "blue",
+                    "B": "black",
+                    "R": "red",
+                    "G": "green",
+                }.items()
+            },
+        },
+        "expected_tapped_source": bool(required.get("activation_requires_tap")),
+        "expected_target": required.get("activated_tap_target") or required.get("target") or "creature",
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any] | None:
     return (
         static_global_pt_execution_scenario_from_expected_rule(rule)
@@ -1561,6 +1591,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or creature_dies_create_tokens_execution_scenario_from_expected_rule(rule)
         or simple_mana_source_execution_scenario_from_expected_rule(rule)
         or simple_activated_damage_execution_scenario_from_expected_rule(rule)
+        or simple_activated_tap_target_execution_scenario_from_expected_rule(rule)
         or simple_activated_create_token_execution_scenario_from_expected_rule(rule)
         or fixed_create_creature_tokens_execution_scenario_from_expected_rule(rule)
         or multi_create_creature_tokens_execution_scenario_from_expected_rule(rule)
