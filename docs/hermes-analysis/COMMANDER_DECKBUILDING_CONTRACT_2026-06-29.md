@@ -199,7 +199,11 @@ Operational priority after this pivot:
    expansion, then run
    `global_commander_ramp_cut_usage_same_lane_proof_scout.py` to consume
    existing trace/proof artifacts, block used ramp cuts, and require explicit
-   same-lane replacement before candidate copy; if the chosen axis is `engine`,
+   same-lane replacement before candidate copy; then run
+   `global_commander_ramp_cut_followup_router.py` to split ramp blockers into
+   trace-required, structured-review-required, and replacement-required lanes
+   before any candidate copy, battle, mutation, or promotion can open; if the
+   chosen axis is `engine`,
    then run
    `global_commander_engine_axis_nonland_cut_policy_model.py` to apply that
    policy to the current nonland cut model, split engine-only and
@@ -589,6 +593,7 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_engine_axis_nonland_cut_policy_model_20260706_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_axis_nonland_cut_policy_model_20260706_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_cut_usage_same_lane_proof_scout_20260706_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_cut_followup_router_20260706_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_engine_cut_usage_same_lane_proof_scout_20260706_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_engine_cut_followup_router_20260706_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_engine_cut_trace_replacement_gate_20260706_current.md`
@@ -1621,6 +1626,15 @@ Current external refresh on 2026-07-05:
   route (`explicit_same_lane_route_count=0`, `pair_ready_count=0`). Candidate
   copy, battle, mutation, and promotion remain closed; the next gate is
   `generate_current_scope_trace_or_find_explicit_same_lane_ramp_replacement_before_candidate_copy`.
+- The ramp cut follow-up router converts those blockers into three explicit
+  lanes: five ramp cuts require current-scope usage or negative trace,
+  `Grim Monolith` requires structured review of the text trace candidate, and
+  `Arcane Signet`, `Birgi, God of Storytelling // Harnfel, Horn of Bounty`, and
+  `Dark Ritual` require a different ramp cut or explicit same-lane replacement
+  proof because usage was observed. All `9` pairs remain blocked
+  (`pair_ready_count=0`, `no_explicit_same_lane_pair_count=9`), and the next
+  gate is
+  `run_trace_plan_structured_review_and_replacement_search_before_candidate_copy`.
 
 ## Global Commander Rollout - 2026-07-01
 

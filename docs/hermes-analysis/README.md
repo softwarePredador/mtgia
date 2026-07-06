@@ -287,6 +287,14 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     Resultado: `3` cortes ramp tem uso observado, `5` faltam trace atual,
     `1` precisa review estruturado de trace textual, nenhuma rota same-lane
     explicita existe, e candidate copy continua fechado.
+    Em seguida, rode
+    `manaloom-knowledge/scripts/global_commander_ramp_cut_followup_router.py`,
+    com evidencia:
+    `master_optimizer_reports/global_commander_ramp_cut_followup_router_20260706_current.md`.
+    Resultado: `5` cortes vao para plano de trace atual, `1` para review
+    estruturado, `3` para busca de corte/substituicao same-lane, todos os `9`
+    pares seguem bloqueados, e o proximo gate e
+    `run_trace_plan_structured_review_and_replacement_search_before_candidate_copy`.
     Historicamente, a politica de `engine` ja foi aplicada em
     `manaloom-knowledge/scripts/global_commander_engine_axis_nonland_cut_policy_model.py`
     com evidencia:
@@ -1071,6 +1079,11 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `missing_trace_cut_count=5`, `explicit_same_lane_route_count=0` e proximo
     gate
     `generate_current_scope_trace_or_find_explicit_same_lane_ramp_replacement_before_candidate_copy`.
+    O router follow-up fica em
+    `global_commander_ramp_cut_followup_router_20260706_current.md`: ele separa
+    `trace_plan_count=5`, `structured_review_count=1`,
+    `replacement_required_count=3`, mantem `pair_ready_count=0` e roteia para
+    `run_trace_plan_structured_review_and_replacement_search_before_candidate_copy`.
     Observacao operacional: snapshots historicos de candidate-copy, battle-probe,
     battle-feedback e package-chain dependem de artefatos locais ignorados. Se
     faltarem ou forem regenerados sem esses artefatos, a auditoria de superficie

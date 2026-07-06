@@ -1,0 +1,583 @@
+{
+  "artifact_type": "global_commander_ramp_cut_followup_router",
+  "battle_gate_allowed_now": false,
+  "battle_or_optimization_performed": false,
+  "battle_run_performed": false,
+  "candidate_copy_allowed_now": false,
+  "candidate_copy_blockers": [
+    "usage_observed_blocks_ramp_cuts:Arcane Signet,Birgi, God of Storytelling // Harnfel, Horn of Bounty,Dark Ritual",
+    "missing_current_scope_usage_trace_for_ramp_cuts:Basalt Monolith,Burnt Offering,Cabal Ritual,Culling the Weak,Desperate Ritual",
+    "no_explicit_same_lane_replacement_route_for_ramp_cut_pairs",
+    "trace_required_for_ramp_cuts:Basalt Monolith,Burnt Offering,Cabal Ritual,Culling the Weak,Desperate Ritual",
+    "structured_trace_review_required_for_ramp_cuts:Grim Monolith",
+    "replacement_required_for_used_ramp_cuts:Arcane Signet,Birgi, God of Storytelling // Harnfel, Horn of Bounty,Dark Ritual"
+  ],
+  "cut_followup_rows": [
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Arcane Signet",
+      "commander": "Kaalia of the Vast",
+      "cut_status": "ramp_cut_usage_observed_blocks_candidate_copy",
+      "deck_id": "619",
+      "matching_excess_roles": [
+        "ramp"
+      ],
+      "mutation_allowed": false,
+      "next_gate": "find_different_ramp_cut_or_explicit_same_lane_replacement_before_candidate_copy",
+      "policy_bucket": "ramp_only_excess_cut_pressure",
+      "promotion_allowed": false,
+      "reason": "current_scope_usage_observed",
+      "required_evidence": "different_cut_source_or_explicit_same_lane_replacement_proof",
+      "roles": [
+        "ramp"
+      ],
+      "route_kind": "replacement_required",
+      "trace_group": "usage_blocked"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+      "commander": "Kaalia of the Vast",
+      "cut_status": "ramp_cut_usage_observed_blocks_candidate_copy",
+      "deck_id": "619",
+      "matching_excess_roles": [
+        "engine",
+        "ramp"
+      ],
+      "mutation_allowed": false,
+      "next_gate": "find_different_ramp_cut_or_explicit_same_lane_replacement_before_candidate_copy",
+      "policy_bucket": "ramp_overlap_excess_cut_pressure",
+      "promotion_allowed": false,
+      "reason": "current_scope_usage_observed",
+      "required_evidence": "different_cut_source_or_explicit_same_lane_replacement_proof",
+      "roles": [
+        "engine",
+        "ramp"
+      ],
+      "route_kind": "replacement_required",
+      "trace_group": "usage_blocked"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Dark Ritual",
+      "commander": "Kaalia of the Vast",
+      "cut_status": "ramp_cut_usage_observed_blocks_candidate_copy",
+      "deck_id": "619",
+      "matching_excess_roles": [
+        "ramp"
+      ],
+      "mutation_allowed": false,
+      "next_gate": "find_different_ramp_cut_or_explicit_same_lane_replacement_before_candidate_copy",
+      "policy_bucket": "ramp_only_excess_cut_pressure",
+      "promotion_allowed": false,
+      "reason": "current_scope_usage_observed",
+      "required_evidence": "different_cut_source_or_explicit_same_lane_replacement_proof",
+      "roles": [
+        "ramp"
+      ],
+      "route_kind": "replacement_required",
+      "trace_group": "usage_blocked"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Grim Monolith",
+      "commander": "Kaalia of the Vast",
+      "cut_status": "ramp_cut_text_trace_candidate_needs_structured_review",
+      "deck_id": "619",
+      "matching_excess_roles": [
+        "ramp"
+      ],
+      "mutation_allowed": false,
+      "next_gate": "review_text_trace_candidate_for_ramp_cut_before_pair_review",
+      "policy_bucket": "ramp_only_excess_cut_pressure",
+      "promotion_allowed": false,
+      "reason": "text_trace_candidate_not_structured_proof",
+      "required_evidence": "structured_trace_or_replay_reference",
+      "roles": [
+        "ramp"
+      ],
+      "route_kind": "structured_trace_review_required",
+      "trace_group": "not_seen_or_no_trace"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Basalt Monolith",
+      "commander": "Kaalia of the Vast",
+      "cut_status": "ramp_cut_missing_current_scope_usage_trace",
+      "deck_id": "619",
+      "matching_excess_roles": [
+        "ramp"
+      ],
+      "mutation_allowed": false,
+      "next_gate": "generate_or_import_current_scope_usage_trace_for_ramp_cut_before_pair_review",
+      "policy_bucket": "ramp_only_excess_cut_pressure",
+      "promotion_allowed": false,
+      "reason": "missing_current_scope_usage_or_negative_trace",
+      "required_evidence": "current_scope_usage_or_negative_trace",
+      "roles": [
+        "ramp"
+      ],
+      "route_kind": "trace_required",
+      "trace_group": "not_seen_or_no_trace"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Burnt Offering",
+      "commander": "Kaalia of the Vast",
+      "cut_status": "ramp_cut_missing_current_scope_usage_trace",
+      "deck_id": "619",
+      "matching_excess_roles": [
+        "ramp"
+      ],
+      "mutation_allowed": false,
+      "next_gate": "generate_or_import_current_scope_usage_trace_for_ramp_cut_before_pair_review",
+      "policy_bucket": "ramp_only_excess_cut_pressure",
+      "promotion_allowed": false,
+      "reason": "missing_current_scope_usage_or_negative_trace",
+      "required_evidence": "current_scope_usage_or_negative_trace",
+      "roles": [
+        "ramp"
+      ],
+      "route_kind": "trace_required",
+      "trace_group": "not_seen_or_no_trace"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Cabal Ritual",
+      "commander": "Kaalia of the Vast",
+      "cut_status": "ramp_cut_missing_current_scope_usage_trace",
+      "deck_id": "619",
+      "matching_excess_roles": [
+        "ramp"
+      ],
+      "mutation_allowed": false,
+      "next_gate": "generate_or_import_current_scope_usage_trace_for_ramp_cut_before_pair_review",
+      "policy_bucket": "ramp_only_excess_cut_pressure",
+      "promotion_allowed": false,
+      "reason": "missing_current_scope_usage_or_negative_trace",
+      "required_evidence": "current_scope_usage_or_negative_trace",
+      "roles": [
+        "ramp"
+      ],
+      "route_kind": "trace_required",
+      "trace_group": "not_seen_or_no_trace"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Culling the Weak",
+      "commander": "Kaalia of the Vast",
+      "cut_status": "ramp_cut_missing_current_scope_usage_trace",
+      "deck_id": "619",
+      "matching_excess_roles": [
+        "ramp"
+      ],
+      "mutation_allowed": false,
+      "next_gate": "generate_or_import_current_scope_usage_trace_for_ramp_cut_before_pair_review",
+      "policy_bucket": "ramp_only_excess_cut_pressure",
+      "promotion_allowed": false,
+      "reason": "missing_current_scope_usage_or_negative_trace",
+      "required_evidence": "current_scope_usage_or_negative_trace",
+      "roles": [
+        "ramp"
+      ],
+      "route_kind": "trace_required",
+      "trace_group": "not_seen_or_no_trace"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Desperate Ritual",
+      "commander": "Kaalia of the Vast",
+      "cut_status": "ramp_cut_missing_current_scope_usage_trace",
+      "deck_id": "619",
+      "matching_excess_roles": [
+        "ramp"
+      ],
+      "mutation_allowed": false,
+      "next_gate": "generate_or_import_current_scope_usage_trace_for_ramp_cut_before_pair_review",
+      "policy_bucket": "ramp_only_excess_cut_pressure",
+      "promotion_allowed": false,
+      "reason": "missing_current_scope_usage_or_negative_trace",
+      "required_evidence": "current_scope_usage_or_negative_trace",
+      "roles": [
+        "ramp"
+      ],
+      "route_kind": "trace_required",
+      "trace_group": "not_seen_or_no_trace"
+    }
+  ],
+  "deck_action_allowed": false,
+  "generated_at": "2026-07-06T05:40:38.175585+00:00",
+  "input_artifacts": {
+    "scout_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_cut_usage_same_lane_proof_scout_20260706_current.json",
+    "scout_status": "ramp_cut_usage_same_lane_proof_blocks_candidate_copy"
+  },
+  "mutation_allowed": false,
+  "pair_followup_rows": [
+    {
+      "add": "Feed the Swarm",
+      "battle_gate_allowed": false,
+      "blockers": [
+        "cut_card_used_by_target_trace",
+        "no_explicit_same_lane_replacement_route"
+      ],
+      "candidate_copy_allowed": false,
+      "candidate_role": "removal",
+      "cut": "Arcane Signet",
+      "cut_next_gate": "find_different_ramp_cut_or_explicit_same_lane_replacement_before_candidate_copy",
+      "cut_roles": [
+        "ramp"
+      ],
+      "cut_route_kind": "replacement_required",
+      "explicit_same_lane_roles": [],
+      "mutation_allowed": false,
+      "pair_next_gate": "find_explicit_same_lane_replacement_route_for_pair_before_candidate_copy",
+      "pair_status": "ramp_cut_pair_blocks_candidate_copy",
+      "promotion_allowed": false
+    },
+    {
+      "add": "Path to Exile",
+      "battle_gate_allowed": false,
+      "blockers": [
+        "cut_card_used_by_target_trace",
+        "no_explicit_same_lane_replacement_route"
+      ],
+      "candidate_copy_allowed": false,
+      "candidate_role": "removal",
+      "cut": "Arcane Signet",
+      "cut_next_gate": "find_different_ramp_cut_or_explicit_same_lane_replacement_before_candidate_copy",
+      "cut_roles": [
+        "ramp"
+      ],
+      "cut_route_kind": "replacement_required",
+      "explicit_same_lane_roles": [],
+      "mutation_allowed": false,
+      "pair_next_gate": "find_explicit_same_lane_replacement_route_for_pair_before_candidate_copy",
+      "pair_status": "ramp_cut_pair_blocks_candidate_copy",
+      "promotion_allowed": false
+    },
+    {
+      "add": "Swords to Plowshares",
+      "battle_gate_allowed": false,
+      "blockers": [
+        "cut_card_used_by_target_trace",
+        "no_explicit_same_lane_replacement_route"
+      ],
+      "candidate_copy_allowed": false,
+      "candidate_role": "removal",
+      "cut": "Arcane Signet",
+      "cut_next_gate": "find_different_ramp_cut_or_explicit_same_lane_replacement_before_candidate_copy",
+      "cut_roles": [
+        "ramp"
+      ],
+      "cut_route_kind": "replacement_required",
+      "explicit_same_lane_roles": [],
+      "mutation_allowed": false,
+      "pair_next_gate": "find_explicit_same_lane_replacement_route_for_pair_before_candidate_copy",
+      "pair_status": "ramp_cut_pair_blocks_candidate_copy",
+      "promotion_allowed": false
+    },
+    {
+      "add": "Feed the Swarm",
+      "battle_gate_allowed": false,
+      "blockers": [
+        "cut_card_missing_current_scope_usage_trace",
+        "no_explicit_same_lane_replacement_route"
+      ],
+      "candidate_copy_allowed": false,
+      "candidate_role": "removal",
+      "cut": "Basalt Monolith",
+      "cut_next_gate": "generate_or_import_current_scope_usage_trace_for_ramp_cut_before_pair_review",
+      "cut_roles": [
+        "ramp"
+      ],
+      "cut_route_kind": "trace_required",
+      "explicit_same_lane_roles": [],
+      "mutation_allowed": false,
+      "pair_next_gate": "find_explicit_same_lane_replacement_route_for_pair_before_candidate_copy",
+      "pair_status": "ramp_cut_pair_blocks_candidate_copy",
+      "promotion_allowed": false
+    },
+    {
+      "add": "Path to Exile",
+      "battle_gate_allowed": false,
+      "blockers": [
+        "cut_card_missing_current_scope_usage_trace",
+        "no_explicit_same_lane_replacement_route"
+      ],
+      "candidate_copy_allowed": false,
+      "candidate_role": "removal",
+      "cut": "Basalt Monolith",
+      "cut_next_gate": "generate_or_import_current_scope_usage_trace_for_ramp_cut_before_pair_review",
+      "cut_roles": [
+        "ramp"
+      ],
+      "cut_route_kind": "trace_required",
+      "explicit_same_lane_roles": [],
+      "mutation_allowed": false,
+      "pair_next_gate": "find_explicit_same_lane_replacement_route_for_pair_before_candidate_copy",
+      "pair_status": "ramp_cut_pair_blocks_candidate_copy",
+      "promotion_allowed": false
+    },
+    {
+      "add": "Swords to Plowshares",
+      "battle_gate_allowed": false,
+      "blockers": [
+        "cut_card_missing_current_scope_usage_trace",
+        "no_explicit_same_lane_replacement_route"
+      ],
+      "candidate_copy_allowed": false,
+      "candidate_role": "removal",
+      "cut": "Basalt Monolith",
+      "cut_next_gate": "generate_or_import_current_scope_usage_trace_for_ramp_cut_before_pair_review",
+      "cut_roles": [
+        "ramp"
+      ],
+      "cut_route_kind": "trace_required",
+      "explicit_same_lane_roles": [],
+      "mutation_allowed": false,
+      "pair_next_gate": "find_explicit_same_lane_replacement_route_for_pair_before_candidate_copy",
+      "pair_status": "ramp_cut_pair_blocks_candidate_copy",
+      "promotion_allowed": false
+    },
+    {
+      "add": "Feed the Swarm",
+      "battle_gate_allowed": false,
+      "blockers": [
+        "cut_card_used_by_target_trace",
+        "no_explicit_same_lane_replacement_route"
+      ],
+      "candidate_copy_allowed": false,
+      "candidate_role": "removal",
+      "cut": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+      "cut_next_gate": "find_different_ramp_cut_or_explicit_same_lane_replacement_before_candidate_copy",
+      "cut_roles": [
+        "engine",
+        "ramp"
+      ],
+      "cut_route_kind": "replacement_required",
+      "explicit_same_lane_roles": [],
+      "mutation_allowed": false,
+      "pair_next_gate": "find_explicit_same_lane_replacement_route_for_pair_before_candidate_copy",
+      "pair_status": "ramp_cut_pair_blocks_candidate_copy",
+      "promotion_allowed": false
+    },
+    {
+      "add": "Path to Exile",
+      "battle_gate_allowed": false,
+      "blockers": [
+        "cut_card_used_by_target_trace",
+        "no_explicit_same_lane_replacement_route"
+      ],
+      "candidate_copy_allowed": false,
+      "candidate_role": "removal",
+      "cut": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+      "cut_next_gate": "find_different_ramp_cut_or_explicit_same_lane_replacement_before_candidate_copy",
+      "cut_roles": [
+        "engine",
+        "ramp"
+      ],
+      "cut_route_kind": "replacement_required",
+      "explicit_same_lane_roles": [],
+      "mutation_allowed": false,
+      "pair_next_gate": "find_explicit_same_lane_replacement_route_for_pair_before_candidate_copy",
+      "pair_status": "ramp_cut_pair_blocks_candidate_copy",
+      "promotion_allowed": false
+    },
+    {
+      "add": "Swords to Plowshares",
+      "battle_gate_allowed": false,
+      "blockers": [
+        "cut_card_used_by_target_trace",
+        "no_explicit_same_lane_replacement_route"
+      ],
+      "candidate_copy_allowed": false,
+      "candidate_role": "removal",
+      "cut": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+      "cut_next_gate": "find_different_ramp_cut_or_explicit_same_lane_replacement_before_candidate_copy",
+      "cut_roles": [
+        "engine",
+        "ramp"
+      ],
+      "cut_route_kind": "replacement_required",
+      "explicit_same_lane_roles": [],
+      "mutation_allowed": false,
+      "pair_next_gate": "find_explicit_same_lane_replacement_route_for_pair_before_candidate_copy",
+      "pair_status": "ramp_cut_pair_blocks_candidate_copy",
+      "promotion_allowed": false
+    }
+  ],
+  "policy": {
+    "mutation_boundary": "This router does not copy decks, run battles, mutate DBs, force traces, or promote packages.",
+    "same_lane_boundary": "Cross-lane removal additions cannot replace ramp cuts without explicit same-lane route evidence.",
+    "structured_trace_boundary": "A text trace candidate is scout evidence only until reviewed as structured proof.",
+    "trace_boundary": "A cut without current-scope usage or negative trace routes to trace generation/import before pair review.",
+    "usage_boundary": "A cut with current-scope target usage routes to a different cut or explicit same-lane replacement proof."
+  },
+  "postgres_writes": false,
+  "promotion_allowed": false,
+  "replacement_search_rows": [
+    {
+      "allowed_recovery_routes": [
+        "find_different_ramp_cut_with_current_scope_negative_evidence",
+        "prove_explicit_same_lane_replacement_before_candidate_copy"
+      ],
+      "battle_gate_allowed": false,
+      "blocked_reason": "current_scope_usage_observed",
+      "blocked_recovery_routes": [
+        "cross_lane_removal_add_for_ramp_cut_without_same_lane_route",
+        "candidate_copy_from_usage_observed_cut"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Arcane Signet",
+      "commander": "Kaalia of the Vast",
+      "deck_id": "619",
+      "mutation_allowed": false,
+      "required_replacement_roles": [
+        "ramp"
+      ]
+    },
+    {
+      "allowed_recovery_routes": [
+        "find_different_ramp_cut_with_current_scope_negative_evidence",
+        "prove_explicit_same_lane_replacement_before_candidate_copy"
+      ],
+      "battle_gate_allowed": false,
+      "blocked_reason": "current_scope_usage_observed",
+      "blocked_recovery_routes": [
+        "cross_lane_removal_add_for_ramp_cut_without_same_lane_route",
+        "candidate_copy_from_usage_observed_cut"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+      "commander": "Kaalia of the Vast",
+      "deck_id": "619",
+      "mutation_allowed": false,
+      "required_replacement_roles": [
+        "engine",
+        "ramp"
+      ]
+    },
+    {
+      "allowed_recovery_routes": [
+        "find_different_ramp_cut_with_current_scope_negative_evidence",
+        "prove_explicit_same_lane_replacement_before_candidate_copy"
+      ],
+      "battle_gate_allowed": false,
+      "blocked_reason": "current_scope_usage_observed",
+      "blocked_recovery_routes": [
+        "cross_lane_removal_add_for_ramp_cut_without_same_lane_route",
+        "candidate_copy_from_usage_observed_cut"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Dark Ritual",
+      "commander": "Kaalia of the Vast",
+      "deck_id": "619",
+      "mutation_allowed": false,
+      "required_replacement_roles": [
+        "ramp"
+      ]
+    }
+  ],
+  "source_db_mutated": false,
+  "status": "ramp_cut_followup_router_blocks_candidate_copy",
+  "structured_review_rows": [
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Grim Monolith",
+      "commander": "Kaalia of the Vast",
+      "deck_id": "619",
+      "fallback_route": "generate_current_scope_trace_if_text_reference_is_not_structured_proof",
+      "mutation_allowed": false,
+      "primary_route": "review_text_trace_candidate_for_ramp_cut",
+      "required_review": "structured_trace_or_replay_reference_review"
+    }
+  ],
+  "summary": {
+    "candidate_copy_blocker_count": 6,
+    "cut_count": 9,
+    "missing_trace_cut_count": 5,
+    "negative_trace_review_required_count": 0,
+    "next_gate": "run_trace_plan_structured_review_and_replacement_search_before_candidate_copy",
+    "no_explicit_same_lane_pair_count": 9,
+    "pair_blocked_count": 9,
+    "pair_count": 9,
+    "pair_ready_count": 0,
+    "replacement_required_count": 3,
+    "route_kind_counts": {
+      "replacement_required": 3,
+      "structured_trace_review_required": 1,
+      "trace_required": 5
+    },
+    "structured_review_count": 1,
+    "structured_trace_review_required_count": 1,
+    "trace_plan_count": 5,
+    "usage_blocked_cut_count": 3
+  },
+  "trace_plan_rows": [
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Basalt Monolith",
+      "commander": "Kaalia of the Vast",
+      "deck_id": "619",
+      "fallback_route": "force_access_trace_only_after_current_scope_trace_gap_is_confirmed",
+      "mutation_allowed": false,
+      "primary_route": "generate_or_import_current_scope_usage_trace_for_ramp_cut",
+      "required_trace": "current_scope_usage_or_negative_trace"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Burnt Offering",
+      "commander": "Kaalia of the Vast",
+      "deck_id": "619",
+      "fallback_route": "force_access_trace_only_after_current_scope_trace_gap_is_confirmed",
+      "mutation_allowed": false,
+      "primary_route": "generate_or_import_current_scope_usage_trace_for_ramp_cut",
+      "required_trace": "current_scope_usage_or_negative_trace"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Cabal Ritual",
+      "commander": "Kaalia of the Vast",
+      "deck_id": "619",
+      "fallback_route": "force_access_trace_only_after_current_scope_trace_gap_is_confirmed",
+      "mutation_allowed": false,
+      "primary_route": "generate_or_import_current_scope_usage_trace_for_ramp_cut",
+      "required_trace": "current_scope_usage_or_negative_trace"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Culling the Weak",
+      "commander": "Kaalia of the Vast",
+      "deck_id": "619",
+      "fallback_route": "force_access_trace_only_after_current_scope_trace_gap_is_confirmed",
+      "mutation_allowed": false,
+      "primary_route": "generate_or_import_current_scope_usage_trace_for_ramp_cut",
+      "required_trace": "current_scope_usage_or_negative_trace"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Desperate Ritual",
+      "commander": "Kaalia of the Vast",
+      "deck_id": "619",
+      "fallback_route": "force_access_trace_only_after_current_scope_trace_gap_is_confirmed",
+      "mutation_allowed": false,
+      "primary_route": "generate_or_import_current_scope_usage_trace_for_ramp_cut",
+      "required_trace": "current_scope_usage_or_negative_trace"
+    }
+  ]
+}

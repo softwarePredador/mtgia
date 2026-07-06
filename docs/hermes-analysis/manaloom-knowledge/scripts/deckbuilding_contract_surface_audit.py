@@ -66,6 +66,12 @@ GLOBAL_COMMANDER_RAMP_CUT_USAGE_SAME_LANE_PROOF_SCOUT = (
 GLOBAL_COMMANDER_RAMP_CUT_USAGE_SAME_LANE_PROOF_SCOUT_TEST = (
     SCRIPT_DIR / "test_global_commander_ramp_cut_usage_same_lane_proof_scout.py"
 )
+GLOBAL_COMMANDER_RAMP_CUT_FOLLOWUP_ROUTER = (
+    SCRIPT_DIR / "global_commander_ramp_cut_followup_router.py"
+)
+GLOBAL_COMMANDER_RAMP_CUT_FOLLOWUP_ROUTER_TEST = (
+    SCRIPT_DIR / "test_global_commander_ramp_cut_followup_router.py"
+)
 GLOBAL_COMMANDER_ENGINE_CUT_USAGE_SAME_LANE_PROOF_SCOUT = (
     SCRIPT_DIR / "global_commander_engine_cut_usage_same_lane_proof_scout.py"
 )
@@ -501,6 +507,10 @@ GLOBAL_COMMANDER_RAMP_AXIS_NONLAND_CUT_POLICY_MODEL_REPORT = (
 GLOBAL_COMMANDER_RAMP_CUT_USAGE_SAME_LANE_PROOF_SCOUT_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_cut_usage_same_lane_proof_scout_20260706_current.md"
+)
+GLOBAL_COMMANDER_RAMP_CUT_FOLLOWUP_ROUTER_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_cut_followup_router_20260706_current.md"
 )
 GLOBAL_COMMANDER_ENGINE_CUT_USAGE_SAME_LANE_PROOF_SCOUT_REPORT = (
     REPO_ROOT
@@ -2040,6 +2050,31 @@ def build_audit() -> dict[str, Any]:
                 "usage_observed_blocks_ramp_cuts:Arcane Signet",
                 "missing_current_scope_usage_trace_for_ramp_cuts:Basalt Monolith",
                 "no_explicit_same_lane_replacement_route_for_ramp_cut_pairs",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_RAMP_CUT_FOLLOWUP_ROUTER,
+            [
+                "global_commander_ramp_cut_followup_router",
+                "ramp_cut_followup_router_blocks_candidate_copy",
+                "replacement_required_for_used_ramp_cuts",
+                "structured_trace_review_required_for_ramp_cuts",
+                "trace_required_for_ramp_cuts",
+                "run_trace_plan_structured_review_and_replacement_search_before_candidate_copy",
+                "candidate_copy_allowed_now",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_RAMP_CUT_FOLLOWUP_ROUTER_TEST,
+            [
+                "test_routes_trace_structured_review_and_replacement_required_cuts",
+                "trace_required_for_ramp_cuts:Basalt Monolith",
+                "structured_trace_review_required_for_ramp_cuts:Grim Monolith",
+                "replacement_required_for_used_ramp_cuts:Arcane Signet",
             ],
         )
     )
@@ -3987,6 +4022,26 @@ def build_audit() -> dict[str, Any]:
                 "candidate_copy_allowed_now: `false`",
                 "usage_observed_blocks_ramp_cuts:Arcane Signet",
                 "no_explicit_same_lane_replacement_route_for_ramp_cut_pairs",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_RAMP_CUT_FOLLOWUP_ROUTER_REPORT,
+            [
+                "Global Commander Ramp Cut Follow-Up Router",
+                "ramp_cut_followup_router_blocks_candidate_copy",
+                "cut_count: `9`",
+                "usage_blocked_cut_count: `3`",
+                "missing_trace_cut_count: `5`",
+                "structured_trace_review_required_count: `1`",
+                "replacement_required_count: `3`",
+                "trace_plan_count: `5`",
+                "structured_review_count: `1`",
+                "pair_ready_count: `0`",
+                "no_explicit_same_lane_pair_count: `9`",
+                "run_trace_plan_structured_review_and_replacement_search_before_candidate_copy",
+                "replacement_required_for_used_ramp_cuts:Arcane Signet",
             ],
         )
     )
