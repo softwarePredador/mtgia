@@ -452,6 +452,16 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `forced_access_is_diagnostic_not_natural_gate`; o proximo gate segue
     `seek_natural_replay_confirmation_before_larger_equal_gate`, sem liberar
     batalha maior ou promocao.
+    O follow-up natural
+    `manaloom-knowledge/scripts/global_commander_candidate_added_card_natural_replay_trace_generator.py`
+    gerou
+    `master_optimizer_reports/global_commander_candidate_added_card_natural_replay_trace_generator_20260706_lorehold_profile_repair_package.md`
+    com status
+    `candidate_added_card_natural_replay_all_exercised_ready_for_larger_gate`:
+    as quatro cartas foram exercitadas sem forced access, com
+    `forced_access_used=false` e `larger_battle_gate_allowed_next=true`. Isso
+    libera apenas o proximo gate maior (`run_larger_equal_battle_gate`);
+    `promotion_allowed=false` permanece.
     O modelo nonland agora bloqueia cortes cross-lane de ramp com
     `cross_lane_ramp_cut_requires_same_lane_source_or_gate`, removendo `Birgi`
     dos cuts genericos de removal. O novo top pair `+Feed the Swarm /

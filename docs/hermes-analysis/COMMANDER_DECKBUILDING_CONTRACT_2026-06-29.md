@@ -247,7 +247,12 @@ Operational priority after this pivot:
    copy has a small equal-seed battle/replay probe; it must compare base versus
    candidate metrics, prove replay target identity is commander-specific, and
    require added cards to be exercised in replay events before any larger gate
-   can be trusted;
+   can be trusted; if added cards are only seen or absent, run
+   `global_commander_candidate_added_card_natural_replay_trace_generator.py`
+   before any larger equal gate. This replay generator must keep
+   `MANALOOM_FORCE_FOCUS_ACCESS_MODE` unset, use focus cards only for
+   tracking, and may open only `larger_battle_gate_allowed_next`; promotion,
+   mutation, and candidate-copy actions remain closed;
 14. run `global_commander_battle_feedback_model.py` after battle probe/gate
    audit artifacts exist; it consolidates exact add/cut signatures into
    reusable learning feedback, blocks pairs with failed exercised equal-gate
@@ -1849,6 +1854,18 @@ Current external refresh on 2026-07-05:
   `forced_access_is_diagnostic_not_natural_gate`, keeps
   `battle_gate_allowed_now=false` and `promotion_allowed=false`, and routes to
   `seek_natural_replay_confirmation_before_larger_equal_gate`.
+  Natural replay follow-up:
+  `global_commander_candidate_added_card_natural_replay_trace_generator.py`
+  generated
+  `global_commander_candidate_added_card_natural_replay_trace_generator_20260706_lorehold_profile_repair_package.md`.
+  Its status is
+  `candidate_added_card_natural_replay_all_exercised_ready_for_larger_gate`:
+  with forced access disabled, `Bant Panorama`,
+  `Birgi, God of Storytelling // Harnfel, Horn of Bounty`, `Brokers Hideout`,
+  and `Pyromancer's Goggles` all produced target-deck exercise events across
+  the natural replay seed window. This only sets
+  `larger_battle_gate_allowed_next=true` and `forced_access_used=false`; it
+  keeps `promotion_allowed=false` and routes to `run_larger_equal_battle_gate`.
 
 ## Global Commander Rollout - 2026-07-01
 

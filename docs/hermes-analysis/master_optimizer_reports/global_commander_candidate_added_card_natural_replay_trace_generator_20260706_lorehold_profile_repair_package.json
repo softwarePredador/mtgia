@@ -1,0 +1,728 @@
+{
+  "artifact_type": "global_commander_candidate_added_card_natural_replay_trace_generator",
+  "battle_gate_performed": false,
+  "battle_or_optimization_performed": false,
+  "candidate_copy_allowed_now": false,
+  "deck_action_allowed": false,
+  "forced_access_used": false,
+  "generated_at": "2026-07-06T09:50:05.557556+00:00",
+  "input_artifacts": {
+    "battle_probe_audit": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_battle_probe_audit_20260706_lorehold_profile_repair_package.json",
+    "battle_replay": "docs/hermes-analysis/manaloom-knowledge/scripts/battle_replay_v10_3.py",
+    "candidate_db": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_copy_materializer_20260706_lorehold_profile_repair_package_candidate/knowledge_candidate.db",
+    "replay_dir": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_added_card_natural_replays_20260706_lorehold_profile_repair_package"
+  },
+  "larger_battle_gate_allowed_next": true,
+  "larger_gate_blockers": [],
+  "mutation_allowed": false,
+  "natural_replay_performed": true,
+  "policy": {
+    "larger_gate_boundary": "A larger equal battle gate may run only after blocker adds are naturally exercised or the package is revised.",
+    "natural_replay_boundary": "This report collects natural replay evidence only; it does not run the larger battle gate.",
+    "promotion_boundary": "No deck mutation or promotion is opened by this report."
+  },
+  "postgres_writes": false,
+  "promotion_allowed": false,
+  "review_rows": [
+    {
+      "card_name": "Bant Panorama",
+      "decision_trace_count": 0,
+      "event_types": {
+        "focus_card_access_snapshot": 185,
+        "land_played": 2,
+        "turn_end": 5,
+        "turn_start": 3
+      },
+      "exercise_event_count": 1,
+      "exposure_event_count": 185,
+      "first_decision_trace": null,
+      "first_exercise_event": {
+        "card": "Bant Panorama",
+        "event": "land_played",
+        "player": "Lorehold",
+        "turn": 5
+      },
+      "first_exposure_event": {
+        "event": "focus_card_access_snapshot",
+        "player": "Lorehold",
+        "turn": 0
+      },
+      "next_gate": "include_in_larger_equal_gate_candidate_package",
+      "status": "natural_added_card_exercised"
+    },
+    {
+      "card_name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+      "decision_trace_count": 12,
+      "event_types": {
+        "cast_announced": 1,
+        "combat": 1,
+        "combat_step": 1,
+        "cost_paid": 1,
+        "focus_card_access_snapshot": 185,
+        "land_played": 1,
+        "priority_pass": 4,
+        "spell_cast": 1,
+        "trigger_put_on_stack": 1,
+        "trigger_resolved": 1,
+        "turn_end": 7,
+        "turn_start": 7
+      },
+      "exercise_event_count": 4,
+      "exposure_event_count": 185,
+      "first_decision_trace": {
+        "event": "mulligan_decision",
+        "player": "Lorehold",
+        "turn": 0
+      },
+      "first_exercise_event": {
+        "card": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+        "event": "cast_announced",
+        "player": "Lorehold",
+        "turn": 7
+      },
+      "first_exposure_event": {
+        "event": "focus_card_access_snapshot",
+        "player": "Lorehold",
+        "turn": 0
+      },
+      "next_gate": "include_in_larger_equal_gate_candidate_package",
+      "status": "natural_added_card_exercised"
+    },
+    {
+      "card_name": "Brokers Hideout",
+      "decision_trace_count": 1,
+      "event_types": {
+        "focus_card_access_snapshot": 185,
+        "land_played": 5,
+        "turn_end": 7,
+        "turn_start": 4
+      },
+      "exercise_event_count": 1,
+      "exposure_event_count": 185,
+      "first_decision_trace": {
+        "event": "mulligan_decision",
+        "player": "Lorehold",
+        "turn": 0
+      },
+      "first_exercise_event": {
+        "card": "Brokers Hideout",
+        "event": "land_played",
+        "player": "Lorehold",
+        "turn": 4
+      },
+      "first_exposure_event": {
+        "event": "focus_card_access_snapshot",
+        "player": "Lorehold",
+        "turn": 0
+      },
+      "next_gate": "include_in_larger_equal_gate_candidate_package",
+      "status": "natural_added_card_exercised"
+    },
+    {
+      "card_name": "Pyromancer's Goggles",
+      "decision_trace_count": 31,
+      "event_types": {
+        "cast_announced": 1,
+        "cost_paid": 1,
+        "focus_card_access_snapshot": 185,
+        "lorehold_upkeep_rummage": 2,
+        "permanent_moved_from_battlefield": 1,
+        "spell_cast": 1,
+        "turn_end": 14,
+        "turn_start": 11,
+        "tutor_resolved": 2
+      },
+      "exercise_event_count": 4,
+      "exposure_event_count": 185,
+      "first_decision_trace": {
+        "event": "tutor",
+        "player": "Lorehold",
+        "turn": 5
+      },
+      "first_exercise_event": {
+        "card": "Pyromancer's Goggles",
+        "event": "cast_announced",
+        "player": "Lorehold",
+        "turn": 4
+      },
+      "first_exposure_event": {
+        "event": "focus_card_access_snapshot",
+        "player": "Lorehold",
+        "turn": 0
+      },
+      "next_gate": "include_in_larger_equal_gate_candidate_package",
+      "status": "natural_added_card_exercised"
+    }
+  ],
+  "seed_reports": [
+    {
+      "cards": {
+        "Bant Panorama": {
+          "decision_trace_count": 0,
+          "event_types": {
+            "focus_card_access_snapshot": 38
+          },
+          "exercise_event_count": 0,
+          "exposure_event_count": 38,
+          "first_decision_trace": null,
+          "first_exercise_event": null,
+          "first_exposure_event": {
+            "event": "focus_card_access_snapshot",
+            "player": "Lorehold",
+            "turn": 0
+          },
+          "first_forced_access_event": null,
+          "forced_access_moved_or_present_count": 0,
+          "forced_access_not_found_count": 0,
+          "forced_access_statuses": {},
+          "reference_event_count": 0
+        },
+        "Birgi, God of Storytelling // Harnfel, Horn of Bounty": {
+          "decision_trace_count": 12,
+          "event_types": {
+            "cast_announced": 1,
+            "combat": 1,
+            "combat_step": 1,
+            "cost_paid": 1,
+            "focus_card_access_snapshot": 38,
+            "land_played": 1,
+            "priority_pass": 4,
+            "spell_cast": 1,
+            "trigger_put_on_stack": 1,
+            "trigger_resolved": 1,
+            "turn_end": 7,
+            "turn_start": 7
+          },
+          "exercise_event_count": 4,
+          "exposure_event_count": 38,
+          "first_decision_trace": {
+            "event": "mulligan_decision",
+            "player": "Lorehold",
+            "turn": 0
+          },
+          "first_exercise_event": {
+            "card": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+            "event": "cast_announced",
+            "player": "Lorehold",
+            "turn": 7
+          },
+          "first_exposure_event": {
+            "event": "focus_card_access_snapshot",
+            "player": "Lorehold",
+            "turn": 0
+          },
+          "first_forced_access_event": null,
+          "forced_access_moved_or_present_count": 0,
+          "forced_access_not_found_count": 0,
+          "forced_access_statuses": {},
+          "reference_event_count": 22
+        },
+        "Brokers Hideout": {
+          "decision_trace_count": 1,
+          "event_types": {
+            "focus_card_access_snapshot": 38,
+            "land_played": 5,
+            "turn_end": 7,
+            "turn_start": 4
+          },
+          "exercise_event_count": 1,
+          "exposure_event_count": 38,
+          "first_decision_trace": {
+            "event": "mulligan_decision",
+            "player": "Lorehold",
+            "turn": 0
+          },
+          "first_exercise_event": {
+            "card": "Brokers Hideout",
+            "event": "land_played",
+            "player": "Lorehold",
+            "turn": 4
+          },
+          "first_exposure_event": {
+            "event": "focus_card_access_snapshot",
+            "player": "Lorehold",
+            "turn": 0
+          },
+          "first_forced_access_event": null,
+          "forced_access_moved_or_present_count": 0,
+          "forced_access_not_found_count": 0,
+          "forced_access_statuses": {},
+          "reference_event_count": 15
+        },
+        "Pyromancer's Goggles": {
+          "decision_trace_count": 4,
+          "event_types": {
+            "focus_card_access_snapshot": 38,
+            "lorehold_upkeep_rummage": 1,
+            "turn_end": 1,
+            "tutor_resolved": 1
+          },
+          "exercise_event_count": 0,
+          "exposure_event_count": 38,
+          "first_decision_trace": {
+            "event": "tutor",
+            "player": "Lorehold",
+            "turn": 5
+          },
+          "first_exercise_event": null,
+          "first_exposure_event": {
+            "event": "focus_card_access_snapshot",
+            "player": "Lorehold",
+            "turn": 0
+          },
+          "first_forced_access_event": null,
+          "forced_access_moved_or_present_count": 0,
+          "forced_access_not_found_count": 0,
+          "forced_access_statuses": {},
+          "reference_event_count": 3
+        }
+      },
+      "decision_count": 128,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_added_card_natural_replays_20260706_lorehold_profile_repair_package/natural_added_replay_seed_100.decision_trace.jsonl",
+      "event_count": 923,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_added_card_natural_replays_20260706_lorehold_profile_repair_package/natural_added_replay_seed_100.events.jsonl",
+      "provenance_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_added_card_natural_replays_20260706_lorehold_profile_repair_package/natural_added_deck_provenance_seed_100.json",
+      "replay_txt": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_added_card_natural_replays_20260706_lorehold_profile_repair_package/natural_added_replay_seed_100.txt",
+      "returncode": 0,
+      "seed": 100,
+      "status": "natural_replay_generated",
+      "stderr_tail": "",
+      "stdout_tail": "Loaded 12 real opponent decks from 96 valid candidates (seed=20260706)\nReplay: /Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_added_card_natural_replays_20260706_lorehold_profile_repair_package/natural_added_replay_seed_100.txt\nReplay events: /Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_added_card_natural_replays_20260706_lorehold_profile_repair_package/natural_added_replay_seed_100.events.jsonl\nDecision trace: /Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_added_card_natural_replays_20260706_lorehold_profile_repair_package/natural_added_replay_seed_100.decision_trace.jsonl\n"
+    },
+    {
+      "cards": {
+        "Bant Panorama": {
+          "decision_trace_count": 0,
+          "event_types": {
+            "focus_card_access_snapshot": 33,
+            "land_played": 2,
+            "turn_end": 5,
+            "turn_start": 3
+          },
+          "exercise_event_count": 1,
+          "exposure_event_count": 33,
+          "first_decision_trace": null,
+          "first_exercise_event": {
+            "card": "Bant Panorama",
+            "event": "land_played",
+            "player": "Lorehold",
+            "turn": 5
+          },
+          "first_exposure_event": {
+            "event": "focus_card_access_snapshot",
+            "player": "Lorehold",
+            "turn": 0
+          },
+          "first_forced_access_event": null,
+          "forced_access_moved_or_present_count": 0,
+          "forced_access_not_found_count": 0,
+          "forced_access_statuses": {},
+          "reference_event_count": 9
+        },
+        "Birgi, God of Storytelling // Harnfel, Horn of Bounty": {
+          "decision_trace_count": 0,
+          "event_types": {
+            "focus_card_access_snapshot": 33
+          },
+          "exercise_event_count": 0,
+          "exposure_event_count": 33,
+          "first_decision_trace": null,
+          "first_exercise_event": null,
+          "first_exposure_event": {
+            "event": "focus_card_access_snapshot",
+            "player": "Lorehold",
+            "turn": 0
+          },
+          "first_forced_access_event": null,
+          "forced_access_moved_or_present_count": 0,
+          "forced_access_not_found_count": 0,
+          "forced_access_statuses": {},
+          "reference_event_count": 0
+        },
+        "Brokers Hideout": {
+          "decision_trace_count": 0,
+          "event_types": {
+            "focus_card_access_snapshot": 33
+          },
+          "exercise_event_count": 0,
+          "exposure_event_count": 33,
+          "first_decision_trace": null,
+          "first_exercise_event": null,
+          "first_exposure_event": {
+            "event": "focus_card_access_snapshot",
+            "player": "Lorehold",
+            "turn": 0
+          },
+          "first_forced_access_event": null,
+          "forced_access_moved_or_present_count": 0,
+          "forced_access_not_found_count": 0,
+          "forced_access_statuses": {},
+          "reference_event_count": 0
+        },
+        "Pyromancer's Goggles": {
+          "decision_trace_count": 0,
+          "event_types": {
+            "focus_card_access_snapshot": 33
+          },
+          "exercise_event_count": 0,
+          "exposure_event_count": 33,
+          "first_decision_trace": null,
+          "first_exercise_event": null,
+          "first_exposure_event": {
+            "event": "focus_card_access_snapshot",
+            "player": "Lorehold",
+            "turn": 0
+          },
+          "first_forced_access_event": null,
+          "forced_access_moved_or_present_count": 0,
+          "forced_access_not_found_count": 0,
+          "forced_access_statuses": {},
+          "reference_event_count": 0
+        }
+      },
+      "decision_count": 118,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_added_card_natural_replays_20260706_lorehold_profile_repair_package/natural_added_replay_seed_101.decision_trace.jsonl",
+      "event_count": 739,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_added_card_natural_replays_20260706_lorehold_profile_repair_package/natural_added_replay_seed_101.events.jsonl",
+      "provenance_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_added_card_natural_replays_20260706_lorehold_profile_repair_package/natural_added_deck_provenance_seed_101.json",
+      "replay_txt": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_added_card_natural_replays_20260706_lorehold_profile_repair_package/natural_added_replay_seed_101.txt",
+      "returncode": 0,
+      "seed": 101,
+      "status": "natural_replay_generated",
+      "stderr_tail": "",
+      "stdout_tail": "Loaded 12 real opponent decks from 96 valid candidates (seed=20260706)\nReplay: /Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_added_card_natural_replays_20260706_lorehold_profile_repair_package/natural_added_replay_seed_101.txt\nReplay events: /Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_added_card_natural_replays_20260706_lorehold_profile_repair_package/natural_added_replay_seed_101.events.jsonl\nDecision trace: /Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_added_card_natural_replays_20260706_lorehold_profile_repair_package/natural_added_replay_seed_101.decision_trace.jsonl\n"
+    },
+    {
+      "cards": {
+        "Bant Panorama": {
+          "decision_trace_count": 0,
+          "event_types": {
+            "focus_card_access_snapshot": 43
+          },
+          "exercise_event_count": 0,
+          "exposure_event_count": 43,
+          "first_decision_trace": null,
+          "first_exercise_event": null,
+          "first_exposure_event": {
+            "event": "focus_card_access_snapshot",
+            "player": "Lorehold",
+            "turn": 0
+          },
+          "first_forced_access_event": null,
+          "forced_access_moved_or_present_count": 0,
+          "forced_access_not_found_count": 0,
+          "forced_access_statuses": {},
+          "reference_event_count": 0
+        },
+        "Birgi, God of Storytelling // Harnfel, Horn of Bounty": {
+          "decision_trace_count": 0,
+          "event_types": {
+            "focus_card_access_snapshot": 43
+          },
+          "exercise_event_count": 0,
+          "exposure_event_count": 43,
+          "first_decision_trace": null,
+          "first_exercise_event": null,
+          "first_exposure_event": {
+            "event": "focus_card_access_snapshot",
+            "player": "Lorehold",
+            "turn": 0
+          },
+          "first_forced_access_event": null,
+          "forced_access_moved_or_present_count": 0,
+          "forced_access_not_found_count": 0,
+          "forced_access_statuses": {},
+          "reference_event_count": 0
+        },
+        "Brokers Hideout": {
+          "decision_trace_count": 0,
+          "event_types": {
+            "focus_card_access_snapshot": 43
+          },
+          "exercise_event_count": 0,
+          "exposure_event_count": 43,
+          "first_decision_trace": null,
+          "first_exercise_event": null,
+          "first_exposure_event": {
+            "event": "focus_card_access_snapshot",
+            "player": "Lorehold",
+            "turn": 0
+          },
+          "first_forced_access_event": null,
+          "forced_access_moved_or_present_count": 0,
+          "forced_access_not_found_count": 0,
+          "forced_access_statuses": {},
+          "reference_event_count": 0
+        },
+        "Pyromancer's Goggles": {
+          "decision_trace_count": 12,
+          "event_types": {
+            "cast_announced": 1,
+            "cost_paid": 1,
+            "focus_card_access_snapshot": 43,
+            "lorehold_upkeep_rummage": 1,
+            "permanent_moved_from_battlefield": 1,
+            "spell_cast": 1,
+            "turn_end": 6,
+            "turn_start": 4,
+            "tutor_resolved": 1
+          },
+          "exercise_event_count": 4,
+          "exposure_event_count": 43,
+          "first_decision_trace": {
+            "event": "tutor",
+            "player": "Lorehold",
+            "turn": 1
+          },
+          "first_exercise_event": {
+            "card": "Pyromancer's Goggles",
+            "event": "cast_announced",
+            "player": "Lorehold",
+            "turn": 4
+          },
+          "first_exposure_event": {
+            "event": "focus_card_access_snapshot",
+            "player": "Lorehold",
+            "turn": 0
+          },
+          "first_forced_access_event": null,
+          "forced_access_moved_or_present_count": 0,
+          "forced_access_not_found_count": 0,
+          "forced_access_statuses": {},
+          "reference_event_count": 12
+        }
+      },
+      "decision_count": 146,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_added_card_natural_replays_20260706_lorehold_profile_repair_package/natural_added_replay_seed_102.decision_trace.jsonl",
+      "event_count": 1028,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_added_card_natural_replays_20260706_lorehold_profile_repair_package/natural_added_replay_seed_102.events.jsonl",
+      "provenance_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_added_card_natural_replays_20260706_lorehold_profile_repair_package/natural_added_deck_provenance_seed_102.json",
+      "replay_txt": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_added_card_natural_replays_20260706_lorehold_profile_repair_package/natural_added_replay_seed_102.txt",
+      "returncode": 0,
+      "seed": 102,
+      "status": "natural_replay_generated",
+      "stderr_tail": "",
+      "stdout_tail": "Loaded 12 real opponent decks from 96 valid candidates (seed=20260706)\nReplay: /Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_added_card_natural_replays_20260706_lorehold_profile_repair_package/natural_added_replay_seed_102.txt\nReplay events: /Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_added_card_natural_replays_20260706_lorehold_profile_repair_package/natural_added_replay_seed_102.events.jsonl\nDecision trace: /Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_added_card_natural_replays_20260706_lorehold_profile_repair_package/natural_added_replay_seed_102.decision_trace.jsonl\n"
+    },
+    {
+      "cards": {
+        "Bant Panorama": {
+          "decision_trace_count": 0,
+          "event_types": {
+            "focus_card_access_snapshot": 35
+          },
+          "exercise_event_count": 0,
+          "exposure_event_count": 35,
+          "first_decision_trace": null,
+          "first_exercise_event": null,
+          "first_exposure_event": {
+            "event": "focus_card_access_snapshot",
+            "player": "Lorehold",
+            "turn": 0
+          },
+          "first_forced_access_event": null,
+          "forced_access_moved_or_present_count": 0,
+          "forced_access_not_found_count": 0,
+          "forced_access_statuses": {},
+          "reference_event_count": 0
+        },
+        "Birgi, God of Storytelling // Harnfel, Horn of Bounty": {
+          "decision_trace_count": 0,
+          "event_types": {
+            "focus_card_access_snapshot": 35
+          },
+          "exercise_event_count": 0,
+          "exposure_event_count": 35,
+          "first_decision_trace": null,
+          "first_exercise_event": null,
+          "first_exposure_event": {
+            "event": "focus_card_access_snapshot",
+            "player": "Lorehold",
+            "turn": 0
+          },
+          "first_forced_access_event": null,
+          "forced_access_moved_or_present_count": 0,
+          "forced_access_not_found_count": 0,
+          "forced_access_statuses": {},
+          "reference_event_count": 0
+        },
+        "Brokers Hideout": {
+          "decision_trace_count": 0,
+          "event_types": {
+            "focus_card_access_snapshot": 35
+          },
+          "exercise_event_count": 0,
+          "exposure_event_count": 35,
+          "first_decision_trace": null,
+          "first_exercise_event": null,
+          "first_exposure_event": {
+            "event": "focus_card_access_snapshot",
+            "player": "Lorehold",
+            "turn": 0
+          },
+          "first_forced_access_event": null,
+          "forced_access_moved_or_present_count": 0,
+          "forced_access_not_found_count": 0,
+          "forced_access_statuses": {},
+          "reference_event_count": 0
+        },
+        "Pyromancer's Goggles": {
+          "decision_trace_count": 0,
+          "event_types": {
+            "focus_card_access_snapshot": 35
+          },
+          "exercise_event_count": 0,
+          "exposure_event_count": 35,
+          "first_decision_trace": null,
+          "first_exercise_event": null,
+          "first_exposure_event": {
+            "event": "focus_card_access_snapshot",
+            "player": "Lorehold",
+            "turn": 0
+          },
+          "first_forced_access_event": null,
+          "forced_access_moved_or_present_count": 0,
+          "forced_access_not_found_count": 0,
+          "forced_access_statuses": {},
+          "reference_event_count": 0
+        }
+      },
+      "decision_count": 101,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_added_card_natural_replays_20260706_lorehold_profile_repair_package/natural_added_replay_seed_103.decision_trace.jsonl",
+      "event_count": 639,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_added_card_natural_replays_20260706_lorehold_profile_repair_package/natural_added_replay_seed_103.events.jsonl",
+      "provenance_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_added_card_natural_replays_20260706_lorehold_profile_repair_package/natural_added_deck_provenance_seed_103.json",
+      "replay_txt": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_added_card_natural_replays_20260706_lorehold_profile_repair_package/natural_added_replay_seed_103.txt",
+      "returncode": 0,
+      "seed": 103,
+      "status": "natural_replay_generated",
+      "stderr_tail": "",
+      "stdout_tail": "Loaded 12 real opponent decks from 96 valid candidates (seed=20260706)\nReplay: /Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_added_card_natural_replays_20260706_lorehold_profile_repair_package/natural_added_replay_seed_103.txt\nReplay events: /Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_added_card_natural_replays_20260706_lorehold_profile_repair_package/natural_added_replay_seed_103.events.jsonl\nDecision trace: /Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_added_card_natural_replays_20260706_lorehold_profile_repair_package/natural_added_replay_seed_103.decision_trace.jsonl\n"
+    },
+    {
+      "cards": {
+        "Bant Panorama": {
+          "decision_trace_count": 0,
+          "event_types": {
+            "focus_card_access_snapshot": 36
+          },
+          "exercise_event_count": 0,
+          "exposure_event_count": 36,
+          "first_decision_trace": null,
+          "first_exercise_event": null,
+          "first_exposure_event": {
+            "event": "focus_card_access_snapshot",
+            "player": "Lorehold",
+            "turn": 0
+          },
+          "first_forced_access_event": null,
+          "forced_access_moved_or_present_count": 0,
+          "forced_access_not_found_count": 0,
+          "forced_access_statuses": {},
+          "reference_event_count": 0
+        },
+        "Birgi, God of Storytelling // Harnfel, Horn of Bounty": {
+          "decision_trace_count": 0,
+          "event_types": {
+            "focus_card_access_snapshot": 36
+          },
+          "exercise_event_count": 0,
+          "exposure_event_count": 36,
+          "first_decision_trace": null,
+          "first_exercise_event": null,
+          "first_exposure_event": {
+            "event": "focus_card_access_snapshot",
+            "player": "Lorehold",
+            "turn": 0
+          },
+          "first_forced_access_event": null,
+          "forced_access_moved_or_present_count": 0,
+          "forced_access_not_found_count": 0,
+          "forced_access_statuses": {},
+          "reference_event_count": 0
+        },
+        "Brokers Hideout": {
+          "decision_trace_count": 0,
+          "event_types": {
+            "focus_card_access_snapshot": 36
+          },
+          "exercise_event_count": 0,
+          "exposure_event_count": 36,
+          "first_decision_trace": null,
+          "first_exercise_event": null,
+          "first_exposure_event": {
+            "event": "focus_card_access_snapshot",
+            "player": "Lorehold",
+            "turn": 0
+          },
+          "first_forced_access_event": null,
+          "forced_access_moved_or_present_count": 0,
+          "forced_access_not_found_count": 0,
+          "forced_access_statuses": {},
+          "reference_event_count": 0
+        },
+        "Pyromancer's Goggles": {
+          "decision_trace_count": 15,
+          "event_types": {
+            "focus_card_access_snapshot": 36,
+            "turn_end": 7,
+            "turn_start": 7
+          },
+          "exercise_event_count": 0,
+          "exposure_event_count": 36,
+          "first_decision_trace": {
+            "event": "mulligan_decision",
+            "player": "Lorehold",
+            "turn": 0
+          },
+          "first_exercise_event": null,
+          "first_exposure_event": {
+            "event": "focus_card_access_snapshot",
+            "player": "Lorehold",
+            "turn": 0
+          },
+          "first_forced_access_event": null,
+          "forced_access_moved_or_present_count": 0,
+          "forced_access_not_found_count": 0,
+          "forced_access_statuses": {},
+          "reference_event_count": 14
+        }
+      },
+      "decision_count": 97,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_added_card_natural_replays_20260706_lorehold_profile_repair_package/natural_added_replay_seed_104.decision_trace.jsonl",
+      "event_count": 606,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_added_card_natural_replays_20260706_lorehold_profile_repair_package/natural_added_replay_seed_104.events.jsonl",
+      "provenance_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_added_card_natural_replays_20260706_lorehold_profile_repair_package/natural_added_deck_provenance_seed_104.json",
+      "replay_txt": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_added_card_natural_replays_20260706_lorehold_profile_repair_package/natural_added_replay_seed_104.txt",
+      "returncode": 0,
+      "seed": 104,
+      "status": "natural_replay_generated",
+      "stderr_tail": "",
+      "stdout_tail": "Loaded 12 real opponent decks from 96 valid candidates (seed=20260706)\nReplay: /Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_added_card_natural_replays_20260706_lorehold_profile_repair_package/natural_added_replay_seed_104.txt\nReplay events: /Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_added_card_natural_replays_20260706_lorehold_profile_repair_package/natural_added_replay_seed_104.events.jsonl\nDecision trace: /Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_added_card_natural_replays_20260706_lorehold_profile_repair_package/natural_added_replay_seed_104.decision_trace.jsonl\n"
+    }
+  ],
+  "source_db_mutated": false,
+  "status": "candidate_added_card_natural_replay_all_exercised_ready_for_larger_gate",
+  "summary": {
+    "commander": "Lorehold, the Historian",
+    "deck_id": "612",
+    "exercised_added_cards": [
+      "Bant Panorama",
+      "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+      "Brokers Hideout",
+      "Pyromancer's Goggles"
+    ],
+    "focus_card_count": 4,
+    "focus_cards": [
+      "Bant Panorama",
+      "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+      "Brokers Hideout",
+      "Pyromancer's Goggles"
+    ],
+    "generated_replay_count": 5,
+    "next_gate": "run_larger_equal_battle_gate",
+    "seed_count": 5,
+    "seed_start": 100,
+    "unexercised_added_cards": []
+  }
+}

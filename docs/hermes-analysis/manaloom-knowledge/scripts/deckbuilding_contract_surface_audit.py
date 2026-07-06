@@ -201,6 +201,12 @@ GLOBAL_COMMANDER_CANDIDATE_ADDED_CARD_EXPOSURE_TRACE_GENERATOR = (
 GLOBAL_COMMANDER_CANDIDATE_ADDED_CARD_EXPOSURE_TRACE_GENERATOR_TEST = (
     SCRIPT_DIR / "test_global_commander_candidate_added_card_exposure_trace_generator.py"
 )
+GLOBAL_COMMANDER_CANDIDATE_ADDED_CARD_NATURAL_REPLAY_TRACE_GENERATOR = (
+    SCRIPT_DIR / "global_commander_candidate_added_card_natural_replay_trace_generator.py"
+)
+GLOBAL_COMMANDER_CANDIDATE_ADDED_CARD_NATURAL_REPLAY_TRACE_GENERATOR_TEST = (
+    SCRIPT_DIR / "test_global_commander_candidate_added_card_natural_replay_trace_generator.py"
+)
 GLOBAL_COMMANDER_BATTLE_FEEDBACK_MODEL = SCRIPT_DIR / "global_commander_battle_feedback_model.py"
 GLOBAL_COMMANDER_CANDIDATE_PACKAGE_CHAIN_AUDIT = (
     SCRIPT_DIR / "global_commander_candidate_package_chain_audit.py"
@@ -755,6 +761,10 @@ GLOBAL_COMMANDER_LOREHOLD_PROFILE_REPAIR_BATTLE_PROBE_AUDIT_REPORT = (
 GLOBAL_COMMANDER_LOREHOLD_PROFILE_REPAIR_ADDED_CARD_EXPOSURE_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_added_card_exposure_trace_generator_20260706_lorehold_profile_repair_package.md"
+)
+GLOBAL_COMMANDER_LOREHOLD_PROFILE_REPAIR_ADDED_CARD_NATURAL_REPLAY_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_added_card_natural_replay_trace_generator_20260706_lorehold_profile_repair_package.md"
 )
 GLOBAL_COMMANDER_CANDIDATE_BATTLE_PROBE_REPORT = (
     REPO_ROOT
@@ -4064,6 +4074,32 @@ def build_audit() -> dict[str, Any]:
     )
     checks.append(
         check_contains(
+            GLOBAL_COMMANDER_CANDIDATE_ADDED_CARD_NATURAL_REPLAY_TRACE_GENERATOR,
+            [
+                "global_commander_candidate_added_card_natural_replay_trace_generator",
+                "MANALOOM_FORCE_FOCUS_ACCESS_MODE",
+                "candidate_added_card_natural_replay_all_exercised_ready_for_larger_gate",
+                "candidate_added_card_natural_replay_blocks_larger_gate",
+                "larger_battle_gate_allowed_next",
+                "forced_access_used",
+                "promotion_allowed",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_CANDIDATE_ADDED_CARD_NATURAL_REPLAY_TRACE_GENERATOR_TEST,
+            [
+                "test_natural_replay_all_exercised_opens_larger_gate_next",
+                "test_natural_replay_seen_without_exercise_blocks_larger_gate",
+                "MANALOOM_FORCE_FOCUS_ACCESS_MODE",
+                "candidate_added_card_natural_replay_all_exercised_ready_for_larger_gate",
+                "natural_replay_unexercised_added_cards",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
             GLOBAL_COMMANDER_BATTLE_FEEDBACK_MODEL,
             [
                 "global_commander_battle_feedback_model",
@@ -5374,6 +5410,23 @@ def build_audit() -> dict[str, Any]:
                 "promotion_allowed: `false`",
                 "forced_access_is_diagnostic_not_natural_gate",
                 "seek_natural_replay_confirmation_before_larger_equal_gate",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_LOREHOLD_PROFILE_REPAIR_ADDED_CARD_NATURAL_REPLAY_REPORT,
+            [
+                "Global Commander Candidate Added Card Natural Replay Trace Generator",
+                "candidate_added_card_natural_replay_all_exercised_ready_for_larger_gate",
+                "forced_access_used: `false`",
+                "larger_battle_gate_allowed_next: `true`",
+                "promotion_allowed: `false`",
+                "run_larger_equal_battle_gate",
+                "Bant Panorama",
+                "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+                "Brokers Hideout",
+                "Pyromancer's Goggles",
             ],
         )
     )
