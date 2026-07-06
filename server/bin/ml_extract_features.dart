@@ -25,10 +25,10 @@ import 'package:postgres/postgres.dart';
 ///   - Funcional: removal_count, card_draw_count, ramp_count, board_wipe_count
 ///   - Meta: format, num_simulations
 void main(List<String> args) async {
-  final env = DotEnv(includePlatformEnvironment: true)..load();
+  final env = DotEnv(quiet: true)..load();
+  env.addAll(Platform.environment);
 
-  final outputFile =
-      _getArg(args, 'output') ?? 'ml_training_data.csv';
+  final outputFile = _getArg(args, 'output') ?? 'ml_training_data.csv';
   final minSims = int.tryParse(_getArg(args, 'min-simulations') ?? '') ?? 0;
 
   print('╔══════════════════════════════════════════════╗');
@@ -224,7 +224,12 @@ Map<String, dynamic> _extractDeckFeatures(
     'all creatures get',
     'damage to each creature',
   ];
-  const drawKeywords = ['draw a card', 'draw two', 'draw three', 'draws a card'];
+  const drawKeywords = [
+    'draw a card',
+    'draw two',
+    'draw three',
+    'draws a card'
+  ];
   const rampKeywords = [
     'add {',
     'search your library for a.*land',
@@ -446,9 +451,8 @@ void _printSummaryStats(List<Map<String, dynamic>> features) {
   print('   CMC médio: ${avgCmc.toStringAsFixed(2)}');
 
   // Com simulação
-  final withSim = features
-      .where((f) => (f['num_simulations'] as int) > 0)
-      .length;
+  final withSim =
+      features.where((f) => (f['num_simulations'] as int) > 0).length;
   print('   Com simulações: $withSim / ${features.length}');
 
   if (withSim > 0) {

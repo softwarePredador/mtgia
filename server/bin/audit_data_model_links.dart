@@ -216,8 +216,8 @@ Future<Map<String, dynamic>> _runDatabaseAudit(
   Directory serverRoot,
   bool requireDb,
 ) async {
-  final env = DotEnv(includePlatformEnvironment: true, quiet: true)
-    ..load(['${serverRoot.path}/.env']);
+  final env = DotEnv(quiet: true)..load(['${serverRoot.path}/.env']);
+  env.addAll(Platform.environment);
 
   final host = env['DB_HOST'];
   final port = int.tryParse(env['DB_PORT'] ?? '');

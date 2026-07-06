@@ -50,7 +50,8 @@ Notas:
     return;
   }
 
-  final env = DotEnv(includePlatformEnvironment: true, quiet: true)..load();
+  final env = DotEnv(quiet: true)..load();
+  env.addAll(Platform.environment);
   final connection = await Connection.open(
     Endpoint(
       host: env['DB_HOST'] ?? 'localhost',
@@ -340,9 +341,8 @@ Future<bool> _tryJqParse(
 
     var parsed = 0;
     var matched = 0;
-    final lines = process.stdout
-        .transform(utf8.decoder)
-        .transform(const LineSplitter());
+    final lines =
+        process.stdout.transform(utf8.decoder).transform(const LineSplitter());
 
     await for (final line in lines) {
       parsed++;

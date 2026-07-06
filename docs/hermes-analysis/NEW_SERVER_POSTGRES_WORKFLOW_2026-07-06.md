@@ -50,6 +50,15 @@ server/bin/with_new_server_pg.sh python3 docs/hermes-analysis/manaloom-knowledge
 server/bin/with_new_server_pg.sh python3 docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py ...
 ```
 
+Run Dart database commands the same way. Dart scripts that load `.env` must let
+the wrapper-exported `Platform.environment` values win over local `.env` values,
+otherwise local runs may try to resolve the internal Docker host
+`evolution_manaloom-postgres`.
+
+```bash
+server/bin/with_new_server_pg.sh bash -c 'cd server && dart run bin/migrate.dart --status'
+```
+
 ## Validated State
 
 Validated on 2026-07-06 from this checkout:
@@ -63,6 +72,33 @@ Validated on 2026-07-06 from this checkout:
 - A read-only XMage authoritative queue smoke test completed against this
   target with `25395` target identities, `25081` local XMage-authoritative
   sources, `314` missing-source exceptions, and `0` parser gaps.
+- `dart run bin/migrate.dart --status` through the wrapper returned `29`
+  executed migrations and `0` pending migrations.
+
+## Artifact Retention
+
+`docs/hermes-analysis/master_optimizer_reports/` is historical/audit evidence,
+not runtime input. New generated `.md`/`.json` reports in that folder are
+ignored by `.gitignore`, but thousands of older reports remain tracked from
+before the ignore rule.
+
+As measured on 2026-07-06:
+
+- `docs/hermes-analysis/master_optimizer_reports/`: about `710 MB` on disk.
+- Tracked files under that folder: `9889`, about `434 MB`.
+- Tracked markdown files in the repo: `4194`, about `66 MB` total.
+
+Cleanup should be a separate evidence-retention commit: keep living contracts,
+deploy registers, latest/current summaries, and applied package evidence; remove
+or external-archive stale per-run reports that are no longer referenced by a
+living contract. Do not mix that cleanup with card-rule package commits.
+
+Use `/tmp` for one-off audit outputs when the result is only a local diagnostic:
+
+```bash
+python3 docs/hermes-analysis/manaloom-knowledge/scripts/legacy_contamination_audit.py \
+  --out-prefix /tmp/legacy_contamination_audit_current
+```
 
 ## Guardrails
 

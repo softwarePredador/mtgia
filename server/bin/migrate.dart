@@ -912,7 +912,8 @@ class Migration {
 void main(List<String> args) async {
   final showStatus = args.contains('--status');
 
-  final env = DotEnv()..load();
+  final env = DotEnv(quiet: true)..load();
+  env.addAll(Platform.environment);
 
   final connection = await Connection.open(
     Endpoint(

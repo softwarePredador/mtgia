@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dotenv/dotenv.dart';
 import 'package:postgres/postgres.dart';
 
@@ -5,7 +7,8 @@ import 'package:postgres/postgres.dart';
 ///
 /// Uso: dart run bin/snapshot_price_history.dart
 Future<void> main() async {
-  final env = DotEnv(includePlatformEnvironment: true, quiet: true)..load();
+  final env = DotEnv(quiet: true)..load();
+  env.addAll(Platform.environment);
 
   final connection = await Connection.open(
     Endpoint(

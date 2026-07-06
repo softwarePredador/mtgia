@@ -6,7 +6,8 @@ import 'package:dotenv/dotenv.dart';
 import 'package:postgres/postgres.dart';
 
 void main(List<String> args) async {
-  final env = DotEnv(includePlatformEnvironment: true, quiet: true)..load();
+  final env = DotEnv(quiet: true)..load();
+  env.addAll(Platform.environment);
 
   final retentionArg = args.firstWhere(
     (a) => a.startsWith('--retention-days='),
@@ -36,7 +37,8 @@ void main(List<String> args) async {
       database == null ||
       username == null ||
       password == null) {
-    print('❌ Variáveis de DB ausentes (DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASS).');
+    print(
+        '❌ Variáveis de DB ausentes (DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASS).');
     exit(1);
   }
 
@@ -52,7 +54,8 @@ void main(List<String> args) async {
   );
 
   try {
-    print('🧹 Cleanup optimize telemetry (retention_days=$retentionDays, dry_run=$dryRun)');
+    print(
+        '🧹 Cleanup optimize telemetry (retention_days=$retentionDays, dry_run=$dryRun)');
 
     final countResult = await connection.execute(
       Sql.named('''

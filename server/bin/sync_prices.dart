@@ -36,7 +36,8 @@ Opções:
     return;
   }
 
-  final env = DotEnv(includePlatformEnvironment: true, quiet: true)..load();
+  final env = DotEnv(quiet: true)..load();
+  env.addAll(Platform.environment);
   final connection = await Connection.open(
     Endpoint(
       host: env['DB_HOST'] ?? 'localhost',

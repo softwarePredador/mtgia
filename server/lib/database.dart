@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:meta/meta.dart' show visibleForTesting;
 import 'package:postgres/postgres.dart';
 import 'package:dotenv/dotenv.dart';
@@ -27,7 +29,8 @@ class Database {
   /// Se a conexão não estiver ativa, lança uma exceção.
   Pool get connection {
     if (!_connected) {
-      throw Exception('A conexão com o banco de dados não foi inicializada. Chame connect() primeiro.');
+      throw Exception(
+          'A conexão com o banco de dados não foi inicializada. Chame connect() primeiro.');
     }
     return _pool;
   }
@@ -41,7 +44,8 @@ class Database {
     if (_connected) return;
 
     // Carrega as variáveis de ambiente do arquivo .env
-    final env = DotEnv(includePlatformEnvironment: true, quiet: true)..load();
+    final env = DotEnv(quiet: true)..load();
+    env.addAll(Platform.environment);
 
     final host = env['DB_HOST'];
     final port = int.tryParse(env['DB_PORT'] ?? '');
@@ -50,7 +54,11 @@ class Database {
     final password = env['DB_PASS'];
     final environment = (env['ENVIRONMENT'] ?? 'development').toLowerCase();
 
-    if (host == null || port == null || database == null || username == null || password == null) {
+    if (host == null ||
+        port == null ||
+        database == null ||
+        username == null ||
+        password == null) {
       print('❌ Erro: Variáveis de ambiente do banco não configuradas.');
       print('   Necessárias: DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASS');
       return;
@@ -111,7 +119,9 @@ class Database {
       return true;
     } catch (e) {
       print('⚠️  Erro ao conectar (SSL: ${sslMode.name}): $e');
-      try { await pool?.close(); } catch (_) {}
+      try {
+        await pool?.close();
+      } catch (_) {}
       return false;
     }
   }
