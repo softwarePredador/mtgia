@@ -2,6 +2,10 @@
 
 ## Pronto sem dependencias externas
 
+- Backlog ativo:
+  - `docs/MANALOOM_ACTIVE_PRODUCT_BACKLOG_2026-07-06.md`
+  - todos os itens que estavam como "falta" foram movidos para
+    `EM_ANDAMENTO`, `CONCLUIDO_PARCIAL` ou `EM_ANDAMENTO_BLOQUEADO_EXTERNO`.
 - Billing interno protegido por feature flag:
   - `POST /users/me/plan/checkout`
   - ativa Pro somente com `MANALOOM_INTERNAL_CHECKOUT_ENABLED=true` ou `ALLOW_INTERNAL_PRO_ACTIVATION=true`.
@@ -20,6 +24,14 @@
   - `GET /reports/:id`
   - app tenta criar link publico ao compartilhar preview de otimizacao.
   - Next.js reativou `/reports/[id]` sem dados mockados.
+- Metricas comerciais e operacionais:
+  - `GET /health/metrics`: latencia e erro por endpoint em memoria.
+  - `GET /health/dashboard`: request metrics, IA e resumo comercial.
+  - `GET /health/commercial`: funil, IA, planos, relatorios e retencao.
+- Scripts operacionais:
+  - `scripts/manaloom_product_smoke.sh`: smoke ponta a ponta no stack novo.
+  - `scripts/manaloom_easypanel_backup.sh`: backup `pg_dump -Fc`.
+  - `scripts/manaloom_validate_restore.sh`: restore em Postgres temporario.
 - Hosts publicos default alinhados para:
   - API: `https://evolution-cartinhas.2ta7qx.easypanel.host`
   - web publico: `https://evolution-manaloom-web-public.2ta7qx.easypanel.host`
@@ -44,6 +56,7 @@
 ```bash
 curl -fsS https://evolution-cartinhas.2ta7qx.easypanel.host/health
 curl -fsS https://evolution-cartinhas.2ta7qx.easypanel.host/ready
+curl -fsS https://evolution-cartinhas.2ta7qx.easypanel.host/health/commercial
 curl -I https://evolution-manaloom-web-public.2ta7qx.easypanel.host/pricing
 curl -I https://evolution-manaloom-web-public.2ta7qx.easypanel.host/reports/nao-existe
 ```
@@ -51,5 +64,29 @@ curl -I https://evolution-manaloom-web-public.2ta7qx.easypanel.host/reports/nao-
 Esperado:
 
 - health/ready respondem 200.
+- commercial responde 200 com funil agregado, sem dados pessoais.
 - pricing responde 200.
 - report inexistente responde 404; report criado pelo app responde 200.
+
+## Rotina operacional em andamento
+
+```bash
+scripts/manaloom_product_smoke.sh
+scripts/manaloom_easypanel_backup.sh
+scripts/manaloom_validate_restore.sh backups/manaloom-postgres/<arquivo>.dump
+```
+
+Para restore completo em ambiente temporario:
+
+```bash
+MANALOOM_RESTORE_MODE=full scripts/manaloom_validate_restore.sh backups/manaloom-postgres/<arquivo>.dump
+```
+
+O restore padrao usa `schema` para ser rapido em validacao recorrente. O modo
+`full` deve ser usado em janela controlada ou maquina com espaco suficiente.
+
+Evidencia de 2026-07-06:
+
+- Backup real do Postgres novo gerado em `backups/manaloom-postgres/`.
+- Restore schema validado em Postgres 17 temporario remoto.
+- Resultado do restore: `80` tabelas publicas restauradas.
