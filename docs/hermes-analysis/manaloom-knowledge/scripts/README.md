@@ -237,6 +237,12 @@ signals plus their limitations. External corpus is source-policy evidence only;
 it does not create cut permission, candidate copy, battle, promotion, or
 value-safe reclassification.
 
+Then run `global_commander_external_nonpayoff_same_lane_cut_policy_mapper.py`
+after external nonpayoff corpus collection. It converts role-level corpus into
+source-discovery policy and requires named external source candidates before
+any miner rerun. It still does not create card-level cut permission, candidate
+copy, battle, promotion, or value-safe reclassification.
+
 ## XMage Authoritative Adaptation
 
 For all-card battle-rule acceleration, use local XMage as the authoritative

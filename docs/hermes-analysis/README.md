@@ -690,6 +690,13 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `exhausted_role_count=3`, `ready_pair_count=0` e
     `external_cut_permission_now=false`. O proximo gate e
     `map_external_nonpayoff_same_lane_corpus_to_cut_policy_before_source_discovery`.
+    O mapper de politica desse corpus fica em
+    `global_commander_external_nonpayoff_same_lane_cut_policy_mapper_20260705_kaalia_value_safe_stage1_repair_scope1.md`.
+    Resultado: `external_nonpayoff_same_lane_policy_ready_no_cut_permission`,
+    com `role_policy_count=3`, `source_discovery_required_role_count=3`,
+    `rerun_miner_allowed_role_count=0` e
+    `card_level_cut_permission_count=0`. O proximo gate e
+    `discover_external_nonpayoff_same_lane_source_candidates_before_miner`.
     Observacao operacional: snapshots historicos de candidate-copy, battle-probe,
     battle-feedback e package-chain dependem de artefatos locais ignorados. Se
     faltarem ou forem regenerados sem esses artefatos, a auditoria de superficie

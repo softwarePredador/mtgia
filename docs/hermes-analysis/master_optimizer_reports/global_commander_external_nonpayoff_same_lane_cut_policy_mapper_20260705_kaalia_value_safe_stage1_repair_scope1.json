@@ -1,0 +1,159 @@
+{
+  "artifact_type": "global_commander_external_nonpayoff_same_lane_cut_policy_mapper",
+  "battle_gate_allowed_now": false,
+  "battle_gate_performed": false,
+  "battle_or_optimization_performed": false,
+  "battle_replay_performed": false,
+  "candidate_copy_allowed_now": false,
+  "candidate_copy_blockers": [
+    "external_policy_is_role_level_not_card_cut_permission",
+    "named_source_candidates_required_before_miner_rerun",
+    "candidate_copy_closed_until_value_safe_same_lane_pair_exists",
+    "battle_gate_closed_until_candidate_copy_and_card_level_usage_evidence_exist"
+  ],
+  "card_level_cut_permission_now": false,
+  "deck_action_allowed": false,
+  "generated_at": "2026-07-06T00:34:42.055980+00:00",
+  "input_artifacts": {
+    "corpus_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_same_lane_cut_corpus_collector_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+  },
+  "mutation_allowed": false,
+  "policy": {
+    "mutation_boundary": "This mapper does not mutate DBs, copy decks, run battles, or promote anything.",
+    "role_boundary": "This mapper creates role-level source-discovery policy, not card-level cut permission.",
+    "source_boundary": "Named external source candidates must be collected and checked locally before any miner rerun.",
+    "trace_boundary": "Target-deck trace and same-lane value-safe pairing remain required before candidate copy."
+  },
+  "postgres_writes": false,
+  "promotion_allowed": false,
+  "role_policy_rows": [
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "corpus_status": "external_nonpayoff_corpus_collected_for_exhausted_same_lane_role",
+      "cut_policy": "require_external_nonpayoff_source_discovery_before_miner",
+      "next_evidence": "discover_external_nonpayoff_same_lane_source_candidates",
+      "nonpayoff_requirement": "research nonpayoff support slots only; exclude commander, lands, Angels/Demons/Dragons payoffs, expected attack enablers, and already traced cards",
+      "policy_reason": "The current deck is exhausted for this role; external corpus can guide source discovery but not cut permission.",
+      "required_evidence": [
+        "named_external_source_candidate_rows",
+        "local_identity_and_legality_check",
+        "target_deck_trace_or_negative_review_before_cut_consideration",
+        "same_lane_value_safe_pair_before_candidate_copy"
+      ],
+      "rerun_miner_allowed_for_role": false,
+      "role_label": "haste/protection/silence attack-window support",
+      "selected_add_count": 2,
+      "source_count": 6,
+      "source_ids": [
+        "edhrec_kaalia_current_2026_07_05",
+        "edhrec_kaalia_combos_2026_07_05",
+        "commander_spellbook_combo_search_2026_07_05",
+        "wizards_commander_brackets_2026_02_09",
+        "scryfall_game_changer_surface_via_playgroup_2026_07_05",
+        "draftsim_kaalia_deck_guide_2025"
+      ],
+      "source_signal_requirements": [
+        "commander_public_usage_presence_or_absence",
+        "combo_dependency_check",
+        "strategy_article_attack_window_context",
+        "game_changer_or_bracket_context"
+      ],
+      "target_cut_role": "haste_protection_silence",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "corpus_status": "external_nonpayoff_corpus_collected_for_exhausted_same_lane_role",
+      "cut_policy": "require_external_nonpayoff_source_discovery_before_miner",
+      "next_evidence": "discover_external_nonpayoff_same_lane_source_candidates",
+      "nonpayoff_requirement": "research nonland, nonpayoff mana sources only; exclude lands, payoff creatures, structural fast-mana anchors, and already traced cards",
+      "policy_reason": "The current deck is exhausted for this role; external corpus can guide source discovery but not cut permission.",
+      "required_evidence": [
+        "named_external_source_candidate_rows",
+        "local_identity_and_legality_check",
+        "target_deck_trace_or_negative_review_before_cut_consideration",
+        "same_lane_value_safe_pair_before_candidate_copy"
+      ],
+      "rerun_miner_allowed_for_role": false,
+      "role_label": "nonland ramp, rocks, fast mana, treasure support",
+      "selected_add_count": 1,
+      "source_count": 6,
+      "source_ids": [
+        "edhrec_kaalia_current_2026_07_05",
+        "edhrec_kaalia_combos_2026_07_05",
+        "commander_spellbook_combo_search_2026_07_05",
+        "wizards_commander_brackets_2026_02_09",
+        "scryfall_game_changer_surface_via_playgroup_2026_07_05",
+        "draftsim_kaalia_deck_guide_2025"
+      ],
+      "source_signal_requirements": [
+        "mana_artifacts_or_ramp_section_context",
+        "combo_dependency_check",
+        "game_changer_or_bracket_context",
+        "target_deck_usage_override_check"
+      ],
+      "target_cut_role": "mana_acceleration",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_level_cut_permission_now": false,
+      "corpus_status": "external_nonpayoff_corpus_collected_for_exhausted_same_lane_role",
+      "cut_policy": "require_external_nonpayoff_source_discovery_before_miner",
+      "next_evidence": "discover_external_nonpayoff_same_lane_source_candidates",
+      "nonpayoff_requirement": "research nonpayoff tutor/access slots only; exclude payoff bodies, expected package anchors, structural tutors, and already traced cards",
+      "policy_reason": "The current deck is exhausted for this role; external corpus can guide source discovery but not cut permission.",
+      "required_evidence": [
+        "named_external_source_candidate_rows",
+        "local_identity_and_legality_check",
+        "target_deck_trace_or_negative_review_before_cut_consideration",
+        "same_lane_value_safe_pair_before_candidate_copy"
+      ],
+      "rerun_miner_allowed_for_role": false,
+      "role_label": "tutor and library-access support",
+      "selected_add_count": 5,
+      "source_count": 5,
+      "source_ids": [
+        "edhrec_kaalia_current_2026_07_05",
+        "edhrec_kaalia_combos_2026_07_05",
+        "commander_spellbook_combo_search_2026_07_05",
+        "wizards_commander_brackets_2026_02_09",
+        "scryfall_game_changer_surface_via_playgroup_2026_07_05"
+      ],
+      "source_signal_requirements": [
+        "public_usage_tutor_context",
+        "combo_dependency_check",
+        "game_changer_or_bracket_context",
+        "target_deck_usage_override_check"
+      ],
+      "target_cut_role": "tutors_access",
+      "value_safe_reclassification_allowed": false
+    }
+  ],
+  "source_db_mutated": false,
+  "source_discovery_required_roles": [
+    "haste_protection_silence",
+    "mana_acceleration",
+    "tutors_access"
+  ],
+  "status": "external_nonpayoff_same_lane_policy_ready_no_cut_permission",
+  "summary": {
+    "candidate_copy_blocker_count": 4,
+    "card_level_cut_permission_count": 0,
+    "commander": "Kaalia of the Vast",
+    "deck_id": "619",
+    "next_gate": "discover_external_nonpayoff_same_lane_source_candidates_before_miner",
+    "policy_counts": {
+      "require_external_nonpayoff_source_discovery_before_miner": 3
+    },
+    "rerun_miner_allowed_role_count": 0,
+    "role_policy_count": 3,
+    "source_discovery_required_role_count": 3
+  },
+  "value_safe_reclassification_allowed_now": false
+}

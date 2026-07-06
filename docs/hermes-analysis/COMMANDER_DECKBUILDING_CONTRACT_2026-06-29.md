@@ -387,7 +387,13 @@ Operational priority after this pivot:
     and combo-dependency context, and target-deck trace override boundaries
     without creating cut permission, candidate copy, battle, promotion, or
     value-safe reclassification;
-50. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
+50. run `global_commander_external_nonpayoff_same_lane_cut_policy_mapper.py`
+    after corpus collection; it must convert role-level corpus into explicit
+    source-discovery policy, keep the policy role-level rather than card-level
+    cut permission, require named external source candidates before miner
+    reruns, and keep candidate copy, battle, promotion, and value-safe
+    reclassification closed;
+51. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
     probes, as regression evidence only unless they produce a named safe cut and
     equal-gate proof under the Lorehold promotion gate.
 
@@ -455,6 +461,7 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_new_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_axis_broadening_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_same_lane_cut_corpus_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_same_lane_cut_policy_mapper_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 
 Historical candidate-copy, battle-probe, battle-feedback, and package-chain
 snapshots are local ignored evidence artifacts. The surface auditor must show
@@ -1010,6 +1017,12 @@ Current external refresh on 2026-07-05:
   recorded as source-policy evidence only; it does not create cut permission.
   The next gate is
   `map_external_nonpayoff_same_lane_corpus_to_cut_policy_before_source_discovery`.
+- Current external nonpayoff same-lane cut-policy mapping returns
+  `external_nonpayoff_same_lane_policy_ready_no_cut_permission` with
+  `role_policy_count=3`, `source_discovery_required_role_count=3`,
+  `rerun_miner_allowed_role_count=0`, and `card_level_cut_permission_count=0`.
+  The next gate is
+  `discover_external_nonpayoff_same_lane_source_candidates_before_miner`.
 
 ## Global Commander Rollout - 2026-07-01
 
