@@ -10153,6 +10153,50 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "mana_source_source_sacrifice_cost_not_supported")
 
+    def test_simple_mana_source_with_unmodeled_auxiliary_sacrifice_maps_partial_mana(self) -> None:
+        row = queue_row(
+            split.RAMP_CREATURE_UNIT,
+            effect_classes=["ReturnFromGraveyardToHandTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["AnyColorManaAbility", "SimpleActivatedAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Atzocan Seer",
+                type_line="Creature - Human Druid",
+                oracle_text=(
+                    "{T}: Add one mana of any color.\n"
+                    "Sacrifice this creature: Return target Dinosaur card from your graveyard to your hand."
+                ),
+            ),
+            source_text=(
+                "this.addAbility(new AnyColorManaAbility());"
+                "Ability ability = new SimpleActivatedAbility("
+                "new ReturnFromGraveyardToHandTargetEffect(), new SacrificeSourceCost());"
+                "ability.addTarget(new TargetCardInYourGraveyard(filter));"
+                "this.addAbility(ability);"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.MANA_SCOPE)
+        self.assertEqual(effect["modeled_ability_subset"], "mana_source_only")
+        self.assertTrue(effect["_runtime_partial"])
+        self.assertEqual(effect["produces"], "WUBRG")
+        self.assertEqual(effect["mana_produced"], 1)
+        self.assertEqual(effect["xmage_mana_ability_classes"], ["AnyColorManaAbility"])
+        self.assertEqual(effect["xmage_auxiliary_ability_classes"], ["SimpleActivatedAbility"])
+        self.assertEqual(
+            effect["xmage_unmodeled_auxiliary_ability_classes"],
+            ["SimpleActivatedAbility"],
+        )
+        self.assertEqual(
+            effect["xmage_unmodeled_effect_classes"],
+            ["ReturnFromGraveyardToHandTargetEffect"],
+        )
+
     def test_simple_mana_source_with_hybrid_activated_draw_cost_maps(self) -> None:
         row = queue_row(
             split.RAMP_ARTIFACT_UNIT,

@@ -14950,12 +14950,52 @@ def simple_mana_source_from_oracle(metadata: dict[str, Any]) -> tuple[str, int] 
     return str(detail["produces"]), int(detail["mana_produced"])
 
 
+DIRECT_SAFE_MANA_ABILITY_CLASSES = SAFE_MANA_ABILITY_CLASSES - {"SimpleManaAbility"}
+
+
+def has_direct_independent_safe_mana_ability(
+    source_text: str,
+    ability_class_values: set[str],
+) -> bool:
+    text = source_text or ""
+    for ability_class in sorted(DIRECT_SAFE_MANA_ABILITY_CLASSES & ability_class_values):
+        if re.search(rf"this\.addAbility\(new\s+{re.escape(ability_class)}\s*\(", text):
+            return True
+
+    if "SimpleManaAbility" not in ability_class_values:
+        return False
+    for match in re.finditer(r"this\.addAbility\(new\s+SimpleManaAbility\b", text):
+        statement = text[match.start() : text.find(";", match.start()) + 1]
+        if not statement:
+            continue
+        if not any(
+            marker in statement
+            for marker in (
+                "SacrificeSourceCost",
+                "SacrificeTargetCost",
+                "Discard",
+                "PayLifeCost",
+                "ExileSourceCost",
+                "ConditionalMana",
+                "spend this mana only",
+            )
+        ):
+            return True
+    return False
+
+
 def simple_mana_source_source_blocker(
     source_text: str,
     ability_class_values: set[str],
     mana_source_detail: dict[str, Any] | None = None,
+    *,
+    allow_auxiliary_sacrifice_cost_when_independent_mana: bool = False,
 ) -> str | None:
     text = source_text or ""
+    has_independent_mana = (
+        allow_auxiliary_sacrifice_cost_when_independent_mana
+        and has_direct_independent_safe_mana_ability(text, ability_class_values)
+    )
     unsupported_markers = {
         "SacrificeSourceCost": "mana_source_source_sacrifice_cost_not_supported",
         "SacrificeTargetCost": "mana_source_source_sacrifice_target_cost_not_supported",
@@ -14967,6 +15007,8 @@ def simple_mana_source_source_blocker(
     }
     for marker, reason in unsupported_markers.items():
         if marker in text:
+            if marker == "SacrificeSourceCost" and has_independent_mana:
+                continue
             return reason
     if mana_source_detail is not None:
         requires_tap = bool(mana_source_detail.get("mana_activation_requires_tap", True))
@@ -23811,6 +23853,7 @@ def split_row(
                 source_text,
                 mana_ability_classes,
                 mana_source_detail,
+                allow_auxiliary_sacrifice_cost_when_independent_mana=True,
             )
             if source_blocker:
                 return None, source_blocker

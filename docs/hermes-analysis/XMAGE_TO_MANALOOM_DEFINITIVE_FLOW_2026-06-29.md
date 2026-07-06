@@ -15164,6 +15164,78 @@ untapping the source, tapping another target creature/permanent, sacrifice,
 exile, target discard, composite/or costs, or broader target-keyword/stat-change
 families without a matching exact runtime adapter and focused package evidence.
 
+## PG555 Independent Mana Auxiliary New Server Evidence
+
+PG555 evidence:
+
+- exact split report:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260706_pg555_independent_mana_aux_candidate.md`
+- package:
+  `docs/hermes-analysis/master_optimizer_reports/pg555_independent_mana_aux_new_server_package_package.md`
+- apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg555_independent_mana_aux_new_server_apply_evidence.md`
+- PG -> SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg555_independent_mana_aux_new_server_sync_report.json`
+- E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg555_independent_mana_aux_new_server_e2e.md`
+- post-sync queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260706_post_pg555_independent_mana_aux_new_server.md`
+- final exact-scope recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260706_post_pg555_independent_mana_aux_new_server_final.md`
+- readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260706_post_pg555_independent_mana_aux_new_server.md`
+- final audits:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260706_post_pg555_independent_mana_aux_new_server_final.md`,
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260706_post_pg555_independent_mana_aux_new_server_final.md`,
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260706_post_pg555_independent_mana_aux_new_server_final.md`,
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260706_post_pg555_independent_mana_aux_new_server_final.md`
+
+Validation:
+
+- focused code checks passed: `py_compile`, `54` package/E2E pytest tests, and
+  `621` exact-scope splitter unittest tests;
+- exact split selected `5` cards for
+  `xmage_simple_mana_source_with_unmodeled_auxiliary` under
+  `xmage_simple_tap_mana_source_permanent_v1`;
+- package precheck found `5/5` target card rows and no existing matching rows;
+- package apply upserted `5` rows and deprecated `0` shadow rows;
+- PostgreSQL postcheck confirmed `5/5` promoted rows, `5/5`
+  verified/auto, and `5/5` oracle hash rows;
+- PG -> SQLite sync loaded `8,953` PostgreSQL rows, updated `8,717` SQLite
+  rows, and exported `6,455` canonical snapshot rows;
+- package E2E: `status=pass`, `scenario_count=5`, `event_count=5`, and
+  every promoted card refreshed through PostgreSQL, Hermes SQLite, canonical
+  snapshot fallback, runtime `get_card_effect`, and battle execution;
+- final exact-scope recheck has `proposal_count=0` and
+  `safe_for_batch_pg_package_count=0`;
+- final audits passed: XMage strategy `pass`, PG-Hermes-SQLite `pass`,
+  operational surface `pass`, legacy contamination `pass`.
+
+Post-sync queue evidence:
+
+- pre-cycle `target_identity_count=25543`
+- post-cycle `target_identity_count=25538`
+- post-cycle `xmage_authoritative_source_count=25224`
+- post-cycle `xmage_missing_source_exception_count=314`
+- post-cycle `xmage_authoritative_parser_gap_count=0`
+- post-cycle `xmage_authoritative_adapter_required_count=25224`
+- post-cycle `adapter_work_unit_count=11354`
+
+Runtime semantics:
+
+- the splitter now accepts a direct independent safe mana ability on a
+  permanent even when a separate auxiliary activated ability has
+  `SacrificeSourceCost`;
+- only the mana ability is executable; auxiliary draw, destroy, damage, or
+  recursion effects remain explicitly unmodeled metadata;
+- the guard still blocks cases where sacrifice, delayed draw, or another
+  auxiliary effect is part of the mana ability itself.
+
+Residual boundary: PG555 does not authorize Astrolabe/Sextant-style mana
+abilities where sacrifice/draw is coupled to mana production, conditional mana
+families, unsafe `SimpleManaAbility` cost shapes, or the separate auxiliary
+effect. Those require their own exact runtime adapter and focused evidence.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

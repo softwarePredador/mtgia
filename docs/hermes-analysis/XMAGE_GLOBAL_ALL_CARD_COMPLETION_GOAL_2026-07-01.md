@@ -1800,6 +1800,20 @@ Immediate checkpoint after PG361:
     mapper/runtime subpattern before generating a new PostgreSQL package.
     Current evidence:
     `docs/hermes-analysis/master_optimizer_reports/pg554_self_keyword_extra_costs_new_server_apply_evidence.md`.
+81. PG555 promoted `5` independent mana-source permanent rows on the new
+    server after extending the exact mapper/runtime lane to accept a direct
+    safe XMage mana ability plus a separate auxiliary sacrifice ability as a
+    partial executable rule. Only the mana source is modeled; the auxiliary
+    draw, destroy, damage, or recursion effect stays explicitly unmodeled. The
+    cycle reduced Commander-legal battle-gap identities from `25543` to
+    `25538`, reduced XMage-authoritative adapter-required identities from
+    `25229` to `25224`, and kept total adapter work units at `11354` while
+    reducing artifact mana-source work units from `151` to `148` and creature
+    mana-source work units from `286` to `284`. The final split returned
+    `proposal_count=0`, so the next cycle must implement another
+    mapper/runtime subpattern before generating a new PostgreSQL package.
+    Current evidence:
+    `docs/hermes-analysis/master_optimizer_reports/pg555_independent_mana_aux_new_server_apply_evidence.md`.
 
 ## Non-Goals
 
