@@ -275,6 +275,16 @@ Operational priority after this pivot:
    cuts, and materialization blockers for each repair axis. Large
    commander-payoff shortfalls must route to a broader commander source lane
    instead of a narrow add/cut materialization;
+
+Profile-repair package follow-up: when a profile-repair package has selected
+adds/cuts but the cut-pair reviewer blocks protected anchors or land-floor
+pairs, run `global_commander_profile_repair_cut_pair_reorderer.py` before any
+candidate copy. The reorderer can only reshuffle review rows so protected
+anchors consume same-lane cuts before land repairs consume the remaining pool.
+It must keep candidate copy, battle, mutation, and promotion closed; if only
+land-floor pairs remain blocked, the next gate is
+`review_land_floor_cut_role_loss_before_candidate_copy`.
+
 19. run `global_commander_payoff_source_lane_expander.py` when a commander
    payoff axis is too sparse for materialization; it must scan local Oracle
    rows by commander color identity, Commander legality, creature payoff type,
@@ -1749,7 +1759,17 @@ Current external refresh on 2026-07-05:
   keeps candidate copy closed: only `Birgi` over `Jeska's Will` has same-lane
   overlap, while the two land pairs need curve/role-loss review and the
   `Pyromancer's Goggles`/`Call Forth the Tempest` restore pairs are cross-lane.
-  The next gate is `reorder_or_expand_profile_repair_cut_pairs_before_candidate_copy`.
+  That made the prior next gate
+  `reorder_or_expand_profile_repair_cut_pairs_before_candidate_copy`.
+  The cut-pair reorderer repairs all protected-anchor pair mismatches by
+  assigning same-lane cuts to `Pyromancer's Goggles`, `Call Forth the Tempest`,
+  and `Birgi, God of Storytelling // Harnfel, Horn of Bounty` first. Candidate
+  copy remains closed with
+  `profile_repair_cut_pair_reorder_ready_for_land_curve_review`,
+  `protected_anchor_ready_pair_count=3`, and `land_pair_review_count=2`
+  because the two land-floor pairs still need curve and role-loss review. The
+  next gate is
+  `review_land_floor_cut_role_loss_before_candidate_copy`.
   Current evidence:
   `global_commander_learning_priority_audit_20260706_ramp_axis_exhaustion_current.md`,
   `global_commander_cross_commander_role_axis_learning_pivot_20260706_ramp_axis_exhaustion_current.md`,
@@ -1771,7 +1791,9 @@ Current external refresh on 2026-07-05:
   and
   `global_commander_profile_repair_package_resynthesizer_20260706_lorehold_land_floor_package_profile.md`,
   then
-  `global_commander_profile_repair_cut_pair_reviewer_20260706_lorehold_land_floor_package_profile.md`.
+  `global_commander_profile_repair_cut_pair_reviewer_20260706_lorehold_land_floor_package_profile.md`,
+  then
+  `global_commander_profile_repair_cut_pair_reorderer_20260706_lorehold_land_floor_package_profile.md`.
 
 ## Global Commander Rollout - 2026-07-01
 
