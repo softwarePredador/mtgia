@@ -1,22 +1,27 @@
 # Global Commander Engine Exact Replacement Or New Cut Finder
 
-- generated_at: `2026-07-06T04:43:06.568175+00:00`
-- status: `engine_exact_replacement_or_new_cut_not_found_locally`
+- generated_at: `2026-07-06T04:54:22.420626+00:00`
+- status: `engine_exact_replacement_found_needs_source_trace`
 - commander: `Kaalia of the Vast`
 - deck_id: `619`
-- replacement_candidate_scanned_count: `7`
-- exact_replacement_ready_count: `0`
+- replacement_candidate_scanned_count: `12`
+- exact_replacement_ready_count: `5`
 - engine_cut_row_count: `8`
 - new_unblocked_engine_cut_count: `0`
 - candidate_copy_allowed_now: `false`
 - battle_gate_allowed_now: `false`
 - promotion_allowed: `false`
-- next_gate: `expand_external_exact_artifact_engine_source_lanes_or_global_axis`
+- next_gate: `source_trace_exact_engine_replacement_before_candidate_copy`
 
 ## Replacement Candidates
 
 | Card | Status | Signals | Color | Legality | Blockers |
 | --- | --- | --- | --- | --- | --- |
+| `Digsite Engineer` | `exact_replacement_candidate_ready_for_source_trace` | `artifact_spell_token_payoff` | `W` | `legal` | - |
+| `Golem Foundry` | `exact_replacement_candidate_ready_for_source_trace` | `artifact_spell_token_payoff` | `` | `legal` | - |
+| `Myrsmith` | `exact_replacement_candidate_ready_for_source_trace` | `artifact_spell_token_payoff` | `W` | `legal` | - |
+| `Poetic Ingenuity` | `exact_replacement_candidate_ready_for_source_trace` | `artifact_spell_token_payoff` | `R` | `legal` | - |
+| `Ravenous Robots` | `exact_replacement_candidate_ready_for_source_trace` | `artifact_spell_token_payoff` | `R` | `legal` | - |
 | `Etherium Sculptor` | `artifact_spell_support_not_biotransference_replacement` | `artifact_spell_cost_reducer` | `U` | `legal` | outside_commander_color_identity, support_only_no_token_or_draw_payoff |
 | `Sai, Master Thopterist` | `exact_artifact_spell_payoff_candidate` | `artifact_spell_draw_payoff,artifact_spell_token_payoff` | `U` | `legal` | outside_commander_color_identity |
 | `Biotransference` | `exact_type_conversion_engine_candidate` | `artifact_spell_token_payoff,artifact_type_conversion_engine` | `B` | `legal` | already_in_current_deck |
@@ -40,7 +45,6 @@
 
 ## Blockers
 
-- `no_local_exact_replacement_ready_for_source_trace`
 - `no_new_unblocked_engine_cut_source`
 - `candidate_copy_closed_after_exact_replacement_or_new_cut_finder`
 

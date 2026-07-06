@@ -5,12 +5,11 @@
   "battle_or_optimization_performed": false,
   "candidate_copy_allowed_now": false,
   "candidate_copy_blockers": [
-    "no_local_exact_replacement_ready_for_source_trace",
     "no_new_unblocked_engine_cut_source",
     "candidate_copy_closed_after_exact_replacement_or_new_cut_finder"
   ],
   "deck_action_allowed": false,
-  "generated_at": "2026-07-06T04:43:06.568175+00:00",
+  "generated_at": "2026-07-06T04:54:22.420626+00:00",
   "input_artifacts": {
     "engine_policy_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_engine_axis_nonland_cut_policy_model_20260706_current.json",
     "reviewer_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_engine_cut_trace_replacement_reviewer_20260706_current.json",
@@ -178,6 +177,104 @@
     {
       "already_in_current_deck": false,
       "battle_gate_allowed": false,
+      "blockers": [],
+      "candidate_copy_allowed": false,
+      "card_name": "Digsite Engineer",
+      "color_identity": [
+        "W"
+      ],
+      "commander_legality": "legal",
+      "edhrec_rank": null,
+      "mutation_allowed": false,
+      "oracle_excerpt": "Whenever you cast an artifact spell, you may pay {2}. If you do, create a 0/0 colorless Construct artifact creature token with \"This token gets +1/+1 for each artifact you control.\"",
+      "raw_exact_status": "exact_artifact_spell_payoff_candidate",
+      "signals": [
+        "artifact_spell_token_payoff"
+      ],
+      "status": "exact_replacement_candidate_ready_for_source_trace",
+      "type_line": "Creature \u2014 Dwarf Artificer"
+    },
+    {
+      "already_in_current_deck": false,
+      "battle_gate_allowed": false,
+      "blockers": [],
+      "candidate_copy_allowed": false,
+      "card_name": "Golem Foundry",
+      "color_identity": [],
+      "commander_legality": "legal",
+      "edhrec_rank": null,
+      "mutation_allowed": false,
+      "oracle_excerpt": "Whenever you cast an artifact spell, you may put a charge counter on this artifact. Remove three charge counters from this artifact: Create a 3/3 colorless Golem artifact creature token.",
+      "raw_exact_status": "exact_artifact_spell_payoff_candidate",
+      "signals": [
+        "artifact_spell_token_payoff"
+      ],
+      "status": "exact_replacement_candidate_ready_for_source_trace",
+      "type_line": "Artifact"
+    },
+    {
+      "already_in_current_deck": false,
+      "battle_gate_allowed": false,
+      "blockers": [],
+      "candidate_copy_allowed": false,
+      "card_name": "Myrsmith",
+      "color_identity": [
+        "W"
+      ],
+      "commander_legality": "legal",
+      "edhrec_rank": null,
+      "mutation_allowed": false,
+      "oracle_excerpt": "Whenever you cast an artifact spell, you may pay {1}. If you do, create a 1/1 colorless Myr artifact creature token.",
+      "raw_exact_status": "exact_artifact_spell_payoff_candidate",
+      "signals": [
+        "artifact_spell_token_payoff"
+      ],
+      "status": "exact_replacement_candidate_ready_for_source_trace",
+      "type_line": "Creature \u2014 Human Artificer"
+    },
+    {
+      "already_in_current_deck": false,
+      "battle_gate_allowed": false,
+      "blockers": [],
+      "candidate_copy_allowed": false,
+      "card_name": "Poetic Ingenuity",
+      "color_identity": [
+        "R"
+      ],
+      "commander_legality": "legal",
+      "edhrec_rank": null,
+      "mutation_allowed": false,
+      "oracle_excerpt": "Whenever one or more Dinosaurs you control attack, create that many Treasure tokens. Whenever you cast an artifact spell, create a 3/1 red Dinosaur creature token. This ability triggers only once each turn.",
+      "raw_exact_status": "exact_artifact_spell_payoff_candidate",
+      "signals": [
+        "artifact_spell_token_payoff"
+      ],
+      "status": "exact_replacement_candidate_ready_for_source_trace",
+      "type_line": "Enchantment"
+    },
+    {
+      "already_in_current_deck": false,
+      "battle_gate_allowed": false,
+      "blockers": [],
+      "candidate_copy_allowed": false,
+      "card_name": "Ravenous Robots",
+      "color_identity": [
+        "R"
+      ],
+      "commander_legality": "legal",
+      "edhrec_rank": null,
+      "mutation_allowed": false,
+      "oracle_excerpt": "Whenever you cast an artifact spell, create a 1/1 colorless Robot artifact creature token. {R}, {T}: Creature tokens you control gain haste until end of turn.",
+      "raw_exact_status": "exact_artifact_spell_payoff_candidate",
+      "signals": [
+        "artifact_spell_token_payoff"
+      ],
+      "status": "exact_replacement_candidate_ready_for_source_trace",
+      "type_line": "Artifact Creature \u2014 Robot"
+    },
+    {
+      "already_in_current_deck": false,
+      "battle_gate_allowed": false,
       "blockers": [
         "outside_commander_color_identity",
         "support_only_no_token_or_draw_payoff"
@@ -334,9 +431,9 @@
     }
   ],
   "source_db_mutated": false,
-  "status": "engine_exact_replacement_or_new_cut_not_found_locally",
+  "status": "engine_exact_replacement_found_needs_source_trace",
   "summary": {
-    "candidate_copy_blocker_count": 3,
+    "candidate_copy_blocker_count": 2,
     "commander": "Kaalia of the Vast",
     "deck_id": "619",
     "engine_cut_row_count": 8,
@@ -344,14 +441,15 @@
       "already_reviewed_engine_cut_not_new_source": 2,
       "new_engine_cut_blocked_by_commander_plan_signal": 6
     },
-    "exact_replacement_ready_count": 0,
+    "exact_replacement_ready_count": 5,
     "local_oracle_cache_boundary": "card_oracle_cache_rows_only",
     "new_unblocked_engine_cut_count": 0,
-    "next_gate": "expand_external_exact_artifact_engine_source_lanes_or_global_axis",
-    "replacement_candidate_scanned_count": 7,
+    "next_gate": "source_trace_exact_engine_replacement_before_candidate_copy",
+    "replacement_candidate_scanned_count": 12,
     "replacement_status_counts": {
       "artifact_spell_support_not_biotransference_replacement": 2,
       "exact_artifact_spell_payoff_candidate": 4,
+      "exact_replacement_candidate_ready_for_source_trace": 5,
       "exact_type_conversion_engine_candidate": 1
     }
   }

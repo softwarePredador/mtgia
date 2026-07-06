@@ -96,6 +96,12 @@ GLOBAL_COMMANDER_EXTERNAL_EXACT_ARTIFACT_ENGINE_CANDIDATE_REVIEWER = (
 GLOBAL_COMMANDER_EXTERNAL_EXACT_ARTIFACT_ENGINE_CANDIDATE_REVIEWER_TEST = (
     SCRIPT_DIR / "test_global_commander_external_exact_artifact_engine_candidate_reviewer.py"
 )
+GLOBAL_COMMANDER_EXTERNAL_EXACT_ARTIFACT_ORACLE_BACKFILL = (
+    SCRIPT_DIR / "global_commander_external_exact_artifact_oracle_backfill.py"
+)
+GLOBAL_COMMANDER_EXTERNAL_EXACT_ARTIFACT_ORACLE_BACKFILL_TEST = (
+    SCRIPT_DIR / "test_global_commander_external_exact_artifact_oracle_backfill.py"
+)
 GLOBAL_COMMANDER_CANDIDATE_COPY_MATERIALIZER = SCRIPT_DIR / "global_commander_candidate_copy_materializer.py"
 GLOBAL_COMMANDER_CANDIDATE_COPY_MATERIALIZER_TEST = (
     SCRIPT_DIR / "test_global_commander_candidate_copy_materializer.py"
@@ -485,6 +491,10 @@ GLOBAL_COMMANDER_EXTERNAL_EXACT_ARTIFACT_ENGINE_SOURCE_EXPANDER_REPORT = (
 GLOBAL_COMMANDER_EXTERNAL_EXACT_ARTIFACT_ENGINE_CANDIDATE_REVIEWER_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_external_exact_artifact_engine_candidate_reviewer_20260706_current.md"
+)
+GLOBAL_COMMANDER_EXTERNAL_EXACT_ARTIFACT_ORACLE_BACKFILL_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_external_exact_artifact_oracle_backfill_20260706_current.md"
 )
 GLOBAL_COMMANDER_CANDIDATE_COPY_MATERIALIZER_REPORT = (
     REPO_ROOT
@@ -1017,6 +1027,9 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_external_exact_artifact_engine_candidate_reviewer.py",
                 "global_commander_external_exact_artifact_engine_candidate_reviewer_20260706_current.md",
                 "backfill_local_oracle_cache_for_external_exact_engine_seeds_before_add_cut_review",
+                "global_commander_external_exact_artifact_oracle_backfill.py",
+                "global_commander_external_exact_artifact_oracle_backfill_20260706_current.md",
+                "model_external_exact_artifact_engine_add_cut_pairs_before_candidate_copy",
                 "global_commander_candidate_copy_materializer.py",
                 "global_commander_candidate_copy_materializer_20260705_kaalia_nonland_top_pair.md",
                 "must reject stale chained sources",
@@ -2064,7 +2077,9 @@ def build_audit() -> dict[str, Any]:
             [
                 "global_commander_external_exact_artifact_engine_candidate_reviewer",
                 "external_exact_artifact_engine_candidate_review_blocks_candidate_copy",
+                "external_exact_artifact_engine_candidate_review_ready_for_add_cut_model",
                 "backfill_local_oracle_cache_for_external_exact_engine_seeds_before_add_cut_review",
+                "model_external_exact_artifact_engine_add_cut_pairs_before_candidate_copy",
                 "missing_local_oracle_cache",
                 "candidate_copy_allowed_now",
                 "battle_gate_allowed_now",
@@ -2080,6 +2095,31 @@ def build_audit() -> dict[str, Any]:
                 "local_external_exact_engine_candidate_ready_for_add_cut_review",
                 "missing_local_oracle_cache",
                 "already_in_current_deck",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_EXTERNAL_EXACT_ARTIFACT_ORACLE_BACKFILL,
+            [
+                "global_commander_external_exact_artifact_oracle_backfill",
+                "external_exact_artifact_oracle_backfill_applied_review_rerun_required",
+                "BACKFILL_SOURCE",
+                "deck_rows_mutated",
+                "candidate_copy_allowed_now",
+                "battle_gate_allowed_now",
+                "promotion_allowed",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_EXTERNAL_EXACT_ARTIFACT_ORACLE_BACKFILL_TEST,
+            [
+                "test_plan_and_apply_backfill_only_for_missing_reviewed_external_seed",
+                "external_exact_artifact_oracle_backfill_plan_ready",
+                "external_exact_artifact_oracle_backfill_applied_review_rerun_required",
+                "Digsite Engineer",
             ],
         )
     )
@@ -3790,12 +3830,13 @@ def build_audit() -> dict[str, Any]:
             GLOBAL_COMMANDER_ENGINE_EXACT_REPLACEMENT_OR_NEW_CUT_FINDER_REPORT,
             [
                 "Global Commander Engine Exact Replacement Or New Cut Finder",
-                "engine_exact_replacement_or_new_cut_not_found_locally",
-                "exact_replacement_ready_count: `0`",
+                "engine_exact_replacement_found_needs_source_trace",
+                "exact_replacement_ready_count: `5`",
                 "new_unblocked_engine_cut_count: `0`",
                 "candidate_copy_allowed_now: `false`",
-                "expand_external_exact_artifact_engine_source_lanes_or_global_axis",
-                "no_local_exact_replacement_ready_for_source_trace",
+                "source_trace_exact_engine_replacement_before_candidate_copy",
+                "Digsite Engineer",
+                "Ravenous Robots",
                 "no_new_unblocked_engine_cut_source",
             ],
         )
@@ -3822,14 +3863,29 @@ def build_audit() -> dict[str, Any]:
             GLOBAL_COMMANDER_EXTERNAL_EXACT_ARTIFACT_ENGINE_CANDIDATE_REVIEWER_REPORT,
             [
                 "Global Commander External Exact Artifact Engine Candidate Reviewer",
-                "external_exact_artifact_engine_candidate_review_blocks_candidate_copy",
+                "external_exact_artifact_engine_candidate_review_ready_for_add_cut_model",
                 "external_ready_input_count: `5`",
-                "local_review_ready_count: `0`",
-                "missing_local_oracle_count: `5`",
+                "local_review_ready_count: `5`",
+                "missing_local_oracle_count: `0`",
                 "candidate_copy_allowed_now: `false`",
-                "backfill_local_oracle_cache_for_external_exact_engine_seeds_before_add_cut_review",
+                "model_external_exact_artifact_engine_add_cut_pairs_before_candidate_copy",
                 "Digsite Engineer",
                 "Ravenous Robots",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_EXTERNAL_EXACT_ARTIFACT_ORACLE_BACKFILL_REPORT,
+            [
+                "Global Commander External Exact Artifact Oracle Backfill",
+                "external_exact_artifact_oracle_backfill_applied_review_rerun_required",
+                "candidate_backfill_count: `5`",
+                "backfill_applied_count: `5`",
+                "source_db_mutated: `true`",
+                "deck_rows_mutated: `false`",
+                "rerun_external_exact_artifact_engine_candidate_reviewer_after_backfill",
+                "Poetic Ingenuity",
             ],
         )
     )

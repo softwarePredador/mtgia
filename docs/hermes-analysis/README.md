@@ -314,9 +314,11 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `manaloom-knowledge/scripts/global_commander_engine_exact_replacement_or_new_cut_finder.py`,
     com evidencia:
     `master_optimizer_reports/global_commander_engine_exact_replacement_or_new_cut_finder_20260706_current.md`.
-    Resultado: nenhum replacement exacto local fica pronto para Kaalia `619`,
-    nenhum novo corte engine fica destravado, e o proximo gate passa a ser
-    `expand_external_exact_artifact_engine_source_lanes_or_global_axis`.
+    Resultado atual pos-backfill: cinco replacements exactos locais ficam
+    prontos para source trace (`Digsite Engineer`, `Golem Foundry`, `Myrsmith`,
+    `Poetic Ingenuity`, `Ravenous Robots`), nenhum novo corte engine fica
+    destravado, e o proximo gate passa a ser
+    `source_trace_exact_engine_replacement_before_candidate_copy`.
     O expander externo seguinte roda em
     `manaloom-knowledge/scripts/global_commander_external_exact_artifact_engine_source_expander.py`,
     com evidencia:
@@ -330,10 +332,14 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `manaloom-knowledge/scripts/global_commander_external_exact_artifact_engine_candidate_reviewer.py`,
     com evidencia:
     `master_optimizer_reports/global_commander_external_exact_artifact_engine_candidate_reviewer_20260706_current.md`.
-    Resultado: os cinco seeds externos prontos tem legalidade Commander local,
-    mas nao tem `card_oracle_cache` local; `local_review_ready_count=0`,
-    `missing_local_oracle_count=5`, e o proximo gate e
-    `backfill_local_oracle_cache_for_external_exact_engine_seeds_before_add_cut_review`.
+    O backfill local de Oracle roda em
+    `manaloom-knowledge/scripts/global_commander_external_exact_artifact_oracle_backfill.py`,
+    com evidencia:
+    `master_optimizer_reports/global_commander_external_exact_artifact_oracle_backfill_20260706_current.md`.
+    Resultado: cinco linhas foram inseridas em `card_oracle_cache`, sem tocar
+    `deck_cards`; o reviewer pos-backfill ficou com
+    `local_review_ready_count=5`, `missing_local_oracle_count=0`, e o proximo
+    gate e `model_external_exact_artifact_engine_add_cut_pairs_before_candidate_copy`.
     Quando uma hipotese add/cut estiver pronta, rode
     `manaloom-knowledge/scripts/global_commander_candidate_copy_materializer.py`
     para materializar uma unica troca em copia isolada do Hermes SQLite. A

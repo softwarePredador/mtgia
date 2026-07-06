@@ -534,7 +534,13 @@ Operational priority after this pivot:
     seed against local Hermes Oracle rows, Commander legality, current-deck
     presence, color identity, and exact engine signals. Missing local Oracle
     rows block candidate copy and route to cache backfill instead of manual deck
-    insertion.
+    insertion through
+    `backfill_local_oracle_cache_for_external_exact_engine_seeds_before_add_cut_review`.
+71. run `global_commander_external_exact_artifact_oracle_backfill.py` only for
+    reviewed external exact-engine seeds that are Commander-legal, absent from
+    the current deck, and missing local Oracle cache rows. It may mutate Hermes
+    SQLite `card_oracle_cache` under report evidence, but must not touch
+    `deck_cards`, battle, promotion, or PostgreSQL product truth.
 
 Current pivot evidence:
 
@@ -559,6 +565,7 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_engine_exact_replacement_or_new_cut_finder_20260706_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_exact_artifact_engine_source_expander_20260706_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_exact_artifact_engine_candidate_reviewer_20260706_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_external_exact_artifact_oracle_backfill_20260706_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_manual_negative_trace_reviewer_20260706_kaalia_value_safe_stage1_live_research.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_followup_live_source_research_expander_20260706_kaalia_value_safe_stage1_after_manual_trace.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_expanded_source_candidate_reviewer_20260706_kaalia_value_safe_stage1_followup_live_after_manual_trace.md`
@@ -1496,17 +1503,14 @@ Current external refresh on 2026-07-05:
   engines (`explicit_same_lane_replacement_proof_count=0`). The next gate is
   `find_exact_artifact_spell_engine_replacement_or_new_engine_cut_before_candidate_copy`.
 - The exact replacement/new cut finder searches the local Hermes Oracle and
-  Commander legality cache before any candidate copy. It finds exact text
-  matches, but none are ready for Kaalia deck `619`: blue or green/blue color
-  identities block `Rhythm of the Wild`, `Sai, Master Thopterist`, `Forensic
-  Gadgeteer`, `Leyline of Transformation`, `Uthros Research Craft`, and
-  `Vedalken Archmage`; `Biotransference` and `Maskwood Nexus` are already in
-  the deck; `Locket of Yesterdays` and `Etherium Sculptor` are support/cost
-  reducers without Biotransference-style token/draw payoff. The remaining
-  engine cuts are protected by commander-plan signals, so
-  `exact_replacement_ready_count=0`, `new_unblocked_engine_cut_count=0`, and
-  the next gate is
-  `expand_external_exact_artifact_engine_source_lanes_or_global_axis`.
+  Commander legality cache before any candidate copy. After the external
+  Oracle backfill below, the current report now finds five exact local
+  artifact-spell payoff replacements ready for source trace:
+  `Digsite Engineer`, `Golem Foundry`, `Myrsmith`, `Poetic Ingenuity`, and
+  `Ravenous Robots`. Blue/color-blocked candidates and support-only reducers
+  remain blocked, the remaining engine cuts are protected by commander-plan
+  signals, `new_unblocked_engine_cut_count=0`, and the next gate is
+  `source_trace_exact_engine_replacement_before_candidate_copy`.
 - The external exact artifact-engine source expander uses live Scryfall Oracle
   lanes after local cache exhaustion. After tightening the shared classifier so
   generic `creature spells you control` text is not treated as artifact
@@ -1518,13 +1522,18 @@ Current external refresh on 2026-07-05:
   promotion remain closed; the next gate is
   `review_external_exact_artifact_engine_candidates_locally_before_candidate_copy`.
 - The external exact artifact-engine candidate reviewer cross-checks those
-  external seeds against local Hermes data. The five ready external seeds all
-  have local Commander legality, but no local `card_oracle_cache` row, so
-  `local_review_ready_count=0` and `missing_local_oracle_count=5`.
-  `Biotransference` remains blocked as already in the deck, and support-only
-  rows stay blocked. Candidate copy, battle, and promotion remain closed; the
-  next gate is
-  `backfill_local_oracle_cache_for_external_exact_engine_seeds_before_add_cut_review`.
+  external seeds against local Hermes data. Before backfill, the five ready
+  external seeds had local Commander legality but no local
+  `card_oracle_cache` row; `global_commander_external_exact_artifact_oracle_backfill.py`
+  then inserted those five Oracle rows into Hermes SQLite with
+  `source_db_mutated=true`, `deck_rows_mutated=false`, and PostgreSQL writes
+  still false.
+- The current post-backfill candidate reviewer now reports
+  `local_review_ready_count=5` and `missing_local_oracle_count=0` for those
+  five seeds. `Biotransference` remains blocked as already in the deck, and
+  support-only rows stay blocked. Candidate copy, battle, and promotion remain
+  closed; the next gate is
+  `model_external_exact_artifact_engine_add_cut_pairs_before_candidate_copy`.
 
 ## Global Commander Rollout - 2026-07-01
 

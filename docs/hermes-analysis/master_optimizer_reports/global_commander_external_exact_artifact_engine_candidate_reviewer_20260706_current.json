@@ -4,7 +4,7 @@
   "battle_gate_performed": false,
   "battle_or_optimization_performed": false,
   "candidate_copy_allowed_now": false,
-  "generated_at": "2026-07-06T04:49:26.195796+00:00",
+  "generated_at": "2026-07-06T04:54:22.353977+00:00",
   "input_artifacts": {
     "expander_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_external_exact_artifact_engine_source_expander_20260706_current.json",
     "expander_status": "external_exact_artifact_engine_source_lanes_expanded_no_deck_action",
@@ -22,9 +22,7 @@
     {
       "already_in_current_deck": false,
       "battle_gate_allowed": false,
-      "blockers": [
-        "missing_local_oracle_cache"
-      ],
+      "blockers": [],
       "candidate_copy_allowed": false,
       "card_name": "Digsite Engineer",
       "external_color_identity": [
@@ -38,23 +36,25 @@
         "artifact_spell_token_payoff"
       ],
       "external_status": "external_exact_engine_candidate_ready_for_local_review",
-      "local_color_identity": [],
+      "local_color_identity": [
+        "W"
+      ],
       "local_commander_legality": "legal",
-      "local_exact_status": "missing_local_oracle_cache",
-      "local_oracle_excerpt": "",
-      "local_oracle_present": false,
-      "local_scryfall_id": null,
-      "local_signals": [],
-      "local_type_line": "",
+      "local_exact_status": "exact_artifact_spell_payoff_candidate",
+      "local_oracle_excerpt": "Whenever you cast an artifact spell, you may pay {2}. If you do, create a 0/0 colorless Construct artifact creature token with \"This token gets +1/+1 for each artifact you control.\"",
+      "local_oracle_present": true,
+      "local_scryfall_id": "d79b8974-796c-4f88-a0cb-5afbaf26fd24",
+      "local_signals": [
+        "artifact_spell_token_payoff"
+      ],
+      "local_type_line": "Creature \u2014 Dwarf Artificer",
       "mutation_allowed": false,
-      "status": "external_exact_engine_candidate_local_review_blocked"
+      "status": "local_external_exact_engine_candidate_ready_for_add_cut_review"
     },
     {
       "already_in_current_deck": false,
       "battle_gate_allowed": false,
-      "blockers": [
-        "missing_local_oracle_cache"
-      ],
+      "blockers": [],
       "candidate_copy_allowed": false,
       "card_name": "Golem Foundry",
       "external_color_identity": [],
@@ -68,21 +68,21 @@
       "external_status": "external_exact_engine_candidate_ready_for_local_review",
       "local_color_identity": [],
       "local_commander_legality": "legal",
-      "local_exact_status": "missing_local_oracle_cache",
-      "local_oracle_excerpt": "",
-      "local_oracle_present": false,
-      "local_scryfall_id": null,
-      "local_signals": [],
-      "local_type_line": "",
+      "local_exact_status": "exact_artifact_spell_payoff_candidate",
+      "local_oracle_excerpt": "Whenever you cast an artifact spell, you may put a charge counter on this artifact. Remove three charge counters from this artifact: Create a 3/3 colorless Golem artifact creature token.",
+      "local_oracle_present": true,
+      "local_scryfall_id": "18724f37-d50b-4b00-bd47-c5bc6e62697a",
+      "local_signals": [
+        "artifact_spell_token_payoff"
+      ],
+      "local_type_line": "Artifact",
       "mutation_allowed": false,
-      "status": "external_exact_engine_candidate_local_review_blocked"
+      "status": "local_external_exact_engine_candidate_ready_for_add_cut_review"
     },
     {
       "already_in_current_deck": false,
       "battle_gate_allowed": false,
-      "blockers": [
-        "missing_local_oracle_cache"
-      ],
+      "blockers": [],
       "candidate_copy_allowed": false,
       "card_name": "Myrsmith",
       "external_color_identity": [
@@ -96,23 +96,25 @@
         "artifact_spell_token_payoff"
       ],
       "external_status": "external_exact_engine_candidate_ready_for_local_review",
-      "local_color_identity": [],
+      "local_color_identity": [
+        "W"
+      ],
       "local_commander_legality": "legal",
-      "local_exact_status": "missing_local_oracle_cache",
-      "local_oracle_excerpt": "",
-      "local_oracle_present": false,
-      "local_scryfall_id": null,
-      "local_signals": [],
-      "local_type_line": "",
+      "local_exact_status": "exact_artifact_spell_payoff_candidate",
+      "local_oracle_excerpt": "Whenever you cast an artifact spell, you may pay {1}. If you do, create a 1/1 colorless Myr artifact creature token.",
+      "local_oracle_present": true,
+      "local_scryfall_id": "78ea3e84-2d78-489f-875a-48e58c956451",
+      "local_signals": [
+        "artifact_spell_token_payoff"
+      ],
+      "local_type_line": "Creature \u2014 Human Artificer",
       "mutation_allowed": false,
-      "status": "external_exact_engine_candidate_local_review_blocked"
+      "status": "local_external_exact_engine_candidate_ready_for_add_cut_review"
     },
     {
       "already_in_current_deck": false,
       "battle_gate_allowed": false,
-      "blockers": [
-        "missing_local_oracle_cache"
-      ],
+      "blockers": [],
       "candidate_copy_allowed": false,
       "card_name": "Poetic Ingenuity",
       "external_color_identity": [
@@ -126,23 +128,25 @@
         "artifact_spell_token_payoff"
       ],
       "external_status": "external_exact_engine_candidate_ready_for_local_review",
-      "local_color_identity": [],
+      "local_color_identity": [
+        "R"
+      ],
       "local_commander_legality": "legal",
-      "local_exact_status": "missing_local_oracle_cache",
-      "local_oracle_excerpt": "",
-      "local_oracle_present": false,
-      "local_scryfall_id": null,
-      "local_signals": [],
-      "local_type_line": "",
+      "local_exact_status": "exact_artifact_spell_payoff_candidate",
+      "local_oracle_excerpt": "Whenever one or more Dinosaurs you control attack, create that many Treasure tokens. Whenever you cast an artifact spell, create a 3/1 red Dinosaur creature token. This ability triggers only once each turn.",
+      "local_oracle_present": true,
+      "local_scryfall_id": "c035250e-6f6e-4d0f-b4fd-2a53d6069aa7",
+      "local_signals": [
+        "artifact_spell_token_payoff"
+      ],
+      "local_type_line": "Enchantment",
       "mutation_allowed": false,
-      "status": "external_exact_engine_candidate_local_review_blocked"
+      "status": "local_external_exact_engine_candidate_ready_for_add_cut_review"
     },
     {
       "already_in_current_deck": false,
       "battle_gate_allowed": false,
-      "blockers": [
-        "missing_local_oracle_cache"
-      ],
+      "blockers": [],
       "candidate_copy_allowed": false,
       "card_name": "Ravenous Robots",
       "external_color_identity": [
@@ -156,16 +160,20 @@
         "artifact_spell_token_payoff"
       ],
       "external_status": "external_exact_engine_candidate_ready_for_local_review",
-      "local_color_identity": [],
+      "local_color_identity": [
+        "R"
+      ],
       "local_commander_legality": "legal",
-      "local_exact_status": "missing_local_oracle_cache",
-      "local_oracle_excerpt": "",
-      "local_oracle_present": false,
-      "local_scryfall_id": null,
-      "local_signals": [],
-      "local_type_line": "",
+      "local_exact_status": "exact_artifact_spell_payoff_candidate",
+      "local_oracle_excerpt": "Whenever you cast an artifact spell, create a 1/1 colorless Robot artifact creature token. {R}, {T}: Creature tokens you control gain haste until end of turn.",
+      "local_oracle_present": true,
+      "local_scryfall_id": "3b303ea3-9f4d-4c28-9446-285a23f841a0",
+      "local_signals": [
+        "artifact_spell_token_payoff"
+      ],
+      "local_type_line": "Artifact Creature \u2014 Robot",
       "mutation_allowed": false,
-      "status": "external_exact_engine_candidate_local_review_blocked"
+      "status": "local_external_exact_engine_candidate_ready_for_add_cut_review"
     },
     {
       "already_in_current_deck": true,
@@ -266,24 +274,25 @@
     }
   ],
   "source_db_mutated": false,
-  "status": "external_exact_artifact_engine_candidate_review_blocks_candidate_copy",
+  "status": "external_exact_artifact_engine_candidate_review_ready_for_add_cut_model",
   "summary": {
     "blocker_counts": {
       "already_in_current_deck": 1,
       "external_status_not_ready_for_local_review:artifact_spell_support_not_biotransference_replacement": 2,
       "external_status_not_ready_for_local_review:exact_type_conversion_engine_candidate": 1,
-      "missing_local_oracle_cache": 7
+      "missing_local_oracle_cache": 2
     },
     "commander": "Kaalia of the Vast",
     "deck_id": "619",
     "external_candidate_count": 8,
     "external_ready_input_count": 5,
-    "local_review_ready_count": 0,
-    "missing_local_oracle_count": 5,
-    "next_gate": "backfill_local_oracle_cache_for_external_exact_engine_seeds_before_add_cut_review",
+    "local_review_ready_count": 5,
+    "missing_local_oracle_count": 0,
+    "next_gate": "model_external_exact_artifact_engine_add_cut_pairs_before_candidate_copy",
     "reviewed_candidate_count": 8,
     "status_counts": {
-      "external_exact_engine_candidate_local_review_blocked": 8
+      "external_exact_engine_candidate_local_review_blocked": 3,
+      "local_external_exact_engine_candidate_ready_for_add_cut_review": 5
     }
   }
 }
