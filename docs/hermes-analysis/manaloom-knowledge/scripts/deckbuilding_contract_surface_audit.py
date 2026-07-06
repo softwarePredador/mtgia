@@ -216,6 +216,12 @@ GLOBAL_COMMANDER_SAME_LANE_USED_CUT_RECOVERY_ROUTER = (
 GLOBAL_COMMANDER_SAME_LANE_USED_CUT_RECOVERY_ROUTER_TEST = (
     SCRIPT_DIR / "test_global_commander_same_lane_used_cut_recovery_router.py"
 )
+GLOBAL_COMMANDER_SAME_LANE_NEW_CUT_SOURCE_MINER = (
+    SCRIPT_DIR / "global_commander_same_lane_new_cut_source_miner.py"
+)
+GLOBAL_COMMANDER_SAME_LANE_NEW_CUT_SOURCE_MINER_TEST = (
+    SCRIPT_DIR / "test_global_commander_same_lane_new_cut_source_miner.py"
+)
 README = REPO_ROOT / "docs/hermes-analysis/README.md"
 
 CONTRACT_MATRIX_JSON = (
@@ -473,6 +479,10 @@ GLOBAL_COMMANDER_SCOPE1_SAME_LANE_STAGE_CUT_TRACE_COLLECTOR_REPORT = (
 GLOBAL_COMMANDER_SCOPE1_SAME_LANE_USED_CUT_RECOVERY_ROUTER_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_used_cut_recovery_router_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+)
+GLOBAL_COMMANDER_SCOPE1_SAME_LANE_NEW_CUT_SOURCE_MINER_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_new_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1.md"
 )
 
 REQUIRED_FOCUS_CARDS = {
@@ -838,6 +848,10 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_same_lane_used_cut_recovery_router_20260705_kaalia_value_safe_stage1_repair_scope1.md",
                 "same_lane_used_cut_recovery_routes_to_new_cut_source",
                 "mine_or_research_new_same_lane_cut_source_before_candidate_copy",
+                "global_commander_same_lane_new_cut_source_miner.py",
+                "global_commander_same_lane_new_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1.md",
+                "same_lane_new_cut_source_mining_exhausted_current_deck",
+                "broaden_same_lane_cut_research_or_package_axis_before_candidate_copy",
                 "battle_gate_allowed_now",
                 "Path to Exile",
                 "Terminate",
@@ -1145,6 +1159,10 @@ def build_audit() -> dict[str, Any]:
                 "same_lane_used_cut_recovery_routes_to_new_cut_source",
                 "strict_recovery_count=10",
                 "mine_or_research_new_same_lane_cut_source_before_candidate_copy",
+                "global_commander_same_lane_new_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1.md",
+                "same_lane_new_cut_source_mining_exhausted_current_deck",
+                "fresh_same_lane_cut_source_count=0",
+                "broaden_same_lane_cut_research_or_package_axis_before_candidate_copy",
                 "battle_gate_allowed_now=false",
                 "Path to Exile",
                 "Terminate",
@@ -1946,6 +1964,34 @@ def build_audit() -> dict[str, Any]:
                 "same_lane_used_cut_recovery_routes_to_new_cut_source",
                 "same_lane_used_cut_recovery_needs_replacement_proof",
                 "review_seen_or_external_stage_cuts_before_recovery",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SAME_LANE_NEW_CUT_SOURCE_MINER,
+            [
+                "global_commander_same_lane_new_cut_source_miner",
+                "same_lane_new_cut_source_hypotheses_ready_for_trace",
+                "same_lane_new_cut_source_mining_exhausted_current_deck",
+                "fresh_same_lane_cut_source_needs_trace",
+                "blocked_recycled_cut_source",
+                "broaden_same_lane_cut_research_or_package_axis_before_candidate_copy",
+                "candidate_copy_allowed_now",
+                "value_safe_reclassification_allowed_now",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SAME_LANE_NEW_CUT_SOURCE_MINER_TEST,
+            [
+                "test_fresh_same_lane_source_routes_to_trace_collection",
+                "test_consumed_stage_cut_is_not_recycled_as_fresh",
+                "test_payoff_overlap_is_blocked_and_routes_to_broaden_axis",
+                "same_lane_new_cut_source_hypotheses_ready_for_trace",
+                "same_lane_new_cut_source_mining_exhausted_current_deck",
+                "broaden_same_lane_cut_research_or_package_axis_before_candidate_copy",
             ],
         )
     )
@@ -3098,6 +3144,27 @@ def build_audit() -> dict[str, Any]:
                 "mine_or_research_new_same_lane_cut_source_before_candidate_copy",
                 "Smothering Tithe",
                 "Demonic Tutor",
+                "Mana Vault",
+                "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SCOPE1_SAME_LANE_NEW_CUT_SOURCE_MINER_REPORT,
+            [
+                "Global Commander Same-Lane New Cut Source Miner",
+                "same_lane_new_cut_source_mining_exhausted_current_deck",
+                "target_role_count: `3`",
+                "exhausted_source_card_count: `42`",
+                "scanned_same_lane_source_count: `47`",
+                "fresh_same_lane_cut_source_count: `0`",
+                "blocked_recycled_cut_source_count: `47`",
+                "blocked_new_cut_source_count: `0`",
+                "candidate_copy_allowed_now: `false`",
+                "value_safe_reclassification_allowed_now: `false`",
+                "broaden_same_lane_cut_research_or_package_axis_before_candidate_copy",
+                "Smothering Tithe",
                 "Mana Vault",
                 "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
             ],

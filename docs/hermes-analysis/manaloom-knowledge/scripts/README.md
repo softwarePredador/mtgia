@@ -215,6 +215,14 @@ prefer a fresh cut-source lane from non-structural used cuts that could proceed
 only after explicit same-lane replacement proof. This router still does not open
 candidate copy, battle, promotion, or value-safe reclassification.
 
+Then run `global_commander_same_lane_new_cut_source_miner.py` after the recovery
+router asks for fresh cut-source mining. It scans the current evaluation DB for
+unconsumed same-lane cut sources and blocks anything already used, seen,
+stage-only, blocked, or traced in the current evidence chain. If no genuinely
+fresh same-lane source remains, the next route is to broaden same-lane cut
+research or the package axis before candidate copy, battle, promotion, or
+value-safe reclassification.
+
 ## XMage Authoritative Adaptation
 
 For all-card battle-rule acceleration, use local XMage as the authoritative

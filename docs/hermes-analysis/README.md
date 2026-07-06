@@ -669,6 +669,13 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `same_lane_replacement_proof_count=9` e `no_same_lane_route_count=0`. O
     proximo gate e
     `mine_or_research_new_same_lane_cut_source_before_candidate_copy`.
+    O minerador de fonte nova fica em
+    `global_commander_same_lane_new_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1.md`.
+    Resultado: `same_lane_new_cut_source_mining_exhausted_current_deck`, com
+    `target_role_count=3`, `scanned_same_lane_source_count=47`,
+    `fresh_same_lane_cut_source_count=0` e
+    `blocked_recycled_cut_source_count=47`. O proximo gate e
+    `broaden_same_lane_cut_research_or_package_axis_before_candidate_copy`.
     Observacao operacional: snapshots historicos de candidate-copy, battle-probe,
     battle-feedback e package-chain dependem de artefatos locais ignorados. Se
     faltarem ou forem regenerados sem esses artefatos, a auditoria de superficie

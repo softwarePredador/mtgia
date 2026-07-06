@@ -367,7 +367,15 @@ Operational priority after this pivot:
     trace collection shows used cuts; it must route used cuts to explicit
     same-lane replacement proof or fresh cut-source mining/research, and it
     must keep every used cut non-value-safe until that later evidence exists;
-47. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
+47. run `global_commander_same_lane_new_cut_source_miner.py` after used-cut
+    recovery routes to fresh cut-source mining; it must scan the current
+    evaluation DB for unconsumed same-lane cut sources, block any card already
+    used, seen, stage-only, blocked, or traced in the current evidence chain,
+    and route to trace collection only when a genuinely fresh same-lane source
+    exists. If none exists, it must broaden same-lane cut research or package
+    axis before candidate copy, battle, promotion, or value-safe
+    reclassification;
+48. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
     probes, as regression evidence only unless they produce a named safe cut and
     equal-gate proof under the Lorehold promotion gate.
 
@@ -432,6 +440,7 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_stage_cut_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_used_cut_recovery_router_20260705_kaalia_value_safe_stage1_repair_scope1.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_new_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 
 Historical candidate-copy, battle-probe, battle-feedback, and package-chain
 snapshots are local ignored evidence artifacts. The surface auditor must show
@@ -964,6 +973,13 @@ Current external refresh on 2026-07-05:
   replacement proof exists. Candidate copy, battle, promotion, and value-safe
   reclassification remain closed. The next gate is
   `mine_or_research_new_same_lane_cut_source_before_candidate_copy`.
+- Current same-lane new cut-source mining returns
+  `same_lane_new_cut_source_mining_exhausted_current_deck` with
+  `target_role_count=3`, `scanned_same_lane_source_count=47`,
+  `exhausted_source_card_count=42`, `fresh_same_lane_cut_source_count=0`,
+  and `blocked_recycled_cut_source_count=47`. Candidate copy, battle,
+  promotion, and value-safe reclassification remain closed. The next gate is
+  `broaden_same_lane_cut_research_or_package_axis_before_candidate_copy`.
 
 ## Global Commander Rollout - 2026-07-01
 
