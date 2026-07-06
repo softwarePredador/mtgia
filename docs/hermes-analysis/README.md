@@ -349,6 +349,14 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `Biotransference`, candidate copy/battle/promocao seguem fechados, e o
     proximo gate e
     `expand_exact_artifact_type_conversion_source_lane_or_keep_biotransference_protected`.
+    O expander de conversao exata roda em
+    `manaloom-knowledge/scripts/global_commander_exact_artifact_type_conversion_source_lane_expander.py`,
+    com evidencia:
+    `master_optimizer_reports/global_commander_exact_artifact_type_conversion_source_lane_expander_20260706_current.md`.
+    Resultado: cinco buscas Scryfall validas retornam apenas
+    `Biotransference` como conversor exato e ela ja esta no deck; nao ha add
+    externo pronto, `Biotransference` fica protegida, e o proximo gate e
+    `protect_biotransference_and_pivot_to_non_biotransference_engine_cut_or_global_axis`.
     Quando uma hipotese add/cut estiver pronta, rode
     `manaloom-knowledge/scripts/global_commander_candidate_copy_materializer.py`
     para materializar uma unica troca em copia isolada do Hermes SQLite. A

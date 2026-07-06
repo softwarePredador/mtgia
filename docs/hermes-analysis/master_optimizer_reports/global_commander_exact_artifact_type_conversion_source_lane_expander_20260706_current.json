@@ -1,0 +1,101 @@
+{
+  "artifact_type": "global_commander_exact_artifact_type_conversion_source_lane_expander",
+  "battle_gate_allowed_now": false,
+  "battle_gate_performed": false,
+  "battle_or_optimization_performed": false,
+  "candidate_copy_allowed_now": false,
+  "deck_rows_mutated": false,
+  "generated_at": "2026-07-06T05:04:06.911070+00:00",
+  "input_artifacts": {
+    "candidate_reviewer_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_external_exact_artifact_engine_candidate_reviewer_20260706_current.json",
+    "pair_model_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_external_exact_artifact_engine_add_cut_pair_model_20260706_current.json",
+    "source_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db"
+  },
+  "policy": {
+    "battle_boundary": "No battle probe is useful while no add/cut pair can preserve exact same-lane signals.",
+    "candidate_copy_boundary": "Source expansion never opens candidate copy directly.",
+    "type_conversion_boundary": "Biotransference cannot be cut unless another legal outside-deck card covers artifact type conversion."
+  },
+  "postgres_writes": false,
+  "promotion_allowed": false,
+  "source_candidate_rows": [
+    {
+      "already_in_current_deck": true,
+      "battle_gate_allowed": false,
+      "blockers": [
+        "already_in_current_deck"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Biotransference",
+      "color_identity": [
+        "B"
+      ],
+      "commander_legality": "legal",
+      "mutation_allowed": false,
+      "oracle_excerpt": "Creatures you control are artifacts in addition to their other types. The same is true for creature spells you control and creature cards you own that aren't on the battlefield. Whenever you cast an artifact spell, you lose 1 life and create a 2/2 black Necron Warrior artifact creature token.",
+      "oracle_id": "5443557e-440f-4fdd-a29b-7740d7cec085",
+      "scryfall_uri": "https://scryfall.com/card/40k/30/biotransference?utm_source=api",
+      "signals": [
+        "artifact_spell_token_payoff",
+        "artifact_type_conversion_engine"
+      ],
+      "source_query": "legal:commander id<=wbr o:\"creatures you control are artifacts\"",
+      "status": "exact_artifact_type_conversion_source_blocked",
+      "type_line": "Enchantment"
+    }
+  ],
+  "source_db_mutated": false,
+  "source_query_rows": [
+    {
+      "error": null,
+      "query": "legal:commander id<=wbr o:\"creatures you control are artifacts\"",
+      "status": "fetched",
+      "total_cards": 1,
+      "url": "https://api.scryfall.com/cards/search?unique=cards&order=name&q=legal%3Acommander%20id%3C%3Dwbr%20o%3A%22creatures%20you%20control%20are%20artifacts%22"
+    },
+    {
+      "error": null,
+      "query": "legal:commander id<=wbr o:\"creature spells you control are artifacts\"",
+      "status": "fetched",
+      "total_cards": 0,
+      "url": "https://api.scryfall.com/cards/search?unique=cards&order=name&q=legal%3Acommander%20id%3C%3Dwbr%20o%3A%22creature%20spells%20you%20control%20are%20artifacts%22"
+    },
+    {
+      "error": null,
+      "query": "legal:commander id<=wbr o:\"creature cards you own\" o:\"are artifacts\"",
+      "status": "fetched",
+      "total_cards": 1,
+      "url": "https://api.scryfall.com/cards/search?unique=cards&order=name&q=legal%3Acommander%20id%3C%3Dwbr%20o%3A%22creature%20cards%20you%20own%22%20o%3A%22are%20artifacts%22"
+    },
+    {
+      "error": null,
+      "query": "legal:commander id<=wbr o:\"artifacts in addition to their other types\" o:\"creatures you control\"",
+      "status": "fetched",
+      "total_cards": 1,
+      "url": "https://api.scryfall.com/cards/search?unique=cards&order=name&q=legal%3Acommander%20id%3C%3Dwbr%20o%3A%22artifacts%20in%20addition%20to%20their%20other%20types%22%20o%3A%22creatures%20you%20control%22"
+    },
+    {
+      "error": null,
+      "query": "legal:commander id<=wbr o:\"are artifacts in addition to their other types\"",
+      "status": "fetched",
+      "total_cards": 2,
+      "url": "https://api.scryfall.com/cards/search?unique=cards&order=name&q=legal%3Acommander%20id%3C%3Dwbr%20o%3A%22are%20artifacts%20in%20addition%20to%20their%20other%20types%22"
+    }
+  ],
+  "status": "exact_artifact_type_conversion_source_lane_exhausted_keep_biotransference_protected",
+  "summary": {
+    "blocker_counts": {
+      "already_in_current_deck": 1
+    },
+    "deck_id": "619",
+    "fetch_failure_count": 0,
+    "fetched_query_count": 5,
+    "next_gate": "protect_biotransference_and_pivot_to_non_biotransference_engine_cut_or_global_axis",
+    "ready_type_conversion_candidate_count": 0,
+    "source_query_count": 5,
+    "status_counts": {
+      "exact_artifact_type_conversion_source_blocked": 1
+    },
+    "type_conversion_candidate_count": 1
+  }
+}

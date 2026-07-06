@@ -546,6 +546,12 @@ Operational priority after this pivot:
     add candidate against the used cut card's required exact same-lane signals.
     Token payoff alone does not replace `Biotransference` if the add lacks
     artifact type-conversion coverage.
+73. run `global_commander_exact_artifact_type_conversion_source_lane_expander.py`
+    when all replacement pairs miss artifact type-conversion. It must treat
+    Scryfall no-result searches as valid empty lanes, require legal
+    color-identity-compatible outside-deck converters, and keep
+    `Biotransference` protected when the only exact converter is already in the
+    current deck.
 
 Current pivot evidence:
 
@@ -572,6 +578,7 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_exact_artifact_engine_candidate_reviewer_20260706_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_exact_artifact_oracle_backfill_20260706_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_exact_artifact_engine_add_cut_pair_model_20260706_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_exact_artifact_type_conversion_source_lane_expander_20260706_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_manual_negative_trace_reviewer_20260706_kaalia_value_safe_stage1_live_research.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_followup_live_source_research_expander_20260706_kaalia_value_safe_stage1_after_manual_trace.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_expanded_source_candidate_reviewer_20260706_kaalia_value_safe_stage1_followup_live_after_manual_trace.md`
@@ -1548,6 +1555,13 @@ Current external refresh on 2026-07-05:
   Candidate copy, battle, source trace, and promotion remain closed; the next
   gate is
   `expand_exact_artifact_type_conversion_source_lane_or_keep_biotransference_protected`.
+- The exact artifact type-conversion source lane expander then runs five live
+  Scryfall Oracle searches, treating no-result searches as valid empty lanes.
+  It finds one exact type-conversion card, `Biotransference`, and that card is
+  already in the current deck. Therefore
+  `ready_type_conversion_candidate_count=0`; `Biotransference` stays protected,
+  candidate copy/battle/promotion remain closed, and the next gate is
+  `protect_biotransference_and_pivot_to_non_biotransference_engine_cut_or_global_axis`.
 
 ## Global Commander Rollout - 2026-07-01
 

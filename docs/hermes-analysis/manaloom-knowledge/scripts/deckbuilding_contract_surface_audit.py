@@ -108,6 +108,12 @@ GLOBAL_COMMANDER_EXTERNAL_EXACT_ARTIFACT_ENGINE_ADD_CUT_PAIR_MODEL = (
 GLOBAL_COMMANDER_EXTERNAL_EXACT_ARTIFACT_ENGINE_ADD_CUT_PAIR_MODEL_TEST = (
     SCRIPT_DIR / "test_global_commander_external_exact_artifact_engine_add_cut_pair_model.py"
 )
+GLOBAL_COMMANDER_EXACT_ARTIFACT_TYPE_CONVERSION_SOURCE_LANE_EXPANDER = (
+    SCRIPT_DIR / "global_commander_exact_artifact_type_conversion_source_lane_expander.py"
+)
+GLOBAL_COMMANDER_EXACT_ARTIFACT_TYPE_CONVERSION_SOURCE_LANE_EXPANDER_TEST = (
+    SCRIPT_DIR / "test_global_commander_exact_artifact_type_conversion_source_lane_expander.py"
+)
 GLOBAL_COMMANDER_CANDIDATE_COPY_MATERIALIZER = SCRIPT_DIR / "global_commander_candidate_copy_materializer.py"
 GLOBAL_COMMANDER_CANDIDATE_COPY_MATERIALIZER_TEST = (
     SCRIPT_DIR / "test_global_commander_candidate_copy_materializer.py"
@@ -505,6 +511,10 @@ GLOBAL_COMMANDER_EXTERNAL_EXACT_ARTIFACT_ORACLE_BACKFILL_REPORT = (
 GLOBAL_COMMANDER_EXTERNAL_EXACT_ARTIFACT_ENGINE_ADD_CUT_PAIR_MODEL_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_external_exact_artifact_engine_add_cut_pair_model_20260706_current.md"
+)
+GLOBAL_COMMANDER_EXACT_ARTIFACT_TYPE_CONVERSION_SOURCE_LANE_EXPANDER_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_exact_artifact_type_conversion_source_lane_expander_20260706_current.md"
 )
 GLOBAL_COMMANDER_CANDIDATE_COPY_MATERIALIZER_REPORT = (
     REPO_ROOT
@@ -1043,6 +1053,9 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_external_exact_artifact_engine_add_cut_pair_model.py",
                 "global_commander_external_exact_artifact_engine_add_cut_pair_model_20260706_current.md",
                 "expand_exact_artifact_type_conversion_source_lane_or_keep_biotransference_protected",
+                "global_commander_exact_artifact_type_conversion_source_lane_expander.py",
+                "global_commander_exact_artifact_type_conversion_source_lane_expander_20260706_current.md",
+                "protect_biotransference_and_pivot_to_non_biotransference_engine_cut_or_global_axis",
                 "global_commander_candidate_copy_materializer.py",
                 "global_commander_candidate_copy_materializer_20260705_kaalia_nonland_top_pair.md",
                 "must reject stale chained sources",
@@ -2158,6 +2171,31 @@ def build_audit() -> dict[str, Any]:
                 "add_cut_pair_blocked_by_same_lane_signal_gap",
                 "add_cut_pair_ready_for_source_trace",
                 "artifact_type_conversion_engine",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_EXACT_ARTIFACT_TYPE_CONVERSION_SOURCE_LANE_EXPANDER,
+            [
+                "global_commander_exact_artifact_type_conversion_source_lane_expander",
+                "exact_artifact_type_conversion_source_lane_exhausted_keep_biotransference_protected",
+                "fetch_scryfall_cards_allow_empty",
+                "already_in_current_deck",
+                "candidate_copy_allowed_now",
+                "battle_gate_allowed_now",
+                "promotion_allowed",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_EXACT_ARTIFACT_TYPE_CONVERSION_SOURCE_LANE_EXPANDER_TEST,
+            [
+                "test_type_conversion_lane_blocks_current_deck_and_surfaces_ready_outside_candidate",
+                "exact_artifact_type_conversion_source_ready_for_add_cut_model",
+                "already_in_current_deck",
+                "Mardu Converter",
             ],
         )
     )
@@ -3939,6 +3977,21 @@ def build_audit() -> dict[str, Any]:
                 "candidate_copy_allowed_now: `false`",
                 "add_does_not_cover_cut_required_signals:artifact_type_conversion_engine",
                 "expand_exact_artifact_type_conversion_source_lane_or_keep_biotransference_protected",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_EXACT_ARTIFACT_TYPE_CONVERSION_SOURCE_LANE_EXPANDER_REPORT,
+            [
+                "Global Commander Exact Artifact Type Conversion Source Lane Expander",
+                "exact_artifact_type_conversion_source_lane_exhausted_keep_biotransference_protected",
+                "fetched_query_count: `5`",
+                "type_conversion_candidate_count: `1`",
+                "ready_type_conversion_candidate_count: `0`",
+                "candidate_copy_allowed_now: `false`",
+                "Biotransference",
+                "protect_biotransference_and_pivot_to_non_biotransference_engine_cut_or_global_axis",
             ],
         )
     )
