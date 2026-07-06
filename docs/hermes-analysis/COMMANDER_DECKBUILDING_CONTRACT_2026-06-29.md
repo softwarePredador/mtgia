@@ -479,7 +479,14 @@ Operational priority after this pivot:
     feed the existing expanded reviewer shape, but it must keep card-level cut
     permission, candidate copy, battle, promotion, and value-safe
     reclassification closed;
-64. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
+64. run `global_commander_external_nonpayoff_live_source_research_expander.py`
+    after a cumulative source-candidate expansion finds no ready candidates; it
+    must broaden current external source types, map live nonpayoff cards into
+    the existing expanded-reviewer row shape, recheck local identity, current
+    deck presence, Commander legality, land-lane routing, prior recycling, and
+    role text, and keep card-level cut permission, candidate copy, battle,
+    promotion, and value-safe reclassification closed;
+65. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
     probes, as regression evidence only unless they produce a named safe cut and
     equal-gate proof under the Lorehold promotion gate.
 
@@ -1338,6 +1345,25 @@ Current external refresh on 2026-07-05:
   `status_counts` split as `22` recycled, `1` already in the current deck, and
   `3` banned. The next gate is
   `broaden_external_nonpayoff_source_research_live`.
+- Live source research then broadens beyond the exhausted EDHREC/optimized pool
+  and recognizes silence text such as `can't cast spells` as part of the
+  `haste_protection_silence` lane. It finds `24` live candidates, of which `7`
+  pass local review-seed checks: `Unbreakable Formation`, `Orim's Chant`,
+  `Sword of the Animist`, `Simian Spirit Guide`, `Dihada, Binder of Wills`,
+  `Fable of the Mirror-Breaker // Reflection of Kiki-Jiki`, and `Collector's
+  Vault`. Candidate copy, battle, promotion, and value-safe reclassification
+  remain closed.
+- The live reviewed-seed miner still finds no fresh same-lane current-deck cut
+  source: `reviewed_seed_count=7`,
+  `fresh_seeded_same_lane_cut_source_count=0`,
+  `blocked_recycled_seeded_cut_source_count=31`, and `tutors_access` remains
+  unseeded. The follow-up router therefore routes to current-deck negative
+  review for `Grand Abolisher`, `Silence`, and `Arena of Glory`.
+- Current-deck negative review blocks all three live candidates:
+  `Silence` was used by the target, while `Grand Abolisher` and `Arena of
+  Glory` were seen without usage and need manual negative trace review before
+  any cut consideration. `negative_review_cleared_count=0`, so the next gate is
+  `find_new_external_source_or_explicit_same_lane_replacement_proof`.
 
 ## Global Commander Rollout - 2026-07-01
 

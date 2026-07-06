@@ -871,6 +871,23 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `expanded_candidate_count=26`, `expanded_ready_for_review_count=0`, `22`
     candidatos reciclados, `1` ja presente no deck e `3` banidos. O proximo
     gate e `broaden_external_nonpayoff_source_research_live`.
+    O expander de pesquisa viva fica em
+    `global_commander_external_nonpayoff_live_source_research_expander_20260706_kaalia_value_safe_stage1_repair_scope1.md`.
+    Resultado:
+    `external_nonpayoff_live_source_research_expanded_ready_for_local_review`,
+    com `live_candidate_count=24`, `live_ready_for_review_count=7`, e seeds
+    novos: `Unbreakable Formation`, `Orim's Chant`, `Sword of the Animist`,
+    `Simian Spirit Guide`, `Dihada, Binder of Wills`,
+    `Fable of the Mirror-Breaker // Reflection of Kiki-Jiki` e
+    `Collector's Vault`. O reviewer local confirma
+    `miner_source_seed_allowed_count=7`, mas o minerador vivo retorna
+    `fresh_seeded_same_lane_cut_source_count=0`,
+    `blocked_recycled_seeded_cut_source_count=31` e `tutors_access` sem seed.
+    O router vivo entao pede negative review de `Grand Abolisher`, `Silence` e
+    `Arena of Glory`; o coletor bloqueia tudo (`Silence` usada pelo alvo,
+    `Grand Abolisher` e `Arena of Glory` vistos sem uso), com
+    `negative_review_cleared_count=0`. Candidate copy, battle, promocao e
+    value-safe reclassification seguem fechados.
     Observacao operacional: snapshots historicos de candidate-copy, battle-probe,
     battle-feedback e package-chain dependem de artefatos locais ignorados. Se
     faltarem ou forem regenerados sem esses artefatos, a auditoria de superficie

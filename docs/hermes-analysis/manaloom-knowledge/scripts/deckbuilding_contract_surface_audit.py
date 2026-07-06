@@ -300,6 +300,12 @@ GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_SOURCE_CANDIDATE_POOL_EXPANDER = (
 GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_SOURCE_CANDIDATE_POOL_EXPANDER_TEST = (
     SCRIPT_DIR / "test_global_commander_external_nonpayoff_source_candidate_pool_expander.py"
 )
+GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_LIVE_SOURCE_RESEARCH_EXPANDER = (
+    SCRIPT_DIR / "global_commander_external_nonpayoff_live_source_research_expander.py"
+)
+GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_LIVE_SOURCE_RESEARCH_EXPANDER_TEST = (
+    SCRIPT_DIR / "test_global_commander_external_nonpayoff_live_source_research_expander.py"
+)
 GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_EXPANDED_SOURCE_CANDIDATE_REVIEWER = (
     SCRIPT_DIR / "global_commander_external_nonpayoff_expanded_source_candidate_reviewer.py"
 )
@@ -642,13 +648,33 @@ GLOBAL_COMMANDER_SCOPE1_EXTERNAL_NONPAYOFF_SOURCE_CANDIDATE_POOL_EXPANDER_FOLLOW
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_source_candidate_pool_expander_20260706_kaalia_value_safe_stage1_repair_scope1_followup_cumulative.md"
 )
+GLOBAL_COMMANDER_SCOPE1_EXTERNAL_NONPAYOFF_LIVE_SOURCE_RESEARCH_EXPANDER_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_live_source_research_expander_20260706_kaalia_value_safe_stage1_repair_scope1.md"
+)
 GLOBAL_COMMANDER_SCOPE1_EXTERNAL_NONPAYOFF_EXPANDED_SOURCE_CANDIDATE_REVIEWER_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_expanded_source_candidate_reviewer_20260706_kaalia_value_safe_stage1_repair_scope1_new_sources.md"
 )
+GLOBAL_COMMANDER_SCOPE1_EXTERNAL_NONPAYOFF_EXPANDED_SOURCE_CANDIDATE_REVIEWER_LIVE_RESEARCH_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_expanded_source_candidate_reviewer_20260706_kaalia_value_safe_stage1_live_research.md"
+)
 GLOBAL_COMMANDER_SCOPE1_REVIEWED_EXTERNAL_NONPAYOFF_SEEDED_CUT_SOURCE_MINER_EXPANDED_SOURCES_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_reviewed_external_nonpayoff_seeded_cut_source_miner_20260706_kaalia_value_safe_stage1_repair_scope1_expanded_sources.md"
+)
+GLOBAL_COMMANDER_SCOPE1_REVIEWED_EXTERNAL_NONPAYOFF_SEEDED_CUT_SOURCE_MINER_LIVE_RESEARCH_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_reviewed_external_nonpayoff_seeded_cut_source_miner_20260706_kaalia_value_safe_stage1_live_research.md"
+)
+GLOBAL_COMMANDER_SCOPE1_EXTERNAL_NONPAYOFF_SEED_EXHAUSTION_RECOVERY_ROUTER_LIVE_RESEARCH_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_seed_exhaustion_recovery_router_20260706_kaalia_value_safe_stage1_live_research.md"
+)
+GLOBAL_COMMANDER_SCOPE1_EXTERNAL_NONPAYOFF_CURRENT_DECK_NEGATIVE_REVIEW_COLLECTOR_LIVE_RESEARCH_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_current_deck_negative_review_collector_20260706_kaalia_value_safe_stage1_live_research.md"
 )
 GLOBAL_COMMANDER_SCOPE1_EXTERNAL_NONPAYOFF_SEED_EXHAUSTION_RECOVERY_ROUTER_EXPANDED_SOURCES_REPORT = (
     REPO_ROOT
@@ -2682,6 +2708,38 @@ def build_audit() -> dict[str, Any]:
     )
     checks.append(
         check_contains(
+            GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_LIVE_SOURCE_RESEARCH_EXPANDER,
+            [
+                "global_commander_external_nonpayoff_live_source_research_expander",
+                "external_nonpayoff_live_source_research_expanded_ready_for_local_review",
+                "LIVE_SOURCE_SNAPSHOTS",
+                "LIVE_SOURCE_CANDIDATES",
+                "Orim's Chant",
+                "Unbreakable Formation",
+                "Sword of the Animist",
+                "Simian Spirit Guide",
+                "Fable of the Mirror-Breaker",
+                "candidate_copy_allowed_now",
+                "card_level_cut_permission_now",
+                "review_expanded_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_LIVE_SOURCE_RESEARCH_EXPANDER_TEST,
+            [
+                "test_live_candidates_are_review_seeds_only",
+                "Orim's Chant",
+                "Grand Abolisher",
+                "Hall of the Bandit Lord",
+                "expanded_source_candidate_already_in_current_deck_blocked",
+                "expanded_source_candidate_land_lane_requires_mana_base_model",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
             GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_EXPANDED_SOURCE_CANDIDATE_REVIEWER,
             [
                 "global_commander_external_nonpayoff_expanded_source_candidate_reviewer",
@@ -4271,6 +4329,26 @@ def build_audit() -> dict[str, Any]:
     )
     checks.append(
         check_contains(
+            GLOBAL_COMMANDER_SCOPE1_EXTERNAL_NONPAYOFF_LIVE_SOURCE_RESEARCH_EXPANDER_REPORT,
+            [
+                "Global Commander External Nonpayoff Live Source Research Expander",
+                "external_nonpayoff_live_source_research_expanded_ready_for_local_review",
+                "live_candidate_count: `24`",
+                "live_ready_for_review_count: `7`",
+                "candidate_copy_allowed_count: `0`",
+                "card_level_cut_permission_count: `0`",
+                "candidate_copy_allowed_now: `false`",
+                "Unbreakable Formation",
+                "Orim's Chant",
+                "Sword of the Animist",
+                "Simian Spirit Guide",
+                "Dihada, Binder of Wills",
+                "Collector's Vault",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
             GLOBAL_COMMANDER_SCOPE1_EXTERNAL_NONPAYOFF_EXPANDED_SOURCE_CANDIDATE_REVIEWER_REPORT,
             [
                 "Global Commander External Nonpayoff Expanded Source Candidate Reviewer",
@@ -4287,6 +4365,71 @@ def build_audit() -> dict[str, Any]:
                 "Swiftfoot Boots",
                 "Wishclaw Talisman",
                 "rerun_seeded_cut_source_miner_with_reviewed_expanded_external_nonpayoff_sources",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SCOPE1_EXTERNAL_NONPAYOFF_EXPANDED_SOURCE_CANDIDATE_REVIEWER_LIVE_RESEARCH_REPORT,
+            [
+                "Global Commander External Nonpayoff Expanded Source Candidate Reviewer",
+                "expanded_external_source_candidates_reviewed_seed_ready_no_deck_action",
+                "reviewed_candidate_count: `24`",
+                "miner_source_seed_allowed_count: `7`",
+                "blocked_current_deck_count: `3`",
+                "blocked_recycled_prior_seed_count: `14`",
+                "Unbreakable Formation",
+                "Orim's Chant",
+                "Sword of the Animist",
+                "rerun_seeded_cut_source_miner_with_reviewed_expanded_external_nonpayoff_sources",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SCOPE1_REVIEWED_EXTERNAL_NONPAYOFF_SEEDED_CUT_SOURCE_MINER_LIVE_RESEARCH_REPORT,
+            [
+                "Global Commander Reviewed External Nonpayoff Seeded Cut Source Miner",
+                "reviewed_external_seeded_cut_source_mining_exhausted_current_deck_no_cut_permission",
+                "reviewed_seed_count: `7`",
+                "seeded_role_count: `2`",
+                "unseeded_target_role_count: `1`",
+                "fresh_seeded_same_lane_cut_source_count: `0`",
+                "blocked_recycled_seeded_cut_source_count: `31`",
+                "unseeded_target_roles_remain_blocked:tutors_access",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SCOPE1_EXTERNAL_NONPAYOFF_SEED_EXHAUSTION_RECOVERY_ROUTER_LIVE_RESEARCH_REPORT,
+            [
+                "Global Commander External Nonpayoff Seed Exhaustion Recovery Router",
+                "external_nonpayoff_seed_exhaustion_recovery_routes_to_current_deck_negative_review",
+                "seeded_exhausted_role_count: `2`",
+                "unseeded_role_count: `1`",
+                "current_deck_negative_review_candidate_count: `3`",
+                "prior_fresh_seeded_same_lane_cut_source_count: `0`",
+                "Grand Abolisher",
+                "Silence",
+                "Arena of Glory",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SCOPE1_EXTERNAL_NONPAYOFF_CURRENT_DECK_NEGATIVE_REVIEW_COLLECTOR_LIVE_RESEARCH_REPORT,
+            [
+                "Global Commander External Nonpayoff Current Deck Negative Review Collector",
+                "external_current_deck_negative_review_blocks_used_candidates",
+                "current_deck_candidate_count: `3`",
+                "usage_blocked_candidate_count: `1`",
+                "seen_without_usage_count: `2`",
+                "negative_review_cleared_count: `0`",
+                "Grand Abolisher",
+                "Silence",
+                "Arena of Glory",
+                "find_new_external_source_or_explicit_same_lane_replacement_proof",
             ],
         )
     )

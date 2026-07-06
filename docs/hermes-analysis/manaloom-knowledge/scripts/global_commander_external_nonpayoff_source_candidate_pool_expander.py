@@ -268,6 +268,8 @@ EXTRA_ROLE_TERMS: dict[str, tuple[str, ...]] = {
         "return that card to the battlefield",
         "permanents you control gain indestructible",
         "creatures you control have haste",
+        "can't cast spells",
+        "can't cast spells this turn",
         "life total can't change",
         "your life total can't change",
     ),

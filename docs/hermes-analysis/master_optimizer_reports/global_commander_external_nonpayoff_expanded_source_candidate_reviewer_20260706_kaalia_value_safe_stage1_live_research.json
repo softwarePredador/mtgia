@@ -1,0 +1,1174 @@
+{
+  "artifact_type": "global_commander_external_nonpayoff_expanded_source_candidate_reviewer",
+  "battle_gate_allowed_now": false,
+  "battle_gate_performed": false,
+  "battle_or_optimization_performed": false,
+  "battle_replay_performed": false,
+  "candidate_copy_allowed_now": false,
+  "candidate_copy_blockers": [
+    "reviewed_expanded_external_candidates_are_miner_seeds_not_cut_permission",
+    "current_deck_cards_remain_blocked_until_trace_or_negative_review",
+    "banned_cards_are_discarded_before_strategy_review",
+    "candidate_copy_closed_until_seeded_miner_finds_traceable_current_deck_cut_source",
+    "value_safe_reclassification_closed_until_same_lane_or_equal_gate_proof_exists"
+  ],
+  "card_level_cut_permission_now": false,
+  "deck_action_allowed": false,
+  "generated_at": "2026-07-06T03:14:55.704493+00:00",
+  "input_artifacts": {
+    "expander_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_live_source_research_expander_20260706_kaalia_value_safe_stage1_repair_scope1.json",
+    "selected_db": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_copy_materializer_20260705_kaalia_value_safe_stage1_repair_scope1_candidate/knowledge_candidate.db"
+  },
+  "miner_source_seed_rows": [
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "board indestructible and combat pressure protection",
+      "card_level_cut_permission_now": false,
+      "card_name": "Unbreakable Formation",
+      "cmc": 3.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "indestructible"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_evidence": "rerun_seeded_cut_source_miner_with_reviewed_expanded_external_nonpayoff_sources",
+      "promotion_allowed": false,
+      "recycled_from_prior_external_seed": false,
+      "rerun_miner_allowed_for_card": true,
+      "review_status": "expanded_source_candidate_local_review_ready_for_seeded_miner",
+      "seed_cautions": [
+        "protection_seed_requires_target_role_cut_source_evidence_later",
+        "does_not_make_current_protection_card_cuttable"
+      ],
+      "seed_scope": "protection_spell_or_haste_seed",
+      "source_card_name": "Unbreakable Formation",
+      "source_ids": [
+        "local_scryfall_oracle_cache_functional_terms_2026_07_06"
+      ],
+      "source_status": "expanded_external_source_candidate_ready_for_local_review",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Instant",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "one-mana silence effect surfaced by broader silence role research",
+      "card_level_cut_permission_now": false,
+      "card_name": "Orim's Chant",
+      "cmc": 1.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "can't cast spells",
+        "can't cast spells this turn"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_evidence": "rerun_seeded_cut_source_miner_with_reviewed_expanded_external_nonpayoff_sources",
+      "promotion_allowed": false,
+      "recycled_from_prior_external_seed": false,
+      "rerun_miner_allowed_for_card": true,
+      "review_status": "expanded_source_candidate_local_review_ready_for_seeded_miner",
+      "seed_cautions": [
+        "protection_seed_requires_target_role_cut_source_evidence_later",
+        "does_not_make_current_protection_card_cuttable"
+      ],
+      "seed_scope": "protection_spell_or_haste_seed",
+      "source_card_name": "Orim's Chant",
+      "source_ids": [
+        "commanders_herald_silence_abolisher_2023_12_20"
+      ],
+      "source_status": "expanded_external_source_candidate_ready_for_local_review",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Instant",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "Kaalia attack-trigger basic-land ramp from EDHREC hidden gems",
+      "card_level_cut_permission_now": false,
+      "card_name": "Sword of the Animist",
+      "cmc": 2.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "basic land card",
+        "onto the battlefield tapped"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_evidence": "rerun_seeded_cut_source_miner_with_reviewed_expanded_external_nonpayoff_sources",
+      "promotion_allowed": false,
+      "recycled_from_prior_external_seed": false,
+      "rerun_miner_allowed_for_card": true,
+      "review_status": "expanded_source_candidate_local_review_ready_for_seeded_miner",
+      "seed_cautions": [
+        "mana_rock_seed_requires_curve_and_source_pressure_review",
+        "does_not_make_existing_ramp_cuttable"
+      ],
+      "seed_scope": "mana_rock_seed_curve_pressure_review",
+      "source_card_name": "Sword of the Animist",
+      "source_ids": [
+        "edhrec_kaalia_hidden_gems_2026_03_26"
+      ],
+      "source_status": "expanded_external_source_candidate_ready_for_local_review",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Legendary Artifact \u2014 Equipment",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "burst acceleration to cast Kaalia earlier from EDHREC hidden gems",
+      "card_level_cut_permission_now": false,
+      "card_name": "Simian Spirit Guide",
+      "cmc": 3.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "add {",
+        "add {r}"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_evidence": "rerun_seeded_cut_source_miner_with_reviewed_expanded_external_nonpayoff_sources",
+      "promotion_allowed": false,
+      "recycled_from_prior_external_seed": false,
+      "rerun_miner_allowed_for_card": true,
+      "review_status": "expanded_source_candidate_local_review_ready_for_seeded_miner",
+      "seed_cautions": [
+        "mana_rock_seed_requires_curve_and_source_pressure_review",
+        "does_not_make_existing_ramp_cuttable"
+      ],
+      "seed_scope": "mana_rock_seed_curve_pressure_review",
+      "source_card_name": "Simian Spirit Guide",
+      "source_ids": [
+        "edhrec_kaalia_hidden_gems_2026_03_26"
+      ],
+      "source_status": "expanded_external_source_candidate_ready_for_local_review",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Creature \u2014 Ape Spirit",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "legendary protection and Treasure support from EDHREC hidden gems",
+      "card_level_cut_permission_now": false,
+      "card_name": "Dihada, Binder of Wills",
+      "cmc": 4.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "haste",
+        "indestructible"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_evidence": "rerun_seeded_cut_source_miner_with_reviewed_expanded_external_nonpayoff_sources",
+      "promotion_allowed": false,
+      "recycled_from_prior_external_seed": false,
+      "rerun_miner_allowed_for_card": true,
+      "review_status": "expanded_source_candidate_local_review_ready_for_seeded_miner",
+      "seed_cautions": [
+        "protection_seed_requires_target_role_cut_source_evidence_later",
+        "does_not_make_current_protection_card_cuttable"
+      ],
+      "seed_scope": "protection_spell_or_haste_seed",
+      "source_card_name": "Dihada, Binder of Wills",
+      "source_ids": [
+        "edhrec_kaalia_hidden_gems_2026_03_26"
+      ],
+      "source_status": "expanded_external_source_candidate_ready_for_local_review",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Legendary Planeswalker \u2014 Dihada",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "looting plus Treasure ramp support from Draftsim Kaalia guide",
+      "card_level_cut_permission_now": false,
+      "card_name": "Fable of the Mirror-Breaker // Reflection of Kiki-Jiki",
+      "cmc": 3.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "treasure",
+        "create a treasure"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_evidence": "rerun_seeded_cut_source_miner_with_reviewed_expanded_external_nonpayoff_sources",
+      "promotion_allowed": false,
+      "recycled_from_prior_external_seed": false,
+      "rerun_miner_allowed_for_card": true,
+      "review_status": "expanded_source_candidate_local_review_ready_for_seeded_miner",
+      "seed_cautions": [
+        "mana_rock_seed_requires_curve_and_source_pressure_review",
+        "does_not_make_existing_ramp_cuttable"
+      ],
+      "seed_scope": "mana_rock_seed_curve_pressure_review",
+      "source_card_name": "Fable of the Mirror-Breaker",
+      "source_ids": [
+        "draftsim_kaalia_guide_2026_07_06"
+      ],
+      "source_status": "expanded_external_source_candidate_ready_for_local_review",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Enchantment \u2014 Saga",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "loot plus Treasure generation support from Draftsim Kaalia guide",
+      "card_level_cut_permission_now": false,
+      "card_name": "Collector's Vault",
+      "cmc": 2.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "add one mana",
+        "mana of any color",
+        "treasure",
+        "draw a card",
+        "add one mana of any color",
+        "create a treasure"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_evidence": "rerun_seeded_cut_source_miner_with_reviewed_expanded_external_nonpayoff_sources",
+      "promotion_allowed": false,
+      "recycled_from_prior_external_seed": false,
+      "rerun_miner_allowed_for_card": true,
+      "review_status": "expanded_source_candidate_local_review_ready_for_seeded_miner",
+      "seed_cautions": [
+        "mana_rock_seed_requires_curve_and_source_pressure_review",
+        "does_not_make_existing_ramp_cuttable"
+      ],
+      "seed_scope": "mana_rock_seed_curve_pressure_review",
+      "source_card_name": "Collector's Vault",
+      "source_ids": [
+        "draftsim_kaalia_guide_2026_07_06"
+      ],
+      "source_status": "expanded_external_source_candidate_ready_for_local_review",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Artifact",
+      "value_safe_reclassification_allowed": false
+    }
+  ],
+  "mutation_allowed": false,
+  "policy": {
+    "legality_boundary": "Banned candidates stay blocked even if they appeared in historical high-power context.",
+    "mutation_boundary": "This reviewer does not copy decks, mutate DBs, run battles, reclassify cuts, or promote packages.",
+    "review_boundary": "Only locally legal outside-deck expanded source candidates can seed the miner.",
+    "scope_boundary": "Fast mana, high-power tutors, narrow tutors, protection, and mana rocks retain separate seed scopes and cautions.",
+    "seed_boundary": "Reviewed expanded external nonpayoff candidates may seed miner research only; they are not add approvals."
+  },
+  "postgres_writes": false,
+  "promotion_allowed": false,
+  "review_rows": [
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "cheap hexproof/indestructible protection from local Oracle search",
+      "card_level_cut_permission_now": false,
+      "card_name": "Loran's Escape",
+      "cmc": 1.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "hexproof",
+        "indestructible"
+      ],
+      "miner_source_seed_allowed": false,
+      "next_evidence": "broaden_external_source_candidate_pool_without_recycling",
+      "promotion_allowed": false,
+      "recycled_from_prior_external_seed": true,
+      "rerun_miner_allowed_for_card": false,
+      "review_status": "expanded_source_candidate_local_review_blocks_recycled_prior_seed",
+      "seed_cautions": [
+        "seed_requires_contextual_review_before_any_deck_action"
+      ],
+      "seed_scope": "blocked_not_a_seed",
+      "source_card_name": "Loran's Escape",
+      "source_ids": [
+        "local_scryfall_oracle_cache_functional_terms_2026_07_06"
+      ],
+      "source_status": "expanded_source_candidate_recycled_from_prior_seed_blocked",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Instant",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "one-mana counterspell for spells targeting a permanent you control",
+      "card_level_cut_permission_now": false,
+      "card_name": "Rebuff the Wicked",
+      "cmc": 1.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "counter target spell that targets"
+      ],
+      "miner_source_seed_allowed": false,
+      "next_evidence": "broaden_external_source_candidate_pool_without_recycling",
+      "promotion_allowed": false,
+      "recycled_from_prior_external_seed": true,
+      "rerun_miner_allowed_for_card": false,
+      "review_status": "expanded_source_candidate_local_review_blocks_recycled_prior_seed",
+      "seed_cautions": [
+        "seed_requires_contextual_review_before_any_deck_action"
+      ],
+      "seed_scope": "blocked_not_a_seed",
+      "source_card_name": "Rebuff the Wicked",
+      "source_ids": [
+        "local_scryfall_oracle_cache_functional_terms_2026_07_06"
+      ],
+      "source_status": "expanded_source_candidate_recycled_from_prior_seed_blocked",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Instant",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "modal creature death protection for commander or payoff recovery",
+      "card_level_cut_permission_now": false,
+      "card_name": "Malakir Rebirth // Malakir Mire",
+      "cmc": 1.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "return it to the battlefield"
+      ],
+      "miner_source_seed_allowed": false,
+      "next_evidence": "broaden_external_source_candidate_pool_without_recycling",
+      "promotion_allowed": false,
+      "recycled_from_prior_external_seed": true,
+      "rerun_miner_allowed_for_card": false,
+      "review_status": "expanded_source_candidate_local_review_blocks_recycled_prior_seed",
+      "seed_cautions": [
+        "seed_requires_contextual_review_before_any_deck_action"
+      ],
+      "seed_scope": "blocked_not_a_seed",
+      "source_card_name": "Malakir Rebirth",
+      "source_ids": [
+        "local_scryfall_oracle_cache_functional_terms_2026_07_06"
+      ],
+      "source_status": "expanded_source_candidate_recycled_from_prior_seed_blocked",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Instant",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "board-wide phase-out protection from local Oracle search",
+      "card_level_cut_permission_now": false,
+      "card_name": "Clever Concealment",
+      "cmc": 4.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "phase out"
+      ],
+      "miner_source_seed_allowed": false,
+      "next_evidence": "broaden_external_source_candidate_pool_without_recycling",
+      "promotion_allowed": false,
+      "recycled_from_prior_external_seed": true,
+      "rerun_miner_allowed_for_card": false,
+      "review_status": "expanded_source_candidate_local_review_blocks_recycled_prior_seed",
+      "seed_cautions": [
+        "seed_requires_contextual_review_before_any_deck_action"
+      ],
+      "seed_scope": "blocked_not_a_seed",
+      "source_card_name": "Clever Concealment",
+      "source_ids": [
+        "local_scryfall_oracle_cache_functional_terms_2026_07_06"
+      ],
+      "source_status": "expanded_source_candidate_recycled_from_prior_seed_blocked",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Instant",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "commander-enabled free indestructible protection spell",
+      "card_level_cut_permission_now": false,
+      "card_name": "Flawless Maneuver",
+      "cmc": 3.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "indestructible"
+      ],
+      "miner_source_seed_allowed": false,
+      "next_evidence": "broaden_external_source_candidate_pool_without_recycling",
+      "promotion_allowed": false,
+      "recycled_from_prior_external_seed": true,
+      "rerun_miner_allowed_for_card": false,
+      "review_status": "expanded_source_candidate_local_review_blocks_recycled_prior_seed",
+      "seed_cautions": [
+        "seed_requires_contextual_review_before_any_deck_action"
+      ],
+      "seed_scope": "blocked_not_a_seed",
+      "source_card_name": "Flawless Maneuver",
+      "source_ids": [
+        "local_scryfall_oracle_cache_functional_terms_2026_07_06"
+      ],
+      "source_status": "expanded_source_candidate_recycled_from_prior_seed_blocked",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Instant",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "single-target or kicked board phase-out protection",
+      "card_level_cut_permission_now": false,
+      "card_name": "Galadriel's Dismissal",
+      "cmc": 1.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "phases out"
+      ],
+      "miner_source_seed_allowed": false,
+      "next_evidence": "broaden_external_source_candidate_pool_without_recycling",
+      "promotion_allowed": false,
+      "recycled_from_prior_external_seed": true,
+      "rerun_miner_allowed_for_card": false,
+      "review_status": "expanded_source_candidate_local_review_blocks_recycled_prior_seed",
+      "seed_cautions": [
+        "seed_requires_contextual_review_before_any_deck_action"
+      ],
+      "seed_scope": "blocked_not_a_seed",
+      "source_card_name": "Galadriel's Dismissal",
+      "source_ids": [
+        "local_scryfall_oracle_cache_functional_terms_2026_07_06"
+      ],
+      "source_status": "expanded_source_candidate_recycled_from_prior_seed_blocked",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Instant",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "board indestructible and combat pressure protection",
+      "card_level_cut_permission_now": false,
+      "card_name": "Unbreakable Formation",
+      "cmc": 3.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "indestructible"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_evidence": "rerun_seeded_cut_source_miner_with_reviewed_expanded_external_nonpayoff_sources",
+      "promotion_allowed": false,
+      "recycled_from_prior_external_seed": false,
+      "rerun_miner_allowed_for_card": true,
+      "review_status": "expanded_source_candidate_local_review_ready_for_seeded_miner",
+      "seed_cautions": [
+        "protection_seed_requires_target_role_cut_source_evidence_later",
+        "does_not_make_current_protection_card_cuttable"
+      ],
+      "seed_scope": "protection_spell_or_haste_seed",
+      "source_card_name": "Unbreakable Formation",
+      "source_ids": [
+        "local_scryfall_oracle_cache_functional_terms_2026_07_06"
+      ],
+      "source_status": "expanded_external_source_candidate_ready_for_local_review",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Instant",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "one-mana silence effect surfaced by broader silence role research",
+      "card_level_cut_permission_now": false,
+      "card_name": "Orim's Chant",
+      "cmc": 1.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "can't cast spells",
+        "can't cast spells this turn"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_evidence": "rerun_seeded_cut_source_miner_with_reviewed_expanded_external_nonpayoff_sources",
+      "promotion_allowed": false,
+      "recycled_from_prior_external_seed": false,
+      "rerun_miner_allowed_for_card": true,
+      "review_status": "expanded_source_candidate_local_review_ready_for_seeded_miner",
+      "seed_cautions": [
+        "protection_seed_requires_target_role_cut_source_evidence_later",
+        "does_not_make_current_protection_card_cuttable"
+      ],
+      "seed_scope": "protection_spell_or_haste_seed",
+      "source_card_name": "Orim's Chant",
+      "source_ids": [
+        "commanders_herald_silence_abolisher_2023_12_20"
+      ],
+      "source_status": "expanded_external_source_candidate_ready_for_local_review",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Instant",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "turn-protection creature from silence role research, expected to be blocked if already in deck",
+      "card_level_cut_permission_now": false,
+      "card_name": "Grand Abolisher",
+      "cmc": 2.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": true,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "can't cast spells"
+      ],
+      "miner_source_seed_allowed": false,
+      "next_evidence": "target_deck_trace_or_negative_review_before_cut_consideration",
+      "promotion_allowed": false,
+      "recycled_from_prior_external_seed": false,
+      "rerun_miner_allowed_for_card": false,
+      "review_status": "expanded_source_candidate_local_review_blocks_current_deck",
+      "seed_cautions": [
+        "seed_requires_contextual_review_before_any_deck_action"
+      ],
+      "seed_scope": "blocked_not_a_seed",
+      "source_card_name": "Grand Abolisher",
+      "source_ids": [
+        "commanders_herald_silence_abolisher_2023_12_20"
+      ],
+      "source_status": "expanded_source_candidate_already_in_current_deck_blocked",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Creature \u2014 Human Cleric",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "premier white silence effect, expected to be blocked if already in deck",
+      "card_level_cut_permission_now": false,
+      "card_name": "Silence",
+      "cmc": 1.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": true,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "can't cast spells",
+        "can't cast spells this turn"
+      ],
+      "miner_source_seed_allowed": false,
+      "next_evidence": "target_deck_trace_or_negative_review_before_cut_consideration",
+      "promotion_allowed": false,
+      "recycled_from_prior_external_seed": false,
+      "rerun_miner_allowed_for_card": false,
+      "review_status": "expanded_source_candidate_local_review_blocks_current_deck",
+      "seed_cautions": [
+        "seed_requires_contextual_review_before_any_deck_action"
+      ],
+      "seed_scope": "blocked_not_a_seed",
+      "source_card_name": "Silence",
+      "source_ids": [
+        "commanders_herald_silence_abolisher_2023_12_20"
+      ],
+      "source_status": "expanded_source_candidate_already_in_current_deck_blocked",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Instant",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "Kaalia attack-trigger basic-land ramp from EDHREC hidden gems",
+      "card_level_cut_permission_now": false,
+      "card_name": "Sword of the Animist",
+      "cmc": 2.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "basic land card",
+        "onto the battlefield tapped"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_evidence": "rerun_seeded_cut_source_miner_with_reviewed_expanded_external_nonpayoff_sources",
+      "promotion_allowed": false,
+      "recycled_from_prior_external_seed": false,
+      "rerun_miner_allowed_for_card": true,
+      "review_status": "expanded_source_candidate_local_review_ready_for_seeded_miner",
+      "seed_cautions": [
+        "mana_rock_seed_requires_curve_and_source_pressure_review",
+        "does_not_make_existing_ramp_cuttable"
+      ],
+      "seed_scope": "mana_rock_seed_curve_pressure_review",
+      "source_card_name": "Sword of the Animist",
+      "source_ids": [
+        "edhrec_kaalia_hidden_gems_2026_03_26"
+      ],
+      "source_status": "expanded_external_source_candidate_ready_for_local_review",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Legendary Artifact \u2014 Equipment",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "burst acceleration to cast Kaalia earlier from EDHREC hidden gems",
+      "card_level_cut_permission_now": false,
+      "card_name": "Simian Spirit Guide",
+      "cmc": 3.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "add {",
+        "add {r}"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_evidence": "rerun_seeded_cut_source_miner_with_reviewed_expanded_external_nonpayoff_sources",
+      "promotion_allowed": false,
+      "recycled_from_prior_external_seed": false,
+      "rerun_miner_allowed_for_card": true,
+      "review_status": "expanded_source_candidate_local_review_ready_for_seeded_miner",
+      "seed_cautions": [
+        "mana_rock_seed_requires_curve_and_source_pressure_review",
+        "does_not_make_existing_ramp_cuttable"
+      ],
+      "seed_scope": "mana_rock_seed_curve_pressure_review",
+      "source_card_name": "Simian Spirit Guide",
+      "source_ids": [
+        "edhrec_kaalia_hidden_gems_2026_03_26"
+      ],
+      "source_status": "expanded_external_source_candidate_ready_for_local_review",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Creature \u2014 Ape Spirit",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "legendary protection and Treasure support from EDHREC hidden gems",
+      "card_level_cut_permission_now": false,
+      "card_name": "Dihada, Binder of Wills",
+      "cmc": 4.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "haste",
+        "indestructible"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_evidence": "rerun_seeded_cut_source_miner_with_reviewed_expanded_external_nonpayoff_sources",
+      "promotion_allowed": false,
+      "recycled_from_prior_external_seed": false,
+      "rerun_miner_allowed_for_card": true,
+      "review_status": "expanded_source_candidate_local_review_ready_for_seeded_miner",
+      "seed_cautions": [
+        "protection_seed_requires_target_role_cut_source_evidence_later",
+        "does_not_make_current_protection_card_cuttable"
+      ],
+      "seed_scope": "protection_spell_or_haste_seed",
+      "source_card_name": "Dihada, Binder of Wills",
+      "source_ids": [
+        "edhrec_kaalia_hidden_gems_2026_03_26"
+      ],
+      "source_status": "expanded_external_source_candidate_ready_for_local_review",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Legendary Planeswalker \u2014 Dihada",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "looting plus Treasure ramp support from Draftsim Kaalia guide",
+      "card_level_cut_permission_now": false,
+      "card_name": "Fable of the Mirror-Breaker // Reflection of Kiki-Jiki",
+      "cmc": 3.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "treasure",
+        "create a treasure"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_evidence": "rerun_seeded_cut_source_miner_with_reviewed_expanded_external_nonpayoff_sources",
+      "promotion_allowed": false,
+      "recycled_from_prior_external_seed": false,
+      "rerun_miner_allowed_for_card": true,
+      "review_status": "expanded_source_candidate_local_review_ready_for_seeded_miner",
+      "seed_cautions": [
+        "mana_rock_seed_requires_curve_and_source_pressure_review",
+        "does_not_make_existing_ramp_cuttable"
+      ],
+      "seed_scope": "mana_rock_seed_curve_pressure_review",
+      "source_card_name": "Fable of the Mirror-Breaker",
+      "source_ids": [
+        "draftsim_kaalia_guide_2026_07_06"
+      ],
+      "source_status": "expanded_external_source_candidate_ready_for_local_review",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Enchantment \u2014 Saga",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "loot plus Treasure generation support from Draftsim Kaalia guide",
+      "card_level_cut_permission_now": false,
+      "card_name": "Collector's Vault",
+      "cmc": 2.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "add one mana",
+        "mana of any color",
+        "treasure",
+        "draw a card",
+        "add one mana of any color",
+        "create a treasure"
+      ],
+      "miner_source_seed_allowed": true,
+      "next_evidence": "rerun_seeded_cut_source_miner_with_reviewed_expanded_external_nonpayoff_sources",
+      "promotion_allowed": false,
+      "recycled_from_prior_external_seed": false,
+      "rerun_miner_allowed_for_card": true,
+      "review_status": "expanded_source_candidate_local_review_ready_for_seeded_miner",
+      "seed_cautions": [
+        "mana_rock_seed_requires_curve_and_source_pressure_review",
+        "does_not_make_existing_ramp_cuttable"
+      ],
+      "seed_scope": "mana_rock_seed_curve_pressure_review",
+      "source_card_name": "Collector's Vault",
+      "source_ids": [
+        "draftsim_kaalia_guide_2026_07_06"
+      ],
+      "source_status": "expanded_external_source_candidate_ready_for_local_review",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Artifact",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "generic two-mana rock baseline for curve-pressure comparison",
+      "card_level_cut_permission_now": false,
+      "card_name": "Mind Stone",
+      "cmc": 2.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "add {",
+        "draw a card",
+        "add {c}"
+      ],
+      "miner_source_seed_allowed": false,
+      "next_evidence": "broaden_external_source_candidate_pool_without_recycling",
+      "promotion_allowed": false,
+      "recycled_from_prior_external_seed": true,
+      "rerun_miner_allowed_for_card": false,
+      "review_status": "expanded_source_candidate_local_review_blocks_recycled_prior_seed",
+      "seed_cautions": [
+        "seed_requires_contextual_review_before_any_deck_action"
+      ],
+      "seed_scope": "blocked_not_a_seed",
+      "source_card_name": "Mind Stone",
+      "source_ids": [
+        "local_scryfall_oracle_cache_functional_terms_2026_07_06"
+      ],
+      "source_status": "expanded_source_candidate_recycled_from_prior_seed_blocked",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Artifact",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "Mardu two-mana color rock baseline",
+      "card_level_cut_permission_now": false,
+      "card_name": "Talisman of Conviction",
+      "cmc": 2.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "add {",
+        "add {c}",
+        "add {r}"
+      ],
+      "miner_source_seed_allowed": false,
+      "next_evidence": "broaden_external_source_candidate_pool_without_recycling",
+      "promotion_allowed": false,
+      "recycled_from_prior_external_seed": true,
+      "rerun_miner_allowed_for_card": false,
+      "review_status": "expanded_source_candidate_local_review_blocks_recycled_prior_seed",
+      "seed_cautions": [
+        "seed_requires_contextual_review_before_any_deck_action"
+      ],
+      "seed_scope": "blocked_not_a_seed",
+      "source_card_name": "Talisman of Conviction",
+      "source_ids": [
+        "local_scryfall_oracle_cache_functional_terms_2026_07_06"
+      ],
+      "source_status": "expanded_source_candidate_recycled_from_prior_seed_blocked",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Artifact",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "Mardu two-mana color rock baseline",
+      "card_level_cut_permission_now": false,
+      "card_name": "Talisman of Indulgence",
+      "cmc": 2.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "add {",
+        "add {c}",
+        "add {b}"
+      ],
+      "miner_source_seed_allowed": false,
+      "next_evidence": "broaden_external_source_candidate_pool_without_recycling",
+      "promotion_allowed": false,
+      "recycled_from_prior_external_seed": true,
+      "rerun_miner_allowed_for_card": false,
+      "review_status": "expanded_source_candidate_local_review_blocks_recycled_prior_seed",
+      "seed_cautions": [
+        "seed_requires_contextual_review_before_any_deck_action"
+      ],
+      "seed_scope": "blocked_not_a_seed",
+      "source_card_name": "Talisman of Indulgence",
+      "source_ids": [
+        "local_scryfall_oracle_cache_functional_terms_2026_07_06"
+      ],
+      "source_status": "expanded_source_candidate_recycled_from_prior_seed_blocked",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Artifact",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "Mardu two-mana color rock baseline",
+      "card_level_cut_permission_now": false,
+      "card_name": "Talisman of Hierarchy",
+      "cmc": 2.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "add {",
+        "add {c}",
+        "add {w}"
+      ],
+      "miner_source_seed_allowed": false,
+      "next_evidence": "broaden_external_source_candidate_pool_without_recycling",
+      "promotion_allowed": false,
+      "recycled_from_prior_external_seed": true,
+      "rerun_miner_allowed_for_card": false,
+      "review_status": "expanded_source_candidate_local_review_blocks_recycled_prior_seed",
+      "seed_cautions": [
+        "seed_requires_contextual_review_before_any_deck_action"
+      ],
+      "seed_scope": "blocked_not_a_seed",
+      "source_card_name": "Talisman of Hierarchy",
+      "source_ids": [
+        "local_scryfall_oracle_cache_functional_terms_2026_07_06"
+      ],
+      "source_status": "expanded_source_candidate_recycled_from_prior_seed_blocked",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Artifact",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "Mardu two-mana signet baseline",
+      "card_level_cut_permission_now": false,
+      "card_name": "Boros Signet",
+      "cmc": 2.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "add {",
+        "add {r}"
+      ],
+      "miner_source_seed_allowed": false,
+      "next_evidence": "broaden_external_source_candidate_pool_without_recycling",
+      "promotion_allowed": false,
+      "recycled_from_prior_external_seed": true,
+      "rerun_miner_allowed_for_card": false,
+      "review_status": "expanded_source_candidate_local_review_blocks_recycled_prior_seed",
+      "seed_cautions": [
+        "seed_requires_contextual_review_before_any_deck_action"
+      ],
+      "seed_scope": "blocked_not_a_seed",
+      "source_card_name": "Boros Signet",
+      "source_ids": [
+        "local_scryfall_oracle_cache_functional_terms_2026_07_06"
+      ],
+      "source_status": "expanded_source_candidate_recycled_from_prior_seed_blocked",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Artifact",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "Mardu two-mana signet baseline",
+      "card_level_cut_permission_now": false,
+      "card_name": "Rakdos Signet",
+      "cmc": 2.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "add {",
+        "add {b}"
+      ],
+      "miner_source_seed_allowed": false,
+      "next_evidence": "broaden_external_source_candidate_pool_without_recycling",
+      "promotion_allowed": false,
+      "recycled_from_prior_external_seed": true,
+      "rerun_miner_allowed_for_card": false,
+      "review_status": "expanded_source_candidate_local_review_blocks_recycled_prior_seed",
+      "seed_cautions": [
+        "seed_requires_contextual_review_before_any_deck_action"
+      ],
+      "seed_scope": "blocked_not_a_seed",
+      "source_card_name": "Rakdos Signet",
+      "source_ids": [
+        "local_scryfall_oracle_cache_functional_terms_2026_07_06"
+      ],
+      "source_status": "expanded_source_candidate_recycled_from_prior_seed_blocked",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Artifact",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "Mardu two-mana signet baseline",
+      "card_level_cut_permission_now": false,
+      "card_name": "Orzhov Signet",
+      "cmc": 2.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "add {",
+        "add {w}"
+      ],
+      "miner_source_seed_allowed": false,
+      "next_evidence": "broaden_external_source_candidate_pool_without_recycling",
+      "promotion_allowed": false,
+      "recycled_from_prior_external_seed": true,
+      "rerun_miner_allowed_for_card": false,
+      "review_status": "expanded_source_candidate_local_review_blocks_recycled_prior_seed",
+      "seed_cautions": [
+        "seed_requires_contextual_review_before_any_deck_action"
+      ],
+      "seed_scope": "blocked_not_a_seed",
+      "source_card_name": "Orzhov Signet",
+      "source_ids": [
+        "local_scryfall_oracle_cache_functional_terms_2026_07_06"
+      ],
+      "source_status": "expanded_source_candidate_recycled_from_prior_seed_blocked",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Artifact",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "haste land from EDHREC hidden gems, expected to route to land lane",
+      "card_level_cut_permission_now": false,
+      "card_name": "Hall of the Bandit Lord",
+      "cmc": 0.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": false,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "add {",
+        "add {c}"
+      ],
+      "miner_source_seed_allowed": false,
+      "next_evidence": "broaden_external_source_candidate_pool_without_recycling",
+      "promotion_allowed": false,
+      "recycled_from_prior_external_seed": true,
+      "rerun_miner_allowed_for_card": false,
+      "review_status": "expanded_source_candidate_local_review_blocks_recycled_prior_seed",
+      "seed_cautions": [
+        "seed_requires_contextual_review_before_any_deck_action"
+      ],
+      "seed_scope": "blocked_not_a_seed",
+      "source_card_name": "Hall of the Bandit Lord",
+      "source_ids": [
+        "edhrec_kaalia_hidden_gems_2026_03_26"
+      ],
+      "source_status": "expanded_source_candidate_recycled_from_prior_seed_blocked",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Legendary Land",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "candidate_signal": "haste land from Draftsim guide, expected to block if already in current deck",
+      "card_level_cut_permission_now": false,
+      "card_name": "Arena of Glory",
+      "cmc": 0.0,
+      "commander_identity_legal": true,
+      "commander_legality_status": "legal",
+      "current_deck_present": true,
+      "local_identity_found": true,
+      "local_role_evidence_terms": [
+        "add {",
+        "add {r}"
+      ],
+      "miner_source_seed_allowed": false,
+      "next_evidence": "target_deck_trace_or_negative_review_before_cut_consideration",
+      "promotion_allowed": false,
+      "recycled_from_prior_external_seed": false,
+      "rerun_miner_allowed_for_card": false,
+      "review_status": "expanded_source_candidate_local_review_blocks_current_deck",
+      "seed_cautions": [
+        "seed_requires_contextual_review_before_any_deck_action"
+      ],
+      "seed_scope": "blocked_not_a_seed",
+      "source_card_name": "Arena of Glory",
+      "source_ids": [
+        "draftsim_kaalia_guide_2026_07_06"
+      ],
+      "source_status": "expanded_source_candidate_already_in_current_deck_blocked",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Land",
+      "value_safe_reclassification_allowed": false
+    }
+  ],
+  "source_db_mutated": false,
+  "source_snapshots": [
+    {
+      "guardrail": "article recommendations are source lanes only and do not authorize add/cut actions",
+      "observed_on": "2026-07-06",
+      "signal": "Kaalia needs haste/protection windows and can use Sword of the Animist, Simian Spirit Guide, and Dihada as underplayed support lanes.",
+      "source_id": "edhrec_kaalia_hidden_gems_2026_03_26",
+      "source_type": "commander_strategy_article",
+      "url": "https://edhrec.com/articles/hidden-gems-for-kaalia-of-the-vast"
+    },
+    {
+      "guardrail": "guide context must be rechecked against current deck presence, role text, and Commander legality",
+      "observed_on": "2026-07-06",
+      "signal": "The guide highlights reanimation/ramp redundancy, Fable of the Mirror-Breaker, Collector's Vault, and haste lands as Kaalia support.",
+      "source_id": "draftsim_kaalia_guide_2026_07_06",
+      "source_type": "commander_deck_guide",
+      "url": "https://draftsim.com/kaalia-of-the-vast-edh-deck/"
+    },
+    {
+      "guardrail": "cEDH silence context is role evidence, not proof the card belongs in this target list",
+      "observed_on": "2026-07-06",
+      "signal": "Silence, Grand Abolisher, and Orim's Chant represent white turn-protection effects that can defend a decisive turn.",
+      "source_id": "commanders_herald_silence_abolisher_2023_12_20",
+      "source_type": "role_strategy_article",
+      "url": "https://commandersherald.com/5-more-silences-and-grand-abolishers-for-cedh/"
+    },
+    {
+      "guardrail": "local identity and role text are necessary but still not cut permission",
+      "observed_on": "2026-07-06",
+      "signal": "Local Oracle text resolves additional Mardu protection and mana sources before any review seed is emitted.",
+      "source_id": "local_scryfall_oracle_cache_functional_terms_2026_07_06",
+      "source_type": "local_oracle_text_crosscheck",
+      "url": "local:card_oracle_cache"
+    }
+  ],
+  "status": "expanded_external_source_candidates_reviewed_seed_ready_no_deck_action",
+  "summary": {
+    "battle_gate_allowed_count": 0,
+    "blocked_commander_banned_count": 0,
+    "blocked_current_deck_count": 3,
+    "blocked_recycled_prior_seed_count": 14,
+    "blocked_role_mismatch_count": 0,
+    "candidate_copy_allowed_count": 0,
+    "card_level_cut_permission_count": 0,
+    "commander": "Kaalia of the Vast",
+    "deck_id": "619",
+    "expander_ready_candidate_count": 0,
+    "miner_seed_count_by_role": {
+      "haste_protection_silence": 3,
+      "mana_acceleration": 4
+    },
+    "miner_source_seed_allowed_count": 7,
+    "next_gate": "rerun_seeded_cut_source_miner_with_reviewed_expanded_external_nonpayoff_sources",
+    "review_status_counts": {
+      "expanded_source_candidate_local_review_blocks_current_deck": 3,
+      "expanded_source_candidate_local_review_blocks_recycled_prior_seed": 14,
+      "expanded_source_candidate_local_review_ready_for_seeded_miner": 7
+    },
+    "reviewed_candidate_count": 24,
+    "seed_scope_counts": {
+      "mana_rock_seed_curve_pressure_review": 4,
+      "protection_spell_or_haste_seed": 3
+    },
+    "value_safe_reclassification_allowed_count": 0
+  },
+  "value_safe_reclassification_allowed_now": false
+}
