@@ -9507,7 +9507,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["activation_cost_mana"], "{2}{B}")
         self.assertTrue(effect["activation_requires_tap"])
 
-    def test_permanent_activated_destroy_blocks_sacrifice_target_cost(self) -> None:
+    def test_permanent_activated_destroy_maps_sacrifice_target_cost(self) -> None:
         row = queue_row(
             split.DESTROY_UNIT,
             effect_classes=["DestroyTargetEffect"],
@@ -9527,10 +9527,44 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                     new DestroyTargetEffect(),
                     new ManaCostsImpl<>("{B}")
                 );
-                ability.addCost(new SacrificeTargetCost(new TargetControlledCreaturePermanent()));
-                ability.addTarget(new TargetCreaturePermanent(
-                    StaticFilters.FILTER_PERMANENT_CREATURE_NON_BLACK
-                ));
+                ability.addCost(new SacrificeTargetCost(StaticFilters.FILTER_PERMANENT_CREATURE));
+                ability.addTarget(new TargetPermanent(FILTER_PERMANENT_CREATURE_NON_BLACK));
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_DESTROY_SCOPE)
+        self.assertEqual(effect["activated_remove_target"], "nonblack_creature")
+        self.assertEqual(effect["target"], "creature")
+        self.assertEqual(effect["target_constraints"], {"card_types": ["creature"], "exclude_colors": ["B"]})
+        self.assertEqual(effect["activation_sacrifice_target"], "creature")
+        self.assertTrue(effect["activation_requires_sacrifice_target"])
+        self.assertFalse(effect["activation_requires_sacrifice"])
+
+    def test_permanent_activated_destroy_blocks_multi_sacrifice_target_cost(self) -> None:
+        row = queue_row(
+            split.DESTROY_UNIT,
+            effect_classes=["DestroyTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Arsonist",
+                type_line="Creature - Human Soldier",
+                oracle_text="{1}, Sacrifice two lands: Destroy target land.",
+            ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(
+                    new DestroyTargetEffect(),
+                    new GenericManaCost(1)
+                );
+                ability.addCost(new SacrificeTargetCost(2, StaticFilters.FILTER_LANDS));
+                ability.addTarget(new TargetLandPermanent());
                 this.addAbility(ability);
             """,
         )

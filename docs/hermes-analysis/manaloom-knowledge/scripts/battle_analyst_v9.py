@@ -45462,6 +45462,15 @@ def can_activate_generic_destroy_permanent(player, permanent, opponents, *, effe
         )
     if not player.can_pay(activation_cost):
         return False
+    sacrifice_target_type = str(effect_data.get("activation_sacrifice_target") or "").strip()
+    if sacrifice_target_type:
+        sacrifice_target, _options = choose_activation_sacrifice_target(
+            player,
+            permanent,
+            sacrifice_target_type,
+        )
+        if sacrifice_target is None:
+            return False
     return any(
         opponent.is_alive()
         and removal_target_candidates(opponent, effect_data, controller=player, source=permanent)
@@ -45510,6 +45519,17 @@ def activate_generic_destroy_permanent(player, opponents, all_players, permanent
     target_type = str(effect_data.get("target") or "").lower()
     if not target_type:
         target_type = "creature" if effect_data.get("effect") == "remove_creature" else "nonland_permanent"
+    sacrifice_target_type = str(effect_data.get("activation_sacrifice_target") or "").strip()
+    sacrificed_target = None
+    sacrifice_options = []
+    if sacrifice_target_type:
+        sacrificed_target, sacrifice_options = choose_activation_sacrifice_target(
+            player,
+            permanent,
+            sacrifice_target_type,
+        )
+        if sacrificed_target is None:
+            return False
     decision = targeting_decision(
         permanent,
         target,
@@ -45534,6 +45554,8 @@ def activate_generic_destroy_permanent(player, opponents, all_players, permanent
         player.graveyard.append(permanent)
         player.record_permanent_sacrificed(permanent, turn)
         sacrificed_source = True
+    if sacrificed_target is not None:
+        sacrifice_permanent_for_activation(player, sacrificed_target, turn)
     if check_ward(target, permanent, player, rng):
         emit_replay_event(
             "removal_countered_by_ward",
@@ -45577,6 +45599,12 @@ def activate_generic_destroy_permanent(player, opponents, all_players, permanent
             "target_score": list(target_priority(target)),
             "requires_tap": 1 if effect_data.get("activation_requires_tap") else 0,
             "requires_sacrifice": 1 if sacrificed_source else 0,
+            "sacrifice_target": sacrifice_target_type or None,
+            "sacrificed_target": (sacrificed_target or {}).get("name"),
+            "sacrifice_options": [
+                option.get("name", "?")
+                for option in (sacrifice_options or [])[:6]
+            ],
         },
         rule_source=fields.get("rule_source", "battle_rule"),
         rule_status=fields.get("rule_review_status", "verified"),
@@ -45588,7 +45616,10 @@ def activate_generic_destroy_permanent(player, opponents, all_players, permanent
         resource_delta={
             "mana": -mana_paid,
             "tapped": 1 if effect_data.get("activation_requires_tap") else 0,
-            "permanents": -1 if sacrificed_source else 0,
+            "permanents": -(
+                (1 if sacrificed_source else 0)
+                + (1 if sacrificed_target is not None else 0)
+            ),
             "opponent_permanents_removed": 1,
         },
         risk_flags=[
@@ -45596,6 +45627,7 @@ def activate_generic_destroy_permanent(player, opponents, all_players, permanent
             for flag, active in {
                 "tap_ability": bool(effect_data.get("activation_requires_tap")),
                 "sacrifice_source": sacrificed_source,
+                "sacrifice_target": sacrificed_target is not None,
                 "activated_destroy_target": True,
             }.items()
             if active
@@ -45610,6 +45642,8 @@ def activate_generic_destroy_permanent(player, opponents, all_players, permanent
         activation_cost=activation_cost,
         tapped=bool(permanent.get("tapped")),
         sacrificed_source=sacrificed_source,
+        sacrifice_target=sacrifice_target_type or None,
+        sacrificed_target=(sacrificed_target or {}).get("name"),
         mana_paid=mana_paid,
         target=target.get("name", "?"),
         target_player=target_player.name,

@@ -12474,6 +12474,22 @@ def activated_destroy_from_oracle(metadata: dict[str, Any]) -> tuple[str, str] |
     return destroy_target_from_oracle(effect_metadata)
 
 
+def activated_destroy_sacrifice_target_from_oracle(metadata: dict[str, Any]) -> str | None:
+    text = re.sub(r"\s+", " ", oracle_text(metadata)).strip().lower()
+    if text.count(":") != 1:
+        return None
+    cost_text = text.split(":", 1)[0].strip()
+    sacrifice_pattern = (
+        r"(?:^|,\s*)sacrifice (?P<phrase>"
+        r"(?:an?|another) (?:creature|artifact|enchantment|land|forest|beast|permanent|swamp)"
+        r")(?:\s*,?|$)"
+    )
+    sacrifice_matches = list(re.finditer(sacrifice_pattern, cost_text))
+    if len(sacrifice_matches) != 1:
+        return None
+    return activation_sacrifice_target_from_phrase(sacrifice_matches[0].group("phrase"))
+
+
 def activated_destroy_target_from_source(text: str) -> str | None:
     if "TargetPointer" in text or ".setTargetPointer" in text or "EachTargetPointer" in text:
         return None
@@ -12542,7 +12558,6 @@ def activated_destroy_from_source(source: str) -> dict[str, Any] | str:
         "RemoveCounterCost",
         "ReturnToHandSourceCost",
         "RevealTargetFromHandCost",
-        "SacrificeTargetCost",
         "TapTargetCost",
     }
     if "Zone.GRAVEYARD" in text:
@@ -12556,6 +12571,14 @@ def activated_destroy_from_source(source: str) -> dict[str, Any] | str:
     window = text[max(0, destroy_index - 500) : destroy_index + 2000]
     if "SimpleActivatedAbility" not in window:
         return "activated_destroy_source_not_simple_activated"
+    sacrifice_target = None
+    if "SacrificeTargetCost" in window:
+        sacrifice_cost_count = len(re.findall(r"new\s+SacrificeTargetCost\s*\(", window))
+        if sacrifice_cost_count != 1 or re.search(r"new\s+SacrificeTargetCost\s*\(\s*[2-9]\d*\s*,", window):
+            return "activated_destroy_source_cost_not_supported"
+        sacrifice_target = activation_sacrifice_target_from_source(text, window)
+        if sacrifice_target is None:
+            return "activated_destroy_source_cost_not_supported"
     target = activated_destroy_target_from_source(text)
     if target is None:
         return "activated_destroy_source_target_not_supported"
@@ -12577,6 +12600,14 @@ def activated_destroy_from_source(source: str) -> dict[str, Any] | str:
         "activation_cost_colors": activation_cost_colors,
         "activation_requires_tap": "TapSourceCost" in window,
         "activation_requires_sacrifice": "SacrificeSourceCost" in window,
+        **(
+            {
+                "activation_sacrifice_target": sacrifice_target,
+                "activation_requires_sacrifice_target": True,
+            }
+            if sacrifice_target is not None
+            else {}
+        ),
     }
 
 
@@ -18466,6 +18497,10 @@ def split_row(
         oracle_effect, oracle_target_type = oracle_destroy
         if str(parsed_activation["target"]) != str(oracle_target_type):
             return None, "activated_destroy_source_oracle_target_mismatch"
+        if parsed_activation.get("activation_sacrifice_target"):
+            oracle_sacrifice_target = activated_destroy_sacrifice_target_from_oracle(metadata)
+            if oracle_sacrifice_target != parsed_activation.get("activation_sacrifice_target"):
+                return None, "activated_destroy_source_oracle_sacrifice_target_mismatch"
         type_line = str(metadata.get("type_line") or "").lower()
         permanent_effect = (
             "creature"
@@ -18497,7 +18532,10 @@ def split_row(
                     "activation_cost_colors",
                     "activation_requires_tap",
                     "activation_requires_sacrifice",
+                    "activation_sacrifice_target",
+                    "activation_requires_sacrifice_target",
                 )
+                if key in parsed_activation
             },
         }
         effect_json = {
@@ -18522,7 +18560,10 @@ def split_row(
                     "activation_cost_colors",
                     "activation_requires_tap",
                     "activation_requires_sacrifice",
+                    "activation_sacrifice_target",
+                    "activation_requires_sacrifice_target",
                 )
+                if key in parsed_activation
             },
         }
         if parsed_activation.get("activation_requires_sacrifice"):

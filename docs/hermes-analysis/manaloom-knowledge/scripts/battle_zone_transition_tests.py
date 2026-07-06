@@ -1024,6 +1024,82 @@ def register_tests(battle, player, card):
         assert beast_token not in active.battlefield
         assert elf in active.battlefield
 
+    def test_attrition_activated_destroy_sacrifices_creature_cost():
+        active = player("Active")
+        opponent = player("Opponent")
+        attrition = battle.enrich_card(
+            {
+                "name": "Attrition",
+                "cmc": 3,
+                "type_line": "Enchantment",
+                "effect": "enchantment",
+                "_activated_rule_effects": [
+                    {
+                        "effect": "remove_creature",
+                        "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+                        "ability_kind": "activated",
+                        "activated_effect": "destroy_target",
+                        "activated_remove_effect": "remove_creature",
+                        "activated_remove_target": "nonblack_creature",
+                        "target": "creature",
+                        "target_constraints": {"card_types": ["creature"], "exclude_colors": ["B"]},
+                        "destination": "graveyard",
+                        "activation_cost_mana": "{0}",
+                        "activation_cost_generic": 0,
+                        "activation_cost_colors": [],
+                        "activation_requires_tap": False,
+                        "activation_requires_sacrifice": False,
+                        "activation_sacrifice_target": "creature",
+                        "activation_requires_sacrifice_target": True,
+                    }
+                ],
+            }
+        )
+        expendable = {
+            "name": "Servo Token",
+            "type_line": "Artifact Creature - Servo",
+            "effect": "creature",
+            "token": True,
+            "is_token": True,
+            "power": 1,
+            "toughness": 1,
+        }
+        black_creature = {
+            "name": "Black Knight",
+            "type_line": "Creature - Human Knight",
+            "effect": "creature",
+            "colors": ["B"],
+            "power": 2,
+            "toughness": 2,
+        }
+        white_creature = {
+            "name": "Serra Angel",
+            "type_line": "Creature - Angel",
+            "effect": "creature",
+            "colors": ["W"],
+            "power": 4,
+            "toughness": 4,
+        }
+        active.battlefield = [attrition, expendable]
+        opponent.battlefield = [black_creature, white_creature]
+
+        activated = battle.activate_best_generic_destroy_permanent(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=10,
+            rng=random.Random(573),
+            phase="precombat_main",
+        )
+
+        assert activated is True
+        assert attrition in active.battlefield
+        assert expendable not in active.battlefield
+        assert expendable not in active.graveyard
+        assert black_creature in opponent.battlefield
+        assert white_creature not in opponent.battlefield
+        assert white_creature in opponent.graveyard
+
     def test_weathered_wayfarer_activated_tutor_requires_opponent_more_lands():
         active = player("Active")
         opponent = player("Opponent")
@@ -1432,6 +1508,7 @@ def register_tests(battle, player, card):
         test_dragonstorm_forecaster_activated_tutor_respects_target_names,
         test_claws_of_gix_life_gain_sacrifices_target_permanent_cost,
         test_ravenous_baloth_life_gain_sacrifices_beast_only,
+        test_attrition_activated_destroy_sacrifices_creature_cost,
         test_weathered_wayfarer_activated_tutor_requires_opponent_more_lands,
         test_spellseeker_etb_finds_cheap_instant_or_sorcery_only,
         test_trophy_mage_etb_finds_artifact_with_mana_value_three_only,

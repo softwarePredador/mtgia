@@ -15828,6 +15828,86 @@ non-simple Oracle text, or unsupported sacrifice target filters. Those remain
 blocked under exact split reason counts and require their own mapper/runtime
 package.
 
+## PG573 Activated Destroy Sacrifice Target New Server Evidence
+
+PG573 evidence:
+
+- package:
+  `docs/hermes-analysis/master_optimizer_reports/pg573_activated_destroy_sacrifice_target_package.md`
+- apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg573_activated_destroy_sacrifice_target_apply_evidence.md`
+- sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg573_activated_destroy_sacrifice_target_sync_report.json`
+- E2E:
+  `docs/hermes-analysis/master_optimizer_reports/pg573_activated_destroy_sacrifice_target_e2e.md`
+- hash-integrity companion backfill:
+  `docs/hermes-analysis/master_optimizer_reports/pg573_oracle_hash_integrity_backfill_new_server.md`
+- hash-integrity sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg573_oracle_hash_integrity_backfill_sync_report.json`
+- post-sync queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260706_post_pg573_activated_destroy_sacrifice_target_commander_legal.md`
+- post split recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260706_post_pg573_activated_destroy_sacrifice_target_recheck.md`
+- readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260706_post_pg573_activated_destroy_sacrifice_target.md`
+- final audits:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260706_post_pg573_activated_destroy_sacrifice_target.md`,
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260706_post_pg573_activated_destroy_sacrifice_target.md`,
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260706_post_pg573_activated_destroy_sacrifice_target.md`,
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260706_post_pg573_activated_destroy_sacrifice_target.md`
+
+PG573 promoted `6` activated destroy rows with safe `SacrificeTargetCost`
+filters on the new server under
+`xmage_permanent_simple_activated_destroy_target_v1`.
+
+Runtime semantics:
+
+- activated destroy permanents can pay exactly one target sacrifice cost before
+  destroy resolution;
+- supported sacrifice targets include `creature`, `land`, `permanent`,
+  `artifact`, `enchantment`, `forest`, `swamp`, and `beast`, when Oracle/XMage
+  agree through the exact split parser;
+- target selection still enforces the destroy target constraints, including
+  `nonblack_creature`, `flying_creature`, and `nonbasic_land`;
+- replay/resource traces record sacrifice target options, the sacrificed
+  permanent, and the destroyed target.
+
+Validation:
+
+- focused code checks passed: `py_compile`, `664` exact-scope unittest tests,
+  and the battle runtime suite with PG-backed rules;
+- package precheck found `6/6` target card rows and no existing matching rules;
+- package apply verified `6/6` promoted rows with `review_status=verified`,
+  `execution_status=auto`, and matching Oracle hash;
+- PG -> Hermes/SQLite sync loaded `6` PostgreSQL rows, updated `6` SQLite rows,
+  and exported `6617` canonical snapshot rows;
+- direct PostgreSQL and SQLite verification matched scope, sacrifice target,
+  and removal target for all six selected cards;
+- post-PG573 queue moved from `target_identity_count=25381` to `25375` and
+  from `xmage_authoritative_source_count=25067` to `25061`;
+- final exact-scope recheck returned `proposal_count=0`;
+- global readiness after sync reported `battle_and_oracle_ready=5575` and
+  `battle_family_mapper_required=28298`;
+- final audits passed: XMage strategy `pass`, PG-Hermes-SQLite `pass`,
+  operational surface `pass`, legacy contamination `pass`, and server-target
+  `pass`.
+
+Integrity companion note:
+
+- the PG/Hermes/SQLite gate exposed `44` old trusted executable PostgreSQL rows
+  missing `oracle_hash`;
+- PG573 included a metadata-only backfill from `md5(coalesce(cards.oracle_text,
+  ''))`, with backup table
+  `manaloom_deploy_audit.pg573_oracle_hash_integrity_backfill_new_server_20260706_211900`;
+- postcheck returned `trusted_executable_missing_hash_after=0`, and the final
+  PG/Hermes/SQLite contract audit passed `51/51`.
+
+Residual boundary: PG573 does not authorize activated destroy rows with
+multi-sacrifice costs, discard, pay-life, tap-target costs, dynamic/non-simple
+Oracle text, unsupported target filters, or non-destroy composite effects.
+Those remain blocked under exact split reason counts and require their own
+mapper/runtime package.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:
