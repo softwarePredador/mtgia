@@ -3427,6 +3427,81 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_spell_cast_gain_life_respects_color_and_noncreature_filters(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.life = 20
+        active.battlefield.extend(
+            [
+                {
+                    "name": "God-Pharaoh's Faithful",
+                    "type_line": "Creature - Human Wizard",
+                    "effect": "creature",
+                    "battle_model_scope": "xmage_spell_cast_gain_life_v1",
+                    "trigger": "spell_cast",
+                    "trigger_effect": "gain_life",
+                    "spell_cast_gain_life": True,
+                    "spell_cast_gain_life_amount": 1,
+                    "spell_cast_gain_life_required_colors": ["U", "B", "R"],
+                    "_rule_logical_key": "battle_rule_v1:gpf-test",
+                },
+                {
+                    "name": "Student of Ojutai",
+                    "type_line": "Creature - Human Monk",
+                    "effect": "creature",
+                    "battle_model_scope": "xmage_spell_cast_gain_life_v1",
+                    "trigger": "noncreature_spell_cast",
+                    "trigger_effect": "gain_life",
+                    "spell_cast_gain_life": True,
+                    "spell_cast_gain_life_amount": 2,
+                    "_rule_logical_key": "battle_rule_v1:student-test",
+                },
+            ]
+        )
+
+        self.battle.trigger_spell_cast_engines(
+            active,
+            [active, opponent],
+            {"name": "Green Creature", "type_line": "Creature - Elf", "colors": ["G"], "cmc": 2},
+            turn=3,
+            phase="precombat_main",
+        )
+        self.assertEqual(active.life, 20)
+        self.battle.trigger_spell_cast_engines(
+            active,
+            [active, opponent],
+            {"name": "Blue Instant", "type_line": "Instant", "colors": ["U"], "cmc": 2},
+            turn=3,
+            phase="precombat_main",
+        )
+
+        self.assertEqual(active.life, 23)
+        life_events = [
+            data
+            for event, data in self.events
+            if event == "trigger_resolved" and data.get("effect") == "gain_life"
+        ]
+        self.assertEqual(len(life_events), 2)
+        self.assertTrue(
+            any(
+                data.get("card") == "God-Pharaoh's Faithful"
+                and data.get("trigger_spell") == "Blue Instant"
+                and data.get("life_gain_requested") == 1
+                and data.get("spell_cast_gain_life_required_colors") == ["U", "B", "R"]
+                and data.get("rule_logical_key") == "battle_rule_v1:gpf-test"
+                for data in life_events
+            )
+        )
+        self.assertTrue(
+            any(
+                data.get("card") == "Student of Ojutai"
+                and data.get("trigger") == "noncreature_spell_cast"
+                and data.get("life_gain_requested") == 2
+                and data.get("rule_logical_key") == "battle_rule_v1:student-test"
+                for data in life_events
+            )
+        )
+
     def test_spell_cast_add_counters_grows_source_for_matching_noncreature_spell(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

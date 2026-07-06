@@ -958,6 +958,107 @@ def run_creature_enters_life_gain(
     }
 
 
+def run_spell_cast_gain_life(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    active = battle.Player(str(scenario.get("player") or "Spell Life Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
+    all_players = [active, opponent]
+    active.life = int(scenario.get("starting_life") or 20)
+    turn = int(scenario.get("turn") or 6)
+    effect_data = battle.get_card_effect(card)
+    source = battle.prepare_entering_permanent(
+        battle.enrich_card({**card, **effect_data}),
+        controller=active,
+        all_players=all_players,
+        turn=turn,
+    )
+    active.battlefield.append(source)
+
+    nonmatching_spell = scenario.get("nonmatching_spell")
+    if isinstance(nonmatching_spell, dict):
+        before_life = active.life
+        before_events = len(events)
+        battle.trigger_spell_cast_engines(
+            active,
+            all_players,
+            dict(nonmatching_spell),
+            turn=turn,
+            phase="precombat_main",
+        )
+        if active.life != before_life:
+            fail(
+                "battle_execution",
+                f"{card['name']} gained life from nonmatching spell {nonmatching_spell.get('name')}",
+            )
+        unexpected = next(
+            (
+                data
+                for event_name, data in events[before_events:]
+                if event_name == "trigger_resolved"
+                and data.get("card") == card.get("name")
+                and data.get("effect") == "gain_life"
+            ),
+            None,
+        )
+        if unexpected is not None:
+            fail("battle_events", f"{card['name']} triggered from nonmatching spell")
+
+    matching_spell = dict(scenario.get("matching_spell") or {})
+    if not matching_spell:
+        fail("scenario", f"{card['name']} missing matching_spell")
+    before_events = len(events)
+    battle.trigger_spell_cast_engines(
+        active,
+        all_players,
+        matching_spell,
+        turn=turn,
+        phase="precombat_main",
+    )
+
+    expected_life_after = int(scenario.get("expected_life_after") or active.life)
+    expected_life_gain = int(scenario.get("expected_life_gain") or 0)
+    if active.life != expected_life_after:
+        fail(
+            "battle_execution",
+            f"{card['name']} life after spell-cast gain-life trigger={active.life}, expected {expected_life_after}",
+        )
+    event = next(
+        (
+            data
+            for event_name, data in events[before_events:]
+            if event_name == "trigger_resolved"
+            and data.get("card") == card.get("name")
+            and data.get("effect") == "gain_life"
+        ),
+        None,
+    )
+    if event is None:
+        fail("battle_events", f"missing {card['name']} spell-cast gain_life trigger_resolved event")
+    if int(event.get("life_gain_requested") or 0) != expected_life_gain:
+        fail(
+            "battle_events",
+            f"{card['name']} life_gain_requested={event.get('life_gain_requested')}, expected {expected_life_gain}",
+        )
+    expected_trigger = scenario.get("expected_trigger")
+    if expected_trigger and event.get("trigger") != expected_trigger:
+        fail(
+            "battle_events",
+            f"{card['name']} trigger={event.get('trigger')!r}, expected {expected_trigger!r}",
+        )
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "life_after": active.life,
+        "life_gained": expected_life_gain,
+        "trigger": event.get("trigger"),
+        "trigger_spell": event.get("trigger_spell"),
+    }
+
+
 def run_creature_etb_create_tokens(
     battle,
     scenario: dict[str, Any],
@@ -3168,6 +3269,7 @@ SCENARIO_RUNNERS = {
     "simple_activated_tap_target": run_simple_activated_tap_target,
     "simple_activated_self_keyword": run_simple_activated_self_keyword,
     "simple_activated_create_token": run_simple_activated_create_token,
+    "spell_cast_gain_life": run_spell_cast_gain_life,
     "static_global_power_toughness_boost": run_static_global_power_toughness_boost,
     "target_creature_cant_block": run_target_creature_cant_block,
     "token_maker_attack_each_opponent": run_token_maker_attack_each_opponent,

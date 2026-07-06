@@ -50261,6 +50261,59 @@ def trigger_spell_cast_engines(
                 all_players=all_players,
             )
             continue
+        gain_life_amount = int(permanent.get("spell_cast_gain_life_amount") or 0)
+        if gain_life_amount > 0 and spell_cast_gain_life_filter_matches(
+            permanent,
+            player,
+            spell,
+            source_zone=source_zone,
+        ):
+
+            def resolve_spell_cast_gain_life_trigger(
+                permanent=permanent,
+                gain_life_amount=gain_life_amount,
+                trigger_kind=trigger_kind,
+                spell=spell,
+            ):
+                life_before = player.life
+                gain_life(player, gain_life_amount, cap=999)
+                life_gained = player.life - life_before
+                emit_replay_event(
+                    "trigger_resolved",
+                    player=player.name,
+                    card=permanent.get("name", "?"),
+                    trigger=trigger_kind,
+                    trigger_spell=spell.get("name", "?"),
+                    effect="gain_life",
+                    life_gain_requested=gain_life_amount,
+                    life_gained=life_gained,
+                    life_before=life_before,
+                    life_after=player.life,
+                    trigger_spell_type_line=spell.get("type_line"),
+                    trigger_spell_source_zone=source_zone,
+                    spell_cast_gain_life_card_types=permanent.get(
+                        "spell_cast_gain_life_card_types"
+                    )
+                    or [],
+                    spell_cast_gain_life_required_colors=permanent.get(
+                        "spell_cast_gain_life_required_colors"
+                    )
+                    or [],
+                    phase=phase,
+                    turn=turn,
+                    **replay_rule_fields(permanent),
+                )
+
+            resolve_or_enqueue_trigger(
+                player,
+                permanent,
+                trigger_kind,
+                resolve_spell_cast_gain_life_trigger,
+                stack=stack,
+                active_player=active_player,
+                all_players=all_players,
+            )
+            continue
         draw_threshold = int(permanent.get("spell_cast_draw_if_cmc_at_least") or 0)
         if draw_threshold > 0:
             spell_cmc = int(float(spell.get("cmc") or 0))
@@ -52035,6 +52088,29 @@ def spell_cast_add_counters_filter_matches(permanent, controller, spell, *, sour
             return False
     mana_value_min = int(permanent.get("spell_cast_add_counters_mana_value_min") or 0)
     if mana_value_min > 0 and card_mana_value(spell) < mana_value_min:
+        return False
+    return True
+
+
+def spell_cast_gain_life_filter_matches(permanent, controller, spell, *, source_zone="hand"):
+    if not isinstance(permanent, dict) or not isinstance(spell, dict):
+        return False
+    required_zone = str(permanent.get("spell_cast_gain_life_source_zone") or "").strip().lower()
+    if required_zone and str(source_zone or "hand").strip().lower() != required_zone:
+        return False
+    required_types = [
+        str(value).strip().lower()
+        for value in _as_list(permanent.get("spell_cast_gain_life_card_types"))
+        if str(value).strip()
+    ]
+    if required_types and not _card_type_matches(spell, required_types):
+        return False
+    required_colors = [
+        _color_symbol(value)
+        for value in _as_list(permanent.get("spell_cast_gain_life_required_colors"))
+        if _color_symbol(value)
+    ]
+    if required_colors and not any(_spell_has_color(spell, color) for color in required_colors):
         return False
     return True
 

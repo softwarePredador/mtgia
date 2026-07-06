@@ -578,3 +578,53 @@ def test_simple_mana_source_refresh_runner_pays_activation_cost_from_support_sou
     assert result["available_mana"] == 1
     assert result["conditional_mana"] == 1
     assert result["sources"] == 2
+
+
+def test_spell_cast_gain_life_runner_blocks_nonmatching_and_resolves_matching_spell() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "creature",
+        "battle_model_scope": "xmage_spell_cast_gain_life_v1",
+        "trigger": "noncreature_spell_cast",
+        "trigger_effect": "gain_life",
+        "spell_cast_gain_life": True,
+        "spell_cast_gain_life_amount": 2,
+        "_rule_logical_key": "battle_rule_v1:student-of-ojutai",
+    }
+    try:
+        result = validator.run_spell_cast_gain_life(
+            battle,
+            {
+                "name": "Student of Ojutai gains life when matching spell is cast",
+                "type": "spell_cast_gain_life",
+                "card": {
+                    "name": "Student of Ojutai",
+                    "type_line": "Creature - Human Monk",
+                    "effect": "creature",
+                },
+                "starting_life": 20,
+                "matching_spell": {"name": "Blue Instant", "type_line": "Instant", "cmc": 2},
+                "nonmatching_spell": {
+                    "name": "Creature Spell",
+                    "type_line": "Creature - Soldier",
+                    "cmc": 2,
+                },
+                "expected_trigger": "noncreature_spell_cast",
+                "expected_life_gain": 2,
+                "expected_life_after": 22,
+                "logical_rule_key": "battle_rule_v1:student-of-ojutai",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Student of Ojutai"
+    assert result["life_after"] == 22
+    assert result["trigger"] == "noncreature_spell_cast"
+    assert result["trigger_spell"] == "Blue Instant"

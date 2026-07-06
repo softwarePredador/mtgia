@@ -6173,6 +6173,125 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "spell_cast_add_counters_oracle_filter_not_supported")
 
+    def test_spell_cast_gain_life_maps_generic_spell_filter(self) -> None:
+        row = queue_row(
+            split.LIFE_UNIT,
+            effect_classes=["GainLifeEffect"],
+            ability_kind="triggered",
+            ability_classes=["SpellCastControllerTriggeredAbility"],
+            xmage_signals=["triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Contemplation",
+                type_line="Enchantment",
+                oracle_text="Whenever you cast a spell, you gain 1 life.",
+            ),
+            source_text="""
+                this.addAbility(new SpellCastControllerTriggeredAbility(
+                    new GainLifeEffect(1), false));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.SPELL_CAST_GAIN_LIFE_SCOPE)
+        self.assertEqual(effect["effect"], "life_gain_engine")
+        self.assertEqual(effect["trigger"], "spell_cast")
+        self.assertEqual(effect["trigger_effect"], "gain_life")
+        self.assertTrue(effect["spell_cast_gain_life"])
+        self.assertEqual(effect["spell_cast_gain_life_amount"], 1)
+
+    def test_spell_cast_gain_life_maps_enchantment_spell_filter(self) -> None:
+        row = queue_row(
+            split.LIFE_UNIT,
+            effect_classes=["GainLifeEffect"],
+            ability_kind="triggered",
+            ability_classes=["SpellCastControllerTriggeredAbility"],
+            xmage_signals=["triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Dawnhart Geist",
+                type_line="Creature - Spirit Warlock",
+                oracle_text="Whenever you cast an enchantment spell, you gain 2 life.",
+            ),
+            source_text="""
+                this.addAbility(new SpellCastControllerTriggeredAbility(
+                    new GainLifeEffect(2), StaticFilters.FILTER_SPELL_AN_ENCHANTMENT, false));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "creature")
+        self.assertTrue(effect["is_creature_permanent"])
+        self.assertEqual(effect["spell_cast_gain_life_amount"], 2)
+        self.assertEqual(effect["spell_cast_gain_life_card_types"], ["enchantment"])
+
+    def test_spell_cast_gain_life_maps_noncreature_spell_filter(self) -> None:
+        row = queue_row(
+            split.LIFE_UNIT,
+            effect_classes=["GainLifeEffect"],
+            ability_kind="triggered",
+            ability_classes=["SpellCastControllerTriggeredAbility"],
+            xmage_signals=["triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Student of Ojutai",
+                type_line="Creature - Human Monk",
+                oracle_text="Whenever you cast a noncreature spell, you gain 2 life.",
+            ),
+            source_text="""
+                this.addAbility(new SpellCastControllerTriggeredAbility(
+                    new GainLifeEffect(2), StaticFilters.FILTER_SPELL_A_NON_CREATURE, false));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["trigger"], "noncreature_spell_cast")
+        self.assertEqual(effect["spell_cast_gain_life_amount"], 2)
+
+    def test_spell_cast_gain_life_maps_color_filter(self) -> None:
+        row = queue_row(
+            split.LIFE_UNIT,
+            effect_classes=["GainLifeEffect"],
+            ability_kind="triggered",
+            ability_classes=["SpellCastControllerTriggeredAbility"],
+            xmage_signals=["triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="God-Pharaoh's Faithful",
+                type_line="Creature - Human Wizard",
+                oracle_text=(
+                    "Whenever you cast a blue, black, or red spell, you gain 1 life."
+                ),
+            ),
+            source_text="""
+                private static final FilterSpell filter =
+                    new FilterSpell("a blue, black, or red spell");
+                static {
+                    filter.add(Predicates.or(
+                        new ColorPredicate(ObjectColor.BLUE),
+                        new ColorPredicate(ObjectColor.BLACK),
+                        new ColorPredicate(ObjectColor.RED)));
+                }
+                this.addAbility(new SpellCastControllerTriggeredAbility(
+                    new GainLifeEffect(1), filter, false));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["spell_cast_gain_life_required_colors"], ["U", "B", "R"])
+
     def test_permanent_activated_life_gain_maps_simple_mana_and_tap_cost(self) -> None:
         row = queue_row(
             split.LIFE_UNIT,

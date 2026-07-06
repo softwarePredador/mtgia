@@ -285,6 +285,7 @@ PERMANENT_ACTIVATED_DRAW_SCOPE = "xmage_permanent_simple_activated_draw_v1"
 PERMANENT_ACTIVATED_DRAW_DISCARD_SCOPE = "xmage_permanent_simple_activated_draw_discard_v1"
 SPELL_CAST_DRAW_ENGINE_SCOPE = "xmage_spell_cast_draw_engine_v1"
 SPELL_CAST_ADD_COUNTERS_SOURCE_SCOPE = "xmage_spell_cast_add_counters_source_v1"
+SPELL_CAST_GAIN_LIFE_SCOPE = "xmage_spell_cast_gain_life_v1"
 ETB_LIFE_GAIN_CREATURE_SCOPE = "xmage_creature_etb_gain_life_v1"
 ETB_DYNAMIC_LIFE_GAIN_CREATURE_SCOPE = "xmage_creature_etb_dynamic_gain_life_v1"
 CREATURE_ENTERS_LIFE_GAIN_TRIGGER_SCOPE = "xmage_creature_enters_life_gain_trigger_v1"
@@ -7624,6 +7625,16 @@ def is_spell_cast_add_counters_source_unit(row: dict[str, Any]) -> bool:
     )
 
 
+def is_spell_cast_gain_life_unit(row: dict[str, Any]) -> bool:
+    if str(row.get("adapter_work_unit") or "") != LIFE_UNIT:
+        return False
+    return (
+        effect_classes(row) == {"GainLifeEffect"}
+        and ability_classes(row) == {"SpellCastControllerTriggeredAbility"}
+        and set(row.get("xmage_signals") or []) == {"triggered_ability"}
+    )
+
+
 def is_counter_unless_pays_spell_unit(row: dict[str, Any]) -> bool:
     return (
         str(row.get("adapter_work_unit") or "") == COUNTER_UNLESS_PAYS_UNIT
@@ -12919,7 +12930,7 @@ def spell_cast_add_counters_filter_from_oracle(metadata: dict[str, Any]) -> dict
     color_filter_text = re.sub(
         r"^(?:a|an)\s+spell\s+that(?:'s| is)\s+",
         "",
-        filter_text,
+        simple_filter_text,
     )
     color_filter_text = re.sub(r"^(?:a|an)\s+", "", color_filter_text)
     color_parts = [
@@ -13011,6 +13022,107 @@ def spell_cast_add_counters_specs_match(
         "spell_cast_add_counters_required_colors",
         "spell_cast_add_counters_requires_multicolored",
         "spell_cast_add_counters_mana_value_min",
+    }
+    for key in comparable_keys:
+        oracle_value = oracle_spec.get(key)
+        source_value = source_spec.get(key)
+        if isinstance(oracle_value, list):
+            oracle_value = sorted(str(value) for value in oracle_value)
+        if isinstance(source_value, list):
+            source_value = sorted(str(value) for value in source_value)
+        if oracle_value != source_value:
+            return False
+    return True
+
+
+def spell_cast_gain_life_filter_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    text = re.sub(r"\s+", " ", oracle_text_after_leading_static_keywords(metadata)).strip().lower()
+    match = re.search(
+        r"whenever you cast (?P<filter>.+?), you (?P<may>may )?gain "
+        r"(?P<count>a|an|one|two|three|four|five|six|seven|eight|nine|ten|\d+) life\.?",
+        text,
+    )
+    if not match:
+        return "spell_cast_gain_life_oracle_not_simple"
+    amount = counter_count_from_text(match.group("count"))
+    if amount is None or amount <= 0:
+        return "spell_cast_gain_life_oracle_amount_not_supported"
+    filter_text = re.sub(r"\s+", " ", match.group("filter").strip())
+    simple_filter_text = re.sub(r"\s+spell$", "", filter_text)
+    result: dict[str, Any] = {
+        "spell_cast_gain_life_amount": amount,
+        "spell_cast_gain_life_optional": bool(match.group("may")),
+        "trigger": "spell_cast",
+    }
+    filter_specs: list[tuple[str, dict[str, Any]]] = [
+        ("a", {}),
+        ("an enchantment", {"spell_cast_gain_life_card_types": ["enchantment"]}),
+        ("a noncreature", {"trigger": "noncreature_spell_cast"}),
+    ]
+    for prefix, spec in filter_specs:
+        if simple_filter_text == prefix:
+            result.update(spec)
+            return result
+    color_filter_text = re.sub(
+        r"^(?:a|an)\s+spell\s+that(?:'s| is)\s+",
+        "",
+        simple_filter_text,
+    )
+    color_filter_text = re.sub(r"^(?:a|an)\s+", "", color_filter_text)
+    color_parts = [
+        part.strip()
+        for part in re.split(r",| or ", color_filter_text)
+        if part.strip()
+    ]
+    color_symbols = [TOKEN_COLOR_WORDS.get(part) for part in color_parts]
+    if color_parts and all(color_symbols):
+        result["spell_cast_gain_life_required_colors"] = color_symbols
+        return result
+    return "spell_cast_gain_life_oracle_filter_not_supported"
+
+
+def spell_cast_gain_life_filter_from_source(source: str) -> dict[str, Any] | str:
+    text = source or ""
+    if len(re.findall(r"new\s+SpellCastControllerTriggeredAbility\s*\(", text)) != 1:
+        return "spell_cast_gain_life_source_not_single_trigger"
+    if "DoIfCostPaid" in text or "SacrificeSourceCost" in text or "PayLifeCost" in text:
+        return "spell_cast_gain_life_source_optional_cost_not_supported"
+    if "SpellCastAllTriggeredAbility" in text or "OrTriggeredAbility" in text:
+        return "spell_cast_gain_life_source_trigger_not_supported"
+    amount = java_constructor_int(text, "GainLifeEffect")
+    if amount is None or amount <= 0:
+        return "spell_cast_gain_life_source_amount_not_fixed"
+    result: dict[str, Any] = {
+        "spell_cast_gain_life_amount": amount,
+        "trigger": "spell_cast",
+    }
+    if "FILTER_SPELL_A_NON_CREATURE" in text:
+        result["trigger"] = "noncreature_spell_cast"
+        return result
+    if "FILTER_SPELL_AN_ENCHANTMENT" in text:
+        result["spell_cast_gain_life_card_types"] = ["enchantment"]
+        return result
+    color_symbols = [
+        TOKEN_COLOR_WORDS.get(match.lower())
+        for match in re.findall(r"ObjectColor\.(WHITE|BLUE|BLACK|RED|GREEN)\b", text)
+    ]
+    if color_symbols:
+        result["spell_cast_gain_life_required_colors"] = color_symbols
+        return result
+    if re.search(r"SpellCastControllerTriggeredAbility\s*\(\s*new\s+GainLifeEffect\s*\(\s*\d+\s*\)\s*,\s*false\s*\)", text):
+        return result
+    return "spell_cast_gain_life_source_filter_not_supported"
+
+
+def spell_cast_gain_life_specs_match(
+    oracle_spec: dict[str, Any],
+    source_spec: dict[str, Any],
+) -> bool:
+    comparable_keys = {
+        "trigger",
+        "spell_cast_gain_life_amount",
+        "spell_cast_gain_life_card_types",
+        "spell_cast_gain_life_required_colors",
     }
     for key in comparable_keys:
         oracle_value = oracle_spec.get(key)
@@ -16595,6 +16707,7 @@ def split_row(
     dies_damage_creature_unit = is_creature_dies_damage_unit(row)
     spell_cast_draw_engine_unit = is_spell_cast_draw_engine_unit(row)
     spell_cast_add_counters_source_unit = is_spell_cast_add_counters_source_unit(row)
+    spell_cast_gain_life_unit = is_spell_cast_gain_life_unit(row)
     permanent_activated_draw_discard_unit = is_permanent_activated_draw_discard_unit(row)
     dies_recursion_creature_unit = is_creature_dies_recursion_unit(row)
     etb_damage_creature_unit = is_creature_etb_damage_unit(row)
@@ -16721,6 +16834,7 @@ def split_row(
         and not dies_damage_creature_unit
         and not spell_cast_draw_engine_unit
         and not spell_cast_add_counters_source_unit
+        and not spell_cast_gain_life_unit
         and not permanent_activated_draw_discard_unit
         and not dies_recursion_creature_unit
         and not etb_damage_creature_unit
@@ -16799,6 +16913,7 @@ def split_row(
         and not dies_damage_creature_unit
         and not spell_cast_draw_engine_unit
         and not spell_cast_add_counters_source_unit
+        and not spell_cast_gain_life_unit
         and not permanent_activated_draw_discard_unit
         and not dies_recursion_creature_unit
         and not etb_damage_creature_unit
@@ -17576,6 +17691,46 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_spell_cast_add_counters_source",
+        ), "selected_exact_scope"
+
+    if spell_cast_gain_life_unit:
+        if not is_permanent_metadata(metadata) or is_spell(metadata):
+            return None, "spell_cast_gain_life_not_permanent"
+        oracle_spec = spell_cast_gain_life_filter_from_oracle(metadata)
+        if isinstance(oracle_spec, str):
+            return None, oracle_spec
+        source_spec = spell_cast_gain_life_filter_from_source(source_text)
+        if isinstance(source_spec, str):
+            return None, source_spec
+        if not spell_cast_gain_life_specs_match(oracle_spec, source_spec):
+            return None, "spell_cast_gain_life_source_oracle_mismatch"
+        type_line = str(metadata.get("type_line") or "").lower()
+        permanent_effect = (
+            "creature"
+            if "creature" in type_line
+            else "artifact"
+            if "artifact" in type_line
+            else "enchantment"
+            if "enchantment" in type_line
+            else "permanent"
+        )
+        effect_json = {
+            "effect": permanent_effect if permanent_effect == "creature" else "life_gain_engine",
+            "battle_model_scope": SPELL_CAST_GAIN_LIFE_SCOPE,
+            "ability_kind": "triggered",
+            "trigger_effect": "gain_life",
+            "spell_cast_gain_life": True,
+            "xmage_effect_class": "GainLifeEffect",
+            "xmage_ability_class": "SpellCastControllerTriggeredAbility",
+            **oracle_spec,
+        }
+        if permanent_effect == "creature":
+            effect_json["is_creature_permanent"] = True
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_spell_cast_gain_life",
         ), "selected_exact_scope"
 
     if permanent_activated_destroy_unit:
@@ -24655,6 +24810,7 @@ def build_exact_split_report(
             and not is_creature_dies_damage_unit(row)
             and not is_spell_cast_draw_engine_unit(row)
             and not is_spell_cast_add_counters_source_unit(row)
+            and not is_spell_cast_gain_life_unit(row)
             and not is_permanent_activated_draw_discard_unit(row)
             and not is_creature_etb_damage_unit(row)
             and not is_creature_etb_graveyard_to_library_unit(row)
@@ -24745,6 +24901,7 @@ def build_exact_split_report(
                 "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect and SpellCastControllerTriggeredAbility, exact draw count, and supported spell filters",
                 "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawDiscardControllerEffect and SimpleActivatedAbility, exact draw-then-discard counts, and mana/tap/life/source self-sacrifice costs only",
                 "add_counters::source_add_counters_variant_v1 rows with AddCountersSourceEffect and SpellCastControllerTriggeredAbility, exact source self-counter count, supported spell filters, and only static self keywords",
+                "life_gain::xmage_life_gain_variant_review_v1 rows with GainLifeEffect and SpellCastControllerTriggeredAbility, exact controller life gain, and supported spell filters",
                 "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, EntersBattlefieldTriggeredAbility, and exact fixed ETB damage Oracle text",
                 "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, DiesSourceTriggeredAbility, exact fixed dies-damage Oracle/source agreement, and no auxiliary ability class",
                 "direct_damage::targeted_damage_variant_v1 rows with one-shot DamageTargetEffect whose amount is an exact supported battlefield/hand/domain count, optional fixed base amount, and supported target constraints",

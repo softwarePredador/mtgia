@@ -1,0 +1,231 @@
+{
+  "battle_execution": {
+    "event_count": 4,
+    "results": [
+      {
+        "card_name": "Contemplation",
+        "life_after": 21,
+        "life_gained": 1,
+        "scenario": "Contemplation gains life when matching spell is cast",
+        "trigger": "spell_cast",
+        "trigger_spell": "E2E Matching Spell for Contemplation"
+      },
+      {
+        "card_name": "Dawnhart Geist",
+        "life_after": 22,
+        "life_gained": 2,
+        "scenario": "Dawnhart Geist gains life when matching spell is cast",
+        "trigger": "spell_cast",
+        "trigger_spell": "E2E Matching Spell for Dawnhart Geist"
+      },
+      {
+        "card_name": "God-Pharaoh's Faithful",
+        "life_after": 21,
+        "life_gained": 1,
+        "scenario": "God-Pharaoh's Faithful gains life when matching spell is cast",
+        "trigger": "spell_cast",
+        "trigger_spell": "E2E Matching Spell for God-Pharaoh's Faithful"
+      },
+      {
+        "card_name": "Student of Ojutai",
+        "life_after": 22,
+        "life_gained": 2,
+        "scenario": "Student of Ojutai gains life when matching spell is cast",
+        "trigger": "noncreature_spell_cast",
+        "trigger_spell": "E2E Matching Spell for Student of Ojutai"
+      }
+    ],
+    "scenario_count": 4
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-06T10:07:52.080160+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg559_spell_cast_gain_life_new_server_package_manifest.json",
+  "package_id": "pg559_spell_cast_gain_life_new_server_package_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 4
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_spell_cast_gain_life_v1",
+          "card_name": "Contemplation",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:63c245df679aa19fe5b18d2e9918493c",
+          "oracle_hash": "d55138f0e38ce89501241de5118b997a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_spell_cast_gain_life_v1",
+          "card_name": "Dawnhart Geist",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:bd9635bdd9fdd90b5cf30c626862d4cb",
+          "oracle_hash": "39601a26e7cf06160f3dc44a7a719c47",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_spell_cast_gain_life_v1",
+          "card_name": "God-Pharaoh's Faithful",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:95ab090f9dbca17d324bda0a4506f2da",
+          "oracle_hash": "ef011c7c90c65d91e901cd0fee8838ee",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_spell_cast_gain_life_v1",
+          "card_name": "Student of Ojutai",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f23e82b45102a808ec3347df3b9e20db",
+          "oracle_hash": "0e76bf14b5b22dd719205302193597cf",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 4
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_spell_cast_gain_life_v1",
+          "card_name": "Contemplation",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:63c245df679aa19fe5b18d2e9918493c",
+          "oracle_hash": "d55138f0e38ce89501241de5118b997a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_spell_cast_gain_life_v1",
+          "card_name": "Dawnhart Geist",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:bd9635bdd9fdd90b5cf30c626862d4cb",
+          "oracle_hash": "39601a26e7cf06160f3dc44a7a719c47",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_spell_cast_gain_life_v1",
+          "card_name": "God-Pharaoh's Faithful",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:95ab090f9dbca17d324bda0a4506f2da",
+          "oracle_hash": "ef011c7c90c65d91e901cd0fee8838ee",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_spell_cast_gain_life_v1",
+          "card_name": "Student of Ojutai",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f23e82b45102a808ec3347df3b9e20db",
+          "oracle_hash": "0e76bf14b5b22dd719205302193597cf",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 4
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_spell_cast_gain_life_v1",
+          "battle_rule_version": 2,
+          "card_name": "Contemplation",
+          "logical_rule_key": "battle_rule_v1:63c245df679aa19fe5b18d2e9918493c"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_spell_cast_gain_life_v1",
+          "battle_rule_version": 2,
+          "card_name": "Dawnhart Geist",
+          "logical_rule_key": "battle_rule_v1:bd9635bdd9fdd90b5cf30c626862d4cb"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_spell_cast_gain_life_v1",
+          "battle_rule_version": 2,
+          "card_name": "God-Pharaoh's Faithful",
+          "logical_rule_key": "battle_rule_v1:95ab090f9dbca17d324bda0a4506f2da"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_spell_cast_gain_life_v1",
+          "battle_rule_version": 2,
+          "card_name": "Student of Ojutai",
+          "logical_rule_key": "battle_rule_v1:f23e82b45102a808ec3347df3b9e20db"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 4
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Contemplation",
+          "component_keys": [],
+          "effect": "life_gain_engine",
+          "logical_rule_key": "battle_rule_v1:63c245df679aa19fe5b18d2e9918493c"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Dawnhart Geist",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:bd9635bdd9fdd90b5cf30c626862d4cb"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "God-Pharaoh's Faithful",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:95ab090f9dbca17d324bda0a4506f2da"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Student of Ojutai",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:f23e82b45102a808ec3347df3b9e20db"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 4,
+        "scenarios": 4
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

@@ -1701,3 +1701,27 @@ def test_graveyard_self_exile_activated_create_token_execution_scenario_marks_so
     }
     assert scenario["expected_token"]["name"] == "Inkling Token"
     assert scenario["expected_token"]["keywords"] == ["flying"]
+
+
+def test_spell_cast_gain_life_execution_scenario_uses_matching_and_nonmatching_spells() -> None:
+    rule = {
+        "normalized_name": "student of ojutai",
+        "card_name": "Student of Ojutai",
+        "logical_rule_key": "battle_rule_v1:student-of-ojutai",
+        "required_effect_fields": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_spell_cast_gain_life_v1",
+            "trigger": "noncreature_spell_cast",
+            "trigger_effect": "gain_life",
+            "spell_cast_gain_life": True,
+            "spell_cast_gain_life_amount": 2,
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario["type"] == "spell_cast_gain_life"
+    assert scenario["expected_life_gain"] == 2
+    assert scenario["expected_trigger"] == "noncreature_spell_cast"
+    assert scenario["matching_spell"]["type_line"] == "Instant"
+    assert "Creature" in scenario["nonmatching_spell"]["type_line"]

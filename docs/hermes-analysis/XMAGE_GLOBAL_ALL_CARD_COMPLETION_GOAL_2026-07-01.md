@@ -1853,6 +1853,18 @@ Immediate checkpoint after PG361:
     implement another mapper/runtime subpattern before generating a new
     PostgreSQL package. Current evidence:
     `docs/hermes-analysis/master_optimizer_reports/pg558_creature_enters_life_gain_new_server_apply_evidence.md`.
+85. PG559 promoted `4` exact spell-cast life-gain trigger rows on the new
+    server after adding the exact `xmage_spell_cast_gain_life_v1`
+    mapper/runtime lane for `SpellCastControllerTriggeredAbility` backed by
+    XMage `GainLifeEffect`. The lane supports generic spell, enchantment
+    spell, noncreature spell, and color-filtered spell triggers. The cycle
+    reduced Commander-legal battle-gap identities from `25505` to `25501`,
+    reduced XMage-authoritative adapter-required identities from `25191` to
+    `25187`, and reduced `life_gain::xmage_life_gain_variant_review_v1` work
+    units from `693` to `689`. The final split returned `proposal_count=0`,
+    so the next cycle must implement another mapper/runtime subpattern before
+    generating a new PostgreSQL package. Current evidence:
+    `docs/hermes-analysis/master_optimizer_reports/pg559_spell_cast_gain_life_new_server_apply_evidence.md`.
 
 ## Non-Goals
 

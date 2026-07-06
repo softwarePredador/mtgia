@@ -15459,6 +15459,79 @@ subtype-only creature enter filters, token-only filters, optional noncreature
 triggers, or life-gain rows with additional unrelated abilities. Those require
 their own exact runtime adapter and focused package evidence.
 
+## PG559 Spell-Cast Life Gain New Server Evidence
+
+PG559 evidence:
+
+- apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg559_spell_cast_gain_life_new_server_apply_evidence.md`
+- exact split:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260706_pg559_spell_cast_gain_life_candidate.md`
+- package:
+  `docs/hermes-analysis/master_optimizer_reports/pg559_spell_cast_gain_life_new_server_package_package.md`
+- post-sync queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260706_post_pg559_spell_cast_gain_life_new_server.md`
+- E2E:
+  `docs/hermes-analysis/master_optimizer_reports/pg559_spell_cast_gain_life_new_server_e2e.md`
+- readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260706_post_pg559_spell_cast_gain_life_new_server.md`
+- final audits:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260706_post_pg559_spell_cast_gain_life_new_server_final.md`,
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260706_post_pg559_spell_cast_gain_life_new_server_final.md`,
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260706_post_pg559_spell_cast_gain_life_new_server_final.md`,
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260706_post_pg559_spell_cast_gain_life_new_server_final.md`
+
+Validation:
+
+- focused code checks passed: `py_compile`, `56` package/E2E pytest tests,
+  and `975` exact-scope/runtime unittest tests;
+- exact split selected `4` cards for `xmage_spell_cast_gain_life` under
+  `xmage_spell_cast_gain_life_v1`;
+- package precheck found `4/4` target card rows and no existing matching
+  expected rules;
+- package apply upserted `4` rows and deprecated `0` shadow rows;
+- PostgreSQL postcheck confirmed `4/4` promoted rows, `4/4`
+  verified/auto rows, and `4/4` oracle-hash rows;
+- PG -> SQLite sync loaded `8,990` PostgreSQL rows, updated `8,754` SQLite
+  rows, and exported `6,491` canonical snapshot rows;
+- package E2E: `status=pass`, `scenario_count=4`, `event_count=4`, and every
+  promoted card refreshed through PostgreSQL, Hermes SQLite, canonical snapshot
+  fallback, runtime `get_card_effect`, and battle execution;
+- final exact-scope recheck has `proposal_count=0` and
+  `safe_for_batch_pg_package_count=0`;
+- final audits passed: XMage strategy `pass`, PG-Hermes-SQLite `pass`,
+  operational surface `pass`, legacy contamination `pass`.
+
+Post-sync queue evidence:
+
+- pre-cycle `target_identity_count=25505`
+- post-cycle `target_identity_count=25501`
+- post-cycle `xmage_authoritative_source_count=25187`
+- post-cycle `xmage_missing_source_exception_count=314`
+- post-cycle `xmage_authoritative_parser_gap_count=0`
+- post-cycle `xmage_authoritative_adapter_required_count=25187`
+- post-cycle `adapter_work_unit_count=11354`
+
+Runtime semantics:
+
+- controller spell-cast triggers now support `trigger_effect=gain_life` with a
+  fixed `spell_cast_gain_life_amount`;
+- supported filters include any spell, enchantment spell, noncreature spell,
+  and color-filtered spell using XMage `ColorPredicate`;
+- nonmatching spells are tested to leave life unchanged and produce no
+  `trigger_resolved` gain-life event;
+- replay events record `trigger_resolved`, `effect=gain_life`,
+  `life_gain_requested`, `life_gained`, life before/after,
+  `trigger_spell_type_line`, `trigger_spell_source_zone`, and the supported
+  spell filter metadata.
+
+Residual boundary: PG559 does not authorize `SpellCastAllTriggeredAbility`
+rows that trigger when any player casts a spell, OR-combined triggers such as
+spell-cast plus landfall, optional-cost spell-cast life gain,
+Adventure-specific filters, dynamic life-gain amounts, or rows with unrelated
+auxiliary effects. Those require their own exact runtime adapter and focused
+package evidence.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

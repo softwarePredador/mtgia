@@ -356,6 +356,12 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "spell_cast_add_counters_requires_historic",
     "spell_cast_add_counters_source_zone",
     "spell_cast_add_counters_mana_value_min",
+    "spell_cast_gain_life",
+    "spell_cast_gain_life_amount",
+    "spell_cast_gain_life_card_types",
+    "spell_cast_gain_life_required_colors",
+    "spell_cast_gain_life_source_zone",
+    "spell_cast_gain_life_optional",
     "flashback_cost",
     "flashback_status",
     "cycling_cost",
@@ -1551,6 +1557,75 @@ def creature_enters_life_gain_execution_scenario_from_expected_rule(
     }
 
 
+def spell_cast_gain_life_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_spell_cast_gain_life_v1":
+        return None
+    amount = int(required.get("spell_cast_gain_life_amount") or 0)
+    if amount <= 0:
+        return None
+    trigger = str(required.get("trigger") or "spell_cast")
+    card_types = [str(value) for value in required.get("spell_cast_gain_life_card_types") or []]
+    required_colors = [
+        str(value)
+        for value in required.get("spell_cast_gain_life_required_colors") or []
+    ]
+    matching_spell = {
+        "name": f"E2E Matching Spell for {rule['card_name']}",
+        "type_line": "Instant",
+        "effect": "draw_cards",
+        "cmc": 2,
+    }
+    nonmatching_spell = None
+    if trigger == "noncreature_spell_cast":
+        matching_spell["type_line"] = "Instant"
+        nonmatching_spell = {
+            "name": f"E2E Nonmatching Creature for {rule['card_name']}",
+            "type_line": "Creature - Soldier",
+            "effect": "creature",
+            "cmc": 2,
+        }
+    elif card_types:
+        primary_type = card_types[0]
+        matching_spell["type_line"] = primary_type.title()
+        nonmatching_spell = {
+            "name": f"E2E Nonmatching Spell for {rule['card_name']}",
+            "type_line": "Creature - Soldier",
+            "effect": "creature",
+            "cmc": 2,
+        }
+    elif required_colors:
+        matching_spell["type_line"] = "Instant"
+        matching_spell["colors"] = [required_colors[0]]
+        nonmatching_spell = {
+            "name": f"E2E Nonmatching Green Spell for {rule['card_name']}",
+            "type_line": "Sorcery",
+            "colors": ["G"],
+            "effect": "draw_cards",
+            "cmc": 2,
+        }
+    source_effect = required.get("effect") or "life_gain_engine"
+    source_type_line = "Creature - Cleric" if source_effect == "creature" else "Enchantment"
+    return {
+        "name": f"{rule['card_name']} gains life when matching spell is cast",
+        "type": "spell_cast_gain_life",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": source_type_line,
+            "effect": source_effect,
+        },
+        "starting_life": 20,
+        "matching_spell": matching_spell,
+        "nonmatching_spell": nonmatching_spell,
+        "expected_trigger": trigger,
+        "expected_life_gain": amount,
+        "expected_life_after": 20 + amount,
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def creature_dies_create_tokens_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
@@ -1901,6 +1976,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or dynamic_life_gain_execution_scenario_from_expected_rule(rule)
         or creature_etb_dynamic_life_gain_execution_scenario_from_expected_rule(rule)
         or creature_enters_life_gain_execution_scenario_from_expected_rule(rule)
+        or spell_cast_gain_life_execution_scenario_from_expected_rule(rule)
     )
 
 
