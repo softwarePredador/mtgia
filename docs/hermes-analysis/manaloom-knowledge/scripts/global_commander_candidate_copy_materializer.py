@@ -299,6 +299,73 @@ def load_reduced_scope_pairs(
     }
 
 
+def load_land_floor_package_pairs(
+    package_report: Path,
+    *,
+    deck_id: str | None = None,
+    add: str | None = None,
+    cut: str | None = None,
+) -> dict[str, Any]:
+    payload = read_json(package_report)
+    if payload.get("artifact_type") != "global_commander_land_floor_package_synthesizer":
+        raise RuntimeError(f"{package_report} is not a land floor package synthesizer report")
+    if not payload.get("candidate_copy_allowed_now"):
+        raise RuntimeError(f"land floor package candidate copy is not allowed by {package_report}")
+    summary = payload.get("summary") or {}
+    if deck_id and str(summary.get("deck_id")) != str(deck_id):
+        raise RuntimeError(f"land floor package deck_id mismatch: expected {deck_id}, got {summary.get('deck_id')}")
+
+    pairs: list[dict[str, Any]] = []
+    for pair in payload.get("pairs") or []:
+        if not isinstance(pair, Mapping):
+            continue
+        pair_add = str(pair.get("add") or "")
+        pair_cut = str(pair.get("cut") or "")
+        if add and normalize_name(pair_add) != normalize_name(add):
+            continue
+        if cut and normalize_name(pair_cut) != normalize_name(cut):
+            continue
+        pairs.append(
+            {
+                "deck_id": str(summary.get("deck_id") or ""),
+                "commander": summary.get("commander"),
+                "role": "land",
+                "add": pair_add,
+                "cut": pair_cut,
+                "pair": dict(pair),
+                "candidate": {
+                    "card_name": pair_add,
+                    "role": "land",
+                    "score": pair.get("add_score") or 0,
+                    "source": "land_floor_package_synthesizer",
+                },
+                "cut_candidate": {
+                    "card_name": pair_cut,
+                    "role": "land_floor_cut",
+                    "matching_over_target_roles": pair.get("cut_roles") or [],
+                    "score": pair.get("cut_score") or 0,
+                },
+                "source_pool_status": payload.get("status"),
+            }
+        )
+    if not pairs:
+        raise RuntimeError(f"no matching land floor package pairs found in {package_report}")
+
+    return {
+        "deck_id": str(summary.get("deck_id") or ""),
+        "deck_name": summary.get("deck_name"),
+        "commander": summary.get("commander"),
+        "role": "land_floor_package",
+        "stage": None,
+        "pairs": pairs,
+        "source_pool_status": payload.get("status"),
+        "source_report_db": expected_source_db(payload, package_report),
+        "blocked_cut_candidates": [],
+        "source_artifact_type": payload.get("artifact_type"),
+        "next_gate": summary.get("next_gate"),
+    }
+
+
 def load_materialization_package(
     pair_report: Path,
     *,
@@ -312,6 +379,8 @@ def load_materialization_package(
         return load_stage_pairs(pair_report, deck_id=deck_id, add=add, cut=cut, stage=stage)
     if payload.get("artifact_type") == "global_commander_package_scope_reducer":
         return load_reduced_scope_pairs(pair_report, deck_id=deck_id, add=add, cut=cut)
+    if payload.get("artifact_type") == "global_commander_land_floor_package_synthesizer":
+        return load_land_floor_package_pairs(pair_report, deck_id=deck_id, add=add, cut=cut)
     pair = load_top_pair_from_pool(pair_report, deck_id=deck_id, add=add, cut=cut)
     return {
         "deck_id": pair["deck_id"],

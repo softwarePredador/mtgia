@@ -198,10 +198,12 @@ Operational priority after this pivot:
    chosen axis is `land`, then run
    `global_commander_land_floor_policy_builder.py` to join the role-axis policy
    with the mana-base profile, named land candidate pool, and land cut candidate
-   model; it may create a read-only pair preflight queue, but candidate copy
-   remains closed until the isolated materializer, commander-source-lane
-   requirement, structure/legal recheck, strategy matrix, battle gate, and replay
-   trace gates are satisfied; if the
+   model; it may create a read-only pair preflight queue, but if a deck needs
+   more than one land to reach floor, then run
+   `global_commander_land_floor_package_synthesizer.py` to cover the full land
+   gap before candidate copy; candidate copy remains closed until the isolated
+   materializer, commander-source-lane requirement, structure/legal recheck,
+   strategy matrix, battle gate, and replay trace gates are satisfied; if the
    chosen axis is `ramp`, then run
    `global_commander_ramp_axis_nonland_cut_policy_model.py` to apply ramp
    ceiling policy to blocked nonland ramp cuts before any same-deck source
@@ -1720,13 +1722,25 @@ Current external refresh on 2026-07-05:
   promotion remain closed; current top preflight is deck `612` with `Ash Barrens`
   as add and `Longshot, Rebel Bowman` as cut. Its next gate is
   `run_candidate_copy_materializer_for_land_floor_pair_after_commander_source_lane`.
+  A single-swap candidate copy was structurally valid but still blocked because
+  deck `612` stayed below land floor (`land=28`). The land floor package
+  synthesizer therefore builds a full `7`-swap package for deck `612`; the
+  package materializer keeps the source DB unchanged, repairs the generic land
+  floor to `land=34`, and passes package chain audit. Battle remains closed
+  because the package strategy matrix blocks on `commander_profile_not_available`
+  for Lorehold, so the next gate is `repair_commander_profile_blockers_before_battle`.
   Current evidence:
   `global_commander_learning_priority_audit_20260706_ramp_axis_exhaustion_current.md`,
   `global_commander_cross_commander_role_axis_learning_pivot_20260706_ramp_axis_exhaustion_current.md`,
   and
   `global_commander_role_axis_policy_builder_20260706_post_ramp_axis_exhaustion_current.md`,
   plus
-  `global_commander_land_floor_policy_builder_20260706_current.md`.
+  `global_commander_land_floor_policy_builder_20260706_current.md`,
+  `global_commander_land_floor_package_synthesizer_20260706_deck612.md`,
+  `global_commander_candidate_copy_materializer_20260706_land_floor_deck612_package.md`,
+  `global_commander_candidate_package_chain_audit_20260706_land_floor_deck612_package.md`,
+  and
+  `global_commander_candidate_package_strategy_matrix_20260706_land_floor_deck612_package.md`.
 
 ## Global Commander Rollout - 2026-07-01
 

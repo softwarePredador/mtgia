@@ -40,6 +40,10 @@ GLOBAL_COMMANDER_LAND_FLOOR_POLICY_BUILDER = SCRIPT_DIR / "global_commander_land
 GLOBAL_COMMANDER_LAND_FLOOR_POLICY_BUILDER_TEST = (
     SCRIPT_DIR / "test_global_commander_land_floor_policy_builder.py"
 )
+GLOBAL_COMMANDER_LAND_FLOOR_PACKAGE_SYNTHESIZER = SCRIPT_DIR / "global_commander_land_floor_package_synthesizer.py"
+GLOBAL_COMMANDER_LAND_FLOOR_PACKAGE_SYNTHESIZER_TEST = (
+    SCRIPT_DIR / "test_global_commander_land_floor_package_synthesizer.py"
+)
 GLOBAL_COMMANDER_NONLAND_CORE_CANDIDATE_MODEL = SCRIPT_DIR / "global_commander_nonland_core_candidate_model.py"
 GLOBAL_COMMANDER_LEARNING_PRIORITY_AUDIT = SCRIPT_DIR / "global_commander_learning_priority_audit.py"
 GLOBAL_COMMANDER_CROSS_COMMANDER_ROLE_AXIS_LEARNING_PIVOT = (
@@ -524,6 +528,10 @@ GLOBAL_COMMANDER_LAND_FLOOR_POLICY_BUILDER_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_land_floor_policy_builder_20260706_current.md"
 )
+GLOBAL_COMMANDER_LAND_FLOOR_PACKAGE_SYNTHESIZER_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_land_floor_package_synthesizer_20260706_deck612.md"
+)
 GLOBAL_COMMANDER_NONLAND_CORE_CANDIDATE_MODEL_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_nonland_core_candidate_model_20260705_global_goal_hermes_only.md"
@@ -639,6 +647,18 @@ GLOBAL_COMMANDER_BIOTRANSFERENCE_PROTECTION_PIVOT_ROUTER_REPORT = (
 GLOBAL_COMMANDER_CANDIDATE_COPY_MATERIALIZER_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_copy_materializer_20260705_kaalia_nonland_top_pair.md"
+)
+GLOBAL_COMMANDER_LAND_FLOOR_PACKAGE_MATERIALIZER_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_copy_materializer_20260706_land_floor_deck612_package.md"
+)
+GLOBAL_COMMANDER_LAND_FLOOR_PACKAGE_CHAIN_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_package_chain_audit_20260706_land_floor_deck612_package.md"
+)
+GLOBAL_COMMANDER_LAND_FLOOR_PACKAGE_STRATEGY_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_package_strategy_matrix_20260706_land_floor_deck612_package.md"
 )
 GLOBAL_COMMANDER_CANDIDATE_BATTLE_PROBE_REPORT = (
     REPO_ROOT
@@ -1168,8 +1188,15 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_role_axis_policy_builder_20260706_post_ramp_axis_exhaustion_current.md",
                 "calibrate_land_floor_policy_before_candidate_copy",
                 "global_commander_land_floor_policy_builder.py",
+                "global_commander_land_floor_package_synthesizer.py",
                 "global_commander_land_floor_policy_builder_20260706_current.md",
                 "run_candidate_copy_materializer_for_land_floor_pair_after_commander_source_lane",
+                "global_commander_land_floor_package_synthesizer_20260706_deck612.md",
+                "global_commander_candidate_copy_materializer_20260706_land_floor_deck612_package.md",
+                "global_commander_candidate_package_chain_audit_20260706_land_floor_deck612_package.md",
+                "global_commander_candidate_package_strategy_matrix_20260706_land_floor_deck612_package.md",
+                "commander_profile_not_available",
+                "repair_commander_profile_blockers_before_battle",
                 "global_commander_external_exact_artifact_engine_source_expander.py",
                 "global_commander_external_exact_artifact_engine_source_expander_20260706_current.md",
                 "review_external_exact_artifact_engine_candidates_locally_before_candidate_copy",
@@ -1996,6 +2023,29 @@ def build_audit() -> dict[str, Any]:
     )
     checks.append(
         check_contains(
+            GLOBAL_COMMANDER_LAND_FLOOR_PACKAGE_SYNTHESIZER,
+            [
+                "global_commander_land_floor_package_synthesizer",
+                "land_floor_package_synthesized_candidate_copy_ready",
+                "materialize_land_floor_package_candidate_copy",
+                "single swaps are blocked when the floor remains unrepaired",
+                "candidate_copy_allowed_now",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_LAND_FLOOR_PACKAGE_SYNTHESIZER_TEST,
+            [
+                "test_synthesizes_full_land_gap_package_and_allows_candidate_copy",
+                "test_blocks_when_unique_pairs_do_not_cover_land_gap",
+                "Fixing Land 1",
+                "Cut Spell 1",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
             GLOBAL_COMMANDER_NONLAND_CORE_CANDIDATE_MODEL,
             [
                 "global_commander_nonland_core_candidate_model",
@@ -2520,6 +2570,8 @@ def build_audit() -> dict[str, Any]:
                 "load_stage_pairs",
                 "global_commander_package_scope_reducer",
                 "load_reduced_scope_pairs",
+                "global_commander_land_floor_package_synthesizer",
+                "load_land_floor_package_pairs",
                 "model_pairs",
                 "--stage",
                 "stage add cards are already present",
@@ -2541,9 +2593,11 @@ def build_audit() -> dict[str, Any]:
                 "test_blocks_source_missing_protected_cut_candidate",
                 "test_materializes_value_safe_stage_pairs_only_in_candidate_copy",
                 "test_materializes_reduced_scope_pairs_only_in_candidate_copy",
+                "test_materializes_land_floor_package_pairs_only_in_candidate_copy",
                 "source_matches_pair_report",
                 "Protected Payoff",
                 "Arena of Glory",
+                "Ash Barrens",
                 "Despark",
                 "Smuggler's Share",
             ],
@@ -4081,6 +4135,21 @@ def build_audit() -> dict[str, Any]:
         )
     )
     checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_LAND_FLOOR_PACKAGE_SYNTHESIZER_REPORT,
+            [
+                "Global Commander Land Floor Package Synthesizer",
+                "land_floor_package_synthesized_candidate_copy_ready",
+                "land_gap: `7`",
+                "selected_pair_count: `7`",
+                "candidate_copy_allowed_now: `true`",
+                "materialize_land_floor_package_candidate_copy",
+                "Ash Barrens",
+                "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+            ],
+        )
+    )
+    checks.append(
         {
             "path": rel(GLOBAL_COMMANDER_NONLAND_CORE_CANDIDATE_MODEL_REPORT),
             "exists": GLOBAL_COMMANDER_NONLAND_CORE_CANDIDATE_MODEL_REPORT.exists(),
@@ -4663,6 +4732,56 @@ def build_audit() -> dict[str, Any]:
     )
     for path, spec in VOLATILE_HISTORICAL_REPORTS.items():
         volatile_historical_reports.append(check_volatile_historical_report(path, spec))
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_LAND_FLOOR_PACKAGE_MATERIALIZER_REPORT,
+            [
+                "Global Commander Candidate Copy Materializer",
+                "candidate_materialized_structure_ready_next_gate_closed",
+                "source_artifact_type: `global_commander_land_floor_package_synthesizer`",
+                "candidate: `7` swap(s)",
+                "source_unchanged: `true`",
+                "source_matches_pair_report: `true`",
+                "allow_battle_gate_now: `false`",
+                "allow_next_strategy_matrix: `true`",
+                "Ash Barrens",
+                "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_LAND_FLOOR_PACKAGE_CHAIN_REPORT,
+            [
+                "Global Commander Candidate Package Chain Audit",
+                "status: `pass`",
+                "swap_count: `7`",
+                "materializer_chain_pass: `true`",
+                "core_floor_repaired: `true`",
+                "battle_gate_allowed_now: `false`",
+                "promotion_allowed: `false`",
+                "run_commander_specific_strategy_matrix_for_package_before_battle",
+                "Ash Barrens",
+                "Evolving Wilds",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_LAND_FLOOR_PACKAGE_STRATEGY_REPORT,
+            [
+                "Global Commander Candidate Package Strategy Matrix",
+                "package_strategy_blocks_battle",
+                "commander: `Lorehold, the Historian`",
+                "battle_gate_allowed_now: `false`",
+                "promotion_allowed: `false`",
+                "commander_profile_not_available",
+                "repair_commander_profile_blockers_before_battle",
+                "Ash Barrens",
+                "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+            ],
+        )
+    )
     checks.append(
         check_contains(
             GLOBAL_COMMANDER_CANDIDATE_PACKAGE_STRATEGY_REPORT,
