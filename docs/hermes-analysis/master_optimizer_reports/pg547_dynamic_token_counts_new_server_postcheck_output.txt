@@ -1,0 +1,8 @@
+       card_name        |    normalized_name     |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
+------------------------+------------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
+ Crash the Party        | crash the party        | battle_rule_v1:5617d2a4db40a81168145b32a933e9ec |                  1 |                           1 |                         1 |           2
+ Deploy to the Front    | deploy to the front    | battle_rule_v1:7db95ac0624f990faca2a4a8d4e864de |                  1 |                           1 |                         1 |           2
+ Fungal Sprouting       | fungal sprouting       | battle_rule_v1:f3a6a30cc5e2bd3ed129bcfbd9084bf2 |                  1 |                           1 |                         1 |           2
+ Goblin Gathering       | goblin gathering       | battle_rule_v1:a0c433cb3bf28fab494fe04f4e10f96b |                  1 |                           1 |                         1 |           2
+ Howl of the Night Pack | howl of the night pack | battle_rule_v1:f075c7e5b6bb551a0f217eba3bf6ac63 |                  1 |                           1 |                         1 |           2
+(5 rows)

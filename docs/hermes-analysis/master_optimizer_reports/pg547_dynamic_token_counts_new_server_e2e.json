@@ -1,0 +1,268 @@
+{
+  "battle_execution": {
+    "event_count": 10,
+    "results": [
+      {
+        "card_name": "Crash the Party",
+        "scenario": "Crash the Party creates modeled creature tokens",
+        "token_name": "Rhino Warrior Token",
+        "token_tapped": true,
+        "tokens_created": 3
+      },
+      {
+        "card_name": "Deploy to the Front",
+        "scenario": "Deploy to the Front creates modeled creature tokens",
+        "token_name": "Soldier Token",
+        "token_tapped": false,
+        "tokens_created": 4
+      },
+      {
+        "card_name": "Fungal Sprouting",
+        "scenario": "Fungal Sprouting creates modeled creature tokens",
+        "token_name": "Saproling Token",
+        "token_tapped": false,
+        "tokens_created": 4
+      },
+      {
+        "card_name": "Goblin Gathering",
+        "scenario": "Goblin Gathering creates modeled creature tokens",
+        "token_name": "Goblin Token",
+        "token_tapped": false,
+        "tokens_created": 4
+      },
+      {
+        "card_name": "Howl of the Night Pack",
+        "scenario": "Howl of the Night Pack creates modeled creature tokens",
+        "token_name": "Wolf Token",
+        "token_tapped": false,
+        "tokens_created": 3
+      }
+    ],
+    "scenario_count": 5
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-06T03:41:08.278270+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg547_dynamic_token_counts_new_server_package_manifest.json",
+  "package_id": "pg547_dynamic_token_counts_new_server_package_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 5
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_create_creature_tokens_spell_v1",
+          "card_name": "Crash the Party",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5617d2a4db40a81168145b32a933e9ec",
+          "oracle_hash": "fcc5c9091e8dc516fbe887bb09d4369f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_create_creature_tokens_spell_v1",
+          "card_name": "Deploy to the Front",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7db95ac0624f990faca2a4a8d4e864de",
+          "oracle_hash": "4179614d05de27ce72bb3a55659ef40b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_create_creature_tokens_spell_v1",
+          "card_name": "Fungal Sprouting",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f3a6a30cc5e2bd3ed129bcfbd9084bf2",
+          "oracle_hash": "2a5a44d545d22c40ad1cf5f1b330d152",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_create_creature_tokens_spell_v1",
+          "card_name": "Goblin Gathering",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a0c433cb3bf28fab494fe04f4e10f96b",
+          "oracle_hash": "6986d05a3b7a31a80d433ad992684d3f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_controlled_subtype_create_creature_tokens_spell_v1",
+          "card_name": "Howl of the Night Pack",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f075c7e5b6bb551a0f217eba3bf6ac63",
+          "oracle_hash": "6890aca1767d2d1b23b90713ae03e1a2",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 5
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_create_creature_tokens_spell_v1",
+          "card_name": "Crash the Party",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5617d2a4db40a81168145b32a933e9ec",
+          "oracle_hash": "fcc5c9091e8dc516fbe887bb09d4369f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_create_creature_tokens_spell_v1",
+          "card_name": "Deploy to the Front",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7db95ac0624f990faca2a4a8d4e864de",
+          "oracle_hash": "4179614d05de27ce72bb3a55659ef40b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_create_creature_tokens_spell_v1",
+          "card_name": "Fungal Sprouting",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f3a6a30cc5e2bd3ed129bcfbd9084bf2",
+          "oracle_hash": "2a5a44d545d22c40ad1cf5f1b330d152",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_create_creature_tokens_spell_v1",
+          "card_name": "Goblin Gathering",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a0c433cb3bf28fab494fe04f4e10f96b",
+          "oracle_hash": "6986d05a3b7a31a80d433ad992684d3f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_controlled_subtype_create_creature_tokens_spell_v1",
+          "card_name": "Howl of the Night Pack",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f075c7e5b6bb551a0f217eba3bf6ac63",
+          "oracle_hash": "6890aca1767d2d1b23b90713ae03e1a2",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 5
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_create_creature_tokens_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Crash the Party",
+          "logical_rule_key": "battle_rule_v1:5617d2a4db40a81168145b32a933e9ec"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_create_creature_tokens_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Deploy to the Front",
+          "logical_rule_key": "battle_rule_v1:7db95ac0624f990faca2a4a8d4e864de"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_create_creature_tokens_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Fungal Sprouting",
+          "logical_rule_key": "battle_rule_v1:f3a6a30cc5e2bd3ed129bcfbd9084bf2"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_create_creature_tokens_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Goblin Gathering",
+          "logical_rule_key": "battle_rule_v1:a0c433cb3bf28fab494fe04f4e10f96b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_controlled_subtype_create_creature_tokens_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Howl of the Night Pack",
+          "logical_rule_key": "battle_rule_v1:f075c7e5b6bb551a0f217eba3bf6ac63"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 5
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Crash the Party",
+          "component_keys": [],
+          "effect": "token_maker",
+          "logical_rule_key": "battle_rule_v1:5617d2a4db40a81168145b32a933e9ec"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Deploy to the Front",
+          "component_keys": [],
+          "effect": "token_maker",
+          "logical_rule_key": "battle_rule_v1:7db95ac0624f990faca2a4a8d4e864de"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Fungal Sprouting",
+          "component_keys": [],
+          "effect": "token_maker",
+          "logical_rule_key": "battle_rule_v1:f3a6a30cc5e2bd3ed129bcfbd9084bf2"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Goblin Gathering",
+          "component_keys": [],
+          "effect": "token_maker",
+          "logical_rule_key": "battle_rule_v1:a0c433cb3bf28fab494fe04f4e10f96b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Howl of the Night Pack",
+          "component_keys": [],
+          "effect": "token_maker",
+          "logical_rule_key": "battle_rule_v1:f075c7e5b6bb551a0f217eba3bf6ac63"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 10,
+        "scenarios": 5
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

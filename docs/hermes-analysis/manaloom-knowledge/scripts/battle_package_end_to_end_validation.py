@@ -518,6 +518,21 @@ def run_fixed_create_creature_tokens(
     card = dict(scenario["card"])
     active = battle.Player(str(scenario.get("player") or "Token Controller"), None, [])
     opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
+
+    def add_support_creature(owner, name: str, *, power: int = 1, toughness: int = 1, tapped: bool = False, attacking: bool = False, subtype: str = "Soldier") -> None:
+        owner.battlefield.append(
+            {
+                "name": name,
+                "type_line": f"Creature - {subtype}",
+                "subtypes": [subtype],
+                "power": power,
+                "toughness": toughness,
+                "effect": "creature",
+                "tapped": bool(tapped),
+                "attacking": bool(attacking),
+            }
+        )
+
     support_subtype = str(scenario.get("controlled_permanent_subtype") or "").strip()
     support_count = int(scenario.get("controlled_permanent_subtype_count") or 0)
     for index in range(max(0, support_count)):
@@ -531,6 +546,19 @@ def run_fixed_create_creature_tokens(
                 "effect": "creature",
             }
         )
+    for index in range(max(0, int(scenario.get("controlled_battlefield_creature_count") or 0))):
+        add_support_creature(active, f"Controlled Creature {index + 1}")
+    for index in range(max(0, int(scenario.get("opponent_battlefield_creature_count") or 0))):
+        add_support_creature(opponent, f"Opponent Creature {index + 1}")
+    for index in range(max(0, int(scenario.get("attacking_creature_count") or 0))):
+        add_support_creature(active, f"Attacking Creature {index + 1}", attacking=True)
+    for index in range(max(0, int(scenario.get("controlled_tapped_creature_count") or 0))):
+        add_support_creature(active, f"Tapped Creature {index + 1}", tapped=True)
+    for index, power in enumerate(scenario.get("controlled_creature_powers") or []):
+        add_support_creature(active, f"Powered Creature {index + 1}", power=int(power or 0), toughness=max(1, int(power or 0)))
+    named_graveyard_card = str(scenario.get("controller_graveyard_named_card") or "").strip()
+    for index in range(max(0, int(scenario.get("controller_graveyard_named_card_count") or 0))):
+        active.graveyard.append({"name": named_graveyard_card or card["name"], "type_line": "Sorcery"})
     before_events = len(events)
     battle.apply_effect_immediate(
         active,

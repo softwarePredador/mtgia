@@ -38744,6 +38744,44 @@ def token_count_for_effect(player, effect_data, default=5, opponents=None):
             for permanent in getattr(player, "battlefield", [])
             if isinstance(permanent, dict) and permanent_has_subtype(permanent, subtype)
         )
+    if isinstance(effect_data, dict) and token_count_source == "all_creatures_on_battlefield":
+        participants = [player, *(opponents or [])]
+        return sum(
+            1
+            for participant in participants
+            for permanent in getattr(participant, "battlefield", []) or []
+            if isinstance(permanent, dict) and is_battlefield_creature(permanent)
+        )
+    if isinstance(effect_data, dict) and token_count_source == "attacking_creatures":
+        participants = [player, *(opponents or [])]
+        return sum(
+            1
+            for participant in participants
+            for permanent in getattr(participant, "battlefield", []) or []
+            if isinstance(permanent, dict) and is_battlefield_creature(permanent) and permanent.get("attacking")
+        )
+    if isinstance(effect_data, dict) and token_count_source == "controlled_tapped_creatures":
+        return sum(
+            1
+            for permanent in getattr(player, "battlefield", []) or []
+            if isinstance(permanent, dict) and is_battlefield_creature(permanent) and permanent.get("tapped")
+        )
+    if isinstance(effect_data, dict) and token_count_source == "greatest_power_among_controlled_creatures":
+        powers = [
+            int(permanent.get("power") or 0)
+            for permanent in getattr(player, "battlefield", []) or []
+            if isinstance(permanent, dict) and is_battlefield_creature(permanent)
+        ]
+        return max([0, *powers])
+    if isinstance(effect_data, dict) and token_count_source == "named_cards_in_controller_graveyard_plus_base":
+        target_name = normalize_card_name(effect_data.get("token_count_card_name") or effect_data.get("card_name") or "")
+        base = int(effect_data.get("token_count_base") or 0)
+        named_count = sum(
+            1
+            for card in getattr(player, "graveyard", []) or []
+            if isinstance(card, dict) and normalize_card_name(card.get("name") or "") == target_name
+        )
+        return base + named_count
     per_opponent = (effect_data or {}).get("token_count_per_opponent")
     if per_opponent not in (None, "", False):
         live_opponents = [

@@ -297,6 +297,7 @@ DIES_RECURSION_CREATURE_SCOPE = "xmage_creature_dies_return_graveyard_card_to_ha
 TOKEN_SPELL_SCOPE = "xmage_fixed_create_creature_tokens_spell_v1"
 X_TOKEN_SPELL_SCOPE = "xmage_x_create_creature_tokens_spell_v1"
 CONTROLLED_SUBTYPE_TOKEN_SPELL_SCOPE = "xmage_controlled_subtype_create_creature_tokens_spell_v1"
+DYNAMIC_COUNT_TOKEN_SPELL_SCOPE = "xmage_dynamic_count_create_creature_tokens_spell_v1"
 MULTI_TOKEN_SPELL_SCOPE = "xmage_multi_create_creature_tokens_spell_v1"
 ETB_TOKEN_CREATURE_SCOPE = "xmage_creature_etb_create_tokens_v1"
 ETB_TREASURE_CREATURE_SCOPE = "xmage_creature_etb_create_treasure_v1"
@@ -898,27 +899,19 @@ def source_xmage_root(row: dict[str, Any]) -> Path | None:
     return None
 
 
-def controlled_subtype_token_count_from_source(source: str, count_expression: str) -> dict[str, Any] | None:
+def controlled_subtype_token_count_from_filter(source: str, filter_var: str) -> dict[str, Any] | None:
     text = source or ""
-    count_var = str(count_expression or "").strip()
-    if not count_var or not re.match(r"^[A-Za-z_]\w*$", count_var):
+    filter_name = str(filter_var or "").strip()
+    if not filter_name or not re.match(r"^[A-Za-z_]\w*$", filter_name):
         return None
-    count_match = re.search(
-        rf"(?:private\s+static\s+final\s+)?(?:DynamicValue|PermanentsOnBattlefieldCount)\s+"
-        rf"{re.escape(count_var)}\s*=\s*new\s+PermanentsOnBattlefieldCount\s*\(\s*(?P<filter>\w+)\s*\)",
-        text,
-    )
-    if not count_match:
-        return None
-    filter_var = count_match.group("filter")
     if not re.search(
-        rf"(?:private\s+static\s+final\s+)?FilterControlledPermanent\s+{re.escape(filter_var)}\s*="
+        rf"(?:private\s+static\s+final\s+)?FilterControlledPermanent\s+{re.escape(filter_name)}\s*="
         r"\s*new\s+FilterControlledPermanent\s*\(",
         text,
     ):
         return None
     subtype_matches = re.findall(
-        rf"{re.escape(filter_var)}\.add\s*\(\s*SubType\.([A-Z0-9_]+)\.getPredicate\s*\(\s*\)\s*\)",
+        rf"{re.escape(filter_name)}\.add\s*\(\s*SubType\.([A-Z0-9_]+)\.getPredicate\s*\(\s*\)\s*\)",
         text,
     )
     if len(set(subtype_matches)) != 1:
@@ -929,6 +922,97 @@ def controlled_subtype_token_count_from_source(source: str, count_expression: st
     }
 
 
+def controlled_tapped_creature_token_count_from_filter(source: str, filter_var: str) -> dict[str, Any] | None:
+    text = source or ""
+    filter_name = str(filter_var or "").strip()
+    if not filter_name or not re.match(r"^[A-Za-z_]\w*$", filter_name):
+        return None
+    if not re.search(
+        rf"(?:private\s+static\s+final\s+)?FilterPermanent\s+{re.escape(filter_name)}\s*="
+        r"\s*new\s+FilterControlledCreaturePermanent\s*\(",
+        text,
+    ):
+        return None
+    if not re.search(rf"{re.escape(filter_name)}\.add\s*\(\s*TappedPredicate\.TAPPED\s*\)", text):
+        return None
+    return {"token_count_source": "controlled_tapped_creatures"}
+
+
+def controlled_subtype_token_count_from_source(source: str, count_expression: str) -> dict[str, Any] | None:
+    text = source or ""
+    count_var = str(count_expression or "").strip()
+    if not count_var or not re.match(r"^[A-Za-z_]\w*$", count_var):
+        return None
+    count_match = re.search(
+        rf"(?:private\s+static\s+final\s+)?(?:DynamicValue|PermanentsOnBattlefieldCount)\s+"
+        rf"{re.escape(count_var)}\s*=\s*new\s+PermanentsOnBattlefieldCount\s*\(\s*(?P<filter>\w+)"
+        r"(?:\s*,\s*[^)]*)?\)",
+        text,
+    )
+    if not count_match:
+        return None
+    return (
+        controlled_subtype_token_count_from_filter(text, count_match.group("filter"))
+        or controlled_tapped_creature_token_count_from_filter(text, count_match.group("filter"))
+    )
+
+
+def permanents_count_token_count_from_expression(source: str, count_expression: str) -> dict[str, Any] | None:
+    args = extract_java_call_args(str(count_expression or ""), "PermanentsOnBattlefieldCount")
+    if args is None:
+        return None
+    parts = split_java_args(args)
+    if not parts:
+        return None
+    filter_expression = parts[0].strip()
+    if re.fullmatch(r"\w+", filter_expression):
+        return (
+            controlled_subtype_token_count_from_filter(source, filter_expression)
+            or controlled_tapped_creature_token_count_from_filter(source, filter_expression)
+        )
+    if re.search(r"new\s+FilterCreaturePermanent\s*\(", filter_expression):
+        return {"token_count_source": "all_creatures_on_battlefield"}
+    if filter_expression == "StaticFilters.FILTER_ATTACKING_CREATURES":
+        return {"token_count_source": "attacking_creatures"}
+    return None
+
+
+def named_graveyard_plus_base_token_count_from_source(source: str, count_expression: str) -> dict[str, Any] | None:
+    text = source or ""
+    match = re.fullmatch(r"(?P<class>\w+)\.instance", str(count_expression or "").strip())
+    if not match:
+        return None
+    class_name = match.group("class")
+    class_block_match = re.search(
+        rf"(?:enum|class)\s+{re.escape(class_name)}\s+implements\s+DynamicValue\b(?P<body>.*?)(?:\n\}}\s*$|\n\}}\s*\n\s*(?:class|enum)\s+)",
+        text,
+        re.S,
+    )
+    class_block = class_block_match.group("body") if class_block_match else text
+    name_match = re.search(r'new\s+NamePredicate\s*\(\s*"(?P<name>[^"]+)"\s*\)', class_block)
+    return_match = re.search(r"return\s+amount\s*\+\s*(?P<base>\d+)\s*;", class_block)
+    if not name_match or not return_match:
+        return None
+    return {
+        "token_count_source": "named_cards_in_controller_graveyard_plus_base",
+        "token_count_card_name": name_match.group("name"),
+        "token_count_base": int(return_match.group("base")),
+    }
+
+
+def dynamic_token_count_from_source(source: str, count_expression: str) -> dict[str, Any] | None:
+    expression = str(count_expression or "").strip()
+    if expression == "GetXValue.instance":
+        return {"token_count_source": "x_value", "token_count_per_x": 1}
+    if expression == "GreatestAmongPermanentsValue.POWER_CONTROLLED_CREATURES":
+        return {"token_count_source": "greatest_power_among_controlled_creatures"}
+    if re.fullmatch(r"\w+", expression):
+        return controlled_subtype_token_count_from_source(source, expression)
+    if "PermanentsOnBattlefieldCount" in expression:
+        return permanents_count_token_count_from_expression(source, expression)
+    return named_graveyard_plus_base_token_count_from_source(source, expression)
+
+
 def fixed_create_token_effect_from_source(source: str) -> tuple[str, int] | dict[str, Any] | str:
     text = source or ""
     if len(re.findall(r"new\s+CreateTokenEffect\s*\(", text)) != 1:
@@ -937,30 +1021,22 @@ def fixed_create_token_effect_from_source(source: str) -> tuple[str, int] | dict
         return "token_source_additional_tokens_not_supported"
     if ".entersWithCounters" in text:
         return "token_source_counters_not_supported"
-    match = re.search(
-        r"new\s+CreateTokenEffect\s*\(\s*new\s+(?P<class>\w+)\s*\([^)]*\)\s*"
-        r"(?:,\s*(?P<count>\d+|GetXValue\.instance|[A-Za-z_]\w*))?"
-        r"(?:,\s*(?P<tapped>true|false))?"
-        r"(?:,\s*(?P<attacking>true|false))?"
-        r"\s*\)",
-        text,
-        re.S,
-    )
-    if not match:
+    args = extract_java_call_args(text, "CreateTokenEffect")
+    if args is None:
         return "token_source_create_token_not_fixed"
-    token_class = match.group("class")
-    token_tapped = match.group("tapped") == "true"
-    if match.group("count") == "GetXValue.instance":
-        parsed = {
-            "token_class": token_class,
-            "token_count_source": "x_value",
-            "token_count_per_x": 1,
-        }
-        if token_tapped:
-            parsed["token_tapped"] = True
-        return parsed
-    if match.group("count") and not match.group("count").isdigit():
-        parsed_dynamic = controlled_subtype_token_count_from_source(text, match.group("count"))
+    parts = split_java_args(args)
+    if not parts:
+        return "token_source_create_token_not_fixed"
+    token_match = re.fullmatch(r"new\s+(?P<class>\w+)\s*\([^)]*\)", parts[0].strip(), re.S)
+    if not token_match:
+        return "token_source_create_token_not_fixed"
+    token_class = token_match.group("class")
+    count_expression = parts[1].strip() if len(parts) > 1 else ""
+    token_tapped = len(parts) > 2 and parts[2].strip() == "true"
+    if len(parts) > 3 and parts[3].strip() == "true":
+        return "token_source_attacking_tokens_not_supported"
+    if count_expression and not count_expression.isdigit():
+        parsed_dynamic = dynamic_token_count_from_source(text, count_expression)
         if parsed_dynamic is None:
             return "token_source_create_token_not_fixed"
         parsed = {
@@ -970,7 +1046,7 @@ def fixed_create_token_effect_from_source(source: str) -> tuple[str, int] | dict
         if token_tapped:
             parsed["token_tapped"] = True
         return parsed
-    count = int(match.group("count") or "1")
+    count = int(count_expression or "1")
     if count <= 0:
         return "token_source_count_not_positive"
     if token_tapped:
@@ -17876,6 +17952,10 @@ def split_row(
                 token_count_fields["token_count_per_x"] = parsed_effect["token_count_per_x"]
             if parsed_effect.get("token_count_subtype"):
                 token_count_fields["token_count_subtype"] = parsed_effect["token_count_subtype"]
+            if parsed_effect.get("token_count_card_name"):
+                token_count_fields["token_count_card_name"] = parsed_effect["token_count_card_name"]
+            if parsed_effect.get("token_count_base") is not None:
+                token_count_fields["token_count_base"] = parsed_effect["token_count_base"]
             if parsed_effect.get("token_tapped"):
                 token_count_fields["token_tapped"] = True
             if parsed_effect["token_count_source"] == "x_value":
@@ -17884,6 +17964,15 @@ def split_row(
             elif parsed_effect["token_count_source"] == "controlled_permanents_with_subtype":
                 scope = CONTROLLED_SUBTYPE_TOKEN_SPELL_SCOPE
                 family_id = "xmage_controlled_subtype_create_creature_tokens_spell"
+            elif parsed_effect["token_count_source"] in {
+                "all_creatures_on_battlefield",
+                "attacking_creatures",
+                "controlled_tapped_creatures",
+                "greatest_power_among_controlled_creatures",
+                "named_cards_in_controller_graveyard_plus_base",
+            }:
+                scope = DYNAMIC_COUNT_TOKEN_SPELL_SCOPE
+                family_id = "xmage_dynamic_count_create_creature_tokens_spell"
             else:
                 return None, "token_source_create_token_not_fixed"
         else:

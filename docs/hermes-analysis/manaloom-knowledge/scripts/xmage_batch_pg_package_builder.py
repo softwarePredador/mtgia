@@ -106,6 +106,8 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "token_count_source",
     "token_count_per_x",
     "token_count_subtype",
+    "token_count_card_name",
+    "token_count_base",
     "token_component_count",
     "token_total_count",
     "xmage_token_class",
@@ -1127,6 +1129,7 @@ def fixed_create_creature_tokens_execution_scenario_from_expected_rule(
     if required.get("battle_model_scope") not in {
         "xmage_fixed_create_creature_tokens_spell_v1",
         "xmage_controlled_subtype_create_creature_tokens_spell_v1",
+        "xmage_dynamic_count_create_creature_tokens_spell_v1",
     }:
         return None
     expected_count = int(required.get("token_count") or 1)
@@ -1152,6 +1155,28 @@ def fixed_create_creature_tokens_execution_scenario_from_expected_rule(
         scenario["expected_token"]["count"] = expected_count
         scenario["controlled_permanent_subtype"] = required.get("token_count_subtype")
         scenario["controlled_permanent_subtype_count"] = expected_count
+    elif required.get("token_count_source") == "all_creatures_on_battlefield":
+        expected_count = 4
+        scenario["expected_token"]["count"] = expected_count
+        scenario["opponent_battlefield_creature_count"] = 2
+        scenario["controlled_battlefield_creature_count"] = expected_count - 2
+    elif required.get("token_count_source") == "attacking_creatures":
+        expected_count = 3
+        scenario["expected_token"]["count"] = expected_count
+        scenario["attacking_creature_count"] = expected_count
+    elif required.get("token_count_source") == "controlled_tapped_creatures":
+        expected_count = 3
+        scenario["expected_token"]["count"] = expected_count
+        scenario["controlled_tapped_creature_count"] = expected_count
+    elif required.get("token_count_source") == "greatest_power_among_controlled_creatures":
+        scenario["controlled_creature_powers"] = [1, 4, 2]
+        scenario["expected_token"]["count"] = 4
+    elif required.get("token_count_source") == "named_cards_in_controller_graveyard_plus_base":
+        graveyard_count = 2
+        base_count = int(required.get("token_count_base") or 0)
+        scenario["controller_graveyard_named_card"] = required.get("token_count_card_name") or rule["card_name"]
+        scenario["controller_graveyard_named_card_count"] = graveyard_count
+        scenario["expected_token"]["count"] = base_count + graveyard_count
     return scenario
 
 

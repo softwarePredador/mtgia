@@ -278,6 +278,84 @@ def test_fixed_create_tokens_runner_counts_controlled_subtype_support() -> None:
     assert result["token_name"] == "Elf Warrior Token"
 
 
+def test_fixed_create_tokens_runner_counts_dynamic_support_state() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    cases = [
+        (
+            "Deploy to the Front",
+            {"token_count_source": "all_creatures_on_battlefield"},
+            {"controlled_battlefield_creature_count": 2, "opponent_battlefield_creature_count": 2},
+            4,
+        ),
+        (
+            "Crash the Party",
+            {"token_count_source": "controlled_tapped_creatures", "token_tapped": True},
+            {"controlled_tapped_creature_count": 3},
+            3,
+        ),
+        (
+            "Fungal Sprouting",
+            {"token_count_source": "greatest_power_among_controlled_creatures"},
+            {"controlled_creature_powers": [1, 4, 2]},
+            4,
+        ),
+        (
+            "Goblin Gathering",
+            {
+                "token_count_source": "named_cards_in_controller_graveyard_plus_base",
+                "token_count_card_name": "Goblin Gathering",
+                "token_count_base": 2,
+            },
+            {"controller_graveyard_named_card": "Goblin Gathering", "controller_graveyard_named_card_count": 2},
+            4,
+        ),
+    ]
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    try:
+        for card_name, count_fields, scenario_fields, expected_count in cases:
+            events = []
+            battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+            battle.get_card_effect = lambda card, fields=count_fields, name=card_name: {
+                "effect": "token_maker",
+                "battle_model_scope": "xmage_dynamic_count_create_creature_tokens_spell_v1",
+                "ability_kind": "one_shot",
+                "card_name": name,
+                "token_name": "Soldier Token",
+                "token_power": 1,
+                "token_toughness": 1,
+                "token_subtype": "Soldier",
+                "token_colors": ["W"],
+                "_rule_logical_key": f"battle_rule_v1:{name.lower().replace(' ', '-')}",
+                **fields,
+            }
+            result = validator.run_fixed_create_creature_tokens(
+                battle,
+                {
+                    "name": f"{card_name} creates modeled creature tokens",
+                    "type": "fixed_create_creature_tokens",
+                    "card": {"name": card_name},
+                    "expected_token": {
+                        "name": "Soldier Token",
+                        "count": expected_count,
+                        "power": 1,
+                        "toughness": 1,
+                        "subtype": "Soldier",
+                        "colors": ["W"],
+                        "tapped": bool(count_fields.get("token_tapped")),
+                    },
+                    "logical_rule_key": f"battle_rule_v1:{card_name.lower().replace(' ', '-')}",
+                    **scenario_fields,
+                },
+                events,
+            )
+            assert result["card_name"] == card_name
+            assert result["tokens_created"] == expected_count
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+
 def test_simple_mana_source_refresh_runner_pays_activation_cost_from_support_source() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

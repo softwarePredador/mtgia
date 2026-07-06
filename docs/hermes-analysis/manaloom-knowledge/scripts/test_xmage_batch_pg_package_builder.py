@@ -1466,6 +1466,85 @@ def test_controlled_subtype_token_spell_execution_scenario_seeds_support_permane
     assert scenario["expected_token"]["name"] == "Elf Warrior Token"
 
 
+def test_dynamic_count_token_spell_execution_scenarios_seed_support_state() -> None:
+    fixtures = [
+        (
+            "Deploy to the Front",
+            {"token_count_source": "all_creatures_on_battlefield"},
+            {"expected_count": 4, "controlled_battlefield_creature_count": 2, "opponent_battlefield_creature_count": 2},
+        ),
+        (
+            "Crash the Party",
+            {"token_count_source": "controlled_tapped_creatures", "token_tapped": True},
+            {"expected_count": 3, "controlled_tapped_creature_count": 3},
+        ),
+        (
+            "Fungal Sprouting",
+            {"token_count_source": "greatest_power_among_controlled_creatures"},
+            {"expected_count": 4, "controlled_creature_powers": [1, 4, 2]},
+        ),
+        (
+            "Goblin Gathering",
+            {
+                "token_count_source": "named_cards_in_controller_graveyard_plus_base",
+                "token_count_card_name": "Goblin Gathering",
+                "token_count_base": 2,
+            },
+            {"expected_count": 4, "controller_graveyard_named_card_count": 2},
+        ),
+    ]
+    for card_name, count_fields, expected in fixtures:
+        rule = {
+            "normalized_name": card_name.lower(),
+            "card_name": card_name,
+            "logical_rule_key": f"battle_rule_v1:{card_name.lower().replace(' ', '-')}",
+            "required_effect_fields": {
+                "effect": "token_maker",
+                "battle_model_scope": "xmage_dynamic_count_create_creature_tokens_spell_v1",
+                "token_name": "Soldier Token",
+                "token_power": 1,
+                "token_toughness": 1,
+                "token_subtype": "Soldier",
+                "token_colors": ["W"],
+                **count_fields,
+            },
+        }
+
+        scenario = builder.execution_scenario_from_expected_rule(rule)
+
+        assert scenario["type"] == "fixed_create_creature_tokens"
+        assert scenario["expected_token"]["count"] == expected["expected_count"]
+        for key, value in expected.items():
+            if key != "expected_count":
+                assert scenario[key] == value
+
+
+def test_expected_rule_preserves_named_graveyard_token_count_fields() -> None:
+    proposal = {
+        "normalized_name": "goblin gathering",
+        "card_name": "Goblin Gathering",
+        "oracle_hash": "hash-goblin-gathering",
+        "logical_rule_key": "battle_rule_v1:goblin-gathering",
+        "effect_json": {
+            "effect": "token_maker",
+            "battle_model_scope": "xmage_dynamic_count_create_creature_tokens_spell_v1",
+            "token_count_source": "named_cards_in_controller_graveyard_plus_base",
+            "token_count_card_name": "Goblin Gathering",
+            "token_count_base": 2,
+            "token_name": "Goblin Token",
+            "token_power": 1,
+            "token_toughness": 1,
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+
+    required = expected["required_effect_fields"]
+    assert required["token_count_source"] == "named_cards_in_controller_graveyard_plus_base"
+    assert required["token_count_card_name"] == "Goblin Gathering"
+    assert required["token_count_base"] == 2
+
+
 def test_graveyard_self_exile_activated_create_token_execution_scenario_marks_source_zone() -> None:
     rule = {
         "normalized_name": "eternal student",
