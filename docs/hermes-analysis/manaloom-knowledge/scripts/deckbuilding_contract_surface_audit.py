@@ -794,6 +794,10 @@ GLOBAL_COMMANDER_BATTLE_FEEDBACK_LARGER_GATE_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_battle_feedback_model_20260706_larger_gate_current.md"
 )
+GLOBAL_COMMANDER_LARGER_GATE_FEEDBACK_LAND_FLOOR_POLICY_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_land_floor_policy_builder_20260706_larger_gate_feedback_current.md"
+)
 GLOBAL_COMMANDER_LARGER_GATE_FEEDBACK_LAND_FLOOR_PACKAGE_STRATEGY_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_package_strategy_matrix_20260706_larger_gate_feedback_land_floor_deck612.md"
@@ -2267,6 +2271,11 @@ def build_audit() -> dict[str, Any]:
                 "LAND_POLICY_READY_STATUS",
                 "land_floor_policy_ready_for_pair_preflight_no_deck_action",
                 "run_candidate_copy_materializer_for_land_floor_pair_after_commander_source_lane",
+                "DEFAULT_BATTLE_FEEDBACK_REPORT",
+                "BATTLE_FEEDBACK_BLOCKED_STATUS",
+                "blocked_package_feedback_by_deck",
+                "blocked_by_protected_baseline_package_feedback",
+                "replace_failed_package_source_lane_or_cut_set_before_land_floor_preflight",
                 "candidate_copy_allowed_now",
                 "land_floor_policy_is_not_materialization_permission",
             ],
@@ -2279,8 +2288,10 @@ def build_audit() -> dict[str, Any]:
                 "test_land_floor_policy_builds_preflight_queue_without_opening_copy",
                 "test_non_land_role_axis_policy_blocks_land_floor_calibration",
                 "test_missing_reviewable_cut_pool_blocks_candidate_copy_preflight",
+                "test_protected_baseline_feedback_blocks_repeating_failed_land_pair",
                 "Battlefield Forge",
                 "Expensive Engine",
+                "battle_feedback_blocked_land_preflight_requires_new_source_lane_or_cut_set",
             ],
         )
     )
@@ -4670,6 +4681,23 @@ def build_audit() -> dict[str, Any]:
                 "candidate_copy_allowed_now: `false`",
                 "run_candidate_copy_materializer_for_land_floor_pair_after_commander_source_lane",
                 "land_floor_policy_is_not_materialization_permission",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_LARGER_GATE_FEEDBACK_LAND_FLOOR_POLICY_REPORT,
+            [
+                "Global Commander Land Floor Policy Builder",
+                "land_floor_policy_ready_no_deck_action",
+                "ready_pair_preflight_deck_count: `8`",
+                "battle_feedback_blocked_land_preflight_count: `1`",
+                "top_deck_id: `616`",
+                "top_pair_add: `Ash Barrens`",
+                "top_pair_cut: `Rise of the Eldrazi`",
+                "blocked_by_protected_baseline_package_feedback",
+                "replace_failed_package_source_lane_or_cut_set_before_land_floor_preflight",
+                "battle_feedback_blocked_land_preflight_requires_new_source_lane_or_cut_set",
             ],
         )
     )

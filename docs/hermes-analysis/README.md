@@ -531,6 +531,15 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `replace_failed_package_source_lane_or_cut_set_before_battle`. Proximo goal:
     tratar a falha como aprendizado global negativo de pacote, abrir nova
     source/cut lane ou hipotese estrategica, e nao repetir esse pacote exato.
+    O land-floor policy builder agora tambem consome esse feedback antes de
+    reabrir a fila de pares: o relatorio
+    `master_optimizer_reports/global_commander_land_floor_policy_builder_20260706_larger_gate_feedback_current.md`
+    marca o deck `612` como `blocked_by_protected_baseline_package_feedback`
+    para o par `+Ash Barrens / -Longshot, Rebel Bowman`, exige
+    `replace_failed_package_source_lane_or_cut_set_before_land_floor_preflight`,
+    e promove o proximo preflight limpo para o deck `616` com
+    `+Ash Barrens / -Rise of the Eldrazi`. Nenhuma copy, battle ou promocao foi
+    aberta por esse relatorio.
     O modelo nonland agora bloqueia cortes cross-lane de ramp com
     `cross_lane_ramp_cut_requires_same_lane_source_or_gate`, removendo `Birgi`
     dos cuts genericos de removal. O novo top pair `+Feed the Swarm /

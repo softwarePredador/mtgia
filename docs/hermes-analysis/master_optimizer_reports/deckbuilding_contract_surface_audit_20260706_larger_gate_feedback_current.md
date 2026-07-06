@@ -1,6 +1,6 @@
 # Deckbuilding Contract Surface Audit
 
-- Generated at: `2026-07-06T12:54:06.291464+00:00`
+- Generated at: `2026-07-06T13:06:58.962911+00:00`
 - Status: `pass`
 - Contract: `docs/hermes-analysis/COMMANDER_DECKBUILDING_CONTRACT_2026-06-29.md`
 
@@ -202,6 +202,7 @@
 | pass | `docs/hermes-analysis/master_optimizer_reports/global_commander_named_land_candidate_pool_20260705_global_goal_hermes_only.md` |  |
 | pass | `docs/hermes-analysis/master_optimizer_reports/global_commander_land_cut_candidate_model_20260705_global_goal_hermes_only.md` |  |
 | pass | `docs/hermes-analysis/master_optimizer_reports/global_commander_land_floor_policy_builder_20260706_current.md` |  |
+| pass | `docs/hermes-analysis/master_optimizer_reports/global_commander_land_floor_policy_builder_20260706_larger_gate_feedback_current.md` |  |
 | pass | `docs/hermes-analysis/master_optimizer_reports/global_commander_land_floor_package_synthesizer_20260706_deck612.md` |  |
 | pass | `docs/hermes-analysis/master_optimizer_reports/global_commander_nonland_core_candidate_model_20260705_global_goal_hermes_only.md` |  |
 | pass | `docs/hermes-analysis/master_optimizer_reports/global_commander_learning_priority_audit_20260706_engine_axis_exhaustion_current.md` |  |

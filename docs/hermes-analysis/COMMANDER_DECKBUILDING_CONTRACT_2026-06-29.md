@@ -198,8 +198,12 @@ Operational priority after this pivot:
    chosen axis is `land`, then run
    `global_commander_land_floor_policy_builder.py` to join the role-axis policy
    with the mana-base profile, named land candidate pool, and land cut candidate
-   model; it may create a read-only pair preflight queue, but if a deck needs
-   more than one land to reach floor, then run
+   model; it may create a read-only pair preflight queue, but it must consume
+   the current `global_commander_battle_feedback_model.py`
+   output before ranking that queue, and any land add/cut pair contained in a
+   package blocked by protected-baseline feedback must route to new source lane,
+   cut set, or strategy instead of re-entering preflight unchanged; if a deck
+   needs more than one land to reach floor, then run
    `global_commander_land_floor_package_synthesizer.py` to cover the full land
    gap before candidate copy; candidate copy remains closed until the isolated
    materializer, commander-source-lane requirement, structure/legal recheck,

@@ -133,6 +133,114 @@ class GlobalCommanderLandFloorPolicyBuilderTests(unittest.TestCase):
         self.assertEqual(row["status"], "blocked_no_reviewable_land_cut_pool")
         self.assertEqual(row["next_gate"], "repair_land_floor_policy_inputs_before_candidate_copy")
 
+    def test_protected_baseline_feedback_blocks_repeating_failed_land_pair(self) -> None:
+        payload = audit.build_report(
+            role_axis_policy_payload=role_policy(),
+            mana_profile_payload={
+                "profiles": [
+                    {
+                        "deck_id": "900",
+                        "deck_name": "Deck 900",
+                        "commander": "Test Commander",
+                        "status": "mana_profile_ready_for_named_land_candidate_pool",
+                        "current_land_count": 31,
+                        "target_land_floor": 34,
+                        "land_gap": 3,
+                    },
+                    {
+                        "deck_id": "901",
+                        "deck_name": "Deck 901",
+                        "commander": "Other Commander",
+                        "status": "mana_profile_ready_for_named_land_candidate_pool",
+                        "current_land_count": 33,
+                        "target_land_floor": 34,
+                        "land_gap": 1,
+                    },
+                ]
+            },
+            named_land_pool_payload={
+                "candidate_pools": [
+                    {
+                        "deck_id": "900",
+                        "deck_name": "Deck 900",
+                        "commander": "Test Commander",
+                        "candidate_count": 1,
+                        "top_candidates": [{"card_name": "Battlefield Forge", "score": 94}],
+                    },
+                    {
+                        "deck_id": "901",
+                        "deck_name": "Deck 901",
+                        "commander": "Other Commander",
+                        "candidate_count": 1,
+                        "top_candidates": [{"card_name": "Boros Garrison", "score": 80}],
+                    },
+                ]
+            },
+            land_cut_model_payload={
+                "deck_cut_pools": [
+                    {
+                        "deck_id": "900",
+                        "deck_name": "Deck 900",
+                        "commander": "Test Commander",
+                        "status": "review_cut_pool_ready",
+                        "cut_candidate_count": 1,
+                        "pair_hypotheses": [
+                            {
+                                "add": "Battlefield Forge",
+                                "cut": "Expensive Engine",
+                                "pair_score": 140,
+                            }
+                        ],
+                    },
+                    {
+                        "deck_id": "901",
+                        "deck_name": "Deck 901",
+                        "commander": "Other Commander",
+                        "status": "review_cut_pool_ready",
+                        "cut_candidate_count": 1,
+                        "pair_hypotheses": [
+                            {
+                                "add": "Boros Garrison",
+                                "cut": "Low Impact Spell",
+                                "pair_score": 70,
+                            }
+                        ],
+                    },
+                ]
+            },
+            battle_feedback_payload={
+                "package_feedback": [
+                    {
+                        "deck_id": "900",
+                        "package_status": "package_blocked_by_protected_baseline_gate",
+                        "recommendation": "block_package_until_new_source_lane_cut_or_strategy",
+                        "added_cards": ["Battlefield Forge", "Boros Signet"],
+                        "cut_cards": ["Expensive Engine", "Slow Finisher"],
+                        "primary_evidence": {
+                            "artifact_path": "reports/failed_gate.json",
+                            "classification": "package_improved_weak_base_but_failed_protected_baseline",
+                            "candidate_vs_immediate_base_win_delta": 1,
+                            "candidate_vs_protected_win_delta": -6,
+                            "protected_baseline_key": "deck_607",
+                        },
+                    }
+                ]
+            },
+        )
+
+        self.assertEqual(payload["status"], "land_floor_policy_ready_no_deck_action")
+        self.assertEqual(payload["summary"]["top_deck_id"], "901")
+        self.assertEqual(payload["summary"]["battle_feedback_blocked_land_preflight_count"], 1)
+        rows_by_deck = {row["deck_id"]: row for row in payload["deck_policy_rows"]}
+        blocked = rows_by_deck["900"]
+        self.assertEqual(blocked["status"], audit.BATTLE_FEEDBACK_BLOCKED_STATUS)
+        self.assertEqual(blocked["next_gate"], audit.BATTLE_FEEDBACK_NEXT_GATE)
+        self.assertEqual(blocked["battle_feedback"]["candidate_vs_protected_win_delta"], -6)
+        self.assertIn(
+            "battle_feedback_blocked_land_preflight_requires_new_source_lane_or_cut_set",
+            payload["candidate_copy_blockers"],
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
