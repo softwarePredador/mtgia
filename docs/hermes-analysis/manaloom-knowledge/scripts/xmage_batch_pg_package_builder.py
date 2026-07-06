@@ -1956,6 +1956,30 @@ def simple_activated_self_keyword_execution_scenario_from_expected_rule(
     }
 
 
+def target_keyword_spell_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_fixed_keyword_target_creature_until_eot_spell_v1":
+        return None
+    type_line = "Sorcery" if required.get("sorcery") is True else "Instant"
+    return {
+        "name": f"{rule['card_name']} grants target keyword until EOT",
+        "type": "stat_modifier_until_eot",
+        "card": {"name": rule["card_name"], "type_line": type_line},
+        "target": {
+            "name": "E2E Target Creature",
+            "type_line": "Creature - Soldier",
+            "power": 2,
+            "toughness": 2,
+        },
+        "expected_power_delta": int(required.get("power_delta") or 0),
+        "expected_toughness_delta": int(required.get("toughness_delta") or 0),
+        "expected_keywords": list(required.get("granted_keywords_until_eot") or []),
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any] | None:
     return (
         static_global_pt_execution_scenario_from_expected_rule(rule)
@@ -1970,6 +1994,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or simple_activated_damage_execution_scenario_from_expected_rule(rule)
         or simple_activated_tap_target_execution_scenario_from_expected_rule(rule)
         or simple_activated_self_keyword_execution_scenario_from_expected_rule(rule)
+        or target_keyword_spell_execution_scenario_from_expected_rule(rule)
         or simple_activated_create_token_execution_scenario_from_expected_rule(rule)
         or fixed_create_creature_tokens_execution_scenario_from_expected_rule(rule)
         or multi_create_creature_tokens_execution_scenario_from_expected_rule(rule)

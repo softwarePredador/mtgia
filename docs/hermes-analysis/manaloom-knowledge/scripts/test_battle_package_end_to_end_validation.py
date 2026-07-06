@@ -246,6 +246,47 @@ def test_simple_activated_self_keyword_runner_executes_keyword_effect() -> None:
     assert result["life_paid"] == 2
 
 
+def test_stat_modifier_until_eot_runner_executes_keyword_only_spell() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "stat_modifier_until_eot",
+        "battle_model_scope": "xmage_fixed_keyword_target_creature_until_eot_spell_v1",
+        "target": "creature",
+        "target_controller": "any",
+        "target_constraints": {"card_types": ["creature"]},
+        "power_delta": 0,
+        "toughness_delta": 0,
+        "granted_keywords_until_eot": ["double_strike"],
+        "_rule_logical_key": "battle_rule_v1:double-cleave",
+    }
+    try:
+        result = validator.run_stat_modifier_until_eot(
+            battle,
+            {
+                "name": "Double Cleave grants double strike",
+                "type": "stat_modifier_until_eot",
+                "card": {"name": "Double Cleave", "type_line": "Instant"},
+                "expected_power_delta": 0,
+                "expected_toughness_delta": 0,
+                "expected_keywords": ["double_strike"],
+                "logical_rule_key": "battle_rule_v1:double-cleave",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Double Cleave"
+    assert result["target_power"] == 2
+    assert result["target_toughness"] == 2
+    assert result["granted_keywords"] == ["double_strike"]
+
+
 def test_simple_mana_source_refresh_runner_executes_partial_mana_rule() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

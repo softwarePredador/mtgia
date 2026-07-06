@@ -247,6 +247,7 @@ DYNAMIC_COUNT_BOOST_TARGET_SCOPE = "xmage_dynamic_count_boost_target_creature_un
 BOOST_CONTROLLED_SPELL_SCOPE = "xmage_fixed_boost_controlled_creatures_until_eot_spell_v1"
 BOOST_ALL_SPELL_SCOPE = "xmage_fixed_boost_all_or_opponents_creatures_until_eot_spell_v1"
 BOOST_ALL_FILTERED_SPELL_SCOPE = "xmage_fixed_boost_filtered_creatures_until_eot_spell_v1"
+TARGET_KEYWORD_SPELL_SCOPE = "xmage_fixed_keyword_target_creature_until_eot_spell_v1"
 BOOST_KEYWORD_SCOPE = "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1"
 ATTACK_TRIGGER_TARGET_KEYWORD_SCOPE = (
     "xmage_creature_attack_grant_keyword_target_creature_until_eot_v1"
@@ -5969,6 +5970,93 @@ def fixed_boost_keyword_target_from_source(
     return int(boost_matches[0][0]), int(boost_matches[0][1]), target_controller
 
 
+def fixed_target_keyword_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    text = strip_parenthetical_reminders(oracle_text(metadata))
+    text = re.sub(r"\s+", " ", text).strip().lower()
+    keyword_words = "|".join(
+        re.escape(word)
+        for word in sorted(TARGET_GRANT_KEYWORD_ORACLE_WORDS, key=len, reverse=True)
+    )
+    match = re.fullmatch(
+        rf"(?P<target>target .+?) gains (?P<keywords>(?:{keyword_words})(?:,? (?:and |or )?(?:{keyword_words}))*) until end of turn\.?",
+        text,
+    )
+    if not match:
+        return "target_keyword_spell_oracle_not_exact"
+    if " or " in match.group("keywords"):
+        return "target_keyword_spell_oracle_choice_not_supported"
+    keyword_parts = [
+        part.strip()
+        for part in re.split(r",?\s+and\s+|,\s*", match.group("keywords"))
+        if part.strip()
+    ]
+    keywords = [TARGET_GRANT_KEYWORD_ORACLE_WORDS.get(part) for part in keyword_parts]
+    if not keywords or any(keyword is None for keyword in keywords):
+        return "target_keyword_spell_oracle_keyword_not_supported"
+    target_phrase = match.group("target")
+    if target_phrase.startswith("target "):
+        target_phrase = target_phrase[len("target ") :].strip()
+    target_data = activated_target_keyword_target_phrase_data(target_phrase)
+    if isinstance(target_data, str):
+        return target_data.replace("activated_target_keyword", "target_keyword_spell")
+    return {
+        "keywords": list(dict.fromkeys(str(keyword) for keyword in keywords if keyword)),
+        **target_data,
+    }
+
+
+def fixed_target_keyword_from_source(
+    source: str,
+    keyword_ability_classes: set[str],
+) -> dict[str, Any] | str:
+    text = source or ""
+    if not keyword_ability_classes:
+        return "target_keyword_spell_source_keyword_missing"
+    if "TargetPointer" in text or ".setTargetPointer" in text or "EachTargetPointer" in text:
+        return "target_keyword_spell_source_target_not_supported"
+    if "BoostTargetEffect" in text:
+        return "target_keyword_spell_source_boost_not_supported"
+    gain_matches = re.findall(r"new\s+GainAbilityTargetEffect\s*\(", text)
+    if len(gain_matches) != len(keyword_ability_classes):
+        return "target_keyword_spell_source_effect_count_mismatch"
+    keywords: list[str] = []
+    for ability_class in sorted(keyword_ability_classes):
+        ability_expr = (
+            rf"(?:{re.escape(ability_class)}\.getInstance\s*\(\s*\)"
+            rf"|new\s+{re.escape(ability_class)}\s*\([^)]*\))"
+        )
+        if not re.search(
+            rf"new\s+GainAbilityTargetEffect\s*\(\s*{ability_expr}"
+            rf"\s*(?:,\s*Duration\.EndOfTurn\s*)?\)",
+            text,
+            re.S,
+        ):
+            return "target_keyword_spell_source_keyword_not_supported"
+        keyword = TARGET_GRANT_KEYWORD_ABILITY_CLASSES.get(ability_class)
+        if not keyword:
+            return "target_keyword_spell_source_keyword_not_supported"
+        keywords.append(keyword)
+    any_target = re.findall(r"new\s+TargetCreaturePermanent\s*\(", text)
+    controlled_target = re.findall(r"new\s+TargetControlledCreaturePermanent\s*\(", text)
+    if len(any_target) + len(controlled_target) != 1:
+        return "target_keyword_spell_source_target_not_supported"
+    if controlled_target:
+        if not re.search(r"new\s+TargetControlledCreaturePermanent\s*\(\s*\)", text, re.S):
+            return "target_keyword_spell_source_target_not_supported"
+        target_controller = "self"
+    else:
+        if not re.search(r"new\s+TargetCreaturePermanent\s*\(\s*\)", text, re.S):
+            return "target_keyword_spell_source_target_not_supported"
+        target_controller = "any"
+    return {
+        "keywords": list(dict.fromkeys(keywords)),
+        "target": "creature",
+        "target_controller": target_controller,
+        "exclude_source": False,
+        "target_constraints": {"card_types": ["creature"]},
+    }
+
+
 def fixed_keyword_draw_target_from_source(
     source: str,
     keyword_ability_class: str,
@@ -7909,6 +7997,17 @@ def is_boost_keyword_spell_unit(row: dict[str, Any]) -> bool:
         and set(row.get("xmage_signals") or []) == {"targeting"}
         and len(abilities) == 1
         and next(iter(abilities)) in TARGET_GRANT_KEYWORD_ABILITY_CLASSES
+    )
+
+
+def is_target_keyword_spell_unit(row: dict[str, Any]) -> bool:
+    abilities = ability_classes(row)
+    return (
+        str(row.get("adapter_work_unit") or "") == BOOST_KEYWORD_UNIT
+        and effect_classes(row) == {"GainAbilityTargetEffect"}
+        and set(row.get("xmage_signals") or []) == {"targeting"}
+        and bool(abilities)
+        and abilities.issubset(TARGET_GRANT_KEYWORD_ABILITY_CLASSES)
     )
 
 
@@ -16785,6 +16884,7 @@ def split_row(
         and not ability_classes(row)
     )
     counter_unless_pays_spell_unit = is_counter_unless_pays_spell_unit(row)
+    target_keyword_spell_unit = is_target_keyword_spell_unit(row)
     boost_keyword_spell_unit = is_boost_keyword_spell_unit(row)
     keyword_draw_spell_unit = (
         unit == DRAW_UNIT
@@ -16880,6 +16980,7 @@ def split_row(
         and not permanent_activated_recursion_to_battlefield_unit
         and not permanent_activated_graveyard_exile_unit
         and not permanent_activated_graveyard_to_library_unit
+        and not target_keyword_spell_unit
         and not boost_keyword_spell_unit
         and not keyword_draw_spell_unit
         and not fixed_token_spell_unit
@@ -16893,7 +16994,7 @@ def split_row(
         return None, "oracle_text_missing"
 
     if (
-        (unit in SPELL_UNITS or boost_keyword_spell_unit)
+        (unit in SPELL_UNITS or boost_keyword_spell_unit or target_keyword_spell_unit)
         and not etb_life_gain_creature_unit
         and not creature_enters_life_gain_unit
         and not static_protection_from_colors_creature_unit
@@ -24278,6 +24379,48 @@ def split_row(
         }
         return build_proposal(row, metadata, effect_json, family_id="xmage_boost_target_creature_until_eot_spell"), "selected_exact_scope"
 
+    if target_keyword_spell_unit:
+        if classes != {"GainAbilityTargetEffect"}:
+            return None, "target_keyword_spell_effect_class_not_pure"
+        abilities = ability_classes(row)
+        if not abilities or not abilities.issubset(TARGET_GRANT_KEYWORD_ABILITY_CLASSES):
+            return None, "target_keyword_spell_ability_not_supported"
+        if has_oracle_complexity(metadata):
+            return None, "target_keyword_spell_oracle_not_simple"
+        source_keyword = fixed_target_keyword_from_source(source_text, abilities)
+        if isinstance(source_keyword, str):
+            return None, source_keyword
+        oracle_keyword = fixed_target_keyword_from_oracle(metadata)
+        if isinstance(oracle_keyword, str):
+            return None, oracle_keyword
+        comparable_keys = ("target", "target_controller", "target_constraints")
+        if set(source_keyword.get("keywords") or []) != set(oracle_keyword.get("keywords") or []):
+            return None, "target_keyword_spell_source_oracle_mismatch"
+        if any(source_keyword.get(key) != oracle_keyword.get(key) for key in comparable_keys):
+            return None, "target_keyword_spell_source_oracle_mismatch"
+        effect_json = {
+            "effect": "stat_modifier_until_eot",
+            "battle_model_scope": TARGET_KEYWORD_SPELL_SCOPE,
+            "target": oracle_keyword["target"],
+            "target_constraints": oracle_keyword["target_constraints"],
+            "target_controller": oracle_keyword["target_controller"],
+            "power_delta": 0,
+            "toughness_delta": 0,
+            "power_boost": 0,
+            "toughness_boost": 0,
+            "duration": "until_end_of_turn",
+            "granted_keywords_until_eot": oracle_keyword["keywords"],
+            "xmage_effect_class": "GainAbilityTargetEffect",
+            "xmage_ability_classes": sorted(abilities),
+            **flags,
+        }
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_target_keyword_creature_until_eot_spell",
+        ), "selected_exact_scope"
+
     if boost_keyword_spell_unit:
         if classes != {"BoostTargetEffect", "GainAbilityTargetEffect"}:
             return None, "boost_keyword_effect_class_not_pure"
@@ -24845,6 +24988,7 @@ def build_exact_split_report(
             and not is_permanent_activated_graveyard_exile_unit(row)
             and not is_permanent_attack_recursion_to_hand_unit(row)
             and not is_creature_combat_damage_recursion_to_hand_unit(row)
+            and not is_target_keyword_spell_unit(row)
             and not is_boost_keyword_spell_unit(row)
             and not is_counter_unless_pays_spell_unit(row)
             and not (
@@ -24930,6 +25074,7 @@ def build_exact_split_report(
                 "SetBasePowerToughnessSourceEffect + SimpleStaticAbility creature rows whose source and Oracle both set source power/toughness to a direct controller/all-graveyards card-type count",
                 "grant_protection_from_chosen_color rows with GainAbilityTargetEffect + SimpleActivatedAbility, exact activated target-creature keyword until EOT, and simple mana/tap source costs only",
                 "grant_protection_from_chosen_color rows with GainAbilityTargetEffect + AttacksTriggeredAbility, exact attack-trigger target-creature keyword until EOT, and Oracle/source target constraints agreement",
+                "grant_protection_from_chosen_color rows with pure GainAbilityTargetEffect one-shot spells, exact target-creature keyword until EOT, and no auxiliary ability classes",
                 "ramp_permanent::xmage_creature_mana_source_variant_review_v1 rows with EntersBattlefieldTriggeredAbility + BasicManaEffect, exact unconditional fixed ETB mana Oracle/source agreement, and no auxiliary ability class",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with ReturnFromGraveyardToHandTargetEffect, SimpleActivatedAbility, exact activated graveyard-to-hand Oracle text, and mana/tap/self-sacrifice/discard-a-card source costs only",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with ReturnFromGraveyardToBattlefieldTargetEffect, SimpleActivatedAbility, exact activated graveyard-to-battlefield Oracle text, and mana/tap/source self-sacrifice costs only",

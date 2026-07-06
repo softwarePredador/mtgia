@@ -713,6 +713,33 @@ def test_manifest_builds_simple_activated_self_keyword_execution_scenario() -> N
     assert len(scenario["controller_hand"]) == 2
 
 
+def test_manifest_builds_target_keyword_spell_execution_scenario() -> None:
+    rule = {
+        "normalized_name": "double cleave",
+        "card_name": "Double Cleave",
+        "oracle_hash": "hash-double-cleave",
+        "logical_rule_key": "battle_rule_v1:hash-double-cleave",
+        "required_effect_fields": {
+            "effect": "stat_modifier_until_eot",
+            "battle_model_scope": "xmage_fixed_keyword_target_creature_until_eot_spell_v1",
+            "target": "creature",
+            "target_controller": "any",
+            "target_constraints": {"card_types": ["creature"]},
+            "power_delta": 0,
+            "toughness_delta": 0,
+            "granted_keywords_until_eot": ["double_strike"],
+        },
+    }
+
+    scenario = builder.target_keyword_spell_execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "stat_modifier_until_eot"
+    assert scenario["expected_power_delta"] == 0
+    assert scenario["expected_toughness_delta"] == 0
+    assert scenario["expected_keywords"] == ["double_strike"]
+
+
 def test_manifest_expected_rule_preserves_spell_additional_sacrifice_cost_fields() -> None:
     proposal = {
         "normalized_name": "bone splinters",

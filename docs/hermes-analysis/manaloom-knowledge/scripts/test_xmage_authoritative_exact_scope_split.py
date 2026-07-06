@@ -14908,6 +14908,80 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["toughness_delta"], 1)
         self.assertEqual(effect["granted_keywords_until_eot"], ["trample"])
 
+    def test_fixed_target_keyword_spell_maps_keyword_only_pattern(self) -> None:
+        row = queue_row(
+            split.BOOST_KEYWORD_UNIT,
+            effect_classes=["GainAbilityTargetEffect"],
+            ability_classes=["DoubleStrikeAbility"],
+            xmage_signals=["targeting"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Target creature gains double strike until end of turn."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new GainAbilityTargetEffect("
+                "DoubleStrikeAbility.getInstance(), Duration.EndOfTurn));"
+                "this.getSpellAbility().addTarget(new TargetCreaturePermanent());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "stat_modifier_until_eot")
+        self.assertEqual(effect["battle_model_scope"], split.TARGET_KEYWORD_SPELL_SCOPE)
+        self.assertEqual(effect["power_delta"], 0)
+        self.assertEqual(effect["toughness_delta"], 0)
+        self.assertEqual(effect["granted_keywords_until_eot"], ["double_strike"])
+        self.assertEqual(effect["target_controller"], "any")
+
+    def test_fixed_target_keyword_spell_maps_multiple_keywords(self) -> None:
+        row = queue_row(
+            split.BOOST_KEYWORD_UNIT,
+            effect_classes=["GainAbilityTargetEffect"],
+            ability_classes=["DeathtouchAbility", "IndestructibleAbility"],
+            xmage_signals=["targeting"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                oracle_text=(
+                    "Target creature gains deathtouch and indestructible until end of turn."
+                )
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new GainAbilityTargetEffect("
+                "DeathtouchAbility.getInstance(), Duration.EndOfTurn));"
+                "this.getSpellAbility().addEffect(new GainAbilityTargetEffect("
+                "IndestructibleAbility.getInstance(), Duration.EndOfTurn));"
+                "this.getSpellAbility().addTarget(new TargetCreaturePermanent());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["granted_keywords_until_eot"], ["deathtouch", "indestructible"])
+
+    def test_fixed_target_keyword_spell_blocks_auxiliary_ability(self) -> None:
+        row = queue_row(
+            split.BOOST_KEYWORD_UNIT,
+            effect_classes=["GainAbilityTargetEffect"],
+            ability_classes=["CyclingAbility", "IndestructibleAbility"],
+            xmage_signals=["targeting"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Target creature gains indestructible until end of turn."),
+            source_text=(
+                "this.addAbility(new CyclingAbility(new ManaCostsImpl<>(\"{2}\")));"
+                "this.getSpellAbility().addEffect(new GainAbilityTargetEffect("
+                "IndestructibleAbility.getInstance(), Duration.EndOfTurn));"
+                "this.getSpellAbility().addTarget(new TargetCreaturePermanent());"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "unsupported_adapter_work_unit")
+
     def test_static_combat_keyword_creature_maps_to_creature_with_keywords(self) -> None:
         row = queue_row(
             "xmage_signature::no_effect_class::FlyingAbility,VigilanceAbility::no_target_class::no_condition_class::no_signal",

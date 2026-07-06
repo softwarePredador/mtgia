@@ -2400,6 +2400,83 @@ def run_simple_activated_self_keyword(
     }
 
 
+def run_stat_modifier_until_eot(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    effect = battle.get_card_effect(card)
+    active = battle.Player(str(scenario.get("player") or "Spell Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
+    target = battle.enrich_card(
+        {
+            "name": "E2E Target Creature",
+            "type_line": "Creature - Soldier",
+            "power": 2,
+            "toughness": 2,
+            **dict(scenario.get("target") or {}),
+        }
+    )
+    active.battlefield = [target]
+    expected_keywords = [
+        str(keyword or "").strip().lower().replace(" ", "_")
+        for keyword in (scenario.get("expected_keywords") or effect.get("granted_keywords_until_eot") or [])
+        if str(keyword or "").strip()
+    ]
+    before_events = len(events)
+    before_power = int(target.get("power") or 0)
+    before_toughness = int(target.get("toughness") or 0)
+    battle.apply_effect_immediate(
+        active,
+        [opponent],
+        battle.enrich_card({**card, **effect}),
+        turn=int(scenario.get("turn") or 7),
+        rng=random.Random(int(scenario.get("seed") or 6073)),
+        effect_data_override=effect,
+        phase=str(scenario.get("phase") or "precombat_main"),
+    )
+    expected_power = before_power + int(scenario.get("expected_power_delta") or effect.get("power_delta") or 0)
+    expected_toughness = before_toughness + int(
+        scenario.get("expected_toughness_delta") or effect.get("toughness_delta") or 0
+    )
+    if int(target.get("power") or 0) != expected_power:
+        fail("battle_execution", f"{card['name']} target power={target.get('power')!r}, expected {expected_power}")
+    if int(target.get("toughness") or 0) != expected_toughness:
+        fail(
+            "battle_execution",
+            f"{card['name']} target toughness={target.get('toughness')!r}, expected {expected_toughness}",
+        )
+    for keyword in expected_keywords:
+        if not battle.card_has_keyword(target, keyword):
+            fail("battle_execution", f"{card['name']} target missing keyword {keyword!r}")
+    resolved_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "stat_modifier_until_eot_resolved"
+            and data.get("card") == card.get("name")
+            and data.get("target") == target.get("name")
+        ),
+        None,
+    )
+    if resolved_event is None:
+        fail("battle_events", f"missing {card['name']} stat modifier resolved event")
+    if list(resolved_event.get("granted_keywords_until_eot") or []) != expected_keywords:
+        fail(
+            "battle_events",
+            f"{card['name']} resolved keywords={resolved_event.get('granted_keywords_until_eot')!r}, expected {expected_keywords!r}",
+        )
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "target": target.get("name"),
+        "target_power": int(target.get("power") or 0),
+        "target_toughness": int(target.get("toughness") or 0),
+        "granted_keywords": expected_keywords,
+    }
+
+
 def assert_expected_event_fields(stage: str, card_name: str, event_data: dict[str, Any], expected: dict[str, Any]) -> None:
     for key, expected_value in expected.items():
         if event_data.get(key) != expected_value:
@@ -3270,6 +3347,7 @@ SCENARIO_RUNNERS = {
     "simple_activated_self_keyword": run_simple_activated_self_keyword,
     "simple_activated_create_token": run_simple_activated_create_token,
     "spell_cast_gain_life": run_spell_cast_gain_life,
+    "stat_modifier_until_eot": run_stat_modifier_until_eot,
     "static_global_power_toughness_boost": run_static_global_power_toughness_boost,
     "target_creature_cant_block": run_target_creature_cant_block,
     "token_maker_attack_each_opponent": run_token_maker_attack_each_opponent,

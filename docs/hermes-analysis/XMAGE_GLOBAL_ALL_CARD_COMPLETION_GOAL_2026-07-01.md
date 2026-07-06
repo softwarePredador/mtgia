@@ -1865,6 +1865,20 @@ Immediate checkpoint after PG361:
     so the next cycle must implement another mapper/runtime subpattern before
     generating a new PostgreSQL package. Current evidence:
     `docs/hermes-analysis/master_optimizer_reports/pg559_spell_cast_gain_life_new_server_apply_evidence.md`.
+86. PG560 promoted `10` exact target-creature keyword spell rows on the new
+    server after adding the exact
+    `xmage_fixed_keyword_target_creature_until_eot_spell_v1`
+    mapper/package/E2E lane for XMage `GainAbilityTargetEffect` spells that
+    grant fixed keywords until end of turn without power/toughness changes.
+    The cycle reduced Commander-legal battle-gap identities from `25501` to
+    `25491`, reduced XMage-authoritative adapter-required identities from
+    `25187` to `25177`, and reduced
+    `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1`
+    work units from `1102` to `1092`. The final split returned
+    `proposal_count=0`, so the next cycle must implement another
+    mapper/runtime subpattern before generating a new PostgreSQL package.
+    Current evidence:
+    `docs/hermes-analysis/master_optimizer_reports/pg560_target_keyword_spell_new_server_apply_evidence.md`.
 
 ## Non-Goals
 
