@@ -65,13 +65,18 @@ Fluxo correto para publicar backend nesse servidor:
 5. Definir `GIT_SHA=<sha-completo>` e `SENTRY_RELEASE=<sha-completo>` no service.
 6. Validar `/health`, `/ready`, `/health/ready`, request-id e banco.
 
-Deploy validado em 2026-07-06:
+Primeiro deploy image-based validado em 2026-07-06:
 
 - commit: `02270f1c38adb8540cd4745418862d6374a96d34`
 - imagem publicada: `localhost:5000/manaloom/cartinhas:02270f1c38ad`
 - `/health.git_sha`: `02270f1c38adb8540cd4745418862d6374a96d34`
 - `/ready`: `ready`, banco healthy, `card_count=34331`
 - `scripts/validate_request_id_ready.sh`: `READY_VALIDATION_OK=1`
+
+Se um commit posterior alterar apenas documentação fora de `server/`, não
+reconstruir o binário por isso. Retaggear a imagem validada para o novo SHA e
+atualizar `GIT_SHA`/`SENTRY_RELEASE` é suficiente para manter a prova pública de
+`master` atual sem criar churn de rebuild.
 
 ### Nota operacional 2026-06-15
 
