@@ -1,0 +1,118 @@
+{
+  "artifact_type": "global_commander_ramp_alternative_cut_trace_generator",
+  "battle_gate_allowed_now": false,
+  "battle_gate_performed": false,
+  "battle_or_optimization_performed": false,
+  "battle_replay_performed": true,
+  "candidate_copy_allowed_now": false,
+  "candidate_copy_blockers": [
+    "alternative_ramp_cut_no_exposure_requires_force_or_more_trace:Ornithopter of Paradise,Pyretic Ritual",
+    "candidate_copy_closed_after_alternative_ramp_cut_trace"
+  ],
+  "commander": "Kaalia of the Vast",
+  "deck_action_allowed": false,
+  "deck_id": "619",
+  "generated_at": "2026-07-06T06:06:26.093205+00:00",
+  "input_artifacts": {
+    "battle_replay": "docs/hermes-analysis/manaloom-knowledge/scripts/battle_replay_v10_3.py",
+    "recovery_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_cut_forced_recovery_router_20260706_current.json",
+    "replay_dir": "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_alternative_cut_trace_replays_20260706_current",
+    "source_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db"
+  },
+  "mutation_allowed": false,
+  "policy": {
+    "alternative_cut_boundary": "Alternative ramp cuts need card-level use or negative review before any cut claim.",
+    "natural_trace_boundary": "Natural trace is evidence collection only, not a battle gate.",
+    "promotion_boundary": "No candidate copy, deck mutation, battle gate, or promotion is opened by this report."
+  },
+  "postgres_writes": false,
+  "promotion_allowed": false,
+  "review_rows": [
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Ornithopter of Paradise",
+      "decision": "no_cut_clearance_without_access",
+      "decision_trace_count": 0,
+      "event_types": {},
+      "exposure_event_count": 0,
+      "first_decision_trace": null,
+      "first_exposure_event": null,
+      "first_usage_event": null,
+      "mutation_allowed": false,
+      "next_gate": "force_access_or_expand_trace_for_alternative_ramp_cut",
+      "status": "alternative_ramp_cut_no_current_exposure_needs_force_access_or_more_trace",
+      "usage_event_count": 0
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Pyretic Ritual",
+      "decision": "no_cut_clearance_without_access",
+      "decision_trace_count": 0,
+      "event_types": {
+        "focus_card_access_snapshot": 18
+      },
+      "exposure_event_count": 0,
+      "first_decision_trace": null,
+      "first_exposure_event": null,
+      "first_usage_event": null,
+      "mutation_allowed": false,
+      "next_gate": "force_access_or_expand_trace_for_alternative_ramp_cut",
+      "status": "alternative_ramp_cut_no_current_exposure_needs_force_access_or_more_trace",
+      "usage_event_count": 0
+    }
+  ],
+  "seed_rows": [
+    {
+      "decision_count": 169,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_alternative_cut_trace_replays_20260706_current/replay_seed_110.decision_trace.jsonl",
+      "event_count": 1599,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_alternative_cut_trace_replays_20260706_current/replay_seed_110.events.jsonl",
+      "provenance_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_alternative_cut_trace_replays_20260706_current/deck_provenance_seed_110.json",
+      "replay_txt": "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_alternative_cut_trace_replays_20260706_current/replay_seed_110.txt",
+      "returncode": 0,
+      "seed": 110,
+      "status": "alternative_ramp_cut_replay_generated"
+    },
+    {
+      "decision_count": 123,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_alternative_cut_trace_replays_20260706_current/replay_seed_111.decision_trace.jsonl",
+      "event_count": 896,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_alternative_cut_trace_replays_20260706_current/replay_seed_111.events.jsonl",
+      "provenance_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_alternative_cut_trace_replays_20260706_current/deck_provenance_seed_111.json",
+      "replay_txt": "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_alternative_cut_trace_replays_20260706_current/replay_seed_111.txt",
+      "returncode": 0,
+      "seed": 111,
+      "status": "alternative_ramp_cut_replay_generated"
+    },
+    {
+      "decision_count": 142,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_alternative_cut_trace_replays_20260706_current/replay_seed_112.decision_trace.jsonl",
+      "event_count": 1093,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_alternative_cut_trace_replays_20260706_current/replay_seed_112.events.jsonl",
+      "provenance_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_alternative_cut_trace_replays_20260706_current/deck_provenance_seed_112.json",
+      "replay_txt": "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_alternative_cut_trace_replays_20260706_current/replay_seed_112.txt",
+      "returncode": 0,
+      "seed": 112,
+      "status": "alternative_ramp_cut_replay_generated"
+    }
+  ],
+  "source_db_mutated": false,
+  "status": "ramp_alternative_cut_trace_needs_force_access_or_more_trace",
+  "summary": {
+    "candidate_copy_blocker_count": 2,
+    "focus_card_count": 2,
+    "focus_cards": [
+      "Ornithopter of Paradise",
+      "Pyretic Ritual"
+    ],
+    "generated_replay_count": 3,
+    "manual_review_count": 0,
+    "next_gate": "force_access_or_expand_trace_for_alternative_ramp_cut",
+    "no_exposure_count": 2,
+    "seed_count": 3,
+    "seed_start": 110,
+    "usage_blocked_count": 0
+  }
+}

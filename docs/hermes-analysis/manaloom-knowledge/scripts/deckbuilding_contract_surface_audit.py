@@ -90,6 +90,12 @@ GLOBAL_COMMANDER_RAMP_CUT_FORCED_RECOVERY_ROUTER = (
 GLOBAL_COMMANDER_RAMP_CUT_FORCED_RECOVERY_ROUTER_TEST = (
     SCRIPT_DIR / "test_global_commander_ramp_cut_forced_recovery_router.py"
 )
+GLOBAL_COMMANDER_RAMP_ALTERNATIVE_CUT_TRACE_GENERATOR = (
+    SCRIPT_DIR / "global_commander_ramp_alternative_cut_trace_generator.py"
+)
+GLOBAL_COMMANDER_RAMP_ALTERNATIVE_CUT_TRACE_GENERATOR_TEST = (
+    SCRIPT_DIR / "test_global_commander_ramp_alternative_cut_trace_generator.py"
+)
 GLOBAL_COMMANDER_ENGINE_CUT_USAGE_SAME_LANE_PROOF_SCOUT = (
     SCRIPT_DIR / "global_commander_engine_cut_usage_same_lane_proof_scout.py"
 )
@@ -541,6 +547,10 @@ GLOBAL_COMMANDER_RAMP_CUT_FORCED_ACCESS_TRACE_GENERATOR_REPORT = (
 GLOBAL_COMMANDER_RAMP_CUT_FORCED_RECOVERY_ROUTER_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_cut_forced_recovery_router_20260706_current.md"
+)
+GLOBAL_COMMANDER_RAMP_ALTERNATIVE_CUT_TRACE_GENERATOR_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_alternative_cut_trace_generator_20260706_current.md"
 )
 GLOBAL_COMMANDER_ENGINE_CUT_USAGE_SAME_LANE_PROOF_SCOUT_REPORT = (
     REPO_ROOT
@@ -4200,6 +4210,48 @@ def build_audit() -> dict[str, Any]:
                 "replacement_blocked_lower_staple_rank_than_used_cut",
                 "alternative_ramp_cut_requires_trace:Ornithopter of Paradise,Pyretic Ritual",
                 "candidate_copy_closed_after_ramp_forced_recovery_router",
+            ],
+        )
+    )
+    checks.extend(
+        [
+            check_contains(
+                GLOBAL_COMMANDER_RAMP_ALTERNATIVE_CUT_TRACE_GENERATOR,
+                [
+                    "Generate natural traces for alternative ramp cut targets.",
+                    "alternative_ramp_cut_no_current_exposure_needs_force_access_or_more_trace",
+                    "candidate_copy_allowed_now",
+                ],
+            ),
+            check_contains(
+                GLOBAL_COMMANDER_RAMP_ALTERNATIVE_CUT_TRACE_GENERATOR_TEST,
+                [
+                    "Tests for alternative ramp cut trace generation.",
+                    "test_usage_blocks_alternative_cut",
+                    "test_no_exposure_requires_more_trace",
+                ],
+            ),
+        ]
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_RAMP_ALTERNATIVE_CUT_TRACE_GENERATOR_REPORT,
+            [
+                "Global Commander Ramp Alternative Cut Trace Generator",
+                "ramp_alternative_cut_trace_needs_force_access_or_more_trace",
+                "focus_card_count: `2`",
+                "focus_cards: `Ornithopter of Paradise, Pyretic Ritual`",
+                "seed_count: `3`",
+                "generated_replay_count: `3`",
+                "usage_blocked_count: `0`",
+                "manual_review_count: `0`",
+                "no_exposure_count: `2`",
+                "candidate_copy_allowed_now: `false`",
+                "battle_replay_performed: `true`",
+                "battle_gate_performed: `false`",
+                "force_access_or_expand_trace_for_alternative_ramp_cut",
+                "alternative_ramp_cut_no_exposure_requires_force_or_more_trace:Ornithopter of Paradise,Pyretic Ritual",
+                "candidate_copy_closed_after_alternative_ramp_cut_trace",
             ],
         )
     )

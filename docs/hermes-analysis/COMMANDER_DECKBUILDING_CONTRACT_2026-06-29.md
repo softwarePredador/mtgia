@@ -1671,6 +1671,14 @@ Current external refresh on 2026-07-05:
   routes only `Ornithopter of Paradise` and `Pyretic Ritual` to current-scope
   trace as alternative cut targets. `Monologue Tax` and `Strike It Rich` require
   manual negative review rather than automatic cut clearance.
+- Run `global_commander_ramp_alternative_cut_trace_generator.py` only for those
+  alternative ramp trace targets. Natural trace evidence can block those cuts
+  if they are used, route to manual negative review if seen without usage, or
+  require more trace/forced access if still unexposed. It must not open
+  candidate copy, battle gate, mutation, or promotion. The current natural
+  trace ran `3` replays for `Ornithopter of Paradise` and `Pyretic Ritual`;
+  both remained unexposed with `0` usage, `0` exposure, and `0` decision traces,
+  so the next gate is `force_access_or_expand_trace_for_alternative_ramp_cut`.
 
 ## Global Commander Rollout - 2026-07-01
 

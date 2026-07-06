@@ -1,0 +1,497 @@
+======================================================================
+BATTLE v10.3 - STRUCTURED REPLAY
+Target deck id: 619
+Commander: Kaalia of the Vast
+Evaluation mode: target-deck-under-pressure
+Evaluation target player: Kaalia of the Vast
+Opponents available: 12
+Opponents picked: Najeela, the Blade-Blossom #111 (real), Dihada, Binder of Wills #29 (real), Kinnan, Bonder Prodigy #120 (real)
+======================================================================
+
+DECK SOURCE PROVENANCE
+  Metrics are derived from the resolved runtime card lists; cached learned-deck metadata is not used for replay lands/CMC/curve.
+  Deck-source blockers are reported separately from battle-engine action/strategy/forensic blockers.
+  Kaalia of the Vast: source=sqlite_deck_cards metrics=runtime_derived_from_resolved_card_list cards=99 lands=34 avg_nonland_cmc=2.71 curve={"0": 1, "1": 16, "2": 17, "3": 18, "4": 6, "5": 3, "6": 1, "7+": 3} blockers=none
+  Najeela, the Blade-Blossom #111 (real): source=learned_decks metrics=runtime_derived_from_resolved_built_deck cards=99 lands=27 avg_nonland_cmc=1.82 curve={"0": 8, "1": 26, "2": 18, "3": 13, "4": 5, "5": 2, "6": 0, "7+": 0} blockers=none
+  Dihada, Binder of Wills #29 (real): source=learned_decks metrics=runtime_derived_from_resolved_built_deck cards=99 lands=24 avg_nonland_cmc=2.07 curve={"0": 6, "1": 21, "2": 27, "3": 13, "4": 3, "5": 3, "6": 1, "7+": 1} blockers=none
+  Kinnan, Bonder Prodigy #120 (real): source=learned_decks metrics=runtime_derived_from_resolved_built_deck cards=99 lands=25 avg_nonland_cmc=2.39 curve={"0": 6, "1": 20, "2": 17, "3": 16, "4": 7, "5": 4, "6": 1, "7+": 3} blockers=none
+
+MULLIGANS
+  MANA __opening_hand__: 3 available (3 sources, 0 treasures, pool={'generic': 0, 'white': 2, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  MANA __opening_hand__: 3 available (3 sources, 0 treasures, pool={'generic': 0, 'white': 2, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  MANA __opening_hand__: 3 available (3 sources, 0 treasures, pool={'generic': 0, 'white': 2, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  MANA __opening_hand__: 3 available (3 sources, 0 treasures, pool={'generic': 0, 'white': 2, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  MANA __opening_hand__: 3 available (3 sources, 0 treasures, pool={'generic': 0, 'white': 2, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  MANA __opening_hand__: 3 available (3 sources, 0 treasures, pool={'generic': 0, 'white': 2, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  MANA __opening_hand__: 3 available (3 sources, 0 treasures, pool={'generic': 0, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  MANA __opening_hand__: 3 available (3 sources, 0 treasures, pool={'generic': 0, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  MANA __opening_hand__: 3 available (3 sources, 0 treasures, pool={'generic': 0, 'white': 2, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  MANA __opening_hand__: 3 available (3 sources, 0 treasures, pool={'generic': 0, 'white': 2, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  MANA __opening_hand__: 3 available (3 sources, 0 treasures, pool={'generic': 0, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  MANA __opening_hand__: 3 available (3 sources, 0 treasures, pool={'generic': 0, 'white': 1, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  MANA __opening_hand__: 3 available (3 sources, 0 treasures, pool={'generic': 0, 'white': 2, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  MANA __opening_hand__: 3 available (3 sources, 0 treasures, pool={'generic': 0, 'white': 2, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  MANA __opening_hand__: 3 available (3 sources, 0 treasures, pool={'generic': 0, 'white': 2, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  MANA __opening_hand__: 3 available (3 sources, 0 treasures, pool={'generic': 0, 'white': 2, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  MANA __opening_hand__: 3 available (3 sources, 0 treasures, pool={'generic': 0, 'white': 2, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  MANA __opening_hand__: 3 available (3 sources, 0 treasures, pool={'generic': 0, 'white': 2, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  MANA __opening_hand__: 3 available (3 sources, 0 treasures, pool={'generic': 0, 'white': 2, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  MANA __opening_hand__: 3 available (3 sources, 0 treasures, pool={'generic': 0, 'white': 2, 'blue': 0, 'black': 0, 'red': 1, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  MANA __opening_hand__: 1 available (1 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  MANA __opening_hand__: 1 available (1 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  MANA __opening_hand__: 1 available (1 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  MANA __opening_hand__: 1 available (1 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  MANA __opening_hand__: 1 available (1 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  MANA __opening_hand__: 1 available (1 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  Kaalia of the Vast: 3 mulligan(s), 5 cards, 1 lands, HandCards=[Swamp // Swamp, Lightning Greaves, Archaeomancer's Map, Wishclaw Talisman, Professional Face-Breaker]
+  MANA __opening_hand__: 2 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  MANA __opening_hand__: 2 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  MANA __opening_hand__: 2 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  MANA __opening_hand__: 2 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  MANA __opening_hand__: 2 available (2 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  Najeela, the Blade-Blossom #111 (real): 1 mulligan(s), 7 cards, 2 lands, HandCards=[Ancient Tomb, Gamble, Demonic Consultation, Necropotence, Tropical Island, Deflecting Swat, Tinder Wall]
+  MANA __opening_hand__: 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  MANA __opening_hand__: 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  MANA __opening_hand__: 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  MANA __opening_hand__: 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  MANA __opening_hand__: 3 available (3 sources, 0 treasures, pool={'generic': 3, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  Dihada, Binder of Wills #29 (real): 1 mulligan(s), 7 cards, 3 lands, HandCards=[Starting Town, Smothering Tithe, Arcane Signet, Enlightened Tutor, Command Tower, Mana Confluence, Vampiric Tutor]
+  MANA __opening_hand__: 3 available (3 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  MANA __opening_hand__: 3 available (3 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  MANA __opening_hand__: 3 available (3 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  MANA __opening_hand__: 3 available (3 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  MANA __opening_hand__: 4 available (4 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  MANA __opening_hand__: 3 available (3 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  Kinnan, Bonder Prodigy #120 (real): 0 mulligan(s), 7 cards, 5 lands, HandCards=[Scalding Tarn, Force of Will, Enduring Vitality, Mana Confluence, Minamo, School at Water's Edge, Yavimaya Coast, Barkchannel Pathway]
+
+TURN 1 - Kaalia of the Vast | Life=40 Hand=5 Board=0 HandCards=[Swamp // Swamp, Lightning Greaves, Archaeomancer's Map, Wishclaw Talisman, Professional Face-Breaker]
+  MANA Kaalia of the Vast: 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  PLAY LAND Kaalia of the Vast: Swamp // Swamp mana+=1 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0} rule=curated/verified
+  END Kaalia of the Vast: Life=40 Hand=5 Board=1 Grave=0 Discarded=0 HandCards=[Lightning Greaves, Archaeomancer's Map, Wishclaw Talisman, Professional Face-Breaker, Smothering Tithe] Permanents=[Swamp // Swamp]
+
+TURN 1 - Najeela, the Blade-Blossom #111 (real) | Life=40 Hand=7 Board=0 HandCards=[Ancient Tomb, Gamble, Demonic Consultation, Necropotence, Tropical Island, Deflecting Swat, Tinder Wall]
+  MANA Najeela, the Blade-Blossom #111 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  PLAY LAND Najeela, the Blade-Blossom #111 (real): Ancient Tomb mana+=1 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 1, 'wildcard': 0} rule=curated/verified
+  END Najeela, the Blade-Blossom #111 (real): Life=40 Hand=7 Board=1 Grave=0 Discarded=0 HandCards=[Gamble, Demonic Consultation, Necropotence, Tropical Island, Deflecting Swat, Tinder Wall, Into the Flood Maw] Permanents=[Ancient Tomb]
+
+TURN 1 - Dihada, Binder of Wills #29 (real) | Life=40 Hand=7 Board=0 HandCards=[Starting Town, Smothering Tithe, Arcane Signet, Enlightened Tutor, Command Tower, Mana Confluence, Vampiric Tutor]
+  MANA Dihada, Binder of Wills #29 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  PLAY LAND Dihada, Binder of Wills #29 (real): Starting Town mana+=1 pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0} rule=curated/verified
+  END Dihada, Binder of Wills #29 (real): Life=40 Hand=7 Board=1 Grave=0 Discarded=0 HandCards=[Smothering Tithe, Arcane Signet, Enlightened Tutor, Command Tower, Mana Confluence, Vampiric Tutor, Imperial Seal] Permanents=[Starting Town]
+
+TURN 1 - Kinnan, Bonder Prodigy #120 (real) | Life=40 Hand=7 Board=0 HandCards=[Scalding Tarn, Force of Will, Enduring Vitality, Mana Confluence, Minamo, School at Water's Edge, Yavimaya Coast, Barkchannel Pathway]
+  MANA Kinnan, Bonder Prodigy #120 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  PLAY LAND Kinnan, Bonder Prodigy #120 (real): Scalding Tarn mana+=1 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0} rule=curated/verified
+  END Kinnan, Bonder Prodigy #120 (real): Life=40 Hand=7 Board=1 Grave=0 Discarded=0 HandCards=[Force of Will, Enduring Vitality, Mana Confluence, Minamo, School at Water's Edge, Yavimaya Coast, Barkchannel Pathway, Subtlety] Permanents=[Scalding Tarn]
+
+TURN 2 - Kaalia of the Vast | Life=40 Hand=5 Board=1 HandCards=[Lightning Greaves, Archaeomancer's Map, Wishclaw Talisman, Professional Face-Breaker, Smothering Tithe]
+  MANA Kaalia of the Vast: 1 available (1 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  PLAY LAND Kaalia of the Vast: Elegant Parlor mana+=1 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0} rule=curated/verified
+  END Kaalia of the Vast: Life=40 Hand=5 Board=2 Grave=0 Discarded=0 HandCards=[Lightning Greaves, Archaeomancer's Map, Wishclaw Talisman, Professional Face-Breaker, Smothering Tithe] Permanents=[Swamp // Swamp, Elegant Parlor (tapped)]
+
+TURN 2 - Najeela, the Blade-Blossom #111 (real) | Life=40 Hand=7 Board=1 HandCards=[Gamble, Demonic Consultation, Necropotence, Tropical Island, Deflecting Swat, Tinder Wall, Into the Flood Maw]
+  MANA Najeela, the Blade-Blossom #111 (real): 1 available (1 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 1, 'wildcard': 0})
+  PLAY LAND Najeela, the Blade-Blossom #111 (real): Tropical Island mana+=1 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 1, 'wildcard': 0} rule=curated/verified
+  ANNOUNCE Najeela, the Blade-Blossom #111 (real): Tinder Wall role=creature phase=precombat_main locked_cost={green=1} targets=-
+  PAY COST Najeela, the Blade-Blossom #111 (real): Tinder Wall cost={green=1} mana 2->1 life 40->40 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 1, 'wildcard': 0}
+  CAST CREATURE Najeela, the Blade-Blossom #111 (real): Tinder Wall (CMC=1.0) [creature] phase=precombat_main cost={green=1} rule=curated/verified
+  END Najeela, the Blade-Blossom #111 (real): Life=40 Hand=6 Board=3 Grave=0 Discarded=0 HandCards=[Gamble, Demonic Consultation, Necropotence, Deflecting Swat, Into the Flood Maw, Scalding Tarn] Permanents=[Ancient Tomb, Tropical Island, Tinder Wall]
+
+TURN 2 - Dihada, Binder of Wills #29 (real) | Life=40 Hand=7 Board=1 HandCards=[Smothering Tithe, Arcane Signet, Enlightened Tutor, Command Tower, Mana Confluence, Vampiric Tutor, Imperial Seal]
+  MANA Dihada, Binder of Wills #29 (real): 1 available (1 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  PLAY LAND Dihada, Binder of Wills #29 (real): Command Tower mana+=1 pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0} rule=curated/verified
+  ANNOUNCE Dihada, Binder of Wills #29 (real): Arcane Signet role=ramp phase=precombat_main locked_cost={generic=2} targets=-
+  PAY COST Dihada, Binder of Wills #29 (real): Arcane Signet cost={generic=2} mana 2->0 life 40->40 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST Dihada, Binder of Wills #29 (real): Arcane Signet (CMC=2.0) [ramp_permanent] phase=precombat_main cost={generic=2} rule=curated/verified
+  ANNOUNCE Dihada, Binder of Wills #29 (real): Enlightened Tutor role=normal phase=precombat_main locked_cost={white=1} targets=-
+  PAY COST Dihada, Binder of Wills #29 (real): Enlightened Tutor cost={white=1} mana 1->0 life 40->40 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST Dihada, Binder of Wills #29 (real): Enlightened Tutor (CMC=1.0) [tutor] phase=precombat_main cost={white=1} rule=curated/active
+  RESOLVE SPELL Dihada, Binder of Wills #29 (real): Enlightened Tutor (CMC=1.0) [tutor] rule=curated/active
+  TUTOR Dihada, Binder of Wills #29 (real): Enlightened Tutor found Fellwar Stone (artifact_or_enchantment_to_top)
+  END Dihada, Binder of Wills #29 (real): Life=40 Hand=5 Board=3 Grave=1 Discarded=0 HandCards=[Smothering Tithe, Mana Confluence, Vampiric Tutor, Imperial Seal, Necromancy] Permanents=[Starting Town, Command Tower, Arcane Signet]
+
+TURN 2 - Kinnan, Bonder Prodigy #120 (real) | Life=40 Hand=7 Board=1 HandCards=[Force of Will, Enduring Vitality, Mana Confluence, Minamo, School at Water's Edge, Yavimaya Coast, Barkchannel Pathway, Subtlety]
+  MANA Kinnan, Bonder Prodigy #120 (real): 0 available (0 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  PLAY LAND Kinnan, Bonder Prodigy #120 (real): Mana Confluence mana+=1 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0} rule=curated/verified
+  END Kinnan, Bonder Prodigy #120 (real): Life=40 Hand=7 Board=2 Grave=0 Discarded=0 HandCards=[Force of Will, Enduring Vitality, Minamo, School at Water's Edge, Yavimaya Coast, Barkchannel Pathway, Subtlety, Nature's Rhythm] Permanents=[Scalding Tarn, Mana Confluence]
+
+TURN 3 - Kaalia of the Vast | Life=40 Hand=5 Board=2 HandCards=[Lightning Greaves, Archaeomancer's Map, Wishclaw Talisman, Professional Face-Breaker, Smothering Tithe]
+  MANA Kaalia of the Vast: 2 available (2 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  ANNOUNCE Kaalia of the Vast: Lightning Greaves role=normal phase=precombat_main locked_cost={generic=2} targets=-
+  PAY COST Kaalia of the Vast: Lightning Greaves cost={generic=2} mana 2->0 life 40->40 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST Kaalia of the Vast: Lightning Greaves (CMC=2.0) [equipment_haste_shroud] phase=precombat_main cost={generic=2} rule=curated/active
+  RESOLVE SPELL Kaalia of the Vast: Lightning Greaves (CMC=2.0) [equipment_haste_shroud] rule=curated/active
+  END Kaalia of the Vast: Life=40 Hand=5 Board=3 Grave=0 Discarded=0 HandCards=[Archaeomancer's Map, Wishclaw Talisman, Professional Face-Breaker, Smothering Tithe, Puresteel Paladin] Permanents=[Swamp // Swamp, Elegant Parlor, Lightning Greaves]
+
+TURN 3 - Najeela, the Blade-Blossom #111 (real) | Life=40 Hand=6 Board=3 HandCards=[Gamble, Demonic Consultation, Necropotence, Deflecting Swat, Into the Flood Maw, Scalding Tarn]
+  MANA Najeela, the Blade-Blossom #111 (real): 2 available (2 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 1, 'wildcard': 0})
+  PLAY LAND Najeela, the Blade-Blossom #111 (real): Scalding Tarn mana+=1 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 1, 'wildcard': 0} rule=curated/verified
+  END Najeela, the Blade-Blossom #111 (real): Life=40 Hand=6 Board=4 Grave=0 Discarded=0 HandCards=[Gamble, Demonic Consultation, Necropotence, Deflecting Swat, Into the Flood Maw, Voice of Victory] Permanents=[Ancient Tomb, Tropical Island, Tinder Wall, Scalding Tarn]
+
+TURN 3 - Dihada, Binder of Wills #29 (real) | Life=40 Hand=5 Board=3 HandCards=[Smothering Tithe, Mana Confluence, Vampiric Tutor, Imperial Seal, Necromancy]
+  MANA Dihada, Binder of Wills #29 (real): 3 available (3 sources, 0 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  PLAY LAND Dihada, Binder of Wills #29 (real): Mana Confluence mana+=1 pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0} rule=curated/verified
+  ANNOUNCE Dihada, Binder of Wills #29 (real): Smothering Tithe role=ramp phase=precombat_main locked_cost={generic=3, white=1} targets=-
+  LIFE Dihada, Binder of Wills #29 (real): event=conditional_mana_life_cost_paid card=Mana Confluence life=40->39
+  PAY COST Dihada, Binder of Wills #29 (real): Smothering Tithe cost={generic=3, white=1} mana 4->0 life 40->39 life_paid=1 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST Dihada, Binder of Wills #29 (real): Smothering Tithe (CMC=4.0) [ramp_engine] phase=precombat_main cost={generic=3, white=1} rule=curated/verified
+  END Dihada, Binder of Wills #29 (real): Life=39 Hand=4 Board=5 Grave=1 Discarded=0 HandCards=[Vampiric Tutor, Imperial Seal, Necromancy, Fellwar Stone] Permanents=[Starting Town, Command Tower, Arcane Signet, Mana Confluence, Smothering Tithe]
+
+TURN 3 - Kinnan, Bonder Prodigy #120 (real) | Life=40 Hand=7 Board=2 HandCards=[Force of Will, Enduring Vitality, Minamo, School at Water's Edge, Yavimaya Coast, Barkchannel Pathway, Subtlety, Nature's Rhythm]
+  MANA Kinnan, Bonder Prodigy #120 (real): 1 available (1 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  TRIGGER Dihada, Binder of Wills #29 (real): Smothering Tithe event=opponent_draw stack=0
+  RESOLVE ABILITY Dihada, Binder of Wills #29 (real): Smothering Tithe kind=opponent_draw
+  PLAY LAND Kinnan, Bonder Prodigy #120 (real): Minamo, School at Water's Edge mana+=1 pool={'generic': 0, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0} rule=curated/verified
+  ANNOUNCE Kinnan, Bonder Prodigy #120 (real): Kinnan, Bonder Prodigy role=commander phase=precombat_main locked_cost={blue=1, green=1} targets=-
+  LIFE Kinnan, Bonder Prodigy #120 (real): event=conditional_mana_life_cost_paid card=Mana Confluence life=40->39
+  PAY COST Kinnan, Bonder Prodigy #120 (real): Kinnan, Bonder Prodigy cost={blue=1, green=1} mana 2->0 life 40->39 life_paid=1 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST COMMANDER Kinnan, Bonder Prodigy #120 (real): Kinnan, Bonder Prodigy (CMC=2.0) [creature] phase=precombat_main cost={blue=1, green=1} rule=curated/verified
+  CAST INSTANT Najeela, the Blade-Blossom #111 (real): Into the Flood Maw (CMC=1.0) [remove_creature] phase=end_step cost={blue=1} rule=curated/verified
+  RESOLVE SPELL Najeela, the Blade-Blossom #111 (real): Into the Flood Maw (CMC=1.0) [remove_creature] rule=curated/verified
+  REMOVAL Najeela, the Blade-Blossom #111 (real): Into the Flood Maw removed Kinnan, Bonder Prodigy from Kinnan, Bonder Prodigy #120 (real)
+  CAST INSTANT Dihada, Binder of Wills #29 (real): Vampiric Tutor (CMC=1.0) [tutor] phase=end_step cost={black=1} rule=curated/verified
+  RESOLVE SPELL Dihada, Binder of Wills #29 (real): Vampiric Tutor (CMC=1.0) [tutor] rule=curated/verified
+  TUTOR Dihada, Binder of Wills #29 (real): Vampiric Tutor found Grim Monolith (any_to_top)
+  LIFE Dihada, Binder of Wills #29 (real): event=tutor_life_loss_resolved card=Vampiric Tutor life=39->37
+  END Kinnan, Bonder Prodigy #120 (real): Life=39 Hand=7 Board=3 Grave=0 Discarded=0 HandCards=[Force of Will, Enduring Vitality, Yavimaya Coast, Barkchannel Pathway, Subtlety, Nature's Rhythm, Chain of Vapor] Permanents=[Scalding Tarn, Mana Confluence, Minamo, School at Water's Edge]
+
+TURN 4 - Kaalia of the Vast | Life=40 Hand=5 Board=3 HandCards=[Archaeomancer's Map, Wishclaw Talisman, Professional Face-Breaker, Smothering Tithe, Puresteel Paladin]
+  MANA Kaalia of the Vast: 2 available (2 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  TRIGGER Dihada, Binder of Wills #29 (real): Smothering Tithe event=opponent_draw stack=1
+  RESOLVE ABILITY Dihada, Binder of Wills #29 (real): Smothering Tithe kind=opponent_draw
+  ANNOUNCE Kaalia of the Vast: Wishclaw Talisman role=normal phase=precombat_main locked_cost={generic=1, black=1} targets=-
+  PAY COST Kaalia of the Vast: Wishclaw Talisman cost={generic=1, black=1} mana 2->0 life 40->40 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST Kaalia of the Vast: Wishclaw Talisman (CMC=2.0) [tutor_artifact] phase=precombat_main cost={generic=1, black=1} rule=curated/verified
+  RESOLVE SPELL Kaalia of the Vast: Wishclaw Talisman (CMC=2.0) [tutor_artifact] rule=curated/verified
+  END Kaalia of the Vast: Life=40 Hand=5 Board=3 Grave=0 Discarded=0 HandCards=[Archaeomancer's Map, Professional Face-Breaker, Smothering Tithe, Puresteel Paladin, Karlach, Fury of Avernus] Permanents=[Swamp // Swamp, Elegant Parlor, Lightning Greaves]
+
+TURN 4 - Najeela, the Blade-Blossom #111 (real) | Life=40 Hand=5 Board=4 HandCards=[Gamble, Demonic Consultation, Necropotence, Deflecting Swat, Voice of Victory]
+  MANA Najeela, the Blade-Blossom #111 (real): 2 available (2 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 1, 'wildcard': 0})
+  TRIGGER Dihada, Binder of Wills #29 (real): Smothering Tithe event=opponent_draw stack=2
+  RESOLVE ABILITY Dihada, Binder of Wills #29 (real): Smothering Tithe kind=opponent_draw
+  ANNOUNCE Najeela, the Blade-Blossom #111 (real): Noble Hierarch role=creature phase=precombat_main locked_cost={green=1} targets=-
+  PAY COST Najeela, the Blade-Blossom #111 (real): Noble Hierarch cost={green=1} mana 2->1 life 40->40 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 1, 'wildcard': 0}
+  CAST CREATURE Najeela, the Blade-Blossom #111 (real): Noble Hierarch (CMC=1.0) [creature] phase=precombat_main cost={green=1} rule=curated/verified
+  END Najeela, the Blade-Blossom #111 (real): Life=40 Hand=5 Board=5 Grave=1 Discarded=0 HandCards=[Gamble, Demonic Consultation, Necropotence, Deflecting Swat, Voice of Victory] Permanents=[Ancient Tomb, Tropical Island, Tinder Wall, Scalding Tarn, Noble Hierarch]
+
+TURN 4 - Dihada, Binder of Wills #29 (real) | Life=37 Hand=3 Board=5 HandCards=[Imperial Seal, Necromancy, Fellwar Stone]
+  MANA Dihada, Binder of Wills #29 (real): 6 available (4 sources, 2 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  ANNOUNCE Dihada, Binder of Wills #29 (real): Dihada, Binder of Wills role=commander phase=precombat_main locked_cost={generic=1, black=1, red=1, white=1} targets=-
+  LIFE Dihada, Binder of Wills #29 (real): event=conditional_mana_life_cost_paid card=Mana Confluence life=37->36
+  PAY COST Dihada, Binder of Wills #29 (real): Dihada, Binder of Wills cost={generic=1, black=1, red=1, white=1} mana 6->2 life 37->36 life_paid=1 pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST COMMANDER Dihada, Binder of Wills #29 (real): Dihada, Binder of Wills (CMC=4.0) [ramp_permanent] phase=precombat_main cost={generic=1, black=1, red=1, white=1} rule=functional_tags_json/heuristic
+  ANNOUNCE Dihada, Binder of Wills #29 (real): Fellwar Stone role=ramp phase=precombat_main locked_cost={generic=2} targets=-
+  PAY COST Dihada, Binder of Wills #29 (real): Fellwar Stone cost={generic=2} mana 2->0 life 36->36 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST Dihada, Binder of Wills #29 (real): Fellwar Stone (CMC=2.0) [ramp_permanent] phase=precombat_main cost={generic=2} rule=curated/active
+  ANNOUNCE Dihada, Binder of Wills #29 (real): Imperial Seal role=normal phase=precombat_main locked_cost={black=1} targets=-
+  PAY COST Dihada, Binder of Wills #29 (real): Imperial Seal cost={black=1} mana 1->0 life 36->36 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST Dihada, Binder of Wills #29 (real): Imperial Seal (CMC=1.0) [tutor] phase=precombat_main cost={black=1} rule=curated/verified
+  RESOLVE SPELL Dihada, Binder of Wills #29 (real): Imperial Seal (CMC=1.0) [tutor] rule=curated/verified
+  TUTOR Dihada, Binder of Wills #29 (real): Imperial Seal found Necropotence (any_to_top)
+  LIFE Dihada, Binder of Wills #29 (real): event=tutor_life_loss_resolved card=Imperial Seal life=36->34
+  END Dihada, Binder of Wills #29 (real): Life=34 Hand=2 Board=6 Grave=4 Discarded=0 HandCards=[Necromancy, Grim Monolith] Permanents=[Starting Town, Command Tower, Arcane Signet, Mana Confluence, Smothering Tithe, Fellwar Stone]
+
+TURN 4 - Kinnan, Bonder Prodigy #120 (real) | Life=39 Hand=7 Board=3 HandCards=[Force of Will, Enduring Vitality, Yavimaya Coast, Barkchannel Pathway, Subtlety, Nature's Rhythm, Chain of Vapor]
+  MANA Kinnan, Bonder Prodigy #120 (real): 2 available (2 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  TRIGGER Dihada, Binder of Wills #29 (real): Smothering Tithe event=opponent_draw stack=3
+  RESOLVE ABILITY Dihada, Binder of Wills #29 (real): Smothering Tithe kind=opponent_draw
+  PLAY LAND Kinnan, Bonder Prodigy #120 (real): Yavimaya Coast mana+=1 pool={'generic': 0, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0} rule=curated/verified
+  ANNOUNCE Kinnan, Bonder Prodigy #120 (real): Chain of Vapor role=normal phase=precombat_main locked_cost={blue=1} targets={'target': 'Lightning Greaves', 'target_controller': 'Kaalia of the Vast', 'target_type': 'nonland_permanent', 'target_legal': True, 'targeting_pipeline': 'targeting_formal_minimal'}
+  PAY COST Kinnan, Bonder Prodigy #120 (real): Chain of Vapor cost={blue=1} mana 3->2 life 39->39 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST Kinnan, Bonder Prodigy #120 (real): Chain of Vapor (CMC=1.0) [remove_permanent] phase=precombat_main cost={blue=1} rule=curated/verified
+  RESOLVE SPELL Kinnan, Bonder Prodigy #120 (real): Chain of Vapor (CMC=1.0) [remove_permanent] rule=curated/verified
+  REMOVAL Kinnan, Bonder Prodigy #120 (real): Chain of Vapor removed Lightning Greaves from Kaalia of the Vast
+  END Kinnan, Bonder Prodigy #120 (real): Life=39 Hand=6 Board=4 Grave=1 Discarded=0 HandCards=[Force of Will, Enduring Vitality, Barkchannel Pathway, Subtlety, Nature's Rhythm, Flooded Strand] Permanents=[Scalding Tarn, Mana Confluence, Minamo, School at Water's Edge, Yavimaya Coast]
+
+TURN 5 - Kaalia of the Vast | Life=40 Hand=6 Board=2 HandCards=[Archaeomancer's Map, Professional Face-Breaker, Smothering Tithe, Puresteel Paladin, Karlach, Fury of Avernus, Lightning Greaves]
+  MANA Kaalia of the Vast: 2 available (2 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  TRIGGER Dihada, Binder of Wills #29 (real): Smothering Tithe event=opponent_draw stack=4
+  RESOLVE ABILITY Dihada, Binder of Wills #29 (real): Smothering Tithe kind=opponent_draw
+  ANNOUNCE Kaalia of the Vast: Lightning Greaves role=normal phase=precombat_main locked_cost={generic=2} targets=-
+  PAY COST Kaalia of the Vast: Lightning Greaves cost={generic=2} mana 2->0 life 40->40 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST Kaalia of the Vast: Lightning Greaves (CMC=2.0) [equipment_haste_shroud] phase=precombat_main cost={generic=2} rule=curated/active
+  RESOLVE SPELL Kaalia of the Vast: Lightning Greaves (CMC=2.0) [equipment_haste_shroud] rule=curated/active
+  END Kaalia of the Vast: Life=40 Hand=6 Board=3 Grave=0 Discarded=0 HandCards=[Archaeomancer's Map, Professional Face-Breaker, Smothering Tithe, Puresteel Paladin, Karlach, Fury of Avernus, Necropotence] Permanents=[Swamp // Swamp, Elegant Parlor, Lightning Greaves]
+
+TURN 5 - Najeela, the Blade-Blossom #111 (real) | Life=40 Hand=5 Board=5 HandCards=[Gamble, Demonic Consultation, Necropotence, Deflecting Swat, Voice of Victory]
+  MANA Najeela, the Blade-Blossom #111 (real): 3 available (3 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 1, 'wildcard': 0})
+  TRIGGER Dihada, Binder of Wills #29 (real): Smothering Tithe event=opponent_draw stack=5
+  RESOLVE ABILITY Dihada, Binder of Wills #29 (real): Smothering Tithe kind=opponent_draw
+  ANNOUNCE Najeela, the Blade-Blossom #111 (real): Voice of Victory role=high_threat phase=precombat_main locked_cost={generic=1, white=1} targets=-
+  PAY COST Najeela, the Blade-Blossom #111 (real): Voice of Victory cost={generic=1, white=1} mana 3->1 life 40->40 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST Najeela, the Blade-Blossom #111 (real): Voice of Victory (CMC=2.0) [silence_opponents] phase=precombat_main cost={generic=1, white=1} rule=curated/verified
+  RESOLVE SPELL Najeela, the Blade-Blossom #111 (real): Voice of Victory (CMC=2.0) [silence_opponents] rule=curated/verified
+  END Najeela, the Blade-Blossom #111 (real): Life=40 Hand=5 Board=6 Grave=1 Discarded=0 HandCards=[Gamble, Demonic Consultation, Necropotence, Deflecting Swat, Wishclaw Talisman] Permanents=[Ancient Tomb, Tropical Island, Tinder Wall, Scalding Tarn, Noble Hierarch, Voice of Victory]
+
+TURN 5 - Dihada, Binder of Wills #29 (real) | Life=34 Hand=2 Board=6 HandCards=[Necromancy, Grim Monolith]
+  MANA Dihada, Binder of Wills #29 (real): 8 available (5 sources, 3 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  ANNOUNCE Dihada, Binder of Wills #29 (real): Grim Monolith role=ramp phase=precombat_main locked_cost={generic=2} targets=-
+  PAY COST Dihada, Binder of Wills #29 (real): Grim Monolith cost={generic=2} mana 8->6 life 34->34 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST Dihada, Binder of Wills #29 (real): Grim Monolith (CMC=2.0) [ramp_permanent] phase=precombat_main cost={generic=2} rule=curated/verified
+  ANNOUNCE Dihada, Binder of Wills #29 (real): Necromancy role=normal phase=precombat_main locked_cost={generic=2, black=1} targets=-
+  PAY COST Dihada, Binder of Wills #29 (real): Necromancy cost={generic=2, black=1} mana 9->6 life 34->34 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 1, 'wildcard': 0}
+  CAST Dihada, Binder of Wills #29 (real): Necromancy (CMC=3.0) [recursion] phase=precombat_main cost={generic=2, black=1} rule=curated/verified
+  RESOLVE SPELL Dihada, Binder of Wills #29 (real): Necromancy (CMC=3.0) [recursion] rule=curated/verified
+  ANNOUNCE Dihada, Binder of Wills #29 (real): Necropotence role=normal phase=precombat_main locked_cost={black=3} targets=-
+  LIFE Dihada, Binder of Wills #29 (real): event=conditional_mana_life_cost_paid card=Mana Confluence life=34->33
+  PAY COST Dihada, Binder of Wills #29 (real): Necropotence cost={black=3} mana 6->3 life 34->33 life_paid=1 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 1, 'wildcard': 0}
+  CAST Dihada, Binder of Wills #29 (real): Necropotence (CMC=3.0) [draw_engine] phase=precombat_main cost={black=3} rule=curated/verified
+  RESOLVE SPELL Dihada, Binder of Wills #29 (real): Necropotence (CMC=3.0) [draw_engine] rule=curated/verified
+  ANNOUNCE Dihada, Binder of Wills #29 (real): Soul Partition role=normal phase=postcombat_main locked_cost={generic=1, white=1} targets={'target': 'Lightning Greaves', 'target_controller': 'Kaalia of the Vast', 'target_type': 'nonland_permanent', 'target_legal': True, 'targeting_pipeline': 'targeting_formal_minimal'}
+  PAY COST Dihada, Binder of Wills #29 (real): Soul Partition cost={generic=1, white=1} mana 3->1 life 33->33 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST Dihada, Binder of Wills #29 (real): Soul Partition (CMC=2.0) [remove_permanent] phase=postcombat_main cost={generic=1, white=1} rule=functional_tags_json/heuristic
+  RESOLVE SPELL Dihada, Binder of Wills #29 (real): Soul Partition (CMC=2.0) [remove_permanent] rule=functional_tags_json/heuristic
+  REMOVAL Dihada, Binder of Wills #29 (real): Soul Partition removed Lightning Greaves from Kaalia of the Vast
+  END Dihada, Binder of Wills #29 (real): Life=33 Hand=1 Board=8 Grave=6 Discarded=0 HandCards=[Gemstone Caverns] Permanents=[Starting Town, Command Tower, Arcane Signet, Mana Confluence, Smothering Tithe, Fellwar Stone, Grim Monolith (tapped), Necropotence]
+
+TURN 5 - Kinnan, Bonder Prodigy #120 (real) | Life=39 Hand=6 Board=4 HandCards=[Force of Will, Enduring Vitality, Barkchannel Pathway, Subtlety, Nature's Rhythm, Flooded Strand]
+  MANA Kinnan, Bonder Prodigy #120 (real): 3 available (3 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  TRIGGER Dihada, Binder of Wills #29 (real): Smothering Tithe event=opponent_draw stack=6
+  RESOLVE ABILITY Dihada, Binder of Wills #29 (real): Smothering Tithe kind=opponent_draw
+  PLAY LAND Kinnan, Bonder Prodigy #120 (real): Barkchannel Pathway mana+=1 pool={'generic': 0, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0} rule=curated/verified
+  ANNOUNCE Kinnan, Bonder Prodigy #120 (real): Kinnan, Bonder Prodigy role=commander phase=precombat_main locked_cost={generic=2, blue=1, green=1} targets=-
+  LIFE Kinnan, Bonder Prodigy #120 (real): event=conditional_mana_life_cost_paid card=Mana Confluence life=39->38
+  PAY COST Kinnan, Bonder Prodigy #120 (real): Kinnan, Bonder Prodigy cost={generic=2, blue=1, green=1} mana 4->0 life 39->38 life_paid=1 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST COMMANDER Kinnan, Bonder Prodigy #120 (real): Kinnan, Bonder Prodigy (CMC=2.0) [creature] phase=precombat_main cost={generic=2, blue=1, green=1} rule=curated/verified
+  END Kinnan, Bonder Prodigy #120 (real): Life=38 Hand=6 Board=6 Grave=1 Discarded=0 HandCards=[Force of Will, Enduring Vitality, Subtlety, Nature's Rhythm, Flooded Strand, Faerie Mastermind] Permanents=[Scalding Tarn, Mana Confluence, Minamo, School at Water's Edge, Yavimaya Coast, Barkchannel Pathway, Kinnan, Bonder Prodigy]
+
+TURN 6 - Kaalia of the Vast | Life=40 Hand=6 Board=2 HandCards=[Archaeomancer's Map, Professional Face-Breaker, Smothering Tithe, Puresteel Paladin, Karlach, Fury of Avernus, Necropotence]
+  MANA Kaalia of the Vast: 2 available (2 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  TRIGGER Dihada, Binder of Wills #29 (real): Smothering Tithe event=opponent_draw stack=7
+  RESOLVE ABILITY Dihada, Binder of Wills #29 (real): Smothering Tithe kind=opponent_draw
+  PLAY LAND Kaalia of the Vast: Bloodstained Mire mana+=1 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0} rule=curated/verified
+  END Kaalia of the Vast: Life=40 Hand=6 Board=3 Grave=1 Discarded=0 HandCards=[Archaeomancer's Map, Professional Face-Breaker, Smothering Tithe, Puresteel Paladin, Karlach, Fury of Avernus, Necropotence] Permanents=[Swamp // Swamp, Elegant Parlor, Bloodstained Mire]
+
+TURN 6 - Najeela, the Blade-Blossom #111 (real) | Life=40 Hand=5 Board=6 HandCards=[Gamble, Demonic Consultation, Necropotence, Deflecting Swat, Wishclaw Talisman]
+  MANA Najeela, the Blade-Blossom #111 (real): 3 available (3 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 1, 'wildcard': 0})
+  TRIGGER Dihada, Binder of Wills #29 (real): Smothering Tithe event=opponent_draw stack=8
+  RESOLVE ABILITY Dihada, Binder of Wills #29 (real): Smothering Tithe kind=opponent_draw
+  PLAY LAND Najeela, the Blade-Blossom #111 (real): Flooded Strand mana+=1 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 1, 'wildcard': 0} rule=curated/verified
+  COMBAT Najeela, the Blade-Blossom #111 (real) -> Kaalia of the Vast: 1 attackers, 0 blockers, 0 gang blocks, 1 power (reason=evaluation_target_pressure, target_life=40)
+  DAMAGE Najeela, the Blade-Blossom #111 (real) -> Kaalia of the Vast: 1 player damage, target life 39, target_dead=False
+  END Najeela, the Blade-Blossom #111 (real): Life=40 Hand=5 Board=7 Grave=1 Discarded=0 HandCards=[Gamble, Demonic Consultation, Necropotence, Deflecting Swat, Wishclaw Talisman] Permanents=[Ancient Tomb, Tropical Island, Tinder Wall, Scalding Tarn, Noble Hierarch, Voice of Victory (tapped), Flooded Strand]
+
+TURN 6 - Dihada, Binder of Wills #29 (real) | Life=33 Hand=1 Board=8 HandCards=[Gemstone Caverns]
+  MANA Dihada, Binder of Wills #29 (real): 9 available (5 sources, 4 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  PLAY LAND Dihada, Binder of Wills #29 (real): Gemstone Caverns mana+=1 pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0} rule=curated/verified
+  ANNOUNCE Dihada, Binder of Wills #29 (real): Voice of Victory role=high_threat phase=precombat_main locked_cost={generic=1, white=1} targets=-
+  PAY COST Dihada, Binder of Wills #29 (real): Voice of Victory cost={generic=1, white=1} mana 10->8 life 33->33 life_paid=0 pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST Dihada, Binder of Wills #29 (real): Voice of Victory (CMC=2.0) [silence_opponents] phase=precombat_main cost={generic=1, white=1} rule=curated/verified
+  RESOLVE SPELL Dihada, Binder of Wills #29 (real): Voice of Victory (CMC=2.0) [silence_opponents] rule=curated/verified
+  END Dihada, Binder of Wills #29 (real): Life=33 Hand=1 Board=10 Grave=6 Discarded=0 HandCards=[Dance of the Dead] Permanents=[Starting Town, Command Tower, Arcane Signet, Mana Confluence, Smothering Tithe, Fellwar Stone, Grim Monolith (tapped), Necropotence, Gemstone Caverns, Voice of Victory]
+
+TURN 6 - Kinnan, Bonder Prodigy #120 (real) | Life=38 Hand=6 Board=6 HandCards=[Force of Will, Enduring Vitality, Subtlety, Nature's Rhythm, Flooded Strand, Faerie Mastermind]
+  MANA Kinnan, Bonder Prodigy #120 (real): 4 available (4 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  TRIGGER Dihada, Binder of Wills #29 (real): Smothering Tithe event=opponent_draw stack=9
+  RESOLVE ABILITY Dihada, Binder of Wills #29 (real): Smothering Tithe kind=opponent_draw
+  PLAY LAND Kinnan, Bonder Prodigy #120 (real): Flooded Strand mana+=1 pool={'generic': 0, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0} rule=curated/verified
+  ANNOUNCE Kinnan, Bonder Prodigy #120 (real): Faerie Mastermind role=creature phase=precombat_main locked_cost={generic=1, blue=1} targets=-
+  PAY COST Kinnan, Bonder Prodigy #120 (real): Faerie Mastermind cost={generic=1, blue=1} mana 4->2 life 38->38 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST CREATURE Kinnan, Bonder Prodigy #120 (real): Faerie Mastermind (CMC=2.0) [creature] phase=precombat_main cost={generic=1, blue=1} rule=curated/verified
+  COMBAT Kinnan, Bonder Prodigy #120 (real) -> Kaalia of the Vast: 1 attackers, 0 blockers, 0 gang blocks, 2 power (reason=evaluation_target_pressure, target_life=39)
+  DAMAGE Kinnan, Bonder Prodigy #120 (real) -> Kaalia of the Vast: 2 player damage, target life 37, target_dead=False
+  END Kinnan, Bonder Prodigy #120 (real): Life=38 Hand=5 Board=8 Grave=1 Discarded=0 HandCards=[Force of Will, Enduring Vitality, Subtlety, Nature's Rhythm, Hidden Strings] Permanents=[Scalding Tarn, Mana Confluence, Minamo, School at Water's Edge, Yavimaya Coast, Barkchannel Pathway, Kinnan, Bonder Prodigy (tapped), Flooded Strand, Faerie Mastermind]
+
+TURN 7 - Kaalia of the Vast | Life=37 Hand=6 Board=3 HandCards=[Archaeomancer's Map, Professional Face-Breaker, Smothering Tithe, Puresteel Paladin, Karlach, Fury of Avernus, Necropotence]
+  MANA Kaalia of the Vast: 2 available (2 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  TRIGGER Dihada, Binder of Wills #29 (real): Smothering Tithe event=opponent_draw stack=10
+  RESOLVE ABILITY Dihada, Binder of Wills #29 (real): Smothering Tithe kind=opponent_draw
+  ANNOUNCE Kaalia of the Vast: Demonic Tutor role=normal phase=precombat_main locked_cost={generic=1, black=1} targets=-
+  PAY COST Kaalia of the Vast: Demonic Tutor cost={generic=1, black=1} mana 2->0 life 37->37 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST Kaalia of the Vast: Demonic Tutor (CMC=2.0) [tutor] phase=precombat_main cost={generic=1, black=1} rule=curated/verified
+  RESOLVE SPELL Kaalia of the Vast: Demonic Tutor (CMC=2.0) [tutor] rule=curated/verified
+  TUTOR Kaalia of the Vast: Demonic Tutor found Mjölnir, Hammer of Thor (any_to_hand)
+  END Kaalia of the Vast: Life=37 Hand=7 Board=3 Grave=2 Discarded=0 HandCards=[Archaeomancer's Map, Professional Face-Breaker, Smothering Tithe, Puresteel Paladin, Karlach, Fury of Avernus, Necropotence, Mjölnir, Hammer of Thor] Permanents=[Swamp // Swamp, Elegant Parlor, Bloodstained Mire]
+
+TURN 7 - Najeela, the Blade-Blossom #111 (real) | Life=40 Hand=5 Board=7 HandCards=[Gamble, Demonic Consultation, Necropotence, Deflecting Swat, Wishclaw Talisman]
+  MANA Najeela, the Blade-Blossom #111 (real): 3 available (3 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 1, 'wildcard': 0})
+  TRIGGER Dihada, Binder of Wills #29 (real): Smothering Tithe event=opponent_draw stack=11
+  RESOLVE ABILITY Dihada, Binder of Wills #29 (real): Smothering Tithe kind=opponent_draw
+  ANNOUNCE Najeela, the Blade-Blossom #111 (real): Rograkh, Son of Rohgahh role=creature phase=precombat_main locked_cost={} targets=-
+  PAY COST Najeela, the Blade-Blossom #111 (real): Rograkh, Son of Rohgahh cost={} mana 3->3 life 40->40 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 1, 'wildcard': 0}
+  CAST CREATURE Najeela, the Blade-Blossom #111 (real): Rograkh, Son of Rohgahh (CMC=0.0) [creature] phase=precombat_main cost={} rule=type_line_creature/fact
+  COMBAT Najeela, the Blade-Blossom #111 (real) -> Kaalia of the Vast: 1 attackers, 0 blockers, 0 gang blocks, 1 power (reason=evaluation_target_pressure, target_life=37)
+  DAMAGE Najeela, the Blade-Blossom #111 (real) -> Kaalia of the Vast: 1 player damage, target life 36, target_dead=False
+  END Najeela, the Blade-Blossom #111 (real): Life=40 Hand=5 Board=8 Grave=1 Discarded=0 HandCards=[Gamble, Demonic Consultation, Necropotence, Deflecting Swat, Wishclaw Talisman] Permanents=[Ancient Tomb, Tropical Island, Tinder Wall, Scalding Tarn, Noble Hierarch, Voice of Victory (tapped), Flooded Strand, Rograkh, Son of Rohgahh]
+
+TURN 7 - Dihada, Binder of Wills #29 (real) | Life=33 Hand=1 Board=10 HandCards=[Dance of the Dead]
+  MANA Dihada, Binder of Wills #29 (real): 13 available (6 sources, 7 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  ANNOUNCE Dihada, Binder of Wills #29 (real): Dance of the Dead role=normal phase=precombat_main locked_cost={generic=1, black=1} targets=-
+  PAY COST Dihada, Binder of Wills #29 (real): Dance of the Dead cost={generic=1, black=1} mana 13->11 life 33->33 life_paid=0 pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST Dihada, Binder of Wills #29 (real): Dance of the Dead (CMC=2.0) [passive] phase=precombat_main cost={generic=1, black=1} rule=known_cards_canonical_snapshot/review_only
+  RESOLVE SPELL Dihada, Binder of Wills #29 (real): Dance of the Dead (CMC=2.0) [passive] rule=known_cards_canonical_snapshot/review_only
+  ANNOUNCE Dihada, Binder of Wills #29 (real): Hoarding Broodlord role=normal phase=precombat_main locked_cost={generic=5, black=3} targets=-
+  LIFE Dihada, Binder of Wills #29 (real): event=conditional_mana_life_cost_paid card=Mana Confluence life=33->32
+  PAY COST Dihada, Binder of Wills #29 (real): Hoarding Broodlord cost={generic=5, black=3} mana 11->3 life 33->32 life_paid=1 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST Dihada, Binder of Wills #29 (real): Hoarding Broodlord (CMC=8.0) [tutor] phase=precombat_main cost={generic=5, black=3} rule=functional_tags_json/heuristic
+  RESOLVE SPELL Dihada, Binder of Wills #29 (real): Hoarding Broodlord (CMC=8.0) [tutor] rule=functional_tags_json/heuristic
+  TUTOR Dihada, Binder of Wills #29 (real): Hoarding Broodlord found Saw in Half (any)
+  ANNOUNCE Dihada, Binder of Wills #29 (real): Saw in Half role=normal phase=precombat_main locked_cost={generic=2, black=1} targets={'target': 'Kinnan, Bonder Prodigy', 'target_controller': 'Kinnan, Bonder Prodigy #120 (real)', 'target_type': 'creature', 'target_legal': True, 'targeting_pipeline': 'targeting_formal_minimal'}
+  PAY COST Dihada, Binder of Wills #29 (real): Saw in Half cost={generic=2, black=1} mana 3->0 life 32->32 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST Dihada, Binder of Wills #29 (real): Saw in Half (CMC=3.0) [remove_creature] phase=precombat_main cost={generic=2, black=1} rule=known_cards_canonical_snapshot/review_only
+  RESOLVE SPELL Dihada, Binder of Wills #29 (real): Saw in Half (CMC=3.0) [remove_creature] rule=known_cards_canonical_snapshot/review_only
+  REMOVAL Dihada, Binder of Wills #29 (real): Saw in Half removed Kinnan, Bonder Prodigy from Kinnan, Bonder Prodigy #120 (real)
+  COMBAT Dihada, Binder of Wills #29 (real) -> Kaalia of the Vast: 1 attackers, 0 blockers, 0 gang blocks, 1 power (reason=evaluation_target_pressure, target_life=36)
+  DAMAGE Dihada, Binder of Wills #29 (real) -> Kaalia of the Vast: 1 player damage, target life 35, target_dead=False
+  END Dihada, Binder of Wills #29 (real): Life=32 Hand=1 Board=10 Grave=9 Discarded=0 HandCards=[Simian Spirit Guide] Permanents=[Starting Town, Command Tower, Arcane Signet, Mana Confluence, Smothering Tithe, Fellwar Stone, Grim Monolith (tapped), Necropotence, Gemstone Caverns, Voice of Victory (tapped)]
+
+TURN 7 - Kinnan, Bonder Prodigy #120 (real) | Life=38 Hand=5 Board=7 HandCards=[Force of Will, Enduring Vitality, Subtlety, Nature's Rhythm, Hidden Strings]
+  MANA Kinnan, Bonder Prodigy #120 (real): 4 available (4 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  TRIGGER Dihada, Binder of Wills #29 (real): Smothering Tithe event=opponent_draw stack=12
+  RESOLVE ABILITY Dihada, Binder of Wills #29 (real): Smothering Tithe kind=opponent_draw
+  ANNOUNCE Kinnan, Bonder Prodigy #120 (real): Llanowar Elves role=creature phase=precombat_main locked_cost={green=1} targets=-
+  PAY COST Kinnan, Bonder Prodigy #120 (real): Llanowar Elves cost={green=1} mana 4->3 life 38->38 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST CREATURE Kinnan, Bonder Prodigy #120 (real): Llanowar Elves (CMC=1.0) [creature] phase=precombat_main cost={green=1} rule=curated/verified
+  ANNOUNCE Kinnan, Bonder Prodigy #120 (real): Enduring Vitality role=creature phase=precombat_main locked_cost={generic=1, green=2} targets=-
+  LIFE Kinnan, Bonder Prodigy #120 (real): event=conditional_mana_life_cost_paid card=Mana Confluence life=38->37
+  PAY COST Kinnan, Bonder Prodigy #120 (real): Enduring Vitality cost={generic=1, green=2} mana 3->0 life 38->37 life_paid=1 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST CREATURE Kinnan, Bonder Prodigy #120 (real): Enduring Vitality (CMC=3.0) [creature] phase=precombat_main cost={generic=1, green=2} rule=curated/verified
+  COMBAT Kinnan, Bonder Prodigy #120 (real) -> Kaalia of the Vast: 1 attackers, 0 blockers, 0 gang blocks, 2 power (reason=evaluation_target_pressure, target_life=35)
+  DAMAGE Kinnan, Bonder Prodigy #120 (real) -> Kaalia of the Vast: 2 player damage, target life 33, target_dead=False
+  END Kinnan, Bonder Prodigy #120 (real): Life=37 Hand=4 Board=9 Grave=1 Discarded=0 HandCards=[Force of Will, Subtlety, Nature's Rhythm, Hidden Strings] Permanents=[Scalding Tarn, Mana Confluence, Minamo, School at Water's Edge, Yavimaya Coast, Barkchannel Pathway, Flooded Strand, Faerie Mastermind (tapped), Llanowar Elves, Enduring Vitality]
+
+TURN 8 - Kaalia of the Vast | Life=33 Hand=7 Board=3 HandCards=[Archaeomancer's Map, Professional Face-Breaker, Smothering Tithe, Puresteel Paladin, Karlach, Fury of Avernus, Necropotence, Mjölnir, Hammer of Thor]
+  MANA Kaalia of the Vast: 2 available (2 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  TRIGGER Dihada, Binder of Wills #29 (real): Smothering Tithe event=opponent_draw stack=13
+  RESOLVE ABILITY Dihada, Binder of Wills #29 (real): Smothering Tithe kind=opponent_draw
+  END Kaalia of the Vast: Life=33 Hand=7 Board=3 Grave=3 Discarded=1 DiscardedCards=[Karlach, Fury of Avernus] HandCards=[Archaeomancer's Map, Professional Face-Breaker, Smothering Tithe, Puresteel Paladin, Necropotence, Mjölnir, Hammer of Thor, Trouble in Pairs] Permanents=[Swamp // Swamp, Elegant Parlor, Bloodstained Mire]
+
+TURN 8 - Najeela, the Blade-Blossom #111 (real) | Life=40 Hand=5 Board=8 HandCards=[Gamble, Demonic Consultation, Necropotence, Deflecting Swat, Wishclaw Talisman]
+  MANA Najeela, the Blade-Blossom #111 (real): 3 available (3 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 1, 'wildcard': 0})
+  TRIGGER Dihada, Binder of Wills #29 (real): Smothering Tithe event=opponent_draw stack=14
+  RESOLVE ABILITY Dihada, Binder of Wills #29 (real): Smothering Tithe kind=opponent_draw
+  ANNOUNCE Najeela, the Blade-Blossom #111 (real): Esper Sentinel role=normal phase=precombat_main locked_cost={white=1} targets=-
+  PAY COST Najeela, the Blade-Blossom #111 (real): Esper Sentinel cost={white=1} mana 3->2 life 40->40 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 1, 'wildcard': 0}
+  CAST Najeela, the Blade-Blossom #111 (real): Esper Sentinel (CMC=1.0) [draw_engine] phase=precombat_main cost={white=1} rule=curated/verified
+  RESOLVE SPELL Najeela, the Blade-Blossom #111 (real): Esper Sentinel (CMC=1.0) [draw_engine] rule=curated/verified
+  TRIGGER Dihada, Binder of Wills #29 (real): Smothering Tithe event=opponent_draw stack=15
+  RESOLVE ABILITY Dihada, Binder of Wills #29 (real): Smothering Tithe kind=opponent_draw
+  COMBAT Najeela, the Blade-Blossom #111 (real) -> Kaalia of the Vast: 2 attackers, 0 blockers, 0 gang blocks, 2 power (reason=evaluation_target_pressure, target_life=33)
+  DAMAGE Najeela, the Blade-Blossom #111 (real) -> Kaalia of the Vast: 2 player damage, target life 31, target_dead=False
+  END Najeela, the Blade-Blossom #111 (real): Life=40 Hand=7 Board=9 Grave=1 Discarded=0 HandCards=[Gamble, Demonic Consultation, Necropotence, Deflecting Swat, Wishclaw Talisman, Ragavan, Nimble Pilferer, City of Traitors] Permanents=[Ancient Tomb, Tropical Island, Tinder Wall, Scalding Tarn, Noble Hierarch, Voice of Victory (tapped), Flooded Strand, Rograkh, Son of Rohgahh (tapped), Esper Sentinel]
+
+TURN 8 - Dihada, Binder of Wills #29 (real) | Life=32 Hand=1 Board=10 HandCards=[Simian Spirit Guide]
+  MANA Dihada, Binder of Wills #29 (real): 10 available (6 sources, 4 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  PLAY LAND Dihada, Binder of Wills #29 (real): Sacred Foundry mana+=1 pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0} rule=curated/verified
+  COMBAT Dihada, Binder of Wills #29 (real) -> Kaalia of the Vast: 1 attackers, 0 blockers, 0 gang blocks, 1 power (reason=evaluation_target_pressure, target_life=31)
+  DAMAGE Dihada, Binder of Wills #29 (real) -> Kaalia of the Vast: 1 player damage, target life 30, target_dead=False
+  END Dihada, Binder of Wills #29 (real): Life=30 Hand=2 Board=11 Grave=9 Discarded=0 HandCards=[Simian Spirit Guide, Grinding Station] Permanents=[Starting Town, Command Tower, Arcane Signet, Mana Confluence, Smothering Tithe, Fellwar Stone, Grim Monolith (tapped), Necropotence, Gemstone Caverns, Voice of Victory (tapped), Sacred Foundry]
+
+TURN 8 - Kinnan, Bonder Prodigy #120 (real) | Life=37 Hand=4 Board=9 HandCards=[Force of Will, Subtlety, Nature's Rhythm, Hidden Strings]
+  MANA Kinnan, Bonder Prodigy #120 (real): 7 available (7 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 3})
+  TRIGGER Dihada, Binder of Wills #29 (real): Smothering Tithe event=opponent_draw stack=16
+  RESOLVE ABILITY Dihada, Binder of Wills #29 (real): Smothering Tithe kind=opponent_draw
+  PLAY LAND Kinnan, Bonder Prodigy #120 (real): Treasure Vault mana+=1 pool={'generic': 0, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 1, 'wildcard': 3} rule=curated/verified
+  ANNOUNCE Kinnan, Bonder Prodigy #120 (real): Kinnan, Bonder Prodigy role=commander phase=precombat_main locked_cost={generic=4, blue=1, green=1} targets=-
+  PAY COST Kinnan, Bonder Prodigy #120 (real): Kinnan, Bonder Prodigy cost={generic=4, blue=1, green=1} mana 8->2 life 37->37 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST COMMANDER Kinnan, Bonder Prodigy #120 (real): Kinnan, Bonder Prodigy (CMC=2.0) [creature] phase=precombat_main cost={generic=4, blue=1, green=1} rule=curated/verified
+  COMBAT Kinnan, Bonder Prodigy #120 (real) -> Kaalia of the Vast: 3 attackers, 0 blockers, 0 gang blocks, 6 power (reason=evaluation_target_pressure, target_life=30)
+  DAMAGE Kinnan, Bonder Prodigy #120 (real) -> Kaalia of the Vast: 6 player damage, target life 24, target_dead=False
+  END Kinnan, Bonder Prodigy #120 (real): Life=37 Hand=4 Board=11 Grave=1 Discarded=0 HandCards=[Force of Will, Subtlety, Nature's Rhythm, Hidden Strings] Permanents=[Scalding Tarn, Mana Confluence, Minamo, School at Water's Edge, Yavimaya Coast, Barkchannel Pathway, Flooded Strand, Faerie Mastermind (tapped), Llanowar Elves (tapped), Enduring Vitality, Treasure Vault, Kinnan, Bonder Prodigy (tapped)]
+
+TURN 9 - Kaalia of the Vast | Life=24 Hand=7 Board=3 HandCards=[Archaeomancer's Map, Professional Face-Breaker, Smothering Tithe, Puresteel Paladin, Necropotence, Mjölnir, Hammer of Thor, Trouble in Pairs]
+  MANA Kaalia of the Vast: 2 available (2 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  TRIGGER Dihada, Binder of Wills #29 (real): Smothering Tithe event=opponent_draw stack=17
+  RESOLVE ABILITY Dihada, Binder of Wills #29 (real): Smothering Tithe kind=opponent_draw
+  END Kaalia of the Vast: Life=24 Hand=7 Board=3 Grave=4 Discarded=1 DiscardedCards=[Puresteel Paladin] HandCards=[Archaeomancer's Map, Professional Face-Breaker, Smothering Tithe, Necropotence, Mjölnir, Hammer of Thor, Trouble in Pairs, Maskwood Nexus] Permanents=[Swamp // Swamp, Elegant Parlor, Bloodstained Mire]
+
+TURN 9 - Najeela, the Blade-Blossom #111 (real) | Life=40 Hand=7 Board=9 HandCards=[Gamble, Demonic Consultation, Necropotence, Deflecting Swat, Wishclaw Talisman, Ragavan, Nimble Pilferer, City of Traitors]
+  MANA Najeela, the Blade-Blossom #111 (real): 3 available (3 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 1, 'wildcard': 0})
+  TRIGGER Dihada, Binder of Wills #29 (real): Smothering Tithe event=opponent_draw stack=18
+  RESOLVE ABILITY Dihada, Binder of Wills #29 (real): Smothering Tithe kind=opponent_draw
+  PLAY LAND Najeela, the Blade-Blossom #111 (real): City of Traitors mana+=1 pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 1, 'wildcard': 0} rule=curated/verified
+  COMBAT Najeela, the Blade-Blossom #111 (real) -> Kaalia of the Vast: 3 attackers, 0 blockers, 0 gang blocks, 3 power (reason=evaluation_target_pressure, target_life=24)
+  DAMAGE Najeela, the Blade-Blossom #111 (real) -> Kaalia of the Vast: 3 player damage, target life 21, target_dead=False
+  END Najeela, the Blade-Blossom #111 (real): Life=40 Hand=7 Board=10 Grave=2 Discarded=1 DiscardedCards=[Wooded Foothills] HandCards=[Gamble, Demonic Consultation, Necropotence, Deflecting Swat, Wishclaw Talisman, Ragavan, Nimble Pilferer, Knuckles the Echidna] Permanents=[Ancient Tomb, Tropical Island, Tinder Wall, Scalding Tarn, Noble Hierarch, Voice of Victory (tapped), Flooded Strand, Rograkh, Son of Rohgahh (tapped), Esper Sentinel (tapped), City of Traitors]
+
+TURN 9 - Dihada, Binder of Wills #29 (real) | Life=30 Hand=2 Board=11 HandCards=[Simian Spirit Guide, Grinding Station]
+  MANA Dihada, Binder of Wills #29 (real): 14 available (7 sources, 7 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  ANNOUNCE Dihada, Binder of Wills #29 (real): Vexing Bauble role=normal phase=precombat_main locked_cost={generic=1} targets=-
+  PAY COST Dihada, Binder of Wills #29 (real): Vexing Bauble cost={generic=1} mana 14->13 life 30->30 life_paid=0 pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST Dihada, Binder of Wills #29 (real): Vexing Bauble (CMC=1.0) [hate_artifact] phase=precombat_main cost={generic=1} rule=curated/verified
+  TRIGGER Najeela, the Blade-Blossom #111 (real): Esper Sentinel event=opponent_noncreature_spell stack=19
+  RESOLVE ABILITY Najeela, the Blade-Blossom #111 (real): Esper Sentinel kind=opponent_noncreature_spell trigger_spell=Vexing Bauble
+  RESOLVE SPELL Dihada, Binder of Wills #29 (real): Vexing Bauble (CMC=1.0) [hate_artifact] rule=curated/verified
+  ANNOUNCE Dihada, Binder of Wills #29 (real): Grinding Station role=normal phase=precombat_main locked_cost={generic=2} targets=-
+  PAY COST Dihada, Binder of Wills #29 (real): Grinding Station cost={generic=2} mana 12->10 life 30->30 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST Dihada, Binder of Wills #29 (real): Grinding Station (CMC=2.0) [mill_engine] phase=precombat_main cost={generic=2} rule=curated/verified
+  RESOLVE SPELL Dihada, Binder of Wills #29 (real): Grinding Station (CMC=2.0) [mill_engine] rule=curated/verified
+  COMBAT Dihada, Binder of Wills #29 (real) -> Kaalia of the Vast: 1 attackers, 0 blockers, 0 gang blocks, 1 power (reason=evaluation_target_pressure, target_life=21)
+  DAMAGE Dihada, Binder of Wills #29 (real) -> Kaalia of the Vast: 1 player damage, target life 20, target_dead=False
+  ACTIVATE Dihada, Binder of Wills #29 (real): Grinding Station kind=tap_sacrifice_artifact_target_player_mill mana_paid=-
+  END Dihada, Binder of Wills #29 (real): Life=30 Hand=2 Board=12 Grave=10 Discarded=0 HandCards=[Simian Spirit Guide, Underworld Breach] Permanents=[Starting Town, Command Tower, Arcane Signet, Mana Confluence, Smothering Tithe, Fellwar Stone, Grim Monolith (tapped), Necropotence, Gemstone Caverns, Voice of Victory (tapped), Sacred Foundry, Grinding Station (tapped)]
+
+TURN 9 - Kinnan, Bonder Prodigy #120 (real) | Life=37 Hand=4 Board=11 HandCards=[Force of Will, Subtlety, Nature's Rhythm, Hidden Strings]
+  MANA Kinnan, Bonder Prodigy #120 (real): 9 available (9 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 1, 'wildcard': 3})
+  TRIGGER Dihada, Binder of Wills #29 (real): Smothering Tithe event=opponent_draw stack=20
+  RESOLVE ABILITY Dihada, Binder of Wills #29 (real): Smothering Tithe kind=opponent_draw
+  PLAY LAND Kinnan, Bonder Prodigy #120 (real): Ancient Tomb mana+=1 pool={'generic': 0, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 2, 'wildcard': 3} rule=curated/verified
+  ANNOUNCE Kinnan, Bonder Prodigy #120 (real): Subtlety role=creature phase=precombat_main locked_cost={generic=2, blue=2} targets=-
+  PAY COST Kinnan, Bonder Prodigy #120 (real): Subtlety cost={generic=2, blue=2} mana 10->6 life 37->37 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 2}
+  CAST CREATURE Kinnan, Bonder Prodigy #120 (real): Subtlety (CMC=4.0) [creature] phase=precombat_main cost={generic=2, blue=2} rule=type_line_creature/fact
+  COMBAT Kinnan, Bonder Prodigy #120 (real) -> Kaalia of the Vast: 4 attackers, 0 blockers, 0 gang blocks, 8 power (reason=evaluation_target_pressure, target_life=20)
+  DAMAGE Kinnan, Bonder Prodigy #120 (real) -> Kaalia of the Vast: 8 player damage, target life 12, target_dead=False
+  END Kinnan, Bonder Prodigy #120 (real): Life=37 Hand=3 Board=13 Grave=1 Discarded=0 HandCards=[Force of Will, Nature's Rhythm, Hidden Strings] Permanents=[Scalding Tarn, Mana Confluence, Minamo, School at Water's Edge, Yavimaya Coast, Barkchannel Pathway, Flooded Strand, Faerie Mastermind (tapped), Llanowar Elves (tapped), Enduring Vitality, Treasure Vault, Kinnan, Bonder Prodigy (tapped), Ancient Tomb, +1 more]
+
+TURN 10 - Kaalia of the Vast | Life=12 Hand=7 Board=3 HandCards=[Archaeomancer's Map, Professional Face-Breaker, Smothering Tithe, Necropotence, Mjölnir, Hammer of Thor, Trouble in Pairs, Maskwood Nexus]
+  MANA Kaalia of the Vast: 2 available (2 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  TRIGGER Dihada, Binder of Wills #29 (real): Smothering Tithe event=opponent_draw stack=21
+  RESOLVE ABILITY Dihada, Binder of Wills #29 (real): Smothering Tithe kind=opponent_draw
+  PLAY LAND Kaalia of the Vast: Plains // Plains mana+=1 pool={'generic': 0, 'white': 1, 'blue': 0, 'black': 1, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0} rule=curated/verified
+  ANNOUNCE Kaalia of the Vast: Archaeomancer's Map role=ramp phase=precombat_main locked_cost={generic=2, white=1} targets=-
+  PAY COST Kaalia of the Vast: Archaeomancer's Map cost={generic=2, white=1} mana 3->0 life 12->12 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST Kaalia of the Vast: Archaeomancer's Map (CMC=3.0) [ramp_engine] phase=precombat_main cost={generic=2, white=1} rule=curated/active
+  TUTOR Kaalia of the Vast: Archaeomancer's Map found Plains // Plains (basic_plains)
+  TRIGGER Najeela, the Blade-Blossom #111 (real): Esper Sentinel event=opponent_noncreature_spell stack=22
+  RESOLVE ABILITY Najeela, the Blade-Blossom #111 (real): Esper Sentinel kind=opponent_noncreature_spell trigger_spell=Archaeomancer's Map
+  TRIGGER Dihada, Binder of Wills #29 (real): Smothering Tithe event=opponent_draw stack=23
+  RESOLVE ABILITY Dihada, Binder of Wills #29 (real): Smothering Tithe kind=opponent_draw
+  CAST INSTANT Najeela, the Blade-Blossom #111 (real): Intuition (CMC=3.0) [tutor] phase=end_step cost={generic=2, blue=1} rule=curated/verified
+  RESOLVE SPELL Najeela, the Blade-Blossom #111 (real): Intuition (CMC=3.0) [tutor] rule=curated/verified
+  TUTOR Najeela, the Blade-Blossom #111 (real): Intuition found Snap (any)
+  END Kaalia of the Vast: Life=12 Hand=7 Board=5 Grave=5 Discarded=1 DiscardedCards=[Plains // Plains] HandCards=[Professional Face-Breaker, Smothering Tithe, Necropotence, Mjölnir, Hammer of Thor, Trouble in Pairs, Maskwood Nexus, Plains // Plains] Permanents=[Swamp // Swamp, Elegant Parlor, Bloodstained Mire, Plains // Plains, Archaeomancer's Map]
+
+TURN 10 - Najeela, the Blade-Blossom #111 (real) | Life=40 Hand=8 Board=10 HandCards=[Gamble, Demonic Consultation, Necropotence, Deflecting Swat, Wishclaw Talisman, Ragavan, Nimble Pilferer, Knuckles the Echidna, Snap]
+  MANA Najeela, the Blade-Blossom #111 (real): 4 available (4 sources, 0 treasures, pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 1, 'wildcard': 0})
+  TRIGGER Dihada, Binder of Wills #29 (real): Smothering Tithe event=opponent_draw stack=24
+  RESOLVE ABILITY Dihada, Binder of Wills #29 (real): Smothering Tithe kind=opponent_draw
+  ANNOUNCE Najeela, the Blade-Blossom #111 (real): Mana Vault role=ramp phase=precombat_main locked_cost={generic=1} targets=-
+  PAY COST Najeela, the Blade-Blossom #111 (real): Mana Vault cost={generic=1} mana 4->3 life 40->40 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 1, 'wildcard': 0}
+  CAST Najeela, the Blade-Blossom #111 (real): Mana Vault (CMC=1.0) [ramp_permanent] phase=precombat_main cost={generic=1} rule=curated/active
+  ANNOUNCE Najeela, the Blade-Blossom #111 (real): Snap role=normal phase=precombat_main locked_cost={generic=1, blue=1} targets={'target': 'Voice of Victory', 'target_controller': 'Dihada, Binder of Wills #29 (real)', 'target_type': 'creature', 'target_legal': True, 'targeting_pipeline': 'targeting_formal_minimal'}
+  PAY COST Najeela, the Blade-Blossom #111 (real): Snap cost={generic=1, blue=1} mana 6->4 life 40->40 life_paid=0 pool={'generic': 0, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 3, 'wildcard': 0}
+  CAST Najeela, the Blade-Blossom #111 (real): Snap (CMC=2.0) [remove_creature] phase=precombat_main cost={generic=1, blue=1} rule=curated/verified
+  RESOLVE SPELL Najeela, the Blade-Blossom #111 (real): Snap (CMC=2.0) [remove_creature] rule=curated/verified
+  REMOVAL Najeela, the Blade-Blossom #111 (real): Snap removed Voice of Victory from Najeela, the Blade-Blossom #111 (real)
+  COMBAT Najeela, the Blade-Blossom #111 (real) -> Kaalia of the Vast: 2 attackers, 0 blockers, 0 gang blocks, 2 power (reason=evaluation_target_pressure, target_life=12)
+  DAMAGE Najeela, the Blade-Blossom #111 (real) -> Kaalia of the Vast: 2 player damage, target life 10, target_dead=False
+  END Najeela, the Blade-Blossom #111 (real): Life=40 Hand=7 Board=10 Grave=9 Discarded=1 DiscardedCards=[Knuckles the Echidna] HandCards=[Gamble, Demonic Consultation, Necropotence, Deflecting Swat, Wishclaw Talisman, Ragavan, Nimble Pilferer, Demonic Tutor] Permanents=[Ancient Tomb, Tropical Island, Tinder Wall, Scalding Tarn, Noble Hierarch, Flooded Strand, Rograkh, Son of Rohgahh (tapped), Esper Sentinel (tapped), City of Traitors, Mana Vault (tapped)]
+
+TURN 10 - Dihada, Binder of Wills #29 (real) | Life=30 Hand=2 Board=12 HandCards=[Simian Spirit Guide, Underworld Breach]
+  MANA Dihada, Binder of Wills #29 (real): 18 available (7 sources, 11 treasures, pool={'generic': 2, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0})
+  ACTIVATE Dihada, Binder of Wills #29 (real): Grinding Station kind=tap_sacrifice_artifact_target_player_mill mana_paid=-
+  ANNOUNCE Dihada, Binder of Wills #29 (real): Underworld Breach role=normal phase=precombat_main locked_cost={generic=1, red=1} targets=-
+  PAY COST Dihada, Binder of Wills #29 (real): Underworld Breach cost={generic=1, red=1} mana 18->16 life 30->30 life_paid=0 pool={'generic': 1, 'white': 0, 'blue': 0, 'black': 0, 'red': 0, 'green': 0, 'colorless': 0, 'wildcard': 0}
+  CAST Dihada, Binder of Wills #29 (real): Underworld Breach (CMC=2.0) [passive] phase=precombat_main cost={generic=1, red=1} rule=curated/verified
+  TRIGGER Najeela, the Blade-Blossom #111 (real): Esper Sentinel event=opponent_noncreature_spell stack=25
+  RESOLVE ABILITY Najeela, the Blade-Blossom #111 (real): Esper Sentinel kind=opponent_noncreature_spell trigger_spell=Underworld Breach
+  RESOLVE SPELL Dihada, Binder of Wills #29 (real): Underworld Breach (CMC=2.0) [passive] rule=curated/verified
+  COMBAT Dihada, Binder of Wills #29 (real) -> Kaalia of the Vast: 1 attackers, 0 blockers, 0 gang blocks, 1 power (reason=evaluation_target_pressure, target_life=10)
+  DAMAGE Dihada, Binder of Wills #29 (real) -> Kaalia of the Vast: 1 player damage, target life 9, target_dead=False
+  END Dihada, Binder of Wills #29 (real): Life=30 Hand=3 Board=12 Grave=11 Discarded=0 HandCards=[Simian Spirit Guide, Deflecting Swat, Esper Sentinel] Permanents=[Starting Town, Command Tower, Mana Confluence, Smothering Tithe, Fellwar Stone, Grim Monolith (tapped), Necropotence, Gemstone Caverns, Voice of Victory (tapped), Sacred Foundry, Grinding Station (tapped), Underworld Breach]
+
+TURN 10 - Kinnan, Bonder Prodigy #120 (real) | Life=37 Hand=3 Board=13 HandCards=[Force of Will, Nature's Rhythm, Hidden Strings]
+  MANA Kinnan, Bonder Prodigy #120 (real): 11 available (11 sources, 0 treasures, pool={'generic': 0, 'white': 0, 'blue': 1, 'black': 0, 'red': 0, 'green': 0, 'colorless': 2, 'wildcard': 4})
+  TRIGGER Dihada, Binder of Wills #29 (real): Smothering Tithe event=opponent_draw stack=26
+  RESOLVE ABILITY Dihada, Binder of Wills #29 (real): Smothering Tithe kind=opponent_draw
+  COMBAT Kinnan, Bonder Prodigy #120 (real) -> Kaalia of the Vast: 5 attackers, 0 blockers, 0 gang blocks, 11 power (reason=lethal, target_life=9)
+  DAMAGE Kinnan, Bonder Prodigy #120 (real) -> Kaalia of the Vast: 11 player damage, target life -2, target_dead=True
+  >>> DIED: Kaalia of the Vast (life_zero) <<<
+
+GAME OVER - Turn 10
+  >>> WIN: Najeela, the Blade-Blossom #111 (real) (elimination) turn 10 <<<
+Winner: Najeela, the Blade-Blossom #111 (real) (elimination)
+Kaalia of the Vast: DEAD Life=-2 Hand=7 HandCards=[Professional Face-Breaker, Smothering Tithe, Necropotence, Mjölnir, Hammer of Thor, Trouble in Pairs, Maskwood Nexus, Plains // Plains]
+Najeela, the Blade-Blossom #111 (real): ALIVE Life=40 Hand=7 HandCards=[Gamble, Demonic Consultation, Necropotence, Deflecting Swat, Wishclaw Talisman, Ragavan, Nimble Pilferer, Demonic Tutor]
+Dihada, Binder of Wills #29 (real): ALIVE Life=30 Hand=3 HandCards=[Simian Spirit Guide, Deflecting Swat, Esper Sentinel]
+Kinnan, Bonder Prodigy #120 (real): ALIVE Life=37 Hand=4 HandCards=[Force of Will, Nature's Rhythm, Hidden Strings, Drift of Phantasms]
