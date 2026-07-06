@@ -163,8 +163,8 @@ Essas variáveis não são lidas diretamente pelo app em runtime no EasyPanel, m
    - ação `services.app.deployService`
 5. Validar no domínio publicado:
    - `bash scripts/validate_request_id_ready.sh`
-   - `curl -fsS https://evolution-cartinhas.8ktevp.easypanel.host/health`
-   - `curl -fsS https://evolution-cartinhas.8ktevp.easypanel.host/ready`
+   - `curl -fsS https://evolution-cartinhas.2ta7qx.easypanel.host/health`
+   - `curl -fsS https://evolution-cartinhas.2ta7qx.easypanel.host/ready`
 6. Confirmar logs e ausência de segredos em payloads de erro.
 
 Precondição para o script:

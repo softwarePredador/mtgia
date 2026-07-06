@@ -28,9 +28,11 @@ XMAGE_FLOW = DOCS_DIR / "XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md"
 BATTLE_RULES_CONTRACT = DOCS_DIR / "BATTLE_RULES_FAMILY_PIPELINE_CONTRACT_2026-06-29.md"
 DECKBUILDING_CONTRACT = DOCS_DIR / "COMMANDER_DECKBUILDING_CONTRACT_2026-06-29.md"
 APP_AI_BRIDGE_CONTRACT = DOCS_DIR / "APP_AI_KNOWLEDGE_BRIDGE_CONTRACT_2026-07-06.md"
+NEW_SERVER_POSTGRES_WORKFLOW = DOCS_DIR / "NEW_SERVER_POSTGRES_WORKFLOW_2026-07-06.md"
 XMAGE_AUDIT = SCRIPT_DIR / "xmage_strategy_consistency_audit.py"
 DECKBUILDING_AUDIT = SCRIPT_DIR / "deckbuilding_contract_surface_audit.py"
 APP_AI_BRIDGE_AUDIT = SCRIPT_DIR / "app_ai_knowledge_bridge_audit.py"
+OLD_SERVER_REFERENCE_AUDIT = SCRIPT_DIR / "old_server_reference_audit.py"
 LOREHOLD_ARTIFACT_AUDIT = SCRIPT_DIR / "lorehold_artifact_contract_audit.py"
 LOREHOLD_PROMOTION_DECISION_AUDIT = SCRIPT_DIR / "lorehold_promotion_gate_decision_audit.py"
 VARIANT_MATRIX = SCRIPT_DIR / "lorehold_variant_strategy_matrix.py"
@@ -55,6 +57,7 @@ UNIVERSAL_OPTIMIZER = SCRIPT_DIR / "universal_optimizer.py"
 ROUTE_GENERATE = REPO_ROOT / "server" / "routes" / "ai" / "generate" / "index.dart"
 DECKBUILDING_SUPPORT = REPO_ROOT / "server" / "lib" / "ai" / "commander_deckbuilding_contract_support.dart"
 QUALITY_GATE = REPO_ROOT / "scripts" / "quality_gate.sh"
+OLD_SERVER_REFERENCE_WRAPPER = REPO_ROOT / "scripts" / "manaloom_old_server_reference_audit.sh"
 LEGACY_CONTAMINATION_BASELINE = DOCS_DIR / "LEGACY_CONTAMINATION_BASELINE_2026-06-30.json"
 
 CURRENT_XMAGE_MANIFEST = (
@@ -148,7 +151,9 @@ def build_checks() -> list[Check]:
                 "MANALOOM_OPERATIONAL_LOOKUP_GUIDE_2026-06-30.md",
                 "MANALOOM_FAILURE_MODE_VALIDATION_MATRIX_2026-06-30.md",
                 "APP_AI_KNOWLEDGE_BRIDGE_CONTRACT_2026-07-06.md",
+                "NEW_SERVER_POSTGRES_WORKFLOW_2026-07-06.md",
                 "app_ai_knowledge_bridge_audit.py",
+                "old_server_reference_audit.py",
                 "legacy_contamination_audit.py",
                 CURRENT_XMAGE_MANIFEST,
                 "global_commander_deck_contract_audit.py",
@@ -194,6 +199,23 @@ def build_checks() -> list[Check]:
                 "./scripts/quality_gate.sh ai-bridge",
             ],
             "docs.app_ai_bridge_contract_exists",
+        ),
+        check_contains(
+            NEW_SERVER_POSTGRES_WORKFLOW,
+            [
+                "Status: `current_operational_target`",
+                "evolution-cartinhas.2ta7qx.easypanel.host",
+                "137.184.5.11",
+                "server/bin/with_new_server_pg.sh",
+                "evolution_manaloom-postgres:5432/halder",
+                "127.0.0.1:15432/halder",
+                "historical-only quarantine",
+                "evolution-cartinhas.8ktevp.easypanel.host",
+                "143.198.230.247",
+                ".credentials.env",
+                "./scripts/quality_gate.sh server-target",
+            ],
+            "docs.new_server_workflow_quarantines_old_target",
         ),
         check_contains(
             XMAGE_FLOW,
@@ -263,12 +285,33 @@ def build_checks() -> list[Check]:
             "scripts.app_ai_bridge_audit_blocks_report_only_knowledge",
         ),
         check_contains(
+            OLD_SERVER_REFERENCE_AUDIT,
+            [
+                "OLD_SERVER_FORBIDDEN_SNIPPETS",
+                "ACTIVE_DIRECTORIES",
+                "NEW_SERVER_DOC_REQUIRED_SNIPPETS",
+                "active_runtime_files_have_no_old_server_references",
+            ],
+            "scripts.old_server_reference_audit_blocks_old_operational_targets",
+        ),
+        check_contains(
+            OLD_SERVER_REFERENCE_WRAPPER,
+            [
+                "old_server_reference_audit.py",
+                "MANALOOM_OLD_SERVER_AUDIT_OUT_PREFIX",
+            ],
+            "scripts.old_server_reference_audit_wrapper_exists",
+        ),
+        check_contains(
             QUALITY_GATE,
             [
                 "run_app_ai_bridge",
                 "ai-bridge",
                 "manaloom_app_ai_bridge_audit.sh",
                 "run_ai_prompt_eval",
+                "run_old_server_reference_audit",
+                "server-target",
+                "manaloom_old_server_reference_audit.sh",
             ],
             "scripts.quality_gate_exposes_app_ai_bridge",
         ),

@@ -482,11 +482,15 @@ POST /ai/archetypes           // Detectar arquétipos
 
 ### Banco de Dados
 ```
-Host: 143.198.230.247
-Port: 5433
+Host: evolution_manaloom-postgres
+Port: 5432
 Database: halder
 User: postgres
 ```
+
+Para trabalho local no PostgreSQL atual do ManaLoom, use sempre
+`server/bin/with_new_server_pg.sh`; o tunnel local exposto pelo wrapper usa
+`127.0.0.1:15432/halder`.
 
 ---
 

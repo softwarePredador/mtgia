@@ -109,3 +109,22 @@ python3 docs/hermes-analysis/manaloom-knowledge/scripts/legacy_contamination_aud
   `PGUSER`, and `PGPASSWORD` only inside the child process.
 - PostgreSQL remains the product source of truth; Hermes SQLite remains cache
   and audit/runtime evidence.
+
+## Historical-only Quarantine
+
+These old targets are historical-only quarantine markers. They may appear in
+audit evidence explaining past migration work, but must not appear as active
+runtime defaults, agent instructions, tests, runbooks, deploy commands, or local
+PostgreSQL entrypoints:
+
+- `evolution-cartinhas.8ktevp.easypanel.host`
+- `143.198.230.247`
+- PostgreSQL port `5433`
+- `.credentials.env`
+
+Run this guard before handing work to another agent or before changing
+deployment/database defaults:
+
+```bash
+./scripts/quality_gate.sh server-target
+```

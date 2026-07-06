@@ -44,6 +44,21 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     prompt/recomendacao:
     `./scripts/quality_gate.sh ai-bridge`.
 
+- `NEW_SERVER_POSTGRES_WORKFLOW_2026-07-06.md`
+  - Status: `current_operational_target`.
+  - Define o servidor EasyPanel atual
+    `evolution-cartinhas.2ta7qx.easypanel.host`, o IP `137.184.5.11`, o
+    PostgreSQL interno `evolution_manaloom-postgres:5432/halder` e o tunnel
+    local `127.0.0.1:15432/halder`.
+  - Regra principal: toda operacao PostgreSQL atual deve passar por
+    `server/bin/with_new_server_pg.sh`; alvo antigo, porta antiga e
+    arquivo legado de credenciais sao quarentena historica, nao caminho
+    operacional.
+  - Auditoria ativa:
+    `manaloom-knowledge/scripts/old_server_reference_audit.py`.
+  - Gate recomendado antes de deploy, handoff ou ajuste de env:
+    `./scripts/quality_gate.sh server-target`.
+
 ## Contrato de dados / aliases
 
 - `DATA_FIELD_ALIAS_CONTRACT_2026-06-30.md`

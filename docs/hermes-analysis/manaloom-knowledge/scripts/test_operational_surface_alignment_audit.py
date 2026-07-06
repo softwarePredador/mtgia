@@ -26,6 +26,14 @@ class OperationalSurfaceAlignmentAuditTests(unittest.TestCase):
             "scripts.app_ai_bridge_audit_blocks_report_only_knowledge",
             check_names,
         )
+        self.assertIn(
+            "docs.new_server_workflow_quarantines_old_target",
+            check_names,
+        )
+        self.assertIn(
+            "scripts.old_server_reference_audit_blocks_old_operational_targets",
+            check_names,
+        )
 
     def test_forbidden_stale_snippet_fails(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:

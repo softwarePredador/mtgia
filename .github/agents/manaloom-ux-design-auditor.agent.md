@@ -779,7 +779,7 @@ When auditing Android:
 2. Check git status.
 3. Connect physical device.
 4. Use production backend:
-    https://evolution-cartinhas.8ktevp.easypanel.host
+    https://evolution-cartinhas.2ta7qx.easypanel.host
 5. Authenticate with QA account.
 6. Navigate real screens.
 7. Capture real screenshots.

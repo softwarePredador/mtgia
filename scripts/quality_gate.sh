@@ -96,9 +96,20 @@ run_ai_prompt_eval() {
 }
 
 run_app_ai_bridge() {
+  run_old_server_reference_audit
   print_header "App AI knowledge bridge audit"
   "$ROOT_DIR/scripts/manaloom_app_ai_bridge_audit.sh"
   run_ai_prompt_eval
+}
+
+run_old_server_reference_audit() {
+  print_header "ManaLoom server target audit"
+  "$ROOT_DIR/scripts/manaloom_old_server_reference_audit.sh"
+}
+
+run_deep_ai_alignment() {
+  print_header "ManaLoom deep AI alignment tester"
+  "$ROOT_DIR/scripts/manaloom_deep_ai_alignment_tester.sh"
 }
 
 ensure_cmd() {
@@ -121,6 +132,8 @@ Uso:
   ./scripts/quality_gate.sh resolution # gate recorrente do corpus de resolução
   ./scripts/quality_gate.sh ai-eval # eval fixa de prompt/saída da IA Commander
   ./scripts/quality_gate.sh ai-bridge # ponte app/IA: auditoria + eval Commander
+  ./scripts/quality_gate.sh server-target # bloqueia referencias ativas ao servidor antigo
+  ./scripts/quality_gate.sh deep-ai # tester profundo IA + dados + battle/deckbuilder
 
 Dica:
   Use 'quick' durante implementação e 'full' antes de concluir item/sprint.
@@ -135,6 +148,8 @@ Exemplos:
   ./scripts/quality_gate.sh resolution
   ./scripts/quality_gate.sh ai-eval
   ./scripts/quality_gate.sh ai-bridge
+  ./scripts/quality_gate.sh server-target
+  ./scripts/quality_gate.sh deep-ai
 EOF
 }
 
@@ -158,6 +173,12 @@ main() {
       ;;
     ai-bridge)
       run_app_ai_bridge
+      ;;
+    server-target)
+      run_old_server_reference_audit
+      ;;
+    deep-ai)
+      run_deep_ai_alignment
       ;;
     -h|--help|help)
       print_usage

@@ -43,7 +43,7 @@ def test_desired_env_for_manaloom_ops_matches_cutover_contract() -> None:
         "manaloom-ops",
         {
             "DB_HOST": "db.example",
-            "DB_PORT": "5433",
+            "DB_PORT": "5432",
             "DB_NAME": "mana",
             "DB_USER": "postgres",
             "DB_PASS": "secret",
@@ -59,7 +59,7 @@ def test_desired_env_for_manaloom_ops_matches_cutover_contract() -> None:
     assert desired["HERMES_KNOWLEDGE_DB"] == "/data/manaloom-ops/knowledge.db"
     assert desired["MANALOOM_KNOWLEDGE_DB"] == "/data/manaloom-ops/knowledge.db"
     assert desired["DB_HOST"] == "db.example"
-    assert desired["DB_PORT"] == "5433"
+    assert desired["DB_PORT"] == "5432"
     assert desired["DB_NAME"] == "mana"
     assert desired["DB_USER"] == "postgres"
     assert desired["DB_PASS"] == "secret"
