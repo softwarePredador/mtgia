@@ -6670,7 +6670,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertTrue(effect["activation_requires_sacrifice"])
         self.assertTrue(effect["activated_self_sacrifice_life_gain"])
 
-    def test_permanent_activated_life_gain_blocks_target_sacrifice_cost(self) -> None:
+    def test_permanent_activated_life_gain_maps_target_sacrifice_cost(self) -> None:
         row = queue_row(
             split.LIFE_UNIT,
             effect_classes=["GainLifeEffect"],
@@ -6695,8 +6695,46 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             """,
         )
 
-        self.assertIsNone(proposal)
-        self.assertEqual(reason, "activated_life_gain_oracle_cost_not_supported")
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_LIFE_GAIN_SCOPE)
+        self.assertEqual(effect["life_gain_amount"], 3)
+        self.assertEqual(effect["activation_cost_mana"], "{1}")
+        self.assertEqual(effect["activation_cost_generic"], 1)
+        self.assertEqual(effect["activation_sacrifice_target"], "creature")
+        self.assertTrue(effect["activation_requires_sacrifice_target"])
+        self.assertFalse(effect["activation_requires_sacrifice"])
+
+    def test_permanent_activated_life_gain_maps_subtype_sacrifice_cost(self) -> None:
+        row = queue_row(
+            split.LIFE_UNIT,
+            effect_classes=["GainLifeEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Ravenous Baloth",
+                type_line="Creature - Beast",
+                oracle_text="Sacrifice a Beast: You gain 4 life.",
+            ),
+            source_text="""
+                private static final FilterControlledPermanent filter =
+                    new FilterControlledPermanent(SubType.BEAST, "a Beast");
+                this.addAbility(new SimpleActivatedAbility(
+                    new GainLifeEffect(4),
+                    new SacrificeTargetCost(filter)));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "creature")
+        self.assertEqual(effect["life_gain_amount"], 4)
+        self.assertEqual(effect["activation_sacrifice_target"], "beast")
+        self.assertTrue(effect["activation_requires_sacrifice_target"])
 
     def test_permanent_activated_life_gain_blocks_dynamic_amount(self) -> None:
         row = queue_row(

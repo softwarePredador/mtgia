@@ -913,6 +913,117 @@ def register_tests(battle, player, card):
         assert target in active.hand
         assert non_target in active.library
 
+    def test_claws_of_gix_life_gain_sacrifices_target_permanent_cost():
+        active = player("Active")
+        active.life = 37
+        active.mana_pool.add_generic(1)
+        claws = battle.enrich_card(
+            {
+                "name": "Claws of Gix",
+                "cmc": 0,
+                "type_line": "Artifact",
+                "effect": "artifact",
+                "battle_model_scope": "xmage_permanent_simple_activated_life_gain_v1",
+                "activated_battle_model_scope": "xmage_permanent_simple_activated_life_gain_v1",
+                "activated_effect": "controller_gain_life",
+                "life_gain_amount": 1,
+                "activated_life_gain_amount": 1,
+                "activation_cost_mana": "{1}",
+                "activation_cost_generic": 1,
+                "activation_cost_colors": [],
+                "activation_requires_tap": False,
+                "activation_requires_sacrifice": False,
+                "activation_sacrifice_target": "permanent",
+                "activation_requires_sacrifice_target": True,
+            }
+        )
+        servo = {
+            "name": "Servo Token",
+            "type_line": "Artifact Creature - Servo",
+            "effect": "creature",
+            "token": True,
+            "is_token": True,
+            "power": 1,
+            "toughness": 1,
+        }
+        active.battlefield = [claws, servo]
+
+        activations = battle.activate_utility_artifacts(
+            active,
+            [],
+            [active],
+            turn=10,
+            rng=random.Random(575),
+            phase="precombat_main",
+        )
+
+        assert activations == 1
+        assert active.life == 38
+        assert claws in active.battlefield
+        assert servo not in active.battlefield
+        assert servo not in active.graveyard
+
+    def test_ravenous_baloth_life_gain_sacrifices_beast_only():
+        active = player("Active")
+        active.life = 34
+        baloth = battle.enrich_card(
+            {
+                "name": "Ravenous Baloth",
+                "cmc": 4,
+                "type_line": "Creature - Beast",
+                "effect": "creature",
+                "power": 4,
+                "toughness": 4,
+                "summoning_sick": False,
+                "battle_model_scope": "xmage_permanent_simple_activated_life_gain_v1",
+                "activated_battle_model_scope": "xmage_permanent_simple_activated_life_gain_v1",
+                "activated_effect": "controller_gain_life",
+                "life_gain_amount": 4,
+                "activated_life_gain_amount": 4,
+                "activation_cost_mana": "{0}",
+                "activation_cost_generic": 0,
+                "activation_cost_colors": [],
+                "activation_requires_tap": False,
+                "activation_requires_sacrifice": False,
+                "activation_sacrifice_target": "beast",
+                "activation_requires_sacrifice_target": True,
+            }
+        )
+        beast_token = {
+            "name": "Beast Token",
+            "type_line": "Creature - Beast",
+            "effect": "creature",
+            "token": True,
+            "is_token": True,
+            "power": 3,
+            "toughness": 3,
+        }
+        elf = {
+            "name": "Elf Token",
+            "type_line": "Creature - Elf",
+            "effect": "creature",
+            "token": True,
+            "is_token": True,
+            "power": 1,
+            "toughness": 1,
+        }
+        active.battlefield = [baloth, elf, beast_token]
+
+        activations = battle.activate_utility_artifacts(
+            active,
+            [],
+            [active],
+            turn=10,
+            rng=random.Random(576),
+            phase="precombat_main",
+        )
+
+        assert activations == 1
+        assert active.life == 38
+        assert baloth in active.battlefield
+        assert beast_token not in active.battlefield
+        assert elf in active.battlefield
+
     def test_weathered_wayfarer_activated_tutor_requires_opponent_more_lands():
         active = player("Active")
         opponent = player("Opponent")
@@ -1319,6 +1430,8 @@ def register_tests(battle, player, card):
         test_captain_sisay_activated_tutor_finds_legendary_card_only,
         test_captain_sisay_activated_tutor_blocks_summoning_sick_creature,
         test_dragonstorm_forecaster_activated_tutor_respects_target_names,
+        test_claws_of_gix_life_gain_sacrifices_target_permanent_cost,
+        test_ravenous_baloth_life_gain_sacrifices_beast_only,
         test_weathered_wayfarer_activated_tutor_requires_opponent_more_lands,
         test_spellseeker_etb_finds_cheap_instant_or_sorcery_only,
         test_trophy_mage_etb_finds_artifact_with_mana_value_three_only,

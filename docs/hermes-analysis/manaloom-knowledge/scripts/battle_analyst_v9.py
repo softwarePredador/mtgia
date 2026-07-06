@@ -19912,6 +19912,10 @@ def activation_sacrifice_target_matches(permanent, target_type):
         return is_enchantment_permanent(permanent)
     if target == "land":
         return is_effective_land(permanent)
+    if target == "forest":
+        return is_effective_land(permanent) and _permanent_has_subtype(permanent, "forest")
+    if target == "beast":
+        return is_battlefield_creature(permanent) and _permanent_has_subtype(permanent, "beast")
     if target == "swamp":
         return is_effective_land(permanent) and _permanent_has_subtype(permanent, "swamp")
     if target == "artifact_or_creature":
@@ -30102,6 +30106,19 @@ def activate_permanent_life_gain_sources(
         if not player.can_pay(activation_cost_text):
             continue
         life_missing = max(0, 40 - int(getattr(player, "life", 0) or 0))
+        sacrifice_target_type = str(effect_data.get("activation_sacrifice_target") or "").strip()
+        sacrifice_target = None
+        sacrifice_options = []
+        if sacrifice_target_type:
+            if life_missing <= 0:
+                continue
+            sacrifice_target, sacrifice_options = choose_activation_sacrifice_target(
+                player,
+                permanent,
+                sacrifice_target_type,
+            )
+            if sacrifice_target is None:
+                continue
         score = amount + life_missing + (4 if requires_sacrifice else 0)
         candidates.append(
             {
@@ -30113,6 +30130,9 @@ def activate_permanent_life_gain_sources(
                 "activation_cost_colors": activation_cost_colors,
                 "requires_tap": requires_tap,
                 "requires_sacrifice": requires_sacrifice,
+                "sacrifice_target_type": sacrifice_target_type,
+                "sacrifice_target": sacrifice_target,
+                "sacrifice_options": sacrifice_options,
                 "score": score,
             }
         )
@@ -30140,6 +30160,9 @@ def activate_permanent_life_gain_sources(
             player.battlefield.remove(permanent)
         player.graveyard.append(permanent)
         player.record_permanent_sacrificed(permanent, turn)
+    sacrificed_target = selected.get("sacrifice_target")
+    if sacrificed_target is not None:
+        sacrifice_permanent_for_activation(player, sacrificed_target, turn)
     life_before = int(getattr(player, "life", 0) or 0)
     gain_life(player, int(selected["amount"]), cap=999)
     life_after = int(getattr(player, "life", life_before) or 0)
@@ -30173,6 +30196,12 @@ def activate_permanent_life_gain_sources(
             "life_gain_requested": selected["amount"],
             "requires_tap": selected["requires_tap"],
             "sacrificed_source": selected["requires_sacrifice"],
+            "sacrifice_target": selected.get("sacrifice_target_type") or None,
+            "sacrificed_target": (sacrificed_target or {}).get("name"),
+            "sacrifice_options": [
+                option.get("name", "?")
+                for option in (selected.get("sacrifice_options") or [])[:6]
+            ],
         },
         rule_source="permanent_simple_activated_life_gain_v1",
         rule_status=effect_data.get("_rule_review_status", "active"),
@@ -30184,13 +30213,17 @@ def activate_permanent_life_gain_sources(
         resource_delta={
             "mana": -(selected["activation_cost_generic"] + len(selected["activation_cost_colors"])),
             "life": life_gained,
-            "permanents": -1 if selected["requires_sacrifice"] else 0,
+            "permanents": -(
+                (1 if selected["requires_sacrifice"] else 0)
+                + (1 if sacrificed_target is not None else 0)
+            ),
         },
         risk_flags=[
             flag
             for flag, active in {
                 "tap_ability": selected["requires_tap"],
                 "sacrifice_source": selected["requires_sacrifice"],
+                "sacrifice_target": sacrificed_target is not None,
                 "life_gain": True,
             }.items()
             if active
@@ -30208,6 +30241,8 @@ def activate_permanent_life_gain_sources(
         controller_life_after=life_after,
         tapped=bool(permanent.get("tapped")),
         sacrificed_self=bool(selected["requires_sacrifice"]),
+        sacrifice_target=selected.get("sacrifice_target_type") or None,
+        sacrificed_target=(sacrificed_target or {}).get("name"),
         phase=phase,
         turn=turn,
         **replay_rule_fields(effect_data),

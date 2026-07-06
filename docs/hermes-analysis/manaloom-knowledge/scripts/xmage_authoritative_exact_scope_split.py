@@ -10079,6 +10079,8 @@ def activation_sacrifice_target_from_phrase(phrase: str) -> str | None:
         "artifact": "artifact",
         "enchantment": "enchantment",
         "land": "land",
+        "forest": "forest",
+        "beast": "beast",
         "swamp": "swamp",
         "permanent": "permanent",
     }
@@ -11238,9 +11240,29 @@ def activated_life_gain_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] 
     match = re.fullmatch(r"you gain (?P<amount>\d+) life\.?", effect_text)
     if not match:
         return "activated_life_gain_oracle_not_simple"
-    activation = activation_cost_from_oracle_prefix(cost_text, allow_source_sacrifice=True)
+    normalized_cost = cost_text
+    sacrifice_target = None
+    sacrifice_pattern = (
+        r"(?:^|,\s*)sacrifice (?P<phrase>"
+        r"(?:an?|another) (?:creature|artifact|enchantment|land|forest|beast|permanent)"
+        r")(?:\s*,?|$)"
+    )
+    sacrifice_matches = list(re.finditer(sacrifice_pattern, normalized_cost))
+    if len(sacrifice_matches) > 1:
+        return "activated_life_gain_oracle_cost_not_supported"
+    if sacrifice_matches:
+        sacrifice_target = activation_sacrifice_target_from_phrase(sacrifice_matches[0].group("phrase"))
+        if sacrifice_target is None:
+            return "activated_life_gain_oracle_cost_not_supported"
+        normalized_cost = re.sub(sacrifice_pattern, ",", normalized_cost).strip(" ,")
+    activation = activation_cost_from_oracle_prefix(normalized_cost, allow_source_sacrifice=True)
     if isinstance(activation, str):
         return str(activation).replace("activated_self_boost", "activated_life_gain")
+    if activation.get("activation_requires_sacrifice") and sacrifice_target:
+        return "activated_life_gain_oracle_cost_not_supported"
+    if sacrifice_target:
+        activation["activation_sacrifice_target"] = sacrifice_target
+        activation["activation_requires_sacrifice_target"] = True
     return {
         "life_gain_amount": int(match.group("amount")),
         **activation,
@@ -11299,6 +11321,11 @@ def activated_life_gain_from_source(source: str) -> dict[str, Any] | str:
     if parsed is None:
         return "activated_life_gain_source_mana_cost_not_supported"
     generic, colors = parsed
+    sacrifice_target = (
+        activation_sacrifice_target_from_source(text, window)
+        if "SacrificeTargetCost" in window
+        else None
+    )
     return {
         "life_gain_amount": amount,
         "activation_cost_mana": cost_text,
@@ -11306,6 +11333,14 @@ def activated_life_gain_from_source(source: str) -> dict[str, Any] | str:
         "activation_cost_colors": colors,
         "activation_requires_tap": "TapSourceCost" in window,
         "activation_requires_sacrifice": "SacrificeSourceCost" in window,
+        **(
+            {
+                "activation_sacrifice_target": sacrifice_target,
+                "activation_requires_sacrifice_target": True,
+            }
+            if sacrifice_target is not None
+            else {}
+        ),
     }
 
 
@@ -13030,8 +13065,19 @@ def activation_sacrifice_target_from_source(source: str, window: str) -> str | N
         return "creature"
     if "FILTER_PERMANENT_ARTIFACT" in relevant:
         return "artifact"
-    if "FILTER_CONTROLLED_LAND" in relevant or "FILTER_LANDS" in relevant or "FILTER_LAND" in relevant:
+    if (
+        "FILTER_CONTROLLED_LAND" in relevant
+        or "FILTER_LANDS" in relevant
+        or "FILTER_LAND" in relevant
+        or "FilterControlledLandPermanent" in relevant
+    ):
         return "land"
+    if "FILTER_PERMANENT" in relevant:
+        return "permanent"
+    if "SubType.FOREST" in relevant:
+        return "forest"
+    if "SubType.BEAST" in relevant:
+        return "beast"
     if "TokenPredicate.TRUE" in relevant:
         return "token"
     if "TokenPredicate.FALSE" in relevant:
@@ -18566,6 +18612,8 @@ def split_row(
             "activation_cost_colors",
             "activation_requires_tap",
             "activation_requires_sacrifice",
+            "activation_sacrifice_target",
+            "activation_requires_sacrifice_target",
         ):
             if parsed_activation.get(key) != oracle_life_gain.get(key):
                 return None, f"activated_life_gain_source_oracle_{key}_mismatch"
@@ -18601,6 +18649,9 @@ def split_row(
             "activation_requires_tap": parsed_activation["activation_requires_tap"],
             "activation_requires_sacrifice": parsed_activation["activation_requires_sacrifice"],
         }
+        for key in ("activation_sacrifice_target", "activation_requires_sacrifice_target"):
+            if parsed_activation.get(key) not in (None, "", [], {}):
+                activated_effect[key] = parsed_activation[key]
         effect_json = {
             "effect": permanent_effect,
             "battle_model_scope": PERMANENT_ACTIVATED_LIFE_GAIN_SCOPE,
@@ -18621,6 +18672,9 @@ def split_row(
             "activation_requires_tap": parsed_activation["activation_requires_tap"],
             "activation_requires_sacrifice": parsed_activation["activation_requires_sacrifice"],
         }
+        for key in ("activation_sacrifice_target", "activation_requires_sacrifice_target"):
+            if parsed_activation.get(key) not in (None, "", [], {}):
+                effect_json[key] = parsed_activation[key]
         if parsed_activation.get("activation_requires_sacrifice"):
             effect_json["activated_self_sacrifice_life_gain"] = True
             activated_effect["activated_self_sacrifice_life_gain"] = True

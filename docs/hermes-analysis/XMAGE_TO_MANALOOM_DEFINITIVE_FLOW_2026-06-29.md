@@ -15721,6 +15721,113 @@ protection, unsupported Oracle activation costs, or Oracle text that is not an
 exact self-regeneration ability. Those remain blocked under exact reason counts
 and require their own mapper/runtime package.
 
+## PG571 Activated Tutor To Hand Simple New Server Evidence
+
+PG571 evidence:
+
+- package:
+  `docs/hermes-analysis/master_optimizer_reports/pg571_activated_tutor_to_hand_simple_package.md`
+- apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg571_activated_tutor_to_hand_simple_apply_evidence.md`
+- sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg571_activated_tutor_to_hand_simple_sync_report.json`
+- post-sync queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260706_post_pg571_activated_tutor_to_hand_simple_commander_legal.md`
+- post split recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260706_post_pg571_activated_tutor_to_hand_simple_recheck.md`
+- readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260706_post_pg571_activated_tutor_to_hand_simple.md`
+- final audits:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260706_post_pg571_activated_tutor_to_hand_simple.md`,
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260706_post_pg571_activated_tutor_to_hand_simple.md`,
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260706_post_pg571_activated_tutor_to_hand_simple.md`
+
+PG571 promoted `4` simple activated library-search-to-hand rows on the new
+server under `xmage_permanent_simple_activated_library_search_to_hand_v1`.
+Runtime support activates non-sacrificing permanents that tutor constrained
+library targets into hand, including artifact and creature sources, while
+preserving summoning-sickness checks for creature activations.
+
+Validation:
+
+- focused code checks passed: `py_compile`, battle runtime tests, and `662`
+  exact-scope unittest tests;
+- package apply verified `4/4` promoted rows with `review_status=verified`,
+  `execution_status=auto`, and matching Oracle hash;
+- PG -> Hermes/SQLite sync loaded `4` PostgreSQL rows, updated `4` SQLite rows,
+  and exported `6605` canonical snapshot rows;
+- post-PG571 queue moved from `target_identity_count=25391` to `25387` and
+  from `xmage_authoritative_source_count=25077` to `25073`;
+- final exact-scope recheck returned `proposal_count=0`;
+- final audits passed: XMage strategy `pass`, PG-Hermes-SQLite `pass`, and
+  operational surface `pass`.
+
+Residual boundary: PG571 does not authorize activated tutors with sacrifice,
+discard, return, exile-from-graveyard, dynamic targets, or non-simple Oracle
+text. Those remain blocked under exact split reason counts and require their
+own mapper/runtime package.
+
+## PG572 Activated Life Gain Sacrifice Target New Server Evidence
+
+PG572 evidence:
+
+- package:
+  `docs/hermes-analysis/master_optimizer_reports/pg572_activated_life_gain_sacrifice_target_package.md`
+- apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg572_activated_life_gain_sacrifice_target_apply_evidence.md`
+- sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg572_activated_life_gain_sacrifice_target_sync_report.json`
+- E2E:
+  `docs/hermes-analysis/master_optimizer_reports/pg572_activated_life_gain_sacrifice_target_e2e.md`
+- post-sync queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260706_post_pg572_activated_life_gain_sacrifice_target_commander_legal.md`
+- post split recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260706_post_pg572_activated_life_gain_sacrifice_target_recheck.md`
+- readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260706_post_pg572_activated_life_gain_sacrifice_target.md`
+- final audits:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260706_post_pg572_activated_life_gain_sacrifice_target.md`,
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260706_post_pg572_activated_life_gain_sacrifice_target.md`,
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260706_post_pg572_activated_life_gain_sacrifice_target.md`,
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260706_post_pg572_activated_life_gain_sacrifice_target.md`
+
+PG572 promoted `6` activated life-gain rows with safe
+`SacrificeTargetCost` filters on the new server under
+`xmage_permanent_simple_activated_life_gain_v1`.
+
+Runtime semantics:
+
+- activated life-gain permanents can pay target sacrifice costs before gaining
+  fixed life;
+- supported sacrifice targets are `permanent`, `creature`, `land`, `forest`,
+  and `beast`, when Oracle/XMage agree;
+- non-self target sacrifice is skipped unless the controller is missing life,
+  preventing value-negative sacrifices at full life;
+- replay/resource traces record the sacrificed target and the requested/gained
+  life amount.
+
+Validation:
+
+- focused code checks passed: `py_compile`, `663` exact-scope unittest tests,
+  and the battle runtime suite with PG-backed rules;
+- package precheck found `6/6` target card rows and no existing matching rules;
+- package apply verified `6/6` promoted rows with `review_status=verified`,
+  `execution_status=auto`, and matching Oracle hash;
+- PG -> Hermes/SQLite sync loaded `6` PostgreSQL rows, updated `6` SQLite rows,
+  and exported `6611` canonical snapshot rows;
+- post-PG572 queue moved from `target_identity_count=25387` to `25381` and
+  from `xmage_authoritative_source_count=25073` to `25067`;
+- final exact-scope recheck returned `proposal_count=0`;
+- final audits passed: XMage strategy `pass`, PG-Hermes-SQLite `pass`,
+  operational surface `pass`, legacy contamination `pass`, server-target
+  `pass`, and report-retention `pass` after evidence references were restored.
+
+Residual boundary: PG572 does not authorize activated life-gain rows with
+discard, exile-from-graveyard, tap-another-permanent, dynamic life gain,
+non-simple Oracle text, or unsupported sacrifice target filters. Those remain
+blocked under exact split reason counts and require their own mapper/runtime
+package.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:
