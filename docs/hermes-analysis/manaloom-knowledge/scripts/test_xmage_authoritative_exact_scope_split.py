@@ -14664,6 +14664,67 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertTrue(effect["_keywords_are_self"])
         self.assertTrue(effect["flying"])
 
+    def test_activated_self_keyword_maps_to_keyword_until_eot(self) -> None:
+        row = queue_row(
+            "xmage_signature::GainAbilitySourceEffect::FlyingAbility,SimpleActivatedAbility::"
+            "no_target_class::no_condition_class::activated_ability",
+            effect_classes=["GainAbilitySourceEffect"],
+            ability_kind="activated",
+            ability_classes=["FlyingAbility", "SimpleActivatedAbility"],
+            xmage_signals=["activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Cobalt Golem",
+                type_line="Artifact Creature - Golem",
+                oracle_text="{1}{U}: Cobalt Golem gains flying until end of turn.",
+            ),
+            source_text=(
+                "this.addAbility(new SimpleActivatedAbility("
+                "new GainAbilitySourceEffect(FlyingAbility.getInstance(), Duration.EndOfTurn), "
+                'new ManaCostsImpl<>("{1}{U}")));'
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "creature")
+        self.assertEqual(effect["battle_model_scope"], split.SELF_KEYWORD_ACTIVATED_SCOPE)
+        self.assertEqual(effect["activated_effect"], "self_keyword_until_eot")
+        self.assertEqual(effect["granted_keywords_until_eot"], ["flying"])
+        self.assertEqual(effect["target"], "self")
+        self.assertEqual(effect["activation_cost_generic"], 1)
+        self.assertEqual(effect["activation_cost_colors"], ["U"])
+        self.assertFalse(effect["activation_requires_tap"])
+        self.assertEqual(effect["_activated_rule_effects"][0]["target"], "self")
+
+    def test_activated_self_keyword_blocks_discard_cost_until_supported(self) -> None:
+        row = queue_row(
+            "xmage_signature::GainAbilitySourceEffect::FlyingAbility,SimpleActivatedAbility::"
+            "no_target_class::no_condition_class::activated_ability",
+            effect_classes=["GainAbilitySourceEffect"],
+            ability_kind="activated",
+            ability_classes=["FlyingAbility", "SimpleActivatedAbility"],
+            xmage_signals=["activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Olivia's Dragoon",
+                type_line="Creature - Vampire Berserker",
+                oracle_text="Discard a card: Olivia's Dragoon gains flying until end of turn.",
+            ),
+            source_text=(
+                "this.addAbility(new SimpleActivatedAbility("
+                "new GainAbilitySourceEffect(FlyingAbility.getInstance(), Duration.EndOfTurn), "
+                "new DiscardCardCost()));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "activated_self_keyword_oracle_cost_not_supported")
+
     def test_activated_self_boost_accepts_colored_mana_cost_source(self) -> None:
         row = queue_row(
             split.SELF_BOOST_ACTIVATED_UNIT,

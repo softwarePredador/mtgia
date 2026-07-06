@@ -15019,6 +15019,78 @@ hybrid/life/special activation costs, "does not untap" clauses, source/Oracle
 mismatches, activated target untap, stun counters, or any `TargetPermanent`
 filter beyond plain `TargetCreaturePermanent`.
 
+## PG553 Self Keyword Until EOT New Server Evidence
+
+PG553 evidence:
+
+- exact split report:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260706_pg553_self_keyword_flying_candidate.md`
+- package:
+  `docs/hermes-analysis/master_optimizer_reports/pg553_self_keyword_until_eot_new_server_package_package.md`
+- apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg553_self_keyword_until_eot_new_server_apply_evidence.md`
+- PG -> SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg553_self_keyword_until_eot_new_server_sync_report.json`
+- E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg553_self_keyword_until_eot_new_server_e2e.md`
+- post-sync queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260706_post_pg553_self_keyword_until_eot_new_server.md`
+- final exact-scope recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260706_post_pg553_self_keyword_until_eot_new_server_final.md`
+- readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260706_post_pg553_self_keyword_until_eot_new_server.md`
+- final audits:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260706_post_pg553_self_keyword_until_eot_new_server_final.md`,
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260706_post_pg553_self_keyword_until_eot_new_server_final.md`,
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260706_post_pg553_self_keyword_until_eot_new_server_final.md`,
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260706_post_pg553_self_keyword_until_eot_new_server_final.md`
+
+Validation:
+
+- focused split/package/E2E tests passed: `618` splitter tests and `54`
+  package/E2E tests;
+- exact split selected `43` cards for
+  `xmage_permanent_simple_activated_self_keyword_until_eot_v1`;
+- package precheck found `1` target card row for each promoted card and
+  `1` shadow row scheduled for deprecation;
+- package apply upserted `43` rows and deprecated `1` shadow row;
+- PostgreSQL postcheck confirmed `43/43` promoted rows, `43/43`
+  verified/auto, and `43/43` oracle hash rows;
+- PG -> SQLite sync loaded `8,943` PostgreSQL rows, updated `8,707` SQLite
+  rows, and exported `6,445` canonical snapshot rows;
+- package E2E: `status=pass`, `scenario_count=43`, `event_count=86`, and
+  every promoted card gained the expected self keyword until end of turn;
+- final exact-scope recheck has `proposal_count=0` and
+  `safe_for_batch_pg_package_count=0`;
+- final audits passed: XMage strategy `26/26`, PG-Hermes-SQLite `51/51`,
+  operational surface `pass`, legacy contamination `pass`.
+
+Post-sync queue evidence:
+
+- pre-cycle `target_identity_count=25591`
+- post-cycle `target_identity_count=25548`
+- post-cycle `xmage_authoritative_source_count=25234`
+- post-cycle `xmage_missing_source_exception_count=314`
+- post-cycle `xmage_authoritative_parser_gap_count=0`
+- post-cycle `xmage_authoritative_adapter_required_count=25234`
+- post-cycle `adapter_work_unit_count=11356`
+
+Runtime semantics:
+
+- the runtime adapter executes only for battlefield permanents with the exact
+  self-keyword activated scope;
+- activation pays the parsed mana cost, including simple hybrid symbols in the
+  package E2E manifest, taps the source only when XMage has `TapSourceCost`,
+  emits `activated_ability`, and then emits
+  `stat_modifier_until_eot_resolved`;
+- the granted keyword is normalized and attached to the source only until end
+  of turn.
+
+Residual boundary: PG553 does not authorize target-keyword abilities,
+multi-mode abilities, non-keyword stat changes, unsupported discard/life/
+sacrifice/exile activation costs, or any generic self-ability review scope
+without an exact runtime adapter and focused package evidence.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

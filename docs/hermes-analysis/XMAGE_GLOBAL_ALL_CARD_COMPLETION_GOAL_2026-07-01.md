@@ -1778,6 +1778,17 @@ Immediate checkpoint after PG361:
     Since the exact splitter is now empty again, the next cycle must implement
     a new mapper/runtime subpattern before any PostgreSQL package can be
     generated.
+79. PG553 promoted `43` simple activated self-keyword-until-EOT permanent
+    rows on the new server after adding the exact
+    `xmage_permanent_simple_activated_self_keyword_until_eot_v1` mapper,
+    runtime adapter, package E2E scenario, and hybrid-cost manifest support.
+    The cycle reduced Commander-legal battle-gap identities from `25591` to
+    `25548`, reduced XMage-authoritative adapter-required identities from
+    `25277` to `25234`, and reduced adapter work units from `11363` to
+    `11356`. The final split returned `proposal_count=0`, so the next cycle
+    must implement another mapper/runtime subpattern before generating a new
+    PostgreSQL package. Current evidence:
+    `docs/hermes-analysis/master_optimizer_reports/pg553_self_keyword_until_eot_new_server_apply_evidence.md`.
 
 ## Non-Goals
 

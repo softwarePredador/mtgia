@@ -1942,6 +1942,99 @@ def run_simple_activated_tap_target(
     }
 
 
+def run_simple_activated_self_keyword(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    effect = battle.get_card_effect(card)
+    permanent_type = str(effect.get("effect") or "creature")
+    default_type_line = {
+        "creature": "Creature - Soldier",
+        "artifact": "Artifact Creature - Golem",
+        "enchantment": "Enchantment Creature",
+    }.get(permanent_type, "Creature - Soldier")
+    source = battle.enrich_card(
+        {
+            **card,
+            "type_line": default_type_line,
+            "effect": permanent_type,
+            "power": int(scenario.get("source_power") or 2),
+            "toughness": int(scenario.get("source_toughness") or 2),
+            "summoning_sick": False,
+            **effect,
+            **dict(scenario.get("source_overrides") or {}),
+        }
+    )
+    active = battle.Player(str(scenario.get("player") or "Activated Controller"), None, [])
+    active.battlefield = [source]
+    add_manifest_mana(active, scenario.get("controller_mana") or {})
+    expected_keywords = [
+        str(keyword or "").strip().lower().replace(" ", "_")
+        for keyword in (scenario.get("expected_keywords") or effect.get("granted_keywords_until_eot") or [])
+        if str(keyword or "").strip()
+    ]
+    expected_tapped_source = bool(scenario.get("expected_tapped_source", effect.get("activation_requires_tap", False)))
+
+    if not battle.can_activate_generic_self_keyword_permanent(active, source):
+        fail("battle_execution", f"{card['name']} simple activated self keyword cannot activate")
+    activated = battle.activate_generic_self_keyword_permanent(
+        active,
+        [active],
+        source,
+        turn=int(scenario.get("turn") or 7),
+        rng=random.Random(int(scenario.get("seed") or 6073)),
+        phase=str(scenario.get("phase") or "precombat_main"),
+    )
+    if not activated:
+        fail("battle_execution", f"{card['name']} simple activated self keyword activation failed")
+    for keyword in expected_keywords:
+        if not battle.card_has_keyword(source, keyword):
+            fail("battle_execution", f"{card['name']} source missing keyword {keyword!r}")
+    if bool(source.get("tapped")) != expected_tapped_source:
+        fail(
+            "battle_execution",
+            f"{card['name']} source tapped={bool(source.get('tapped'))}, expected {expected_tapped_source}",
+        )
+    activation_event = next(
+        (
+            data
+            for event, data in reversed(events)
+            if event == "activated_ability"
+            and data.get("card") == card.get("name")
+            and data.get("activation_kind") == "simple_activated_self_keyword"
+        ),
+        None,
+    )
+    if activation_event is None:
+        fail("battle_events", f"missing {card['name']} simple activated self keyword event")
+    resolved_event = next(
+        (
+            data
+            for event, data in reversed(events)
+            if event == "stat_modifier_until_eot_resolved"
+            and data.get("card") == card.get("name")
+            and data.get("target") == source.get("name")
+        ),
+        None,
+    )
+    if resolved_event is None:
+        fail("battle_events", f"missing {card['name']} self keyword resolved event")
+    if list(resolved_event.get("granted_keywords_until_eot") or []) != expected_keywords:
+        fail(
+            "battle_events",
+            f"{card['name']} resolved keywords={resolved_event.get('granted_keywords_until_eot')!r}, expected {expected_keywords!r}",
+        )
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "source_keywords": list(source.get("keywords") or []),
+        "granted_keywords": expected_keywords,
+        "source_tapped": bool(source.get("tapped")),
+    }
+
+
 def assert_expected_event_fields(stage: str, card_name: str, event_data: dict[str, Any], expected: dict[str, Any]) -> None:
     for key, expected_value in expected.items():
         if event_data.get(key) != expected_value:
@@ -2806,6 +2899,7 @@ SCENARIO_RUNNERS = {
     "simple_mana_source_refresh": run_simple_mana_source_refresh,
     "simple_activated_damage": run_simple_activated_damage,
     "simple_activated_tap_target": run_simple_activated_tap_target,
+    "simple_activated_self_keyword": run_simple_activated_self_keyword,
     "simple_activated_create_token": run_simple_activated_create_token,
     "static_global_power_toughness_boost": run_static_global_power_toughness_boost,
     "target_creature_cant_block": run_target_creature_cant_block,

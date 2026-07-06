@@ -188,6 +188,52 @@ def test_simple_activated_tap_target_runner_executes_tap_effect() -> None:
     assert result["source_tapped"] is True
 
 
+def test_simple_activated_self_keyword_runner_executes_keyword_effect() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "creature",
+        "battle_model_scope": "xmage_permanent_simple_activated_self_keyword_until_eot_v1",
+        "activated_effect": "self_keyword_until_eot",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_keyword_until_eot_v1",
+        "target": "self",
+        "target_controller": "self",
+        "target_constraints": {"source": "self", "card_types": ["creature"]},
+        "granted_keywords_until_eot": ["flying"],
+        "activation_cost_mana": "{2}{R/W}",
+        "activation_cost_generic": 2,
+        "activation_cost_colors": ["R/W"],
+        "activation_requires_tap": False,
+        "activation_requires_sacrifice": False,
+        "_rule_logical_key": "battle_rule_v1:cobalt-golem",
+    }
+    try:
+        result = validator.run_simple_activated_self_keyword(
+            battle,
+            {
+                "name": "Cobalt Golem gains flying",
+                "type": "simple_activated_self_keyword",
+                "card": {"name": "Cobalt Golem"},
+                "controller_mana": {"generic": 2, "red": 1},
+                "expected_keywords": ["flying"],
+                "expected_tapped_source": False,
+                "logical_rule_key": "battle_rule_v1:cobalt-golem",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Cobalt Golem"
+    assert result["granted_keywords"] == ["flying"]
+    assert "flying" in result["source_keywords"]
+    assert result["source_tapped"] is False
+
+
 def test_simple_mana_source_refresh_runner_executes_partial_mana_rule() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

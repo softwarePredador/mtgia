@@ -78,6 +78,7 @@ SELF_BOOST_ACTIVATED_UNIT = (
     "no_target_class::no_condition_class::activated_ability"
 )
 SELF_BOOST_ACTIVATED_UNIT_PREFIX = "xmage_signature::BoostSourceEffect::"
+SELF_KEYWORD_ACTIVATED_UNIT_PREFIX = "xmage_signature::GainAbilitySourceEffect::"
 TARGET_BOOST_ACTIVATED_UNIT = (
     "xmage_signature::BoostTargetEffect::SimpleActivatedAbility::"
     "TargetCreaturePermanent::no_condition_class::targeting,activated_ability"
@@ -250,6 +251,7 @@ ATTACK_TRIGGER_TARGET_KEYWORD_SCOPE = (
     "xmage_creature_attack_grant_keyword_target_creature_until_eot_v1"
 )
 SELF_BOOST_ACTIVATED_SCOPE = "xmage_permanent_simple_activated_self_boost_until_eot_v1"
+SELF_KEYWORD_ACTIVATED_SCOPE = "xmage_permanent_simple_activated_self_keyword_until_eot_v1"
 TARGET_BOOST_ACTIVATED_SCOPE = "xmage_permanent_simple_activated_target_boost_until_eot_v1"
 TARGET_KEYWORD_ACTIVATED_SCOPE = "xmage_permanent_simple_activated_target_keyword_until_eot_v1"
 STATIC_KEYWORD_CREATURE_SCOPE = "xmage_static_self_combat_keyword_creature_v1"
@@ -7893,6 +7895,19 @@ def is_permanent_activated_target_keyword_unit(row: dict[str, Any]) -> bool:
     )
 
 
+def is_permanent_activated_self_keyword_unit(row: dict[str, Any]) -> bool:
+    abilities = ability_classes(row)
+    keyword_abilities = abilities.intersection(TARGET_GRANT_KEYWORD_ABILITY_CLASSES)
+    return (
+        str(row.get("adapter_work_unit") or "").startswith(SELF_KEYWORD_ACTIVATED_UNIT_PREFIX)
+        and effect_classes(row) == {"GainAbilitySourceEffect"}
+        and set(row.get("xmage_signals") or []) == {"activated_ability"}
+        and "SimpleActivatedAbility" in abilities
+        and len(keyword_abilities) == 1
+        and len(abilities - {"SimpleActivatedAbility"} - keyword_abilities) == 0
+    )
+
+
 def is_creature_attack_target_keyword_unit(row: dict[str, Any]) -> bool:
     abilities = ability_classes(row)
     keyword_abilities = abilities.intersection(TARGET_GRANT_KEYWORD_ABILITY_CLASSES)
@@ -11469,6 +11484,67 @@ def activated_target_keyword_from_source(source: str, keyword_ability_class: str
     return {
         "keyword": TARGET_GRANT_KEYWORD_ABILITY_CLASSES[keyword_ability_class],
         **target_data,
+        **activation,
+    }
+
+
+def activated_self_keyword_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    text = strip_parenthetical_reminders(
+        oracle_text_after_leading_static_keywords(metadata)
+    )
+    text = re.sub(r"\s+", " ", text).strip().lower()
+    if text.count(":") != 1:
+        return "activated_self_keyword_oracle_not_simple"
+    cost_text, effect_text = [part.strip() for part in text.split(":", 1)]
+    keyword_words = "|".join(
+        re.escape(word)
+        for word in sorted(TARGET_GRANT_KEYWORD_ORACLE_WORDS, key=len, reverse=True)
+    )
+    match = re.match(
+        rf"^(?!target\b)(?P<subject>.+?)\s+gains\s+(?P<keyword>{keyword_words}) until end of turn\.?$",
+        effect_text,
+    )
+    if not match:
+        return "activated_self_keyword_oracle_not_simple"
+    activation = activation_cost_from_oracle_prefix(cost_text)
+    if isinstance(activation, str):
+        return str(activation).replace("activated_self_boost", "activated_self_keyword")
+    return {
+        "keyword": TARGET_GRANT_KEYWORD_ORACLE_WORDS[match.group("keyword")],
+        **activation,
+    }
+
+
+def activated_self_keyword_from_source(source: str, keyword_ability_class: str) -> dict[str, Any] | str:
+    text = source or ""
+    if "Zone.GRAVEYARD" in text:
+        return "activated_self_keyword_source_not_battlefield"
+    gain_matches = re.findall(r"new\s+GainAbilitySourceEffect\s*\(", text)
+    if len(gain_matches) != 1:
+        return "activated_self_keyword_source_not_single_effect"
+    ability_expr = (
+        rf"(?:{re.escape(keyword_ability_class)}\.getInstance\s*\(\s*\)"
+        rf"|new\s+{re.escape(keyword_ability_class)}\s*\([^)]*\))"
+    )
+    if not re.search(
+        rf"new\s+GainAbilitySourceEffect\s*\(\s*{ability_expr}"
+        rf"(?:\s*,\s*Duration\.EndOfTurn\s*)?\)",
+        text,
+        re.S,
+    ):
+        return "activated_self_keyword_source_keyword_not_supported"
+    gain_index = text.find("GainAbilitySourceEffect")
+    window = text[max(0, gain_index - 500) : gain_index + 2000]
+    if "SimpleActivatedAbility" not in window:
+        return "activated_self_keyword_source_not_simple_activated"
+    activation = activated_target_keyword_cost_from_source(window)
+    if isinstance(activation, str):
+        return (
+            activation.replace("activated_target_keyword", "activated_self_keyword")
+            .replace("activated_self_boost", "activated_self_keyword")
+        )
+    return {
+        "keyword": TARGET_GRANT_KEYWORD_ABILITY_CLASSES[keyword_ability_class],
         **activation,
     }
 
@@ -15920,6 +15996,7 @@ def split_row(
     permanent_activated_self_boost_unit = is_permanent_activated_self_boost_unit(row)
     permanent_activated_target_boost_unit = is_permanent_activated_target_boost_unit(row)
     permanent_activated_target_keyword_unit = is_permanent_activated_target_keyword_unit(row)
+    permanent_activated_self_keyword_unit = is_permanent_activated_self_keyword_unit(row)
     permanent_activated_tutor_battlefield_unit = is_permanent_activated_tutor_battlefield_unit(row)
     attack_target_keyword_unit = is_creature_attack_target_keyword_unit(row)
     static_controlled_pt_unit = is_static_controlled_pt_unit(row)
@@ -16036,6 +16113,7 @@ def split_row(
         and not permanent_activated_self_boost_unit
         and not permanent_activated_target_boost_unit
         and not permanent_activated_target_keyword_unit
+        and not permanent_activated_self_keyword_unit
         and not permanent_activated_tutor_battlefield_unit
         and not attack_target_keyword_unit
         and not static_controlled_pt_unit
@@ -16111,6 +16189,7 @@ def split_row(
         and not permanent_activated_life_gain_unit
         and not permanent_activated_self_boost_unit
         and not permanent_activated_target_keyword_unit
+        and not permanent_activated_self_keyword_unit
         and not permanent_activated_tutor_battlefield_unit
         and not attack_target_keyword_unit
         and not static_controlled_pt_unit
@@ -17363,6 +17442,95 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_permanent_simple_activated_target_keyword_until_eot",
+        ), "selected_exact_scope"
+
+    if permanent_activated_self_keyword_unit:
+        if not is_permanent_metadata(metadata) or is_spell(metadata):
+            return None, "activated_self_keyword_not_permanent"
+        keyword_abilities = ability_classes(row).intersection(TARGET_GRANT_KEYWORD_ABILITY_CLASSES)
+        if len(keyword_abilities) != 1:
+            return None, "activated_self_keyword_ability_not_supported"
+        keyword_ability_class = next(iter(keyword_abilities))
+        oracle_keyword = activated_self_keyword_from_oracle(metadata)
+        if isinstance(oracle_keyword, str):
+            return None, oracle_keyword
+        parsed_activation = activated_self_keyword_from_source(source_text, keyword_ability_class)
+        if isinstance(parsed_activation, str):
+            return None, parsed_activation
+        if parsed_activation.get("keyword") != oracle_keyword.get("keyword"):
+            return None, "activated_self_keyword_source_oracle_keyword_mismatch"
+        source_cost = (
+            int(parsed_activation["activation_cost_generic"]),
+            list(parsed_activation["activation_cost_colors"]),
+            bool(parsed_activation["activation_requires_tap"]),
+        )
+        oracle_cost = (
+            int(oracle_keyword["activation_cost_generic"]),
+            list(oracle_keyword["activation_cost_colors"]),
+            bool(oracle_keyword["activation_requires_tap"]),
+        )
+        if source_cost != oracle_cost:
+            return None, "activated_self_keyword_source_oracle_cost_mismatch"
+        keyword = oracle_keyword["keyword"]
+        activated_effect = {
+            "effect": "stat_modifier_until_eot",
+            "battle_model_scope": SELF_KEYWORD_ACTIVATED_SCOPE,
+            "ability_kind": "activated",
+            "activated_effect": "self_keyword_until_eot",
+            "target": "self",
+            "target_controller": "self",
+            "target_constraints": {"source": "self", "card_types": ["creature"]},
+            "power_delta": 0,
+            "toughness_delta": 0,
+            "granted_keywords_until_eot": [keyword],
+            "duration": "until_end_of_turn",
+            "xmage_effect_class": "GainAbilitySourceEffect",
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_keyword_ability_class": keyword_ability_class,
+            "activation_cost_mana": parsed_activation["activation_cost_mana"],
+            "activation_cost_generic": parsed_activation["activation_cost_generic"],
+            "activation_cost_colors": parsed_activation["activation_cost_colors"],
+            "activation_requires_tap": parsed_activation["activation_requires_tap"],
+            "activation_requires_sacrifice": False,
+        }
+        type_line = str(metadata.get("type_line") or "").lower()
+        permanent_effect = (
+            "creature"
+            if "creature" in type_line
+            else "artifact"
+            if "artifact" in type_line
+            else "enchantment"
+            if "enchantment" in type_line
+            else "permanent"
+        )
+        effect_json = {
+            "effect": permanent_effect,
+            "battle_model_scope": SELF_KEYWORD_ACTIVATED_SCOPE,
+            "ability_kind": "static_and_activated",
+            "activated_effect": "self_keyword_until_eot",
+            "activated_battle_model_scope": SELF_KEYWORD_ACTIVATED_SCOPE,
+            "target": "self",
+            "target_controller": "self",
+            "target_constraints": {"source": "self", "card_types": ["creature"]},
+            "power_delta": 0,
+            "toughness_delta": 0,
+            "granted_keywords_until_eot": [keyword],
+            "duration": "until_end_of_turn",
+            "_activated_rule_effects": [activated_effect],
+            "xmage_effect_class": "GainAbilitySourceEffect",
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_keyword_ability_class": keyword_ability_class,
+            "activation_cost_mana": parsed_activation["activation_cost_mana"],
+            "activation_cost_generic": parsed_activation["activation_cost_generic"],
+            "activation_cost_colors": parsed_activation["activation_cost_colors"],
+            "activation_requires_tap": parsed_activation["activation_requires_tap"],
+            "activation_requires_sacrifice": False,
+        }
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_permanent_simple_activated_self_keyword_until_eot",
         ), "selected_exact_scope"
 
     if attack_target_keyword_unit:
@@ -23716,6 +23884,7 @@ def build_exact_split_report(
             and not is_permanent_activated_self_boost_unit(row)
             and not is_permanent_activated_target_boost_unit(row)
             and not is_permanent_activated_target_keyword_unit(row)
+            and not is_permanent_activated_self_keyword_unit(row)
             and not is_creature_attack_target_keyword_unit(row)
             and not is_static_controlled_pt_unit(row)
             and not is_static_global_pt_unit(row)
@@ -23804,6 +23973,7 @@ def build_exact_split_report(
                 "life_gain::xmage_life_gain_variant_review_v1 rows with GainLifeEffect, SimpleActivatedAbility, exact fixed activated life-gain Oracle text, and mana/tap/source self-sacrifice costs only",
                 "xmage_signature BoostControlledEffect one-shot spell rows with exact fixed controlled-creature boost until EOT and no color/modal/dynamic filters",
                 "xmage_signature BoostSourceEffect + SimpleActivatedAbility rows with exact activated self boost until EOT and mana/tap source costs only",
+                "xmage_signature GainAbilitySourceEffect + SimpleActivatedAbility rows with exact activated self keyword until EOT and mana/tap source costs only",
                 "xmage_signature BoostTargetEffect + SimpleActivatedAbility + TargetCreaturePermanent rows with exact activated target-creature boost until EOT and mana/tap source costs only",
                 "xmage_signature BoostControlledEffect + SimpleStaticAbility rows with exact static controlled-creature power/toughness boosts and simple creature/artifact/subtype/legendary filters",
                 "xmage_signature BoostAllEffect + SimpleStaticAbility rows with exact static fixed creature power/toughness boosts for all, opponent, color, subtype, token, or land-creature filters",

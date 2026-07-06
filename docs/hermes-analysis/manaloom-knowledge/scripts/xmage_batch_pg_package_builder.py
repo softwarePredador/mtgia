@@ -1354,19 +1354,7 @@ def simple_activated_create_token_execution_scenario_from_expected_rule(
         "name": f"{rule['card_name']} activates token ability",
         "type": "simple_activated_create_token",
         "card": {"name": rule["card_name"]},
-        "controller_mana": {
-            "generic": int(required.get("activation_cost_generic") or 0),
-            **{
-                color_name: list(required.get("activation_cost_colors") or []).count(symbol)
-                for symbol, color_name in {
-                    "W": "white",
-                    "U": "blue",
-                    "B": "black",
-                    "R": "red",
-                    "G": "green",
-                }.items()
-            },
-        },
+        "controller_mana": _manifest_mana_for_required_activation(required),
         "controller_hand": discard_hand,
         "expected_token": {
             "name": required.get("token_name"),
@@ -1405,6 +1393,33 @@ def _manifest_mana_for_activation_cost(cost: str | None) -> dict[str, int]:
         if token.isdigit():
             mana["generic"] += int(token)
             continue
+        if "/" in token:
+            token = token.split("/", 1)[0]
+        color = {
+            "W": "white",
+            "U": "blue",
+            "B": "black",
+            "R": "red",
+            "G": "green",
+        }.get(token)
+        if color:
+            mana[color] += 1
+    return mana
+
+
+def _manifest_mana_for_required_activation(
+    required: dict[str, Any],
+    *,
+    cost_field: str = "activation_cost_mana",
+    generic_field: str = "activation_cost_generic",
+    colors_field: str = "activation_cost_colors",
+) -> dict[str, int]:
+    if required.get(cost_field) is not None:
+        return _manifest_mana_for_activation_cost(required.get(cost_field))
+    mana = _manifest_mana_for_activation_cost(None)
+    mana["generic"] = int(required.get(generic_field) or 0)
+    for symbol in list(required.get(colors_field) or []):
+        token = str(symbol or "").strip().upper()
         if "/" in token:
             token = token.split("/", 1)[0]
         color = {
@@ -1528,19 +1543,7 @@ def simple_activated_damage_execution_scenario_from_expected_rule(
         "type": "simple_activated_damage",
         "card": {"name": rule["card_name"]},
         "opponent_life": 7,
-        "controller_mana": {
-            "generic": int(required.get("activation_cost_generic") or 0),
-            **{
-                color_name: list(required.get("activation_cost_colors") or []).count(symbol)
-                for symbol, color_name in {
-                    "W": "white",
-                    "U": "blue",
-                    "B": "black",
-                    "R": "red",
-                    "G": "green",
-                }.items()
-            },
-        },
+        "controller_mana": _manifest_mana_for_required_activation(required),
         "controller_hand": discard_hand,
         "expected_damage": int(required.get("activated_damage_amount") or required.get("amount") or 0),
         "expected_discard_count": int(required.get("activation_discard_count") or 0),
@@ -1560,21 +1563,26 @@ def simple_activated_tap_target_execution_scenario_from_expected_rule(
         "name": f"{rule['card_name']} activates tap target ability",
         "type": "simple_activated_tap_target",
         "card": {"name": rule["card_name"]},
-        "controller_mana": {
-            "generic": int(required.get("activation_cost_generic") or 0),
-            **{
-                color_name: list(required.get("activation_cost_colors") or []).count(symbol)
-                for symbol, color_name in {
-                    "W": "white",
-                    "U": "blue",
-                    "B": "black",
-                    "R": "red",
-                    "G": "green",
-                }.items()
-            },
-        },
+        "controller_mana": _manifest_mana_for_required_activation(required),
         "expected_tapped_source": bool(required.get("activation_requires_tap")),
         "expected_target": required.get("activated_tap_target") or required.get("target") or "creature",
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
+def simple_activated_self_keyword_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_permanent_simple_activated_self_keyword_until_eot_v1":
+        return None
+    return {
+        "name": f"{rule['card_name']} activates self keyword ability",
+        "type": "simple_activated_self_keyword",
+        "card": {"name": rule["card_name"]},
+        "controller_mana": _manifest_mana_for_required_activation(required),
+        "expected_tapped_source": bool(required.get("activation_requires_tap")),
+        "expected_keywords": list(required.get("granted_keywords_until_eot") or []),
         "logical_rule_key": rule["logical_rule_key"],
     }
 
@@ -1592,6 +1600,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or simple_mana_source_execution_scenario_from_expected_rule(rule)
         or simple_activated_damage_execution_scenario_from_expected_rule(rule)
         or simple_activated_tap_target_execution_scenario_from_expected_rule(rule)
+        or simple_activated_self_keyword_execution_scenario_from_expected_rule(rule)
         or simple_activated_create_token_execution_scenario_from_expected_rule(rule)
         or fixed_create_creature_tokens_execution_scenario_from_expected_rule(rule)
         or multi_create_creature_tokens_execution_scenario_from_expected_rule(rule)

@@ -1,0 +1,47 @@
+        card_name         |     normalized_name      |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows 
+--------------------------+--------------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
+ Bastion Mastodon         | bastion mastodon         | battle_rule_v1:b59702d6b24ef10cfb35b8fc05141e5a |                  1 |                           1 |                         1 |           1
+ Bladed Sentinel          | bladed sentinel          | battle_rule_v1:b59702d6b24ef10cfb35b8fc05141e5a |                  1 |                           1 |                         1 |           1
+ Cabaretti Initiate       | cabaretti initiate       | battle_rule_v1:70662d33af983f49e3efe6be4edd2ea3 |                  1 |                           1 |                         1 |           1
+ Cobalt Golem             | cobalt golem             | battle_rule_v1:4229b46a2d055286677776058710c9a0 |                  1 |                           1 |                         1 |           1
+ Disciple of the Old Ways | disciple of the old ways | battle_rule_v1:19e21f69b210fc58f573520fe5de1209 |                  1 |                           1 |                         1 |           1
+ Dukhara Peafowl          | dukhara peafowl          | battle_rule_v1:9b74f37395fab7ba2c0a30d1fe8d99cf |                  1 |                           1 |                         1 |           1
+ Fallaji Chaindancer      | fallaji chaindancer      | battle_rule_v1:f657df51464c9b553e5d1f20e9919ef3 |                  1 |                           1 |                         1 |           1
+ Goblin Balloon Brigade   | goblin balloon brigade   | battle_rule_v1:3ee1ffe5faf91652d3c784e297e0b9b2 |                  1 |                           1 |                         1 |           1
+ Gruul Nodorog            | gruul nodorog            | battle_rule_v1:24747817c1615a7feca8b0170cfaf2dd |                  1 |                           1 |                         1 |           1
+ Gust-Skimmer             | gust-skimmer             | battle_rule_v1:9b74f37395fab7ba2c0a30d1fe8d99cf |                  1 |                           1 |                         1 |           1
+ Henge Guardian           | henge guardian           | battle_rule_v1:ad5d95c26ddc943c4e8b7d8b91f63694 |                  1 |                           1 |                         1 |           1
+ Igneous Golem            | igneous golem            | battle_rule_v1:ad5d95c26ddc943c4e8b7d8b91f63694 |                  1 |                           1 |                         1 |           1
+ Kessig Wolf              | kessig wolf              | battle_rule_v1:d91a4dd7582e08ffcf129c4233bae5b3 |                  1 |                           1 |                         1 |           1
+ Killer Whale             | killer whale             | battle_rule_v1:9b74f37395fab7ba2c0a30d1fe8d99cf |                  1 |                           1 |                         1 |           1
+ Kor Sky Climber          | kor sky climber          | battle_rule_v1:ba95fae7516cf8427333d9c26944f53b |                  1 |                           1 |                         1 |           1
+ Leaping Master           | leaping master           | battle_rule_v1:3c4ae7da8bf9331aa9b3a1440351bd4f |                  1 |                           1 |                         1 |           1
+ Llanowar Cavalry         | llanowar cavalry         | battle_rule_v1:b59702d6b24ef10cfb35b8fc05141e5a |                  1 |                           1 |                         1 |           1
+ Malachite Golem          | malachite golem          | battle_rule_v1:b2d1218052b1616341977a4e35e9ec25 |                  1 |                           1 |                         1 |           1
+ Manta Riders             | manta riders             | battle_rule_v1:9b74f37395fab7ba2c0a30d1fe8d99cf |                  1 |                           1 |                         1 |           1
+ Mardu Hateblade          | mardu hateblade          | battle_rule_v1:42bc5b44120c62ba8e9dcb101d5d7dd9 |                  1 |                           1 |                         1 |           1
+ Moorland Inquisitor      | moorland inquisitor      | battle_rule_v1:f2c6d2027fec783423393124be801ac5 |                  1 |                           1 |                         1 |           1
+ Narnam Cobra             | narnam cobra             | battle_rule_v1:b610502f835ff39e6df5f67d0afa8a6d |                  1 |                           1 |                         1 |           1
+ Noble Panther            | noble panther            | battle_rule_v1:61b2044ea8db83b4e96913de03551ed6 |                  1 |                           1 |                         1 |           1
+ Patagia Golem            | patagia golem            | battle_rule_v1:9b62ab2925be0d35b587d7533e0aac23 |                  1 |                           1 |                         1 |           1
+ Pestilent Wolf           | pestilent wolf           | battle_rule_v1:e6edc8f4fa4f3e92bde6ab96372d6cd5 |                  1 |                           1 |                         1 |           1
+ Prakhata Pillar-Bug      | prakhata pillar-bug      | battle_rule_v1:36207d5b6736a4f31d0df9da8c11f96c |                  1 |                           1 |                         1 |           1
+ Riveteers Initiate       | riveteers initiate       | battle_rule_v1:cc5b9d6fab3b1edc016be5c63a665c2f |                  1 |                           1 |                         1 |           1
+ Roofstalker Wight        | roofstalker wight        | battle_rule_v1:4229b46a2d055286677776058710c9a0 |                  1 |                           1 |                         1 |           1
+ Saberclaw Golem          | saberclaw golem          | battle_rule_v1:19e21f69b210fc58f573520fe5de1209 |                  1 |                           1 |                         1 |           1
+ Serpentine Kavu          | serpentine kavu          | battle_rule_v1:a3f6c89fbf2cc5c872ba5501007c7ea4 |                  1 |                           1 |                         1 |           1
+ Skittering Heartstopper  | skittering heartstopper  | battle_rule_v1:42bc5b44120c62ba8e9dcb101d5d7dd9 |                  1 |                           1 |                         1 |           1
+ Steeple Creeper          | steeple creeper          | battle_rule_v1:74f8c06f6a78112775d5ef6b2d1e335f |                  1 |                           1 |                         1 |           1
+ Stonefare Crocodile      | stonefare crocodile      | battle_rule_v1:e198f8f84865c78788e70263781ca10a |                  1 |                           1 |                         1 |           1
+ Stream Hopper            | stream hopper            | battle_rule_v1:ea343ddf01e22d6327b886985dfbcb2e |                  1 |                           1 |                         1 |           1
+ Titanium Golem           | titanium golem           | battle_rule_v1:b5f2449c52f26c1eee1a9eb66f56ef6c |                  1 |                           1 |                         1 |           1
+ Towering Thunderfist     | towering thunderfist     | battle_rule_v1:b59702d6b24ef10cfb35b8fc05141e5a |                  1 |                           1 |                         1 |           1
+ Twilight Panther         | twilight panther         | battle_rule_v1:42bc5b44120c62ba8e9dcb101d5d7dd9 |                  1 |                           1 |                         1 |           1
+ Unyielding Krumar        | unyielding krumar        | battle_rule_v1:b5f2449c52f26c1eee1a9eb66f56ef6c |                  1 |                           1 |                         1 |           1
+ Vectis Silencers         | vectis silencers         | battle_rule_v1:549a7b1ef3848872fccc762e253f2511 |                  1 |                           1 |                         1 |           1
+ Viashino Grappler        | viashino grappler        | battle_rule_v1:46dff79e66000a67cca12590ac05f5c5 |                  1 |                           1 |                         1 |           1
+ Weldfast Monitor         | weldfast monitor         | battle_rule_v1:24747817c1615a7feca8b0170cfaf2dd |                  1 |                           1 |                         1 |           1
+ Whiptongue Frog          | whiptongue frog          | battle_rule_v1:9b74f37395fab7ba2c0a30d1fe8d99cf |                  1 |                           1 |                         1 |           1
+ Wily Bandar              | wily bandar              | battle_rule_v1:a7e1a331e5c42445e2cdee9d19f74d67 |                  1 |                           1 |                         1 |           1
+(43 rows)
+

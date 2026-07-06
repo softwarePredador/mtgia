@@ -676,6 +676,38 @@ def test_manifest_builds_simple_activated_tap_target_execution_scenario() -> Non
     assert scenario["controller_mana"]["white"] == 1
 
 
+def test_manifest_builds_simple_activated_self_keyword_execution_scenario() -> None:
+    rule = {
+        "normalized_name": "cobalt golem",
+        "card_name": "Cobalt Golem",
+        "oracle_hash": "hash-cobalt-golem",
+        "logical_rule_key": "battle_rule_v1:hash-cobalt-golem",
+        "required_effect_fields": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_self_keyword_until_eot_v1",
+            "activated_effect": "self_keyword_until_eot",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_self_keyword_until_eot_v1",
+            "target": "self",
+            "target_controller": "self",
+            "granted_keywords_until_eot": ["flying"],
+            "activation_cost_mana": "{2}{R/W}",
+            "activation_cost_generic": 2,
+            "activation_cost_colors": ["R/W"],
+            "activation_requires_tap": False,
+        },
+    }
+
+    scenario = builder.simple_activated_self_keyword_execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "simple_activated_self_keyword"
+    assert scenario["expected_keywords"] == ["flying"]
+    assert scenario["expected_tapped_source"] is False
+    assert scenario["controller_mana"]["generic"] == 2
+    assert scenario["controller_mana"]["red"] == 1
+    assert scenario["controller_mana"]["white"] == 0
+
+
 def test_manifest_expected_rule_preserves_spell_additional_sacrifice_cost_fields() -> None:
     proposal = {
         "normalized_name": "bone splinters",
