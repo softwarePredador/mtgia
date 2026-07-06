@@ -1,0 +1,441 @@
+{
+  "battle_execution": {
+    "event_count": 9,
+    "results": [
+      {
+        "card_name": "Ajani's Welcome",
+        "entering_controller": "Life Trigger Controller",
+        "life_after": 21,
+        "life_gained": 1,
+        "scenario": "Ajani's Welcome gains life when creature enters",
+        "trigger": "creature_you_control_enters"
+      },
+      {
+        "card_name": "Bogwater Lumaret",
+        "entering_controller": "Life Trigger Controller",
+        "life_after": 21,
+        "life_gained": 1,
+        "scenario": "Bogwater Lumaret gains life when creature enters",
+        "trigger": "creature_you_control_enters"
+      },
+      {
+        "card_name": "Essence Warden",
+        "entering_controller": "Opponent",
+        "life_after": 21,
+        "life_gained": 1,
+        "scenario": "Essence Warden gains life when creature enters",
+        "trigger": "creature_enters"
+      },
+      {
+        "card_name": "Healer of the Pride",
+        "entering_controller": "Life Trigger Controller",
+        "life_after": 22,
+        "life_gained": 2,
+        "scenario": "Healer of the Pride gains life when creature enters",
+        "trigger": "creature_you_control_enters"
+      },
+      {
+        "card_name": "Hinterland Sanctifier",
+        "entering_controller": "Life Trigger Controller",
+        "life_after": 21,
+        "life_gained": 1,
+        "scenario": "Hinterland Sanctifier gains life when creature enters",
+        "trigger": "creature_you_control_enters"
+      },
+      {
+        "card_name": "Impassioned Orator",
+        "entering_controller": "Life Trigger Controller",
+        "life_after": 21,
+        "life_gained": 1,
+        "scenario": "Impassioned Orator gains life when creature enters",
+        "trigger": "creature_you_control_enters"
+      },
+      {
+        "card_name": "Kor Celebrant",
+        "entering_controller": "Life Trigger Controller",
+        "life_after": 21,
+        "life_gained": 1,
+        "scenario": "Kor Celebrant gains life when creature enters",
+        "trigger": "creature_you_control_enters"
+      },
+      {
+        "card_name": "Soul Warden",
+        "entering_controller": "Opponent",
+        "life_after": 21,
+        "life_gained": 1,
+        "scenario": "Soul Warden gains life when creature enters",
+        "trigger": "creature_enters"
+      },
+      {
+        "card_name": "Soul's Attendant",
+        "entering_controller": "Opponent",
+        "life_after": 21,
+        "life_gained": 1,
+        "scenario": "Soul's Attendant gains life when creature enters",
+        "trigger": "creature_enters"
+      }
+    ],
+    "scenario_count": 9
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-06T07:50:24.228341+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg558_creature_enters_life_gain_new_server_package_manifest.json",
+  "package_id": "pg558_creature_enters_life_gain_new_server_package_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 9
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_enters_life_gain_trigger_v1",
+          "card_name": "Ajani's Welcome",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:089f3a0bad3917be07c2b3be1816798a",
+          "oracle_hash": "6d09a37bd5c0505506c94b6f2d94a7a5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_enters_life_gain_trigger_v1",
+          "card_name": "Bogwater Lumaret",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f7abc667a056e8f3a9e9f532c8e2d71b",
+          "oracle_hash": "4f1dcd5e34ac1dcc36285db8ea88fe55",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_enters_life_gain_trigger_v1",
+          "card_name": "Essence Warden",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d872267cd94ffd18d01759dffea4b534",
+          "oracle_hash": "541ce650961d6205c6983a80f0de26c8",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_enters_life_gain_trigger_v1",
+          "card_name": "Healer of the Pride",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:633cd660f33c0fbfd62a2b44e3885178",
+          "oracle_hash": "1a8c83b7c87404d6374a48479a91191f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_enters_life_gain_trigger_v1",
+          "card_name": "Hinterland Sanctifier",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e8bfae58e56b3d8549356753d856f890",
+          "oracle_hash": "e7a0375eed54098f412273247b5f1092",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_enters_life_gain_trigger_v1",
+          "card_name": "Impassioned Orator",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e7b144f63b6e37e3970f3ca0753d00f8",
+          "oracle_hash": "e7a0375eed54098f412273247b5f1092",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_enters_life_gain_trigger_v1",
+          "card_name": "Kor Celebrant",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f7abc667a056e8f3a9e9f532c8e2d71b",
+          "oracle_hash": "4f1dcd5e34ac1dcc36285db8ea88fe55",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_enters_life_gain_trigger_v1",
+          "card_name": "Soul Warden",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d872267cd94ffd18d01759dffea4b534",
+          "oracle_hash": "541ce650961d6205c6983a80f0de26c8",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_enters_life_gain_trigger_v1",
+          "card_name": "Soul's Attendant",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9a4743d4ac2cab2cf9ef969669b9606c",
+          "oracle_hash": "62c289d4ca14a9ac8ace7faa3460b6a6",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 9
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_enters_life_gain_trigger_v1",
+          "card_name": "Ajani's Welcome",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:089f3a0bad3917be07c2b3be1816798a",
+          "oracle_hash": "6d09a37bd5c0505506c94b6f2d94a7a5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_enters_life_gain_trigger_v1",
+          "card_name": "Bogwater Lumaret",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f7abc667a056e8f3a9e9f532c8e2d71b",
+          "oracle_hash": "4f1dcd5e34ac1dcc36285db8ea88fe55",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_enters_life_gain_trigger_v1",
+          "card_name": "Essence Warden",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d872267cd94ffd18d01759dffea4b534",
+          "oracle_hash": "541ce650961d6205c6983a80f0de26c8",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_enters_life_gain_trigger_v1",
+          "card_name": "Healer of the Pride",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:633cd660f33c0fbfd62a2b44e3885178",
+          "oracle_hash": "1a8c83b7c87404d6374a48479a91191f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_enters_life_gain_trigger_v1",
+          "card_name": "Hinterland Sanctifier",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e8bfae58e56b3d8549356753d856f890",
+          "oracle_hash": "e7a0375eed54098f412273247b5f1092",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_enters_life_gain_trigger_v1",
+          "card_name": "Impassioned Orator",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e7b144f63b6e37e3970f3ca0753d00f8",
+          "oracle_hash": "e7a0375eed54098f412273247b5f1092",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_enters_life_gain_trigger_v1",
+          "card_name": "Kor Celebrant",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f7abc667a056e8f3a9e9f532c8e2d71b",
+          "oracle_hash": "4f1dcd5e34ac1dcc36285db8ea88fe55",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_enters_life_gain_trigger_v1",
+          "card_name": "Soul Warden",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d872267cd94ffd18d01759dffea4b534",
+          "oracle_hash": "541ce650961d6205c6983a80f0de26c8",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_enters_life_gain_trigger_v1",
+          "card_name": "Soul's Attendant",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9a4743d4ac2cab2cf9ef969669b9606c",
+          "oracle_hash": "62c289d4ca14a9ac8ace7faa3460b6a6",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 9
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_enters_life_gain_trigger_v1",
+          "battle_rule_version": 2,
+          "card_name": "Ajani's Welcome",
+          "logical_rule_key": "battle_rule_v1:089f3a0bad3917be07c2b3be1816798a"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_enters_life_gain_trigger_v1",
+          "battle_rule_version": 2,
+          "card_name": "Bogwater Lumaret",
+          "logical_rule_key": "battle_rule_v1:f7abc667a056e8f3a9e9f532c8e2d71b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_enters_life_gain_trigger_v1",
+          "battle_rule_version": 2,
+          "card_name": "Essence Warden",
+          "logical_rule_key": "battle_rule_v1:d872267cd94ffd18d01759dffea4b534"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_enters_life_gain_trigger_v1",
+          "battle_rule_version": 2,
+          "card_name": "Healer of the Pride",
+          "logical_rule_key": "battle_rule_v1:633cd660f33c0fbfd62a2b44e3885178"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_enters_life_gain_trigger_v1",
+          "battle_rule_version": 2,
+          "card_name": "Hinterland Sanctifier",
+          "logical_rule_key": "battle_rule_v1:e8bfae58e56b3d8549356753d856f890"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_enters_life_gain_trigger_v1",
+          "battle_rule_version": 2,
+          "card_name": "Impassioned Orator",
+          "logical_rule_key": "battle_rule_v1:e7b144f63b6e37e3970f3ca0753d00f8"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_enters_life_gain_trigger_v1",
+          "battle_rule_version": 2,
+          "card_name": "Kor Celebrant",
+          "logical_rule_key": "battle_rule_v1:f7abc667a056e8f3a9e9f532c8e2d71b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_enters_life_gain_trigger_v1",
+          "battle_rule_version": 2,
+          "card_name": "Soul Warden",
+          "logical_rule_key": "battle_rule_v1:d872267cd94ffd18d01759dffea4b534"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_enters_life_gain_trigger_v1",
+          "battle_rule_version": 2,
+          "card_name": "Soul's Attendant",
+          "logical_rule_key": "battle_rule_v1:9a4743d4ac2cab2cf9ef969669b9606c"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 9
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Ajani's Welcome",
+          "component_keys": [],
+          "effect": "enchantment",
+          "logical_rule_key": "battle_rule_v1:089f3a0bad3917be07c2b3be1816798a"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Bogwater Lumaret",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:f7abc667a056e8f3a9e9f532c8e2d71b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Essence Warden",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:d872267cd94ffd18d01759dffea4b534"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Healer of the Pride",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:633cd660f33c0fbfd62a2b44e3885178"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Hinterland Sanctifier",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:e8bfae58e56b3d8549356753d856f890"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Impassioned Orator",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:e7b144f63b6e37e3970f3ca0753d00f8"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Kor Celebrant",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:f7abc667a056e8f3a9e9f532c8e2d71b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Soul Warden",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:d872267cd94ffd18d01759dffea4b534"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Soul's Attendant",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:9a4743d4ac2cab2cf9ef969669b9606c"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 9,
+        "scenarios": 9
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

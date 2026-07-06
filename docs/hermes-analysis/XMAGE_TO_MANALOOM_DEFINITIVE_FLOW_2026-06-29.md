@@ -15385,6 +15385,80 @@ converge/colors spent, damage-dealt-derived life gain, or broad non-simple
 Oracle text. Those require their own exact runtime adapter and focused package
 evidence.
 
+## PG558 Creature-Enters Life Gain New Server Evidence
+
+PG558 evidence:
+
+- exact split report:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260706_pg558_creature_enters_life_gain_candidate.md`
+- package:
+  `docs/hermes-analysis/master_optimizer_reports/pg558_creature_enters_life_gain_new_server_package_package.md`
+- apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg558_creature_enters_life_gain_new_server_apply_evidence.md`
+- PG -> SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg558_creature_enters_life_gain_new_server_sync_report.json`
+- E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg558_creature_enters_life_gain_new_server_e2e.md`
+- post-sync queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260706_post_pg558_creature_enters_life_gain_new_server.md`
+- final exact-scope recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260706_post_pg558_creature_enters_life_gain_new_server_final.md`
+- readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260706_post_pg558_creature_enters_life_gain_new_server.md`
+- final audits:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260706_post_pg558_creature_enters_life_gain_new_server_final.md`,
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260706_post_pg558_creature_enters_life_gain_new_server_final.md`,
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260706_post_pg558_creature_enters_life_gain_new_server_final.md`,
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260706_post_pg558_creature_enters_life_gain_new_server_final.md`
+
+Validation:
+
+- focused code checks passed: `py_compile`, `54` package/E2E pytest tests, and
+  `970` exact-scope/runtime unittest tests;
+- exact split selected `9` cards for
+  `xmage_creature_enters_life_gain_trigger` under
+  `xmage_creature_enters_life_gain_trigger_v1`;
+- package precheck found `9/9` target card rows and no existing matching
+  expected rules;
+- package apply upserted `9` rows and deprecated `0` shadow rows;
+- PostgreSQL postcheck confirmed `9/9` promoted rows, `9/9`
+  verified/auto rows, and `9/9` oracle-hash rows;
+- PG -> SQLite sync loaded `8,986` PostgreSQL rows, updated `8,750` SQLite
+  rows, and exported `6,487` canonical snapshot rows;
+- package E2E: `status=pass`, `scenario_count=9`, `event_count=9`, and every
+  promoted card refreshed through PostgreSQL, Hermes SQLite, canonical snapshot
+  fallback, runtime `get_card_effect`, and battle execution;
+- final exact-scope recheck has `proposal_count=0` and
+  `safe_for_batch_pg_package_count=0`;
+- final audits passed: XMage strategy `pass`, PG-Hermes-SQLite `pass`,
+  operational surface `pass`, legacy contamination `pass`.
+
+Post-sync queue evidence:
+
+- pre-cycle `target_identity_count=25514`
+- post-cycle `target_identity_count=25505`
+- post-cycle `xmage_authoritative_source_count=25191`
+- post-cycle `xmage_missing_source_exception_count=314`
+- post-cycle `xmage_authoritative_parser_gap_count=0`
+- post-cycle `xmage_authoritative_adapter_required_count=25191`
+- post-cycle `adapter_work_unit_count=11354`
+
+Runtime semantics:
+
+- controlled and global creature-enter triggers now support
+  `trigger_effect=gain_life` with fixed `trigger_gain_life`;
+- `trigger_another_creature_enters` skips the source permanent itself;
+- global triggers such as `Soul Warden` and `Essence Warden` resolve for
+  opponent-controlled creatures entering;
+- self-controller triggers such as `Ajani's Welcome`, `Healer of the Pride`,
+  `Impassioned Orator`, `Hinterland Sanctifier`, `Bogwater Lumaret`, and
+  `Kor Celebrant` resolve only for controller-side creature entry.
+
+Residual boundary: PG558 does not authorize noncreature enter filters,
+subtype-only creature enter filters, token-only filters, optional noncreature
+triggers, or life-gain rows with additional unrelated abilities. Those require
+their own exact runtime adapter and focused package evidence.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

@@ -19650,6 +19650,181 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "static_cost_reduction_colored_mana_not_supported")
 
+    def test_creature_enters_life_gain_maps_global_another_creature_trigger(self) -> None:
+        row = queue_row(
+            split.LIFE_UNIT,
+            effect_classes=["GainLifeEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldAllTriggeredAbility"],
+            xmage_signals=["triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Soul Warden",
+                type_line="Creature - Human Cleric",
+                oracle_text="Whenever another creature enters, you gain 1 life.",
+            ),
+            source_text="""
+                private static final FilterPermanent filter = new FilterCreaturePermanent("another creature");
+                static {
+                    filter.add(AnotherPredicate.instance);
+                }
+                this.addAbility(new EntersBattlefieldAllTriggeredAbility(new GainLifeEffect(1), filter));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.CREATURE_ENTERS_LIFE_GAIN_TRIGGER_SCOPE)
+        self.assertEqual(effect["trigger"], "creature_enters")
+        self.assertEqual(effect["trigger_controller_scope"], "any")
+        self.assertEqual(effect["trigger_gain_life"], 1)
+        self.assertTrue(effect["trigger_another_creature_enters"])
+        self.assertFalse(effect["trigger_optional"])
+
+    def test_creature_enters_life_gain_maps_controlled_creature_trigger(self) -> None:
+        row = queue_row(
+            split.LIFE_UNIT,
+            effect_classes=["GainLifeEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldControlledTriggeredAbility"],
+            xmage_signals=["triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Ajani's Welcome",
+                type_line="Enchantment",
+                oracle_text="Whenever a creature you control enters, you gain 1 life.",
+            ),
+            source_text="""
+                this.addAbility(new EntersBattlefieldControlledTriggeredAbility(
+                    new GainLifeEffect(1),
+                    StaticFilters.FILTER_PERMANENT_A_CREATURE
+                ));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "enchantment")
+        self.assertEqual(effect["trigger"], "creature_you_control_enters")
+        self.assertEqual(effect["trigger_controller_scope"], "self")
+        self.assertFalse(effect["trigger_another_creature_enters"])
+
+    def test_creature_enters_life_gain_ignores_source_card_subtypes(self) -> None:
+        row = queue_row(
+            split.LIFE_UNIT,
+            effect_classes=["GainLifeEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldAllTriggeredAbility"],
+            xmage_signals=["triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Essence Warden",
+                type_line="Creature - Elf Shaman",
+                oracle_text="Whenever another creature enters, you gain 1 life.",
+            ),
+            source_text="""
+                private static final FilterCreaturePermanent filter = new FilterCreaturePermanent("another creature");
+                static {
+                    filter.add(AnotherPredicate.instance);
+                }
+                this.subtype.add(SubType.ELF);
+                this.subtype.add(SubType.SHAMAN);
+                this.addAbility(new EntersBattlefieldAllTriggeredAbility(
+                    Zone.BATTLEFIELD, new GainLifeEffect(1), filter, false));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        self.assertEqual(proposal["effect_json"]["trigger_controller_scope"], "any")
+
+    def test_creature_enters_life_gain_accepts_controlled_another_creature_filter(self) -> None:
+        row = queue_row(
+            split.LIFE_UNIT,
+            effect_classes=["GainLifeEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldControlledTriggeredAbility"],
+            xmage_signals=["triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Healer of the Pride",
+                type_line="Creature - Cat Cleric",
+                oracle_text="Whenever another creature you control enters, you gain 2 life.",
+            ),
+            source_text="""
+                this.addAbility(new EntersBattlefieldControlledTriggeredAbility(
+                    Zone.BATTLEFIELD, new GainLifeEffect(2),
+                    StaticFilters.FILTER_ANOTHER_CREATURE, false));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["trigger_controller_scope"], "self")
+        self.assertEqual(effect["trigger_gain_life"], 2)
+        self.assertTrue(effect["trigger_another_creature_enters"])
+        self.assertFalse(effect["trigger_optional"])
+
+    def test_creature_enters_life_gain_maps_this_or_another_trigger(self) -> None:
+        row = queue_row(
+            split.LIFE_UNIT,
+            effect_classes=["GainLifeEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldThisOrAnotherTriggeredAbility"],
+            xmage_signals=["triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Bogwater Lumaret",
+                type_line="Creature - Spirit Frog",
+                oracle_text="Whenever this creature or another creature you control enters, you gain 1 life.",
+            ),
+            source_text="""
+                this.addAbility(new EntersBattlefieldThisOrAnotherTriggeredAbility(
+                    new GainLifeEffect(1), StaticFilters.FILTER_PERMANENT_CREATURE, false, true
+                ));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["trigger_controller_scope"], "self")
+        self.assertFalse(effect["trigger_another_creature_enters"])
+        self.assertFalse(effect["trigger_optional"])
+
+    def test_creature_enters_life_gain_blocks_noncreature_enter_filter(self) -> None:
+        row = queue_row(
+            split.LIFE_UNIT,
+            effect_classes=["GainLifeEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldAllTriggeredAbility"],
+            xmage_signals=["triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Leonin Elder",
+                type_line="Creature - Cat Cleric",
+                oracle_text="Whenever an artifact enters, you may gain 1 life.",
+            ),
+            source_text="""
+                this.addAbility(new EntersBattlefieldAllTriggeredAbility(
+                    Zone.BATTLEFIELD, new GainLifeEffect(1),
+                    StaticFilters.FILTER_PERMANENT_ARTIFACT_AN, true));
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "creature_enters_life_gain_oracle_not_exact_creature")
+
     def test_report_summarizes_selected_and_blocked_rows(self) -> None:
         rows = [
             queue_row(split.DRAW_UNIT, effect_classes=["DrawCardSourceControllerEffect"], card_id="draw"),

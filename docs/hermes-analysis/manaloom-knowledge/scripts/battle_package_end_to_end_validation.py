@@ -856,6 +856,108 @@ def run_creature_etb_dynamic_life_gain(
     }
 
 
+def run_creature_enters_life_gain(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    active = battle.Player(str(scenario.get("player") or "Life Trigger Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
+    all_players = [active, opponent]
+    active.life = int(scenario.get("starting_life") or 20)
+    opponent.life = int(scenario.get("opponent_starting_life") or 20)
+    turn = int(scenario.get("turn") or 6)
+    effect_data = battle.get_card_effect(card)
+    source = battle.prepare_entering_permanent(
+        battle.enrich_card({**card, **effect_data}),
+        controller=active,
+        all_players=all_players,
+        turn=turn,
+    )
+
+    entering_controller_name = str(scenario.get("entering_controller") or "controller")
+    if entering_controller_name == "opponent":
+        entering_controller = opponent
+        entering_opponents = [active]
+    else:
+        entering_controller = active
+        entering_opponents = [opponent]
+
+    if bool(scenario.get("source_starts_on_battlefield")):
+        active.battlefield.append(source)
+        entering_card = dict(scenario.get("entering_creature") or {
+            "name": "E2E Entering Creature",
+            "type_line": "Creature - Soldier",
+            "effect": "creature",
+            "power": 2,
+            "toughness": 2,
+        })
+        entering = battle.prepare_entering_permanent(
+            battle.enrich_card(entering_card),
+            controller=entering_controller,
+            all_players=all_players,
+            turn=turn,
+        )
+    else:
+        entering = source
+
+    entering_controller.battlefield.append(entering)
+    before_events = len(events)
+    battle.process_controlled_creature_enters_triggers(
+        entering_controller,
+        entering_opponents,
+        entering,
+        turn,
+        all_players=all_players,
+    )
+    battle.process_opponent_controlled_creature_enters_triggers(
+        entering_controller,
+        entering,
+        turn,
+        all_players=all_players,
+    )
+
+    expected_life_after = int(scenario.get("expected_life_after") or active.life)
+    expected_life_gain = int(scenario.get("expected_life_gain") or 0)
+    if active.life != expected_life_after:
+        fail(
+            "battle_execution",
+            f"{card['name']} life after creature-enter trigger={active.life}, expected {expected_life_after}",
+        )
+    event = next(
+        (
+            data
+            for event_name, data in events[before_events:]
+            if event_name == "trigger_resolved"
+            and data.get("card") == card.get("name")
+            and data.get("effect") == "gain_life"
+        ),
+        None,
+    )
+    if event is None:
+        fail("battle_events", f"missing {card['name']} creature-enter gain_life trigger_resolved event")
+    if int(event.get("life_gain_requested") or event.get("amount") or 0) != expected_life_gain:
+        fail(
+            "battle_events",
+            f"{card['name']} life_gain_requested={event.get('life_gain_requested')}, expected {expected_life_gain}",
+        )
+    expected_trigger = scenario.get("expected_trigger")
+    if expected_trigger and event.get("trigger") != expected_trigger:
+        fail(
+            "battle_events",
+            f"{card['name']} trigger={event.get('trigger')!r}, expected {expected_trigger!r}",
+        )
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "life_after": active.life,
+        "life_gained": expected_life_gain,
+        "trigger": event.get("trigger"),
+        "entering_controller": event.get("entering_controller"),
+    }
+
+
 def run_creature_etb_create_tokens(
     battle,
     scenario: dict[str, Any],
@@ -3052,6 +3154,7 @@ SCENARIO_RUNNERS = {
     "creature_etb_create_treasure": run_creature_etb_create_treasure,
     "creature_etb_create_tokens": run_creature_etb_create_tokens,
     "creature_etb_dynamic_life_gain": run_creature_etb_dynamic_life_gain,
+    "creature_enters_life_gain": run_creature_enters_life_gain,
     "creature_etb_scry": run_creature_etb_scry,
     "destroy_target_create_treasure": run_destroy_target_create_treasure,
     "dynamic_life_gain": run_dynamic_life_gain,

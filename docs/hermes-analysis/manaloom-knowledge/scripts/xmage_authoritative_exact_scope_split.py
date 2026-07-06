@@ -287,6 +287,7 @@ SPELL_CAST_DRAW_ENGINE_SCOPE = "xmage_spell_cast_draw_engine_v1"
 SPELL_CAST_ADD_COUNTERS_SOURCE_SCOPE = "xmage_spell_cast_add_counters_source_v1"
 ETB_LIFE_GAIN_CREATURE_SCOPE = "xmage_creature_etb_gain_life_v1"
 ETB_DYNAMIC_LIFE_GAIN_CREATURE_SCOPE = "xmage_creature_etb_dynamic_gain_life_v1"
+CREATURE_ENTERS_LIFE_GAIN_TRIGGER_SCOPE = "xmage_creature_enters_life_gain_trigger_v1"
 ETB_DRAW_CREATURE_SCOPE = "xmage_creature_etb_draw_cards_v1"
 ETB_SCRY_CREATURE_SCOPE = "xmage_creature_etb_scry_v1"
 ETB_OPTIONAL_DISCARD_DRAW_CREATURE_SCOPE = "xmage_creature_etb_optional_discard_draw_cards_v1"
@@ -7255,6 +7256,22 @@ def is_creature_etb_life_gain_unit(row: dict[str, Any]) -> bool:
     )
 
 
+def is_creature_enters_life_gain_unit(row: dict[str, Any]) -> bool:
+    if str(row.get("adapter_work_unit") or "") != LIFE_UNIT:
+        return False
+    abilities = ability_classes(row)
+    return (
+        effect_classes(row) == {"GainLifeEffect"}
+        and frozenset(abilities)
+        in {
+            frozenset({"EntersBattlefieldAllTriggeredAbility"}),
+            frozenset({"EntersBattlefieldControlledTriggeredAbility"}),
+            frozenset({"EntersBattlefieldThisOrAnotherTriggeredAbility"}),
+        }
+        and set(row.get("xmage_signals") or []).issubset({"triggered_ability"})
+    )
+
+
 def is_creature_dies_life_gain_unit(row: dict[str, Any]) -> bool:
     if str(row.get("adapter_work_unit") or "") != LIFE_UNIT:
         return False
@@ -13905,6 +13922,121 @@ def etb_life_gain_amount_from_oracle(metadata: dict[str, Any]) -> int | None:
     return int(match.group(1))
 
 
+def creature_enters_life_gain_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    text = re.sub(r"\s+", " ", oracle_text_after_leading_static_keywords(metadata)).strip().lower()
+    number_pattern = r"(a|one|two|three|four|five|\d+)"
+    patterns: list[tuple[str, str, bool]] = [
+        (
+            rf"whenever another creature you control enters(?: the battlefield)?[, ]+you (may )?gain {number_pattern} life\.?",
+            "self",
+            True,
+        ),
+        (
+            rf"whenever another creature enters(?: the battlefield)?[, ]+you (may )?gain {number_pattern} life\.?",
+            "any",
+            True,
+        ),
+        (
+            rf"whenever a creature you control enters(?: the battlefield)?[, ]+you (may )?gain {number_pattern} life\.?",
+            "self",
+            False,
+        ),
+        (
+            rf"whenever this creature or another creature you control enters(?: the battlefield)?[, ]+you (may )?gain {number_pattern} life\.?",
+            "self",
+            False,
+        ),
+    ]
+    for pattern, controller_scope, another_only in patterns:
+        match = re.fullmatch(pattern, text)
+        if not match:
+            continue
+        amount = number_word_to_int(match.group(2))
+        if amount <= 0:
+            return "creature_enters_life_gain_oracle_amount_not_fixed"
+        trigger = "creature_enters" if controller_scope == "any" else "creature_you_control_enters"
+        return {
+            "trigger": trigger,
+            "trigger_effect": "gain_life",
+            "trigger_controller_scope": controller_scope,
+            "trigger_gain_life": amount,
+            "trigger_another_creature_enters": another_only,
+            "trigger_optional": bool(match.group(1)),
+            "trigger_entering_card_types": ["creature"],
+        }
+    return "creature_enters_life_gain_oracle_not_exact_creature"
+
+
+def creature_enters_life_gain_from_source(source_text: str, ability_names: set[str]) -> dict[str, Any] | str:
+    text = str(source_text or "")
+    amount = java_constructor_int(text, "GainLifeEffect")
+    if amount is None or amount <= 0:
+        return "creature_enters_life_gain_source_amount_not_fixed"
+    if "TokenPredicate" in text:
+        return "creature_enters_life_gain_source_token_filter_not_supported"
+    if "FILTER_PERMANENT_ARTIFACT" in text or "FILTER_LAND" in text or "FilterLandPermanent" in text:
+        return "creature_enters_life_gain_source_noncreature_filter_not_supported"
+    if re.search(r"\bfilter\.add\s*\(\s*SubType\.", text):
+        return "creature_enters_life_gain_source_subtype_filter_not_supported"
+
+    optional = False
+    another_only = bool(
+        "AnotherPredicate.instance" in text
+        or "FILTER_ANOTHER_CREATURE" in text
+        or "FILTER_ANOTHER_CREATURE_YOU_CONTROL" in text
+    )
+    if ability_names == {"EntersBattlefieldAllTriggeredAbility"}:
+        optional = bool(
+            re.search(
+                r"EntersBattlefieldAllTriggeredAbility\s*\([^;]*,\s*true\s*\)",
+                text,
+                flags=re.DOTALL,
+            )
+        )
+        if (
+            "FilterCreaturePermanent" not in text
+            and "FILTER_ANOTHER_CREATURE" not in text
+            and "FILTER_ANOTHER_CREATURE_YOU_CONTROL" not in text
+        ):
+            return "creature_enters_life_gain_source_creature_filter_not_supported"
+        controller_scope = "self" if "FILTER_ANOTHER_CREATURE_YOU_CONTROL" in text else "any"
+        trigger = "creature_you_control_enters" if controller_scope == "self" else "creature_enters"
+    elif ability_names == {"EntersBattlefieldControlledTriggeredAbility"}:
+        optional = bool(
+            re.search(
+                r"EntersBattlefieldControlledTriggeredAbility\s*\([^;]*,\s*true\s*\)",
+                text,
+                flags=re.DOTALL,
+            )
+        )
+        if (
+            "FILTER_PERMANENT_A_CREATURE" not in text
+            and "FILTER_ANOTHER_CREATURE" not in text
+            and "FilterControlledCreaturePermanent" not in text
+        ):
+            return "creature_enters_life_gain_source_creature_filter_not_supported"
+        controller_scope = "self"
+        trigger = "creature_you_control_enters"
+    elif ability_names == {"EntersBattlefieldThisOrAnotherTriggeredAbility"}:
+        if "FILTER_PERMANENT_CREATURE" not in text:
+            return "creature_enters_life_gain_source_creature_filter_not_supported"
+        controller_scope = "self"
+        trigger = "creature_you_control_enters"
+        another_only = False
+    else:
+        return "creature_enters_life_gain_source_ability_not_supported"
+
+    return {
+        "trigger": trigger,
+        "trigger_effect": "gain_life",
+        "trigger_controller_scope": controller_scope,
+        "trigger_gain_life": amount,
+        "trigger_another_creature_enters": another_only,
+        "trigger_optional": optional,
+        "trigger_entering_card_types": ["creature"],
+    }
+
+
 def dies_life_gain_amount_from_oracle(metadata: dict[str, Any]) -> int | None:
     text = re.sub(r"\s+", " ", oracle_text_after_leading_static_keywords(metadata)).strip()
     match = re.fullmatch(
@@ -16246,6 +16378,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "creature ETB dynamic battlefield-count damage trigger"
     elif scope == ETB_DYNAMIC_LIFE_GAIN_CREATURE_SCOPE:
         scope_kind = "creature ETB dynamic life-gain trigger"
+    elif scope == CREATURE_ENTERS_LIFE_GAIN_TRIGGER_SCOPE:
+        scope_kind = "permanent trigger when a creature enters and controller gains life"
     elif scope == ETB_BOUNCE_CREATURE_SCOPE:
         scope_kind = "creature ETB return target permanent to hand trigger"
     elif scope == DESTROY_GAIN_LIFE_SCOPE:
@@ -16315,6 +16449,7 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
     elif scope in {
         ETB_LIFE_GAIN_CREATURE_SCOPE,
         ETB_DYNAMIC_LIFE_GAIN_CREATURE_SCOPE,
+        CREATURE_ENTERS_LIFE_GAIN_TRIGGER_SCOPE,
         ETB_DRAW_CREATURE_SCOPE,
         ETB_DRAW_LOSE_LIFE_CREATURE_SCOPE,
         ETB_DAMAGE_CREATURE_SCOPE,
@@ -16450,6 +16585,7 @@ def split_row(
     )
     static_horsemanship_creature_unit = is_static_horsemanship_creature_unit(row)
     etb_life_gain_creature_unit = is_creature_etb_life_gain_unit(row)
+    creature_enters_life_gain_unit = is_creature_enters_life_gain_unit(row)
     dies_life_gain_creature_unit = is_creature_dies_life_gain_unit(row)
     etb_draw_creature_unit = is_creature_etb_draw_unit(row)
     etb_scry_creature_unit = is_creature_etb_scry_unit(row)
@@ -16575,6 +16711,7 @@ def split_row(
         and not static_flying_can_block_only_flying_creature_unit
         and not static_horsemanship_creature_unit
         and not etb_life_gain_creature_unit
+        and not creature_enters_life_gain_unit
         and not dies_life_gain_creature_unit
         and not etb_draw_creature_unit
         and not etb_scry_creature_unit
@@ -16644,6 +16781,7 @@ def split_row(
     if (
         (unit in SPELL_UNITS or boost_keyword_spell_unit)
         and not etb_life_gain_creature_unit
+        and not creature_enters_life_gain_unit
         and not static_protection_from_colors_creature_unit
         and not static_cast_as_flash_permission_unit
         and not static_cant_be_blocked_creature_unit
@@ -19918,6 +20056,51 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_creature_etb_gain_life",
+        ), "selected_exact_scope"
+
+    if creature_enters_life_gain_unit:
+        if not is_permanent_metadata(metadata) or is_spell(metadata):
+            return None, "creature_enters_life_gain_not_permanent"
+        oracle_trigger = creature_enters_life_gain_from_oracle(metadata)
+        if isinstance(oracle_trigger, str):
+            return None, oracle_trigger
+        source_trigger = creature_enters_life_gain_from_source(source_text, ability_classes(row))
+        if isinstance(source_trigger, str):
+            return None, source_trigger
+        for key in (
+            "trigger",
+            "trigger_effect",
+            "trigger_controller_scope",
+            "trigger_gain_life",
+            "trigger_another_creature_enters",
+            "trigger_optional",
+            "trigger_entering_card_types",
+        ):
+            if source_trigger.get(key) != oracle_trigger.get(key):
+                return None, "creature_enters_life_gain_source_oracle_mismatch"
+        type_line = str(metadata.get("type_line") or "").lower()
+        permanent_effect = (
+            "creature"
+            if "creature" in type_line
+            else "enchantment"
+            if "enchantment" in type_line
+            else "artifact"
+            if "artifact" in type_line
+            else "permanent"
+        )
+        effect_json = {
+            "effect": permanent_effect,
+            "battle_model_scope": CREATURE_ENTERS_LIFE_GAIN_TRIGGER_SCOPE,
+            "ability_kind": "triggered",
+            "xmage_effect_class": "GainLifeEffect",
+            "xmage_ability_class": next(iter(ability_classes(row))),
+            **oracle_trigger,
+        }
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_creature_enters_life_gain_trigger",
         ), "selected_exact_scope"
 
     if dies_life_gain_creature_unit:

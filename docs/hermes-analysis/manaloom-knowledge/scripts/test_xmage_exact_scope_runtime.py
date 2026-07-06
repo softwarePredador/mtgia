@@ -16851,6 +16851,90 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertEqual([card["name"] for card in blue_instants], ["Jace's Ingenuity"])
         self.assertEqual([card["name"] for card in named_legend], ["Akroma's Memorial"])
 
+    def test_creature_enters_life_gain_triggers_on_opponent_creature_for_global_scope(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.life = 20
+        source = {
+            "name": "Soul Warden",
+            "type_line": "Creature - Human Cleric",
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_enters_life_gain_trigger_v1",
+            "trigger": "creature_enters",
+            "trigger_effect": "gain_life",
+            "trigger_controller_scope": "any",
+            "trigger_gain_life": 1,
+            "trigger_another_creature_enters": True,
+            "_rule_logical_key": "battle_rule_v1:fixture_soul_warden",
+        }
+        entering = {
+            "name": "Opponent Bear",
+            "type_line": "Creature - Bear",
+            "effect": "creature",
+            "power": 2,
+            "toughness": 2,
+        }
+        active.battlefield = [source]
+        opponent.battlefield = [entering]
+
+        self.battle.process_opponent_controlled_creature_enters_triggers(
+            opponent,
+            entering,
+            turn=3,
+            all_players=[active, opponent],
+        )
+
+        self.assertEqual(active.life, 21)
+        self.assertTrue(
+            any(
+                event == "trigger_resolved"
+                and data.get("card") == "Soul Warden"
+                and data.get("trigger") == "creature_enters"
+                and data.get("effect") == "gain_life"
+                and data.get("life_gained") == 1
+                and data.get("entering_controller") == "Opponent"
+                for event, data in self.events
+            )
+        )
+
+    def test_creature_enters_life_gain_triggers_when_source_itself_enters_if_not_another_only(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.life = 20
+        source = {
+            "name": "Kor Celebrant",
+            "type_line": "Creature - Kor Cleric",
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_enters_life_gain_trigger_v1",
+            "trigger": "creature_you_control_enters",
+            "trigger_effect": "gain_life",
+            "trigger_controller_scope": "self",
+            "trigger_gain_life": 1,
+            "trigger_another_creature_enters": False,
+            "_rule_logical_key": "battle_rule_v1:fixture_kor_celebrant",
+        }
+        active.battlefield = [source]
+
+        self.battle.process_controlled_creature_enters_triggers(
+            active,
+            [opponent],
+            source,
+            turn=4,
+            all_players=[active, opponent],
+        )
+
+        self.assertEqual(active.life, 21)
+        self.assertTrue(
+            any(
+                event == "trigger_resolved"
+                and data.get("card") == "Kor Celebrant"
+                and data.get("trigger") == "creature_you_control_enters"
+                and data.get("effect") == "gain_life"
+                and data.get("life_gained") == 1
+                for event, data in self.events
+            )
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

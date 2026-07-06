@@ -38249,16 +38249,66 @@ def process_controlled_creature_enters_triggers(
         permanent
         for permanent in list(getattr(player, "battlefield", []) or [])
         if isinstance(permanent, dict)
-        and permanent.get("trigger") == "creature_you_control_enters"
-        and permanent.get("trigger_effect") in {"damage_each_opponent", "damage_any_target"}
+        and permanent.get("trigger") in {"creature_you_control_enters", "creature_enters"}
+        and permanent.get("trigger_effect") in {"damage_each_opponent", "damage_any_target", "gain_life"}
     ]
     resolved = 0
     for permanent in trigger_sources:
         if (
             permanent is entering_permanent
             and permanent.get("trigger_another_creature_you_control_enters")
+            or permanent is entering_permanent
+            and permanent.get("trigger_another_creature_enters")
         ):
             continue
+        if permanent.get("trigger_effect") == "gain_life":
+            amount = int(
+                permanent.get("trigger_gain_life")
+                or permanent.get("gain_life")
+                or permanent.get("controller_gain_life")
+                or 0
+            )
+            if amount <= 0:
+                continue
+
+            def resolve_creature_enters_gain_life_trigger(permanent=permanent, amount=amount):
+                controller_life_before = player.life
+                gain_life(player, amount, cap=999)
+                controller_life_after = player.life
+                emit_replay_event(
+                    "trigger_resolved",
+                    player=player.name,
+                    card=permanent.get("name", "?"),
+                    trigger=permanent.get("trigger") or "creature_you_control_enters",
+                    entering_creature=entering_permanent.get("name", "?"),
+                    entering_controller=getattr(player, "name", "?"),
+                    source_event=source_event,
+                    effect="gain_life",
+                    amount=amount,
+                    life_gain_requested=amount,
+                    life_gained=max(0, controller_life_after - controller_life_before),
+                    controller_life_before=controller_life_before,
+                    controller_life_after=controller_life_after,
+                    turn=turn,
+                    **replay_rule_fields(permanent),
+                )
+
+            resolve_or_enqueue_trigger(
+                player,
+                permanent,
+                permanent.get("trigger") or "creature_you_control_enters",
+                resolve_creature_enters_gain_life_trigger,
+                stack=stack,
+                active_player=active_player,
+                all_players=all_players,
+                data={
+                    "entering_creature": entering_permanent.get("name", "?"),
+                    "source_event": source_event,
+                },
+            )
+            resolved += 1
+            continue
+
         if permanent.get("trigger_effect") == "damage_each_opponent":
             amount = int(permanent.get("trigger_damage_each_opponent") or permanent.get("damage") or 1)
             if amount <= 0:
@@ -38413,7 +38463,7 @@ def process_opponent_controlled_creature_enters_triggers(
             permanent
             for permanent in list(getattr(source_controller, "battlefield", []) or [])
             if isinstance(permanent, dict)
-            and permanent.get("trigger") == "creature_enters_under_opponent_control"
+            and permanent.get("trigger") in {"creature_enters_under_opponent_control", "creature_enters"}
             and permanent.get("trigger_effect") == "gain_life"
         ]
         for permanent in trigger_sources:
@@ -38438,12 +38488,14 @@ def process_opponent_controlled_creature_enters_triggers(
                     "trigger_resolved",
                     player=source_controller.name,
                     card=permanent.get("name", "?"),
-                    trigger="creature_enters_under_opponent_control",
+                    trigger=permanent.get("trigger") or "creature_enters_under_opponent_control",
                     entering_creature=entering_permanent.get("name", "?"),
                     entering_controller=getattr(entering_controller, "name", "?"),
                     source_event=source_event,
                     effect="gain_life",
                     amount=amount,
+                    life_gain_requested=amount,
+                    life_gained=max(0, controller_life_after - controller_life_before),
                     controller_life_before=controller_life_before,
                     controller_life_after=controller_life_after,
                     turn=turn,
@@ -38453,7 +38505,7 @@ def process_opponent_controlled_creature_enters_triggers(
             resolve_or_enqueue_trigger(
                 source_controller,
                 permanent,
-                "creature_enters_under_opponent_control",
+                permanent.get("trigger") or "creature_enters_under_opponent_control",
                 resolve_opponent_creature_enters_gain_life_trigger,
                 stack=stack,
                 active_player=active_player,
