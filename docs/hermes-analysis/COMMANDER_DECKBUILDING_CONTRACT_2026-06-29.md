@@ -192,7 +192,11 @@ Operational priority after this pivot:
    above-range capacity roles as cut pressure rather than missing-role add
    lanes, while keeping same-deck source expansion, candidate copy, battle,
    mutation, and promotion closed; when `engine` was exhausted, the builder
-   must hold `engine` as evidence and route the next non-exhausted axis; then run
+   must hold `engine` as evidence and route the next non-exhausted axis; if the
+   chosen axis is `ramp`, then run
+   `global_commander_ramp_axis_nonland_cut_policy_model.py` to apply ramp
+   ceiling policy to blocked nonland ramp cuts before any same-deck source
+   expansion; if the chosen axis is `engine`, then run
    `global_commander_engine_axis_nonland_cut_policy_model.py` to apply that
    policy to the current nonland cut model, split engine-only and
    excess-overlap cut pressure from protected commander-plan engines, and route
@@ -579,6 +583,7 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_role_axis_policy_builder_20260706_engine_axis_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_role_axis_policy_builder_20260706_post_engine_axis_exhaustion_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_engine_axis_nonland_cut_policy_model_20260706_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_axis_nonland_cut_policy_model_20260706_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_engine_cut_usage_same_lane_proof_scout_20260706_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_engine_cut_followup_router_20260706_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_engine_cut_trace_replacement_gate_20260706_current.md`
@@ -1596,6 +1601,13 @@ Current external refresh on 2026-07-05:
   `engine` until new card-level evidence exists (`held_engine_axis_count=1`),
   and routes the next gate to
   `apply_ramp_axis_policy_before_more_same_deck_source_expansion`.
+- The ramp-axis nonland cut policy model then applies that ramp ceiling policy
+  to deck `619`'s blocked nonland cut candidates. It evaluates `24` cuts,
+  exposes `9` ramp cut-pressure rows as review-only, keeps `2` ramp-overlap
+  non-excess rows blocked for review, and emits `9` add/cut pairs that still
+  require card-level usage and same-lane proof. Candidate copy, battle, DB
+  mutation, and promotion remain closed; the next gate is
+  `collect_card_level_usage_and_same_lane_proof_for_ramp_policy_cut_pressure`.
 
 ## Global Commander Rollout - 2026-07-01
 

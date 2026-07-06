@@ -1,0 +1,1048 @@
+{
+  "artifact_type": "global_commander_ramp_axis_nonland_cut_policy_model",
+  "battle_gate_allowed_now": false,
+  "battle_or_optimization_performed": false,
+  "blockers": [
+    "ramp_policy_cut_pressure_is_not_card_level_cut_permission",
+    "candidate_copy_closed_until_usage_same_lane_and_battle_feedback_memory_exist",
+    "battle_gate_closed_until_candidate_copy_strategy_matrix_and_replay_trace"
+  ],
+  "candidate_copy_allowed_now": false,
+  "contract": "docs/hermes-analysis/COMMANDER_DECKBUILDING_CONTRACT_2026-06-29.md",
+  "generated_at": "2026-07-06T05:29:20.652579+00:00",
+  "mutation_allowed": false,
+  "policy": {
+    "cut_boundary": "Only ramp-only or excess-overlap cards become review cut pressure, and still need card-level proof.",
+    "mutation_boundary": "This model does not choose cards, copy decks, run battle, mutate DBs, or promote packages.",
+    "protection_boundary": "Ramp cards with missing-floor overlap or commander-plan signals are protected until source-lane review.",
+    "ramp_boundary": "Ramp is capacity pressure when above range; it is not an add lane."
+  },
+  "pool_policy_rows": [
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "commander": "Kaalia of the Vast",
+      "deck_id": "619",
+      "deck_name": "VARIANT Kaalia Variant 01 - Rafael Paste 2026-06-24",
+      "evaluated_cut_count": 24,
+      "excess_roles": [
+        "engine",
+        "ramp",
+        "tutor"
+      ],
+      "missing_roles": [
+        "removal"
+      ],
+      "mutation_allowed": false,
+      "pair_rows": [
+        {
+          "add": "Feed the Swarm",
+          "battle_gate_allowed": false,
+          "candidate_copy_allowed": false,
+          "cut": "Arcane Signet",
+          "mutation_allowed": false,
+          "promotion_allowed": false,
+          "required_gate": "collect_card_level_usage_and_same_lane_proof_for_ramp_policy_cut_pressure",
+          "status": "ramp_policy_pair_needs_card_level_usage_and_same_lane_proof"
+        },
+        {
+          "add": "Feed the Swarm",
+          "battle_gate_allowed": false,
+          "candidate_copy_allowed": false,
+          "cut": "Basalt Monolith",
+          "mutation_allowed": false,
+          "promotion_allowed": false,
+          "required_gate": "collect_card_level_usage_and_same_lane_proof_for_ramp_policy_cut_pressure",
+          "status": "ramp_policy_pair_needs_card_level_usage_and_same_lane_proof"
+        },
+        {
+          "add": "Feed the Swarm",
+          "battle_gate_allowed": false,
+          "candidate_copy_allowed": false,
+          "cut": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+          "mutation_allowed": false,
+          "promotion_allowed": false,
+          "required_gate": "collect_card_level_usage_and_same_lane_proof_for_ramp_policy_cut_pressure",
+          "status": "ramp_policy_pair_needs_card_level_usage_and_same_lane_proof"
+        },
+        {
+          "add": "Path to Exile",
+          "battle_gate_allowed": false,
+          "candidate_copy_allowed": false,
+          "cut": "Arcane Signet",
+          "mutation_allowed": false,
+          "promotion_allowed": false,
+          "required_gate": "collect_card_level_usage_and_same_lane_proof_for_ramp_policy_cut_pressure",
+          "status": "ramp_policy_pair_needs_card_level_usage_and_same_lane_proof"
+        },
+        {
+          "add": "Path to Exile",
+          "battle_gate_allowed": false,
+          "candidate_copy_allowed": false,
+          "cut": "Basalt Monolith",
+          "mutation_allowed": false,
+          "promotion_allowed": false,
+          "required_gate": "collect_card_level_usage_and_same_lane_proof_for_ramp_policy_cut_pressure",
+          "status": "ramp_policy_pair_needs_card_level_usage_and_same_lane_proof"
+        },
+        {
+          "add": "Path to Exile",
+          "battle_gate_allowed": false,
+          "candidate_copy_allowed": false,
+          "cut": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+          "mutation_allowed": false,
+          "promotion_allowed": false,
+          "required_gate": "collect_card_level_usage_and_same_lane_proof_for_ramp_policy_cut_pressure",
+          "status": "ramp_policy_pair_needs_card_level_usage_and_same_lane_proof"
+        },
+        {
+          "add": "Swords to Plowshares",
+          "battle_gate_allowed": false,
+          "candidate_copy_allowed": false,
+          "cut": "Arcane Signet",
+          "mutation_allowed": false,
+          "promotion_allowed": false,
+          "required_gate": "collect_card_level_usage_and_same_lane_proof_for_ramp_policy_cut_pressure",
+          "status": "ramp_policy_pair_needs_card_level_usage_and_same_lane_proof"
+        },
+        {
+          "add": "Swords to Plowshares",
+          "battle_gate_allowed": false,
+          "candidate_copy_allowed": false,
+          "cut": "Basalt Monolith",
+          "mutation_allowed": false,
+          "promotion_allowed": false,
+          "required_gate": "collect_card_level_usage_and_same_lane_proof_for_ramp_policy_cut_pressure",
+          "status": "ramp_policy_pair_needs_card_level_usage_and_same_lane_proof"
+        },
+        {
+          "add": "Swords to Plowshares",
+          "battle_gate_allowed": false,
+          "candidate_copy_allowed": false,
+          "cut": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+          "mutation_allowed": false,
+          "promotion_allowed": false,
+          "required_gate": "collect_card_level_usage_and_same_lane_proof_for_ramp_policy_cut_pressure",
+          "status": "ramp_policy_pair_needs_card_level_usage_and_same_lane_proof"
+        }
+      ],
+      "policy_bucket_counts": {
+        "non_ramp_cut_outside_ramp_axis_policy": 13,
+        "ramp_only_excess_cut_pressure": 8,
+        "ramp_overlap_excess_cut_pressure": 1,
+        "ramp_overlap_non_excess_requires_review": 2
+      },
+      "policy_cut_rows": [
+        {
+          "battle_gate_allowed": false,
+          "candidate_copy_allowed": false,
+          "card_name": "Arcane Signet",
+          "classification_source": "text_inferred",
+          "cmc": 2.0,
+          "commander_plan_signals": [],
+          "cut_pressure_ready": true,
+          "matching_excess_roles": [
+            "ramp"
+          ],
+          "missing_role_overlap": [],
+          "mutation_allowed": false,
+          "non_excess_overlap": [],
+          "original_cut_reasons": [
+            "cross_lane_ramp_cut_requires_same_lane_source_or_gate"
+          ],
+          "original_score": 0,
+          "policy_blockers": [],
+          "policy_bucket": "ramp_only_excess_cut_pressure",
+          "policy_reasons": [
+            "ramp_is_capacity_ceiling_not_missing_role",
+            "cut_pressure_is_review_only_not_card_level_permission",
+            "protect_missing_floor_and_commander_plan_before_cut"
+          ],
+          "policy_status": "ramp_axis_policy_review_cut_pressure_ready",
+          "promotion_allowed": false,
+          "roles": [
+            "ramp"
+          ]
+        },
+        {
+          "battle_gate_allowed": false,
+          "candidate_copy_allowed": false,
+          "card_name": "Basalt Monolith",
+          "classification_source": "text_inferred",
+          "cmc": 3.0,
+          "commander_plan_signals": [],
+          "cut_pressure_ready": true,
+          "matching_excess_roles": [
+            "ramp"
+          ],
+          "missing_role_overlap": [],
+          "mutation_allowed": false,
+          "non_excess_overlap": [],
+          "original_cut_reasons": [
+            "cross_lane_ramp_cut_requires_same_lane_source_or_gate"
+          ],
+          "original_score": 0,
+          "policy_blockers": [],
+          "policy_bucket": "ramp_only_excess_cut_pressure",
+          "policy_reasons": [
+            "ramp_is_capacity_ceiling_not_missing_role",
+            "cut_pressure_is_review_only_not_card_level_permission",
+            "protect_missing_floor_and_commander_plan_before_cut"
+          ],
+          "policy_status": "ramp_axis_policy_review_cut_pressure_ready",
+          "promotion_allowed": false,
+          "roles": [
+            "ramp"
+          ]
+        },
+        {
+          "battle_gate_allowed": false,
+          "candidate_copy_allowed": false,
+          "card_name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+          "classification_source": "text_inferred",
+          "cmc": 3.0,
+          "commander_plan_signals": [],
+          "cut_pressure_ready": true,
+          "matching_excess_roles": [
+            "engine",
+            "ramp"
+          ],
+          "missing_role_overlap": [],
+          "mutation_allowed": false,
+          "non_excess_overlap": [],
+          "original_cut_reasons": [
+            "cross_lane_ramp_cut_requires_same_lane_source_or_gate"
+          ],
+          "original_score": 0,
+          "policy_blockers": [],
+          "policy_bucket": "ramp_overlap_excess_cut_pressure",
+          "policy_reasons": [
+            "ramp_is_capacity_ceiling_not_missing_role",
+            "cut_pressure_is_review_only_not_card_level_permission",
+            "protect_missing_floor_and_commander_plan_before_cut"
+          ],
+          "policy_status": "ramp_axis_policy_review_cut_pressure_ready",
+          "promotion_allowed": false,
+          "roles": [
+            "engine",
+            "ramp"
+          ]
+        },
+        {
+          "battle_gate_allowed": false,
+          "candidate_copy_allowed": false,
+          "card_name": "Burnt Offering",
+          "classification_source": "text_inferred",
+          "cmc": 1.0,
+          "commander_plan_signals": [],
+          "cut_pressure_ready": true,
+          "matching_excess_roles": [
+            "ramp"
+          ],
+          "missing_role_overlap": [],
+          "mutation_allowed": false,
+          "non_excess_overlap": [],
+          "original_cut_reasons": [
+            "cross_lane_ramp_cut_requires_same_lane_source_or_gate"
+          ],
+          "original_score": 0,
+          "policy_blockers": [],
+          "policy_bucket": "ramp_only_excess_cut_pressure",
+          "policy_reasons": [
+            "ramp_is_capacity_ceiling_not_missing_role",
+            "cut_pressure_is_review_only_not_card_level_permission",
+            "protect_missing_floor_and_commander_plan_before_cut"
+          ],
+          "policy_status": "ramp_axis_policy_review_cut_pressure_ready",
+          "promotion_allowed": false,
+          "roles": [
+            "ramp"
+          ]
+        },
+        {
+          "battle_gate_allowed": false,
+          "candidate_copy_allowed": false,
+          "card_name": "Cabal Ritual",
+          "classification_source": "text_inferred",
+          "cmc": 2.0,
+          "commander_plan_signals": [],
+          "cut_pressure_ready": true,
+          "matching_excess_roles": [
+            "ramp"
+          ],
+          "missing_role_overlap": [],
+          "mutation_allowed": false,
+          "non_excess_overlap": [],
+          "original_cut_reasons": [
+            "cross_lane_ramp_cut_requires_same_lane_source_or_gate"
+          ],
+          "original_score": 0,
+          "policy_blockers": [],
+          "policy_bucket": "ramp_only_excess_cut_pressure",
+          "policy_reasons": [
+            "ramp_is_capacity_ceiling_not_missing_role",
+            "cut_pressure_is_review_only_not_card_level_permission",
+            "protect_missing_floor_and_commander_plan_before_cut"
+          ],
+          "policy_status": "ramp_axis_policy_review_cut_pressure_ready",
+          "promotion_allowed": false,
+          "roles": [
+            "ramp"
+          ]
+        },
+        {
+          "battle_gate_allowed": false,
+          "candidate_copy_allowed": false,
+          "card_name": "Culling the Weak",
+          "classification_source": "text_inferred",
+          "cmc": 1.0,
+          "commander_plan_signals": [],
+          "cut_pressure_ready": true,
+          "matching_excess_roles": [
+            "ramp"
+          ],
+          "missing_role_overlap": [],
+          "mutation_allowed": false,
+          "non_excess_overlap": [],
+          "original_cut_reasons": [
+            "cross_lane_ramp_cut_requires_same_lane_source_or_gate"
+          ],
+          "original_score": 0,
+          "policy_blockers": [],
+          "policy_bucket": "ramp_only_excess_cut_pressure",
+          "policy_reasons": [
+            "ramp_is_capacity_ceiling_not_missing_role",
+            "cut_pressure_is_review_only_not_card_level_permission",
+            "protect_missing_floor_and_commander_plan_before_cut"
+          ],
+          "policy_status": "ramp_axis_policy_review_cut_pressure_ready",
+          "promotion_allowed": false,
+          "roles": [
+            "ramp"
+          ]
+        },
+        {
+          "battle_gate_allowed": false,
+          "candidate_copy_allowed": false,
+          "card_name": "Dark Ritual",
+          "classification_source": "text_inferred",
+          "cmc": 1.0,
+          "commander_plan_signals": [],
+          "cut_pressure_ready": true,
+          "matching_excess_roles": [
+            "ramp"
+          ],
+          "missing_role_overlap": [],
+          "mutation_allowed": false,
+          "non_excess_overlap": [],
+          "original_cut_reasons": [
+            "cross_lane_ramp_cut_requires_same_lane_source_or_gate"
+          ],
+          "original_score": 0,
+          "policy_blockers": [],
+          "policy_bucket": "ramp_only_excess_cut_pressure",
+          "policy_reasons": [
+            "ramp_is_capacity_ceiling_not_missing_role",
+            "cut_pressure_is_review_only_not_card_level_permission",
+            "protect_missing_floor_and_commander_plan_before_cut"
+          ],
+          "policy_status": "ramp_axis_policy_review_cut_pressure_ready",
+          "promotion_allowed": false,
+          "roles": [
+            "ramp"
+          ]
+        },
+        {
+          "battle_gate_allowed": false,
+          "candidate_copy_allowed": false,
+          "card_name": "Desperate Ritual",
+          "classification_source": "text_inferred",
+          "cmc": 2.0,
+          "commander_plan_signals": [],
+          "cut_pressure_ready": true,
+          "matching_excess_roles": [
+            "ramp"
+          ],
+          "missing_role_overlap": [],
+          "mutation_allowed": false,
+          "non_excess_overlap": [],
+          "original_cut_reasons": [
+            "cross_lane_ramp_cut_requires_same_lane_source_or_gate"
+          ],
+          "original_score": 0,
+          "policy_blockers": [],
+          "policy_bucket": "ramp_only_excess_cut_pressure",
+          "policy_reasons": [
+            "ramp_is_capacity_ceiling_not_missing_role",
+            "cut_pressure_is_review_only_not_card_level_permission",
+            "protect_missing_floor_and_commander_plan_before_cut"
+          ],
+          "policy_status": "ramp_axis_policy_review_cut_pressure_ready",
+          "promotion_allowed": false,
+          "roles": [
+            "ramp"
+          ]
+        },
+        {
+          "battle_gate_allowed": false,
+          "candidate_copy_allowed": false,
+          "card_name": "Grim Monolith",
+          "classification_source": "text_inferred",
+          "cmc": 2.0,
+          "commander_plan_signals": [],
+          "cut_pressure_ready": true,
+          "matching_excess_roles": [
+            "ramp"
+          ],
+          "missing_role_overlap": [],
+          "mutation_allowed": false,
+          "non_excess_overlap": [],
+          "original_cut_reasons": [
+            "cross_lane_ramp_cut_requires_same_lane_source_or_gate"
+          ],
+          "original_score": 0,
+          "policy_blockers": [],
+          "policy_bucket": "ramp_only_excess_cut_pressure",
+          "policy_reasons": [
+            "ramp_is_capacity_ceiling_not_missing_role",
+            "cut_pressure_is_review_only_not_card_level_permission",
+            "protect_missing_floor_and_commander_plan_before_cut"
+          ],
+          "policy_status": "ramp_axis_policy_review_cut_pressure_ready",
+          "promotion_allowed": false,
+          "roles": [
+            "ramp"
+          ]
+        },
+        {
+          "battle_gate_allowed": false,
+          "candidate_copy_allowed": false,
+          "card_name": "Archaeomancer's Map",
+          "classification_source": "text_inferred",
+          "cmc": 3.0,
+          "commander_plan_signals": [],
+          "cut_pressure_ready": false,
+          "matching_excess_roles": [
+            "engine",
+            "tutor"
+          ],
+          "missing_role_overlap": [],
+          "mutation_allowed": false,
+          "non_excess_overlap": [],
+          "original_cut_reasons": [
+            "matches_excess_roles:engine,tutor",
+            "only_carries_excess_roles",
+            "role_text_inferred_review"
+          ],
+          "original_score": 33,
+          "policy_blockers": [
+            "cut_does_not_carry_ramp_role"
+          ],
+          "policy_bucket": "non_ramp_cut_outside_ramp_axis_policy",
+          "policy_reasons": [
+            "ramp_is_capacity_ceiling_not_missing_role",
+            "cut_pressure_is_review_only_not_card_level_permission",
+            "protect_missing_floor_and_commander_plan_before_cut"
+          ],
+          "policy_status": "ramp_axis_policy_not_applicable_to_cut",
+          "promotion_allowed": false,
+          "roles": [
+            "engine",
+            "tutor"
+          ]
+        },
+        {
+          "battle_gate_allowed": false,
+          "candidate_copy_allowed": false,
+          "card_name": "Genji Glove",
+          "classification_source": "text_inferred",
+          "cmc": 5.0,
+          "commander_plan_signals": [
+            "kaalia_attack_window_or_extra_combat",
+            "kaalia_equipment_support_package"
+          ],
+          "cut_pressure_ready": false,
+          "matching_excess_roles": [
+            "engine"
+          ],
+          "missing_role_overlap": [],
+          "mutation_allowed": false,
+          "non_excess_overlap": [],
+          "original_cut_reasons": [
+            "matches_excess_roles:engine",
+            "only_carries_excess_roles",
+            "high_cmc_spell_slot",
+            "role_text_inferred_review"
+          ],
+          "original_score": 28,
+          "policy_blockers": [
+            "ramp_card_has_commander_plan_signal:kaalia_attack_window_or_extra_combat,kaalia_equipment_support_package",
+            "cut_does_not_carry_ramp_role"
+          ],
+          "policy_bucket": "non_ramp_cut_outside_ramp_axis_policy",
+          "policy_reasons": [
+            "ramp_is_capacity_ceiling_not_missing_role",
+            "cut_pressure_is_review_only_not_card_level_permission",
+            "protect_missing_floor_and_commander_plan_before_cut"
+          ],
+          "policy_status": "ramp_axis_policy_not_applicable_to_cut",
+          "promotion_allowed": false,
+          "roles": [
+            "engine"
+          ]
+        },
+        {
+          "battle_gate_allowed": false,
+          "candidate_copy_allowed": false,
+          "card_name": "Karlach, Fury of Avernus",
+          "classification_source": "text_inferred",
+          "cmc": 5.0,
+          "commander_plan_signals": [
+            "kaalia_attack_window_or_extra_combat"
+          ],
+          "cut_pressure_ready": false,
+          "matching_excess_roles": [
+            "engine"
+          ],
+          "missing_role_overlap": [],
+          "mutation_allowed": false,
+          "non_excess_overlap": [],
+          "original_cut_reasons": [
+            "matches_excess_roles:engine",
+            "only_carries_excess_roles",
+            "high_cmc_spell_slot",
+            "role_text_inferred_review"
+          ],
+          "original_score": 28,
+          "policy_blockers": [
+            "ramp_card_has_commander_plan_signal:kaalia_attack_window_or_extra_combat",
+            "cut_does_not_carry_ramp_role"
+          ],
+          "policy_bucket": "non_ramp_cut_outside_ramp_axis_policy",
+          "policy_reasons": [
+            "ramp_is_capacity_ceiling_not_missing_role",
+            "cut_pressure_is_review_only_not_card_level_permission",
+            "protect_missing_floor_and_commander_plan_before_cut"
+          ],
+          "policy_status": "ramp_axis_policy_not_applicable_to_cut",
+          "promotion_allowed": false,
+          "roles": [
+            "engine"
+          ]
+        },
+        {
+          "battle_gate_allowed": false,
+          "candidate_copy_allowed": false,
+          "card_name": "Ardenn, Intrepid Archaeologist",
+          "classification_source": "text_inferred",
+          "cmc": 3.0,
+          "commander_plan_signals": [
+            "kaalia_equipment_support_package"
+          ],
+          "cut_pressure_ready": false,
+          "matching_excess_roles": [
+            "engine"
+          ],
+          "missing_role_overlap": [],
+          "mutation_allowed": false,
+          "non_excess_overlap": [],
+          "original_cut_reasons": [
+            "matches_excess_roles:engine",
+            "only_carries_excess_roles",
+            "role_text_inferred_review"
+          ],
+          "original_score": 23,
+          "policy_blockers": [
+            "ramp_card_has_commander_plan_signal:kaalia_equipment_support_package",
+            "cut_does_not_carry_ramp_role"
+          ],
+          "policy_bucket": "non_ramp_cut_outside_ramp_axis_policy",
+          "policy_reasons": [
+            "ramp_is_capacity_ceiling_not_missing_role",
+            "cut_pressure_is_review_only_not_card_level_permission",
+            "protect_missing_floor_and_commander_plan_before_cut"
+          ],
+          "policy_status": "ramp_axis_policy_not_applicable_to_cut",
+          "promotion_allowed": false,
+          "roles": [
+            "engine"
+          ]
+        },
+        {
+          "battle_gate_allowed": false,
+          "candidate_copy_allowed": false,
+          "card_name": "Biotransference",
+          "classification_source": "text_inferred",
+          "cmc": 4.0,
+          "commander_plan_signals": [],
+          "cut_pressure_ready": false,
+          "matching_excess_roles": [
+            "engine"
+          ],
+          "missing_role_overlap": [],
+          "mutation_allowed": false,
+          "non_excess_overlap": [],
+          "original_cut_reasons": [
+            "matches_excess_roles:engine",
+            "only_carries_excess_roles",
+            "role_text_inferred_review"
+          ],
+          "original_score": 23,
+          "policy_blockers": [
+            "cut_does_not_carry_ramp_role"
+          ],
+          "policy_bucket": "non_ramp_cut_outside_ramp_axis_policy",
+          "policy_reasons": [
+            "ramp_is_capacity_ceiling_not_missing_role",
+            "cut_pressure_is_review_only_not_card_level_permission",
+            "protect_missing_floor_and_commander_plan_before_cut"
+          ],
+          "policy_status": "ramp_axis_policy_not_applicable_to_cut",
+          "promotion_allowed": false,
+          "roles": [
+            "engine"
+          ]
+        },
+        {
+          "battle_gate_allowed": false,
+          "candidate_copy_allowed": false,
+          "card_name": "Delney, Streetwise Lookout",
+          "classification_source": "text_inferred",
+          "cmc": 3.0,
+          "commander_plan_signals": [
+            "kaalia_trigger_or_type_enabler"
+          ],
+          "cut_pressure_ready": false,
+          "matching_excess_roles": [
+            "engine"
+          ],
+          "missing_role_overlap": [],
+          "mutation_allowed": false,
+          "non_excess_overlap": [],
+          "original_cut_reasons": [
+            "matches_excess_roles:engine",
+            "only_carries_excess_roles",
+            "role_text_inferred_review"
+          ],
+          "original_score": 23,
+          "policy_blockers": [
+            "ramp_card_has_commander_plan_signal:kaalia_trigger_or_type_enabler",
+            "cut_does_not_carry_ramp_role"
+          ],
+          "policy_bucket": "non_ramp_cut_outside_ramp_axis_policy",
+          "policy_reasons": [
+            "ramp_is_capacity_ceiling_not_missing_role",
+            "cut_pressure_is_review_only_not_card_level_permission",
+            "protect_missing_floor_and_commander_plan_before_cut"
+          ],
+          "policy_status": "ramp_axis_policy_not_applicable_to_cut",
+          "promotion_allowed": false,
+          "roles": [
+            "engine"
+          ]
+        },
+        {
+          "battle_gate_allowed": false,
+          "candidate_copy_allowed": false,
+          "card_name": "Maskwood Nexus",
+          "classification_source": "text_inferred",
+          "cmc": 4.0,
+          "commander_plan_signals": [
+            "kaalia_trigger_or_type_enabler"
+          ],
+          "cut_pressure_ready": false,
+          "matching_excess_roles": [
+            "engine"
+          ],
+          "missing_role_overlap": [],
+          "mutation_allowed": false,
+          "non_excess_overlap": [],
+          "original_cut_reasons": [
+            "matches_excess_roles:engine",
+            "only_carries_excess_roles",
+            "role_text_inferred_review"
+          ],
+          "original_score": 23,
+          "policy_blockers": [
+            "ramp_card_has_commander_plan_signal:kaalia_trigger_or_type_enabler",
+            "cut_does_not_carry_ramp_role"
+          ],
+          "policy_bucket": "non_ramp_cut_outside_ramp_axis_policy",
+          "policy_reasons": [
+            "ramp_is_capacity_ceiling_not_missing_role",
+            "cut_pressure_is_review_only_not_card_level_permission",
+            "protect_missing_floor_and_commander_plan_before_cut"
+          ],
+          "policy_status": "ramp_axis_policy_not_applicable_to_cut",
+          "promotion_allowed": false,
+          "roles": [
+            "engine"
+          ]
+        },
+        {
+          "battle_gate_allowed": false,
+          "candidate_copy_allowed": false,
+          "card_name": "Sigarda's Aid",
+          "classification_source": "text_inferred",
+          "cmc": 1.0,
+          "commander_plan_signals": [
+            "kaalia_equipment_support_package"
+          ],
+          "cut_pressure_ready": false,
+          "matching_excess_roles": [
+            "engine"
+          ],
+          "missing_role_overlap": [],
+          "mutation_allowed": false,
+          "non_excess_overlap": [],
+          "original_cut_reasons": [
+            "matches_excess_roles:engine",
+            "only_carries_excess_roles",
+            "role_text_inferred_review"
+          ],
+          "original_score": 23,
+          "policy_blockers": [
+            "ramp_card_has_commander_plan_signal:kaalia_equipment_support_package",
+            "cut_does_not_carry_ramp_role"
+          ],
+          "policy_bucket": "non_ramp_cut_outside_ramp_axis_policy",
+          "policy_reasons": [
+            "ramp_is_capacity_ceiling_not_missing_role",
+            "cut_pressure_is_review_only_not_card_level_permission",
+            "protect_missing_floor_and_commander_plan_before_cut"
+          ],
+          "policy_status": "ramp_axis_policy_not_applicable_to_cut",
+          "promotion_allowed": false,
+          "roles": [
+            "engine"
+          ]
+        },
+        {
+          "battle_gate_allowed": false,
+          "candidate_copy_allowed": false,
+          "card_name": "Grim Tutor",
+          "classification_source": "text_inferred",
+          "cmc": 3.0,
+          "commander_plan_signals": [],
+          "cut_pressure_ready": false,
+          "matching_excess_roles": [
+            "tutor"
+          ],
+          "missing_role_overlap": [],
+          "mutation_allowed": false,
+          "non_excess_overlap": [],
+          "original_cut_reasons": [
+            "matches_excess_roles:tutor",
+            "only_carries_excess_roles",
+            "role_text_inferred_review"
+          ],
+          "original_score": 20,
+          "policy_blockers": [
+            "cut_does_not_carry_ramp_role"
+          ],
+          "policy_bucket": "non_ramp_cut_outside_ramp_axis_policy",
+          "policy_reasons": [
+            "ramp_is_capacity_ceiling_not_missing_role",
+            "cut_pressure_is_review_only_not_card_level_permission",
+            "protect_missing_floor_and_commander_plan_before_cut"
+          ],
+          "policy_status": "ramp_axis_policy_not_applicable_to_cut",
+          "promotion_allowed": false,
+          "roles": [
+            "tutor"
+          ]
+        },
+        {
+          "battle_gate_allowed": false,
+          "candidate_copy_allowed": false,
+          "card_name": "Oswald Fiddlebender",
+          "classification_source": "text_inferred",
+          "cmc": 2.0,
+          "commander_plan_signals": [],
+          "cut_pressure_ready": false,
+          "matching_excess_roles": [
+            "tutor"
+          ],
+          "missing_role_overlap": [],
+          "mutation_allowed": false,
+          "non_excess_overlap": [],
+          "original_cut_reasons": [
+            "matches_excess_roles:tutor",
+            "only_carries_excess_roles",
+            "role_text_inferred_review"
+          ],
+          "original_score": 20,
+          "policy_blockers": [
+            "cut_does_not_carry_ramp_role"
+          ],
+          "policy_bucket": "non_ramp_cut_outside_ramp_axis_policy",
+          "policy_reasons": [
+            "ramp_is_capacity_ceiling_not_missing_role",
+            "cut_pressure_is_review_only_not_card_level_permission",
+            "protect_missing_floor_and_commander_plan_before_cut"
+          ],
+          "policy_status": "ramp_axis_policy_not_applicable_to_cut",
+          "promotion_allowed": false,
+          "roles": [
+            "tutor"
+          ]
+        },
+        {
+          "battle_gate_allowed": false,
+          "candidate_copy_allowed": false,
+          "card_name": "Steelshaper's Gift",
+          "classification_source": "text_inferred",
+          "cmc": 1.0,
+          "commander_plan_signals": [
+            "kaalia_equipment_support_package"
+          ],
+          "cut_pressure_ready": false,
+          "matching_excess_roles": [
+            "tutor"
+          ],
+          "missing_role_overlap": [],
+          "mutation_allowed": false,
+          "non_excess_overlap": [],
+          "original_cut_reasons": [
+            "matches_excess_roles:tutor",
+            "only_carries_excess_roles",
+            "role_text_inferred_review"
+          ],
+          "original_score": 20,
+          "policy_blockers": [
+            "ramp_card_has_commander_plan_signal:kaalia_equipment_support_package",
+            "cut_does_not_carry_ramp_role"
+          ],
+          "policy_bucket": "non_ramp_cut_outside_ramp_axis_policy",
+          "policy_reasons": [
+            "ramp_is_capacity_ceiling_not_missing_role",
+            "cut_pressure_is_review_only_not_card_level_permission",
+            "protect_missing_floor_and_commander_plan_before_cut"
+          ],
+          "policy_status": "ramp_axis_policy_not_applicable_to_cut",
+          "promotion_allowed": false,
+          "roles": [
+            "tutor"
+          ]
+        },
+        {
+          "battle_gate_allowed": false,
+          "candidate_copy_allowed": false,
+          "card_name": "Stoneforge Mystic",
+          "classification_source": "text_inferred",
+          "cmc": 2.0,
+          "commander_plan_signals": [
+            "kaalia_equipment_support_package"
+          ],
+          "cut_pressure_ready": false,
+          "matching_excess_roles": [
+            "tutor"
+          ],
+          "missing_role_overlap": [],
+          "mutation_allowed": false,
+          "non_excess_overlap": [],
+          "original_cut_reasons": [
+            "matches_excess_roles:tutor",
+            "only_carries_excess_roles",
+            "role_text_inferred_review"
+          ],
+          "original_score": 20,
+          "policy_blockers": [
+            "ramp_card_has_commander_plan_signal:kaalia_equipment_support_package",
+            "cut_does_not_carry_ramp_role"
+          ],
+          "policy_bucket": "non_ramp_cut_outside_ramp_axis_policy",
+          "policy_reasons": [
+            "ramp_is_capacity_ceiling_not_missing_role",
+            "cut_pressure_is_review_only_not_card_level_permission",
+            "protect_missing_floor_and_commander_plan_before_cut"
+          ],
+          "policy_status": "ramp_axis_policy_not_applicable_to_cut",
+          "promotion_allowed": false,
+          "roles": [
+            "tutor"
+          ]
+        },
+        {
+          "battle_gate_allowed": false,
+          "candidate_copy_allowed": false,
+          "card_name": "Alicia Masters, Skilled Sculptor",
+          "classification_source": "text_inferred",
+          "cmc": 2.0,
+          "commander_plan_signals": [],
+          "cut_pressure_ready": false,
+          "matching_excess_roles": [
+            "engine",
+            "ramp"
+          ],
+          "missing_role_overlap": [],
+          "mutation_allowed": false,
+          "non_excess_overlap": [
+            "board_wipe"
+          ],
+          "original_cut_reasons": [
+            "cross_lane_ramp_cut_requires_same_lane_source_or_gate"
+          ],
+          "original_score": 0,
+          "policy_blockers": [
+            "ramp_card_also_carries_non_excess_roles:board_wipe"
+          ],
+          "policy_bucket": "ramp_overlap_non_excess_requires_review",
+          "policy_reasons": [
+            "ramp_is_capacity_ceiling_not_missing_role",
+            "cut_pressure_is_review_only_not_card_level_permission",
+            "protect_missing_floor_and_commander_plan_before_cut"
+          ],
+          "policy_status": "ramp_axis_policy_blocks_non_excess_overlap",
+          "promotion_allowed": false,
+          "roles": [
+            "board_wipe",
+            "engine",
+            "ramp"
+          ]
+        },
+        {
+          "battle_gate_allowed": false,
+          "candidate_copy_allowed": false,
+          "card_name": "Bloodthirster",
+          "classification_source": "text_inferred",
+          "cmc": 6.0,
+          "commander_plan_signals": [
+            "kaalia_angel_demon_dragon_payoff",
+            "kaalia_attack_window_or_extra_combat"
+          ],
+          "cut_pressure_ready": false,
+          "matching_excess_roles": [
+            "engine"
+          ],
+          "missing_role_overlap": [],
+          "mutation_allowed": false,
+          "non_excess_overlap": [],
+          "original_cut_reasons": [
+            "kaalia_angel_demon_dragon_payoff_requires_source_lane"
+          ],
+          "original_score": 0,
+          "policy_blockers": [
+            "ramp_card_has_commander_plan_signal:kaalia_angel_demon_dragon_payoff,kaalia_attack_window_or_extra_combat",
+            "cut_does_not_carry_ramp_role"
+          ],
+          "policy_bucket": "non_ramp_cut_outside_ramp_axis_policy",
+          "policy_reasons": [
+            "ramp_is_capacity_ceiling_not_missing_role",
+            "cut_pressure_is_review_only_not_card_level_permission",
+            "protect_missing_floor_and_commander_plan_before_cut"
+          ],
+          "policy_status": "ramp_axis_policy_not_applicable_to_cut",
+          "promotion_allowed": false,
+          "roles": [
+            "engine"
+          ]
+        },
+        {
+          "battle_gate_allowed": false,
+          "candidate_copy_allowed": false,
+          "card_name": "Fable of the Mirror-Breaker // Reflection of Kiki-Jiki",
+          "classification_source": "text_inferred",
+          "cmc": 3.0,
+          "commander_plan_signals": [],
+          "cut_pressure_ready": false,
+          "matching_excess_roles": [
+            "engine",
+            "ramp"
+          ],
+          "missing_role_overlap": [],
+          "mutation_allowed": false,
+          "non_excess_overlap": [
+            "draw",
+            "recursion"
+          ],
+          "original_cut_reasons": [
+            "cross_lane_ramp_cut_requires_same_lane_source_or_gate"
+          ],
+          "original_score": 0,
+          "policy_blockers": [
+            "ramp_card_also_carries_non_excess_roles:draw,recursion"
+          ],
+          "policy_bucket": "ramp_overlap_non_excess_requires_review",
+          "policy_reasons": [
+            "ramp_is_capacity_ceiling_not_missing_role",
+            "cut_pressure_is_review_only_not_card_level_permission",
+            "protect_missing_floor_and_commander_plan_before_cut"
+          ],
+          "policy_status": "ramp_axis_policy_blocks_non_excess_overlap",
+          "promotion_allowed": false,
+          "roles": [
+            "draw",
+            "engine",
+            "ramp",
+            "recursion"
+          ]
+        }
+      ],
+      "policy_status_counts": {
+        "ramp_axis_policy_blocks_non_excess_overlap": 2,
+        "ramp_axis_policy_not_applicable_to_cut": 13,
+        "ramp_axis_policy_review_cut_pressure_ready": 9
+      },
+      "promotion_allowed": false,
+      "protected_ramp_cut_count": 0,
+      "ramp_cut_pressure_ready_count": 9,
+      "role": "removal"
+    }
+  ],
+  "postgres_writes": false,
+  "promotion_allowed": false,
+  "ramp_policy": {
+    "above_range_deck_count": 10,
+    "actionable_deck_count": 10,
+    "axis_suppressed_by_engine_axis_exhaustion": false,
+    "battle_gate_allowed": false,
+    "below_floor_deck_count": 0,
+    "candidate_copy_allowed": false,
+    "commander_count": 3,
+    "deck_action_allowed": false,
+    "engine_axis_exhausted_deck_count": 0,
+    "engine_axis_exhausted_decks": [],
+    "next_gate": "apply_ramp_axis_policy_before_more_same_deck_source_expansion",
+    "policy_actions": [
+      "treat_ramp_above_range_as_cut_pressure_not_add_lane",
+      "protect_ramp_cards_that_cover_missing_floor_roles",
+      "block_more_same_deck_source_expansion_until_axis_policy_is_applied"
+    ],
+    "pressure_class": "ceiling_saturation_axis",
+    "priority_score": 321,
+    "promotion_allowed": false,
+    "role": "ramp",
+    "source_cycle_blocked_deck_count": 1,
+    "source_cycle_blocked_decks": [
+      "619"
+    ],
+    "status": "role_axis_policy_blocks_same_deck_source_cycle"
+  },
+  "source_core_role_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_core_role_audit_20260705_global_goal_hermes_only.json",
+  "source_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "source_db_mutated": false,
+  "source_nonland_model_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_nonland_core_candidate_model_20260705_global_goal_hermes_only.json",
+  "source_role_axis_policy_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_role_axis_policy_builder_20260706_post_engine_axis_exhaustion_current.json",
+  "status": "ramp_axis_nonland_cut_policy_applied_review_only",
+  "summary": {
+    "candidate_pair_count": 9,
+    "evaluated_cut_count": 24,
+    "evaluated_pool_count": 1,
+    "next_gate": "collect_card_level_usage_and_same_lane_proof_for_ramp_policy_cut_pressure",
+    "policy_bucket_counts": {
+      "non_ramp_cut_outside_ramp_axis_policy": 13,
+      "ramp_only_excess_cut_pressure": 8,
+      "ramp_overlap_excess_cut_pressure": 1,
+      "ramp_overlap_non_excess_requires_review": 2
+    },
+    "policy_status_counts": {
+      "ramp_axis_policy_blocks_non_excess_overlap": 2,
+      "ramp_axis_policy_not_applicable_to_cut": 13,
+      "ramp_axis_policy_review_cut_pressure_ready": 9
+    },
+    "protected_ramp_cut_count": 0,
+    "ramp_cut_pressure_ready_count": 9,
+    "source_cycle_deck_count": 1
+  }
+}

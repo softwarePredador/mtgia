@@ -272,8 +272,15 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `master_optimizer_reports/global_commander_role_axis_policy_builder_20260706_post_engine_axis_exhaustion_current.md`.
     Resultado: `ramp` e tratado como pressao de capacidade/teto, `engine`
     fica retido ate surgir nova evidencia card-level, e candidate copy, battle
-    e promocao seguem fechados. Historicamente, a politica de `engine` ja foi
-    aplicada em
+    e promocao seguem fechados. A aplicacao atual do eixo `ramp` fica em
+    `manaloom-knowledge/scripts/global_commander_ramp_axis_nonland_cut_policy_model.py`
+    com evidencia:
+    `master_optimizer_reports/global_commander_ramp_axis_nonland_cut_policy_model_20260706_current.md`.
+    Resultado: `24` cortes sao avaliados, `9` viram pressao review-only de
+    corte ramp, `2` rows de overlap non-excess ficam bloqueadas para review, e
+    o proximo gate e
+    `collect_card_level_usage_and_same_lane_proof_for_ramp_policy_cut_pressure`.
+    Historicamente, a politica de `engine` ja foi aplicada em
     `manaloom-knowledge/scripts/global_commander_engine_axis_nonland_cut_policy_model.py`
     com evidencia:
     `master_optimizer_reports/global_commander_engine_axis_nonland_cut_policy_model_20260706_current.md`.
@@ -1046,6 +1053,11 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     ele trata `ramp` como pressao de teto/capacidade, segura `engine` ate nova
     evidencia card-level e roteia para
     `apply_ramp_axis_policy_before_more_same_deck_source_expansion`.
+    A aplicacao de `ramp` fica em
+    `global_commander_ramp_axis_nonland_cut_policy_model_20260706_current.md`:
+    ela avalia `24` cortes, expõe `9` pressoes review-only de corte ramp,
+    mantem candidate copy, battle e promocao fechados e exige
+    `collect_card_level_usage_and_same_lane_proof_for_ramp_policy_cut_pressure`.
     Observacao operacional: snapshots historicos de candidate-copy, battle-probe,
     battle-feedback e package-chain dependem de artefatos locais ignorados. Se
     faltarem ou forem regenerados sem esses artefatos, a auditoria de superficie

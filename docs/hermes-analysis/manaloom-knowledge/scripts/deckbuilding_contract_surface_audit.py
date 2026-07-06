@@ -54,6 +54,12 @@ GLOBAL_COMMANDER_ENGINE_AXIS_NONLAND_CUT_POLICY_MODEL = (
 GLOBAL_COMMANDER_ENGINE_AXIS_NONLAND_CUT_POLICY_MODEL_TEST = (
     SCRIPT_DIR / "test_global_commander_engine_axis_nonland_cut_policy_model.py"
 )
+GLOBAL_COMMANDER_RAMP_AXIS_NONLAND_CUT_POLICY_MODEL = (
+    SCRIPT_DIR / "global_commander_ramp_axis_nonland_cut_policy_model.py"
+)
+GLOBAL_COMMANDER_RAMP_AXIS_NONLAND_CUT_POLICY_MODEL_TEST = (
+    SCRIPT_DIR / "test_global_commander_ramp_axis_nonland_cut_policy_model.py"
+)
 GLOBAL_COMMANDER_ENGINE_CUT_USAGE_SAME_LANE_PROOF_SCOUT = (
     SCRIPT_DIR / "global_commander_engine_cut_usage_same_lane_proof_scout.py"
 )
@@ -481,6 +487,10 @@ GLOBAL_COMMANDER_ROLE_AXIS_POLICY_BUILDER_REPORT = (
 GLOBAL_COMMANDER_ENGINE_AXIS_NONLAND_CUT_POLICY_MODEL_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_engine_axis_nonland_cut_policy_model_20260706_current.md"
+)
+GLOBAL_COMMANDER_RAMP_AXIS_NONLAND_CUT_POLICY_MODEL_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_axis_nonland_cut_policy_model_20260706_current.md"
 )
 GLOBAL_COMMANDER_ENGINE_CUT_USAGE_SAME_LANE_PROOF_SCOUT_REPORT = (
     REPO_ROOT
@@ -1972,6 +1982,30 @@ def build_audit() -> dict[str, Any]:
                 "engine_only_excess_cut_pressure",
                 "engine_overlap_excess_cut_pressure",
                 "kaalia_attack_window_or_extra_combat",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_RAMP_AXIS_NONLAND_CUT_POLICY_MODEL,
+            [
+                "global_commander_ramp_axis_nonland_cut_policy_model",
+                "ramp_axis_nonland_cut_policy_applied_review_only",
+                "ramp_axis_policy_review_cut_pressure_ready",
+                "ramp_axis_policy_blocks_non_excess_overlap",
+                "collect_card_level_usage_and_same_lane_proof_for_ramp_policy_cut_pressure",
+                "candidate_copy_allowed_now",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_RAMP_AXIS_NONLAND_CUT_POLICY_MODEL_TEST,
+            [
+                "test_ramp_policy_splits_ready_and_protected_blocked_cuts",
+                "ramp_only_excess_cut_pressure",
+                "ramp_overlap_excess_cut_pressure",
+                "kaalia_angel_demon_dragon_payoff",
             ],
         )
     )
@@ -3887,6 +3921,21 @@ def build_audit() -> dict[str, Any]:
                 "candidate_copy_allowed_now: `false`",
                 "collect_card_level_usage_and_same_lane_proof_for_engine_policy_cut_pressure",
                 "engine_axis_policy_blocks_cut_until_source_lane_review",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_RAMP_AXIS_NONLAND_CUT_POLICY_MODEL_REPORT,
+            [
+                "Global Commander Ramp Axis Nonland Cut Policy Model",
+                "ramp_axis_nonland_cut_policy_applied_review_only",
+                "evaluated_cut_count: `24`",
+                "ramp_cut_pressure_ready_count: `9`",
+                "candidate_pair_count: `9`",
+                "candidate_copy_allowed_now: `false`",
+                "collect_card_level_usage_and_same_lane_proof_for_ramp_policy_cut_pressure",
+                "ramp_axis_policy_blocks_non_excess_overlap",
             ],
         )
     )
