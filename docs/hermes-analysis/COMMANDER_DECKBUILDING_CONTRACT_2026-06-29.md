@@ -197,7 +197,10 @@ Operational priority after this pivot:
    run `global_commander_engine_cut_usage_same_lane_proof_scout.py` to consume
    existing current-scope trace/proof artifacts for those cut-pressure cards,
    block used cuts, and require explicit same-lane replacement before any
-   candidate copy can open;
+   candidate copy can open; then run
+   `global_commander_engine_cut_followup_router.py` to split blockers into
+   trace-required cuts and replacement-required used cuts before any candidate
+   copy, battle, mutation, or promotion can open;
 12. run `global_commander_candidate_copy_materializer.py` only after a named
    add/cut pool is ready; it may materialize one hypothesis inside an isolated
    copied Hermes SQLite DB, must prove the source DB hash is unchanged, and
@@ -537,6 +540,7 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_role_axis_policy_builder_20260706_engine_axis_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_engine_axis_nonland_cut_policy_model_20260706_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_engine_cut_usage_same_lane_proof_scout_20260706_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_engine_cut_followup_router_20260706_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_manual_negative_trace_reviewer_20260706_kaalia_value_safe_stage1_live_research.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_followup_live_source_research_expander_20260706_kaalia_value_safe_stage1_after_manual_trace.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_expanded_source_candidate_reviewer_20260706_kaalia_value_safe_stage1_followup_live_after_manual_trace.md`
@@ -1449,6 +1453,13 @@ Current external refresh on 2026-07-05:
   `pair_ready_count=0`). Candidate copy, battle, and promotion remain closed;
   the next gate is
   `generate_current_scope_trace_or_find_explicit_same_lane_engine_replacement_before_candidate_copy`.
+- The engine cut follow-up router converts those blockers into two separate
+  gates: `Archaeomancer's Map` needs a current-scope usage or negative trace
+  plan, while `Biotransference` needs a different engine cut or explicit
+  same-lane replacement proof because target usage was observed. All `6` pairs
+  still lack explicit same-lane routes (`no_explicit_same_lane_pair_count=6`),
+  `candidate_copy_allowed_now=false`, and the next gate is
+  `run_trace_plan_and_replacement_search_before_candidate_copy`.
 
 ## Global Commander Rollout - 2026-07-01
 

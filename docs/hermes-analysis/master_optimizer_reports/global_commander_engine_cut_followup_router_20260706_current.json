@@ -1,0 +1,263 @@
+{
+  "artifact_type": "global_commander_engine_cut_followup_router",
+  "battle_gate_allowed_now": false,
+  "battle_or_optimization_performed": false,
+  "battle_run_performed": false,
+  "candidate_copy_allowed_now": false,
+  "candidate_copy_blockers": [
+    "usage_observed_blocks_engine_cuts:Biotransference",
+    "missing_current_scope_usage_trace_for_engine_cuts:Archaeomancer's Map",
+    "no_explicit_same_lane_replacement_route_for_engine_cut_pairs",
+    "trace_required_for_engine_cuts:Archaeomancer's Map",
+    "replacement_required_for_used_engine_cuts:Biotransference"
+  ],
+  "cut_followup_rows": [
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Biotransference",
+      "commander": "Kaalia of the Vast",
+      "cut_status": "engine_cut_usage_observed_blocks_candidate_copy",
+      "deck_id": "619",
+      "matching_excess_roles": [
+        "engine"
+      ],
+      "mutation_allowed": false,
+      "next_gate": "find_different_engine_cut_or_explicit_same_lane_replacement_before_candidate_copy",
+      "policy_bucket": "engine_only_excess_cut_pressure",
+      "promotion_allowed": false,
+      "reason": "current_scope_usage_observed",
+      "required_evidence": "different_cut_source_or_explicit_same_lane_replacement_proof",
+      "roles": [
+        "engine"
+      ],
+      "route_kind": "replacement_required",
+      "trace_group": "usage_blocked"
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Archaeomancer's Map",
+      "commander": "Kaalia of the Vast",
+      "cut_status": "engine_cut_missing_current_scope_usage_trace",
+      "deck_id": "619",
+      "matching_excess_roles": [
+        "engine",
+        "tutor"
+      ],
+      "mutation_allowed": false,
+      "next_gate": "generate_or_import_current_scope_usage_trace_for_engine_cut_before_pair_review",
+      "policy_bucket": "engine_overlap_excess_cut_pressure",
+      "promotion_allowed": false,
+      "reason": "missing_current_scope_usage_or_negative_trace",
+      "required_evidence": "current_scope_usage_or_negative_trace",
+      "roles": [
+        "engine",
+        "tutor"
+      ],
+      "route_kind": "trace_required",
+      "trace_group": "not_seen_or_no_trace"
+    }
+  ],
+  "deck_action_allowed": false,
+  "generated_at": "2026-07-06T04:16:20.499871+00:00",
+  "input_artifacts": {
+    "scout_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_engine_cut_usage_same_lane_proof_scout_20260706_current.json",
+    "scout_status": "engine_cut_usage_same_lane_proof_blocks_candidate_copy"
+  },
+  "mutation_allowed": false,
+  "pair_followup_rows": [
+    {
+      "add": "Feed the Swarm",
+      "battle_gate_allowed": false,
+      "blockers": [
+        "cut_card_missing_current_scope_usage_trace",
+        "no_explicit_same_lane_replacement_route"
+      ],
+      "candidate_copy_allowed": false,
+      "candidate_role": "removal",
+      "cut": "Archaeomancer's Map",
+      "cut_next_gate": "generate_or_import_current_scope_usage_trace_for_engine_cut_before_pair_review",
+      "cut_roles": [
+        "engine",
+        "tutor"
+      ],
+      "cut_route_kind": "trace_required",
+      "explicit_same_lane_roles": [],
+      "mutation_allowed": false,
+      "pair_next_gate": "find_explicit_same_lane_replacement_route_for_pair_before_candidate_copy",
+      "pair_status": "engine_cut_pair_blocks_candidate_copy",
+      "promotion_allowed": false
+    },
+    {
+      "add": "Path to Exile",
+      "battle_gate_allowed": false,
+      "blockers": [
+        "cut_card_missing_current_scope_usage_trace",
+        "no_explicit_same_lane_replacement_route"
+      ],
+      "candidate_copy_allowed": false,
+      "candidate_role": "removal",
+      "cut": "Archaeomancer's Map",
+      "cut_next_gate": "generate_or_import_current_scope_usage_trace_for_engine_cut_before_pair_review",
+      "cut_roles": [
+        "engine",
+        "tutor"
+      ],
+      "cut_route_kind": "trace_required",
+      "explicit_same_lane_roles": [],
+      "mutation_allowed": false,
+      "pair_next_gate": "find_explicit_same_lane_replacement_route_for_pair_before_candidate_copy",
+      "pair_status": "engine_cut_pair_blocks_candidate_copy",
+      "promotion_allowed": false
+    },
+    {
+      "add": "Swords to Plowshares",
+      "battle_gate_allowed": false,
+      "blockers": [
+        "cut_card_missing_current_scope_usage_trace",
+        "no_explicit_same_lane_replacement_route"
+      ],
+      "candidate_copy_allowed": false,
+      "candidate_role": "removal",
+      "cut": "Archaeomancer's Map",
+      "cut_next_gate": "generate_or_import_current_scope_usage_trace_for_engine_cut_before_pair_review",
+      "cut_roles": [
+        "engine",
+        "tutor"
+      ],
+      "cut_route_kind": "trace_required",
+      "explicit_same_lane_roles": [],
+      "mutation_allowed": false,
+      "pair_next_gate": "find_explicit_same_lane_replacement_route_for_pair_before_candidate_copy",
+      "pair_status": "engine_cut_pair_blocks_candidate_copy",
+      "promotion_allowed": false
+    },
+    {
+      "add": "Feed the Swarm",
+      "battle_gate_allowed": false,
+      "blockers": [
+        "cut_card_used_by_target_trace",
+        "no_explicit_same_lane_replacement_route"
+      ],
+      "candidate_copy_allowed": false,
+      "candidate_role": "removal",
+      "cut": "Biotransference",
+      "cut_next_gate": "find_different_engine_cut_or_explicit_same_lane_replacement_before_candidate_copy",
+      "cut_roles": [
+        "engine"
+      ],
+      "cut_route_kind": "replacement_required",
+      "explicit_same_lane_roles": [],
+      "mutation_allowed": false,
+      "pair_next_gate": "find_explicit_same_lane_replacement_route_for_pair_before_candidate_copy",
+      "pair_status": "engine_cut_pair_blocks_candidate_copy",
+      "promotion_allowed": false
+    },
+    {
+      "add": "Path to Exile",
+      "battle_gate_allowed": false,
+      "blockers": [
+        "cut_card_used_by_target_trace",
+        "no_explicit_same_lane_replacement_route"
+      ],
+      "candidate_copy_allowed": false,
+      "candidate_role": "removal",
+      "cut": "Biotransference",
+      "cut_next_gate": "find_different_engine_cut_or_explicit_same_lane_replacement_before_candidate_copy",
+      "cut_roles": [
+        "engine"
+      ],
+      "cut_route_kind": "replacement_required",
+      "explicit_same_lane_roles": [],
+      "mutation_allowed": false,
+      "pair_next_gate": "find_explicit_same_lane_replacement_route_for_pair_before_candidate_copy",
+      "pair_status": "engine_cut_pair_blocks_candidate_copy",
+      "promotion_allowed": false
+    },
+    {
+      "add": "Swords to Plowshares",
+      "battle_gate_allowed": false,
+      "blockers": [
+        "cut_card_used_by_target_trace",
+        "no_explicit_same_lane_replacement_route"
+      ],
+      "candidate_copy_allowed": false,
+      "candidate_role": "removal",
+      "cut": "Biotransference",
+      "cut_next_gate": "find_different_engine_cut_or_explicit_same_lane_replacement_before_candidate_copy",
+      "cut_roles": [
+        "engine"
+      ],
+      "cut_route_kind": "replacement_required",
+      "explicit_same_lane_roles": [],
+      "mutation_allowed": false,
+      "pair_next_gate": "find_explicit_same_lane_replacement_route_for_pair_before_candidate_copy",
+      "pair_status": "engine_cut_pair_blocks_candidate_copy",
+      "promotion_allowed": false
+    }
+  ],
+  "policy": {
+    "mutation_boundary": "This router does not copy decks, run battles, mutate DBs, force traces, or promote packages.",
+    "same_lane_boundary": "Cross-lane removal additions cannot replace engine or tutor cuts without explicit same-lane route evidence.",
+    "trace_boundary": "A cut without current-scope usage or negative trace routes to trace generation/import before pair review.",
+    "usage_boundary": "A cut with current-scope target usage routes to a different cut or explicit same-lane replacement proof."
+  },
+  "postgres_writes": false,
+  "promotion_allowed": false,
+  "replacement_search_rows": [
+    {
+      "allowed_recovery_routes": [
+        "find_different_engine_cut_with_current_scope_negative_evidence",
+        "prove_explicit_same_lane_replacement_before_candidate_copy"
+      ],
+      "battle_gate_allowed": false,
+      "blocked_reason": "current_scope_usage_observed",
+      "blocked_recovery_routes": [
+        "cross_lane_removal_add_for_engine_cut_without_same_lane_route",
+        "candidate_copy_from_usage_observed_cut"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Biotransference",
+      "commander": "Kaalia of the Vast",
+      "deck_id": "619",
+      "mutation_allowed": false,
+      "required_replacement_roles": [
+        "engine"
+      ]
+    }
+  ],
+  "source_db_mutated": false,
+  "status": "engine_cut_followup_router_blocks_candidate_copy",
+  "summary": {
+    "candidate_copy_blocker_count": 5,
+    "cut_count": 2,
+    "missing_trace_cut_count": 1,
+    "negative_trace_review_required_count": 0,
+    "next_gate": "run_trace_plan_and_replacement_search_before_candidate_copy",
+    "no_explicit_same_lane_pair_count": 6,
+    "pair_blocked_count": 6,
+    "pair_count": 6,
+    "pair_ready_count": 0,
+    "replacement_required_count": 1,
+    "route_kind_counts": {
+      "replacement_required": 1,
+      "trace_required": 1
+    },
+    "trace_plan_count": 1,
+    "usage_blocked_cut_count": 1
+  },
+  "trace_plan_rows": [
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Archaeomancer's Map",
+      "commander": "Kaalia of the Vast",
+      "deck_id": "619",
+      "fallback_route": "force_access_trace_only_after_current_scope_trace_gap_is_confirmed",
+      "mutation_allowed": false,
+      "primary_route": "generate_or_import_current_scope_usage_trace_for_engine_cut",
+      "required_trace": "current_scope_usage_or_negative_trace"
+    }
+  ]
+}
