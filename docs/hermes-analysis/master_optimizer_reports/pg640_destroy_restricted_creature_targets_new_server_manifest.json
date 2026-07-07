@@ -1,0 +1,471 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg640_destroy_restricted_creature_target_20260707_211817",
+  "deploy_id": "PG640",
+  "execution_scenarios": [
+    {
+      "card": {
+        "name": "Feast of Dreams",
+        "type_line": "Instant"
+      },
+      "expected_destination": "graveyard",
+      "expected_effect": "remove_creature",
+      "expected_target_constraints": {
+        "any_of": [
+          {
+            "card_types": [
+              "creature"
+            ],
+            "enchanted": true
+          },
+          {
+            "all_card_types_required": true,
+            "card_types": [
+              "creature",
+              "enchantment"
+            ]
+          }
+        ]
+      },
+      "logical_rule_key": "battle_rule_v1:e6d42a483cdea8e4b045a761f5e24608",
+      "name": "Feast of Dreams removes one legal target",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Removal Target",
+        "type_line": "Land"
+      },
+      "target": {
+        "cmc": 3,
+        "effect": "creature",
+        "enchanted": true,
+        "enchanted_by": "E2E Fixture Aura",
+        "name": "E2E Legal Removal Target",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "type": "single_target_removal"
+    },
+    {
+      "card": {
+        "name": "Pitfall Trap",
+        "type_line": "Instant"
+      },
+      "expected_destination": "graveyard",
+      "expected_effect": "remove_creature",
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ],
+        "combat_state": "attacking",
+        "exclude_keywords": [
+          "flying"
+        ]
+      },
+      "logical_rule_key": "battle_rule_v1:cafef6a70e46efcf8cfb31e9a3cd867b",
+      "name": "Pitfall Trap removes one legal target",
+      "nonmatching_target": {
+        "cmc": 3,
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "name": "E2E Illegal Removal Target",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "target": {
+        "attacking": true,
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Legal Removal Target",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "type": "single_target_removal"
+    },
+    {
+      "card": {
+        "name": "Shoot the Sheriff",
+        "type_line": "Instant"
+      },
+      "expected_destination": "graveyard",
+      "expected_effect": "remove_creature",
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ],
+        "exclude_subtypes": [
+          "assassin",
+          "mercenary",
+          "pirate",
+          "rogue",
+          "warlock"
+        ]
+      },
+      "logical_rule_key": "battle_rule_v1:f6fa8a546a5f6a8ac8e079780426db81",
+      "name": "Shoot the Sheriff removes one legal target",
+      "nonmatching_target": {
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Illegal Removal Target",
+        "power": 2,
+        "subtypes": [
+          "assassin"
+        ],
+        "toughness": 2,
+        "type_line": "Creature - Assassin"
+      },
+      "target": {
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Legal Removal Target",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "type": "single_target_removal"
+    },
+    {
+      "card": {
+        "name": "Smite",
+        "type_line": "Instant"
+      },
+      "expected_destination": "graveyard",
+      "expected_effect": "remove_creature",
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ],
+        "combat_state": "blocked"
+      },
+      "logical_rule_key": "battle_rule_v1:47362b1e69b76080dc09d9b5f212cc1d",
+      "name": "Smite removes one legal target",
+      "nonmatching_target": {
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Illegal Removal Target",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "target": {
+        "blocked": true,
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Legal Removal Target",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "type": "single_target_removal"
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Feast of Dreams",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e6d42a483cdea8e4b045a761f5e24608",
+      "min_rule_version": 2,
+      "normalized_name": "feast of dreams",
+      "oracle_hash": "3b7028b204de24777fbff90bae7bad1d",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "any_of": [
+            {
+              "card_types": [
+                "creature"
+              ],
+              "enchanted": true
+            },
+            {
+              "all_card_types_required": true,
+              "card_types": [
+                "creature",
+                "enchantment"
+              ]
+            }
+          ]
+        },
+        "xmage_effect_class": "DestroyTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Pitfall Trap",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cafef6a70e46efcf8cfb31e9a3cd867b",
+      "min_rule_version": 2,
+      "normalized_name": "pitfall trap",
+      "oracle_hash": "d8d5d9754a1cc6abb73aa85c473517d6",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "combat_state": "attacking",
+          "exclude_keywords": [
+            "flying"
+          ]
+        },
+        "xmage_effect_class": "DestroyTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Shoot the Sheriff",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f6fa8a546a5f6a8ac8e079780426db81",
+      "min_rule_version": 2,
+      "normalized_name": "shoot the sheriff",
+      "oracle_hash": "f1a7c404a2d7e0348b16ea26c04a9325",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "exclude_subtypes": [
+            "assassin",
+            "mercenary",
+            "pirate",
+            "rogue",
+            "warlock"
+          ]
+        },
+        "xmage_effect_class": "DestroyTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Smite",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:47362b1e69b76080dc09d9b5f212cc1d",
+      "min_rule_version": 2,
+      "normalized_name": "smite",
+      "oracle_hash": "d4194bd872cbb87d702b24cd32b48b8c",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "combat_state": "blocked"
+        },
+        "xmage_effect_class": "DestroyTargetEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_destroy_target_spell": 4
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg640_destroy_restricted_creature_targets_new_server_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg640_destroy_restricted_creature_targets_new_server_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg640_destroy_restricted_creature_targets_new_server_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg640_destroy_restricted_creature_targets_new_server_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg640_destroy_restricted_creature_targets_new_server_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg640_destroy_restricted_creature_targets_new_server_rollback.sql"
+  },
+  "generated_at": "2026-07-07T21:18:17+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Feast of Dreams"
+      },
+      "card_name": "Feast of Dreams",
+      "effect": "remove_creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e6d42a483cdea8e4b045a761f5e24608",
+      "normalized_name": "feast of dreams",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "any_of": [
+            {
+              "card_types": [
+                "creature"
+              ],
+              "enchanted": true
+            },
+            {
+              "all_card_types_required": true,
+              "card_types": [
+                "creature",
+                "enchantment"
+              ]
+            }
+          ]
+        },
+        "xmage_effect_class": "DestroyTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Pitfall Trap"
+      },
+      "card_name": "Pitfall Trap",
+      "effect": "remove_creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cafef6a70e46efcf8cfb31e9a3cd867b",
+      "normalized_name": "pitfall trap",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "combat_state": "attacking",
+          "exclude_keywords": [
+            "flying"
+          ]
+        },
+        "xmage_effect_class": "DestroyTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Shoot the Sheriff"
+      },
+      "card_name": "Shoot the Sheriff",
+      "effect": "remove_creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f6fa8a546a5f6a8ac8e079780426db81",
+      "normalized_name": "shoot the sheriff",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "exclude_subtypes": [
+            "assassin",
+            "mercenary",
+            "pirate",
+            "rogue",
+            "warlock"
+          ]
+        },
+        "xmage_effect_class": "DestroyTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Smite"
+      },
+      "card_name": "Smite",
+      "effect": "remove_creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:47362b1e69b76080dc09d9b5f212cc1d",
+      "normalized_name": "smite",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "combat_state": "blocked"
+        },
+        "xmage_effect_class": "DestroyTargetEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Feast of Dreams",
+    "Pitfall Trap",
+    "Shoot the Sheriff",
+    "Smite"
+  ],
+  "selected_count": 4,
+  "slug": "destroy_restricted_creature_targets_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Feast of Dreams",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e6d42a483cdea8e4b045a761f5e24608",
+      "min_rule_version": 2,
+      "normalized_name": "feast of dreams",
+      "oracle_hash": "3b7028b204de24777fbff90bae7bad1d",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Pitfall Trap",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cafef6a70e46efcf8cfb31e9a3cd867b",
+      "min_rule_version": 2,
+      "normalized_name": "pitfall trap",
+      "oracle_hash": "d8d5d9754a1cc6abb73aa85c473517d6",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Shoot the Sheriff",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f6fa8a546a5f6a8ac8e079780426db81",
+      "min_rule_version": 2,
+      "normalized_name": "shoot the sheriff",
+      "oracle_hash": "f1a7c404a2d7e0348b16ea26c04a9325",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Smite",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:47362b1e69b76080dc09d9b5f212cc1d",
+      "min_rule_version": 2,
+      "normalized_name": "smite",
+      "oracle_hash": "d4194bd872cbb87d702b24cd32b48b8c",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

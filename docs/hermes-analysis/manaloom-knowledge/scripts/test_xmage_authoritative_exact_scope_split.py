@@ -12482,6 +12482,22 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                 {"card_types": ["creature"], "combat_state": "attacking"},
             ),
             (
+                "Destroy target attacking creature without flying.",
+                (
+                    'new FilterAttackingCreature("attacking creature without flying");'
+                    "filter.add(Predicates.not(new AbilityPredicate(FlyingAbility.class)));"
+                    "this.addAbility(new AlternativeCostSourceAbility(new ManaCostsImpl<>(\"{W}\"), TrapCondition.instance));"
+                ),
+                "creature",
+                {"card_types": ["creature"], "combat_state": "attacking", "exclude_keywords": ["flying"]},
+            ),
+            (
+                "Destroy target blocked creature.",
+                'new FilterCreaturePermanent("blocked creature"); filter.add(BlockedPredicate.instance);',
+                "creature",
+                {"card_types": ["creature"], "combat_state": "blocked"},
+            ),
+            (
                 "Destroy target nonlegendary creature.",
                 'new FilterCreaturePermanent("nonlegendary creature"); Predicates.not(SuperType.LEGENDARY.getPredicate());',
                 "creature",
@@ -12516,6 +12532,29 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                 'new FilterCreaturePermanent("Human creature"); SubType.HUMAN.getPredicate();',
                 "creature",
                 {"card_types": ["creature"], "required_subtypes": ["human"]},
+            ),
+            (
+                "Destroy target non-outlaw creature.",
+                'new FilterCreaturePermanent("non-outlaw creature"); filter.add(Predicates.not(OutlawPredicate.instance));',
+                "creature",
+                {
+                    "card_types": ["creature"],
+                    "exclude_subtypes": ["assassin", "mercenary", "pirate", "rogue", "warlock"],
+                },
+            ),
+            (
+                "Destroy target enchanted creature or enchantment creature.",
+                (
+                    'new FilterCreaturePermanent("enchanted creature or enchantment creature");'
+                    "filter.add(Predicates.or(EnchantedPredicate.instance, CardType.ENCHANTMENT.getPredicate()));"
+                ),
+                "creature",
+                {
+                    "any_of": [
+                        {"card_types": ["creature"], "enchanted": True},
+                        {"card_types": ["creature", "enchantment"], "all_card_types_required": True},
+                    ]
+                },
             ),
             (
                 "Destroy target Spirit or enchantment.",

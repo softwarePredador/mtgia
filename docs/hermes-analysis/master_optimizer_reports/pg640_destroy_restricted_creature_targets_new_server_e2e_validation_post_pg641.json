@@ -1,0 +1,251 @@
+{
+  "battle_execution": {
+    "event_count": 12,
+    "results": [
+      {
+        "battlefield_names": [
+          "E2E Illegal Removal Target"
+        ],
+        "card_name": "Feast of Dreams",
+        "destination": "graveyard",
+        "moved_names": [
+          "E2E Legal Removal Target"
+        ],
+        "nonmatching_target": "E2E Illegal Removal Target",
+        "scenario": "Feast of Dreams removes one legal target",
+        "target": "E2E Legal Removal Target"
+      },
+      {
+        "battlefield_names": [
+          "E2E Illegal Removal Target"
+        ],
+        "card_name": "Pitfall Trap",
+        "destination": "graveyard",
+        "moved_names": [
+          "E2E Legal Removal Target"
+        ],
+        "nonmatching_target": "E2E Illegal Removal Target",
+        "scenario": "Pitfall Trap removes one legal target",
+        "target": "E2E Legal Removal Target"
+      },
+      {
+        "battlefield_names": [
+          "E2E Illegal Removal Target"
+        ],
+        "card_name": "Shoot the Sheriff",
+        "destination": "graveyard",
+        "moved_names": [
+          "E2E Legal Removal Target"
+        ],
+        "nonmatching_target": "E2E Illegal Removal Target",
+        "scenario": "Shoot the Sheriff removes one legal target",
+        "target": "E2E Legal Removal Target"
+      },
+      {
+        "battlefield_names": [
+          "E2E Illegal Removal Target"
+        ],
+        "card_name": "Smite",
+        "destination": "graveyard",
+        "moved_names": [
+          "E2E Legal Removal Target"
+        ],
+        "nonmatching_target": "E2E Illegal Removal Target",
+        "scenario": "Smite removes one legal target",
+        "target": "E2E Legal Removal Target"
+      }
+    ],
+    "scenario_count": 4
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-07T21:25:28.414380+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg640_destroy_restricted_creature_targets_new_server_manifest.json",
+  "package_id": "pg640_destroy_restricted_creature_targets_new_server_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 4
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Feast of Dreams",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e6d42a483cdea8e4b045a761f5e24608",
+          "oracle_hash": "3b7028b204de24777fbff90bae7bad1d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Pitfall Trap",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:cafef6a70e46efcf8cfb31e9a3cd867b",
+          "oracle_hash": "d8d5d9754a1cc6abb73aa85c473517d6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Shoot the Sheriff",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f6fa8a546a5f6a8ac8e079780426db81",
+          "oracle_hash": "f1a7c404a2d7e0348b16ea26c04a9325",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Smite",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:47362b1e69b76080dc09d9b5f212cc1d",
+          "oracle_hash": "d4194bd872cbb87d702b24cd32b48b8c",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 4
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Feast of Dreams",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e6d42a483cdea8e4b045a761f5e24608",
+          "oracle_hash": "3b7028b204de24777fbff90bae7bad1d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Pitfall Trap",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:cafef6a70e46efcf8cfb31e9a3cd867b",
+          "oracle_hash": "d8d5d9754a1cc6abb73aa85c473517d6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Shoot the Sheriff",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f6fa8a546a5f6a8ac8e079780426db81",
+          "oracle_hash": "f1a7c404a2d7e0348b16ea26c04a9325",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Smite",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:47362b1e69b76080dc09d9b5f212cc1d",
+          "oracle_hash": "d4194bd872cbb87d702b24cd32b48b8c",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 4
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Feast of Dreams",
+          "logical_rule_key": "battle_rule_v1:e6d42a483cdea8e4b045a761f5e24608"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Pitfall Trap",
+          "logical_rule_key": "battle_rule_v1:cafef6a70e46efcf8cfb31e9a3cd867b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Shoot the Sheriff",
+          "logical_rule_key": "battle_rule_v1:f6fa8a546a5f6a8ac8e079780426db81"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Smite",
+          "logical_rule_key": "battle_rule_v1:47362b1e69b76080dc09d9b5f212cc1d"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 4
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Feast of Dreams",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:e6d42a483cdea8e4b045a761f5e24608"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Pitfall Trap",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:cafef6a70e46efcf8cfb31e9a3cd867b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Shoot the Sheriff",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:f6fa8a546a5f6a8ac8e079780426db81"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Smite",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:47362b1e69b76080dc09d9b5f212cc1d"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 12,
+        "scenarios": 4
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

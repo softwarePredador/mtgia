@@ -7209,6 +7209,105 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertEqual([card["name"] for card in opponent.battlefield], ["Black Attacker", "White Defender"])
         self.assertEqual([card["name"] for card in opponent.graveyard], ["White Attacker"])
 
+        opponent.battlefield = [
+            {"name": "Unblocked Attacker", "type_line": "Creature - Soldier", "power": 9, "toughness": 9, "attacking": True},
+            {"name": "Blocking Soldier", "type_line": "Creature - Soldier", "power": 2, "toughness": 2, "blocking": True},
+            {"name": "Blocked Giant", "type_line": "Creature - Giant", "power": 5, "toughness": 5, "blocked": True},
+        ]
+        opponent.graveyard = []
+        blocked_effect = {
+            "effect": "remove_creature",
+            "battle_model_scope": "xmage_destroy_target_spell_v1",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"], "combat_state": "blocked"},
+            "destination": "graveyard",
+            "instant": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Fixture Smite", "type_line": "Instant"},
+            turn=6,
+            rng=random.Random(40),
+            effect_data_override=blocked_effect,
+        )
+
+        self.assertEqual([card["name"] for card in opponent.battlefield], ["Unblocked Attacker", "Blocking Soldier"])
+        self.assertEqual([card["name"] for card in opponent.graveyard], ["Blocked Giant"])
+
+        opponent.battlefield = [
+            {
+                "name": "Ground Attacker",
+                "type_line": "Creature - Beast",
+                "power": 4,
+                "toughness": 4,
+                "attacking": True,
+            },
+            {
+                "name": "Flying Attacker",
+                "type_line": "Creature - Bird",
+                "power": 2,
+                "toughness": 2,
+                "attacking": True,
+                "keywords": ["flying"],
+            },
+        ]
+        opponent.graveyard = []
+        nonflying_attacker_effect = {
+            "effect": "remove_creature",
+            "battle_model_scope": "xmage_destroy_target_spell_v1",
+            "target": "creature",
+            "target_constraints": {
+                "card_types": ["creature"],
+                "combat_state": "attacking",
+                "exclude_keywords": ["flying"],
+            },
+            "destination": "graveyard",
+            "instant": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Fixture Pitfall Trap", "type_line": "Instant"},
+            turn=7,
+            rng=random.Random(41),
+            effect_data_override=nonflying_attacker_effect,
+        )
+
+        self.assertEqual([card["name"] for card in opponent.battlefield], ["Flying Attacker"])
+        self.assertEqual([card["name"] for card in opponent.graveyard], ["Ground Attacker"])
+
+        opponent.battlefield = [
+            {"name": "Fair Citizen", "type_line": "Creature - Citizen", "power": 2, "toughness": 2},
+            {"name": "Rogue Outlaw", "type_line": "Creature - Rogue", "power": 4, "toughness": 4},
+        ]
+        opponent.graveyard = []
+        non_outlaw_effect = {
+            "effect": "remove_creature",
+            "battle_model_scope": "xmage_destroy_target_spell_v1",
+            "target": "creature",
+            "target_constraints": {
+                "card_types": ["creature"],
+                "exclude_subtypes": ["assassin", "mercenary", "pirate", "rogue", "warlock"],
+            },
+            "destination": "graveyard",
+            "instant": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Fixture Shoot the Sheriff", "type_line": "Instant"},
+            turn=8,
+            rng=random.Random(42),
+            effect_data_override=non_outlaw_effect,
+        )
+
+        self.assertEqual([card["name"] for card in opponent.battlefield], ["Rogue Outlaw"])
+        self.assertEqual([card["name"] for card in opponent.graveyard], ["Fair Citizen"])
+
     def test_exile_target_spell_respects_power_and_color_constraints(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

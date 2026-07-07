@@ -1936,6 +1936,57 @@ def test_single_target_removal_scenario_models_excluded_color_and_combat_state()
     assert scenario["nonmatching_target"]["colors"] == ["B"]
 
 
+def test_single_target_removal_scenario_models_blocked_creature_state() -> None:
+    rule = {
+        "normalized_name": "smite",
+        "card_name": "Smite",
+        "oracle_hash": "hash-smite",
+        "logical_rule_key": "battle_rule_v1:hash-smite",
+        "required_effect_fields": {
+            "effect": "remove_creature",
+            "battle_model_scope": "xmage_destroy_target_spell_v1",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"], "combat_state": "blocked"},
+            "destination": "graveyard",
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "single_target_removal"
+    assert scenario["target"]["blocked"] is True
+    assert not scenario["nonmatching_target"].get("blocked")
+
+
+def test_single_target_removal_scenario_models_excluded_keyword() -> None:
+    rule = {
+        "normalized_name": "pitfall trap",
+        "card_name": "Pitfall Trap",
+        "oracle_hash": "hash-pitfall-trap",
+        "logical_rule_key": "battle_rule_v1:hash-pitfall-trap",
+        "required_effect_fields": {
+            "effect": "remove_creature",
+            "battle_model_scope": "xmage_destroy_target_spell_v1",
+            "target": "creature",
+            "target_constraints": {
+                "card_types": ["creature"],
+                "combat_state": "attacking",
+                "exclude_keywords": ["flying"],
+            },
+            "destination": "graveyard",
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "single_target_removal"
+    assert scenario["target"]["attacking"] is True
+    assert "keywords" not in scenario["target"]
+    assert scenario["nonmatching_target"]["keywords"] == ["flying"]
+
+
 def test_single_target_removal_scenario_models_excluded_card_type() -> None:
     rule = {
         "normalized_name": "expunge",

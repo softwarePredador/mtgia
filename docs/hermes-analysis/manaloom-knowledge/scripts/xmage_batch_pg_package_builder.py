@@ -3399,6 +3399,8 @@ def _target_fixture_from_constraints(
             "toughness_min",
             "toughness_max",
             "required_keywords",
+            "excluded_keywords",
+            "exclude_keywords",
             "required_subtypes",
             "exclude_card_types",
             "exclude_colors",
@@ -3516,10 +3518,23 @@ def _target_fixture_from_constraints(
     ]
     if matching and keywords:
         fixture["keywords"] = keywords
+    excluded_keywords = [
+        str(value).strip().lower().replace(" ", "_")
+        for value in (
+            active_constraints.get("excluded_keywords")
+            or active_constraints.get("exclude_keywords")
+            or []
+        )
+        if str(value).strip()
+    ]
+    if not matching and excluded_keywords:
+        fixture["keywords"] = excluded_keywords
     combat_state = str(active_constraints.get("combat_state") or "").strip().lower()
     if matching and combat_state:
         if combat_state in {"attacking", "attacking_or_blocking"}:
             fixture["attacking"] = True
+        if combat_state == "blocked":
+            fixture["blocked"] = True
         if combat_state == "blocking":
             fixture["blocking"] = True
     tapped_state = str(active_constraints.get("tapped_state") or active_constraints.get("tap_state") or "").strip().lower()

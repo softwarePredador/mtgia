@@ -5289,6 +5289,8 @@ def global_stat_modifier_creature_filter_matches(target, creature_filter):
     combat_state = str(creature_filter.get("combat_state") or "").lower()
     if combat_state == "attacking" and not bool(target.get("attacking")):
         return False
+    if combat_state == "blocked" and not bool(target.get("blocked")):
+        return False
     if combat_state == "blocking" and not bool(target.get("blocking")):
         return False
     if combat_state == "attacking_or_blocking" and not (
@@ -12536,6 +12538,8 @@ def is_legal_target(spell, target, controller, all_players=None, target_type=Non
         return False
     combat_state = str(constraints.get("combat_state") or "").lower()
     if combat_state == "attacking" and not bool(target.get("attacking")):
+        return False
+    if combat_state == "blocked" and not bool(target.get("blocked")):
         return False
     if combat_state == "blocking" and not bool(target.get("blocking")):
         return False
