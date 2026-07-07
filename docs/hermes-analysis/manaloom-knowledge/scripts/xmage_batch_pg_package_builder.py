@@ -49,7 +49,14 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "cost_increase_generic",
     "cost_increase_color_symbols",
     "cost_increase_filters",
+    "cost_reduction_applies_to",
+    "cost_reduction_amount_source",
+    "cost_reduction_generic",
+    "cost_reduction_color_symbols",
+    "cost_reduction_filters",
     "applies_to_spell_colors",
+    "applies_to_card_types",
+    "applies_to_subtypes",
     "creature_filter",
     "permanent_type",
     "counter_unless_pays_generic",
@@ -343,6 +350,7 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "cost_reduction_applies_to",
     "cost_reduction_amount_source",
     "cost_reduction_generic",
+    "cost_reduction_color_symbols",
     "cost_reduction_condition",
     "cost_reduction_required_subtype",
     "cost_reduction_required_keyword",
@@ -3826,9 +3834,89 @@ def static_cost_increase_execution_scenario_from_expected_rule(
     }
 
 
+def static_cost_reduction_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_static_generic_cost_reduction_for_matching_spells_v1":
+        return None
+    if required.get("effect") != "static_cost_reduction":
+        return None
+    color_symbols = [
+        str(symbol).upper()
+        for symbol in (required.get("cost_reduction_color_symbols") or [])
+        if str(symbol).upper() in {"W", "U", "B", "R", "G"}
+    ]
+    spell_colors = [
+        str(symbol).upper()
+        for symbol in (required.get("applies_to_spell_colors") or [])
+        if str(symbol).upper() in {"W", "U", "B", "R", "G"}
+    ]
+    test_colors = color_symbols or spell_colors or ["W"]
+    card_types = [str(value).lower() for value in required.get("applies_to_card_types") or [] if value]
+    subtypes = [str(value).lower() for value in required.get("applies_to_subtypes") or [] if value]
+    if "instant" in card_types:
+        type_line = "Instant"
+    elif "sorcery" in card_types:
+        type_line = "Sorcery"
+    elif "artifact" in card_types:
+        type_line = "Artifact"
+    elif "enchantment" in card_types:
+        type_line = "Enchantment"
+    elif subtypes:
+        type_line = "Creature - " + " ".join(part.capitalize() for part in subtypes[0].split())
+    else:
+        type_line = "Creature"
+    base_generic = max(1, int(required.get("cost_reduction_generic") or 0))
+    base_colored: dict[str, int] = {}
+    for symbol in test_colors:
+        mapped = {
+            "W": "white",
+            "U": "blue",
+            "B": "black",
+            "R": "red",
+            "G": "green",
+        }.get(symbol)
+        if mapped:
+            base_colored[mapped] = base_colored.get(mapped, 0) + 1
+    expected_colored = dict(base_colored)
+    applied_colored = 0
+    for symbol in color_symbols:
+        mapped = {
+            "W": "white",
+            "U": "blue",
+            "B": "black",
+            "R": "red",
+            "G": "green",
+        }.get(symbol)
+        if mapped and expected_colored.get(mapped, 0) > 0:
+            expected_colored[mapped] -= 1
+            applied_colored += 1
+    generic_reduction = max(0, int(required.get("cost_reduction_generic") or 0))
+    applied_generic = min(base_generic, generic_reduction)
+    return {
+        "name": f"{rule['card_name']} reduces matching spell cost",
+        "type": "static_cost_reduction_spell_cost",
+        "card": {"name": rule["card_name"]},
+        "target_spell": {
+            "name": "E2E Matching Reduced Spell",
+            "type_line": type_line,
+            "colors": test_colors,
+            "mana_cost": f"{{{base_generic}}}" + "".join(f"{{{symbol}}}" for symbol in test_colors),
+            "cmc": base_generic + len(test_colors),
+        },
+        "expected_generic": base_generic - applied_generic,
+        "expected_colored": expected_colored,
+        "expected_static_cost_reduction_total": applied_generic + applied_colored,
+        "expected_static_cost_reduction_color_symbols": list(color_symbols),
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any] | None:
     return (
         counter_unless_pays_execution_scenario_from_expected_rule(rule)
+        or static_cost_reduction_execution_scenario_from_expected_rule(rule)
         or static_cost_increase_execution_scenario_from_expected_rule(rule)
         or static_controlled_pt_execution_scenario_from_expected_rule(rule)
         or static_controlled_keyword_execution_scenario_from_expected_rule(rule)

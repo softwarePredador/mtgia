@@ -12440,6 +12440,30 @@ def static_cost_reduction_from_oracle(metadata: dict[str, Any]) -> dict[str, Any
     text = re.sub(r"\s+", " ", text).strip().lower()
     if not text:
         return "static_cost_reduction_oracle_missing"
+    colored_match = re.fullmatch(
+        r"(?P<subject>.+?) you cast costs? "
+        r"(?P<cost>(?:\{[wubrg]\})+) less to cast\.? "
+        r"this effect reduces only the amount of colored mana you pay\.?",
+        text,
+    )
+    if colored_match:
+        parsed_cost = parse_mana_cost_text(canonical_mana_cost_text(colored_match.group("cost")))
+        if parsed_cost is None:
+            return "static_cost_reduction_colored_mana_not_supported"
+        generic, colors = parsed_cost
+        if generic:
+            return "static_cost_reduction_colored_mana_generic_component_not_supported"
+        if not colors:
+            return "static_cost_reduction_colored_mana_not_supported"
+        subject_spec = static_cost_reduction_subject_spec(colored_match.group("subject") or "")
+        if isinstance(subject_spec, str):
+            return subject_spec
+        return {
+            **subject_spec,
+            "cost_reduction_generic": 0,
+            "cost_reduction_color_symbols": ordered_color_symbols(colors),
+            "cost_reduction_amount_source": "fixed",
+        }
     if "reduces only the amount of colored mana" in text:
         return "static_cost_reduction_colored_mana_not_supported"
     patterns = [
@@ -12502,20 +12526,35 @@ def static_cost_reduction_from_source(source_text: str) -> dict[str, Any] | str:
     constructors = re.findall(r"\bnew\s+SpellsCostReductionControllerEffect\b", text)
     if len(constructors) != 1:
         return "static_cost_reduction_source_constructor_count_not_one"
-    if "new ManaCostsImpl" in text:
-        return "static_cost_reduction_colored_mana_not_supported"
     constructor_args = extract_constructor_args(text, "SpellsCostReductionControllerEffect")
     if constructor_args is None:
         return "static_cost_reduction_source_constructor_not_found"
     args = split_top_level_args(constructor_args)
     if len(args) < 2:
         return "static_cost_reduction_source_amount_not_fixed"
-    amount_match = re.fullmatch(r"\d+", args[1].strip())
-    if not amount_match:
-        return "static_cost_reduction_source_amount_not_fixed"
-    amount = int(args[1].strip())
-    if amount <= 0:
-        return "static_cost_reduction_source_amount_not_positive"
+    amount = 0
+    color_symbols: list[str] = []
+    mana_cost_match = re.search(
+        r"new\s+ManaCostsImpl<[^>]*>\s*\(\s*\"(?P<cost>[^\"]+)\"\s*\)",
+        args[1],
+    )
+    if mana_cost_match:
+        parsed_cost = parse_mana_cost_text(canonical_mana_cost_text(mana_cost_match.group("cost")))
+        if parsed_cost is None:
+            return "static_cost_reduction_colored_mana_not_supported"
+        generic, colors = parsed_cost
+        if generic:
+            return "static_cost_reduction_colored_mana_generic_component_not_supported"
+        if not colors:
+            return "static_cost_reduction_source_amount_not_fixed"
+        color_symbols = ordered_color_symbols(colors)
+    else:
+        amount_match = re.fullmatch(r"\d+", args[1].strip())
+        if not amount_match:
+            return "static_cost_reduction_source_amount_not_fixed"
+        amount = int(args[1].strip())
+        if amount <= 0:
+            return "static_cost_reduction_source_amount_not_positive"
     filter_arg = args[0]
     filter_chunks = "\n".join(source_filter_add_chunks(text))
     filter_source = "\n".join([filter_arg, filter_chunks])
@@ -12572,6 +12611,8 @@ def static_cost_reduction_from_source(source_text: str) -> dict[str, Any] | str:
         "cost_reduction_generic": amount,
         "cost_reduction_amount_source": "fixed",
     }
+    if color_symbols:
+        result["cost_reduction_color_symbols"] = color_symbols
     mana_value_match = re.search(
         r"ManaValuePredicate\s*\(\s*ComparisonType\.(MORE_THAN|OR_GREATER)\s*,\s*(\d+)\s*\)",
         filter_source,
@@ -12584,6 +12625,10 @@ def static_cost_reduction_from_source(source_text: str) -> dict[str, Any] | str:
 
 def static_cost_reduction_specs_match(source: dict[str, Any], oracle: dict[str, Any]) -> bool:
     if int(source.get("cost_reduction_generic") or 0) != int(oracle.get("cost_reduction_generic") or 0):
+        return False
+    if ordered_color_symbols(source.get("cost_reduction_color_symbols") or []) != ordered_color_symbols(
+        oracle.get("cost_reduction_color_symbols") or []
+    ):
         return False
     if str(source.get("cost_reduction_applies_to") or "") != str(oracle.get("cost_reduction_applies_to") or ""):
         return False
@@ -24827,7 +24872,10 @@ def split_row(
             "ability_kind": "static",
             "static_effect": "generic_cost_reduction_for_matching_spells",
             "cost_reduction_applies_to": "spells_you_cast",
-            "cost_reduction_generic": int(oracle_reduction["cost_reduction_generic"]),
+            "cost_reduction_generic": int(oracle_reduction.get("cost_reduction_generic") or 0),
+            "cost_reduction_color_symbols": ordered_color_symbols(
+                oracle_reduction.get("cost_reduction_color_symbols") or []
+            ),
             "cost_reduction_amount_source": "fixed",
             "permanent_type": permanent_type,
             "xmage_effect_class": "SpellsCostReductionControllerEffect",

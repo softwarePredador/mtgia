@@ -196,6 +196,51 @@ def test_static_cost_increase_runner_executes_colored_tax() -> None:
     assert result["static_cost_increase_color_symbols"] == ["B"]
 
 
+def test_static_cost_reduction_runner_executes_colored_reduction() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    previous_get_card_effect = battle.get_card_effect
+    battle.get_card_effect = lambda card: {
+        "effect": "static_cost_reduction",
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+        "cost_reduction_applies_to": "spells_you_cast",
+        "cost_reduction_generic": 0,
+        "cost_reduction_color_symbols": ["W", "B"],
+        "cost_reduction_filters": [{"applies_to_subtypes": ["cleric"]}],
+        "applies_to_subtypes": ["cleric"],
+        "_rule_logical_key": "battle_rule_v1:edgewalker",
+    }
+    try:
+        result = validator.run_static_cost_reduction_spell_cost(
+            battle,
+            {
+                "name": "Edgewalker reduces cleric spell cost",
+                "type": "static_cost_reduction_spell_cost",
+                "card": {"name": "Edgewalker"},
+                "target_spell": {
+                    "name": "E2E Matching Cleric Spell",
+                    "type_line": "Creature - Cleric",
+                    "colors": ["W", "B"],
+                    "mana_cost": "{1}{W}{B}",
+                    "cmc": 3,
+                },
+                "expected_generic": 1,
+                "expected_colored": {"white": 0, "black": 0},
+                "expected_static_cost_reduction_total": 2,
+                "expected_static_cost_reduction_color_symbols": ["W", "B"],
+            },
+            [],
+        )
+    finally:
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Edgewalker"
+    assert result["generic"] == 1
+    assert result["colored"]["white"] == 0
+    assert result["colored"]["black"] == 0
+    assert result["static_cost_reduction_total"] == 2
+    assert result["static_cost_reduction_color_symbols"] == ["W", "B"]
+
+
 def test_simple_activated_damage_runner_executes_life_cost() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

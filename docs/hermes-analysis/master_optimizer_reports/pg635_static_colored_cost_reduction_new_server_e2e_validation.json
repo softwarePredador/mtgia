@@ -1,0 +1,161 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [
+      {
+        "card_name": "Edgewalker",
+        "colored": {
+          "black": 0,
+          "white": 0
+        },
+        "generic": 1,
+        "scenario": "Edgewalker reduces matching spell cost",
+        "static_cost_reduction_color_symbols": [
+          "W",
+          "B"
+        ],
+        "static_cost_reduction_total": 2,
+        "target_spell": "E2E Matching Reduced Spell"
+      },
+      {
+        "card_name": "Ragemonger",
+        "colored": {
+          "black": 0,
+          "red": 0
+        },
+        "generic": 1,
+        "scenario": "Ragemonger reduces matching spell cost",
+        "static_cost_reduction_color_symbols": [
+          "B",
+          "R"
+        ],
+        "static_cost_reduction_total": 2,
+        "target_spell": "E2E Matching Reduced Spell"
+      }
+    ],
+    "scenario_count": 2
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-07T19:54:22.206566+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg635_static_colored_cost_reduction_new_server_package_manifest.json",
+  "package_id": "pg635_static_colored_cost_reduction_new_server_package_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 2
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+          "card_name": "Edgewalker",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2f9f9069e9192da0c8e90d58cff9fcda",
+          "oracle_hash": "9dbbd985fcdc89be41cf2c5b86ff79bf",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+          "card_name": "Ragemonger",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:43f0b5923df1d7ea90f69aec83340904",
+          "oracle_hash": "2535a2d4ca1ff4aa0700f0feedcc9688",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 2
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+          "card_name": "Edgewalker",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2f9f9069e9192da0c8e90d58cff9fcda",
+          "oracle_hash": "9dbbd985fcdc89be41cf2c5b86ff79bf",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+          "card_name": "Ragemonger",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:43f0b5923df1d7ea90f69aec83340904",
+          "oracle_hash": "2535a2d4ca1ff4aa0700f0feedcc9688",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 2
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+          "battle_rule_version": 2,
+          "card_name": "Edgewalker",
+          "logical_rule_key": "battle_rule_v1:2f9f9069e9192da0c8e90d58cff9fcda"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+          "battle_rule_version": 2,
+          "card_name": "Ragemonger",
+          "logical_rule_key": "battle_rule_v1:43f0b5923df1d7ea90f69aec83340904"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 2
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Edgewalker",
+          "component_keys": [],
+          "effect": "static_cost_reduction",
+          "logical_rule_key": "battle_rule_v1:2f9f9069e9192da0c8e90d58cff9fcda"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Ragemonger",
+          "component_keys": [],
+          "effect": "static_cost_reduction",
+          "logical_rule_key": "battle_rule_v1:43f0b5923df1d7ea90f69aec83340904"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 2
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

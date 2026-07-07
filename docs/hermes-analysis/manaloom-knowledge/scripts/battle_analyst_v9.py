@@ -1391,6 +1391,21 @@ def _static_cost_reduction_amount_source(effect_data):
     return ""
 
 
+def _static_cost_reduction_color_symbols(effect_data):
+    symbols = []
+    for key in (
+        "cost_reduction_color_symbols",
+        "cost_reduction_colors",
+        "cost_reduction_colored_symbols",
+        "colored_cost_reduction_symbols",
+    ):
+        for value in _as_list(effect_data.get(key)):
+            symbol = _color_symbol(value)
+            if symbol in SYMBOL_TO_COLOR_NAME and symbol not in symbols:
+                symbols.append(symbol)
+    return symbols
+
+
 def _battlefield_creature_count_for_cost_reduction(controller):
     if controller is None:
         return 0
@@ -1450,6 +1465,8 @@ def _static_cost_reduction_amount(source, effect_data, *, controller=None):
         except (TypeError, ValueError):
             return 0
     if str(effect_data.get("effect") or "") in STATIC_COST_REDUCTION_EFFECTS:
+        if _static_cost_reduction_color_symbols(effect_data):
+            return 0
         return 1
     return 0
 
@@ -1749,7 +1766,8 @@ def _cost_reduction_condition_satisfied(effect_data, controller):
 
 def _static_cost_reduction_matches_spell(source, effect_data, card, *, controller=None):
     amount = _static_cost_reduction_amount(source, effect_data, controller=controller)
-    if amount <= 0:
+    colored_symbols = _static_cost_reduction_color_symbols(effect_data)
+    if amount <= 0 and not colored_symbols:
         return None
     if controller is not None and not _cost_reduction_condition_satisfied(effect_data, controller):
         return None
@@ -1790,6 +1808,7 @@ def _static_cost_reduction_matches_spell(source, effect_data, card, *, controlle
     return {
         "source": source.get("name", "unknown"),
         "amount": amount,
+        "colored_symbols": list(colored_symbols),
         "scope": scope,
         "colors": sorted(colors),
         "applies_to_card_types": card_types,
@@ -2038,23 +2057,50 @@ def apply_static_cost_reductions_to_cost(cost, reductions):
         return cost
     adjusted = copy.deepcopy(cost)
     starting_generic = max(0, int(adjusted.get("generic", 0) or 0))
+    colored_cost = dict(adjusted.get("colored") or {})
     remaining_generic = starting_generic
+    remaining_colored = {
+        str(color): max(0, int(amount or 0))
+        for color, amount in colored_cost.items()
+    }
     applied = []
+    applied_colored_symbols_all = []
     for reduction in reductions:
         amount = max(0, int(reduction.get("amount", 0) or 0))
-        if amount <= 0:
+        applied_amount = 0
+        if amount > 0:
+            applied_amount = min(remaining_generic, amount)
+            remaining_generic -= applied_amount
+        applied_colored_symbols = []
+        for symbol in _as_list(reduction.get("colored_symbols")):
+            symbol = _color_symbol(symbol)
+            color_name = SYMBOL_TO_COLOR_NAME.get(symbol)
+            if not color_name:
+                continue
+            available = max(0, int(remaining_colored.get(color_name, 0) or 0))
+            if available <= 0:
+                continue
+            remaining_colored[color_name] = available - 1
+            applied_colored_symbols.append(symbol)
+            applied_colored_symbols_all.append(symbol)
+        if applied_amount <= 0 and not applied_colored_symbols:
             continue
-        applied_amount = min(remaining_generic, amount)
-        if applied_amount <= 0:
-            continue
-        remaining_generic -= applied_amount
         applied_reduction = dict(reduction)
         applied_reduction["applied_amount"] = applied_amount
+        if applied_colored_symbols:
+            applied_reduction["applied_colored_symbols"] = list(applied_colored_symbols)
+            applied_reduction["applied_colored_amount"] = len(applied_colored_symbols)
         applied.append(applied_reduction)
     if not applied:
         return cost
     adjusted["generic"] = remaining_generic
-    adjusted["static_cost_reduction_total"] = starting_generic - remaining_generic
+    adjusted["colored"] = remaining_colored
+    adjusted["static_cost_reduction_total"] = (
+        starting_generic - remaining_generic + len(applied_colored_symbols_all)
+    )
+    adjusted["static_cost_reduction_generic_total"] = starting_generic - remaining_generic
+    if applied_colored_symbols_all:
+        adjusted["static_cost_reduction_color_symbols"] = list(applied_colored_symbols_all)
     adjusted["static_cost_reductions"] = applied
     return adjusted
 

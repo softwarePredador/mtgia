@@ -112,6 +112,43 @@ def test_static_cost_increase_colored_tax_fields_and_execution_scenario_are_mani
     assert scenario["expected_static_cost_increase_color_symbols"] == ["B"]
 
 
+def test_static_cost_reduction_colored_symbols_fields_and_execution_scenario_are_manifested() -> None:
+    proposal = {
+        "normalized_name": "edgewalker",
+        "card_name": "Edgewalker",
+        "oracle_hash": "hash-edgewalker",
+        "logical_rule_key": "battle_rule_v1:edgewalker",
+        "effect_json": {
+            "effect": "static_cost_reduction",
+            "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+            "static_effect": "generic_cost_reduction_for_matching_spells",
+            "cost_reduction_applies_to": "spells_you_cast",
+            "cost_reduction_amount_source": "fixed",
+            "cost_reduction_generic": 0,
+            "cost_reduction_color_symbols": ["W", "B"],
+            "cost_reduction_filters": [{"applies_to_subtypes": ["cleric"]}],
+            "applies_to_subtypes": ["cleric"],
+            "permanent_type": "creature",
+            "xmage_ability_class": "SimpleStaticAbility",
+            "xmage_effect_class": "SpellsCostReductionControllerEffect",
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    required = expected["required_effect_fields"]
+    assert required["cost_reduction_color_symbols"] == ["W", "B"]
+    assert required["cost_reduction_filters"] == [{"applies_to_subtypes": ["cleric"]}]
+    assert scenario["type"] == "static_cost_reduction_spell_cost"
+    assert scenario["target_spell"]["type_line"] == "Creature - Cleric"
+    assert scenario["target_spell"]["mana_cost"] == "{1}{W}{B}"
+    assert scenario["expected_generic"] == 1
+    assert scenario["expected_colored"] == {"white": 0, "black": 0}
+    assert scenario["expected_static_cost_reduction_total"] == 2
+    assert scenario["expected_static_cost_reduction_color_symbols"] == ["W", "B"]
+
+
 def test_creature_etb_draw_discard_execution_scenario_is_manifested() -> None:
     proposal = {
         "normalized_name": "bazaar trademage",

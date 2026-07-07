@@ -1,0 +1,5 @@
+ card_name  | normalized_name |           oracle_hash            |                logical_rule_key                 |      shadow_handling       | target_card_rows |          canonical_card_id           | existing_rule_rows | expected_rule_rows_before | would_deprecate_shadow_rows
+------------+-----------------+----------------------------------+-------------------------------------------------+----------------------------+------------------+--------------------------------------+--------------------+---------------------------+-----------------------------
+ Edgewalker | edgewalker      | 9dbbd985fcdc89be41cf2c5b86ff79bf | battle_rule_v1:2f9f9069e9192da0c8e90d58cff9fcda | deprecate_nonmatching_rows |                1 | 82f6f927-550a-4843-be0d-332f349bd0cc |                  0 |                         0 |                           0
+ Ragemonger | ragemonger      | 2535a2d4ca1ff4aa0700f0feedcc9688 | battle_rule_v1:43f0b5923df1d7ea90f69aec83340904 | deprecate_nonmatching_rows |                1 | 4e58effc-30c4-4fc7-a31c-ec5945600601 |                  0 |                         0 |                           0
+(2 rows)

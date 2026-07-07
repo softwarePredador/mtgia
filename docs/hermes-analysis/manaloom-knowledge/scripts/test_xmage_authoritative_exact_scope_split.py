@@ -24753,7 +24753,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertNotIn("applies_to_card_types", effect)
         self.assertNotIn("cost_reduction_up_to", effect)
 
-    def test_static_generic_cost_reduction_blocks_colored_mana_reductions(self) -> None:
+    def test_static_generic_cost_reduction_maps_colored_mana_reductions(self) -> None:
         row = queue_row(
             split.STATIC_GENERIC_COST_REDUCTION_UNIT,
             effect_classes=["SpellsCostReductionControllerEffect"],
@@ -24781,8 +24781,13 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             """,
         )
 
-        self.assertIsNone(proposal)
-        self.assertEqual(reason, "static_cost_reduction_colored_mana_not_supported")
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.STATIC_GENERIC_COST_REDUCTION_SCOPE)
+        self.assertEqual(effect["effect"], "static_cost_reduction")
+        self.assertEqual(effect["cost_reduction_generic"], 0)
+        self.assertEqual(effect["cost_reduction_color_symbols"], ["W", "B"])
+        self.assertEqual(effect["applies_to_subtypes"], ["cleric"])
 
     def test_static_generic_cost_increase_maps_all_spells_tax(self) -> None:
         row = queue_row(

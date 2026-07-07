@@ -1,0 +1,2817 @@
+{
+  "cards": [
+    {
+      "card_name": "Lorehold, the Historian",
+      "checks": {
+        "functional_tags": "not_required",
+        "pg_rule": "pass",
+        "snapshot_rule": "pass",
+        "sqlite_rule": "pass"
+      },
+      "expected_rules": [
+        {
+          "effect": "passive",
+          "scope": "lorehold_opponent_upkeep_miracle_v1"
+        }
+      ],
+      "missing_function_tags": [],
+      "normalized_name": "lorehold, the historian",
+      "pg_card_rows": 4,
+      "pg_function_tags": [
+        "draw",
+        "enabler",
+        "engine",
+        "loot"
+      ],
+      "pg_rules": [
+        {
+          "effect": "passive",
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:91aa990f0d25b0aba2a1447bc1a47914",
+          "review_status": "active",
+          "scope": "lorehold_opponent_upkeep_miracle_v1",
+          "source": "curated"
+        },
+        {
+          "effect": "commander",
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:4b13901834c35e2201143db3f94fd150",
+          "review_status": "deprecated",
+          "scope": "",
+          "source": "curated"
+        },
+        {
+          "effect": "draw_engine",
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:bdfc00d674cb68d8e2a12125213ab559",
+          "review_status": "needs_review",
+          "scope": "",
+          "source": "generated"
+        },
+        {
+          "effect": "passive",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:06d892f8ad75831f785aef6dcedc82b4",
+          "review_status": "verified",
+          "scope": "lorehold_opponent_upkeep_miracle_v1",
+          "source": "curated"
+        }
+      ],
+      "required_function_tags": [],
+      "snapshot_rule": {
+        "effect": "passive",
+        "execution_status": "auto",
+        "logical_rule_key": "battle_rule_v1:06d892f8ad75831f785aef6dcedc82b4",
+        "review_status": "verified",
+        "scope": "lorehold_opponent_upkeep_miracle_v1",
+        "source": "curated"
+      },
+      "sqlite_rules": [
+        {
+          "effect": "draw_engine",
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:bdfc00d674cb68d8e2a12125213ab559",
+          "review_status": "needs_review",
+          "scope": "",
+          "source": "generated"
+        },
+        {
+          "effect": "passive",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:06d892f8ad75831f785aef6dcedc82b4",
+          "review_status": "verified",
+          "scope": "lorehold_opponent_upkeep_miracle_v1",
+          "source": "curated"
+        }
+      ],
+      "xmage_source_path": null
+    },
+    {
+      "card_name": "Farewell",
+      "checks": {
+        "functional_tags": "not_required",
+        "pg_rule": "pass",
+        "snapshot_rule": "pass",
+        "sqlite_rule": "pass"
+      },
+      "expected_rules": [
+        {
+          "effect": "board_wipe",
+          "scope": "modal_exile_wipe_creature_runtime_baseline_v1"
+        }
+      ],
+      "missing_function_tags": [],
+      "normalized_name": "farewell",
+      "pg_card_rows": 1,
+      "pg_function_tags": [
+        "big_spell",
+        "board_wipe",
+        "graveyard",
+        "graveyard_synergy"
+      ],
+      "pg_rules": [
+        {
+          "effect": "board_wipe",
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:2f2efdf63e6e80b69b67b7a8e946e4e3",
+          "review_status": "deprecated",
+          "scope": "",
+          "source": "generated"
+        },
+        {
+          "effect": "board_wipe",
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:b53caf6e1ec35c80ef4ef3df05ed35ec",
+          "review_status": "needs_review",
+          "scope": "",
+          "source": "generated"
+        },
+        {
+          "effect": "board_wipe",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c5aef30c5a5904e02c4cfe40957080d3",
+          "review_status": "verified",
+          "scope": "modal_exile_wipe_creature_runtime_baseline_v1",
+          "source": "curated"
+        }
+      ],
+      "required_function_tags": [],
+      "snapshot_rule": {
+        "effect": "board_wipe",
+        "execution_status": "auto",
+        "logical_rule_key": "battle_rule_v1:c5aef30c5a5904e02c4cfe40957080d3",
+        "review_status": "verified",
+        "scope": "modal_exile_wipe_creature_runtime_baseline_v1",
+        "source": "curated"
+      },
+      "sqlite_rules": [
+        {
+          "effect": "board_wipe",
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:2f2efdf63e6e80b69b67b7a8e946e4e3",
+          "review_status": "deprecated",
+          "scope": "",
+          "source": "generated"
+        },
+        {
+          "effect": "board_wipe",
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:b53caf6e1ec35c80ef4ef3df05ed35ec",
+          "review_status": "needs_review",
+          "scope": "",
+          "source": "generated"
+        },
+        {
+          "effect": "board_wipe",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c5aef30c5a5904e02c4cfe40957080d3",
+          "review_status": "verified",
+          "scope": "modal_exile_wipe_creature_runtime_baseline_v1",
+          "source": "curated"
+        }
+      ],
+      "xmage_source_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/f/Farewell.java"
+    },
+    {
+      "card_name": "Fellwar Stone",
+      "checks": {
+        "functional_tags": "not_required",
+        "pg_rule": "pass",
+        "snapshot_rule": "pass",
+        "sqlite_rule": "pass"
+      },
+      "expected_rules": [
+        {
+          "effect": "ramp_permanent",
+          "scope": "conditional_opponent_color_mana_rock_v1"
+        }
+      ],
+      "missing_function_tags": [],
+      "normalized_name": "fellwar stone",
+      "pg_card_rows": 1,
+      "pg_function_tags": [
+        "mana_fixing",
+        "ramp"
+      ],
+      "pg_rules": [
+        {
+          "effect": "ramp_permanent",
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:a5270b2fac934dee9b6efc9d0e2ea81d",
+          "review_status": "deprecated",
+          "scope": "",
+          "source": "curated"
+        },
+        {
+          "effect": "ramp_permanent",
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:601753de1461f2f66d16bb51bd3fb408",
+          "review_status": "needs_review",
+          "scope": "",
+          "source": "generated"
+        },
+        {
+          "effect": "ramp_permanent",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3906ffa3cbf7d3437d68e44e13e10bba",
+          "review_status": "verified",
+          "scope": "conditional_opponent_color_mana_rock_v1",
+          "source": "curated"
+        }
+      ],
+      "required_function_tags": [],
+      "snapshot_rule": {
+        "effect": "ramp_permanent",
+        "execution_status": "auto",
+        "logical_rule_key": "battle_rule_v1:3906ffa3cbf7d3437d68e44e13e10bba",
+        "review_status": "verified",
+        "scope": "conditional_opponent_color_mana_rock_v1",
+        "source": "curated"
+      },
+      "sqlite_rules": [
+        {
+          "effect": "ramp_permanent",
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:601753de1461f2f66d16bb51bd3fb408",
+          "review_status": "needs_review",
+          "scope": "",
+          "source": "generated"
+        },
+        {
+          "effect": "ramp_permanent",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3906ffa3cbf7d3437d68e44e13e10bba",
+          "review_status": "verified",
+          "scope": "conditional_opponent_color_mana_rock_v1",
+          "source": "curated"
+        }
+      ],
+      "xmage_source_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/f/FellwarStone.java"
+    },
+    {
+      "card_name": "Flawless Maneuver",
+      "checks": {
+        "functional_tags": "not_required",
+        "pg_rule": "pass",
+        "snapshot_rule": "pass",
+        "sqlite_rule": "pass"
+      },
+      "expected_rules": [
+        {
+          "effect": "indestructible",
+          "scope": "flawless_maneuver_control_commander_free_creatures_indestructible_until_eot_v1"
+        }
+      ],
+      "missing_function_tags": [],
+      "normalized_name": "flawless maneuver",
+      "pg_card_rows": 1,
+      "pg_function_tags": [
+        "big_spell",
+        "protection"
+      ],
+      "pg_rules": [
+        {
+          "effect": "indestructible",
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:4eb738d35e1f66ebdcfa0bb45899301f",
+          "review_status": "deprecated",
+          "scope": "",
+          "source": "curated"
+        },
+        {
+          "effect": "indestructible",
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:87112f449c0005908203df41614840bf",
+          "review_status": "needs_review",
+          "scope": "",
+          "source": "generated"
+        },
+        {
+          "effect": "indestructible",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:73622071c1ad89267708f914a0729bf2",
+          "review_status": "verified",
+          "scope": "flawless_maneuver_control_commander_free_creatures_indestructible_until_eot_v1",
+          "source": "curated"
+        }
+      ],
+      "required_function_tags": [],
+      "snapshot_rule": {
+        "effect": "indestructible",
+        "execution_status": "auto",
+        "logical_rule_key": "battle_rule_v1:73622071c1ad89267708f914a0729bf2",
+        "review_status": "verified",
+        "scope": "flawless_maneuver_control_commander_free_creatures_indestructible_until_eot_v1",
+        "source": "curated"
+      },
+      "sqlite_rules": [
+        {
+          "effect": "indestructible",
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:87112f449c0005908203df41614840bf",
+          "review_status": "needs_review",
+          "scope": "",
+          "source": "generated"
+        },
+        {
+          "effect": "indestructible",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:73622071c1ad89267708f914a0729bf2",
+          "review_status": "verified",
+          "scope": "flawless_maneuver_control_commander_free_creatures_indestructible_until_eot_v1",
+          "source": "curated"
+        }
+      ],
+      "xmage_source_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/f/FlawlessManeuver.java"
+    },
+    {
+      "card_name": "Hit the Mother Lode",
+      "checks": {
+        "functional_tags": "not_required",
+        "pg_rule": "pass",
+        "snapshot_rule": "pass",
+        "sqlite_rule": "pass"
+      },
+      "expected_rules": [
+        {
+          "effect": "draw_cards",
+          "scope": "discover_10_as_one_card_value_component_v1"
+        },
+        {
+          "effect": "treasure_maker",
+          "scope": "discover_10_treasure_difference_average_v1"
+        }
+      ],
+      "missing_function_tags": [],
+      "normalized_name": "hit the mother lode",
+      "pg_card_rows": 1,
+      "pg_function_tags": [
+        "big_spell",
+        "token",
+        "token_maker"
+      ],
+      "pg_rules": [
+        {
+          "effect": "ramp_engine",
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:28c62ac668a006eef75c91712e20b56e",
+          "review_status": "deprecated",
+          "scope": "",
+          "source": "generated"
+        },
+        {
+          "effect": "ramp_engine",
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:ad358bc2e8adf8003110158e73e0fccc",
+          "review_status": "needs_review",
+          "scope": "",
+          "source": "generated"
+        },
+        {
+          "effect": "draw_cards",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:96918f32221fe2908cf49d33a457af2f",
+          "review_status": "verified",
+          "scope": "discover_10_as_one_card_value_component_v1",
+          "source": "curated"
+        },
+        {
+          "effect": "treasure_maker",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3c85508fc77f408ea77c6ad8c81cab34",
+          "review_status": "verified",
+          "scope": "discover_10_treasure_difference_average_v1",
+          "source": "curated"
+        }
+      ],
+      "required_function_tags": [],
+      "snapshot_rule": {
+        "effect": "draw_cards",
+        "execution_status": "auto",
+        "logical_rule_key": "battle_rule_v1:96918f32221fe2908cf49d33a457af2f",
+        "review_status": "verified",
+        "scope": "discover_10_as_one_card_value_component_v1",
+        "source": "curated"
+      },
+      "sqlite_rules": [
+        {
+          "effect": "ramp_engine",
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:28c62ac668a006eef75c91712e20b56e",
+          "review_status": "deprecated",
+          "scope": "",
+          "source": "generated"
+        },
+        {
+          "effect": "ramp_engine",
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:ad358bc2e8adf8003110158e73e0fccc",
+          "review_status": "needs_review",
+          "scope": "",
+          "source": "generated"
+        },
+        {
+          "effect": "treasure_maker",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3c85508fc77f408ea77c6ad8c81cab34",
+          "review_status": "verified",
+          "scope": "discover_10_treasure_difference_average_v1",
+          "source": "curated"
+        },
+        {
+          "effect": "draw_cards",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:96918f32221fe2908cf49d33a457af2f",
+          "review_status": "verified",
+          "scope": "discover_10_as_one_card_value_component_v1",
+          "source": "curated"
+        }
+      ],
+      "xmage_source_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/h/HitTheMotherLode.java"
+    },
+    {
+      "card_name": "Improvisation Capstone",
+      "checks": {
+        "functional_tags": "not_required",
+        "pg_rule": "pass",
+        "snapshot_rule": "pass",
+        "sqlite_rule": "pass"
+      },
+      "expected_rules": [
+        {
+          "effect": "exile_value",
+          "scope": "exile_value_free_casts_paradigm_annotation_v1"
+        }
+      ],
+      "missing_function_tags": [],
+      "normalized_name": "improvisation capstone",
+      "pg_card_rows": 1,
+      "pg_function_tags": [
+        "big_spell",
+        "draw",
+        "exile_value"
+      ],
+      "pg_rules": [
+        {
+          "effect": "draw_cards",
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:d4c4b6b24e887ee80aed27177ca506dc",
+          "review_status": "deprecated",
+          "scope": "",
+          "source": "generated"
+        },
+        {
+          "effect": "draw_cards",
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:57a4438eb44726db5fbec8d3bb588ccc",
+          "review_status": "needs_review",
+          "scope": "",
+          "source": "generated"
+        },
+        {
+          "effect": "exile_value",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4a001137f9a15f1a45b994a4d63f1689",
+          "review_status": "verified",
+          "scope": "exile_value_free_casts_paradigm_annotation_v1",
+          "source": "curated"
+        }
+      ],
+      "required_function_tags": [],
+      "snapshot_rule": {
+        "effect": "exile_value",
+        "execution_status": "auto",
+        "logical_rule_key": "battle_rule_v1:4a001137f9a15f1a45b994a4d63f1689",
+        "review_status": "verified",
+        "scope": "exile_value_free_casts_paradigm_annotation_v1",
+        "source": "curated"
+      },
+      "sqlite_rules": [
+        {
+          "effect": "draw_cards",
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:d4c4b6b24e887ee80aed27177ca506dc",
+          "review_status": "deprecated",
+          "scope": "",
+          "source": "generated"
+        },
+        {
+          "effect": "draw_cards",
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:57a4438eb44726db5fbec8d3bb588ccc",
+          "review_status": "needs_review",
+          "scope": "",
+          "source": "generated"
+        },
+        {
+          "effect": "exile_value",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4a001137f9a15f1a45b994a4d63f1689",
+          "review_status": "verified",
+          "scope": "exile_value_free_casts_paradigm_annotation_v1",
+          "source": "curated"
+        }
+      ],
+      "xmage_source_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/i/ImprovisationCapstone.java"
+    },
+    {
+      "card_name": "Land Tax",
+      "checks": {
+        "functional_tags": "not_required",
+        "pg_rule": "pass",
+        "snapshot_rule": "pass",
+        "sqlite_rule": "pass"
+      },
+      "expected_rules": [
+        {
+          "effect": "land_tax",
+          "scope": "land_tax_upkeep_opponent_more_lands_basic_land_tutor_to_hand_v1"
+        }
+      ],
+      "missing_function_tags": [],
+      "normalized_name": "land tax",
+      "pg_card_rows": 1,
+      "pg_function_tags": [
+        "draw",
+        "enabler",
+        "ramp"
+      ],
+      "pg_rules": [
+        {
+          "effect": "passive",
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:44f3e6ff98ac438be56aa74272b47f93",
+          "review_status": "deprecated",
+          "scope": "",
+          "source": "curated"
+        },
+        {
+          "effect": "tutor",
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:7942d476288c89dceddf389503889fe4",
+          "review_status": "needs_review",
+          "scope": "",
+          "source": "generated"
+        },
+        {
+          "effect": "land_tax",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e3f5f35c6a9ee4fd8c7b9972c4152bef",
+          "review_status": "verified",
+          "scope": "land_tax_upkeep_opponent_more_lands_basic_land_tutor_to_hand_v1",
+          "source": "curated"
+        }
+      ],
+      "required_function_tags": [],
+      "snapshot_rule": {
+        "effect": "land_tax",
+        "execution_status": "auto",
+        "logical_rule_key": "battle_rule_v1:e3f5f35c6a9ee4fd8c7b9972c4152bef",
+        "review_status": "verified",
+        "scope": "land_tax_upkeep_opponent_more_lands_basic_land_tutor_to_hand_v1",
+        "source": "curated"
+      },
+      "sqlite_rules": [
+        {
+          "effect": "tutor",
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:7942d476288c89dceddf389503889fe4",
+          "review_status": "needs_review",
+          "scope": "",
+          "source": "generated"
+        },
+        {
+          "effect": "land_tax",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e3f5f35c6a9ee4fd8c7b9972c4152bef",
+          "review_status": "verified",
+          "scope": "land_tax_upkeep_opponent_more_lands_basic_land_tutor_to_hand_v1",
+          "source": "curated"
+        }
+      ],
+      "xmage_source_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/l/LandTax.java"
+    },
+    {
+      "card_name": "Library of Leng",
+      "checks": {
+        "functional_tags": "not_required",
+        "pg_rule": "pass",
+        "snapshot_rule": "pass",
+        "sqlite_rule": "pass"
+      },
+      "expected_rules": [
+        {
+          "effect": "passive",
+          "scope": "discard_replacement_to_top_v1"
+        }
+      ],
+      "missing_function_tags": [],
+      "normalized_name": "library of leng",
+      "pg_card_rows": 1,
+      "pg_function_tags": [
+        "graveyard",
+        "graveyard_synergy"
+      ],
+      "pg_rules": [
+        {
+          "effect": "ramp_permanent",
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:90345eb5573a6295450e7f625c28b943",
+          "review_status": "deprecated",
+          "scope": "",
+          "source": "generated"
+        },
+        {
+          "effect": "ramp_permanent",
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:8caf0789b3906db96a0e271861bfbdd3",
+          "review_status": "needs_review",
+          "scope": "",
+          "source": "generated"
+        },
+        {
+          "effect": "passive",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b6491cf6f7d7df9a3fb0d91abd3d31c3",
+          "review_status": "verified",
+          "scope": "discard_replacement_to_top_v1",
+          "source": "curated"
+        }
+      ],
+      "required_function_tags": [],
+      "snapshot_rule": {
+        "effect": "passive",
+        "execution_status": "auto",
+        "logical_rule_key": "battle_rule_v1:b6491cf6f7d7df9a3fb0d91abd3d31c3",
+        "review_status": "verified",
+        "scope": "discard_replacement_to_top_v1",
+        "source": "curated"
+      },
+      "sqlite_rules": [
+        {
+          "effect": "ramp_permanent",
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:90345eb5573a6295450e7f625c28b943",
+          "review_status": "deprecated",
+          "scope": "",
+          "source": "generated"
+        },
+        {
+          "effect": "ramp_permanent",
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:8caf0789b3906db96a0e271861bfbdd3",
+          "review_status": "needs_review",
+          "scope": "",
+          "source": "generated"
+        },
+        {
+          "effect": "passive",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b6491cf6f7d7df9a3fb0d91abd3d31c3",
+          "review_status": "verified",
+          "scope": "discard_replacement_to_top_v1",
+          "source": "curated"
+        }
+      ],
+      "xmage_source_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/l/LibraryOfLeng.java"
+    },
+    {
+      "card_name": "Scroll Rack",
+      "checks": {
+        "functional_tags": "not_required",
+        "pg_rule": "pass",
+        "snapshot_rule": "pass",
+        "sqlite_rule": "pass"
+      },
+      "expected_rules": [
+        {
+          "effect": "topdeck_manipulation",
+          "scope": "scroll_rack_upkeep_single_exchange_v1"
+        }
+      ],
+      "missing_function_tags": [],
+      "normalized_name": "scroll rack",
+      "pg_card_rows": 1,
+      "pg_function_tags": [
+        "artifact_synergy",
+        "draw",
+        "enabler",
+        "engine"
+      ],
+      "pg_rules": [
+        {
+          "effect": "topdeck_manipulation",
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:efb8905b224067dc9b1c61e0bf194bfe",
+          "review_status": "deprecated",
+          "scope": "",
+          "source": "curated"
+        },
+        {
+          "effect": "ramp_permanent",
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:601753de1461f2f66d16bb51bd3fb408",
+          "review_status": "needs_review",
+          "scope": "",
+          "source": "generated"
+        },
+        {
+          "effect": "topdeck_manipulation",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3b58ff16a7eb52fb05c1bd8517225cd2",
+          "review_status": "verified",
+          "scope": "scroll_rack_upkeep_single_exchange_v1",
+          "source": "curated"
+        }
+      ],
+      "required_function_tags": [],
+      "snapshot_rule": {
+        "effect": "topdeck_manipulation",
+        "execution_status": "auto",
+        "logical_rule_key": "battle_rule_v1:3b58ff16a7eb52fb05c1bd8517225cd2",
+        "review_status": "verified",
+        "scope": "scroll_rack_upkeep_single_exchange_v1",
+        "source": "curated"
+      },
+      "sqlite_rules": [
+        {
+          "effect": "ramp_permanent",
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:601753de1461f2f66d16bb51bd3fb408",
+          "review_status": "needs_review",
+          "scope": "",
+          "source": "generated"
+        },
+        {
+          "effect": "topdeck_manipulation",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3b58ff16a7eb52fb05c1bd8517225cd2",
+          "review_status": "verified",
+          "scope": "scroll_rack_upkeep_single_exchange_v1",
+          "source": "curated"
+        }
+      ],
+      "xmage_source_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/s/ScrollRack.java"
+    },
+    {
+      "card_name": "Swords to Plowshares",
+      "checks": {
+        "functional_tags": "not_required",
+        "pg_rule": "pass",
+        "snapshot_rule": "pass",
+        "sqlite_rule": "pass"
+      },
+      "expected_rules": [
+        {
+          "effect": "remove_creature",
+          "scope": "swords_to_plowshares_creature_exile_life_equal_power_v1"
+        }
+      ],
+      "missing_function_tags": [],
+      "normalized_name": "swords to plowshares",
+      "pg_card_rows": 1,
+      "pg_function_tags": [
+        "removal"
+      ],
+      "pg_rules": [
+        {
+          "effect": "remove_creature",
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:c51b206c12dbfeebcb4c2e3f0a42500b",
+          "review_status": "deprecated",
+          "scope": "",
+          "source": "curated"
+        },
+        {
+          "effect": "remove_creature",
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:6d605e71cab499f7d5f6da75903de044",
+          "review_status": "needs_review",
+          "scope": "",
+          "source": "generated"
+        },
+        {
+          "effect": "remove_creature",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:379008f3f03f94258292123453e3041c",
+          "review_status": "verified",
+          "scope": "swords_to_plowshares_creature_exile_life_equal_power_v1",
+          "source": "curated"
+        }
+      ],
+      "required_function_tags": [],
+      "snapshot_rule": {
+        "effect": "remove_creature",
+        "execution_status": "auto",
+        "logical_rule_key": "battle_rule_v1:379008f3f03f94258292123453e3041c",
+        "review_status": "verified",
+        "scope": "swords_to_plowshares_creature_exile_life_equal_power_v1",
+        "source": "curated"
+      },
+      "sqlite_rules": [
+        {
+          "effect": "remove_creature",
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:6d605e71cab499f7d5f6da75903de044",
+          "review_status": "needs_review",
+          "scope": "",
+          "source": "generated"
+        },
+        {
+          "effect": "remove_creature",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:379008f3f03f94258292123453e3041c",
+          "review_status": "verified",
+          "scope": "swords_to_plowshares_creature_exile_life_equal_power_v1",
+          "source": "curated"
+        }
+      ],
+      "xmage_source_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/s/SwordsToPlowshares.java"
+    },
+    {
+      "card_name": "Talisman of Conviction",
+      "checks": {
+        "functional_tags": "not_required",
+        "pg_rule": "pass",
+        "snapshot_rule": "pass",
+        "sqlite_rule": "pass"
+      },
+      "expected_rules": [
+        {
+          "effect": "ramp_permanent",
+          "scope": "pain_talisman_color_pair_partial_v1"
+        }
+      ],
+      "missing_function_tags": [],
+      "normalized_name": "talisman of conviction",
+      "pg_card_rows": 1,
+      "pg_function_tags": [
+        "ramp"
+      ],
+      "pg_rules": [
+        {
+          "effect": "ramp_permanent",
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:6671147cad5e2014454ed291f4b0c5ea",
+          "review_status": "deprecated",
+          "scope": "",
+          "source": "curated"
+        },
+        {
+          "effect": "ramp_permanent",
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:7b0724138094316c227d006975e0cfe4",
+          "review_status": "needs_review",
+          "scope": "",
+          "source": "generated"
+        },
+        {
+          "effect": "ramp_permanent",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:02133e513da5ea98ac74d32d39b16470",
+          "review_status": "verified",
+          "scope": "pain_talisman_color_pair_partial_v1",
+          "source": "curated"
+        }
+      ],
+      "required_function_tags": [],
+      "snapshot_rule": {
+        "effect": "ramp_permanent",
+        "execution_status": "auto",
+        "logical_rule_key": "battle_rule_v1:02133e513da5ea98ac74d32d39b16470",
+        "review_status": "verified",
+        "scope": "pain_talisman_color_pair_partial_v1",
+        "source": "curated"
+      },
+      "sqlite_rules": [
+        {
+          "effect": "ramp_permanent",
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:7b0724138094316c227d006975e0cfe4",
+          "review_status": "needs_review",
+          "scope": "",
+          "source": "generated"
+        },
+        {
+          "effect": "ramp_permanent",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:02133e513da5ea98ac74d32d39b16470",
+          "review_status": "verified",
+          "scope": "pain_talisman_color_pair_partial_v1",
+          "source": "curated"
+        }
+      ],
+      "xmage_source_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/t/TalismanOfConviction.java"
+    },
+    {
+      "card_name": "Teferi's Protection",
+      "checks": {
+        "functional_tags": "not_required",
+        "pg_rule": "pass",
+        "snapshot_rule": "pass",
+        "sqlite_rule": "pass"
+      },
+      "expected_rules": [
+        {
+          "effect": "phase_out",
+          "scope": "teferis_protection_life_lock_protection_all_permanents_phase_out_self_exile_v1"
+        }
+      ],
+      "missing_function_tags": [],
+      "normalized_name": "teferi's protection",
+      "pg_card_rows": 1,
+      "pg_function_tags": [
+        "lifegain",
+        "protection"
+      ],
+      "pg_rules": [
+        {
+          "effect": "phase_out",
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:7da1165b49fd9158be854caf2b99be22",
+          "review_status": "deprecated",
+          "scope": "",
+          "source": "curated"
+        },
+        {
+          "effect": "phase_out",
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:ff382e14f0ba68552a4dcd823d430b0e",
+          "review_status": "needs_review",
+          "scope": "",
+          "source": "generated"
+        },
+        {
+          "effect": "phase_out",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c8b6905f312e06fe599dfb81bf4f3f4a",
+          "review_status": "verified",
+          "scope": "teferis_protection_life_lock_protection_all_permanents_phase_out_self_exile_v1",
+          "source": "curated"
+        }
+      ],
+      "required_function_tags": [],
+      "snapshot_rule": {
+        "effect": "phase_out",
+        "execution_status": "auto",
+        "logical_rule_key": "battle_rule_v1:c8b6905f312e06fe599dfb81bf4f3f4a",
+        "review_status": "verified",
+        "scope": "teferis_protection_life_lock_protection_all_permanents_phase_out_self_exile_v1",
+        "source": "curated"
+      },
+      "sqlite_rules": [
+        {
+          "effect": "phase_out",
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:ff382e14f0ba68552a4dcd823d430b0e",
+          "review_status": "needs_review",
+          "scope": "",
+          "source": "generated"
+        },
+        {
+          "effect": "phase_out",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c8b6905f312e06fe599dfb81bf4f3f4a",
+          "review_status": "verified",
+          "scope": "teferis_protection_life_lock_protection_all_permanents_phase_out_self_exile_v1",
+          "source": "curated"
+        }
+      ],
+      "xmage_source_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/t/TeferisProtection.java"
+    },
+    {
+      "card_name": "Tibalt's Trickery",
+      "checks": {
+        "functional_tags": "not_required",
+        "pg_rule": "pass",
+        "snapshot_rule": "pass",
+        "sqlite_rule": "pass"
+      },
+      "expected_rules": [
+        {
+          "effect": "counter",
+          "scope": "counterspell_with_random_replacement_annotation_v1"
+        }
+      ],
+      "missing_function_tags": [],
+      "normalized_name": "tibalt's trickery",
+      "pg_card_rows": 1,
+      "pg_function_tags": [
+        "big_spell",
+        "counterspell",
+        "draw",
+        "enabler",
+        "exile_value",
+        "graveyard",
+        "graveyard_synergy",
+        "protection",
+        "removal"
+      ],
+      "pg_rules": [
+        {
+          "effect": "counter",
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:80c54d3108fda175ea66541afff74133",
+          "review_status": "deprecated",
+          "scope": "",
+          "source": "generated"
+        },
+        {
+          "effect": "counter",
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:93c180ba34c0c9f4cfbbe9f42ba9168a",
+          "review_status": "needs_review",
+          "scope": "",
+          "source": "generated"
+        },
+        {
+          "effect": "counter",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c3821ae5e8f44d1820ba5c1ed48c3366",
+          "review_status": "verified",
+          "scope": "counterspell_with_random_replacement_annotation_v1",
+          "source": "curated"
+        }
+      ],
+      "required_function_tags": [],
+      "snapshot_rule": {
+        "effect": "counter",
+        "execution_status": "auto",
+        "logical_rule_key": "battle_rule_v1:c3821ae5e8f44d1820ba5c1ed48c3366",
+        "review_status": "verified",
+        "scope": "counterspell_with_random_replacement_annotation_v1",
+        "source": "curated"
+      },
+      "sqlite_rules": [
+        {
+          "effect": "counter",
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:80c54d3108fda175ea66541afff74133",
+          "review_status": "deprecated",
+          "scope": "",
+          "source": "generated"
+        },
+        {
+          "effect": "counter",
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:93c180ba34c0c9f4cfbbe9f42ba9168a",
+          "review_status": "needs_review",
+          "scope": "",
+          "source": "generated"
+        },
+        {
+          "effect": "counter",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c3821ae5e8f44d1820ba5c1ed48c3366",
+          "review_status": "verified",
+          "scope": "counterspell_with_random_replacement_annotation_v1",
+          "source": "curated"
+        }
+      ],
+      "xmage_source_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/t/TibaltsTrickery.java"
+    },
+    {
+      "card_name": "Command Tower",
+      "checks": {
+        "functional_tags": "not_required",
+        "pg_rule": "pass",
+        "snapshot_rule": "pass",
+        "sqlite_rule": "pass"
+      },
+      "expected_rules": [
+        {
+          "effect": "land",
+          "scope": "commander_identity_land_mana_source_v1"
+        }
+      ],
+      "missing_function_tags": [],
+      "normalized_name": "command tower",
+      "pg_card_rows": 30,
+      "pg_function_tags": [
+        "land",
+        "mana_fixing",
+        "ramp"
+      ],
+      "pg_rules": [
+        {
+          "effect": "land",
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:55c2bc99b653af8c05e99108f1c45b5d",
+          "review_status": "needs_review",
+          "scope": "",
+          "source": "generated"
+        },
+        {
+          "effect": "land",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8a974d0b2c767176f8066c7932447896",
+          "review_status": "verified",
+          "scope": "commander_identity_land_mana_source_v1",
+          "source": "curated"
+        }
+      ],
+      "required_function_tags": [],
+      "snapshot_rule": {
+        "effect": "land",
+        "execution_status": "auto",
+        "logical_rule_key": "battle_rule_v1:8a974d0b2c767176f8066c7932447896",
+        "review_status": "verified",
+        "scope": "commander_identity_land_mana_source_v1",
+        "source": "curated"
+      },
+      "sqlite_rules": [
+        {
+          "effect": "land",
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:55c2bc99b653af8c05e99108f1c45b5d",
+          "review_status": "needs_review",
+          "scope": "",
+          "source": "generated"
+        },
+        {
+          "effect": "land",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8a974d0b2c767176f8066c7932447896",
+          "review_status": "verified",
+          "scope": "commander_identity_land_mana_source_v1",
+          "source": "curated"
+        }
+      ],
+      "xmage_source_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/c/CommandTower.java"
+    },
+    {
+      "card_name": "Sol Ring",
+      "checks": {
+        "functional_tags": "not_required",
+        "pg_rule": "pass",
+        "snapshot_rule": "pass",
+        "sqlite_rule": "pass"
+      },
+      "expected_rules": [
+        {
+          "effect": "ramp_permanent",
+          "scope": "two_colorless_mana_rock_v1"
+        }
+      ],
+      "missing_function_tags": [],
+      "normalized_name": "sol ring",
+      "pg_card_rows": 30,
+      "pg_function_tags": [
+        "ramp"
+      ],
+      "pg_rules": [
+        {
+          "effect": "ramp_permanent",
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:54660395e3972806e107ca61c374b218",
+          "review_status": "deprecated",
+          "scope": "colorless_two_mana_rock_v1",
+          "source": "curated"
+        },
+        {
+          "effect": "ramp_permanent",
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:0efab52e2fe6c51956a3d94ac671fd43",
+          "review_status": "needs_review",
+          "scope": "",
+          "source": "generated"
+        },
+        {
+          "effect": "ramp_permanent",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:42621fcae461313f674d46db0da059af",
+          "review_status": "verified",
+          "scope": "two_colorless_mana_rock_v1",
+          "source": "curated"
+        }
+      ],
+      "required_function_tags": [],
+      "snapshot_rule": {
+        "effect": "ramp_permanent",
+        "execution_status": "auto",
+        "logical_rule_key": "battle_rule_v1:42621fcae461313f674d46db0da059af",
+        "review_status": "verified",
+        "scope": "two_colorless_mana_rock_v1",
+        "source": "curated"
+      },
+      "sqlite_rules": [
+        {
+          "effect": "ramp_permanent",
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:0efab52e2fe6c51956a3d94ac671fd43",
+          "review_status": "needs_review",
+          "scope": "",
+          "source": "generated"
+        },
+        {
+          "effect": "ramp_permanent",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:42621fcae461313f674d46db0da059af",
+          "review_status": "verified",
+          "scope": "two_colorless_mana_rock_v1",
+          "source": "curated"
+        }
+      ],
+      "xmage_source_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/s/SolRing.java"
+    },
+    {
+      "card_name": "Thor, God of Thunder",
+      "checks": {
+        "functional_tags": "pass",
+        "pg_rule": "pass",
+        "snapshot_rule": "pass",
+        "sqlite_rule": "pass"
+      },
+      "expected_rules": [
+        {
+          "effect": "creature",
+          "scope": "etb_graveyard_impulse_recast_noncreature_spell_damage_any_target_v1"
+        }
+      ],
+      "missing_function_tags": [],
+      "normalized_name": "thor, god of thunder",
+      "pg_card_rows": 1,
+      "pg_function_tags": [
+        "payoff",
+        "recursion",
+        "removal",
+        "spellslinger"
+      ],
+      "pg_rules": [
+        {
+          "effect": "creature",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:280e17ec34ac105baeb6989491c6ff25",
+          "review_status": "verified",
+          "scope": "etb_graveyard_impulse_recast_noncreature_spell_damage_any_target_v1",
+          "source": "curated"
+        }
+      ],
+      "required_function_tags": [
+        "payoff",
+        "recursion",
+        "removal",
+        "spellslinger"
+      ],
+      "snapshot_rule": {
+        "effect": "creature",
+        "execution_status": "auto",
+        "logical_rule_key": "battle_rule_v1:280e17ec34ac105baeb6989491c6ff25",
+        "review_status": "verified",
+        "scope": "etb_graveyard_impulse_recast_noncreature_spell_damage_any_target_v1",
+        "source": "curated"
+      },
+      "sqlite_rules": [
+        {
+          "effect": "creature",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:280e17ec34ac105baeb6989491c6ff25",
+          "review_status": "verified",
+          "scope": "etb_graveyard_impulse_recast_noncreature_spell_damage_any_target_v1",
+          "source": "curated"
+        }
+      ],
+      "xmage_source_path": null
+    },
+    {
+      "card_name": "Furygale Flocking",
+      "checks": {
+        "functional_tags": "pass",
+        "pg_rule": "pass",
+        "snapshot_rule": "pass",
+        "sqlite_rule": "pass"
+      },
+      "expected_rules": [
+        {
+          "effect": "token_maker",
+          "scope": "per_opponent_two_3_3_flying_hasty_elementals_graveyard_cost_reduction_runtime_attack_requirement_v1"
+        }
+      ],
+      "missing_function_tags": [],
+      "normalized_name": "furygale flocking",
+      "pg_card_rows": 1,
+      "pg_function_tags": [
+        "big_spell",
+        "payoff",
+        "token_maker"
+      ],
+      "pg_rules": [
+        {
+          "effect": "token_maker",
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:b00038ee20b54d2b9bac7287d2de3443",
+          "review_status": "needs_review",
+          "scope": "",
+          "source": "generated"
+        },
+        {
+          "effect": "token_maker",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:63b66f50aad09aa5669ac693b2fca7e5",
+          "review_status": "verified",
+          "scope": "per_opponent_two_3_3_flying_hasty_elementals_graveyard_cost_reduction_runtime_attack_requirement_v1",
+          "source": "curated"
+        }
+      ],
+      "required_function_tags": [
+        "big_spell",
+        "payoff",
+        "token_maker"
+      ],
+      "snapshot_rule": {
+        "effect": "token_maker",
+        "execution_status": "auto",
+        "logical_rule_key": "battle_rule_v1:63b66f50aad09aa5669ac693b2fca7e5",
+        "review_status": "verified",
+        "scope": "per_opponent_two_3_3_flying_hasty_elementals_graveyard_cost_reduction_runtime_attack_requirement_v1",
+        "source": "curated"
+      },
+      "sqlite_rules": [
+        {
+          "effect": "token_maker",
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:b00038ee20b54d2b9bac7287d2de3443",
+          "review_status": "needs_review",
+          "scope": "",
+          "source": "generated"
+        },
+        {
+          "effect": "token_maker",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:63b66f50aad09aa5669ac693b2fca7e5",
+          "review_status": "verified",
+          "scope": "per_opponent_two_3_3_flying_hasty_elementals_graveyard_cost_reduction_runtime_attack_requirement_v1",
+          "source": "curated"
+        }
+      ],
+      "xmage_source_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/f/FurygaleFlocking.java"
+    },
+    {
+      "card_name": "Molecule Man",
+      "checks": {
+        "functional_tags": "pass",
+        "pg_rule": "pass",
+        "snapshot_rule": "pass",
+        "sqlite_rule": "pass"
+      },
+      "expected_rules": [
+        {
+          "effect": "passive",
+          "scope": "nonland_hand_miracle_zero_static_v1"
+        }
+      ],
+      "missing_function_tags": [],
+      "normalized_name": "molecule man",
+      "pg_card_rows": 1,
+      "pg_function_tags": [
+        "combo_piece",
+        "enabler",
+        "engine"
+      ],
+      "pg_rules": [
+        {
+          "effect": "passive",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:752f8cfd0a44d1889ffdb40610847374",
+          "review_status": "verified",
+          "scope": "nonland_hand_miracle_zero_static_v1",
+          "source": "curated"
+        }
+      ],
+      "required_function_tags": [
+        "combo_piece",
+        "enabler",
+        "engine"
+      ],
+      "snapshot_rule": {
+        "effect": "passive",
+        "execution_status": "auto",
+        "logical_rule_key": "battle_rule_v1:752f8cfd0a44d1889ffdb40610847374",
+        "review_status": "verified",
+        "scope": "nonland_hand_miracle_zero_static_v1",
+        "source": "curated"
+      },
+      "sqlite_rules": [
+        {
+          "effect": "passive",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:752f8cfd0a44d1889ffdb40610847374",
+          "review_status": "verified",
+          "scope": "nonland_hand_miracle_zero_static_v1",
+          "source": "curated"
+        }
+      ],
+      "xmage_source_path": null
+    },
+    {
+      "card_name": "Pearl Medallion",
+      "checks": {
+        "functional_tags": "pass",
+        "pg_rule": "pass",
+        "snapshot_rule": "pass",
+        "sqlite_rule": "pass"
+      },
+      "expected_rules": [
+        {
+          "effect": "static_cost_reduction",
+          "scope": "static_cost_reduction_for_matching_spells_v1"
+        }
+      ],
+      "missing_function_tags": [],
+      "normalized_name": "pearl medallion",
+      "pg_card_rows": 1,
+      "pg_function_tags": [
+        "enabler",
+        "ramp"
+      ],
+      "pg_rules": [
+        {
+          "effect": "ramp_permanent",
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:9d95c51a6c089d9710c604b46ab3ff67",
+          "review_status": "deprecated",
+          "scope": "",
+          "source": "generated"
+        },
+        {
+          "effect": "ramp_permanent",
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:601753de1461f2f66d16bb51bd3fb408",
+          "review_status": "needs_review",
+          "scope": "",
+          "source": "generated"
+        },
+        {
+          "effect": "static_cost_reduction",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0d857d5b176cc91065a4754f5824ebf2",
+          "review_status": "verified",
+          "scope": "static_cost_reduction_for_matching_spells_v1",
+          "source": "curated"
+        }
+      ],
+      "required_function_tags": [
+        "enabler",
+        "ramp"
+      ],
+      "snapshot_rule": {
+        "effect": "static_cost_reduction",
+        "execution_status": "auto",
+        "logical_rule_key": "battle_rule_v1:0d857d5b176cc91065a4754f5824ebf2",
+        "review_status": "verified",
+        "scope": "static_cost_reduction_for_matching_spells_v1",
+        "source": "curated"
+      },
+      "sqlite_rules": [
+        {
+          "effect": "ramp_permanent",
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:9d95c51a6c089d9710c604b46ab3ff67",
+          "review_status": "deprecated",
+          "scope": "",
+          "source": "generated"
+        },
+        {
+          "effect": "ramp_permanent",
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:601753de1461f2f66d16bb51bd3fb408",
+          "review_status": "needs_review",
+          "scope": "",
+          "source": "generated"
+        },
+        {
+          "effect": "static_cost_reduction",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0d857d5b176cc91065a4754f5824ebf2",
+          "review_status": "verified",
+          "scope": "static_cost_reduction_for_matching_spells_v1",
+          "source": "curated"
+        }
+      ],
+      "xmage_source_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/p/PearlMedallion.java"
+    },
+    {
+      "card_name": "Prismari Pianist",
+      "checks": {
+        "functional_tags": "pass",
+        "pg_rule": "pass",
+        "snapshot_rule": "pass",
+        "sqlite_rule": "pass"
+      },
+      "expected_rules": [
+        {
+          "effect": "token_maker",
+          "scope": "instant_sorcery_cast_create_1_or_3_1_1_elementals_by_spell_mv_v1"
+        }
+      ],
+      "missing_function_tags": [],
+      "normalized_name": "prismari pianist",
+      "pg_card_rows": 1,
+      "pg_function_tags": [
+        "payoff",
+        "spellslinger",
+        "token_maker"
+      ],
+      "pg_rules": [
+        {
+          "effect": "token_maker",
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:b00038ee20b54d2b9bac7287d2de3443",
+          "review_status": "needs_review",
+          "scope": "",
+          "source": "generated"
+        },
+        {
+          "effect": "token_maker",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0288989021534a6f036968f62361f634",
+          "review_status": "verified",
+          "scope": "instant_sorcery_cast_create_1_or_3_1_1_elementals_by_spell_mv_v1",
+          "source": "curated"
+        }
+      ],
+      "required_function_tags": [
+        "payoff",
+        "spellslinger",
+        "token_maker"
+      ],
+      "snapshot_rule": {
+        "effect": "token_maker",
+        "execution_status": "auto",
+        "logical_rule_key": "battle_rule_v1:0288989021534a6f036968f62361f634",
+        "review_status": "verified",
+        "scope": "instant_sorcery_cast_create_1_or_3_1_1_elementals_by_spell_mv_v1",
+        "source": "curated"
+      },
+      "sqlite_rules": [
+        {
+          "effect": "token_maker",
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:b00038ee20b54d2b9bac7287d2de3443",
+          "review_status": "needs_review",
+          "scope": "",
+          "source": "generated"
+        },
+        {
+          "effect": "token_maker",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0288989021534a6f036968f62361f634",
+          "review_status": "verified",
+          "scope": "instant_sorcery_cast_create_1_or_3_1_1_elementals_by_spell_mv_v1",
+          "source": "curated"
+        }
+      ],
+      "xmage_source_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/p/PrismariPianist.java"
+    },
+    {
+      "card_name": "Redirect Lightning",
+      "checks": {
+        "functional_tags": "pass",
+        "pg_rule": "pass",
+        "snapshot_rule": "pass",
+        "sqlite_rule": "pass"
+      },
+      "expected_rules": [
+        {
+          "effect": "redirect_removal",
+          "scope": "single_target_spell_or_ability_redirect_additional_cost_annotation_v1"
+        }
+      ],
+      "missing_function_tags": [],
+      "normalized_name": "redirect lightning",
+      "pg_card_rows": 1,
+      "pg_function_tags": [
+        "protection",
+        "removal"
+      ],
+      "pg_rules": [
+        {
+          "effect": "draw_cards",
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:35f8268896dae39a71b06b17a65c6e7d",
+          "review_status": "needs_review",
+          "scope": "",
+          "source": "generated"
+        },
+        {
+          "effect": "redirect_removal",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d47b67e18fbd03ed1745f6917901d6c9",
+          "review_status": "verified",
+          "scope": "single_target_spell_or_ability_redirect_additional_cost_annotation_v1",
+          "source": "curated"
+        }
+      ],
+      "required_function_tags": [
+        "protection",
+        "removal"
+      ],
+      "snapshot_rule": {
+        "effect": "redirect_removal",
+        "execution_status": "auto",
+        "logical_rule_key": "battle_rule_v1:d47b67e18fbd03ed1745f6917901d6c9",
+        "review_status": "verified",
+        "scope": "single_target_spell_or_ability_redirect_additional_cost_annotation_v1",
+        "source": "curated"
+      },
+      "sqlite_rules": [
+        {
+          "effect": "draw_cards",
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:35f8268896dae39a71b06b17a65c6e7d",
+          "review_status": "needs_review",
+          "scope": "",
+          "source": "generated"
+        },
+        {
+          "effect": "redirect_removal",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d47b67e18fbd03ed1745f6917901d6c9",
+          "review_status": "verified",
+          "scope": "single_target_spell_or_ability_redirect_additional_cost_annotation_v1",
+          "source": "curated"
+        }
+      ],
+      "xmage_source_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/r/RedirectLightning.java"
+    },
+    {
+      "card_name": "The Mind Stone",
+      "checks": {
+        "functional_tags": "pass",
+        "pg_rule": "pass",
+        "snapshot_rule": "pass",
+        "sqlite_rule": "pass"
+      },
+      "expected_rules": [
+        {
+          "effect": "ramp_permanent",
+          "scope": "legendary_artifact_mana_harness_and_end_step_blink_other_nonland_permanent_v1"
+        }
+      ],
+      "missing_function_tags": [],
+      "normalized_name": "the mind stone",
+      "pg_card_rows": 1,
+      "pg_function_tags": [
+        "artifact_synergy",
+        "blink",
+        "engine",
+        "ramp"
+      ],
+      "pg_rules": [
+        {
+          "effect": "ramp_permanent",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:57bb1f91d9eea2ad14a8e8d24d2f8d53",
+          "review_status": "verified",
+          "scope": "legendary_artifact_mana_harness_and_end_step_blink_other_nonland_permanent_v1",
+          "source": "curated"
+        }
+      ],
+      "required_function_tags": [
+        "artifact_synergy",
+        "blink",
+        "engine",
+        "ramp"
+      ],
+      "snapshot_rule": {
+        "effect": "ramp_permanent",
+        "execution_status": "auto",
+        "logical_rule_key": "battle_rule_v1:57bb1f91d9eea2ad14a8e8d24d2f8d53",
+        "review_status": "verified",
+        "scope": "legendary_artifact_mana_harness_and_end_step_blink_other_nonland_permanent_v1",
+        "source": "curated"
+      },
+      "sqlite_rules": [
+        {
+          "effect": "ramp_permanent",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:57bb1f91d9eea2ad14a8e8d24d2f8d53",
+          "review_status": "verified",
+          "scope": "legendary_artifact_mana_harness_and_end_step_blink_other_nonland_permanent_v1",
+          "source": "curated"
+        }
+      ],
+      "xmage_source_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/t/TheMindStone.java"
+    },
+    {
+      "card_name": "The Scarlet Witch",
+      "checks": {
+        "functional_tags": "pass",
+        "pg_rule": "pass",
+        "snapshot_rule": "pass",
+        "sqlite_rule": "pass"
+      },
+      "expected_rules": [
+        {
+          "effect": "static_cost_reduction",
+          "scope": "static_power_based_cost_reduction_for_instant_sorcery_mv4_plus_v1"
+        }
+      ],
+      "missing_function_tags": [],
+      "normalized_name": "the scarlet witch",
+      "pg_card_rows": 1,
+      "pg_function_tags": [
+        "big_spell",
+        "enabler",
+        "engine",
+        "spellslinger"
+      ],
+      "pg_rules": [
+        {
+          "effect": "static_cost_reduction",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0b23c5f26d2bc884b7f506cdd9d422fc",
+          "review_status": "verified",
+          "scope": "static_power_based_cost_reduction_for_instant_sorcery_mv4_plus_v1",
+          "source": "curated"
+        }
+      ],
+      "required_function_tags": [
+        "big_spell",
+        "enabler",
+        "engine",
+        "spellslinger"
+      ],
+      "snapshot_rule": {
+        "effect": "static_cost_reduction",
+        "execution_status": "auto",
+        "logical_rule_key": "battle_rule_v1:0b23c5f26d2bc884b7f506cdd9d422fc",
+        "review_status": "verified",
+        "scope": "static_power_based_cost_reduction_for_instant_sorcery_mv4_plus_v1",
+        "source": "curated"
+      },
+      "sqlite_rules": [
+        {
+          "effect": "static_cost_reduction",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0b23c5f26d2bc884b7f506cdd9d422fc",
+          "review_status": "verified",
+          "scope": "static_power_based_cost_reduction_for_instant_sorcery_mv4_plus_v1",
+          "source": "curated"
+        }
+      ],
+      "xmage_source_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/t/TheScarletWitch.java"
+    },
+    {
+      "card_name": "Turbulent Steppe",
+      "checks": {
+        "functional_tags": "pass",
+        "pg_rule": "pass",
+        "snapshot_rule": "pass",
+        "sqlite_rule": "pass"
+      },
+      "expected_rules": [
+        {
+          "effect": "land",
+          "scope": "land_enters_tapped_unless_opponents_control_lands_count_mana_source_v1"
+        }
+      ],
+      "missing_function_tags": [],
+      "normalized_name": "turbulent steppe",
+      "pg_card_rows": 1,
+      "pg_function_tags": [
+        "land",
+        "ramp"
+      ],
+      "pg_rules": [
+        {
+          "effect": "land",
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:33d0f77ed0b6806a7128dbd3d865b167",
+          "review_status": "needs_review",
+          "scope": "",
+          "source": "generated"
+        },
+        {
+          "effect": "land",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a614845f052c61eaa22e619e7b288e17",
+          "review_status": "verified",
+          "scope": "land_enters_tapped_unless_opponents_control_lands_count_mana_source_v1",
+          "source": "curated"
+        }
+      ],
+      "required_function_tags": [
+        "land",
+        "ramp"
+      ],
+      "snapshot_rule": {
+        "effect": "land",
+        "execution_status": "auto",
+        "logical_rule_key": "battle_rule_v1:a614845f052c61eaa22e619e7b288e17",
+        "review_status": "verified",
+        "scope": "land_enters_tapped_unless_opponents_control_lands_count_mana_source_v1",
+        "source": "curated"
+      },
+      "sqlite_rules": [
+        {
+          "effect": "land",
+          "execution_status": "disabled",
+          "logical_rule_key": "battle_rule_v1:33d0f77ed0b6806a7128dbd3d865b167",
+          "review_status": "needs_review",
+          "scope": "",
+          "source": "generated"
+        },
+        {
+          "effect": "land",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a614845f052c61eaa22e619e7b288e17",
+          "review_status": "verified",
+          "scope": "land_enters_tapped_unless_opponents_control_lands_count_mana_source_v1",
+          "source": "curated"
+        }
+      ],
+      "xmage_source_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/t/TurbulentSteppe.java"
+    }
+  ],
+  "checks": [
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "pg_rule::Lorehold, the Historian",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "sqlite_rule::Lorehold, the Historian",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "snapshot_rule::Lorehold, the Historian",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "pg_rule::Farewell",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "sqlite_rule::Farewell",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "snapshot_rule::Farewell",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "pg_rule::Fellwar Stone",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "sqlite_rule::Fellwar Stone",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "snapshot_rule::Fellwar Stone",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "pg_rule::Flawless Maneuver",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "sqlite_rule::Flawless Maneuver",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "snapshot_rule::Flawless Maneuver",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "pg_rule::Hit the Mother Lode",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "sqlite_rule::Hit the Mother Lode",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "snapshot_rule::Hit the Mother Lode",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "pg_rule::Improvisation Capstone",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "sqlite_rule::Improvisation Capstone",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "snapshot_rule::Improvisation Capstone",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "pg_rule::Land Tax",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "sqlite_rule::Land Tax",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "snapshot_rule::Land Tax",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "pg_rule::Library of Leng",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "sqlite_rule::Library of Leng",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "snapshot_rule::Library of Leng",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "pg_rule::Scroll Rack",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "sqlite_rule::Scroll Rack",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "snapshot_rule::Scroll Rack",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "pg_rule::Swords to Plowshares",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "sqlite_rule::Swords to Plowshares",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "snapshot_rule::Swords to Plowshares",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "pg_rule::Talisman of Conviction",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "sqlite_rule::Talisman of Conviction",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "snapshot_rule::Talisman of Conviction",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "pg_rule::Teferi's Protection",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "sqlite_rule::Teferi's Protection",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "snapshot_rule::Teferi's Protection",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "pg_rule::Tibalt's Trickery",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "sqlite_rule::Tibalt's Trickery",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "snapshot_rule::Tibalt's Trickery",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "pg_rule::Command Tower",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "sqlite_rule::Command Tower",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "snapshot_rule::Command Tower",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "pg_rule::Sol Ring",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "sqlite_rule::Sol Ring",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "snapshot_rule::Sol Ring",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "pg_rule::Thor, God of Thunder",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "sqlite_rule::Thor, God of Thunder",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "snapshot_rule::Thor, God of Thunder",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "functional_tags::Thor, God of Thunder",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "pg_rule::Furygale Flocking",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "sqlite_rule::Furygale Flocking",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "snapshot_rule::Furygale Flocking",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "functional_tags::Furygale Flocking",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "pg_rule::Molecule Man",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "sqlite_rule::Molecule Man",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "snapshot_rule::Molecule Man",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "functional_tags::Molecule Man",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "pg_rule::Pearl Medallion",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "sqlite_rule::Pearl Medallion",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "snapshot_rule::Pearl Medallion",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "functional_tags::Pearl Medallion",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "pg_rule::Prismari Pianist",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "sqlite_rule::Prismari Pianist",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "snapshot_rule::Prismari Pianist",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "functional_tags::Prismari Pianist",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "pg_rule::Redirect Lightning",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "sqlite_rule::Redirect Lightning",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "snapshot_rule::Redirect Lightning",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "functional_tags::Redirect Lightning",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "pg_rule::The Mind Stone",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "sqlite_rule::The Mind Stone",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "snapshot_rule::The Mind Stone",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "functional_tags::The Mind Stone",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "pg_rule::The Scarlet Witch",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "sqlite_rule::The Scarlet Witch",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "snapshot_rule::The Scarlet Witch",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "functional_tags::The Scarlet Witch",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "pg_rule::Turbulent Steppe",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "sqlite_rule::Turbulent Steppe",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "snapshot_rule::Turbulent Steppe",
+      "status": "pass"
+    },
+    {
+      "detail": {
+        "missing_function_tags": [],
+        "missing_rules": {
+          "pg": [],
+          "snapshot": false,
+          "sqlite": []
+        }
+      },
+      "name": "functional_tags::Turbulent Steppe",
+      "status": "pass"
+    }
+  ],
+  "generated_at": "2026-07-07T19:56:52.155112+00:00",
+  "postgres_target": "127.0.0.1:15432/halder",
+  "snapshot_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "status": "pass",
+  "summary": {
+    "battle_rule_cards_passed": 24,
+    "checks_failed": 0,
+    "checks_total": 81,
+    "functional_classification_cards_passed": 24,
+    "functional_classification_cards_required": 9,
+    "target_card_count": 24,
+    "xmage_source_found_count": 21,
+    "xmage_source_missing_count": 3
+  },
+  "xmage_root": "/Users/desenvolvimentomobile/Downloads/mage-master"
+}

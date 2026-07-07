@@ -12964,6 +12964,54 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertNotIn("static_cost_increase_total", red_spell_cost)
         self.assertEqual(red_spell_cost["colored"]["red"], 1)
 
+    def test_static_cost_reduction_can_reduce_colored_mana_requirement(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        active.battlefield.append(
+            {
+                "name": "Edgewalker",
+                "type_line": "Creature - Human Cleric",
+                "effect": "static_cost_reduction",
+                "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+                "cost_reduction_applies_to": "spells_you_cast",
+                "cost_reduction_generic": 0,
+                "cost_reduction_color_symbols": ["W", "B"],
+                "cost_reduction_filters": [{"applies_to_subtypes": ["cleric"]}],
+                "applies_to_subtypes": ["cleric"],
+            }
+        )
+
+        cleric_spell_cost = self.battle.card_cost_for_player_state(
+            active,
+            {
+                "name": "Fixture Cleric",
+                "type_line": "Creature - Human Cleric",
+                "colors": ["W", "B"],
+                "mana_cost": "{1}{W}{B}",
+            },
+        )
+        wizard_spell_cost = self.battle.card_cost_for_player_state(
+            active,
+            {
+                "name": "Fixture Wizard",
+                "type_line": "Creature - Human Wizard",
+                "colors": ["W", "B"],
+                "mana_cost": "{1}{W}{B}",
+            },
+        )
+
+        self.assertEqual(cleric_spell_cost["generic"], 1)
+        self.assertEqual(cleric_spell_cost["colored"]["white"], 0)
+        self.assertEqual(cleric_spell_cost["colored"]["black"], 0)
+        self.assertEqual(cleric_spell_cost["static_cost_reduction_total"], 2)
+        self.assertEqual(cleric_spell_cost["static_cost_reduction_generic_total"], 0)
+        self.assertEqual(cleric_spell_cost["static_cost_reduction_color_symbols"], ["W", "B"])
+        self.assertEqual(cleric_spell_cost["static_cost_reductions"][0]["colored_symbols"], ["W", "B"])
+        self.assertEqual(cleric_spell_cost["static_cost_reductions"][0]["applied_colored_amount"], 2)
+        self.assertEqual(cleric_spell_cost["static_cost_reductions"][0]["applied_colored_symbols"], ["W", "B"])
+        self.assertNotIn("static_cost_reduction_total", wizard_spell_cost)
+        self.assertEqual(wizard_spell_cost["colored"]["white"], 1)
+        self.assertEqual(wizard_spell_cost["colored"]["black"], 1)
+
     def test_counter_target_creature_spell_filters_stack_target_type(self) -> None:
         opponent = self.battle.Player("Opponent", None, [])
         counter_effect = {

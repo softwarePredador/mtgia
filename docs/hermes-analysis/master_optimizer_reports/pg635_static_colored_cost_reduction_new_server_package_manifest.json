@@ -1,0 +1,231 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg635_static_colored_cost_reduction_new_20260707_195231",
+  "deploy_id": "pg635",
+  "execution_scenarios": [
+    {
+      "card": {
+        "name": "Edgewalker"
+      },
+      "expected_colored": {
+        "black": 0,
+        "white": 0
+      },
+      "expected_generic": 1,
+      "expected_static_cost_reduction_color_symbols": [
+        "W",
+        "B"
+      ],
+      "expected_static_cost_reduction_total": 2,
+      "logical_rule_key": "battle_rule_v1:2f9f9069e9192da0c8e90d58cff9fcda",
+      "name": "Edgewalker reduces matching spell cost",
+      "target_spell": {
+        "cmc": 3,
+        "colors": [
+          "W",
+          "B"
+        ],
+        "mana_cost": "{1}{W}{B}",
+        "name": "E2E Matching Reduced Spell",
+        "type_line": "Creature - Cleric"
+      },
+      "type": "static_cost_reduction_spell_cost"
+    },
+    {
+      "card": {
+        "name": "Ragemonger"
+      },
+      "expected_colored": {
+        "black": 0,
+        "red": 0
+      },
+      "expected_generic": 1,
+      "expected_static_cost_reduction_color_symbols": [
+        "B",
+        "R"
+      ],
+      "expected_static_cost_reduction_total": 2,
+      "logical_rule_key": "battle_rule_v1:43f0b5923df1d7ea90f69aec83340904",
+      "name": "Ragemonger reduces matching spell cost",
+      "target_spell": {
+        "cmc": 3,
+        "colors": [
+          "B",
+          "R"
+        ],
+        "mana_cost": "{1}{B}{R}",
+        "name": "E2E Matching Reduced Spell",
+        "type_line": "Creature - Minotaur"
+      },
+      "type": "static_cost_reduction_spell_cost"
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Edgewalker",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2f9f9069e9192da0c8e90d58cff9fcda",
+      "min_rule_version": 2,
+      "normalized_name": "edgewalker",
+      "oracle_hash": "9dbbd985fcdc89be41cf2c5b86ff79bf",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "applies_to_subtypes": [
+          "cleric"
+        ],
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+        "cost_reduction_amount_source": "fixed",
+        "cost_reduction_applies_to": "spells_you_cast",
+        "cost_reduction_color_symbols": [
+          "W",
+          "B"
+        ],
+        "cost_reduction_generic": 0,
+        "effect": "static_cost_reduction",
+        "permanent_type": "creature",
+        "static_effect": "generic_cost_reduction_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostReductionControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Ragemonger",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:43f0b5923df1d7ea90f69aec83340904",
+      "min_rule_version": 2,
+      "normalized_name": "ragemonger",
+      "oracle_hash": "2535a2d4ca1ff4aa0700f0feedcc9688",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "applies_to_subtypes": [
+          "minotaur"
+        ],
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+        "cost_reduction_amount_source": "fixed",
+        "cost_reduction_applies_to": "spells_you_cast",
+        "cost_reduction_color_symbols": [
+          "B",
+          "R"
+        ],
+        "cost_reduction_generic": 0,
+        "effect": "static_cost_reduction",
+        "permanent_type": "creature",
+        "static_effect": "generic_cost_reduction_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostReductionControllerEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_static_generic_cost_reduction_for_matching_spells": 2
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg635_static_colored_cost_reduction_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg635_static_colored_cost_reduction_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg635_static_colored_cost_reduction_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg635_static_colored_cost_reduction_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg635_static_colored_cost_reduction_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg635_static_colored_cost_reduction_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-07T19:52:31+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Edgewalker"
+      },
+      "card_name": "Edgewalker",
+      "effect": "static_cost_reduction",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2f9f9069e9192da0c8e90d58cff9fcda",
+      "normalized_name": "edgewalker",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "applies_to_subtypes": [
+          "cleric"
+        ],
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+        "cost_reduction_amount_source": "fixed",
+        "cost_reduction_applies_to": "spells_you_cast",
+        "cost_reduction_color_symbols": [
+          "W",
+          "B"
+        ],
+        "cost_reduction_generic": 0,
+        "effect": "static_cost_reduction",
+        "permanent_type": "creature",
+        "static_effect": "generic_cost_reduction_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostReductionControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Ragemonger"
+      },
+      "card_name": "Ragemonger",
+      "effect": "static_cost_reduction",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:43f0b5923df1d7ea90f69aec83340904",
+      "normalized_name": "ragemonger",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "applies_to_subtypes": [
+          "minotaur"
+        ],
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+        "cost_reduction_amount_source": "fixed",
+        "cost_reduction_applies_to": "spells_you_cast",
+        "cost_reduction_color_symbols": [
+          "B",
+          "R"
+        ],
+        "cost_reduction_generic": 0,
+        "effect": "static_cost_reduction",
+        "permanent_type": "creature",
+        "static_effect": "generic_cost_reduction_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostReductionControllerEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Edgewalker",
+    "Ragemonger"
+  ],
+  "selected_count": 2,
+  "slug": "static_colored_cost_reduction_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Edgewalker",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2f9f9069e9192da0c8e90d58cff9fcda",
+      "min_rule_version": 2,
+      "normalized_name": "edgewalker",
+      "oracle_hash": "9dbbd985fcdc89be41cf2c5b86ff79bf",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Ragemonger",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:43f0b5923df1d7ea90f69aec83340904",
+      "min_rule_version": 2,
+      "normalized_name": "ragemonger",
+      "oracle_hash": "2535a2d4ca1ff4aa0700f0feedcc9688",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

@@ -168,6 +168,10 @@ def replay_cost_snapshot(cost):
             "static_cost_reduction_total",
             0,
         )
+    if cost.get("static_cost_reduction_color_symbols"):
+        snapshot["static_cost_reduction_color_symbols"] = list(
+            cost.get("static_cost_reduction_color_symbols") or []
+        )
     if cost.get("static_cost_reductions"):
         snapshot["static_cost_reductions"] = [
             dict(reduction) for reduction in cost.get("static_cost_reductions", [])
