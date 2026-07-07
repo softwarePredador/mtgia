@@ -299,6 +299,7 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "produces",
     "produced_mana_symbols",
     "mana_activation_requires_tap",
+    "mana_activation_requires_sacrifice_target",
     "sacrifice_mana_source_contextual_only",
     "sacrifice_mana_produced",
     "sacrifice_produces",
@@ -2018,6 +2019,91 @@ def simple_mana_source_execution_scenario_from_expected_rule(rule: dict[str, Any
     }
 
 
+def _manifest_unlock_cost_for_mana_source(required: dict[str, Any]) -> str:
+    symbols = [
+        str(symbol or "").strip().upper()
+        for symbol in (required.get("produced_mana_symbols") or [])
+        if str(symbol or "").strip().upper() in {"W", "U", "B", "R", "G", "C"}
+    ]
+    if symbols:
+        return "{1}" if symbols[0] == "C" else f"{{{symbols[0]}}}"
+    produces = str(required.get("sacrifice_produces") or required.get("produces") or "").upper()
+    for symbol in ("G", "W", "U", "B", "R"):
+        if symbol in produces:
+            return f"{{{symbol}}}"
+    return "{1}"
+
+
+def sacrifice_mana_source_execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("effect") != "ramp_permanent" or not required.get("is_mana_source"):
+        return None
+    scope = str(required.get("battle_model_scope") or "")
+    if scope not in {
+        "xmage_self_sacrifice_mana_source_permanent_v1",
+        "xmage_tap_and_self_sacrifice_mana_source_permanent_v1",
+        "xmage_target_sacrifice_mana_source_permanent_v1",
+    }:
+        return None
+    produced = int(required.get("sacrifice_mana_produced") or required.get("mana_produced") or 0)
+    if produced <= 0:
+        return None
+    activation_cost = (
+        required.get("sacrifice_activation_mana_cost")
+        or required.get("activation_mana_cost")
+    )
+    controller_mana = _manifest_mana_for_activation_cost(activation_cost)
+    unlock_cost = _manifest_unlock_cost_for_mana_source(required)
+    target_sacrifice = bool(
+        required.get("mana_activation_requires_sacrifice_target")
+        or required.get("activation_requires_sacrifice_target")
+        or required.get("activation_sacrifice_target")
+    )
+    scenario: dict[str, Any] = {
+        "name": f"{rule['card_name']} activates contextual sacrifice mana source",
+        "type": "sacrifice_mana_source_activation",
+        "card": {"name": rule["card_name"]},
+        "source_overrides": {
+            "tapped": False,
+            "summoning_sick": False,
+        },
+        "controller_mana": controller_mana,
+        "unlock_card": {
+            "name": "E2E Mana Unlock",
+            "type_line": "Creature - Fixture",
+            "effect": "creature",
+            "cmc": max(1, produced),
+            "mana_cost": unlock_cost,
+        },
+        "expected_available_mana_after_activation": produced,
+        "expected_conditional_mana": (
+            produced
+            if _manifest_has_multiple_mana_choices(required.get("sacrifice_produces") or required.get("produces"))
+            and not required.get("sacrifice_produced_mana_symbols")
+            and not required.get("produced_mana_symbols")
+            else 0
+        ),
+        "expected_event": (
+            "target_sacrifice_mana_source_activated"
+            if target_sacrifice
+            else "self_sacrifice_mana_source_activated"
+        ),
+        "expected_produced": produced,
+        "expect_source_sacrificed": not target_sacrifice,
+        "expect_target_sacrificed": target_sacrifice,
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+    if target_sacrifice:
+        scenario["sacrifice_target"] = {
+            "name": "E2E Sacrifice Target",
+            "type_line": "Creature - Fixture",
+            "effect": "creature",
+            "power": 1,
+            "toughness": 1,
+        }
+    return scenario
+
+
 def simple_activated_damage_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
@@ -2709,6 +2795,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or creature_etb_library_pick_execution_scenario_from_expected_rule(rule)
         or creature_dies_create_tokens_execution_scenario_from_expected_rule(rule)
         or simple_mana_source_execution_scenario_from_expected_rule(rule)
+        or sacrifice_mana_source_execution_scenario_from_expected_rule(rule)
         or damage_each_opponent_spell_execution_scenario_from_expected_rule(rule)
         or simple_activated_damage_execution_scenario_from_expected_rule(rule)
         or simple_activated_tap_target_execution_scenario_from_expected_rule(rule)

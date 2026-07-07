@@ -11388,6 +11388,113 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["produces"], "WUBRG")
         self.assertEqual(effect["permanent_type"], "creature")
 
+    def test_any_color_mana_rock_alias_maps_to_simple_mana_source(self) -> None:
+        row = queue_row(
+            split.RAMP_ANY_COLOR_MANA_ROCK_UNIT,
+            effect_classes=[],
+            ability_kind="activated",
+            ability_classes=["AnyColorManaAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(name="Manalith", type_line="Artifact", oracle_text="{T}: Add one mana of any color."),
+            source_text="this.addAbility(new AnyColorManaAbility());",
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.MANA_SCOPE)
+        self.assertEqual(effect["produces"], "WUBRG")
+        self.assertEqual(effect["mana_produced"], 1)
+        self.assertTrue(effect["mana_activation_requires_tap"])
+        self.assertEqual(effect["permanent_type"], "artifact")
+
+    def test_any_color_mana_rock_alias_preserves_generic_activation_cost(self) -> None:
+        row = queue_row(
+            split.RAMP_ANY_COLOR_MANA_ROCK_UNIT,
+            effect_classes=[],
+            ability_kind="activated",
+            ability_classes=["AnyColorManaAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Celestial Prism",
+                type_line="Artifact",
+                oracle_text="{2}, {T}: Add one mana of any color.",
+            ),
+            source_text=(
+                "Ability ability = new AnyColorManaAbility(new GenericManaCost(2));"
+                "ability.addCost(new TapSourceCost());"
+                "this.addAbility(ability);"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.MANA_SCOPE)
+        self.assertEqual(effect["produces"], "WUBRG")
+        self.assertEqual(effect["activation_mana_cost"], "{2}")
+        self.assertTrue(effect["mana_activation_requires_tap"])
+
+    def test_any_color_mana_rock_alias_maps_self_sacrifice_tail_partial(self) -> None:
+        row = queue_row(
+            split.RAMP_ANY_COLOR_MANA_ROCK_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect"],
+            ability_kind="activated",
+            ability_classes=["AnyColorManaAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Chromatic Sphere",
+                type_line="Artifact",
+                oracle_text="{1}, {T}, Sacrifice this artifact: Add one mana of any color. Draw a card.",
+            ),
+            source_text=(
+                "ActivatedManaAbilityImpl ability = new AnyColorManaAbility(new GenericManaCost(1));"
+                "ability.addCost(new TapSourceCost());"
+                "ability.addCost(new SacrificeSourceCost());"
+                "ability.addEffect(new DrawCardSourceControllerEffect(1));"
+                "this.addAbility(ability);"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.SELF_SACRIFICE_MANA_SOURCE_SCOPE)
+        self.assertEqual(effect["produces"], "WUBRG")
+        self.assertEqual(effect["activation_mana_cost"], "{1}")
+        self.assertTrue(effect["mana_activation_requires_tap"])
+        self.assertTrue(effect["mana_activation_requires_sacrifice"])
+        self.assertTrue(effect["_runtime_partial"])
+        self.assertEqual(effect["_runtime_partial_sacrifice_mana_tail"], "draw a card.")
+        self.assertEqual(effect["xmage_unmodeled_effect_classes"], ["DrawCardSourceControllerEffect"])
+
+    def test_any_color_mana_rock_alias_blocks_pay_life_cost(self) -> None:
+        row = queue_row(
+            split.RAMP_ANY_COLOR_MANA_ROCK_UNIT,
+            effect_classes=[],
+            ability_kind="activated",
+            ability_classes=["AnyColorManaAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Phyrexian Lens",
+                type_line="Artifact",
+                oracle_text="{T}, Pay 1 life: Add one mana of any color.",
+            ),
+            source_text=(
+                "Ability ability = new AnyColorManaAbility();"
+                "ability.addCost(new PayLifeCost(1));"
+                "this.addAbility(ability);"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "mana_source_source_pay_life_cost_not_supported")
+
     def test_simple_creature_multi_symbol_mana_source_maps_fixed_symbols(self) -> None:
         row = queue_row(
             split.RAMP_CREATURE_UNIT,

@@ -53,6 +53,7 @@ LIFE_UNIT = "life_gain::xmage_life_gain_variant_review_v1"
 EXILE_UNIT = "removal_exile::targeted_exile_variant_v1"
 RAMP_ARTIFACT_UNIT = "ramp_permanent::xmage_artifact_mana_source_variant_review_v1"
 RAMP_CREATURE_UNIT = "ramp_permanent::xmage_creature_mana_source_variant_review_v1"
+RAMP_ANY_COLOR_MANA_ROCK_UNIT = "ramp_permanent::one_any_color_mana_rock_v1"
 COUNTER_UNIT = "counter_spell::counter_target_stack_object_variant_v1"
 COUNTER_UNLESS_PAYS_UNIT = (
     "xmage_signature::CounterUnlessPaysEffect::no_ability_class::"
@@ -163,6 +164,7 @@ SUPPORTED_UNITS = {
     EXILE_UNIT,
     RAMP_ARTIFACT_UNIT,
     RAMP_CREATURE_UNIT,
+    RAMP_ANY_COLOR_MANA_ROCK_UNIT,
     COUNTER_UNIT,
     BOUNCE_UNIT,
     RECURSION_UNIT,
@@ -411,7 +413,7 @@ SPELL_UNITS = {
     TOKEN_SPELL_UNIT,
     LOOK_LIBRARY_PICK_SPELL_UNIT,
 }
-RAMP_UNITS = {RAMP_ARTIFACT_UNIT, RAMP_CREATURE_UNIT}
+RAMP_UNITS = {RAMP_ARTIFACT_UNIT, RAMP_CREATURE_UNIT, RAMP_ANY_COLOR_MANA_ROCK_UNIT}
 
 SPELL_COMPLEXITY_TOKENS = {
     "additional cost",

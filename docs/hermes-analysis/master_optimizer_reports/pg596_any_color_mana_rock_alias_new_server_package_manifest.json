@@ -1,0 +1,579 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg596_any_color_mana_rock_alias_new_serv_20260707_052414",
+  "deploy_id": "PG596",
+  "execution_scenarios": [
+    {
+      "card": {
+        "name": "Celestial Prism"
+      },
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 2,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_activation_limit_per_turn": 0,
+      "expected_available_mana_after_refresh": 1,
+      "expected_conditional_mana": 1,
+      "expected_produced_mana_symbols": [],
+      "expected_sources": 3,
+      "expected_tapped": true,
+      "logical_rule_key": "battle_rule_v1:8abc926d110e8c26fb4143c78b705d4a",
+      "name": "Celestial Prism refreshes modeled mana source",
+      "source_overrides": {},
+      "support_mana_sources": [
+        {
+          "battle_model_scope": "e2e_support_mana_source_v1",
+          "effect": "ramp_permanent",
+          "is_mana_source": true,
+          "mana_activation_requires_tap": true,
+          "mana_produced": 1,
+          "name": "E2E Generic Support Source 1",
+          "produced_mana_symbols": [
+            "C"
+          ],
+          "produces": "C",
+          "type_line": "Artifact"
+        },
+        {
+          "battle_model_scope": "e2e_support_mana_source_v1",
+          "effect": "ramp_permanent",
+          "is_mana_source": true,
+          "mana_activation_requires_tap": true,
+          "mana_produced": 1,
+          "name": "E2E Generic Support Source 2",
+          "produced_mana_symbols": [
+            "C"
+          ],
+          "produces": "C",
+          "type_line": "Artifact"
+        }
+      ],
+      "type": "simple_mana_source_refresh"
+    },
+    {
+      "card": {
+        "name": "Chromatic Sphere"
+      },
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 1,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expect_source_sacrificed": true,
+      "expect_target_sacrificed": false,
+      "expected_available_mana_after_activation": 1,
+      "expected_conditional_mana": 1,
+      "expected_event": "self_sacrifice_mana_source_activated",
+      "expected_produced": 1,
+      "logical_rule_key": "battle_rule_v1:f3f232b22d73b373966715bfc102dc89",
+      "name": "Chromatic Sphere activates contextual sacrifice mana source",
+      "source_overrides": {
+        "summoning_sick": false,
+        "tapped": false
+      },
+      "type": "sacrifice_mana_source_activation",
+      "unlock_card": {
+        "cmc": 1,
+        "effect": "creature",
+        "mana_cost": "{G}",
+        "name": "E2E Mana Unlock",
+        "type_line": "Creature - Fixture"
+      }
+    },
+    {
+      "card": {
+        "name": "Mana Cylix"
+      },
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 1,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_activation_limit_per_turn": 0,
+      "expected_available_mana_after_refresh": 1,
+      "expected_conditional_mana": 1,
+      "expected_produced_mana_symbols": [],
+      "expected_sources": 2,
+      "expected_tapped": true,
+      "logical_rule_key": "battle_rule_v1:5bddc6f173c531e5421b248587ad9200",
+      "name": "Mana Cylix refreshes modeled mana source",
+      "source_overrides": {},
+      "support_mana_sources": [
+        {
+          "battle_model_scope": "e2e_support_mana_source_v1",
+          "effect": "ramp_permanent",
+          "is_mana_source": true,
+          "mana_activation_requires_tap": true,
+          "mana_produced": 1,
+          "name": "E2E Generic Support Source 1",
+          "produced_mana_symbols": [
+            "C"
+          ],
+          "produces": "C",
+          "type_line": "Artifact"
+        }
+      ],
+      "type": "simple_mana_source_refresh"
+    },
+    {
+      "card": {
+        "name": "Manalith"
+      },
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 0,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_activation_limit_per_turn": 0,
+      "expected_available_mana_after_refresh": 1,
+      "expected_conditional_mana": 1,
+      "expected_produced_mana_symbols": [],
+      "expected_sources": 1,
+      "expected_tapped": true,
+      "logical_rule_key": "battle_rule_v1:a58e029d95561381bb71d4cea43788df",
+      "name": "Manalith refreshes modeled mana source",
+      "source_overrides": {},
+      "support_mana_sources": [],
+      "type": "simple_mana_source_refresh"
+    },
+    {
+      "card": {
+        "name": "Phyrexian Altar"
+      },
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 0,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expect_source_sacrificed": false,
+      "expect_target_sacrificed": true,
+      "expected_available_mana_after_activation": 1,
+      "expected_conditional_mana": 1,
+      "expected_event": "target_sacrifice_mana_source_activated",
+      "expected_produced": 1,
+      "logical_rule_key": "battle_rule_v1:37b8c3fa5a8d0e1058c9fa50c55f73fb",
+      "name": "Phyrexian Altar activates contextual sacrifice mana source",
+      "sacrifice_target": {
+        "effect": "creature",
+        "name": "E2E Sacrifice Target",
+        "power": 1,
+        "toughness": 1,
+        "type_line": "Creature - Fixture"
+      },
+      "source_overrides": {
+        "summoning_sick": false,
+        "tapped": false
+      },
+      "type": "sacrifice_mana_source_activation",
+      "unlock_card": {
+        "cmc": 1,
+        "effect": "creature",
+        "mana_cost": "{G}",
+        "name": "E2E Mana Unlock",
+        "type_line": "Creature - Fixture"
+      }
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Celestial Prism",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8abc926d110e8c26fb4143c78b705d4a",
+      "min_rule_version": 2,
+      "normalized_name": "celestial prism",
+      "oracle_hash": "d4fbeac453cff388c63c90d13b51a63b",
+      "required_effect_fields": {
+        "activation_mana_cost": "{2}",
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "artifact",
+        "produces": "WUBRG",
+        "xmage_effect_classes": [],
+        "xmage_mana_ability_classes": [
+          "AnyColorManaAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Chromatic Sphere",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f3f232b22d73b373966715bfc102dc89",
+      "min_rule_version": 2,
+      "normalized_name": "chromatic sphere",
+      "oracle_hash": "9feea6f9709f43a5e6cebccf273b2ebc",
+      "required_effect_fields": {
+        "_runtime_partial": true,
+        "_runtime_partial_reason": "Only the XMage self-sacrifice mana ability is executable in this rule; listed auxiliary ability/effect classes and same-ability non-mana tails remain unmodeled.",
+        "ability_kind": "activated_mana",
+        "activation_mana_cost": "{1}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "mana_source_contextual_only": true,
+        "permanent_type": "artifact",
+        "produces": "WUBRG",
+        "xmage_ability_class": "AnyColorManaAbility",
+        "xmage_auxiliary_ability_classes": [],
+        "xmage_effect_classes": [
+          "DrawCardSourceControllerEffect"
+        ],
+        "xmage_mana_ability_classes": [
+          "AnyColorManaAbility"
+        ],
+        "xmage_unmodeled_effect_classes": [
+          "DrawCardSourceControllerEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Mana Cylix",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5bddc6f173c531e5421b248587ad9200",
+      "min_rule_version": 2,
+      "normalized_name": "mana cylix",
+      "oracle_hash": "e7da6ddd05e9302702b6f8a48bba9fd6",
+      "required_effect_fields": {
+        "activation_mana_cost": "{1}",
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "artifact",
+        "produces": "WUBRG",
+        "xmage_effect_classes": [],
+        "xmage_mana_ability_classes": [
+          "AnyColorManaAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Manalith",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a58e029d95561381bb71d4cea43788df",
+      "min_rule_version": 2,
+      "normalized_name": "manalith",
+      "oracle_hash": "2cb86f263cc7e5d235b1db55361d97ae",
+      "required_effect_fields": {
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "artifact",
+        "produces": "WUBRG",
+        "xmage_effect_classes": [],
+        "xmage_mana_ability_classes": [
+          "AnyColorManaAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Phyrexian Altar",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:37b8c3fa5a8d0e1058c9fa50c55f73fb",
+      "min_rule_version": 2,
+      "normalized_name": "phyrexian altar",
+      "oracle_hash": "b7c5a22696e90cd9ed2601073ce9551d",
+      "required_effect_fields": {
+        "ability_kind": "activated_mana",
+        "activation_requires_sacrifice_target": true,
+        "activation_requires_tap": false,
+        "activation_sacrifice_target": "creature",
+        "battle_model_scope": "xmage_target_sacrifice_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_sacrifice_target": true,
+        "mana_activation_requires_tap": false,
+        "mana_produced": 1,
+        "mana_source_contextual_only": true,
+        "permanent_type": "artifact",
+        "produces": "WUBRG",
+        "xmage_ability_classes": [
+          "AnyColorManaAbility"
+        ],
+        "xmage_auxiliary_ability_classes": [],
+        "xmage_effect_classes": [],
+        "xmage_mana_ability_classes": [
+          "AnyColorManaAbility"
+        ],
+        "xmage_unmodeled_effect_classes": []
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_self_sacrifice_mana_source_permanent": 1,
+    "xmage_simple_mana_source_permanent": 3,
+    "xmage_target_sacrifice_mana_source_permanent": 1
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg596_any_color_mana_rock_alias_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg596_any_color_mana_rock_alias_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg596_any_color_mana_rock_alias_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg596_any_color_mana_rock_alias_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg596_any_color_mana_rock_alias_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg596_any_color_mana_rock_alias_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-07T05:31:42+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Celestial Prism"
+      },
+      "card_name": "Celestial Prism",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8abc926d110e8c26fb4143c78b705d4a",
+      "normalized_name": "celestial prism",
+      "required_effect_fields": {
+        "activation_mana_cost": "{2}",
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "artifact",
+        "produces": "WUBRG",
+        "xmage_effect_classes": [],
+        "xmage_mana_ability_classes": [
+          "AnyColorManaAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Chromatic Sphere"
+      },
+      "card_name": "Chromatic Sphere",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f3f232b22d73b373966715bfc102dc89",
+      "normalized_name": "chromatic sphere",
+      "required_effect_fields": {
+        "_runtime_partial": true,
+        "_runtime_partial_reason": "Only the XMage self-sacrifice mana ability is executable in this rule; listed auxiliary ability/effect classes and same-ability non-mana tails remain unmodeled.",
+        "ability_kind": "activated_mana",
+        "activation_mana_cost": "{1}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "mana_source_contextual_only": true,
+        "permanent_type": "artifact",
+        "produces": "WUBRG",
+        "xmage_ability_class": "AnyColorManaAbility",
+        "xmage_auxiliary_ability_classes": [],
+        "xmage_effect_classes": [
+          "DrawCardSourceControllerEffect"
+        ],
+        "xmage_mana_ability_classes": [
+          "AnyColorManaAbility"
+        ],
+        "xmage_unmodeled_effect_classes": [
+          "DrawCardSourceControllerEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Mana Cylix"
+      },
+      "card_name": "Mana Cylix",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5bddc6f173c531e5421b248587ad9200",
+      "normalized_name": "mana cylix",
+      "required_effect_fields": {
+        "activation_mana_cost": "{1}",
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "artifact",
+        "produces": "WUBRG",
+        "xmage_effect_classes": [],
+        "xmage_mana_ability_classes": [
+          "AnyColorManaAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Manalith"
+      },
+      "card_name": "Manalith",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a58e029d95561381bb71d4cea43788df",
+      "normalized_name": "manalith",
+      "required_effect_fields": {
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "artifact",
+        "produces": "WUBRG",
+        "xmage_effect_classes": [],
+        "xmage_mana_ability_classes": [
+          "AnyColorManaAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Phyrexian Altar"
+      },
+      "card_name": "Phyrexian Altar",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:37b8c3fa5a8d0e1058c9fa50c55f73fb",
+      "normalized_name": "phyrexian altar",
+      "required_effect_fields": {
+        "ability_kind": "activated_mana",
+        "activation_requires_sacrifice_target": true,
+        "activation_requires_tap": false,
+        "activation_sacrifice_target": "creature",
+        "battle_model_scope": "xmage_target_sacrifice_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_sacrifice_target": true,
+        "mana_activation_requires_tap": false,
+        "mana_produced": 1,
+        "mana_source_contextual_only": true,
+        "permanent_type": "artifact",
+        "produces": "WUBRG",
+        "xmage_ability_classes": [
+          "AnyColorManaAbility"
+        ],
+        "xmage_auxiliary_ability_classes": [],
+        "xmage_effect_classes": [],
+        "xmage_mana_ability_classes": [
+          "AnyColorManaAbility"
+        ],
+        "xmage_unmodeled_effect_classes": []
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Celestial Prism",
+    "Chromatic Sphere",
+    "Mana Cylix",
+    "Manalith",
+    "Phyrexian Altar"
+  ],
+  "selected_count": 5,
+  "slug": "any_color_mana_rock_alias_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Celestial Prism",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8abc926d110e8c26fb4143c78b705d4a",
+      "min_rule_version": 2,
+      "normalized_name": "celestial prism",
+      "oracle_hash": "d4fbeac453cff388c63c90d13b51a63b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Chromatic Sphere",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f3f232b22d73b373966715bfc102dc89",
+      "min_rule_version": 2,
+      "normalized_name": "chromatic sphere",
+      "oracle_hash": "9feea6f9709f43a5e6cebccf273b2ebc",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Mana Cylix",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5bddc6f173c531e5421b248587ad9200",
+      "min_rule_version": 2,
+      "normalized_name": "mana cylix",
+      "oracle_hash": "e7da6ddd05e9302702b6f8a48bba9fd6",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Manalith",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a58e029d95561381bb71d4cea43788df",
+      "min_rule_version": 2,
+      "normalized_name": "manalith",
+      "oracle_hash": "2cb86f263cc7e5d235b1db55361d97ae",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Phyrexian Altar",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:37b8c3fa5a8d0e1058c9fa50c55f73fb",
+      "min_rule_version": 2,
+      "normalized_name": "phyrexian altar",
+      "oracle_hash": "b7c5a22696e90cd9ed2601073ce9551d",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_target_sacrifice_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

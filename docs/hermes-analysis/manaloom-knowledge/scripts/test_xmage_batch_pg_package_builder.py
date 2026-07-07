@@ -485,6 +485,93 @@ def test_simple_mana_source_execution_scenario_tracks_two_color_choices_as_condi
     assert scenario["expected_tapped"] is True
 
 
+def test_self_sacrifice_mana_source_execution_scenario_unlocks_spell() -> None:
+    rule = {
+        "card_name": "Chromatic Sphere",
+        "logical_rule_key": "battle_rule_v1:chromatic",
+        "required_effect_fields": {
+            "effect": "ramp_permanent",
+            "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1",
+            "is_mana_source": True,
+            "mana_source_contextual_only": True,
+            "mana_activation_requires_sacrifice": True,
+            "activation_requires_sacrifice": True,
+            "mana_produced": 1,
+            "produces": "WUBRG",
+            "activation_mana_cost": "{1}",
+            "mana_activation_requires_tap": True,
+            "activation_requires_tap": True,
+        },
+    }
+
+    scenario = builder.sacrifice_mana_source_execution_scenario_from_expected_rule(rule)
+
+    assert scenario["type"] == "sacrifice_mana_source_activation"
+    assert scenario["expected_event"] == "self_sacrifice_mana_source_activated"
+    assert scenario["controller_mana"]["generic"] == 1
+    assert scenario["unlock_card"]["mana_cost"] == "{G}"
+    assert scenario["expected_available_mana_after_activation"] == 1
+    assert scenario["expected_conditional_mana"] == 1
+    assert scenario["expect_source_sacrificed"] is True
+    assert scenario["expect_target_sacrificed"] is False
+
+
+def test_target_sacrifice_mana_source_execution_scenario_seeds_target() -> None:
+    rule = {
+        "card_name": "Phyrexian Altar",
+        "logical_rule_key": "battle_rule_v1:altar",
+        "required_effect_fields": {
+            "effect": "ramp_permanent",
+            "battle_model_scope": "xmage_target_sacrifice_mana_source_permanent_v1",
+            "is_mana_source": True,
+            "mana_source_contextual_only": True,
+            "mana_activation_requires_sacrifice_target": True,
+            "activation_requires_sacrifice_target": True,
+            "activation_sacrifice_target": "creature",
+            "mana_produced": 1,
+            "produces": "WUBRG",
+            "mana_activation_requires_tap": False,
+            "activation_requires_tap": False,
+        },
+    }
+
+    scenario = builder.sacrifice_mana_source_execution_scenario_from_expected_rule(rule)
+
+    assert scenario["type"] == "sacrifice_mana_source_activation"
+    assert scenario["expected_event"] == "target_sacrifice_mana_source_activated"
+    assert scenario["sacrifice_target"]["type_line"] == "Creature - Fixture"
+    assert scenario["unlock_card"]["mana_cost"] == "{G}"
+    assert scenario["expected_conditional_mana"] == 1
+    assert scenario["expect_source_sacrificed"] is False
+    assert scenario["expect_target_sacrificed"] is True
+
+
+def test_target_sacrifice_mana_source_execution_scenario_uses_manifest_aliases() -> None:
+    rule = {
+        "card_name": "Phyrexian Altar",
+        "logical_rule_key": "battle_rule_v1:altar",
+        "required_effect_fields": {
+            "effect": "ramp_permanent",
+            "battle_model_scope": "xmage_target_sacrifice_mana_source_permanent_v1",
+            "is_mana_source": True,
+            "mana_source_contextual_only": True,
+            "activation_requires_sacrifice_target": True,
+            "activation_sacrifice_target": "creature",
+            "mana_produced": 1,
+            "produces": "WUBRG",
+            "mana_activation_requires_tap": False,
+            "activation_requires_tap": False,
+        },
+    }
+
+    scenario = builder.sacrifice_mana_source_execution_scenario_from_expected_rule(rule)
+
+    assert scenario["expected_event"] == "target_sacrifice_mana_source_activated"
+    assert scenario["expect_source_sacrificed"] is False
+    assert scenario["expect_target_sacrificed"] is True
+    assert scenario["sacrifice_target"]["type_line"] == "Creature - Fixture"
+
+
 def test_manifest_expected_rule_preserves_library_bottom_pick_fields() -> None:
     proposal = {
         "normalized_name": "shimmer of possibility",

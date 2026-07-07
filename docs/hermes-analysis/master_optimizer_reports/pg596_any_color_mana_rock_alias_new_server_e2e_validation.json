@@ -1,0 +1,278 @@
+{
+  "battle_execution": {
+    "event_count": 9,
+    "results": [
+      {
+        "activation_limit_per_turn": 0,
+        "available_mana": 1,
+        "card_name": "Celestial Prism",
+        "conditional_mana": 1,
+        "scenario": "Celestial Prism refreshes modeled mana source",
+        "sources": 3,
+        "tapped": true
+      },
+      {
+        "available_mana": 1,
+        "card_name": "Chromatic Sphere",
+        "conditional_mana": 1,
+        "event": "self_sacrifice_mana_source_activated",
+        "scenario": "Chromatic Sphere activates contextual sacrifice mana source",
+        "source_sacrificed": true,
+        "target_sacrificed": false
+      },
+      {
+        "activation_limit_per_turn": 0,
+        "available_mana": 1,
+        "card_name": "Mana Cylix",
+        "conditional_mana": 1,
+        "scenario": "Mana Cylix refreshes modeled mana source",
+        "sources": 2,
+        "tapped": true
+      },
+      {
+        "activation_limit_per_turn": 0,
+        "available_mana": 1,
+        "card_name": "Manalith",
+        "conditional_mana": 1,
+        "scenario": "Manalith refreshes modeled mana source",
+        "sources": 1,
+        "tapped": true
+      },
+      {
+        "available_mana": 1,
+        "card_name": "Phyrexian Altar",
+        "conditional_mana": 1,
+        "event": "target_sacrifice_mana_source_activated",
+        "scenario": "Phyrexian Altar activates contextual sacrifice mana source",
+        "source_sacrificed": false,
+        "target_sacrificed": true
+      }
+    ],
+    "scenario_count": 5
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-07T05:31:51.601011+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg596_any_color_mana_rock_alias_new_server_package_manifest.json",
+  "package_id": "pg596_any_color_mana_rock_alias_new_server_package_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 5
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Celestial Prism",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8abc926d110e8c26fb4143c78b705d4a",
+          "oracle_hash": "d4fbeac453cff388c63c90d13b51a63b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1",
+          "card_name": "Chromatic Sphere",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f3f232b22d73b373966715bfc102dc89",
+          "oracle_hash": "9feea6f9709f43a5e6cebccf273b2ebc",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Mana Cylix",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5bddc6f173c531e5421b248587ad9200",
+          "oracle_hash": "e7da6ddd05e9302702b6f8a48bba9fd6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Manalith",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a58e029d95561381bb71d4cea43788df",
+          "oracle_hash": "2cb86f263cc7e5d235b1db55361d97ae",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_target_sacrifice_mana_source_permanent_v1",
+          "card_name": "Phyrexian Altar",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:37b8c3fa5a8d0e1058c9fa50c55f73fb",
+          "oracle_hash": "b7c5a22696e90cd9ed2601073ce9551d",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 5
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Celestial Prism",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8abc926d110e8c26fb4143c78b705d4a",
+          "oracle_hash": "d4fbeac453cff388c63c90d13b51a63b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1",
+          "card_name": "Chromatic Sphere",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f3f232b22d73b373966715bfc102dc89",
+          "oracle_hash": "9feea6f9709f43a5e6cebccf273b2ebc",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Mana Cylix",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5bddc6f173c531e5421b248587ad9200",
+          "oracle_hash": "e7da6ddd05e9302702b6f8a48bba9fd6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Manalith",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a58e029d95561381bb71d4cea43788df",
+          "oracle_hash": "2cb86f263cc7e5d235b1db55361d97ae",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_target_sacrifice_mana_source_permanent_v1",
+          "card_name": "Phyrexian Altar",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:37b8c3fa5a8d0e1058c9fa50c55f73fb",
+          "oracle_hash": "b7c5a22696e90cd9ed2601073ce9551d",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 5
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Celestial Prism",
+          "logical_rule_key": "battle_rule_v1:8abc926d110e8c26fb4143c78b705d4a"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Chromatic Sphere",
+          "logical_rule_key": "battle_rule_v1:f3f232b22d73b373966715bfc102dc89"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Mana Cylix",
+          "logical_rule_key": "battle_rule_v1:5bddc6f173c531e5421b248587ad9200"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Manalith",
+          "logical_rule_key": "battle_rule_v1:a58e029d95561381bb71d4cea43788df"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_target_sacrifice_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Phyrexian Altar",
+          "logical_rule_key": "battle_rule_v1:37b8c3fa5a8d0e1058c9fa50c55f73fb"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 5
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Celestial Prism",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:8abc926d110e8c26fb4143c78b705d4a"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Chromatic Sphere",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:f3f232b22d73b373966715bfc102dc89"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Mana Cylix",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:5bddc6f173c531e5421b248587ad9200"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Manalith",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:a58e029d95561381bb71d4cea43788df"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Phyrexian Altar",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:37b8c3fa5a8d0e1058c9fa50c55f73fb"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 9,
+        "scenarios": 5
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

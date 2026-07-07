@@ -2595,6 +2595,111 @@ def run_simple_mana_source_refresh(
     }
 
 
+def run_sacrifice_mana_source_activation(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    effect = battle.get_card_effect(card)
+    source = battle.enrich_card(
+        {
+            **card,
+            "type_line": scenario.get("type_line") or "Artifact",
+            "summoning_sick": False,
+            "tapped": False,
+            **effect,
+            **dict(scenario.get("source_overrides") or {}),
+        }
+    )
+    active = battle.Player(str(scenario.get("player") or "Sacrifice Mana Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
+    unlock_card = dict(
+        scenario.get("unlock_card")
+        or {
+            "name": "E2E Mana Unlock",
+            "type_line": "Creature - Fixture",
+            "effect": "creature",
+            "cmc": 1,
+            "mana_cost": "{G}",
+        }
+    )
+    active.hand.append(unlock_card)
+    active.battlefield.append(source)
+    sacrifice_target = None
+    if scenario.get("sacrifice_target"):
+        sacrifice_target = battle.enrich_card(dict(scenario["sacrifice_target"]))
+        active.battlefield.append(sacrifice_target)
+    add_manifest_mana(active, scenario.get("controller_mana") or {})
+
+    before_events = len(events)
+    turn = int(scenario.get("turn") or 7)
+    activated = battle.activate_self_sacrifice_mana_sources(
+        active,
+        [opponent],
+        [active, opponent],
+        turn=turn,
+        phase=str(scenario.get("phase") or "precombat_main"),
+    )
+    if activated != int(scenario.get("expected_activated") or 1):
+        fail("battle_execution", f"{card['name']} sacrifice mana activations={activated}")
+
+    expected_available = int(scenario.get("expected_available_mana_after_activation") or 0)
+    if active.available_mana() != expected_available:
+        fail(
+            "battle_execution",
+            f"{card['name']} available mana after sacrifice activation={active.available_mana()}, expected {expected_available}",
+        )
+    if not active.can_pay_card(unlock_card):
+        fail("battle_execution", f"{card['name']} sacrifice mana did not unlock {unlock_card.get('name')}")
+    if bool(scenario.get("expect_source_sacrificed")):
+        if source in active.battlefield or source not in active.graveyard:
+            fail("battle_execution", f"{card['name']} source sacrifice state invalid")
+    if bool(scenario.get("expect_target_sacrificed")) and sacrifice_target is not None:
+        if sacrifice_target in active.battlefield or sacrifice_target not in active.graveyard:
+            fail("battle_execution", f"{card['name']} target sacrifice state invalid")
+        if source not in active.battlefield:
+            fail("battle_execution", f"{card['name']} source left battlefield during target sacrifice")
+
+    expected_conditional = int(scenario.get("expected_conditional_mana") or 0)
+    conditional_total = sum(
+        int(item.get("amount") or 0)
+        for item in getattr(active, "conditional_mana_sources", []) or []
+        if isinstance(item, dict)
+    )
+    if conditional_total != expected_conditional:
+        fail(
+            "battle_execution",
+            f"{card['name']} conditional mana={conditional_total}, expected {expected_conditional}",
+        )
+    expected_event = str(scenario.get("expected_event") or "self_sacrifice_mana_source_activated")
+    activation_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == expected_event and data.get("card") == card.get("name")
+        ),
+        None,
+    )
+    if activation_event is None:
+        fail("battle_events", f"missing {card['name']} {expected_event} event")
+    expected_produced = int(scenario.get("expected_produced") or expected_available)
+    if int(activation_event.get("produced") or 0) != expected_produced:
+        fail("battle_events", f"{card['name']} produced={activation_event.get('produced')!r}")
+    if activation_event.get("unlock_target") != unlock_card.get("name"):
+        fail("battle_events", f"{card['name']} unlock_target={activation_event.get('unlock_target')!r}")
+
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "available_mana": active.available_mana(),
+        "conditional_mana": conditional_total,
+        "event": expected_event,
+        "source_sacrificed": source in active.graveyard,
+        "target_sacrificed": bool(sacrifice_target is not None and sacrifice_target in active.graveyard),
+    }
+
+
 def run_simple_activated_create_token(
     battle,
     scenario: dict[str, Any],
@@ -4605,6 +4710,7 @@ SCENARIO_RUNNERS = {
     "single_target_removal": run_single_target_removal,
     "multi_target_removal": run_multi_target_removal,
     "simple_mana_source_refresh": run_simple_mana_source_refresh,
+    "sacrifice_mana_source_activation": run_sacrifice_mana_source_activation,
     "simple_activated_damage": run_simple_activated_damage,
     "simple_activated_tap_target": run_simple_activated_tap_target,
     "simple_activated_destroy": run_simple_activated_destroy,
