@@ -4011,6 +4011,26 @@ def _controlled_permanent_mana_colors(player):
     ]
 
 
+def _commander_identity_mana_colors_for_player(player):
+    commanders = []
+    commander = getattr(player, "commander", None)
+    if isinstance(commander, dict):
+        commanders.append(commander)
+    for candidate in getattr(player, "command_zone", []) or []:
+        if isinstance(candidate, dict) and candidate not in commanders:
+            commanders.append(candidate)
+    colors = []
+    for commander_card in commanders:
+        for value in compute_color_identity(commander_card) or []:
+            raw = str(value or "").strip()
+            color = raw.lower() if raw.lower() in COLOR_NAME_TO_SYMBOL else None
+            if color is None:
+                color = SYMBOL_TO_COLOR_NAME.get(raw.upper())
+            if color and color not in colors:
+                colors.append(color)
+    return colors
+
+
 def _has_untapped_mana_support_permanent(
     player,
     source,
@@ -4037,6 +4057,10 @@ def mana_source_colors_for_state(player, source):
         return ["red"]
     if _creature_has_any_color_mana_from_passive(player, source):
         return ["wildcard"]
+    if isinstance(source, dict) and source.get("commander_identity_mana_source"):
+        commander_colors = _commander_identity_mana_colors_for_player(player)
+        if commander_colors:
+            return commander_colors
     if isinstance(source, dict) and source.get("mana_colors_from_controlled_permanents"):
         colors = _controlled_permanent_mana_colors(player)
         if colors:
@@ -4088,6 +4112,8 @@ def _mana_mode_color(value):
 
 def _source_explicit_mana_colors(source):
     if not isinstance(source, dict):
+        return []
+    if source.get("commander_identity_mana_source"):
         return []
     explicit = (
         source.get("produces")
@@ -4212,6 +4238,22 @@ def conditional_mana_source_for_state(player, source, produced):
     configured = _configured_conditional_mana_source_for_state(player, source, produced)
     if configured:
         return configured
+    if isinstance(source, dict) and source.get("commander_identity_mana_source"):
+        commander_colors = _commander_identity_mana_colors_for_player(player)
+        if commander_colors:
+            return _conditional_mana_source_entry(
+                source,
+                produced,
+                [
+                    {
+                        "color": color,
+                        "restriction": "any_spell",
+                        "mode": "commander_color_identity",
+                    }
+                    for color in commander_colors
+                ],
+                "commander_identity_mana_source",
+            )
     if isinstance(source, dict) and source.get("mana_produced_from_colors_among_permanents"):
         return None
     explicit_colors = _source_explicit_mana_colors(source)
@@ -10403,6 +10445,22 @@ class Player:
                 phase=phase,
                 **replay_rule_fields(effect),
             )
+        random_replacement_result = None
+        if (
+            not counter_tax_paid
+            and target_controller_obj is not None
+            and effect.get("random_mill_then_free_replacement_spell")
+        ):
+            random_replacement_result = resolve_random_mill_then_free_replacement_spell(
+                self,
+                target_controller_obj,
+                counter,
+                target_card,
+                effect,
+                turn,
+                phase=phase,
+                all_players=all_players,
+            )
         countered_to_top = bool(effect.get("countered_spell_to_top_library")) and not counter_tax_paid
         if countered_to_top and isinstance(target_card, dict):
             target_card["_countered_to_top_library"] = True
@@ -10450,6 +10508,10 @@ class Player:
             counter_tax_paid_by=counter_tax_paid_by,
             counter_tax_mana_before=counter_tax_mana_before,
             counter_tax_mana_after=counter_tax_mana_after,
+            random_mill_then_free_replacement_spell=bool(
+                effect.get("random_mill_then_free_replacement_spell")
+            ),
+            random_replacement_result=random_replacement_result,
             cost=cost,
             cards_drawn=draw_count,
             life_gain_on_counter=life_gain_on_counter,
@@ -21838,6 +21900,8 @@ def cast_exiled_card_without_paying_mana(
     if is_effective_land(exiled_card):
         return False, "land_not_castable"
     exiled_effect = get_card_effect(exiled_card)
+    if exiled_effect.get("effect") == "unknown" and exiled_card.get("effect"):
+        exiled_effect = dict(exiled_card)
     if exiled_effect.get("effect") in {"unknown", "land", "counter"}:
         return False, "unsupported_or_reactive_effect"
     cast_phase = phase or "precombat_main"
@@ -21852,6 +21916,7 @@ def cast_exiled_card_without_paying_mana(
         source_zone="exile",
         alternative_cost_kind="cast_without_paying_mana",
     )
+    cast_ctx.is_legal = True
     cast_ctx.locked_cost = zero_mana_cost_snapshot("cast_without_paying_mana_cost")
     store_cast_context_fields(
         exiled_effect,
@@ -21919,7 +21984,324 @@ def cast_exiled_card_without_paying_mana(
         stack=stack,
         phase=cast_phase,
     )
+    if (
+        is_instant_or_sorcery_spell(exiled_card)
+        and exiled_card not in getattr(player, "graveyard", [])
+        and exiled_card not in getattr(player, "exile", [])
+        and exiled_card not in getattr(player, "hand", [])
+        and exiled_card not in getattr(player, "library", [])
+        and exiled_card not in getattr(player, "battlefield", [])
+    ):
+        player.graveyard.append(exiled_card)
+        emit_replay_event(
+            "free_cast_spell_moved_to_graveyard",
+            player=player.name,
+            card=exiled_card.get("name", "?"),
+            source=source_card.get("name", "?") if isinstance(source_card, dict) else str(source_card),
+            source_resolution=resolution_label,
+            turn=turn,
+            phase=cast_phase,
+            **replay_rule_fields(source_effect_data),
+        )
     return True, "cast_without_paying_mana"
+
+
+def _bottom_exiled_cards_from_reveal(player, cards, rng):
+    bottomed = []
+    for revealed_card in list(cards or []):
+        if not isinstance(revealed_card, dict):
+            continue
+        if revealed_card not in getattr(player, "exile", []) or []:
+            continue
+        player.exile.remove(revealed_card)
+        bottomed.append(revealed_card)
+    if bottomed:
+        rng.shuffle(bottomed)
+        player.library.extend(bottomed)
+    return bottomed
+
+
+def _reveal_to_exile_until_nonland_match(
+    player,
+    *,
+    max_mana_value=None,
+    min_total_mana_value=None,
+    forbidden_name=None,
+    source_card=None,
+    turn=None,
+    reason="library_reveal",
+):
+    revealed = []
+    hit = None
+    total_mana_value = 0
+    forbidden_normalized = normalize_card_name(forbidden_name or "")
+    while player.library:
+        candidate = player.library.pop(0)
+        if isinstance(candidate, dict):
+            move_to_exile(player, candidate, reason=reason, turn=turn)
+        revealed.append(candidate)
+        if not isinstance(candidate, dict) or is_effective_land(candidate):
+            continue
+        candidate_mana_value = card_mana_value(candidate)
+        total_mana_value += candidate_mana_value
+        if forbidden_normalized and normalize_card_name(candidate.get("name", "")) == forbidden_normalized:
+            continue
+        if max_mana_value is not None and candidate_mana_value > int(max_mana_value):
+            continue
+        hit = candidate
+        if min_total_mana_value is None or total_mana_value >= int(min_total_mana_value):
+            break
+    if min_total_mana_value is not None and total_mana_value < int(min_total_mana_value):
+        hit = None
+    return {
+        "revealed": revealed,
+        "hit": hit,
+        "hit_mana_value": card_mana_value(hit) if isinstance(hit, dict) else None,
+        "total_mana_value": total_mana_value,
+        "source": source_card.get("name", "?") if isinstance(source_card, dict) else str(source_card or "?"),
+    }
+
+
+def resolve_discover_value(
+    player,
+    opponents,
+    all_players,
+    card,
+    effect_data,
+    turn,
+    rng,
+    *,
+    stack=None,
+    phase=None,
+    finish=True,
+):
+    discover_value = int(effect_data.get("discover_value") or 0)
+    reveal = _reveal_to_exile_until_nonland_match(
+        player,
+        max_mana_value=discover_value,
+        source_card=card,
+        turn=turn,
+        reason="discover_revealed",
+    )
+    hit = reveal["hit"]
+    cast_success = False
+    cast_result = "no_discover_hit"
+    hit_destination = None
+    if isinstance(hit, dict):
+        cast_success, cast_result = cast_exiled_card_without_paying_mana(
+            player,
+            opponents,
+            all_players,
+            card,
+            hit,
+            turn,
+            rng,
+            source_effect_data=effect_data,
+            stack=stack,
+            phase=phase or "resolution",
+            resolution_label="discover",
+        )
+        if cast_success:
+            hit_destination = "cast"
+        elif hit in player.exile:
+            player.exile.remove(hit)
+            player.hand.append(hit)
+            hit_destination = "hand"
+            cast_result = "put_into_hand_after_discover"
+    bottomed = _bottom_exiled_cards_from_reveal(player, reveal["revealed"], rng)
+    treasure_count = 0
+    if effect_data.get("discover_treasure_difference") and isinstance(hit, dict):
+        treasure_count = max(0, discover_value - int(reveal["hit_mana_value"] or 0))
+        player.treasures += treasure_count
+    result = {
+        "discover_value": discover_value,
+        "revealed": [
+            revealed_card.get("name", "?") if isinstance(revealed_card, dict) else str(revealed_card)
+            for revealed_card in reveal["revealed"]
+        ],
+        "hit": hit.get("name", None) if isinstance(hit, dict) else None,
+        "hit_mana_value": reveal["hit_mana_value"],
+        "hit_destination": hit_destination,
+        "cast_success": cast_success,
+        "cast_result": cast_result,
+        "bottomed": [
+            bottomed_card.get("name", "?") if isinstance(bottomed_card, dict) else str(bottomed_card)
+            for bottomed_card in bottomed
+        ],
+        "treasures_created": treasure_count,
+    }
+    effect_data["_last_discover_result"] = result
+    emit_replay_event(
+        "discover_resolved",
+        player=player.name,
+        card=card.get("name", "?"),
+        turn=turn,
+        phase=phase or "resolution",
+        **result,
+        **replay_rule_fields(effect_data),
+    )
+    if finish:
+        finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+    return result
+
+
+def resolve_exile_until_total_mana_value_free_casts(
+    player,
+    opponents,
+    all_players,
+    card,
+    effect_data,
+    turn,
+    rng,
+    *,
+    stack=None,
+    phase=None,
+):
+    total_needed = int(effect_data.get("exile_until_total_mana_value_at_least") or 0)
+    reveal = _reveal_to_exile_until_nonland_match(
+        player,
+        min_total_mana_value=total_needed,
+        source_card=card,
+        turn=turn,
+        reason="exile_value_revealed",
+    )
+    free_casts = []
+    if effect_data.get("may_cast_exiled_spells_without_paying"):
+        for exiled_card in list(reveal["revealed"]):
+            if not isinstance(exiled_card, dict) or exiled_card not in player.exile:
+                continue
+            if is_effective_land(exiled_card):
+                continue
+            success, result = cast_exiled_card_without_paying_mana(
+                player,
+                opponents,
+                all_players,
+                card,
+                exiled_card,
+                turn,
+                rng,
+                source_effect_data=effect_data,
+                stack=stack,
+                phase=phase or "resolution",
+                resolution_label="exile_value",
+            )
+            free_casts.append(
+                {
+                    "card": exiled_card.get("name", "?"),
+                    "mana_value": card_mana_value(exiled_card),
+                    "success": success,
+                    "result": result,
+                }
+            )
+    emit_replay_event(
+        "exile_value_free_casts_resolved",
+        player=player.name,
+        card=card.get("name", "?"),
+        total_mana_value_threshold=total_needed,
+        exiled_cards=[
+            exiled_card.get("name", "?") if isinstance(exiled_card, dict) else str(exiled_card)
+            for exiled_card in reveal["revealed"]
+        ],
+        exiled_total_mana_value=reveal["total_mana_value"],
+        free_cast_count=sum(1 for row in free_casts if row["success"]),
+        free_casts=free_casts,
+        paradigm=bool(effect_data.get("paradigm")),
+        turn=turn,
+        phase=phase or "resolution",
+        **replay_rule_fields(effect_data),
+    )
+    finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+    return free_casts
+
+
+def resolve_random_mill_then_free_replacement_spell(
+    counter_controller,
+    target_controller,
+    counter_card,
+    target_card,
+    effect_data,
+    turn,
+    *,
+    phase=None,
+    all_players=None,
+):
+    if target_controller is None or not effect_data.get("random_mill_then_free_replacement_spell"):
+        return None
+    target_name = target_card.get("name", "?") if isinstance(target_card, dict) else str(target_card or "?")
+    counter_name = counter_card.get("name", "?") if isinstance(counter_card, dict) else str(counter_card or "?")
+    seed_text = f"{turn or 0}:{counter_name}:{target_name}:{len(getattr(target_controller, 'library', []) or [])}"
+    seed = sum((index + 1) * ord(char) for index, char in enumerate(seed_text))
+    rng = random.Random(seed)
+    mill_count = rng.randint(1, 3)
+    milled = []
+    for _ in range(mill_count):
+        if not getattr(target_controller, "library", None):
+            break
+        milled_card = target_controller.library.pop(0)
+        target_controller.graveyard.append(milled_card)
+        milled.append(milled_card)
+    reveal = _reveal_to_exile_until_nonland_match(
+        target_controller,
+        forbidden_name=target_name,
+        source_card=counter_card,
+        turn=turn,
+        reason="tibalts_trickery_replacement_revealed",
+    )
+    all_players_list = list(all_players or [])
+    if target_controller not in all_players_list:
+        all_players_list.append(target_controller)
+    if counter_controller is not None and counter_controller not in all_players_list:
+        all_players_list.append(counter_controller)
+    opponents = [player for player in all_players_list if player is not target_controller]
+    hit = reveal["hit"]
+    cast_success = False
+    cast_result = "no_replacement_hit"
+    if isinstance(hit, dict):
+        cast_success, cast_result = cast_exiled_card_without_paying_mana(
+            target_controller,
+            opponents,
+            all_players_list,
+            counter_card,
+            hit,
+            turn,
+            rng,
+            source_effect_data=effect_data,
+            phase=phase or "resolution",
+            resolution_label="tibalts_trickery_replacement",
+        )
+    bottomed = _bottom_exiled_cards_from_reveal(target_controller, reveal["revealed"], rng)
+    result = {
+        "mill_count": mill_count,
+        "cards_milled": len(milled),
+        "milled": [
+            milled_card.get("name", "?") if isinstance(milled_card, dict) else str(milled_card)
+            for milled_card in milled
+        ],
+        "replacement_hit": hit.get("name", None) if isinstance(hit, dict) else None,
+        "replacement_hit_mana_value": reveal["hit_mana_value"],
+        "replacement_cast_success": cast_success,
+        "replacement_cast_result": cast_result,
+        "replacement_revealed": [
+            revealed_card.get("name", "?") if isinstance(revealed_card, dict) else str(revealed_card)
+            for revealed_card in reveal["revealed"]
+        ],
+        "replacement_bottomed": [
+            bottomed_card.get("name", "?") if isinstance(bottomed_card, dict) else str(bottomed_card)
+            for bottomed_card in bottomed
+        ],
+    }
+    emit_replay_event(
+        "tibalts_trickery_replacement_resolved",
+        player=getattr(counter_controller, "name", "?"),
+        card=counter_name,
+        target_controller=getattr(target_controller, "name", "?"),
+        target_spell=target_name,
+        turn=turn,
+        phase=phase or "resolution",
+        **result,
+        **replay_rule_fields(effect_data),
+    )
+    return result
 
 
 def _remove_card_from_zone(zone, card):
@@ -58078,10 +58460,27 @@ def resolve_composite_resolution_effect(player, opponents, card, effect_data, tu
         component_fields = replay_rule_fields(component)
         outcome = "unsupported_component"
         if component_effect == "draw_cards":
-            count = int(component.get("count") or component.get("amount") or component.get("draw_count") or 1)
-            player.draw(max(0, count), rng)
-            outcome = "cards_drawn"
-            applied.append({"effect": component_effect, "count": count})
+            if component.get("discover_value"):
+                discover_result = resolve_discover_value(
+                    player,
+                    opponents,
+                    participants,
+                    card,
+                    component,
+                    turn,
+                    rng,
+                    stack=stack,
+                    phase=phase,
+                    finish=False,
+                )
+                effect_data["_last_discover_result"] = discover_result
+                outcome = "discover_resolved"
+                applied.append({"effect": component_effect, **discover_result})
+            else:
+                count = int(component.get("count") or component.get("amount") or component.get("draw_count") or 1)
+                player.draw(max(0, count), rng)
+                outcome = "cards_drawn"
+                applied.append({"effect": component_effect, "count": count})
         elif component_effect == "put_land_from_hand_onto_battlefield":
             selected_land, land_options, selection_reason = choose_land_from_hand_to_put_onto_battlefield(player)
             if selected_land is None:
@@ -58215,7 +58614,17 @@ def resolve_composite_resolution_effect(player, opponents, card, effect_data, tu
             outcome = "ritual_mana_added"
             applied.append({"effect": component_effect, "mana_added": produced})
         elif component_effect == "treasure_maker":
-            treasure_count = int(component.get("treasure_count") or 1)
+            if component.get("discover_treasure_difference"):
+                discover_result = effect_data.get("_last_discover_result") or {}
+                discover_value = int(discover_result.get("discover_value") or component.get("discover_value") or 0)
+                hit_mana_value = discover_result.get("hit_mana_value")
+                treasure_count = (
+                    max(0, discover_value - int(hit_mana_value or 0))
+                    if hit_mana_value is not None
+                    else int(component.get("treasure_count") or 0)
+                )
+            else:
+                treasure_count = int(component.get("treasure_count") or 1)
             draw_count = int(component.get("draw_count") or 0)
             player.treasures += treasure_count
             if draw_count > 0:
@@ -59790,6 +60199,19 @@ def apply_effect_immediate(
     elif effect == "draw_cards":
         if not pay_additional_card_costs(player, card, effect_data, turn=turn):
             finish_resolved_spell(player, card, turn=turn)
+            return
+        if effect_data.get("discover_value"):
+            resolve_discover_value(
+                player,
+                opponents,
+                all_players_for_entry,
+                card,
+                effect_data,
+                turn,
+                rng,
+                stack=stack,
+                phase=phase,
+            )
             return
         n = effect_data.get("count", 2)
         if effect_data.get("draw_discard_spell"):
@@ -61986,10 +62408,25 @@ def apply_effect_immediate(
         )
         finish_resolved_spell(player, card, turn=turn)
     elif effect == "exile_value":
-        # Dance with Calamity — exile top X, play for free
-        X = max(3, player.available_mana() // 2)
-        player.draw(min(X, 3), rng)
-        finish_resolved_spell(player, card, turn=turn)
+        if effect_data.get("exile_until_total_mana_value_at_least") and effect_data.get(
+            "may_cast_exiled_spells_without_paying"
+        ):
+            resolve_exile_until_total_mana_value_free_casts(
+                player,
+                opponents,
+                all_players_for_entry,
+                card,
+                effect_data,
+                turn,
+                rng,
+                stack=stack,
+                phase=phase,
+            )
+        else:
+            # Dance with Calamity — exile top X, play for free
+            X = max(3, player.available_mana() // 2)
+            player.draw(min(X, 3), rng)
+            finish_resolved_spell(player, card, turn=turn)
     elif effect == "redirect_removal":
         grant_creatures_until_eot(player, keywords=("indestructible",))
         player.indestructible = True

@@ -44,9 +44,22 @@ class PriorityLoreholdCardRuntimeTests(unittest.TestCase):
         battle.DECISION_TRACE_HANDLER = self.old_decision_handler
 
     def test_mana_family_sources_produce_expected_runtime_mana(self) -> None:
-        player = battle.Player("Lorehold", None, [], is_human=True)
+        commander = card(
+            "Lorehold, the Historian",
+            "Legendary Creature — Elder Dragon",
+            color_identity=["R", "W"],
+        )
+        player = battle.Player("Lorehold", commander, [], is_human=True)
         player.battlefield = [
-            card("Command Tower", "Land", effect="land"),
+            card(
+                "Command Tower",
+                "Land",
+                effect="land",
+                mana_produced=1,
+                produces="WUBRGC",
+                commander_identity_mana_source=True,
+                battle_model_scope="commander_identity_land_mana_source_v1",
+            ),
             card(
                 "Sol Ring",
                 "Artifact",
@@ -80,6 +93,10 @@ class PriorityLoreholdCardRuntimeTests(unittest.TestCase):
         self.assertEqual(player.available_mana(), 5)
         self.assertEqual(player.mana_pool.snapshot().get("colorless"), 2)
         conditional_sources = {source["source"]: source for source in player.conditional_mana_sources}
+        self.assertEqual(
+            sorted(mode["color"] for mode in conditional_sources["Command Tower"]["modes"]),
+            ["red", "white"],
+        )
         self.assertEqual(
             sorted(mode["color"] for mode in conditional_sources["Talisman of Conviction"]["modes"]),
             ["colorless", "red", "white"],
@@ -341,6 +358,116 @@ class PriorityLoreholdCardRuntimeTests(unittest.TestCase):
         self.assertEqual(thor_triggers[0]["amount"], 4)
         self.assertEqual(thor_triggers[0]["result"], "player_damage")
         self.assertEqual(opponent.life, 0)
+
+    def test_hit_the_mother_lode_discovers_and_creates_treasure_difference(self) -> None:
+        player = battle.Player("Lorehold", None, [], is_human=True)
+        opponent = battle.Player("Opponent", None, [])
+        player.library = [
+            card("Mountain", "Basic Land — Mountain", effect="land", cmc=0),
+            card("Expensive Miss", "Sorcery", effect="draw_cards", count=0, cmc=11),
+            card("Free Hit", "Sorcery", effect="draw_cards", count=0, cmc=4),
+        ]
+        effect = {
+            "effect": "draw_cards",
+            "count": 1,
+            "discover_value": 10,
+            "discover_treasure_difference": True,
+            "battle_model_scope": "discover_10_as_one_card_value_component_v1",
+        }
+
+        battle.apply_effect_immediate(
+            player,
+            [opponent],
+            card("Hit the Mother Lode", "Sorcery", cmc=7),
+            turn=5,
+            rng=random.Random(5),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(player.treasures, 6)
+        self.assertEqual([grave_card["name"] for grave_card in player.graveyard], ["Free Hit", "Hit the Mother Lode"])
+        self.assertEqual({library_card["name"] for library_card in player.library}, {"Mountain", "Expensive Miss"})
+        events = [data for event, data in self.events if event == "discover_resolved"]
+        self.assertEqual(events[0]["hit"], "Free Hit")
+        self.assertEqual(events[0]["hit_mana_value"], 4)
+        self.assertEqual(events[0]["treasures_created"], 6)
+        self.assertTrue(events[0]["cast_success"])
+
+    def test_improvisation_capstone_exiles_until_total_mana_value_and_free_casts(self) -> None:
+        player = battle.Player("Lorehold", None, [], is_human=True)
+        opponent = battle.Player("Opponent", None, [])
+        player.library = [
+            card("Plains", "Basic Land — Plains", effect="land", cmc=0),
+            card("Small Spell", "Instant", effect="draw_cards", count=0, cmc=2),
+            card("Second Spell", "Sorcery", effect="draw_cards", count=0, cmc=3),
+        ]
+        effect = {
+            "effect": "exile_value",
+            "exile_until_total_mana_value_at_least": 4,
+            "may_cast_exiled_spells_without_paying": True,
+            "paradigm": True,
+            "battle_model_scope": "exile_value_free_casts_paradigm_annotation_v1",
+        }
+
+        battle.apply_effect_immediate(
+            player,
+            [opponent],
+            card("Improvisation Capstone", "Sorcery", cmc=7),
+            turn=6,
+            rng=random.Random(6),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(
+            [grave_card["name"] for grave_card in player.graveyard],
+            ["Small Spell", "Second Spell", "Improvisation Capstone"],
+        )
+        self.assertEqual([exiled["name"] for exiled in player.exile], ["Plains"])
+        events = [data for event, data in self.events if event == "exile_value_free_casts_resolved"]
+        self.assertEqual(events[0]["exiled_total_mana_value"], 5)
+        self.assertEqual(events[0]["free_cast_count"], 2)
+        self.assertTrue(events[0]["paradigm"])
+
+    def test_tibalts_trickery_counters_then_resolves_random_replacement(self) -> None:
+        counter_player = battle.Player("Lorehold", None, [], is_human=True)
+        spell_player = battle.Player("Opponent", None, [])
+        tibalt = card(
+            "Tibalt's Trickery",
+            "Instant",
+            effect="counter",
+            target="spell",
+            instant=True,
+            cmc=2,
+            random_mill_then_free_replacement_spell=True,
+            battle_model_scope="counterspell_with_random_replacement_annotation_v1",
+        )
+        target_spell = card("Original Bomb", "Sorcery", effect="draw_cards", count=0, cmc=7)
+        counter_player.hand = [tibalt]
+        counter_player.mana_pool.add_generic(2)
+        spell_player.library = [
+            card("Island", "Basic Land — Island", effect="land", cmc=0),
+            card("Mountain", "Basic Land — Mountain", effect="land", cmc=0),
+            card("Forest", "Basic Land — Forest", effect="land", cmc=0),
+            card("Replacement Spell", "Sorcery", effect="draw_cards", count=0, cmc=5),
+        ]
+        stack_item = battle.StackItem(target_spell, spell_player, {"effect": "draw_cards", "count": 0})
+
+        used_counter = counter_player.use_counterspell(
+            turn=7,
+            target_card=target_spell,
+            stack_item=stack_item,
+            phase="stack_response",
+            all_players=[counter_player, spell_player],
+        )
+
+        self.assertIs(used_counter, tibalt)
+        self.assertTrue(tibalt["_countered_target"])
+        self.assertIn(tibalt, counter_player.graveyard)
+        self.assertIn("Replacement Spell", [grave_card["name"] for grave_card in spell_player.graveyard])
+        events = [data for event, data in self.events if event == "tibalts_trickery_replacement_resolved"]
+        self.assertEqual(events[0]["replacement_hit"], "Replacement Spell")
+        self.assertTrue(events[0]["replacement_cast_success"])
+        self.assertGreaterEqual(events[0]["cards_milled"], 1)
 
 
 if __name__ == "__main__":

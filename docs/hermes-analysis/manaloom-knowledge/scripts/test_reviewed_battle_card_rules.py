@@ -189,6 +189,45 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
             "scroll_rack_upkeep_single_exchange_v1",
         )
 
+    def test_priority_free_cast_residual_rules_are_verified(self) -> None:
+        rows = load_reviewed_rule_rows(DEFAULT_REVIEWED_RULES_PATH)
+        by_scope = {
+            (row["card_name"], row["effect_json"].get("battle_model_scope")): row
+            for row in rows
+        }
+
+        hit_discover = by_scope[
+            ("Hit the Mother Lode", "discover_10_as_one_card_value_component_v1")
+        ]
+        hit_treasure = by_scope[
+            ("Hit the Mother Lode", "discover_10_treasure_difference_average_v1")
+        ]
+        self.assertEqual(hit_discover["review_status"], "verified")
+        self.assertEqual(hit_treasure["review_status"], "verified")
+        self.assertEqual(hit_discover["execution_status"], "auto")
+        self.assertEqual(hit_treasure["execution_status"], "auto")
+        self.assertEqual(hit_discover["oracle_hash"], "971773d66dc1e38d5cbb8465858998bd")
+        self.assertEqual(hit_treasure["oracle_hash"], "971773d66dc1e38d5cbb8465858998bd")
+        self.assertEqual(hit_discover["effect_json"]["discover_value"], 10)
+        self.assertTrue(hit_treasure["effect_json"]["discover_treasure_difference"])
+
+        capstone = by_scope[
+            ("Improvisation Capstone", "exile_value_free_casts_paradigm_annotation_v1")
+        ]
+        self.assertEqual(capstone["review_status"], "verified")
+        self.assertEqual(capstone["execution_status"], "auto")
+        self.assertEqual(capstone["oracle_hash"], "211282705b9124c8f737b1eb351e13f0")
+        self.assertEqual(capstone["effect_json"]["exile_until_total_mana_value_at_least"], 4)
+        self.assertTrue(capstone["effect_json"]["may_cast_exiled_spells_without_paying"])
+
+        tibalt = by_scope[
+            ("Tibalt's Trickery", "counterspell_with_random_replacement_annotation_v1")
+        ]
+        self.assertEqual(tibalt["review_status"], "verified")
+        self.assertEqual(tibalt["execution_status"], "auto")
+        self.assertEqual(tibalt["oracle_hash"], "4817af87412f9b1d481222c3da52ced5")
+        self.assertTrue(tibalt["effect_json"]["random_mill_then_free_replacement_spell"])
+
     def test_reviewed_rule_payload_contains_expected_cards(self) -> None:
         rows = load_reviewed_rule_rows(DEFAULT_REVIEWED_RULES_PATH)
         by_name = {row["card_name"]: row for row in rows}
@@ -289,6 +328,7 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
         self.assertIn("Blind Obedience", by_name)
         self.assertIn("Breena, the Demagogue", by_name)
         self.assertIn("Chrome Mox", by_name)
+        self.assertIn("Command Tower", by_name)
         self.assertIn("Chromatic Star", by_name)
         self.assertIn("Crop Rotation", by_name)
         self.assertIn("Curator's Ward", by_name)
@@ -619,6 +659,19 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
         self.assertEqual(by_name["Chrome Mox"]["review_status"], "verified")
         self.assertTrue(
             by_name["Chrome Mox"]["effect_json"]["requires_imprint_nonartifact_nonland"]
+        )
+        self.assertEqual(by_name["Command Tower"]["review_status"], "verified")
+        self.assertEqual(by_name["Command Tower"]["execution_status"], "auto")
+        self.assertEqual(
+            by_name["Command Tower"]["logical_rule_key"],
+            "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
+        )
+        self.assertEqual(by_name["Command Tower"]["effect_json"]["effect"], "land")
+        self.assertEqual(by_name["Command Tower"]["effect_json"]["produces"], "WUBRGC")
+        self.assertTrue(by_name["Command Tower"]["effect_json"]["commander_identity_mana_source"])
+        self.assertEqual(
+            by_name["Command Tower"]["effect_json"]["battle_model_scope"],
+            "commander_identity_land_mana_source_v1",
         )
         self.assertEqual(by_name["Chromatic Star"]["review_status"], "active")
         self.assertEqual(

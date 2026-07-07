@@ -1660,6 +1660,28 @@
     "review_status": "verified",
     "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: this enters only after imprinting a nonartifact, nonland colored card from hand. Runtime should use the dedicated imprint selector and never treat it as free unconditional mana."
   },
+  "Command Tower": {
+    "effect_json": {
+      "cmc": 0.0,
+      "effect": "land",
+      "produces": "WUBRGC",
+      "mana_produced": 1,
+      "commander_identity_mana_source": true,
+      "battle_model_scope": "commander_identity_land_mana_source_v1"
+    },
+    "deck_role_json": {
+      "category": "land",
+      "effect": "land",
+      "subtype": "commander_identity_fixing"
+    },
+    "logical_rule_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
+    "source": "curated",
+    "confidence": 0.99,
+    "review_status": "verified",
+    "execution_status": "auto",
+    "oracle_hash": "df826611f7a0a91ba8781558b346e7af",
+    "notes": "Oracle-reviewed against PostgreSQL/Scryfall text: Command Tower taps for one mana of any color in the commander's color identity. Runtime verification on 2026-07-07 uses commander_identity_mana_source to expose only the active commander's colors, with WUBRGC retained as metadata fallback."
+  },
   "Codex Shredder": {
     "effect_json": {
       "ability_kind": "activated",
@@ -2592,9 +2614,10 @@
     ],
     "source": "curated",
     "confidence": 0.84,
-    "review_status": "active",
+    "review_status": "verified",
     "execution_status": "auto",
-    "notes": "Oracle-reviewed on 2026-06-22 against local Scryfall/PostgreSQL cache: Discover 10 and create tapped Treasures for the difference if the discovered card costs less than 10. Runtime composes a one-card value component plus conservative Treasure output."
+    "oracle_hash": "971773d66dc1e38d5cbb8465858998bd",
+    "notes": "Oracle-reviewed on 2026-06-22 against local Scryfall/PostgreSQL cache: Discover 10 and create tapped Treasures for the difference if the discovered card costs less than 10. Runtime verification on 2026-07-07 resolves discover by revealing/exiling until a valid hit, free-casting or putting the hit into hand, bottoming revealed misses randomly, and creating the exact Treasure difference."
   },
   "Improvisation Capstone": {
     "effect_json": {
@@ -2613,9 +2636,10 @@
     },
     "source": "curated",
     "confidence": 0.84,
-    "review_status": "active",
+    "review_status": "verified",
     "execution_status": "auto",
-    "notes": "Oracle-reviewed on 2026-06-22 against local Scryfall/PostgreSQL cache: exile cards until total mana value 4 or greater and cast any number for free; Paradigm repeats later. Runtime uses the supported exile-value approximation and tracks Paradigm as metadata."
+    "oracle_hash": "211282705b9124c8f737b1eb351e13f0",
+    "notes": "Oracle-reviewed on 2026-06-22 against local Scryfall/PostgreSQL cache: exile cards until total mana value 4 or greater and cast any number for free; Paradigm repeats later. Runtime verification on 2026-07-07 exiles until the nonland total mana value threshold is met, free-casts supported exiled spells, and retains Paradigm as repeat metadata."
   },
   "Increasing Vengeance": {
     "effect_json": {
@@ -2951,9 +2975,10 @@
     },
     "source": "curated",
     "confidence": 0.86,
-    "review_status": "active",
+    "review_status": "verified",
     "execution_status": "auto",
-    "notes": "Oracle-reviewed on 2026-06-22 against local Scryfall/PostgreSQL cache: counters target spell, then gives that controller a random replacement-cast line. Runtime executes the counter baseline and records the replacement drawback."
+    "oracle_hash": "4817af87412f9b1d481222c3da52ced5",
+    "notes": "Oracle-reviewed on 2026-06-22 against local Scryfall/PostgreSQL cache: counters target spell, then gives that controller a random replacement-cast line. Runtime verification on 2026-07-07 counters the spell, mills a deterministic random 1-3 cards for the target controller, reveals to a different-name nonland replacement spell, free-casts supported hits, and bottoms revealed misses randomly."
   },
   "Wear // Tear": {
     "effect_json": {
