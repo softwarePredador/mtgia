@@ -16267,6 +16267,77 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertEqual(best["power"], 4)
         self.assertEqual(best["toughness"], 4)
 
+    def test_controlled_stat_modifier_until_eot_respects_creature_color_filter(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        white_creature = {
+            "name": "Own White Soldier",
+            "type_line": "Creature - Soldier",
+            "mana_cost": "{W}",
+            "colors": ["W"],
+            "power": 2,
+            "toughness": 2,
+        }
+        black_creature = {
+            "name": "Own Black Soldier",
+            "type_line": "Creature - Soldier",
+            "mana_cost": "{B}",
+            "colors": ["B"],
+            "power": 2,
+            "toughness": 2,
+        }
+        enemy_white = {
+            "name": "Enemy White Soldier",
+            "type_line": "Creature - Soldier",
+            "mana_cost": "{W}",
+            "colors": ["W"],
+            "power": 2,
+            "toughness": 2,
+        }
+        active.battlefield.extend([white_creature, black_creature])
+        opponent.battlefield.append(enemy_white)
+        effect = {
+            "effect": "controlled_stat_modifier_until_eot",
+            "battle_model_scope": "xmage_fixed_boost_controlled_creatures_until_eot_spell_v1",
+            "target": "controlled_w_creatures",
+            "target_controller": "self",
+            "target_constraints": {
+                "controller": "self",
+                "card_types": ["creature"],
+                "creature_filter": {"colors": ["W"]},
+            },
+            "creature_filter": {"colors": ["W"]},
+            "power_delta": 2,
+            "toughness_delta": 2,
+            "instant": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Guardians' Pledge",
+                "type_line": "Instant",
+                "oracle_text": "White creatures you control get +2/+2 until end of turn.",
+            },
+            turn=14,
+            rng=random.Random(14),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual((white_creature["power"], white_creature["toughness"]), (4, 4))
+        self.assertEqual((black_creature["power"], black_creature["toughness"]), (2, 2))
+        self.assertEqual((enemy_white["power"], enemy_white["toughness"]), (2, 2))
+        self.assertTrue(
+            any(
+                event == "controlled_stat_modifier_until_eot_resolved"
+                and data.get("card") == "Fixture Guardians' Pledge"
+                and data.get("affected_count") == 1
+                and data.get("creature_filter") == {"colors": ["W"]}
+                for event, data in self.events
+            )
+        )
+
     def test_global_stat_modifier_until_eot_spell_buffs_all_creatures_and_cleans_up(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

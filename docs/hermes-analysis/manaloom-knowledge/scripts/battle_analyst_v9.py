@@ -4835,10 +4835,18 @@ def resolve_stat_modifier_until_eot_spell(player, opponents, card, effect_data, 
 def resolve_controlled_stat_modifier_until_eot_spell(player, opponents, card, effect_data, turn):
     power_delta = int(effect_data.get("power_delta") or effect_data.get("power_boost") or 0)
     toughness_delta = int(effect_data.get("toughness_delta") or effect_data.get("toughness_boost") or 0)
+    target_constraints = effect_data.get("target_constraints") or {}
+    if not isinstance(target_constraints, dict):
+        target_constraints = {}
+    creature_filter = effect_data.get("creature_filter") or target_constraints.get("creature_filter") or {}
+    if not isinstance(creature_filter, dict):
+        creature_filter = {}
     affected = []
     moved = []
     for target in list(getattr(player, "battlefield", []) or []):
         if not is_battlefield_creature(target):
+            continue
+        if creature_filter and not global_stat_modifier_creature_filter_matches(target, creature_filter):
             continue
         power_before = _numeric_card_stat(target, "power")
         toughness_before = _numeric_card_stat(target, "toughness", "power")
@@ -4871,6 +4879,7 @@ def resolve_controlled_stat_modifier_until_eot_spell(player, opponents, card, ef
         affected_count=len(affected),
         affected=[dict(item) for item in affected],
         moved_to_graveyard=moved,
+        creature_filter=creature_filter,
         power_delta=power_delta,
         toughness_delta=toughness_delta,
         result=result,

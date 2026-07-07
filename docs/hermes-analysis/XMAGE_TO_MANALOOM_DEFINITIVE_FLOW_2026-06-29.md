@@ -17394,6 +17394,61 @@ attachment-state filters. `A Tale for the Ages` remains blocked under
 explicit aura/attachment state contract and focused execution scenario for
 enchanted creatures.
 
+## PG603 Boost Controlled Color Filter Checkpoint
+
+As of 2026-07-07, PG603 is applied and synced against the new server target.
+It extends instant/sorcery controlled-creature stat modifiers to exact color
+filters resolved from local XMage `BoostControlledEffect` source.
+
+Closed card:
+
+- `Guardians' Pledge`
+
+Runtime/modeling change:
+
+- `xmage_authoritative_exact_scope_split.py` now maps exact
+  `BoostControlledEffect(..., Duration.EndOfTurn, filter, false)` color filters
+  into `creature_filter.colors` and `target_constraints.creature_filter`;
+- `battle_analyst_v9.py` now respects `creature_filter` when resolving
+  `controlled_stat_modifier_until_eot`, so nonmatching controlled creatures and
+  matching opponent creatures are not affected;
+- `xmage_batch_pg_package_builder.py` and
+  `battle_package_end_to_end_validation.py` now emit and execute focused
+  `controlled_stat_modifier_until_eot` scenarios with matching controlled,
+  nonmatching controlled, and opponent matching creatures.
+
+Validation:
+
+- split produced `proposal_count=1` and `safe_for_batch_pg_package_count=1`;
+- precheck found `1/1` target row, `0` existing expected executable rows, and
+  `0` shadow rows to deprecate;
+- apply upserted `1` PostgreSQL row and deprecated `0` shadow rows;
+- postcheck confirmed `1/1` promoted row, `1/1` `verified_auto` row, and
+  `1/1` row with `oracle_hash`;
+- focused tests passed: splitter `3` boost-controlled tests, exact runtime `2`
+  controlled-stat-modifier tests, direct package-builder scenario tests `2/2`,
+  and Python compilation for the touched splitter/runtime/package/E2E scripts;
+- PG -> SQLite/snapshot sync loaded `9408` PostgreSQL rows, updated `9172`
+  SQLite rows, and exported `6851` canonical snapshot rows;
+- metadata sync used `database_target=127.0.0.1:15432/halder`, matched `7819`
+  PostgreSQL cards, and left `deck_cards` at `2699/2699` matched;
+- E2E validation passed PostgreSQL, SQLite, snapshot, runtime lookup, and `1`
+  battle execution scenario with `2` runtime events;
+- post-sync queue rebuild reduced `target_identity_count` from `25134` to
+  `25133`, `xmage_authoritative_source_count` from `24820` to `24819`, and
+  `xmage_authoritative_adapter_required_count` from `24820` to `24819`;
+- final exact-scope recheck returned `proposal_count=0` and
+  `safe_for_batch_pg_package_count=0`;
+- final PG/Hermes/SQLite contract audit passed `51/51`;
+- final XMage strategy audit passed `26/26`;
+- final operational surface alignment audit passed;
+- final legacy contamination audit passed;
+- `scripts/quality_gate.sh server-target` passed against the new-server target.
+
+Residual boundary: PG603 does not authorize modal controlled boosts, multiple
+`BoostControlledEffect` modes, X/dynamic controlled boosts, or non-color
+controlled spell filters. Those remain separate adapter contracts.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

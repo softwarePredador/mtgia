@@ -17503,7 +17503,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["power_delta"], 2)
         self.assertEqual(effect["toughness_delta"], 0)
 
-    def test_boost_controlled_color_filter_stays_blocked(self) -> None:
+    def test_boost_controlled_color_filter_maps_to_controlled_stat_modifier(self) -> None:
         row = queue_row(split.BOOST_CONTROLLED_SPELL_UNIT, effect_classes=["BoostControlledEffect"])
         proposal, reason = split.split_row(
             row,
@@ -17515,8 +17515,15 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             ),
         )
 
-        self.assertIsNone(proposal)
-        self.assertEqual(reason, "boost_controlled_source_filter_not_supported")
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "controlled_stat_modifier_until_eot")
+        self.assertEqual(effect["battle_model_scope"], split.BOOST_CONTROLLED_SPELL_SCOPE)
+        self.assertEqual(effect["target"], "controlled_w_creatures")
+        self.assertEqual(effect["target_constraints"]["creature_filter"], {"colors": ["W"]})
+        self.assertEqual(effect["creature_filter"], {"colors": ["W"]})
+        self.assertEqual(effect["power_delta"], 2)
+        self.assertEqual(effect["toughness_delta"], 2)
 
     def test_boost_controlled_modal_spell_stays_blocked(self) -> None:
         row = queue_row(split.BOOST_CONTROLLED_SPELL_UNIT, effect_classes=["BoostControlledEffect"])

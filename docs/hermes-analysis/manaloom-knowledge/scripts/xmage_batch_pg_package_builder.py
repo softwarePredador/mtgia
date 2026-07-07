@@ -2594,6 +2594,65 @@ def target_keyword_spell_execution_scenario_from_expected_rule(
     }
 
 
+def controlled_stat_modifier_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_fixed_boost_controlled_creatures_until_eot_spell_v1":
+        return None
+    if required.get("effect") != "controlled_stat_modifier_until_eot":
+        return None
+    target_constraints = dict(required.get("target_constraints") or {})
+    creature_filter = required.get("creature_filter") or target_constraints.get("creature_filter") or {}
+    if not isinstance(creature_filter, dict):
+        creature_filter = {}
+    colors = [
+        str(value).strip().upper()
+        for value in (creature_filter.get("colors") or [])
+        if str(value).strip()
+    ]
+    matching = {
+        "name": "E2E Matching Controlled Creature",
+        "type_line": "Creature - Soldier",
+        "power": 2,
+        "toughness": 2,
+        "colors": colors or ["W"],
+        "mana_cost": "".join(f"{{{color}}}" for color in (colors or ["W"])),
+    }
+    nonmatching_color = "B" if "B" not in colors else "W"
+    nonmatching = {
+        "name": "E2E Nonmatching Controlled Creature",
+        "type_line": "Creature - Soldier",
+        "power": 2,
+        "toughness": 2,
+        "colors": [nonmatching_color],
+        "mana_cost": f"{{{nonmatching_color}}}",
+    }
+    opponent_target = {
+        "name": "E2E Opponent Matching Creature",
+        "type_line": "Creature - Soldier",
+        "power": 2,
+        "toughness": 2,
+        "colors": colors or ["W"],
+        "mana_cost": "".join(f"{{{color}}}" for color in (colors or ["W"])),
+    }
+    return {
+        "name": f"{rule['card_name']} boosts controlled filtered creatures until EOT",
+        "type": "controlled_stat_modifier_until_eot",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": "Sorcery" if required.get("sorcery") is True else "Instant",
+        },
+        "matching_target": matching,
+        "nonmatching_target": nonmatching,
+        "opponent_target": opponent_target,
+        "expected_power_delta": int(required.get("power_delta") or 0),
+        "expected_toughness_delta": int(required.get("toughness_delta") or 0),
+        "expected_creature_filter": creature_filter,
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def attack_self_boost_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
@@ -3203,6 +3262,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or simple_activated_self_boost_execution_scenario_from_expected_rule(rule)
         or simple_activated_self_keyword_execution_scenario_from_expected_rule(rule)
         or simple_activated_regenerate_source_execution_scenario_from_expected_rule(rule)
+        or controlled_stat_modifier_execution_scenario_from_expected_rule(rule)
         or target_keyword_spell_execution_scenario_from_expected_rule(rule)
         or attack_self_boost_execution_scenario_from_expected_rule(rule)
         or becomes_blocked_self_boost_execution_scenario_from_expected_rule(rule)

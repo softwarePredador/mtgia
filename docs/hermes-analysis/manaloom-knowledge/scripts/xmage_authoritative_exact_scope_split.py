@@ -8180,25 +8180,54 @@ def fixed_boost_target_from_oracle(metadata: dict[str, Any]) -> tuple[int, int] 
     return power, toughness
 
 
-def fixed_boost_controlled_from_oracle(metadata: dict[str, Any]) -> tuple[int, int] | str | None:
+def fixed_boost_controlled_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str | None:
     text = strip_leading_parenthetical_reminders(oracle_text(metadata))
     if "choose one" in text.lower() or "+x/" in text.lower() or "/+x" in text.lower():
         return "boost_controlled_oracle_not_simple"
     match = re.match(
-        r"^creatures you control get ([+-]?\d+)/([+-]?\d+) until end of turn\.?$",
+        r"^(?:(?P<color>white|blue|black|red|green)\s+)?creatures you control get ([+-]?\d+)/([+-]?\d+) until end of turn\.?$",
         text,
         re.I,
     )
     if not match:
         return None
-    power = signed_int_from_oracle(match.group(1))
-    toughness = signed_int_from_oracle(match.group(2))
+    power = signed_int_from_oracle(match.group(2))
+    toughness = signed_int_from_oracle(match.group(3))
     if power is None or toughness is None:
         return None
-    return power, toughness
+    creature_filter: dict[str, Any] = {}
+    color_word = str(match.group("color") or "").lower()
+    if color_word:
+        creature_filter["colors"] = [BOOST_ALL_FILTER_COLOR_WORDS[color_word]]
+    return {"power": power, "toughness": toughness, "creature_filter": creature_filter}
 
 
-def fixed_boost_controlled_from_source(source: str) -> tuple[int, int] | str | None:
+def boost_controlled_filter_from_source(source: str, filter_name: str | None) -> dict[str, Any] | str:
+    text = source or ""
+    if not filter_name or filter_name == "StaticFilters.FILTER_PERMANENT_CREATURES":
+        return {}
+    if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", filter_name):
+        return "boost_controlled_source_filter_not_supported"
+    if any(marker in text for marker in STATIC_CONTROLLED_PT_BLOCKED_SOURCE_MARKERS):
+        return "boost_controlled_source_filter_not_supported"
+    color_tokens = re.findall(
+        rf"\b{re.escape(filter_name)}\.add\s*\(\s*new\s+ColorPredicate\s*\(\s*ObjectColor\.([A-Z]+)\s*\)\s*\)",
+        text,
+    )
+    if color_tokens:
+        colors = [
+            OBJECT_COLOR_TO_SYMBOL[token]
+            for token in color_tokens
+            if token in OBJECT_COLOR_TO_SYMBOL
+        ]
+        if colors:
+            return {"colors": ordered_color_symbols(colors)}
+    if "ColorPredicate" in text:
+        return "boost_controlled_source_filter_not_supported"
+    return "boost_controlled_source_filter_not_supported"
+
+
+def fixed_boost_controlled_from_source(source: str) -> dict[str, Any] | str | None:
     text = source or ""
     matches = re.findall(
         r"new\s+BoostControlledEffect\s*\(\s*([+-]?\d+)\s*,\s*([+-]?\d+)\s*,\s*"
@@ -8210,12 +8239,15 @@ def fixed_boost_controlled_from_source(source: str) -> tuple[int, int] | str | N
         return None
     power_raw, toughness_raw, rest = matches[0]
     rest_text = str(rest or "")
+    creature_filter: dict[str, Any] = {}
     if rest_text.strip():
-        if "StaticFilters.FILTER_PERMANENT_CREATURES" not in rest_text:
-            return "boost_controlled_source_filter_not_supported"
-        if any(marker in text for marker in STATIC_CONTROLLED_PT_BLOCKED_SOURCE_MARKERS):
-            return "boost_controlled_source_filter_not_supported"
-    return int(power_raw), int(toughness_raw)
+        args = [part.strip() for part in rest_text.lstrip(",").split(",") if part.strip()]
+        filter_name = args[0] if args else ""
+        source_filter = boost_controlled_filter_from_source(text, filter_name)
+        if isinstance(source_filter, str):
+            return source_filter
+        creature_filter = source_filter
+    return {"power": int(power_raw), "toughness": int(toughness_raw), "creature_filter": creature_filter}
 
 
 BOOST_ALL_FILTER_COLOR_WORDS = {
@@ -28170,20 +28202,30 @@ def split_row(
             return None, oracle_boost
         if oracle_boost is None:
             return None, "boost_controlled_oracle_not_simple"
-        if source_boost != oracle_boost:
+        if source_boost["power"] != oracle_boost["power"] or source_boost["toughness"] != oracle_boost["toughness"]:
             return None, "boost_controlled_source_oracle_mismatch"
-        power, toughness = oracle_boost
+        source_filter = dict(source_boost.get("creature_filter") or {})
+        oracle_filter = dict(oracle_boost.get("creature_filter") or {})
+        if source_filter != oracle_filter:
+            return None, "boost_controlled_source_oracle_filter_mismatch"
+        power = int(oracle_boost["power"])
+        toughness = int(oracle_boost["toughness"])
+        target_constraints = {"controller": "self", "card_types": ["creature"]}
+        if oracle_filter:
+            target_constraints["creature_filter"] = oracle_filter
         effect_json = {
             "effect": "controlled_stat_modifier_until_eot",
             "battle_model_scope": BOOST_CONTROLLED_SPELL_SCOPE,
-            "target": "controlled_creatures",
+            "target": f"controlled_{boost_all_filter_label(oracle_filter)}" if oracle_filter else "controlled_creatures",
             "target_controller": "self",
-            "target_constraints": {"controller": "self", "card_types": ["creature"]},
+            "target_constraints": target_constraints,
             "power_delta": power,
             "toughness_delta": toughness,
             "xmage_effect_class": "BoostControlledEffect",
             **flags,
         }
+        if oracle_filter:
+            effect_json["creature_filter"] = oracle_filter
         return build_proposal(
             row,
             metadata,

@@ -1,0 +1,161 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg603_boost_controlled_color_filter_new_20260707_080717",
+  "deploy_id": "pg603_boost_controlled_color_filter_new_server",
+  "execution_scenarios": [
+    {
+      "card": {
+        "name": "Guardians' Pledge",
+        "type_line": "Instant"
+      },
+      "expected_creature_filter": {
+        "colors": [
+          "W"
+        ]
+      },
+      "expected_power_delta": 2,
+      "expected_toughness_delta": 2,
+      "logical_rule_key": "battle_rule_v1:d498740178408798a7a7dd58d99cb5f5",
+      "matching_target": {
+        "colors": [
+          "W"
+        ],
+        "mana_cost": "{W}",
+        "name": "E2E Matching Controlled Creature",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "name": "Guardians' Pledge boosts controlled filtered creatures until EOT",
+      "nonmatching_target": {
+        "colors": [
+          "B"
+        ],
+        "mana_cost": "{B}",
+        "name": "E2E Nonmatching Controlled Creature",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "opponent_target": {
+        "colors": [
+          "W"
+        ],
+        "mana_cost": "{W}",
+        "name": "E2E Opponent Matching Creature",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "type": "controlled_stat_modifier_until_eot"
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Guardians' Pledge",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d498740178408798a7a7dd58d99cb5f5",
+      "min_rule_version": 2,
+      "normalized_name": "guardians' pledge",
+      "oracle_hash": "7e8abb39dd94877bb29f3b5505330abd",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_controlled_creatures_until_eot_spell_v1",
+        "creature_filter": {
+          "colors": [
+            "W"
+          ]
+        },
+        "effect": "controlled_stat_modifier_until_eot",
+        "power_delta": 2,
+        "target": "controlled_w_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "creature_filter": {
+            "colors": [
+              "W"
+            ]
+          }
+        },
+        "target_controller": "self",
+        "toughness_delta": 2,
+        "xmage_effect_class": "BoostControlledEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_boost_controlled_creatures_until_eot_spell": 1
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg603_boost_controlled_color_filter_new_server_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg603_boost_controlled_color_filter_new_server_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg603_boost_controlled_color_filter_new_server_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg603_boost_controlled_color_filter_new_server_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg603_boost_controlled_color_filter_new_server_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg603_boost_controlled_color_filter_new_server_rollback.sql"
+  },
+  "generated_at": "2026-07-07T08:07:17+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Guardians' Pledge"
+      },
+      "card_name": "Guardians' Pledge",
+      "effect": "controlled_stat_modifier_until_eot",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d498740178408798a7a7dd58d99cb5f5",
+      "normalized_name": "guardians' pledge",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_controlled_creatures_until_eot_spell_v1",
+        "creature_filter": {
+          "colors": [
+            "W"
+          ]
+        },
+        "effect": "controlled_stat_modifier_until_eot",
+        "power_delta": 2,
+        "target": "controlled_w_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "creature_filter": {
+            "colors": [
+              "W"
+            ]
+          }
+        },
+        "target_controller": "self",
+        "toughness_delta": 2,
+        "xmage_effect_class": "BoostControlledEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Guardians' Pledge"
+  ],
+  "selected_count": 1,
+  "slug": "pg603_boost_controlled_color_filter_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Guardians' Pledge",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d498740178408798a7a7dd58d99cb5f5",
+      "min_rule_version": 2,
+      "normalized_name": "guardians' pledge",
+      "oracle_hash": "7e8abb39dd94877bb29f3b5505330abd",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_controlled_creatures_until_eot_spell_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

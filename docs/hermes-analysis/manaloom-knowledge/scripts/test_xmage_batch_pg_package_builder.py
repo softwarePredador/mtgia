@@ -1000,6 +1000,40 @@ def test_manifest_builds_target_keyword_spell_execution_scenario() -> None:
     assert scenario["expected_keywords"] == ["double_strike"]
 
 
+def test_manifest_builds_controlled_stat_modifier_filtered_execution_scenario() -> None:
+    rule = {
+        "normalized_name": "guardians' pledge",
+        "card_name": "Guardians' Pledge",
+        "oracle_hash": "hash-guardians-pledge",
+        "logical_rule_key": "battle_rule_v1:hash-guardians-pledge",
+        "required_effect_fields": {
+            "effect": "controlled_stat_modifier_until_eot",
+            "battle_model_scope": "xmage_fixed_boost_controlled_creatures_until_eot_spell_v1",
+            "target": "controlled_w_creatures",
+            "target_controller": "self",
+            "target_constraints": {
+                "controller": "self",
+                "card_types": ["creature"],
+                "creature_filter": {"colors": ["W"]},
+            },
+            "creature_filter": {"colors": ["W"]},
+            "power_delta": 2,
+            "toughness_delta": 2,
+        },
+    }
+
+    scenario = builder.controlled_stat_modifier_execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "controlled_stat_modifier_until_eot"
+    assert scenario["expected_power_delta"] == 2
+    assert scenario["expected_toughness_delta"] == 2
+    assert scenario["expected_creature_filter"] == {"colors": ["W"]}
+    assert scenario["matching_target"]["colors"] == ["W"]
+    assert scenario["nonmatching_target"]["colors"] == ["B"]
+    assert scenario["opponent_target"]["colors"] == ["W"]
+
+
 def test_manifest_builds_attack_self_boost_execution_scenario() -> None:
     rule = {
         "normalized_name": "benalish veteran",

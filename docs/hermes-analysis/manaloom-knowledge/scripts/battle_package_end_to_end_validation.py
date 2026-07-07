@@ -3456,6 +3456,105 @@ def run_stat_modifier_until_eot(
     }
 
 
+def run_controlled_stat_modifier_until_eot(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    effect = battle.get_card_effect(card)
+    active = battle.Player(str(scenario.get("player") or "Spell Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
+    matching_target = battle.enrich_card(
+        {
+            "name": "E2E Matching Controlled Creature",
+            "type_line": "Creature - Soldier",
+            "power": 2,
+            "toughness": 2,
+            **dict(scenario.get("matching_target") or {}),
+        }
+    )
+    nonmatching_target = battle.enrich_card(
+        {
+            "name": "E2E Nonmatching Controlled Creature",
+            "type_line": "Creature - Soldier",
+            "power": 2,
+            "toughness": 2,
+            **dict(scenario.get("nonmatching_target") or {}),
+        }
+    )
+    opponent_target = battle.enrich_card(
+        {
+            "name": "E2E Opponent Matching Creature",
+            "type_line": "Creature - Soldier",
+            "power": 2,
+            "toughness": 2,
+            **dict(scenario.get("opponent_target") or {}),
+        }
+    )
+    active.battlefield = [matching_target, nonmatching_target]
+    opponent.battlefield = [opponent_target]
+    before_events = len(events)
+    matching_before = (int(matching_target.get("power") or 0), int(matching_target.get("toughness") or 0))
+    nonmatching_before = (
+        int(nonmatching_target.get("power") or 0),
+        int(nonmatching_target.get("toughness") or 0),
+    )
+    opponent_before = (int(opponent_target.get("power") or 0), int(opponent_target.get("toughness") or 0))
+    battle.apply_effect_immediate(
+        active,
+        [opponent],
+        battle.enrich_card({**card, **effect}),
+        turn=int(scenario.get("turn") or 7),
+        rng=random.Random(int(scenario.get("seed") or 6074)),
+        effect_data_override=effect,
+        phase=str(scenario.get("phase") or "precombat_main"),
+    )
+    expected_power = matching_before[0] + int(scenario.get("expected_power_delta") or effect.get("power_delta") or 0)
+    expected_toughness = matching_before[1] + int(
+        scenario.get("expected_toughness_delta") or effect.get("toughness_delta") or 0
+    )
+    if int(matching_target.get("power") or 0) != expected_power:
+        fail("battle_execution", f"{card['name']} matching power={matching_target.get('power')!r}, expected {expected_power}")
+    if int(matching_target.get("toughness") or 0) != expected_toughness:
+        fail(
+            "battle_execution",
+            f"{card['name']} matching toughness={matching_target.get('toughness')!r}, expected {expected_toughness}",
+        )
+    if (int(nonmatching_target.get("power") or 0), int(nonmatching_target.get("toughness") or 0)) != nonmatching_before:
+        fail("battle_execution", f"{card['name']} incorrectly affected controlled nonmatching creature")
+    if (int(opponent_target.get("power") or 0), int(opponent_target.get("toughness") or 0)) != opponent_before:
+        fail("battle_execution", f"{card['name']} incorrectly affected opponent creature")
+    resolved_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "controlled_stat_modifier_until_eot_resolved"
+            and data.get("card") == card.get("name")
+        ),
+        None,
+    )
+    if resolved_event is None:
+        fail("battle_events", f"missing {card['name']} controlled stat modifier resolved event")
+    if int(resolved_event.get("affected_count") or 0) != 1:
+        fail("battle_events", f"{card['name']} affected_count={resolved_event.get('affected_count')!r}, expected 1")
+    expected_filter = scenario.get("expected_creature_filter") or effect.get("creature_filter") or {}
+    if dict(resolved_event.get("creature_filter") or {}) != dict(expected_filter or {}):
+        fail(
+            "battle_events",
+            f"{card['name']} creature_filter={resolved_event.get('creature_filter')!r}, expected {expected_filter!r}",
+        )
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "matching_target": matching_target.get("name"),
+        "matching_power": int(matching_target.get("power") or 0),
+        "matching_toughness": int(matching_target.get("toughness") or 0),
+        "affected_count": int(resolved_event.get("affected_count") or 0),
+        "creature_filter": dict(expected_filter or {}),
+    }
+
+
 def run_simple_activated_self_boost(
     battle,
     scenario: dict[str, Any],
@@ -4978,6 +5077,7 @@ SCENARIO_RUNNERS = {
     "damage_each_opponent_spell": run_damage_each_opponent_spell,
     "simple_activated_create_token": run_simple_activated_create_token,
     "spell_cast_gain_life": run_spell_cast_gain_life,
+    "controlled_stat_modifier_until_eot": run_controlled_stat_modifier_until_eot,
     "stat_modifier_until_eot": run_stat_modifier_until_eot,
     "static_controlled_power_toughness_boost": run_static_controlled_power_toughness_boost,
     "static_controlled_keyword": run_static_controlled_keyword,
