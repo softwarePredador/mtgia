@@ -1,0 +1,8 @@
+                check_name                | value
+------------------------------------------+-------
+ target_rows                              | 4
+ target_active_auto_rows                  | 4
+ target_verified_auto_rows                | 0
+ target_missing_oracle_hash               | 0
+ requested_cards_snapshot_verified_before | 0/4
+(5 rows)
