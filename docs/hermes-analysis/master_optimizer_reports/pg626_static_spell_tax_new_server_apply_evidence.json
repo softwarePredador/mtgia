@@ -1,0 +1,286 @@
+{
+  "database_target": "127.0.0.1:15432/halder",
+  "deploy_id": "pg626",
+  "generated_at": "2026-07-07T16:53:28.656990+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg626_static_spell_tax_new_server_package_manifest.json",
+  "mutations_performed": [
+    "postgres_apply_pg626_static_spell_tax_new_server"
+  ],
+  "postcheck": {
+    "backup_rows": 0,
+    "cards": [
+      "Chill",
+      "Feroz's Ban",
+      "Geist-Fueled Scarecrow",
+      "Glowrider",
+      "High Seas",
+      "Irini Sengir",
+      "Lodestone Golem",
+      "Sphere of Resistance",
+      "Squeeze",
+      "Thorn of Amethyst",
+      "Vryn Wingmare"
+    ],
+    "failed_cards": [],
+    "promoted_oracle_hash_rows": 11,
+    "promoted_rule_rows": 11,
+    "promoted_verified_auto_rows": 11,
+    "row_count": 11
+  },
+  "postcheck_rows": [
+    {
+      "backup_rows": 0,
+      "card_name": "Chill",
+      "logical_rule_key": "battle_rule_v1:42e1803a0fa35bde5078216f000a8565",
+      "normalized_name": "chill",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Feroz's Ban",
+      "logical_rule_key": "battle_rule_v1:36c30b4595a5fd9bc7cad0939cc673ae",
+      "normalized_name": "feroz's ban",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Geist-Fueled Scarecrow",
+      "logical_rule_key": "battle_rule_v1:bc0652215e0eb2196080ba602c733d06",
+      "normalized_name": "geist-fueled scarecrow",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Glowrider",
+      "logical_rule_key": "battle_rule_v1:6d39ef37e00c1bfdf2999fe446aa7af2",
+      "normalized_name": "glowrider",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "High Seas",
+      "logical_rule_key": "battle_rule_v1:568910bfb93935223202729c0d2df2bf",
+      "normalized_name": "high seas",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Irini Sengir",
+      "logical_rule_key": "battle_rule_v1:fa436e282020bbd4790d9ed1d32b2d8e",
+      "normalized_name": "irini sengir",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Lodestone Golem",
+      "logical_rule_key": "battle_rule_v1:f368a79346c5a6bd7107f0fa321560de",
+      "normalized_name": "lodestone golem",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Sphere of Resistance",
+      "logical_rule_key": "battle_rule_v1:07d2256999fcb290d88cdeb0a37df913",
+      "normalized_name": "sphere of resistance",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Squeeze",
+      "logical_rule_key": "battle_rule_v1:45a67d690ccb5a603257c768c9e1fc14",
+      "normalized_name": "squeeze",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Thorn of Amethyst",
+      "logical_rule_key": "battle_rule_v1:7c7242062532b63919b249f9056eebc4",
+      "normalized_name": "thorn of amethyst",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Vryn Wingmare",
+      "logical_rule_key": "battle_rule_v1:4353887075328c833b63293e78b34d32",
+      "normalized_name": "vryn wingmare",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    }
+  ],
+  "precheck": {
+    "cards": [
+      "Chill",
+      "Feroz's Ban",
+      "Geist-Fueled Scarecrow",
+      "Glowrider",
+      "High Seas",
+      "Irini Sengir",
+      "Lodestone Golem",
+      "Sphere of Resistance",
+      "Squeeze",
+      "Thorn of Amethyst",
+      "Vryn Wingmare"
+    ],
+    "existing_expected_rows_before": 11,
+    "missing_targets": [],
+    "row_count": 11,
+    "total_target_card_rows": 11,
+    "would_deprecate_shadow_rows": 0
+  },
+  "precheck_rows": [
+    {
+      "canonical_card_id": "b90b0464-117c-4567-99a5-3138a3eaadbf",
+      "card_name": "Chill",
+      "existing_rule_rows": 1,
+      "expected_rule_rows_before": 1,
+      "logical_rule_key": "battle_rule_v1:42e1803a0fa35bde5078216f000a8565",
+      "normalized_name": "chill",
+      "oracle_hash": "f4ac8621285e1e52dd72499ccf64d9d4",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "5c26311d-7731-4666-b4a6-f95b2f1afd71",
+      "card_name": "Feroz's Ban",
+      "existing_rule_rows": 1,
+      "expected_rule_rows_before": 1,
+      "logical_rule_key": "battle_rule_v1:36c30b4595a5fd9bc7cad0939cc673ae",
+      "normalized_name": "feroz's ban",
+      "oracle_hash": "13de41ee21897c15ba9c50254076dacd",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "ba7c2fd4-f3e2-4fc2-ba60-28853c97ba0c",
+      "card_name": "Geist-Fueled Scarecrow",
+      "existing_rule_rows": 1,
+      "expected_rule_rows_before": 1,
+      "logical_rule_key": "battle_rule_v1:bc0652215e0eb2196080ba602c733d06",
+      "normalized_name": "geist-fueled scarecrow",
+      "oracle_hash": "8da7a7b4754f33c1803f4628748c2ee8",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "195710c2-3b51-4fe0-8440-e67f8754d832",
+      "card_name": "Glowrider",
+      "existing_rule_rows": 1,
+      "expected_rule_rows_before": 1,
+      "logical_rule_key": "battle_rule_v1:6d39ef37e00c1bfdf2999fe446aa7af2",
+      "normalized_name": "glowrider",
+      "oracle_hash": "63532c8ee6deff218245c18a4e0232b9",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "6ea6513d-e1dd-4186-81ca-c5d13bf90d60",
+      "card_name": "High Seas",
+      "existing_rule_rows": 1,
+      "expected_rule_rows_before": 1,
+      "logical_rule_key": "battle_rule_v1:568910bfb93935223202729c0d2df2bf",
+      "normalized_name": "high seas",
+      "oracle_hash": "f1f40237cb6e55ff37a1554f94a9c69a",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "fbc69418-d7f1-4708-888a-13c29c424a38",
+      "card_name": "Irini Sengir",
+      "existing_rule_rows": 1,
+      "expected_rule_rows_before": 1,
+      "logical_rule_key": "battle_rule_v1:fa436e282020bbd4790d9ed1d32b2d8e",
+      "normalized_name": "irini sengir",
+      "oracle_hash": "48331728eaaa585e546b3596488a0b67",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "fcb9b1bb-f31c-4f16-8f90-3db6b519d9f4",
+      "card_name": "Lodestone Golem",
+      "existing_rule_rows": 1,
+      "expected_rule_rows_before": 1,
+      "logical_rule_key": "battle_rule_v1:f368a79346c5a6bd7107f0fa321560de",
+      "normalized_name": "lodestone golem",
+      "oracle_hash": "10cfd50f769f63c64f5f61b74b425bf8",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "af68609c-355e-4563-a0e3-ca64554a9825",
+      "card_name": "Sphere of Resistance",
+      "existing_rule_rows": 1,
+      "expected_rule_rows_before": 1,
+      "logical_rule_key": "battle_rule_v1:07d2256999fcb290d88cdeb0a37df913",
+      "normalized_name": "sphere of resistance",
+      "oracle_hash": "dc1787214f6dbc6529c1ebc4be32470b",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "8a6888dd-8000-44db-86b0-ce590f9837ed",
+      "card_name": "Squeeze",
+      "existing_rule_rows": 1,
+      "expected_rule_rows_before": 1,
+      "logical_rule_key": "battle_rule_v1:45a67d690ccb5a603257c768c9e1fc14",
+      "normalized_name": "squeeze",
+      "oracle_hash": "acdb79860c5ae969d42f017f2f4888d1",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "0b88837b-0396-4f6d-8944-ccba9fed180f",
+      "card_name": "Thorn of Amethyst",
+      "existing_rule_rows": 1,
+      "expected_rule_rows_before": 1,
+      "logical_rule_key": "battle_rule_v1:7c7242062532b63919b249f9056eebc4",
+      "normalized_name": "thorn of amethyst",
+      "oracle_hash": "63532c8ee6deff218245c18a4e0232b9",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "e09d6892-44b2-4769-831c-d5b6b968abb9",
+      "card_name": "Vryn Wingmare",
+      "existing_rule_rows": 1,
+      "expected_rule_rows_before": 1,
+      "logical_rule_key": "battle_rule_v1:4353887075328c833b63293e78b34d32",
+      "normalized_name": "vryn wingmare",
+      "oracle_hash": "4c2bb06ecbd7257be31483056c7502ef",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    }
+  ],
+  "slug": "static_spell_tax_new_server"
+}

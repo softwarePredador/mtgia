@@ -1238,6 +1238,8 @@ def alternative_cost_for_effect(player, card, effect_data):
 
 STATIC_COST_REDUCTION_EFFECTS = {"static_cost_reduction", "cost_reduction"}
 STATIC_COST_REDUCTION_SCOPE = "static_cost_reduction_for_matching_spells_v1"
+STATIC_COST_INCREASE_EFFECTS = {"static_cost_increase", "cost_increase"}
+STATIC_GENERIC_COST_INCREASE_SCOPE = "xmage_static_generic_cost_increase_for_matching_spells_v1"
 CHOSEN_CARD_TYPE_COST_REDUCTION_APPLIES_TO = "spells_you_cast_of_chosen_card_type"
 POWER_BASED_INSTANT_SORCERY_COST_REDUCTION_SCOPE = (
     "static_power_based_cost_reduction_for_instant_sorcery_mv4_plus_v1"
@@ -1821,6 +1823,165 @@ def static_cost_reductions_for_spell(player, card):
     return reductions
 
 
+def _static_cost_increase_amount(effect_data):
+    for key in (
+        "cost_increase_generic",
+        "generic_cost_increase",
+        "cost_increase_amount",
+        "generic_increase",
+        "amount",
+    ):
+        if key not in effect_data:
+            continue
+        try:
+            return max(0, int(effect_data.get(key) or 0))
+        except (TypeError, ValueError):
+            return 0
+    if str(effect_data.get("effect") or "") in STATIC_COST_INCREASE_EFFECTS:
+        return 1
+    return 0
+
+
+def _source_static_cost_increase_effect(source):
+    if not isinstance(source, dict):
+        return {}
+    direct_effect = str(source.get("effect") or "").strip()
+    if direct_effect in STATIC_COST_INCREASE_EFFECTS:
+        return source
+    try:
+        effect_data = get_card_effect(source)
+    except Exception:
+        return {}
+    if not isinstance(effect_data, dict):
+        return {}
+    if str(effect_data.get("effect") or "").strip() in STATIC_COST_INCREASE_EFFECTS:
+        return effect_data
+    return {}
+
+
+def _static_cost_increase_controller_matches(source_controller, caster, effect_data):
+    applies_to = str(effect_data.get("cost_increase_applies_to") or "").strip().lower()
+    if not applies_to:
+        applies_to = "spells_each_player_cast"
+    if applies_to in {"spells_each_player_cast", "spells_all_players_cast", "all_spells"}:
+        return True
+    if applies_to in {"spells_you_cast", "spells_controller_cast"}:
+        return source_controller is caster
+    if applies_to in {"spells_opponents_cast", "spells_opponents_casting"}:
+        return source_controller is not caster
+    return False
+
+
+def _static_cost_increase_filter_specs(effect_data):
+    filters = effect_data.get("cost_increase_filters")
+    if isinstance(filters, list):
+        result = [spec for spec in filters if isinstance(spec, dict)]
+        if result:
+            return result
+    spec = {}
+    for source_key, target_key in (
+        ("applies_to_card_types", "applies_to_card_types"),
+        ("applies_to_spell_types", "applies_to_card_types"),
+        ("spell_types", "applies_to_card_types"),
+        ("card_types", "applies_to_card_types"),
+        ("excluded_card_types", "excluded_card_types"),
+        ("excludes_card_types", "excluded_card_types"),
+        ("applies_to_spell_colors", "applies_to_spell_colors"),
+        ("spell_colors", "applies_to_spell_colors"),
+        ("applies_to_colors", "applies_to_spell_colors"),
+        ("applies_to_subtypes", "applies_to_subtypes"),
+        ("spell_subtypes", "applies_to_subtypes"),
+        ("subtypes", "applies_to_subtypes"),
+    ):
+        values = [str(value).lower() for value in _as_list(effect_data.get(source_key)) if value]
+        if values:
+            spec[target_key] = values
+    return [spec]
+
+
+def _static_cost_increase_filter_matches(card, spec):
+    excluded_types = [str(value).lower() for value in _as_list(spec.get("excluded_card_types")) if value]
+    if excluded_types and _card_type_matches(card, excluded_types):
+        return False
+    card_types = [str(value).lower() for value in _as_list(spec.get("applies_to_card_types")) if value]
+    if card_types and not _card_type_matches(card, card_types):
+        return False
+    subtypes = [str(value).lower() for value in _as_list(spec.get("applies_to_subtypes")) if value]
+    if subtypes and not _card_subtype_matches(card, subtypes):
+        return False
+    colors = {
+        symbol
+        for symbol in (_color_symbol(value) for value in _as_list(spec.get("applies_to_spell_colors")))
+        if symbol in SYMBOL_TO_COLOR_NAME
+    }
+    if colors and not any(_spell_has_color(card, color) for color in colors):
+        return False
+    return True
+
+
+def _static_cost_increase_matches_spell(source, effect_data, card, *, caster, source_controller):
+    amount = _static_cost_increase_amount(effect_data)
+    if amount <= 0:
+        return None
+    if not _static_cost_increase_controller_matches(source_controller, caster, effect_data):
+        return None
+    matching_filter = None
+    for spec in _static_cost_increase_filter_specs(effect_data):
+        if _static_cost_increase_filter_matches(card, spec):
+            matching_filter = spec
+            break
+    if matching_filter is None:
+        return None
+    return {
+        "source": source.get("name", "unknown"),
+        "amount": amount,
+        "scope": str(effect_data.get("battle_model_scope") or STATIC_GENERIC_COST_INCREASE_SCOPE),
+        "cost_increase_applies_to": str(
+            effect_data.get("cost_increase_applies_to") or "spells_each_player_cast"
+        ),
+        "applies_to_card_types": [
+            str(value).lower()
+            for value in _as_list(matching_filter.get("applies_to_card_types"))
+            if value
+        ],
+        "excluded_card_types": [
+            str(value).lower()
+            for value in _as_list(matching_filter.get("excluded_card_types"))
+            if value
+        ],
+        "applies_to_spell_colors": sorted(
+            symbol
+            for symbol in (
+                _color_symbol(value)
+                for value in _as_list(matching_filter.get("applies_to_spell_colors"))
+            )
+            if symbol in SYMBOL_TO_COLOR_NAME
+        ),
+        "amount_source": str(effect_data.get("cost_increase_amount_source") or "fixed"),
+    }
+
+
+def static_cost_increases_for_spell(player, card):
+    increases = []
+    for source_controller in _table_players_for(player):
+        for source in getattr(source_controller, "battlefield", []) or []:
+            if not isinstance(source, dict):
+                continue
+            effect_data = _source_static_cost_increase_effect(source)
+            if not effect_data:
+                continue
+            increase = _static_cost_increase_matches_spell(
+                source,
+                effect_data,
+                card,
+                caster=player,
+                source_controller=source_controller,
+            )
+            if increase:
+                increases.append(increase)
+    return increases
+
+
 UNSUPPORTED_SELF_COST_REDUCTION_AMOUNT_SOURCES = {
     "sacrificed_artifact_or_creature_count_this_turn",
     "creatures_tapped_as_additional_cost_while_casting",
@@ -2155,13 +2316,18 @@ def card_cost_for_player_state(
     x_value=0,
     additional_costs=None,
 ):
+    increases = static_cost_increases_for_spell(player, card)
+    static_tax = sum(max(0, int(increase.get("amount", 0) or 0)) for increase in increases)
     cost = card_mana_cost(
         card,
-        additional_generic,
+        additional_generic + static_tax,
         alternative_cost=alternative_cost,
         x_value=x_value,
         additional_costs=additional_costs,
     )
+    if increases:
+        cost["static_cost_increase_total"] = static_tax
+        cost["static_cost_increases"] = increases
     reductions = static_cost_reductions_for_spell(player, card)
     self_effect = _card_self_cost_reduction_effect(card)
     if self_effect:
@@ -59905,6 +60071,13 @@ def apply_effect_immediate(
                 == SHARED_CARD_TYPE_COST_REDUCTION_APPLIES_TO
             ):
                 resolve_semblance_anvil_imprint(player, permanent, card, turn=turn)
+    elif effect == "static_cost_increase":
+        if is_instant(card) or is_sorcery(card):
+            finish_resolved_spell(player, card, turn=turn)
+        else:
+            permanent = prepare_resolved_permanent(enrich_card({**card, **effect_data}))
+            permanent["effect"] = "static_cost_increase"
+            player.battlefield.append(permanent)
     elif effect == "topdeck_play":
         if is_instant(card) or is_sorcery(card):
             finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)

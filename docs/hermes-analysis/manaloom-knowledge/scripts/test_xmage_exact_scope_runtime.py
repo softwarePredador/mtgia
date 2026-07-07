@@ -12531,6 +12531,83 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertEqual(reduced["generic"], 3)
         self.assertEqual(reduced["static_cost_reductions"][0]["source"], "Fixture Draconic Lore")
 
+    def test_static_spell_tax_increases_matching_spell_cost_from_any_controller(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        self.battle.bind_table_context([active, opponent])
+        opponent.battlefield.append(
+            {
+                "name": "Sphere of Resistance",
+                "type_line": "Artifact",
+                "effect": "static_cost_increase",
+                "battle_model_scope": "xmage_static_generic_cost_increase_for_matching_spells_v1",
+                "cost_increase_applies_to": "spells_each_player_cast",
+                "cost_increase_generic": 1,
+                "cost_increase_filters": [{}],
+            }
+        )
+        spell = {"name": "Fixture Bolt", "type_line": "Instant", "mana_cost": "{R}"}
+
+        taxed = self.battle.card_cost_for_player_state(active, spell)
+
+        self.assertEqual(taxed["generic"], 1)
+        self.assertEqual(taxed["colored"]["red"], 1)
+        self.assertEqual(taxed["static_cost_increase_total"], 1)
+        self.assertEqual(taxed["static_cost_increases"][0]["source"], "Sphere of Resistance")
+
+    def test_static_spell_tax_respects_noncreature_filter(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        active.battlefield.append(
+            {
+                "name": "Glowrider",
+                "type_line": "Creature - Human Cleric",
+                "effect": "static_cost_increase",
+                "battle_model_scope": "xmage_static_generic_cost_increase_for_matching_spells_v1",
+                "cost_increase_applies_to": "spells_each_player_cast",
+                "cost_increase_generic": 1,
+                "cost_increase_filters": [{"excluded_card_types": ["creature"]}],
+            }
+        )
+
+        creature_cost = self.battle.card_cost_for_player_state(
+            active,
+            {"name": "Fixture Bear", "type_line": "Creature", "mana_cost": "{1}{G}"},
+        )
+        instant_cost = self.battle.card_cost_for_player_state(
+            active,
+            {"name": "Fixture Insight", "type_line": "Instant", "mana_cost": "{1}{U}"},
+        )
+
+        self.assertNotIn("static_cost_increase_total", creature_cost)
+        self.assertEqual(creature_cost["generic"], 1)
+        self.assertEqual(instant_cost["generic"], 2)
+        self.assertEqual(instant_cost["static_cost_increases"][0]["excluded_card_types"], ["creature"])
+
+    def test_static_spell_tax_respects_controller_scope(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        self.battle.bind_table_context([active, opponent])
+        active.battlefield.append(
+            {
+                "name": "Geist-Fueled Scarecrow",
+                "type_line": "Artifact Creature - Scarecrow",
+                "effect": "static_cost_increase",
+                "battle_model_scope": "xmage_static_generic_cost_increase_for_matching_spells_v1",
+                "cost_increase_applies_to": "spells_you_cast",
+                "cost_increase_generic": 1,
+                "cost_increase_filters": [{"applies_to_card_types": ["creature"]}],
+            }
+        )
+        creature = {"name": "Fixture Bear", "type_line": "Creature", "mana_cost": "{1}{G}"}
+
+        active_cost = self.battle.card_cost_for_player_state(active, creature)
+        opponent_cost = self.battle.card_cost_for_player_state(opponent, creature)
+
+        self.assertEqual(active_cost["generic"], 2)
+        self.assertEqual(active_cost["static_cost_increase_total"], 1)
+        self.assertNotIn("static_cost_increase_total", opponent_cost)
+        self.assertEqual(opponent_cost["generic"], 1)
+
     def test_counter_target_creature_spell_filters_stack_target_type(self) -> None:
         opponent = self.battle.Player("Opponent", None, [])
         counter_effect = {

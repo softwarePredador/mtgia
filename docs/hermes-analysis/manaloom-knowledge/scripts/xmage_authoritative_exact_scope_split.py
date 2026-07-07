@@ -113,6 +113,7 @@ STATIC_GENERIC_COST_REDUCTION_UNIT = (
     "xmage_signature::SpellsCostReductionControllerEffect::SimpleStaticAbility::"
     "no_target_class::no_condition_class::cost_reduction,static_ability"
 )
+STATIC_GENERIC_COST_INCREASE_UNIT = "passive::xmage_static_rule_restriction_or_tax_variant_review_v1"
 BOOST_KEYWORD_UNIT = "grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1"
 ATTACK_SELF_BOOST_UNIT = (
     "xmage_signature::BoostSourceEffect::AttacksTriggeredAbility::"
@@ -210,6 +211,7 @@ DRAW_SCOPE = "xmage_fixed_source_controller_draw_spell_v1"
 DRAW_PUT_LAND_SCOPE = "xmage_fixed_draw_put_land_from_hand_spell_v1"
 DRAW_SELF_COST_REDUCTION_SCOPE = "xmage_fixed_source_controller_draw_spell_self_cost_reduction_v1"
 STATIC_GENERIC_COST_REDUCTION_SCOPE = "xmage_static_generic_cost_reduction_for_matching_spells_v1"
+STATIC_GENERIC_COST_INCREASE_SCOPE = "xmage_static_generic_cost_increase_for_matching_spells_v1"
 TARGET_DRAW_SCOPE = "xmage_fixed_target_player_draw_spell_v1"
 TARGET_PLAYER_DISCARD_SCOPE = "xmage_fixed_target_player_discard_spell_v1"
 PREVENT_ALL_COMBAT_DAMAGE_SPELL_SCOPE = "xmage_prevent_all_combat_damage_spell_v1"
@@ -9121,6 +9123,19 @@ def is_static_generic_cost_reduction_unit(row: dict[str, Any]) -> bool:
     )
 
 
+def is_static_generic_cost_increase_unit(row: dict[str, Any]) -> bool:
+    abilities = ability_classes(row)
+    remaining = abilities - {"SimpleStaticAbility"}
+    return (
+        str(row.get("adapter_work_unit") or "") == STATIC_GENERIC_COST_INCREASE_UNIT
+        and effect_classes(row) == {"SpellsCostIncreasingAllEffect"}
+        and "SimpleStaticAbility" in abilities
+        and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
+        and set(row.get("xmage_signals") or []).issubset({"targeting", "static_ability"})
+        and "static_ability" in set(row.get("xmage_signals") or [])
+    )
+
+
 def is_static_graveyard_count_pt_unit(row: dict[str, Any]) -> bool:
     abilities = ability_classes(row)
     remaining = abilities - {"SimpleStaticAbility"}
@@ -12581,6 +12596,262 @@ def static_cost_reduction_specs_match(source: dict[str, Any], oracle: dict[str, 
     if ordered_color_symbols(source.get("applies_to_spell_colors") or []) != ordered_color_symbols(oracle.get("applies_to_spell_colors") or []):
         return False
     return True
+
+
+def ordered_cost_increase_filters(filters: list[dict[str, Any]] | None) -> list[dict[str, Any]]:
+    ordered: list[dict[str, Any]] = []
+    for spec in filters or []:
+        if not isinstance(spec, dict):
+            continue
+        normalized: dict[str, Any] = {}
+        card_types = ordered_static_cost_reduction_card_types(spec.get("applies_to_card_types") or [])
+        excluded_types = ordered_static_cost_reduction_card_types(spec.get("excluded_card_types") or [])
+        colors = ordered_color_symbols(spec.get("applies_to_spell_colors") or [])
+        subtypes = sorted(
+            set(
+                canonical_static_cost_reduction_subtype(value)
+                for value in spec.get("applies_to_subtypes", [])
+                if canonical_static_cost_reduction_subtype(value)
+            )
+        )
+        if card_types:
+            normalized["applies_to_card_types"] = card_types
+        if excluded_types:
+            normalized["excluded_card_types"] = excluded_types
+        if colors:
+            normalized["applies_to_spell_colors"] = colors
+        if subtypes:
+            normalized["applies_to_subtypes"] = subtypes
+        ordered.append(normalized)
+    return sorted(ordered, key=lambda item: json.dumps(item, sort_keys=True))
+
+
+def _static_cost_increase_part_filter(part: str) -> dict[str, Any] | str:
+    text = re.sub(r"\s+", " ", str(part or "").strip().lower())
+    text = text.replace("-", "")
+    text = re.sub(r"\b(an?|the)\b", "", text)
+    text = re.sub(r"\bspells?\b", "", text)
+    text = re.sub(r"\s+", " ", text).strip(" .")
+    if not text or text in {"all", "each"}:
+        return {}
+    card_types: list[str] = []
+    excluded_card_types: list[str] = []
+    colors: list[str] = []
+    subtypes: list[str] = []
+    for token in text.split():
+        if token.startswith("non") and token[3:] in STATIC_COST_REDUCTION_CARD_TYPE_WORDS:
+            excluded_card_types.append(STATIC_COST_REDUCTION_CARD_TYPE_WORDS[token[3:]])
+        elif token in STATIC_COST_REDUCTION_CARD_TYPE_WORDS:
+            card_types.append(STATIC_COST_REDUCTION_CARD_TYPE_WORDS[token])
+        elif token in COLOR_WORD_TO_SYMBOL:
+            colors.append(COLOR_WORD_TO_SYMBOL[token])
+        else:
+            subtype = canonical_static_cost_reduction_subtype(token)
+            if not subtype or any(char.isdigit() for char in subtype):
+                return "static_cost_increase_oracle_subject_not_supported"
+            subtypes.append(subtype)
+    result: dict[str, Any] = {}
+    if card_types:
+        result["applies_to_card_types"] = ordered_static_cost_reduction_card_types(card_types)
+    if excluded_card_types:
+        result["excluded_card_types"] = ordered_static_cost_reduction_card_types(excluded_card_types)
+    if colors:
+        result["applies_to_spell_colors"] = ordered_color_symbols(colors)
+    if subtypes:
+        result["applies_to_subtypes"] = sorted(set(subtypes))
+    if result.get("applies_to_card_types") and result.get("excluded_card_types"):
+        return "static_cost_increase_mixed_include_exclude_types_not_supported"
+    return result
+
+
+def _merge_cost_increase_filter_parts(filters: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    if len(filters) <= 1:
+        return ordered_cost_increase_filters(filters)
+    baseline_keys = {"applies_to_card_types", "excluded_card_types", "applies_to_subtypes"}
+    baselines = [
+        {key: tuple(spec.get(key) or []) for key in baseline_keys}
+        for spec in filters
+    ]
+    if len({json.dumps(value, sort_keys=True) for value in baselines}) == 1:
+        merged = dict(filters[0])
+        colors: list[str] = []
+        for spec in filters:
+            colors.extend(spec.get("applies_to_spell_colors") or [])
+        if colors:
+            merged["applies_to_spell_colors"] = ordered_color_symbols(colors)
+        return ordered_cost_increase_filters([merged])
+    return ordered_cost_increase_filters(filters)
+
+
+def static_cost_increase_subject_spec(subject: str) -> dict[str, Any] | str:
+    text = re.sub(r"\s+", " ", str(subject or "").strip().lower())
+    text = text.replace("and/or", " or ")
+    text = re.sub(r"\bthat's\b|\bthat is\b", "", text)
+    text = re.sub(r"\bspells?\b", " spells", text)
+    text = re.sub(r"\s+", " ", text).strip(" .")
+    if not text or text in {"spells", "all spells", "each spell"}:
+        return {"cost_increase_filters": [{}]}
+    parts = [
+        re.sub(r"\s+", " ", part).strip(" .")
+        for part in re.split(r"\s*(?:,| or | and )\s*", text)
+        if re.sub(r"\s+", " ", part).strip(" .")
+    ]
+    parsed_filters: list[dict[str, Any]] = []
+    for part in parts or [text]:
+        parsed = _static_cost_increase_part_filter(part)
+        if isinstance(parsed, str):
+            return parsed
+        parsed_filters.append(parsed)
+    return {"cost_increase_filters": _merge_cost_increase_filter_parts(parsed_filters)}
+
+
+def static_cost_increase_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    raw_text = strip_parenthetical_reminders(str(metadata.get("oracle_text") or ""))
+    lines = [
+        re.sub(r"\s+", " ", line).strip().lower()
+        for line in raw_text.splitlines()
+        if "cost" in line.lower() and "more to cast" in line.lower()
+    ]
+    if len(lines) != 1:
+        return "static_cost_increase_oracle_not_exact_generic"
+    text = lines[0]
+    colored_match = re.search(r"costs?\s+\{([wubrg])\}\s+more to cast", text, re.I)
+    if colored_match:
+        return "static_cost_increase_colored_mana_not_supported"
+    patterns = [
+        re.compile(
+            r"^(?P<subject>spells your opponents cast) costs? "
+            r"\{(?P<amount>\d+)\} more to cast\.?$"
+        ),
+        re.compile(
+            r"^(?P<subject>.+? spells)(?: you cast)? costs? "
+            r"\{(?P<amount>\d+)\} more to cast\.?$"
+        ),
+        re.compile(
+            r"^spells costs? \{(?P<amount>\d+)\} more to cast\.?$"
+        ),
+    ]
+    for pattern in patterns:
+        match = pattern.fullmatch(text)
+        if not match:
+            continue
+        amount = int(match.group("amount"))
+        if amount <= 0:
+            return "static_cost_increase_oracle_amount_not_positive"
+        if text.startswith("spells your opponents cast"):
+            applies_to = "spells_opponents_cast"
+            subject = "spells"
+        elif " you cast " in f" {text} ":
+            applies_to = "spells_you_cast"
+            subject = (match.groupdict().get("subject") or "spells").replace(" you cast", "")
+        else:
+            applies_to = "spells_each_player_cast"
+            subject = match.groupdict().get("subject") or "spells"
+        subject_spec = static_cost_increase_subject_spec(subject)
+        if isinstance(subject_spec, str):
+            return subject_spec
+        return {
+            **subject_spec,
+            "cost_increase_applies_to": applies_to,
+            "cost_increase_generic": amount,
+            "cost_increase_amount_source": "fixed",
+        }
+    return "static_cost_increase_oracle_not_exact_generic"
+
+
+def static_cost_increase_from_source(source_text: str) -> dict[str, Any] | str:
+    text = source_text or ""
+    constructors = re.findall(r"\bnew\s+SpellsCostIncreasingAllEffect\b", text)
+    if len(constructors) != 1:
+        return "static_cost_increase_source_constructor_count_not_one"
+    constructor_args = extract_constructor_args(text, "SpellsCostIncreasingAllEffect")
+    if constructor_args is None:
+        return "static_cost_increase_source_constructor_not_found"
+    args = split_top_level_args(constructor_args)
+    if len(args) < 3:
+        return "static_cost_increase_source_args_not_supported"
+    if "new ManaCostsImpl" in args[0]:
+        return "static_cost_increase_colored_mana_not_supported"
+    amount_match = re.fullmatch(r"\d+", args[0].strip())
+    if not amount_match:
+        return "static_cost_increase_source_amount_not_fixed"
+    amount = int(args[0].strip())
+    if amount <= 0:
+        return "static_cost_increase_source_amount_not_positive"
+    target_match = re.search(r"TargetController\.(ANY|YOU|OPPONENT)\b", args[-1])
+    if not target_match:
+        return "static_cost_increase_source_target_controller_not_supported"
+    target_controller = target_match.group(1)
+    applies_to = {
+        "ANY": "spells_each_player_cast",
+        "YOU": "spells_you_cast",
+        "OPPONENT": "spells_opponents_cast",
+    }[target_controller]
+
+    filter_arg = args[1]
+    filter_chunks = "\n".join(source_filter_add_chunks(text))
+    filter_source = "\n".join([filter_arg, filter_chunks])
+    excluded_card_types = [
+        token.lower()
+        for token in re.findall(
+            r"Predicates\.not\s*\(\s*CardType\.(ARTIFACT|BATTLE|CREATURE|ENCHANTMENT|INSTANT|LAND|PLANESWALKER|SORCERY)\.getPredicate\s*\(\s*\)\s*\)",
+            filter_source,
+        )
+    ]
+    card_types: list[str] = []
+    if re.search(r"\bFilterArtifactCard\b", text):
+        card_types.append("artifact")
+    if re.search(r"\bFilterCreatureCard\b", text):
+        card_types.append("creature")
+    if re.search(r"\bFilterEnchantmentCard\b", text):
+        card_types.append("enchantment")
+    if re.search(r"\bFilterInstantOrSorceryCard\b", text):
+        card_types.extend(["instant", "sorcery"])
+    for token in re.findall(
+        r"CardType\.(ARTIFACT|BATTLE|CREATURE|ENCHANTMENT|INSTANT|LAND|PLANESWALKER|SORCERY)\.getPredicate\s*\(\s*\)",
+        filter_source,
+    ):
+        lowered = token.lower()
+        if lowered not in excluded_card_types:
+            card_types.append(lowered)
+    colors = [
+        OBJECT_COLOR_TO_SYMBOL[token]
+        for token in re.findall(r"ObjectColor\.(WHITE|BLUE|BLACK|RED|GREEN)\b", filter_source)
+        if token in OBJECT_COLOR_TO_SYMBOL
+    ]
+    spec: dict[str, Any] = {}
+    if card_types:
+        spec["applies_to_card_types"] = ordered_static_cost_reduction_card_types(card_types)
+    if excluded_card_types:
+        spec["excluded_card_types"] = ordered_static_cost_reduction_card_types(excluded_card_types)
+    if colors:
+        spec["applies_to_spell_colors"] = ordered_color_symbols(colors)
+    if spec.get("applies_to_card_types") and spec.get("excluded_card_types"):
+        return "static_cost_increase_source_mixed_include_exclude_types_not_supported"
+
+    all_spell_filter = (
+        "new FilterCard(\"Spells\")" in text
+        or "new FilterCard(\"spells\")" in text
+        or re.search(r'new\s+FilterCard\s*\(\s*"[^"]*spells?[^"]*"\s*\)', text, re.I) is not None
+    )
+    if not spec and not all_spell_filter:
+        return "static_cost_increase_source_filter_not_supported"
+    return {
+        "cost_increase_applies_to": applies_to,
+        "cost_increase_generic": amount,
+        "cost_increase_amount_source": "fixed",
+        "cost_increase_filters": ordered_cost_increase_filters([spec]),
+    }
+
+
+def static_cost_increase_specs_match(source: dict[str, Any], oracle: dict[str, Any]) -> bool:
+    if int(source.get("cost_increase_generic") or 0) != int(oracle.get("cost_increase_generic") or 0):
+        return False
+    if str(source.get("cost_increase_applies_to") or "") != str(oracle.get("cost_increase_applies_to") or ""):
+        return False
+    return ordered_cost_increase_filters(source.get("cost_increase_filters")) == ordered_cost_increase_filters(
+        oracle.get("cost_increase_filters")
+    )
 
 
 def activated_ability_line_from_oracle(metadata: dict[str, Any]) -> str:
@@ -20260,6 +20531,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "fixed Equipment attachment with static equipped-creature power/toughness and keyword modifier"
     elif scope == STATIC_GENERIC_COST_REDUCTION_SCOPE:
         scope_kind = "permanent static generic cost reduction for matching spells you cast"
+    elif scope == STATIC_GENERIC_COST_INCREASE_SCOPE:
+        scope_kind = "permanent static generic cost increase for matching spells"
     elif scope == STATIC_CAST_AS_FLASH_PERMISSION_SCOPE:
         scope_kind = "static cast-as-though-flash timing permission permanent"
     elif scope == STATIC_CANT_BE_BLOCKED_CREATURE_SCOPE:
@@ -20488,6 +20761,7 @@ def split_row(
     simple_aura_static_pt_unit = is_simple_aura_static_pt_unit(row)
     simple_equipment_static_attachment_unit = is_simple_equipment_static_attachment_unit(row)
     static_generic_cost_reduction_unit = is_static_generic_cost_reduction_unit(row)
+    static_generic_cost_increase_unit = is_static_generic_cost_increase_unit(row)
     static_graveyard_count_pt_unit = is_static_graveyard_count_pt_unit(row)
     static_graveyard_threshold_boost_unit = is_static_graveyard_threshold_boost_unit(row)
     static_graveyard_count_boost_unit = is_static_graveyard_count_boost_unit(row)
@@ -20622,6 +20896,7 @@ def split_row(
         and not simple_aura_static_pt_unit
         and not simple_equipment_static_attachment_unit
         and not static_generic_cost_reduction_unit
+        and not static_generic_cost_increase_unit
         and not static_graveyard_count_pt_unit
         and not static_graveyard_threshold_boost_unit
         and not static_graveyard_count_boost_unit
@@ -20709,6 +20984,7 @@ def split_row(
         and not simple_aura_static_pt_unit
         and not simple_equipment_static_attachment_unit
         and not static_generic_cost_reduction_unit
+        and not static_generic_cost_increase_unit
         and not static_graveyard_count_pt_unit
         and not static_graveyard_threshold_boost_unit
         and not static_graveyard_count_boost_unit
@@ -24198,6 +24474,60 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_static_generic_cost_reduction_for_matching_spells",
+        ), "selected_exact_scope"
+
+    if static_generic_cost_increase_unit:
+        if not is_permanent_metadata(metadata) or is_spell(metadata):
+            return None, "static_cost_increase_not_permanent"
+        source_increase = static_cost_increase_from_source(source_text)
+        if isinstance(source_increase, str):
+            return None, source_increase
+        oracle_increase = static_cost_increase_from_oracle(metadata)
+        if isinstance(oracle_increase, str):
+            return None, oracle_increase
+        if not static_cost_increase_specs_match(source_increase, oracle_increase):
+            return None, "static_cost_increase_source_oracle_mismatch"
+        type_line = str(metadata.get("type_line") or "").lower()
+        permanent_type = (
+            "creature"
+            if "creature" in type_line
+            else "artifact"
+            if "artifact" in type_line
+            else "enchantment"
+            if "enchantment" in type_line
+            else "permanent"
+        )
+        effect_json = {
+            "effect": "static_cost_increase",
+            "battle_model_scope": STATIC_GENERIC_COST_INCREASE_SCOPE,
+            "ability_kind": "static",
+            "static_effect": "generic_cost_increase_for_matching_spells",
+            "cost_increase_applies_to": str(oracle_increase["cost_increase_applies_to"]),
+            "cost_increase_generic": int(oracle_increase["cost_increase_generic"]),
+            "cost_increase_amount_source": "fixed",
+            "cost_increase_filters": ordered_cost_increase_filters(
+                oracle_increase.get("cost_increase_filters")
+            ),
+            "permanent_type": permanent_type,
+            "xmage_effect_class": "SpellsCostIncreasingAllEffect",
+            "xmage_ability_class": "SimpleStaticAbility",
+            **flags,
+        }
+        filters = effect_json["cost_increase_filters"]
+        if len(filters) == 1:
+            effect_json.update(filters[0])
+        self_keywords = static_keywords_from_oracle(metadata)
+        if self_keywords:
+            keyword_list = ordered_keywords(self_keywords)
+            effect_json["keywords"] = keyword_list
+            effect_json["_keywords_are_self"] = True
+            for self_keyword in keyword_list:
+                effect_json[self_keyword] = True
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_static_generic_cost_increase_for_matching_spells",
         ), "selected_exact_scope"
 
     if static_graveyard_count_pt_unit:
@@ -30185,6 +30515,7 @@ def build_exact_split_report(
             and not is_simple_aura_static_pt_unit(row)
             and not is_simple_equipment_static_attachment_unit(row)
             and not is_static_generic_cost_reduction_unit(row)
+            and not is_static_generic_cost_increase_unit(row)
             and not is_static_graveyard_count_pt_unit(row)
             and not is_static_graveyard_threshold_boost_unit(row)
             and not is_static_graveyard_count_boost_unit(row)
@@ -30283,6 +30614,7 @@ def build_exact_split_report(
                 "xmage_signature AttachEffect + BoostEnchantedEffect Aura rows with exact fixed enchanted-creature power/toughness modifiers and simple EnchantAbility",
                 "xmage_signature BoostEquippedEffect Equipment rows with exact fixed equipped-creature power/toughness boost, supported attached combat keywords, and no auxiliary non-static effects",
                 "xmage_signature SpellsCostReductionControllerEffect + SimpleStaticAbility rows with exact generic cost reduction for spells you cast by card type, subtype, color, or minimum mana value",
+                "SpellsCostIncreasingAllEffect + SimpleStaticAbility permanents with exact fixed generic spell-tax amount, TargetController scope, and supported type/color/non-type filters",
                 "SetBasePowerToughnessSourceEffect + SimpleStaticAbility creature rows whose source and Oracle both set source power/toughness to a direct controller/all-graveyards card-type count",
                 "grant_protection_from_chosen_color rows with GainAbilityTargetEffect + SimpleActivatedAbility, exact activated target-creature keyword until EOT, and simple mana/tap source costs only",
                 "grant_protection_from_chosen_color rows with GainAbilityTargetEffect + AttacksTriggeredAbility, exact attack-trigger target-creature keyword until EOT, and Oracle/source target constraints agreement",

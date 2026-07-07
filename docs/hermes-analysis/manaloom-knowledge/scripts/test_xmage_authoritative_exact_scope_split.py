@@ -24538,6 +24538,127 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "static_cost_reduction_colored_mana_not_supported")
 
+    def test_static_generic_cost_increase_maps_all_spells_tax(self) -> None:
+        row = queue_row(
+            split.STATIC_GENERIC_COST_INCREASE_UNIT,
+            effect_classes=["SpellsCostIncreasingAllEffect"],
+            ability_kind="static",
+            ability_classes=["SimpleStaticAbility"],
+            xmage_signals=["targeting", "static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Sphere of Resistance",
+                type_line="Artifact",
+                oracle_text="Spells cost {1} more to cast.",
+            ),
+            source_text="""
+                this.addAbility(new SimpleStaticAbility(
+                    new SpellsCostIncreasingAllEffect(1, new FilterCard("Spells"), TargetController.ANY)));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "static_cost_increase")
+        self.assertEqual(effect["battle_model_scope"], split.STATIC_GENERIC_COST_INCREASE_SCOPE)
+        self.assertEqual(effect["cost_increase_generic"], 1)
+        self.assertEqual(effect["cost_increase_applies_to"], "spells_each_player_cast")
+        self.assertEqual(effect["cost_increase_filters"], [{}])
+
+    def test_static_generic_cost_increase_maps_noncreature_tax(self) -> None:
+        row = queue_row(
+            split.STATIC_GENERIC_COST_INCREASE_UNIT,
+            effect_classes=["SpellsCostIncreasingAllEffect"],
+            ability_kind="static",
+            ability_classes=["FlyingAbility", "SimpleStaticAbility"],
+            xmage_signals=["targeting", "static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Vryn Wingmare",
+                type_line="Creature - Pegasus",
+                oracle_text="Flying\nNoncreature spells cost {1} more to cast.",
+            ),
+            source_text="""
+                private static final FilterCard filter = new FilterCard("Noncreature spells");
+                static {
+                    filter.add(Predicates.not(CardType.CREATURE.getPredicate()));
+                }
+                this.addAbility(new SimpleStaticAbility(
+                    new SpellsCostIncreasingAllEffect(1, filter, TargetController.ANY)));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["cost_increase_generic"], 1)
+        self.assertEqual(effect["cost_increase_filters"], [{"excluded_card_types": ["creature"]}])
+        self.assertTrue(effect["flying"])
+
+    def test_static_generic_cost_increase_maps_color_and_type_tax(self) -> None:
+        row = queue_row(
+            split.STATIC_GENERIC_COST_INCREASE_UNIT,
+            effect_classes=["SpellsCostIncreasingAllEffect"],
+            ability_kind="static",
+            ability_classes=["SimpleStaticAbility"],
+            xmage_signals=["targeting", "static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="High Seas",
+                type_line="Enchantment",
+                oracle_text="Red creature spells and green creature spells cost {1} more to cast.",
+            ),
+            source_text="""
+                private static final FilterCreatureCard filter = new FilterCreatureCard("Red creature spells and green creature spells");
+                static {
+                    filter.add(Predicates.or(new ColorPredicate(ObjectColor.RED),
+                        (new ColorPredicate(ObjectColor.GREEN))));
+                }
+                this.addAbility(new SimpleStaticAbility(
+                    new SpellsCostIncreasingAllEffect(1, filter, TargetController.ANY)));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(
+            effect["cost_increase_filters"],
+            [{"applies_to_card_types": ["creature"], "applies_to_spell_colors": ["R", "G"]}],
+        )
+
+    def test_static_generic_cost_increase_blocks_colored_tax(self) -> None:
+        row = queue_row(
+            split.STATIC_GENERIC_COST_INCREASE_UNIT,
+            effect_classes=["SpellsCostIncreasingAllEffect"],
+            ability_kind="static",
+            ability_classes=["SimpleStaticAbility"],
+            xmage_signals=["targeting", "static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Derelor",
+                type_line="Creature - Thrull",
+                oracle_text="Black spells you cast cost {B} more to cast.",
+            ),
+            source_text="""
+                private static final FilterCard filter = new FilterCard("Black spells");
+                static {
+                    filter.add(new ColorPredicate(ObjectColor.BLACK));
+                }
+                this.addAbility(new SimpleStaticAbility(
+                    new SpellsCostIncreasingAllEffect(new ManaCostsImpl<>("{B}"), filter, TargetController.YOU)));
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "static_cost_increase_colored_mana_not_supported")
+
     def test_creature_enters_life_gain_maps_global_another_creature_trigger(self) -> None:
         row = queue_row(
             split.LIFE_UNIT,

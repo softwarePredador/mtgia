@@ -1,0 +1,610 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg626_static_spell_tax_new_server_20260707_165227",
+  "deploy_id": "pg626",
+  "execution_scenarios": [],
+  "expected_rules": [
+    {
+      "card_name": "Chill",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:42e1803a0fa35bde5078216f000a8565",
+      "min_rule_version": 2,
+      "normalized_name": "chill",
+      "oracle_hash": "f4ac8621285e1e52dd72499ccf64d9d4",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_generic_cost_increase_for_matching_spells_v1",
+        "effect": "static_cost_increase",
+        "permanent_type": "enchantment",
+        "static_effect": "generic_cost_increase_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostIncreasingAllEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Feroz's Ban",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:36c30b4595a5fd9bc7cad0939cc673ae",
+      "min_rule_version": 2,
+      "normalized_name": "feroz's ban",
+      "oracle_hash": "13de41ee21897c15ba9c50254076dacd",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_generic_cost_increase_for_matching_spells_v1",
+        "effect": "static_cost_increase",
+        "permanent_type": "artifact",
+        "static_effect": "generic_cost_increase_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostIncreasingAllEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Geist-Fueled Scarecrow",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:bc0652215e0eb2196080ba602c733d06",
+      "min_rule_version": 2,
+      "normalized_name": "geist-fueled scarecrow",
+      "oracle_hash": "8da7a7b4754f33c1803f4628748c2ee8",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_generic_cost_increase_for_matching_spells_v1",
+        "effect": "static_cost_increase",
+        "permanent_type": "creature",
+        "static_effect": "generic_cost_increase_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostIncreasingAllEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Glowrider",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6d39ef37e00c1bfdf2999fe446aa7af2",
+      "min_rule_version": 2,
+      "normalized_name": "glowrider",
+      "oracle_hash": "63532c8ee6deff218245c18a4e0232b9",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_generic_cost_increase_for_matching_spells_v1",
+        "effect": "static_cost_increase",
+        "permanent_type": "creature",
+        "static_effect": "generic_cost_increase_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostIncreasingAllEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "High Seas",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:568910bfb93935223202729c0d2df2bf",
+      "min_rule_version": 2,
+      "normalized_name": "high seas",
+      "oracle_hash": "f1f40237cb6e55ff37a1554f94a9c69a",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_generic_cost_increase_for_matching_spells_v1",
+        "effect": "static_cost_increase",
+        "permanent_type": "enchantment",
+        "static_effect": "generic_cost_increase_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostIncreasingAllEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Irini Sengir",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:fa436e282020bbd4790d9ed1d32b2d8e",
+      "min_rule_version": 2,
+      "normalized_name": "irini sengir",
+      "oracle_hash": "48331728eaaa585e546b3596488a0b67",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_generic_cost_increase_for_matching_spells_v1",
+        "effect": "static_cost_increase",
+        "permanent_type": "creature",
+        "static_effect": "generic_cost_increase_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostIncreasingAllEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Lodestone Golem",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f368a79346c5a6bd7107f0fa321560de",
+      "min_rule_version": 2,
+      "normalized_name": "lodestone golem",
+      "oracle_hash": "10cfd50f769f63c64f5f61b74b425bf8",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_generic_cost_increase_for_matching_spells_v1",
+        "effect": "static_cost_increase",
+        "permanent_type": "creature",
+        "static_effect": "generic_cost_increase_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostIncreasingAllEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sphere of Resistance",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:07d2256999fcb290d88cdeb0a37df913",
+      "min_rule_version": 2,
+      "normalized_name": "sphere of resistance",
+      "oracle_hash": "dc1787214f6dbc6529c1ebc4be32470b",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_generic_cost_increase_for_matching_spells_v1",
+        "effect": "static_cost_increase",
+        "permanent_type": "artifact",
+        "static_effect": "generic_cost_increase_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostIncreasingAllEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Squeeze",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:45a67d690ccb5a603257c768c9e1fc14",
+      "min_rule_version": 2,
+      "normalized_name": "squeeze",
+      "oracle_hash": "acdb79860c5ae969d42f017f2f4888d1",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_generic_cost_increase_for_matching_spells_v1",
+        "effect": "static_cost_increase",
+        "permanent_type": "enchantment",
+        "static_effect": "generic_cost_increase_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostIncreasingAllEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Thorn of Amethyst",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7c7242062532b63919b249f9056eebc4",
+      "min_rule_version": 2,
+      "normalized_name": "thorn of amethyst",
+      "oracle_hash": "63532c8ee6deff218245c18a4e0232b9",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_generic_cost_increase_for_matching_spells_v1",
+        "effect": "static_cost_increase",
+        "permanent_type": "artifact",
+        "static_effect": "generic_cost_increase_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostIncreasingAllEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Vryn Wingmare",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4353887075328c833b63293e78b34d32",
+      "min_rule_version": 2,
+      "normalized_name": "vryn wingmare",
+      "oracle_hash": "4c2bb06ecbd7257be31483056c7502ef",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_generic_cost_increase_for_matching_spells_v1",
+        "effect": "static_cost_increase",
+        "keywords": [
+          "flying"
+        ],
+        "permanent_type": "creature",
+        "static_effect": "generic_cost_increase_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostIncreasingAllEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_static_generic_cost_increase_for_matching_spells": 11
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg626_static_spell_tax_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg626_static_spell_tax_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg626_static_spell_tax_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg626_static_spell_tax_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg626_static_spell_tax_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg626_static_spell_tax_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-07T16:52:27+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Chill"
+      },
+      "card_name": "Chill",
+      "effect": "static_cost_increase",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:42e1803a0fa35bde5078216f000a8565",
+      "normalized_name": "chill",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_generic_cost_increase_for_matching_spells_v1",
+        "effect": "static_cost_increase",
+        "permanent_type": "enchantment",
+        "static_effect": "generic_cost_increase_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostIncreasingAllEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Feroz's Ban"
+      },
+      "card_name": "Feroz's Ban",
+      "effect": "static_cost_increase",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:36c30b4595a5fd9bc7cad0939cc673ae",
+      "normalized_name": "feroz's ban",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_generic_cost_increase_for_matching_spells_v1",
+        "effect": "static_cost_increase",
+        "permanent_type": "artifact",
+        "static_effect": "generic_cost_increase_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostIncreasingAllEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Geist-Fueled Scarecrow"
+      },
+      "card_name": "Geist-Fueled Scarecrow",
+      "effect": "static_cost_increase",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:bc0652215e0eb2196080ba602c733d06",
+      "normalized_name": "geist-fueled scarecrow",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_generic_cost_increase_for_matching_spells_v1",
+        "effect": "static_cost_increase",
+        "permanent_type": "creature",
+        "static_effect": "generic_cost_increase_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostIncreasingAllEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Glowrider"
+      },
+      "card_name": "Glowrider",
+      "effect": "static_cost_increase",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6d39ef37e00c1bfdf2999fe446aa7af2",
+      "normalized_name": "glowrider",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_generic_cost_increase_for_matching_spells_v1",
+        "effect": "static_cost_increase",
+        "permanent_type": "creature",
+        "static_effect": "generic_cost_increase_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostIncreasingAllEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "High Seas"
+      },
+      "card_name": "High Seas",
+      "effect": "static_cost_increase",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:568910bfb93935223202729c0d2df2bf",
+      "normalized_name": "high seas",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_generic_cost_increase_for_matching_spells_v1",
+        "effect": "static_cost_increase",
+        "permanent_type": "enchantment",
+        "static_effect": "generic_cost_increase_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostIncreasingAllEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Irini Sengir"
+      },
+      "card_name": "Irini Sengir",
+      "effect": "static_cost_increase",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:fa436e282020bbd4790d9ed1d32b2d8e",
+      "normalized_name": "irini sengir",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_generic_cost_increase_for_matching_spells_v1",
+        "effect": "static_cost_increase",
+        "permanent_type": "creature",
+        "static_effect": "generic_cost_increase_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostIncreasingAllEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Lodestone Golem"
+      },
+      "card_name": "Lodestone Golem",
+      "effect": "static_cost_increase",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f368a79346c5a6bd7107f0fa321560de",
+      "normalized_name": "lodestone golem",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_generic_cost_increase_for_matching_spells_v1",
+        "effect": "static_cost_increase",
+        "permanent_type": "creature",
+        "static_effect": "generic_cost_increase_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostIncreasingAllEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Sphere of Resistance"
+      },
+      "card_name": "Sphere of Resistance",
+      "effect": "static_cost_increase",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:07d2256999fcb290d88cdeb0a37df913",
+      "normalized_name": "sphere of resistance",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_generic_cost_increase_for_matching_spells_v1",
+        "effect": "static_cost_increase",
+        "permanent_type": "artifact",
+        "static_effect": "generic_cost_increase_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostIncreasingAllEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Squeeze"
+      },
+      "card_name": "Squeeze",
+      "effect": "static_cost_increase",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:45a67d690ccb5a603257c768c9e1fc14",
+      "normalized_name": "squeeze",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_generic_cost_increase_for_matching_spells_v1",
+        "effect": "static_cost_increase",
+        "permanent_type": "enchantment",
+        "static_effect": "generic_cost_increase_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostIncreasingAllEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Thorn of Amethyst"
+      },
+      "card_name": "Thorn of Amethyst",
+      "effect": "static_cost_increase",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7c7242062532b63919b249f9056eebc4",
+      "normalized_name": "thorn of amethyst",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_generic_cost_increase_for_matching_spells_v1",
+        "effect": "static_cost_increase",
+        "permanent_type": "artifact",
+        "static_effect": "generic_cost_increase_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostIncreasingAllEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Vryn Wingmare"
+      },
+      "card_name": "Vryn Wingmare",
+      "effect": "static_cost_increase",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4353887075328c833b63293e78b34d32",
+      "normalized_name": "vryn wingmare",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_generic_cost_increase_for_matching_spells_v1",
+        "effect": "static_cost_increase",
+        "keywords": [
+          "flying"
+        ],
+        "permanent_type": "creature",
+        "static_effect": "generic_cost_increase_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostIncreasingAllEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Chill",
+    "Feroz's Ban",
+    "Geist-Fueled Scarecrow",
+    "Glowrider",
+    "High Seas",
+    "Irini Sengir",
+    "Lodestone Golem",
+    "Sphere of Resistance",
+    "Squeeze",
+    "Thorn of Amethyst",
+    "Vryn Wingmare"
+  ],
+  "selected_count": 11,
+  "slug": "static_spell_tax_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Chill",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:42e1803a0fa35bde5078216f000a8565",
+      "min_rule_version": 2,
+      "normalized_name": "chill",
+      "oracle_hash": "f4ac8621285e1e52dd72499ccf64d9d4",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_generic_cost_increase_for_matching_spells_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Feroz's Ban",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:36c30b4595a5fd9bc7cad0939cc673ae",
+      "min_rule_version": 2,
+      "normalized_name": "feroz's ban",
+      "oracle_hash": "13de41ee21897c15ba9c50254076dacd",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_generic_cost_increase_for_matching_spells_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Geist-Fueled Scarecrow",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:bc0652215e0eb2196080ba602c733d06",
+      "min_rule_version": 2,
+      "normalized_name": "geist-fueled scarecrow",
+      "oracle_hash": "8da7a7b4754f33c1803f4628748c2ee8",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_generic_cost_increase_for_matching_spells_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Glowrider",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6d39ef37e00c1bfdf2999fe446aa7af2",
+      "min_rule_version": 2,
+      "normalized_name": "glowrider",
+      "oracle_hash": "63532c8ee6deff218245c18a4e0232b9",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_generic_cost_increase_for_matching_spells_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "High Seas",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:568910bfb93935223202729c0d2df2bf",
+      "min_rule_version": 2,
+      "normalized_name": "high seas",
+      "oracle_hash": "f1f40237cb6e55ff37a1554f94a9c69a",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_generic_cost_increase_for_matching_spells_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Irini Sengir",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:fa436e282020bbd4790d9ed1d32b2d8e",
+      "min_rule_version": 2,
+      "normalized_name": "irini sengir",
+      "oracle_hash": "48331728eaaa585e546b3596488a0b67",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_generic_cost_increase_for_matching_spells_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Lodestone Golem",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f368a79346c5a6bd7107f0fa321560de",
+      "min_rule_version": 2,
+      "normalized_name": "lodestone golem",
+      "oracle_hash": "10cfd50f769f63c64f5f61b74b425bf8",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_generic_cost_increase_for_matching_spells_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sphere of Resistance",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:07d2256999fcb290d88cdeb0a37df913",
+      "min_rule_version": 2,
+      "normalized_name": "sphere of resistance",
+      "oracle_hash": "dc1787214f6dbc6529c1ebc4be32470b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_generic_cost_increase_for_matching_spells_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Squeeze",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:45a67d690ccb5a603257c768c9e1fc14",
+      "min_rule_version": 2,
+      "normalized_name": "squeeze",
+      "oracle_hash": "acdb79860c5ae969d42f017f2f4888d1",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_generic_cost_increase_for_matching_spells_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Thorn of Amethyst",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7c7242062532b63919b249f9056eebc4",
+      "min_rule_version": 2,
+      "normalized_name": "thorn of amethyst",
+      "oracle_hash": "63532c8ee6deff218245c18a4e0232b9",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_generic_cost_increase_for_matching_spells_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Vryn Wingmare",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4353887075328c833b63293e78b34d32",
+      "min_rule_version": 2,
+      "normalized_name": "vryn wingmare",
+      "oracle_hash": "4c2bb06ecbd7257be31483056c7502ef",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_generic_cost_increase_for_matching_spells_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}
