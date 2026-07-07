@@ -539,6 +539,314 @@ class PriorityLoreholdCardRuntimeTests(unittest.TestCase):
         self.assertTrue(events[0]["replacement_cast_success"])
         self.assertGreaterEqual(events[0]["cards_milled"], 1)
 
+    def test_lorehold_and_scroll_rack_set_hand_spell_as_next_miracle_draw(self) -> None:
+        player = battle.Player("Lorehold", None, [], is_human=True, strategy="spellslinger")
+        player.battlefield = [
+            card("Plains", "Basic Land — Plains", effect="land", mana_produced=1),
+            card(
+                "Lorehold, the Historian",
+                "Legendary Creature — Elder Dragon",
+                effect="passive",
+                grants_miracle_cost=2,
+                opponent_upkeep_rummage=True,
+                battle_model_scope="lorehold_opponent_upkeep_miracle_v1",
+            ),
+            card(
+                "Scroll Rack",
+                "Artifact",
+                effect="topdeck_manipulation",
+                hand_to_top_exchange=True,
+                activation_cost_generic=1,
+                battle_model_scope="scroll_rack_upkeep_single_exchange_v1",
+            ),
+        ]
+        player.hand = [
+            card("Call Forth the Tempest", "Sorcery", cmc=8, mana_cost="{6}{R}{R}"),
+        ]
+        player.library = [card("Mountain", "Basic Land — Mountain", effect="land", cmc=0)]
+        player.refresh_mana_sources(turn=2)
+
+        activated = battle.activate_lorehold_topdeck_artifacts(
+            player,
+            turn=2,
+            rng=random.Random(22),
+            phase="opponent_upkeep",
+        )
+
+        self.assertEqual(activated, 1)
+        self.assertEqual(player.library[0]["name"], "Call Forth the Tempest")
+        self.assertEqual([hand_card["name"] for hand_card in player.hand], ["Mountain"])
+        events = [data for event, data in self.events if event == "topdeck_manipulation_activated"]
+        self.assertEqual(events[0]["card"], "Scroll Rack")
+        self.assertEqual(events[0]["activation_kind"], "scroll_rack_single_exchange_for_lorehold")
+        self.assertEqual(events[0]["top_after"], "Call Forth the Tempest")
+
+    def test_molecule_man_grants_zero_miracle_to_nonland_hand_cards(self) -> None:
+        player = battle.Player("Lorehold", None, [], is_human=True)
+        molecule = card(
+            "Molecule Man",
+            "Legendary Creature — Human Hero",
+            effect="passive",
+            grants_miracle_cost=0,
+            grants_miracle_nonland=True,
+            grants_miracle_card_scope="nonland",
+            battle_model_scope="nonland_hand_miracle_zero_static_v1",
+        )
+        player.battlefield = [molecule]
+        player.mana_pool.add_generic(0)
+        nonland = card("Blasphemous Act", "Sorcery", cmc=9, mana_cost="{8}{R}")
+        artifact = card("The One Ring", "Legendary Artifact", cmc=4, mana_cost="{4}")
+        land = card("Plains", "Basic Land — Plains", cmc=0)
+
+        self.assertEqual(battle.lorehold_miracle_cost(player), 0)
+        self.assertTrue(battle.miracle_card_scope_allows(player, nonland))
+        self.assertTrue(battle.miracle_card_scope_allows(player, artifact))
+        self.assertFalse(battle.miracle_card_scope_allows(player, land))
+        plan = battle.miracle_cast_plan_for_card(
+            player,
+            artifact,
+            {"effect": "ramp_permanent"},
+        )
+        self.assertIsNotNone(plan)
+        self.assertEqual(plan["miracle_cost"], 0)
+        self.assertEqual(plan["locked_cost"]["generic"], 0)
+
+    def test_pearl_medallion_and_scarlet_witch_apply_static_cost_reductions(self) -> None:
+        player = battle.Player("Lorehold", None, [], is_human=True)
+        player.battlefield = [
+            card(
+                "Pearl Medallion",
+                "Artifact",
+                effect="static_cost_reduction",
+                cost_reduction_generic=1,
+                applies_to_spell_colors=["W"],
+                cost_reduction_applies_to="spells_you_cast",
+                battle_model_scope="static_cost_reduction_for_matching_spells_v1",
+            ),
+            card(
+                "The Scarlet Witch",
+                "Legendary Creature — Human Warlock Hero",
+                effect="static_cost_reduction",
+                power=4,
+                applies_to_card_types=["instant", "sorcery"],
+                minimum_mana_value=4,
+                cost_reduction_amount_source="source_power",
+                cost_reduction_applies_to="instant_sorcery_spells_you_cast",
+                battle_model_scope="static_power_based_cost_reduction_for_instant_sorcery_mv4_plus_v1",
+            ),
+        ]
+
+        white_big_spell = card("Farewell", "Sorcery", cmc=6, mana_cost="{4}{W}{W}")
+        red_small_spell = card("Lightning Bolt", "Instant", cmc=1, mana_cost="{R}")
+        artifact_spell = card("Sol Ring", "Artifact", cmc=1, mana_cost="{1}")
+        white_cost = battle.card_cost_for_player_state(player, white_big_spell)
+        red_cost = battle.card_cost_for_player_state(player, red_small_spell)
+        artifact_cost = battle.card_cost_for_player_state(player, artifact_spell)
+
+        self.assertEqual(white_cost["generic"], 0)
+        self.assertEqual(white_cost["static_cost_reduction_total"], 4)
+        self.assertEqual(
+            {row["source"] for row in white_cost["static_cost_reductions"]},
+            {"Pearl Medallion", "The Scarlet Witch"},
+        )
+        self.assertEqual(red_cost["generic"], 0)
+        self.assertNotIn("static_cost_reduction_total", red_cost)
+        self.assertEqual(artifact_cost["generic"], 1)
+        self.assertNotIn("static_cost_reduction_total", artifact_cost)
+
+    def test_prismari_pianist_creates_more_tokens_for_large_instant_or_sorcery(self) -> None:
+        player = battle.Player("Lorehold", None, [], is_human=True)
+        pianist = card(
+            "Prismari Pianist",
+            "Creature — Orc Wizard",
+            effect="token_maker",
+            trigger="instant_sorcery_cast",
+            trigger_effect="token_maker",
+            trigger_token_count=1,
+            trigger_token_count_if_spell_cmc_at_least=5,
+            trigger_token_count_at_or_above_threshold=3,
+            token_name="Elemental Token",
+            token_power=1,
+            token_toughness=1,
+            token_subtype="Elemental",
+            token_colors=["U", "R"],
+            battle_model_scope="instant_sorcery_cast_create_1_or_3_1_1_elementals_by_spell_mv_v1",
+        )
+        player.battlefield = [pianist]
+
+        battle.trigger_spell_cast_engines(
+            player,
+            [player],
+            card("Big Score", "Instant", cmc=4),
+            turn=3,
+            phase="precombat_main",
+            active_player=player,
+        )
+        battle.trigger_spell_cast_engines(
+            player,
+            [player],
+            card("Rise of the Eldrazi", "Sorcery", cmc=12),
+            turn=3,
+            phase="precombat_main",
+            active_player=player,
+        )
+
+        tokens = [permanent for permanent in player.battlefield if permanent.get("name") == "Elemental Token"]
+        self.assertEqual(len(tokens), 4)
+        self.assertTrue(all(token.get("power") == 1 and token.get("toughness") == 1 for token in tokens))
+        events = [data for event, data in self.events if event == "trigger_resolved" and data.get("card") == "Prismari Pianist"]
+        self.assertEqual([event["tokens_created"] for event in events], [1, 3])
+
+    def test_furygale_flocking_reduces_cost_from_graveyard_and_assigns_tokens(self) -> None:
+        player = battle.Player("Lorehold", None, [], is_human=True)
+        opponents = [battle.Player("Opponent A", None, []), battle.Player("Opponent B", None, [])]
+        player.graveyard = [
+            card("Faithless Looting", "Sorcery", cmc=1),
+            card("Big Score", "Instant", cmc=4),
+            card("Sol Ring", "Artifact", cmc=1),
+        ]
+        furygale_effect = {
+            "effect": "token_maker",
+            "cost_reduction_applies_to": "this_spell",
+            "cost_reduction_amount_source": "instant_sorcery_cards_in_your_graveyard_count",
+            "graveyard_count_card_types": ["instant", "sorcery"],
+            "token_name": "Elemental Token",
+            "token_power": 3,
+            "token_toughness": 3,
+            "token_subtype": "Elemental",
+            "token_colors": ["U", "R"],
+            "token_flying": True,
+            "token_haste": True,
+            "token_count_per_opponent": 2,
+            "attack_each_opponent_this_turn_status": "runtime_executor_v1",
+            "battle_model_scope": "per_opponent_two_3_3_flying_hasty_elementals_graveyard_cost_reduction_runtime_attack_requirement_v1",
+        }
+        furygale = card("Furygale Flocking", "Sorcery", cmc=10, mana_cost="{8}{U}{R}", **furygale_effect)
+
+        reduced_cost = battle.card_cost_for_player_state(player, furygale)
+        created = battle.create_creature_tokens_from_effect(
+            player,
+            {**furygale_effect, "_source_card_name": "Furygale Flocking"},
+            opponents=opponents,
+            turn=6,
+        )
+
+        self.assertEqual(reduced_cost["generic"], 6)
+        self.assertEqual(reduced_cost["static_cost_reduction_total"], 2)
+        self.assertEqual(created, 4)
+        tokens = [permanent for permanent in player.battlefield if permanent.get("name") == "Elemental Token"]
+        self.assertEqual(len(tokens), 4)
+        self.assertEqual(
+            sorted(token.get("must_attack_defender") for token in tokens),
+            ["Opponent A", "Opponent A", "Opponent B", "Opponent B"],
+        )
+        self.assertTrue(all(token.get("flying") and token.get("haste") for token in tokens))
+
+    def test_redirect_lightning_changes_single_target_stack_object(self) -> None:
+        redirector = battle.Player("Lorehold", None, [], is_human=True)
+        opponent = battle.Player("Opponent", None, [])
+        original_target = card("Lorehold, the Historian", "Legendary Creature — Elder Dragon", effect="creature", power=2, toughness=5)
+        new_target = card("Opponent Creature", "Creature — Zombie", effect="creature", power=3, toughness=3)
+        redirector.battlefield = [original_target]
+        opponent.battlefield = [new_target]
+        stack_item = battle.StackItem(
+            card("Murder", "Instant", effect="remove_creature"),
+            opponent,
+            {
+                "effect": "remove_creature",
+                "target": "creature",
+                "declared_targets": [
+                    {
+                        "target": original_target,
+                        "controller": redirector,
+                        "target_type": "creature",
+                    }
+                ],
+            },
+        )
+        effect = {
+            "effect": "redirect_removal",
+            "target": "single_target_spell_or_ability",
+            "battle_model_scope": "single_target_spell_or_ability_redirect_additional_cost_annotation_v1",
+            "redirect_target_mode_status": "runtime_executor_v1",
+        }
+
+        context = battle.redirectable_stack_context(redirector, [redirector, opponent], stack_item)
+        resolved = battle.resolve_redirect_removal(
+            redirector,
+            [redirector, opponent],
+            card("Redirect Lightning", "Instant", cmc=1),
+            {**effect, "_redirect_context": context},
+            turn=4,
+            phase="stack_response",
+        )
+
+        self.assertTrue(resolved)
+        self.assertIs(stack_item.effect_data["declared_targets"][0]["target"], new_target)
+        events = [data for event, data in self.events if event == "redirect_removal_resolved"]
+        self.assertEqual(events[0]["card"], "Redirect Lightning")
+        self.assertEqual(events[0]["old_target"], "Lorehold, the Historian")
+        self.assertEqual(events[0]["new_target"], "Opponent Creature")
+        self.assertTrue(events[0]["target_change_applied"])
+
+    def test_mind_stone_harnesses_and_blinks_best_nonland_permanent(self) -> None:
+        player = battle.Player("Lorehold", None, [], is_human=True)
+        opponent = battle.Player("Opponent", None, [])
+        mind_stone = card(
+            "The Mind Stone",
+            "Legendary Artifact",
+            effect="ramp_permanent",
+            mana_produced=1,
+            produces="W",
+            harness_activation_cost="{5}{W}",
+            harness_activation_requires_tap=True,
+            harnessed_end_step_blink=True,
+            battle_model_scope="legendary_artifact_mana_harness_and_end_step_blink_other_nonland_permanent_v1",
+        )
+        target = card(
+            "Solemn Simulacrum",
+            "Artifact Creature — Golem",
+            effect="creature",
+            power=2,
+            toughness=2,
+            etb_draw_count=1,
+        )
+        player.battlefield = [
+            mind_stone,
+            target,
+            card("Plains", "Basic Land — Plains", effect="land"),
+        ]
+        player.library = [card("Blink Draw", "Sorcery", cmc=2)]
+        player.mana_pool.add_generic(5)
+        player.mana_pool.add("white", 1)
+
+        activated = battle.activate_utility_artifacts(
+            player,
+            [opponent],
+            [player, opponent],
+            turn=5,
+            rng=random.Random(5),
+            phase="postcombat_main",
+        )
+        battle.process_harnessed_end_step_blink(
+            player,
+            [opponent],
+            [player, opponent],
+            turn=5,
+            rng=random.Random(6),
+        )
+
+        self.assertEqual(activated, 1)
+        self.assertTrue(mind_stone["harnessed"])
+        self.assertTrue(mind_stone["tapped"])
+        self.assertEqual(
+            [permanent["name"] for permanent in player.battlefield],
+            ["The Mind Stone", "Plains", "Solemn Simulacrum"],
+        )
+        events = [data for event, data in self.events if event == "trigger_resolved" and data.get("card") == "The Mind Stone"]
+        self.assertEqual(events[0]["effect"], "harnessed_blink")
+        self.assertEqual(events[0]["blinked"], "Solemn Simulacrum")
+
 
 if __name__ == "__main__":
     unittest.main()
