@@ -1845,6 +1845,85 @@ def run_single_target_removal(
     }
 
 
+def run_multi_target_removal(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    active = battle.Player(str(scenario.get("player") or "Active"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
+    targets = [dict(target) for target in scenario.get("targets") or []]
+    if len(targets) <= 1:
+        fail("battle_execution", f"{card['name']} multi-target scenario has {len(targets)} targets")
+    nonmatching = dict(
+        scenario.get("nonmatching_target")
+        or {
+            "name": "E2E Illegal Removal Target",
+            "type_line": "Land",
+            "effect": "land",
+            "cmc": 0,
+        }
+    )
+    opponent.battlefield = [nonmatching, *targets]
+    before_events = len(events)
+
+    effect_data = battle.get_card_effect(card)
+    expected_effect = scenario.get("expected_effect")
+    if expected_effect and effect_data.get("effect") != expected_effect:
+        fail("battle_execution", f"{card['name']} effect={effect_data.get('effect')!r}")
+
+    battle.apply_effect_immediate(
+        active,
+        [opponent],
+        card,
+        turn=int(scenario.get("turn") or 6),
+        rng=random.Random(int(scenario.get("seed") or 6065)),
+    )
+
+    target_names = [str(target.get("name") or "") for target in targets]
+    nonmatching_name = str(nonmatching.get("name") or "")
+    destination = str(scenario.get("expected_destination") or "graveyard").lower()
+    destination_zone_name = "exile" if destination == "exile" else "hand" if destination == "hand" else "graveyard"
+    destination_zone = getattr(opponent, destination_zone_name)
+    moved_names = [str(item.get("name") or "") for item in destination_zone if isinstance(item, dict)]
+    battlefield_names = [str(item.get("name") or "") for item in opponent.battlefield if isinstance(item, dict)]
+    missing = [name for name in target_names if name not in moved_names]
+    if missing:
+        fail("battle_execution", f"{card['name']} did not move legal targets {missing} to {destination}")
+    if nonmatching_name not in battlefield_names:
+        fail("battle_execution", f"{card['name']} removed illegal target {nonmatching_name}")
+
+    resolution_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "multi_target_resolution"
+            and data.get("card") == card.get("name")
+        ),
+        None,
+    )
+    if resolution_event is None:
+        fail("battle_events", f"missing {card['name']} multi_target_resolution event")
+    resolved_names = [str(name or "") for name in resolution_event.get("resolved") or []]
+    for target_name in target_names:
+        if target_name not in resolved_names:
+            fail("battle_events", f"{card['name']} missing resolved target {target_name}")
+    if int(resolution_event.get("declared") or 0) < len(target_names):
+        fail("battle_events", f"{card['name']} declared={resolution_event.get('declared')!r}")
+
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "targets": target_names,
+        "nonmatching_target": nonmatching_name,
+        "destination": destination,
+        "moved_names": moved_names,
+        "battlefield_names": battlefield_names,
+        "resolved_names": resolved_names,
+    }
+
+
 def run_destroy_target_create_treasure(
     battle,
     scenario: dict[str, Any],
@@ -4408,6 +4487,7 @@ SCENARIO_RUNNERS = {
     "nonfliers_cant_block_rider": run_nonfliers_cant_block_rider,
     "remove_permanent_basic_land_compensation": run_remove_permanent_basic_land_compensation,
     "single_target_removal": run_single_target_removal,
+    "multi_target_removal": run_multi_target_removal,
     "simple_mana_source_refresh": run_simple_mana_source_refresh,
     "simple_activated_damage": run_simple_activated_damage,
     "simple_activated_tap_target": run_simple_activated_tap_target,

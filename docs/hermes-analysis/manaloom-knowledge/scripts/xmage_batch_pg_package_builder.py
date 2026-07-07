@@ -65,7 +65,10 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "count_from_x",
     "target_count_from_x",
     "target_player_draw",
+    "target_count",
     "target_count_min",
+    "target_count_max",
+    "max_targets",
     "up_to_count",
     "destination",
     "resolution_order",
@@ -2575,6 +2578,9 @@ def single_target_removal_execution_scenario_from_expected_rule(
         return None
     if required.get("effect") not in {"remove_creature", "remove_permanent"}:
         return None
+    target_count = int(required.get("target_count_max") or required.get("max_targets") or required.get("target_count") or 1)
+    if target_count > 1:
+        return None
     constraints = dict(required.get("target_constraints") or {})
     destination = str(required.get("destination") or "graveyard").lower()
     return {
@@ -2593,6 +2599,52 @@ def single_target_removal_execution_scenario_from_expected_rule(
         "expected_destination": destination,
         "expected_effect": required.get("effect"),
         "expected_target_constraints": constraints,
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
+def multi_target_removal_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") not in {
+        "xmage_exile_target_spell_v1",
+        "xmage_destroy_target_spell_v1",
+        "xmage_return_target_to_hand_spell_v1",
+    }:
+        return None
+    if required.get("effect") not in {"remove_creature", "remove_permanent"}:
+        return None
+    target_count = int(required.get("target_count_max") or required.get("max_targets") or required.get("target_count") or 1)
+    if target_count <= 1:
+        return None
+    target_count = max(2, min(target_count, 10))
+    constraints = dict(required.get("target_constraints") or {})
+    destination = str(required.get("destination") or "graveyard").lower()
+    return {
+        "name": f"{rule['card_name']} removes {target_count} legal targets",
+        "type": "multi_target_removal",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": "Sorcery" if required.get("sorcery") is True else "Instant",
+        },
+        "targets": [
+            _target_fixture_from_constraints(
+                f"E2E Legal Removal Target {index}",
+                constraints,
+                matching=True,
+            )
+            for index in range(1, target_count + 1)
+        ],
+        "nonmatching_target": _target_fixture_from_constraints(
+            "E2E Illegal Removal Target",
+            constraints,
+            matching=False,
+        ),
+        "expected_destination": destination,
+        "expected_effect": required.get("effect"),
+        "expected_target_constraints": constraints,
+        "expected_target_count": target_count,
         "logical_rule_key": rule["logical_rule_key"],
     }
 
@@ -2621,6 +2673,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or attack_self_boost_execution_scenario_from_expected_rule(rule)
         or becomes_blocked_self_boost_execution_scenario_from_expected_rule(rule)
         or each_player_sacrifice_execution_scenario_from_expected_rule(rule)
+        or multi_target_removal_execution_scenario_from_expected_rule(rule)
         or single_target_removal_execution_scenario_from_expected_rule(rule)
         or simple_activated_create_token_execution_scenario_from_expected_rule(rule)
         or fixed_create_creature_tokens_execution_scenario_from_expected_rule(rule)

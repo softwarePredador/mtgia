@@ -1,0 +1,1735 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg592_multi_target_removal_new_server_20260707_041006",
+  "deploy_id": "PG592",
+  "execution_scenarios": [
+    {
+      "card": {
+        "name": "Aether Gale",
+        "type_line": "Instant"
+      },
+      "expected_destination": "hand",
+      "expected_effect": "remove_permanent",
+      "expected_target_constraints": {
+        "card_types": [
+          "permanent"
+        ],
+        "exclude_card_types": [
+          "land"
+        ]
+      },
+      "expected_target_count": 6,
+      "logical_rule_key": "battle_rule_v1:2126a1ef56d3fe0715fc133edd155a03",
+      "name": "Aether Gale removes 6 legal targets",
+      "nonmatching_target": {
+        "cmc": 3,
+        "effect": "land enchantment",
+        "name": "E2E Illegal Removal Target",
+        "type_line": "Land Enchantment"
+      },
+      "targets": [
+        {
+          "cmc": 3,
+          "effect": "enchantment",
+          "name": "E2E Legal Removal Target 1",
+          "type_line": "Enchantment"
+        },
+        {
+          "cmc": 3,
+          "effect": "enchantment",
+          "name": "E2E Legal Removal Target 2",
+          "type_line": "Enchantment"
+        },
+        {
+          "cmc": 3,
+          "effect": "enchantment",
+          "name": "E2E Legal Removal Target 3",
+          "type_line": "Enchantment"
+        },
+        {
+          "cmc": 3,
+          "effect": "enchantment",
+          "name": "E2E Legal Removal Target 4",
+          "type_line": "Enchantment"
+        },
+        {
+          "cmc": 3,
+          "effect": "enchantment",
+          "name": "E2E Legal Removal Target 5",
+          "type_line": "Enchantment"
+        },
+        {
+          "cmc": 3,
+          "effect": "enchantment",
+          "name": "E2E Legal Removal Target 6",
+          "type_line": "Enchantment"
+        }
+      ],
+      "type": "multi_target_removal"
+    },
+    {
+      "card": {
+        "name": "Captivating Gyre",
+        "type_line": "Instant"
+      },
+      "expected_destination": "hand",
+      "expected_effect": "remove_creature",
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ]
+      },
+      "expected_target_count": 3,
+      "logical_rule_key": "battle_rule_v1:f68e1d898b5344ecd63ff35e6ca79a76",
+      "name": "Captivating Gyre removes 3 legal targets",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Removal Target",
+        "type_line": "Land"
+      },
+      "targets": [
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Removal Target 1",
+          "power": 2,
+          "toughness": 2,
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Removal Target 2",
+          "power": 2,
+          "toughness": 2,
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Removal Target 3",
+          "power": 2,
+          "toughness": 2,
+          "type_line": "Creature - Soldier"
+        }
+      ],
+      "type": "multi_target_removal"
+    },
+    {
+      "card": {
+        "name": "Curtains' Call",
+        "type_line": "Instant"
+      },
+      "expected_destination": "graveyard",
+      "expected_effect": "remove_creature",
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ]
+      },
+      "expected_target_count": 2,
+      "logical_rule_key": "battle_rule_v1:6d69d284924ce85ca2c0ffa250d50461",
+      "name": "Curtains' Call removes 2 legal targets",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Removal Target",
+        "type_line": "Land"
+      },
+      "targets": [
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Removal Target 1",
+          "power": 2,
+          "toughness": 2,
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Removal Target 2",
+          "power": 2,
+          "toughness": 2,
+          "type_line": "Creature - Soldier"
+        }
+      ],
+      "type": "multi_target_removal"
+    },
+    {
+      "card": {
+        "name": "Dust to Dust",
+        "type_line": "Instant"
+      },
+      "expected_destination": "exile",
+      "expected_effect": "remove_permanent",
+      "expected_target_constraints": {
+        "card_types": [
+          "artifact"
+        ]
+      },
+      "expected_target_count": 2,
+      "logical_rule_key": "battle_rule_v1:31ef4f85440c299f97a4646af08981d1",
+      "name": "Dust to Dust removes 2 legal targets",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Removal Target",
+        "type_line": "Land"
+      },
+      "targets": [
+        {
+          "cmc": 3,
+          "effect": "artifact",
+          "name": "E2E Legal Removal Target 1",
+          "type_line": "Artifact"
+        },
+        {
+          "cmc": 3,
+          "effect": "artifact",
+          "name": "E2E Legal Removal Target 2",
+          "type_line": "Artifact"
+        }
+      ],
+      "type": "multi_target_removal"
+    },
+    {
+      "card": {
+        "name": "Hex",
+        "type_line": "Instant"
+      },
+      "expected_destination": "graveyard",
+      "expected_effect": "remove_creature",
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ]
+      },
+      "expected_target_count": 6,
+      "logical_rule_key": "battle_rule_v1:0fec27d146ba994e75357991c2fb9e24",
+      "name": "Hex removes 6 legal targets",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Removal Target",
+        "type_line": "Land"
+      },
+      "targets": [
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Removal Target 1",
+          "power": 2,
+          "toughness": 2,
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Removal Target 2",
+          "power": 2,
+          "toughness": 2,
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Removal Target 3",
+          "power": 2,
+          "toughness": 2,
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Removal Target 4",
+          "power": 2,
+          "toughness": 2,
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Removal Target 5",
+          "power": 2,
+          "toughness": 2,
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Removal Target 6",
+          "power": 2,
+          "toughness": 2,
+          "type_line": "Creature - Soldier"
+        }
+      ],
+      "type": "multi_target_removal"
+    },
+    {
+      "card": {
+        "name": "Into the Core",
+        "type_line": "Instant"
+      },
+      "expected_destination": "exile",
+      "expected_effect": "remove_permanent",
+      "expected_target_constraints": {
+        "card_types": [
+          "artifact"
+        ]
+      },
+      "expected_target_count": 2,
+      "logical_rule_key": "battle_rule_v1:6c2bebfca72481cc7a744168d8349a3a",
+      "name": "Into the Core removes 2 legal targets",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Removal Target",
+        "type_line": "Land"
+      },
+      "targets": [
+        {
+          "cmc": 3,
+          "effect": "artifact",
+          "name": "E2E Legal Removal Target 1",
+          "type_line": "Artifact"
+        },
+        {
+          "cmc": 3,
+          "effect": "artifact",
+          "name": "E2E Legal Removal Target 2",
+          "type_line": "Artifact"
+        }
+      ],
+      "type": "multi_target_removal"
+    },
+    {
+      "card": {
+        "name": "Into the Void",
+        "type_line": "Instant"
+      },
+      "expected_destination": "hand",
+      "expected_effect": "remove_creature",
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ]
+      },
+      "expected_target_count": 2,
+      "logical_rule_key": "battle_rule_v1:38d93f0dfd1788f6bfab8b2fafc91c6c",
+      "name": "Into the Void removes 2 legal targets",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Removal Target",
+        "type_line": "Land"
+      },
+      "targets": [
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Removal Target 1",
+          "power": 2,
+          "toughness": 2,
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Removal Target 2",
+          "power": 2,
+          "toughness": 2,
+          "type_line": "Creature - Soldier"
+        }
+      ],
+      "type": "multi_target_removal"
+    },
+    {
+      "card": {
+        "name": "Peace and Quiet",
+        "type_line": "Instant"
+      },
+      "expected_destination": "graveyard",
+      "expected_effect": "remove_permanent",
+      "expected_target_constraints": {
+        "card_types": [
+          "enchantment"
+        ]
+      },
+      "expected_target_count": 2,
+      "logical_rule_key": "battle_rule_v1:a3e570ebd9affb96ba01ad48d803e1c3",
+      "name": "Peace and Quiet removes 2 legal targets",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Removal Target",
+        "type_line": "Land"
+      },
+      "targets": [
+        {
+          "cmc": 3,
+          "effect": "enchantment",
+          "name": "E2E Legal Removal Target 1",
+          "type_line": "Enchantment"
+        },
+        {
+          "cmc": 3,
+          "effect": "enchantment",
+          "name": "E2E Legal Removal Target 2",
+          "type_line": "Enchantment"
+        }
+      ],
+      "type": "multi_target_removal"
+    },
+    {
+      "card": {
+        "name": "Quicksilver Geyser",
+        "type_line": "Instant"
+      },
+      "expected_destination": "hand",
+      "expected_effect": "remove_permanent",
+      "expected_target_constraints": {
+        "card_types": [
+          "permanent"
+        ],
+        "exclude_card_types": [
+          "land"
+        ]
+      },
+      "expected_target_count": 2,
+      "logical_rule_key": "battle_rule_v1:bbb9acdf8bcbc2d98292533bcd8f2c56",
+      "name": "Quicksilver Geyser removes 2 legal targets",
+      "nonmatching_target": {
+        "cmc": 3,
+        "effect": "land enchantment",
+        "name": "E2E Illegal Removal Target",
+        "type_line": "Land Enchantment"
+      },
+      "targets": [
+        {
+          "cmc": 3,
+          "effect": "enchantment",
+          "name": "E2E Legal Removal Target 1",
+          "type_line": "Enchantment"
+        },
+        {
+          "cmc": 3,
+          "effect": "enchantment",
+          "name": "E2E Legal Removal Target 2",
+          "type_line": "Enchantment"
+        }
+      ],
+      "type": "multi_target_removal"
+    },
+    {
+      "card": {
+        "name": "Rack and Ruin",
+        "type_line": "Instant"
+      },
+      "expected_destination": "graveyard",
+      "expected_effect": "remove_permanent",
+      "expected_target_constraints": {
+        "card_types": [
+          "artifact"
+        ]
+      },
+      "expected_target_count": 2,
+      "logical_rule_key": "battle_rule_v1:5bd747a047adeb31e0319be76732dae0",
+      "name": "Rack and Ruin removes 2 legal targets",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Removal Target",
+        "type_line": "Land"
+      },
+      "targets": [
+        {
+          "cmc": 3,
+          "effect": "artifact",
+          "name": "E2E Legal Removal Target 1",
+          "type_line": "Artifact"
+        },
+        {
+          "cmc": 3,
+          "effect": "artifact",
+          "name": "E2E Legal Removal Target 2",
+          "type_line": "Artifact"
+        }
+      ],
+      "type": "multi_target_removal"
+    },
+    {
+      "card": {
+        "name": "Rain of Salt",
+        "type_line": "Instant"
+      },
+      "expected_destination": "graveyard",
+      "expected_effect": "remove_permanent",
+      "expected_target_constraints": {
+        "card_types": [
+          "land"
+        ]
+      },
+      "expected_target_count": 2,
+      "logical_rule_key": "battle_rule_v1:4e8ee7650f6debebf7aab19490dca01e",
+      "name": "Rain of Salt removes 2 legal targets",
+      "nonmatching_target": {
+        "cmc": 1,
+        "effect": "draw_cards",
+        "name": "E2E Illegal Removal Target",
+        "type_line": "Instant"
+      },
+      "targets": [
+        {
+          "cmc": 3,
+          "effect": "land",
+          "name": "E2E Legal Removal Target 1",
+          "type_line": "Land"
+        },
+        {
+          "cmc": 3,
+          "effect": "land",
+          "name": "E2E Legal Removal Target 2",
+          "type_line": "Land"
+        }
+      ],
+      "type": "multi_target_removal"
+    },
+    {
+      "card": {
+        "name": "Sea God's Scorn",
+        "type_line": "Instant"
+      },
+      "expected_destination": "hand",
+      "expected_effect": "remove_permanent",
+      "expected_target_constraints": {
+        "card_types": [
+          "creature",
+          "enchantment"
+        ]
+      },
+      "expected_target_count": 3,
+      "logical_rule_key": "battle_rule_v1:72ebe890e46e112eba0f798cd2115af2",
+      "name": "Sea God's Scorn removes 3 legal targets",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Removal Target",
+        "type_line": "Land"
+      },
+      "targets": [
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Removal Target 1",
+          "power": 2,
+          "toughness": 2,
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Removal Target 2",
+          "power": 2,
+          "toughness": 2,
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Removal Target 3",
+          "power": 2,
+          "toughness": 2,
+          "type_line": "Creature - Soldier"
+        }
+      ],
+      "type": "multi_target_removal"
+    },
+    {
+      "card": {
+        "name": "Undo",
+        "type_line": "Instant"
+      },
+      "expected_destination": "hand",
+      "expected_effect": "remove_creature",
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ]
+      },
+      "expected_target_count": 2,
+      "logical_rule_key": "battle_rule_v1:909947e1fbc1920dad254e2d3576f981",
+      "name": "Undo removes 2 legal targets",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Removal Target",
+        "type_line": "Land"
+      },
+      "targets": [
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Removal Target 1",
+          "power": 2,
+          "toughness": 2,
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Removal Target 2",
+          "power": 2,
+          "toughness": 2,
+          "type_line": "Creature - Soldier"
+        }
+      ],
+      "type": "multi_target_removal"
+    },
+    {
+      "card": {
+        "name": "Violent Ultimatum",
+        "type_line": "Instant"
+      },
+      "expected_destination": "graveyard",
+      "expected_effect": "remove_permanent",
+      "expected_target_constraints": {
+        "card_types": [
+          "permanent"
+        ]
+      },
+      "expected_target_count": 3,
+      "logical_rule_key": "battle_rule_v1:7bc325a7c482e8723b42bdfa3fd25f39",
+      "name": "Violent Ultimatum removes 3 legal targets",
+      "nonmatching_target": {
+        "cmc": 1,
+        "effect": "draw_cards",
+        "name": "E2E Illegal Removal Target",
+        "type_line": "Instant"
+      },
+      "targets": [
+        {
+          "cmc": 3,
+          "effect": "enchantment",
+          "name": "E2E Legal Removal Target 1",
+          "type_line": "Enchantment"
+        },
+        {
+          "cmc": 3,
+          "effect": "enchantment",
+          "name": "E2E Legal Removal Target 2",
+          "type_line": "Enchantment"
+        },
+        {
+          "cmc": 3,
+          "effect": "enchantment",
+          "name": "E2E Legal Removal Target 3",
+          "type_line": "Enchantment"
+        }
+      ],
+      "type": "multi_target_removal"
+    },
+    {
+      "card": {
+        "name": "Waterwhirl",
+        "type_line": "Instant"
+      },
+      "expected_destination": "hand",
+      "expected_effect": "remove_creature",
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ]
+      },
+      "expected_target_count": 2,
+      "logical_rule_key": "battle_rule_v1:dba71fd521cd67e989ec67c9bf44f4c7",
+      "name": "Waterwhirl removes 2 legal targets",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Removal Target",
+        "type_line": "Land"
+      },
+      "targets": [
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Removal Target 1",
+          "power": 2,
+          "toughness": 2,
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Removal Target 2",
+          "power": 2,
+          "toughness": 2,
+          "type_line": "Creature - Soldier"
+        }
+      ],
+      "type": "multi_target_removal"
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Aether Gale",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2126a1ef56d3fe0715fc133edd155a03",
+      "min_rule_version": 2,
+      "normalized_name": "aether gale",
+      "oracle_hash": "d1fc7949cb10f1c2e7ec857565648ce5",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+        "destination": "hand",
+        "effect": "remove_permanent",
+        "max_targets": 6,
+        "target": "nonland_permanent",
+        "target_constraints": {
+          "card_types": [
+            "permanent"
+          ],
+          "exclude_card_types": [
+            "land"
+          ]
+        },
+        "target_count": 6,
+        "target_count_max": 6,
+        "target_count_min": 6,
+        "up_to_count": false,
+        "xmage_effect_class": "ReturnToHandTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Captivating Gyre",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f68e1d898b5344ecd63ff35e6ca79a76",
+      "min_rule_version": 2,
+      "normalized_name": "captivating gyre",
+      "oracle_hash": "00ae49f4e4e6cd85e4554475ac0e19c5",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+        "destination": "hand",
+        "effect": "remove_creature",
+        "max_targets": 3,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_count": 3,
+        "target_count_max": 3,
+        "target_count_min": 0,
+        "up_to_count": true,
+        "xmage_effect_class": "ReturnToHandTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Curtains' Call",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6d69d284924ce85ca2c0ffa250d50461",
+      "min_rule_version": 2,
+      "normalized_name": "curtains' call",
+      "oracle_hash": "e00d758f164347f51e6d3b313640681b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "max_targets": 2,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_count": 2,
+        "target_count_max": 2,
+        "target_count_min": 2,
+        "up_to_count": false,
+        "xmage_effect_class": "DestroyTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Dust to Dust",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:31ef4f85440c299f97a4646af08981d1",
+      "min_rule_version": 2,
+      "normalized_name": "dust to dust",
+      "oracle_hash": "6f5f55793963ace6a90eb544c29949ee",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "destination": "exile",
+        "effect": "remove_permanent",
+        "max_targets": 2,
+        "target": "artifact",
+        "target_constraints": {
+          "card_types": [
+            "artifact"
+          ]
+        },
+        "target_count": 2,
+        "target_count_max": 2,
+        "target_count_min": 2,
+        "up_to_count": false,
+        "xmage_effect_class": "ExileTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Hex",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0fec27d146ba994e75357991c2fb9e24",
+      "min_rule_version": 2,
+      "normalized_name": "hex",
+      "oracle_hash": "f9f9399fcaf665408acdb8d1ccd26339",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "max_targets": 6,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_count": 6,
+        "target_count_max": 6,
+        "target_count_min": 6,
+        "up_to_count": false,
+        "xmage_effect_class": "DestroyTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Into the Core",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6c2bebfca72481cc7a744168d8349a3a",
+      "min_rule_version": 2,
+      "normalized_name": "into the core",
+      "oracle_hash": "6f5f55793963ace6a90eb544c29949ee",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "destination": "exile",
+        "effect": "remove_permanent",
+        "max_targets": 2,
+        "target": "artifact",
+        "target_constraints": {
+          "card_types": [
+            "artifact"
+          ]
+        },
+        "target_count": 2,
+        "target_count_max": 2,
+        "target_count_min": 2,
+        "up_to_count": false,
+        "xmage_effect_class": "ExileTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Into the Void",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:38d93f0dfd1788f6bfab8b2fafc91c6c",
+      "min_rule_version": 2,
+      "normalized_name": "into the void",
+      "oracle_hash": "8f1aed1b5c1ecea6286f713e5eaffdd1",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+        "destination": "hand",
+        "effect": "remove_creature",
+        "max_targets": 2,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_count": 2,
+        "target_count_max": 2,
+        "target_count_min": 0,
+        "up_to_count": true,
+        "xmage_effect_class": "ReturnToHandTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Peace and Quiet",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a3e570ebd9affb96ba01ad48d803e1c3",
+      "min_rule_version": 2,
+      "normalized_name": "peace and quiet",
+      "oracle_hash": "1483db02640b3614f36e7277f3d3f8f3",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_permanent",
+        "max_targets": 2,
+        "target": "enchantment",
+        "target_constraints": {
+          "card_types": [
+            "enchantment"
+          ]
+        },
+        "target_count": 2,
+        "target_count_max": 2,
+        "target_count_min": 2,
+        "up_to_count": false,
+        "xmage_effect_class": "DestroyTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Quicksilver Geyser",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:bbb9acdf8bcbc2d98292533bcd8f2c56",
+      "min_rule_version": 2,
+      "normalized_name": "quicksilver geyser",
+      "oracle_hash": "b353ed47c24d6123c99747e48c9960c2",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+        "destination": "hand",
+        "effect": "remove_permanent",
+        "max_targets": 2,
+        "target": "nonland_permanent",
+        "target_constraints": {
+          "card_types": [
+            "permanent"
+          ],
+          "exclude_card_types": [
+            "land"
+          ]
+        },
+        "target_count": 2,
+        "target_count_max": 2,
+        "target_count_min": 0,
+        "up_to_count": true,
+        "xmage_effect_class": "ReturnToHandTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Rack and Ruin",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5bd747a047adeb31e0319be76732dae0",
+      "min_rule_version": 2,
+      "normalized_name": "rack and ruin",
+      "oracle_hash": "c3a404d6b1483c72b476cdc506c606de",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_permanent",
+        "max_targets": 2,
+        "target": "artifact",
+        "target_constraints": {
+          "card_types": [
+            "artifact"
+          ]
+        },
+        "target_count": 2,
+        "target_count_max": 2,
+        "target_count_min": 2,
+        "up_to_count": false,
+        "xmage_effect_class": "DestroyTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Rain of Salt",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4e8ee7650f6debebf7aab19490dca01e",
+      "min_rule_version": 2,
+      "normalized_name": "rain of salt",
+      "oracle_hash": "a9e5e5ced594abfd48c502ab0abe2356",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_permanent",
+        "max_targets": 2,
+        "target": "land",
+        "target_constraints": {
+          "card_types": [
+            "land"
+          ]
+        },
+        "target_count": 2,
+        "target_count_max": 2,
+        "target_count_min": 2,
+        "up_to_count": false,
+        "xmage_effect_class": "DestroyTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sea God's Scorn",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:72ebe890e46e112eba0f798cd2115af2",
+      "min_rule_version": 2,
+      "normalized_name": "sea god's scorn",
+      "oracle_hash": "8b6a3eb1cb9fad995b1337516c498de0",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+        "destination": "hand",
+        "effect": "remove_permanent",
+        "max_targets": 3,
+        "target": "creature_or_enchantment",
+        "target_constraints": {
+          "card_types": [
+            "creature",
+            "enchantment"
+          ]
+        },
+        "target_count": 3,
+        "target_count_max": 3,
+        "target_count_min": 0,
+        "up_to_count": true,
+        "xmage_effect_class": "ReturnToHandTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Undo",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:909947e1fbc1920dad254e2d3576f981",
+      "min_rule_version": 2,
+      "normalized_name": "undo",
+      "oracle_hash": "092fb3db659b27f77c2104a2a0dffa8b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+        "destination": "hand",
+        "effect": "remove_creature",
+        "max_targets": 2,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_count": 2,
+        "target_count_max": 2,
+        "target_count_min": 2,
+        "up_to_count": false,
+        "xmage_effect_class": "ReturnToHandTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Violent Ultimatum",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7bc325a7c482e8723b42bdfa3fd25f39",
+      "min_rule_version": 2,
+      "normalized_name": "violent ultimatum",
+      "oracle_hash": "ab0f63b5ff7568f5bc0e867e9f5e2b62",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_permanent",
+        "max_targets": 3,
+        "target": "permanent",
+        "target_constraints": {
+          "card_types": [
+            "permanent"
+          ]
+        },
+        "target_count": 3,
+        "target_count_max": 3,
+        "target_count_min": 3,
+        "up_to_count": false,
+        "xmage_effect_class": "DestroyTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Waterwhirl",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:dba71fd521cd67e989ec67c9bf44f4c7",
+      "min_rule_version": 2,
+      "normalized_name": "waterwhirl",
+      "oracle_hash": "8f1aed1b5c1ecea6286f713e5eaffdd1",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+        "destination": "hand",
+        "effect": "remove_creature",
+        "max_targets": 2,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_count": 2,
+        "target_count_max": 2,
+        "target_count_min": 0,
+        "up_to_count": true,
+        "xmage_effect_class": "ReturnToHandTargetEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_destroy_multi_target_spell": 6,
+    "xmage_exile_multi_target_spell": 2,
+    "xmage_return_multi_target_to_hand_spell": 7
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg592_multi_target_removal_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg592_multi_target_removal_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg592_multi_target_removal_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg592_multi_target_removal_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg592_multi_target_removal_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg592_multi_target_removal_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-07T04:12:46+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Aether Gale"
+      },
+      "card_name": "Aether Gale",
+      "effect": "remove_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2126a1ef56d3fe0715fc133edd155a03",
+      "normalized_name": "aether gale",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+        "destination": "hand",
+        "effect": "remove_permanent",
+        "max_targets": 6,
+        "target": "nonland_permanent",
+        "target_constraints": {
+          "card_types": [
+            "permanent"
+          ],
+          "exclude_card_types": [
+            "land"
+          ]
+        },
+        "target_count": 6,
+        "target_count_max": 6,
+        "target_count_min": 6,
+        "up_to_count": false,
+        "xmage_effect_class": "ReturnToHandTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Captivating Gyre"
+      },
+      "card_name": "Captivating Gyre",
+      "effect": "remove_creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f68e1d898b5344ecd63ff35e6ca79a76",
+      "normalized_name": "captivating gyre",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+        "destination": "hand",
+        "effect": "remove_creature",
+        "max_targets": 3,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_count": 3,
+        "target_count_max": 3,
+        "target_count_min": 0,
+        "up_to_count": true,
+        "xmage_effect_class": "ReturnToHandTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Curtains' Call"
+      },
+      "card_name": "Curtains' Call",
+      "effect": "remove_creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6d69d284924ce85ca2c0ffa250d50461",
+      "normalized_name": "curtains' call",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "max_targets": 2,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_count": 2,
+        "target_count_max": 2,
+        "target_count_min": 2,
+        "up_to_count": false,
+        "xmage_effect_class": "DestroyTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Dust to Dust"
+      },
+      "card_name": "Dust to Dust",
+      "effect": "remove_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:31ef4f85440c299f97a4646af08981d1",
+      "normalized_name": "dust to dust",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "destination": "exile",
+        "effect": "remove_permanent",
+        "max_targets": 2,
+        "target": "artifact",
+        "target_constraints": {
+          "card_types": [
+            "artifact"
+          ]
+        },
+        "target_count": 2,
+        "target_count_max": 2,
+        "target_count_min": 2,
+        "up_to_count": false,
+        "xmage_effect_class": "ExileTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Hex"
+      },
+      "card_name": "Hex",
+      "effect": "remove_creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0fec27d146ba994e75357991c2fb9e24",
+      "normalized_name": "hex",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "max_targets": 6,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_count": 6,
+        "target_count_max": 6,
+        "target_count_min": 6,
+        "up_to_count": false,
+        "xmage_effect_class": "DestroyTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Into the Core"
+      },
+      "card_name": "Into the Core",
+      "effect": "remove_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6c2bebfca72481cc7a744168d8349a3a",
+      "normalized_name": "into the core",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "destination": "exile",
+        "effect": "remove_permanent",
+        "max_targets": 2,
+        "target": "artifact",
+        "target_constraints": {
+          "card_types": [
+            "artifact"
+          ]
+        },
+        "target_count": 2,
+        "target_count_max": 2,
+        "target_count_min": 2,
+        "up_to_count": false,
+        "xmage_effect_class": "ExileTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Into the Void"
+      },
+      "card_name": "Into the Void",
+      "effect": "remove_creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:38d93f0dfd1788f6bfab8b2fafc91c6c",
+      "normalized_name": "into the void",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+        "destination": "hand",
+        "effect": "remove_creature",
+        "max_targets": 2,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_count": 2,
+        "target_count_max": 2,
+        "target_count_min": 0,
+        "up_to_count": true,
+        "xmage_effect_class": "ReturnToHandTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Peace and Quiet"
+      },
+      "card_name": "Peace and Quiet",
+      "effect": "remove_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a3e570ebd9affb96ba01ad48d803e1c3",
+      "normalized_name": "peace and quiet",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_permanent",
+        "max_targets": 2,
+        "target": "enchantment",
+        "target_constraints": {
+          "card_types": [
+            "enchantment"
+          ]
+        },
+        "target_count": 2,
+        "target_count_max": 2,
+        "target_count_min": 2,
+        "up_to_count": false,
+        "xmage_effect_class": "DestroyTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Quicksilver Geyser"
+      },
+      "card_name": "Quicksilver Geyser",
+      "effect": "remove_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:bbb9acdf8bcbc2d98292533bcd8f2c56",
+      "normalized_name": "quicksilver geyser",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+        "destination": "hand",
+        "effect": "remove_permanent",
+        "max_targets": 2,
+        "target": "nonland_permanent",
+        "target_constraints": {
+          "card_types": [
+            "permanent"
+          ],
+          "exclude_card_types": [
+            "land"
+          ]
+        },
+        "target_count": 2,
+        "target_count_max": 2,
+        "target_count_min": 0,
+        "up_to_count": true,
+        "xmage_effect_class": "ReturnToHandTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Rack and Ruin"
+      },
+      "card_name": "Rack and Ruin",
+      "effect": "remove_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5bd747a047adeb31e0319be76732dae0",
+      "normalized_name": "rack and ruin",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_permanent",
+        "max_targets": 2,
+        "target": "artifact",
+        "target_constraints": {
+          "card_types": [
+            "artifact"
+          ]
+        },
+        "target_count": 2,
+        "target_count_max": 2,
+        "target_count_min": 2,
+        "up_to_count": false,
+        "xmage_effect_class": "DestroyTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Rain of Salt"
+      },
+      "card_name": "Rain of Salt",
+      "effect": "remove_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4e8ee7650f6debebf7aab19490dca01e",
+      "normalized_name": "rain of salt",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_permanent",
+        "max_targets": 2,
+        "target": "land",
+        "target_constraints": {
+          "card_types": [
+            "land"
+          ]
+        },
+        "target_count": 2,
+        "target_count_max": 2,
+        "target_count_min": 2,
+        "up_to_count": false,
+        "xmage_effect_class": "DestroyTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Sea God's Scorn"
+      },
+      "card_name": "Sea God's Scorn",
+      "effect": "remove_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:72ebe890e46e112eba0f798cd2115af2",
+      "normalized_name": "sea god's scorn",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+        "destination": "hand",
+        "effect": "remove_permanent",
+        "max_targets": 3,
+        "target": "creature_or_enchantment",
+        "target_constraints": {
+          "card_types": [
+            "creature",
+            "enchantment"
+          ]
+        },
+        "target_count": 3,
+        "target_count_max": 3,
+        "target_count_min": 0,
+        "up_to_count": true,
+        "xmage_effect_class": "ReturnToHandTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Undo"
+      },
+      "card_name": "Undo",
+      "effect": "remove_creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:909947e1fbc1920dad254e2d3576f981",
+      "normalized_name": "undo",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+        "destination": "hand",
+        "effect": "remove_creature",
+        "max_targets": 2,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_count": 2,
+        "target_count_max": 2,
+        "target_count_min": 2,
+        "up_to_count": false,
+        "xmage_effect_class": "ReturnToHandTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Violent Ultimatum"
+      },
+      "card_name": "Violent Ultimatum",
+      "effect": "remove_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7bc325a7c482e8723b42bdfa3fd25f39",
+      "normalized_name": "violent ultimatum",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_permanent",
+        "max_targets": 3,
+        "target": "permanent",
+        "target_constraints": {
+          "card_types": [
+            "permanent"
+          ]
+        },
+        "target_count": 3,
+        "target_count_max": 3,
+        "target_count_min": 3,
+        "up_to_count": false,
+        "xmage_effect_class": "DestroyTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Waterwhirl"
+      },
+      "card_name": "Waterwhirl",
+      "effect": "remove_creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:dba71fd521cd67e989ec67c9bf44f4c7",
+      "normalized_name": "waterwhirl",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+        "destination": "hand",
+        "effect": "remove_creature",
+        "max_targets": 2,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_count": 2,
+        "target_count_max": 2,
+        "target_count_min": 0,
+        "up_to_count": true,
+        "xmage_effect_class": "ReturnToHandTargetEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Aether Gale",
+    "Captivating Gyre",
+    "Curtains' Call",
+    "Dust to Dust",
+    "Hex",
+    "Into the Core",
+    "Into the Void",
+    "Peace and Quiet",
+    "Quicksilver Geyser",
+    "Rack and Ruin",
+    "Rain of Salt",
+    "Sea God's Scorn",
+    "Undo",
+    "Violent Ultimatum",
+    "Waterwhirl"
+  ],
+  "selected_count": 15,
+  "slug": "multi_target_removal_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Aether Gale",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2126a1ef56d3fe0715fc133edd155a03",
+      "min_rule_version": 2,
+      "normalized_name": "aether gale",
+      "oracle_hash": "d1fc7949cb10f1c2e7ec857565648ce5",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Captivating Gyre",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f68e1d898b5344ecd63ff35e6ca79a76",
+      "min_rule_version": 2,
+      "normalized_name": "captivating gyre",
+      "oracle_hash": "00ae49f4e4e6cd85e4554475ac0e19c5",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Curtains' Call",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6d69d284924ce85ca2c0ffa250d50461",
+      "min_rule_version": 2,
+      "normalized_name": "curtains' call",
+      "oracle_hash": "e00d758f164347f51e6d3b313640681b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Dust to Dust",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:31ef4f85440c299f97a4646af08981d1",
+      "min_rule_version": 2,
+      "normalized_name": "dust to dust",
+      "oracle_hash": "6f5f55793963ace6a90eb544c29949ee",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Hex",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0fec27d146ba994e75357991c2fb9e24",
+      "min_rule_version": 2,
+      "normalized_name": "hex",
+      "oracle_hash": "f9f9399fcaf665408acdb8d1ccd26339",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Into the Core",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6c2bebfca72481cc7a744168d8349a3a",
+      "min_rule_version": 2,
+      "normalized_name": "into the core",
+      "oracle_hash": "6f5f55793963ace6a90eb544c29949ee",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Into the Void",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:38d93f0dfd1788f6bfab8b2fafc91c6c",
+      "min_rule_version": 2,
+      "normalized_name": "into the void",
+      "oracle_hash": "8f1aed1b5c1ecea6286f713e5eaffdd1",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Peace and Quiet",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a3e570ebd9affb96ba01ad48d803e1c3",
+      "min_rule_version": 2,
+      "normalized_name": "peace and quiet",
+      "oracle_hash": "1483db02640b3614f36e7277f3d3f8f3",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Quicksilver Geyser",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:bbb9acdf8bcbc2d98292533bcd8f2c56",
+      "min_rule_version": 2,
+      "normalized_name": "quicksilver geyser",
+      "oracle_hash": "b353ed47c24d6123c99747e48c9960c2",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Rack and Ruin",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5bd747a047adeb31e0319be76732dae0",
+      "min_rule_version": 2,
+      "normalized_name": "rack and ruin",
+      "oracle_hash": "c3a404d6b1483c72b476cdc506c606de",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Rain of Salt",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4e8ee7650f6debebf7aab19490dca01e",
+      "min_rule_version": 2,
+      "normalized_name": "rain of salt",
+      "oracle_hash": "a9e5e5ced594abfd48c502ab0abe2356",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sea God's Scorn",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:72ebe890e46e112eba0f798cd2115af2",
+      "min_rule_version": 2,
+      "normalized_name": "sea god's scorn",
+      "oracle_hash": "8b6a3eb1cb9fad995b1337516c498de0",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Undo",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:909947e1fbc1920dad254e2d3576f981",
+      "min_rule_version": 2,
+      "normalized_name": "undo",
+      "oracle_hash": "092fb3db659b27f77c2104a2a0dffa8b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Violent Ultimatum",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7bc325a7c482e8723b42bdfa3fd25f39",
+      "min_rule_version": 2,
+      "normalized_name": "violent ultimatum",
+      "oracle_hash": "ab0f63b5ff7568f5bc0e867e9f5e2b62",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Waterwhirl",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:dba71fd521cd67e989ec67c9bf44f4c7",
+      "min_rule_version": 2,
+      "normalized_name": "waterwhirl",
+      "oracle_hash": "8f1aed1b5c1ecea6286f713e5eaffdd1",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

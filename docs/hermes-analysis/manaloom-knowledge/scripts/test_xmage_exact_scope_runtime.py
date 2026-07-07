@@ -12489,6 +12489,72 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_return_up_to_two_target_creatures_to_owner_hand_resolves_multi_target(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        illegal_target = {
+            "name": "Plain Land",
+            "type_line": "Land",
+            "effect": "land",
+            "cmc": 0,
+        }
+        target_one = {
+            "name": "First Creature",
+            "type_line": "Creature - Wizard",
+            "cmc": 2,
+            "power": 2,
+            "toughness": 2,
+        }
+        target_two = {
+            "name": "Second Creature",
+            "type_line": "Creature - Soldier",
+            "cmc": 3,
+            "power": 3,
+            "toughness": 3,
+        }
+        opponent.battlefield.extend([illegal_target, target_one, target_two])
+        effect = {
+            "effect": "remove_creature",
+            "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "destination": "hand",
+            "target_count": 2,
+            "target_count_min": 0,
+            "target_count_max": 2,
+            "max_targets": 2,
+            "up_to_count": True,
+            "instant": False,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Into the Void",
+                "type_line": "Sorcery",
+                "oracle_text": "Return up to two target creatures to their owners' hands.",
+            },
+            turn=7,
+            rng=random.Random(17),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(
+            sorted(card["name"] for card in opponent.hand),
+            ["First Creature", "Second Creature"],
+        )
+        self.assertEqual([card["name"] for card in opponent.battlefield], ["Plain Land"])
+        self.assertTrue(
+            any(
+                event == "multi_target_resolution"
+                and data.get("card") == "Into the Void"
+                and data.get("declared") == 2
+                and sorted(data.get("resolved") or []) == ["First Creature", "Second Creature"]
+                for event, data in self.events
+            )
+        )
+
     def test_graveyard_to_hand_recursion_returns_matching_card_only(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

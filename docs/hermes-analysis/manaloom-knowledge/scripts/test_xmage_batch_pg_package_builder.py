@@ -961,6 +961,35 @@ def test_single_target_bounce_scenario_moves_target_to_hand() -> None:
     assert scenario["nonmatching_target"].get("enchanted") is False
 
 
+def test_multi_target_removal_scenario_uses_declared_target_count() -> None:
+    rule = {
+        "normalized_name": "into the void",
+        "card_name": "Into the Void",
+        "oracle_hash": "hash-into-the-void",
+        "logical_rule_key": "battle_rule_v1:hash-into-the-void",
+        "required_effect_fields": {
+            "effect": "remove_creature",
+            "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "destination": "hand",
+            "target_count_min": 0,
+            "target_count_max": 2,
+            "max_targets": 2,
+            "up_to_count": True,
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "multi_target_removal"
+    assert scenario["expected_destination"] == "hand"
+    assert scenario["expected_target_count"] == 2
+    assert len(scenario["targets"]) == 2
+    assert builder.single_target_removal_execution_scenario_from_expected_rule(rule) is None
+
+
 def test_single_target_removal_scenario_models_excluded_color_and_combat_state() -> None:
     rule = {
         "normalized_name": "assassins blade",

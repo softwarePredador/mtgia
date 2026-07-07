@@ -3004,6 +3004,119 @@ def bounce_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, str] | Non
     return None
 
 
+def removal_multi_target_oracle_text(metadata: dict[str, Any], action: str) -> str:
+    if action in {"destroy", "exile"}:
+        return primary_removal_action_text(metadata, action)
+    return re.sub(
+        r"\s+",
+        " ",
+        " ".join(oracle_effect_lines_without_neutral_auxiliary(metadata)).strip().lower(),
+    )
+
+
+def removal_multi_target_from_phrase(phrase: str) -> tuple[str, str] | None:
+    normalized = re.sub(r"\s+", " ", str(phrase or "").strip().lower())
+    normalized = normalized.removesuffix(".")
+    normalized = normalized.replace(" and/or ", " or ")
+    normalized = normalized.replace(", and/or ", " or ")
+    mapping = {
+        "creature": ("remove_creature", "creature"),
+        "creatures": ("remove_creature", "creature"),
+        "artifact": ("remove_permanent", "artifact"),
+        "artifacts": ("remove_permanent", "artifact"),
+        "enchantment": ("remove_permanent", "enchantment"),
+        "enchantments": ("remove_permanent", "enchantment"),
+        "land": ("remove_permanent", "land"),
+        "lands": ("remove_permanent", "land"),
+        "permanent": ("remove_permanent", "permanent"),
+        "permanents": ("remove_permanent", "permanent"),
+        "nonland permanent": ("remove_permanent", "nonland_permanent"),
+        "nonland permanents": ("remove_permanent", "nonland_permanent"),
+        "artifact or enchantment": ("remove_permanent", "artifact_or_enchantment"),
+        "artifacts or enchantments": ("remove_permanent", "artifact_or_enchantment"),
+        "creature or enchantment": ("remove_permanent", "creature_or_enchantment"),
+        "creatures or enchantments": ("remove_permanent", "creature_or_enchantment"),
+    }
+    return mapping.get(normalized)
+
+
+def fixed_multi_target_removal_from_oracle(
+    metadata: dict[str, Any],
+    action: str,
+) -> dict[str, Any] | None:
+    text = removal_multi_target_oracle_text(metadata, action)
+    count_token = r"one|two|three|four|five|six|seven|eight|nine|ten|\d+"
+    if action == "return":
+        pattern = (
+            rf"^return (?P<upto>up to )?(?P<count>{count_token}) target "
+            rf"(?P<phrase>.+?) to their owners' hands?\.?$"
+        )
+        destination = "hand"
+    elif action == "destroy":
+        pattern = rf"^destroy (?P<upto>up to )?(?P<count>{count_token}) target (?P<phrase>.+?)\.?$"
+        destination = "graveyard"
+    elif action == "exile":
+        pattern = rf"^exile (?P<upto>up to )?(?P<count>{count_token}) target (?P<phrase>.+?)\.?$"
+        destination = "exile"
+    else:
+        return None
+    match = re.match(pattern, text)
+    if not match:
+        return None
+    count = word_count_value(match.group("count"))
+    if count is None or count <= 1:
+        return None
+    mapped = removal_multi_target_from_phrase(match.group("phrase"))
+    if mapped is None:
+        return None
+    effect, target = mapped
+    up_to = bool(match.group("upto"))
+    return {
+        "effect": effect,
+        "target": target,
+        "count": int(count),
+        "target_count_min": 0 if up_to else int(count),
+        "target_count_max": int(count),
+        "up_to_count": up_to,
+        "destination": destination,
+    }
+
+
+def fixed_multi_target_count_from_source(source_text: str) -> dict[str, Any] | str | None:
+    text = str(source_text or "")
+    if "XTargetsCountAdjuster" in text or "GetXValue" in text or "ManacostVariableValue" in text:
+        return "multi_target_source_x_count_not_supported"
+    if "TargetPointer" in text or ".setTargetPointer" in text:
+        return "multi_target_source_target_pointer_not_supported"
+    target_matches = list(
+        re.finditer(
+            r"new\s+(?P<class>Target(?:Creature|Artifact|Enchantment|Land)?Permanent|TargetNonlandPermanent)\s*\(",
+            text,
+        )
+    )
+    if len(target_matches) != 1:
+        return "multi_target_source_target_constructor_not_single"
+    constructor = target_matches[0].group("class")
+    args = extract_constructor_args(text[target_matches[0].start() :], constructor)
+    if args is None:
+        return "multi_target_source_target_constructor_not_supported"
+    parts = split_top_level_args(args)
+    numeric_parts = [int(part) for part in parts[:2] if re.fullmatch(r"\d+", str(part or "").strip())]
+    if not numeric_parts:
+        return None
+    if len(numeric_parts) >= 2:
+        target_min, target_max = numeric_parts[0], numeric_parts[1]
+    else:
+        target_min = target_max = numeric_parts[0]
+    if target_max <= 1:
+        return None
+    return {
+        "target_count_min": int(target_min),
+        "target_count_max": int(target_max),
+        "up_to_count": int(target_min) == 0,
+    }
+
+
 def counter_target_from_oracle(metadata: dict[str, Any]) -> str | None:
     text = re.sub(
         r"\s+",
@@ -25296,6 +25409,36 @@ def split_row(
         )
         if additional_cost_reason is not None:
             return None, additional_cost_reason
+        multi_target = fixed_multi_target_removal_from_oracle(metadata, "destroy")
+        if multi_target is not None:
+            source_count = fixed_multi_target_count_from_source(source_text)
+            if isinstance(source_count, str):
+                return None, source_count
+            if source_count is None:
+                return None, "destroy_multi_target_source_count_not_fixed"
+            for key in ("target_count_min", "target_count_max", "up_to_count"):
+                if source_count.get(key) != multi_target.get(key):
+                    return None, f"destroy_multi_target_source_oracle_{key}_mismatch"
+            target_type = str(multi_target["target"])
+            if not source_matches_target_constraint(source_text, target_type):
+                return None, "destroy_multi_target_source_target_mismatch"
+            target_base = restricted_target_base(target_type)
+            effect_json = {
+                "effect": multi_target["effect"],
+                "battle_model_scope": DESTROY_SCOPE,
+                "target": target_base,
+                "target_constraints": target_constraints_for(target_type),
+                "destination": "graveyard",
+                "target_count": int(multi_target["target_count_max"]),
+                "target_count_min": int(multi_target["target_count_min"]),
+                "target_count_max": int(multi_target["target_count_max"]),
+                "max_targets": int(multi_target["target_count_max"]),
+                "up_to_count": bool(multi_target["up_to_count"]),
+                "xmage_effect_class": "DestroyTargetEffect",
+                **flags,
+                **(additional_cost_fields or {}),
+            }
+            return build_proposal(row, metadata, effect_json, family_id="xmage_destroy_multi_target_spell"), "selected_exact_scope"
         target = destroy_target_from_oracle(metadata)
         if target is None:
             return None, "destroy_target_not_supported"
@@ -25542,6 +25685,35 @@ def split_row(
             return None, "exile_auxiliary_ability_class_not_supported"
         if has_oracle_complexity(metadata):
             return None, "exile_oracle_not_simple"
+        multi_target = fixed_multi_target_removal_from_oracle(metadata, "exile")
+        if multi_target is not None:
+            source_count = fixed_multi_target_count_from_source(source_text)
+            if isinstance(source_count, str):
+                return None, source_count
+            if source_count is None:
+                return None, "exile_multi_target_source_count_not_fixed"
+            for key in ("target_count_min", "target_count_max", "up_to_count"):
+                if source_count.get(key) != multi_target.get(key):
+                    return None, f"exile_multi_target_source_oracle_{key}_mismatch"
+            target_type = str(multi_target["target"])
+            if not source_matches_target_constraint(source_text, target_type):
+                return None, "exile_multi_target_source_target_mismatch"
+            target_base = restricted_target_base(target_type)
+            effect_json = {
+                "effect": multi_target["effect"],
+                "battle_model_scope": EXILE_SCOPE,
+                "target": target_base,
+                "target_constraints": target_constraints_for(target_type),
+                "destination": "exile",
+                "target_count": int(multi_target["target_count_max"]),
+                "target_count_min": int(multi_target["target_count_min"]),
+                "target_count_max": int(multi_target["target_count_max"]),
+                "max_targets": int(multi_target["target_count_max"]),
+                "up_to_count": bool(multi_target["up_to_count"]),
+                "xmage_effect_class": "ExileTargetEffect",
+                **flags,
+            }
+            return build_proposal(row, metadata, effect_json, family_id="xmage_exile_multi_target_spell"), "selected_exact_scope"
         target = exile_target_from_oracle(metadata)
         if target is None:
             return None, "exile_target_not_supported"
@@ -25725,6 +25897,35 @@ def split_row(
             return None, "bounce_ability_class_not_simple"
         if has_oracle_complexity(metadata):
             return None, "bounce_oracle_not_simple"
+        multi_target = fixed_multi_target_removal_from_oracle(metadata, "return")
+        if multi_target is not None:
+            source_count = fixed_multi_target_count_from_source(source_text)
+            if isinstance(source_count, str):
+                return None, source_count
+            if source_count is None:
+                return None, "bounce_multi_target_source_count_not_fixed"
+            for key in ("target_count_min", "target_count_max", "up_to_count"):
+                if source_count.get(key) != multi_target.get(key):
+                    return None, f"bounce_multi_target_source_oracle_{key}_mismatch"
+            target_type = str(multi_target["target"])
+            if not source_matches_target_constraint(source_text, target_type):
+                return None, "bounce_multi_target_source_target_mismatch"
+            target_base = restricted_target_base(target_type)
+            effect_json = {
+                "effect": multi_target["effect"],
+                "battle_model_scope": BOUNCE_SCOPE,
+                "target": target_base,
+                "target_constraints": target_constraints_for(target_type),
+                "destination": "hand",
+                "target_count": int(multi_target["target_count_max"]),
+                "target_count_min": int(multi_target["target_count_min"]),
+                "target_count_max": int(multi_target["target_count_max"]),
+                "max_targets": int(multi_target["target_count_max"]),
+                "up_to_count": bool(multi_target["up_to_count"]),
+                "xmage_effect_class": "ReturnToHandTargetEffect",
+                **flags,
+            }
+            return build_proposal(row, metadata, effect_json, family_id="xmage_return_multi_target_to_hand_spell"), "selected_exact_scope"
         target = bounce_target_from_oracle(metadata)
         if target is None:
             return None, "bounce_target_not_supported"

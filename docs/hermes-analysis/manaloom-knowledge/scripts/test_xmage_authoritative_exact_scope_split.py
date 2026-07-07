@@ -11226,17 +11226,12 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                 self.assertEqual(effect["destination"], "exile")
                 self.assertEqual(effect["target_constraints"], constraints)
 
-    def test_exile_target_spell_keeps_dynamic_and_multi_target_blocked(self) -> None:
+    def test_exile_target_spell_keeps_dynamic_target_blocked(self) -> None:
         blocked = [
             (
                 "Blazing Hope",
                 "Exile target creature with power greater than or equal to your life total.",
                 "new FilterCreaturePermanent(); new PowerPredicate(ComparisonType.MORE_THAN, LifeValue.instance);",
-            ),
-            (
-                "Dust to Dust",
-                "Exile two target artifacts.",
-                "this.getSpellAbility().addTarget(new TargetArtifactPermanent(2));",
             ),
         ]
         for name, oracle, source in blocked:
@@ -13054,6 +13049,69 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
 
         self.assertEqual(reason, "selected_exact_scope")
         self.assertEqual(proposal["effect_json"]["target"], "nonland_permanent")
+
+    def test_return_up_to_two_target_creatures_to_hand_maps_to_multi_target_bounce(self) -> None:
+        row = queue_row(split.BOUNCE_UNIT, effect_classes=["ReturnToHandTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Return up to two target creatures to their owners' hands."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new ReturnToHandTargetEffect());"
+                "this.getSpellAbility().addTarget(new TargetCreaturePermanent(0, 2));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "remove_creature")
+        self.assertEqual(effect["battle_model_scope"], split.BOUNCE_SCOPE)
+        self.assertEqual(effect["target"], "creature")
+        self.assertEqual(effect["destination"], "hand")
+        self.assertEqual(effect["target_count_min"], 0)
+        self.assertEqual(effect["target_count_max"], 2)
+        self.assertEqual(effect["max_targets"], 2)
+        self.assertTrue(effect["up_to_count"])
+
+    def test_destroy_two_target_creatures_maps_to_multi_target_destroy(self) -> None:
+        row = queue_row(split.DESTROY_UNIT, effect_classes=["DestroyTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Destroy two target creatures."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new DestroyTargetEffect());"
+                "this.getSpellAbility().addTarget(new TargetCreaturePermanent(2));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "remove_creature")
+        self.assertEqual(effect["battle_model_scope"], split.DESTROY_SCOPE)
+        self.assertEqual(effect["destination"], "graveyard")
+        self.assertEqual(effect["target_count_min"], 2)
+        self.assertEqual(effect["target_count_max"], 2)
+        self.assertEqual(effect["max_targets"], 2)
+        self.assertFalse(effect["up_to_count"])
+
+    def test_exile_two_target_artifacts_maps_to_multi_target_exile(self) -> None:
+        row = queue_row(split.EXILE_UNIT, effect_classes=["ExileTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Exile two target artifacts."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new ExileTargetEffect());"
+                "this.getSpellAbility().addTarget(new TargetArtifactPermanent(2));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "remove_permanent")
+        self.assertEqual(effect["battle_model_scope"], split.EXILE_SCOPE)
+        self.assertEqual(effect["target"], "artifact")
+        self.assertEqual(effect["destination"], "exile")
+        self.assertEqual(effect["target_count_min"], 2)
+        self.assertEqual(effect["target_count_max"], 2)
 
     def test_bounce_spell_with_compound_effect_stays_blocked(self) -> None:
         row = queue_row(
