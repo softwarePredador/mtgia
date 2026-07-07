@@ -1,0 +1,472 @@
+{
+  "battle_execution": {
+    "event_count": 55,
+    "results": [
+      {
+        "card_name": "Battlewise Valor",
+        "scenario": "Battlewise Valor boosts target creature and scries 1",
+        "scry_count": 1,
+        "target": "E2E Target Creature",
+        "target_power": 4,
+        "target_toughness": 4,
+        "top_after": [
+          "E2E Low Priority Land"
+        ]
+      },
+      {
+        "card_name": "Chain to Memory",
+        "scenario": "Chain to Memory boosts target creature and scries 2",
+        "scry_count": 2,
+        "target": "E2E Target Creature",
+        "target_power": -2,
+        "target_toughness": 2,
+        "top_after": [
+          "E2E High Priority Spell",
+          "E2E Low Priority Land"
+        ]
+      },
+      {
+        "card_name": "Cruel Finality",
+        "scenario": "Cruel Finality boosts target creature and scries 1",
+        "scry_count": 1,
+        "target": "E2E Target Creature",
+        "target_power": 0,
+        "target_toughness": 0,
+        "top_after": [
+          "E2E Low Priority Land"
+        ]
+      },
+      {
+        "card_name": "Ferocious Charge",
+        "scenario": "Ferocious Charge boosts target creature and scries 2",
+        "scry_count": 2,
+        "target": "E2E Target Creature",
+        "target_power": 6,
+        "target_toughness": 6,
+        "top_after": [
+          "E2E High Priority Spell",
+          "E2E Low Priority Land"
+        ]
+      },
+      {
+        "card_name": "Inordinate Rage",
+        "scenario": "Inordinate Rage boosts target creature and scries 1",
+        "scry_count": 1,
+        "target": "E2E Target Creature",
+        "target_power": 5,
+        "target_toughness": 4,
+        "top_after": [
+          "E2E Low Priority Land"
+        ]
+      },
+      {
+        "card_name": "Lose Hope",
+        "scenario": "Lose Hope boosts target creature and scries 2",
+        "scry_count": 2,
+        "target": "E2E Target Creature",
+        "target_power": 1,
+        "target_toughness": 1,
+        "top_after": [
+          "E2E High Priority Spell",
+          "E2E Low Priority Land"
+        ]
+      },
+      {
+        "card_name": "Lost in a Labyrinth",
+        "scenario": "Lost in a Labyrinth boosts target creature and scries 1",
+        "scry_count": 1,
+        "target": "E2E Target Creature",
+        "target_power": -1,
+        "target_toughness": 2,
+        "top_after": [
+          "E2E Low Priority Land"
+        ]
+      },
+      {
+        "card_name": "Stand Firm",
+        "scenario": "Stand Firm boosts target creature and scries 2",
+        "scry_count": 2,
+        "target": "E2E Target Creature",
+        "target_power": 3,
+        "target_toughness": 3,
+        "top_after": [
+          "E2E High Priority Spell",
+          "E2E Low Priority Land"
+        ]
+      },
+      {
+        "card_name": "Titan's Strength",
+        "scenario": "Titan's Strength boosts target creature and scries 1",
+        "scry_count": 1,
+        "target": "E2E Target Creature",
+        "target_power": 5,
+        "target_toughness": 3,
+        "top_after": [
+          "E2E Low Priority Land"
+        ]
+      }
+    ],
+    "scenario_count": 9
+  },
+  "battle_path": "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-07T09:28:08.637431+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/xmage_pg606_boost_scry_target_creature_new_server_manifest.json",
+  "package_id": "xmage_pg606_boost_scry_target_creature_new_server_manifest",
+  "snapshot": "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 9
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_scry_spell_v1",
+          "card_name": "Battlewise Valor",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:bd646a15240999a31b3a43d3868bb9f8",
+          "oracle_hash": "39efb1028043c442a031e20663ddbba6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_scry_spell_v1",
+          "card_name": "Chain to Memory",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:cc01b914c4f25dddbc14ca9e38d0da3b",
+          "oracle_hash": "5b436220c5b97c232e8a326e46c1621a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_scry_spell_v1",
+          "card_name": "Cruel Finality",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:770a982113240e555a029a13fe0845cc",
+          "oracle_hash": "6607f87cbc28d09f065d02626b497f25",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_scry_spell_v1",
+          "card_name": "Ferocious Charge",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:303636bd3206b78bd4dae05b7ab2fbb7",
+          "oracle_hash": "234f37220afdcd59883fb42040b5316a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_scry_spell_v1",
+          "card_name": "Inordinate Rage",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:96951ba32d22dd7ec132e97626e8953b",
+          "oracle_hash": "aac555e74c84ff2259502412998894ad",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_scry_spell_v1",
+          "card_name": "Lose Hope",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6e0bd9004e0a621b8a159ed83853c023",
+          "oracle_hash": "b7a2c933eb27b70ff31f4e54d09522a5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_scry_spell_v1",
+          "card_name": "Lost in a Labyrinth",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:78cddcafdeb47dc8bd21a24ad89cafa7",
+          "oracle_hash": "9a40b36a87c71a11ae19f25474271c88",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_scry_spell_v1",
+          "card_name": "Stand Firm",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8f4b4416559a19a326d92523816e635b",
+          "oracle_hash": "e7fe992d92fb0d4827a72ecd33a0df85",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_scry_spell_v1",
+          "card_name": "Titan's Strength",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e23d068c288c30591543879d21bcaa99",
+          "oracle_hash": "8ef95d2114a7199a355583cf4bcdd0cc",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 9
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_scry_spell_v1",
+          "card_name": "Battlewise Valor",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:bd646a15240999a31b3a43d3868bb9f8",
+          "oracle_hash": "39efb1028043c442a031e20663ddbba6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_scry_spell_v1",
+          "card_name": "Chain to Memory",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:cc01b914c4f25dddbc14ca9e38d0da3b",
+          "oracle_hash": "5b436220c5b97c232e8a326e46c1621a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_scry_spell_v1",
+          "card_name": "Cruel Finality",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:770a982113240e555a029a13fe0845cc",
+          "oracle_hash": "6607f87cbc28d09f065d02626b497f25",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_scry_spell_v1",
+          "card_name": "Ferocious Charge",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:303636bd3206b78bd4dae05b7ab2fbb7",
+          "oracle_hash": "234f37220afdcd59883fb42040b5316a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_scry_spell_v1",
+          "card_name": "Inordinate Rage",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:96951ba32d22dd7ec132e97626e8953b",
+          "oracle_hash": "aac555e74c84ff2259502412998894ad",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_scry_spell_v1",
+          "card_name": "Lose Hope",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6e0bd9004e0a621b8a159ed83853c023",
+          "oracle_hash": "b7a2c933eb27b70ff31f4e54d09522a5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_scry_spell_v1",
+          "card_name": "Lost in a Labyrinth",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:78cddcafdeb47dc8bd21a24ad89cafa7",
+          "oracle_hash": "9a40b36a87c71a11ae19f25474271c88",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_scry_spell_v1",
+          "card_name": "Stand Firm",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8f4b4416559a19a326d92523816e635b",
+          "oracle_hash": "e7fe992d92fb0d4827a72ecd33a0df85",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_scry_spell_v1",
+          "card_name": "Titan's Strength",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e23d068c288c30591543879d21bcaa99",
+          "oracle_hash": "8ef95d2114a7199a355583cf4bcdd0cc",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 9
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_scry_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Battlewise Valor",
+          "logical_rule_key": "battle_rule_v1:bd646a15240999a31b3a43d3868bb9f8"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_scry_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Chain to Memory",
+          "logical_rule_key": "battle_rule_v1:cc01b914c4f25dddbc14ca9e38d0da3b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_scry_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Cruel Finality",
+          "logical_rule_key": "battle_rule_v1:770a982113240e555a029a13fe0845cc"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_scry_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Ferocious Charge",
+          "logical_rule_key": "battle_rule_v1:303636bd3206b78bd4dae05b7ab2fbb7"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_scry_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Inordinate Rage",
+          "logical_rule_key": "battle_rule_v1:96951ba32d22dd7ec132e97626e8953b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_scry_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Lose Hope",
+          "logical_rule_key": "battle_rule_v1:6e0bd9004e0a621b8a159ed83853c023"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_scry_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Lost in a Labyrinth",
+          "logical_rule_key": "battle_rule_v1:78cddcafdeb47dc8bd21a24ad89cafa7"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_scry_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Stand Firm",
+          "logical_rule_key": "battle_rule_v1:8f4b4416559a19a326d92523816e635b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_scry_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Titan's Strength",
+          "logical_rule_key": "battle_rule_v1:e23d068c288c30591543879d21bcaa99"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 9
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Battlewise Valor",
+          "component_keys": [],
+          "effect": "composite_resolution",
+          "logical_rule_key": "battle_rule_v1:bd646a15240999a31b3a43d3868bb9f8"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Chain to Memory",
+          "component_keys": [],
+          "effect": "composite_resolution",
+          "logical_rule_key": "battle_rule_v1:cc01b914c4f25dddbc14ca9e38d0da3b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Cruel Finality",
+          "component_keys": [],
+          "effect": "composite_resolution",
+          "logical_rule_key": "battle_rule_v1:770a982113240e555a029a13fe0845cc"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Ferocious Charge",
+          "component_keys": [],
+          "effect": "composite_resolution",
+          "logical_rule_key": "battle_rule_v1:303636bd3206b78bd4dae05b7ab2fbb7"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Inordinate Rage",
+          "component_keys": [],
+          "effect": "composite_resolution",
+          "logical_rule_key": "battle_rule_v1:96951ba32d22dd7ec132e97626e8953b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Lose Hope",
+          "component_keys": [],
+          "effect": "composite_resolution",
+          "logical_rule_key": "battle_rule_v1:6e0bd9004e0a621b8a159ed83853c023"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Lost in a Labyrinth",
+          "component_keys": [],
+          "effect": "composite_resolution",
+          "logical_rule_key": "battle_rule_v1:78cddcafdeb47dc8bd21a24ad89cafa7"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Stand Firm",
+          "component_keys": [],
+          "effect": "composite_resolution",
+          "logical_rule_key": "battle_rule_v1:8f4b4416559a19a326d92523816e635b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Titan's Strength",
+          "component_keys": [],
+          "effect": "composite_resolution",
+          "logical_rule_key": "battle_rule_v1:e23d068c288c30591543879d21bcaa99"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 55,
+        "scenarios": 9
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

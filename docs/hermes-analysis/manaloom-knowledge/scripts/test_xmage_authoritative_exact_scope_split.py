@@ -8103,6 +8103,87 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "boost_draw_source_oracle_mismatch")
 
+    def test_fixed_boost_scry_spell_maps_battlewise_valor_pattern(self) -> None:
+        row = queue_row(
+            split.BOOST_SCRY_UNIT,
+            effect_classes=["BoostTargetEffect", "ScryEffect"],
+            xmage_signals=["targeting"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Battlewise Valor",
+                oracle_text=(
+                    "Target creature gets +2/+2 until end of turn. Scry 1. "
+                    "(Look at the top card of your library. You may put that card on the bottom.)"
+                ),
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new BoostTargetEffect(2, 2, Duration.EndOfTurn));"
+                "this.getSpellAbility().addTarget(new TargetCreaturePermanent());"
+                "this.getSpellAbility().addEffect(new ScryEffect(1));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "composite_resolution")
+        self.assertEqual(effect["battle_model_scope"], split.BOOST_SCRY_SCOPE)
+        self.assertEqual(effect["power_delta"], 2)
+        self.assertEqual(effect["toughness_delta"], 2)
+        self.assertEqual(effect["scry_count"], 1)
+        self.assertEqual(
+            [component["effect"] for component in effect["_composite_rule_components"]],
+            ["stat_modifier_until_eot", "scry"],
+        )
+
+    def test_fixed_boost_scry_spell_accepts_negative_power_and_two_arg_scry(self) -> None:
+        row = queue_row(
+            split.BOOST_SCRY_UNIT,
+            effect_classes=["BoostTargetEffect", "ScryEffect"],
+            xmage_signals=["targeting"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Chain to Memory",
+                oracle_text="Target creature gets -4/-0 until end of turn. Scry 2.",
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new BoostTargetEffect(-4, 0));"
+                "this.getSpellAbility().addTarget(new TargetCreaturePermanent());"
+                "this.getSpellAbility().addEffect(new ScryEffect(2, false));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["power_delta"], -4)
+        self.assertEqual(effect["toughness_delta"], 0)
+        self.assertEqual(effect["scry_count"], 2)
+
+    def test_fixed_boost_scry_spell_blocks_multi_target_source(self) -> None:
+        row = queue_row(
+            split.BOOST_SCRY_UNIT,
+            effect_classes=["BoostTargetEffect", "ScryEffect"],
+            xmage_signals=["targeting"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Multi Target Scry",
+                oracle_text="Target creature gets +2/+2 until end of turn. Scry 1.",
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new BoostTargetEffect(2, 2));"
+                "this.getSpellAbility().addTarget(new TargetCreaturePermanent(0, 2));"
+                "this.getSpellAbility().addEffect(new ScryEffect(1));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "boost_scry_source_not_fixed")
+
     def test_fixed_keyword_draw_spell_maps_bladebrand_pattern(self) -> None:
         row = queue_row(
             split.DRAW_UNIT,

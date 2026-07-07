@@ -1,0 +1,1597 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg606_boost_scry_target_creature_new_ser_20260707_091910",
+  "deploy_id": "PG606",
+  "execution_scenarios": [
+    {
+      "card": {
+        "name": "Battlewise Valor",
+        "type_line": "Instant"
+      },
+      "expected_power_delta": 2,
+      "expected_scry_count": 1,
+      "expected_toughness_delta": 2,
+      "library": [
+        {
+          "cmc": 0,
+          "effect": "land",
+          "name": "E2E Low Priority Land",
+          "type_line": "Land"
+        },
+        {
+          "cmc": 5,
+          "effect": "direct_damage",
+          "name": "E2E High Priority Spell",
+          "type_line": "Instant"
+        },
+        {
+          "cmc": 2,
+          "effect": "creature",
+          "name": "E2E Library Remainder",
+          "type_line": "Creature"
+        }
+      ],
+      "logical_rule_key": "battle_rule_v1:bd646a15240999a31b3a43d3868bb9f8",
+      "name": "Battlewise Valor boosts target creature and scries 1",
+      "target": {
+        "name": "E2E Target Creature",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "type": "boost_scry_spell"
+    },
+    {
+      "card": {
+        "name": "Chain to Memory",
+        "type_line": "Instant"
+      },
+      "expected_power_delta": -4,
+      "expected_scry_count": 2,
+      "expected_toughness_delta": 0,
+      "library": [
+        {
+          "cmc": 0,
+          "effect": "land",
+          "name": "E2E Low Priority Land",
+          "type_line": "Land"
+        },
+        {
+          "cmc": 5,
+          "effect": "direct_damage",
+          "name": "E2E High Priority Spell",
+          "type_line": "Instant"
+        },
+        {
+          "cmc": 2,
+          "effect": "creature",
+          "name": "E2E Library Remainder",
+          "type_line": "Creature"
+        }
+      ],
+      "logical_rule_key": "battle_rule_v1:cc01b914c4f25dddbc14ca9e38d0da3b",
+      "name": "Chain to Memory boosts target creature and scries 2",
+      "target": {
+        "name": "E2E Target Creature",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "type": "boost_scry_spell"
+    },
+    {
+      "card": {
+        "name": "Cruel Finality",
+        "type_line": "Instant"
+      },
+      "expected_power_delta": -2,
+      "expected_scry_count": 1,
+      "expected_toughness_delta": -2,
+      "library": [
+        {
+          "cmc": 0,
+          "effect": "land",
+          "name": "E2E Low Priority Land",
+          "type_line": "Land"
+        },
+        {
+          "cmc": 5,
+          "effect": "direct_damage",
+          "name": "E2E High Priority Spell",
+          "type_line": "Instant"
+        },
+        {
+          "cmc": 2,
+          "effect": "creature",
+          "name": "E2E Library Remainder",
+          "type_line": "Creature"
+        }
+      ],
+      "logical_rule_key": "battle_rule_v1:770a982113240e555a029a13fe0845cc",
+      "name": "Cruel Finality boosts target creature and scries 1",
+      "target": {
+        "name": "E2E Target Creature",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "type": "boost_scry_spell"
+    },
+    {
+      "card": {
+        "name": "Ferocious Charge",
+        "type_line": "Instant"
+      },
+      "expected_power_delta": 4,
+      "expected_scry_count": 2,
+      "expected_toughness_delta": 4,
+      "library": [
+        {
+          "cmc": 0,
+          "effect": "land",
+          "name": "E2E Low Priority Land",
+          "type_line": "Land"
+        },
+        {
+          "cmc": 5,
+          "effect": "direct_damage",
+          "name": "E2E High Priority Spell",
+          "type_line": "Instant"
+        },
+        {
+          "cmc": 2,
+          "effect": "creature",
+          "name": "E2E Library Remainder",
+          "type_line": "Creature"
+        }
+      ],
+      "logical_rule_key": "battle_rule_v1:303636bd3206b78bd4dae05b7ab2fbb7",
+      "name": "Ferocious Charge boosts target creature and scries 2",
+      "target": {
+        "name": "E2E Target Creature",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "type": "boost_scry_spell"
+    },
+    {
+      "card": {
+        "name": "Inordinate Rage",
+        "type_line": "Instant"
+      },
+      "expected_power_delta": 3,
+      "expected_scry_count": 1,
+      "expected_toughness_delta": 2,
+      "library": [
+        {
+          "cmc": 0,
+          "effect": "land",
+          "name": "E2E Low Priority Land",
+          "type_line": "Land"
+        },
+        {
+          "cmc": 5,
+          "effect": "direct_damage",
+          "name": "E2E High Priority Spell",
+          "type_line": "Instant"
+        },
+        {
+          "cmc": 2,
+          "effect": "creature",
+          "name": "E2E Library Remainder",
+          "type_line": "Creature"
+        }
+      ],
+      "logical_rule_key": "battle_rule_v1:96951ba32d22dd7ec132e97626e8953b",
+      "name": "Inordinate Rage boosts target creature and scries 1",
+      "target": {
+        "name": "E2E Target Creature",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "type": "boost_scry_spell"
+    },
+    {
+      "card": {
+        "name": "Lose Hope",
+        "type_line": "Instant"
+      },
+      "expected_power_delta": -1,
+      "expected_scry_count": 2,
+      "expected_toughness_delta": -1,
+      "library": [
+        {
+          "cmc": 0,
+          "effect": "land",
+          "name": "E2E Low Priority Land",
+          "type_line": "Land"
+        },
+        {
+          "cmc": 5,
+          "effect": "direct_damage",
+          "name": "E2E High Priority Spell",
+          "type_line": "Instant"
+        },
+        {
+          "cmc": 2,
+          "effect": "creature",
+          "name": "E2E Library Remainder",
+          "type_line": "Creature"
+        }
+      ],
+      "logical_rule_key": "battle_rule_v1:6e0bd9004e0a621b8a159ed83853c023",
+      "name": "Lose Hope boosts target creature and scries 2",
+      "target": {
+        "name": "E2E Target Creature",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "type": "boost_scry_spell"
+    },
+    {
+      "card": {
+        "name": "Lost in a Labyrinth",
+        "type_line": "Instant"
+      },
+      "expected_power_delta": -3,
+      "expected_scry_count": 1,
+      "expected_toughness_delta": 0,
+      "library": [
+        {
+          "cmc": 0,
+          "effect": "land",
+          "name": "E2E Low Priority Land",
+          "type_line": "Land"
+        },
+        {
+          "cmc": 5,
+          "effect": "direct_damage",
+          "name": "E2E High Priority Spell",
+          "type_line": "Instant"
+        },
+        {
+          "cmc": 2,
+          "effect": "creature",
+          "name": "E2E Library Remainder",
+          "type_line": "Creature"
+        }
+      ],
+      "logical_rule_key": "battle_rule_v1:78cddcafdeb47dc8bd21a24ad89cafa7",
+      "name": "Lost in a Labyrinth boosts target creature and scries 1",
+      "target": {
+        "name": "E2E Target Creature",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "type": "boost_scry_spell"
+    },
+    {
+      "card": {
+        "name": "Stand Firm",
+        "type_line": "Instant"
+      },
+      "expected_power_delta": 1,
+      "expected_scry_count": 2,
+      "expected_toughness_delta": 1,
+      "library": [
+        {
+          "cmc": 0,
+          "effect": "land",
+          "name": "E2E Low Priority Land",
+          "type_line": "Land"
+        },
+        {
+          "cmc": 5,
+          "effect": "direct_damage",
+          "name": "E2E High Priority Spell",
+          "type_line": "Instant"
+        },
+        {
+          "cmc": 2,
+          "effect": "creature",
+          "name": "E2E Library Remainder",
+          "type_line": "Creature"
+        }
+      ],
+      "logical_rule_key": "battle_rule_v1:8f4b4416559a19a326d92523816e635b",
+      "name": "Stand Firm boosts target creature and scries 2",
+      "target": {
+        "name": "E2E Target Creature",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "type": "boost_scry_spell"
+    },
+    {
+      "card": {
+        "name": "Titan's Strength",
+        "type_line": "Instant"
+      },
+      "expected_power_delta": 3,
+      "expected_scry_count": 1,
+      "expected_toughness_delta": 1,
+      "library": [
+        {
+          "cmc": 0,
+          "effect": "land",
+          "name": "E2E Low Priority Land",
+          "type_line": "Land"
+        },
+        {
+          "cmc": 5,
+          "effect": "direct_damage",
+          "name": "E2E High Priority Spell",
+          "type_line": "Instant"
+        },
+        {
+          "cmc": 2,
+          "effect": "creature",
+          "name": "E2E Library Remainder",
+          "type_line": "Creature"
+        }
+      ],
+      "logical_rule_key": "battle_rule_v1:e23d068c288c30591543879d21bcaa99",
+      "name": "Titan's Strength boosts target creature and scries 1",
+      "target": {
+        "name": "E2E Target Creature",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "type": "boost_scry_spell"
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Battlewise Valor",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:bd646a15240999a31b3a43d3868bb9f8",
+      "min_rule_version": 2,
+      "normalized_name": "battlewise valor",
+      "oracle_hash": "39efb1028043c442a031e20663ddbba6",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+            "compose_on_resolution": true,
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 2,
+            "power_delta": 2,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "target_controller": "any",
+            "toughness_boost": 2,
+            "toughness_delta": 2,
+            "xmage_effect_class": "BoostTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_scry_spell_v1",
+            "compose_on_resolution": true,
+            "count": 1,
+            "effect": "scry",
+            "scry_count": 1,
+            "xmage_effect_class": "ScryEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_scry_spell_v1",
+        "count": 1,
+        "duration": "until_end_of_turn",
+        "effect": "composite_resolution",
+        "power_boost": 2,
+        "power_delta": 2,
+        "resolution_order": "boost_then_scry",
+        "scry_count": 1,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 2,
+        "toughness_delta": 2,
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "ScryEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Chain to Memory",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cc01b914c4f25dddbc14ca9e38d0da3b",
+      "min_rule_version": 2,
+      "normalized_name": "chain to memory",
+      "oracle_hash": "5b436220c5b97c232e8a326e46c1621a",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+            "compose_on_resolution": true,
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": -4,
+            "power_delta": -4,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "target_controller": "any",
+            "toughness_boost": 0,
+            "toughness_delta": 0,
+            "xmage_effect_class": "BoostTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_scry_spell_v1",
+            "compose_on_resolution": true,
+            "count": 2,
+            "effect": "scry",
+            "scry_count": 2,
+            "xmage_effect_class": "ScryEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_scry_spell_v1",
+        "count": 2,
+        "duration": "until_end_of_turn",
+        "effect": "composite_resolution",
+        "power_boost": -4,
+        "power_delta": -4,
+        "resolution_order": "boost_then_scry",
+        "scry_count": 2,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "ScryEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Cruel Finality",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:770a982113240e555a029a13fe0845cc",
+      "min_rule_version": 2,
+      "normalized_name": "cruel finality",
+      "oracle_hash": "6607f87cbc28d09f065d02626b497f25",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+            "compose_on_resolution": true,
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": -2,
+            "power_delta": -2,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "target_controller": "any",
+            "toughness_boost": -2,
+            "toughness_delta": -2,
+            "xmage_effect_class": "BoostTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_scry_spell_v1",
+            "compose_on_resolution": true,
+            "count": 1,
+            "effect": "scry",
+            "scry_count": 1,
+            "xmage_effect_class": "ScryEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_scry_spell_v1",
+        "count": 1,
+        "duration": "until_end_of_turn",
+        "effect": "composite_resolution",
+        "power_boost": -2,
+        "power_delta": -2,
+        "resolution_order": "boost_then_scry",
+        "scry_count": 1,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": -2,
+        "toughness_delta": -2,
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "ScryEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Ferocious Charge",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:303636bd3206b78bd4dae05b7ab2fbb7",
+      "min_rule_version": 2,
+      "normalized_name": "ferocious charge",
+      "oracle_hash": "234f37220afdcd59883fb42040b5316a",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+            "compose_on_resolution": true,
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 4,
+            "power_delta": 4,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "target_controller": "any",
+            "toughness_boost": 4,
+            "toughness_delta": 4,
+            "xmage_effect_class": "BoostTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_scry_spell_v1",
+            "compose_on_resolution": true,
+            "count": 2,
+            "effect": "scry",
+            "scry_count": 2,
+            "xmage_effect_class": "ScryEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_scry_spell_v1",
+        "count": 2,
+        "duration": "until_end_of_turn",
+        "effect": "composite_resolution",
+        "power_boost": 4,
+        "power_delta": 4,
+        "resolution_order": "boost_then_scry",
+        "scry_count": 2,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 4,
+        "toughness_delta": 4,
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "ScryEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Inordinate Rage",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:96951ba32d22dd7ec132e97626e8953b",
+      "min_rule_version": 2,
+      "normalized_name": "inordinate rage",
+      "oracle_hash": "aac555e74c84ff2259502412998894ad",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+            "compose_on_resolution": true,
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 3,
+            "power_delta": 3,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "target_controller": "any",
+            "toughness_boost": 2,
+            "toughness_delta": 2,
+            "xmage_effect_class": "BoostTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_scry_spell_v1",
+            "compose_on_resolution": true,
+            "count": 1,
+            "effect": "scry",
+            "scry_count": 1,
+            "xmage_effect_class": "ScryEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_scry_spell_v1",
+        "count": 1,
+        "duration": "until_end_of_turn",
+        "effect": "composite_resolution",
+        "power_boost": 3,
+        "power_delta": 3,
+        "resolution_order": "boost_then_scry",
+        "scry_count": 1,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 2,
+        "toughness_delta": 2,
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "ScryEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Lose Hope",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6e0bd9004e0a621b8a159ed83853c023",
+      "min_rule_version": 2,
+      "normalized_name": "lose hope",
+      "oracle_hash": "b7a2c933eb27b70ff31f4e54d09522a5",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+            "compose_on_resolution": true,
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": -1,
+            "power_delta": -1,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "target_controller": "any",
+            "toughness_boost": -1,
+            "toughness_delta": -1,
+            "xmage_effect_class": "BoostTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_scry_spell_v1",
+            "compose_on_resolution": true,
+            "count": 2,
+            "effect": "scry",
+            "scry_count": 2,
+            "xmage_effect_class": "ScryEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_scry_spell_v1",
+        "count": 2,
+        "duration": "until_end_of_turn",
+        "effect": "composite_resolution",
+        "power_boost": -1,
+        "power_delta": -1,
+        "resolution_order": "boost_then_scry",
+        "scry_count": 2,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": -1,
+        "toughness_delta": -1,
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "ScryEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Lost in a Labyrinth",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:78cddcafdeb47dc8bd21a24ad89cafa7",
+      "min_rule_version": 2,
+      "normalized_name": "lost in a labyrinth",
+      "oracle_hash": "9a40b36a87c71a11ae19f25474271c88",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+            "compose_on_resolution": true,
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": -3,
+            "power_delta": -3,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "target_controller": "any",
+            "toughness_boost": 0,
+            "toughness_delta": 0,
+            "xmage_effect_class": "BoostTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_scry_spell_v1",
+            "compose_on_resolution": true,
+            "count": 1,
+            "effect": "scry",
+            "scry_count": 1,
+            "xmage_effect_class": "ScryEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_scry_spell_v1",
+        "count": 1,
+        "duration": "until_end_of_turn",
+        "effect": "composite_resolution",
+        "power_boost": -3,
+        "power_delta": -3,
+        "resolution_order": "boost_then_scry",
+        "scry_count": 1,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "ScryEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Stand Firm",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8f4b4416559a19a326d92523816e635b",
+      "min_rule_version": 2,
+      "normalized_name": "stand firm",
+      "oracle_hash": "e7fe992d92fb0d4827a72ecd33a0df85",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+            "compose_on_resolution": true,
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 1,
+            "power_delta": 1,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "target_controller": "any",
+            "toughness_boost": 1,
+            "toughness_delta": 1,
+            "xmage_effect_class": "BoostTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_scry_spell_v1",
+            "compose_on_resolution": true,
+            "count": 2,
+            "effect": "scry",
+            "scry_count": 2,
+            "xmage_effect_class": "ScryEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_scry_spell_v1",
+        "count": 2,
+        "duration": "until_end_of_turn",
+        "effect": "composite_resolution",
+        "power_boost": 1,
+        "power_delta": 1,
+        "resolution_order": "boost_then_scry",
+        "scry_count": 2,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 1,
+        "toughness_delta": 1,
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "ScryEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Titan's Strength",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e23d068c288c30591543879d21bcaa99",
+      "min_rule_version": 2,
+      "normalized_name": "titan's strength",
+      "oracle_hash": "8ef95d2114a7199a355583cf4bcdd0cc",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+            "compose_on_resolution": true,
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 3,
+            "power_delta": 3,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "target_controller": "any",
+            "toughness_boost": 1,
+            "toughness_delta": 1,
+            "xmage_effect_class": "BoostTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_scry_spell_v1",
+            "compose_on_resolution": true,
+            "count": 1,
+            "effect": "scry",
+            "scry_count": 1,
+            "xmage_effect_class": "ScryEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_scry_spell_v1",
+        "count": 1,
+        "duration": "until_end_of_turn",
+        "effect": "composite_resolution",
+        "power_boost": 3,
+        "power_delta": 3,
+        "resolution_order": "boost_then_scry",
+        "scry_count": 1,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 1,
+        "toughness_delta": 1,
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "ScryEffect"
+        ]
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_fixed_boost_scry_spell": 9
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/xmage_pg606_boost_scry_target_creature_new_server_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/xmage_pg606_boost_scry_target_creature_new_server_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/xmage_pg606_boost_scry_target_creature_new_server_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/xmage_pg606_boost_scry_target_creature_new_server_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/xmage_pg606_boost_scry_target_creature_new_server_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/xmage_pg606_boost_scry_target_creature_new_server_rollback.sql"
+  },
+  "generated_at": "2026-07-07T09:19:10+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Battlewise Valor"
+      },
+      "card_name": "Battlewise Valor",
+      "effect": "composite_resolution",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:bd646a15240999a31b3a43d3868bb9f8",
+      "normalized_name": "battlewise valor",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+            "compose_on_resolution": true,
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 2,
+            "power_delta": 2,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "target_controller": "any",
+            "toughness_boost": 2,
+            "toughness_delta": 2,
+            "xmage_effect_class": "BoostTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_scry_spell_v1",
+            "compose_on_resolution": true,
+            "count": 1,
+            "effect": "scry",
+            "scry_count": 1,
+            "xmage_effect_class": "ScryEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_scry_spell_v1",
+        "count": 1,
+        "duration": "until_end_of_turn",
+        "effect": "composite_resolution",
+        "power_boost": 2,
+        "power_delta": 2,
+        "resolution_order": "boost_then_scry",
+        "scry_count": 1,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 2,
+        "toughness_delta": 2,
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "ScryEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Chain to Memory"
+      },
+      "card_name": "Chain to Memory",
+      "effect": "composite_resolution",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cc01b914c4f25dddbc14ca9e38d0da3b",
+      "normalized_name": "chain to memory",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+            "compose_on_resolution": true,
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": -4,
+            "power_delta": -4,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "target_controller": "any",
+            "toughness_boost": 0,
+            "toughness_delta": 0,
+            "xmage_effect_class": "BoostTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_scry_spell_v1",
+            "compose_on_resolution": true,
+            "count": 2,
+            "effect": "scry",
+            "scry_count": 2,
+            "xmage_effect_class": "ScryEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_scry_spell_v1",
+        "count": 2,
+        "duration": "until_end_of_turn",
+        "effect": "composite_resolution",
+        "power_boost": -4,
+        "power_delta": -4,
+        "resolution_order": "boost_then_scry",
+        "scry_count": 2,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "ScryEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Cruel Finality"
+      },
+      "card_name": "Cruel Finality",
+      "effect": "composite_resolution",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:770a982113240e555a029a13fe0845cc",
+      "normalized_name": "cruel finality",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+            "compose_on_resolution": true,
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": -2,
+            "power_delta": -2,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "target_controller": "any",
+            "toughness_boost": -2,
+            "toughness_delta": -2,
+            "xmage_effect_class": "BoostTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_scry_spell_v1",
+            "compose_on_resolution": true,
+            "count": 1,
+            "effect": "scry",
+            "scry_count": 1,
+            "xmage_effect_class": "ScryEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_scry_spell_v1",
+        "count": 1,
+        "duration": "until_end_of_turn",
+        "effect": "composite_resolution",
+        "power_boost": -2,
+        "power_delta": -2,
+        "resolution_order": "boost_then_scry",
+        "scry_count": 1,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": -2,
+        "toughness_delta": -2,
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "ScryEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Ferocious Charge"
+      },
+      "card_name": "Ferocious Charge",
+      "effect": "composite_resolution",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:303636bd3206b78bd4dae05b7ab2fbb7",
+      "normalized_name": "ferocious charge",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+            "compose_on_resolution": true,
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 4,
+            "power_delta": 4,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "target_controller": "any",
+            "toughness_boost": 4,
+            "toughness_delta": 4,
+            "xmage_effect_class": "BoostTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_scry_spell_v1",
+            "compose_on_resolution": true,
+            "count": 2,
+            "effect": "scry",
+            "scry_count": 2,
+            "xmage_effect_class": "ScryEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_scry_spell_v1",
+        "count": 2,
+        "duration": "until_end_of_turn",
+        "effect": "composite_resolution",
+        "power_boost": 4,
+        "power_delta": 4,
+        "resolution_order": "boost_then_scry",
+        "scry_count": 2,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 4,
+        "toughness_delta": 4,
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "ScryEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Inordinate Rage"
+      },
+      "card_name": "Inordinate Rage",
+      "effect": "composite_resolution",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:96951ba32d22dd7ec132e97626e8953b",
+      "normalized_name": "inordinate rage",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+            "compose_on_resolution": true,
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 3,
+            "power_delta": 3,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "target_controller": "any",
+            "toughness_boost": 2,
+            "toughness_delta": 2,
+            "xmage_effect_class": "BoostTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_scry_spell_v1",
+            "compose_on_resolution": true,
+            "count": 1,
+            "effect": "scry",
+            "scry_count": 1,
+            "xmage_effect_class": "ScryEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_scry_spell_v1",
+        "count": 1,
+        "duration": "until_end_of_turn",
+        "effect": "composite_resolution",
+        "power_boost": 3,
+        "power_delta": 3,
+        "resolution_order": "boost_then_scry",
+        "scry_count": 1,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 2,
+        "toughness_delta": 2,
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "ScryEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Lose Hope"
+      },
+      "card_name": "Lose Hope",
+      "effect": "composite_resolution",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6e0bd9004e0a621b8a159ed83853c023",
+      "normalized_name": "lose hope",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+            "compose_on_resolution": true,
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": -1,
+            "power_delta": -1,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "target_controller": "any",
+            "toughness_boost": -1,
+            "toughness_delta": -1,
+            "xmage_effect_class": "BoostTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_scry_spell_v1",
+            "compose_on_resolution": true,
+            "count": 2,
+            "effect": "scry",
+            "scry_count": 2,
+            "xmage_effect_class": "ScryEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_scry_spell_v1",
+        "count": 2,
+        "duration": "until_end_of_turn",
+        "effect": "composite_resolution",
+        "power_boost": -1,
+        "power_delta": -1,
+        "resolution_order": "boost_then_scry",
+        "scry_count": 2,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": -1,
+        "toughness_delta": -1,
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "ScryEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Lost in a Labyrinth"
+      },
+      "card_name": "Lost in a Labyrinth",
+      "effect": "composite_resolution",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:78cddcafdeb47dc8bd21a24ad89cafa7",
+      "normalized_name": "lost in a labyrinth",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+            "compose_on_resolution": true,
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": -3,
+            "power_delta": -3,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "target_controller": "any",
+            "toughness_boost": 0,
+            "toughness_delta": 0,
+            "xmage_effect_class": "BoostTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_scry_spell_v1",
+            "compose_on_resolution": true,
+            "count": 1,
+            "effect": "scry",
+            "scry_count": 1,
+            "xmage_effect_class": "ScryEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_scry_spell_v1",
+        "count": 1,
+        "duration": "until_end_of_turn",
+        "effect": "composite_resolution",
+        "power_boost": -3,
+        "power_delta": -3,
+        "resolution_order": "boost_then_scry",
+        "scry_count": 1,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "ScryEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Stand Firm"
+      },
+      "card_name": "Stand Firm",
+      "effect": "composite_resolution",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8f4b4416559a19a326d92523816e635b",
+      "normalized_name": "stand firm",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+            "compose_on_resolution": true,
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 1,
+            "power_delta": 1,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "target_controller": "any",
+            "toughness_boost": 1,
+            "toughness_delta": 1,
+            "xmage_effect_class": "BoostTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_scry_spell_v1",
+            "compose_on_resolution": true,
+            "count": 2,
+            "effect": "scry",
+            "scry_count": 2,
+            "xmage_effect_class": "ScryEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_scry_spell_v1",
+        "count": 2,
+        "duration": "until_end_of_turn",
+        "effect": "composite_resolution",
+        "power_boost": 1,
+        "power_delta": 1,
+        "resolution_order": "boost_then_scry",
+        "scry_count": 2,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 1,
+        "toughness_delta": 1,
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "ScryEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Titan's Strength"
+      },
+      "card_name": "Titan's Strength",
+      "effect": "composite_resolution",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e23d068c288c30591543879d21bcaa99",
+      "normalized_name": "titan's strength",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+            "compose_on_resolution": true,
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 3,
+            "power_delta": 3,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "target_controller": "any",
+            "toughness_boost": 1,
+            "toughness_delta": 1,
+            "xmage_effect_class": "BoostTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_scry_spell_v1",
+            "compose_on_resolution": true,
+            "count": 1,
+            "effect": "scry",
+            "scry_count": 1,
+            "xmage_effect_class": "ScryEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_scry_spell_v1",
+        "count": 1,
+        "duration": "until_end_of_turn",
+        "effect": "composite_resolution",
+        "power_boost": 3,
+        "power_delta": 3,
+        "resolution_order": "boost_then_scry",
+        "scry_count": 1,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 1,
+        "toughness_delta": 1,
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "ScryEffect"
+        ]
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Battlewise Valor",
+    "Chain to Memory",
+    "Cruel Finality",
+    "Ferocious Charge",
+    "Inordinate Rage",
+    "Lose Hope",
+    "Lost in a Labyrinth",
+    "Stand Firm",
+    "Titan's Strength"
+  ],
+  "selected_count": 9,
+  "slug": "boost_scry_target_creature_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Battlewise Valor",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:bd646a15240999a31b3a43d3868bb9f8",
+      "min_rule_version": 2,
+      "normalized_name": "battlewise valor",
+      "oracle_hash": "39efb1028043c442a031e20663ddbba6",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_scry_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Chain to Memory",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cc01b914c4f25dddbc14ca9e38d0da3b",
+      "min_rule_version": 2,
+      "normalized_name": "chain to memory",
+      "oracle_hash": "5b436220c5b97c232e8a326e46c1621a",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_scry_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Cruel Finality",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:770a982113240e555a029a13fe0845cc",
+      "min_rule_version": 2,
+      "normalized_name": "cruel finality",
+      "oracle_hash": "6607f87cbc28d09f065d02626b497f25",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_scry_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Ferocious Charge",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:303636bd3206b78bd4dae05b7ab2fbb7",
+      "min_rule_version": 2,
+      "normalized_name": "ferocious charge",
+      "oracle_hash": "234f37220afdcd59883fb42040b5316a",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_scry_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Inordinate Rage",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:96951ba32d22dd7ec132e97626e8953b",
+      "min_rule_version": 2,
+      "normalized_name": "inordinate rage",
+      "oracle_hash": "aac555e74c84ff2259502412998894ad",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_scry_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Lose Hope",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6e0bd9004e0a621b8a159ed83853c023",
+      "min_rule_version": 2,
+      "normalized_name": "lose hope",
+      "oracle_hash": "b7a2c933eb27b70ff31f4e54d09522a5",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_scry_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Lost in a Labyrinth",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:78cddcafdeb47dc8bd21a24ad89cafa7",
+      "min_rule_version": 2,
+      "normalized_name": "lost in a labyrinth",
+      "oracle_hash": "9a40b36a87c71a11ae19f25474271c88",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_scry_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Stand Firm",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8f4b4416559a19a326d92523816e635b",
+      "min_rule_version": 2,
+      "normalized_name": "stand firm",
+      "oracle_hash": "e7fe992d92fb0d4827a72ecd33a0df85",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_scry_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Titan's Strength",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e23d068c288c30591543879d21bcaa99",
+      "min_rule_version": 2,
+      "normalized_name": "titan's strength",
+      "oracle_hash": "8ef95d2114a7199a355583cf4bcdd0cc",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_scry_spell_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

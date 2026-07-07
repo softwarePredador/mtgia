@@ -8136,6 +8136,102 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertNotIn("first_strike", target)
         self.assertEqual(target.get("keywords", []), [])
 
+    def test_composite_boost_scry_spell_modifies_target_and_scries(self) -> None:
+        active = self.battle.Player(
+            "Active",
+            None,
+            [
+                {"name": "Low Priority Land", "type_line": "Land", "cmc": 0},
+                {"name": "High Priority Spell", "type_line": "Instant", "cmc": 5},
+                {"name": "Library Remainder", "type_line": "Creature", "cmc": 2},
+            ],
+        )
+        opponent = self.battle.Player("Opponent", None, [])
+        target = {"name": "Active Bear", "type_line": "Creature - Bear", "power": 2, "toughness": 2}
+        active.battlefield = [target]
+        effect = {
+            "effect": "composite_resolution",
+            "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_scry_spell_v1",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "target_controller": "any",
+            "power_delta": 2,
+            "toughness_delta": 2,
+            "power_boost": 2,
+            "toughness_boost": 2,
+            "duration": "until_end_of_turn",
+            "scry_count": 2,
+            "count": 2,
+            "_composite_rule_components": [
+                {
+                    "effect": "stat_modifier_until_eot",
+                    "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+                    "target": "creature",
+                    "target_constraints": {"card_types": ["creature"]},
+                    "target_controller": "any",
+                    "power_delta": 2,
+                    "toughness_delta": 2,
+                    "power_boost": 2,
+                    "toughness_boost": 2,
+                    "duration": "until_end_of_turn",
+                    "compose_on_resolution": True,
+                },
+                {
+                    "effect": "scry",
+                    "battle_model_scope": "xmage_fixed_scry_spell_v1",
+                    "count": 2,
+                    "scry_count": 2,
+                    "compose_on_resolution": True,
+                },
+            ],
+        }
+        card = {
+            "name": "Fixture Battlewise Valor",
+            "type_line": "Instant",
+            "oracle_text": "Target creature gets +2/+2 until end of turn. Scry 2.",
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            card,
+            turn=5,
+            rng=random.Random(52),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(target["power"], 4)
+        self.assertEqual(target["toughness"], 4)
+        self.assertEqual(active.graveyard[0]["name"], "Fixture Battlewise Valor")
+        self.assertTrue(
+            any(
+                event == "stat_modifier_until_eot_resolved"
+                and data.get("card") == "Fixture Battlewise Valor"
+                and data.get("target") == "Active Bear"
+                and data.get("target_power_after") == 4
+                for event, data in self.events
+            )
+        )
+        self.assertTrue(
+            any(
+                event == "scry_resolved"
+                and data.get("card") == "Fixture Battlewise Valor"
+                and data.get("component_index") == 1
+                and data.get("scry_count") == 2
+                and "High Priority Spell" in data.get("kept_on_top", [])
+                for event, data in self.events
+            )
+        )
+        self.assertTrue(
+            any(
+                event == "composite_rule_resolved"
+                and data.get("card") == "Fixture Battlewise Valor"
+                and data.get("components_applied") == 2
+                and data.get("components_skipped") == 0
+                for event, data in self.events
+            )
+        )
+
     def test_composite_destroy_draw_spell_resolves_both_components_once(self) -> None:
         active = self.battle.Player("Active", None, [{"name": "Drawn Card"}])
         opponent = self.battle.Player("Opponent", None, [])

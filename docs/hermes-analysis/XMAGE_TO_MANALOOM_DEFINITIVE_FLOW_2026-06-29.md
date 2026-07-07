@@ -17600,6 +17600,78 @@ boost spells, multi-target boost spells, attacking-only targets, target
 subtype modes, or spells that combine boost+keyword with additional effects
 unless a later exact adapter models those constraints.
 
+## 2026-07-07 PG606 Boost + Scry Target-Creature Spell Checkpoint
+
+PG606 closed the exact XMage subpattern:
+
+`xmage_signature::BoostTargetEffect,ScryEffect::no_ability_class::TargetCreaturePermanent::no_condition_class::targeting`
+
+Cards promoted:
+
+- `Battlewise Valor`
+- `Chain to Memory`
+- `Cruel Finality`
+- `Ferocious Charge`
+- `Inordinate Rage`
+- `Lose Hope`
+- `Lost in a Labyrinth`
+- `Stand Firm`
+- `Titan's Strength`
+
+Implementation:
+
+- `xmage_authoritative_exact_scope_split.py` now maps exact
+  `BoostTargetEffect` plus fixed `ScryEffect` one-shot spells when XMage has a
+  single simple `TargetCreaturePermanent()` and Oracle says
+  `Target creature gets P/T until end of turn. Scry N.`;
+- the exact scope is
+  `xmage_fixed_boost_target_creature_until_eot_scry_spell_v1`;
+- the emitted runtime rule is a `composite_resolution` with ordered
+  `stat_modifier_until_eot` and `scry` components;
+- `xmage_batch_pg_package_builder.py` now emits `boost_scry_spell` E2E
+  scenarios;
+- `battle_package_end_to_end_validation.py` validates the target P/T change,
+  `scry_resolved`, and `composite_rule_resolved` in the same focused cast.
+
+Validation:
+
+- split produced `proposal_count=9` and
+  `safe_for_batch_pg_package_count=9`;
+- precheck found `9/9` target rows, `0` existing expected executable rows, and
+  `0` shadow rows to deprecate;
+- apply upserted `9` PostgreSQL rows and deprecated `0` shadow rows;
+- postcheck confirmed `9/9` promoted rows, `9/9` `verified_auto` rows, and
+  `9/9` rows with `oracle_hash`;
+- focused tests passed: splitter `751` tests, exact runtime `380` tests,
+  package builder `75` tests, and Python compilation for the touched
+  splitter/package/runtime/E2E scripts;
+- PG -> SQLite/snapshot sync refreshed from `127.0.0.1:15432/halder`;
+- metadata sync used `database_target=127.0.0.1:15432/halder`, matched `6908`
+  PostgreSQL cards, and left `deck_cards` at `2699/2699` matched;
+- E2E validation passed PostgreSQL, SQLite, snapshot, runtime lookup, and `9`
+  battle execution scenarios with `55` runtime events;
+- post-sync queue rebuild reduced `target_identity_count` from `25126` to
+  `25117`, `xmage_authoritative_source_count` from `24812` to `24803`, and
+  `xmage_authoritative_adapter_required_count` from `24812` to `24803`;
+- final exact-scope recheck against the post-PG606 queue returned
+  `proposal_count=0` and `safe_for_batch_pg_package_count=0`;
+- the PG/Hermes/SQLite contract audit initially exposed `44` old trusted
+  executable PostgreSQL rows missing `oracle_hash`; the existing PG604B
+  backfill package was safely reapplied, updating `44` rows and leaving
+  `trusted_executable_rules_missing_oracle_hash=0`;
+- final PG/Hermes/SQLite contract audit passed `51/51`;
+- final XMage strategy audit passed `26/26`;
+- final operational surface alignment audit passed;
+- final legacy contamination audit passed;
+- `scripts/quality_gate.sh server-target` passed against the new-server target;
+- global all-card readiness was refreshed at
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260707_post_pg606_boost_scry_new_server.md`.
+
+Residual boundary: PG606 does not authorize dynamic boost amounts, dynamic scry
+counts, non-creature targets, multi-target variants, activated/triggered
+variants, or additional effects beyond the exact boost-then-scry one-shot
+resolution.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

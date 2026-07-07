@@ -1,0 +1,89 @@
+WITH proposed(normalized_name, card_name, oracle_hash, logical_rule_key, effect_json, deck_role_json, source, confidence, review_status, execution_status, notes, shadow_handling) AS (
+  VALUES
+    ('battlewise valor', 'Battlewise Valor', '39efb1028043c442a031e20663ddbba6', 'battle_rule_v1:bd646a15240999a31b3a43d3868bb9f8', '{"_composite_rule_components":[{"battle_model_scope":"xmage_fixed_boost_target_creature_until_eot_spell_v1","compose_on_resolution":true,"duration":"until_end_of_turn","effect":"stat_modifier_until_eot","power_boost":2,"power_delta":2,"target":"creature","target_constraints":{"card_types":["creature"]},"target_controller":"any","toughness_boost":2,"toughness_delta":2,"xmage_effect_class":"BoostTargetEffect"},{"battle_model_scope":"xmage_fixed_scry_spell_v1","compose_on_resolution":true,"count":1,"effect":"scry","scry_count":1,"xmage_effect_class":"ScryEffect"}],"battle_model_scope":"xmage_fixed_boost_target_creature_until_eot_scry_spell_v1","count":1,"duration":"until_end_of_turn","effect":"composite_resolution","instant":true,"power_boost":2,"power_delta":2,"resolution_order":"boost_then_scry","scry_count":1,"sorcery":false,"target":"creature","target_constraints":{"card_types":["creature"]},"target_controller":"any","toughness_boost":2,"toughness_delta":2,"xmage_effect_classes":["BoostTargetEffect","ScryEffect"]}'::jsonb, '{"category":"draw","effect":"composite_resolution","target":"creature","timing":"instant"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class BattlewiseValor translated into ManaLoom runtime scope xmage_fixed_boost_target_creature_until_eot_scry_spell_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('chain to memory', 'Chain to Memory', '5b436220c5b97c232e8a326e46c1621a', 'battle_rule_v1:cc01b914c4f25dddbc14ca9e38d0da3b', '{"_composite_rule_components":[{"battle_model_scope":"xmage_fixed_boost_target_creature_until_eot_spell_v1","compose_on_resolution":true,"duration":"until_end_of_turn","effect":"stat_modifier_until_eot","power_boost":-4,"power_delta":-4,"target":"creature","target_constraints":{"card_types":["creature"]},"target_controller":"any","toughness_boost":0,"toughness_delta":0,"xmage_effect_class":"BoostTargetEffect"},{"battle_model_scope":"xmage_fixed_scry_spell_v1","compose_on_resolution":true,"count":2,"effect":"scry","scry_count":2,"xmage_effect_class":"ScryEffect"}],"battle_model_scope":"xmage_fixed_boost_target_creature_until_eot_scry_spell_v1","count":2,"duration":"until_end_of_turn","effect":"composite_resolution","instant":true,"power_boost":-4,"power_delta":-4,"resolution_order":"boost_then_scry","scry_count":2,"sorcery":false,"target":"creature","target_constraints":{"card_types":["creature"]},"target_controller":"any","toughness_boost":0,"toughness_delta":0,"xmage_effect_classes":["BoostTargetEffect","ScryEffect"]}'::jsonb, '{"category":"draw","effect":"composite_resolution","target":"creature","timing":"instant"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class ChainToMemory translated into ManaLoom runtime scope xmage_fixed_boost_target_creature_until_eot_scry_spell_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('cruel finality', 'Cruel Finality', '6607f87cbc28d09f065d02626b497f25', 'battle_rule_v1:770a982113240e555a029a13fe0845cc', '{"_composite_rule_components":[{"battle_model_scope":"xmage_fixed_boost_target_creature_until_eot_spell_v1","compose_on_resolution":true,"duration":"until_end_of_turn","effect":"stat_modifier_until_eot","power_boost":-2,"power_delta":-2,"target":"creature","target_constraints":{"card_types":["creature"]},"target_controller":"any","toughness_boost":-2,"toughness_delta":-2,"xmage_effect_class":"BoostTargetEffect"},{"battle_model_scope":"xmage_fixed_scry_spell_v1","compose_on_resolution":true,"count":1,"effect":"scry","scry_count":1,"xmage_effect_class":"ScryEffect"}],"battle_model_scope":"xmage_fixed_boost_target_creature_until_eot_scry_spell_v1","count":1,"duration":"until_end_of_turn","effect":"composite_resolution","instant":true,"power_boost":-2,"power_delta":-2,"resolution_order":"boost_then_scry","scry_count":1,"sorcery":false,"target":"creature","target_constraints":{"card_types":["creature"]},"target_controller":"any","toughness_boost":-2,"toughness_delta":-2,"xmage_effect_classes":["BoostTargetEffect","ScryEffect"]}'::jsonb, '{"category":"draw","effect":"composite_resolution","target":"creature","timing":"instant"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class CruelFinality translated into ManaLoom runtime scope xmage_fixed_boost_target_creature_until_eot_scry_spell_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('ferocious charge', 'Ferocious Charge', '234f37220afdcd59883fb42040b5316a', 'battle_rule_v1:303636bd3206b78bd4dae05b7ab2fbb7', '{"_composite_rule_components":[{"battle_model_scope":"xmage_fixed_boost_target_creature_until_eot_spell_v1","compose_on_resolution":true,"duration":"until_end_of_turn","effect":"stat_modifier_until_eot","power_boost":4,"power_delta":4,"target":"creature","target_constraints":{"card_types":["creature"]},"target_controller":"any","toughness_boost":4,"toughness_delta":4,"xmage_effect_class":"BoostTargetEffect"},{"battle_model_scope":"xmage_fixed_scry_spell_v1","compose_on_resolution":true,"count":2,"effect":"scry","scry_count":2,"xmage_effect_class":"ScryEffect"}],"battle_model_scope":"xmage_fixed_boost_target_creature_until_eot_scry_spell_v1","count":2,"duration":"until_end_of_turn","effect":"composite_resolution","instant":true,"power_boost":4,"power_delta":4,"resolution_order":"boost_then_scry","scry_count":2,"sorcery":false,"target":"creature","target_constraints":{"card_types":["creature"]},"target_controller":"any","toughness_boost":4,"toughness_delta":4,"xmage_effect_classes":["BoostTargetEffect","ScryEffect"]}'::jsonb, '{"category":"draw","effect":"composite_resolution","target":"creature","timing":"instant"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class FerociousCharge translated into ManaLoom runtime scope xmage_fixed_boost_target_creature_until_eot_scry_spell_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('inordinate rage', 'Inordinate Rage', 'aac555e74c84ff2259502412998894ad', 'battle_rule_v1:96951ba32d22dd7ec132e97626e8953b', '{"_composite_rule_components":[{"battle_model_scope":"xmage_fixed_boost_target_creature_until_eot_spell_v1","compose_on_resolution":true,"duration":"until_end_of_turn","effect":"stat_modifier_until_eot","power_boost":3,"power_delta":3,"target":"creature","target_constraints":{"card_types":["creature"]},"target_controller":"any","toughness_boost":2,"toughness_delta":2,"xmage_effect_class":"BoostTargetEffect"},{"battle_model_scope":"xmage_fixed_scry_spell_v1","compose_on_resolution":true,"count":1,"effect":"scry","scry_count":1,"xmage_effect_class":"ScryEffect"}],"battle_model_scope":"xmage_fixed_boost_target_creature_until_eot_scry_spell_v1","count":1,"duration":"until_end_of_turn","effect":"composite_resolution","instant":true,"power_boost":3,"power_delta":3,"resolution_order":"boost_then_scry","scry_count":1,"sorcery":false,"target":"creature","target_constraints":{"card_types":["creature"]},"target_controller":"any","toughness_boost":2,"toughness_delta":2,"xmage_effect_classes":["BoostTargetEffect","ScryEffect"]}'::jsonb, '{"category":"draw","effect":"composite_resolution","target":"creature","timing":"instant"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class InordinateRage translated into ManaLoom runtime scope xmage_fixed_boost_target_creature_until_eot_scry_spell_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('lose hope', 'Lose Hope', 'b7a2c933eb27b70ff31f4e54d09522a5', 'battle_rule_v1:6e0bd9004e0a621b8a159ed83853c023', '{"_composite_rule_components":[{"battle_model_scope":"xmage_fixed_boost_target_creature_until_eot_spell_v1","compose_on_resolution":true,"duration":"until_end_of_turn","effect":"stat_modifier_until_eot","power_boost":-1,"power_delta":-1,"target":"creature","target_constraints":{"card_types":["creature"]},"target_controller":"any","toughness_boost":-1,"toughness_delta":-1,"xmage_effect_class":"BoostTargetEffect"},{"battle_model_scope":"xmage_fixed_scry_spell_v1","compose_on_resolution":true,"count":2,"effect":"scry","scry_count":2,"xmage_effect_class":"ScryEffect"}],"battle_model_scope":"xmage_fixed_boost_target_creature_until_eot_scry_spell_v1","count":2,"duration":"until_end_of_turn","effect":"composite_resolution","instant":true,"power_boost":-1,"power_delta":-1,"resolution_order":"boost_then_scry","scry_count":2,"sorcery":false,"target":"creature","target_constraints":{"card_types":["creature"]},"target_controller":"any","toughness_boost":-1,"toughness_delta":-1,"xmage_effect_classes":["BoostTargetEffect","ScryEffect"]}'::jsonb, '{"category":"draw","effect":"composite_resolution","target":"creature","timing":"instant"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class LoseHope translated into ManaLoom runtime scope xmage_fixed_boost_target_creature_until_eot_scry_spell_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('lost in a labyrinth', 'Lost in a Labyrinth', '9a40b36a87c71a11ae19f25474271c88', 'battle_rule_v1:78cddcafdeb47dc8bd21a24ad89cafa7', '{"_composite_rule_components":[{"battle_model_scope":"xmage_fixed_boost_target_creature_until_eot_spell_v1","compose_on_resolution":true,"duration":"until_end_of_turn","effect":"stat_modifier_until_eot","power_boost":-3,"power_delta":-3,"target":"creature","target_constraints":{"card_types":["creature"]},"target_controller":"any","toughness_boost":0,"toughness_delta":0,"xmage_effect_class":"BoostTargetEffect"},{"battle_model_scope":"xmage_fixed_scry_spell_v1","compose_on_resolution":true,"count":1,"effect":"scry","scry_count":1,"xmage_effect_class":"ScryEffect"}],"battle_model_scope":"xmage_fixed_boost_target_creature_until_eot_scry_spell_v1","count":1,"duration":"until_end_of_turn","effect":"composite_resolution","instant":true,"power_boost":-3,"power_delta":-3,"resolution_order":"boost_then_scry","scry_count":1,"sorcery":false,"target":"creature","target_constraints":{"card_types":["creature"]},"target_controller":"any","toughness_boost":0,"toughness_delta":0,"xmage_effect_classes":["BoostTargetEffect","ScryEffect"]}'::jsonb, '{"category":"draw","effect":"composite_resolution","target":"creature","timing":"instant"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class LostInALabyrinth translated into ManaLoom runtime scope xmage_fixed_boost_target_creature_until_eot_scry_spell_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('stand firm', 'Stand Firm', 'e7fe992d92fb0d4827a72ecd33a0df85', 'battle_rule_v1:8f4b4416559a19a326d92523816e635b', '{"_composite_rule_components":[{"battle_model_scope":"xmage_fixed_boost_target_creature_until_eot_spell_v1","compose_on_resolution":true,"duration":"until_end_of_turn","effect":"stat_modifier_until_eot","power_boost":1,"power_delta":1,"target":"creature","target_constraints":{"card_types":["creature"]},"target_controller":"any","toughness_boost":1,"toughness_delta":1,"xmage_effect_class":"BoostTargetEffect"},{"battle_model_scope":"xmage_fixed_scry_spell_v1","compose_on_resolution":true,"count":2,"effect":"scry","scry_count":2,"xmage_effect_class":"ScryEffect"}],"battle_model_scope":"xmage_fixed_boost_target_creature_until_eot_scry_spell_v1","count":2,"duration":"until_end_of_turn","effect":"composite_resolution","instant":true,"power_boost":1,"power_delta":1,"resolution_order":"boost_then_scry","scry_count":2,"sorcery":false,"target":"creature","target_constraints":{"card_types":["creature"]},"target_controller":"any","toughness_boost":1,"toughness_delta":1,"xmage_effect_classes":["BoostTargetEffect","ScryEffect"]}'::jsonb, '{"category":"draw","effect":"composite_resolution","target":"creature","timing":"instant"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class StandFirm translated into ManaLoom runtime scope xmage_fixed_boost_target_creature_until_eot_scry_spell_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('titan''s strength', 'Titan''s Strength', '8ef95d2114a7199a355583cf4bcdd0cc', 'battle_rule_v1:e23d068c288c30591543879d21bcaa99', '{"_composite_rule_components":[{"battle_model_scope":"xmage_fixed_boost_target_creature_until_eot_spell_v1","compose_on_resolution":true,"duration":"until_end_of_turn","effect":"stat_modifier_until_eot","power_boost":3,"power_delta":3,"target":"creature","target_constraints":{"card_types":["creature"]},"target_controller":"any","toughness_boost":1,"toughness_delta":1,"xmage_effect_class":"BoostTargetEffect"},{"battle_model_scope":"xmage_fixed_scry_spell_v1","compose_on_resolution":true,"count":1,"effect":"scry","scry_count":1,"xmage_effect_class":"ScryEffect"}],"battle_model_scope":"xmage_fixed_boost_target_creature_until_eot_scry_spell_v1","count":1,"duration":"until_end_of_turn","effect":"composite_resolution","instant":true,"power_boost":3,"power_delta":3,"resolution_order":"boost_then_scry","scry_count":1,"sorcery":false,"target":"creature","target_constraints":{"card_types":["creature"]},"target_controller":"any","toughness_boost":1,"toughness_delta":1,"xmage_effect_classes":["BoostTargetEffect","ScryEffect"]}'::jsonb, '{"category":"draw","effect":"composite_resolution","target":"creature","timing":"instant"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class TitansStrength translated into ManaLoom runtime scope xmage_fixed_boost_target_creature_until_eot_scry_spell_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.', 'deprecate_nonmatching_rows')
+),
+matched_cards AS (
+  SELECT
+    p.normalized_name,
+    p.card_name,
+    p.oracle_hash,
+    c.id AS card_id,
+    c.name AS db_card_name
+  FROM proposed p
+  LEFT JOIN public.cards c
+    ON (
+         lower(c.name) = p.normalized_name
+         OR split_part(lower(c.name), ' // ', 1) = p.normalized_name
+       )
+   AND md5(coalesce(c.oracle_text, '')) = p.oracle_hash
+),
+target_cards AS (
+  SELECT
+    normalized_name,
+    card_name,
+    oracle_hash,
+    count(card_id) AS target_card_rows,
+    min(card_id::text)::uuid AS canonical_card_id,
+    min(db_card_name) AS canonical_card_name
+  FROM matched_cards
+  GROUP BY normalized_name, card_name, oracle_hash
+),
+rule_rows AS (
+  SELECT p.normalized_name, count(r.*) AS existing_rule_rows
+  FROM proposed p
+  LEFT JOIN public.card_battle_rules r
+    ON (
+         r.normalized_name = p.normalized_name
+         OR r.normalized_name LIKE p.normalized_name || ' // %'
+       )
+  GROUP BY p.normalized_name
+),
+expected_rows AS (
+  SELECT p.normalized_name, count(r.*) AS expected_rule_rows_before
+  FROM proposed p
+  LEFT JOIN public.card_battle_rules r
+    ON (
+         r.normalized_name = p.normalized_name
+         OR r.normalized_name LIKE p.normalized_name || ' // %'
+       )
+   AND r.logical_rule_key = p.logical_rule_key
+  GROUP BY p.normalized_name
+),
+shadow_rows AS (
+  SELECT p.normalized_name, count(r.*) AS would_deprecate_shadow_rows
+  FROM proposed p
+  LEFT JOIN public.card_battle_rules r
+    ON (
+         r.normalized_name = p.normalized_name
+         OR r.normalized_name LIKE p.normalized_name || ' // %'
+       )
+   AND r.logical_rule_key <> p.logical_rule_key
+   AND r.review_status NOT IN ('deprecated', 'rejected')
+   AND r.execution_status <> 'disabled'
+  GROUP BY p.normalized_name
+)
+SELECT
+  p.card_name,
+  p.normalized_name,
+  p.oracle_hash,
+  p.logical_rule_key,
+  p.shadow_handling,
+  tc.target_card_rows,
+  tc.canonical_card_id,
+  rr.existing_rule_rows,
+  er.expected_rule_rows_before,
+  sr.would_deprecate_shadow_rows
+FROM proposed p
+JOIN target_cards tc USING (normalized_name, card_name, oracle_hash)
+JOIN rule_rows rr USING (normalized_name)
+JOIN expected_rows er USING (normalized_name)
+JOIN shadow_rows sr USING (normalized_name)
+ORDER BY p.card_name;

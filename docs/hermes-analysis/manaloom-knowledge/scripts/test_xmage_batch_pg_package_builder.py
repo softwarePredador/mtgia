@@ -1027,6 +1027,46 @@ def test_manifest_builds_boost_keyword_spell_execution_scenario() -> None:
     assert scenario["expected_keywords"] == ["trample"]
 
 
+def test_manifest_builds_boost_scry_spell_execution_scenario() -> None:
+    rule = {
+        "normalized_name": "battlewise valor",
+        "card_name": "Battlewise Valor",
+        "oracle_hash": "hash-battlewise-valor",
+        "logical_rule_key": "battle_rule_v1:hash-battlewise-valor",
+        "required_effect_fields": {
+            "effect": "composite_resolution",
+            "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_scry_spell_v1",
+            "target": "creature",
+            "target_controller": "any",
+            "target_constraints": {"card_types": ["creature"]},
+            "power_delta": 2,
+            "toughness_delta": 2,
+            "scry_count": 1,
+            "_composite_rule_components": [
+                {
+                    "effect": "stat_modifier_until_eot",
+                    "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+                    "power_delta": 2,
+                    "toughness_delta": 2,
+                },
+                {
+                    "effect": "scry",
+                    "battle_model_scope": "xmage_fixed_scry_spell_v1",
+                    "count": 1,
+                },
+            ],
+        },
+    }
+
+    scenario = builder.boost_scry_spell_execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "boost_scry_spell"
+    assert scenario["expected_power_delta"] == 2
+    assert scenario["expected_toughness_delta"] == 2
+    assert scenario["expected_scry_count"] == 1
+
+
 def test_manifest_builds_controlled_stat_modifier_filtered_execution_scenario() -> None:
     rule = {
         "normalized_name": "guardians' pledge",

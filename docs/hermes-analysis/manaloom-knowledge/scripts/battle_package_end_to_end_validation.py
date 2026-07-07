@@ -3549,6 +3549,98 @@ def run_stat_modifier_until_eot(
     }
 
 
+def run_boost_scry_spell(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    effect = battle.get_card_effect(card)
+    active = battle.Player(str(scenario.get("player") or "Spell Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
+    target = battle.enrich_card(
+        {
+            "name": "E2E Target Creature",
+            "type_line": "Creature - Soldier",
+            "power": 2,
+            "toughness": 2,
+            **dict(scenario.get("target") or {}),
+        }
+    )
+    active.battlefield = [target]
+    active.library = [dict(library_card) for library_card in scenario.get("library") or []]
+    before_events = len(events)
+    before_power = int(target.get("power") or 0)
+    before_toughness = int(target.get("toughness") or 0)
+    expected_scry_count = int(scenario.get("expected_scry_count") or effect.get("scry_count") or 1)
+    battle.apply_effect_immediate(
+        active,
+        [opponent],
+        battle.enrich_card({**card, **effect}),
+        turn=int(scenario.get("turn") or 7),
+        rng=random.Random(int(scenario.get("seed") or 6074)),
+        effect_data_override=effect,
+        phase=str(scenario.get("phase") or "precombat_main"),
+    )
+    expected_power = before_power + int(scenario.get("expected_power_delta") or effect.get("power_delta") or 0)
+    expected_toughness = before_toughness + int(
+        scenario.get("expected_toughness_delta") or effect.get("toughness_delta") or 0
+    )
+    if int(target.get("power") or 0) != expected_power:
+        fail("battle_execution", f"{card['name']} target power={target.get('power')!r}, expected {expected_power}")
+    if int(target.get("toughness") or 0) != expected_toughness:
+        fail(
+            "battle_execution",
+            f"{card['name']} target toughness={target.get('toughness')!r}, expected {expected_toughness}",
+        )
+    resolved_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "stat_modifier_until_eot_resolved"
+            and data.get("card") == card.get("name")
+            and data.get("target") == target.get("name")
+        ),
+        None,
+    )
+    if resolved_event is None:
+        fail("battle_events", f"missing {card['name']} stat modifier resolved event")
+    scry_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "scry_resolved"
+            and data.get("card") == card.get("name")
+            and int(data.get("scry_count") or 0) == expected_scry_count
+        ),
+        None,
+    )
+    if scry_event is None:
+        fail("battle_events", f"missing {card['name']} scry_resolved event")
+    composite_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "composite_rule_resolved"
+            and data.get("card") == card.get("name")
+            and int(data.get("components_applied") or 0) == 2
+            and int(data.get("components_skipped") or 0) == 0
+        ),
+        None,
+    )
+    if composite_event is None:
+        fail("battle_events", f"missing {card['name']} composite_rule_resolved event")
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "target": target.get("name"),
+        "target_power": int(target.get("power") or 0),
+        "target_toughness": int(target.get("toughness") or 0),
+        "scry_count": expected_scry_count,
+        "top_after": list(scry_event.get("top_after") or []),
+    }
+
+
 def run_controlled_stat_modifier_until_eot(
     battle,
     scenario: dict[str, Any],
@@ -5173,6 +5265,7 @@ SCENARIO_RUNNERS = {
     "spell_cast_gain_life": run_spell_cast_gain_life,
     "controlled_stat_modifier_until_eot": run_controlled_stat_modifier_until_eot,
     "stat_modifier_until_eot": run_stat_modifier_until_eot,
+    "boost_scry_spell": run_boost_scry_spell,
     "static_controlled_power_toughness_boost": run_static_controlled_power_toughness_boost,
     "static_controlled_keyword": run_static_controlled_keyword,
     "static_count_power_toughness": run_static_count_power_toughness,

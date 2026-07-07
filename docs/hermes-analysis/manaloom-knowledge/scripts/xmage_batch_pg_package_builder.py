@@ -2598,6 +2598,55 @@ def target_keyword_spell_execution_scenario_from_expected_rule(
     }
 
 
+def boost_scry_spell_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_fixed_boost_target_creature_until_eot_scry_spell_v1":
+        return None
+    if required.get("effect") != "composite_resolution":
+        return None
+    components = [
+        component
+        for component in required.get("_composite_rule_components") or []
+        if isinstance(component, dict)
+    ]
+    boost_component = next(
+        (component for component in components if component.get("effect") == "stat_modifier_until_eot"),
+        None,
+    )
+    scry_component = next(
+        (component for component in components if component.get("effect") == "scry"),
+        None,
+    )
+    if boost_component is None or scry_component is None:
+        return None
+    scry_count = int(required.get("scry_count") or scry_component.get("scry_count") or scry_component.get("count") or 1)
+    if scry_count <= 0:
+        return None
+    type_line = "Sorcery" if required.get("sorcery") is True else "Instant"
+    return {
+        "name": f"{rule['card_name']} boosts target creature and scries {scry_count}",
+        "type": "boost_scry_spell",
+        "card": {"name": rule["card_name"], "type_line": type_line},
+        "target": {
+            "name": "E2E Target Creature",
+            "type_line": "Creature - Soldier",
+            "power": 2,
+            "toughness": 2,
+        },
+        "expected_power_delta": int(required.get("power_delta") or boost_component.get("power_delta") or 0),
+        "expected_toughness_delta": int(required.get("toughness_delta") or boost_component.get("toughness_delta") or 0),
+        "expected_scry_count": scry_count,
+        "library": [
+            {"name": "E2E Low Priority Land", "type_line": "Land", "effect": "land", "cmc": 0},
+            {"name": "E2E High Priority Spell", "type_line": "Instant", "effect": "direct_damage", "cmc": 5},
+            {"name": "E2E Library Remainder", "type_line": "Creature", "effect": "creature", "cmc": 2},
+        ],
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def controlled_stat_modifier_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
@@ -3333,6 +3382,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or simple_activated_regenerate_source_execution_scenario_from_expected_rule(rule)
         or controlled_stat_modifier_execution_scenario_from_expected_rule(rule)
         or target_keyword_spell_execution_scenario_from_expected_rule(rule)
+        or boost_scry_spell_execution_scenario_from_expected_rule(rule)
         or attack_self_boost_execution_scenario_from_expected_rule(rule)
         or becomes_blocked_self_boost_execution_scenario_from_expected_rule(rule)
         or each_player_sacrifice_execution_scenario_from_expected_rule(rule)

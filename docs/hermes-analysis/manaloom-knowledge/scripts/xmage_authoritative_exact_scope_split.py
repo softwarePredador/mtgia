@@ -71,6 +71,10 @@ BOOST_TARGET_UNIT = (
     "xmage_signature::BoostTargetEffect::no_ability_class::TargetCreaturePermanent::"
     "no_condition_class::targeting"
 )
+BOOST_SCRY_UNIT = (
+    "xmage_signature::BoostTargetEffect,ScryEffect::no_ability_class::"
+    "TargetCreaturePermanent::no_condition_class::targeting"
+)
 BOOST_CONTROLLED_SPELL_UNIT = (
     "xmage_signature::BoostControlledEffect::no_ability_class::"
     "no_target_class::no_condition_class::no_signal"
@@ -174,6 +178,7 @@ SUPPORTED_UNITS = {
     BOARD_WIPE_UNIT,
     ADD_COUNTERS_TARGET_UNIT,
     BOOST_TARGET_UNIT,
+    BOOST_SCRY_UNIT,
     BOOST_CONTROLLED_SPELL_UNIT,
     BOOST_ALL_SPELL_UNIT,
     BECOMES_BLOCKED_SELF_BOOST_UNIT,
@@ -235,6 +240,7 @@ EXILE_SCRY_SCOPE = "xmage_exile_target_and_scry_spell_v1"
 BOUNCE_SCRY_SCOPE = "xmage_return_target_to_hand_and_scry_spell_v1"
 DAMAGE_DRAW_SCOPE = "xmage_fixed_damage_target_and_draw_card_spell_v1"
 BOOST_DRAW_SCOPE = "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1"
+BOOST_SCRY_SCOPE = "xmage_fixed_boost_target_creature_until_eot_scry_spell_v1"
 KEYWORD_DRAW_SCOPE = "xmage_fixed_keyword_target_creature_until_eot_draw_card_spell_v1"
 BOOST_KEYWORD_DRAW_SCOPE = "xmage_fixed_boost_keyword_target_creature_until_eot_draw_card_spell_v1"
 DESTROY_DRAW_SCOPE = "xmage_destroy_target_and_draw_card_spell_v1"
@@ -411,6 +417,7 @@ SPELL_UNITS = {
     ADD_COUNTERS_TARGET_UNIT,
     ADD_COUNTERS_SOURCE_UNIT,
     BOOST_TARGET_UNIT,
+    BOOST_SCRY_UNIT,
     BOOST_CONTROLLED_SPELL_UNIT,
     BOOST_ALL_SPELL_UNIT,
     TOKEN_SPELL_UNIT,
@@ -6609,6 +6616,39 @@ def fixed_boost_draw_from_source(source: str) -> tuple[int, int, int] | None:
     if not boost_match or not draw_match or boost_match.start() > draw_match.start():
         return None
     return boost[0], boost[1], int(draw_matches[0])
+
+
+def fixed_boost_scry_from_oracle(metadata: dict[str, Any]) -> tuple[int, int, int] | None:
+    text = strip_parenthetical_reminders(oracle_text(metadata))
+    text = re.sub(r"\s+", " ", text).strip()
+    match = re.match(
+        r"^target creature gets ([+-]?\d+)/([+-]?\d+) until end of turn\. scry (\d+)\.?$",
+        text,
+    )
+    if not match:
+        return None
+    power = signed_int_from_oracle(match.group(1))
+    toughness = signed_int_from_oracle(match.group(2))
+    if power is None or toughness is None:
+        return None
+    scry_count = int(match.group(3))
+    if scry_count <= 0:
+        return None
+    return power, toughness, scry_count
+
+
+def fixed_boost_scry_from_source(source: str) -> tuple[int, int, int] | None:
+    text = source or ""
+    boost = fixed_boost_target_from_source(text)
+    if boost is None:
+        return None
+    scry_match = fixed_scry_count_match_from_source(text)
+    if scry_match is None:
+        return None
+    boost_match = re.search(r"new\s+BoostTargetEffect\s*\(", text)
+    if boost_match is None or boost_match.start() > scry_match[1]:
+        return None
+    return boost[0], boost[1], scry_match[0]
 
 
 def fixed_boost_keyword_target_from_source(
@@ -25311,6 +25351,66 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_fixed_damage_scry_spell",
+        ), "selected_exact_scope"
+
+    if unit == BOOST_SCRY_UNIT and classes == {"BoostTargetEffect", "ScryEffect"}:
+        unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+        if unsupported_abilities:
+            return None, "boost_scry_ability_class_not_simple"
+        oracle_boost_scry = fixed_boost_scry_from_oracle(metadata)
+        if oracle_boost_scry is None:
+            return None, "boost_scry_oracle_not_exact_fixed"
+        source_boost_scry = fixed_boost_scry_from_source(source_text)
+        if source_boost_scry is None:
+            return None, "boost_scry_source_not_fixed"
+        if source_boost_scry != oracle_boost_scry:
+            return None, "boost_scry_source_oracle_mismatch"
+        power_delta, toughness_delta, scry_count = oracle_boost_scry
+        boost_component = {
+            "effect": "stat_modifier_until_eot",
+            "battle_model_scope": BOOST_TARGET_SCOPE,
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "target_controller": "any",
+            "power_delta": power_delta,
+            "toughness_delta": toughness_delta,
+            "power_boost": power_delta,
+            "toughness_boost": toughness_delta,
+            "duration": "until_end_of_turn",
+            "compose_on_resolution": True,
+            "xmage_effect_class": "BoostTargetEffect",
+        }
+        scry_component = {
+            "effect": "scry",
+            "battle_model_scope": SCRY_SCOPE,
+            "count": scry_count,
+            "scry_count": scry_count,
+            "compose_on_resolution": True,
+            "xmage_effect_class": "ScryEffect",
+        }
+        effect_json = {
+            "effect": "composite_resolution",
+            "battle_model_scope": BOOST_SCRY_SCOPE,
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "target_controller": "any",
+            "power_delta": power_delta,
+            "toughness_delta": toughness_delta,
+            "power_boost": power_delta,
+            "toughness_boost": toughness_delta,
+            "duration": "until_end_of_turn",
+            "scry_count": scry_count,
+            "count": scry_count,
+            "resolution_order": "boost_then_scry",
+            "_composite_rule_components": [boost_component, scry_component],
+            "xmage_effect_classes": ["BoostTargetEffect", "ScryEffect"],
+            **flags,
+        }
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_fixed_boost_scry_spell",
         ), "selected_exact_scope"
 
     if unit == DESTROY_UNIT and classes == {"DestroyTargetEffect", "ScryEffect"}:
