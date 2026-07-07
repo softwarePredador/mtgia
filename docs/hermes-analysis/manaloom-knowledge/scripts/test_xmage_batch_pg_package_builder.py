@@ -1325,6 +1325,31 @@ def test_multi_target_removal_scenario_uses_declared_target_count() -> None:
     assert builder.single_target_removal_execution_scenario_from_expected_rule(rule) is None
 
 
+def test_destroy_gain_life_scenario_carries_controller_life_gain() -> None:
+    rule = {
+        "normalized_name": "divine offering fixture",
+        "card_name": "Divine Offering Fixture",
+        "oracle_hash": "hash-divine-offering-fixture",
+        "logical_rule_key": "battle_rule_v1:hash-divine-offering-fixture",
+        "required_effect_fields": {
+            "effect": "remove_permanent",
+            "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+            "target": "artifact_or_enchantment",
+            "target_constraints": {"card_types": ["artifact", "enchantment"]},
+            "destination": "graveyard",
+            "controller_gains_life": 4,
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "single_target_removal"
+    assert scenario["expected_effect"] == "remove_permanent"
+    assert scenario["expected_controller_life_gain"] == 4
+    assert scenario["controller_life"] == 10
+
+
 def test_multi_target_damage_scenario_exercises_divided_damage() -> None:
     rule = {
         "normalized_name": "arc lightning",

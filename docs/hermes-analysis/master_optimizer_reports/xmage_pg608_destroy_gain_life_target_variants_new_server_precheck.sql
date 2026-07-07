@@ -1,0 +1,90 @@
+WITH proposed(normalized_name, card_name, oracle_hash, logical_rule_key, effect_json, deck_role_json, source, confidence, review_status, execution_status, notes, shadow_handling) AS (
+  VALUES
+    ('aerial predation', 'Aerial Predation', 'b2cb8ff88a5f9cb91c99b46c96d78950', 'battle_rule_v1:0e5ac29c17b71bb4879d5d16832f3bca', '{"battle_model_scope":"xmage_destroy_target_and_controller_gain_life_spell_v1","controller_gains_life":2,"destination":"graveyard","effect":"remove_creature","instant":true,"sorcery":false,"target":"flying_creature","target_constraints":{"card_types":["creature"],"required_keywords":["flying"]},"xmage_effect_classes":["DestroyTargetEffect","GainLifeEffect"]}'::jsonb, '{"category":"removal","effect":"remove_creature","target":"flying_creature","timing":"instant"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class AerialPredation translated into ManaLoom runtime scope xmage_destroy_target_and_controller_gain_life_spell_v1. This row is package-ready only because the source signature is a narrow fixed destroy-target plus controller life-gain spell with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('dark offering', 'Dark Offering', '143098df19af20647c9bbc2d7874e72d', 'battle_rule_v1:86330155927d6b3e3f3ba2428cea1c0d', '{"battle_model_scope":"xmage_destroy_target_and_controller_gain_life_spell_v1","controller_gains_life":3,"destination":"graveyard","effect":"remove_creature","instant":false,"sorcery":true,"target":"nonblack_creature","target_constraints":{"card_types":["creature"],"exclude_colors":["B"]},"xmage_effect_classes":["DestroyTargetEffect","GainLifeEffect"]}'::jsonb, '{"category":"removal","effect":"remove_creature","target":"nonblack_creature"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class DarkOffering translated into ManaLoom runtime scope xmage_destroy_target_and_controller_gain_life_spell_v1. This row is package-ready only because the source signature is a narrow fixed destroy-target plus controller life-gain spell with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('eriette''s lullaby', 'Eriette''s Lullaby', 'b0c3d7e7072c72605ff87885e8d45ad0', 'battle_rule_v1:7f42d43c8c797438b78b67efb326202f', '{"battle_model_scope":"xmage_destroy_target_and_controller_gain_life_spell_v1","controller_gains_life":2,"destination":"graveyard","effect":"remove_creature","instant":false,"sorcery":true,"target":"tapped_creature","target_constraints":{"card_types":["creature"],"tapped_state":"tapped"},"xmage_effect_classes":["DestroyTargetEffect","GainLifeEffect"]}'::jsonb, '{"category":"removal","effect":"remove_creature","target":"tapped_creature"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class EriettesLullaby translated into ManaLoom runtime scope xmage_destroy_target_and_controller_gain_life_spell_v1. This row is package-ready only because the source signature is a narrow fixed destroy-target plus controller life-gain spell with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('lucky offering', 'Lucky Offering', '10b3966d679592b0097e6d74dda6d1c3', 'battle_rule_v1:982867e310f7149aa3336071e323549f', '{"battle_model_scope":"xmage_destroy_target_and_controller_gain_life_spell_v1","controller_gains_life":3,"destination":"graveyard","effect":"remove_permanent","instant":false,"sorcery":true,"target":"artifact_mana_value_3_or_less","target_constraints":{"card_types":["artifact"],"mana_value_max":3},"xmage_effect_classes":["DestroyTargetEffect","GainLifeEffect"]}'::jsonb, '{"category":"removal","effect":"remove_permanent","target":"artifact_mana_value_3_or_less"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class LuckyOffering translated into ManaLoom runtime scope xmage_destroy_target_and_controller_gain_life_spell_v1. This row is package-ready only because the source signature is a narrow fixed destroy-target plus controller life-gain spell with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('noxious grasp', 'Noxious Grasp', 'a81be47c02993bee84732bd8e9005446', 'battle_rule_v1:76fa402d8900912bcb88ff88721efef4', '{"battle_model_scope":"xmage_destroy_target_and_controller_gain_life_spell_v1","controller_gains_life":1,"destination":"graveyard","effect":"remove_permanent","instant":true,"sorcery":false,"target":"green_or_white_creature_or_planeswalker","target_constraints":{"card_types":["creature","planeswalker"],"target_colors":["G","W"]},"xmage_effect_classes":["DestroyTargetEffect","GainLifeEffect"]}'::jsonb, '{"category":"removal","effect":"remove_permanent","target":"green_or_white_creature_or_planeswalker","timing":"instant"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class NoxiousGrasp translated into ManaLoom runtime scope xmage_destroy_target_and_controller_gain_life_spell_v1. This row is package-ready only because the source signature is a narrow fixed destroy-target plus controller life-gain spell with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('poison arrow', 'Poison Arrow', '143098df19af20647c9bbc2d7874e72d', 'battle_rule_v1:86330155927d6b3e3f3ba2428cea1c0d', '{"battle_model_scope":"xmage_destroy_target_and_controller_gain_life_spell_v1","controller_gains_life":3,"destination":"graveyard","effect":"remove_creature","instant":false,"sorcery":true,"target":"nonblack_creature","target_constraints":{"card_types":["creature"],"exclude_colors":["B"]},"xmage_effect_classes":["DestroyTargetEffect","GainLifeEffect"]}'::jsonb, '{"category":"removal","effect":"remove_creature","target":"nonblack_creature"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class PoisonArrow translated into ManaLoom runtime scope xmage_destroy_target_and_controller_gain_life_spell_v1. This row is package-ready only because the source signature is a narrow fixed destroy-target plus controller life-gain spell with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('radiant strike', 'Radiant Strike', '9d1548b9f503a2c3f65bd4856d5b62ea', 'battle_rule_v1:a6b67b3d134b165eeb74b148c3016b36', '{"battle_model_scope":"xmage_destroy_target_and_controller_gain_life_spell_v1","controller_gains_life":3,"destination":"graveyard","effect":"remove_permanent","instant":true,"sorcery":false,"target":"artifact_or_tapped_creature","target_constraints":{"any_of":[{"card_types":["artifact"]},{"card_types":["creature"],"tapped_state":"tapped"}]},"xmage_effect_classes":["DestroyTargetEffect","GainLifeEffect"]}'::jsonb, '{"category":"removal","effect":"remove_permanent","target":"artifact_or_tapped_creature","timing":"instant"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class RadiantStrike translated into ManaLoom runtime scope xmage_destroy_target_and_controller_gain_life_spell_v1. This row is package-ready only because the source signature is a narrow fixed destroy-target plus controller life-gain spell with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('silverstrike', 'Silverstrike', 'd25187a9dd4e987f960cba8a3453f2c8', 'battle_rule_v1:7af59986d8d36daf76a83874661b1b31', '{"battle_model_scope":"xmage_destroy_target_and_controller_gain_life_spell_v1","controller_gains_life":3,"destination":"graveyard","effect":"remove_creature","instant":true,"sorcery":false,"target":"attacking_creature","target_constraints":{"card_types":["creature"],"combat_state":"attacking"},"xmage_effect_classes":["DestroyTargetEffect","GainLifeEffect"]}'::jsonb, '{"category":"removal","effect":"remove_creature","target":"attacking_creature","timing":"instant"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class Silverstrike translated into ManaLoom runtime scope xmage_destroy_target_and_controller_gain_life_spell_v1. This row is package-ready only because the source signature is a narrow fixed destroy-target plus controller life-gain spell with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('surge of righteousness', 'Surge of Righteousness', '3924868b9e82affd8785ea508e7406be', 'battle_rule_v1:30063fd54671ccd84a8107ebb7b854cf', '{"battle_model_scope":"xmage_destroy_target_and_controller_gain_life_spell_v1","controller_gains_life":2,"destination":"graveyard","effect":"remove_creature","instant":true,"sorcery":false,"target":"black_or_red_attacking_or_blocking_creature","target_constraints":{"card_types":["creature"],"combat_state":"attacking_or_blocking","target_colors":["B","R"]},"xmage_effect_classes":["DestroyTargetEffect","GainLifeEffect"]}'::jsonb, '{"category":"removal","effect":"remove_creature","target":"black_or_red_attacking_or_blocking_creature","timing":"instant"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class SurgeOfRighteousness translated into ManaLoom runtime scope xmage_destroy_target_and_controller_gain_life_spell_v1. This row is package-ready only because the source signature is a narrow fixed destroy-target plus controller life-gain spell with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('triumphant surge', 'Triumphant Surge', '3d72bcd72bed0ee2e1e98de87f9a60d8', 'battle_rule_v1:e7f6166f5bccea52b3b5bc6235ac68d2', '{"battle_model_scope":"xmage_destroy_target_and_controller_gain_life_spell_v1","controller_gains_life":3,"destination":"graveyard","effect":"remove_creature","instant":true,"sorcery":false,"target":"creature_power_4_or_greater","target_constraints":{"card_types":["creature"],"power_min":4},"xmage_effect_classes":["DestroyTargetEffect","GainLifeEffect"]}'::jsonb, '{"category":"removal","effect":"remove_creature","target":"creature_power_4_or_greater","timing":"instant"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class TriumphantSurge translated into ManaLoom runtime scope xmage_destroy_target_and_controller_gain_life_spell_v1. This row is package-ready only because the source signature is a narrow fixed destroy-target plus controller life-gain spell with focused runtime coverage.', 'deprecate_nonmatching_rows')
+),
+matched_cards AS (
+  SELECT
+    p.normalized_name,
+    p.card_name,
+    p.oracle_hash,
+    c.id AS card_id,
+    c.name AS db_card_name
+  FROM proposed p
+  LEFT JOIN public.cards c
+    ON (
+         lower(c.name) = p.normalized_name
+         OR split_part(lower(c.name), ' // ', 1) = p.normalized_name
+       )
+   AND md5(coalesce(c.oracle_text, '')) = p.oracle_hash
+),
+target_cards AS (
+  SELECT
+    normalized_name,
+    card_name,
+    oracle_hash,
+    count(card_id) AS target_card_rows,
+    min(card_id::text)::uuid AS canonical_card_id,
+    min(db_card_name) AS canonical_card_name
+  FROM matched_cards
+  GROUP BY normalized_name, card_name, oracle_hash
+),
+rule_rows AS (
+  SELECT p.normalized_name, count(r.*) AS existing_rule_rows
+  FROM proposed p
+  LEFT JOIN public.card_battle_rules r
+    ON (
+         r.normalized_name = p.normalized_name
+         OR r.normalized_name LIKE p.normalized_name || ' // %'
+       )
+  GROUP BY p.normalized_name
+),
+expected_rows AS (
+  SELECT p.normalized_name, count(r.*) AS expected_rule_rows_before
+  FROM proposed p
+  LEFT JOIN public.card_battle_rules r
+    ON (
+         r.normalized_name = p.normalized_name
+         OR r.normalized_name LIKE p.normalized_name || ' // %'
+       )
+   AND r.logical_rule_key = p.logical_rule_key
+  GROUP BY p.normalized_name
+),
+shadow_rows AS (
+  SELECT p.normalized_name, count(r.*) AS would_deprecate_shadow_rows
+  FROM proposed p
+  LEFT JOIN public.card_battle_rules r
+    ON (
+         r.normalized_name = p.normalized_name
+         OR r.normalized_name LIKE p.normalized_name || ' // %'
+       )
+   AND r.logical_rule_key <> p.logical_rule_key
+   AND r.review_status NOT IN ('deprecated', 'rejected')
+   AND r.execution_status <> 'disabled'
+  GROUP BY p.normalized_name
+)
+SELECT
+  p.card_name,
+  p.normalized_name,
+  p.oracle_hash,
+  p.logical_rule_key,
+  p.shadow_handling,
+  tc.target_card_rows,
+  tc.canonical_card_id,
+  rr.existing_rule_rows,
+  er.expected_rule_rows_before,
+  sr.would_deprecate_shadow_rows
+FROM proposed p
+JOIN target_cards tc USING (normalized_name, card_name, oracle_hash)
+JOIN rule_rows rr USING (normalized_name)
+JOIN expected_rows er USING (normalized_name)
+JOIN shadow_rows sr USING (normalized_name)
+ORDER BY p.card_name;

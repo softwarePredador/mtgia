@@ -2,10 +2,12 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 import sqlite3
 import tempfile
 import unittest
 from contextlib import closing
+from decimal import Decimal
 from pathlib import Path
 
 
@@ -177,6 +179,13 @@ class AuditMultiRuleRuntimeReadinessTests(unittest.TestCase):
         self.assertEqual(detail["overall_status"], "no_runtime_safe_primary")
         self.assertIn("review_only_gap", detail["gap_categories"])
         self.assertIn("annotation_only_gap", detail["gap_categories"])
+
+    def test_json_default_serializes_postgres_decimal_values(self) -> None:
+        payload = {"integer": Decimal("2"), "fractional": Decimal("0.95")}
+
+        rendered = json.loads(json.dumps(payload, default=audit._json_default))
+
+        self.assertEqual(rendered, {"integer": 2, "fractional": 0.95})
 
 
 if __name__ == "__main__":

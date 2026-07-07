@@ -284,6 +284,7 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "sacrifice_scope",
     "sacrifice_choice",
     "sacrifice_requires_multicolored",
+    "controller_gains_life",
     "life_gain",
     "life_gain_amount",
     "life_gain_amount_source",
@@ -3097,6 +3098,7 @@ def single_target_removal_execution_scenario_from_expected_rule(
     if required.get("battle_model_scope") not in {
         "xmage_exile_target_spell_v1",
         "xmage_destroy_target_spell_v1",
+        "xmage_destroy_target_and_controller_gain_life_spell_v1",
         "xmage_return_target_to_hand_spell_v1",
     }:
         return None
@@ -3107,7 +3109,7 @@ def single_target_removal_execution_scenario_from_expected_rule(
         return None
     constraints = dict(required.get("target_constraints") or {})
     destination = str(required.get("destination") or "graveyard").lower()
-    return {
+    scenario = {
         "name": f"{rule['card_name']} removes one legal target",
         "type": "single_target_removal",
         "card": {
@@ -3125,6 +3127,11 @@ def single_target_removal_execution_scenario_from_expected_rule(
         "expected_target_constraints": constraints,
         "logical_rule_key": rule["logical_rule_key"],
     }
+    controller_life_gain = int(required.get("controller_gains_life") or 0)
+    if controller_life_gain > 0:
+        scenario["controller_life"] = 10
+        scenario["expected_controller_life_gain"] = controller_life_gain
+    return scenario
 
 
 def single_target_removal_and_surveil_execution_scenario_from_expected_rule(

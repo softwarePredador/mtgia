@@ -19,6 +19,7 @@ import json
 import sqlite3
 from collections import Counter
 from datetime import datetime, timezone
+from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
@@ -44,6 +45,14 @@ db_helper = _load_module("battle_multi_rule_audit_db_helper", DB_HELPER_PATH)
 
 def _counter_to_sorted_dict(counter: Counter[str]) -> dict[str, int]:
     return dict(sorted(counter.items(), key=lambda item: (-item[1], item[0])))
+
+
+def _json_default(value: Any) -> Any:
+    if isinstance(value, Decimal):
+        if value == value.to_integral_value():
+            return int(value)
+        return float(value)
+    raise TypeError(f"Object of type {value.__class__.__name__} is not JSON serializable")
 
 
 def _gap_category_from_reason(reason: str) -> str:
@@ -299,7 +308,14 @@ def main() -> int:
 
     summary = build_summary(db_path, use_pg=args.pg)
     output_path.write_text(
-        json.dumps(summary, indent=2, ensure_ascii=False, sort_keys=True) + "\n",
+        json.dumps(
+            summary,
+            indent=2,
+            ensure_ascii=False,
+            sort_keys=True,
+            default=_json_default,
+        )
+        + "\n",
         encoding="utf-8",
     )
     print(

@@ -1928,6 +1928,9 @@ def run_single_target_removal(
     card = dict(scenario["card"])
     active = battle.Player(str(scenario.get("player") or "Active"), None, [])
     opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
+    controller_starting_life = int(scenario.get("controller_life") or getattr(active, "life", 20) or 20)
+    expected_controller_life_gain = int(scenario.get("expected_controller_life_gain") or 0)
+    active.life = controller_starting_life
     target = dict(scenario["target"])
     nonmatching = dict(
         scenario.get("nonmatching_target")
@@ -1982,8 +1985,27 @@ def run_single_target_removal(
         fail("battle_events", f"{card['name']} target_legal={removal_event.get('target_legal')!r}")
     if str(removal_event.get("destination") or "").lower() != destination:
         fail("battle_events", f"{card['name']} destination={removal_event.get('destination')!r}")
+    if expected_controller_life_gain > 0:
+        expected_life = controller_starting_life + expected_controller_life_gain
+        if active.life != expected_life:
+            fail(
+                "battle_execution",
+                f"{card['name']} controller_life={active.life}, expected={expected_life}",
+            )
+        for field, expected in (
+            ("controller_gains_life", expected_controller_life_gain),
+            ("life_gain_requested", expected_controller_life_gain),
+            ("life_gained", expected_controller_life_gain),
+        ):
+            if int(removal_event.get(field) or 0) != expected:
+                fail("battle_events", f"{card['name']} {field}={removal_event.get(field)!r}")
+        if removal_event.get("life_gain_recipient") != "controller":
+            fail(
+                "battle_events",
+                f"{card['name']} life_gain_recipient={removal_event.get('life_gain_recipient')!r}",
+            )
 
-    return {
+    result = {
         "scenario": scenario.get("name"),
         "card_name": card["name"],
         "target": target_name,
@@ -1992,6 +2014,11 @@ def run_single_target_removal(
         "moved_names": moved_names,
         "battlefield_names": battlefield_names,
     }
+    if expected_controller_life_gain > 0:
+        result["controller_life_before"] = controller_starting_life
+        result["controller_life_after"] = active.life
+        result["controller_life_gained"] = expected_controller_life_gain
+    return result
 
 
 def run_single_target_removal_and_surveil(

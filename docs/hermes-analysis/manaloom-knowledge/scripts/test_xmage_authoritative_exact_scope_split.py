@@ -8019,6 +8019,168 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["controller_gains_life"], 4)
         self.assertEqual(effect["target_constraints"], {"card_types": ["artifact", "enchantment"]})
 
+    def test_destroy_gain_life_spell_maps_restricted_target_filters(self) -> None:
+        cases = [
+            (
+                "Destroy target creature with flying. You gain 2 life.",
+                (
+                    "this.getSpellAbility().addTarget(new TargetPermanent("
+                    "StaticFilters.FILTER_CREATURE_FLYING));"
+                    "this.getSpellAbility().addEffect(new DestroyTargetEffect());"
+                    "this.getSpellAbility().addEffect(new GainLifeEffect(2));"
+                ),
+                "flying_creature",
+                2,
+                {"card_types": ["creature"], "required_keywords": ["flying"]},
+                "remove_creature",
+            ),
+            (
+                "Destroy target nonblack creature. You gain 3 life.",
+                (
+                    "this.getSpellAbility().addEffect(new DestroyTargetEffect());"
+                    "this.getSpellAbility().addEffect(new GainLifeEffect(3));"
+                    "this.getSpellAbility().addTarget(new TargetPermanent("
+                    "FILTER_PERMANENT_CREATURE_NON_BLACK));"
+                ),
+                "nonblack_creature",
+                3,
+                {"card_types": ["creature"], "exclude_colors": ["B"]},
+                "remove_creature",
+            ),
+            (
+                "Destroy target tapped creature. You gain 2 life.",
+                (
+                    "private static final FilterPermanent filter = "
+                    "new FilterCreaturePermanent(\"tapped creature\");"
+                    "filter.add(TappedPredicate.TAPPED);"
+                    "this.getSpellAbility().addEffect(new DestroyTargetEffect());"
+                    "this.getSpellAbility().addTarget(new TargetPermanent(filter));"
+                    "this.getSpellAbility().addEffect(new GainLifeEffect(2));"
+                ),
+                "tapped_creature",
+                2,
+                {"card_types": ["creature"], "tapped_state": "tapped"},
+                "remove_creature",
+            ),
+            (
+                "Destroy target artifact with mana value 3 or less. You gain 3 life.",
+                (
+                    "private static final FilterPermanent filter = "
+                    "new FilterArtifactPermanent(\"artifact with mana value 3 or less\");"
+                    "filter.add(new ManaValuePredicate(ComparisonType.FEWER_THAN, 4));"
+                    "this.getSpellAbility().addEffect(new DestroyTargetEffect());"
+                    "this.getSpellAbility().addEffect(new GainLifeEffect(3));"
+                    "this.getSpellAbility().addTarget(new TargetPermanent(filter));"
+                ),
+                "artifact_mana_value_3_or_less",
+                3,
+                {"card_types": ["artifact"], "mana_value_max": 3},
+                "remove_permanent",
+            ),
+            (
+                "Destroy target creature or planeswalker that's green or white. You gain 1 life.",
+                (
+                    "private static final FilterPermanent filter = "
+                    "new FilterCreatureOrPlaneswalkerPermanent("
+                    "\"creature or planeswalker that's green or white\");"
+                    "filter.add(Predicates.or(new ColorPredicate(ObjectColor.GREEN), "
+                    "new ColorPredicate(ObjectColor.WHITE)));"
+                    "this.getSpellAbility().addEffect(new DestroyTargetEffect());"
+                    "this.getSpellAbility().addTarget(new TargetPermanent(filter));"
+                    "this.getSpellAbility().addEffect(new GainLifeEffect(1));"
+                ),
+                "green_or_white_creature_or_planeswalker",
+                1,
+                {"card_types": ["creature", "planeswalker"], "target_colors": ["G", "W"]},
+                "remove_permanent",
+            ),
+            (
+                "Destroy target artifact or tapped creature. You gain 3 life.",
+                (
+                    "private static final FilterPermanent filter = "
+                    "new FilterPermanent(\"artifact or tapped creature\");"
+                    "filter.add(Predicates.or(CardType.ARTIFACT.getPredicate(), "
+                    "Predicates.and(TappedPredicate.TAPPED, CardType.CREATURE.getPredicate())));"
+                    "this.getSpellAbility().addEffect(new DestroyTargetEffect());"
+                    "this.getSpellAbility().addTarget(new TargetPermanent(filter));"
+                    "this.getSpellAbility().addEffect(new GainLifeEffect(3));"
+                ),
+                "artifact_or_tapped_creature",
+                3,
+                {
+                    "any_of": [
+                        {"card_types": ["artifact"]},
+                        {"card_types": ["creature"], "tapped_state": "tapped"},
+                    ]
+                },
+                "remove_permanent",
+            ),
+            (
+                "Destroy target attacking creature. You gain 3 life.",
+                (
+                    "this.getSpellAbility().addEffect(new DestroyTargetEffect());"
+                    "this.getSpellAbility().addTarget(new TargetAttackingCreature());"
+                    "this.getSpellAbility().addEffect(new GainLifeEffect(3));"
+                ),
+                "attacking_creature",
+                3,
+                {"card_types": ["creature"], "combat_state": "attacking"},
+                "remove_creature",
+            ),
+            (
+                "Destroy target black or red creature that's attacking or blocking. You gain 2 life.",
+                (
+                    "private static final FilterCreaturePermanent filter = "
+                    "new FilterAttackingOrBlockingCreature("
+                    "\"black or red creature that's attacking or blocking\");"
+                    "filter.add(Predicates.or(new ColorPredicate(ObjectColor.BLACK), "
+                    "new ColorPredicate(ObjectColor.RED)));"
+                    "this.getSpellAbility().addTarget(new TargetPermanent(filter));"
+                    "this.getSpellAbility().addEffect(new DestroyTargetEffect());"
+                    "this.getSpellAbility().addEffect(new GainLifeEffect(2));"
+                ),
+                "black_or_red_attacking_or_blocking_creature",
+                2,
+                {
+                    "card_types": ["creature"],
+                    "target_colors": ["B", "R"],
+                    "combat_state": "attacking_or_blocking",
+                },
+                "remove_creature",
+            ),
+            (
+                "Destroy target creature with power 4 or greater. You gain 3 life.",
+                (
+                    "private static final FilterPermanent filter = "
+                    "new FilterCreaturePermanent(\"creature with power 4 or greater\");"
+                    "filter.add(new PowerPredicate(ComparisonType.MORE_THAN, 3));"
+                    "this.getSpellAbility().addEffect(new DestroyTargetEffect());"
+                    "this.getSpellAbility().addEffect(new GainLifeEffect(3));"
+                    "this.getSpellAbility().addTarget(new TargetPermanent(filter));"
+                ),
+                "creature_power_4_or_greater",
+                3,
+                {"card_types": ["creature"], "power_min": 4},
+                "remove_creature",
+            ),
+        ]
+        for oracle, source, expected_target, expected_life, expected_constraints, expected_effect in cases:
+            with self.subTest(expected_target=expected_target):
+                row = queue_row(split.LIFE_UNIT, effect_classes=["DestroyTargetEffect", "GainLifeEffect"])
+                proposal, reason = split.split_row(
+                    row,
+                    metadata(oracle_text=oracle),
+                    source_text=source,
+                )
+
+                self.assertEqual(reason, "selected_exact_scope")
+                effect = proposal["effect_json"]
+                self.assertEqual(effect["effect"], expected_effect)
+                self.assertEqual(effect["battle_model_scope"], split.DESTROY_GAIN_LIFE_SCOPE)
+                self.assertEqual(effect["target"], expected_target)
+                self.assertEqual(effect["controller_gains_life"], expected_life)
+                self.assertEqual(effect["target_constraints"], expected_constraints)
+
     def test_destroy_gain_life_spell_blocks_dynamic_life_gain(self) -> None:
         row = queue_row(split.LIFE_UNIT, effect_classes=["DestroyTargetEffect", "GainLifeEffect"])
         proposal, reason = split.split_row(
@@ -8072,7 +8234,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "additional_cost_detected")
 
-    def test_destroy_gain_life_spell_blocks_restricted_target_filter(self) -> None:
+    def test_destroy_gain_life_spell_blocks_opaque_target_filter(self) -> None:
         row = queue_row(split.LIFE_UNIT, effect_classes=["DestroyTargetEffect", "GainLifeEffect"])
         proposal, reason = split.split_row(
             row,

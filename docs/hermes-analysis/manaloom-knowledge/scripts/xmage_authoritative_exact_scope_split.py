@@ -2385,6 +2385,26 @@ def simple_destroy_gain_life_from_source(source: str) -> tuple[str, int] | None:
     target_classes = re.findall(r"new\s+(Target\w+)\s*\(", text)
     if len(target_classes) != 1:
         return None
+    supported_targets = {
+        "artifact_or_enchantment",
+        "artifact_or_creature",
+        "artifact",
+        "enchantment",
+        "creature",
+        "land",
+        "flying_creature",
+        "nonblack_creature",
+        "tapped_creature",
+        "attacking_creature",
+        "creature_power_4_or_greater",
+        "artifact_mana_value_3_or_less",
+        "green_or_white_creature_or_planeswalker",
+        "artifact_or_tapped_creature",
+        "black_or_red_attacking_or_blocking_creature",
+    }
+    restricted_target = restricted_battlefield_target_from_source(text)
+    if restricted_target in supported_targets:
+        return restricted_target, int(life_matches[0])
     target_patterns = [
         (
             "artifact_or_enchantment",
@@ -2404,29 +2424,40 @@ def simple_destroy_gain_life_from_source(source: str) -> tuple[str, int] | None:
         for target, pattern in target_patterns
         if re.search(pattern, text, re.S)
     ]
-    if len(matched_targets) != 1:
+    if len(matched_targets) != 1 or matched_targets[0] not in supported_targets:
         return None
     return matched_targets[0], int(life_matches[0])
 
 
 def simple_destroy_gain_life_from_oracle(metadata: dict[str, Any]) -> tuple[str, int] | None:
     text = oracle_text(metadata)
-    target_patterns = [
-        ("artifact_or_enchantment", r"artifact or enchantment"),
-        ("artifact_or_creature", r"artifact or creature"),
-        ("artifact", r"artifact"),
-        ("enchantment", r"enchantment"),
-        ("creature", r"creature"),
-        ("land", r"land"),
-    ]
-    for target, target_phrase in target_patterns:
-        match = re.match(
-            rf"^destroy target {target_phrase}\. you gain (\d+) life\.?$",
-            text,
-        )
-        if match:
-            return target, int(match.group(1))
-    return None
+    match = re.fullmatch(r"destroy target .+?\. you gain (?P<life>\d+) life\.?", text)
+    if not match:
+        return None
+    destroy = destroy_target_from_oracle(metadata)
+    if destroy is None:
+        return None
+    _, target = destroy
+    supported_targets = {
+        "artifact_or_enchantment",
+        "artifact_or_creature",
+        "artifact",
+        "enchantment",
+        "creature",
+        "land",
+        "flying_creature",
+        "nonblack_creature",
+        "tapped_creature",
+        "attacking_creature",
+        "creature_power_4_or_greater",
+        "artifact_mana_value_3_or_less",
+        "green_or_white_creature_or_planeswalker",
+        "artifact_or_tapped_creature",
+        "black_or_red_attacking_or_blocking_creature",
+    }
+    if target not in supported_targets:
+        return None
+    return target, int(match.group("life"))
 
 
 def simple_destroy_target_controller_life_loss_from_source(source: str) -> int | None:
@@ -11048,6 +11079,7 @@ def restricted_target_base(target: str) -> str:
         "blue_creature",
         "green_creature",
         "green_or_white_creature",
+        "black_or_red_attacking_or_blocking_creature",
         "artifact_creature",
         "nonartifact_creature",
         "nonartifact_nonblack_creature",
@@ -11083,6 +11115,8 @@ def restricted_target_base(target: str) -> str:
     if target in {
         "black_or_red_creature_or_planeswalker",
         "black_or_red_permanent",
+        "green_or_white_creature_or_planeswalker",
+        "artifact_or_tapped_creature",
         "white_permanent",
         "monocolored_permanent",
         "multicolored_creature_or_enchantment",
@@ -11111,7 +11145,7 @@ def restricted_target_base(target: str) -> str:
 
 def mana_value_restricted_target_parts(target: str) -> dict[str, Any] | None:
     match = re.fullmatch(
-        r"(?P<base>creature|permanent|nonland_permanent)_mana_value_(?P<value>\d+)_(?P<op>or_less|or_greater|exact)",
+        r"(?P<base>artifact|creature|permanent|nonland_permanent)_mana_value_(?P<value>\d+)_(?P<op>or_less|or_greater|exact)",
         str(target or ""),
     )
     if not match:
@@ -11154,10 +11188,12 @@ def restricted_battlefield_target_from_oracle(metadata: dict[str, Any], action: 
         (r"target attacking or blocking creature with power 3 or less", "attacking_or_blocking_creature_power_3_or_less"),
         (r"target attacking creature with power 3 or less", "attacking_creature_power_3_or_less"),
         (r"target attacking creature with flying", "attacking_flying_creature"),
+        (r"target black or red creature (?:that's|that is) attacking or blocking", "black_or_red_attacking_or_blocking_creature"),
         (r"target nonblack attacking creature", "nonblack_attacking_creature"),
         (r"target attacking or blocking creature", "attacking_or_blocking_creature"),
         (r"target attacking creature", "attacking_creature"),
         (r"target blocking creature", "blocking_creature"),
+        (r"target artifact or tapped creature", "artifact_or_tapped_creature"),
         (r"target tapped creature", "tapped_creature"),
         (r"target untapped creature", "untapped_creature"),
         (r"target creature with flying", "flying_creature"),
@@ -11190,6 +11226,7 @@ def restricted_battlefield_target_from_oracle(metadata: dict[str, Any], action: 
         (r"target noncreature artifact", "noncreature_artifact"),
         (r"target nonbasic land", "nonbasic_land"),
         (r"target blue or black creature with flying", "blue_or_black_flying_creature"),
+        (r"target creature or planeswalker that's green or white", "green_or_white_creature_or_planeswalker"),
         (r"target creature or planeswalker that's black or red", "black_or_red_creature_or_planeswalker"),
         (r"target creature, vehicle, or nonbasic land", "creature_vehicle_or_nonbasic_land"),
         (r"target black or red permanent", "black_or_red_permanent"),
@@ -11222,7 +11259,7 @@ def restricted_battlefield_target_from_oracle(metadata: dict[str, Any], action: 
             return target
     mana_value_match = re.match(
         prefix
-        + r"target (?P<base>creature|permanent|nonland permanent) with "
+        + r"target (?P<base>artifact|creature|permanent|nonland permanent) with "
         + r"(?:mana value|converted mana cost) (?P<value>\d+)(?P<op> or less| or greater)?"
         + suffix,
         text,
@@ -11265,12 +11302,28 @@ def restricted_battlefield_target_from_source(source: str) -> str | None:
         )
     ):
         return "attacking_flying_creature"
+    if (
+        "FilterAttackingOrBlockingCreature" in text
+        and "ObjectColor.BLACK" in text
+        and "ObjectColor.RED" in text
+        and "ColorPredicate" in text
+    ):
+        return "black_or_red_attacking_or_blocking_creature"
     if re.search(r"new\s+TargetAttackingOrBlockingCreature\s*\(", text) or "FilterAttackingOrBlockingCreature" in text:
         return "attacking_or_blocking_creature"
     if re.search(r"new\s+TargetAttackingCreature\s*\(", text) or "FilterAttackingCreature" in text:
         return "attacking_creature"
     if re.search(r"new\s+TargetBlockingCreature\s*\(", text) or "FilterBlockingCreature" in text:
         return "blocking_creature"
+    if (
+        'FilterPermanent("artifact or tapped creature")' in text
+        or (
+            "CardType.ARTIFACT" in text
+            and "CardType.CREATURE" in text
+            and "TappedPredicate.TAPPED" in text
+        )
+    ):
+        return "artifact_or_tapped_creature"
     if 'FilterCreaturePermanent("tapped creature")' in text or "tapped creature" in text or "TappedPredicate.TAPPED" in text:
         return "tapped_creature"
     if 'FilterCreaturePermanent("untapped creature")' in text or "untapped creature" in text or "TappedPredicate.UNTAPPED" in text:
@@ -11377,6 +11430,13 @@ def restricted_battlefield_target_from_source(source: str) -> str | None:
     ):
         return "blue_or_black_flying_creature"
     if (
+        "FilterCreatureOrPlaneswalkerPermanent" in text
+        and "ObjectColor.GREEN" in text
+        and "ObjectColor.WHITE" in text
+        and "ColorPredicate" in text
+    ):
+        return "green_or_white_creature_or_planeswalker"
+    if (
         'FilterPermanent("artifact, enchantment, or creature with flying")' in text
         or (
             "CardType.ARTIFACT" in text
@@ -11473,7 +11533,9 @@ def mana_value_restricted_target_from_source(source: str) -> str | None:
     )
     if not mana_value_match:
         return None
-    if "FilterCreaturePermanent" in text or "TargetCreaturePermanent" in text:
+    if "FilterArtifactPermanent" in text or "TargetArtifactPermanent" in text:
+        base = "artifact"
+    elif "FilterCreaturePermanent" in text or "TargetCreaturePermanent" in text:
         base = "creature"
     elif "FilterNonlandPermanent" in text or "TargetNonlandPermanent" in text:
         base = "nonland_permanent"
@@ -19374,6 +19436,12 @@ def target_constraints_for(target: str) -> dict[str, Any]:
         return {"card_types": ["creature"], "combat_state": "blocking"}
     if target == "attacking_or_blocking_creature":
         return {"card_types": ["creature"], "combat_state": "attacking_or_blocking"}
+    if target == "black_or_red_attacking_or_blocking_creature":
+        return {
+            "card_types": ["creature"],
+            "target_colors": ["B", "R"],
+            "combat_state": "attacking_or_blocking",
+        }
     if target == "attacking_creature_power_3_or_less":
         return {"card_types": ["creature"], "combat_state": "attacking", "power_max": 3}
     if target == "attacking_or_blocking_creature_power_2_or_less":
@@ -19483,6 +19551,15 @@ def target_constraints_for(target: str) -> dict[str, Any]:
         return {"card_types": ["creature", "planeswalker"], "target_colors": ["B", "R"]}
     if target == "black_or_red_permanent":
         return {"card_types": ["permanent"], "target_colors": ["B", "R"]}
+    if target == "green_or_white_creature_or_planeswalker":
+        return {"card_types": ["creature", "planeswalker"], "target_colors": ["G", "W"]}
+    if target == "artifact_or_tapped_creature":
+        return {
+            "any_of": [
+                {"card_types": ["artifact"]},
+                {"card_types": ["creature"], "tapped_state": "tapped"},
+            ]
+        }
     if target == "white_permanent":
         return {"card_types": ["permanent"], "target_colors": ["W"]}
     if target == "monocolored_permanent":
@@ -26785,7 +26862,11 @@ def split_row(
         if source_destroy != oracle_destroy:
             return None, "destroy_life_gain_source_oracle_mismatch"
         target, life_gain = oracle_destroy
-        effect = "remove_creature" if target == "creature" else "remove_permanent"
+        effect = (
+            "remove_creature"
+            if restricted_target_base(target) == "creature"
+            else "remove_permanent"
+        )
         effect_json = {
             "effect": effect,
             "battle_model_scope": DESTROY_GAIN_LIFE_SCOPE,

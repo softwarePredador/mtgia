@@ -145,6 +145,58 @@ def test_simple_activated_damage_runner_executes_random_discard_cost() -> None:
     assert result["opponent_life"] == 5
 
 
+def test_single_target_removal_runner_validates_controller_life_gain() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "remove_permanent",
+        "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+        "target": "artifact_or_enchantment",
+        "target_constraints": {"card_types": ["artifact", "enchantment"]},
+        "destination": "graveyard",
+        "controller_gains_life": 4,
+        "_rule_logical_key": "battle_rule_v1:divine-offering-fixture",
+    }
+    try:
+        result = validator.run_single_target_removal(
+            battle,
+            {
+                "name": "Divine Offering Fixture removes one legal target",
+                "type": "single_target_removal",
+                "card": {"name": "Divine Offering Fixture", "type_line": "Instant"},
+                "target": {
+                    "name": "E2E Legal Removal Target",
+                    "type_line": "Artifact",
+                    "effect": "artifact",
+                    "cmc": 3,
+                },
+                "nonmatching_target": {
+                    "name": "E2E Illegal Removal Target",
+                    "type_line": "Land",
+                    "effect": "land",
+                    "cmc": 0,
+                },
+                "expected_destination": "graveyard",
+                "expected_effect": "remove_permanent",
+                "expected_controller_life_gain": 4,
+                "controller_life": 10,
+                "logical_rule_key": "battle_rule_v1:divine-offering-fixture",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Divine Offering Fixture"
+    assert result["controller_life_before"] == 10
+    assert result["controller_life_after"] == 14
+    assert result["controller_life_gained"] == 4
+
+
 def test_simple_activated_tap_target_runner_executes_tap_effect() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

@@ -1,0 +1,563 @@
+{
+  "battle_execution": {
+    "event_count": 30,
+    "results": [
+      {
+        "battlefield_names": [
+          "E2E Illegal Removal Target"
+        ],
+        "card_name": "Aerial Predation",
+        "controller_life_after": 12,
+        "controller_life_before": 10,
+        "controller_life_gained": 2,
+        "destination": "graveyard",
+        "moved_names": [
+          "E2E Legal Removal Target"
+        ],
+        "nonmatching_target": "E2E Illegal Removal Target",
+        "scenario": "Aerial Predation removes one legal target",
+        "target": "E2E Legal Removal Target"
+      },
+      {
+        "battlefield_names": [
+          "E2E Illegal Removal Target"
+        ],
+        "card_name": "Dark Offering",
+        "controller_life_after": 13,
+        "controller_life_before": 10,
+        "controller_life_gained": 3,
+        "destination": "graveyard",
+        "moved_names": [
+          "E2E Legal Removal Target"
+        ],
+        "nonmatching_target": "E2E Illegal Removal Target",
+        "scenario": "Dark Offering removes one legal target",
+        "target": "E2E Legal Removal Target"
+      },
+      {
+        "battlefield_names": [
+          "E2E Illegal Removal Target"
+        ],
+        "card_name": "Eriette's Lullaby",
+        "controller_life_after": 12,
+        "controller_life_before": 10,
+        "controller_life_gained": 2,
+        "destination": "graveyard",
+        "moved_names": [
+          "E2E Legal Removal Target"
+        ],
+        "nonmatching_target": "E2E Illegal Removal Target",
+        "scenario": "Eriette's Lullaby removes one legal target",
+        "target": "E2E Legal Removal Target"
+      },
+      {
+        "battlefield_names": [
+          "E2E Illegal Removal Target"
+        ],
+        "card_name": "Lucky Offering",
+        "controller_life_after": 13,
+        "controller_life_before": 10,
+        "controller_life_gained": 3,
+        "destination": "graveyard",
+        "moved_names": [
+          "E2E Legal Removal Target"
+        ],
+        "nonmatching_target": "E2E Illegal Removal Target",
+        "scenario": "Lucky Offering removes one legal target",
+        "target": "E2E Legal Removal Target"
+      },
+      {
+        "battlefield_names": [
+          "E2E Illegal Removal Target"
+        ],
+        "card_name": "Noxious Grasp",
+        "controller_life_after": 11,
+        "controller_life_before": 10,
+        "controller_life_gained": 1,
+        "destination": "graveyard",
+        "moved_names": [
+          "E2E Legal Removal Target"
+        ],
+        "nonmatching_target": "E2E Illegal Removal Target",
+        "scenario": "Noxious Grasp removes one legal target",
+        "target": "E2E Legal Removal Target"
+      },
+      {
+        "battlefield_names": [
+          "E2E Illegal Removal Target"
+        ],
+        "card_name": "Poison Arrow",
+        "controller_life_after": 13,
+        "controller_life_before": 10,
+        "controller_life_gained": 3,
+        "destination": "graveyard",
+        "moved_names": [
+          "E2E Legal Removal Target"
+        ],
+        "nonmatching_target": "E2E Illegal Removal Target",
+        "scenario": "Poison Arrow removes one legal target",
+        "target": "E2E Legal Removal Target"
+      },
+      {
+        "battlefield_names": [
+          "E2E Illegal Removal Target"
+        ],
+        "card_name": "Radiant Strike",
+        "controller_life_after": 13,
+        "controller_life_before": 10,
+        "controller_life_gained": 3,
+        "destination": "graveyard",
+        "moved_names": [
+          "E2E Legal Removal Target"
+        ],
+        "nonmatching_target": "E2E Illegal Removal Target",
+        "scenario": "Radiant Strike removes one legal target",
+        "target": "E2E Legal Removal Target"
+      },
+      {
+        "battlefield_names": [
+          "E2E Illegal Removal Target"
+        ],
+        "card_name": "Silverstrike",
+        "controller_life_after": 13,
+        "controller_life_before": 10,
+        "controller_life_gained": 3,
+        "destination": "graveyard",
+        "moved_names": [
+          "E2E Legal Removal Target"
+        ],
+        "nonmatching_target": "E2E Illegal Removal Target",
+        "scenario": "Silverstrike removes one legal target",
+        "target": "E2E Legal Removal Target"
+      },
+      {
+        "battlefield_names": [
+          "E2E Illegal Removal Target"
+        ],
+        "card_name": "Surge of Righteousness",
+        "controller_life_after": 12,
+        "controller_life_before": 10,
+        "controller_life_gained": 2,
+        "destination": "graveyard",
+        "moved_names": [
+          "E2E Legal Removal Target"
+        ],
+        "nonmatching_target": "E2E Illegal Removal Target",
+        "scenario": "Surge of Righteousness removes one legal target",
+        "target": "E2E Legal Removal Target"
+      },
+      {
+        "battlefield_names": [
+          "E2E Illegal Removal Target"
+        ],
+        "card_name": "Triumphant Surge",
+        "controller_life_after": 13,
+        "controller_life_before": 10,
+        "controller_life_gained": 3,
+        "destination": "graveyard",
+        "moved_names": [
+          "E2E Legal Removal Target"
+        ],
+        "nonmatching_target": "E2E Illegal Removal Target",
+        "scenario": "Triumphant Surge removes one legal target",
+        "target": "E2E Legal Removal Target"
+      }
+    ],
+    "scenario_count": 10
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-07T10:09:42.832205+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/xmage_pg608_destroy_gain_life_target_variants_new_server_manifest.json",
+  "package_id": "xmage_pg608_destroy_gain_life_target_variants_new_server_manifest",
+  "snapshot": "docs/hermes-analysis/master_optimizer_reports/xmage_pg608_destroy_gain_life_target_variants_new_server_known_cards_canonical_snapshot.json",
+  "sqlite_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 10
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "card_name": "Aerial Predation",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0e5ac29c17b71bb4879d5d16832f3bca",
+          "oracle_hash": "b2cb8ff88a5f9cb91c99b46c96d78950",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "card_name": "Dark Offering",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:86330155927d6b3e3f3ba2428cea1c0d",
+          "oracle_hash": "143098df19af20647c9bbc2d7874e72d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "card_name": "Eriette's Lullaby",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7f42d43c8c797438b78b67efb326202f",
+          "oracle_hash": "b0c3d7e7072c72605ff87885e8d45ad0",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "card_name": "Lucky Offering",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:982867e310f7149aa3336071e323549f",
+          "oracle_hash": "10b3966d679592b0097e6d74dda6d1c3",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "card_name": "Noxious Grasp",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:76fa402d8900912bcb88ff88721efef4",
+          "oracle_hash": "a81be47c02993bee84732bd8e9005446",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "card_name": "Poison Arrow",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:86330155927d6b3e3f3ba2428cea1c0d",
+          "oracle_hash": "143098df19af20647c9bbc2d7874e72d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "card_name": "Radiant Strike",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a6b67b3d134b165eeb74b148c3016b36",
+          "oracle_hash": "9d1548b9f503a2c3f65bd4856d5b62ea",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "card_name": "Silverstrike",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7af59986d8d36daf76a83874661b1b31",
+          "oracle_hash": "d25187a9dd4e987f960cba8a3453f2c8",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "card_name": "Surge of Righteousness",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:30063fd54671ccd84a8107ebb7b854cf",
+          "oracle_hash": "3924868b9e82affd8785ea508e7406be",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "card_name": "Triumphant Surge",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e7f6166f5bccea52b3b5bc6235ac68d2",
+          "oracle_hash": "3d72bcd72bed0ee2e1e98de87f9a60d8",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 10
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "card_name": "Aerial Predation",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0e5ac29c17b71bb4879d5d16832f3bca",
+          "oracle_hash": "b2cb8ff88a5f9cb91c99b46c96d78950",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "card_name": "Dark Offering",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:86330155927d6b3e3f3ba2428cea1c0d",
+          "oracle_hash": "143098df19af20647c9bbc2d7874e72d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "card_name": "Eriette's Lullaby",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7f42d43c8c797438b78b67efb326202f",
+          "oracle_hash": "b0c3d7e7072c72605ff87885e8d45ad0",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "card_name": "Lucky Offering",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:982867e310f7149aa3336071e323549f",
+          "oracle_hash": "10b3966d679592b0097e6d74dda6d1c3",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "card_name": "Noxious Grasp",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:76fa402d8900912bcb88ff88721efef4",
+          "oracle_hash": "a81be47c02993bee84732bd8e9005446",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "card_name": "Poison Arrow",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:86330155927d6b3e3f3ba2428cea1c0d",
+          "oracle_hash": "143098df19af20647c9bbc2d7874e72d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "card_name": "Radiant Strike",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a6b67b3d134b165eeb74b148c3016b36",
+          "oracle_hash": "9d1548b9f503a2c3f65bd4856d5b62ea",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "card_name": "Silverstrike",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7af59986d8d36daf76a83874661b1b31",
+          "oracle_hash": "d25187a9dd4e987f960cba8a3453f2c8",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "card_name": "Surge of Righteousness",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:30063fd54671ccd84a8107ebb7b854cf",
+          "oracle_hash": "3924868b9e82affd8785ea508e7406be",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "card_name": "Triumphant Surge",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e7f6166f5bccea52b3b5bc6235ac68d2",
+          "oracle_hash": "3d72bcd72bed0ee2e1e98de87f9a60d8",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 10
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Aerial Predation",
+          "logical_rule_key": "battle_rule_v1:0e5ac29c17b71bb4879d5d16832f3bca"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Dark Offering",
+          "logical_rule_key": "battle_rule_v1:86330155927d6b3e3f3ba2428cea1c0d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Eriette's Lullaby",
+          "logical_rule_key": "battle_rule_v1:7f42d43c8c797438b78b67efb326202f"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Lucky Offering",
+          "logical_rule_key": "battle_rule_v1:982867e310f7149aa3336071e323549f"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Noxious Grasp",
+          "logical_rule_key": "battle_rule_v1:76fa402d8900912bcb88ff88721efef4"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Poison Arrow",
+          "logical_rule_key": "battle_rule_v1:86330155927d6b3e3f3ba2428cea1c0d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Radiant Strike",
+          "logical_rule_key": "battle_rule_v1:a6b67b3d134b165eeb74b148c3016b36"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Silverstrike",
+          "logical_rule_key": "battle_rule_v1:7af59986d8d36daf76a83874661b1b31"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Surge of Righteousness",
+          "logical_rule_key": "battle_rule_v1:30063fd54671ccd84a8107ebb7b854cf"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Triumphant Surge",
+          "logical_rule_key": "battle_rule_v1:e7f6166f5bccea52b3b5bc6235ac68d2"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 10
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Aerial Predation",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:0e5ac29c17b71bb4879d5d16832f3bca"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Dark Offering",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:86330155927d6b3e3f3ba2428cea1c0d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Eriette's Lullaby",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:7f42d43c8c797438b78b67efb326202f"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Lucky Offering",
+          "component_keys": [],
+          "effect": "remove_permanent",
+          "logical_rule_key": "battle_rule_v1:982867e310f7149aa3336071e323549f"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Noxious Grasp",
+          "component_keys": [],
+          "effect": "remove_permanent",
+          "logical_rule_key": "battle_rule_v1:76fa402d8900912bcb88ff88721efef4"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Poison Arrow",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:86330155927d6b3e3f3ba2428cea1c0d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Radiant Strike",
+          "component_keys": [],
+          "effect": "remove_permanent",
+          "logical_rule_key": "battle_rule_v1:a6b67b3d134b165eeb74b148c3016b36"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Silverstrike",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:7af59986d8d36daf76a83874661b1b31"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Surge of Righteousness",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:30063fd54671ccd84a8107ebb7b854cf"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Triumphant Surge",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:e7f6166f5bccea52b3b5bc6235ac68d2"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 30,
+        "scenarios": 10
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

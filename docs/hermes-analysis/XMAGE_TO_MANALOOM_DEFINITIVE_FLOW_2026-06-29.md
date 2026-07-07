@@ -17749,6 +17749,87 @@ alternate-cost payment mechanics. `Soul Spike` and `Spinning Darkness` are
 therefore promoted for their XMage-backed resolution effect; their alternate
 cost abilities remain outside this package's scope.
 
+## 2026-07-07 PG608 Destroy Target + Controller Life-Gain Target Variants Checkpoint
+
+PG608 closed the exact XMage subpattern:
+
+- `DestroyTargetEffect + GainLifeEffect`;
+- fixed `GainLifeEffect(n)`;
+- one legal target;
+- no additional cost, triggered wrapper, activated wrapper, dynamic X, or
+  mana-value-equal life gain;
+- supported restricted targets:
+  `flying_creature`, `nonblack_creature`, `tapped_creature`,
+  `artifact_mana_value_3_or_less`,
+  `green_or_white_creature_or_planeswalker`, `artifact_or_tapped_creature`,
+  `attacking_creature`, `black_or_red_attacking_or_blocking_creature`, and
+  `creature_power_4_or_greater`.
+
+Promoted cards:
+
+- `Aerial Predation`;
+- `Dark Offering`;
+- `Eriette's Lullaby`;
+- `Lucky Offering`;
+- `Noxious Grasp`;
+- `Poison Arrow`;
+- `Radiant Strike`;
+- `Silverstrike`;
+- `Surge of Righteousness`;
+- `Triumphant Surge`.
+
+Implementation:
+
+- `xmage_authoritative_exact_scope_split.py` now maps destroy+life restricted
+  targets through the shared target-constraint layer instead of accepting only
+  simple artifact/creature target regexes;
+- `xmage_batch_pg_package_builder.py` now carries `controller_gains_life` into
+  single-target removal E2E scenarios for
+  `xmage_destroy_target_and_controller_gain_life_spell_v1`;
+- `battle_package_end_to_end_validation.py` now validates controller life
+  before/after and the `removal_resolved` life-gain event fields;
+- `audit_multi_rule_runtime_readiness.py` now serializes PostgreSQL `Decimal`
+  values in report JSON, fixing a PG audit failure exposed during this cycle.
+
+Validation:
+
+- split produced `proposal_count=10` and
+  `safe_for_batch_pg_package_count=10`;
+- precheck found `10/10` target card rows, `0` existing expected rule rows, and
+  `0` shadow rows to deprecate;
+- apply upserted `10` PostgreSQL rows and deprecated `0` shadow rows;
+- postcheck confirmed `10/10` promoted rows, `10/10` verified/auto rows, and
+  `10/10` rows with `oracle_hash`;
+- focused tests passed for splitter destroy+life variants, package builder
+  destroy+life scenario, E2E controller life-gain runner, and the Decimal
+  serialization fix;
+- PG -> SQLite/snapshot sync loaded `10` PostgreSQL rows, updated `10` SQLite
+  rows, and exported `5760` canonical snapshot rows;
+- metadata sync used `database_target=127.0.0.1:15432/halder`, matched `6928`
+  PostgreSQL cards, and left `deck_cards` at `2699/2699` matched;
+- E2E validation passed PostgreSQL, SQLite, snapshot, runtime lookup, and `10`
+  battle execution scenarios, each proving target removal plus controller life
+  gain;
+- post-sync queue rebuild reduced `target_identity_count` from `25107` to
+  `25097`, `xmage_authoritative_source_count` from `24793` to `24783`,
+  `xmage_authoritative_adapter_required_count` from `24793` to `24783`, and
+  `life_gain::xmage_life_gain_variant_review_v1` from `673` to `663`;
+- global readiness now reports `battle_and_oracle_ready=5853` and
+  `battle_family_mapper_required=28020`;
+- PG/Hermes/SQLite contract audit passed `51/51`;
+- XMage strategy audit passed `26/26`;
+- operational surface alignment audit passed;
+- legacy contamination audit passed;
+- multi-rule runtime readiness audit passed after the Decimal serialization
+  fix;
+- `scripts/quality_gate.sh server-target` passed against the new-server target.
+
+Residual boundary: PG608 models fixed destroy-target plus controller life gain.
+It does not authorize dynamic life gain equal to mana value/X, additional-cost
+destroy spells, conditional cast gates, ETB/dies triggered variants, activated
+destroy abilities, or destroy-plus-life patterns with multiple independent
+targets/effects.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:
