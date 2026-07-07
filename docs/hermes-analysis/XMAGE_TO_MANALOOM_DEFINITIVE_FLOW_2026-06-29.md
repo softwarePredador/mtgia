@@ -17051,6 +17051,74 @@ non-trample keywords, temporary end-of-turn grants, conditional/tapped/attacking
 filters, compound controlled abilities, ability-sharing effects, or static
 controlled P/T boosts. Those remain separate adapter contracts.
 
+## PG598 Dynamic CounterUnlessPays Checkpoint
+
+As of 2026-07-07, PG598 is applied and synced against the new server target.
+It closes the exact dynamic tax subset of XMage `CounterUnlessPaysEffect` rows
+that PG520/PG528 intentionally left out after fixed generic taxes.
+
+Closed cards:
+
+- `Clash of Wills`
+- `Concerted Defense`
+- `Evasive Action`
+- `Ixidor's Will`
+- `Spell Stutter`
+- `Syncopate`
+- `Thassa's Rebuff`
+
+Runtime/modeling change:
+
+- `xmage_authoritative_exact_scope_split.py` now accepts exact Oracle/XMage
+  matches for dynamic counter-unless taxes backed by `GetXValue.instance`,
+  `PartyCount.instance`, `DomainValue.REGULAR`, `DevotionCount.U`,
+  `PermanentsOnBattlefieldCount(FILTER, 2)` for Wizards on all battlefields,
+  and `IntPlusDynamicValue(2, controlled Faerie count)`;
+- the promoted rows reuse
+  `xmage_counter_target_spell_unless_controller_pays_generic_v1` and record
+  the resolved dynamic formula through `counter_unless_pays_amount_source`,
+  `counter_unless_pays_base`, `counter_unless_pays_per`,
+  `counter_unless_pays_subtype`, and
+  `counter_unless_pays_battlefield_scope`;
+- `battle_analyst_v9.py` now resolves dynamic counter taxes at stack-response
+  time, including X from the target stack item's cast context, domain from the
+  counter controller's lands, party count, blue devotion, controlled subtype
+  counts, and all-battlefield subtype counts;
+- a zero dynamic tax is treated as payable zero, so the target spell is not
+  countered when the resolved tax is `{0}`;
+- `xmage_batch_pg_package_builder.py` now preserves dynamic counter-unless
+  fields and generates `counter_unless_pays_response` E2E scenarios;
+- `battle_package_end_to_end_validation.py` now executes those scenarios and
+  validates PG, SQLite, snapshot, runtime lookup, stack response, resolved
+  tax, tax source/count, and Syncopate's exile replacement.
+
+Validation:
+
+- split produced `proposal_count=7` and
+  `safe_for_batch_pg_package_count=7`;
+- precheck found `7/7` target rows, `0` existing expected executable rows,
+  and `0` shadow rows to deprecate;
+- apply upserted `7` PostgreSQL rows and deprecated `0` shadow rows;
+- postcheck confirmed `7/7` promoted rows, `7/7` `verified_auto` rows, and
+  `7/7` rows with `oracle_hash`;
+- focused tests passed: splitter `734`, package builder `69`, exact runtime
+  `373`;
+- PG -> SQLite/snapshot final sync after hash backfill loaded `9371`
+  PostgreSQL rows, updated `9135` SQLite rows, and exported `6814` canonical
+  snapshot rows;
+- E2E validation passed PostgreSQL, SQLite, snapshot, runtime lookup, and `7`
+  battle execution scenarios;
+- final exact-scope recheck returned `proposal_count=0`;
+- final PG/Hermes/SQLite contract audit passed `51/51`;
+- final XMage strategy audit passed `26/26`;
+- final operational and legacy contamination audits passed;
+- `scripts/quality_gate.sh server-target` passed against the new-server target.
+
+Residual boundary: PG598 does not authorize broader counterspell families,
+activated/triggered stack interaction, modal counters, non-spell targets, or
+counter-unless formulas outside the exact source/oracle matches listed above.
+Those remain separate adapter contracts.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

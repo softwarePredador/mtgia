@@ -4169,6 +4169,102 @@ def run_copy_stack_ability_response(
     }
 
 
+def run_counter_unless_pays_response(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    response_card = dict(scenario["card"])
+    turn = int(scenario.get("turn") or 7)
+    phase = str(scenario.get("phase") or "precombat_main")
+    active = battle.Player(str(scenario.get("active_player") or "Active"), None, [])
+    responder = battle.Player(str(scenario.get("responder") or "Responder"), None, [])
+    active.battlefield = [dict(item) for item in scenario.get("active_battlefield") or []]
+    responder.battlefield = [dict(item) for item in scenario.get("responder_battlefield") or []]
+    add_manifest_mana(active, scenario.get("active_mana") or {})
+    add_manifest_mana(responder, scenario.get("responder_mana") or {"blue": 1})
+    responder.hand = [response_card]
+    target_spell = dict(scenario.get("target_spell") or {
+        "name": "Counter Target Fixture",
+        "cmc": 7,
+        "mana_cost": "{5}{R}{R}",
+        "type_line": "Creature - Dragon",
+        "effect": "finisher",
+    })
+    target_effect = dict(scenario.get("target_stack_effect") or {"effect": "finisher"})
+    stack = battle.Stack()
+    stack.push(target_spell, active, target_effect)
+
+    if not battle.priority_round(
+        active,
+        [active, responder],
+        stack,
+        turn,
+        random.Random(int(scenario.get("seed") or 6072)),
+        phase=phase,
+    ):
+        fail("battle_execution", f"{response_card['name']} was not cast as counter response")
+
+    expected_countered = bool(scenario.get("expected_countered", True))
+    actual_countered = bool(stack.items and getattr(stack.items[-1], "countered", False))
+    if actual_countered != expected_countered:
+        fail("battle_execution", f"{response_card['name']} countered={actual_countered}, expected={expected_countered}")
+
+    counter_event = next(
+        (
+            data
+            for event, data in reversed(events)
+            if event == "spell_countered" and data.get("counter") == response_card.get("name")
+        ),
+        None,
+    )
+    if counter_event is None:
+        fail("battle_events", f"missing {response_card['name']} spell_countered event")
+
+    expected_tax = scenario.get("expected_counter_unless_pays_generic")
+    if expected_tax is not None and counter_event.get("counter_unless_pays_generic") != int(expected_tax):
+        fail(
+            "battle_events",
+            f"{response_card['name']} tax={counter_event.get('counter_unless_pays_generic')}, expected={expected_tax}",
+        )
+    expected_source = scenario.get("expected_counter_unless_pays_amount_source")
+    if expected_source is not None and counter_event.get("counter_unless_pays_amount_source") != expected_source:
+        fail(
+            "battle_events",
+            f"{response_card['name']} tax_source={counter_event.get('counter_unless_pays_amount_source')!r}",
+        )
+    expected_count = scenario.get("expected_counter_unless_pays_count")
+    if expected_count is not None and counter_event.get("counter_unless_pays_count") != int(expected_count):
+        fail(
+            "battle_events",
+            f"{response_card['name']} tax_count={counter_event.get('counter_unless_pays_count')}, expected={expected_count}",
+        )
+    expected_paid = bool(scenario.get("expected_counter_tax_paid", False))
+    if bool(counter_event.get("counter_tax_paid")) != expected_paid:
+        fail("battle_events", f"{response_card['name']} counter_tax_paid={counter_event.get('counter_tax_paid')}")
+    expected_exile = bool(scenario.get("expected_countered_spell_to_exile"))
+    if bool(counter_event.get("countered_spell_to_exile")) != expected_exile:
+        fail("battle_events", f"{response_card['name']} countered_spell_to_exile={counter_event.get('countered_spell_to_exile')}")
+    if expected_exile and expected_countered:
+        if not target_spell.get("_exile_on_resolution"):
+            fail("battle_execution", f"{response_card['name']} did not mark countered spell for exile")
+        stack.resolve_top()
+        if not any(card.get("name") == target_spell.get("name") for card in active.exile if isinstance(card, dict)):
+            fail("battle_execution", f"{response_card['name']} did not move countered spell to exile")
+
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": response_card["name"],
+        "target": target_spell.get("name"),
+        "countered": actual_countered,
+        "counter_unless_pays_generic": counter_event.get("counter_unless_pays_generic"),
+        "counter_unless_pays_amount_source": counter_event.get("counter_unless_pays_amount_source"),
+        "counter_unless_pays_count": counter_event.get("counter_unless_pays_count"),
+        "counter_tax_paid": counter_event.get("counter_tax_paid"),
+        "countered_spell_to_exile": counter_event.get("countered_spell_to_exile"),
+    }
+
+
 def run_change_single_target_response(
     battle,
     scenario: dict[str, Any],
@@ -4714,6 +4810,7 @@ SCENARIO_RUNNERS = {
     "aura_static_power_toughness_attachment": run_aura_static_power_toughness_attachment,
     "becomes_blocked_self_boost": run_becomes_blocked_self_boost,
     "conditional_land_play": run_conditional_land_play,
+    "counter_unless_pays_response": run_counter_unless_pays_response,
     "copy_stack_ability_response": run_copy_stack_ability_response,
     "copy_spell_choose_new_targets": run_copy_spell_choose_new_targets,
     "change_single_target_response": run_change_single_target_response,

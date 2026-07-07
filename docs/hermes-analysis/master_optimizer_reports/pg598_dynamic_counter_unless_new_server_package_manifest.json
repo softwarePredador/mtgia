@@ -1,0 +1,816 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg598_dynamic_counter_unless_new_server_20260707_063333",
+  "deploy_id": "pg598",
+  "execution_scenarios": [
+    {
+      "active_battlefield": [],
+      "active_mana": {
+        "generic": 0
+      },
+      "card": {
+        "cmc": 1,
+        "instant": true,
+        "mana_cost": "{U}",
+        "name": "Clash of Wills",
+        "type_line": "Instant"
+      },
+      "expected_counter_tax_paid": false,
+      "expected_counter_unless_pays_amount_source": "x_value",
+      "expected_counter_unless_pays_count": 3,
+      "expected_counter_unless_pays_generic": 3,
+      "expected_countered": true,
+      "expected_countered_spell_to_exile": false,
+      "logical_rule_key": "battle_rule_v1:d4e54073e1ba3b1b6421bdca2219979b",
+      "name": "Clash of Wills counters unless tax is paid",
+      "responder_battlefield": [],
+      "responder_mana": {
+        "blue": 1
+      },
+      "target_spell": {
+        "cmc": 7,
+        "effect": "finisher",
+        "mana_cost": "{5}{R}{R}",
+        "name": "Counter Target Fixture",
+        "type_line": "Creature - Dragon"
+      },
+      "target_stack_effect": {
+        "_cast_context": {
+          "x_value": 3
+        },
+        "effect": "finisher"
+      },
+      "type": "counter_unless_pays_response"
+    },
+    {
+      "active_battlefield": [],
+      "active_mana": {
+        "generic": 0
+      },
+      "card": {
+        "cmc": 1,
+        "instant": true,
+        "mana_cost": "{U}",
+        "name": "Concerted Defense",
+        "type_line": "Instant"
+      },
+      "expected_counter_tax_paid": false,
+      "expected_counter_unless_pays_amount_source": "party_count",
+      "expected_counter_unless_pays_count": 4,
+      "expected_counter_unless_pays_generic": 5,
+      "expected_countered": true,
+      "expected_countered_spell_to_exile": false,
+      "logical_rule_key": "battle_rule_v1:ba1635cf0df5e7ffbc3d10d4140869ec",
+      "name": "Concerted Defense counters unless tax is paid",
+      "responder_battlefield": [
+        {
+          "name": "Fixture Cleric",
+          "subtypes": [
+            "Cleric"
+          ],
+          "type_line": "Creature - Cleric"
+        },
+        {
+          "name": "Fixture Rogue",
+          "subtypes": [
+            "Rogue"
+          ],
+          "type_line": "Creature - Rogue"
+        },
+        {
+          "name": "Fixture Warrior",
+          "subtypes": [
+            "Warrior"
+          ],
+          "type_line": "Creature - Warrior"
+        },
+        {
+          "name": "Fixture Wizard",
+          "subtypes": [
+            "Wizard"
+          ],
+          "type_line": "Creature - Wizard"
+        }
+      ],
+      "responder_mana": {
+        "blue": 1
+      },
+      "target_spell": {
+        "cmc": 7,
+        "effect": "finisher",
+        "mana_cost": "{5}{R}{R}",
+        "name": "Counter Target Fixture",
+        "type_line": "Sorcery"
+      },
+      "target_stack_effect": {
+        "effect": "finisher"
+      },
+      "type": "counter_unless_pays_response"
+    },
+    {
+      "active_battlefield": [],
+      "active_mana": {
+        "generic": 0
+      },
+      "card": {
+        "cmc": 1,
+        "instant": true,
+        "mana_cost": "{U}",
+        "name": "Evasive Action",
+        "type_line": "Instant"
+      },
+      "expected_counter_tax_paid": false,
+      "expected_counter_unless_pays_amount_source": "domain_basic_land_types",
+      "expected_counter_unless_pays_count": 3,
+      "expected_counter_unless_pays_generic": 3,
+      "expected_countered": true,
+      "expected_countered_spell_to_exile": false,
+      "logical_rule_key": "battle_rule_v1:21c488c17c3ea1d2c0f3257033074a69",
+      "name": "Evasive Action counters unless tax is paid",
+      "responder_battlefield": [
+        {
+          "name": "Fixture Plains",
+          "subtypes": [
+            "Plains"
+          ],
+          "type_line": "Land - Plains"
+        },
+        {
+          "name": "Fixture Island",
+          "subtypes": [
+            "Island"
+          ],
+          "type_line": "Land - Island"
+        },
+        {
+          "name": "Fixture Mountain",
+          "subtypes": [
+            "Mountain"
+          ],
+          "type_line": "Land - Mountain"
+        }
+      ],
+      "responder_mana": {
+        "blue": 1
+      },
+      "target_spell": {
+        "cmc": 7,
+        "effect": "finisher",
+        "mana_cost": "{5}{R}{R}",
+        "name": "Counter Target Fixture",
+        "type_line": "Creature - Dragon"
+      },
+      "target_stack_effect": {
+        "effect": "finisher"
+      },
+      "type": "counter_unless_pays_response"
+    },
+    {
+      "active_battlefield": [
+        {
+          "name": "Active Wizard",
+          "subtypes": [
+            "Wizard"
+          ],
+          "type_line": "Creature - Wizard"
+        }
+      ],
+      "active_mana": {
+        "generic": 0
+      },
+      "card": {
+        "cmc": 1,
+        "instant": true,
+        "mana_cost": "{U}",
+        "name": "Ixidor's Will",
+        "type_line": "Instant"
+      },
+      "expected_counter_tax_paid": false,
+      "expected_counter_unless_pays_amount_source": "battlefield_subtype_count",
+      "expected_counter_unless_pays_count": 2,
+      "expected_counter_unless_pays_generic": 4,
+      "expected_countered": true,
+      "expected_countered_spell_to_exile": false,
+      "logical_rule_key": "battle_rule_v1:42fabb59d3d935341743b390fea84259",
+      "name": "Ixidor's Will counters unless tax is paid",
+      "responder_battlefield": [
+        {
+          "name": "Responder Wizard",
+          "subtypes": [
+            "Wizard"
+          ],
+          "type_line": "Creature - Wizard"
+        }
+      ],
+      "responder_mana": {
+        "blue": 1
+      },
+      "target_spell": {
+        "cmc": 7,
+        "effect": "finisher",
+        "mana_cost": "{5}{R}{R}",
+        "name": "Counter Target Fixture",
+        "type_line": "Creature - Dragon"
+      },
+      "target_stack_effect": {
+        "effect": "finisher"
+      },
+      "type": "counter_unless_pays_response"
+    },
+    {
+      "active_battlefield": [],
+      "active_mana": {
+        "generic": 0
+      },
+      "card": {
+        "cmc": 1,
+        "instant": true,
+        "mana_cost": "{U}",
+        "name": "Spell Stutter",
+        "type_line": "Instant"
+      },
+      "expected_counter_tax_paid": false,
+      "expected_counter_unless_pays_amount_source": "controlled_subtype_count",
+      "expected_counter_unless_pays_count": 2,
+      "expected_counter_unless_pays_generic": 4,
+      "expected_countered": true,
+      "expected_countered_spell_to_exile": false,
+      "logical_rule_key": "battle_rule_v1:b40cf10ece4cea17b18e7bc0df955085",
+      "name": "Spell Stutter counters unless tax is paid",
+      "responder_battlefield": [
+        {
+          "name": "Fixture Faerie One",
+          "subtypes": [
+            "Faerie"
+          ],
+          "type_line": "Creature - Faerie"
+        },
+        {
+          "name": "Fixture Faerie Two",
+          "subtypes": [
+            "Faerie"
+          ],
+          "type_line": "Creature - Faerie"
+        }
+      ],
+      "responder_mana": {
+        "blue": 1
+      },
+      "target_spell": {
+        "cmc": 7,
+        "effect": "finisher",
+        "mana_cost": "{5}{R}{R}",
+        "name": "Counter Target Fixture",
+        "type_line": "Creature - Dragon"
+      },
+      "target_stack_effect": {
+        "effect": "finisher"
+      },
+      "type": "counter_unless_pays_response"
+    },
+    {
+      "active_battlefield": [],
+      "active_mana": {
+        "generic": 0
+      },
+      "card": {
+        "cmc": 1,
+        "instant": true,
+        "mana_cost": "{U}",
+        "name": "Syncopate",
+        "type_line": "Instant"
+      },
+      "expected_counter_tax_paid": false,
+      "expected_counter_unless_pays_amount_source": "x_value",
+      "expected_counter_unless_pays_count": 3,
+      "expected_counter_unless_pays_generic": 3,
+      "expected_countered": true,
+      "expected_countered_spell_to_exile": true,
+      "logical_rule_key": "battle_rule_v1:d2561a6e5cbcba21904956d952042be0",
+      "name": "Syncopate counters unless tax is paid",
+      "responder_battlefield": [],
+      "responder_mana": {
+        "blue": 1
+      },
+      "target_spell": {
+        "cmc": 7,
+        "effect": "finisher",
+        "mana_cost": "{5}{R}{R}",
+        "name": "Counter Target Fixture",
+        "type_line": "Creature - Dragon"
+      },
+      "target_stack_effect": {
+        "_cast_context": {
+          "x_value": 3
+        },
+        "effect": "finisher"
+      },
+      "type": "counter_unless_pays_response"
+    },
+    {
+      "active_battlefield": [],
+      "active_mana": {
+        "generic": 0
+      },
+      "card": {
+        "cmc": 1,
+        "instant": true,
+        "mana_cost": "{U}",
+        "name": "Thassa's Rebuff",
+        "type_line": "Instant"
+      },
+      "expected_counter_tax_paid": false,
+      "expected_counter_unless_pays_amount_source": "devotion_to_blue",
+      "expected_counter_unless_pays_count": 3,
+      "expected_counter_unless_pays_generic": 3,
+      "expected_countered": true,
+      "expected_countered_spell_to_exile": false,
+      "logical_rule_key": "battle_rule_v1:2776146218af8964966c2c530b85c4eb",
+      "name": "Thassa's Rebuff counters unless tax is paid",
+      "responder_battlefield": [
+        {
+          "mana_cost": "{U}{U}",
+          "name": "Fixture Blue Devotion One",
+          "type_line": "Enchantment"
+        },
+        {
+          "mana_cost": "{2}{U}",
+          "name": "Fixture Blue Devotion Two",
+          "type_line": "Artifact"
+        }
+      ],
+      "responder_mana": {
+        "blue": 1
+      },
+      "target_spell": {
+        "cmc": 7,
+        "effect": "finisher",
+        "mana_cost": "{5}{R}{R}",
+        "name": "Counter Target Fixture",
+        "type_line": "Creature - Dragon"
+      },
+      "target_stack_effect": {
+        "effect": "finisher"
+      },
+      "type": "counter_unless_pays_response"
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Clash of Wills",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d4e54073e1ba3b1b6421bdca2219979b",
+      "min_rule_version": 2,
+      "normalized_name": "clash of wills",
+      "oracle_hash": "d1b33ad1ce87755e487775712f5d5ed4",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+        "counter_unless_pays_amount_source": "x_value",
+        "counter_unless_pays_generic": 0,
+        "effect": "counter",
+        "target": "spell",
+        "target_constraints": {
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterUnlessPaysEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Concerted Defense",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ba1635cf0df5e7ffbc3d10d4140869ec",
+      "min_rule_version": 2,
+      "normalized_name": "concerted defense",
+      "oracle_hash": "38106b4fd7e6b0e2ef70868b965057ed",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+        "counter_unless_pays_amount_source": "party_count",
+        "counter_unless_pays_base": 1,
+        "counter_unless_pays_generic": 0,
+        "counter_unless_pays_per": 1,
+        "effect": "counter",
+        "target": "noncreature_spell",
+        "target_constraints": {
+          "exclude_card_types": [
+            "creature"
+          ],
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterUnlessPaysEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Evasive Action",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:21c488c17c3ea1d2c0f3257033074a69",
+      "min_rule_version": 2,
+      "normalized_name": "evasive action",
+      "oracle_hash": "ab61c8fb5ab9c3677681a279bd2ea0bd",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+        "counter_unless_pays_amount_source": "domain_basic_land_types",
+        "counter_unless_pays_generic": 0,
+        "counter_unless_pays_per": 1,
+        "effect": "counter",
+        "target": "spell",
+        "target_constraints": {
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterUnlessPaysEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Ixidor's Will",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:42fabb59d3d935341743b390fea84259",
+      "min_rule_version": 2,
+      "normalized_name": "ixidor's will",
+      "oracle_hash": "00ba7056980d7375a26942fc6d509d91",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+        "counter_unless_pays_amount_source": "battlefield_subtype_count",
+        "counter_unless_pays_battlefield_scope": "all_battlefields",
+        "counter_unless_pays_generic": 0,
+        "counter_unless_pays_per": 2,
+        "counter_unless_pays_subtype": "wizard",
+        "effect": "counter",
+        "target": "spell",
+        "target_constraints": {
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterUnlessPaysEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Spell Stutter",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b40cf10ece4cea17b18e7bc0df955085",
+      "min_rule_version": 2,
+      "normalized_name": "spell stutter",
+      "oracle_hash": "e6edc0c78404144dd458182ab6081fee",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+        "counter_unless_pays_amount_source": "controlled_subtype_count",
+        "counter_unless_pays_base": 2,
+        "counter_unless_pays_generic": 0,
+        "counter_unless_pays_per": 1,
+        "counter_unless_pays_subtype": "faerie",
+        "effect": "counter",
+        "target": "spell",
+        "target_constraints": {
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterUnlessPaysEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Syncopate",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d2561a6e5cbcba21904956d952042be0",
+      "min_rule_version": 2,
+      "normalized_name": "syncopate",
+      "oracle_hash": "4db03fdba3086fb379e6051414f4ef68",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+        "counter_unless_pays_amount_source": "x_value",
+        "counter_unless_pays_generic": 0,
+        "countered_spell_to_exile": true,
+        "countered_spell_to_exile_reason": "counter_unless_pays_exile_replacement",
+        "effect": "counter",
+        "target": "spell",
+        "target_constraints": {
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterUnlessPaysEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Thassa's Rebuff",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2776146218af8964966c2c530b85c4eb",
+      "min_rule_version": 2,
+      "normalized_name": "thassa's rebuff",
+      "oracle_hash": "d7d873f32db17223e44c1d8889546f90",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+        "counter_unless_pays_amount_source": "devotion_to_blue",
+        "counter_unless_pays_generic": 0,
+        "effect": "counter",
+        "target": "spell",
+        "target_constraints": {
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterUnlessPaysEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_counter_unless_pays_dynamic_spell": 7
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg598_dynamic_counter_unless_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg598_dynamic_counter_unless_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg598_dynamic_counter_unless_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg598_dynamic_counter_unless_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg598_dynamic_counter_unless_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg598_dynamic_counter_unless_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-07T06:33:33+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Clash of Wills"
+      },
+      "card_name": "Clash of Wills",
+      "effect": "counter",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d4e54073e1ba3b1b6421bdca2219979b",
+      "normalized_name": "clash of wills",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+        "counter_unless_pays_amount_source": "x_value",
+        "counter_unless_pays_generic": 0,
+        "effect": "counter",
+        "target": "spell",
+        "target_constraints": {
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterUnlessPaysEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Concerted Defense"
+      },
+      "card_name": "Concerted Defense",
+      "effect": "counter",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ba1635cf0df5e7ffbc3d10d4140869ec",
+      "normalized_name": "concerted defense",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+        "counter_unless_pays_amount_source": "party_count",
+        "counter_unless_pays_base": 1,
+        "counter_unless_pays_generic": 0,
+        "counter_unless_pays_per": 1,
+        "effect": "counter",
+        "target": "noncreature_spell",
+        "target_constraints": {
+          "exclude_card_types": [
+            "creature"
+          ],
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterUnlessPaysEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Evasive Action"
+      },
+      "card_name": "Evasive Action",
+      "effect": "counter",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:21c488c17c3ea1d2c0f3257033074a69",
+      "normalized_name": "evasive action",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+        "counter_unless_pays_amount_source": "domain_basic_land_types",
+        "counter_unless_pays_generic": 0,
+        "counter_unless_pays_per": 1,
+        "effect": "counter",
+        "target": "spell",
+        "target_constraints": {
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterUnlessPaysEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Ixidor's Will"
+      },
+      "card_name": "Ixidor's Will",
+      "effect": "counter",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:42fabb59d3d935341743b390fea84259",
+      "normalized_name": "ixidor's will",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+        "counter_unless_pays_amount_source": "battlefield_subtype_count",
+        "counter_unless_pays_battlefield_scope": "all_battlefields",
+        "counter_unless_pays_generic": 0,
+        "counter_unless_pays_per": 2,
+        "counter_unless_pays_subtype": "wizard",
+        "effect": "counter",
+        "target": "spell",
+        "target_constraints": {
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterUnlessPaysEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Spell Stutter"
+      },
+      "card_name": "Spell Stutter",
+      "effect": "counter",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b40cf10ece4cea17b18e7bc0df955085",
+      "normalized_name": "spell stutter",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+        "counter_unless_pays_amount_source": "controlled_subtype_count",
+        "counter_unless_pays_base": 2,
+        "counter_unless_pays_generic": 0,
+        "counter_unless_pays_per": 1,
+        "counter_unless_pays_subtype": "faerie",
+        "effect": "counter",
+        "target": "spell",
+        "target_constraints": {
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterUnlessPaysEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Syncopate"
+      },
+      "card_name": "Syncopate",
+      "effect": "counter",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d2561a6e5cbcba21904956d952042be0",
+      "normalized_name": "syncopate",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+        "counter_unless_pays_amount_source": "x_value",
+        "counter_unless_pays_generic": 0,
+        "countered_spell_to_exile": true,
+        "countered_spell_to_exile_reason": "counter_unless_pays_exile_replacement",
+        "effect": "counter",
+        "target": "spell",
+        "target_constraints": {
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterUnlessPaysEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Thassa's Rebuff"
+      },
+      "card_name": "Thassa's Rebuff",
+      "effect": "counter",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2776146218af8964966c2c530b85c4eb",
+      "normalized_name": "thassa's rebuff",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+        "counter_unless_pays_amount_source": "devotion_to_blue",
+        "counter_unless_pays_generic": 0,
+        "effect": "counter",
+        "target": "spell",
+        "target_constraints": {
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterUnlessPaysEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Clash of Wills",
+    "Concerted Defense",
+    "Evasive Action",
+    "Ixidor's Will",
+    "Spell Stutter",
+    "Syncopate",
+    "Thassa's Rebuff"
+  ],
+  "selected_count": 7,
+  "slug": "dynamic_counter_unless_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Clash of Wills",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d4e54073e1ba3b1b6421bdca2219979b",
+      "min_rule_version": 2,
+      "normalized_name": "clash of wills",
+      "oracle_hash": "d1b33ad1ce87755e487775712f5d5ed4",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Concerted Defense",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ba1635cf0df5e7ffbc3d10d4140869ec",
+      "min_rule_version": 2,
+      "normalized_name": "concerted defense",
+      "oracle_hash": "38106b4fd7e6b0e2ef70868b965057ed",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Evasive Action",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:21c488c17c3ea1d2c0f3257033074a69",
+      "min_rule_version": 2,
+      "normalized_name": "evasive action",
+      "oracle_hash": "ab61c8fb5ab9c3677681a279bd2ea0bd",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Ixidor's Will",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:42fabb59d3d935341743b390fea84259",
+      "min_rule_version": 2,
+      "normalized_name": "ixidor's will",
+      "oracle_hash": "00ba7056980d7375a26942fc6d509d91",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Spell Stutter",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b40cf10ece4cea17b18e7bc0df955085",
+      "min_rule_version": 2,
+      "normalized_name": "spell stutter",
+      "oracle_hash": "e6edc0c78404144dd458182ab6081fee",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Syncopate",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d2561a6e5cbcba21904956d952042be0",
+      "min_rule_version": 2,
+      "normalized_name": "syncopate",
+      "oracle_hash": "4db03fdba3086fb379e6051414f4ef68",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Thassa's Rebuff",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2776146218af8964966c2c530b85c4eb",
+      "min_rule_version": 2,
+      "normalized_name": "thassa's rebuff",
+      "oracle_hash": "d7d873f32db17223e44c1d8889546f90",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

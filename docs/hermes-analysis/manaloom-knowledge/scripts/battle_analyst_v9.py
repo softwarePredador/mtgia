@@ -8716,6 +8716,12 @@ CARD_EFFECT_FIELD_RULE_KEYS = (
     "scry_on_counter",
     "scry_count",
     "counter_unless_pays_generic",
+    "counter_unless_pays_amount_source",
+    "counter_unless_pays_base",
+    "counter_unless_pays_per",
+    "counter_unless_pays_subtype",
+    "counter_unless_pays_battlefield_scope",
+    "counter_unless_pays_default",
     "countered_spell_to_top_library",
     "countered_spell_to_exile",
     "countered_spell_to_exile_reason",
@@ -9349,6 +9355,81 @@ def counter_can_target(counter_card, counter_effect, target_card, stack_item=Non
         except Exception:
             return False
     return True
+
+
+def _counter_unless_pays_tax_amount(effect, counter_controller, target_controller=None, stack_item=None, all_players=None):
+    def safe_int(value, default=0):
+        try:
+            return int(float(value))
+        except Exception:
+            return int(default or 0)
+
+    fixed_amount = safe_int(effect.get("counter_unless_pays_generic"), 0)
+    amount_source = str(effect.get("counter_unless_pays_amount_source") or "").strip().lower()
+    if not amount_source:
+        return max(0, fixed_amount), {
+            "counter_unless_pays_amount_source": None,
+            "counter_unless_pays_base": fixed_amount,
+            "counter_unless_pays_per": 0,
+            "counter_unless_pays_count": None,
+        }, fixed_amount > 0
+
+    base = max(0, safe_int(effect.get("counter_unless_pays_base"), 0))
+    per = max(0, safe_int(effect.get("counter_unless_pays_per"), 1))
+    count = 0
+    if amount_source == "x_value":
+        effect_context = getattr(stack_item, "effect_data", None) or {}
+        amount = x_value_from_effect_context(effect_context, default=effect.get("counter_unless_pays_default") or 0)
+        return max(0, amount), {
+            "counter_unless_pays_amount_source": amount_source,
+            "counter_unless_pays_base": 0,
+            "counter_unless_pays_per": 1,
+            "counter_unless_pays_count": max(0, amount),
+        }, True
+    if amount_source == "domain_basic_land_types":
+        count = _domain_basic_land_type_count(counter_controller)
+    elif amount_source == "devotion_to_blue":
+        count = blue_devotion(counter_controller)
+    elif amount_source == "party_count":
+        count = _controlled_party_count(counter_controller)
+    elif amount_source == "controlled_subtype_count":
+        subtype = str(effect.get("counter_unless_pays_subtype") or "").strip().lower()
+        count = sum(
+            1
+            for permanent in _controlled_permanents(counter_controller)
+            if is_battlefield_creature(permanent) and permanent_has_subtype(permanent, subtype)
+        )
+    elif amount_source == "battlefield_subtype_count":
+        subtype = str(effect.get("counter_unless_pays_subtype") or "").strip().lower()
+        players = list(all_players or [])
+        if not players:
+            players = [player for player in (counter_controller, target_controller) if player is not None]
+        seen = set()
+        count = 0
+        for participant in players:
+            identity = id(participant)
+            if identity in seen:
+                continue
+            seen.add(identity)
+            for permanent in getattr(participant, "battlefield", []) or []:
+                if is_battlefield_creature(permanent) and permanent_has_subtype(permanent, subtype):
+                    count += 1
+    else:
+        return max(0, fixed_amount), {
+            "counter_unless_pays_amount_source": amount_source,
+            "counter_unless_pays_base": fixed_amount,
+            "counter_unless_pays_per": 0,
+            "counter_unless_pays_count": None,
+            "counter_unless_pays_unsupported": True,
+        }, fixed_amount > 0
+
+    amount = base + (per * max(0, count))
+    return max(0, amount), {
+        "counter_unless_pays_amount_source": amount_source,
+        "counter_unless_pays_base": base,
+        "counter_unless_pays_per": per,
+        "counter_unless_pays_count": max(0, count),
+    }, True
 
 
 class ManaPool:
@@ -10166,6 +10247,7 @@ class Player:
         phase=None,
         priority_window=None,
         preferred_counter=None,
+        all_players=None,
     ):
         counters = self.counterspell_cards(
             castable_only=True,
@@ -10190,12 +10272,25 @@ class Player:
         effect = get_card_effect(counter)
         target_controller_obj = getattr(stack_item, "controller", None)
         counter_target_name = (target_card or {}).get("name", "?")
-        counter_unless_pays_generic = int(effect.get("counter_unless_pays_generic") or 0)
+        counter_unless_pays_generic, counter_unless_pays_details, has_counter_unless_tax = (
+            _counter_unless_pays_tax_amount(
+                effect,
+                self,
+                target_controller=target_controller_obj,
+                stack_item=stack_item,
+                all_players=all_players,
+            )
+        )
         counter_tax_paid = False
         counter_tax_paid_by = None
         counter_tax_mana_before = None
         counter_tax_mana_after = None
-        if counter_unless_pays_generic > 0 and target_controller_obj is not None:
+        if has_counter_unless_tax and counter_unless_pays_generic <= 0 and target_controller_obj is not None:
+            counter_tax_paid = True
+            counter_tax_paid_by = getattr(target_controller_obj, "name", None)
+            counter_tax_mana_before = target_controller_obj.mana_pool.snapshot()
+            counter_tax_mana_after = target_controller_obj.mana_pool.snapshot()
+        elif counter_unless_pays_generic > 0 and target_controller_obj is not None:
             counter_tax_mana_before = target_controller_obj.mana_pool.snapshot()
             tax_cost = {"generic": counter_unless_pays_generic}
             if target_controller_obj.can_pay(tax_cost) and target_controller_obj.spend_mana(tax_cost):
@@ -10297,6 +10392,11 @@ class Player:
             countered_spell_to_top_library=countered_to_top,
             countered_spell_to_exile=countered_to_exile,
             counter_unless_pays_generic=counter_unless_pays_generic,
+            counter_unless_pays_amount_source=counter_unless_pays_details.get("counter_unless_pays_amount_source"),
+            counter_unless_pays_base=counter_unless_pays_details.get("counter_unless_pays_base"),
+            counter_unless_pays_per=counter_unless_pays_details.get("counter_unless_pays_per"),
+            counter_unless_pays_count=counter_unless_pays_details.get("counter_unless_pays_count"),
+            counter_unless_pays_unsupported=bool(counter_unless_pays_details.get("counter_unless_pays_unsupported")),
             counter_tax_paid=counter_tax_paid,
             counter_tax_paid_by=counter_tax_paid_by,
             counter_tax_mana_before=counter_tax_mana_before,
@@ -14919,6 +15019,7 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
                     phase=phase,
                     priority_window="own_approach_topdeck_combo",
                     preferred_counter=counter,
+                    all_players=all_players,
                 )
                 if used_counter:
                     fields = replay_rule_fields(get_card_effect(used_counter))
@@ -15569,6 +15670,7 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
                     stack_depth=len(stack.items),
                     phase=phase,
                     priority_window="stack_response",
+                    all_players=all_players,
                 )
                 if counter:
                     fields = replay_rule_fields(get_card_effect(counter))

@@ -3327,6 +3327,116 @@ def fixed_counter_unless_pays_from_source(source_text: str) -> tuple[int, bool] 
     return int(match.group("cost")), match.group("exile") == "true"
 
 
+def dynamic_counter_unless_pays_from_oracle(
+    metadata: dict[str, Any],
+) -> tuple[str, dict[str, Any], bool] | None:
+    text = strip_parenthetical_reminders(oracle_text(metadata))
+    text = re.sub(r"\s+", " ", text).strip()
+    text = re.sub(r"^domain\s+(?:—|-)\s+", "", text).strip()
+    base_pattern = (
+        r"^(?P<counter>counter target .+?) unless its controller pays "
+        r"(?P<cost>.+?)"
+        r"(?P<exile>\. if that spell is countered this way, exile it instead of putting (?:it )?into its owner's graveyard)?\.?$"
+    )
+    match = re.match(base_pattern, text)
+    if not match:
+        return None
+    target = counter_target_from_oracle({"oracle_text": match.group("counter")})
+    if target is None:
+        return None
+    cost_text = match.group("cost").strip().rstrip(".").strip()
+    exile_if_countered = bool(match.group("exile"))
+    spec: dict[str, Any] | None = None
+    if cost_text == "{x}":
+        spec = {"counter_unless_pays_amount_source": "x_value"}
+    elif cost_text == "{x}, where x is your devotion to blue":
+        spec = {"counter_unless_pays_amount_source": "devotion_to_blue"}
+    elif re.fullmatch(r"\{1\} for each basic land type among lands you control", cost_text):
+        spec = {
+            "counter_unless_pays_amount_source": "domain_basic_land_types",
+            "counter_unless_pays_per": 1,
+        }
+    elif re.fullmatch(r"\{2\} for each wizard on the battlefield", cost_text):
+        spec = {
+            "counter_unless_pays_amount_source": "battlefield_subtype_count",
+            "counter_unless_pays_subtype": "wizard",
+            "counter_unless_pays_battlefield_scope": "all_battlefields",
+            "counter_unless_pays_per": 2,
+        }
+    elif re.fullmatch(r"\{2\} plus an additional \{1\} for each faerie you control", cost_text):
+        spec = {
+            "counter_unless_pays_amount_source": "controlled_subtype_count",
+            "counter_unless_pays_subtype": "faerie",
+            "counter_unless_pays_base": 2,
+            "counter_unless_pays_per": 1,
+        }
+    elif re.fullmatch(
+        r"\{1\} plus an additional \{1\} for each creature in your party",
+        cost_text,
+    ):
+        spec = {
+            "counter_unless_pays_amount_source": "party_count",
+            "counter_unless_pays_base": 1,
+            "counter_unless_pays_per": 1,
+        }
+    if spec is None:
+        return None
+    return target, spec, exile_if_countered
+
+
+def dynamic_counter_unless_pays_from_source(source_text: str) -> tuple[dict[str, Any], bool] | None:
+    text = str(source_text or "")
+    effect_matches = list(re.finditer(r"new\s+CounterUnlessPaysEffect\s*\(", text))
+    if len(effect_matches) != 1:
+        return None
+    if "new TargetSpell" not in text:
+        return None
+    exile_if_countered = bool(
+        re.search(
+            r"new\s+CounterUnlessPaysEffect\s*\(\s*GetXValue\.instance\s*,\s*true\s*\)",
+            text,
+        )
+    )
+    if re.search(r"new\s+CounterUnlessPaysEffect\s*\(\s*GetXValue\.instance\s*(?:,\s*true\s*)?\)", text):
+        return {"counter_unless_pays_amount_source": "x_value"}, exile_if_countered
+    if "new CounterUnlessPaysEffect(DomainValue.REGULAR)" in text:
+        return {
+            "counter_unless_pays_amount_source": "domain_basic_land_types",
+            "counter_unless_pays_per": 1,
+        }, False
+    if "new CounterUnlessPaysEffect(DevotionCount.U)" in text:
+        return {"counter_unless_pays_amount_source": "devotion_to_blue"}, False
+    if "PartyCount.instance" in text and re.search(r"new\s+IntPlusDynamicValue\s*\(\s*1\s*,\s*PartyCount\.instance\s*\)", text):
+        return {
+            "counter_unless_pays_amount_source": "party_count",
+            "counter_unless_pays_base": 1,
+            "counter_unless_pays_per": 1,
+        }, False
+    if (
+        "SubType.WIZARD" in text
+        and re.search(r"new\s+PermanentsOnBattlefieldCount\s*\(\s*FILTER\s*,\s*2\s*\)", text)
+        and "FilterControlledPermanent" not in text
+    ):
+        return {
+            "counter_unless_pays_amount_source": "battlefield_subtype_count",
+            "counter_unless_pays_subtype": "wizard",
+            "counter_unless_pays_battlefield_scope": "all_battlefields",
+            "counter_unless_pays_per": 2,
+        }, False
+    if (
+        "SubType.FAERIE" in text
+        and "FilterControlledPermanent" in text
+        and re.search(r"new\s+IntPlusDynamicValue\s*\(\s*2\s*,\s*faerieCount\s*\)", text)
+    ):
+        return {
+            "counter_unless_pays_amount_source": "controlled_subtype_count",
+            "counter_unless_pays_subtype": "faerie",
+            "counter_unless_pays_base": 2,
+            "counter_unless_pays_per": 1,
+        }, False
+    return None
+
+
 def counter_target_constraints_for(target: str) -> dict[str, Any]:
     constraints: dict[str, Any] = {"zone": "stack", "stack_object": "spell"}
     mana_value_match = re.match(r"^spell_mana_value_(?P<value>\d+)(?P<op>_or_greater|_or_less)?$", target)
@@ -26252,22 +26362,58 @@ def split_row(
         if ability_kind(row) != "one_shot":
             return None, "counter_unless_pays_not_one_shot_spell_ability"
         oracle_pair = fixed_counter_unless_pays_from_oracle(metadata)
-        if oracle_pair is None:
-            return None, "counter_unless_pays_oracle_not_exact_fixed_generic"
-        source_pair = fixed_counter_unless_pays_from_source(source_text)
-        if source_pair is None:
-            return None, "counter_unless_pays_source_not_fixed_generic"
-        target, pay_generic, exile_if_countered = oracle_pair
-        source_cost, source_exile_if_countered = source_pair
-        if pay_generic != source_cost or exile_if_countered != source_exile_if_countered:
+        if oracle_pair is not None:
+            source_pair = fixed_counter_unless_pays_from_source(source_text)
+            if source_pair is None:
+                return None, "counter_unless_pays_source_not_fixed_generic"
+            target, pay_generic, exile_if_countered = oracle_pair
+            source_cost, source_exile_if_countered = source_pair
+            if pay_generic != source_cost or exile_if_countered != source_exile_if_countered:
+                return None, "counter_unless_pays_source_oracle_mismatch"
+            effect_json = {
+                "effect": "counter",
+                "battle_model_scope": COUNTER_UNLESS_PAYS_SCOPE,
+                "target": target,
+                "target_constraints": counter_target_constraints_for(target),
+                "counter_unless_pays_generic": pay_generic,
+                "xmage_effect_class": "CounterUnlessPaysEffect",
+                **flags,
+            }
+            if exile_if_countered:
+                effect_json["countered_spell_to_exile"] = True
+                effect_json["countered_spell_to_exile_reason"] = "counter_unless_pays_exile_replacement"
+            if target == "blue_spell":
+                effect_json["requires_blue_target"] = True
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_counter_unless_pays_generic_spell",
+            ), "selected_exact_scope"
+
+        dynamic_oracle_pair = dynamic_counter_unless_pays_from_oracle(metadata)
+        if dynamic_oracle_pair is None:
+            return None, "counter_unless_pays_oracle_not_exact_supported_tax"
+        dynamic_source_pair = dynamic_counter_unless_pays_from_source(source_text)
+        if dynamic_source_pair is None:
+            return None, "counter_unless_pays_source_not_supported_tax"
+        target, dynamic_spec, exile_if_countered = dynamic_oracle_pair
+        source_target = counter_target_from_source(source_text)
+        source_dynamic_spec, source_exile_if_countered = dynamic_source_pair
+        if (
+            source_target != target
+            or dynamic_spec != source_dynamic_spec
+            or exile_if_countered != source_exile_if_countered
+        ):
             return None, "counter_unless_pays_source_oracle_mismatch"
         effect_json = {
             "effect": "counter",
             "battle_model_scope": COUNTER_UNLESS_PAYS_SCOPE,
             "target": target,
             "target_constraints": counter_target_constraints_for(target),
-            "counter_unless_pays_generic": pay_generic,
+            "counter_unless_pays_generic": 0,
             "xmage_effect_class": "CounterUnlessPaysEffect",
+            **dynamic_spec,
             **flags,
         }
         if exile_if_countered:
@@ -26279,7 +26425,7 @@ def split_row(
             row,
             metadata,
             effect_json,
-            family_id="xmage_counter_unless_pays_generic_spell",
+            family_id="xmage_counter_unless_pays_dynamic_spell",
         ), "selected_exact_scope"
 
     if unit == COUNTER_UNIT:

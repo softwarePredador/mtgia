@@ -13367,15 +13367,15 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             {"zone": "stack", "stack_object": "spell", "card_types": ["artifact", "creature"]},
         )
 
-    def test_counter_unless_pays_blocks_dynamic_variant(self) -> None:
+    def test_counter_unless_pays_dynamic_x_maps_to_runtime(self) -> None:
         row = queue_row(
             split.COUNTER_UNLESS_PAYS_UNIT,
             effect_classes=["CounterUnlessPaysEffect"],
             xmage_signals=["targeting", "counter"],
         )
-        dynamic_proposal, dynamic_reason = split.split_row(
+        proposal, reason = split.split_row(
             row,
-            metadata(oracle_text="Counter target spell unless its controller pays {1}."),
+            metadata(oracle_text="Counter target spell unless its controller pays {X}."),
             source_text=(
                 "this.getSpellAbility().addEffect("
                 "new CounterUnlessPaysEffect(GetXValue.instance));"
@@ -13383,8 +13383,114 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             ),
         )
 
-        self.assertIsNone(dynamic_proposal)
-        self.assertEqual(dynamic_reason, "counter_unless_pays_source_not_fixed_generic")
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(proposal["family_id"], "xmage_counter_unless_pays_dynamic_spell")
+        self.assertEqual(effect["target"], "spell")
+        self.assertEqual(effect["counter_unless_pays_amount_source"], "x_value")
+        self.assertEqual(effect["counter_unless_pays_generic"], 0)
+
+    def test_counter_unless_pays_dynamic_supported_tax_variants_map_to_runtime(self) -> None:
+        cases = [
+            (
+                "Syncopate",
+                "Counter target spell unless its controller pays {X}. "
+                "If that spell is countered this way, exile it instead of putting it into its owner's graveyard.",
+                "this.getSpellAbility().addEffect(new CounterUnlessPaysEffect(GetXValue.instance, true));"
+                "this.getSpellAbility().addTarget(new TargetSpell());",
+                "spell",
+                {"counter_unless_pays_amount_source": "x_value"},
+                True,
+            ),
+            (
+                "Evasive Action",
+                "Domain — Counter target spell unless its controller pays {1} "
+                "for each basic land type among lands you control.",
+                "this.getSpellAbility().addEffect(new CounterUnlessPaysEffect(DomainValue.REGULAR));"
+                "this.getSpellAbility().addTarget(new TargetSpell());",
+                "spell",
+                {
+                    "counter_unless_pays_amount_source": "domain_basic_land_types",
+                    "counter_unless_pays_per": 1,
+                },
+                False,
+            ),
+            (
+                "Thassa's Rebuff",
+                "Counter target spell unless its controller pays {X}, where X is your devotion to blue.",
+                "this.getSpellAbility().addEffect(new CounterUnlessPaysEffect(DevotionCount.U));"
+                "this.getSpellAbility().addTarget(new TargetSpell());",
+                "spell",
+                {"counter_unless_pays_amount_source": "devotion_to_blue"},
+                False,
+            ),
+            (
+                "Concerted Defense",
+                "Counter target noncreature spell unless its controller pays {1} "
+                "plus an additional {1} for each creature in your party.",
+                "private static final DynamicValue xValue = new IntPlusDynamicValue(1, PartyCount.instance);"
+                "this.getSpellAbility().addEffect(new CounterUnlessPaysEffect(xValue));"
+                "this.getSpellAbility().addTarget(new TargetSpell(StaticFilters.FILTER_SPELL_NON_CREATURE));",
+                "noncreature_spell",
+                {
+                    "counter_unless_pays_amount_source": "party_count",
+                    "counter_unless_pays_base": 1,
+                    "counter_unless_pays_per": 1,
+                },
+                False,
+            ),
+            (
+                "Ixidor's Will",
+                "Counter target spell unless its controller pays {2} for each Wizard on the battlefield.",
+                "private static final FilterCreaturePermanent FILTER = "
+                "new FilterCreaturePermanent(SubType.WIZARD, \"Wizard\");"
+                "this.getSpellAbility().addEffect("
+                "new CounterUnlessPaysEffect(new PermanentsOnBattlefieldCount(FILTER, 2)));"
+                "this.getSpellAbility().addTarget(new TargetSpell());",
+                "spell",
+                {
+                    "counter_unless_pays_amount_source": "battlefield_subtype_count",
+                    "counter_unless_pays_subtype": "wizard",
+                    "counter_unless_pays_battlefield_scope": "all_battlefields",
+                    "counter_unless_pays_per": 2,
+                },
+                False,
+            ),
+            (
+                "Spell Stutter",
+                "Counter target spell unless its controller pays {2} "
+                "plus an additional {1} for each Faerie you control.",
+                "private static final DynamicValue faerieCount = "
+                "new PermanentsOnBattlefieldCount(new FilterControlledPermanent(SubType.FAERIE));"
+                "private static final DynamicValue xValue = new IntPlusDynamicValue(2, faerieCount);"
+                "this.getSpellAbility().addEffect(new CounterUnlessPaysEffect(xValue));"
+                "this.getSpellAbility().addTarget(new TargetSpell());",
+                "spell",
+                {
+                    "counter_unless_pays_amount_source": "controlled_subtype_count",
+                    "counter_unless_pays_subtype": "faerie",
+                    "counter_unless_pays_base": 2,
+                    "counter_unless_pays_per": 1,
+                },
+                False,
+            ),
+        ]
+        for card_name, oracle, source, expected_target, expected_spec, expected_exile in cases:
+            with self.subTest(card_name=card_name):
+                row = queue_row(
+                    split.COUNTER_UNLESS_PAYS_UNIT,
+                    effect_classes=["CounterUnlessPaysEffect"],
+                    xmage_signals=["targeting", "counter"],
+                )
+                proposal, reason = split.split_row(row, metadata(oracle_text=oracle), source_text=source)
+
+                self.assertEqual(reason, "selected_exact_scope")
+                effect = proposal["effect_json"]
+                self.assertEqual(proposal["family_id"], "xmage_counter_unless_pays_dynamic_spell")
+                self.assertEqual(effect["target"], expected_target)
+                for key, value in expected_spec.items():
+                    self.assertEqual(effect[key], value)
+                self.assertEqual(bool(effect.get("countered_spell_to_exile")), expected_exile)
 
     def test_counter_draw_spell_with_activated_ability_target_stays_blocked(self) -> None:
         row = queue_row(

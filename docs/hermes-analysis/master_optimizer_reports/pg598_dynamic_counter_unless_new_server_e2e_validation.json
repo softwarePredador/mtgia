@@ -1,0 +1,378 @@
+{
+  "battle_execution": {
+    "event_count": 10,
+    "results": [
+      {
+        "card_name": "Clash of Wills",
+        "counter_tax_paid": false,
+        "counter_unless_pays_amount_source": "x_value",
+        "counter_unless_pays_count": 3,
+        "counter_unless_pays_generic": 3,
+        "countered": true,
+        "countered_spell_to_exile": false,
+        "scenario": "Clash of Wills counters unless tax is paid",
+        "target": "Counter Target Fixture"
+      },
+      {
+        "card_name": "Concerted Defense",
+        "counter_tax_paid": false,
+        "counter_unless_pays_amount_source": "party_count",
+        "counter_unless_pays_count": 4,
+        "counter_unless_pays_generic": 5,
+        "countered": true,
+        "countered_spell_to_exile": false,
+        "scenario": "Concerted Defense counters unless tax is paid",
+        "target": "Counter Target Fixture"
+      },
+      {
+        "card_name": "Evasive Action",
+        "counter_tax_paid": false,
+        "counter_unless_pays_amount_source": "domain_basic_land_types",
+        "counter_unless_pays_count": 3,
+        "counter_unless_pays_generic": 3,
+        "countered": true,
+        "countered_spell_to_exile": false,
+        "scenario": "Evasive Action counters unless tax is paid",
+        "target": "Counter Target Fixture"
+      },
+      {
+        "card_name": "Ixidor's Will",
+        "counter_tax_paid": false,
+        "counter_unless_pays_amount_source": "battlefield_subtype_count",
+        "counter_unless_pays_count": 2,
+        "counter_unless_pays_generic": 4,
+        "countered": true,
+        "countered_spell_to_exile": false,
+        "scenario": "Ixidor's Will counters unless tax is paid",
+        "target": "Counter Target Fixture"
+      },
+      {
+        "card_name": "Spell Stutter",
+        "counter_tax_paid": false,
+        "counter_unless_pays_amount_source": "controlled_subtype_count",
+        "counter_unless_pays_count": 2,
+        "counter_unless_pays_generic": 4,
+        "countered": true,
+        "countered_spell_to_exile": false,
+        "scenario": "Spell Stutter counters unless tax is paid",
+        "target": "Counter Target Fixture"
+      },
+      {
+        "card_name": "Syncopate",
+        "counter_tax_paid": false,
+        "counter_unless_pays_amount_source": "x_value",
+        "counter_unless_pays_count": 3,
+        "counter_unless_pays_generic": 3,
+        "countered": true,
+        "countered_spell_to_exile": true,
+        "scenario": "Syncopate counters unless tax is paid",
+        "target": "Counter Target Fixture"
+      },
+      {
+        "card_name": "Thassa's Rebuff",
+        "counter_tax_paid": false,
+        "counter_unless_pays_amount_source": "devotion_to_blue",
+        "counter_unless_pays_count": 3,
+        "counter_unless_pays_generic": 3,
+        "countered": true,
+        "countered_spell_to_exile": false,
+        "scenario": "Thassa's Rebuff counters unless tax is paid",
+        "target": "Counter Target Fixture"
+      }
+    ],
+    "scenario_count": 7
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-07T06:37:34.869367+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg598_dynamic_counter_unless_new_server_package_manifest.json",
+  "package_id": "pg598_dynamic_counter_unless_new_server_package_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 7
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+          "card_name": "Clash of Wills",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d4e54073e1ba3b1b6421bdca2219979b",
+          "oracle_hash": "d1b33ad1ce87755e487775712f5d5ed4",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+          "card_name": "Concerted Defense",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ba1635cf0df5e7ffbc3d10d4140869ec",
+          "oracle_hash": "38106b4fd7e6b0e2ef70868b965057ed",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+          "card_name": "Evasive Action",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:21c488c17c3ea1d2c0f3257033074a69",
+          "oracle_hash": "ab61c8fb5ab9c3677681a279bd2ea0bd",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+          "card_name": "Ixidor's Will",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:42fabb59d3d935341743b390fea84259",
+          "oracle_hash": "00ba7056980d7375a26942fc6d509d91",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+          "card_name": "Spell Stutter",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b40cf10ece4cea17b18e7bc0df955085",
+          "oracle_hash": "e6edc0c78404144dd458182ab6081fee",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+          "card_name": "Syncopate",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d2561a6e5cbcba21904956d952042be0",
+          "oracle_hash": "4db03fdba3086fb379e6051414f4ef68",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+          "card_name": "Thassa's Rebuff",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2776146218af8964966c2c530b85c4eb",
+          "oracle_hash": "d7d873f32db17223e44c1d8889546f90",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 7
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+          "card_name": "Clash of Wills",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d4e54073e1ba3b1b6421bdca2219979b",
+          "oracle_hash": "d1b33ad1ce87755e487775712f5d5ed4",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+          "card_name": "Concerted Defense",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ba1635cf0df5e7ffbc3d10d4140869ec",
+          "oracle_hash": "38106b4fd7e6b0e2ef70868b965057ed",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+          "card_name": "Evasive Action",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:21c488c17c3ea1d2c0f3257033074a69",
+          "oracle_hash": "ab61c8fb5ab9c3677681a279bd2ea0bd",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+          "card_name": "Ixidor's Will",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:42fabb59d3d935341743b390fea84259",
+          "oracle_hash": "00ba7056980d7375a26942fc6d509d91",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+          "card_name": "Spell Stutter",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b40cf10ece4cea17b18e7bc0df955085",
+          "oracle_hash": "e6edc0c78404144dd458182ab6081fee",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+          "card_name": "Syncopate",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d2561a6e5cbcba21904956d952042be0",
+          "oracle_hash": "4db03fdba3086fb379e6051414f4ef68",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+          "card_name": "Thassa's Rebuff",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2776146218af8964966c2c530b85c4eb",
+          "oracle_hash": "d7d873f32db17223e44c1d8889546f90",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 7
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+          "battle_rule_version": 2,
+          "card_name": "Clash of Wills",
+          "logical_rule_key": "battle_rule_v1:d4e54073e1ba3b1b6421bdca2219979b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+          "battle_rule_version": 2,
+          "card_name": "Concerted Defense",
+          "logical_rule_key": "battle_rule_v1:ba1635cf0df5e7ffbc3d10d4140869ec"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+          "battle_rule_version": 2,
+          "card_name": "Evasive Action",
+          "logical_rule_key": "battle_rule_v1:21c488c17c3ea1d2c0f3257033074a69"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+          "battle_rule_version": 2,
+          "card_name": "Ixidor's Will",
+          "logical_rule_key": "battle_rule_v1:42fabb59d3d935341743b390fea84259"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+          "battle_rule_version": 2,
+          "card_name": "Spell Stutter",
+          "logical_rule_key": "battle_rule_v1:b40cf10ece4cea17b18e7bc0df955085"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+          "battle_rule_version": 2,
+          "card_name": "Syncopate",
+          "logical_rule_key": "battle_rule_v1:d2561a6e5cbcba21904956d952042be0"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+          "battle_rule_version": 2,
+          "card_name": "Thassa's Rebuff",
+          "logical_rule_key": "battle_rule_v1:2776146218af8964966c2c530b85c4eb"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 7
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Clash of Wills",
+          "component_keys": [],
+          "effect": "counter",
+          "logical_rule_key": "battle_rule_v1:d4e54073e1ba3b1b6421bdca2219979b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Concerted Defense",
+          "component_keys": [],
+          "effect": "counter",
+          "logical_rule_key": "battle_rule_v1:ba1635cf0df5e7ffbc3d10d4140869ec"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Evasive Action",
+          "component_keys": [],
+          "effect": "counter",
+          "logical_rule_key": "battle_rule_v1:21c488c17c3ea1d2c0f3257033074a69"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Ixidor's Will",
+          "component_keys": [],
+          "effect": "counter",
+          "logical_rule_key": "battle_rule_v1:42fabb59d3d935341743b390fea84259"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Spell Stutter",
+          "component_keys": [],
+          "effect": "counter",
+          "logical_rule_key": "battle_rule_v1:b40cf10ece4cea17b18e7bc0df955085"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Syncopate",
+          "component_keys": [],
+          "effect": "counter",
+          "logical_rule_key": "battle_rule_v1:d2561a6e5cbcba21904956d952042be0"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Thassa's Rebuff",
+          "component_keys": [],
+          "effect": "counter",
+          "logical_rule_key": "battle_rule_v1:2776146218af8964966c2c530b85c4eb"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 10,
+        "scenarios": 7
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

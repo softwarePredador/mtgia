@@ -45,6 +45,15 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "creature_filter",
     "permanent_type",
     "counter_unless_pays_generic",
+    "counter_unless_pays_amount_source",
+    "counter_unless_pays_base",
+    "counter_unless_pays_per",
+    "counter_unless_pays_subtype",
+    "counter_unless_pays_battlefield_scope",
+    "counter_unless_pays_default",
+    "countered_spell_to_top_library",
+    "countered_spell_to_exile",
+    "countered_spell_to_exile_reason",
     "power_delta",
     "toughness_delta",
     "power_boost",
@@ -2788,9 +2797,118 @@ def multi_target_damage_execution_scenario_from_expected_rule(
     }
 
 
+def counter_unless_pays_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if (
+        required.get("effect") != "counter"
+        or required.get("battle_model_scope") != "xmage_counter_target_spell_unless_controller_pays_generic_v1"
+    ):
+        return None
+
+    def safe_int(value: Any, default: int = 0) -> int:
+        try:
+            return int(float(value))
+        except Exception:
+            return int(default or 0)
+
+    amount_source = str(required.get("counter_unless_pays_amount_source") or "").strip().lower()
+    base = max(0, safe_int(required.get("counter_unless_pays_base"), 0))
+    per = max(0, safe_int(required.get("counter_unless_pays_per"), 1))
+    expected_tax = max(0, safe_int(required.get("counter_unless_pays_generic"), 0))
+    expected_count: int | None = None
+    target_stack_effect: dict[str, Any] = {"effect": "finisher"}
+    active_battlefield: list[dict[str, Any]] = []
+    responder_battlefield: list[dict[str, Any]] = []
+
+    if amount_source == "x_value":
+        expected_count = 3
+        expected_tax = 3
+        target_stack_effect["_cast_context"] = {"x_value": expected_tax}
+    elif amount_source == "domain_basic_land_types":
+        expected_count = 3
+        responder_battlefield = [
+            {"name": "Fixture Plains", "type_line": "Land - Plains", "subtypes": ["Plains"]},
+            {"name": "Fixture Island", "type_line": "Land - Island", "subtypes": ["Island"]},
+            {"name": "Fixture Mountain", "type_line": "Land - Mountain", "subtypes": ["Mountain"]},
+        ]
+        expected_tax = per * expected_count
+    elif amount_source == "devotion_to_blue":
+        expected_count = 3
+        responder_battlefield = [
+            {"name": "Fixture Blue Devotion One", "type_line": "Enchantment", "mana_cost": "{U}{U}"},
+            {"name": "Fixture Blue Devotion Two", "type_line": "Artifact", "mana_cost": "{2}{U}"},
+        ]
+        expected_tax = expected_count
+    elif amount_source == "party_count":
+        expected_count = 4
+        responder_battlefield = [
+            {"name": "Fixture Cleric", "type_line": "Creature - Cleric", "subtypes": ["Cleric"]},
+            {"name": "Fixture Rogue", "type_line": "Creature - Rogue", "subtypes": ["Rogue"]},
+            {"name": "Fixture Warrior", "type_line": "Creature - Warrior", "subtypes": ["Warrior"]},
+            {"name": "Fixture Wizard", "type_line": "Creature - Wizard", "subtypes": ["Wizard"]},
+        ]
+        expected_tax = base + (per * expected_count)
+    elif amount_source == "controlled_subtype_count":
+        expected_count = 2
+        subtype = str(required.get("counter_unless_pays_subtype") or "faerie").strip().title()
+        responder_battlefield = [
+            {"name": f"Fixture {subtype} One", "type_line": f"Creature - {subtype}", "subtypes": [subtype]},
+            {"name": f"Fixture {subtype} Two", "type_line": f"Creature - {subtype}", "subtypes": [subtype]},
+        ]
+        expected_tax = base + (per * expected_count)
+    elif amount_source == "battlefield_subtype_count":
+        expected_count = 2
+        subtype = str(required.get("counter_unless_pays_subtype") or "wizard").strip().title()
+        active_battlefield = [
+            {"name": f"Active {subtype}", "type_line": f"Creature - {subtype}", "subtypes": [subtype]},
+        ]
+        responder_battlefield = [
+            {"name": f"Responder {subtype}", "type_line": f"Creature - {subtype}", "subtypes": [subtype]},
+        ]
+        expected_tax = base + (per * expected_count)
+
+    target_spell = {
+        "name": "Counter Target Fixture",
+        "cmc": 7,
+        "mana_cost": "{5}{R}{R}",
+        "type_line": "Creature - Dragon",
+        "effect": "finisher",
+    }
+    if required.get("target") == "noncreature_spell":
+        target_spell.update({"type_line": "Sorcery"})
+
+    return {
+        "name": f"{rule['card_name']} counters unless tax is paid",
+        "type": "counter_unless_pays_response",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": "Instant",
+            "mana_cost": "{U}",
+            "cmc": 1,
+            "instant": True,
+        },
+        "target_spell": target_spell,
+        "target_stack_effect": target_stack_effect,
+        "active_battlefield": active_battlefield,
+        "responder_battlefield": responder_battlefield,
+        "responder_mana": {"blue": 1},
+        "active_mana": {"generic": 0},
+        "expected_countered": True,
+        "expected_counter_tax_paid": False,
+        "expected_counter_unless_pays_generic": expected_tax,
+        "expected_counter_unless_pays_amount_source": amount_source or None,
+        "expected_counter_unless_pays_count": expected_count,
+        "expected_countered_spell_to_exile": bool(required.get("countered_spell_to_exile")),
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any] | None:
     return (
-        static_controlled_keyword_execution_scenario_from_expected_rule(rule)
+        counter_unless_pays_execution_scenario_from_expected_rule(rule)
+        or static_controlled_keyword_execution_scenario_from_expected_rule(rule)
         or static_global_pt_execution_scenario_from_expected_rule(rule)
         or aura_static_pt_execution_scenario_from_expected_rule(rule)
         or destroy_target_create_treasure_execution_scenario_from_expected_rule(rule)

@@ -50,6 +50,34 @@ def test_package_deck_role_preserves_true_external_reference_placeholder() -> No
     assert builder.package_deck_role(proposal) == proposal["deck_role_json"]
 
 
+def test_counter_unless_pays_dynamic_fields_and_execution_scenario_are_manifested() -> None:
+    proposal = {
+        "normalized_name": "spell stutter",
+        "card_name": "Spell Stutter",
+        "oracle_hash": "hash-counter",
+        "logical_rule_key": "battle_rule_v1:counter",
+        "effect_json": {
+            "effect": "counter",
+            "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+            "target": "spell",
+            "counter_unless_pays_generic": 0,
+            "counter_unless_pays_amount_source": "controlled_subtype_count",
+            "counter_unless_pays_subtype": "faerie",
+            "counter_unless_pays_base": 2,
+            "counter_unless_pays_per": 1,
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    assert expected["required_effect_fields"]["counter_unless_pays_amount_source"] == "controlled_subtype_count"
+    assert expected["required_effect_fields"]["counter_unless_pays_subtype"] == "faerie"
+    assert scenario["type"] == "counter_unless_pays_response"
+    assert scenario["expected_counter_unless_pays_generic"] == 4
+    assert scenario["expected_counter_unless_pays_count"] == 2
+
+
 def test_manifest_expected_rule_from_proposal_contains_e2e_fields() -> None:
     proposal = {
         "normalized_name": "verge rangers",
