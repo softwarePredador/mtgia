@@ -28,6 +28,7 @@ import '../widgets/deck_optimize_ui_support.dart';
 import '../widgets/deck_progress_indicator.dart';
 import '../widgets/sample_hand_widget.dart';
 import '../../auth/providers/auth_provider.dart';
+import '../../battle/screens/battle_replays_screen.dart';
 import '../../cards/screens/card_detail_screen.dart';
 import '../../cards/widgets/card_edition_metadata.dart';
 import '../../commercial/models/manaloom_plan.dart';
@@ -107,6 +108,14 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
     _showOptimizationOptions(context, initialIntent: intent);
   }
 
+  void _openBattleReplays() {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => BattleReplaysScreen(deckId: widget.deckId),
+      ),
+    );
+  }
+
   Map<String, dynamic>? _pricingFromDeck(DeckDetails deck) {
     if (deck.pricingTotal == null) return null;
     return {
@@ -173,6 +182,9 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                 case 'post_game':
                   context.push('/decks/${widget.deckId}/post-game');
                   break;
+                case 'battle_replays':
+                  _openBattleReplays();
+                  break;
                 case 'toggle_public':
                   _togglePublic();
                   break;
@@ -212,6 +224,15 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                   child: ListTile(
                     leading: Icon(Icons.timeline_outlined),
                     title: Text('Pós-jogo / evolução'),
+                    contentPadding: EdgeInsets.zero,
+                    dense: true,
+                  ),
+                ),
+                const PopupMenuItem(
+                  value: 'battle_replays',
+                  child: ListTile(
+                    leading: Icon(Icons.psychology_alt_outlined),
+                    title: Text('Battle / replays'),
                     contentPadding: EdgeInsets.zero,
                     dense: true,
                   ),
@@ -435,6 +456,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                 onTogglePublic: _togglePublic,
                 onShowOptimizationOptions:
                     () => _showOptimizationOptions(context),
+                onOpenBattleReplays: _openBattleReplays,
                 onSelectCommander:
                     () => context.go('/decks/${widget.deckId}/search'),
                 onImportList: () => _showImportListDialog(context),

@@ -32,6 +32,7 @@ class DeckDetailsOverviewTab extends StatelessWidget {
   final VoidCallback onShowPricingDetails;
   final VoidCallback onTogglePublic;
   final VoidCallback onShowOptimizationOptions;
+  final VoidCallback? onOpenBattleReplays;
   final VoidCallback onSelectCommander;
   final VoidCallback onImportList;
   final ValueChanged<String?> onEditDescription;
@@ -58,6 +59,7 @@ class DeckDetailsOverviewTab extends StatelessWidget {
     required this.onShowPricingDetails,
     required this.onTogglePublic,
     required this.onShowOptimizationOptions,
+    this.onOpenBattleReplays,
     required this.onSelectCommander,
     required this.onImportList,
     required this.onEditDescription,
@@ -385,7 +387,11 @@ class DeckDetailsOverviewTab extends StatelessWidget {
               onEditDescription: onEditDescription,
             ),
             const SizedBox(height: 16),
-            DeckDiagnosticPanel(deck: deck, analysis: diagnosticAnalysis),
+            DeckDiagnosticPanel(
+              deck: deck,
+              analysis: diagnosticAnalysis,
+              onOpenBattleReplays: onOpenBattleReplays,
+            ),
             const SizedBox(height: 16),
             SampleHandWidget(deck: deck, compact: true),
           ],

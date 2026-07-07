@@ -10,12 +10,14 @@ class DeckDiagnosticPanel extends StatelessWidget {
   final DeckDetails deck;
   final DeckAnalysisData? analysis;
   final VoidCallback? onOpenAnalysis;
+  final VoidCallback? onOpenBattleReplays;
 
   const DeckDiagnosticPanel({
     super.key,
     required this.deck,
     this.analysis,
     this.onOpenAnalysis,
+    this.onOpenBattleReplays,
   });
 
   @override
@@ -102,6 +104,16 @@ class DeckDiagnosticPanel extends StatelessWidget {
                           onPressed: onOpenAnalysis,
                           icon: const Icon(Icons.analytics_outlined, size: 18),
                           label: const Text('Análise completa'),
+                        ),
+                      if (onOpenBattleReplays != null)
+                        TextButton.icon(
+                          key: const Key('deck-open-battle-replays-button'),
+                          onPressed: onOpenBattleReplays,
+                          icon: const Icon(
+                            Icons.psychology_alt_outlined,
+                            size: 18,
+                          ),
+                          label: const Text('Battle / replays'),
                         ),
                     ],
                   ),
