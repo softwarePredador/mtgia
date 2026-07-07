@@ -19684,6 +19684,119 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_prevent_all_combat_damage_spell_prevents_player_combat_damage(self) -> None:
+        attacker = self.battle.Player("Attacker", None, [])
+        defender = self.battle.Player("Defender", None, [])
+        attacker_creature = {
+            "name": "Charging Beast",
+            "type_line": "Creature - Beast",
+            "effect": "creature",
+            "power": 7,
+            "toughness": 7,
+        }
+        attacker.battlefield = [attacker_creature]
+
+        fog = {
+            "name": "Holy Day",
+            "type_line": "Instant",
+            "effect": "damage_prevention_shield",
+            "battle_model_scope": "xmage_prevent_all_combat_damage_spell_v1",
+            "prevent_all_combat_damage_this_turn": True,
+            "prevent_damage_scope": "all_combat_damage",
+            "prevent_damage_duration": "until_end_of_turn",
+        }
+        self.battle.apply_effect_immediate(
+            defender,
+            [attacker],
+            fog,
+            turn=4,
+            rng=random.Random(4),
+            effect_data_override=fog,
+            phase="combat_damage",
+        )
+        self.battle.combat_damage_steps(
+            attacker,
+            [defender],
+            defender,
+            [attacker_creature],
+            [(attacker_creature, [])],
+            turn=4,
+            rng=random.Random(4),
+            all_players=[attacker, defender],
+        )
+
+        self.assertEqual(defender.life, 40)
+        self.assertTrue(
+            any(
+                event == "combat_damage_prevention_created"
+                and data.get("card") == "Holy Day"
+                and data.get("prevent_damage_scope") == "all_combat_damage"
+                for event, data in self.events
+            )
+        )
+        self.assertTrue(
+            any(
+                event == "combat_damage_prevented"
+                and data.get("source") == "Charging Beast"
+                and data.get("amount") == 7
+                for event, data in self.events
+            )
+        )
+
+    def test_prevent_all_combat_damage_spell_prevents_creature_combat_damage(self) -> None:
+        attacker = self.battle.Player("Attacker", None, [])
+        defender = self.battle.Player("Defender", None, [])
+        attacking_creature = {
+            "name": "Attacking Giant",
+            "type_line": "Creature - Giant",
+            "effect": "creature",
+            "power": 5,
+            "toughness": 5,
+        }
+        blocker = {
+            "name": "Blocking Soldier",
+            "type_line": "Creature - Soldier",
+            "effect": "creature",
+            "power": 2,
+            "toughness": 2,
+        }
+        attacker.battlefield = [attacking_creature]
+        defender.battlefield = [blocker]
+
+        fog = {
+            "name": "Fog",
+            "type_line": "Instant",
+            "effect": "damage_prevention_shield",
+            "battle_model_scope": "xmage_prevent_all_combat_damage_spell_v1",
+            "prevent_all_combat_damage_this_turn": True,
+            "prevent_damage_scope": "all_combat_damage",
+            "prevent_damage_duration": "until_end_of_turn",
+        }
+        self.battle.apply_effect_immediate(
+            defender,
+            [attacker],
+            fog,
+            turn=5,
+            rng=random.Random(5),
+            effect_data_override=fog,
+            phase="combat_damage",
+        )
+        self.battle.combat_damage_steps(
+            attacker,
+            [defender],
+            defender,
+            [attacking_creature],
+            [(attacking_creature, [blocker])],
+            turn=5,
+            rng=random.Random(5),
+            all_players=[attacker, defender],
+        )
+
+        self.assertIn(attacking_creature, attacker.battlefield)
+        self.assertIn(blocker, defender.battlefield)
+        self.assertEqual(attacking_creature.get("damage_marked_this_turn", 0), 0)
+        self.assertEqual(blocker.get("damage_marked_this_turn", 0), 0)
+
 
 if __name__ == "__main__":
     unittest.main()

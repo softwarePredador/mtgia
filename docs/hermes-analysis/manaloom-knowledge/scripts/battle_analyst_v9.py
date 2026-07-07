@@ -9735,6 +9735,7 @@ class Player:
         self.cannot_lose_this_turn = False
         self.damage_life_floor = None
         self.damage_prevention_shields = []
+        self.combat_damage_prevention_effects = []
         self.noncombat_damage_modifiers = []
         self.silenced_opponents = False
         self.silenced_opponents_until_eot = False
@@ -16223,6 +16224,7 @@ def clear_until_eot(player):
     player.cannot_lose_this_turn = False
     player.damage_life_floor = None
     player.damage_prevention_shields = []
+    player.combat_damage_prevention_effects = []
 
 
 DISCARD_MODAL_MONUMENT_SCOPE = (
@@ -59520,6 +59522,29 @@ def apply_effect_immediate(
         finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
     elif effect == "damage_prevention_shield":
         if is_instant(card) or is_sorcery(card):
+            if effect_data.get("prevent_all_combat_damage_this_turn"):
+                prevention = {
+                    "source": card.get("name", "damage_prevention_shield"),
+                    "source_controller": player.name,
+                    "battle_model_scope": effect_data.get("battle_model_scope"),
+                    "prevent_damage_scope": effect_data.get("prevent_damage_scope", "all_combat_damage"),
+                    "duration": effect_data.get("prevent_damage_duration", "until_end_of_turn"),
+                    "turn": turn,
+                }
+                for participant in all_players_for_entry:
+                    participant.combat_damage_prevention_effects.append(dict(prevention))
+                emit_replay_event(
+                    "combat_damage_prevention_created",
+                    player=player.name,
+                    card=card.get("name", "?"),
+                    affected_players=[participant.name for participant in all_players_for_entry],
+                    prevent_damage_scope=prevention["prevent_damage_scope"],
+                    duration=prevention["duration"],
+                    turn=turn,
+                    **replay_rule_fields(effect_data),
+                )
+                finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+                return
             chosen_source = effect_data.get("_chosen_damage_source") or {}
             chosen_source_name = (
                 effect_data.get("_chosen_damage_source_name")
@@ -64365,9 +64390,35 @@ def combat_damage_steps(attacker, opponents, target, attackers, block_assignment
     combat_target_life_before = target.life
     combat_attacker_life_before = attacker.life
     rng = rng or random.Random(turn or 0)
+    combat_participants = all_players or [attacker, *list(opponents or []), target]
+
+    def active_combat_damage_prevention():
+        for participant in combat_participants:
+            for prevention in getattr(participant, "combat_damage_prevention_effects", []) or []:
+                if prevention.get("prevent_damage_scope") != "all_combat_damage":
+                    continue
+                if prevention.get("duration") not in (None, "", "until_end_of_turn"):
+                    continue
+                return prevention
+        return None
 
     def deal_player_damage(creature, damage=None):
         damage = combat_stat(creature, "power", 2) if damage is None else damage
+        prevention = active_combat_damage_prevention()
+        if prevention:
+            emit_replay_event(
+                "combat_damage_prevented",
+                player=target.name,
+                attacker=attacker.name,
+                source=creature.get("name", "?"),
+                amount=damage,
+                prevention_source=prevention.get("source"),
+                prevention_source_controller=prevention.get("source_controller"),
+                prevent_damage_scope=prevention.get("prevent_damage_scope"),
+                turn=turn,
+                phase="combat_damage",
+            )
+            return 0
         damage_source = dict(creature)
         damage_source.setdefault("controller", attacker.name)
         damage_dealt, final_damage, dealt = deal_damage_to_player_with_static_replacements(
@@ -64417,6 +64468,22 @@ def combat_damage_steps(attacker, opponents, target, attackers, block_assignment
 
     def mark_damage(source, damaged, amount, *, source_controller=None, damaged_controller=None):
         if amount <= 0:
+            return
+        prevention = active_combat_damage_prevention()
+        if prevention:
+            emit_replay_event(
+                "combat_damage_prevented",
+                player=getattr(damaged_controller, "name", None),
+                attacker=getattr(source_controller, "name", None),
+                source=source.get("name", "?") if isinstance(source, dict) else str(source),
+                target=damaged.get("name", "?") if isinstance(damaged, dict) else str(damaged),
+                amount=amount,
+                prevention_source=prevention.get("source"),
+                prevention_source_controller=prevention.get("source_controller"),
+                prevent_damage_scope=prevention.get("prevent_damage_scope"),
+                turn=turn,
+                phase="combat_damage",
+            )
             return
         final_amount = apply_static_damage_replacements(
             source_controller,

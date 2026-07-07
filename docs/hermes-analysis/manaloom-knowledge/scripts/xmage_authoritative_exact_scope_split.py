@@ -142,6 +142,14 @@ TARGET_PLAYER_DISCARD_UNIT = (
     "xmage_signature::DiscardTargetEffect::no_ability_class::"
     "TargetPlayer::no_condition_class::targeting"
 )
+PREVENT_ALL_COMBAT_DAMAGE_SPELL_UNIT = (
+    "xmage_signature::PreventAllDamageByAllPermanentsEffect::no_ability_class::"
+    "no_target_class::no_condition_class::no_signal"
+)
+PREVENT_ALL_COMBAT_DAMAGE_CYCLING_SPELL_UNIT = (
+    "xmage_signature::PreventAllDamageByAllPermanentsEffect::CyclingAbility::"
+    "no_target_class::no_condition_class::no_signal"
+)
 ETB_TOKEN_CREATURE_UNIT = (
     "token_maker::xmage_signature::CreateTokenEffect::EntersBattlefieldTriggeredAbility::"
     "no_target_class::no_condition_class::token,triggered_ability"
@@ -194,6 +202,8 @@ SUPPORTED_UNITS = {
     LOOK_LIBRARY_PICK_SPELL_UNIT,
     ETB_LOOK_LIBRARY_PICK_CREATURE_UNIT,
     TARGET_PLAYER_DISCARD_UNIT,
+    PREVENT_ALL_COMBAT_DAMAGE_SPELL_UNIT,
+    PREVENT_ALL_COMBAT_DAMAGE_CYCLING_SPELL_UNIT,
 }
 
 DRAW_SCOPE = "xmage_fixed_source_controller_draw_spell_v1"
@@ -202,6 +212,7 @@ DRAW_SELF_COST_REDUCTION_SCOPE = "xmage_fixed_source_controller_draw_spell_self_
 STATIC_GENERIC_COST_REDUCTION_SCOPE = "xmage_static_generic_cost_reduction_for_matching_spells_v1"
 TARGET_DRAW_SCOPE = "xmage_fixed_target_player_draw_spell_v1"
 TARGET_PLAYER_DISCARD_SCOPE = "xmage_fixed_target_player_discard_spell_v1"
+PREVENT_ALL_COMBAT_DAMAGE_SPELL_SCOPE = "xmage_prevent_all_combat_damage_spell_v1"
 DRAW_DISCARD_SPELL_SCOPE = "xmage_fixed_draw_discard_spell_v1"
 DRAW_LOSE_LIFE_SPELL_SCOPE = "xmage_fixed_controller_draw_lose_life_spell_v1"
 TARGET_DRAW_LOSE_LIFE_SPELL_SCOPE = "xmage_fixed_target_player_draw_lose_life_spell_v1"
@@ -430,6 +441,8 @@ SPELL_UNITS = {
     BOOST_SCRY_UNIT,
     BOOST_CONTROLLED_SPELL_UNIT,
     BOOST_ALL_SPELL_UNIT,
+    PREVENT_ALL_COMBAT_DAMAGE_SPELL_UNIT,
+    PREVENT_ALL_COMBAT_DAMAGE_CYCLING_SPELL_UNIT,
     TOKEN_SPELL_UNIT,
     LOOK_LIBRARY_PICK_SPELL_UNIT,
 }
@@ -20105,6 +20118,50 @@ def target_constraints_for(target: str) -> dict[str, Any]:
     return {"target": target}
 
 
+def prevent_all_combat_damage_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    lines = [
+        re.sub(r"\s+", " ", line).strip().lower().rstrip(".")
+        for line in normalized_oracle_lines(metadata)
+        if line.strip()
+    ]
+    effect_lines = [
+        line
+        for line in lines
+        if not line.startswith("cycling ")
+        and not line.startswith("flashback ")
+        and not line.startswith("buyback ")
+    ]
+    if effect_lines != ["prevent all combat damage that would be dealt this turn"]:
+        return "prevent_all_combat_damage_oracle_not_exact"
+    return {
+        "prevent_damage_scope": "all_combat_damage",
+        "prevent_damage_duration": "until_end_of_turn",
+    }
+
+
+def prevent_all_combat_damage_source_blocker(source_text: str) -> str | None:
+    text = source_text or ""
+    if len(re.findall(r"new\s+PreventAllDamageByAllPermanentsEffect\s*\(", text)) != 1:
+        return "prevent_all_combat_damage_source_not_single_effect"
+    if re.search(
+        r"new\s+PreventAllDamageByAllPermanentsEffect\s*\(\s*Duration\.EndOfTurn\s*,\s*true\s*\)",
+        text,
+    ) is None:
+        return "prevent_all_combat_damage_source_not_exact_global_combat"
+    unsupported_markers = (
+        "StaticFilters.",
+        "new Filter",
+        "FILTER_",
+        "ComparisonType.",
+        "PowerPredicate",
+        "Conditional",
+        "Target",
+    )
+    if any(marker in text for marker in unsupported_markers):
+        return "prevent_all_combat_damage_source_filter_or_condition_not_supported"
+    return None
+
+
 def proposal_notes(row: dict[str, Any], scope: str) -> str:
     scope_kind = "runtime-backed exact-scope adapter"
     if scope == MANA_WITH_ACTIVATED_DRAW_SCOPE:
@@ -20151,6 +20208,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "fixed controller life-gain plus draw-card spell"
     elif scope == TARGET_PLAYER_DISCARD_SCOPE:
         scope_kind = "fixed target-player discard spell"
+    elif scope == PREVENT_ALL_COMBAT_DAMAGE_SPELL_SCOPE:
+        scope_kind = "fixed spell-resolution prevention of all combat damage until end of turn"
     elif scope == COUNTER_TARGET_CONTROLLER_LOSE_LIFE_SCOPE:
         scope_kind = "fixed counter-target spell with target-controller life loss"
     elif scope == BOOST_DRAW_SCOPE:
@@ -20462,6 +20521,10 @@ def split_row(
     counter_unless_pays_spell_unit = is_counter_unless_pays_spell_unit(row)
     target_keyword_spell_unit = is_target_keyword_spell_unit(row)
     boost_keyword_spell_unit = is_boost_keyword_spell_unit(row)
+    prevent_all_combat_damage_spell_unit = unit in {
+        PREVENT_ALL_COMBAT_DAMAGE_SPELL_UNIT,
+        PREVENT_ALL_COMBAT_DAMAGE_CYCLING_SPELL_UNIT,
+    }
     keyword_draw_spell_unit = (
         unit == DRAW_UNIT
         and effect_classes(row) == {"DrawCardSourceControllerEffect", "GainAbilityTargetEffect"}
@@ -20678,6 +20741,40 @@ def split_row(
 
     flags = spell_flags(metadata)
     classes = effect_classes(row)
+
+    if prevent_all_combat_damage_spell_unit:
+        abilities = ability_classes(row)
+        if classes != {"PreventAllDamageByAllPermanentsEffect"}:
+            return None, "prevent_all_combat_damage_effect_class_not_pure"
+        if not abilities.issubset({"CyclingAbility"}):
+            return None, "prevent_all_combat_damage_ability_class_not_supported"
+        oracle_prevention = prevent_all_combat_damage_oracle(metadata)
+        if isinstance(oracle_prevention, str):
+            return None, oracle_prevention
+        source_blocker = prevent_all_combat_damage_source_blocker(source_text)
+        if source_blocker:
+            return None, source_blocker
+        effect_json = {
+            "effect": "damage_prevention_shield",
+            "battle_model_scope": PREVENT_ALL_COMBAT_DAMAGE_SPELL_SCOPE,
+            "prevent_all_combat_damage_this_turn": True,
+            "prevent_damage_scope": oracle_prevention["prevent_damage_scope"],
+            "prevent_damage_duration": oracle_prevention["prevent_damage_duration"],
+            "prevent_damage_amount": 999,
+            "duration": "until_end_of_turn",
+            "xmage_effect_class": "PreventAllDamageByAllPermanentsEffect",
+            "xmage_ability_classes": sorted(abilities),
+            **flags,
+        }
+        if "CyclingAbility" in abilities:
+            effect_json["has_cycling"] = True
+            effect_json["_cycling_is_auxiliary"] = True
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_prevent_all_combat_damage_spell",
+        ), "selected_exact_scope"
 
     if simple_equipment_static_attachment_unit:
         type_line = str(metadata.get("type_line") or "").lower()
@@ -30191,6 +30288,7 @@ def build_exact_split_report(
                 "grant_protection_from_chosen_color rows with GainAbilityTargetEffect + AttacksTriggeredAbility, exact attack-trigger target-creature keyword until EOT, and Oracle/source target constraints agreement",
                 "xmage_signature BoostSourceEffect + AttacksTriggeredAbility rows with exact fixed self boost until EOT and Oracle/source agreement",
                 "grant_protection_from_chosen_color rows with pure GainAbilityTargetEffect one-shot spells, exact target-creature keyword until EOT, and no auxiliary ability classes",
+                "PreventAllDamageByAllPermanentsEffect one-shot spells with exact Oracle 'Prevent all combat damage that would be dealt this turn', exact XMage Duration.EndOfTurn onlyCombat=true source, and optional CyclingAbility as auxiliary resolution-neutral ability",
                 "ramp_permanent::xmage_creature_mana_source_variant_review_v1 rows with EntersBattlefieldTriggeredAbility + BasicManaEffect, exact unconditional fixed ETB mana Oracle/source agreement, and no auxiliary ability class",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with ReturnFromGraveyardToHandTargetEffect, SimpleActivatedAbility, exact activated graveyard-to-hand Oracle text, and mana/tap/self-sacrifice/discard-a-card source costs only",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with ReturnFromGraveyardToBattlefieldTargetEffect, SimpleActivatedAbility, exact activated graveyard-to-battlefield Oracle text, and mana/tap/source self-sacrifice costs only",

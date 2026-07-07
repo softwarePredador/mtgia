@@ -64,6 +64,7 @@ EFFECT_TO_DECK_CATEGORY = {
     "phase_creatures": "protection",
     "protect_creature": "protection",
     "cannot_lose_turn": "protection",
+    "damage_prevention_shield": "protection",
     "redirect_removal": "protection",
     "counter": "protection",
     "hate_artifact": "protection",

@@ -24964,6 +24964,83 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "board_wipe_sacrifice_count_not_fixed")
 
+    def test_prevent_all_combat_damage_spell_maps_exact_scope(self) -> None:
+        proposal, reason = split.split_row(
+            queue_row(
+                split.PREVENT_ALL_COMBAT_DAMAGE_SPELL_UNIT,
+                effect_classes=["PreventAllDamageByAllPermanentsEffect"],
+            ),
+            metadata(
+                name="Holy Day",
+                type_line="Instant",
+                oracle_text="Prevent all combat damage that would be dealt this turn.",
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect("
+                "new PreventAllDamageByAllPermanentsEffect(Duration.EndOfTurn, true));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "damage_prevention_shield")
+        self.assertEqual(effect["battle_model_scope"], split.PREVENT_ALL_COMBAT_DAMAGE_SPELL_SCOPE)
+        self.assertTrue(effect["prevent_all_combat_damage_this_turn"])
+        self.assertEqual(effect["prevent_damage_scope"], "all_combat_damage")
+
+    def test_prevent_all_combat_damage_accepts_cycling_auxiliary(self) -> None:
+        proposal, reason = split.split_row(
+            queue_row(
+                split.PREVENT_ALL_COMBAT_DAMAGE_CYCLING_SPELL_UNIT,
+                effect_classes=["PreventAllDamageByAllPermanentsEffect"],
+                ability_classes=["CyclingAbility"],
+            ),
+            metadata(
+                name="Angelsong",
+                type_line="Instant",
+                oracle_text="Prevent all combat damage that would be dealt this turn.\nCycling {2}",
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect("
+                "new PreventAllDamageByAllPermanentsEffect(Duration.EndOfTurn, true));"
+                "this.addAbility(new CyclingAbility(new ManaCostsImpl<>(\"{2}\")));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        self.assertTrue(proposal["effect_json"]["has_cycling"])
+        self.assertTrue(proposal["effect_json"]["_cycling_is_auxiliary"])
+
+    def test_prevent_all_combat_damage_blocks_filtered_source(self) -> None:
+        proposal, reason = split.split_row(
+            queue_row(
+                split.PREVENT_ALL_COMBAT_DAMAGE_SPELL_UNIT,
+                effect_classes=["PreventAllDamageByAllPermanentsEffect"],
+            ),
+            metadata(
+                name="Vine Snare",
+                type_line="Instant",
+                oracle_text=(
+                    "Prevent all combat damage that would be dealt this turn "
+                    "by creatures with power 4 or less."
+                ),
+            ),
+            source_text=(
+                "filter.add(new PowerPredicate(ComparisonType.FEWER_THAN, 5));"
+                "this.getSpellAbility().addEffect("
+                "new PreventAllDamageByAllPermanentsEffect(filter, Duration.EndOfTurn, true));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertIn(
+            reason,
+            {
+                "prevent_all_combat_damage_oracle_not_exact",
+                "prevent_all_combat_damage_source_not_exact_global_combat",
+            },
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
