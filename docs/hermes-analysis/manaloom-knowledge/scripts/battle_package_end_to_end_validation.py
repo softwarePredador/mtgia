@@ -775,6 +775,62 @@ def run_dynamic_life_gain(
     }
 
 
+def run_damage_each_opponent_spell(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    active = battle.Player(str(scenario.get("player") or "Damage Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Opponent A"), None, [])
+    second_opponent = battle.Player(str(scenario.get("second_opponent") or "Opponent B"), None, [])
+    opponent.life = int(scenario.get("opponent_life") or 9)
+    second_opponent.life = int(scenario.get("second_opponent_life") or 11)
+    opponents = [opponent, second_opponent]
+    expected_damage = int(scenario.get("expected_damage") or 0)
+    starting_life = {player.name: player.life for player in opponents}
+
+    before_events = len(events)
+    battle.apply_effect_immediate(
+        active,
+        opponents,
+        card,
+        turn=int(scenario.get("turn") or 5),
+        rng=random.Random(int(scenario.get("seed") or 6074)),
+    )
+
+    for target in opponents:
+        expected_life = starting_life[target.name] - expected_damage
+        if target.life != expected_life:
+            fail(
+                "battle_execution",
+                f"{card['name']} {target.name} life={target.life}, expected {expected_life}",
+            )
+    event = next(
+        (
+            data
+            for event_name, data in events[before_events:]
+            if event_name == "damage_each_opponent_resolved"
+            and data.get("card") == card.get("name")
+        ),
+        None,
+    )
+    if event is None:
+        fail("battle_events", f"missing {card['name']} damage_each_opponent_resolved event")
+    if int(event.get("amount") or 0) != expected_damage:
+        fail("battle_events", f"{card['name']} event amount={event.get('amount')}, expected {expected_damage}")
+    damaged = list(event.get("damaged_opponents") or [])
+    if set(damaged) != {opponent.name, second_opponent.name}:
+        fail("battle_events", f"{card['name']} damaged_opponents={damaged!r}")
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "damage": expected_damage,
+        "opponent_life": opponent.life,
+        "second_opponent_life": second_opponent.life,
+    }
+
+
 def run_creature_etb_dynamic_life_gain(
     battle,
     scenario: dict[str, Any],
@@ -4272,6 +4328,7 @@ SCENARIO_RUNNERS = {
     "simple_activated_self_boost": run_simple_activated_self_boost,
     "simple_activated_self_keyword": run_simple_activated_self_keyword,
     "simple_activated_regenerate_source": run_simple_activated_regenerate_source,
+    "damage_each_opponent_spell": run_damage_each_opponent_spell,
     "simple_activated_create_token": run_simple_activated_create_token,
     "spell_cast_gain_life": run_spell_cast_gain_life,
     "stat_modifier_until_eot": run_stat_modifier_until_eot,

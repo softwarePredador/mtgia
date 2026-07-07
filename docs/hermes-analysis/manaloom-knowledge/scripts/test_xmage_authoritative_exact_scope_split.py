@@ -7134,6 +7134,59 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["amount"], 3)
         self.assertEqual(effect["target"], "any_target")
 
+    def test_fixed_damage_each_opponent_spell_maps_to_runtime(self) -> None:
+        row = queue_row(
+            split.DAMAGE_EACH_OPPONENT_UNIT,
+            effect_classes=["DamagePlayersEffect"],
+            xmage_signals=["targeting"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Sizzle",
+                type_line="Sorcery",
+                oracle_text="Sizzle deals 3 damage to each opponent.",
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect("
+                "new DamagePlayersEffect(3, TargetController.OPPONENT));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "damage_each_opponent")
+        self.assertEqual(effect["battle_model_scope"], split.DAMAGE_EACH_OPPONENT_SCOPE)
+        self.assertEqual(effect["amount"], 3)
+        self.assertEqual(effect["damage"], 3)
+        self.assertEqual(effect["target_controller"], "opponents")
+
+    def test_fixed_damage_each_opponent_blocks_extra_damage_effects(self) -> None:
+        row = queue_row(
+            split.DAMAGE_EACH_OPPONENT_UNIT,
+            effect_classes=["DamagePlayersEffect", "DamageAllEffect"],
+            xmage_signals=["targeting", "destroy_all"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="End the Festivities",
+                type_line="Sorcery",
+                oracle_text=(
+                    "End the Festivities deals 1 damage to each opponent and each "
+                    "creature and planeswalker they control."
+                ),
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect("
+                "new DamagePlayersEffect(1, TargetController.OPPONENT));"
+                "this.getSpellAbility().addEffect(new DamageAllEffect(1));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "damage_each_opponent_effect_class_not_pure")
+
     def test_fixed_damage_spell_maps_nonred_and_nonwhite_creature_targets(self) -> None:
         cases = [
             (

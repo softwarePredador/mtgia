@@ -38,6 +38,7 @@ def as_list(value: Any) -> list[Any]:
 DRAW_UNIT = "draw_cards::xmage_draw_card_variant_review_v1"
 DRAW_ENGINE_UNIT = "draw_engine::xmage_draw_card_variant_review_v1"
 DAMAGE_UNIT = "direct_damage::targeted_damage_variant_v1"
+DAMAGE_EACH_OPPONENT_UNIT = "damage_each_opponent::spell_damage_each_opponent_v1"
 DESTROY_UNIT = "removal_destroy::targeted_destroy_variant_v1"
 ACTIVATED_SELF_SAC_DESTROY_ARTIFACT_OR_ENCHANTMENT_UNIT = (
     "remove_permanent::activated_sacrifice_self_destroy_artifact_or_enchantment_v1"
@@ -148,6 +149,7 @@ ETB_SCRY_CREATURE_UNIT = (
 SUPPORTED_UNITS = {
     DRAW_UNIT,
     DAMAGE_UNIT,
+    DAMAGE_EACH_OPPONENT_UNIT,
     DESTROY_UNIT,
     TAP_TARGET_CREATURE_UNIT,
     TREASURE_UNIT,
@@ -185,6 +187,7 @@ DRAW_DISCARD_SPELL_SCOPE = "xmage_fixed_draw_discard_spell_v1"
 DRAW_LOSE_LIFE_SPELL_SCOPE = "xmage_fixed_controller_draw_lose_life_spell_v1"
 TARGET_DRAW_LOSE_LIFE_SPELL_SCOPE = "xmage_fixed_target_player_draw_lose_life_spell_v1"
 DAMAGE_SCOPE = "xmage_fixed_damage_target_spell_v1"
+DAMAGE_EACH_OPPONENT_SCOPE = "spell_damage_each_opponent_v1"
 X_DAMAGE_SCOPE = "xmage_x_damage_target_spell_v1"
 DAMAGE_EXILE_IF_DIES_SCOPE = "xmage_fixed_damage_target_exile_if_dies_spell_v1"
 DAMAGE_GAIN_LIFE_SCOPE = "xmage_fixed_damage_target_and_controller_gain_life_spell_v1"
@@ -9439,6 +9442,37 @@ def damage_target_from_oracle(metadata: dict[str, Any]) -> str | None:
     if re.search(r"target creature\b", text):
         return "creature"
     return None
+
+
+def fixed_damage_each_opponent_from_oracle(metadata: dict[str, Any]) -> int | str:
+    text = strip_parenthetical_reminders(oracle_text(metadata))
+    match = re.fullmatch(r".+ deals (\d+) damage to each opponent\.?", text)
+    if not match:
+        return "damage_each_opponent_oracle_not_exact_fixed"
+    amount = int(match.group(1))
+    if amount <= 0:
+        return "damage_each_opponent_oracle_amount_not_fixed"
+    return amount
+
+
+def fixed_damage_each_opponent_from_source(source: str) -> int | str:
+    text = source or ""
+    if has_additional_cost(text):
+        return "damage_each_opponent_additional_cost_not_supported"
+    if len(re.findall(r"new\s+DamagePlayersEffect\s*\(", text)) != 1:
+        return "damage_each_opponent_source_not_single"
+    constructor_args = extract_constructor_args(text, "DamagePlayersEffect")
+    if constructor_args is None:
+        return "damage_each_opponent_source_not_supported"
+    parts = split_top_level_args(constructor_args)
+    if not parts or not re.fullmatch(r"\d+", parts[0].strip()):
+        return "damage_each_opponent_source_amount_not_fixed"
+    if not any("TargetController.OPPONENT" in part for part in parts[1:]):
+        return "damage_each_opponent_source_target_not_opponents"
+    amount = int(parts[0].strip())
+    if amount <= 0:
+        return "damage_each_opponent_source_amount_not_fixed"
+    return amount
 
 
 def graveyard_count_damage_target_from_oracle(metadata: dict[str, Any]) -> str | None:
@@ -24927,6 +24961,40 @@ def split_row(
                 if rest_destination == "graveyard"
                 else "xmage_look_library_pick_to_hand_rest_bottom_spell"
             ),
+        ), "selected_exact_scope"
+
+    if unit == DAMAGE_EACH_OPPONENT_UNIT:
+        if not is_spell(metadata):
+            return None, "not_instant_or_sorcery_spell"
+        if ability_classes(row):
+            return None, "damage_each_opponent_ability_class_not_simple"
+        if classes != {"DamagePlayersEffect"}:
+            return None, "damage_each_opponent_effect_class_not_pure"
+        if "additional cost" in oracle_text(metadata):
+            return None, "damage_each_opponent_additional_cost_not_supported"
+        source_amount = fixed_damage_each_opponent_from_source(source_text)
+        if isinstance(source_amount, str):
+            return None, source_amount
+        oracle_amount = fixed_damage_each_opponent_from_oracle(metadata)
+        if isinstance(oracle_amount, str):
+            return None, oracle_amount
+        if int(source_amount) != int(oracle_amount):
+            return None, "damage_each_opponent_source_oracle_amount_mismatch"
+        effect_json = {
+            "effect": "damage_each_opponent",
+            "battle_model_scope": DAMAGE_EACH_OPPONENT_SCOPE,
+            "ability_kind": "one_shot",
+            "amount": int(oracle_amount),
+            "damage": int(oracle_amount),
+            "target_controller": "opponents",
+            "xmage_effect_class": "DamagePlayersEffect",
+            **flags,
+        }
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_spell_damage_each_opponent",
         ), "selected_exact_scope"
 
     if unit == DAMAGE_UNIT:

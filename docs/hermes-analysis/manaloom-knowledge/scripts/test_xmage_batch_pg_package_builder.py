@@ -645,6 +645,34 @@ def test_manifest_builds_simple_activated_damage_execution_scenario() -> None:
     assert len(scenario["controller_hand"]) == 2
 
 
+def test_manifest_builds_damage_each_opponent_spell_execution_scenario() -> None:
+    rule = {
+        "normalized_name": "sizzle",
+        "card_name": "Sizzle",
+        "oracle_hash": "hash-sizzle",
+        "logical_rule_key": "battle_rule_v1:hash-sizzle",
+        "required_effect_fields": {
+            "effect": "damage_each_opponent",
+            "battle_model_scope": "spell_damage_each_opponent_v1",
+            "ability_kind": "one_shot",
+            "amount": 3,
+            "damage": 3,
+            "target_controller": "opponents",
+            "sorcery": True,
+        },
+    }
+
+    scenario = builder.damage_each_opponent_spell_execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "damage_each_opponent_spell"
+    assert scenario["card"]["name"] == "Sizzle"
+    assert scenario["card"]["type_line"] == "Sorcery"
+    assert scenario["expected_damage"] == 3
+    assert scenario["opponent_life"] == 9
+    assert scenario["second_opponent_life"] == 11
+
+
 def test_manifest_builds_simple_activated_tap_target_execution_scenario() -> None:
     rule = {
         "normalized_name": "akroan jailer",

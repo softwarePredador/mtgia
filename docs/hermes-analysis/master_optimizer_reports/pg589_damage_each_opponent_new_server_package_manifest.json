@@ -1,0 +1,159 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg589_damage_each_opponent_new_server_20260707_031213",
+  "deploy_id": "PG589",
+  "execution_scenarios": [
+    {
+      "card": {
+        "name": "Breath of Malfegor",
+        "type_line": "Sorcery"
+      },
+      "expected_damage": 5,
+      "logical_rule_key": "battle_rule_v1:1c0ff8f9f93d2b1561b7a3eb9d7c8fd6",
+      "name": "Breath of Malfegor damages each opponent",
+      "opponent_life": 9,
+      "second_opponent_life": 11,
+      "type": "damage_each_opponent_spell"
+    },
+    {
+      "card": {
+        "name": "Sizzle",
+        "type_line": "Sorcery"
+      },
+      "expected_damage": 3,
+      "logical_rule_key": "battle_rule_v1:f893e75f14f2e36880d6fdc27b063d57",
+      "name": "Sizzle damages each opponent",
+      "opponent_life": 9,
+      "second_opponent_life": 11,
+      "type": "damage_each_opponent_spell"
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Breath of Malfegor",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1c0ff8f9f93d2b1561b7a3eb9d7c8fd6",
+      "min_rule_version": 2,
+      "normalized_name": "breath of malfegor",
+      "oracle_hash": "63b809af7c5db7172b1864065f6665a5",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "amount": 5,
+        "battle_model_scope": "spell_damage_each_opponent_v1",
+        "damage": 5,
+        "effect": "damage_each_opponent",
+        "target_controller": "opponents",
+        "xmage_effect_class": "DamagePlayersEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sizzle",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f893e75f14f2e36880d6fdc27b063d57",
+      "min_rule_version": 2,
+      "normalized_name": "sizzle",
+      "oracle_hash": "cca674b36ac5b061baaf47773f166470",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "amount": 3,
+        "battle_model_scope": "spell_damage_each_opponent_v1",
+        "damage": 3,
+        "effect": "damage_each_opponent",
+        "target_controller": "opponents",
+        "xmage_effect_class": "DamagePlayersEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_spell_damage_each_opponent": 2
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg589_damage_each_opponent_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg589_damage_each_opponent_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg589_damage_each_opponent_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg589_damage_each_opponent_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg589_damage_each_opponent_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg589_damage_each_opponent_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-07T03:12:13+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Breath of Malfegor"
+      },
+      "card_name": "Breath of Malfegor",
+      "effect": "damage_each_opponent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1c0ff8f9f93d2b1561b7a3eb9d7c8fd6",
+      "normalized_name": "breath of malfegor",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "amount": 5,
+        "battle_model_scope": "spell_damage_each_opponent_v1",
+        "damage": 5,
+        "effect": "damage_each_opponent",
+        "target_controller": "opponents",
+        "xmage_effect_class": "DamagePlayersEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Sizzle"
+      },
+      "card_name": "Sizzle",
+      "effect": "damage_each_opponent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f893e75f14f2e36880d6fdc27b063d57",
+      "normalized_name": "sizzle",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "amount": 3,
+        "battle_model_scope": "spell_damage_each_opponent_v1",
+        "damage": 3,
+        "effect": "damage_each_opponent",
+        "target_controller": "opponents",
+        "xmage_effect_class": "DamagePlayersEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Breath of Malfegor",
+    "Sizzle"
+  ],
+  "selected_count": 2,
+  "slug": "damage_each_opponent_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Breath of Malfegor",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1c0ff8f9f93d2b1561b7a3eb9d7c8fd6",
+      "min_rule_version": 2,
+      "normalized_name": "breath of malfegor",
+      "oracle_hash": "63b809af7c5db7172b1864065f6665a5",
+      "required_effect_fields": {
+        "battle_model_scope": "spell_damage_each_opponent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sizzle",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f893e75f14f2e36880d6fdc27b063d57",
+      "min_rule_version": 2,
+      "normalized_name": "sizzle",
+      "oracle_hash": "cca674b36ac5b061baaf47773f166470",
+      "required_effect_fields": {
+        "battle_model_scope": "spell_damage_each_opponent_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

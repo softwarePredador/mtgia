@@ -2046,6 +2046,26 @@ def simple_activated_damage_execution_scenario_from_expected_rule(
     }
 
 
+def damage_each_opponent_spell_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "spell_damage_each_opponent_v1":
+        return None
+    return {
+        "name": f"{rule['card_name']} damages each opponent",
+        "type": "damage_each_opponent_spell",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": "Instant" if required.get("instant") else "Sorcery",
+        },
+        "opponent_life": 9,
+        "second_opponent_life": 11,
+        "expected_damage": int(required.get("damage") or required.get("amount") or 0),
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def simple_activated_tap_target_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
@@ -2499,6 +2519,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or creature_etb_scry_execution_scenario_from_expected_rule(rule)
         or creature_dies_create_tokens_execution_scenario_from_expected_rule(rule)
         or simple_mana_source_execution_scenario_from_expected_rule(rule)
+        or damage_each_opponent_spell_execution_scenario_from_expected_rule(rule)
         or simple_activated_damage_execution_scenario_from_expected_rule(rule)
         or simple_activated_tap_target_execution_scenario_from_expected_rule(rule)
         or simple_activated_destroy_execution_scenario_from_expected_rule(rule)
