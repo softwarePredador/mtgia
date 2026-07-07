@@ -10175,6 +10175,25 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
     def test_destroy_target_spell_maps_extended_static_target_filters(self) -> None:
         cases = [
             (
+                (
+                    "Cast this spell only during the declare attackers step and only if you've been attacked this step.\n"
+                    "Destroy target nonblack attacking creature."
+                ),
+                (
+                    'new FilterCreaturePermanent("nonblack attacking creature");'
+                    "filter.add(Predicates.not(new ColorPredicate(ObjectColor.BLACK)));"
+                    "filter.add(AttackingPredicate.instance);"
+                ),
+                "creature",
+                {"card_types": ["creature"], "combat_state": "attacking", "exclude_colors": ["B"]},
+            ),
+            (
+                "Destroy target attacking creature.",
+                "new TargetAttackingCreature();",
+                "creature",
+                {"card_types": ["creature"], "combat_state": "attacking"},
+            ),
+            (
                 "Destroy target nonlegendary creature.",
                 'new FilterCreaturePermanent("nonlegendary creature"); Predicates.not(SuperType.LEGENDARY.getPredicate());',
                 "creature",
@@ -10252,6 +10271,89 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                 self.assertEqual(effect["battle_model_scope"], split.DESTROY_SCOPE)
                 self.assertEqual(effect["target"], target)
                 self.assertEqual(effect["target_constraints"], constraints)
+
+    def test_destroy_target_spell_uses_primary_effect_sentence_before_auxiliary_keyword_text(self) -> None:
+        cases = [
+            (
+                "Dark Withering",
+                "Destroy target nonblack creature.\nMadness {B}",
+                "FILTER_PERMANENT_CREATURE_NON_BLACK; new MadnessAbility(new ManaCostsImpl<>(\"{B}\"));",
+                {"card_types": ["creature"], "exclude_colors": ["B"]},
+            ),
+            (
+                "Death Rattle",
+                "Delve\nDestroy target nongreen creature. It can't be regenerated.",
+                'new FilterCreaturePermanent("nongreen creature"); new DelveAbility(false);',
+                {"card_types": ["creature"], "exclude_colors": ["G"]},
+            ),
+        ]
+        for name, oracle, source_filter, constraints in cases:
+            with self.subTest(name=name):
+                row = queue_row(split.DESTROY_UNIT, effect_classes=["DestroyTargetEffect"])
+                proposal, reason = split.split_row(
+                    row,
+                    metadata(name=name, oracle_text=oracle),
+                    source_text=(
+                        f"{source_filter};"
+                        "this.getSpellAbility().addEffect(new DestroyTargetEffect());"
+                        "this.getSpellAbility().addTarget(new TargetPermanent(filter));"
+                    ),
+                )
+
+                self.assertEqual(reason, "selected_exact_scope")
+                effect = proposal["effect_json"]
+                self.assertEqual(effect["battle_model_scope"], split.DESTROY_SCOPE)
+                self.assertEqual(effect["target_constraints"], constraints)
+
+    def test_destroy_target_spell_blocks_non_neutral_auxiliary_source_abilities(self) -> None:
+        cases = [
+            (
+                "Assassin's Blade",
+                (
+                    "Cast this spell only during the declare attackers step and only if you've been attacked this step.\n"
+                    "Destroy target nonblack attacking creature."
+                ),
+                (
+                    "Ability ability = new CastOnlyDuringPhaseStepSourceAbility(null, null, null);"
+                    "this.addAbility(ability);"
+                    'new FilterCreaturePermanent("nonblack attacking creature");'
+                    "filter.add(Predicates.not(new ColorPredicate(ObjectColor.BLACK)));"
+                    "filter.add(AttackingPredicate.instance);"
+                ),
+            ),
+            (
+                "Sheer Drop",
+                "Destroy target tapped creature.\nAwaken 3-{5}{W}",
+                (
+                    'new FilterCreaturePermanent("tapped creature");'
+                    "filter.add(TappedPredicate.TAPPED);"
+                    "this.addAbility(new AwakenAbility(this, 3, \"{5}{W}\"));"
+                ),
+            ),
+            (
+                "Slaughter",
+                "Buyback-Pay 4 life.\nDestroy target nonblack creature. It can't be regenerated.",
+                (
+                    "this.addAbility(new BuybackAbility(new PayLifeCost(4)));"
+                    "FILTER_PERMANENT_CREATURE_NON_BLACK;"
+                ),
+            ),
+        ]
+        for name, oracle, source_filter in cases:
+            with self.subTest(name=name):
+                row = queue_row(split.DESTROY_UNIT, effect_classes=["DestroyTargetEffect"])
+                proposal, reason = split.split_row(
+                    row,
+                    metadata(name=name, oracle_text=oracle),
+                    source_text=(
+                        f"{source_filter};"
+                        "this.getSpellAbility().addEffect(new DestroyTargetEffect());"
+                        "this.getSpellAbility().addTarget(new TargetPermanent(filter));"
+                    ),
+                )
+
+                self.assertIsNone(proposal)
+                self.assertEqual(reason, "destroy_auxiliary_ability_class_not_supported")
 
     def test_destroy_target_spell_blocks_color_restricted_source_mismatch(self) -> None:
         row = queue_row(split.DESTROY_UNIT, effect_classes=["DestroyTargetEffect"])
@@ -10635,6 +10737,50 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                     "any_of": [
                         {"card_types": ["creature"]},
                         {"card_types": ["artifact"], "required_subtypes": ["spacecraft"]},
+                    ]
+                },
+            ),
+            (
+                "Vanishing Verse",
+                "Exile target monocolored permanent.",
+                'new FilterPermanent("monocolored permanent"); filter.add(MonocoloredPredicate.instance);',
+                "remove_permanent",
+                "permanent",
+                {"card_types": ["permanent"], "color_count_exact": 1},
+            ),
+            (
+                "Shoot Down",
+                "Exile target artifact, enchantment, or creature with flying.",
+                'new FilterPermanent("artifact, enchantment, or creature with flying");'
+                "filter.add(Predicates.or(CardType.ARTIFACT.getPredicate(),"
+                "CardType.ENCHANTMENT.getPredicate(),"
+                "Predicates.and(CardType.CREATURE.getPredicate(),"
+                "new AbilityPredicate(FlyingAbility.class))));",
+                "remove_permanent",
+                "permanent",
+                {
+                    "any_of": [
+                        {"card_types": ["artifact"]},
+                        {"card_types": ["enchantment"]},
+                        {"card_types": ["creature"], "required_keywords": ["flying"]},
+                    ]
+                },
+            ),
+            (
+                "Thraben Exorcism",
+                "Exile target Spirit, creature with disturb, or enchantment.",
+                'new FilterPermanent("Spirit, creature with disturb, or enchantment");'
+                "filter.add(Predicates.or(SubType.SPIRIT.getPredicate(),"
+                "Predicates.and(CardType.CREATURE.getPredicate(),"
+                "new AbilityPredicate(DisturbAbility.class)),"
+                "CardType.ENCHANTMENT.getPredicate()));",
+                "remove_permanent",
+                "permanent",
+                {
+                    "any_of": [
+                        {"card_types": ["permanent"], "required_subtypes": ["spirit"]},
+                        {"card_types": ["creature"], "required_keywords": ["disturb"]},
+                        {"card_types": ["enchantment"]},
                     ]
                 },
             ),

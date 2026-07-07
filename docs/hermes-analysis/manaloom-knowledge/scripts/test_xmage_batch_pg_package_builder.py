@@ -787,6 +787,62 @@ def test_single_target_removal_scenario_uses_illegal_fixture_for_simple_creature
     assert scenario["nonmatching_target"]["type_line"] == "Land"
 
 
+def test_single_target_removal_scenario_models_excluded_color_and_combat_state() -> None:
+    rule = {
+        "normalized_name": "assassins blade",
+        "card_name": "Assassin's Blade",
+        "oracle_hash": "hash-assassins-blade",
+        "logical_rule_key": "battle_rule_v1:hash-assassins-blade",
+        "required_effect_fields": {
+            "effect": "remove_creature",
+            "battle_model_scope": "xmage_destroy_target_spell_v1",
+            "target": "creature",
+            "target_constraints": {
+                "card_types": ["creature"],
+                "combat_state": "attacking",
+                "exclude_colors": ["B"],
+            },
+            "destination": "graveyard",
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "single_target_removal"
+    assert scenario["target"]["attacking"] is True
+    assert scenario["target"]["colors"] == ["W"]
+    assert scenario["nonmatching_target"]["colors"] == ["B"]
+
+
+def test_single_target_removal_scenario_models_excluded_card_type() -> None:
+    rule = {
+        "normalized_name": "expunge",
+        "card_name": "Expunge",
+        "oracle_hash": "hash-expunge",
+        "logical_rule_key": "battle_rule_v1:hash-expunge",
+        "required_effect_fields": {
+            "effect": "remove_creature",
+            "battle_model_scope": "xmage_destroy_target_spell_v1",
+            "target": "creature",
+            "target_constraints": {
+                "card_types": ["creature"],
+                "exclude_card_types": ["artifact"],
+                "exclude_colors": ["B"],
+            },
+            "destination": "graveyard",
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["target"]["type_line"].startswith("Creature")
+    assert scenario["target"]["colors"] == ["W"]
+    assert "Artifact Creature" in scenario["nonmatching_target"]["type_line"]
+    assert scenario["nonmatching_target"]["colors"] == ["B"]
+
+
 def test_manifest_expected_rule_preserves_spell_additional_sacrifice_cost_fields() -> None:
     proposal = {
         "normalized_name": "bone splinters",

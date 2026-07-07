@@ -16606,6 +16606,128 @@ exile plus scry/composite variants; compensation-token exile; graveyard exile;
 or stack exile. Those remain in separate work units or blocked reasons and
 require their own runtime contract.
 
+## PG583B Safe Primary Sentence Removal Targets New Server Evidence
+
+The initial PG583 primary-sentence removal package selected 15 cards and was
+applied, then rolled back before finalization. The safety audit found that the
+first splitter allowed source-declared auxiliary abilities that the simple
+removal runtime does not model: `AwakenAbility`, `BuybackAbility`, and
+`CastOnlyDuringPhaseStepSourceAbility`. The durable package is PG583B.
+
+PG583B evidence:
+
+- superseded PG583 historical evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg583_primary_sentence_removal_targets_new_server_apply_evidence.md`
+- exact split:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260707_pg583b_safe_primary_sentence_removal_targets_new_server.json`,
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260707_pg583b_safe_primary_sentence_removal_targets_new_server.md`
+- package manifest and summary:
+  `docs/hermes-analysis/master_optimizer_reports/pg583b_safe_primary_sentence_removal_targets_new_server_manifest.json`,
+  `docs/hermes-analysis/master_optimizer_reports/pg583b_safe_primary_sentence_removal_targets_new_server_package.md`
+- precheck/apply/postcheck/rollback SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg583b_safe_primary_sentence_removal_targets_new_server_precheck.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/pg583b_safe_primary_sentence_removal_targets_new_server_apply.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/pg583b_safe_primary_sentence_removal_targets_new_server_postcheck.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/pg583b_safe_primary_sentence_removal_targets_new_server_rollback.sql`
+- apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg583b_safe_primary_sentence_removal_targets_new_server_apply_evidence.md`
+- sync after prune:
+  `docs/hermes-analysis/master_optimizer_reports/pg583b_safe_primary_sentence_removal_targets_new_server_pg_to_sqlite_sync_after_prune.json`
+- E2E after prune:
+  `docs/hermes-analysis/master_optimizer_reports/pg583b_safe_primary_sentence_removal_targets_new_server_e2e_after_prune.json`,
+  `docs/hermes-analysis/master_optimizer_reports/pg583b_safe_primary_sentence_removal_targets_new_server_e2e_after_prune.md`
+- post-PG583B readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260707_post_pg583b_safe_primary_sentence_removal_targets_new_server_after_prune.json`,
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260707_post_pg583b_safe_primary_sentence_removal_targets_new_server_after_prune.md`
+- post-PG583B queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260707_post_pg583b_safe_primary_sentence_removal_targets_new_server_commander_legal.json`,
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260707_post_pg583b_safe_primary_sentence_removal_targets_new_server_commander_legal.md`
+- post-PG583B exact split recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260707_post_pg583b_safe_primary_sentence_removal_targets_new_server_recheck.json`,
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260707_post_pg583b_safe_primary_sentence_removal_targets_new_server_recheck.md`
+- final PG/Hermes/SQLite audit:
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260707_post_pg583b_safe_primary_sentence_removal_targets_new_server_final.json`,
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260707_post_pg583b_safe_primary_sentence_removal_targets_new_server_final.md`
+- final governance audits:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260707_post_pg583b_safe_primary_sentence_removal_targets_new_server_final.json`,
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260707_post_pg583b_safe_primary_sentence_removal_targets_new_server_final.md`,
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260707_post_pg583b_safe_primary_sentence_removal_targets_new_server_final.json`,
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260707_post_pg583b_safe_primary_sentence_removal_targets_new_server_final.md`,
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260707_post_pg583b_safe_primary_sentence_removal_targets_new_server_final.json`,
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260707_post_pg583b_safe_primary_sentence_removal_targets_new_server_final.md`
+
+PG583B promoted the exact XMage single-target removal subpattern where the
+primary `Destroy target ...` or `Exile target ...` sentence is followed only
+by target constraints or resolution-neutral cast/cost alternatives for the
+modeled default resolution. The splitter now checks source-declared Java
+abilities instead of raw queue ability classes, so target predicates such as
+`AbilityPredicate(FlyingAbility.class)` remain target constraints rather than
+auxiliary card mechanics.
+
+Promoted cards:
+
+- Dark Withering;
+- Death Rattle;
+- Expunge;
+- Murderous Compulsion;
+- Protective Response;
+- Shoot Down;
+- Slingbow Trap;
+- Snuff Out;
+- Thraben Exorcism;
+- Vanishing Verse.
+
+Blocked from PG583B after rollback:
+
+- Assassin's Blade;
+- Eightfold Maze;
+- Just Fate;
+- Sheer Drop;
+- Slaughter.
+
+Validation:
+
+- PG583 rollback deleted `17` rows and restored the `2` old `Snuff Out`
+  backup rows before PG583B apply;
+- split produced `proposal_count=10` and
+  `safe_for_batch_pg_package_count=10`;
+- proposals covered `7` `xmage_destroy_target_spell_v1` rows and `3`
+  `xmage_exile_target_spell_v1` rows;
+- precheck found `10` target rows;
+- `Snuff Out` had `2` existing `generated/needs_review/review_only` rows
+  without `oracle_hash`;
+- apply upserted `10` PostgreSQL rows and deprecated `2` shadow/review-only
+  rows;
+- postcheck confirmed `10` promoted rows, `10` `verified_auto` rows, and `10`
+  rows with `oracle_hash`;
+- PG -> SQLite sync selected the original 15-card rollback set, loaded `10`
+  active PostgreSQL rows, pruned the five unsafe stale SQLite rows, and
+  exported `6679` canonical snapshot rows;
+- package E2E passed `10` execution scenarios and `27` battle events across
+  PG, SQLite, snapshot, runtime `get_card_effect`, and battle execution;
+- post-PG583B queue moved from `target_identity_count=25318` and
+  `xmage_authoritative_source_count=25004` to `25308` and `24994`;
+- `removal_destroy::targeted_destroy_variant_v1` moved from `538` to `531`;
+- `removal_exile::targeted_exile_variant_v1` moved from `131` to `128`;
+- readiness moved `battle_and_oracle_ready` to `5642` and
+  `battle_family_mapper_required` to `28231`;
+- final exact-scope recheck returned `proposal_count=0`;
+- final PG/Hermes/SQLite contract passed `51/51`;
+- final XMage strategy audit passed `26/26`;
+- final operational and legacy contamination audits passed.
+
+Sync contract correction: selected-card PG -> SQLite sync now also prunes
+selected names that have no active PG runtime row. This prevents rollbacked or
+excluded cards from remaining executable in Hermes/SQLite after PostgreSQL has
+removed them.
+
+Residual boundary: PG583B does not authorize X-target removal, multi-target
+removal, dynamic life-total or damage-this-turn target restrictions, activated
+removal with extra Oracle clauses such as `Activate only ...`, additional-cost
+exile variants, compensation-token removal, graveyard exile, stack exile, or
+non-pure destroy/exile effect classes. Those remain in separate work units or
+blocked reasons and require their own runtime contract.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

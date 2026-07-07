@@ -428,6 +428,16 @@ ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES = {
     "UndauntedAbility",
 }
 
+REMOVAL_RESOLUTION_NEUTRAL_SOURCE_ABILITY_CLASSES = (
+    ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+    - {"CastOnlyDuringPhaseStepSourceAbility"}
+) | {
+    # These alter how a spell can be cast or paid for, but not the default
+    # one-shot removal resolution modeled by xmage_*_target_spell_v1.
+    "AlternativeCostSourceAbility",
+    "DelveAbility",
+}
+
 NUMBER_WORDS = {
     "one": 1,
     "two": 2,
@@ -741,6 +751,27 @@ def default_source_reader(row: dict[str, Any]) -> str:
     if not path.is_file():
         return ""
     return path.read_text(encoding="utf-8", errors="replace")
+
+
+def source_declared_ability_classes(source: str) -> set[str]:
+    """Card-level ability classes declared by the Java source.
+
+    Queue-level ability extraction also sees classes used inside predicates
+    such as `AbilityPredicate(FlyingAbility.class)`. For exact spell promotion
+    we only want abilities actually added to the card/source, because predicate
+    ability classes are target constraints, not auxiliary card mechanics.
+    """
+    return {
+        match.group(1)
+        for match in re.finditer(r"\bnew\s+([A-Za-z][A-Za-z0-9_]*Ability)\b", source or "")
+    }
+
+
+def unsupported_simple_removal_source_ability_classes(source: str) -> set[str]:
+    return (
+        source_declared_ability_classes(source)
+        - REMOVAL_RESOLUTION_NEUTRAL_SOURCE_ABILITY_CLASSES
+    )
 
 
 def fixed_aura_static_pt_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str | None:
@@ -2095,6 +2126,27 @@ def oracle_text_without_leading_devoid(metadata: dict[str, Any]) -> str:
     return re.sub(r"^devoid\s+", "", text).strip()
 
 
+def primary_removal_action_text(metadata: dict[str, Any], action: str) -> str:
+    action_prefix = str(action or "").strip().lower()
+    raw_text = strip_parenthetical_reminders(str(metadata.get("oracle_text") or ""))
+    candidates: list[str] = []
+    for raw_line in raw_text.splitlines():
+        line = re.sub(r"\s+", " ", raw_line.strip()).strip()
+        if not line:
+            continue
+        for sentence in re.split(r"(?<=\.)\s+", line):
+            candidate = re.sub(r"\s+", " ", sentence.strip().lower()).strip()
+            if not candidate or is_resolution_neutral_auxiliary_oracle_line(candidate):
+                continue
+            candidate = re.sub(r"^devoid\s+", "", candidate).strip()
+            if candidate.startswith(action_prefix + " "):
+                candidates.append(candidate)
+    if candidates:
+        return candidates[0]
+    text = oracle_text_without_leading_devoid(metadata) if action_prefix == "exile" else oracle_text(metadata)
+    return text
+
+
 def oracle_is_play_lands_from_graveyard(metadata: dict[str, Any]) -> bool:
     return oracle_text(metadata) == "you may play lands from your graveyard."
 
@@ -2119,7 +2171,7 @@ def has_oracle_complexity(metadata: dict[str, Any], tokens: set[str] = SPELL_COM
 
 
 def destroy_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, str] | None:
-    text = oracle_text(metadata)
+    text = primary_removal_action_text(metadata, "destroy")
     if "destroy target" not in text:
         return None
     restricted = restricted_battlefield_target_from_oracle(metadata, "destroy")
@@ -2851,7 +2903,7 @@ def etb_bounce_source_supported(source: str, oracle_spec: dict[str, Any]) -> str
 
 
 def exile_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, str] | None:
-    text = oracle_text_without_leading_devoid(metadata)
+    text = primary_removal_action_text(metadata, "exile")
     restricted = restricted_battlefield_target_from_oracle(metadata, "exile")
     if restricted is not None:
         return ("remove_creature" if restricted_target_base(restricted) == "creature" else "remove_permanent"), restricted
@@ -9716,6 +9768,7 @@ def restricted_target_base(target: str) -> str:
     if target in {
         "attacking_creature",
         "attacking_flying_creature",
+        "nonblack_attacking_creature",
         "blocking_creature",
         "attacking_or_blocking_creature",
         "attacking_creature_power_3_or_less",
@@ -9769,8 +9822,11 @@ def restricted_target_base(target: str) -> str:
         "black_or_red_creature_or_planeswalker",
         "black_or_red_permanent",
         "white_permanent",
+        "monocolored_permanent",
         "multicolored_creature_or_enchantment",
         "artifact_enchantment_or_creature_power_4_or_greater",
+        "artifact_enchantment_or_flying_creature",
+        "spirit_or_disturb_creature_or_enchantment",
         "creature_or_spacecraft",
         "creature_vehicle_or_nonbasic_land",
         "nonwhite_permanent",
@@ -9822,11 +9878,11 @@ def restricted_battlefield_target_from_oracle(metadata: dict[str, Any], action: 
         prefix = r"^.+ deals \d+ damage to "
         suffix = r"(?:\.|$)"
     elif action == "destroy":
-        text = oracle_text(metadata)
+        text = primary_removal_action_text(metadata, "destroy")
         prefix = r"^destroy "
         suffix = r"\.?$"
     elif action == "exile":
-        text = oracle_text_without_leading_devoid(metadata)
+        text = primary_removal_action_text(metadata, "exile")
         prefix = r"^exile "
         suffix = r"\.?$"
     else:
@@ -9836,6 +9892,7 @@ def restricted_battlefield_target_from_oracle(metadata: dict[str, Any], action: 
         (r"target attacking or blocking creature with power 3 or less", "attacking_or_blocking_creature_power_3_or_less"),
         (r"target attacking creature with power 3 or less", "attacking_creature_power_3_or_less"),
         (r"target attacking creature with flying", "attacking_flying_creature"),
+        (r"target nonblack attacking creature", "nonblack_attacking_creature"),
         (r"target attacking or blocking creature", "attacking_or_blocking_creature"),
         (r"target attacking creature", "attacking_creature"),
         (r"target blocking creature", "blocking_creature"),
@@ -9875,11 +9932,20 @@ def restricted_battlefield_target_from_oracle(metadata: dict[str, Any], action: 
         (r"target creature, vehicle, or nonbasic land", "creature_vehicle_or_nonbasic_land"),
         (r"target black or red permanent", "black_or_red_permanent"),
         (r"target white permanent", "white_permanent"),
+        (r"target monocolored permanent", "monocolored_permanent"),
         (r"target nonwhite permanent", "nonwhite_permanent"),
         (r"target multicolored creature or multicolored enchantment", "multicolored_creature_or_enchantment"),
         (
             r"target artifact, enchantment, or creature with power 4 or greater",
             "artifact_enchantment_or_creature_power_4_or_greater",
+        ),
+        (
+            r"target artifact, enchantment, or creature with flying",
+            "artifact_enchantment_or_flying_creature",
+        ),
+        (
+            r"target spirit, creature with disturb, or enchantment",
+            "spirit_or_disturb_creature_or_enchantment",
         ),
         (r"target creature or spacecraft", "creature_or_spacecraft"),
         (r"target creature with power 3 or less", "creature_power_3_or_less"),
@@ -9947,6 +10013,16 @@ def restricted_battlefield_target_from_source(source: str) -> str | None:
         return "tapped_creature"
     if "TappedPredicate.UNTAPPED" in text:
         return "untapped_creature"
+    if (
+        'FilterCreaturePermanent("nonblack attacking creature")' in text
+        or (
+            "AttackingPredicate" in text
+            and "ObjectColor.BLACK" in text
+            and "Predicates.not" in text
+            and "ColorPredicate" in text
+        )
+    ):
+        return "nonblack_attacking_creature"
     if (
         "FilterCreaturePermanent(\"nonartifact, nonblack creature\")" in text
         or "nonartifact, nonblack creature" in text
@@ -10038,6 +10114,16 @@ def restricted_battlefield_target_from_source(source: str) -> str | None:
         and "AbilityPredicate(FlyingAbility.class)" in text
     ):
         return "blue_or_black_flying_creature"
+    if (
+        'FilterPermanent("artifact, enchantment, or creature with flying")' in text
+        or (
+            "CardType.ARTIFACT" in text
+            and "CardType.ENCHANTMENT" in text
+            and "CardType.CREATURE" in text
+            and "AbilityPredicate(FlyingAbility.class)" in text
+        )
+    ):
+        return "artifact_enchantment_or_flying_creature"
     if "FILTER_CREATURE_FLYING" in text or "AbilityPredicate(FlyingAbility.class)" in text:
         return "flying_creature"
     if "ObjectColor.BLACK" in text and "ObjectColor.RED" in text and "FilterPermanent(\"black or red permanent\")" in text:
@@ -10068,6 +10154,8 @@ def restricted_battlefield_target_from_source(source: str) -> str | None:
         and "Predicates.not" not in text
     ):
         return "white_permanent"
+    if 'FilterPermanent("monocolored permanent")' in text or "MonocoloredPredicate" in text:
+        return "monocolored_permanent"
     if 'FilterPermanent("multicolored creature or multicolored enchantment")' in text or (
         "MulticoloredPredicate" in text
         and "CardType.CREATURE" in text
@@ -10085,6 +10173,16 @@ def restricted_battlefield_target_from_source(source: str) -> str | None:
         "CardType.CREATURE" in text and "SubType.SPACECRAFT" in text
     ):
         return "creature_or_spacecraft"
+    if (
+        'FilterPermanent("Spirit, creature with disturb, or enchantment")' in text
+        or (
+            "SubType.SPIRIT" in text
+            and "DisturbAbility" in text
+            and "CardType.CREATURE" in text
+            and "CardType.ENCHANTMENT" in text
+        )
+    ):
+        return "spirit_or_disturb_creature_or_enchantment"
     if (
         "FilterCreaturePermanent" in text
         and re.search(r"PowerPredicate\s*\(\s*ComparisonType\.FEWER_THAN\s*,\s*4\s*\)", text)
@@ -12650,6 +12748,13 @@ def activated_destroy_from_oracle(metadata: dict[str, Any]) -> tuple[str, str] |
     if text.count(":") != 1:
         return None
     effect_text = text.rsplit(":", 1)[1].strip()
+    extra_sentences = [
+        sentence.strip()
+        for sentence in re.split(r"(?<=\.)\s+", effect_text)
+        if sentence.strip()
+    ]
+    if len(extra_sentences) > 1 and extra_sentences[1:] != ["it can't be regenerated."]:
+        return None
     effect_metadata = dict(metadata)
     effect_metadata["oracle_text"] = effect_text
     return destroy_target_from_oracle(effect_metadata)
@@ -17497,6 +17602,8 @@ def target_constraints_for(target: str) -> dict[str, Any]:
         return {"card_types": ["creature"], "combat_state": "attacking"}
     if target == "attacking_flying_creature":
         return {"card_types": ["creature"], "combat_state": "attacking", "required_keywords": ["flying"]}
+    if target == "nonblack_attacking_creature":
+        return {"card_types": ["creature"], "combat_state": "attacking", "exclude_colors": ["B"]}
     if target == "blocking_creature":
         return {"card_types": ["creature"], "combat_state": "blocking"}
     if target == "attacking_or_blocking_creature":
@@ -17610,6 +17717,8 @@ def target_constraints_for(target: str) -> dict[str, Any]:
         return {"card_types": ["permanent"], "target_colors": ["B", "R"]}
     if target == "white_permanent":
         return {"card_types": ["permanent"], "target_colors": ["W"]}
+    if target == "monocolored_permanent":
+        return {"card_types": ["permanent"], "color_count_exact": 1}
     if target == "multicolored_creature_or_enchantment":
         return {"card_types": ["creature", "enchantment"], "color_count_min": 2}
     if target == "artifact_enchantment_or_creature_power_4_or_greater":
@@ -17618,6 +17727,22 @@ def target_constraints_for(target: str) -> dict[str, Any]:
                 {"card_types": ["artifact"]},
                 {"card_types": ["enchantment"]},
                 {"card_types": ["creature"], "power_min": 4},
+            ]
+        }
+    if target == "artifact_enchantment_or_flying_creature":
+        return {
+            "any_of": [
+                {"card_types": ["artifact"]},
+                {"card_types": ["enchantment"]},
+                {"card_types": ["creature"], "required_keywords": ["flying"]},
+            ]
+        }
+    if target == "spirit_or_disturb_creature_or_enchantment":
+        return {
+            "any_of": [
+                {"card_types": ["permanent"], "required_subtypes": ["spirit"]},
+                {"card_types": ["creature"], "required_keywords": ["disturb"]},
+                {"card_types": ["enchantment"]},
             ]
         }
     if target == "creature_or_spacecraft":
@@ -24348,6 +24473,9 @@ def split_row(
             ), "selected_exact_scope"
         if classes != {"DestroyTargetEffect"}:
             return None, "destroy_effect_class_not_pure"
+        unsupported_abilities = unsupported_simple_removal_source_ability_classes(source_text)
+        if unsupported_abilities:
+            return None, "destroy_auxiliary_ability_class_not_supported"
         additional_cost_fields, additional_cost_reason = fixed_destroy_spell_additional_cost_fields_from_source(
             source_text,
             metadata,
@@ -24595,6 +24723,9 @@ def split_row(
     if unit == EXILE_UNIT:
         if classes != {"ExileTargetEffect"}:
             return None, "exile_effect_class_not_pure"
+        unsupported_abilities = unsupported_simple_removal_source_ability_classes(source_text)
+        if unsupported_abilities:
+            return None, "exile_auxiliary_ability_class_not_supported"
         if has_oracle_complexity(metadata):
             return None, "exile_oracle_not_simple"
         target = exile_target_from_oracle(metadata)

@@ -498,6 +498,55 @@ class SyncBattleCardRulesPgSelectionTests(unittest.TestCase):
         self.assertEqual(changed, 0)
         self.assertEqual(remaining, {"selected-new", "other-current"})
 
+    def test_partial_sqlite_cleanup_prunes_selected_card_when_pg_has_no_runtime_row(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            sqlite_path = Path(tmpdir) / "knowledge.db"
+            conn = sqlite3.connect(sqlite_path)
+            try:
+                sync_pg.battle_rule_registry.ensure_battle_card_rules(conn)
+                sync_pg.upsert_battle_card_rule(
+                    conn,
+                    "Rolled Back Card",
+                    {"effect": "remove_creature"},
+                    normalized_name_value="rolled back card",
+                    source="curated",
+                    confidence=0.9,
+                    review_status="verified",
+                    execution_status="auto",
+                    logical_rule_key_value="rolled-back-stale",
+                )
+                sync_pg.upsert_battle_card_rule(
+                    conn,
+                    "Other Card",
+                    {"effect": "ramp_permanent"},
+                    normalized_name_value="other card",
+                    source="curated",
+                    confidence=0.9,
+                    review_status="verified",
+                    execution_status="auto",
+                    logical_rule_key_value="other-current",
+                )
+                conn.commit()
+
+                changed = sync_pg.cleanup_sqlite_rows_absent_from_runtime_rows(
+                    conn,
+                    [],
+                    global_cleanup=False,
+                    prune_card_names=["Rolled Back Card"],
+                )
+                conn.commit()
+                remaining = {
+                    row[0]
+                    for row in conn.execute(
+                        "SELECT logical_rule_key FROM battle_card_rules"
+                    )
+                }
+            finally:
+                conn.close()
+
+        self.assertEqual(changed, 1)
+        self.assertEqual(remaining, {"other-current"})
+
     def test_global_sqlite_cleanup_removes_runtime_rows_absent_from_pg_snapshot(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             sqlite_path = Path(tmpdir) / "knowledge.db"

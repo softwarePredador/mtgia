@@ -901,6 +901,7 @@ def cleanup_sqlite_rows_absent_from_runtime_rows(
     rows: list[dict[str, Any]],
     *,
     global_cleanup: bool = False,
+    prune_card_names: list[str] | None = None,
 ) -> int:
     """Drop stale local mirror rows for cards now governed by PG.
 
@@ -956,28 +957,50 @@ def cleanup_sqlite_rows_absent_from_runtime_rows(
         return changed
 
     keys_by_name: dict[str, set[str]] = {}
+    for card_name in prune_card_names or []:
+        normalized = normalize_card_name(card_name)
+        front = normalize_card_name(str(card_name).split(" // ", 1)[0])
+        if normalized:
+            keys_by_name.setdefault(normalized, set())
+        if front:
+            keys_by_name.setdefault(front, set())
+
     for normalized, logical_key in runtime_keys:
         keys_by_name.setdefault(normalized, set()).add(logical_key)
 
     changed = 0
     for normalized, logical_keys in keys_by_name.items():
-        key_placeholders = ",".join("?" for _ in logical_keys)
-        cursor = conn.execute(
-            f"""
-            DELETE FROM battle_card_rules
-            WHERE source IN ({source_placeholders})
-              AND (
-                (normalized_name = ? AND logical_rule_key NOT IN ({key_placeholders}))
-                OR normalized_name LIKE ?
-              )
-            """,
-            (
-                *mirror_sources,
-                normalized,
-                *sorted(logical_keys),
-                normalized + " // %",
-            ),
-        )
+        if logical_keys:
+            key_placeholders = ",".join("?" for _ in logical_keys)
+            cursor = conn.execute(
+                f"""
+                DELETE FROM battle_card_rules
+                WHERE source IN ({source_placeholders})
+                  AND (
+                    (normalized_name = ? AND logical_rule_key NOT IN ({key_placeholders}))
+                    OR normalized_name LIKE ?
+                  )
+                """,
+                (
+                    *mirror_sources,
+                    normalized,
+                    *sorted(logical_keys),
+                    normalized + " // %",
+                ),
+            )
+        else:
+            cursor = conn.execute(
+                f"""
+                DELETE FROM battle_card_rules
+                WHERE source IN ({source_placeholders})
+                  AND (normalized_name = ? OR normalized_name LIKE ?)
+                """,
+                (
+                    *mirror_sources,
+                    normalized,
+                    normalized + " // %",
+                ),
+            )
         changed += max(0, cursor.rowcount)
     return changed
 
@@ -988,6 +1011,7 @@ def mirror_pg_rules_to_sqlite(
     *,
     reviewed_rows: list[dict[str, Any]] | None = None,
     global_cleanup: bool = False,
+    prune_card_names: list[str] | None = None,
 ) -> int:
     changed = 0
     filtered_rows = filter_rows_for_current_reviewed_curated(
@@ -1006,6 +1030,7 @@ def mirror_pg_rules_to_sqlite(
             conn,
             runtime_rows,
             global_cleanup=global_cleanup,
+            prune_card_names=prune_card_names,
         )
         for row in runtime_rows:
             effect_json = json_obj(row.get("effect_json"))
@@ -1110,6 +1135,7 @@ def main() -> int:
             rows,
             reviewed_rows=seed_rows,
             global_cleanup=not bool(selected_card_names),
+            prune_card_names=selected_card_names,
         )
         report["canonical_snapshot_rows_exported"] = export_canonical_snapshot(
             load_active_snapshot_rows(args.sqlite_db),

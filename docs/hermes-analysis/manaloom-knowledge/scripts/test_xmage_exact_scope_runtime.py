@@ -6416,6 +6416,53 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertEqual([card["name"] for card in opponent.battlefield], ["Colorless Construct", "Multicolor Bear"])
         self.assertEqual([card["name"] for card in opponent.graveyard], ["Monocolor Bear"])
 
+        opponent.battlefield = [
+            {
+                "name": "Black Attacker",
+                "type_line": "Creature - Warrior",
+                "colors": ["B"],
+                "power": 3,
+                "toughness": 3,
+                "attacking": True,
+            },
+            {
+                "name": "White Defender",
+                "type_line": "Creature - Soldier",
+                "colors": ["W"],
+                "power": 2,
+                "toughness": 2,
+            },
+            {
+                "name": "White Attacker",
+                "type_line": "Creature - Soldier",
+                "colors": ["W"],
+                "power": 2,
+                "toughness": 2,
+                "attacking": True,
+            },
+        ]
+        opponent.graveyard = []
+        nonblack_attacking_effect = {
+            "effect": "remove_creature",
+            "battle_model_scope": "xmage_destroy_target_spell_v1",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"], "combat_state": "attacking", "exclude_colors": ["B"]},
+            "destination": "graveyard",
+            "instant": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Fixture Assassin's Blade", "type_line": "Instant"},
+            turn=5,
+            rng=random.Random(39),
+            effect_data_override=nonblack_attacking_effect,
+        )
+
+        self.assertEqual([card["name"] for card in opponent.battlefield], ["Black Attacker", "White Defender"])
+        self.assertEqual([card["name"] for card in opponent.graveyard], ["White Attacker"])
+
     def test_exile_target_spell_respects_power_and_color_constraints(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])
@@ -6588,6 +6635,60 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         )
         self.assertEqual([card["name"] for card in any_of_opponent.battlefield], ["Fixture Land"])
         self.assertEqual([card["name"] for card in any_of_opponent.exile], ["Fixture Artifact"])
+
+        mono_opponent = self.battle.Player("Mono Opponent", None, [])
+        mono_opponent.battlefield.extend(
+            [
+                {"name": "Gold Permanent", "type_line": "Enchantment", "colors": ["W", "B"], "cmc": 2},
+                {"name": "Mono Permanent", "type_line": "Artifact Creature - Construct", "colors": ["U"], "power": 1, "toughness": 1},
+            ]
+        )
+        self.battle.apply_effect_immediate(
+            active,
+            [mono_opponent],
+            {"name": "Fixture Vanishing Verse", "type_line": "Instant"},
+            turn=6,
+            rng=random.Random(40),
+            effect_data_override={
+                "effect": "remove_permanent",
+                "battle_model_scope": "xmage_exile_target_spell_v1",
+                "target": "permanent",
+                "target_constraints": {"card_types": ["permanent"], "color_count_exact": 1},
+                "destination": "exile",
+            },
+        )
+        self.assertEqual([card["name"] for card in mono_opponent.battlefield], ["Gold Permanent"])
+        self.assertEqual([card["name"] for card in mono_opponent.exile], ["Mono Permanent"])
+
+        flying_any_of_opponent = self.battle.Player("Flying Any Of Opponent", None, [])
+        flying_any_of_opponent.battlefield.extend(
+            [
+                {"name": "Ground Creature", "type_line": "Creature - Bear", "power": 2, "toughness": 2},
+                {"name": "Flying Creature", "type_line": "Creature - Bird", "keywords": ["flying"], "power": 1, "toughness": 1},
+            ]
+        )
+        self.battle.apply_effect_immediate(
+            active,
+            [flying_any_of_opponent],
+            {"name": "Fixture Shoot Down", "type_line": "Sorcery"},
+            turn=6,
+            rng=random.Random(41),
+            effect_data_override={
+                "effect": "remove_permanent",
+                "battle_model_scope": "xmage_exile_target_spell_v1",
+                "target": "permanent",
+                "target_constraints": {
+                    "any_of": [
+                        {"card_types": ["artifact"]},
+                        {"card_types": ["enchantment"]},
+                        {"card_types": ["creature"], "required_keywords": ["flying"]},
+                    ]
+                },
+                "destination": "exile",
+            },
+        )
+        self.assertEqual([card["name"] for card in flying_any_of_opponent.battlefield], ["Ground Creature"])
+        self.assertEqual([card["name"] for card in flying_any_of_opponent.exile], ["Flying Creature"])
 
     def test_destroy_target_spell_moves_creature_to_graveyard(self) -> None:
         active = self.battle.Player("Active", None, [])

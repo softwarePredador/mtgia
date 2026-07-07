@@ -2092,6 +2092,8 @@ def _type_line_for_fixture(card_type: str, subtypes: list[str] | None = None) ->
     subtype_suffix = ""
     if subtypes:
         subtype_suffix = " - " + " ".join(str(value).title() for value in subtypes if value)
+    if " " in clean_type:
+        return f"{' '.join(part.title() for part in clean_type.split())}{subtype_suffix}"
     if clean_type == "creature":
         return f"Creature{subtype_suffix or ' - Soldier'}"
     if clean_type == "artifact":
@@ -2103,6 +2105,13 @@ def _type_line_for_fixture(card_type: str, subtypes: list[str] | None = None) ->
     if clean_type == "land":
         return f"Land{subtype_suffix}"
     return f"Permanent{subtype_suffix}"
+
+
+def _fixture_color_not_in(excluded_colors: set[str]) -> str:
+    for color in ("W", "U", "B", "R", "G"):
+        if color not in excluded_colors:
+            return color
+    return "W"
 
 
 def _merge_first_any_of_option(constraints: dict[str, Any]) -> dict[str, Any]:
@@ -2140,7 +2149,15 @@ def _target_fixture_from_constraints(
             "power_max",
             "toughness_min",
             "toughness_max",
+            "required_keywords",
             "required_subtypes",
+            "exclude_card_types",
+            "exclude_colors",
+            "exclude_subtypes",
+            "exclude_supertypes",
+            "combat_state",
+            "tapped_state",
+            "tap_state",
         )
     ):
         card_types = {str(value or "").strip().lower() for value in constraints.get("card_types") or []}
@@ -2160,11 +2177,21 @@ def _target_fixture_from_constraints(
 
     active_constraints = _merge_first_any_of_option(constraints) if matching else dict(constraints)
     card_type = _primary_fixture_card_type(active_constraints)
+    if not matching and active_constraints.get("exclude_card_types"):
+        excluded_type = str((active_constraints.get("exclude_card_types") or ["artifact"])[0]).strip().lower()
+        if excluded_type:
+            card_type = f"{excluded_type} {card_type}" if card_type != excluded_type else excluded_type
+    excluded_supertype = ""
+    if not matching and active_constraints.get("exclude_supertypes"):
+        excluded_supertype = str((active_constraints.get("exclude_supertypes") or ["legendary"])[0]).strip().lower()
     colors: list[str] = []
+    excluded_colors = {str(value).strip().upper() for value in active_constraints.get("exclude_colors") or [] if value}
     if matching:
         target_colors = [str(value) for value in active_constraints.get("target_colors") or [] if value]
         if target_colors:
             colors = [target_colors[0]]
+        elif excluded_colors:
+            colors = [_fixture_color_not_in(excluded_colors)]
         elif active_constraints.get("color_count_min") is not None:
             colors = ["W", "U"]
         elif active_constraints.get("color_count_exact") is not None:
@@ -2174,8 +2201,13 @@ def _target_fixture_from_constraints(
             colors = ["B"]
             if "B" in {str(value) for value in active_constraints.get("target_colors") or []}:
                 colors = ["W"]
+        elif excluded_colors:
+            colors = [sorted(excluded_colors)[0]]
         elif active_constraints.get("color_count_min") is not None:
             colors = ["W"]
+        elif active_constraints.get("color_count_exact") is not None:
+            exact = max(0, int(active_constraints.get("color_count_exact") or 0))
+            colors = ["W", "U"] if exact <= 1 else ["W"]
 
     power = 2
     toughness = 2
@@ -2193,19 +2225,42 @@ def _target_fixture_from_constraints(
         toughness = maximum if matching else maximum + 1
 
     subtypes = [str(value).lower() for value in active_constraints.get("required_subtypes") or [] if value]
+    if not matching and active_constraints.get("exclude_subtypes"):
+        subtypes = [str((active_constraints.get("exclude_subtypes") or ["spirit"])[0]).strip().lower()]
+    type_line = _type_line_for_fixture(card_type, subtypes)
+    if excluded_supertype:
+        type_line = f"{excluded_supertype.title()} {type_line}"
     fixture = {
         "name": name,
-        "type_line": _type_line_for_fixture(card_type, subtypes),
+        "type_line": type_line,
         "effect": "creature" if card_type == "creature" else card_type,
         "cmc": 3,
     }
-    if card_type == "creature":
+    if "creature" in card_type:
         fixture["power"] = power
         fixture["toughness"] = toughness
     if colors:
         fixture["colors"] = colors
     if subtypes:
         fixture["subtypes"] = subtypes
+    keywords = [
+        str(value).strip().lower().replace(" ", "_")
+        for value in active_constraints.get("required_keywords") or []
+        if str(value).strip()
+    ]
+    if matching and keywords:
+        fixture["keywords"] = keywords
+    combat_state = str(active_constraints.get("combat_state") or "").strip().lower()
+    if matching and combat_state:
+        if combat_state in {"attacking", "attacking_or_blocking"}:
+            fixture["attacking"] = True
+        if combat_state in {"blocking", "attacking_or_blocking"}:
+            fixture["blocking"] = True
+    tapped_state = str(active_constraints.get("tapped_state") or active_constraints.get("tap_state") or "").strip().lower()
+    if tapped_state:
+        fixture["tapped"] = bool(matching and tapped_state == "tapped") or bool(
+            not matching and tapped_state == "untapped"
+        )
     return fixture
 
 
