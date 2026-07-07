@@ -296,6 +296,7 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "exile_if_dies_from_damage",
     "exile_if_dies_target",
     "damage_scope",
+    "damage_required_colors",
     "damage_excluded_subtypes",
     "destroy_card_types",
     "destroy_controller",

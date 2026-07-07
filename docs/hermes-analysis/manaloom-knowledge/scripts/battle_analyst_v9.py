@@ -52071,6 +52071,11 @@ def apply_damage_wipe(player, opponents, card, effect_data, turn, *, finish_spel
         for value in _as_list(effect_data.get("damage_excluded_subtypes"))
         if str(value or "").strip()
     ]
+    damage_required_colors = [
+        str(value or "").strip().upper()
+        for value in _as_list(effect_data.get("damage_required_colors"))
+        if str(value or "").strip()
+    ]
     affected_players = (
         list(opponents)
         if damage_scope
@@ -52110,6 +52115,11 @@ def apply_damage_wipe(player, opponents, card, effect_data, turn, *, finish_spel
                 if damage_excluded_subtypes and any(
                     permanent_has_subtype(permanent, subtype)
                     for subtype in damage_excluded_subtypes
+                ):
+                    continue
+                if damage_required_colors and not any(
+                    card_has_color(permanent, color)
+                    for color in damage_required_colors
                 ):
                     continue
                 creatures_seen += 1
@@ -52242,6 +52252,7 @@ def apply_damage_wipe(player, opponents, card, effect_data, turn, *, finish_spel
         damage=amount,
         damage_scope=damage_scope,
         damage_excluded_subtypes=damage_excluded_subtypes,
+        damage_required_colors=damage_required_colors,
         damage_amount_source=effect_data.get("damage_amount_source"),
         current_spell_mana_value=card_mana_value(card),
         spell_mana_value_cast_this_turn=getattr(

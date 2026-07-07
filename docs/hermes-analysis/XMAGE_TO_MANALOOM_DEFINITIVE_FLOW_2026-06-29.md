@@ -18631,6 +18631,70 @@ Evidence:
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260707_post_pg647_damage_excluded_subtype_new_server_commander_legal.md`
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260707_post_pg647_damage_excluded_subtype_new_server_recheck.md`
 
+## 2026-07-07 - PG648 Damage Wipe Required Color Checkpoint
+
+PG648 closed the exact board-wipe damage subpattern where XMage and Oracle both
+state fixed damage to creatures with a required color filter:
+
+- runtime contract added: `damage_required_colors` for
+  `xmage_fixed_damage_all_matching_permanents_spell_v1`;
+- split contract added:
+  - Oracle must match `each <color> and/or <color> creature`;
+  - XMage source must contain the same
+    `ColorPredicate(ObjectColor.<COLOR>)` set;
+  - mismatched Oracle/source color sets stay blocked as
+    `board_wipe_damage_source_scope_mismatch`;
+- promoted card: `Evaporate`;
+- postcheck: `promoted_rule_rows=1`, `promoted_verified_auto_rows=1`, and
+  `promoted_oracle_hash_rows=1`;
+- E2E package validation passed PostgreSQL, SQLite, canonical snapshot, and
+  `runtime_get_card_effect`;
+- focused runtime coverage verifies that white/blue creatures are damaged while
+  a green creature is ignored by the same `damage_wipe`.
+
+During the same validation gate, PG649 fixed a contract failure unrelated to
+`Evaporate`: `44` existing trusted/active executable PostgreSQL rules had no
+`oracle_hash`. PG649 backfilled those hashes from `cards.oracle_text` via
+`card_id`, without changing `effect_json`, review status, or execution status.
+Postcheck confirmed `remaining_trusted_active_missing_hash_rows=0` and
+`backfilled_rows_with_expected_hash=44`.
+
+Final post-PG649 state:
+
+- PG -> Hermes/SQLite sync:
+  `pg_rows_loaded=5916`, `sqlite_inserted_or_updated=5902`,
+  `canonical_snapshot_rows_exported=5879`;
+- global readiness:
+  `battle_and_oracle_ready=5976`, `battle_family_mapper_required=27900`,
+  `snapshot_has_verified_rule=6004`, `snapshot_has_any_rule=7211`;
+- authoritative queue:
+  `target_identity_count=24977`,
+  `xmage_authoritative_source_count=24664`,
+  `xmage_missing_source_exception_count=313`,
+  `xmage_authoritative_parser_gap_count=0`,
+  `xmage_authoritative_adapter_required_count=24664`;
+- final exact-scope recheck returned `proposal_count=0` and
+  `safe_for_batch_pg_package_count=0`;
+- validation gates:
+  `python3 -m unittest test_xmage_authoritative_exact_scope_split.py test_xmage_exact_scope_runtime.py`
+  passed `1202` tests,
+  `xmage_strategy_consistency_audit` passed `26/26`,
+  `pg_hermes_sqlite_contract_audit` passed `51/51` after PG649,
+  `operational_surface_alignment_audit` passed, and
+  `legacy_contamination_audit` passed.
+
+Evidence:
+
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260707_pg648_damage_required_color_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg648_damage_required_color_new_server_package_package.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg648_damage_required_color_new_server_e2e_validation.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg649_trusted_rule_oracle_hash_backfill_new_server_package.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg649_trusted_rule_oracle_hash_backfill_new_server_pg_to_sqlite_sync.json`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260707_post_pg649_hash_backfill_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260707_post_pg649_hash_backfill_new_server_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260707_post_pg649_hash_backfill_new_server_recheck.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260707_post_pg649_hash_backfill_new_server.md`
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

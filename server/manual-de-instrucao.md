@@ -102,6 +102,30 @@ Atualizacao 2026-07-07 / PG647:
   `xmage_authoritative_adapter_required_count=24665`, `parser_gap=0`,
   `missing_source_exception_count=313`.
 
+Atualizacao 2026-07-07 / PG648-PG649:
+
+- Fechado o subpadrao seguro de board wipe de dano com filtro de cor:
+  `DamageAllEffect` + Oracle `each white and/or blue creature` + fonte XMage
+  com `ColorPredicate(ObjectColor.WHITE/BLUE)`.
+- Runtime `battle_analyst_v9.py` agora respeita
+  `damage_required_colors` em
+  `xmage_fixed_damage_all_matching_permanents_spell_v1`.
+- PostgreSQL novo recebeu a regra verificada de `Evaporate`; precheck confirmou
+  `target_card_rows=1`, apply retornou `upserted_rows=1` e postcheck confirmou
+  `promoted_verified_auto_rows=1` e `promoted_oracle_hash_rows=1`.
+- Durante o gate PG/Hermes/SQLite, PG649 saneou `44` regras trusted/active
+  antigas sem `oracle_hash`, preenchendo o hash a partir de
+  `cards.oracle_text` via `card_id`; postcheck ficou com
+  `remaining_trusted_active_missing_hash_rows=0`.
+- Sync PG -> Hermes/SQLite pos-PG649: `pg_rows_loaded=5916`,
+  `sqlite_inserted_or_updated=5902`, `canonical_snapshot_rows_exported=5879`.
+- Readiness pos-PG649: `battle_and_oracle_ready=5976`,
+  `battle_family_mapper_required=27900`,
+  `snapshot_has_verified_rule=6004`, `snapshot_has_any_rule=7211`.
+- Rebuild da fila pos-PG649: `target_identity_count=24977`,
+  `xmage_authoritative_adapter_required_count=24664`, `parser_gap=0`,
+  `missing_source_exception_count=313`.
+
 Comandos globais:
 
 ```bash

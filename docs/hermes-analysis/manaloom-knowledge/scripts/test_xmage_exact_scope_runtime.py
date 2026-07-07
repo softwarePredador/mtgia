@@ -18282,6 +18282,67 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_damage_wipe_respects_required_colors(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        opponent.battlefield.extend(
+            [
+                {
+                    "name": "Opp White",
+                    "type_line": "Creature - Soldier",
+                    "colors": ["W"],
+                    "toughness": 1,
+                },
+                {
+                    "name": "Opp Blue",
+                    "type_line": "Creature - Wizard",
+                    "colors": ["U"],
+                    "toughness": 1,
+                },
+                {
+                    "name": "Opp Green",
+                    "type_line": "Creature - Elf",
+                    "colors": ["G"],
+                    "toughness": 1,
+                },
+            ]
+        )
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Evaporate",
+                "type_line": "Sorcery",
+                "oracle_text": "Fixture Evaporate deals 1 damage to each white and/or blue creature.",
+            },
+            turn=13,
+            rng=random.Random(13),
+            effect_data_override={
+                "effect": "damage_wipe",
+                "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+                "amount": 1,
+                "damage": 1,
+                "damage_scope": "each_creature",
+                "damage_required_colors": ["W", "U"],
+            },
+        )
+
+        self.assertEqual([card["name"] for card in opponent.battlefield], ["Opp Green"])
+        self.assertEqual(
+            [card["name"] for card in opponent.graveyard],
+            ["Opp White", "Opp Blue"],
+        )
+        self.assertTrue(
+            any(
+                event == "damage_wipe_resolved"
+                and data.get("card") == "Fixture Evaporate"
+                and data.get("damage_required_colors") == ["W", "U"]
+                and data.get("opponent_creatures_destroyed") == 2
+                for event, data in self.events
+            )
+        )
+
     def test_simple_activated_recursion_permanent_pays_colored_taps_and_returns_matching_card(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

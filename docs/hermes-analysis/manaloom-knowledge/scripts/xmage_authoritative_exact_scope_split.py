@@ -5916,6 +5916,26 @@ def damage_all_spec_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | No
         return {"damage_scope": "each_untapped_creature"}
     if re.match(r"^.+ deals? \d+ damage to each nonartifact creature\.?$", text):
         return {"damage_scope": "each_nonartifact_creature"}
+    color_match = re.match(
+        r"^.+ deals? \d+ damage to each (?P<colors>(?:white|blue|black|red|green)(?: and/or (?:white|blue|black|red|green))*) creature\.?$",
+        text,
+    )
+    if color_match:
+        color_words = [
+            part.strip()
+            for part in re.split(r"\s+and/or\s+", color_match.group("colors"))
+            if part.strip()
+        ]
+        color_symbols = [
+            TOKEN_COLOR_WORDS[color_word]
+            for color_word in color_words
+            if color_word in TOKEN_COLOR_WORDS
+        ]
+        if color_symbols and len(color_symbols) == len(color_words):
+            return {
+                "damage_scope": "each_creature",
+                "damage_required_colors": ordered_color_symbols(color_symbols),
+            }
     excluded_subtype = re.match(
         r"^.+ deals? \d+ damage to each non[- ](?P<subtype>[a-z][a-z ]*) creature\.?$",
         text,
@@ -5938,6 +5958,32 @@ def damage_all_scope_from_oracle(metadata: dict[str, Any]) -> str | None:
 
 
 def damage_all_source_matches_spec(source: str, spec: dict[str, Any]) -> bool:
+    required_colors = ordered_color_symbols(
+        [
+            str(value or "").strip().upper()
+            for value in as_list(spec.get("damage_required_colors"))
+            if str(value or "").strip()
+        ]
+    )
+    if required_colors:
+        object_color_symbols = {
+            "WHITE": "W",
+            "BLUE": "U",
+            "BLACK": "B",
+            "RED": "R",
+            "GREEN": "G",
+        }
+        source_colors = ordered_color_symbols(
+            [
+                object_color_symbols[color]
+                for color in re.findall(
+                    r"ColorPredicate\s*\(\s*ObjectColor\.(WHITE|BLUE|BLACK|RED|GREEN)\s*\)",
+                    source or "",
+                )
+            ]
+        )
+        if set(source_colors) != set(required_colors):
+            return False
     excluded_subtypes = [
         str(value or "").strip().lower()
         for value in as_list(spec.get("damage_excluded_subtypes"))

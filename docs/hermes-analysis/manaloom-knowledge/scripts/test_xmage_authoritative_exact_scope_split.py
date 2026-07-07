@@ -18401,6 +18401,42 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "board_wipe_damage_source_scope_mismatch")
 
+    def test_damage_wipe_required_color_scope_maps_when_source_matches(self) -> None:
+        row = queue_row(split.BOARD_WIPE_UNIT, effect_classes=["DamageAllEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Evaporate deals 1 damage to each white and/or blue creature."),
+            source_text=(
+                "private static final FilterCreaturePermanent filter = "
+                "new FilterCreaturePermanent(\"white and/or blue creature\");"
+                "static { filter.add(Predicates.or("
+                "new ColorPredicate(ObjectColor.WHITE),"
+                "new ColorPredicate(ObjectColor.BLUE))); }"
+                "this.getSpellAbility().addEffect(new DamageAllEffect(1, filter));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["damage_scope"], "each_creature")
+        self.assertEqual(effect["damage_required_colors"], ["W", "U"])
+
+    def test_damage_wipe_required_color_scope_requires_matching_source(self) -> None:
+        row = queue_row(split.BOARD_WIPE_UNIT, effect_classes=["DamageAllEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Evaporate deals 1 damage to each white and/or blue creature."),
+            source_text=(
+                "private static final FilterCreaturePermanent filter = "
+                "new FilterCreaturePermanent(\"white creature\");"
+                "static { filter.add(new ColorPredicate(ObjectColor.WHITE)); }"
+                "this.getSpellAbility().addEffect(new DamageAllEffect(1, filter));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "board_wipe_damage_source_scope_mismatch")
+
     def test_fixed_plus_one_counter_target_creature_maps_to_add_counters_runtime(self) -> None:
         row = queue_row(split.ADD_COUNTERS_TARGET_UNIT, effect_classes=["AddCountersTargetEffect"])
         proposal, reason = split.split_row(
