@@ -1,0 +1,963 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg607_damage_life_target_variants_new_se_20260707_095059",
+  "deploy_id": "PG607",
+  "execution_scenarios": [
+    {
+      "card": {
+        "name": "Deadly Riposte",
+        "type_line": "Instant"
+      },
+      "controller_life": 10,
+      "expected_damage": 3,
+      "expected_life_gain": 2,
+      "expected_target": "tapped_creature",
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ],
+        "tapped_state": "tapped"
+      },
+      "logical_rule_key": "battle_rule_v1:91ef332cf9a3564d504b69d3a7e7193d",
+      "name": "Deadly Riposte deals damage and gains life",
+      "opponent_life": 20,
+      "target": {
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Damage Gain Legal Target",
+        "power": 2,
+        "tapped": true,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "type": "damage_gain_life_spell"
+    },
+    {
+      "card": {
+        "name": "Joust Through",
+        "type_line": "Instant"
+      },
+      "controller_life": 10,
+      "expected_damage": 3,
+      "expected_life_gain": 1,
+      "expected_target": "attacking_or_blocking_creature",
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ],
+        "combat_state": "attacking_or_blocking"
+      },
+      "logical_rule_key": "battle_rule_v1:c0803b01326684733246ecf321e2340f",
+      "name": "Joust Through deals damage and gains life",
+      "opponent_life": 20,
+      "target": {
+        "attacking": true,
+        "blocking": true,
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Damage Gain Legal Target",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "type": "damage_gain_life_spell"
+    },
+    {
+      "card": {
+        "name": "Kiss of Death",
+        "type_line": "Instant"
+      },
+      "controller_life": 10,
+      "expected_damage": 4,
+      "expected_life_gain": 4,
+      "expected_target": "opponent_or_planeswalker",
+      "expected_target_constraints": {
+        "scope": "opponent_or_planeswalker"
+      },
+      "logical_rule_key": "battle_rule_v1:724158f47f0fc0f1ccfdbbb4ff687eea",
+      "name": "Kiss of Death deals damage and gains life",
+      "opponent_life": 20,
+      "target": null,
+      "type": "damage_gain_life_spell"
+    },
+    {
+      "card": {
+        "name": "Sorin's Vengeance",
+        "type_line": "Instant"
+      },
+      "controller_life": 10,
+      "expected_damage": 10,
+      "expected_life_gain": 10,
+      "expected_target": "player_or_planeswalker",
+      "expected_target_constraints": {
+        "scope": "player_or_planeswalker"
+      },
+      "logical_rule_key": "battle_rule_v1:eb20910b419b6ac97a9e3c0a86b23973",
+      "name": "Sorin's Vengeance deals damage and gains life",
+      "opponent_life": 20,
+      "target": null,
+      "type": "damage_gain_life_spell"
+    },
+    {
+      "card": {
+        "name": "Soul Shred",
+        "type_line": "Instant"
+      },
+      "controller_life": 10,
+      "expected_damage": 3,
+      "expected_life_gain": 3,
+      "expected_target": "nonblack_creature",
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ],
+        "exclude_colors": [
+          "B"
+        ]
+      },
+      "logical_rule_key": "battle_rule_v1:32a1e9755f09e0d9b05907579b4f153e",
+      "name": "Soul Shred deals damage and gains life",
+      "opponent_life": 20,
+      "target": {
+        "cmc": 3,
+        "colors": [
+          "W"
+        ],
+        "effect": "creature",
+        "name": "E2E Damage Gain Legal Target",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "type": "damage_gain_life_spell"
+    },
+    {
+      "card": {
+        "name": "Soul Spike",
+        "type_line": "Instant"
+      },
+      "controller_life": 10,
+      "expected_damage": 4,
+      "expected_life_gain": 4,
+      "expected_target": "any_target",
+      "expected_target_constraints": {
+        "scope": "any_target"
+      },
+      "logical_rule_key": "battle_rule_v1:b30ee9a5fcd603703d248235230ed80f",
+      "name": "Soul Spike deals damage and gains life",
+      "opponent_life": 20,
+      "target": {
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Damage Gain Legal Target",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "type": "damage_gain_life_spell"
+    },
+    {
+      "card": {
+        "name": "Spinning Darkness",
+        "type_line": "Instant"
+      },
+      "controller_life": 10,
+      "expected_damage": 3,
+      "expected_life_gain": 3,
+      "expected_target": "nonblack_creature",
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ],
+        "exclude_colors": [
+          "B"
+        ]
+      },
+      "logical_rule_key": "battle_rule_v1:d291091aff24d2d4909f1594c326313a",
+      "name": "Spinning Darkness deals damage and gains life",
+      "opponent_life": 20,
+      "target": {
+        "cmc": 3,
+        "colors": [
+          "W"
+        ],
+        "effect": "creature",
+        "name": "E2E Damage Gain Legal Target",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "type": "damage_gain_life_spell"
+    },
+    {
+      "card": {
+        "name": "Stolen Grain",
+        "type_line": "Instant"
+      },
+      "controller_life": 10,
+      "expected_damage": 5,
+      "expected_life_gain": 5,
+      "expected_target": "opponent_or_planeswalker",
+      "expected_target_constraints": {
+        "scope": "opponent_or_planeswalker"
+      },
+      "logical_rule_key": "battle_rule_v1:b704bb09a733d5e521be85ffbe15b4d3",
+      "name": "Stolen Grain deals damage and gains life",
+      "opponent_life": 20,
+      "target": null,
+      "type": "damage_gain_life_spell"
+    },
+    {
+      "card": {
+        "name": "Taste of Blood",
+        "type_line": "Instant"
+      },
+      "controller_life": 10,
+      "expected_damage": 1,
+      "expected_life_gain": 1,
+      "expected_target": "player_or_planeswalker",
+      "expected_target_constraints": {
+        "scope": "player_or_planeswalker"
+      },
+      "logical_rule_key": "battle_rule_v1:1111d6f096c488d21ee0546808a14729",
+      "name": "Taste of Blood deals damage and gains life",
+      "opponent_life": 20,
+      "target": null,
+      "type": "damage_gain_life_spell"
+    },
+    {
+      "card": {
+        "name": "Vampiric Touch",
+        "type_line": "Instant"
+      },
+      "controller_life": 10,
+      "expected_damage": 2,
+      "expected_life_gain": 2,
+      "expected_target": "opponent_or_planeswalker",
+      "expected_target_constraints": {
+        "scope": "opponent_or_planeswalker"
+      },
+      "logical_rule_key": "battle_rule_v1:62ca1f552078fd5873eada59caf77a96",
+      "name": "Vampiric Touch deals damage and gains life",
+      "opponent_life": 20,
+      "target": null,
+      "type": "damage_gain_life_spell"
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Deadly Riposte",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:91ef332cf9a3564d504b69d3a7e7193d",
+      "min_rule_version": 2,
+      "normalized_name": "deadly riposte",
+      "oracle_hash": "828dc896bdc14123907a824bc2ea6903",
+      "required_effect_fields": {
+        "amount": 3,
+        "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+        "controller_gain_life": 2,
+        "damage": 3,
+        "effect": "direct_damage",
+        "gain_life": 2,
+        "target": "tapped_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "tapped_state": "tapped"
+        },
+        "xmage_effect_classes": [
+          "DamageTargetEffect",
+          "GainLifeEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Joust Through",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c0803b01326684733246ecf321e2340f",
+      "min_rule_version": 2,
+      "normalized_name": "joust through",
+      "oracle_hash": "e00e2b2e27811d348c98eac6ac8512ab",
+      "required_effect_fields": {
+        "amount": 3,
+        "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+        "controller_gain_life": 1,
+        "damage": 3,
+        "effect": "direct_damage",
+        "gain_life": 1,
+        "target": "attacking_or_blocking_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "combat_state": "attacking_or_blocking"
+        },
+        "xmage_effect_classes": [
+          "DamageTargetEffect",
+          "GainLifeEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Kiss of Death",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:724158f47f0fc0f1ccfdbbb4ff687eea",
+      "min_rule_version": 2,
+      "normalized_name": "kiss of death",
+      "oracle_hash": "b4b1b9466bde86a7d4bc39a3f18207f7",
+      "required_effect_fields": {
+        "amount": 4,
+        "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+        "controller_gain_life": 4,
+        "damage": 4,
+        "effect": "direct_damage",
+        "gain_life": 4,
+        "target": "opponent_or_planeswalker",
+        "target_constraints": {
+          "scope": "opponent_or_planeswalker"
+        },
+        "xmage_effect_classes": [
+          "DamageTargetEffect",
+          "GainLifeEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sorin's Vengeance",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:eb20910b419b6ac97a9e3c0a86b23973",
+      "min_rule_version": 2,
+      "normalized_name": "sorin's vengeance",
+      "oracle_hash": "5401c85c3a83d51677939d3484c39742",
+      "required_effect_fields": {
+        "amount": 10,
+        "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+        "controller_gain_life": 10,
+        "damage": 10,
+        "effect": "direct_damage",
+        "gain_life": 10,
+        "target": "player_or_planeswalker",
+        "target_constraints": {
+          "scope": "player_or_planeswalker"
+        },
+        "xmage_effect_classes": [
+          "DamageTargetEffect",
+          "GainLifeEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Soul Shred",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:32a1e9755f09e0d9b05907579b4f153e",
+      "min_rule_version": 2,
+      "normalized_name": "soul shred",
+      "oracle_hash": "b37068726ddbb54cdfa6cd28df01557d",
+      "required_effect_fields": {
+        "amount": 3,
+        "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+        "controller_gain_life": 3,
+        "damage": 3,
+        "effect": "direct_damage",
+        "gain_life": 3,
+        "target": "nonblack_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "exclude_colors": [
+            "B"
+          ]
+        },
+        "xmage_effect_classes": [
+          "DamageTargetEffect",
+          "GainLifeEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Soul Spike",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b30ee9a5fcd603703d248235230ed80f",
+      "min_rule_version": 2,
+      "normalized_name": "soul spike",
+      "oracle_hash": "614c79047afc07dad14f14f488dada0d",
+      "required_effect_fields": {
+        "amount": 4,
+        "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+        "controller_gain_life": 4,
+        "damage": 4,
+        "effect": "direct_damage",
+        "gain_life": 4,
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_effect_classes": [
+          "DamageTargetEffect",
+          "GainLifeEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Spinning Darkness",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d291091aff24d2d4909f1594c326313a",
+      "min_rule_version": 2,
+      "normalized_name": "spinning darkness",
+      "oracle_hash": "2561e07b514f9ac6f73f3b97b46e8246",
+      "required_effect_fields": {
+        "amount": 3,
+        "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+        "controller_gain_life": 3,
+        "damage": 3,
+        "effect": "direct_damage",
+        "gain_life": 3,
+        "target": "nonblack_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "exclude_colors": [
+            "B"
+          ]
+        },
+        "xmage_effect_classes": [
+          "DamageTargetEffect",
+          "GainLifeEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Stolen Grain",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b704bb09a733d5e521be85ffbe15b4d3",
+      "min_rule_version": 2,
+      "normalized_name": "stolen grain",
+      "oracle_hash": "ee81fbfe136dc894be32bf7e9430aeed",
+      "required_effect_fields": {
+        "amount": 5,
+        "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+        "controller_gain_life": 5,
+        "damage": 5,
+        "effect": "direct_damage",
+        "gain_life": 5,
+        "target": "opponent_or_planeswalker",
+        "target_constraints": {
+          "scope": "opponent_or_planeswalker"
+        },
+        "xmage_effect_classes": [
+          "DamageTargetEffect",
+          "GainLifeEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Taste of Blood",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1111d6f096c488d21ee0546808a14729",
+      "min_rule_version": 2,
+      "normalized_name": "taste of blood",
+      "oracle_hash": "61112b2e9a074b6010ab6ace7cd3657a",
+      "required_effect_fields": {
+        "amount": 1,
+        "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+        "controller_gain_life": 1,
+        "damage": 1,
+        "effect": "direct_damage",
+        "gain_life": 1,
+        "target": "player_or_planeswalker",
+        "target_constraints": {
+          "scope": "player_or_planeswalker"
+        },
+        "xmage_effect_classes": [
+          "DamageTargetEffect",
+          "GainLifeEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Vampiric Touch",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:62ca1f552078fd5873eada59caf77a96",
+      "min_rule_version": 2,
+      "normalized_name": "vampiric touch",
+      "oracle_hash": "dfebe66697b700444015f0d97a0f3e17",
+      "required_effect_fields": {
+        "amount": 2,
+        "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+        "controller_gain_life": 2,
+        "damage": 2,
+        "effect": "direct_damage",
+        "gain_life": 2,
+        "target": "opponent_or_planeswalker",
+        "target_constraints": {
+          "scope": "opponent_or_planeswalker"
+        },
+        "xmage_effect_classes": [
+          "DamageTargetEffect",
+          "GainLifeEffect"
+        ]
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_fixed_damage_gain_life_spell": 10
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/xmage_pg607_damage_life_target_variants_new_server_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/xmage_pg607_damage_life_target_variants_new_server_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/xmage_pg607_damage_life_target_variants_new_server_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/xmage_pg607_damage_life_target_variants_new_server_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/xmage_pg607_damage_life_target_variants_new_server_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/xmage_pg607_damage_life_target_variants_new_server_rollback.sql"
+  },
+  "generated_at": "2026-07-07T09:50:59+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Deadly Riposte"
+      },
+      "card_name": "Deadly Riposte",
+      "effect": "direct_damage",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:91ef332cf9a3564d504b69d3a7e7193d",
+      "normalized_name": "deadly riposte",
+      "required_effect_fields": {
+        "amount": 3,
+        "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+        "controller_gain_life": 2,
+        "damage": 3,
+        "effect": "direct_damage",
+        "gain_life": 2,
+        "target": "tapped_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "tapped_state": "tapped"
+        },
+        "xmage_effect_classes": [
+          "DamageTargetEffect",
+          "GainLifeEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Joust Through"
+      },
+      "card_name": "Joust Through",
+      "effect": "direct_damage",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c0803b01326684733246ecf321e2340f",
+      "normalized_name": "joust through",
+      "required_effect_fields": {
+        "amount": 3,
+        "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+        "controller_gain_life": 1,
+        "damage": 3,
+        "effect": "direct_damage",
+        "gain_life": 1,
+        "target": "attacking_or_blocking_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "combat_state": "attacking_or_blocking"
+        },
+        "xmage_effect_classes": [
+          "DamageTargetEffect",
+          "GainLifeEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Kiss of Death"
+      },
+      "card_name": "Kiss of Death",
+      "effect": "direct_damage",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:724158f47f0fc0f1ccfdbbb4ff687eea",
+      "normalized_name": "kiss of death",
+      "required_effect_fields": {
+        "amount": 4,
+        "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+        "controller_gain_life": 4,
+        "damage": 4,
+        "effect": "direct_damage",
+        "gain_life": 4,
+        "target": "opponent_or_planeswalker",
+        "target_constraints": {
+          "scope": "opponent_or_planeswalker"
+        },
+        "xmage_effect_classes": [
+          "DamageTargetEffect",
+          "GainLifeEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Sorin's Vengeance"
+      },
+      "card_name": "Sorin's Vengeance",
+      "effect": "direct_damage",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:eb20910b419b6ac97a9e3c0a86b23973",
+      "normalized_name": "sorin's vengeance",
+      "required_effect_fields": {
+        "amount": 10,
+        "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+        "controller_gain_life": 10,
+        "damage": 10,
+        "effect": "direct_damage",
+        "gain_life": 10,
+        "target": "player_or_planeswalker",
+        "target_constraints": {
+          "scope": "player_or_planeswalker"
+        },
+        "xmage_effect_classes": [
+          "DamageTargetEffect",
+          "GainLifeEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Soul Shred"
+      },
+      "card_name": "Soul Shred",
+      "effect": "direct_damage",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:32a1e9755f09e0d9b05907579b4f153e",
+      "normalized_name": "soul shred",
+      "required_effect_fields": {
+        "amount": 3,
+        "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+        "controller_gain_life": 3,
+        "damage": 3,
+        "effect": "direct_damage",
+        "gain_life": 3,
+        "target": "nonblack_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "exclude_colors": [
+            "B"
+          ]
+        },
+        "xmage_effect_classes": [
+          "DamageTargetEffect",
+          "GainLifeEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Soul Spike"
+      },
+      "card_name": "Soul Spike",
+      "effect": "direct_damage",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b30ee9a5fcd603703d248235230ed80f",
+      "normalized_name": "soul spike",
+      "required_effect_fields": {
+        "amount": 4,
+        "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+        "controller_gain_life": 4,
+        "damage": 4,
+        "effect": "direct_damage",
+        "gain_life": 4,
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_effect_classes": [
+          "DamageTargetEffect",
+          "GainLifeEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Spinning Darkness"
+      },
+      "card_name": "Spinning Darkness",
+      "effect": "direct_damage",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d291091aff24d2d4909f1594c326313a",
+      "normalized_name": "spinning darkness",
+      "required_effect_fields": {
+        "amount": 3,
+        "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+        "controller_gain_life": 3,
+        "damage": 3,
+        "effect": "direct_damage",
+        "gain_life": 3,
+        "target": "nonblack_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "exclude_colors": [
+            "B"
+          ]
+        },
+        "xmage_effect_classes": [
+          "DamageTargetEffect",
+          "GainLifeEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Stolen Grain"
+      },
+      "card_name": "Stolen Grain",
+      "effect": "direct_damage",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b704bb09a733d5e521be85ffbe15b4d3",
+      "normalized_name": "stolen grain",
+      "required_effect_fields": {
+        "amount": 5,
+        "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+        "controller_gain_life": 5,
+        "damage": 5,
+        "effect": "direct_damage",
+        "gain_life": 5,
+        "target": "opponent_or_planeswalker",
+        "target_constraints": {
+          "scope": "opponent_or_planeswalker"
+        },
+        "xmage_effect_classes": [
+          "DamageTargetEffect",
+          "GainLifeEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Taste of Blood"
+      },
+      "card_name": "Taste of Blood",
+      "effect": "direct_damage",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1111d6f096c488d21ee0546808a14729",
+      "normalized_name": "taste of blood",
+      "required_effect_fields": {
+        "amount": 1,
+        "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+        "controller_gain_life": 1,
+        "damage": 1,
+        "effect": "direct_damage",
+        "gain_life": 1,
+        "target": "player_or_planeswalker",
+        "target_constraints": {
+          "scope": "player_or_planeswalker"
+        },
+        "xmage_effect_classes": [
+          "DamageTargetEffect",
+          "GainLifeEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Vampiric Touch"
+      },
+      "card_name": "Vampiric Touch",
+      "effect": "direct_damage",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:62ca1f552078fd5873eada59caf77a96",
+      "normalized_name": "vampiric touch",
+      "required_effect_fields": {
+        "amount": 2,
+        "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+        "controller_gain_life": 2,
+        "damage": 2,
+        "effect": "direct_damage",
+        "gain_life": 2,
+        "target": "opponent_or_planeswalker",
+        "target_constraints": {
+          "scope": "opponent_or_planeswalker"
+        },
+        "xmage_effect_classes": [
+          "DamageTargetEffect",
+          "GainLifeEffect"
+        ]
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Deadly Riposte",
+    "Joust Through",
+    "Kiss of Death",
+    "Sorin's Vengeance",
+    "Soul Shred",
+    "Soul Spike",
+    "Spinning Darkness",
+    "Stolen Grain",
+    "Taste of Blood",
+    "Vampiric Touch"
+  ],
+  "selected_count": 10,
+  "slug": "damage_life_target_variants_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Deadly Riposte",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:91ef332cf9a3564d504b69d3a7e7193d",
+      "min_rule_version": 2,
+      "normalized_name": "deadly riposte",
+      "oracle_hash": "828dc896bdc14123907a824bc2ea6903",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Joust Through",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c0803b01326684733246ecf321e2340f",
+      "min_rule_version": 2,
+      "normalized_name": "joust through",
+      "oracle_hash": "e00e2b2e27811d348c98eac6ac8512ab",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Kiss of Death",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:724158f47f0fc0f1ccfdbbb4ff687eea",
+      "min_rule_version": 2,
+      "normalized_name": "kiss of death",
+      "oracle_hash": "b4b1b9466bde86a7d4bc39a3f18207f7",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sorin's Vengeance",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:eb20910b419b6ac97a9e3c0a86b23973",
+      "min_rule_version": 2,
+      "normalized_name": "sorin's vengeance",
+      "oracle_hash": "5401c85c3a83d51677939d3484c39742",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Soul Shred",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:32a1e9755f09e0d9b05907579b4f153e",
+      "min_rule_version": 2,
+      "normalized_name": "soul shred",
+      "oracle_hash": "b37068726ddbb54cdfa6cd28df01557d",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Soul Spike",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b30ee9a5fcd603703d248235230ed80f",
+      "min_rule_version": 2,
+      "normalized_name": "soul spike",
+      "oracle_hash": "614c79047afc07dad14f14f488dada0d",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Spinning Darkness",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d291091aff24d2d4909f1594c326313a",
+      "min_rule_version": 2,
+      "normalized_name": "spinning darkness",
+      "oracle_hash": "2561e07b514f9ac6f73f3b97b46e8246",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Stolen Grain",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b704bb09a733d5e521be85ffbe15b4d3",
+      "min_rule_version": 2,
+      "normalized_name": "stolen grain",
+      "oracle_hash": "ee81fbfe136dc894be32bf7e9430aeed",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Taste of Blood",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1111d6f096c488d21ee0546808a14729",
+      "min_rule_version": 2,
+      "normalized_name": "taste of blood",
+      "oracle_hash": "61112b2e9a074b6010ab6ace7cd3657a",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Vampiric Touch",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:62ca1f552078fd5873eada59caf77a96",
+      "min_rule_version": 2,
+      "normalized_name": "vampiric touch",
+      "oracle_hash": "dfebe66697b700444015f0d97a0f3e17",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

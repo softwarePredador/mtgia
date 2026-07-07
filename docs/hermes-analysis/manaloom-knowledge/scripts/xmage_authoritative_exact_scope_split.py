@@ -11271,9 +11271,9 @@ def restricted_battlefield_target_from_source(source: str) -> str | None:
         return "attacking_creature"
     if re.search(r"new\s+TargetBlockingCreature\s*\(", text) or "FilterBlockingCreature" in text:
         return "blocking_creature"
-    if "TappedPredicate.TAPPED" in text:
+    if 'FilterCreaturePermanent("tapped creature")' in text or "tapped creature" in text or "TappedPredicate.TAPPED" in text:
         return "tapped_creature"
-    if "TappedPredicate.UNTAPPED" in text:
+    if 'FilterCreaturePermanent("untapped creature")' in text or "untapped creature" in text or "TappedPredicate.UNTAPPED" in text:
         return "untapped_creature"
     if (
         'FilterCreaturePermanent("nonblack attacking creature")' in text
@@ -11513,32 +11513,26 @@ def fixed_damage_gain_life_from_source(source: str) -> tuple[int, int, str] | No
         return None
     if "TargetPointer" in text or ".setTargetPointer" in text:
         return None
-    target_classes = re.findall(r"new\s+(Target\w+)\s*\(", text)
-    supported_targets = [
-        target_class
-        for target_class in target_classes
-        if target_class
-        in {
-            "TargetAnyTarget",
-            "TargetCreaturePermanent",
-            "TargetCreatureOrPlaneswalker",
-        }
-    ]
-    if len(target_classes) != 1 or len(supported_targets) != 1:
+    target = damage_target_from_source(text)
+    if target not in {
+        "any_target",
+        "attacking_or_blocking_creature",
+        "creature",
+        "creature_or_planeswalker",
+        "nonblack_creature",
+        "opponent_or_planeswalker",
+        "player_or_planeswalker",
+        "tapped_creature",
+    }:
         return None
-    target_map = {
-        "TargetAnyTarget": "any_target",
-        "TargetCreaturePermanent": "creature",
-        "TargetCreatureOrPlaneswalker": "creature_or_planeswalker",
-    }
-    return int(damage_matches[0]), int(life_matches[0]), target_map[supported_targets[0]]
+    return int(damage_matches[0]), int(life_matches[0]), target
 
 
 def fixed_damage_gain_life_from_oracle(metadata: dict[str, Any]) -> tuple[int, int, str] | None:
     text = oracle_text(metadata)
     match = re.match(
         r"^.+ deals (\d+) damage to "
-        r"(any target|target creature|target creature or planeswalker)"
+        r"(any target|target attacking or blocking creature|target creature|target creature or planeswalker|target nonblack creature|target opponent or planeswalker|target player or planeswalker|target tapped creature)"
         r"(?: and you gain|\. you gain) (\d+) life\.?$",
         text,
     )
@@ -11546,8 +11540,13 @@ def fixed_damage_gain_life_from_oracle(metadata: dict[str, Any]) -> tuple[int, i
         return None
     target_map = {
         "any target": "any_target",
+        "target attacking or blocking creature": "attacking_or_blocking_creature",
         "target creature": "creature",
         "target creature or planeswalker": "creature_or_planeswalker",
+        "target nonblack creature": "nonblack_creature",
+        "target opponent or planeswalker": "opponent_or_planeswalker",
+        "target player or planeswalker": "player_or_planeswalker",
+        "target tapped creature": "tapped_creature",
     }
     return int(match.group(1)), int(match.group(3)), target_map[match.group(2)]
 

@@ -831,6 +831,155 @@ def run_damage_each_opponent_spell(
     }
 
 
+def _nonmatching_damage_gain_life_target(constraints: dict[str, Any]) -> dict[str, Any]:
+    if str(constraints.get("tapped_state") or constraints.get("tap_state") or "").lower() == "tapped":
+        return {
+            "name": "E2E Untapped Damage Decoy",
+            "type_line": "Creature - Fixture",
+            "effect": "creature",
+            "power": 2,
+            "toughness": 2,
+            "tapped": False,
+        }
+    if str(constraints.get("combat_state") or "").lower() == "attacking_or_blocking":
+        return {
+            "name": "E2E Idle Damage Decoy",
+            "type_line": "Creature - Fixture",
+            "effect": "creature",
+            "power": 2,
+            "toughness": 2,
+            "attacking": False,
+            "blocking": False,
+        }
+    excluded_colors = {
+        str(color).strip().upper()
+        for color in constraints.get("exclude_colors") or []
+        if str(color).strip()
+    }
+    if excluded_colors:
+        color = sorted(excluded_colors)[0]
+        return {
+            "name": "E2E Excluded Color Damage Decoy",
+            "type_line": "Creature - Fixture",
+            "effect": "creature",
+            "power": 2,
+            "toughness": 2,
+            "colors": [color],
+            "color_identity": [color],
+            "mana_cost": f"{{{color}}}",
+        }
+    card_types = {
+        str(value or "").strip().lower()
+        for value in constraints.get("card_types") or []
+        if str(value or "").strip()
+    }
+    if "creature" in card_types:
+        return {
+            "name": "E2E Noncreature Damage Decoy",
+            "type_line": "Land",
+            "effect": "land",
+            "cmc": 0,
+        }
+    return {
+        "name": "E2E Illegal Damage Decoy",
+        "type_line": "Land",
+        "effect": "land",
+        "cmc": 0,
+    }
+
+
+def run_damage_gain_life_spell(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    active = battle.Player(str(scenario.get("player") or "Damage Life Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
+    active.life = int(scenario.get("controller_life") or 10)
+    opponent.life = int(scenario.get("opponent_life") or 20)
+    expected_damage = int(scenario.get("expected_damage") or 0)
+    expected_life_gain = int(scenario.get("expected_life_gain") or 0)
+    constraints = dict(scenario.get("expected_target_constraints") or {})
+    target = dict(scenario.get("target") or {})
+    nonmatching_target = None
+    if target:
+        target.setdefault("power", 2)
+        target["toughness"] = min(int(target.get("toughness") or 2), max(1, expected_damage))
+        target.setdefault("effect", "creature")
+        nonmatching_target = _nonmatching_damage_gain_life_target(constraints)
+        opponent.battlefield = [
+            battle.enrich_card(dict(nonmatching_target)),
+            battle.enrich_card(dict(target)),
+        ]
+
+    before_events = len(events)
+    controller_life_before = active.life
+    opponent_life_before = opponent.life
+    battle.apply_effect_immediate(
+        active,
+        [opponent],
+        card,
+        turn=int(scenario.get("turn") or 5),
+        rng=random.Random(int(scenario.get("seed") or 6075)),
+    )
+
+    damage_event = next(
+        (
+            data
+            for event_name, data in events[before_events:]
+            if event_name == "damage_resolved"
+            and data.get("card") == card.get("name")
+        ),
+        None,
+    )
+    if damage_event is None:
+        fail("battle_events", f"missing {card['name']} damage_resolved event")
+    if int(damage_event.get("amount") or 0) != expected_damage:
+        fail("battle_events", f"{card['name']} damage amount={damage_event.get('amount')}, expected {expected_damage}")
+    if int(damage_event.get("life_gain_requested") or 0) != expected_life_gain:
+        fail(
+            "battle_events",
+            f"{card['name']} life_gain_requested={damage_event.get('life_gain_requested')}, expected {expected_life_gain}",
+        )
+    if int(damage_event.get("life_gained") or 0) != expected_life_gain:
+        fail("battle_events", f"{card['name']} life_gained={damage_event.get('life_gained')}, expected {expected_life_gain}")
+    expected_controller_life = controller_life_before + expected_life_gain
+    if active.life != expected_controller_life:
+        fail("battle_execution", f"{card['name']} controller life={active.life}, expected {expected_controller_life}")
+
+    if target:
+        target_name = str(target.get("name") or "")
+        if damage_event.get("target") != target_name:
+            fail("battle_events", f"{card['name']} target={damage_event.get('target')!r}, expected {target_name!r}")
+        if any(
+            isinstance(permanent, dict) and permanent.get("name") == target_name
+            for permanent in opponent.battlefield
+        ):
+            fail("battle_execution", f"{card['name']} did not remove damaged target {target_name}")
+        if nonmatching_target and not any(
+            isinstance(permanent, dict) and permanent.get("name") == nonmatching_target.get("name")
+            for permanent in opponent.battlefield
+        ):
+            fail("battle_execution", f"{card['name']} removed illegal target {nonmatching_target.get('name')}")
+    else:
+        expected_opponent_life = opponent_life_before - expected_damage
+        if opponent.life != expected_opponent_life:
+            fail("battle_execution", f"{card['name']} opponent life={opponent.life}, expected {expected_opponent_life}")
+        if damage_event.get("target_player") != opponent.name:
+            fail("battle_events", f"{card['name']} target_player={damage_event.get('target_player')!r}")
+
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "damage": expected_damage,
+        "life_gained": expected_life_gain,
+        "target": damage_event.get("target") or damage_event.get("target_player"),
+        "controller_life": active.life,
+        "opponent_life": opponent.life,
+    }
+
+
 def run_creature_etb_dynamic_life_gain(
     battle,
     scenario: dict[str, Any],
@@ -5261,6 +5410,7 @@ SCENARIO_RUNNERS = {
     "simple_activated_self_keyword": run_simple_activated_self_keyword,
     "simple_activated_regenerate_source": run_simple_activated_regenerate_source,
     "damage_each_opponent_spell": run_damage_each_opponent_spell,
+    "damage_gain_life_spell": run_damage_gain_life_spell,
     "simple_activated_create_token": run_simple_activated_create_token,
     "spell_cast_gain_life": run_spell_cast_gain_life,
     "controlled_stat_modifier_until_eot": run_controlled_stat_modifier_until_eot,

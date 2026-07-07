@@ -7918,6 +7918,71 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["battle_model_scope"], split.DAMAGE_GAIN_LIFE_SCOPE)
         self.assertEqual(effect["target"], "creature")
 
+    def test_fixed_damage_gain_life_spell_maps_restricted_targets(self) -> None:
+        cases = [
+            (
+                "Deadly Riposte deals 3 damage to target tapped creature and you gain 2 life.",
+                (
+                    'private static final FilterPermanent filter = new FilterCreaturePermanent("tapped creature");'
+                    "this.getSpellAbility().addEffect(new DamageTargetEffect(3));"
+                    "this.getSpellAbility().addTarget(new TargetPermanent(filter));"
+                    "this.getSpellAbility().addEffect(new GainLifeEffect(2).concatBy(\"and\"));"
+                ),
+                "tapped_creature",
+                {"card_types": ["creature"], "tapped_state": "tapped"},
+            ),
+            (
+                "Joust Through deals 3 damage to target attacking or blocking creature. You gain 1 life.",
+                (
+                    "this.getSpellAbility().addEffect(new DamageTargetEffect(3));"
+                    "this.getSpellAbility().addTarget(new TargetAttackingOrBlockingCreature());"
+                    "this.getSpellAbility().addEffect(new GainLifeEffect(1));"
+                ),
+                "attacking_or_blocking_creature",
+                {"card_types": ["creature"], "combat_state": "attacking_or_blocking"},
+            ),
+            (
+                "Kiss of Death deals 4 damage to target opponent or planeswalker. You gain 4 life.",
+                (
+                    "this.getSpellAbility().addEffect(new DamageTargetEffect(4));"
+                    "this.getSpellAbility().addEffect(new GainLifeEffect(4));"
+                    "this.getSpellAbility().addTarget(new TargetOpponentOrPlaneswalker());"
+                ),
+                "opponent_or_planeswalker",
+                {"scope": "opponent_or_planeswalker"},
+            ),
+            (
+                "Sorin's Vengeance deals 10 damage to target player or planeswalker and you gain 10 life.",
+                (
+                    "this.getSpellAbility().addEffect(new DamageTargetEffect(10));"
+                    "this.getSpellAbility().addEffect(new GainLifeEffect(10).concatBy(\"and\"));"
+                    "this.getSpellAbility().addTarget(new TargetPlayerOrPlaneswalker());"
+                ),
+                "player_or_planeswalker",
+                {"scope": "player_or_planeswalker"},
+            ),
+            (
+                "Soul Shred deals 3 damage to target nonblack creature. You gain 3 life.",
+                (
+                    "this.getSpellAbility().addEffect(new DamageTargetEffect(3));"
+                    "this.getSpellAbility().addTarget(new TargetPermanent(FILTER_PERMANENT_CREATURE_NON_BLACK));"
+                    "this.getSpellAbility().addEffect(new GainLifeEffect(3));"
+                ),
+                "nonblack_creature",
+                {"card_types": ["creature"], "exclude_colors": ["B"]},
+            ),
+        ]
+        for oracle_text, source_text, expected_target, expected_constraints in cases:
+            with self.subTest(oracle_text=oracle_text):
+                row = queue_row(split.LIFE_UNIT, effect_classes=["DamageTargetEffect", "GainLifeEffect"])
+                proposal, reason = split.split_row(row, metadata(oracle_text=oracle_text), source_text=source_text)
+
+                self.assertEqual(reason, "selected_exact_scope")
+                effect = proposal["effect_json"]
+                self.assertEqual(effect["battle_model_scope"], split.DAMAGE_GAIN_LIFE_SCOPE)
+                self.assertEqual(effect["target"], expected_target)
+                self.assertEqual(effect["target_constraints"], expected_constraints)
+
     def test_fixed_damage_gain_life_spell_blocks_variable_x(self) -> None:
         row = queue_row(split.LIFE_UNIT, effect_classes=["DamageTargetEffect", "GainLifeEffect"])
         proposal, reason = split.split_row(

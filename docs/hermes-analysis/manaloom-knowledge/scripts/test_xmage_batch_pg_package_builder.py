@@ -836,6 +836,34 @@ def test_manifest_builds_damage_each_opponent_spell_execution_scenario() -> None
     assert scenario["second_opponent_life"] == 11
 
 
+def test_manifest_builds_damage_gain_life_spell_execution_scenario() -> None:
+    rule = {
+        "normalized_name": "kiss_of_death",
+        "card_name": "Kiss of Death",
+        "oracle_hash": "hash-kiss",
+        "logical_rule_key": "battle_rule_v1:hash-kiss",
+        "required_effect_fields": {
+            "effect": "direct_damage",
+            "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+            "amount": 4,
+            "damage": 4,
+            "gain_life": 4,
+            "controller_gain_life": 4,
+            "target": "opponent_or_planeswalker",
+            "target_constraints": {"scope": "opponent_or_planeswalker"},
+        },
+    }
+
+    scenario = builder.damage_gain_life_spell_execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "damage_gain_life_spell"
+    assert scenario["target"] is None
+    assert scenario["expected_damage"] == 4
+    assert scenario["expected_life_gain"] == 4
+    assert scenario["expected_target_constraints"] == {"scope": "opponent_or_planeswalker"}
+
+
 def test_manifest_builds_simple_activated_tap_target_execution_scenario() -> None:
     rule = {
         "normalized_name": "akroan jailer",

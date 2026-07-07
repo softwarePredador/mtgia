@@ -17672,6 +17672,83 @@ counts, non-creature targets, multi-target variants, activated/triggered
 variants, or additional effects beyond the exact boost-then-scry one-shot
 resolution.
 
+## 2026-07-07 PG607 Damage + Controller Life-Gain Target Variants Checkpoint
+
+PG607 closed the exact XMage subpattern:
+
+`DamageTargetEffect + GainLifeEffect` one-shot instant/sorcery resolution with
+fixed damage, fixed controller life gain, and runtime-supported target
+constraints.
+
+Cards promoted:
+
+- `Deadly Riposte`
+- `Joust Through`
+- `Kiss of Death`
+- `Sorin's Vengeance`
+- `Soul Shred`
+- `Soul Spike`
+- `Spinning Darkness`
+- `Stolen Grain`
+- `Taste of Blood`
+- `Vampiric Touch`
+
+Implementation:
+
+- `xmage_authoritative_exact_scope_split.py` now recognizes restricted
+  `DamageTargetEffect + GainLifeEffect` targets for tapped creatures, attacking
+  or blocking creatures, nonblack creatures, player/planeswalker targets, and
+  opponent/planeswalker targets;
+- the exact scope remains
+  `xmage_fixed_damage_target_and_controller_gain_life_spell_v1`;
+- `xmage_batch_pg_package_builder.py` now requires `gain_life` and
+  `controller_gain_life` fields and emits `damage_gain_life_spell` E2E
+  scenarios for this scope;
+- `battle_package_end_to_end_validation.py` now validates damage, controller
+  life gain, legal target selection, and nonmatching restricted-target decoys in
+  focused battle execution.
+
+Validation:
+
+- split produced `proposal_count=10` and
+  `safe_for_batch_pg_package_count=10`;
+- precheck found `10/10` Oracle-hash-matched target rows, `0` existing expected
+  executable rows, and `0` shadow rows to deprecate;
+- apply upserted `10` PostgreSQL rows and deprecated `0` shadow rows;
+- postcheck confirmed `10/10` promoted rows, `10/10` `verified_auto` rows, and
+  `10/10` rows with `oracle_hash`;
+- focused tests passed for the splitter `damage_gain_life` cases, package
+  builder `damage_gain_life` scenario, exact runtime
+  `fixed_damage_gain_life`, and Python compilation for the touched splitter,
+  package builder, and E2E validator scripts;
+- PG -> SQLite/snapshot sync refreshed from `127.0.0.1:15432/halder`, exported
+  `5750` canonical snapshot rows, and wrote `5771` SQLite rows;
+- metadata sync used `database_target=127.0.0.1:15432/halder`, matched `6908`
+  PostgreSQL cards, and left `deck_cards` at `2699/2699` matched;
+- E2E validation passed PostgreSQL, SQLite, snapshot, runtime lookup, and `10`
+  battle execution scenarios with `25` runtime events;
+- post-sync queue rebuild reduced `target_identity_count` from `25117` to
+  `25107`, `xmage_authoritative_source_count` from `24803` to `24793`,
+  `xmage_authoritative_adapter_required_count` from `24803` to `24793`, and
+  `life_gain::xmage_life_gain_variant_review_v1` from `683` to `673`;
+- final exact-scope recheck against the post-PG607 queue returned
+  `proposal_count=0` and `safe_for_batch_pg_package_count=0`;
+- final PG/Hermes/SQLite contract audit passed `51/51`;
+- final XMage strategy audit passed `26/26`;
+- final operational surface alignment audit passed;
+- final legacy contamination audit passed;
+- `scripts/quality_gate.sh server-target` passed against the new-server target;
+- global all-card readiness was refreshed at
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260707_post_pg607_damage_life_target_variants_new_server.md`.
+
+Residual boundary: PG607 models the resolution of fixed damage plus controller
+life gain. It does not authorize variable-X drain, damage based on game state,
+flashback/additional-effect variants, activated/triggered variants, damage
+prevention replacement modeling beyond existing runtime behavior, or new
+alternate-cost payment mechanics. `Soul Spike` and `Spinning Darkness` are
+therefore promoted for their XMage-backed resolution effect; their alternate
+cost abilities remain outside this package's scope.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

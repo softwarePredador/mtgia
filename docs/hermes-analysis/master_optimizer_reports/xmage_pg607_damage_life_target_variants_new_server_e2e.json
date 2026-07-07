@@ -1,0 +1,493 @@
+{
+  "battle_execution": {
+    "event_count": 25,
+    "results": [
+      {
+        "card_name": "Deadly Riposte",
+        "controller_life": 12,
+        "damage": 3,
+        "life_gained": 2,
+        "opponent_life": 20,
+        "scenario": "Deadly Riposte deals damage and gains life",
+        "target": "E2E Damage Gain Legal Target"
+      },
+      {
+        "card_name": "Joust Through",
+        "controller_life": 11,
+        "damage": 3,
+        "life_gained": 1,
+        "opponent_life": 20,
+        "scenario": "Joust Through deals damage and gains life",
+        "target": "E2E Damage Gain Legal Target"
+      },
+      {
+        "card_name": "Kiss of Death",
+        "controller_life": 14,
+        "damage": 4,
+        "life_gained": 4,
+        "opponent_life": 16,
+        "scenario": "Kiss of Death deals damage and gains life",
+        "target": "Opponent"
+      },
+      {
+        "card_name": "Sorin's Vengeance",
+        "controller_life": 20,
+        "damage": 10,
+        "life_gained": 10,
+        "opponent_life": 10,
+        "scenario": "Sorin's Vengeance deals damage and gains life",
+        "target": "Opponent"
+      },
+      {
+        "card_name": "Soul Shred",
+        "controller_life": 13,
+        "damage": 3,
+        "life_gained": 3,
+        "opponent_life": 20,
+        "scenario": "Soul Shred deals damage and gains life",
+        "target": "E2E Damage Gain Legal Target"
+      },
+      {
+        "card_name": "Soul Spike",
+        "controller_life": 14,
+        "damage": 4,
+        "life_gained": 4,
+        "opponent_life": 20,
+        "scenario": "Soul Spike deals damage and gains life",
+        "target": "E2E Damage Gain Legal Target"
+      },
+      {
+        "card_name": "Spinning Darkness",
+        "controller_life": 13,
+        "damage": 3,
+        "life_gained": 3,
+        "opponent_life": 20,
+        "scenario": "Spinning Darkness deals damage and gains life",
+        "target": "E2E Damage Gain Legal Target"
+      },
+      {
+        "card_name": "Stolen Grain",
+        "controller_life": 15,
+        "damage": 5,
+        "life_gained": 5,
+        "opponent_life": 15,
+        "scenario": "Stolen Grain deals damage and gains life",
+        "target": "Opponent"
+      },
+      {
+        "card_name": "Taste of Blood",
+        "controller_life": 11,
+        "damage": 1,
+        "life_gained": 1,
+        "opponent_life": 19,
+        "scenario": "Taste of Blood deals damage and gains life",
+        "target": "Opponent"
+      },
+      {
+        "card_name": "Vampiric Touch",
+        "controller_life": 12,
+        "damage": 2,
+        "life_gained": 2,
+        "opponent_life": 18,
+        "scenario": "Vampiric Touch deals damage and gains life",
+        "target": "Opponent"
+      }
+    ],
+    "scenario_count": 10
+  },
+  "battle_path": "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-07T09:52:04.272248+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/xmage_pg607_damage_life_target_variants_new_server_manifest.json",
+  "package_id": "xmage_pg607_damage_life_target_variants_new_server_manifest",
+  "snapshot": "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 10
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "card_name": "Deadly Riposte",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:91ef332cf9a3564d504b69d3a7e7193d",
+          "oracle_hash": "828dc896bdc14123907a824bc2ea6903",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "card_name": "Joust Through",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c0803b01326684733246ecf321e2340f",
+          "oracle_hash": "e00e2b2e27811d348c98eac6ac8512ab",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "card_name": "Kiss of Death",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:724158f47f0fc0f1ccfdbbb4ff687eea",
+          "oracle_hash": "b4b1b9466bde86a7d4bc39a3f18207f7",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "card_name": "Sorin's Vengeance",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:eb20910b419b6ac97a9e3c0a86b23973",
+          "oracle_hash": "5401c85c3a83d51677939d3484c39742",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "card_name": "Soul Shred",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:32a1e9755f09e0d9b05907579b4f153e",
+          "oracle_hash": "b37068726ddbb54cdfa6cd28df01557d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "card_name": "Soul Spike",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b30ee9a5fcd603703d248235230ed80f",
+          "oracle_hash": "614c79047afc07dad14f14f488dada0d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "card_name": "Spinning Darkness",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d291091aff24d2d4909f1594c326313a",
+          "oracle_hash": "2561e07b514f9ac6f73f3b97b46e8246",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "card_name": "Stolen Grain",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b704bb09a733d5e521be85ffbe15b4d3",
+          "oracle_hash": "ee81fbfe136dc894be32bf7e9430aeed",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "card_name": "Taste of Blood",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1111d6f096c488d21ee0546808a14729",
+          "oracle_hash": "61112b2e9a074b6010ab6ace7cd3657a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "card_name": "Vampiric Touch",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:62ca1f552078fd5873eada59caf77a96",
+          "oracle_hash": "dfebe66697b700444015f0d97a0f3e17",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 10
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "card_name": "Deadly Riposte",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:91ef332cf9a3564d504b69d3a7e7193d",
+          "oracle_hash": "828dc896bdc14123907a824bc2ea6903",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "card_name": "Joust Through",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c0803b01326684733246ecf321e2340f",
+          "oracle_hash": "e00e2b2e27811d348c98eac6ac8512ab",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "card_name": "Kiss of Death",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:724158f47f0fc0f1ccfdbbb4ff687eea",
+          "oracle_hash": "b4b1b9466bde86a7d4bc39a3f18207f7",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "card_name": "Sorin's Vengeance",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:eb20910b419b6ac97a9e3c0a86b23973",
+          "oracle_hash": "5401c85c3a83d51677939d3484c39742",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "card_name": "Soul Shred",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:32a1e9755f09e0d9b05907579b4f153e",
+          "oracle_hash": "b37068726ddbb54cdfa6cd28df01557d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "card_name": "Soul Spike",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b30ee9a5fcd603703d248235230ed80f",
+          "oracle_hash": "614c79047afc07dad14f14f488dada0d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "card_name": "Spinning Darkness",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d291091aff24d2d4909f1594c326313a",
+          "oracle_hash": "2561e07b514f9ac6f73f3b97b46e8246",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "card_name": "Stolen Grain",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b704bb09a733d5e521be85ffbe15b4d3",
+          "oracle_hash": "ee81fbfe136dc894be32bf7e9430aeed",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "card_name": "Taste of Blood",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1111d6f096c488d21ee0546808a14729",
+          "oracle_hash": "61112b2e9a074b6010ab6ace7cd3657a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "card_name": "Vampiric Touch",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:62ca1f552078fd5873eada59caf77a96",
+          "oracle_hash": "dfebe66697b700444015f0d97a0f3e17",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 10
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Deadly Riposte",
+          "logical_rule_key": "battle_rule_v1:91ef332cf9a3564d504b69d3a7e7193d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Joust Through",
+          "logical_rule_key": "battle_rule_v1:c0803b01326684733246ecf321e2340f"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Kiss of Death",
+          "logical_rule_key": "battle_rule_v1:724158f47f0fc0f1ccfdbbb4ff687eea"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Sorin's Vengeance",
+          "logical_rule_key": "battle_rule_v1:eb20910b419b6ac97a9e3c0a86b23973"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Soul Shred",
+          "logical_rule_key": "battle_rule_v1:32a1e9755f09e0d9b05907579b4f153e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Soul Spike",
+          "logical_rule_key": "battle_rule_v1:b30ee9a5fcd603703d248235230ed80f"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Spinning Darkness",
+          "logical_rule_key": "battle_rule_v1:d291091aff24d2d4909f1594c326313a"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Stolen Grain",
+          "logical_rule_key": "battle_rule_v1:b704bb09a733d5e521be85ffbe15b4d3"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Taste of Blood",
+          "logical_rule_key": "battle_rule_v1:1111d6f096c488d21ee0546808a14729"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Vampiric Touch",
+          "logical_rule_key": "battle_rule_v1:62ca1f552078fd5873eada59caf77a96"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 10
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Deadly Riposte",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:91ef332cf9a3564d504b69d3a7e7193d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Joust Through",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:c0803b01326684733246ecf321e2340f"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Kiss of Death",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:724158f47f0fc0f1ccfdbbb4ff687eea"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Sorin's Vengeance",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:eb20910b419b6ac97a9e3c0a86b23973"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Soul Shred",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:32a1e9755f09e0d9b05907579b4f153e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Soul Spike",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:b30ee9a5fcd603703d248235230ed80f"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Spinning Darkness",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:d291091aff24d2d4909f1594c326313a"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Stolen Grain",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:b704bb09a733d5e521be85ffbe15b4d3"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Taste of Blood",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:1111d6f096c488d21ee0546808a14729"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Vampiric Touch",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:62ca1f552078fd5873eada59caf77a96"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 25,
+        "scenarios": 10
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}
