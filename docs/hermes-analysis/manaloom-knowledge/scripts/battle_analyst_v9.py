@@ -5480,6 +5480,28 @@ def land_enters_tapped_for_state(land, player=None, opponents=None):
     conditional = conditional_land_enters_tapped_for_state(land, player=player)
     if conditional is not None:
         return conditional
+    opponent_lands_threshold = land.get("enters_tapped_unless_opponents_control_lands_count")
+    if opponent_lands_threshold not in (None, "", 0):
+        try:
+            required_opponent_lands = max(0, int(opponent_lands_threshold))
+        except (TypeError, ValueError):
+            required_opponent_lands = 0
+        opponent_lands = sum(controlled_land_count(opponent) for opponent in opponents or [])
+        condition_met = opponent_lands >= required_opponent_lands
+        land["conditional_enters_tapped_status"] = (
+            land.get("conditional_enters_tapped_status") or "runtime_executor_v1"
+        )
+        land["conditional_enters_tapped_profile"] = (
+            land.get("conditional_enters_tapped_profile") or "opponents_control_lands_count"
+        )
+        land["conditional_enters_tapped_condition_met"] = condition_met
+        land["conditional_enters_tapped_land_count"] = opponent_lands
+        land["conditional_enters_tapped_reason"] = (
+            "opponents_control_required_land_count"
+            if condition_met
+            else "opponents_below_required_land_count"
+        )
+        return not condition_met
     threshold = land.get("enters_tapped_unless_opponent_count")
     oracle_text = str(land.get("oracle_text") or "").lower()
     if threshold in (None, "", 0) and re.search(

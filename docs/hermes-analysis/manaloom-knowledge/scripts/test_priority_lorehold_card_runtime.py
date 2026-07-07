@@ -110,6 +110,52 @@ class PriorityLoreholdCardRuntimeTests(unittest.TestCase):
         self.assertEqual(talisman_modes["red"]["life_loss_on_spend"], 1)
         self.assertEqual(talisman_modes["white"]["life_loss_on_spend"], 1)
 
+    def test_turbulent_steppe_enters_untapped_only_when_opponents_control_eight_lands(self) -> None:
+        def basic_lands(prefix: str, count: int):
+            return [
+                card(f"{prefix} Land {index}", "Basic Land — Mountain", effect="land")
+                for index in range(count)
+            ]
+
+        def play_with_opponent_land_count(opponent_land_count: int):
+            player = battle.Player("Lorehold", None, [], is_human=True)
+            opponent = battle.Player("Opponent", None, [])
+            opponent.battlefield = basic_lands("Opponent", opponent_land_count)
+            steppe = card("Turbulent Steppe", "Land — Mountain Plains", cmc=0)
+            player.hand = [steppe]
+
+            played = battle.play_land_candidate(
+                player,
+                [opponent],
+                [player, opponent],
+                turn=4,
+                stack=battle.Stack(),
+                candidate={"card": steppe, "source_zone": "hand"},
+            )
+
+            self.assertTrue(played)
+            return player.battlefield[-1], player
+
+        tapped_steppe, tapped_player = play_with_opponent_land_count(7)
+        self.assertTrue(tapped_steppe["tapped"])
+        self.assertTrue(tapped_steppe["enters_tapped"])
+        self.assertEqual(
+            tapped_steppe["conditional_enters_tapped_reason"],
+            "opponents_below_required_land_count",
+        )
+        self.assertEqual(tapped_player.available_mana(), 0)
+
+        untapped_steppe, untapped_player = play_with_opponent_land_count(8)
+        self.assertFalse(untapped_steppe.get("tapped", False))
+        self.assertFalse(untapped_steppe.get("enters_tapped", False))
+        self.assertEqual(
+            untapped_steppe["conditional_enters_tapped_reason"],
+            "opponents_control_required_land_count",
+        )
+        self.assertEqual(untapped_steppe["conditional_enters_tapped_land_count"], 8)
+        self.assertEqual(untapped_player.available_mana(), 1)
+        self.assertEqual(untapped_player.mana_pool.snapshot().get("wildcard"), 1)
+
     def test_farewell_modal_exile_wipe_exiles_selected_types_and_graveyards(self) -> None:
         player = battle.Player("Lorehold", None, [], is_human=True)
         opponent = battle.Player("Opponent", None, [])

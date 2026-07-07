@@ -664,7 +664,7 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
         self.assertEqual(by_name["Command Tower"]["execution_status"], "auto")
         self.assertEqual(
             by_name["Command Tower"]["logical_rule_key"],
-            "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
+            "battle_rule_v1:8a974d0b2c767176f8066c7932447896",
         )
         self.assertEqual(by_name["Command Tower"]["effect_json"]["effect"], "land")
         self.assertEqual(by_name["Command Tower"]["effect_json"]["produces"], "WUBRGC")

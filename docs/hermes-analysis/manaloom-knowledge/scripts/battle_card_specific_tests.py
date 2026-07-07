@@ -331,7 +331,7 @@ def register_tests(battle, player):
             assert lorehold_effect["flying"] is True
             assert lorehold_effect["haste"] is True
             assert lorehold_effect["_rule_logical_key"] == "battle_rule_v1:06d892f8ad75831f785aef6dcedc82b4"
-            assert lorehold_effect["_rule_oracle_hash"] == "f1b6d4f38a533e56f0efb5a3f1547214"
+            assert lorehold_effect["_rule_oracle_hash"] == "11d814aa6546578eab746b36fdb98582"
 
             active = player("Lorehold")
             active.is_human = True
@@ -378,8 +378,8 @@ def register_tests(battle, player):
         assert rummage_event["discarded"] == "Nine Mana Spell"
         assert rummage_event["drawn"] == "Reforge the Soul"
         assert rummage_event["rule_logical_key"] == "battle_rule_v1:06d892f8ad75831f785aef6dcedc82b4"
-        assert rummage_event["rule_oracle_hash"] == "f1b6d4f38a533e56f0efb5a3f1547214"
-        assert rummage_event["rule_review_status"] == "active"
+        assert rummage_event["rule_oracle_hash"] == "11d814aa6546578eab746b36fdb98582"
+        assert rummage_event["rule_review_status"] == "verified"
         assert rummage_event["rule_execution_status"] == "auto"
 
     def test_past_in_flames_grants_flashback_with_pg036_rule_provenance():
@@ -6796,7 +6796,7 @@ def register_tests(battle, player):
         assert resolved[-1]["found_count"] == 3
         assert resolved[-1]["destination"] == "hand"
         assert resolved[-1]["rule_logical_key"] == "battle_rule_v1:e3f5f35c6a9ee4fd8c7b9972c4152bef"
-        assert resolved[-1]["rule_oracle_hash"] == "83b074e38da3e6c4eb6ec3e7568c914b"
+        assert resolved[-1]["rule_oracle_hash"] == "97d0feaea346a6ca0e6ab722c880b658"
         trace = next(
             decision
             for decision in decisions

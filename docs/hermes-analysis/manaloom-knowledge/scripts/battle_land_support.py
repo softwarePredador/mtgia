@@ -75,6 +75,8 @@ def source_colors(source):
     explicit = (
         source.get("produces")
         or source.get("produced_mana")
+        or source.get("source_colors")
+        or source.get("basic_land_subtype_colors")
         or source.get("color_identity")
     )
     if isinstance(explicit, str):

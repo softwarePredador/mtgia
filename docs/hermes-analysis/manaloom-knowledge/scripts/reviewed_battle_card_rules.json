@@ -1674,7 +1674,7 @@
       "effect": "land",
       "subtype": "commander_identity_fixing"
     },
-    "logical_rule_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
+    "logical_rule_key": "battle_rule_v1:8a974d0b2c767176f8066c7932447896",
     "source": "curated",
     "confidence": 0.99,
     "review_status": "verified",
