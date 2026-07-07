@@ -25557,7 +25557,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertTrue(proposal["effect_json"]["has_cycling"])
         self.assertTrue(proposal["effect_json"]["_cycling_is_auxiliary"])
 
-    def test_prevent_all_combat_damage_blocks_filtered_source(self) -> None:
+    def test_prevent_all_combat_damage_with_power_filter_maps_creature_source_scope(self) -> None:
         proposal, reason = split.split_row(
             queue_row(
                 split.PREVENT_ALL_COMBAT_DAMAGE_SPELL_UNIT,
@@ -25578,13 +25578,118 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             ),
         )
 
-        self.assertIsNone(proposal)
-        self.assertIn(
-            reason,
-            {
-                "prevent_all_combat_damage_oracle_not_exact",
-                "prevent_all_combat_damage_source_not_exact_global_combat",
-            },
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.PREVENT_DAMAGE_FROM_CREATURES_SPELL_SCOPE)
+        self.assertEqual(effect["prevent_damage_scope"], "combat_damage_from_creatures")
+        self.assertEqual(effect["prevent_damage_kind"], "combat_damage")
+        self.assertTrue(effect["prevent_damage_from_creature_sources_this_turn"])
+        self.assertEqual(effect["prevent_source_constraints"], {"card_types": ["creature"], "power_lte": 4})
+
+    def test_prevent_damage_from_creatures_maps_all_damage_source_scope(self) -> None:
+        proposal, reason = split.split_row(
+            queue_row(
+                split.PREVENT_ALL_COMBAT_DAMAGE_SPELL_UNIT,
+                effect_classes=["PreventAllDamageByAllPermanentsEffect"],
+            ),
+            metadata(
+                name="Ethereal Haze",
+                type_line="Instant",
+                oracle_text="Prevent all damage that would be dealt by creatures this turn.",
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect("
+                "new PreventAllDamageByAllPermanentsEffect("
+                "StaticFilters.FILTER_PERMANENT_CREATURES, Duration.EndOfTurn, false));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.PREVENT_DAMAGE_FROM_CREATURES_SPELL_SCOPE)
+        self.assertEqual(effect["prevent_damage_scope"], "damage_from_creatures")
+        self.assertEqual(effect["prevent_damage_kind"], "all_damage")
+        self.assertEqual(effect["prevent_source_constraints"], {"card_types": ["creature"]})
+
+    def test_prevent_damage_from_opponent_creatures_maps_controller_scope(self) -> None:
+        proposal, reason = split.split_row(
+            queue_row(
+                split.PREVENT_ALL_COMBAT_DAMAGE_SPELL_UNIT,
+                effect_classes=["PreventAllDamageByAllPermanentsEffect"],
+            ),
+            metadata(
+                name="Thwart the Enemy",
+                type_line="Instant",
+                oracle_text=(
+                    "Prevent all damage that would be dealt this turn by creatures "
+                    "your opponents control."
+                ),
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new PreventAllDamageByAllPermanentsEffect("
+                "StaticFilters.FILTER_OPPONENTS_PERMANENT_CREATURES, Duration.EndOfTurn, false));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        self.assertEqual(
+            proposal["effect_json"]["prevent_source_constraints"],
+            {"card_types": ["creature"], "controller_scope": "opponents_control"},
+        )
+
+    def test_prevent_combat_damage_from_attacking_creatures_maps_combat_role(self) -> None:
+        proposal, reason = split.split_row(
+            queue_row(
+                split.PREVENT_ALL_COMBAT_DAMAGE_SPELL_UNIT,
+                effect_classes=["PreventAllDamageByAllPermanentsEffect"],
+            ),
+            metadata(
+                name="Harmless Assault",
+                type_line="Instant",
+                oracle_text=(
+                    "Prevent all combat damage that would be dealt this turn by "
+                    "attacking creatures."
+                ),
+            ),
+            source_text=(
+                "private static final FilterAttackingCreature filter = "
+                "new FilterAttackingCreature(\"attacking creatures\");"
+                "this.getSpellAbility().addEffect("
+                "new PreventAllDamageByAllPermanentsEffect(filter, Duration.EndOfTurn, true));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        self.assertEqual(
+            proposal["effect_json"]["prevent_source_constraints"],
+            {"card_types": ["creature"], "combat_role": "attacking"},
+        )
+
+    def test_prevent_combat_damage_from_nongreen_creatures_maps_color_exclusion(self) -> None:
+        proposal, reason = split.split_row(
+            queue_row(
+                split.PREVENT_ALL_COMBAT_DAMAGE_SPELL_UNIT,
+                effect_classes=["PreventAllDamageByAllPermanentsEffect"],
+            ),
+            metadata(
+                name="Hunter's Ambush",
+                type_line="Instant",
+                oracle_text=(
+                    "Prevent all combat damage that would be dealt by nongreen "
+                    "creatures this turn."
+                ),
+            ),
+            source_text=(
+                "filter.add(Predicates.not(new ColorPredicate(ObjectColor.GREEN)));"
+                "this.getSpellAbility().addEffect("
+                "new PreventAllDamageByAllPermanentsEffect(filter, Duration.EndOfTurn, true));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        self.assertEqual(
+            proposal["effect_json"]["prevent_source_constraints"],
+            {"card_types": ["creature"], "exclude_colors": ["G"]},
         )
 
     def test_choose_one_fixed_damage_or_destroy_maps_modal_scope(self) -> None:

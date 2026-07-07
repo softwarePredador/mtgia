@@ -6503,6 +6503,187 @@ def run_static_cost_reduction_spell_cost(
     }
 
 
+def _controller_for_damage_source(source: dict[str, Any], active, opponent):
+    return active if source.get("_controller_role") == "self" else opponent
+
+
+def run_damage_prevention(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    active = battle.Player(str(scenario.get("player") or "Prevention Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
+    turn = int(scenario.get("turn") or 7)
+    seed = int(scenario.get("seed") or 6090)
+    before_events = len(events)
+    battle.apply_effect_immediate(
+        active,
+        [opponent],
+        card,
+        turn=turn,
+        rng=random.Random(seed),
+        effect_data_override=card,
+        phase="combat_damage",
+    )
+    if not any(
+        event == "combat_damage_prevention_created"
+        and data.get("card") == card.get("name")
+        for event, data in events[before_events:]
+    ):
+        fail("battle_events", f"missing {card['name']} combat_damage_prevention_created event")
+
+    kind = str(scenario.get("expected_prevent_damage_kind") or "combat_damage")
+    matching_source = dict(scenario["matching_source"])
+    nonmatching_source = dict(scenario.get("nonmatching_source") or {})
+
+    if kind == "all_damage":
+        matching_controller = _controller_for_damage_source(matching_source, active, opponent)
+        matching_source["controller"] = matching_controller.name
+        life_before = active.life
+        dealt, final_amount, did_deal = battle.deal_damage_to_player_with_static_replacements(
+            matching_controller,
+            active,
+            matching_source,
+            int(scenario.get("matching_damage") or 5),
+            turn=turn,
+            phase="postcombat_main",
+            damage_event_type="player",
+        )
+        if (dealt, final_amount, did_deal) != (0, 0, False) or active.life != life_before:
+            fail(
+                "battle_execution",
+                f"{card['name']} matching all-damage source was not prevented: dealt={dealt} final={final_amount} life={active.life}",
+            )
+        if nonmatching_source:
+            nonmatching_controller = _controller_for_damage_source(nonmatching_source, active, opponent)
+            nonmatching_source["controller"] = nonmatching_controller.name
+            target_player = active if nonmatching_controller is opponent else opponent
+            nonmatching_life_before = target_player.life
+            dealt, final_amount, did_deal = battle.deal_damage_to_player_with_static_replacements(
+                nonmatching_controller,
+                target_player,
+                nonmatching_source,
+                int(scenario.get("nonmatching_damage") or 3),
+                turn=turn,
+                phase="postcombat_main",
+                damage_event_type="player",
+            )
+            if not did_deal or final_amount <= 0 or target_player.life >= nonmatching_life_before:
+                fail(
+                    "battle_execution",
+                    f"{card['name']} nonmatching all-damage source was incorrectly prevented",
+                )
+        replacement = next(
+            (
+                data
+                for event, data in events[before_events:]
+                if event == "static_damage_replacement_applied"
+                and data.get("source") == matching_source.get("name")
+                and data.get("final_amount") == 0
+            ),
+            None,
+        )
+        if replacement is None:
+            fail("battle_events", f"missing {card['name']} static damage prevention event")
+        return {
+            "scenario": scenario.get("name"),
+            "card_name": card["name"],
+            "prevent_damage_kind": kind,
+            "matching_source": matching_source.get("name"),
+            "nonmatching_source": nonmatching_source.get("name"),
+            "matching_damage_prevented": True,
+        }
+
+    if kind != "combat_damage":
+        fail("battle_execution", f"{card['name']} unsupported prevention kind {kind!r}")
+
+    matching_source.setdefault("controller", opponent.name)
+    matching_source.pop("_controller_role", None)
+    nonmatching_source.setdefault("controller", opponent.name)
+    if nonmatching_source.get("_combat_role") == "blocking":
+        opponent.battlefield = [matching_source]
+        active.battlefield = [nonmatching_source]
+        battle.combat_damage_steps(
+            opponent,
+            [active],
+            active,
+            [matching_source],
+            [(matching_source, [nonmatching_source])],
+            turn=turn,
+            rng=random.Random(seed),
+            all_players=[opponent, active],
+        )
+        if int(nonmatching_source.get("damage_marked_this_turn") or 0) != 0:
+            fail("battle_execution", f"{card['name']} attacking-source damage was not prevented")
+        if int(matching_source.get("damage_marked_this_turn") or 0) <= 0:
+            fail("battle_execution", f"{card['name']} blocking-source damage was incorrectly prevented")
+        nonmatching_result = "blocking_damage_allowed"
+    else:
+        combat_sources = [matching_source]
+        if nonmatching_source and "creature" in str(nonmatching_source.get("type_line") or "").lower():
+            combat_sources.append(nonmatching_source)
+        opponent.battlefield = combat_sources
+        battle.combat_damage_steps(
+            opponent,
+            [active],
+            active,
+            combat_sources,
+            [(source, []) for source in combat_sources],
+            turn=turn,
+            rng=random.Random(seed),
+            all_players=[opponent, active],
+        )
+        expected_nonmatching_damage = (
+            int(nonmatching_source.get("power") or 0)
+            if len(combat_sources) > 1 and combat_sources[1] is nonmatching_source
+            else 0
+        )
+        expected_life = 40 - expected_nonmatching_damage
+        if active.life != expected_life:
+            fail(
+                "battle_execution",
+                f"{card['name']} combat prevention life={active.life}, expected {expected_life}",
+            )
+        nonmatching_result = "nonmatching_combat_damage_allowed" if expected_nonmatching_damage else "no_combat_nonmatch"
+
+    prevented_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "combat_damage_prevented"
+            and data.get("source") == matching_source.get("name")
+        ),
+        None,
+    )
+    if prevented_event is None:
+        fail("battle_events", f"missing {card['name']} combat_damage_prevented event")
+
+    life_before_noncombat = active.life
+    dealt, final_amount, did_deal = battle.deal_damage_to_player_with_static_replacements(
+        opponent,
+        active,
+        matching_source,
+        int(scenario.get("noncombat_probe_damage") or 2),
+        turn=turn,
+        phase="postcombat_main",
+        damage_event_type="player",
+    )
+    if not did_deal or final_amount <= 0 or active.life >= life_before_noncombat:
+        fail("battle_execution", f"{card['name']} combat-only prevention stopped noncombat damage")
+
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "prevent_damage_kind": kind,
+        "matching_source": matching_source.get("name"),
+        "nonmatching_source": nonmatching_source.get("name"),
+        "matching_combat_damage_prevented": True,
+        "nonmatching_result": nonmatching_result,
+    }
+
+
 SCENARIO_RUNNERS = {
     "attack_self_boost": run_attack_self_boost,
     "aura_static_power_toughness_attachment": run_aura_static_power_toughness_attachment,
@@ -6524,6 +6705,7 @@ SCENARIO_RUNNERS = {
     "creature_enters_life_gain": run_creature_enters_life_gain,
     "creature_etb_scry": run_creature_etb_scry,
     "destroy_target_create_treasure": run_destroy_target_create_treasure,
+    "damage_prevention": run_damage_prevention,
     "dynamic_life_gain": run_dynamic_life_gain,
     "each_player_sacrifice": run_each_player_sacrifice,
     "fixed_create_creature_tokens": run_fixed_create_creature_tokens,

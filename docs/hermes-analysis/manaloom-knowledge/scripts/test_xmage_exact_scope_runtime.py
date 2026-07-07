@@ -20579,6 +20579,330 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertEqual(attacking_creature.get("damage_marked_this_turn", 0), 0)
         self.assertEqual(blocker.get("damage_marked_this_turn", 0), 0)
 
+    def test_prevent_damage_from_creatures_spell_prevents_noncombat_creature_damage_only(self) -> None:
+        source_controller = self.battle.Player("Opponent", None, [])
+        defender = self.battle.Player("Defender", None, [])
+        source_creature = {
+            "name": "Pinger Creature",
+            "type_line": "Creature - Wizard",
+            "effect": "creature",
+            "power": 1,
+            "toughness": 1,
+            "controller": source_controller.name,
+            "colors": ["R"],
+        }
+        noncreature_source = {
+            "name": "Burn Spell",
+            "type_line": "Instant",
+            "effect": "direct_damage",
+            "controller": source_controller.name,
+            "colors": ["R"],
+        }
+        haze = {
+            "name": "Ethereal Haze",
+            "type_line": "Instant",
+            "effect": "damage_prevention_shield",
+            "battle_model_scope": "xmage_prevent_damage_from_creatures_spell_v1",
+            "prevent_damage_from_creature_sources_this_turn": True,
+            "prevent_damage_scope": "damage_from_creatures",
+            "prevent_damage_kind": "all_damage",
+            "prevent_damage_duration": "until_end_of_turn",
+            "prevent_source_constraints": {"card_types": ["creature"]},
+        }
+        self.battle.apply_effect_immediate(
+            defender,
+            [source_controller],
+            haze,
+            turn=6,
+            rng=random.Random(6),
+            effect_data_override=haze,
+            phase="combat_damage",
+        )
+
+        dealt, final_amount, did_deal = self.battle.deal_damage_to_player_with_static_replacements(
+            source_controller,
+            defender,
+            source_creature,
+            4,
+            turn=6,
+            phase="postcombat_main",
+            damage_event_type="player",
+        )
+        self.assertEqual((dealt, final_amount, did_deal), (0, 0, False))
+        self.assertEqual(defender.life, 40)
+        self.assertTrue(
+            any(
+                event == "static_damage_replacement_applied"
+                and data.get("source") == "Pinger Creature"
+                and data.get("final_amount") == 0
+                and data.get("modifiers", [{}])[0].get("prevention") == "damage_from_creatures"
+                for event, data in self.events
+            )
+        )
+
+        dealt, final_amount, did_deal = self.battle.deal_damage_to_player_with_static_replacements(
+            source_controller,
+            defender,
+            noncreature_source,
+            3,
+            turn=6,
+            phase="postcombat_main",
+            damage_event_type="player",
+        )
+        self.assertEqual((dealt, final_amount, did_deal), (3, 3, True))
+        self.assertEqual(defender.life, 37)
+
+    def test_prevent_damage_from_opponent_creatures_does_not_prevent_own_creature_damage(self) -> None:
+        defender = self.battle.Player("Defender", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        opposing_creature = {
+            "name": "Opposing Pinger",
+            "type_line": "Creature - Goblin",
+            "effect": "creature",
+            "controller": opponent.name,
+            "colors": ["R"],
+        }
+        own_creature = {
+            "name": "Own Pinger",
+            "type_line": "Creature - Soldier",
+            "effect": "creature",
+            "controller": defender.name,
+            "colors": ["W"],
+        }
+        thwart = {
+            "name": "Thwart the Enemy",
+            "type_line": "Instant",
+            "effect": "damage_prevention_shield",
+            "battle_model_scope": "xmage_prevent_damage_from_creatures_spell_v1",
+            "prevent_damage_from_creature_sources_this_turn": True,
+            "prevent_damage_scope": "damage_from_creatures",
+            "prevent_damage_kind": "all_damage",
+            "prevent_damage_duration": "until_end_of_turn",
+            "prevent_source_constraints": {
+                "card_types": ["creature"],
+                "controller_scope": "opponents_control",
+            },
+        }
+        self.battle.apply_effect_immediate(
+            defender,
+            [opponent],
+            thwart,
+            turn=7,
+            rng=random.Random(7),
+            effect_data_override=thwart,
+            phase="combat_damage",
+        )
+
+        dealt, final_amount, did_deal = self.battle.deal_damage_to_player_with_static_replacements(
+            opponent,
+            defender,
+            opposing_creature,
+            5,
+            turn=7,
+            phase="postcombat_main",
+            damage_event_type="player",
+        )
+        self.assertEqual((dealt, final_amount, did_deal), (0, 0, False))
+        self.assertEqual(defender.life, 40)
+
+        dealt, final_amount, did_deal = self.battle.deal_damage_to_player_with_static_replacements(
+            defender,
+            opponent,
+            own_creature,
+            3,
+            turn=7,
+            phase="postcombat_main",
+            damage_event_type="player",
+        )
+        self.assertEqual((dealt, final_amount, did_deal), (3, 3, True))
+        self.assertEqual(opponent.life, 37)
+
+    def test_prevent_combat_damage_from_attacking_creatures_allows_blocker_damage(self) -> None:
+        attacker = self.battle.Player("Attacker", None, [])
+        defender = self.battle.Player("Defender", None, [])
+        attacking_creature = {
+            "name": "Attacking Knight",
+            "type_line": "Creature - Knight",
+            "effect": "creature",
+            "power": 4,
+            "toughness": 5,
+            "colors": ["W"],
+        }
+        blocker = {
+            "name": "Blocking Bear",
+            "type_line": "Creature - Bear",
+            "effect": "creature",
+            "power": 3,
+            "toughness": 5,
+            "colors": ["G"],
+        }
+        attacker.battlefield = [attacking_creature]
+        defender.battlefield = [blocker]
+        harmless_assault = {
+            "name": "Harmless Assault",
+            "type_line": "Instant",
+            "effect": "damage_prevention_shield",
+            "battle_model_scope": "xmage_prevent_damage_from_creatures_spell_v1",
+            "prevent_damage_from_creature_sources_this_turn": True,
+            "prevent_damage_scope": "combat_damage_from_creatures",
+            "prevent_damage_kind": "combat_damage",
+            "prevent_damage_duration": "until_end_of_turn",
+            "prevent_source_constraints": {
+                "card_types": ["creature"],
+                "combat_role": "attacking",
+            },
+        }
+        self.battle.apply_effect_immediate(
+            defender,
+            [attacker],
+            harmless_assault,
+            turn=8,
+            rng=random.Random(8),
+            effect_data_override=harmless_assault,
+            phase="combat_damage",
+        )
+        self.battle.combat_damage_steps(
+            attacker,
+            [defender],
+            defender,
+            [attacking_creature],
+            [(attacking_creature, [blocker])],
+            turn=8,
+            rng=random.Random(8),
+            all_players=[attacker, defender],
+        )
+
+        self.assertEqual(blocker.get("damage_marked_this_turn", 0), 0)
+        self.assertEqual(attacking_creature.get("damage_marked_this_turn", 0), 3)
+
+    def test_prevent_combat_damage_from_nongreen_and_low_power_creatures_respects_filters(self) -> None:
+        attacker = self.battle.Player("Attacker", None, [])
+        defender = self.battle.Player("Defender", None, [])
+        nongreen = {
+            "name": "Red Raider",
+            "type_line": "Creature - Warrior",
+            "effect": "creature",
+            "power": 4,
+            "toughness": 4,
+            "colors": ["R"],
+        }
+        green = {
+            "name": "Green Raider",
+            "type_line": "Creature - Warrior",
+            "effect": "creature",
+            "power": 3,
+            "toughness": 3,
+            "colors": ["G"],
+        }
+        attacker.battlefield = [nongreen, green]
+        hunters_ambush = {
+            "name": "Hunter's Ambush",
+            "type_line": "Instant",
+            "effect": "damage_prevention_shield",
+            "battle_model_scope": "xmage_prevent_damage_from_creatures_spell_v1",
+            "prevent_damage_from_creature_sources_this_turn": True,
+            "prevent_damage_scope": "combat_damage_from_creatures",
+            "prevent_damage_kind": "combat_damage",
+            "prevent_damage_duration": "until_end_of_turn",
+            "prevent_source_constraints": {
+                "card_types": ["creature"],
+                "exclude_colors": ["G"],
+            },
+        }
+        self.battle.apply_effect_immediate(
+            defender,
+            [attacker],
+            hunters_ambush,
+            turn=9,
+            rng=random.Random(9),
+            effect_data_override=hunters_ambush,
+            phase="combat_damage",
+        )
+        self.battle.combat_damage_steps(
+            attacker,
+            [defender],
+            defender,
+            [nongreen, green],
+            [(nongreen, []), (green, [])],
+            turn=9,
+            rng=random.Random(9),
+            all_players=[attacker, defender],
+        )
+
+        self.assertEqual(defender.life, 37)
+        self.assertTrue(
+            any(
+                event == "combat_damage_prevented"
+                and data.get("source") == "Red Raider"
+                and data.get("amount") == 4
+                for event, data in self.events
+            )
+        )
+
+        defender.life = 40
+        defender.combat_damage_prevention_effects.clear()
+        attacker.combat_damage_prevention_effects.clear()
+        low_power = {
+            "name": "Small Raider",
+            "type_line": "Creature - Warrior",
+            "effect": "creature",
+            "power": 4,
+            "toughness": 4,
+            "colors": ["R"],
+        }
+        high_power = {
+            "name": "Large Raider",
+            "type_line": "Creature - Giant",
+            "effect": "creature",
+            "power": 5,
+            "toughness": 5,
+            "colors": ["R"],
+        }
+        attacker.battlefield = [low_power, high_power]
+        vine_snare = {
+            "name": "Vine Snare",
+            "type_line": "Instant",
+            "effect": "damage_prevention_shield",
+            "battle_model_scope": "xmage_prevent_damage_from_creatures_spell_v1",
+            "prevent_damage_from_creature_sources_this_turn": True,
+            "prevent_damage_scope": "combat_damage_from_creatures",
+            "prevent_damage_kind": "combat_damage",
+            "prevent_damage_duration": "until_end_of_turn",
+            "prevent_source_constraints": {
+                "card_types": ["creature"],
+                "power_lte": 4,
+            },
+        }
+        self.battle.apply_effect_immediate(
+            defender,
+            [attacker],
+            vine_snare,
+            turn=10,
+            rng=random.Random(10),
+            effect_data_override=vine_snare,
+            phase="combat_damage",
+        )
+        self.battle.combat_damage_steps(
+            attacker,
+            [defender],
+            defender,
+            [low_power, high_power],
+            [(low_power, []), (high_power, [])],
+            turn=10,
+            rng=random.Random(10),
+            all_players=[attacker, defender],
+        )
+
+        self.assertEqual(defender.life, 35)
+        self.assertTrue(
+            any(
+                event == "combat_damage_prevented"
+                and data.get("source") == "Small Raider"
+                and data.get("amount") == 4
+                for event, data in self.events
+            )
+        )
+
     def test_modal_damage_or_destroy_chooses_destroy_when_target_exists(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

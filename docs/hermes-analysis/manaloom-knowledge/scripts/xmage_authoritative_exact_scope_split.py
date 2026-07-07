@@ -215,6 +215,7 @@ STATIC_GENERIC_COST_INCREASE_SCOPE = "xmage_static_generic_cost_increase_for_mat
 TARGET_DRAW_SCOPE = "xmage_fixed_target_player_draw_spell_v1"
 TARGET_PLAYER_DISCARD_SCOPE = "xmage_fixed_target_player_discard_spell_v1"
 PREVENT_ALL_COMBAT_DAMAGE_SPELL_SCOPE = "xmage_prevent_all_combat_damage_spell_v1"
+PREVENT_DAMAGE_FROM_CREATURES_SPELL_SCOPE = "xmage_prevent_damage_from_creatures_spell_v1"
 DRAW_DISCARD_SPELL_SCOPE = "xmage_fixed_draw_discard_spell_v1"
 DRAW_LOSE_LIFE_SPELL_SCOPE = "xmage_fixed_controller_draw_lose_life_spell_v1"
 TARGET_DRAW_LOSE_LIFE_SPELL_SCOPE = "xmage_fixed_target_player_draw_lose_life_spell_v1"
@@ -20984,7 +20985,7 @@ def target_constraints_for(target: str) -> dict[str, Any]:
     return {"target": target}
 
 
-def prevent_all_combat_damage_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+def prevent_damage_by_creature_sources_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
     lines = [
         re.sub(r"\s+", " ", line).strip().lower().rstrip(".")
         for line in normalized_oracle_lines(metadata)
@@ -20997,35 +20998,151 @@ def prevent_all_combat_damage_oracle(metadata: dict[str, Any]) -> dict[str, Any]
         and not line.startswith("flashback ")
         and not line.startswith("buyback ")
     ]
-    if effect_lines != ["prevent all combat damage that would be dealt this turn"]:
+    if len(effect_lines) != 1:
         return "prevent_all_combat_damage_oracle_not_exact"
-    return {
-        "prevent_damage_scope": "all_combat_damage",
-        "prevent_damage_duration": "until_end_of_turn",
-    }
+    line = effect_lines[0]
+    if line == "prevent all combat damage that would be dealt this turn":
+        return {
+            "prevent_damage_scope": "all_combat_damage",
+            "prevent_damage_kind": "combat_damage",
+            "prevent_damage_duration": "until_end_of_turn",
+            "prevent_source_constraints": {},
+        }
+    if line == "prevent all damage that would be dealt by creatures this turn":
+        return {
+            "prevent_damage_scope": "damage_from_creatures",
+            "prevent_damage_kind": "all_damage",
+            "prevent_damage_duration": "until_end_of_turn",
+            "prevent_source_constraints": {"card_types": ["creature"]},
+        }
+    if line == "prevent all combat damage that would be dealt this turn by attacking creatures":
+        return {
+            "prevent_damage_scope": "combat_damage_from_creatures",
+            "prevent_damage_kind": "combat_damage",
+            "prevent_damage_duration": "until_end_of_turn",
+            "prevent_source_constraints": {
+                "card_types": ["creature"],
+                "combat_role": "attacking",
+            },
+        }
+    if line == "prevent all combat damage that would be dealt by nongreen creatures this turn":
+        return {
+            "prevent_damage_scope": "combat_damage_from_creatures",
+            "prevent_damage_kind": "combat_damage",
+            "prevent_damage_duration": "until_end_of_turn",
+            "prevent_source_constraints": {
+                "card_types": ["creature"],
+                "exclude_colors": ["G"],
+            },
+        }
+    if line == "prevent all damage that would be dealt this turn by creatures your opponents control":
+        return {
+            "prevent_damage_scope": "damage_from_creatures",
+            "prevent_damage_kind": "all_damage",
+            "prevent_damage_duration": "until_end_of_turn",
+            "prevent_source_constraints": {
+                "card_types": ["creature"],
+                "controller_scope": "opponents_control",
+            },
+        }
+    power_match = re.fullmatch(
+        r"prevent all combat damage that would be dealt this turn by creatures with power (?P<power>\d+) or less",
+        line,
+    )
+    if power_match:
+        return {
+            "prevent_damage_scope": "combat_damage_from_creatures",
+            "prevent_damage_kind": "combat_damage",
+            "prevent_damage_duration": "until_end_of_turn",
+            "prevent_source_constraints": {
+                "card_types": ["creature"],
+                "power_lte": int(power_match.group("power")),
+            },
+        }
+    return "prevent_all_combat_damage_oracle_not_exact"
 
 
-def prevent_all_combat_damage_source_blocker(source_text: str) -> str | None:
+def prevent_damage_by_creature_sources_from_source(source_text: str) -> dict[str, Any] | str:
     text = source_text or ""
     if len(re.findall(r"new\s+PreventAllDamageByAllPermanentsEffect\s*\(", text)) != 1:
         return "prevent_all_combat_damage_source_not_single_effect"
     if re.search(
         r"new\s+PreventAllDamageByAllPermanentsEffect\s*\(\s*Duration\.EndOfTurn\s*,\s*true\s*\)",
         text,
-    ) is None:
-        return "prevent_all_combat_damage_source_not_exact_global_combat"
-    unsupported_markers = (
-        "StaticFilters.",
-        "new Filter",
-        "FILTER_",
-        "ComparisonType.",
-        "PowerPredicate",
-        "Conditional",
-        "Target",
+    ) is not None:
+        return {
+            "prevent_damage_scope": "all_combat_damage",
+            "prevent_damage_kind": "combat_damage",
+            "prevent_damage_duration": "until_end_of_turn",
+            "prevent_source_constraints": {},
+        }
+    if re.search(
+        r"PreventAllDamageByAllPermanentsEffect\s*\(\s*StaticFilters\.FILTER_PERMANENT_CREATURES\s*,\s*Duration\.EndOfTurn\s*,\s*false\s*\)",
+        text,
+    ):
+        return {
+            "prevent_damage_scope": "damage_from_creatures",
+            "prevent_damage_kind": "all_damage",
+            "prevent_damage_duration": "until_end_of_turn",
+            "prevent_source_constraints": {"card_types": ["creature"]},
+        }
+    if re.search(
+        r"PreventAllDamageByAllPermanentsEffect\s*\(\s*StaticFilters\.FILTER_OPPONENTS_PERMANENT_CREATURES\s*,\s*Duration\.EndOfTurn\s*,\s*false\s*\)",
+        text,
+    ):
+        return {
+            "prevent_damage_scope": "damage_from_creatures",
+            "prevent_damage_kind": "all_damage",
+            "prevent_damage_duration": "until_end_of_turn",
+            "prevent_source_constraints": {
+                "card_types": ["creature"],
+                "controller_scope": "opponents_control",
+            },
+        }
+    if "FilterAttackingCreature" in text and re.search(
+        r"PreventAllDamageByAllPermanentsEffect\s*\(\s*filter\s*,\s*Duration\.EndOfTurn\s*,\s*true\s*\)",
+        text,
+    ):
+        return {
+            "prevent_damage_scope": "combat_damage_from_creatures",
+            "prevent_damage_kind": "combat_damage",
+            "prevent_damage_duration": "until_end_of_turn",
+            "prevent_source_constraints": {
+                "card_types": ["creature"],
+                "combat_role": "attacking",
+            },
+        }
+    if "ColorPredicate(ObjectColor.GREEN)" in text and "Predicates.not" in text and re.search(
+        r"PreventAllDamageByAllPermanentsEffect\s*\(\s*filter\s*,\s*Duration\.EndOfTurn\s*,\s*true\s*\)",
+        text,
+    ):
+        return {
+            "prevent_damage_scope": "combat_damage_from_creatures",
+            "prevent_damage_kind": "combat_damage",
+            "prevent_damage_duration": "until_end_of_turn",
+            "prevent_source_constraints": {
+                "card_types": ["creature"],
+                "exclude_colors": ["G"],
+            },
+        }
+    power_match = re.search(
+        r"PowerPredicate\s*\(\s*ComparisonType\.FEWER_THAN\s*,\s*(\d+)\s*\)",
+        text,
     )
-    if any(marker in text for marker in unsupported_markers):
-        return "prevent_all_combat_damage_source_filter_or_condition_not_supported"
-    return None
+    if power_match and re.search(
+        r"PreventAllDamageByAllPermanentsEffect\s*\(\s*filter\s*,\s*Duration\.EndOfTurn\s*,\s*true\s*\)",
+        text,
+    ):
+        return {
+            "prevent_damage_scope": "combat_damage_from_creatures",
+            "prevent_damage_kind": "combat_damage",
+            "prevent_damage_duration": "until_end_of_turn",
+            "prevent_source_constraints": {
+                "card_types": ["creature"],
+                "power_lte": int(power_match.group(1)) - 1,
+            },
+        }
+    return "prevent_all_combat_damage_source_filter_or_condition_not_supported"
 
 
 def proposal_notes(row: dict[str, Any], scope: str) -> str:
@@ -21076,6 +21193,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "fixed target-player discard spell"
     elif scope == PREVENT_ALL_COMBAT_DAMAGE_SPELL_SCOPE:
         scope_kind = "fixed spell-resolution prevention of all combat damage until end of turn"
+    elif scope == PREVENT_DAMAGE_FROM_CREATURES_SPELL_SCOPE:
+        scope_kind = "fixed spell-resolution prevention of damage from filtered creature sources until end of turn"
     elif scope == COUNTER_TARGET_CONTROLLER_LOSE_LIFE_SCOPE:
         scope_kind = "fixed counter-target spell with target-controller life loss"
     elif scope == BOOST_DRAW_SCOPE:
@@ -21619,17 +21738,24 @@ def split_row(
             return None, "prevent_all_combat_damage_effect_class_not_pure"
         if not abilities.issubset({"CyclingAbility"}):
             return None, "prevent_all_combat_damage_ability_class_not_supported"
-        oracle_prevention = prevent_all_combat_damage_oracle(metadata)
+        oracle_prevention = prevent_damage_by_creature_sources_oracle(metadata)
         if isinstance(oracle_prevention, str):
             return None, oracle_prevention
-        source_blocker = prevent_all_combat_damage_source_blocker(source_text)
-        if source_blocker:
-            return None, source_blocker
+        source_prevention = prevent_damage_by_creature_sources_from_source(source_text)
+        if isinstance(source_prevention, str):
+            return None, source_prevention
+        if source_prevention != oracle_prevention:
+            return None, "prevent_all_combat_damage_source_oracle_mismatch"
+        scope = (
+            PREVENT_ALL_COMBAT_DAMAGE_SPELL_SCOPE
+            if oracle_prevention["prevent_damage_scope"] == "all_combat_damage"
+            else PREVENT_DAMAGE_FROM_CREATURES_SPELL_SCOPE
+        )
         effect_json = {
             "effect": "damage_prevention_shield",
-            "battle_model_scope": PREVENT_ALL_COMBAT_DAMAGE_SPELL_SCOPE,
-            "prevent_all_combat_damage_this_turn": True,
+            "battle_model_scope": scope,
             "prevent_damage_scope": oracle_prevention["prevent_damage_scope"],
+            "prevent_damage_kind": oracle_prevention["prevent_damage_kind"],
             "prevent_damage_duration": oracle_prevention["prevent_damage_duration"],
             "prevent_damage_amount": 999,
             "duration": "until_end_of_turn",
@@ -21637,6 +21763,13 @@ def split_row(
             "xmage_ability_classes": sorted(abilities),
             **flags,
         }
+        if oracle_prevention["prevent_damage_scope"] == "all_combat_damage":
+            effect_json["prevent_all_combat_damage_this_turn"] = True
+        else:
+            effect_json["prevent_damage_from_creature_sources_this_turn"] = True
+            effect_json["prevent_source_constraints"] = oracle_prevention[
+                "prevent_source_constraints"
+            ]
         if "CyclingAbility" in abilities:
             effect_json["has_cycling"] = True
             effect_json["_cycling_is_auxiliary"] = True

@@ -593,6 +593,32 @@ def test_manifest_expected_rule_preserves_target_player_draw_fields() -> None:
     }
 
 
+def test_manifest_expected_rule_preserves_damage_prevention_fields() -> None:
+    proposal = {
+        "normalized_name": "vine snare",
+        "card_name": "Vine Snare",
+        "oracle_hash": "hash-vine-snare",
+        "logical_rule_key": "battle_rule_v1:hash-vine-snare",
+        "effect_json": {
+            "effect": "damage_prevention_shield",
+            "battle_model_scope": "xmage_prevent_damage_from_creatures_spell_v1",
+            "prevent_damage_from_creature_sources_this_turn": True,
+            "prevent_damage_scope": "combat_damage_from_creatures",
+            "prevent_damage_kind": "combat_damage",
+            "prevent_damage_duration": "until_end_of_turn",
+            "prevent_damage_amount": 999,
+            "prevent_source_constraints": {
+                "card_types": ["creature"],
+                "power_lte": 4,
+            },
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+
+    assert expected["required_effect_fields"] == proposal["effect_json"]
+
+
 def test_manifest_expected_rule_preserves_partial_mana_source_fields() -> None:
     proposal = {
         "normalized_name": "cultivator's caravan",
@@ -1841,6 +1867,36 @@ def test_single_target_bounce_scenario_moves_target_to_hand() -> None:
     assert scenario["expected_destination"] == "hand"
     assert scenario["target"]["enchanted"] is True
     assert scenario["nonmatching_target"].get("enchanted") is False
+
+
+def test_damage_prevention_scenario_uses_matching_and_nonmatching_sources() -> None:
+    rule = {
+        "normalized_name": "hunter's ambush",
+        "card_name": "Hunter's Ambush",
+        "oracle_hash": "hash-hunters-ambush",
+        "logical_rule_key": "battle_rule_v1:hash-hunters-ambush",
+        "required_effect_fields": {
+            "effect": "damage_prevention_shield",
+            "battle_model_scope": "xmage_prevent_damage_from_creatures_spell_v1",
+            "prevent_damage_from_creature_sources_this_turn": True,
+            "prevent_damage_scope": "combat_damage_from_creatures",
+            "prevent_damage_kind": "combat_damage",
+            "prevent_damage_duration": "until_end_of_turn",
+            "prevent_source_constraints": {
+                "card_types": ["creature"],
+                "exclude_colors": ["G"],
+            },
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "damage_prevention"
+    assert scenario["matching_source"]["type_line"].startswith("Creature")
+    assert scenario["matching_source"]["colors"] == ["R"]
+    assert scenario["nonmatching_source"]["colors"] == ["G"]
+    assert scenario["expected_prevent_damage_kind"] == "combat_damage"
 
 
 def test_single_target_removal_and_surveil_scenario_exercises_surveillance() -> None:

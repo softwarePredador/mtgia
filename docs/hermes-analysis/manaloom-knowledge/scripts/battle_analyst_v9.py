@@ -51353,6 +51353,101 @@ def _static_damage_modifier_participants(controller, target_controller=None):
     return participants
 
 
+def _temporary_damage_prevention_effects(controller, target_controller=None):
+    effects = []
+    seen = set()
+    for participant in _static_damage_modifier_participants(controller, target_controller):
+        for prevention in getattr(participant, "combat_damage_prevention_effects", []) or []:
+            if not isinstance(prevention, dict):
+                continue
+            if prevention.get("duration") not in (None, "", "until_end_of_turn"):
+                continue
+            scope = prevention.get("prevent_damage_scope")
+            if scope not in {
+                "all_combat_damage",
+                "damage_from_creatures",
+                "combat_damage_from_creatures",
+            }:
+                continue
+            constraints = prevention.get("prevent_source_constraints") or {}
+            key = (
+                prevention.get("source"),
+                prevention.get("source_controller"),
+                prevention.get("battle_model_scope"),
+                scope,
+                prevention.get("prevent_damage_kind"),
+                json.dumps(constraints, sort_keys=True),
+            )
+            if key in seen:
+                continue
+            seen.add(key)
+            effects.append(prevention)
+    return effects
+
+
+def _source_controller_name(source_card, source_controller=None):
+    if source_controller is not None:
+        return getattr(source_controller, "name", None)
+    if isinstance(source_card, dict):
+        return source_card.get("controller") or source_card.get("owner")
+    return None
+
+
+def _source_matches_color_exclusion(source_card, excluded_colors):
+    excluded = _normalized_color_set(excluded_colors)
+    if not excluded:
+        return True
+    if not isinstance(source_card, dict):
+        return False
+    source_color_values = source_card.get("colors") or source_card.get("color_identity")
+    normalized = _normalized_color_set(source_color_values)
+    if not normalized:
+        normalized = _normalized_color_set(compute_color_identity(source_card))
+    return not bool(normalized & excluded)
+
+
+def _temporary_damage_prevention_applies(
+    prevention,
+    source_card,
+    source_controller,
+    damage_event_type,
+    *,
+    source_combat_role=None,
+):
+    if not isinstance(prevention, dict):
+        return False
+    scope = prevention.get("prevent_damage_scope")
+    if scope == "all_combat_damage":
+        return damage_event_type == "combat_damage"
+    if scope == "combat_damage_from_creatures" and damage_event_type != "combat_damage":
+        return False
+    if scope != "damage_from_creatures" and scope != "combat_damage_from_creatures":
+        return False
+    constraints = prevention.get("prevent_source_constraints") or {}
+    if "creature" in set(str(card_type).lower() for card_type in constraints.get("card_types") or []):
+        if not is_battlefield_creature(source_card):
+            return False
+    combat_role = constraints.get("combat_role")
+    if combat_role and str(source_combat_role or "").lower() != str(combat_role).lower():
+        return False
+    controller_scope = constraints.get("controller_scope")
+    if controller_scope == "opponents_control":
+        prevention_controller = prevention.get("source_controller")
+        source_controller_name = _source_controller_name(source_card, source_controller)
+        if not prevention_controller or source_controller_name in (None, "", prevention_controller):
+            return False
+    if not _source_matches_color_exclusion(source_card, constraints.get("exclude_colors") or []):
+        return False
+    if constraints.get("power_lte") is not None:
+        try:
+            max_power = int(constraints.get("power_lte"))
+        except (TypeError, ValueError):
+            return False
+        if card_power_value(source_card, default=max_power + 1) > max_power:
+            return False
+    return True
+
+
 def _static_damage_modifier_effects(controller, target_controller=None):
     effects = []
     seen_modifier_keys = set()
@@ -51514,10 +51609,30 @@ def apply_static_damage_replacements(
 
     original_amount = modified_amount
     applied = []
+    for prevention in _temporary_damage_prevention_effects(controller, target_controller):
+        if not _temporary_damage_prevention_applies(
+            prevention,
+            source_card,
+            controller,
+            damage_event_type,
+        ):
+            continue
+        modified_amount = 0
+        applied.append(
+            {
+                "source": prevention.get("source", "damage_prevention_shield"),
+                "controller": prevention.get("source_controller"),
+                "scope": prevention.get("battle_model_scope"),
+                "prevention": prevention.get("prevent_damage_scope"),
+            }
+        )
+        break
     for modifier_controller, permanent, effect_data in _static_damage_modifier_effects(
         controller,
         target_controller,
     ):
+        if modified_amount <= 0:
+            break
         if not _static_damage_modifier_applies(
             modifier_controller,
             permanent,
@@ -60383,12 +60498,17 @@ def apply_effect_immediate(
         finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
     elif effect == "damage_prevention_shield":
         if is_instant(card) or is_sorcery(card):
-            if effect_data.get("prevent_all_combat_damage_this_turn"):
+            if (
+                effect_data.get("prevent_all_combat_damage_this_turn")
+                or effect_data.get("prevent_damage_from_creature_sources_this_turn")
+            ):
                 prevention = {
                     "source": card.get("name", "damage_prevention_shield"),
                     "source_controller": player.name,
                     "battle_model_scope": effect_data.get("battle_model_scope"),
                     "prevent_damage_scope": effect_data.get("prevent_damage_scope", "all_combat_damage"),
+                    "prevent_damage_kind": effect_data.get("prevent_damage_kind", "combat_damage"),
+                    "prevent_source_constraints": effect_data.get("prevent_source_constraints") or {},
                     "duration": effect_data.get("prevent_damage_duration", "until_end_of_turn"),
                     "turn": turn,
                 }
@@ -65271,19 +65391,26 @@ def combat_damage_steps(attacker, opponents, target, attackers, block_assignment
     rng = rng or random.Random(turn or 0)
     combat_participants = all_players or [attacker, *list(opponents or []), target]
 
-    def active_combat_damage_prevention():
+    def active_combat_damage_prevention(source, source_controller=None, source_combat_role=None):
         for participant in combat_participants:
             for prevention in getattr(participant, "combat_damage_prevention_effects", []) or []:
-                if prevention.get("prevent_damage_scope") != "all_combat_damage":
-                    continue
-                if prevention.get("duration") not in (None, "", "until_end_of_turn"):
-                    continue
-                return prevention
+                if _temporary_damage_prevention_applies(
+                    prevention,
+                    source,
+                    source_controller,
+                    "combat_damage",
+                    source_combat_role=source_combat_role,
+                ):
+                    return prevention
         return None
 
     def deal_player_damage(creature, damage=None):
         damage = combat_stat(creature, "power", 2) if damage is None else damage
-        prevention = active_combat_damage_prevention()
+        prevention = active_combat_damage_prevention(
+            creature,
+            attacker,
+            source_combat_role="attacking",
+        )
         if prevention:
             emit_replay_event(
                 "combat_damage_prevented",
@@ -65348,7 +65475,11 @@ def combat_damage_steps(attacker, opponents, target, attackers, block_assignment
     def mark_damage(source, damaged, amount, *, source_controller=None, damaged_controller=None):
         if amount <= 0:
             return
-        prevention = active_combat_damage_prevention()
+        prevention = active_combat_damage_prevention(
+            source,
+            source_controller,
+            source_combat_role="attacking" if source_controller is attacker else "blocking",
+        )
         if prevention:
             emit_replay_event(
                 "combat_damage_prevented",

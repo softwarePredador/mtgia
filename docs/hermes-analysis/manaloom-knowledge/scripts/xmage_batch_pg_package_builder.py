@@ -91,6 +91,13 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "count_from_x",
     "target_count_from_x",
     "target_player_draw",
+    "prevent_all_combat_damage_this_turn",
+    "prevent_damage_from_creature_sources_this_turn",
+    "prevent_damage_scope",
+    "prevent_damage_kind",
+    "prevent_damage_duration",
+    "prevent_damage_amount",
+    "prevent_source_constraints",
     "target_count",
     "target_count_min",
     "target_count_max",
@@ -3680,6 +3687,86 @@ def counter_target_execution_scenario_from_expected_rule(
     }
 
 
+def _damage_source_fixture_from_prevention_constraints(
+    name: str,
+    constraints: dict[str, Any],
+    *,
+    matching: bool,
+) -> dict[str, Any]:
+    source = {
+        "name": name,
+        "type_line": "Creature - Warrior",
+        "effect": "creature",
+        "power": 4,
+        "toughness": 4,
+        "colors": ["R"],
+    }
+    requires_creature = "creature" in {
+        str(card_type).lower() for card_type in constraints.get("card_types") or []
+    }
+    if not matching and requires_creature:
+        if constraints.get("exclude_colors"):
+            source["colors"] = [str((constraints.get("exclude_colors") or ["G"])[0]).upper()]
+            return source
+        if constraints.get("power_lte") is not None:
+            source["power"] = int(constraints.get("power_lte") or 0) + 1
+            source["toughness"] = max(int(source["power"]), 4)
+            return source
+        if constraints.get("combat_role") == "attacking":
+            source["_combat_role"] = "blocking"
+            return source
+        if constraints.get("controller_scope") == "opponents_control":
+            source["_controller_role"] = "self"
+            return source
+        source = {
+            "name": name,
+            "type_line": "Instant",
+            "effect": "direct_damage",
+            "amount": 3,
+            "colors": ["R"],
+        }
+    return source
+
+
+def damage_prevention_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("effect") != "damage_prevention_shield":
+        return None
+    if required.get("battle_model_scope") not in {
+        "xmage_prevent_all_combat_damage_spell_v1",
+        "xmage_prevent_damage_from_creatures_spell_v1",
+    }:
+        return None
+    constraints = dict(required.get("prevent_source_constraints") or {})
+    return {
+        "name": f"{rule['card_name']} prevents matching damage source",
+        "type": "damage_prevention",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": "Instant",
+            "mana_cost": "{1}{W}",
+            "cmc": 2,
+            **required,
+        },
+        "matching_source": _damage_source_fixture_from_prevention_constraints(
+            "E2E Matching Damage Source",
+            constraints,
+            matching=True,
+        ),
+        "nonmatching_source": _damage_source_fixture_from_prevention_constraints(
+            "E2E Nonmatching Damage Source",
+            constraints,
+            matching=False,
+        ),
+        "expected_prevent_damage_scope": required.get("prevent_damage_scope"),
+        "expected_prevent_damage_kind": required.get("prevent_damage_kind", "combat_damage"),
+        "expected_source_constraints": constraints,
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def single_target_removal_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
@@ -4175,7 +4262,8 @@ def static_cost_reduction_execution_scenario_from_expected_rule(
 
 def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any] | None:
     return (
-        counter_target_execution_scenario_from_expected_rule(rule)
+        damage_prevention_execution_scenario_from_expected_rule(rule)
+        or counter_target_execution_scenario_from_expected_rule(rule)
         or counter_unless_pays_execution_scenario_from_expected_rule(rule)
         or static_cost_reduction_execution_scenario_from_expected_rule(rule)
         or static_cost_increase_execution_scenario_from_expected_rule(rule)

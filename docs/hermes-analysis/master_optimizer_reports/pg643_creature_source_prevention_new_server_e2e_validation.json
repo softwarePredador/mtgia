@@ -1,0 +1,276 @@
+{
+  "battle_execution": {
+    "event_count": 22,
+    "results": [
+      {
+        "card_name": "Ethereal Haze",
+        "matching_damage_prevented": true,
+        "matching_source": "E2E Matching Damage Source",
+        "nonmatching_source": "E2E Nonmatching Damage Source",
+        "prevent_damage_kind": "all_damage",
+        "scenario": "Ethereal Haze prevents matching damage source"
+      },
+      {
+        "card_name": "Harmless Assault",
+        "matching_combat_damage_prevented": true,
+        "matching_source": "E2E Matching Damage Source",
+        "nonmatching_result": "blocking_damage_allowed",
+        "nonmatching_source": "E2E Nonmatching Damage Source",
+        "prevent_damage_kind": "combat_damage",
+        "scenario": "Harmless Assault prevents matching damage source"
+      },
+      {
+        "card_name": "Hunter's Ambush",
+        "matching_combat_damage_prevented": true,
+        "matching_source": "E2E Matching Damage Source",
+        "nonmatching_result": "nonmatching_combat_damage_allowed",
+        "nonmatching_source": "E2E Nonmatching Damage Source",
+        "prevent_damage_kind": "combat_damage",
+        "scenario": "Hunter's Ambush prevents matching damage source"
+      },
+      {
+        "card_name": "Thwart the Enemy",
+        "matching_damage_prevented": true,
+        "matching_source": "E2E Matching Damage Source",
+        "nonmatching_source": "E2E Nonmatching Damage Source",
+        "prevent_damage_kind": "all_damage",
+        "scenario": "Thwart the Enemy prevents matching damage source"
+      },
+      {
+        "card_name": "Vine Snare",
+        "matching_combat_damage_prevented": true,
+        "matching_source": "E2E Matching Damage Source",
+        "nonmatching_result": "nonmatching_combat_damage_allowed",
+        "nonmatching_source": "E2E Nonmatching Damage Source",
+        "prevent_damage_kind": "combat_damage",
+        "scenario": "Vine Snare prevents matching damage source"
+      }
+    ],
+    "scenario_count": 5
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-07T22:06:01.050756+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg643_creature_source_prevention_new_server_manifest.json",
+  "package_id": "pg643_creature_source_prevention_new_server_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 5
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_prevent_damage_from_creatures_spell_v1",
+          "card_name": "Ethereal Haze",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9fca8ead02e6ecfd5dca402fd1b5005f",
+          "oracle_hash": "e40ccef210036508a675913beb82b76a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_prevent_damage_from_creatures_spell_v1",
+          "card_name": "Harmless Assault",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5f3de78578b5094b87f338c98ae4b9a7",
+          "oracle_hash": "ce5c49e8d6fa039f6ef0779f2948babd",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_prevent_damage_from_creatures_spell_v1",
+          "card_name": "Hunter's Ambush",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:85209bbf30b3c8a3fd7ed15f58a779e2",
+          "oracle_hash": "c25758a6bbd50a7d902c5c98b40764ac",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_prevent_damage_from_creatures_spell_v1",
+          "card_name": "Thwart the Enemy",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:276afd80522f6d887335c2f46352b750",
+          "oracle_hash": "ad413164aca5d65f29503d075eaee7f8",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_prevent_damage_from_creatures_spell_v1",
+          "card_name": "Vine Snare",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d0ac46bdd9ce7de24c3f2a13a6b4d0af",
+          "oracle_hash": "8bbd84b4d5d6a574896f766d9974bf80",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 5
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_prevent_damage_from_creatures_spell_v1",
+          "card_name": "Ethereal Haze",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9fca8ead02e6ecfd5dca402fd1b5005f",
+          "oracle_hash": "e40ccef210036508a675913beb82b76a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_prevent_damage_from_creatures_spell_v1",
+          "card_name": "Harmless Assault",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5f3de78578b5094b87f338c98ae4b9a7",
+          "oracle_hash": "ce5c49e8d6fa039f6ef0779f2948babd",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_prevent_damage_from_creatures_spell_v1",
+          "card_name": "Hunter's Ambush",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:85209bbf30b3c8a3fd7ed15f58a779e2",
+          "oracle_hash": "c25758a6bbd50a7d902c5c98b40764ac",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_prevent_damage_from_creatures_spell_v1",
+          "card_name": "Thwart the Enemy",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:276afd80522f6d887335c2f46352b750",
+          "oracle_hash": "ad413164aca5d65f29503d075eaee7f8",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_prevent_damage_from_creatures_spell_v1",
+          "card_name": "Vine Snare",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d0ac46bdd9ce7de24c3f2a13a6b4d0af",
+          "oracle_hash": "8bbd84b4d5d6a574896f766d9974bf80",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 5
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_prevent_damage_from_creatures_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Ethereal Haze",
+          "logical_rule_key": "battle_rule_v1:9fca8ead02e6ecfd5dca402fd1b5005f"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_prevent_damage_from_creatures_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Harmless Assault",
+          "logical_rule_key": "battle_rule_v1:5f3de78578b5094b87f338c98ae4b9a7"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_prevent_damage_from_creatures_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Hunter's Ambush",
+          "logical_rule_key": "battle_rule_v1:85209bbf30b3c8a3fd7ed15f58a779e2"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_prevent_damage_from_creatures_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Thwart the Enemy",
+          "logical_rule_key": "battle_rule_v1:276afd80522f6d887335c2f46352b750"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_prevent_damage_from_creatures_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Vine Snare",
+          "logical_rule_key": "battle_rule_v1:d0ac46bdd9ce7de24c3f2a13a6b4d0af"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 5
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Ethereal Haze",
+          "component_keys": [],
+          "effect": "damage_prevention_shield",
+          "logical_rule_key": "battle_rule_v1:9fca8ead02e6ecfd5dca402fd1b5005f"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Harmless Assault",
+          "component_keys": [],
+          "effect": "damage_prevention_shield",
+          "logical_rule_key": "battle_rule_v1:5f3de78578b5094b87f338c98ae4b9a7"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Hunter's Ambush",
+          "component_keys": [],
+          "effect": "damage_prevention_shield",
+          "logical_rule_key": "battle_rule_v1:85209bbf30b3c8a3fd7ed15f58a779e2"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Thwart the Enemy",
+          "component_keys": [],
+          "effect": "damage_prevention_shield",
+          "logical_rule_key": "battle_rule_v1:276afd80522f6d887335c2f46352b750"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Vine Snare",
+          "component_keys": [],
+          "effect": "damage_prevention_shield",
+          "logical_rule_key": "battle_rule_v1:d0ac46bdd9ce7de24c3f2a13a6b4d0af"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 22,
+        "scenarios": 5
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}
