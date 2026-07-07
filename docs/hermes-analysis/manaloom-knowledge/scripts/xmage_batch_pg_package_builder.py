@@ -1089,8 +1089,7 @@ def static_count_pt_execution_scenario_from_expected_rule(rule: dict[str, Any]) 
     required = dict(rule.get("required_effect_fields") or {})
     if required.get("battle_model_scope") != "xmage_static_source_power_toughness_equal_count_v1":
         return None
-    if required.get("static_power_toughness_source") != "battlefield_permanent_count":
-        return None
+    amount_source = str(required.get("static_power_toughness_source") or "")
     scope = str(required.get("battlefield_count_scope") or "controller_battlefield")
     card_types = [str(value).lower() for value in required.get("battlefield_count_card_types") or []]
     subtypes = [str(value).lower() for value in required.get("battlefield_count_subtypes") or []]
@@ -1116,7 +1115,33 @@ def static_count_pt_execution_scenario_from_expected_rule(rule: dict[str, Any]) 
     }
     controller_battlefield = []
     opponent_battlefield = []
-    if scope == "all_battlefields":
+    controller_hand = []
+    opponent_hand = []
+    if amount_source == "controller_hand_count":
+        controller_hand = [
+            {"name": f"E2E Controller Hand Card {index + 1}", "type_line": "Instant"}
+            for index in range(3)
+        ]
+        expected_count = len(controller_hand)
+    elif amount_source == "opponent_max_hand_count":
+        opponent_hand = [
+            {"name": f"E2E Opponent Hand Card {index + 1}", "type_line": "Sorcery"}
+            for index in range(4)
+        ]
+        expected_count = len(opponent_hand)
+    elif amount_source == "all_players_hand_count":
+        controller_hand = [
+            {"name": f"E2E Controller Hand Card {index + 1}", "type_line": "Instant"}
+            for index in range(2)
+        ]
+        opponent_hand = [
+            {"name": f"E2E Opponent Hand Card {index + 1}", "type_line": "Sorcery"}
+            for index in range(3)
+        ]
+        expected_count = len(controller_hand) + len(opponent_hand)
+    elif amount_source != "battlefield_permanent_count":
+        return None
+    elif scope == "all_battlefields":
         controller_battlefield.append(
             {
                 "name": f"E2E Controller Matching Permanent for {rule['card_name']}",
@@ -1164,6 +1189,8 @@ def static_count_pt_execution_scenario_from_expected_rule(rule: dict[str, Any]) 
         "card": source_card,
         "controller_battlefield": controller_battlefield,
         "opponent_battlefield": opponent_battlefield,
+        "controller_hand": controller_hand,
+        "opponent_hand": opponent_hand,
         "expected_count": expected_count,
         "expected_power": expected_value,
         "expected_toughness": expected_value,

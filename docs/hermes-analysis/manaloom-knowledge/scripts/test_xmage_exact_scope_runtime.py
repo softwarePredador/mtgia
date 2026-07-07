@@ -1454,6 +1454,55 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_static_count_power_toughness_counts_hand_size_sources(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.hand = [{"name": f"Active Card {idx}", "type_line": "Instant"} for idx in range(3)]
+        opponent.hand = [{"name": f"Opponent Card {idx}", "type_line": "Sorcery"} for idx in range(5)]
+        fixtures = [
+            ("Maro", "controller_hand_count", 1, 3),
+            ("Masumaro, First to Live", "controller_hand_count", 2, 6),
+            ("Adamaro, First to Desire", "opponent_max_hand_count", 1, 5),
+            ("Multani, Maro-Sorcerer", "all_players_hand_count", 1, 8),
+        ]
+        for name, amount_source, multiplier, expected in fixtures:
+            with self.subTest(name=name):
+                permanent = {
+                    "name": name,
+                    "type_line": "Creature - Elemental",
+                    "effect": "creature",
+                    "power": 0,
+                    "toughness": 0,
+                    "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+                    "static_effect": "source_power_toughness_equal_count",
+                    "static_power_toughness_source": amount_source,
+                    "stat_modifier_amount_source": amount_source,
+                    "static_power_toughness_base": 0,
+                    "static_power_toughness_count_multiplier": multiplier,
+                }
+                active.battlefield = [permanent]
+                self.events.clear()
+
+                self.battle.refresh_graveyard_count_creature_statics_for_player(
+                    active,
+                    turn=5,
+                    phase="test",
+                    emit_events=True,
+                    all_players=[active, opponent],
+                )
+
+                self.assertEqual(permanent["static_count_power_toughness_current"], expected)
+                self.assertEqual(permanent["power"], expected)
+                self.assertEqual(permanent["toughness"], expected)
+                self.assertTrue(
+                    any(
+                        event == "static_count_power_toughness_changed"
+                        and data.get("card") == name
+                        and data.get("static_count_power_toughness_count") == expected // multiplier
+                        for event, data in self.events
+                    )
+                )
+
     def test_static_graveyard_threshold_source_boost_toggles_without_cumulative_bonus(self) -> None:
         active = self.battle.Player("Active", None, [])
         active.graveyard = [

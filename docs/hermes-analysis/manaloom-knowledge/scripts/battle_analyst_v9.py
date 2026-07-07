@@ -49155,6 +49155,24 @@ def _stat_modifier_count_from_source(player, opponents, effect_data):
             "stat_modifier_amount_source": "controller_hand_count",
             "hand_stat_modifier_count": count,
         }
+    if amount_source == "opponent_max_hand_count":
+        opponent_counts = [len(getattr(opponent, "hand", []) or []) for opponent in opponents or []]
+        count = max(opponent_counts) if opponent_counts else 0
+        return count, {
+            "stat_modifier_amount_source": "opponent_max_hand_count",
+            "opponent_max_hand_stat_modifier_count": count,
+            "opponent_hand_sizes": opponent_counts,
+        }
+    if amount_source == "all_players_hand_count":
+        player_count = len(getattr(player, "hand", []) or [])
+        opponent_counts = [len(getattr(opponent, "hand", []) or []) for opponent in opponents or []]
+        count = player_count + sum(opponent_counts)
+        return count, {
+            "stat_modifier_amount_source": "all_players_hand_count",
+            "all_players_hand_stat_modifier_count": count,
+            "controller_hand_size": player_count,
+            "opponent_hand_sizes": opponent_counts,
+        }
     if amount_source == "domain_basic_land_types":
         count = _domain_basic_land_type_count(player)
         return count, {

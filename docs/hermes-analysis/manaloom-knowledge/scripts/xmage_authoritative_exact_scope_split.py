@@ -7589,6 +7589,39 @@ def static_count_pt_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | No
                 STATIC_COUNT_PT_BASIC_LAND_SUBTYPES[basic_land_match.group("subtype")]
             ],
         )
+    if re.match(
+        r"^[a-z0-9' ,./-]+ power and toughness are each equal to the number of cards in your hand\.?$",
+        text,
+    ):
+        return static_count_pt_result(
+            static_power_toughness_source="controller_hand_count",
+            stat_modifier_amount_source="controller_hand_count",
+        )
+    if re.match(
+        r"^[a-z0-9' ,./-]+ power and toughness are each equal to twice the number of cards in your hand\.?$",
+        text,
+    ):
+        return static_count_pt_result(
+            static_power_toughness_source="controller_hand_count",
+            stat_modifier_amount_source="controller_hand_count",
+            static_power_toughness_count_multiplier=2,
+        )
+    if re.match(
+        r"^[a-z0-9' ,./-]+ power and toughness are each equal to the number of cards in the hand of the opponent with the most cards in hand\.?$",
+        text,
+    ):
+        return static_count_pt_result(
+            static_power_toughness_source="opponent_max_hand_count",
+            stat_modifier_amount_source="opponent_max_hand_count",
+        )
+    if re.match(
+        r"^[a-z0-9' ,./-]+ power and toughness are each equal to the total number of cards in all players' hands\.?$",
+        text,
+    ):
+        return static_count_pt_result(
+            static_power_toughness_source="all_players_hand_count",
+            stat_modifier_amount_source="all_players_hand_count",
+        )
     subtype_battlefield_match = re.match(
         r"^[a-z0-9' ,./-]+ power and toughness are each equal to the number of "
         r"(?P<subtype>[a-z][a-z -]+) on the battlefield\.?$",
@@ -7615,6 +7648,31 @@ def static_count_pt_from_source(source: str) -> dict[str, Any] | str | None:
     text = source or ""
     if len(re.findall(r"new\s+SetBasePowerToughnessSourceEffect\s*\(", text)) != 1:
         return None
+    if "MostCardsInOpponentsHandCount" in text:
+        return static_count_pt_result(
+            static_power_toughness_source="opponent_max_hand_count",
+            stat_modifier_amount_source="opponent_max_hand_count",
+        )
+    if "CardsInAllHandsCount.instance" in text:
+        return static_count_pt_result(
+            static_power_toughness_source="all_players_hand_count",
+            stat_modifier_amount_source="all_players_hand_count",
+        )
+    if "CardsInControllerHandCount.ANY" in text:
+        multiplier = 1
+        multiplied = re.search(
+            r"new\s+MultipliedValue\s*\(\s*CardsInControllerHandCount\.ANY\s*,\s*([0-9]+)\s*\)",
+            text,
+        )
+        if multiplied:
+            multiplier = int(multiplied.group(1))
+        elif "MultipliedValue" in text:
+            return "static_count_pt_source_count_not_supported"
+        return static_count_pt_result(
+            static_power_toughness_source="controller_hand_count",
+            stat_modifier_amount_source="controller_hand_count",
+            static_power_toughness_count_multiplier=multiplier,
+        )
     blocked_markers = (
         "AdditiveDynamicValue",
         "IntPlusDynamicValue",

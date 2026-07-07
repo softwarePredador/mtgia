@@ -2650,6 +2650,70 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["battlefield_count_subtypes"], ["forest"])
         self.assertEqual(effect["keywords"], ["hexproof"])
 
+    def test_static_count_power_toughness_hand_size_variants_are_package_safe(self) -> None:
+        row = queue_row(
+            "xmage_signature::SetBasePowerToughnessSourceEffect::SimpleStaticAbility::"
+            "no_target_class::no_condition_class::static_ability",
+            effect_classes=["SetBasePowerToughnessSourceEffect"],
+            ability_kind="static",
+            ability_classes=["SimpleStaticAbility"],
+            xmage_signals=["static_ability"],
+        )
+        fixtures = [
+            (
+                "Maro",
+                "Maro's power and toughness are each equal to the number of cards in your hand.",
+                "this.addAbility(new SimpleStaticAbility(Zone.ALL, "
+                "new SetBasePowerToughnessSourceEffect(CardsInControllerHandCount.ANY)));",
+                "controller_hand_count",
+                1,
+            ),
+            (
+                "Masumaro, First to Live",
+                "Masumaro's power and toughness are each equal to twice the number of cards in your hand.",
+                "DynamicValue xValue= new MultipliedValue(CardsInControllerHandCount.ANY, 2);"
+                "this.addAbility(new SimpleStaticAbility(Zone.ALL, new SetBasePowerToughnessSourceEffect(xValue)));",
+                "controller_hand_count",
+                2,
+            ),
+            (
+                "Adamaro, First to Desire",
+                (
+                    "Adamaro's power and toughness are each equal to the number of cards "
+                    "in the hand of the opponent with the most cards in hand."
+                ),
+                "this.addAbility(new SimpleStaticAbility(Zone.ALL, "
+                "new SetBasePowerToughnessSourceEffect(new MostCardsInOpponentsHandCount())));",
+                "opponent_max_hand_count",
+                1,
+            ),
+            (
+                "Multani, Maro-Sorcerer",
+                (
+                    "Shroud\n"
+                    "Multani's power and toughness are each equal to the total number of cards in all players' hands."
+                ),
+                "this.addAbility(new SimpleStaticAbility(Zone.ALL, "
+                "new SetBasePowerToughnessSourceEffect(CardsInAllHandsCount.instance)));",
+                "all_players_hand_count",
+                1,
+            ),
+        ]
+        for name, oracle, source, amount_source, multiplier in fixtures:
+            with self.subTest(name=name):
+                proposal, reason = split.split_row(
+                    row,
+                    metadata(name=name, type_line="Creature - Elemental", oracle_text=oracle),
+                    source_text=source,
+                )
+
+                self.assertEqual(reason, "selected_exact_scope")
+                effect = proposal["effect_json"]
+                self.assertEqual(effect["battle_model_scope"], split.STATIC_COUNT_PT_SCOPE)
+                self.assertEqual(effect["static_power_toughness_source"], amount_source)
+                self.assertEqual(effect["stat_modifier_amount_source"], amount_source)
+                self.assertEqual(effect["static_power_toughness_count_multiplier"], multiplier)
+
     def test_static_count_power_toughness_blocks_extra_attack_restriction_oracle(self) -> None:
         row = queue_row(
             "xmage_signature::SetBasePowerToughnessSourceEffect::SimpleStaticAbility::"

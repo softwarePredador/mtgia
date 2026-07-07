@@ -1,0 +1,227 @@
+{
+  "battle_execution": {
+    "event_count": 4,
+    "results": [
+      {
+        "card_name": "Adamaro, First to Desire",
+        "count": 4,
+        "power": 4,
+        "scenario": "Adamaro, First to Desire static count P/T recalculates",
+        "toughness": 4
+      },
+      {
+        "card_name": "Maro",
+        "count": 3,
+        "power": 3,
+        "scenario": "Maro static count P/T recalculates",
+        "toughness": 3
+      },
+      {
+        "card_name": "Masumaro, First to Live",
+        "count": 3,
+        "power": 6,
+        "scenario": "Masumaro, First to Live static count P/T recalculates",
+        "toughness": 6
+      },
+      {
+        "card_name": "Multani, Maro-Sorcerer",
+        "count": 5,
+        "power": 5,
+        "scenario": "Multani, Maro-Sorcerer static count P/T recalculates",
+        "toughness": 5
+      }
+    ],
+    "scenario_count": 4
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-07T07:17:17.797250+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg600_static_hand_count_pt_new_server_manifest.json",
+  "package_id": "pg600_static_hand_count_pt_new_server_manifest",
+  "snapshot": "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 4
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+          "card_name": "Adamaro, First to Desire",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:951695ee91b1beff938cc9b0260ccabf",
+          "oracle_hash": "f8a897b7ec5cc444b666fc52362a5261",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+          "card_name": "Maro",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7a6ac98595448a90c5be6ce4fe95cb03",
+          "oracle_hash": "88729c402888815a70e5ba2cf0a2b266",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+          "card_name": "Masumaro, First to Live",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:32eadb1d269955a7aff13bd501840668",
+          "oracle_hash": "b5eb2ac7602a08a549cccedacb4e17c4",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+          "card_name": "Multani, Maro-Sorcerer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6838948687551b209751bd8e3ee8ec44",
+          "oracle_hash": "f301834c308f04da7735eedfd9e3864a",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 4
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+          "card_name": "Adamaro, First to Desire",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:951695ee91b1beff938cc9b0260ccabf",
+          "oracle_hash": "f8a897b7ec5cc444b666fc52362a5261",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+          "card_name": "Maro",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7a6ac98595448a90c5be6ce4fe95cb03",
+          "oracle_hash": "88729c402888815a70e5ba2cf0a2b266",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+          "card_name": "Masumaro, First to Live",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:32eadb1d269955a7aff13bd501840668",
+          "oracle_hash": "b5eb2ac7602a08a549cccedacb4e17c4",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+          "card_name": "Multani, Maro-Sorcerer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6838948687551b209751bd8e3ee8ec44",
+          "oracle_hash": "f301834c308f04da7735eedfd9e3864a",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 4
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+          "battle_rule_version": 2,
+          "card_name": "Adamaro, First to Desire",
+          "logical_rule_key": "battle_rule_v1:951695ee91b1beff938cc9b0260ccabf"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+          "battle_rule_version": 2,
+          "card_name": "Maro",
+          "logical_rule_key": "battle_rule_v1:7a6ac98595448a90c5be6ce4fe95cb03"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+          "battle_rule_version": 2,
+          "card_name": "Masumaro, First to Live",
+          "logical_rule_key": "battle_rule_v1:32eadb1d269955a7aff13bd501840668"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+          "battle_rule_version": 2,
+          "card_name": "Multani, Maro-Sorcerer",
+          "logical_rule_key": "battle_rule_v1:6838948687551b209751bd8e3ee8ec44"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 4
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Adamaro, First to Desire",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:951695ee91b1beff938cc9b0260ccabf"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Maro",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:7a6ac98595448a90c5be6ce4fe95cb03"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Masumaro, First to Live",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:32eadb1d269955a7aff13bd501840668"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Multani, Maro-Sorcerer",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:6838948687551b209751bd8e3ee8ec44"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 4,
+        "scenarios": 4
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}
