@@ -10497,6 +10497,39 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["_activated_rule_effects"][0]["activation_discard_count"], 2)
         self.assertTrue(effect["_activated_rule_effects"][0]["activation_discard_random"])
 
+    def test_permanent_activated_damage_maps_pay_life_cost(self) -> None:
+        row = queue_row(
+            split.DAMAGE_UNIT,
+            effect_classes=["DamageTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Reckless Assault",
+                type_line="Enchantment",
+                oracle_text="{1}, Pay 2 life: Reckless Assault deals 1 damage to any target.",
+            ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(new DamageTargetEffect(1), new ManaCostsImpl<>("{1}"));
+                ability.addCost(new PayLifeCost(2));
+                ability.addTarget(new TargetAnyTarget());
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "enchantment")
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_DAMAGE_SCOPE)
+        self.assertEqual(effect["activated_damage_amount"], 1)
+        self.assertEqual(effect["target"], "any_target")
+        self.assertEqual(effect["activation_cost_mana"], "{1}")
+        self.assertEqual(effect["activation_life_cost"], 2)
+        self.assertEqual(effect["_activated_rule_effects"][0]["activation_life_cost"], 2)
+
     def test_permanent_activated_damage_maps_land_discard_cost(self) -> None:
         row = queue_row(
             split.DAMAGE_UNIT,

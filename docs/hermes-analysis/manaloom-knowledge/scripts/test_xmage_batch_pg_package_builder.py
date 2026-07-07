@@ -920,8 +920,37 @@ def test_manifest_builds_simple_activated_damage_execution_scenario() -> None:
     assert scenario["expected_discard_count"] == 1
     assert scenario["expected_discard_target"] == "any_card"
     assert scenario["expected_discard_random"] is True
+    assert scenario["expected_life_paid"] == 0
     assert scenario["controller_mana"]["generic"] == 2
     assert len(scenario["controller_hand"]) == 2
+
+
+def test_manifest_builds_simple_activated_damage_life_cost_execution_scenario() -> None:
+    rule = {
+        "normalized_name": "reckless_assault",
+        "card_name": "Reckless Assault",
+        "oracle_hash": "hash-reckless-assault",
+        "logical_rule_key": "battle_rule_v1:hash-reckless-assault",
+        "required_effect_fields": {
+            "effect": "enchantment",
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "activated_damage_amount": 1,
+            "target": "any_target",
+            "activation_cost_mana": "{1}",
+            "activation_cost_generic": 1,
+            "activation_cost_colors": [],
+            "activation_life_cost": 2,
+        },
+    }
+
+    scenario = builder.simple_activated_damage_execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "simple_activated_damage"
+    assert scenario["expected_damage"] == 1
+    assert scenario["expected_life_paid"] == 2
+    assert scenario["starting_life"] == 40
+    assert scenario["controller_mana"]["generic"] == 1
 
 
 def test_manifest_builds_damage_each_opponent_spell_execution_scenario() -> None:

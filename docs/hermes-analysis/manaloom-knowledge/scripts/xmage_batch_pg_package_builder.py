@@ -2500,12 +2500,14 @@ def simple_activated_damage_execution_scenario_from_expected_rule(
         "type": "simple_activated_damage",
         "card": {"name": rule["card_name"]},
         "opponent_life": 7,
+        "starting_life": 40,
         "controller_mana": _manifest_mana_for_required_activation(required),
         "controller_hand": discard_hand,
         "expected_damage": int(required.get("activated_damage_amount") or required.get("amount") or 0),
         "expected_discard_count": int(required.get("activation_discard_count") or 0),
         "expected_discard_target": discard_target,
         "expected_discard_random": bool(required.get("activation_discard_random")),
+        "expected_life_paid": int(required.get("activation_life_cost") or 0),
         "logical_rule_key": rule["logical_rule_key"],
     }
 

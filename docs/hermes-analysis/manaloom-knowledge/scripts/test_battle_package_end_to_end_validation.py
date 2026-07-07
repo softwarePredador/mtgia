@@ -145,6 +145,55 @@ def test_simple_activated_damage_runner_executes_random_discard_cost() -> None:
     assert result["opponent_life"] == 5
 
 
+def test_simple_activated_damage_runner_executes_life_cost() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "enchantment",
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_effect": "direct_damage",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_damage_amount": 1,
+        "target": "any_target",
+        "target_constraints": {"scope": "any_target"},
+        "activation_cost_mana": "{1}",
+        "activation_cost_generic": 1,
+        "activation_cost_colors": [],
+        "activation_requires_tap": False,
+        "activation_requires_sacrifice": False,
+        "activation_life_cost": 2,
+        "_rule_logical_key": "battle_rule_v1:reckless_assault",
+    }
+    try:
+        result = validator.run_simple_activated_damage(
+            battle,
+            {
+                "name": "Reckless Assault activates damage ability",
+                "type": "simple_activated_damage",
+                "card": {"name": "Reckless Assault"},
+                "opponent_life": 7,
+                "starting_life": 10,
+                "controller_mana": {"generic": 1},
+                "expected_damage": 1,
+                "expected_life_paid": 2,
+                "logical_rule_key": "battle_rule_v1:reckless_assault",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Reckless Assault"
+    assert result["damage"] == 1
+    assert result["life_paid"] == 2
+    assert result["controller_life"] == 8
+    assert result["opponent_life"] == 6
+
+
 def test_simple_activated_draw_runner_executes_sacrifice_target_cost() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

@@ -14320,11 +14320,28 @@ def activation_discard_cost_from_source(window: str) -> dict[str, Any] | str | N
     }
 
 
+def activation_life_cost_from_oracle(text: str) -> int | None:
+    cost_text = str(text or "").lower().rsplit(":", 1)[0]
+    if "life" not in cost_text:
+        return 0
+    pay_life_mentions = re.findall(r"pay [^,:]*life", cost_text)
+    life_matches = re.findall(r"(?:^|,)\s*pay (?P<life>\d+) life(?:\s*,?|$)", cost_text)
+    if len(pay_life_mentions) != 1 or len(life_matches) != 1:
+        return None
+    life_cost = int(life_matches[0])
+    if life_cost <= 0:
+        return None
+    return life_cost
+
+
 def activated_damage_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
     text = re.sub(r"\s+", " ", oracle_text(metadata)).strip().lower()
     if text.count(":") != 1:
         return None
     discard_cost = activation_discard_cost_from_oracle(text)
+    life_cost = activation_life_cost_from_oracle(text)
+    if life_cost is None:
+        return None
     effect_text = text.rsplit(":", 1)[1].strip()
     restricted = restricted_battlefield_target_from_oracle({"oracle_text": effect_text}, "damage")
     if restricted is not None:
@@ -14341,6 +14358,7 @@ def activated_damage_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | N
             "amount": int(match.group(1)),
             "target": restricted,
             "activation_sacrifice_cost": sacrifice_cost,
+            "activation_life_cost": life_cost,
             **(discard_cost or {}),
         }
     match = re.match(
@@ -14366,6 +14384,7 @@ def activated_damage_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | N
         "amount": int(match.group(1)),
         "target": target_map[match.group(2)],
         "activation_sacrifice_cost": sacrifice_cost,
+        "activation_life_cost": life_cost,
         **(discard_cost or {}),
     }
 
@@ -14377,7 +14396,6 @@ def activated_damage_from_source(source: str) -> dict[str, Any] | str:
         "ExileFromTopOfLibraryCost",
         "ExileSourceFromGraveCost",
         "MillCardsCost",
-        "PayLifeCost",
         "RemoveCounterCost",
         "ReturnToHandSourceCost",
         "RevealTargetFromHandCost",
@@ -14417,6 +14435,12 @@ def activated_damage_from_source(source: str) -> dict[str, Any] | str:
     present_risky = sorted(cost for cost in risky_cost_classes if cost in window)
     if present_risky:
         return "activated_damage_source_cost_not_supported"
+    life_matches = re.findall(r"PayLifeCost\s*\(\s*(\d+)\s*\)", window)
+    if "PayLifeCost" in window and len(life_matches) != 1:
+        return "activated_damage_source_cost_not_supported"
+    activation_life_cost = int(life_matches[0]) if life_matches else 0
+    if activation_life_cost < 0:
+        return "activated_damage_source_cost_not_supported"
     discard_cost = activation_discard_cost_from_source(window)
     if isinstance(discard_cost, str):
         return discard_cost
@@ -14449,6 +14473,7 @@ def activated_damage_from_source(source: str) -> dict[str, Any] | str:
         "activation_requires_tap": requires_tap,
         "activation_requires_sacrifice": requires_sacrifice,
         "activation_sacrifice_cost": sacrifice_cost,
+        "activation_life_cost": activation_life_cost,
         **(discard_cost or {}),
     }
 
@@ -25626,6 +25651,10 @@ def split_row(
             oracle_damage.get("activation_discard_random")
         ):
             return None, "activated_damage_source_oracle_discard_cost_mismatch"
+        if int(parsed_activation.get("activation_life_cost") or 0) != int(
+            oracle_damage.get("activation_life_cost") or 0
+        ):
+            return None, "activated_damage_source_oracle_life_cost_mismatch"
         type_line = str(metadata.get("type_line") or "").lower()
         permanent_effect = (
             "creature"
@@ -25670,6 +25699,7 @@ def split_row(
                     "activation_discard_target",
                     "activation_requires_discard_card",
                     "activation_discard_random",
+                    "activation_life_cost",
                 )
                 if key in parsed_activation
             },

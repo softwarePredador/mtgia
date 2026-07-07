@@ -3353,15 +3353,18 @@ def run_simple_activated_damage(
     )
     active = battle.Player(str(scenario.get("player") or "Activated Controller"), None, [])
     opponent = battle.Player(str(scenario.get("opponent") or "Activated Opponent"), None, [])
+    active.life = int(scenario.get("starting_life") or 40)
     opponent.life = int(scenario.get("opponent_life") or 7)
     active.battlefield = [source]
     active.hand = [dict(card) for card in scenario.get("controller_hand", [])]
     add_manifest_mana(active, scenario.get("controller_mana") or {})
     starting_life = opponent.life
+    starting_active_life = active.life
     starting_hand_names = [card.get("name", "?") for card in active.hand if isinstance(card, dict)]
     expected_damage = int(scenario.get("expected_damage") or effect.get("activated_damage_amount") or 0)
     expected_discard_count = int(scenario.get("expected_discard_count") or 0)
     expected_discard_target = str(scenario.get("expected_discard_target") or "any_card")
+    expected_life_paid = int(scenario.get("expected_life_paid") or 0)
 
     if not battle.can_activate_generic_tap_damage_permanent(active, source, [opponent]):
         fail("battle_execution", f"{card['name']} simple activated damage cannot activate")
@@ -3380,6 +3383,11 @@ def run_simple_activated_damage(
             "battle_execution",
             f"{card['name']} opponent life={opponent.life}, expected {starting_life - expected_damage}",
         )
+    if active.life != starting_active_life - expected_life_paid:
+        fail(
+            "battle_execution",
+            f"{card['name']} controller life={active.life}, expected {starting_active_life - expected_life_paid}",
+        )
     activation_event = next(
         (
             data
@@ -3396,6 +3404,11 @@ def run_simple_activated_damage(
         fail(
             "battle_events",
             f"{card['name']} discarded_count={activation_event.get('discarded_count')}, expected {expected_discard_count}",
+        )
+    if int(activation_event.get("life_paid") or 0) != expected_life_paid:
+        fail(
+            "battle_events",
+            f"{card['name']} life_paid={activation_event.get('life_paid')}, expected {expected_life_paid}",
         )
     if expected_discard_count:
         discarded = list(activation_event.get("discarded") or [])
@@ -3421,6 +3434,8 @@ def run_simple_activated_damage(
         "card_name": card["name"],
         "damage": expected_damage,
         "opponent_life": opponent.life,
+        "life_paid": expected_life_paid,
+        "controller_life": active.life,
         "discarded_count": expected_discard_count,
         "discard_target": expected_discard_target if expected_discard_count else None,
     }

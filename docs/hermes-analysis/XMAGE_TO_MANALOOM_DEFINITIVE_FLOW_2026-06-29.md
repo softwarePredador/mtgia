@@ -18462,6 +18462,87 @@ Current next high-volume queue after PG616:
 - `add_counters::source_add_counters_variant_v1` - `771`
 - `life_gain::xmage_life_gain_variant_review_v1` - `663`
 
+## PG617 Checkpoint - Activated Damage With Fixed Pay-Life Cost
+
+PG617 closes the narrow permanent activated damage subpattern where XMage and
+Oracle both show a fixed `Pay N life` activation cost. It uses the existing
+runtime-backed scope: `xmage_permanent_simple_activated_damage_v1`.
+
+Promoted card:
+
+- `Reckless Assault` - `{1}, Pay 2 life: This enchantment deals 1 damage to any target.`
+
+Implementation:
+
+- `xmage_authoritative_exact_scope_split.py` now recognizes Oracle
+  `Pay N life` and XMage `PayLifeCost(N)` only when the cost is fixed and
+  source/Oracle agree;
+- `battle_analyst_v9.py` now preserves `activation_life_cost` when building
+  simple activated damage effects, blocks unsafe activation when life cannot
+  change or the controller is too low, pays the life through `change_life`,
+  and emits `life_paid`, `life_before`, and `life_after` in replay evidence;
+- `xmage_batch_pg_package_builder.py` now emits
+  `expected_life_paid` for simple activated damage package scenarios;
+- `battle_package_end_to_end_validation.py` now validates controller life loss
+  and replay event `life_paid` for activated damage scenarios;
+- focused splitter, package-builder, E2E, and runtime tests were added.
+
+Validation:
+
+- focused Python compilation passed for the touched splitter, battle runtime,
+  package builder, E2E validator, and tests;
+- focused pytest for the affected files passed with `1261` tests;
+- exact split produced `proposal_count=1` and
+  `safe_for_batch_pg_package_count=1`;
+- precheck found `1/1` target card row, `0` existing expected rows, and `0`
+  shadow rows to deprecate;
+- apply/postcheck confirmed `upserted_rows=1`, `1/1` verified/auto promoted
+  row, and `1/1` row with `oracle_hash`;
+- PG battle-rules -> Hermes/SQLite sync loaded `5848` PostgreSQL rules,
+  inserted/updated `5835` SQLite rows, and exported `5814` canonical snapshot
+  rows;
+- metadata sync used `database_target=127.0.0.1:15432/halder`, matched `6982`
+  PostgreSQL cards, wrote `6901` SQLite cache alias rows, left `deck_cards` at
+  `2699/2699` matched, and kept `unresolved_count=1`;
+- E2E package validation passed PostgreSQL, SQLite, snapshot, runtime lookup,
+  and `1` battle execution scenario with `2` runtime events; the scenario paid
+  `2` life, left the controller at `38`, and dealt `1` damage;
+- PG617 validation exposed `44` older trusted executable PostgreSQL rows
+  without `oracle_hash`; the companion
+  `xmage_pg617b_trusted_oracle_hash_backfill_new_server` package backed up and
+  backfilled `44/44` rows from `md5(cards.oracle_text)`, then resynced
+  SQLite/snapshot;
+- final PG/Hermes/SQLite contract audit passed `51/51`;
+- legacy contamination audit passed;
+- operational surface alignment audit passed;
+- strategy consistency audit passed `26/26`;
+- multi-rule runtime readiness remained bounded to existing global review gaps
+  (`no_runtime_safe_primary=1101`, `single_primary_with_blocked_alternatives=282`,
+  `composite_resolution_ready=2`);
+- global readiness now reports `battle_and_oracle_ready=5907` and
+  `battle_family_mapper_required=27966`;
+- post-sync queue rebuild reduced `target_identity_count` from `25044` to
+  `25043`, `xmage_authoritative_source_count` from `24730` to `24729`,
+  `xmage_authoritative_adapter_required_count` from `24730` to `24729`, and
+  `direct_damage::targeted_damage_variant_v1` from `774` to `773`;
+- final exact-scope recheck against the post-PG617 queue returned
+  `proposal_count=0` and `safe_for_batch_pg_package_count=0`.
+
+Residual boundary: PG617 does not authorize remove-counter costs,
+exile-library costs, tap-target costs, variable or nonnumeric life payments,
+dynamic damage amounts, restricted combat-only targets, multiple activated
+damage modes, or source/Oracle pay-life mismatches. Those remain separate
+adapter contracts.
+
+Current next high-volume queue after PG617:
+
+- `recursion::xmage_graveyard_return_variant_review_v1` - `1795`
+- `draw_engine::xmage_draw_card_variant_review_v1` - `1575`
+- `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1` - `1085`
+- `direct_damage::targeted_damage_variant_v1` - `773`
+- `add_counters::source_add_counters_variant_v1` - `771`
+- `life_gain::xmage_life_gain_variant_review_v1` - `663`
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

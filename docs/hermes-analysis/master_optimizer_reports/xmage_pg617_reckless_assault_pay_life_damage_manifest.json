@@ -1,0 +1,175 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg617_reckless_assault_pay_life_damage_p_20260707_131724",
+  "deploy_id": "pg617_reckless_assault_pay_life_damage",
+  "execution_scenarios": [
+    {
+      "card": {
+        "name": "Reckless Assault"
+      },
+      "controller_hand": [],
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 1,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_damage": 1,
+      "expected_discard_count": 0,
+      "expected_discard_random": false,
+      "expected_discard_target": "any_card",
+      "expected_life_paid": 2,
+      "logical_rule_key": "battle_rule_v1:b51a166a422c807a1ec756dfb204d090",
+      "name": "Reckless Assault activates damage ability",
+      "opponent_life": 7,
+      "starting_life": 40,
+      "type": "simple_activated_damage"
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Reckless Assault",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b51a166a422c807a1ec756dfb204d090",
+      "min_rule_version": 2,
+      "normalized_name": "reckless assault",
+      "oracle_hash": "6d31a1cd7b13233018db3591a3cb5eaf",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "direct_damage",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 1,
+            "activation_cost_mana": "{1}",
+            "activation_life_cost": 2,
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "activation_sacrifice_cost": null,
+            "amount": 1,
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "damage": 1,
+            "effect": "direct_damage",
+            "target": "any_target",
+            "target_constraints": {
+              "scope": "any_target"
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "DamageTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_damage_amount": 1,
+        "activated_effect": "direct_damage",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 1,
+        "activation_cost_mana": "{1}",
+        "activation_life_cost": 2,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "enchantment",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_permanent_simple_activated_damage": 1
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/xmage_pg617_reckless_assault_pay_life_damage_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/xmage_pg617_reckless_assault_pay_life_damage_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/xmage_pg617_reckless_assault_pay_life_damage_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/xmage_pg617_reckless_assault_pay_life_damage_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/xmage_pg617_reckless_assault_pay_life_damage_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/xmage_pg617_reckless_assault_pay_life_damage_rollback.sql"
+  },
+  "generated_at": "2026-07-07T13:17:24+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Reckless Assault"
+      },
+      "card_name": "Reckless Assault",
+      "effect": "enchantment",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b51a166a422c807a1ec756dfb204d090",
+      "normalized_name": "reckless assault",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "direct_damage",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 1,
+            "activation_cost_mana": "{1}",
+            "activation_life_cost": 2,
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "activation_sacrifice_cost": null,
+            "amount": 1,
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "damage": 1,
+            "effect": "direct_damage",
+            "target": "any_target",
+            "target_constraints": {
+              "scope": "any_target"
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "DamageTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_damage_amount": 1,
+        "activated_effect": "direct_damage",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 1,
+        "activation_cost_mana": "{1}",
+        "activation_life_cost": 2,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "enchantment",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Reckless Assault"
+  ],
+  "selected_count": 1,
+  "slug": "pg617_reckless_assault_pay_life_damage",
+  "snapshot_checks": [
+    {
+      "card_name": "Reckless Assault",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b51a166a422c807a1ec756dfb204d090",
+      "min_rule_version": 2,
+      "normalized_name": "reckless assault",
+      "oracle_hash": "6d31a1cd7b13233018db3591a3cb5eaf",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}
