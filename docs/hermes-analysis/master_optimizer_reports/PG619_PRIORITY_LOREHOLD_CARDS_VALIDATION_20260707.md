@@ -3,6 +3,32 @@
 Status: `applied_and_validated`
 Database target: `127.0.0.1:15432/halder` via `server/bin/with_new_server_pg.sh`
 
+## Follow-up Revalidation - 2026-07-07
+
+Status: `superseded_by_full_priority_pass`
+
+The original PG619 closure left `Hit the Mother Lode`, `Improvisation
+Capstone`, and `Tibalt's Trickery` as active because their executors were not
+fully proven at that point. The later focused priority audit revalidated the
+entire requested set against PostgreSQL, Hermes SQLite, the canonical snapshot,
+and focused runtime tests:
+
+- `priority_lorehold_card_validation_audit_20260707_new_server`: `pass`,
+  `24/24` target cards have PostgreSQL + SQLite + snapshot battle rules, and
+  `9/9` requested functional-classification cards have the required tags.
+- `test_priority_lorehold_card_runtime.py`: `12/12 OK`, including runtime
+  coverage for `Hit the Mother Lode`, `Improvisation Capstone`, and
+  `Tibalt's Trickery`.
+- `test_reviewed_battle_card_rules.py`: `32/32 OK`.
+- `xmage_strategy_consistency_audit_20260707_priority_lorehold_cards_new_server`:
+  `26/26 pass`.
+- `pg_hermes_sqlite_contract_audit_20260707_priority_lorehold_cards_new_server`:
+  `51/51 pass`.
+
+Current interpretation: the "remaining runtime families" section below is kept
+as historical context only. It no longer describes the current state of these
+three cards.
+
 ## Scope
 
 Priority cards requested:
