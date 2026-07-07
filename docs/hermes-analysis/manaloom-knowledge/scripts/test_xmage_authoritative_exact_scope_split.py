@@ -9348,6 +9348,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                 "{W}",
                 0,
                 ["W"],
+                True,
             ),
             (
                 "Icy Manipulator",
@@ -9374,6 +9375,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                 "{1}",
                 1,
                 [],
+                True,
             ),
             (
                 "Pacification Array",
@@ -9392,6 +9394,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                 "{2}",
                 2,
                 [],
+                True,
             ),
             (
                 "Scepter of Dominance",
@@ -9410,9 +9413,138 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                 "{W}",
                 0,
                 ["W"],
+                True,
+            ),
+            (
+                "Ali Baba",
+                "{R}: Tap target Wall.",
+                "Creature - Human Rogue",
+                """
+                    private static final FilterPermanent filter = new FilterPermanent("Wall");
+                    static {
+                        filter.add(SubType.WALL.getPredicate());
+                    }
+                    Ability ability = new SimpleActivatedAbility(new TapTargetEffect(), new ManaCostsImpl<>("{R}"));
+                    ability.addTarget(new TargetPermanent(filter));
+                    this.addAbility(ability);
+                """,
+                "wall_creature",
+                "{R}",
+                0,
+                ["R"],
+                False,
+            ),
+            (
+                "Coeurl",
+                "{1}{W}, {T}: Tap target nonenchantment creature.",
+                "Creature - Cat Beast",
+                """
+                    private static final FilterCreaturePermanent filter =
+                        new FilterCreaturePermanent("nonenchantment creature");
+                    static {
+                        filter.add(Predicates.not(CardType.ENCHANTMENT.getPredicate()));
+                    }
+                    Ability ability = new SimpleActivatedAbility(new TapTargetEffect(), new ManaCostsImpl<>("{1}{W}"));
+                    ability.addCost(new TapSourceCost());
+                    ability.addTarget(new TargetPermanent(filter));
+                    this.addAbility(ability);
+                """,
+                "nonenchantment_creature",
+                "{1}{W}",
+                1,
+                ["W"],
+                True,
+            ),
+            (
+                "Kitsune Diviner",
+                "{T}: Tap target Spirit.",
+                "Creature - Fox Cleric",
+                """
+                    private static final FilterPermanent filter = new FilterPermanent("Spirit");
+                    static {
+                        filter.add(SubType.SPIRIT.getPredicate());
+                    }
+                    Ability ability = new SimpleActivatedAbility(new TapTargetEffect(), new TapSourceCost());
+                    ability.addTarget(new TargetPermanent(filter));
+                    this.addAbility(ability);
+                """,
+                "spirit_creature",
+                "{0}",
+                0,
+                [],
+                True,
+            ),
+            (
+                "Law-Rune Enforcer",
+                "{1}, {T}: Tap target creature with mana value 2 or greater.",
+                "Creature - Human Soldier",
+                """
+                    FilterCreaturePermanent filter = new FilterCreaturePermanent("creature with mana value 2 or greater");
+                    filter.add(new ManaValuePredicate(ComparisonType.MORE_THAN, 1));
+                    Ability ability = new SimpleActivatedAbility(new TapTargetEffect(), new GenericManaCost(1));
+                    ability.addCost(new TapSourceCost());
+                    ability.addTarget(new TargetPermanent(filter));
+                    this.addAbility(ability);
+                """,
+                "creature_mana_value_2_or_greater",
+                "{1}",
+                1,
+                [],
+                True,
+            ),
+            (
+                "Sigardian Priest",
+                "{1}, {T}: Tap target non-Human creature.",
+                "Creature - Human Cleric",
+                """
+                    FilterCreaturePermanent filter = new FilterCreaturePermanent("non-Human creature");
+                    filter.add(Predicates.not(SubType.HUMAN.getPredicate()));
+                    Ability ability = new SimpleActivatedAbility(new TapTargetEffect(), new GenericManaCost(1));
+                    ability.addCost(new TapSourceCost());
+                    ability.addTarget(new TargetPermanent(filter));
+                    this.addAbility(ability);
+                """,
+                "non_human_creature",
+                "{1}",
+                1,
+                [],
+                True,
+            ),
+            (
+                "Sterling Keykeeper",
+                "{2}, {T}: Tap target non-Mount creature.",
+                "Creature - Human Soldier",
+                """
+                    FilterCreaturePermanent filter = new FilterCreaturePermanent("non-Mount creature");
+                    filter.add(Predicates.not(SubType.MOUNT.getPredicate()));
+                    Ability ability = new SimpleActivatedAbility(new TapTargetEffect(), new GenericManaCost(2));
+                    ability.addCost(new TapSourceCost());
+                    ability.addTarget(new TargetPermanent(filter));
+                    this.addAbility(ability);
+                """,
+                "non_mount_creature",
+                "{2}",
+                2,
+                [],
+                True,
+            ),
+            (
+                "Storm Front",
+                "{G}{G}: Tap target creature with flying.",
+                "Enchantment",
+                """
+                    Ability ability = new SimpleActivatedAbility(new TapTargetEffect(), new ManaCostsImpl<>("{G}{G}"));
+                    ability.addTarget(new TargetPermanent(StaticFilters.FILTER_CREATURE_FLYING));
+                    this.addAbility(ability);
+                """,
+                "flying_creature",
+                "{G}{G}",
+                0,
+                ["G", "G"],
+                False,
             ),
         ]
-        for card_name, oracle, type_line, source_text, target, cost, generic, colors in cases:
+        for card_name, oracle, type_line, source_text, target, cost, generic, colors, requires_tap in cases:
             with self.subTest(card_name=card_name):
                 row = queue_row(
                     split.TAP_TARGET_PERMANENT_UNIT,
@@ -9436,7 +9568,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                 self.assertEqual(effect["activation_cost_mana"], cost)
                 self.assertEqual(effect["activation_cost_generic"], generic)
                 self.assertEqual(effect["activation_cost_colors"], colors)
-                self.assertTrue(effect["activation_requires_tap"])
+                self.assertEqual(effect["activation_requires_tap"], requires_tap)
 
     def test_permanent_activated_tap_target_blocks_snow_cost(self) -> None:
         row = queue_row(
@@ -9466,6 +9598,32 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
 
         self.assertIsNone(proposal)
         self.assertEqual(reason, "activated_tap_target_oracle_cost_not_supported")
+
+    def test_permanent_activated_tap_target_blocks_variable_target_count(self) -> None:
+        row = queue_row(
+            split.TAP_TARGET_PERMANENT_UNIT,
+            effect_classes=["TapTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Mishra's Helix",
+                type_line="Artifact",
+                oracle_text="{X}, {T}: Tap X target lands.",
+            ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(new TapTargetEffect(), new ManaCostsImpl<>("{X}"));
+                ability.addCost(new TapSourceCost());
+                ability.addTarget(new TargetLandPermanent());
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "activated_tap_target_oracle_not_simple")
 
     def test_fixed_destroy_draw_spell_blocks_dynamic_source_draw(self) -> None:
         row = queue_row(

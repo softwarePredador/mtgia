@@ -18079,6 +18079,81 @@ Current next high-volume queue after PG611:
 - `direct_damage::targeted_damage_variant_v1` - `775`
 - `add_counters::source_add_counters_variant_v1` - `771`
 
+## PG612 Checkpoint - Restricted Activated Tap Targets
+
+PG612 extends the PG611 activated tap-target family to restricted target
+variants that still map to the same runtime-backed scope:
+`xmage_permanent_simple_activated_tap_target_v1`.
+
+Promoted cards:
+
+- `Ali Baba` - `{R}: Tap target Wall.`
+- `Coeurl` - `{1}{W}, {T}: Tap target nonenchantment creature.`
+- `Kitsune Diviner` - `{T}: Tap target Spirit.`
+- `Law-Rune Enforcer` - `{1}, {T}: Tap target creature with mana value 2 or greater.`
+- `Sigardian Priest` - `{1}, {T}: Tap target non-Human creature.`
+- `Sterling Keykeeper` - `{2}, {T}: Tap target non-Mount creature.`
+- `Storm Front` - `{G}{G}: Tap target creature with flying.`
+
+Implementation:
+
+- `xmage_authoritative_exact_scope_split.py` now recognizes restricted
+  tap-target Oracle/XMage signatures for subtype, keyword, non-card-type,
+  excluded subtype, and mana-value-min constraints;
+- `target_constraints_for` now emits executable constraints for
+  `nonenchantment_creature`, `non_human_creature`, and `non_mount_creature`;
+- `xmage_batch_pg_package_builder.py` now uses the shared target-constraint
+  fixture builder for tap-target scenarios and supports mana-value fixture
+  adjustment;
+- focused E2E coverage proves restricted tap-target activation against a legal
+  mana-value target.
+
+Validation:
+
+- focused Python compilation passed for the touched splitter, package builder,
+  E2E validator, and battle runtime scripts;
+- focused pytest passed with `861` tests and `158` subtests;
+- exact split produced `proposal_count=7` and
+  `safe_for_batch_pg_package_count=7`;
+- precheck found `7/7` target card rows, `0` existing expected rows, and `0`
+  shadow rows to deprecate;
+- apply/postcheck confirmed `upserted_rows=7`, `7/7` verified/auto promoted
+  rows, and `7/7` rows with `oracle_hash`;
+- PG -> SQLite/snapshot sync loaded `7` PostgreSQL rows, updated `7` SQLite
+  rows, and exported `5799` canonical snapshot rows;
+- metadata sync used `database_target=127.0.0.1:15432/halder`, matched `6967`
+  PostgreSQL cards, wrote `6886` SQLite cache alias rows, and left
+  `deck_cards` at `2699/2699` matched;
+- E2E validation passed PostgreSQL, SQLite, snapshot, runtime lookup, and `7`
+  battle execution scenarios with `14` runtime events;
+- PG/Hermes/SQLite contract audit passed `51/51`;
+- legacy contamination audit passed `32/32`;
+- operational surface alignment audit passed `48/48`;
+- strategy consistency audit passed `26/26`;
+- multi-rule runtime readiness remained bounded to existing global review gaps
+  (`no_runtime_safe_primary=1101`, `single_primary_with_blocked_alternatives=282`,
+  `composite_resolution_ready=2`);
+- global readiness now reports `battle_and_oracle_ready=5892` and
+  `battle_family_mapper_required=27981`;
+- post-sync queue rebuild reduced `target_identity_count` from `25065` to
+  `25058`, `xmage_authoritative_source_count` from `24751` to `24744`, and
+  `xmage_authoritative_adapter_required_count` from `24751` to `24744`;
+- final exact-scope recheck against the post-PG612 queue returned
+  `proposal_count=0` and `safe_for_batch_pg_package_count=0`.
+
+Residual boundary: PG612 does not authorize Snow `{S}` activation costs,
+variable `X` target counts such as `Tap X target lands`, tap-all effects,
+non-simple activation costs, untap effects, destroy/damage effects, or dynamic
+conditional target restrictions. Those remain separate adapter contracts.
+
+Current next high-volume queue after PG612:
+
+- `recursion::xmage_graveyard_return_variant_review_v1` - `1795`
+- `draw_engine::xmage_draw_card_variant_review_v1` - `1577`
+- `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1` - `1085`
+- `direct_damage::targeted_damage_variant_v1` - `775`
+- `add_counters::source_add_counters_variant_v1` - `771`
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

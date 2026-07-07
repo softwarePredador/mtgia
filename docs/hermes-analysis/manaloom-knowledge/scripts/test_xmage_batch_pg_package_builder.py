@@ -1005,7 +1005,37 @@ def test_manifest_builds_simple_activated_tap_target_noncreature_fixture() -> No
 
     assert scenario is not None
     assert scenario["expected_target"] == "artifact_creature_or_land"
-    assert scenario["target"]["type_line"] == "Land"
+    assert scenario["target"]["type_line"] in {"Creature - Soldier", "Artifact", "Land"}
+    assert scenario["controller_mana"]["generic"] == 1
+
+
+def test_manifest_builds_simple_activated_tap_target_restricted_fixture() -> None:
+    rule = {
+        "normalized_name": "law-rune enforcer",
+        "card_name": "Law-Rune Enforcer",
+        "oracle_hash": "hash-law-rune-enforcer",
+        "logical_rule_key": "battle_rule_v1:hash-law-rune-enforcer",
+        "required_effect_fields": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+            "activated_effect": "tap_target",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+            "activated_tap_target": "creature_mana_value_2_or_greater",
+            "target": "creature_mana_value_2_or_greater",
+            "target_constraints": {"card_types": ["creature"], "mana_value_min": 2},
+            "activation_cost_mana": "{1}",
+            "activation_cost_generic": 1,
+            "activation_cost_colors": [],
+            "activation_requires_tap": True,
+        },
+    }
+
+    scenario = builder.simple_activated_tap_target_execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["expected_target"] == "creature_mana_value_2_or_greater"
+    assert scenario["target"]["type_line"] == "Creature - Soldier"
+    assert scenario["target"]["cmc"] == 2
     assert scenario["controller_mana"]["generic"] == 1
 
 

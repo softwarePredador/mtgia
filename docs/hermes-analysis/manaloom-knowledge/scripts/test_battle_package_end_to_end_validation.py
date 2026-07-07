@@ -297,6 +297,56 @@ def test_simple_activated_tap_target_runner_executes_noncreature_target() -> Non
     )
 
 
+def test_simple_activated_tap_target_runner_executes_restricted_target() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "creature",
+        "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+        "activated_effect": "tap_target",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+        "activated_tap_target": "creature_mana_value_2_or_greater",
+        "target": "creature_mana_value_2_or_greater",
+        "target_constraints": {"card_types": ["creature"], "mana_value_min": 2},
+        "activation_cost_mana": "{1}",
+        "activation_cost_generic": 1,
+        "activation_cost_colors": [],
+        "activation_requires_tap": True,
+        "activation_requires_sacrifice": False,
+        "_rule_logical_key": "battle_rule_v1:law-rune-enforcer",
+    }
+    try:
+        result = validator.run_simple_activated_tap_target(
+            battle,
+            {
+                "name": "Law-Rune Enforcer taps a mana value target",
+                "type": "simple_activated_tap_target",
+                "card": {"name": "Law-Rune Enforcer"},
+                "target": {
+                    "name": "E2E Mana Value Target",
+                    "type_line": "Creature - Soldier",
+                    "effect": "creature",
+                    "cmc": 2,
+                },
+                "controller_mana": {"generic": 1},
+                "expected_tapped_source": True,
+                "logical_rule_key": "battle_rule_v1:law-rune-enforcer",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Law-Rune Enforcer"
+    assert result["target"] == "E2E Mana Value Target"
+    assert result["target_tapped"] is True
+    assert result["source_tapped"] is True
+
+
 def test_simple_activated_self_keyword_runner_executes_keyword_effect() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

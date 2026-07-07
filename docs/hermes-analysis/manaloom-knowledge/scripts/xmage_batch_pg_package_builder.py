@@ -2571,32 +2571,17 @@ def simple_activated_tap_target_execution_scenario_from_expected_rule(
     if required.get("battle_model_scope") != "xmage_permanent_simple_activated_tap_target_v1":
         return None
     target = required.get("activated_tap_target") or required.get("target") or "creature"
-    target_fixture = {
-        "artifact": {
-            "name": "E2E Artifact Target",
-            "type_line": "Artifact",
-            "effect": "artifact",
-            "cmc": 2,
-        },
-        "artifact_or_creature": {
-            "name": "E2E Artifact Target",
-            "type_line": "Artifact",
-            "effect": "artifact",
-            "cmc": 2,
-        },
-        "artifact_creature_or_land": {
-            "name": "E2E Land Target",
-            "type_line": "Land",
-            "effect": "land",
-            "cmc": 0,
-        },
-        "permanent": {
-            "name": "E2E Enchantment Target",
-            "type_line": "Enchantment",
-            "effect": "enchantment",
-            "cmc": 3,
-        },
-    }.get(str(target), {})
+    constraints = dict(required.get("target_constraints") or {})
+    if not constraints.get("card_types"):
+        if str(target) == "artifact_creature_or_land":
+            constraints["card_types"] = ["artifact", "creature", "land"]
+        elif str(target) == "artifact_or_creature":
+            constraints["card_types"] = ["artifact", "creature"]
+    target_fixture = _target_fixture_from_constraints(
+        "E2E Legal Tap Target",
+        constraints or {"card_types": ["creature"]},
+        matching=True,
+    )
     return {
         "name": f"{rule['card_name']} activates tap target ability",
         "type": "simple_activated_tap_target",
@@ -3154,6 +3139,14 @@ def _target_fixture_from_constraints(
         maximum = int(active_constraints["toughness_max"])
         toughness = maximum if matching else maximum + 1
 
+    mana_value = 3
+    if active_constraints.get("mana_value_min") is not None:
+        minimum = int(active_constraints["mana_value_min"])
+        mana_value = minimum if matching else max(0, minimum - 1)
+    if active_constraints.get("mana_value_max") is not None:
+        maximum = int(active_constraints["mana_value_max"])
+        mana_value = maximum if matching else maximum + 1
+
     subtypes = [str(value).lower() for value in active_constraints.get("required_subtypes") or [] if value]
     if not matching and active_constraints.get("exclude_subtypes"):
         subtypes = [str((active_constraints.get("exclude_subtypes") or ["spirit"])[0]).strip().lower()]
@@ -3164,7 +3157,7 @@ def _target_fixture_from_constraints(
         "name": name,
         "type_line": type_line,
         "effect": "creature" if card_type == "creature" else card_type,
-        "cmc": 3,
+        "cmc": mana_value,
     }
     if "creature" in card_type:
         fixture["power"] = power

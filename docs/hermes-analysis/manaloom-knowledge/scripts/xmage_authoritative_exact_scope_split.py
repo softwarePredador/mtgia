@@ -14456,6 +14456,16 @@ def activated_tap_target_from_oracle(metadata: dict[str, Any]) -> dict[str, Any]
         return "activated_tap_target_oracle_not_simple"
     cost_text, effect_text = [part.strip() for part in text.split(":", 1)]
     target_patterns = [
+        (r"tap target wall\.?", "wall_creature"),
+        (r"tap target spirit\.?", "spirit_creature"),
+        (r"tap target nonenchantment creature\.?", "nonenchantment_creature"),
+        (
+            r"tap target creature with (?:converted mana cost|mana value) 2 or greater\.?",
+            "creature_mana_value_2_or_greater",
+        ),
+        (r"tap target non-human creature\.?", "non_human_creature"),
+        (r"tap target non-mount creature\.?", "non_mount_creature"),
+        (r"tap target creature with flying\.?", "flying_creature"),
         (r"tap target creature\.?", "creature"),
         (r"tap target artifact\.?", "artifact"),
         (r"tap target artifact or creature\.?", "artifact_or_creature"),
@@ -14510,7 +14520,26 @@ def activated_tap_target_from_source(source: str) -> dict[str, Any] | str:
     if "SimpleActivatedAbility" not in window:
         return "activated_tap_target_source_not_simple_activated"
     target = None
-    if re.search(r"new\s+TargetCreaturePermanent\s*\(\s*\)", text, re.S):
+    mana_value_target = mana_value_restricted_target_from_source(text)
+    if mana_value_target:
+        target = mana_value_target
+    elif "FILTER_CREATURE_FLYING" in text:
+        target = "flying_creature"
+    elif "SubType.WALL" in text:
+        target = "wall_creature"
+    elif "SubType.SPIRIT" in text:
+        target = "spirit_creature"
+    elif (
+        "FilterCreaturePermanent" in text
+        and "Predicates.not" in text
+        and "CardType.ENCHANTMENT.getPredicate()" in text
+    ):
+        target = "nonenchantment_creature"
+    elif "FilterCreaturePermanent" in text and "Predicates.not" in text and "SubType.HUMAN.getPredicate()" in text:
+        target = "non_human_creature"
+    elif "FilterCreaturePermanent" in text and "Predicates.not" in text and "SubType.MOUNT.getPredicate()" in text:
+        target = "non_mount_creature"
+    elif re.search(r"new\s+TargetCreaturePermanent\s*\(\s*\)", text, re.S):
         target = "creature"
     elif "FILTER_PERMANENT_ARTIFACT_OR_CREATURE" in text:
         target = "artifact_or_creature"
@@ -19608,6 +19637,8 @@ def target_constraints_for(target: str) -> dict[str, Any]:
         return {"card_types": ["creature"], "exclude_card_types": ["artifact"]}
     if target == "nonartifact_nonblack_creature":
         return {"card_types": ["creature"], "exclude_card_types": ["artifact"], "exclude_colors": ["B"]}
+    if target == "nonenchantment_creature":
+        return {"card_types": ["creature"], "exclude_card_types": ["enchantment"]}
     if target == "legendary_creature":
         return {"card_types": ["creature"], "required_supertypes": ["legendary"]}
     if target == "nonlegendary_creature":
@@ -19628,6 +19659,10 @@ def target_constraints_for(target: str) -> dict[str, Any]:
         return {"card_types": ["creature"], "exclude_subtypes": ["merfolk"]}
     if target == "non_spirit_creature":
         return {"card_types": ["creature"], "exclude_subtypes": ["spirit"]}
+    if target == "non_human_creature":
+        return {"card_types": ["creature"], "exclude_subtypes": ["human"]}
+    if target == "non_mount_creature":
+        return {"card_types": ["creature"], "exclude_subtypes": ["mount"]}
     if target == "non_vampire_werewolf_zombie_creature":
         return {"card_types": ["creature"], "exclude_subtypes": ["vampire", "werewolf", "zombie"]}
     if target == "creature_power_3_or_less":
