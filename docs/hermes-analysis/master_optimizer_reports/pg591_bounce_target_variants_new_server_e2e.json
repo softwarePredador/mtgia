@@ -1,0 +1,345 @@
+{
+  "battle_execution": {
+    "event_count": 18,
+    "results": [
+      {
+        "battlefield_names": [
+          "E2E Illegal Removal Target"
+        ],
+        "card_name": "Bounce Off",
+        "destination": "hand",
+        "moved_names": [
+          "E2E Legal Removal Target"
+        ],
+        "nonmatching_target": "E2E Illegal Removal Target",
+        "scenario": "Bounce Off removes one legal target",
+        "target": "E2E Legal Removal Target"
+      },
+      {
+        "battlefield_names": [
+          "E2E Illegal Removal Target"
+        ],
+        "card_name": "Cut the Earthly Bond",
+        "destination": "hand",
+        "moved_names": [
+          "E2E Legal Removal Target"
+        ],
+        "nonmatching_target": "E2E Illegal Removal Target",
+        "scenario": "Cut the Earthly Bond removes one legal target",
+        "target": "E2E Legal Removal Target"
+      },
+      {
+        "battlefield_names": [
+          "E2E Illegal Removal Target"
+        ],
+        "card_name": "Depart the Realm",
+        "destination": "hand",
+        "moved_names": [
+          "E2E Legal Removal Target"
+        ],
+        "nonmatching_target": "E2E Illegal Removal Target",
+        "scenario": "Depart the Realm removes one legal target",
+        "target": "E2E Legal Removal Target"
+      },
+      {
+        "battlefield_names": [
+          "E2E Illegal Removal Target"
+        ],
+        "card_name": "Hoodwink",
+        "destination": "hand",
+        "moved_names": [
+          "E2E Legal Removal Target"
+        ],
+        "nonmatching_target": "E2E Illegal Removal Target",
+        "scenario": "Hoodwink removes one legal target",
+        "target": "E2E Legal Removal Target"
+      },
+      {
+        "battlefield_names": [
+          "E2E Illegal Removal Target"
+        ],
+        "card_name": "Into Thin Air",
+        "destination": "hand",
+        "moved_names": [
+          "E2E Legal Removal Target"
+        ],
+        "nonmatching_target": "E2E Illegal Removal Target",
+        "scenario": "Into Thin Air removes one legal target",
+        "target": "E2E Legal Removal Target"
+      },
+      {
+        "battlefield_names": [
+          "E2E Illegal Removal Target"
+        ],
+        "card_name": "Wipe Away",
+        "destination": "hand",
+        "moved_names": [
+          "E2E Legal Removal Target"
+        ],
+        "nonmatching_target": "E2E Illegal Removal Target",
+        "scenario": "Wipe Away removes one legal target",
+        "target": "E2E Legal Removal Target"
+      }
+    ],
+    "scenario_count": 6
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-07T03:56:59.043348+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg591_bounce_target_variants_new_server_package_manifest.json",
+  "package_id": "pg591_bounce_target_variants_new_server_package_manifest",
+  "snapshot": "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 6
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+          "card_name": "Bounce Off",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f2e24de1c6d45066dbda2109912a63e2",
+          "oracle_hash": "4697e48be0d012476635626b59ff686b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+          "card_name": "Cut the Earthly Bond",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f722ea9825e629e4690dabad8ea3536d",
+          "oracle_hash": "160612165db10cbd4158a1c24ceaa263",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+          "card_name": "Depart the Realm",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:001a1215317195fb0dd53f88c849c54c",
+          "oracle_hash": "6183c0a6f7e8710981aeb09c5c2fdee4",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+          "card_name": "Hoodwink",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:09b2438b59221a455f58e7c7e8db8a22",
+          "oracle_hash": "89d3f25fb5311c47d4d3c11cc326914a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+          "card_name": "Into Thin Air",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1ced64c4f5a32cab3c82e97ad1f7bfad",
+          "oracle_hash": "223da72bf51053d6b0f5dc8845673134",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+          "card_name": "Wipe Away",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2048333401c1ae3096acb4d43a4c83db",
+          "oracle_hash": "707e43acd81856daca2162b5de8dc02a",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 6
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+          "card_name": "Bounce Off",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f2e24de1c6d45066dbda2109912a63e2",
+          "oracle_hash": "4697e48be0d012476635626b59ff686b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+          "card_name": "Cut the Earthly Bond",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f722ea9825e629e4690dabad8ea3536d",
+          "oracle_hash": "160612165db10cbd4158a1c24ceaa263",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+          "card_name": "Depart the Realm",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:001a1215317195fb0dd53f88c849c54c",
+          "oracle_hash": "6183c0a6f7e8710981aeb09c5c2fdee4",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+          "card_name": "Hoodwink",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:09b2438b59221a455f58e7c7e8db8a22",
+          "oracle_hash": "89d3f25fb5311c47d4d3c11cc326914a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+          "card_name": "Into Thin Air",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1ced64c4f5a32cab3c82e97ad1f7bfad",
+          "oracle_hash": "223da72bf51053d6b0f5dc8845673134",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+          "card_name": "Wipe Away",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2048333401c1ae3096acb4d43a4c83db",
+          "oracle_hash": "707e43acd81856daca2162b5de8dc02a",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 6
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Bounce Off",
+          "logical_rule_key": "battle_rule_v1:f2e24de1c6d45066dbda2109912a63e2"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Cut the Earthly Bond",
+          "logical_rule_key": "battle_rule_v1:f722ea9825e629e4690dabad8ea3536d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Depart the Realm",
+          "logical_rule_key": "battle_rule_v1:001a1215317195fb0dd53f88c849c54c"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Hoodwink",
+          "logical_rule_key": "battle_rule_v1:09b2438b59221a455f58e7c7e8db8a22"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Into Thin Air",
+          "logical_rule_key": "battle_rule_v1:1ced64c4f5a32cab3c82e97ad1f7bfad"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Wipe Away",
+          "logical_rule_key": "battle_rule_v1:2048333401c1ae3096acb4d43a4c83db"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 6
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Bounce Off",
+          "component_keys": [],
+          "effect": "remove_permanent",
+          "logical_rule_key": "battle_rule_v1:f2e24de1c6d45066dbda2109912a63e2"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Cut the Earthly Bond",
+          "component_keys": [],
+          "effect": "remove_permanent",
+          "logical_rule_key": "battle_rule_v1:f722ea9825e629e4690dabad8ea3536d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Depart the Realm",
+          "component_keys": [],
+          "effect": "remove_permanent",
+          "logical_rule_key": "battle_rule_v1:001a1215317195fb0dd53f88c849c54c"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Hoodwink",
+          "component_keys": [],
+          "effect": "remove_permanent",
+          "logical_rule_key": "battle_rule_v1:09b2438b59221a455f58e7c7e8db8a22"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Into Thin Air",
+          "component_keys": [],
+          "effect": "remove_permanent",
+          "logical_rule_key": "battle_rule_v1:1ced64c4f5a32cab3c82e97ad1f7bfad"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Wipe Away",
+          "component_keys": [],
+          "effect": "remove_permanent",
+          "logical_rule_key": "battle_rule_v1:2048333401c1ae3096acb4d43a4c83db"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 18,
+        "scenarios": 6
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

@@ -11929,6 +11929,15 @@ def is_legal_target(spell, target, controller, all_players=None, target_type=Non
         or constraints.get("target_non_token")
     ) and is_token_permanent(target):
         return False
+    if bool(constraints.get("enchanted") or constraints.get("is_enchanted")):
+        enchanted = bool(
+            target.get("enchanted")
+            or target.get("enchanted_by")
+            or target.get("attached_aura")
+            or target.get("auras_attached")
+        )
+        if not enchanted:
+            return False
     required_keywords = [
         str(value or "").strip().lower().replace(" ", "_")
         for value in _as_list(constraints.get("required_keywords") or constraints.get("target_keywords"))

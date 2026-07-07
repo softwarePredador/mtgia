@@ -1808,7 +1808,8 @@ def run_single_target_removal(
     target_name = str(target.get("name") or "")
     nonmatching_name = str(nonmatching.get("name") or "")
     destination = str(scenario.get("expected_destination") or "graveyard").lower()
-    destination_zone = getattr(opponent, "exile" if destination == "exile" else "graveyard")
+    destination_zone_name = "exile" if destination == "exile" else "hand" if destination == "hand" else "graveyard"
+    destination_zone = getattr(opponent, destination_zone_name)
     moved_names = [str(item.get("name") or "") for item in destination_zone if isinstance(item, dict)]
     battlefield_names = [str(item.get("name") or "") for item in opponent.battlefield if isinstance(item, dict)]
     if target_name not in moved_names:

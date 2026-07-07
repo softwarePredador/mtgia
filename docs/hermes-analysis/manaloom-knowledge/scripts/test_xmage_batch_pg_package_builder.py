@@ -937,6 +937,30 @@ def test_single_target_removal_scenario_uses_illegal_fixture_for_simple_creature
     assert scenario["nonmatching_target"]["type_line"] == "Land"
 
 
+def test_single_target_bounce_scenario_moves_target_to_hand() -> None:
+    rule = {
+        "normalized_name": "cut the earthly bond",
+        "card_name": "Cut the Earthly Bond",
+        "oracle_hash": "hash-cut-the-earthly-bond",
+        "logical_rule_key": "battle_rule_v1:hash-cut-the-earthly-bond",
+        "required_effect_fields": {
+            "effect": "remove_permanent",
+            "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+            "target": "enchanted_permanent",
+            "target_constraints": {"card_types": ["permanent"], "enchanted": True},
+            "destination": "hand",
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "single_target_removal"
+    assert scenario["expected_destination"] == "hand"
+    assert scenario["target"]["enchanted"] is True
+    assert scenario["nonmatching_target"].get("enchanted") is False
+
+
 def test_single_target_removal_scenario_models_excluded_color_and_combat_state() -> None:
     rule = {
         "normalized_name": "assassins blade",

@@ -12966,6 +12966,95 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["target"], "nonland_permanent")
         self.assertEqual(effect["destination"], "hand")
 
+    def test_return_target_creature_or_vehicle_to_hand_maps_to_bounce_runtime(self) -> None:
+        row = queue_row(split.BOUNCE_UNIT, effect_classes=["ReturnToHandTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Return target creature or Vehicle to its owner's hand."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new ReturnToHandTargetEffect());"
+                "this.getSpellAbility().addTarget(new TargetPermanent("
+                "StaticFilters.FILTER_PERMANENT_CREATURE_OR_VEHICLE));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "remove_permanent")
+        self.assertEqual(effect["target"], "creature_or_vehicle")
+        self.assertEqual(effect["destination"], "hand")
+        self.assertEqual(
+            effect["target_constraints"],
+            {
+                "any_of": [
+                    {"card_types": ["creature"]},
+                    {"card_types": ["artifact"], "required_subtypes": ["vehicle"]},
+                ]
+            },
+        )
+
+    def test_return_target_enchanted_permanent_to_hand_maps_to_bounce_runtime(self) -> None:
+        row = queue_row(split.BOUNCE_UNIT, effect_classes=["ReturnToHandTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Return target enchanted permanent to its owner's hand."),
+            source_text=(
+                "filter.add(EnchantedPredicate.instance);"
+                "this.getSpellAbility().addEffect(new ReturnToHandTargetEffect());"
+                "this.getSpellAbility().addTarget(new TargetPermanent(filter));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "remove_permanent")
+        self.assertEqual(effect["target"], "enchanted_permanent")
+        self.assertEqual(effect["target_constraints"], {"card_types": ["permanent"], "enchanted": True})
+        self.assertEqual(effect["destination"], "hand")
+
+    def test_return_target_artifact_enchantment_or_land_to_hand_maps_to_bounce_runtime(self) -> None:
+        row = queue_row(split.BOUNCE_UNIT, effect_classes=["ReturnToHandTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Return target artifact, enchantment, or land to its owner's hand."),
+            source_text=(
+                "CardType.ARTIFACT.getPredicate(); CardType.ENCHANTMENT.getPredicate(); "
+                "CardType.LAND.getPredicate();"
+                "this.getSpellAbility().addEffect(new ReturnToHandTargetEffect());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "remove_permanent")
+        self.assertEqual(effect["target"], "artifact_or_enchantment_or_land")
+        self.assertEqual(effect["target_constraints"], {"card_types": ["artifact", "enchantment", "land"]})
+        self.assertEqual(effect["destination"], "hand")
+
+    def test_bounce_spell_ignores_resolution_neutral_auxiliary_oracle_lines(self) -> None:
+        row = queue_row(
+            split.BOUNCE_UNIT,
+            effect_classes=["ReturnToHandTargetEffect"],
+            ability_classes=["ForetellAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                oracle_text=(
+                    "Foretell {U}\n"
+                    "Return target nonland permanent to its owner's hand."
+                )
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new ReturnToHandTargetEffect());"
+                "this.getSpellAbility().addTarget(new TargetNonlandPermanent());"
+                "this.addAbility(new ForetellAbility(this, \"{U}\"));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        self.assertEqual(proposal["effect_json"]["target"], "nonland_permanent")
+
     def test_bounce_spell_with_compound_effect_stays_blocked(self) -> None:
         row = queue_row(
             split.BOUNCE_UNIT,

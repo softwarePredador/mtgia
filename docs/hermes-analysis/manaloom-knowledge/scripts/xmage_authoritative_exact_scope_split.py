@@ -2956,10 +2956,26 @@ def exile_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, str] | None
 
 
 def bounce_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, str] | None:
-    text = oracle_text(metadata)
+    text = re.sub(
+        r"\s+",
+        " ",
+        " ".join(oracle_effect_lines_without_neutral_auxiliary(metadata)).strip().lower(),
+    )
     patterns: list[tuple[str, tuple[str, str]]] = [
         (r"^return target tapped creature to its owner's hand\.?$", ("remove_creature", "tapped_creature")),
         (r"^return target untapped creature to its owner's hand\.?$", ("remove_creature", "untapped_creature")),
+        (
+            r"^return target creature or vehicle to its owner's hand\.?$",
+            ("remove_permanent", "creature_or_vehicle"),
+        ),
+        (
+            r"^return target enchanted permanent to its owner's hand\.?$",
+            ("remove_permanent", "enchanted_permanent"),
+        ),
+        (
+            r"^return target artifact, enchantment, or land to its owner's hand\.?$",
+            ("remove_permanent", "artifact_or_enchantment_or_land"),
+        ),
         (
             r"^return target artifact or enchantment to its owner's hand\.?$",
             ("remove_permanent", "artifact_or_enchantment"),
@@ -18332,6 +18348,15 @@ def target_constraints_for(target: str) -> dict[str, Any]:
         return {"card_types": ["permanent"], "exclude_card_types": ["creature"]}
     if target == "noncreature_artifact":
         return {"card_types": ["artifact"], "exclude_card_types": ["creature"]}
+    if target == "creature_or_vehicle":
+        return {
+            "any_of": [
+                {"card_types": ["creature"]},
+                {"card_types": ["artifact"], "required_subtypes": ["vehicle"]},
+            ]
+        }
+    if target == "enchanted_permanent":
+        return {"card_types": ["permanent"], "enchanted": True}
     if target == "island_or_swamp_opponent_controls":
         return {"card_types": ["land"], "required_subtypes": ["island", "swamp"]}
     if target == "nonbasic_land":

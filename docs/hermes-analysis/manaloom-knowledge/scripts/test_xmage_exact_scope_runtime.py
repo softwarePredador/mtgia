@@ -12438,6 +12438,57 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_return_target_enchanted_permanent_to_owner_hand_respects_constraint(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        non_target = {
+            "name": "Plain Artifact",
+            "type_line": "Artifact",
+            "cmc": 2,
+        }
+        target = {
+            "name": "Enchanted Artifact",
+            "type_line": "Artifact",
+            "cmc": 3,
+            "enchanted": True,
+            "enchanted_by": "Fixture Aura",
+        }
+        opponent.battlefield.extend([non_target, target])
+        effect = {
+            "effect": "remove_permanent",
+            "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+            "target": "enchanted_permanent",
+            "target_constraints": {"card_types": ["permanent"], "enchanted": True},
+            "destination": "hand",
+            "instant": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Cut the Earthly Bond",
+                "type_line": "Instant",
+                "oracle_text": "Return target enchanted permanent to its owner's hand.",
+            },
+            turn=7,
+            rng=random.Random(17),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual([card["name"] for card in opponent.hand], ["Enchanted Artifact"])
+        self.assertEqual([card["name"] for card in opponent.battlefield], ["Plain Artifact"])
+        self.assertTrue(
+            any(
+                event == "removal_resolved"
+                and data.get("card") == "Cut the Earthly Bond"
+                and data.get("target") == "Enchanted Artifact"
+                and data.get("destination") == "hand"
+                and data.get("target_legal") is True
+                for event, data in self.events
+            )
+        )
+
     def test_graveyard_to_hand_recursion_returns_matching_card_only(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

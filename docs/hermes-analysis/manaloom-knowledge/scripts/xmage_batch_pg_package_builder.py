@@ -2448,6 +2448,8 @@ def _target_fixture_from_constraints(
             "exclude_colors",
             "exclude_subtypes",
             "exclude_supertypes",
+            "enchanted",
+            "is_enchanted",
             "combat_state",
             "tapped_state",
             "tap_state",
@@ -2536,6 +2538,10 @@ def _target_fixture_from_constraints(
         fixture["colors"] = colors
     if subtypes:
         fixture["subtypes"] = subtypes
+    if active_constraints.get("enchanted") or active_constraints.get("is_enchanted"):
+        fixture["enchanted"] = bool(matching)
+        if matching:
+            fixture["enchanted_by"] = "E2E Fixture Aura"
     keywords = [
         str(value).strip().lower().replace(" ", "_")
         for value in active_constraints.get("required_keywords") or []
@@ -2564,6 +2570,7 @@ def single_target_removal_execution_scenario_from_expected_rule(
     if required.get("battle_model_scope") not in {
         "xmage_exile_target_spell_v1",
         "xmage_destroy_target_spell_v1",
+        "xmage_return_target_to_hand_spell_v1",
     }:
         return None
     if required.get("effect") not in {"remove_creature", "remove_permanent"}:

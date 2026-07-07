@@ -1,0 +1,606 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg591_bounce_target_variants_new_server_20260707_035542",
+  "deploy_id": "PG591",
+  "execution_scenarios": [
+    {
+      "card": {
+        "name": "Bounce Off",
+        "type_line": "Instant"
+      },
+      "expected_destination": "hand",
+      "expected_effect": "remove_permanent",
+      "expected_target_constraints": {
+        "any_of": [
+          {
+            "card_types": [
+              "creature"
+            ]
+          },
+          {
+            "card_types": [
+              "artifact"
+            ],
+            "required_subtypes": [
+              "vehicle"
+            ]
+          }
+        ]
+      },
+      "logical_rule_key": "battle_rule_v1:f2e24de1c6d45066dbda2109912a63e2",
+      "name": "Bounce Off removes one legal target",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Removal Target",
+        "type_line": "Land"
+      },
+      "target": {
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Legal Removal Target",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "type": "single_target_removal"
+    },
+    {
+      "card": {
+        "name": "Cut the Earthly Bond",
+        "type_line": "Instant"
+      },
+      "expected_destination": "hand",
+      "expected_effect": "remove_permanent",
+      "expected_target_constraints": {
+        "card_types": [
+          "permanent"
+        ],
+        "enchanted": true
+      },
+      "logical_rule_key": "battle_rule_v1:f722ea9825e629e4690dabad8ea3536d",
+      "name": "Cut the Earthly Bond removes one legal target",
+      "nonmatching_target": {
+        "cmc": 3,
+        "effect": "enchantment",
+        "enchanted": false,
+        "name": "E2E Illegal Removal Target",
+        "type_line": "Enchantment"
+      },
+      "target": {
+        "cmc": 3,
+        "effect": "enchantment",
+        "enchanted": true,
+        "enchanted_by": "E2E Fixture Aura",
+        "name": "E2E Legal Removal Target",
+        "type_line": "Enchantment"
+      },
+      "type": "single_target_removal"
+    },
+    {
+      "card": {
+        "name": "Depart the Realm",
+        "type_line": "Instant"
+      },
+      "expected_destination": "hand",
+      "expected_effect": "remove_permanent",
+      "expected_target_constraints": {
+        "card_types": [
+          "permanent"
+        ],
+        "exclude_card_types": [
+          "land"
+        ]
+      },
+      "logical_rule_key": "battle_rule_v1:001a1215317195fb0dd53f88c849c54c",
+      "name": "Depart the Realm removes one legal target",
+      "nonmatching_target": {
+        "cmc": 3,
+        "effect": "land enchantment",
+        "name": "E2E Illegal Removal Target",
+        "type_line": "Land Enchantment"
+      },
+      "target": {
+        "cmc": 3,
+        "effect": "enchantment",
+        "name": "E2E Legal Removal Target",
+        "type_line": "Enchantment"
+      },
+      "type": "single_target_removal"
+    },
+    {
+      "card": {
+        "name": "Hoodwink",
+        "type_line": "Instant"
+      },
+      "expected_destination": "hand",
+      "expected_effect": "remove_permanent",
+      "expected_target_constraints": {
+        "card_types": [
+          "artifact",
+          "enchantment",
+          "land"
+        ]
+      },
+      "logical_rule_key": "battle_rule_v1:09b2438b59221a455f58e7c7e8db8a22",
+      "name": "Hoodwink removes one legal target",
+      "nonmatching_target": {
+        "cmc": 1,
+        "effect": "draw_cards",
+        "name": "E2E Illegal Removal Target",
+        "type_line": "Instant"
+      },
+      "target": {
+        "cmc": 3,
+        "effect": "artifact",
+        "name": "E2E Legal Removal Target",
+        "type_line": "Artifact"
+      },
+      "type": "single_target_removal"
+    },
+    {
+      "card": {
+        "name": "Into Thin Air",
+        "type_line": "Instant"
+      },
+      "expected_destination": "hand",
+      "expected_effect": "remove_permanent",
+      "expected_target_constraints": {
+        "card_types": [
+          "artifact"
+        ]
+      },
+      "logical_rule_key": "battle_rule_v1:1ced64c4f5a32cab3c82e97ad1f7bfad",
+      "name": "Into Thin Air removes one legal target",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Removal Target",
+        "type_line": "Land"
+      },
+      "target": {
+        "cmc": 3,
+        "effect": "artifact",
+        "name": "E2E Legal Removal Target",
+        "type_line": "Artifact"
+      },
+      "type": "single_target_removal"
+    },
+    {
+      "card": {
+        "name": "Wipe Away",
+        "type_line": "Instant"
+      },
+      "expected_destination": "hand",
+      "expected_effect": "remove_permanent",
+      "expected_target_constraints": {
+        "card_types": [
+          "permanent"
+        ]
+      },
+      "logical_rule_key": "battle_rule_v1:2048333401c1ae3096acb4d43a4c83db",
+      "name": "Wipe Away removes one legal target",
+      "nonmatching_target": {
+        "cmc": 1,
+        "effect": "draw_cards",
+        "name": "E2E Illegal Removal Target",
+        "type_line": "Instant"
+      },
+      "target": {
+        "cmc": 3,
+        "effect": "enchantment",
+        "name": "E2E Legal Removal Target",
+        "type_line": "Enchantment"
+      },
+      "type": "single_target_removal"
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Bounce Off",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f2e24de1c6d45066dbda2109912a63e2",
+      "min_rule_version": 2,
+      "normalized_name": "bounce off",
+      "oracle_hash": "4697e48be0d012476635626b59ff686b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+        "destination": "hand",
+        "effect": "remove_permanent",
+        "target": "creature_or_vehicle",
+        "target_constraints": {
+          "any_of": [
+            {
+              "card_types": [
+                "creature"
+              ]
+            },
+            {
+              "card_types": [
+                "artifact"
+              ],
+              "required_subtypes": [
+                "vehicle"
+              ]
+            }
+          ]
+        },
+        "xmage_effect_class": "ReturnToHandTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Cut the Earthly Bond",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f722ea9825e629e4690dabad8ea3536d",
+      "min_rule_version": 2,
+      "normalized_name": "cut the earthly bond",
+      "oracle_hash": "160612165db10cbd4158a1c24ceaa263",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+        "destination": "hand",
+        "effect": "remove_permanent",
+        "target": "enchanted_permanent",
+        "target_constraints": {
+          "card_types": [
+            "permanent"
+          ],
+          "enchanted": true
+        },
+        "xmage_effect_class": "ReturnToHandTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Depart the Realm",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:001a1215317195fb0dd53f88c849c54c",
+      "min_rule_version": 2,
+      "normalized_name": "depart the realm",
+      "oracle_hash": "6183c0a6f7e8710981aeb09c5c2fdee4",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+        "destination": "hand",
+        "effect": "remove_permanent",
+        "target": "nonland_permanent",
+        "target_constraints": {
+          "card_types": [
+            "permanent"
+          ],
+          "exclude_card_types": [
+            "land"
+          ]
+        },
+        "xmage_effect_class": "ReturnToHandTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Hoodwink",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:09b2438b59221a455f58e7c7e8db8a22",
+      "min_rule_version": 2,
+      "normalized_name": "hoodwink",
+      "oracle_hash": "89d3f25fb5311c47d4d3c11cc326914a",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+        "destination": "hand",
+        "effect": "remove_permanent",
+        "target": "artifact_or_enchantment_or_land",
+        "target_constraints": {
+          "card_types": [
+            "artifact",
+            "enchantment",
+            "land"
+          ]
+        },
+        "xmage_effect_class": "ReturnToHandTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Into Thin Air",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1ced64c4f5a32cab3c82e97ad1f7bfad",
+      "min_rule_version": 2,
+      "normalized_name": "into thin air",
+      "oracle_hash": "223da72bf51053d6b0f5dc8845673134",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+        "destination": "hand",
+        "effect": "remove_permanent",
+        "target": "artifact",
+        "target_constraints": {
+          "card_types": [
+            "artifact"
+          ]
+        },
+        "xmage_effect_class": "ReturnToHandTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Wipe Away",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2048333401c1ae3096acb4d43a4c83db",
+      "min_rule_version": 2,
+      "normalized_name": "wipe away",
+      "oracle_hash": "707e43acd81856daca2162b5de8dc02a",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+        "destination": "hand",
+        "effect": "remove_permanent",
+        "target": "permanent",
+        "target_constraints": {
+          "card_types": [
+            "permanent"
+          ]
+        },
+        "xmage_effect_class": "ReturnToHandTargetEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_return_target_to_hand_spell": 6
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg591_bounce_target_variants_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg591_bounce_target_variants_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg591_bounce_target_variants_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg591_bounce_target_variants_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg591_bounce_target_variants_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg591_bounce_target_variants_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-07T03:55:42+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Bounce Off"
+      },
+      "card_name": "Bounce Off",
+      "effect": "remove_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f2e24de1c6d45066dbda2109912a63e2",
+      "normalized_name": "bounce off",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+        "destination": "hand",
+        "effect": "remove_permanent",
+        "target": "creature_or_vehicle",
+        "target_constraints": {
+          "any_of": [
+            {
+              "card_types": [
+                "creature"
+              ]
+            },
+            {
+              "card_types": [
+                "artifact"
+              ],
+              "required_subtypes": [
+                "vehicle"
+              ]
+            }
+          ]
+        },
+        "xmage_effect_class": "ReturnToHandTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Cut the Earthly Bond"
+      },
+      "card_name": "Cut the Earthly Bond",
+      "effect": "remove_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f722ea9825e629e4690dabad8ea3536d",
+      "normalized_name": "cut the earthly bond",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+        "destination": "hand",
+        "effect": "remove_permanent",
+        "target": "enchanted_permanent",
+        "target_constraints": {
+          "card_types": [
+            "permanent"
+          ],
+          "enchanted": true
+        },
+        "xmage_effect_class": "ReturnToHandTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Depart the Realm"
+      },
+      "card_name": "Depart the Realm",
+      "effect": "remove_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:001a1215317195fb0dd53f88c849c54c",
+      "normalized_name": "depart the realm",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+        "destination": "hand",
+        "effect": "remove_permanent",
+        "target": "nonland_permanent",
+        "target_constraints": {
+          "card_types": [
+            "permanent"
+          ],
+          "exclude_card_types": [
+            "land"
+          ]
+        },
+        "xmage_effect_class": "ReturnToHandTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Hoodwink"
+      },
+      "card_name": "Hoodwink",
+      "effect": "remove_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:09b2438b59221a455f58e7c7e8db8a22",
+      "normalized_name": "hoodwink",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+        "destination": "hand",
+        "effect": "remove_permanent",
+        "target": "artifact_or_enchantment_or_land",
+        "target_constraints": {
+          "card_types": [
+            "artifact",
+            "enchantment",
+            "land"
+          ]
+        },
+        "xmage_effect_class": "ReturnToHandTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Into Thin Air"
+      },
+      "card_name": "Into Thin Air",
+      "effect": "remove_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1ced64c4f5a32cab3c82e97ad1f7bfad",
+      "normalized_name": "into thin air",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+        "destination": "hand",
+        "effect": "remove_permanent",
+        "target": "artifact",
+        "target_constraints": {
+          "card_types": [
+            "artifact"
+          ]
+        },
+        "xmage_effect_class": "ReturnToHandTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Wipe Away"
+      },
+      "card_name": "Wipe Away",
+      "effect": "remove_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2048333401c1ae3096acb4d43a4c83db",
+      "normalized_name": "wipe away",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+        "destination": "hand",
+        "effect": "remove_permanent",
+        "target": "permanent",
+        "target_constraints": {
+          "card_types": [
+            "permanent"
+          ]
+        },
+        "xmage_effect_class": "ReturnToHandTargetEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Bounce Off",
+    "Cut the Earthly Bond",
+    "Depart the Realm",
+    "Hoodwink",
+    "Into Thin Air",
+    "Wipe Away"
+  ],
+  "selected_count": 6,
+  "slug": "bounce_target_variants_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Bounce Off",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f2e24de1c6d45066dbda2109912a63e2",
+      "min_rule_version": 2,
+      "normalized_name": "bounce off",
+      "oracle_hash": "4697e48be0d012476635626b59ff686b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Cut the Earthly Bond",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f722ea9825e629e4690dabad8ea3536d",
+      "min_rule_version": 2,
+      "normalized_name": "cut the earthly bond",
+      "oracle_hash": "160612165db10cbd4158a1c24ceaa263",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Depart the Realm",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:001a1215317195fb0dd53f88c849c54c",
+      "min_rule_version": 2,
+      "normalized_name": "depart the realm",
+      "oracle_hash": "6183c0a6f7e8710981aeb09c5c2fdee4",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Hoodwink",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:09b2438b59221a455f58e7c7e8db8a22",
+      "min_rule_version": 2,
+      "normalized_name": "hoodwink",
+      "oracle_hash": "89d3f25fb5311c47d4d3c11cc326914a",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Into Thin Air",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1ced64c4f5a32cab3c82e97ad1f7bfad",
+      "min_rule_version": 2,
+      "normalized_name": "into thin air",
+      "oracle_hash": "223da72bf51053d6b0f5dc8845673134",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Wipe Away",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2048333401c1ae3096acb4d43a4c83db",
+      "min_rule_version": 2,
+      "normalized_name": "wipe away",
+      "oracle_hash": "707e43acd81856daca2162b5de8dc02a",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}
