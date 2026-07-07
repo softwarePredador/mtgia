@@ -1,0 +1,6 @@
+     card_name      |  normalized_name   |           oracle_hash            |                logical_rule_key                 |      shadow_handling       | target_card_rows |          canonical_card_id           | existing_rule_rows | expected_rule_rows_before | would_deprecate_shadow_rows 
+--------------------+--------------------+----------------------------------+-------------------------------------------------+----------------------------+------------------+--------------------------------------+--------------------+---------------------------+-----------------------------
+ Gnarlwood Dryad    | gnarlwood dryad    | 931248cb730afdeffa72975c843822b8 | battle_rule_v1:86d2e2c36b3bec8ff5dd9be436cf3dae | deprecate_nonmatching_rows |                1 | bbc809e6-7cb2-42a0-9d9b-16796472bf6b |                  0 |                         0 |                           0
+ Moldgraf Scavenger | moldgraf scavenger | 75a9e03fe95688a3b46eedb435597e3b | battle_rule_v1:737bfeb625f5b9540007a1aefbfa9685 | deprecate_nonmatching_rows |                1 | 3e4ab294-1529-403e-a2a8-f58f3c3a1be6 |                  0 |                         0 |                           0
+(2 rows)
+

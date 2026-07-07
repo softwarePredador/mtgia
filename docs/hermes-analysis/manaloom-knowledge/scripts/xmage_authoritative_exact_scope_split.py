@@ -8128,7 +8128,25 @@ def static_graveyard_threshold_int(value: str) -> int | None:
 
 def static_graveyard_threshold_boost_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
     text = oracle_text_after_leading_static_keywords(metadata)
-    text = re.sub(r"^(?:threshold|descend\s+\d+)\s*[—-]\s*", "", text).strip()
+    text = re.sub(r"^(?:threshold|delirium|descend\s+\d+)\s*[—-]\s*", "", text).strip()
+    delirium_match = re.match(
+        r"^(?:this creature|[a-z0-9' ,./-]+) gets (?P<power>[+-]\d+)/(?P<toughness>[+-]\d+) "
+        r"as long as there are four or more card types among cards in your graveyard\.?$",
+        text,
+    )
+    if delirium_match:
+        power_bonus = signed_int_from_oracle(delirium_match.group("power"))
+        toughness_bonus = signed_int_from_oracle(delirium_match.group("toughness"))
+        if power_bonus is None or toughness_bonus is None:
+            return None
+        return {
+            "graveyard_count_scope": "controller_graveyard",
+            "graveyard_count_card_types": ["card_type"],
+            "graveyard_count_mode": "distinct_card_types",
+            "graveyard_count_threshold": 4,
+            "static_power_bonus": power_bonus,
+            "static_toughness_bonus": toughness_bonus,
+        }
     match = re.match(
         r"^this creature gets (?P<power>[+-]\d+)/(?P<toughness>[+-]\d+) as long as "
         r"(?:there are (?P<threshold_a>\d+|one|two|three|four|five|six|seven|eight|nine|ten) "
@@ -8173,7 +8191,9 @@ def static_graveyard_threshold_boost_from_source(source: str) -> dict[str, Any] 
         threshold = 4
         card_types = ["permanent"]
     elif "DeliriumCondition" in text:
-        return "static_graveyard_threshold_boost_source_condition_not_supported"
+        threshold = 4
+        card_types = ["card_type"]
+        count_mode = "distinct_card_types"
     elif (
         "LessonsInGraveCondition" in text
         or "CardsInOpponentGraveyardCondition" in text
@@ -8185,6 +8205,7 @@ def static_graveyard_threshold_boost_from_source(source: str) -> dict[str, Any] 
     return {
         "graveyard_count_scope": "controller_graveyard",
         "graveyard_count_card_types": card_types,
+        **({"graveyard_count_mode": count_mode} if "count_mode" in locals() else {}),
         "graveyard_count_threshold": threshold,
         "static_power_bonus": int(boost_match.group(1)),
         "static_toughness_bonus": int(boost_match.group(2)),

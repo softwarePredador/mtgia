@@ -1671,7 +1671,7 @@ def _controlled_creature_has_keyword(permanent, keyword):
     return normalized_keyword in _keyword_values(permanent)
 
 
-def _graveyard_card_type_count(player):
+def _graveyard_card_type_set(player):
     card_types = {
         "artifact",
         "battle",
@@ -1691,7 +1691,11 @@ def _graveyard_card_type_count(player):
         for card_type in card_types:
             if re.search(rf"\b{re.escape(card_type)}\b", type_line):
                 seen.add(card_type)
-    return len(seen)
+    return seen
+
+
+def _graveyard_card_type_count(player):
+    return len(_graveyard_card_type_set(player))
 
 
 def _cost_reduction_condition_satisfied(effect_data, controller):
@@ -42143,6 +42147,12 @@ def static_graveyard_threshold_boost_count(permanent, controller, all_players=No
             participants.insert(0, controller)
     else:
         participants = [controller] if controller is not None else []
+    count_mode = str(permanent.get("graveyard_count_mode") or "").strip().lower()
+    if count_mode in {"distinct_card_types", "card_type_count"}:
+        seen_types = set()
+        for participant in participants:
+            seen_types.update(_graveyard_card_type_set(participant))
+        return len(seen_types)
     allowed_types = permanent.get("graveyard_count_card_types") or ["card"]
     count = 0
     for participant in participants:

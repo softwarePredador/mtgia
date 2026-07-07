@@ -1,0 +1,6 @@
+     card_name      |  normalized_name   |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows 
+--------------------+--------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
+ Gnarlwood Dryad    | gnarlwood dryad    | battle_rule_v1:86d2e2c36b3bec8ff5dd9be436cf3dae |                  1 |                           1 |                         1 |           0
+ Moldgraf Scavenger | moldgraf scavenger | battle_rule_v1:737bfeb625f5b9540007a1aefbfa9685 |                  1 |                           1 |                         1 |           0
+(2 rows)
+

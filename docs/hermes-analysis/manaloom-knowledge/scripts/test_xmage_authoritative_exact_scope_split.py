@@ -3127,6 +3127,44 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["static_power_bonus"], 3)
         self.assertEqual(effect["static_toughness_bonus"], 0)
 
+    def test_static_graveyard_threshold_boost_delirium_distinct_card_types_is_package_safe(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["BoostSourceEffect", "ConditionalContinuousEffect"],
+            ability_kind="static",
+            ability_classes=["DeathtouchAbility", "SimpleStaticAbility"],
+            xmage_signals=["condition", "static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Gnarlwood Dryad",
+                type_line="Creature - Dryad Horror",
+                oracle_text=(
+                    "Deathtouch\n"
+                    "Delirium — This creature gets +2/+2 as long as "
+                    "there are four or more card types among cards in your graveyard."
+                ),
+            ),
+            source_text=(
+                "this.addAbility(new SimpleStaticAbility(new ConditionalContinuousEffect("
+                "new BoostSourceEffect(2, 2, Duration.WhileOnBattlefield), "
+                "DeliriumCondition.instance, \"delirium\")));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.STATIC_GRAVEYARD_THRESHOLD_BOOST_SCOPE)
+        self.assertEqual(effect["static_effect"], "source_power_toughness_boost_if_graveyard_count")
+        self.assertEqual(effect["graveyard_count_scope"], "controller_graveyard")
+        self.assertEqual(effect["graveyard_count_card_types"], ["card_type"])
+        self.assertEqual(effect["graveyard_count_mode"], "distinct_card_types")
+        self.assertEqual(effect["graveyard_count_threshold"], 4)
+        self.assertEqual(effect["static_power_bonus"], 2)
+        self.assertEqual(effect["static_toughness_bonus"], 2)
+        self.assertIn("deathtouch", effect["keywords"])
+
     def test_static_graveyard_threshold_boost_blocks_opponent_graveyard_count(self) -> None:
         row = queue_row(
             split.RECURSION_UNIT,

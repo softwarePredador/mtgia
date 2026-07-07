@@ -149,6 +149,43 @@ def test_static_cost_reduction_colored_symbols_fields_and_execution_scenario_are
     assert scenario["expected_static_cost_reduction_color_symbols"] == ["W", "B"]
 
 
+def test_static_graveyard_threshold_distinct_card_types_fields_and_execution_scenario_are_manifested() -> None:
+    proposal = {
+        "normalized_name": "gnarlwood dryad",
+        "card_name": "Gnarlwood Dryad",
+        "oracle_hash": "hash-gnarlwood-dryad",
+        "logical_rule_key": "battle_rule_v1:gnarlwood-dryad",
+        "effect_json": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_static_source_boost_if_graveyard_threshold_v1",
+            "static_effect": "source_power_toughness_boost_if_graveyard_count",
+            "graveyard_count_scope": "controller_graveyard",
+            "graveyard_count_card_types": ["card_type"],
+            "graveyard_count_mode": "distinct_card_types",
+            "graveyard_count_threshold": 4,
+            "static_power_bonus": 2,
+            "static_toughness_bonus": 2,
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    required = expected["required_effect_fields"]
+    assert required["graveyard_count_mode"] == "distinct_card_types"
+    assert required["graveyard_count_card_types"] == ["card_type"]
+    assert scenario["type"] == "static_graveyard_threshold_source_boost"
+    assert scenario["expected_count"] == 4
+    assert scenario["expected_power"] == 3
+    assert scenario["expected_toughness"] == 3
+    assert {card["type_line"] for card in scenario["controller_graveyard"]} == {
+        "Creature",
+        "Enchantment",
+        "Instant",
+        "Land",
+    }
+
+
 def test_creature_etb_draw_discard_execution_scenario_is_manifested() -> None:
     proposal = {
         "normalized_name": "bazaar trademage",

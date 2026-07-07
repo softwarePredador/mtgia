@@ -471,6 +471,7 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "static_power_toughness_source",
     "graveyard_count_scope",
     "graveyard_count_card_types",
+    "graveyard_count_mode",
     "graveyard_count_card_names",
     "graveyard_count_subtypes",
     "graveyard_count_threshold",
@@ -1376,6 +1377,61 @@ def static_count_pt_execution_scenario_from_expected_rule(rule: dict[str, Any]) 
         "expected_count": expected_count,
         "expected_power": expected_value,
         "expected_toughness": expected_value,
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
+def static_graveyard_threshold_boost_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_static_source_boost_if_graveyard_threshold_v1":
+        return None
+    if required.get("static_effect") != "source_power_toughness_boost_if_graveyard_count":
+        return None
+
+    base_power = 1
+    base_toughness = 1
+    count_mode = str(required.get("graveyard_count_mode") or "").strip().lower()
+    card_types = [str(value).lower() for value in required.get("graveyard_count_card_types") or ["card"]]
+    threshold = int(required.get("graveyard_count_threshold") or 0)
+    if count_mode == "distinct_card_types":
+        controller_graveyard = [
+            {"name": "E2E Graveyard Creature", "type_line": "Creature"},
+            {"name": "E2E Graveyard Instant", "type_line": "Instant"},
+            {"name": "E2E Graveyard Land", "type_line": "Land"},
+            {"name": "E2E Graveyard Enchantment", "type_line": "Enchantment"},
+        ]
+        expected_count = 4
+    elif "permanent" in card_types:
+        controller_graveyard = [
+            {"name": "E2E Graveyard Creature", "type_line": "Creature"},
+            {"name": "E2E Graveyard Artifact", "type_line": "Artifact"},
+            {"name": "E2E Graveyard Land", "type_line": "Land"},
+            {"name": "E2E Graveyard Enchantment", "type_line": "Enchantment"},
+        ]
+        expected_count = len(controller_graveyard)
+    else:
+        expected_count = max(threshold, 1)
+        controller_graveyard = [
+            {"name": f"E2E Graveyard Card {index}", "type_line": "Instant"}
+            for index in range(1, expected_count + 1)
+        ]
+
+    return {
+        "name": f"{rule['card_name']} graveyard threshold boost applies",
+        "type": "static_graveyard_threshold_source_boost",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": "Creature - E2E",
+            "power": base_power,
+            "toughness": base_toughness,
+        },
+        "controller_graveyard": controller_graveyard,
+        "expected_count": expected_count,
+        "expected_active": True,
+        "expected_power": base_power + int(required.get("static_power_bonus") or 0),
+        "expected_toughness": base_toughness + int(required.get("static_toughness_bonus") or 0),
         "logical_rule_key": rule["logical_rule_key"],
     }
 
@@ -3922,6 +3978,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or static_controlled_keyword_execution_scenario_from_expected_rule(rule)
         or static_global_pt_execution_scenario_from_expected_rule(rule)
         or aura_static_pt_execution_scenario_from_expected_rule(rule)
+        or static_graveyard_threshold_boost_execution_scenario_from_expected_rule(rule)
         or static_count_pt_execution_scenario_from_expected_rule(rule)
         or destroy_target_create_treasure_execution_scenario_from_expected_rule(rule)
         or creature_etb_create_treasure_execution_scenario_from_expected_rule(rule)

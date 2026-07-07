@@ -1,0 +1,245 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg636_delirium_threshold_boost_new_serve_20260707_201340",
+  "deploy_id": "pg636",
+  "execution_scenarios": [
+    {
+      "card": {
+        "name": "Gnarlwood Dryad",
+        "power": 1,
+        "toughness": 1,
+        "type_line": "Creature - E2E"
+      },
+      "controller_graveyard": [
+        {
+          "name": "E2E Graveyard Creature",
+          "type_line": "Creature"
+        },
+        {
+          "name": "E2E Graveyard Instant",
+          "type_line": "Instant"
+        },
+        {
+          "name": "E2E Graveyard Land",
+          "type_line": "Land"
+        },
+        {
+          "name": "E2E Graveyard Enchantment",
+          "type_line": "Enchantment"
+        }
+      ],
+      "expected_active": true,
+      "expected_count": 4,
+      "expected_power": 3,
+      "expected_toughness": 3,
+      "logical_rule_key": "battle_rule_v1:86d2e2c36b3bec8ff5dd9be436cf3dae",
+      "name": "Gnarlwood Dryad graveyard threshold boost applies",
+      "type": "static_graveyard_threshold_source_boost"
+    },
+    {
+      "card": {
+        "name": "Moldgraf Scavenger",
+        "power": 1,
+        "toughness": 1,
+        "type_line": "Creature - E2E"
+      },
+      "controller_graveyard": [
+        {
+          "name": "E2E Graveyard Creature",
+          "type_line": "Creature"
+        },
+        {
+          "name": "E2E Graveyard Instant",
+          "type_line": "Instant"
+        },
+        {
+          "name": "E2E Graveyard Land",
+          "type_line": "Land"
+        },
+        {
+          "name": "E2E Graveyard Enchantment",
+          "type_line": "Enchantment"
+        }
+      ],
+      "expected_active": true,
+      "expected_count": 4,
+      "expected_power": 4,
+      "expected_toughness": 1,
+      "logical_rule_key": "battle_rule_v1:737bfeb625f5b9540007a1aefbfa9685",
+      "name": "Moldgraf Scavenger graveyard threshold boost applies",
+      "type": "static_graveyard_threshold_source_boost"
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Gnarlwood Dryad",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:86d2e2c36b3bec8ff5dd9be436cf3dae",
+      "min_rule_version": 2,
+      "normalized_name": "gnarlwood dryad",
+      "oracle_hash": "931248cb730afdeffa72975c843822b8",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_source_boost_if_graveyard_threshold_v1",
+        "effect": "creature",
+        "graveyard_count_card_types": [
+          "card_type"
+        ],
+        "graveyard_count_mode": "distinct_card_types",
+        "graveyard_count_scope": "controller_graveyard",
+        "graveyard_count_threshold": 4,
+        "keywords": [
+          "deathtouch"
+        ],
+        "static_effect": "source_power_toughness_boost_if_graveyard_count",
+        "static_power_bonus": 2,
+        "static_toughness_bonus": 2,
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Moldgraf Scavenger",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:737bfeb625f5b9540007a1aefbfa9685",
+      "min_rule_version": 2,
+      "normalized_name": "moldgraf scavenger",
+      "oracle_hash": "75a9e03fe95688a3b46eedb435597e3b",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_source_boost_if_graveyard_threshold_v1",
+        "effect": "creature",
+        "graveyard_count_card_types": [
+          "card_type"
+        ],
+        "graveyard_count_mode": "distinct_card_types",
+        "graveyard_count_scope": "controller_graveyard",
+        "graveyard_count_threshold": 4,
+        "static_effect": "source_power_toughness_boost_if_graveyard_count",
+        "static_power_bonus": 3,
+        "static_toughness_bonus": 0,
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_static_source_boost_if_graveyard_threshold": 2
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg636_delirium_threshold_boost_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg636_delirium_threshold_boost_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg636_delirium_threshold_boost_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg636_delirium_threshold_boost_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg636_delirium_threshold_boost_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg636_delirium_threshold_boost_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-07T20:13:40+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Gnarlwood Dryad"
+      },
+      "card_name": "Gnarlwood Dryad",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:86d2e2c36b3bec8ff5dd9be436cf3dae",
+      "normalized_name": "gnarlwood dryad",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_source_boost_if_graveyard_threshold_v1",
+        "effect": "creature",
+        "graveyard_count_card_types": [
+          "card_type"
+        ],
+        "graveyard_count_mode": "distinct_card_types",
+        "graveyard_count_scope": "controller_graveyard",
+        "graveyard_count_threshold": 4,
+        "keywords": [
+          "deathtouch"
+        ],
+        "static_effect": "source_power_toughness_boost_if_graveyard_count",
+        "static_power_bonus": 2,
+        "static_toughness_bonus": 2,
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Moldgraf Scavenger"
+      },
+      "card_name": "Moldgraf Scavenger",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:737bfeb625f5b9540007a1aefbfa9685",
+      "normalized_name": "moldgraf scavenger",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_source_boost_if_graveyard_threshold_v1",
+        "effect": "creature",
+        "graveyard_count_card_types": [
+          "card_type"
+        ],
+        "graveyard_count_mode": "distinct_card_types",
+        "graveyard_count_scope": "controller_graveyard",
+        "graveyard_count_threshold": 4,
+        "static_effect": "source_power_toughness_boost_if_graveyard_count",
+        "static_power_bonus": 3,
+        "static_toughness_bonus": 0,
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Gnarlwood Dryad",
+    "Moldgraf Scavenger"
+  ],
+  "selected_count": 2,
+  "slug": "delirium_threshold_boost_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Gnarlwood Dryad",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:86d2e2c36b3bec8ff5dd9be436cf3dae",
+      "min_rule_version": 2,
+      "normalized_name": "gnarlwood dryad",
+      "oracle_hash": "931248cb730afdeffa72975c843822b8",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_source_boost_if_graveyard_threshold_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Moldgraf Scavenger",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:737bfeb625f5b9540007a1aefbfa9685",
+      "min_rule_version": 2,
+      "normalized_name": "moldgraf scavenger",
+      "oracle_hash": "75a9e03fe95688a3b46eedb435597e3b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_source_boost_if_graveyard_threshold_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

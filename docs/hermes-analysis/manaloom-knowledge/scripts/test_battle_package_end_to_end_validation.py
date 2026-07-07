@@ -241,6 +241,61 @@ def test_static_cost_reduction_runner_executes_colored_reduction() -> None:
     assert result["static_cost_reduction_color_symbols"] == ["W", "B"]
 
 
+def test_static_graveyard_threshold_runner_executes_distinct_card_type_delirium() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "creature",
+        "battle_model_scope": "xmage_static_source_boost_if_graveyard_threshold_v1",
+        "static_effect": "source_power_toughness_boost_if_graveyard_count",
+        "graveyard_count_scope": "controller_graveyard",
+        "graveyard_count_card_types": ["card_type"],
+        "graveyard_count_mode": "distinct_card_types",
+        "graveyard_count_threshold": 4,
+        "static_power_bonus": 2,
+        "static_toughness_bonus": 2,
+        "_rule_logical_key": "battle_rule_v1:gnarlwood-dryad",
+    }
+    try:
+        result = validator.run_static_graveyard_threshold_source_boost(
+            battle,
+            {
+                "name": "Gnarlwood Dryad graveyard threshold boost applies",
+                "type": "static_graveyard_threshold_source_boost",
+                "card": {
+                    "name": "Gnarlwood Dryad",
+                    "type_line": "Creature - Dryad Horror",
+                    "power": 1,
+                    "toughness": 1,
+                },
+                "controller_graveyard": [
+                    {"name": "E2E Graveyard Creature", "type_line": "Creature"},
+                    {"name": "E2E Graveyard Instant", "type_line": "Instant"},
+                    {"name": "E2E Graveyard Land", "type_line": "Land"},
+                    {"name": "E2E Graveyard Enchantment", "type_line": "Enchantment"},
+                ],
+                "expected_count": 4,
+                "expected_active": True,
+                "expected_power": 3,
+                "expected_toughness": 3,
+                "logical_rule_key": "battle_rule_v1:gnarlwood-dryad",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Gnarlwood Dryad"
+    assert result["power"] == 3
+    assert result["toughness"] == 3
+    assert result["graveyard_count"] == 4
+    assert result["active"] is True
+
+
 def test_simple_activated_damage_runner_executes_life_cost() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

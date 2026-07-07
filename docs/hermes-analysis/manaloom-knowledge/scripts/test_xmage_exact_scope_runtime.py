@@ -1803,6 +1803,58 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertEqual(capybara["power"], 6)
         self.assertEqual(capybara["toughness"], 2)
 
+    def test_static_graveyard_threshold_source_boost_counts_distinct_card_types_for_delirium(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        active.graveyard = [
+            {"name": "Creature A", "type_line": "Creature - Bear"},
+            {"name": "Instant A", "type_line": "Instant"},
+            {"name": "Land A", "type_line": "Land"},
+            {"name": "Instant B", "type_line": "Instant"},
+        ]
+        dryad = {
+            "name": "Gnarlwood Dryad",
+            "type_line": "Creature - Dryad Horror",
+            "effect": "creature",
+            "power": 1,
+            "toughness": 1,
+            "battle_model_scope": "xmage_static_source_boost_if_graveyard_threshold_v1",
+            "static_effect": "source_power_toughness_boost_if_graveyard_count",
+            "graveyard_count_scope": "controller_graveyard",
+            "graveyard_count_card_types": ["card_type"],
+            "graveyard_count_mode": "distinct_card_types",
+            "graveyard_count_threshold": 4,
+            "static_power_bonus": 2,
+            "static_toughness_bonus": 2,
+        }
+        active.battlefield = [dryad]
+
+        self.battle.refresh_graveyard_count_creature_statics_for_player(active, turn=2, phase="test")
+        self.assertFalse(dryad["_static_graveyard_threshold_active"])
+        self.assertEqual(dryad["static_graveyard_threshold_count_current"], 3)
+        self.assertEqual(dryad["power"], 1)
+        self.assertEqual(dryad["toughness"], 1)
+
+        active.graveyard.append({"name": "Enchantment A", "type_line": "Enchantment"})
+        self.battle.refresh_graveyard_count_creature_statics_for_player(
+            active,
+            turn=3,
+            phase="test",
+            emit_events=True,
+        )
+        self.assertTrue(dryad["_static_graveyard_threshold_active"])
+        self.assertEqual(dryad["static_graveyard_threshold_count_current"], 4)
+        self.assertEqual(dryad["power"], 3)
+        self.assertEqual(dryad["toughness"], 3)
+        self.assertTrue(
+            any(
+                event == "static_graveyard_threshold_source_boost_changed"
+                and data.get("card") == "Gnarlwood Dryad"
+                and data.get("graveyard_count") == 4
+                and data.get("active") is True
+                for event, data in self.events
+            )
+        )
+
     def test_static_graveyard_count_source_boost_counts_controller_graveyard_without_cumulative_bonus(self) -> None:
         active = self.battle.Player("Active", None, [])
         active.graveyard = [
