@@ -19900,6 +19900,76 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertTrue(effect["_keywords_are_self"])
         self.assertEqual(effect["etb_library_look_count"], 2)
 
+    def test_creature_etb_library_pick_bottom_filtered_exact_unit(self) -> None:
+        row = queue_row(
+            split.ETB_LOOK_LIBRARY_PICK_CREATURE_UNIT,
+            effect_classes=["LookLibraryAndPickControllerEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Augur of Bolas",
+                type_line="Creature - Merfolk Wizard",
+                oracle_text=(
+                    "When Augur of Bolas enters the battlefield, look at the top three cards of your library. "
+                    "You may reveal an instant or sorcery card from among them and put it into your hand. "
+                    "Put the rest on the bottom of your library in any order."
+                ),
+            ),
+            source_text="""
+                this.addAbility(new EntersBattlefieldTriggeredAbility(new LookLibraryAndPickControllerEffect(
+                    3, 1, StaticFilters.FILTER_CARD_INSTANT_OR_SORCERY,
+                    PutCards.HAND, PutCards.BOTTOM_ANY
+                )));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.ETB_LIBRARY_PICK_BOTTOM_CREATURE_SCOPE)
+        self.assertEqual(effect["etb_library_look_count"], 3)
+        self.assertEqual(effect["etb_library_pick_count"], 1)
+        self.assertEqual(effect["etb_library_pick_target"], "instant_or_sorcery")
+        self.assertEqual(effect["etb_library_rest_destination"], "library_bottom")
+        self.assertTrue(effect["etb_library_pick_up_to_count"])
+        self.assertEqual(effect["etb_library_bottom_order"], "any")
+
+    def test_creature_etb_library_pick_bottom_any_card_exact_unit(self) -> None:
+        row = queue_row(
+            split.ETB_LOOK_LIBRARY_PICK_CREATURE_UNIT,
+            effect_classes=["LookLibraryAndPickControllerEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Sea Gate Oracle",
+                type_line="Creature - Human Wizard",
+                oracle_text=(
+                    "When Sea Gate Oracle enters the battlefield, look at the top two cards of your library. "
+                    "Put one of them into your hand and the other on the bottom of your library."
+                ),
+            ),
+            source_text="""
+                this.addAbility(new EntersBattlefieldTriggeredAbility(
+                    new LookLibraryAndPickControllerEffect(2, 1, PutCards.HAND, PutCards.BOTTOM_ANY)));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.ETB_LIBRARY_PICK_BOTTOM_CREATURE_SCOPE)
+        self.assertEqual(effect["etb_library_look_count"], 2)
+        self.assertEqual(effect["etb_library_pick_count"], 1)
+        self.assertEqual(effect["etb_library_pick_target"], "any_card")
+        self.assertEqual(effect["etb_library_rest_destination"], "library_bottom")
+        self.assertEqual(effect["etb_library_bottom_order"], "any")
+
     def test_creature_etb_library_pick_blocks_top_any_destination(self) -> None:
         row = queue_row(
             split.RECURSION_UNIT,

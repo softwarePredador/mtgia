@@ -44124,6 +44124,7 @@ def library_dig_card_matches_pick_target(candidate, pick_target):
     def has_type(card_type):
         return bool(re.search(rf"\b{re.escape(str(card_type).lower())}\b", type_line))
 
+    type_tokens = set(type_line.split())
     if target in {"creature", "land", "enchantment", "artifact", "instant", "sorcery", "planeswalker", "battle"}:
         return has_type(target)
     if target == "creature_or_land":
@@ -44136,6 +44137,33 @@ def library_dig_card_matches_pick_target(candidate, pick_target):
         return has_type("enchantment") or has_type("land")
     if target == "instant_or_sorcery":
         return has_type("instant") or has_type("sorcery")
+    if target == "human_card":
+        return "human" in type_tokens
+    if target == "green_card":
+        return _spell_has_color(candidate, "G")
+    if target == "artifact_or_pirate":
+        return has_type("artifact") or "pirate" in type_tokens
+    if target == "land_or_double_faced":
+        layout = str(candidate.get("layout") or "").lower()
+        is_double_faced = bool(candidate.get("card_faces")) or "//" in str(candidate.get("name") or "")
+        return has_type("land") or is_double_faced or layout in {
+            "transform",
+            "modal_dfc",
+            "meld",
+            "double_faced_token",
+        }
+    if target == "mount_creature_or_plains":
+        return (has_type("creature") and "mount" in type_tokens) or (has_type("land") and "plains" in type_tokens)
+    if target == "goblin_swamp_or_mountain":
+        return "goblin" in type_tokens or (has_type("land") and bool({"swamp", "mountain"} & type_tokens))
+    if target == "elf_swamp_or_forest":
+        return "elf" in type_tokens or (has_type("land") and bool({"swamp", "forest"} & type_tokens))
+    if target == "elemental_island_or_mountain":
+        return "elemental" in type_tokens or (has_type("land") and bool({"island", "mountain"} & type_tokens))
+    if target == "kithkin_forest_or_plains":
+        return "kithkin" in type_tokens or (has_type("land") and bool({"forest", "plains"} & type_tokens))
+    if target == "merfolk_plains_or_island":
+        return "merfolk" in type_tokens or (has_type("land") and bool({"plains", "island"} & type_tokens))
     if target == "colorless_card":
         colors = candidate.get("colors")
         color_identity = candidate.get("color_identity")

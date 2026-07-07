@@ -2269,6 +2269,60 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_creature_etb_library_pick_can_bottom_unpicked_filtered_cards(self) -> None:
+        active = self.battle.Player(
+            "Active",
+            None,
+            [
+                {"name": "Nonmatching Creature", "type_line": "Creature - Scout", "cmc": 7},
+                {"name": "High Value Instant", "type_line": "Instant", "cmc": 8},
+                {"name": "Low Value Sorcery", "type_line": "Sorcery", "cmc": 2},
+            ],
+        )
+        opponent = self.battle.Player("Opponent", None, [])
+        permanent = {
+            "name": "Augur of Bolas",
+            "type_line": "Creature - Merfolk Wizard",
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+            "ability_kind": "triggered",
+            "trigger": "enters_battlefield",
+            "etb_library_look_count": 3,
+            "etb_library_pick_count": 1,
+            "etb_library_pick_target": "instant_or_sorcery",
+            "etb_library_rest_destination": "library_bottom",
+            "etb_library_pick_up_to_count": True,
+            "etb_library_bottom_order": "any",
+        }
+
+        self.battle.resolve_generic_permanent_etb(
+            active,
+            [opponent],
+            permanent,
+            permanent,
+            turn=5,
+            rng=random.Random(6),
+        )
+
+        self.assertEqual([card["name"] for card in active.hand], ["High Value Instant"])
+        self.assertEqual(active.graveyard, [])
+        self.assertEqual(
+            [card["name"] for card in active.library],
+            ["Nonmatching Creature", "Low Value Sorcery"],
+        )
+        self.assertTrue(
+            any(
+                event == "dig_to_hand_resolved"
+                and data.get("card") == "Augur of Bolas"
+                and data.get("looked_count") == 3
+                and data.get("picked") == ["High Value Instant"]
+                and data.get("moved_to_library_bottom") == ["Nonmatching Creature", "Low Value Sorcery"]
+                and data.get("rest_destination") == "library_bottom"
+                and data.get("pick_target") == "instant_or_sorcery"
+                for event, data in self.events
+            )
+        )
+
     def test_library_tutor_to_battlefield_respects_tapped_flag(self) -> None:
         active = self.battle.Player(
             "Active",

@@ -124,6 +124,10 @@ LOOK_LIBRARY_PICK_SPELL_UNIT = (
     "xmage_signature::LookLibraryAndPickControllerEffect::no_ability_class::"
     "no_target_class::no_condition_class::no_signal"
 )
+ETB_LOOK_LIBRARY_PICK_CREATURE_UNIT = (
+    "xmage_signature::LookLibraryAndPickControllerEffect::EntersBattlefieldTriggeredAbility::"
+    "no_target_class::no_condition_class::triggered_ability"
+)
 TARGET_PLAYER_DISCARD_UNIT = (
     "xmage_signature::DiscardTargetEffect::no_ability_class::"
     "TargetPlayer::no_condition_class::targeting"
@@ -174,6 +178,7 @@ SUPPORTED_UNITS = {
     TOKEN_SPELL_UNIT,
     TOKEN_SPELL_FLASHBACK_UNIT,
     LOOK_LIBRARY_PICK_SPELL_UNIT,
+    ETB_LOOK_LIBRARY_PICK_CREATURE_UNIT,
     TARGET_PLAYER_DISCARD_UNIT,
 }
 
@@ -355,6 +360,7 @@ ETB_RECURSION_BATTLEFIELD_CREATURE_SCOPE = "xmage_creature_etb_return_graveyard_
 ETB_MILL_RECURSION_CREATURE_SCOPE = "xmage_creature_etb_mill_then_return_graveyard_card_to_hand_v1"
 ETB_GRAVEYARD_TO_LIBRARY_CREATURE_SCOPE = "xmage_creature_etb_put_graveyard_card_on_library_v1"
 ETB_LIBRARY_PICK_CREATURE_SCOPE = "xmage_creature_etb_look_library_pick_to_hand_rest_graveyard_v1"
+ETB_LIBRARY_PICK_BOTTOM_CREATURE_SCOPE = "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1"
 DAMAGE_RECURSION_CREATURE_SCOPE = "xmage_creature_combat_damage_return_graveyard_card_to_hand_v1"
 COMBAT_DAMAGE_DRAW_CREATURE_SCOPE = "xmage_creature_combat_damage_draw_cards_v1"
 ATTACK_RECURSION_PERMANENT_SCOPE = "xmage_permanent_attack_return_graveyard_card_to_hand_v1"
@@ -3410,6 +3416,38 @@ def library_pick_target_constraints_for(target: str) -> dict[str, Any]:
         constraints["card_types"] = ["enchantment", "land"]
     elif target == "instant_or_sorcery":
         constraints["card_types"] = ["instant", "sorcery"]
+    elif target == "human_card":
+        constraints["subtypes"] = ["human"]
+    elif target == "green_card":
+        constraints["colors"] = ["G"]
+    elif target == "artifact_or_pirate":
+        constraints["any_of"] = [{"card_types": ["artifact"]}, {"subtypes": ["pirate"]}]
+    elif target == "land_or_double_faced":
+        constraints["any_of"] = [{"card_types": ["land"]}, {"layout": "double_faced"}]
+    elif target == "mount_creature_or_plains":
+        constraints["any_of"] = [
+            {"card_types": ["creature"], "subtypes": ["mount"]},
+            {"card_types": ["land"], "subtypes": ["plains"]},
+        ]
+    elif target in {
+        "goblin_swamp_or_mountain",
+        "elf_swamp_or_forest",
+        "elemental_island_or_mountain",
+        "kithkin_forest_or_plains",
+        "merfolk_plains_or_island",
+    }:
+        subtype, first_land, second_land = {
+            "goblin_swamp_or_mountain": ("goblin", "swamp", "mountain"),
+            "elf_swamp_or_forest": ("elf", "swamp", "forest"),
+            "elemental_island_or_mountain": ("elemental", "island", "mountain"),
+            "kithkin_forest_or_plains": ("kithkin", "forest", "plains"),
+            "merfolk_plains_or_island": ("merfolk", "plains", "island"),
+        }[target]
+        constraints["any_of"] = [
+            {"subtypes": [subtype]},
+            {"card_types": ["land"], "subtypes": [first_land]},
+            {"card_types": ["land"], "subtypes": [second_land]},
+        ]
     elif target == "colorless_card":
         constraints["colorless"] = True
     elif target == "snow_permanent":
@@ -8472,7 +8510,7 @@ def is_creature_etb_graveyard_to_library_unit(row: dict[str, Any]) -> bool:
 
 
 def is_creature_etb_library_pick_unit(row: dict[str, Any]) -> bool:
-    if str(row.get("adapter_work_unit") or "") != RECURSION_UNIT:
+    if str(row.get("adapter_work_unit") or "") not in {RECURSION_UNIT, ETB_LOOK_LIBRARY_PICK_CREATURE_UNIT}:
         return False
     abilities = ability_classes(row)
     remaining = abilities - {"EntersBattlefieldTriggeredAbility"}
@@ -16221,13 +16259,23 @@ def library_pick_target_from_phrase(phrase: str) -> str | None:
     normalized = normalized.removesuffix(" cards").removesuffix(" card")
     mapping = {
         "artifact, creature, or land": "artifact_creature_or_land",
+        "artifact or pirate": "artifact_or_pirate",
         "colorless": "colorless_card",
         "colorless card": "colorless_card",
         "creature or enchantment": "creature_or_enchantment",
         "creature or land": "creature_or_land",
         "enchantment or land": "enchantment_or_land",
+        "goblin, swamp, or mountain": "goblin_swamp_or_mountain",
+        "elf, swamp, or forest": "elf_swamp_or_forest",
+        "elemental, island, or mountain": "elemental_island_or_mountain",
+        "kithkin, forest, or plains": "kithkin_forest_or_plains",
+        "merfolk, plains, or island": "merfolk_plains_or_island",
+        "green": "green_card",
+        "human": "human_card",
         "instant and/or sorcery": "instant_or_sorcery",
         "instant or sorcery": "instant_or_sorcery",
+        "land or double-faced": "land_or_double_faced",
+        "mount creature or plains": "mount_creature_or_plains",
         "snow permanent": "snow_permanent",
         "enchantment": "enchantment",
         "creature": "creature",
@@ -16285,6 +16333,8 @@ def library_pick_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
 def library_pick_target_from_source(source: str, filter_arg: str) -> str | None:
     text = source or ""
     filter_ref = str(filter_arg or "").strip()
+    if "FILTER_CARD_INSTANT_OR_SORCERY" in filter_ref or "FILTER_CARD_INSTANT_OR_SORCERY" in text:
+        return "instant_or_sorcery"
     if "FILTER_CARD_ARTIFACTS" in filter_ref or "FILTER_CARD_ARTIFACTS" in text:
         return "artifact"
     if "FILTER_CARD_CREATURES" in filter_ref or "FILTER_CARD_CREATURES" in text:
@@ -16306,6 +16356,37 @@ def library_pick_target_from_source(source: str, filter_arg: str) -> str | None:
         target = library_pick_target_from_phrase(filter_match.group(1))
         if target is not None:
             return target
+    if "ObjectColor.GREEN" in text or "ColorPredicate(ObjectColor.GREEN)" in text:
+        return "green_card"
+    subtype_names = {
+        "SubType.HUMAN": "human_card",
+        "SubType.GOBLIN": "goblin_swamp_or_mountain",
+        "SubType.ELF": "elf_swamp_or_forest",
+        "SubType.ELEMENTAL": "elemental_island_or_mountain",
+        "SubType.KITHKIN": "kithkin_forest_or_plains",
+        "SubType.MERFOLK": "merfolk_plains_or_island",
+        "SubType.MOUNT": "mount_creature_or_plains",
+        "SubType.PIRATE": "artifact_or_pirate",
+    }
+    for source_subtype, target in subtype_names.items():
+        if source_subtype in text:
+            if target == "artifact_or_pirate" and "CardType.ARTIFACT" not in text:
+                continue
+            if target == "mount_creature_or_plains" and "SubType.PLAINS" not in text:
+                continue
+            if target.endswith("_swamp_or_mountain") and not ("SubType.SWAMP" in text and "SubType.MOUNTAIN" in text):
+                continue
+            if target.endswith("_swamp_or_forest") and not ("SubType.SWAMP" in text and "SubType.FOREST" in text):
+                continue
+            if target.endswith("_island_or_mountain") and not ("SubType.ISLAND" in text and "SubType.MOUNTAIN" in text):
+                continue
+            if target.endswith("_forest_or_plains") and not ("SubType.FOREST" in text and "SubType.PLAINS" in text):
+                continue
+            if target.endswith("_plains_or_island") and not ("SubType.PLAINS" in text and "SubType.ISLAND" in text):
+                continue
+            return target
+    if "DoubleFacedCardPredicate" in text and "CardType.LAND" in text:
+        return "land_or_double_faced"
     if (
         "CardType.ARTIFACT.getPredicate()" in text
         and "CardType.CREATURE.getPredicate()" in text
@@ -16559,10 +16640,18 @@ def etb_recursion_to_battlefield_from_oracle(metadata: dict[str, Any]) -> dict[s
 
 def etb_library_pick_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
     text = oracle_text_after_leading_static_keywords(metadata)
-    trigger_prefix = r"^when (?:this creature|[^,]+?) enters(?: the battlefield)?, "
+    text = re.sub(
+        r"^when (?:this creature|[^,]+?) enters(?: the battlefield)?,\s*",
+        "",
+        text,
+    )
+    pseudo_metadata = dict(metadata)
+    pseudo_metadata["oracle_text"] = text
+    parsed = look_library_pick_from_oracle(pseudo_metadata)
+    if isinstance(parsed, dict):
+        return parsed
     match = re.match(
-        trigger_prefix
-        + r"look at the top (?P<look>\w+) cards of your library(?:, then|\.) "
+        r"^look at the top (?P<look>\w+) cards of your library(?:, then|\.) "
         + r"put one of (?:them|those cards) into your hand and "
         + r"(?:the other|the rest) into your graveyard\.?$",
         text,
@@ -16581,21 +16670,10 @@ def etb_library_pick_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | s
 
 
 def etb_library_pick_from_source(source: str) -> dict[str, Any] | str:
-    text = source or ""
-    match = re.search(
-        r"LookLibraryAndPickControllerEffect\s*\(\s*(?P<look>\d+)\s*,\s*"
-        r"(?P<pick>\d+)\s*,\s*PutCards\.HAND\s*,\s*PutCards\.GRAVEYARD",
-        text,
-        re.S,
-    )
-    if not match:
-        return "etb_library_pick_source_effect_not_found"
-    return {
-        "look_count": int(match.group("look")),
-        "pick_count": int(match.group("pick")),
-        "pick_target": "any_card",
-        "rest_destination": "graveyard",
-    }
+    parsed = look_library_pick_from_source(source)
+    if isinstance(parsed, str):
+        return parsed.replace("look_library_pick", "etb_library_pick")
+    return parsed
 
 
 def dies_recursion_to_hand_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
@@ -18423,6 +18501,7 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         ETB_MILL_RECURSION_CREATURE_SCOPE,
         ETB_GRAVEYARD_TO_LIBRARY_CREATURE_SCOPE,
         ETB_LIBRARY_PICK_CREATURE_SCOPE,
+        ETB_LIBRARY_PICK_BOTTOM_CREATURE_SCOPE,
         ETB_TUTOR_BATTLEFIELD_CREATURE_SCOPE,
         ETB_TUTOR_TOP_CREATURE_SCOPE,
         ETB_TOKEN_CREATURE_SCOPE,
@@ -23433,22 +23512,37 @@ def split_row(
             if source_pick.get(key) != oracle_pick.get(key):
                 return None, f"etb_library_pick_source_oracle_{key}_mismatch"
         keyword_list = ordered_keywords(keywords_from_ability_classes(row))
+        rest_destination = str(oracle_pick["rest_destination"])
+        scope = (
+            ETB_LIBRARY_PICK_CREATURE_SCOPE
+            if rest_destination == "graveyard"
+            else ETB_LIBRARY_PICK_BOTTOM_CREATURE_SCOPE
+        )
         effect_json = {
             "effect": "creature",
-            "battle_model_scope": ETB_LIBRARY_PICK_CREATURE_SCOPE,
+            "battle_model_scope": scope,
             "ability_kind": "triggered",
             "trigger": "enters_battlefield",
             "etb_library_look_count": int(oracle_pick["look_count"]),
             "etb_library_pick_count": int(oracle_pick["pick_count"]),
             "etb_library_pick_target": str(oracle_pick["pick_target"]),
-            "etb_library_rest_destination": str(oracle_pick["rest_destination"]),
+            "etb_library_rest_destination": rest_destination,
             "target": str(oracle_pick["pick_target"]),
             "target_constraints": library_pick_target_constraints_for(str(oracle_pick["pick_target"])),
             "destination": "hand",
-            "rest_destination": str(oracle_pick["rest_destination"]),
+            "rest_destination": rest_destination,
             "xmage_effect_class": "LookLibraryAndPickControllerEffect",
             "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
         }
+        if oracle_pick.get("pick_up_to_count"):
+            effect_json["pick_up_to_count"] = True
+            effect_json["etb_library_pick_up_to_count"] = True
+        if oracle_pick.get("pick_all_matching"):
+            effect_json["pick_all_matching"] = True
+            effect_json["etb_library_pick_all_matching"] = True
+        if rest_destination == "library_bottom":
+            effect_json["library_bottom_order"] = str(source_pick.get("library_bottom_order") or "any")
+            effect_json["etb_library_bottom_order"] = effect_json["library_bottom_order"]
         if keyword_list:
             effect_json["keywords"] = keyword_list
             effect_json["_keywords_are_self"] = True
@@ -23458,7 +23552,11 @@ def split_row(
             row,
             metadata,
             effect_json,
-            family_id="xmage_creature_etb_look_library_pick_to_hand_rest_graveyard",
+            family_id=(
+                "xmage_creature_etb_look_library_pick_to_hand_rest_graveyard"
+                if rest_destination == "graveyard"
+                else "xmage_creature_etb_look_library_pick_to_hand_rest_bottom"
+            ),
         ), "selected_exact_scope"
 
     if etb_tutor_battlefield_creature_unit:

@@ -1,0 +1,1965 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg590_creature_etb_library_pick_new_serv_20260707_034004",
+  "deploy_id": "PG590",
+  "execution_scenarios": [
+    {
+      "card": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+        "destination": "hand",
+        "effect": "creature",
+        "etb_library_bottom_order": "any",
+        "etb_library_look_count": 3,
+        "etb_library_pick_count": 1,
+        "etb_library_pick_target": "instant_or_sorcery",
+        "etb_library_pick_up_to_count": true,
+        "etb_library_rest_destination": "library_bottom",
+        "library_bottom_order": "any",
+        "name": "Augur of Bolas",
+        "pick_up_to_count": true,
+        "rest_destination": "library_bottom",
+        "target": "instant_or_sorcery",
+        "target_constraints": {
+          "card_types": [
+            "instant",
+            "sorcery"
+          ],
+          "controller": "self",
+          "zone": "library"
+        },
+        "trigger": "enters_battlefield",
+        "type_line": "Creature - Scout",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      },
+      "controller_library": [
+        {
+          "cmc": 8,
+          "name": "E2E Nonmatching Creature",
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "cmc": 5,
+          "name": "E2E Preferred Match",
+          "type_line": "Instant"
+        },
+        {
+          "cmc": 2,
+          "name": "E2E Secondary Match",
+          "type_line": "Instant"
+        }
+      ],
+      "expected_look_count": 3,
+      "expected_pick_target": "instant_or_sorcery",
+      "expected_picked": [
+        "E2E Preferred Match"
+      ],
+      "expected_rest_destination": "library_bottom",
+      "logical_rule_key": "battle_rule_v1:e32f8dd338034426a8da73df9f7cbbf1",
+      "name": "Augur of Bolas digs on ETB",
+      "type": "creature_etb_library_pick"
+    },
+    {
+      "card": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+        "destination": "hand",
+        "effect": "creature",
+        "etb_library_bottom_order": "any",
+        "etb_library_look_count": 4,
+        "etb_library_pick_count": 1,
+        "etb_library_pick_target": "human_card",
+        "etb_library_pick_up_to_count": true,
+        "etb_library_rest_destination": "library_bottom",
+        "library_bottom_order": "any",
+        "name": "Courageous Outrider",
+        "pick_up_to_count": true,
+        "rest_destination": "library_bottom",
+        "target": "human_card",
+        "target_constraints": {
+          "controller": "self",
+          "subtypes": [
+            "human"
+          ],
+          "zone": "library"
+        },
+        "trigger": "enters_battlefield",
+        "type_line": "Creature - Scout",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      },
+      "controller_library": [
+        {
+          "cmc": 8,
+          "name": "E2E Nonmatching Artifact",
+          "type_line": "Artifact"
+        },
+        {
+          "cmc": 5,
+          "name": "E2E Preferred Match",
+          "type_line": "Creature - Human Soldier"
+        },
+        {
+          "cmc": 2,
+          "name": "E2E Secondary Match",
+          "type_line": "Creature - Human Soldier"
+        },
+        {
+          "cmc": 1,
+          "name": "E2E Filler 4",
+          "type_line": "Artifact"
+        }
+      ],
+      "expected_look_count": 4,
+      "expected_pick_target": "human_card",
+      "expected_picked": [
+        "E2E Preferred Match"
+      ],
+      "expected_rest_destination": "library_bottom",
+      "logical_rule_key": "battle_rule_v1:6200d112a15836a83caa0c2a19e2743e",
+      "name": "Courageous Outrider digs on ETB",
+      "type": "creature_etb_library_pick"
+    },
+    {
+      "card": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+        "destination": "hand",
+        "effect": "creature",
+        "etb_library_bottom_order": "random",
+        "etb_library_look_count": 4,
+        "etb_library_pick_count": 1,
+        "etb_library_pick_target": "goblin_swamp_or_mountain",
+        "etb_library_pick_up_to_count": true,
+        "etb_library_rest_destination": "library_bottom",
+        "library_bottom_order": "random",
+        "name": "Eclipsed Boggart",
+        "pick_up_to_count": true,
+        "rest_destination": "library_bottom",
+        "target": "goblin_swamp_or_mountain",
+        "target_constraints": {
+          "any_of": [
+            {
+              "subtypes": [
+                "goblin"
+              ]
+            },
+            {
+              "card_types": [
+                "land"
+              ],
+              "subtypes": [
+                "swamp"
+              ]
+            },
+            {
+              "card_types": [
+                "land"
+              ],
+              "subtypes": [
+                "mountain"
+              ]
+            }
+          ],
+          "controller": "self",
+          "zone": "library"
+        },
+        "trigger": "enters_battlefield",
+        "type_line": "Creature - Scout",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      },
+      "controller_library": [
+        {
+          "cmc": 8,
+          "name": "E2E Nonmatching Artifact",
+          "type_line": "Artifact"
+        },
+        {
+          "cmc": 5,
+          "name": "E2E Preferred Match",
+          "type_line": "Creature - Goblin"
+        },
+        {
+          "cmc": 2,
+          "name": "E2E Secondary Match",
+          "type_line": "Creature - Goblin"
+        },
+        {
+          "cmc": 1,
+          "name": "E2E Filler 4",
+          "type_line": "Artifact"
+        }
+      ],
+      "expected_look_count": 4,
+      "expected_pick_target": "goblin_swamp_or_mountain",
+      "expected_picked": [
+        "E2E Preferred Match"
+      ],
+      "expected_rest_destination": "library_bottom",
+      "logical_rule_key": "battle_rule_v1:8f5fc4e14dfe69544aad6bbff142496b",
+      "name": "Eclipsed Boggart digs on ETB",
+      "type": "creature_etb_library_pick"
+    },
+    {
+      "card": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+        "destination": "hand",
+        "effect": "creature",
+        "etb_library_bottom_order": "random",
+        "etb_library_look_count": 4,
+        "etb_library_pick_count": 1,
+        "etb_library_pick_target": "elf_swamp_or_forest",
+        "etb_library_pick_up_to_count": true,
+        "etb_library_rest_destination": "library_bottom",
+        "library_bottom_order": "random",
+        "name": "Eclipsed Elf",
+        "pick_up_to_count": true,
+        "rest_destination": "library_bottom",
+        "target": "elf_swamp_or_forest",
+        "target_constraints": {
+          "any_of": [
+            {
+              "subtypes": [
+                "elf"
+              ]
+            },
+            {
+              "card_types": [
+                "land"
+              ],
+              "subtypes": [
+                "swamp"
+              ]
+            },
+            {
+              "card_types": [
+                "land"
+              ],
+              "subtypes": [
+                "forest"
+              ]
+            }
+          ],
+          "controller": "self",
+          "zone": "library"
+        },
+        "trigger": "enters_battlefield",
+        "type_line": "Creature - Scout",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      },
+      "controller_library": [
+        {
+          "cmc": 8,
+          "name": "E2E Nonmatching Artifact",
+          "type_line": "Artifact"
+        },
+        {
+          "cmc": 5,
+          "name": "E2E Preferred Match",
+          "type_line": "Creature - Elf"
+        },
+        {
+          "cmc": 2,
+          "name": "E2E Secondary Match",
+          "type_line": "Creature - Elf"
+        },
+        {
+          "cmc": 1,
+          "name": "E2E Filler 4",
+          "type_line": "Artifact"
+        }
+      ],
+      "expected_look_count": 4,
+      "expected_pick_target": "elf_swamp_or_forest",
+      "expected_picked": [
+        "E2E Preferred Match"
+      ],
+      "expected_rest_destination": "library_bottom",
+      "logical_rule_key": "battle_rule_v1:10492a00c5eda109ce55064b5c4161f6",
+      "name": "Eclipsed Elf digs on ETB",
+      "type": "creature_etb_library_pick"
+    },
+    {
+      "card": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+        "destination": "hand",
+        "effect": "creature",
+        "etb_library_bottom_order": "random",
+        "etb_library_look_count": 4,
+        "etb_library_pick_count": 1,
+        "etb_library_pick_target": "elemental_island_or_mountain",
+        "etb_library_pick_up_to_count": true,
+        "etb_library_rest_destination": "library_bottom",
+        "library_bottom_order": "random",
+        "name": "Eclipsed Flamekin",
+        "pick_up_to_count": true,
+        "rest_destination": "library_bottom",
+        "target": "elemental_island_or_mountain",
+        "target_constraints": {
+          "any_of": [
+            {
+              "subtypes": [
+                "elemental"
+              ]
+            },
+            {
+              "card_types": [
+                "land"
+              ],
+              "subtypes": [
+                "island"
+              ]
+            },
+            {
+              "card_types": [
+                "land"
+              ],
+              "subtypes": [
+                "mountain"
+              ]
+            }
+          ],
+          "controller": "self",
+          "zone": "library"
+        },
+        "trigger": "enters_battlefield",
+        "type_line": "Creature - Scout",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      },
+      "controller_library": [
+        {
+          "cmc": 8,
+          "name": "E2E Nonmatching Artifact",
+          "type_line": "Artifact"
+        },
+        {
+          "cmc": 5,
+          "name": "E2E Preferred Match",
+          "type_line": "Creature - Elemental"
+        },
+        {
+          "cmc": 2,
+          "name": "E2E Secondary Match",
+          "type_line": "Creature - Elemental"
+        },
+        {
+          "cmc": 1,
+          "name": "E2E Filler 4",
+          "type_line": "Artifact"
+        }
+      ],
+      "expected_look_count": 4,
+      "expected_pick_target": "elemental_island_or_mountain",
+      "expected_picked": [
+        "E2E Preferred Match"
+      ],
+      "expected_rest_destination": "library_bottom",
+      "logical_rule_key": "battle_rule_v1:3173b16ce72f792acb2bb1c1d76d61f6",
+      "name": "Eclipsed Flamekin digs on ETB",
+      "type": "creature_etb_library_pick"
+    },
+    {
+      "card": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+        "destination": "hand",
+        "effect": "creature",
+        "etb_library_bottom_order": "random",
+        "etb_library_look_count": 4,
+        "etb_library_pick_count": 1,
+        "etb_library_pick_target": "kithkin_forest_or_plains",
+        "etb_library_pick_up_to_count": true,
+        "etb_library_rest_destination": "library_bottom",
+        "library_bottom_order": "random",
+        "name": "Eclipsed Kithkin",
+        "pick_up_to_count": true,
+        "rest_destination": "library_bottom",
+        "target": "kithkin_forest_or_plains",
+        "target_constraints": {
+          "any_of": [
+            {
+              "subtypes": [
+                "kithkin"
+              ]
+            },
+            {
+              "card_types": [
+                "land"
+              ],
+              "subtypes": [
+                "forest"
+              ]
+            },
+            {
+              "card_types": [
+                "land"
+              ],
+              "subtypes": [
+                "plains"
+              ]
+            }
+          ],
+          "controller": "self",
+          "zone": "library"
+        },
+        "trigger": "enters_battlefield",
+        "type_line": "Creature - Scout",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      },
+      "controller_library": [
+        {
+          "cmc": 8,
+          "name": "E2E Nonmatching Artifact",
+          "type_line": "Artifact"
+        },
+        {
+          "cmc": 5,
+          "name": "E2E Preferred Match",
+          "type_line": "Creature - Kithkin"
+        },
+        {
+          "cmc": 2,
+          "name": "E2E Secondary Match",
+          "type_line": "Creature - Kithkin"
+        },
+        {
+          "cmc": 1,
+          "name": "E2E Filler 4",
+          "type_line": "Artifact"
+        }
+      ],
+      "expected_look_count": 4,
+      "expected_pick_target": "kithkin_forest_or_plains",
+      "expected_picked": [
+        "E2E Preferred Match"
+      ],
+      "expected_rest_destination": "library_bottom",
+      "logical_rule_key": "battle_rule_v1:defacba718e027311e1e1afbad2089fe",
+      "name": "Eclipsed Kithkin digs on ETB",
+      "type": "creature_etb_library_pick"
+    },
+    {
+      "card": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+        "destination": "hand",
+        "effect": "creature",
+        "etb_library_bottom_order": "random",
+        "etb_library_look_count": 4,
+        "etb_library_pick_count": 1,
+        "etb_library_pick_target": "merfolk_plains_or_island",
+        "etb_library_pick_up_to_count": true,
+        "etb_library_rest_destination": "library_bottom",
+        "library_bottom_order": "random",
+        "name": "Eclipsed Merrow",
+        "pick_up_to_count": true,
+        "rest_destination": "library_bottom",
+        "target": "merfolk_plains_or_island",
+        "target_constraints": {
+          "any_of": [
+            {
+              "subtypes": [
+                "merfolk"
+              ]
+            },
+            {
+              "card_types": [
+                "land"
+              ],
+              "subtypes": [
+                "plains"
+              ]
+            },
+            {
+              "card_types": [
+                "land"
+              ],
+              "subtypes": [
+                "island"
+              ]
+            }
+          ],
+          "controller": "self",
+          "zone": "library"
+        },
+        "trigger": "enters_battlefield",
+        "type_line": "Creature - Scout",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      },
+      "controller_library": [
+        {
+          "cmc": 8,
+          "name": "E2E Nonmatching Artifact",
+          "type_line": "Artifact"
+        },
+        {
+          "cmc": 5,
+          "name": "E2E Preferred Match",
+          "type_line": "Creature - Merfolk"
+        },
+        {
+          "cmc": 2,
+          "name": "E2E Secondary Match",
+          "type_line": "Creature - Merfolk"
+        },
+        {
+          "cmc": 1,
+          "name": "E2E Filler 4",
+          "type_line": "Artifact"
+        }
+      ],
+      "expected_look_count": 4,
+      "expected_pick_target": "merfolk_plains_or_island",
+      "expected_picked": [
+        "E2E Preferred Match"
+      ],
+      "expected_rest_destination": "library_bottom",
+      "logical_rule_key": "battle_rule_v1:477abd93b4a79f60485e3a8197340042",
+      "name": "Eclipsed Merrow digs on ETB",
+      "type": "creature_etb_library_pick"
+    },
+    {
+      "card": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+        "destination": "hand",
+        "effect": "creature",
+        "etb_library_bottom_order": "any",
+        "etb_library_look_count": 2,
+        "etb_library_pick_count": 1,
+        "etb_library_pick_target": "any_card",
+        "etb_library_rest_destination": "library_bottom",
+        "library_bottom_order": "any",
+        "name": "Sea Gate Oracle",
+        "rest_destination": "library_bottom",
+        "target": "any_card",
+        "target_constraints": {
+          "controller": "self",
+          "scope": "any_card",
+          "zone": "library"
+        },
+        "trigger": "enters_battlefield",
+        "type_line": "Creature - Scout",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      },
+      "controller_library": [
+        {
+          "cmc": 7,
+          "name": "E2E Preferred Any",
+          "type_line": "Sorcery"
+        },
+        {
+          "cmc": 2,
+          "name": "E2E Secondary Any",
+          "type_line": "Creature - Scout"
+        }
+      ],
+      "expected_look_count": 2,
+      "expected_pick_target": "any_card",
+      "expected_picked": [
+        "E2E Preferred Any"
+      ],
+      "expected_rest_destination": "library_bottom",
+      "logical_rule_key": "battle_rule_v1:6807079ec4aada62c41e0444fb2ea8de",
+      "name": "Sea Gate Oracle digs on ETB",
+      "type": "creature_etb_library_pick"
+    },
+    {
+      "card": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+        "destination": "hand",
+        "effect": "creature",
+        "etb_library_bottom_order": "random",
+        "etb_library_look_count": 5,
+        "etb_library_pick_count": 1,
+        "etb_library_pick_target": "green_card",
+        "etb_library_pick_up_to_count": true,
+        "etb_library_rest_destination": "library_bottom",
+        "library_bottom_order": "random",
+        "name": "Skalla Wolf",
+        "pick_up_to_count": true,
+        "rest_destination": "library_bottom",
+        "target": "green_card",
+        "target_constraints": {
+          "colors": [
+            "G"
+          ],
+          "controller": "self",
+          "zone": "library"
+        },
+        "trigger": "enters_battlefield",
+        "type_line": "Creature - Scout",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      },
+      "controller_library": [
+        {
+          "cmc": 8,
+          "name": "E2E Nonmatching Artifact",
+          "type_line": "Artifact"
+        },
+        {
+          "cmc": 5,
+          "colors": [
+            "G"
+          ],
+          "name": "E2E Preferred Match",
+          "type_line": "Creature - Elf"
+        },
+        {
+          "cmc": 2,
+          "colors": [
+            "G"
+          ],
+          "name": "E2E Secondary Match",
+          "type_line": "Creature - Elf"
+        },
+        {
+          "cmc": 1,
+          "name": "E2E Filler 4",
+          "type_line": "Artifact"
+        },
+        {
+          "cmc": 1,
+          "name": "E2E Filler 5",
+          "type_line": "Artifact"
+        }
+      ],
+      "expected_look_count": 5,
+      "expected_pick_target": "green_card",
+      "expected_picked": [
+        "E2E Preferred Match"
+      ],
+      "expected_rest_destination": "library_bottom",
+      "logical_rule_key": "battle_rule_v1:15590162c5153067777396365efd9e64",
+      "name": "Skalla Wolf digs on ETB",
+      "type": "creature_etb_library_pick"
+    },
+    {
+      "card": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+        "destination": "hand",
+        "effect": "creature",
+        "etb_library_bottom_order": "random",
+        "etb_library_look_count": 4,
+        "etb_library_pick_count": 1,
+        "etb_library_pick_target": "artifact_or_pirate",
+        "etb_library_pick_up_to_count": true,
+        "etb_library_rest_destination": "library_bottom",
+        "library_bottom_order": "random",
+        "name": "Staunch Crewmate",
+        "pick_up_to_count": true,
+        "rest_destination": "library_bottom",
+        "target": "artifact_or_pirate",
+        "target_constraints": {
+          "any_of": [
+            {
+              "card_types": [
+                "artifact"
+              ]
+            },
+            {
+              "subtypes": [
+                "pirate"
+              ]
+            }
+          ],
+          "controller": "self",
+          "zone": "library"
+        },
+        "trigger": "enters_battlefield",
+        "type_line": "Creature - Scout",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      },
+      "controller_library": [
+        {
+          "cmc": 8,
+          "name": "E2E Nonmatching Creature",
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "cmc": 5,
+          "name": "E2E Preferred Match",
+          "type_line": "Artifact"
+        },
+        {
+          "cmc": 2,
+          "name": "E2E Secondary Match",
+          "type_line": "Artifact"
+        },
+        {
+          "cmc": 1,
+          "name": "E2E Filler 4",
+          "type_line": "Artifact"
+        }
+      ],
+      "expected_look_count": 4,
+      "expected_pick_target": "artifact_or_pirate",
+      "expected_picked": [
+        "E2E Preferred Match"
+      ],
+      "expected_rest_destination": "library_bottom",
+      "logical_rule_key": "battle_rule_v1:9b6de6e2550d80b3c10771cb920be527",
+      "name": "Staunch Crewmate digs on ETB",
+      "type": "creature_etb_library_pick"
+    },
+    {
+      "card": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+        "destination": "hand",
+        "effect": "creature",
+        "etb_library_bottom_order": "random",
+        "etb_library_look_count": 4,
+        "etb_library_pick_count": 1,
+        "etb_library_pick_target": "creature_or_enchantment",
+        "etb_library_pick_up_to_count": true,
+        "etb_library_rest_destination": "library_bottom",
+        "library_bottom_order": "random",
+        "name": "Sumala Woodshaper",
+        "pick_up_to_count": true,
+        "rest_destination": "library_bottom",
+        "target": "creature_or_enchantment",
+        "target_constraints": {
+          "card_types": [
+            "creature",
+            "enchantment"
+          ],
+          "controller": "self",
+          "zone": "library"
+        },
+        "trigger": "enters_battlefield",
+        "type_line": "Creature - Scout",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      },
+      "controller_library": [
+        {
+          "cmc": 8,
+          "name": "E2E Nonmatching Artifact",
+          "type_line": "Artifact"
+        },
+        {
+          "cmc": 5,
+          "name": "E2E Preferred Match",
+          "type_line": "Enchantment"
+        },
+        {
+          "cmc": 2,
+          "name": "E2E Secondary Match",
+          "type_line": "Enchantment"
+        },
+        {
+          "cmc": 1,
+          "name": "E2E Filler 4",
+          "type_line": "Artifact"
+        }
+      ],
+      "expected_look_count": 4,
+      "expected_pick_target": "creature_or_enchantment",
+      "expected_picked": [
+        "E2E Preferred Match"
+      ],
+      "expected_rest_destination": "library_bottom",
+      "logical_rule_key": "battle_rule_v1:ac1dc0c54e35d9cf940ce99c00eb7637",
+      "name": "Sumala Woodshaper digs on ETB",
+      "type": "creature_etb_library_pick"
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Augur of Bolas",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e32f8dd338034426a8da73df9f7cbbf1",
+      "min_rule_version": 2,
+      "normalized_name": "augur of bolas",
+      "oracle_hash": "7cb97c62b56dc0a9f8d653903ad26e23",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+        "destination": "hand",
+        "effect": "creature",
+        "etb_library_bottom_order": "any",
+        "etb_library_look_count": 3,
+        "etb_library_pick_count": 1,
+        "etb_library_pick_target": "instant_or_sorcery",
+        "etb_library_pick_up_to_count": true,
+        "etb_library_rest_destination": "library_bottom",
+        "library_bottom_order": "any",
+        "pick_up_to_count": true,
+        "rest_destination": "library_bottom",
+        "target": "instant_or_sorcery",
+        "target_constraints": {
+          "card_types": [
+            "instant",
+            "sorcery"
+          ],
+          "controller": "self",
+          "zone": "library"
+        },
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Courageous Outrider",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6200d112a15836a83caa0c2a19e2743e",
+      "min_rule_version": 2,
+      "normalized_name": "courageous outrider",
+      "oracle_hash": "642f82e736cd5bf03f87e91471514aec",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+        "destination": "hand",
+        "effect": "creature",
+        "etb_library_bottom_order": "any",
+        "etb_library_look_count": 4,
+        "etb_library_pick_count": 1,
+        "etb_library_pick_target": "human_card",
+        "etb_library_pick_up_to_count": true,
+        "etb_library_rest_destination": "library_bottom",
+        "library_bottom_order": "any",
+        "pick_up_to_count": true,
+        "rest_destination": "library_bottom",
+        "target": "human_card",
+        "target_constraints": {
+          "controller": "self",
+          "subtypes": [
+            "human"
+          ],
+          "zone": "library"
+        },
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Eclipsed Boggart",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8f5fc4e14dfe69544aad6bbff142496b",
+      "min_rule_version": 2,
+      "normalized_name": "eclipsed boggart",
+      "oracle_hash": "a9ebe16b5c8bd757e00ae9e9c35c27ce",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+        "destination": "hand",
+        "effect": "creature",
+        "etb_library_bottom_order": "random",
+        "etb_library_look_count": 4,
+        "etb_library_pick_count": 1,
+        "etb_library_pick_target": "goblin_swamp_or_mountain",
+        "etb_library_pick_up_to_count": true,
+        "etb_library_rest_destination": "library_bottom",
+        "library_bottom_order": "random",
+        "pick_up_to_count": true,
+        "rest_destination": "library_bottom",
+        "target": "goblin_swamp_or_mountain",
+        "target_constraints": {
+          "any_of": [
+            {
+              "subtypes": [
+                "goblin"
+              ]
+            },
+            {
+              "card_types": [
+                "land"
+              ],
+              "subtypes": [
+                "swamp"
+              ]
+            },
+            {
+              "card_types": [
+                "land"
+              ],
+              "subtypes": [
+                "mountain"
+              ]
+            }
+          ],
+          "controller": "self",
+          "zone": "library"
+        },
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Eclipsed Elf",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:10492a00c5eda109ce55064b5c4161f6",
+      "min_rule_version": 2,
+      "normalized_name": "eclipsed elf",
+      "oracle_hash": "9a239a1738b1b83b196d7cb9169f9d7c",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+        "destination": "hand",
+        "effect": "creature",
+        "etb_library_bottom_order": "random",
+        "etb_library_look_count": 4,
+        "etb_library_pick_count": 1,
+        "etb_library_pick_target": "elf_swamp_or_forest",
+        "etb_library_pick_up_to_count": true,
+        "etb_library_rest_destination": "library_bottom",
+        "library_bottom_order": "random",
+        "pick_up_to_count": true,
+        "rest_destination": "library_bottom",
+        "target": "elf_swamp_or_forest",
+        "target_constraints": {
+          "any_of": [
+            {
+              "subtypes": [
+                "elf"
+              ]
+            },
+            {
+              "card_types": [
+                "land"
+              ],
+              "subtypes": [
+                "swamp"
+              ]
+            },
+            {
+              "card_types": [
+                "land"
+              ],
+              "subtypes": [
+                "forest"
+              ]
+            }
+          ],
+          "controller": "self",
+          "zone": "library"
+        },
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Eclipsed Flamekin",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3173b16ce72f792acb2bb1c1d76d61f6",
+      "min_rule_version": 2,
+      "normalized_name": "eclipsed flamekin",
+      "oracle_hash": "e3795fff4e5aed4b26daa9e0c1a4f7c6",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+        "destination": "hand",
+        "effect": "creature",
+        "etb_library_bottom_order": "random",
+        "etb_library_look_count": 4,
+        "etb_library_pick_count": 1,
+        "etb_library_pick_target": "elemental_island_or_mountain",
+        "etb_library_pick_up_to_count": true,
+        "etb_library_rest_destination": "library_bottom",
+        "library_bottom_order": "random",
+        "pick_up_to_count": true,
+        "rest_destination": "library_bottom",
+        "target": "elemental_island_or_mountain",
+        "target_constraints": {
+          "any_of": [
+            {
+              "subtypes": [
+                "elemental"
+              ]
+            },
+            {
+              "card_types": [
+                "land"
+              ],
+              "subtypes": [
+                "island"
+              ]
+            },
+            {
+              "card_types": [
+                "land"
+              ],
+              "subtypes": [
+                "mountain"
+              ]
+            }
+          ],
+          "controller": "self",
+          "zone": "library"
+        },
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Eclipsed Kithkin",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:defacba718e027311e1e1afbad2089fe",
+      "min_rule_version": 2,
+      "normalized_name": "eclipsed kithkin",
+      "oracle_hash": "dc954b8c9a7dad2d34e9d9f6beb95ed4",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+        "destination": "hand",
+        "effect": "creature",
+        "etb_library_bottom_order": "random",
+        "etb_library_look_count": 4,
+        "etb_library_pick_count": 1,
+        "etb_library_pick_target": "kithkin_forest_or_plains",
+        "etb_library_pick_up_to_count": true,
+        "etb_library_rest_destination": "library_bottom",
+        "library_bottom_order": "random",
+        "pick_up_to_count": true,
+        "rest_destination": "library_bottom",
+        "target": "kithkin_forest_or_plains",
+        "target_constraints": {
+          "any_of": [
+            {
+              "subtypes": [
+                "kithkin"
+              ]
+            },
+            {
+              "card_types": [
+                "land"
+              ],
+              "subtypes": [
+                "forest"
+              ]
+            },
+            {
+              "card_types": [
+                "land"
+              ],
+              "subtypes": [
+                "plains"
+              ]
+            }
+          ],
+          "controller": "self",
+          "zone": "library"
+        },
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Eclipsed Merrow",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:477abd93b4a79f60485e3a8197340042",
+      "min_rule_version": 2,
+      "normalized_name": "eclipsed merrow",
+      "oracle_hash": "430674e395638d853f8c3fa0e7759fe7",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+        "destination": "hand",
+        "effect": "creature",
+        "etb_library_bottom_order": "random",
+        "etb_library_look_count": 4,
+        "etb_library_pick_count": 1,
+        "etb_library_pick_target": "merfolk_plains_or_island",
+        "etb_library_pick_up_to_count": true,
+        "etb_library_rest_destination": "library_bottom",
+        "library_bottom_order": "random",
+        "pick_up_to_count": true,
+        "rest_destination": "library_bottom",
+        "target": "merfolk_plains_or_island",
+        "target_constraints": {
+          "any_of": [
+            {
+              "subtypes": [
+                "merfolk"
+              ]
+            },
+            {
+              "card_types": [
+                "land"
+              ],
+              "subtypes": [
+                "plains"
+              ]
+            },
+            {
+              "card_types": [
+                "land"
+              ],
+              "subtypes": [
+                "island"
+              ]
+            }
+          ],
+          "controller": "self",
+          "zone": "library"
+        },
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sea Gate Oracle",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6807079ec4aada62c41e0444fb2ea8de",
+      "min_rule_version": 2,
+      "normalized_name": "sea gate oracle",
+      "oracle_hash": "9ea9fb16f29a0c6092da5eda6e00a04e",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+        "destination": "hand",
+        "effect": "creature",
+        "etb_library_bottom_order": "any",
+        "etb_library_look_count": 2,
+        "etb_library_pick_count": 1,
+        "etb_library_pick_target": "any_card",
+        "etb_library_rest_destination": "library_bottom",
+        "library_bottom_order": "any",
+        "rest_destination": "library_bottom",
+        "target": "any_card",
+        "target_constraints": {
+          "controller": "self",
+          "scope": "any_card",
+          "zone": "library"
+        },
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Skalla Wolf",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:15590162c5153067777396365efd9e64",
+      "min_rule_version": 2,
+      "normalized_name": "skalla wolf",
+      "oracle_hash": "0bd92a7ca7f76eb36a4c2abe85d78e11",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+        "destination": "hand",
+        "effect": "creature",
+        "etb_library_bottom_order": "random",
+        "etb_library_look_count": 5,
+        "etb_library_pick_count": 1,
+        "etb_library_pick_target": "green_card",
+        "etb_library_pick_up_to_count": true,
+        "etb_library_rest_destination": "library_bottom",
+        "library_bottom_order": "random",
+        "pick_up_to_count": true,
+        "rest_destination": "library_bottom",
+        "target": "green_card",
+        "target_constraints": {
+          "colors": [
+            "G"
+          ],
+          "controller": "self",
+          "zone": "library"
+        },
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Staunch Crewmate",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9b6de6e2550d80b3c10771cb920be527",
+      "min_rule_version": 2,
+      "normalized_name": "staunch crewmate",
+      "oracle_hash": "7c9ecf31e2b7fe50e0568348df48c75b",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+        "destination": "hand",
+        "effect": "creature",
+        "etb_library_bottom_order": "random",
+        "etb_library_look_count": 4,
+        "etb_library_pick_count": 1,
+        "etb_library_pick_target": "artifact_or_pirate",
+        "etb_library_pick_up_to_count": true,
+        "etb_library_rest_destination": "library_bottom",
+        "library_bottom_order": "random",
+        "pick_up_to_count": true,
+        "rest_destination": "library_bottom",
+        "target": "artifact_or_pirate",
+        "target_constraints": {
+          "any_of": [
+            {
+              "card_types": [
+                "artifact"
+              ]
+            },
+            {
+              "subtypes": [
+                "pirate"
+              ]
+            }
+          ],
+          "controller": "self",
+          "zone": "library"
+        },
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sumala Woodshaper",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ac1dc0c54e35d9cf940ce99c00eb7637",
+      "min_rule_version": 2,
+      "normalized_name": "sumala woodshaper",
+      "oracle_hash": "2c2b65886f7fbc445aa18641c68bc28e",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+        "destination": "hand",
+        "effect": "creature",
+        "etb_library_bottom_order": "random",
+        "etb_library_look_count": 4,
+        "etb_library_pick_count": 1,
+        "etb_library_pick_target": "creature_or_enchantment",
+        "etb_library_pick_up_to_count": true,
+        "etb_library_rest_destination": "library_bottom",
+        "library_bottom_order": "random",
+        "pick_up_to_count": true,
+        "rest_destination": "library_bottom",
+        "target": "creature_or_enchantment",
+        "target_constraints": {
+          "card_types": [
+            "creature",
+            "enchantment"
+          ],
+          "controller": "self",
+          "zone": "library"
+        },
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_creature_etb_look_library_pick_to_hand_rest_bottom": 11
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg590_creature_etb_library_pick_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg590_creature_etb_library_pick_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg590_creature_etb_library_pick_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg590_creature_etb_library_pick_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg590_creature_etb_library_pick_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg590_creature_etb_library_pick_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-07T03:40:04+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Augur of Bolas"
+      },
+      "card_name": "Augur of Bolas",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e32f8dd338034426a8da73df9f7cbbf1",
+      "normalized_name": "augur of bolas",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+        "destination": "hand",
+        "effect": "creature",
+        "etb_library_bottom_order": "any",
+        "etb_library_look_count": 3,
+        "etb_library_pick_count": 1,
+        "etb_library_pick_target": "instant_or_sorcery",
+        "etb_library_pick_up_to_count": true,
+        "etb_library_rest_destination": "library_bottom",
+        "library_bottom_order": "any",
+        "pick_up_to_count": true,
+        "rest_destination": "library_bottom",
+        "target": "instant_or_sorcery",
+        "target_constraints": {
+          "card_types": [
+            "instant",
+            "sorcery"
+          ],
+          "controller": "self",
+          "zone": "library"
+        },
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Courageous Outrider"
+      },
+      "card_name": "Courageous Outrider",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6200d112a15836a83caa0c2a19e2743e",
+      "normalized_name": "courageous outrider",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+        "destination": "hand",
+        "effect": "creature",
+        "etb_library_bottom_order": "any",
+        "etb_library_look_count": 4,
+        "etb_library_pick_count": 1,
+        "etb_library_pick_target": "human_card",
+        "etb_library_pick_up_to_count": true,
+        "etb_library_rest_destination": "library_bottom",
+        "library_bottom_order": "any",
+        "pick_up_to_count": true,
+        "rest_destination": "library_bottom",
+        "target": "human_card",
+        "target_constraints": {
+          "controller": "self",
+          "subtypes": [
+            "human"
+          ],
+          "zone": "library"
+        },
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Eclipsed Boggart"
+      },
+      "card_name": "Eclipsed Boggart",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8f5fc4e14dfe69544aad6bbff142496b",
+      "normalized_name": "eclipsed boggart",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+        "destination": "hand",
+        "effect": "creature",
+        "etb_library_bottom_order": "random",
+        "etb_library_look_count": 4,
+        "etb_library_pick_count": 1,
+        "etb_library_pick_target": "goblin_swamp_or_mountain",
+        "etb_library_pick_up_to_count": true,
+        "etb_library_rest_destination": "library_bottom",
+        "library_bottom_order": "random",
+        "pick_up_to_count": true,
+        "rest_destination": "library_bottom",
+        "target": "goblin_swamp_or_mountain",
+        "target_constraints": {
+          "any_of": [
+            {
+              "subtypes": [
+                "goblin"
+              ]
+            },
+            {
+              "card_types": [
+                "land"
+              ],
+              "subtypes": [
+                "swamp"
+              ]
+            },
+            {
+              "card_types": [
+                "land"
+              ],
+              "subtypes": [
+                "mountain"
+              ]
+            }
+          ],
+          "controller": "self",
+          "zone": "library"
+        },
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Eclipsed Elf"
+      },
+      "card_name": "Eclipsed Elf",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:10492a00c5eda109ce55064b5c4161f6",
+      "normalized_name": "eclipsed elf",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+        "destination": "hand",
+        "effect": "creature",
+        "etb_library_bottom_order": "random",
+        "etb_library_look_count": 4,
+        "etb_library_pick_count": 1,
+        "etb_library_pick_target": "elf_swamp_or_forest",
+        "etb_library_pick_up_to_count": true,
+        "etb_library_rest_destination": "library_bottom",
+        "library_bottom_order": "random",
+        "pick_up_to_count": true,
+        "rest_destination": "library_bottom",
+        "target": "elf_swamp_or_forest",
+        "target_constraints": {
+          "any_of": [
+            {
+              "subtypes": [
+                "elf"
+              ]
+            },
+            {
+              "card_types": [
+                "land"
+              ],
+              "subtypes": [
+                "swamp"
+              ]
+            },
+            {
+              "card_types": [
+                "land"
+              ],
+              "subtypes": [
+                "forest"
+              ]
+            }
+          ],
+          "controller": "self",
+          "zone": "library"
+        },
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Eclipsed Flamekin"
+      },
+      "card_name": "Eclipsed Flamekin",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3173b16ce72f792acb2bb1c1d76d61f6",
+      "normalized_name": "eclipsed flamekin",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+        "destination": "hand",
+        "effect": "creature",
+        "etb_library_bottom_order": "random",
+        "etb_library_look_count": 4,
+        "etb_library_pick_count": 1,
+        "etb_library_pick_target": "elemental_island_or_mountain",
+        "etb_library_pick_up_to_count": true,
+        "etb_library_rest_destination": "library_bottom",
+        "library_bottom_order": "random",
+        "pick_up_to_count": true,
+        "rest_destination": "library_bottom",
+        "target": "elemental_island_or_mountain",
+        "target_constraints": {
+          "any_of": [
+            {
+              "subtypes": [
+                "elemental"
+              ]
+            },
+            {
+              "card_types": [
+                "land"
+              ],
+              "subtypes": [
+                "island"
+              ]
+            },
+            {
+              "card_types": [
+                "land"
+              ],
+              "subtypes": [
+                "mountain"
+              ]
+            }
+          ],
+          "controller": "self",
+          "zone": "library"
+        },
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Eclipsed Kithkin"
+      },
+      "card_name": "Eclipsed Kithkin",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:defacba718e027311e1e1afbad2089fe",
+      "normalized_name": "eclipsed kithkin",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+        "destination": "hand",
+        "effect": "creature",
+        "etb_library_bottom_order": "random",
+        "etb_library_look_count": 4,
+        "etb_library_pick_count": 1,
+        "etb_library_pick_target": "kithkin_forest_or_plains",
+        "etb_library_pick_up_to_count": true,
+        "etb_library_rest_destination": "library_bottom",
+        "library_bottom_order": "random",
+        "pick_up_to_count": true,
+        "rest_destination": "library_bottom",
+        "target": "kithkin_forest_or_plains",
+        "target_constraints": {
+          "any_of": [
+            {
+              "subtypes": [
+                "kithkin"
+              ]
+            },
+            {
+              "card_types": [
+                "land"
+              ],
+              "subtypes": [
+                "forest"
+              ]
+            },
+            {
+              "card_types": [
+                "land"
+              ],
+              "subtypes": [
+                "plains"
+              ]
+            }
+          ],
+          "controller": "self",
+          "zone": "library"
+        },
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Eclipsed Merrow"
+      },
+      "card_name": "Eclipsed Merrow",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:477abd93b4a79f60485e3a8197340042",
+      "normalized_name": "eclipsed merrow",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+        "destination": "hand",
+        "effect": "creature",
+        "etb_library_bottom_order": "random",
+        "etb_library_look_count": 4,
+        "etb_library_pick_count": 1,
+        "etb_library_pick_target": "merfolk_plains_or_island",
+        "etb_library_pick_up_to_count": true,
+        "etb_library_rest_destination": "library_bottom",
+        "library_bottom_order": "random",
+        "pick_up_to_count": true,
+        "rest_destination": "library_bottom",
+        "target": "merfolk_plains_or_island",
+        "target_constraints": {
+          "any_of": [
+            {
+              "subtypes": [
+                "merfolk"
+              ]
+            },
+            {
+              "card_types": [
+                "land"
+              ],
+              "subtypes": [
+                "plains"
+              ]
+            },
+            {
+              "card_types": [
+                "land"
+              ],
+              "subtypes": [
+                "island"
+              ]
+            }
+          ],
+          "controller": "self",
+          "zone": "library"
+        },
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Sea Gate Oracle"
+      },
+      "card_name": "Sea Gate Oracle",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6807079ec4aada62c41e0444fb2ea8de",
+      "normalized_name": "sea gate oracle",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+        "destination": "hand",
+        "effect": "creature",
+        "etb_library_bottom_order": "any",
+        "etb_library_look_count": 2,
+        "etb_library_pick_count": 1,
+        "etb_library_pick_target": "any_card",
+        "etb_library_rest_destination": "library_bottom",
+        "library_bottom_order": "any",
+        "rest_destination": "library_bottom",
+        "target": "any_card",
+        "target_constraints": {
+          "controller": "self",
+          "scope": "any_card",
+          "zone": "library"
+        },
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Skalla Wolf"
+      },
+      "card_name": "Skalla Wolf",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:15590162c5153067777396365efd9e64",
+      "normalized_name": "skalla wolf",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+        "destination": "hand",
+        "effect": "creature",
+        "etb_library_bottom_order": "random",
+        "etb_library_look_count": 5,
+        "etb_library_pick_count": 1,
+        "etb_library_pick_target": "green_card",
+        "etb_library_pick_up_to_count": true,
+        "etb_library_rest_destination": "library_bottom",
+        "library_bottom_order": "random",
+        "pick_up_to_count": true,
+        "rest_destination": "library_bottom",
+        "target": "green_card",
+        "target_constraints": {
+          "colors": [
+            "G"
+          ],
+          "controller": "self",
+          "zone": "library"
+        },
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Staunch Crewmate"
+      },
+      "card_name": "Staunch Crewmate",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9b6de6e2550d80b3c10771cb920be527",
+      "normalized_name": "staunch crewmate",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+        "destination": "hand",
+        "effect": "creature",
+        "etb_library_bottom_order": "random",
+        "etb_library_look_count": 4,
+        "etb_library_pick_count": 1,
+        "etb_library_pick_target": "artifact_or_pirate",
+        "etb_library_pick_up_to_count": true,
+        "etb_library_rest_destination": "library_bottom",
+        "library_bottom_order": "random",
+        "pick_up_to_count": true,
+        "rest_destination": "library_bottom",
+        "target": "artifact_or_pirate",
+        "target_constraints": {
+          "any_of": [
+            {
+              "card_types": [
+                "artifact"
+              ]
+            },
+            {
+              "subtypes": [
+                "pirate"
+              ]
+            }
+          ],
+          "controller": "self",
+          "zone": "library"
+        },
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Sumala Woodshaper"
+      },
+      "card_name": "Sumala Woodshaper",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ac1dc0c54e35d9cf940ce99c00eb7637",
+      "normalized_name": "sumala woodshaper",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+        "destination": "hand",
+        "effect": "creature",
+        "etb_library_bottom_order": "random",
+        "etb_library_look_count": 4,
+        "etb_library_pick_count": 1,
+        "etb_library_pick_target": "creature_or_enchantment",
+        "etb_library_pick_up_to_count": true,
+        "etb_library_rest_destination": "library_bottom",
+        "library_bottom_order": "random",
+        "pick_up_to_count": true,
+        "rest_destination": "library_bottom",
+        "target": "creature_or_enchantment",
+        "target_constraints": {
+          "card_types": [
+            "creature",
+            "enchantment"
+          ],
+          "controller": "self",
+          "zone": "library"
+        },
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Augur of Bolas",
+    "Courageous Outrider",
+    "Eclipsed Boggart",
+    "Eclipsed Elf",
+    "Eclipsed Flamekin",
+    "Eclipsed Kithkin",
+    "Eclipsed Merrow",
+    "Sea Gate Oracle",
+    "Skalla Wolf",
+    "Staunch Crewmate",
+    "Sumala Woodshaper"
+  ],
+  "selected_count": 11,
+  "slug": "creature_etb_library_pick_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Augur of Bolas",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e32f8dd338034426a8da73df9f7cbbf1",
+      "min_rule_version": 2,
+      "normalized_name": "augur of bolas",
+      "oracle_hash": "7cb97c62b56dc0a9f8d653903ad26e23",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Courageous Outrider",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6200d112a15836a83caa0c2a19e2743e",
+      "min_rule_version": 2,
+      "normalized_name": "courageous outrider",
+      "oracle_hash": "642f82e736cd5bf03f87e91471514aec",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Eclipsed Boggart",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8f5fc4e14dfe69544aad6bbff142496b",
+      "min_rule_version": 2,
+      "normalized_name": "eclipsed boggart",
+      "oracle_hash": "a9ebe16b5c8bd757e00ae9e9c35c27ce",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Eclipsed Elf",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:10492a00c5eda109ce55064b5c4161f6",
+      "min_rule_version": 2,
+      "normalized_name": "eclipsed elf",
+      "oracle_hash": "9a239a1738b1b83b196d7cb9169f9d7c",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Eclipsed Flamekin",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3173b16ce72f792acb2bb1c1d76d61f6",
+      "min_rule_version": 2,
+      "normalized_name": "eclipsed flamekin",
+      "oracle_hash": "e3795fff4e5aed4b26daa9e0c1a4f7c6",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Eclipsed Kithkin",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:defacba718e027311e1e1afbad2089fe",
+      "min_rule_version": 2,
+      "normalized_name": "eclipsed kithkin",
+      "oracle_hash": "dc954b8c9a7dad2d34e9d9f6beb95ed4",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Eclipsed Merrow",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:477abd93b4a79f60485e3a8197340042",
+      "min_rule_version": 2,
+      "normalized_name": "eclipsed merrow",
+      "oracle_hash": "430674e395638d853f8c3fa0e7759fe7",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sea Gate Oracle",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6807079ec4aada62c41e0444fb2ea8de",
+      "min_rule_version": 2,
+      "normalized_name": "sea gate oracle",
+      "oracle_hash": "9ea9fb16f29a0c6092da5eda6e00a04e",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Skalla Wolf",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:15590162c5153067777396365efd9e64",
+      "min_rule_version": 2,
+      "normalized_name": "skalla wolf",
+      "oracle_hash": "0bd92a7ca7f76eb36a4c2abe85d78e11",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Staunch Crewmate",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9b6de6e2550d80b3c10771cb920be527",
+      "min_rule_version": 2,
+      "normalized_name": "staunch crewmate",
+      "oracle_hash": "7c9ecf31e2b7fe50e0568348df48c75b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sumala Woodshaper",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ac1dc0c54e35d9cf940ce99c00eb7637",
+      "min_rule_version": 2,
+      "normalized_name": "sumala woodshaper",
+      "oracle_hash": "2c2b65886f7fbc445aa18641c68bc28e",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

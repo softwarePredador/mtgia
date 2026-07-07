@@ -1387,6 +1387,91 @@ def run_creature_etb_scry(
     }
 
 
+def run_creature_etb_library_pick(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    active = battle.Player(
+        str(scenario.get("player") or "ETB Library Pick Controller"),
+        None,
+        [],
+    )
+    opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
+    active.library = [dict(candidate) for candidate in scenario.get("controller_library") or []]
+    expected_picked = [str(name) for name in scenario.get("expected_picked") or []]
+    expected_look_count = int(scenario.get("expected_look_count") or 0)
+    expected_rest_destination = str(scenario.get("expected_rest_destination") or "graveyard")
+    expected_pick_target = str(scenario.get("expected_pick_target") or "any_card")
+    if expected_look_count <= 0:
+        fail("battle_execution", f"{card['name']} missing expected_look_count")
+
+    effect_data = battle.get_card_effect(card)
+    permanent = battle.prepare_entering_permanent(
+        battle.enrich_card({**card, **effect_data}),
+        controller=active,
+        all_players=[active, opponent],
+        turn=int(scenario.get("turn") or 6),
+    )
+    active.battlefield.append(permanent)
+
+    before_events = len(events)
+    battle.resolve_generic_permanent_etb(
+        active,
+        [opponent],
+        permanent,
+        effect_data,
+        int(scenario.get("turn") or 6),
+        random.Random(int(scenario.get("seed") or 6070)),
+        all_players=[active, opponent],
+    )
+
+    dig_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "dig_to_hand_resolved" and data.get("card") == card.get("name")
+        ),
+        None,
+    )
+    if dig_event is None:
+        fail("battle_events", f"missing {card['name']} dig_to_hand_resolved event")
+    if int(dig_event.get("looked_count") or 0) != expected_look_count:
+        fail("battle_events", f"{card['name']} looked_count={dig_event.get('looked_count')}")
+    actual_picked = [str(name) for name in dig_event.get("picked") or []]
+    if actual_picked != expected_picked:
+        fail("battle_execution", f"{card['name']} picked={actual_picked} expected={expected_picked}")
+    if str(dig_event.get("pick_target") or "") != expected_pick_target:
+        fail("battle_events", f"{card['name']} pick_target={dig_event.get('pick_target')}")
+    if str(dig_event.get("rest_destination") or "") != expected_rest_destination:
+        fail("battle_events", f"{card['name']} rest_destination={dig_event.get('rest_destination')}")
+
+    if expected_rest_destination in {"library_bottom", "bottom", "bottom_library"}:
+        moved_rest = [str(name) for name in dig_event.get("moved_to_library_bottom") or []]
+        bottom_names = [str(candidate.get("name", "?")) for candidate in active.library[-len(moved_rest) :]]
+        if moved_rest and bottom_names != moved_rest:
+            fail("battle_execution", f"{card['name']} library_bottom={bottom_names} expected={moved_rest}")
+    else:
+        moved_rest = [str(name) for name in dig_event.get("moved_to_graveyard") or []]
+        graveyard_names = [str(candidate.get("name", "?")) for candidate in active.graveyard]
+        if moved_rest != graveyard_names:
+            fail("battle_execution", f"{card['name']} graveyard={graveyard_names} expected={moved_rest}")
+
+    hand_names = [str(candidate.get("name", "?")) for candidate in active.hand]
+    if hand_names != expected_picked:
+        fail("battle_execution", f"{card['name']} hand={hand_names} expected={expected_picked}")
+
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "picked": actual_picked,
+        "moved_rest": moved_rest,
+        "rest_destination": expected_rest_destination,
+        "pick_target": expected_pick_target,
+    }
+
+
 def run_creature_dies_create_tokens(
     battle,
     scenario: dict[str, Any],
@@ -4309,6 +4394,7 @@ SCENARIO_RUNNERS = {
     "creature_etb_create_treasure": run_creature_etb_create_treasure,
     "creature_etb_create_tokens": run_creature_etb_create_tokens,
     "creature_etb_dynamic_life_gain": run_creature_etb_dynamic_life_gain,
+    "creature_etb_library_pick": run_creature_etb_library_pick,
     "creature_enters_draw": run_creature_enters_draw,
     "creature_enters_life_gain": run_creature_enters_life_gain,
     "creature_etb_scry": run_creature_etb_scry,

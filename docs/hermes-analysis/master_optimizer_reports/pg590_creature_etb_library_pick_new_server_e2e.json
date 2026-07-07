@@ -1,0 +1,589 @@
+{
+  "battle_execution": {
+    "event_count": 11,
+    "results": [
+      {
+        "card_name": "Augur of Bolas",
+        "moved_rest": [
+          "E2E Nonmatching Creature",
+          "E2E Secondary Match"
+        ],
+        "pick_target": "instant_or_sorcery",
+        "picked": [
+          "E2E Preferred Match"
+        ],
+        "rest_destination": "library_bottom",
+        "scenario": "Augur of Bolas digs on ETB"
+      },
+      {
+        "card_name": "Courageous Outrider",
+        "moved_rest": [
+          "E2E Nonmatching Artifact",
+          "E2E Secondary Match",
+          "E2E Filler 4"
+        ],
+        "pick_target": "human_card",
+        "picked": [
+          "E2E Preferred Match"
+        ],
+        "rest_destination": "library_bottom",
+        "scenario": "Courageous Outrider digs on ETB"
+      },
+      {
+        "card_name": "Eclipsed Boggart",
+        "moved_rest": [
+          "E2E Nonmatching Artifact",
+          "E2E Secondary Match",
+          "E2E Filler 4"
+        ],
+        "pick_target": "goblin_swamp_or_mountain",
+        "picked": [
+          "E2E Preferred Match"
+        ],
+        "rest_destination": "library_bottom",
+        "scenario": "Eclipsed Boggart digs on ETB"
+      },
+      {
+        "card_name": "Eclipsed Elf",
+        "moved_rest": [
+          "E2E Nonmatching Artifact",
+          "E2E Secondary Match",
+          "E2E Filler 4"
+        ],
+        "pick_target": "elf_swamp_or_forest",
+        "picked": [
+          "E2E Preferred Match"
+        ],
+        "rest_destination": "library_bottom",
+        "scenario": "Eclipsed Elf digs on ETB"
+      },
+      {
+        "card_name": "Eclipsed Flamekin",
+        "moved_rest": [
+          "E2E Nonmatching Artifact",
+          "E2E Secondary Match",
+          "E2E Filler 4"
+        ],
+        "pick_target": "elemental_island_or_mountain",
+        "picked": [
+          "E2E Preferred Match"
+        ],
+        "rest_destination": "library_bottom",
+        "scenario": "Eclipsed Flamekin digs on ETB"
+      },
+      {
+        "card_name": "Eclipsed Kithkin",
+        "moved_rest": [
+          "E2E Nonmatching Artifact",
+          "E2E Secondary Match",
+          "E2E Filler 4"
+        ],
+        "pick_target": "kithkin_forest_or_plains",
+        "picked": [
+          "E2E Preferred Match"
+        ],
+        "rest_destination": "library_bottom",
+        "scenario": "Eclipsed Kithkin digs on ETB"
+      },
+      {
+        "card_name": "Eclipsed Merrow",
+        "moved_rest": [
+          "E2E Nonmatching Artifact",
+          "E2E Secondary Match",
+          "E2E Filler 4"
+        ],
+        "pick_target": "merfolk_plains_or_island",
+        "picked": [
+          "E2E Preferred Match"
+        ],
+        "rest_destination": "library_bottom",
+        "scenario": "Eclipsed Merrow digs on ETB"
+      },
+      {
+        "card_name": "Sea Gate Oracle",
+        "moved_rest": [
+          "E2E Secondary Any"
+        ],
+        "pick_target": "any_card",
+        "picked": [
+          "E2E Preferred Any"
+        ],
+        "rest_destination": "library_bottom",
+        "scenario": "Sea Gate Oracle digs on ETB"
+      },
+      {
+        "card_name": "Skalla Wolf",
+        "moved_rest": [
+          "E2E Nonmatching Artifact",
+          "E2E Secondary Match",
+          "E2E Filler 4",
+          "E2E Filler 5"
+        ],
+        "pick_target": "green_card",
+        "picked": [
+          "E2E Preferred Match"
+        ],
+        "rest_destination": "library_bottom",
+        "scenario": "Skalla Wolf digs on ETB"
+      },
+      {
+        "card_name": "Staunch Crewmate",
+        "moved_rest": [
+          "E2E Nonmatching Creature",
+          "E2E Secondary Match",
+          "E2E Filler 4"
+        ],
+        "pick_target": "artifact_or_pirate",
+        "picked": [
+          "E2E Preferred Match"
+        ],
+        "rest_destination": "library_bottom",
+        "scenario": "Staunch Crewmate digs on ETB"
+      },
+      {
+        "card_name": "Sumala Woodshaper",
+        "moved_rest": [
+          "E2E Nonmatching Artifact",
+          "E2E Secondary Match",
+          "E2E Filler 4"
+        ],
+        "pick_target": "creature_or_enchantment",
+        "picked": [
+          "E2E Preferred Match"
+        ],
+        "rest_destination": "library_bottom",
+        "scenario": "Sumala Woodshaper digs on ETB"
+      }
+    ],
+    "scenario_count": 11
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-07T03:41:50.863328+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg590_creature_etb_library_pick_new_server_package_manifest.json",
+  "package_id": "pg590_creature_etb_library_pick_new_server_package_manifest",
+  "snapshot": "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 11
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+          "card_name": "Augur of Bolas",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e32f8dd338034426a8da73df9f7cbbf1",
+          "oracle_hash": "7cb97c62b56dc0a9f8d653903ad26e23",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+          "card_name": "Courageous Outrider",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6200d112a15836a83caa0c2a19e2743e",
+          "oracle_hash": "642f82e736cd5bf03f87e91471514aec",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+          "card_name": "Eclipsed Boggart",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8f5fc4e14dfe69544aad6bbff142496b",
+          "oracle_hash": "a9ebe16b5c8bd757e00ae9e9c35c27ce",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+          "card_name": "Eclipsed Elf",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:10492a00c5eda109ce55064b5c4161f6",
+          "oracle_hash": "9a239a1738b1b83b196d7cb9169f9d7c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+          "card_name": "Eclipsed Flamekin",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3173b16ce72f792acb2bb1c1d76d61f6",
+          "oracle_hash": "e3795fff4e5aed4b26daa9e0c1a4f7c6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+          "card_name": "Eclipsed Kithkin",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:defacba718e027311e1e1afbad2089fe",
+          "oracle_hash": "dc954b8c9a7dad2d34e9d9f6beb95ed4",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+          "card_name": "Eclipsed Merrow",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:477abd93b4a79f60485e3a8197340042",
+          "oracle_hash": "430674e395638d853f8c3fa0e7759fe7",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+          "card_name": "Sea Gate Oracle",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6807079ec4aada62c41e0444fb2ea8de",
+          "oracle_hash": "9ea9fb16f29a0c6092da5eda6e00a04e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+          "card_name": "Skalla Wolf",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:15590162c5153067777396365efd9e64",
+          "oracle_hash": "0bd92a7ca7f76eb36a4c2abe85d78e11",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+          "card_name": "Staunch Crewmate",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9b6de6e2550d80b3c10771cb920be527",
+          "oracle_hash": "7c9ecf31e2b7fe50e0568348df48c75b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+          "card_name": "Sumala Woodshaper",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ac1dc0c54e35d9cf940ce99c00eb7637",
+          "oracle_hash": "2c2b65886f7fbc445aa18641c68bc28e",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 11
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+          "card_name": "Augur of Bolas",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e32f8dd338034426a8da73df9f7cbbf1",
+          "oracle_hash": "7cb97c62b56dc0a9f8d653903ad26e23",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+          "card_name": "Courageous Outrider",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6200d112a15836a83caa0c2a19e2743e",
+          "oracle_hash": "642f82e736cd5bf03f87e91471514aec",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+          "card_name": "Eclipsed Boggart",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8f5fc4e14dfe69544aad6bbff142496b",
+          "oracle_hash": "a9ebe16b5c8bd757e00ae9e9c35c27ce",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+          "card_name": "Eclipsed Elf",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:10492a00c5eda109ce55064b5c4161f6",
+          "oracle_hash": "9a239a1738b1b83b196d7cb9169f9d7c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+          "card_name": "Eclipsed Flamekin",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3173b16ce72f792acb2bb1c1d76d61f6",
+          "oracle_hash": "e3795fff4e5aed4b26daa9e0c1a4f7c6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+          "card_name": "Eclipsed Kithkin",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:defacba718e027311e1e1afbad2089fe",
+          "oracle_hash": "dc954b8c9a7dad2d34e9d9f6beb95ed4",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+          "card_name": "Eclipsed Merrow",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:477abd93b4a79f60485e3a8197340042",
+          "oracle_hash": "430674e395638d853f8c3fa0e7759fe7",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+          "card_name": "Sea Gate Oracle",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6807079ec4aada62c41e0444fb2ea8de",
+          "oracle_hash": "9ea9fb16f29a0c6092da5eda6e00a04e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+          "card_name": "Skalla Wolf",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:15590162c5153067777396365efd9e64",
+          "oracle_hash": "0bd92a7ca7f76eb36a4c2abe85d78e11",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+          "card_name": "Staunch Crewmate",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9b6de6e2550d80b3c10771cb920be527",
+          "oracle_hash": "7c9ecf31e2b7fe50e0568348df48c75b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+          "card_name": "Sumala Woodshaper",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ac1dc0c54e35d9cf940ce99c00eb7637",
+          "oracle_hash": "2c2b65886f7fbc445aa18641c68bc28e",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 11
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+          "battle_rule_version": 2,
+          "card_name": "Augur of Bolas",
+          "logical_rule_key": "battle_rule_v1:e32f8dd338034426a8da73df9f7cbbf1"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+          "battle_rule_version": 2,
+          "card_name": "Courageous Outrider",
+          "logical_rule_key": "battle_rule_v1:6200d112a15836a83caa0c2a19e2743e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+          "battle_rule_version": 2,
+          "card_name": "Eclipsed Boggart",
+          "logical_rule_key": "battle_rule_v1:8f5fc4e14dfe69544aad6bbff142496b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+          "battle_rule_version": 2,
+          "card_name": "Eclipsed Elf",
+          "logical_rule_key": "battle_rule_v1:10492a00c5eda109ce55064b5c4161f6"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+          "battle_rule_version": 2,
+          "card_name": "Eclipsed Flamekin",
+          "logical_rule_key": "battle_rule_v1:3173b16ce72f792acb2bb1c1d76d61f6"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+          "battle_rule_version": 2,
+          "card_name": "Eclipsed Kithkin",
+          "logical_rule_key": "battle_rule_v1:defacba718e027311e1e1afbad2089fe"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+          "battle_rule_version": 2,
+          "card_name": "Eclipsed Merrow",
+          "logical_rule_key": "battle_rule_v1:477abd93b4a79f60485e3a8197340042"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+          "battle_rule_version": 2,
+          "card_name": "Sea Gate Oracle",
+          "logical_rule_key": "battle_rule_v1:6807079ec4aada62c41e0444fb2ea8de"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+          "battle_rule_version": 2,
+          "card_name": "Skalla Wolf",
+          "logical_rule_key": "battle_rule_v1:15590162c5153067777396365efd9e64"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+          "battle_rule_version": 2,
+          "card_name": "Staunch Crewmate",
+          "logical_rule_key": "battle_rule_v1:9b6de6e2550d80b3c10771cb920be527"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+          "battle_rule_version": 2,
+          "card_name": "Sumala Woodshaper",
+          "logical_rule_key": "battle_rule_v1:ac1dc0c54e35d9cf940ce99c00eb7637"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 11
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Augur of Bolas",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:e32f8dd338034426a8da73df9f7cbbf1"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Courageous Outrider",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:6200d112a15836a83caa0c2a19e2743e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Eclipsed Boggart",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:8f5fc4e14dfe69544aad6bbff142496b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Eclipsed Elf",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:10492a00c5eda109ce55064b5c4161f6"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Eclipsed Flamekin",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:3173b16ce72f792acb2bb1c1d76d61f6"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Eclipsed Kithkin",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:defacba718e027311e1e1afbad2089fe"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Eclipsed Merrow",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:477abd93b4a79f60485e3a8197340042"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Sea Gate Oracle",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:6807079ec4aada62c41e0444fb2ea8de"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Skalla Wolf",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:15590162c5153067777396365efd9e64"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Staunch Crewmate",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:9b6de6e2550d80b3c10771cb920be527"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Sumala Woodshaper",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:ac1dc0c54e35d9cf940ce99c00eb7637"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 11,
+        "scenarios": 11
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

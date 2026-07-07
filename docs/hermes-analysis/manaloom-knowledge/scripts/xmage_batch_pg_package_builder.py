@@ -200,6 +200,8 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "etb_library_pick_target",
     "etb_library_rest_destination",
     "etb_library_pick_all_matching",
+    "etb_library_pick_up_to_count",
+    "etb_library_bottom_order",
     "etb_tutor_target",
     "etb_tutor_count",
     "tutor_target",
@@ -2285,6 +2287,87 @@ def each_player_sacrifice_execution_scenario_from_expected_rule(
     }
 
 
+def _library_pick_matching_card(target: str, *, name: str, cmc: int = 5) -> dict[str, Any]:
+    normalized = str(target or "any_card").strip().lower()
+    mapping = {
+        "artifact": ("Artifact", {}),
+        "artifact_or_pirate": ("Artifact", {}),
+        "creature": ("Creature - Soldier", {}),
+        "creature_or_enchantment": ("Enchantment", {}),
+        "creature_or_land": ("Creature - Scout", {}),
+        "elemental_island_or_mountain": ("Creature - Elemental", {}),
+        "elf_swamp_or_forest": ("Creature - Elf", {}),
+        "enchantment": ("Enchantment", {}),
+        "green_card": ("Creature - Elf", {"colors": ["G"]}),
+        "goblin_swamp_or_mountain": ("Creature - Goblin", {}),
+        "human_card": ("Creature - Human Soldier", {}),
+        "instant_or_sorcery": ("Instant", {}),
+        "kithkin_forest_or_plains": ("Creature - Kithkin", {}),
+        "land": ("Land", {}),
+        "land_or_double_faced": ("Land", {}),
+        "merfolk_plains_or_island": ("Creature - Merfolk", {}),
+        "mount_creature_or_plains": ("Creature - Mount", {}),
+    }
+    type_line, extras = mapping.get(normalized, ("Creature - Soldier", {}))
+    return {"name": name, "type_line": type_line, "cmc": cmc, **extras}
+
+
+def _library_pick_nonmatching_card(target: str, *, cmc: int = 8) -> dict[str, Any]:
+    normalized = str(target or "any_card").strip().lower()
+    if normalized in {"artifact", "artifact_or_pirate"}:
+        return {"name": "E2E Nonmatching Creature", "type_line": "Creature - Soldier", "cmc": cmc}
+    if normalized in {"instant_or_sorcery"}:
+        return {"name": "E2E Nonmatching Creature", "type_line": "Creature - Soldier", "cmc": cmc}
+    if normalized in {"land", "land_or_double_faced"}:
+        return {"name": "E2E Nonmatching Instant", "type_line": "Instant", "cmc": cmc}
+    return {"name": "E2E Nonmatching Artifact", "type_line": "Artifact", "cmc": cmc}
+
+
+def creature_etb_library_pick_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") not in {
+        "xmage_creature_etb_look_library_pick_to_hand_rest_graveyard_v1",
+        "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+    }:
+        return None
+    look_count = max(1, int(required.get("etb_library_look_count") or 1))
+    pick_count = max(1, int(required.get("etb_library_pick_count") or 1))
+    pick_target = str(required.get("etb_library_pick_target") or required.get("target") or "any_card")
+    pick_all_matching = bool(required.get("etb_library_pick_all_matching") or required.get("pick_all_matching"))
+    matching = [
+        _library_pick_matching_card(pick_target, name="E2E Preferred Match", cmc=5),
+        _library_pick_matching_card(pick_target, name="E2E Secondary Match", cmc=2),
+    ]
+    if pick_target == "any_card":
+        library = [
+            {"name": "E2E Preferred Any", "type_line": "Sorcery", "cmc": 7},
+            {"name": "E2E Secondary Any", "type_line": "Creature - Scout", "cmc": 2},
+        ]
+        expected_picked = ["E2E Preferred Any"]
+    else:
+        library = [_library_pick_nonmatching_card(pick_target), *matching]
+        expected_picked = [card["name"] for card in matching[: (len(matching) if pick_all_matching else pick_count)]]
+    while len(library) < look_count:
+        library.append({"name": f"E2E Filler {len(library) + 1}", "type_line": "Artifact", "cmc": 1})
+    return {
+        "name": f"{rule['card_name']} digs on ETB",
+        "type": "creature_etb_library_pick",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": "Creature - Scout",
+            **required,
+        },
+        "controller_library": library,
+        "expected_picked": expected_picked,
+        "expected_look_count": look_count,
+        "expected_rest_destination": str(required.get("etb_library_rest_destination") or "graveyard"),
+        "expected_pick_target": pick_target,
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def _primary_fixture_card_type(constraints: dict[str, Any]) -> str:
     card_types = [
         str(value or "").strip().lower()
@@ -2517,6 +2600,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or creature_dies_create_treasure_execution_scenario_from_expected_rule(rule)
         or creature_etb_create_tokens_execution_scenario_from_expected_rule(rule)
         or creature_etb_scry_execution_scenario_from_expected_rule(rule)
+        or creature_etb_library_pick_execution_scenario_from_expected_rule(rule)
         or creature_dies_create_tokens_execution_scenario_from_expected_rule(rule)
         or simple_mana_source_execution_scenario_from_expected_rule(rule)
         or damage_each_opponent_spell_execution_scenario_from_expected_rule(rule)

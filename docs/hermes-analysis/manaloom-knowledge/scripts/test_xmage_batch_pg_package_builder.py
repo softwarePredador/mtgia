@@ -1583,6 +1583,35 @@ def test_creature_etb_scry_execution_scenario() -> None:
     assert scenario["logical_rule_key"] == "battle_rule_v1:omenspeaker"
 
 
+def test_creature_etb_library_pick_bottom_execution_scenario() -> None:
+    rule = {
+        "normalized_name": "augur of bolas",
+        "card_name": "Augur of Bolas",
+        "logical_rule_key": "battle_rule_v1:augur-of-bolas",
+        "required_effect_fields": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1",
+            "trigger": "enters_battlefield",
+            "etb_library_look_count": 3,
+            "etb_library_pick_count": 1,
+            "etb_library_pick_target": "instant_or_sorcery",
+            "etb_library_rest_destination": "library_bottom",
+            "etb_library_pick_up_to_count": True,
+            "etb_library_bottom_order": "any",
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario["type"] == "creature_etb_library_pick"
+    assert scenario["expected_look_count"] == 3
+    assert scenario["expected_pick_target"] == "instant_or_sorcery"
+    assert scenario["expected_rest_destination"] == "library_bottom"
+    assert scenario["expected_picked"] == ["E2E Preferred Match"]
+    assert scenario["card"]["name"] == "Augur of Bolas"
+    assert scenario["logical_rule_key"] == "battle_rule_v1:augur-of-bolas"
+
+
 def test_creature_dies_create_tokens_execution_scenario() -> None:
     rule = {
         "normalized_name": "carrier thrall",

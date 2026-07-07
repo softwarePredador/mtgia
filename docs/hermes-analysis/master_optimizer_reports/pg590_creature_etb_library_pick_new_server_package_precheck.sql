@@ -1,0 +1,91 @@
+WITH proposed(normalized_name, card_name, oracle_hash, logical_rule_key, effect_json, deck_role_json, source, confidence, review_status, execution_status, notes, shadow_handling) AS (
+  VALUES
+    ('augur of bolas', 'Augur of Bolas', '7cb97c62b56dc0a9f8d653903ad26e23', 'battle_rule_v1:e32f8dd338034426a8da73df9f7cbbf1', '{"ability_kind":"triggered","battle_model_scope":"xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1","destination":"hand","effect":"creature","etb_library_bottom_order":"any","etb_library_look_count":3,"etb_library_pick_count":1,"etb_library_pick_target":"instant_or_sorcery","etb_library_pick_up_to_count":true,"etb_library_rest_destination":"library_bottom","library_bottom_order":"any","pick_up_to_count":true,"rest_destination":"library_bottom","target":"instant_or_sorcery","target_constraints":{"card_types":["instant","sorcery"],"controller":"self","zone":"library"},"trigger":"enters_battlefield","xmage_ability_class":"EntersBattlefieldTriggeredAbility","xmage_effect_class":"LookLibraryAndPickControllerEffect"}'::jsonb, '{"category":"unknown","effect":"creature","target":"instant_or_sorcery"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class AugurOfBolas translated into ManaLoom runtime scope xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1. This row is package-ready only because the source signature is a narrow creature enter-the-battlefield triggered ability with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('courageous outrider', 'Courageous Outrider', '642f82e736cd5bf03f87e91471514aec', 'battle_rule_v1:6200d112a15836a83caa0c2a19e2743e', '{"ability_kind":"triggered","battle_model_scope":"xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1","destination":"hand","effect":"creature","etb_library_bottom_order":"any","etb_library_look_count":4,"etb_library_pick_count":1,"etb_library_pick_target":"human_card","etb_library_pick_up_to_count":true,"etb_library_rest_destination":"library_bottom","library_bottom_order":"any","pick_up_to_count":true,"rest_destination":"library_bottom","target":"human_card","target_constraints":{"controller":"self","subtypes":["human"],"zone":"library"},"trigger":"enters_battlefield","xmage_ability_class":"EntersBattlefieldTriggeredAbility","xmage_effect_class":"LookLibraryAndPickControllerEffect"}'::jsonb, '{"category":"unknown","effect":"creature","target":"human_card"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class CourageousOutrider translated into ManaLoom runtime scope xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1. This row is package-ready only because the source signature is a narrow creature enter-the-battlefield triggered ability with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('eclipsed boggart', 'Eclipsed Boggart', 'a9ebe16b5c8bd757e00ae9e9c35c27ce', 'battle_rule_v1:8f5fc4e14dfe69544aad6bbff142496b', '{"ability_kind":"triggered","battle_model_scope":"xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1","destination":"hand","effect":"creature","etb_library_bottom_order":"random","etb_library_look_count":4,"etb_library_pick_count":1,"etb_library_pick_target":"goblin_swamp_or_mountain","etb_library_pick_up_to_count":true,"etb_library_rest_destination":"library_bottom","library_bottom_order":"random","pick_up_to_count":true,"rest_destination":"library_bottom","target":"goblin_swamp_or_mountain","target_constraints":{"any_of":[{"subtypes":["goblin"]},{"card_types":["land"],"subtypes":["swamp"]},{"card_types":["land"],"subtypes":["mountain"]}],"controller":"self","zone":"library"},"trigger":"enters_battlefield","xmage_ability_class":"EntersBattlefieldTriggeredAbility","xmage_effect_class":"LookLibraryAndPickControllerEffect"}'::jsonb, '{"category":"unknown","effect":"creature","target":"goblin_swamp_or_mountain"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class EclipsedBoggart translated into ManaLoom runtime scope xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1. This row is package-ready only because the source signature is a narrow creature enter-the-battlefield triggered ability with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('eclipsed elf', 'Eclipsed Elf', '9a239a1738b1b83b196d7cb9169f9d7c', 'battle_rule_v1:10492a00c5eda109ce55064b5c4161f6', '{"ability_kind":"triggered","battle_model_scope":"xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1","destination":"hand","effect":"creature","etb_library_bottom_order":"random","etb_library_look_count":4,"etb_library_pick_count":1,"etb_library_pick_target":"elf_swamp_or_forest","etb_library_pick_up_to_count":true,"etb_library_rest_destination":"library_bottom","library_bottom_order":"random","pick_up_to_count":true,"rest_destination":"library_bottom","target":"elf_swamp_or_forest","target_constraints":{"any_of":[{"subtypes":["elf"]},{"card_types":["land"],"subtypes":["swamp"]},{"card_types":["land"],"subtypes":["forest"]}],"controller":"self","zone":"library"},"trigger":"enters_battlefield","xmage_ability_class":"EntersBattlefieldTriggeredAbility","xmage_effect_class":"LookLibraryAndPickControllerEffect"}'::jsonb, '{"category":"unknown","effect":"creature","target":"elf_swamp_or_forest"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class EclipsedElf translated into ManaLoom runtime scope xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1. This row is package-ready only because the source signature is a narrow creature enter-the-battlefield triggered ability with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('eclipsed flamekin', 'Eclipsed Flamekin', 'e3795fff4e5aed4b26daa9e0c1a4f7c6', 'battle_rule_v1:3173b16ce72f792acb2bb1c1d76d61f6', '{"ability_kind":"triggered","battle_model_scope":"xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1","destination":"hand","effect":"creature","etb_library_bottom_order":"random","etb_library_look_count":4,"etb_library_pick_count":1,"etb_library_pick_target":"elemental_island_or_mountain","etb_library_pick_up_to_count":true,"etb_library_rest_destination":"library_bottom","library_bottom_order":"random","pick_up_to_count":true,"rest_destination":"library_bottom","target":"elemental_island_or_mountain","target_constraints":{"any_of":[{"subtypes":["elemental"]},{"card_types":["land"],"subtypes":["island"]},{"card_types":["land"],"subtypes":["mountain"]}],"controller":"self","zone":"library"},"trigger":"enters_battlefield","xmage_ability_class":"EntersBattlefieldTriggeredAbility","xmage_effect_class":"LookLibraryAndPickControllerEffect"}'::jsonb, '{"category":"unknown","effect":"creature","target":"elemental_island_or_mountain"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class EclipsedFlamekin translated into ManaLoom runtime scope xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1. This row is package-ready only because the source signature is a narrow creature enter-the-battlefield triggered ability with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('eclipsed kithkin', 'Eclipsed Kithkin', 'dc954b8c9a7dad2d34e9d9f6beb95ed4', 'battle_rule_v1:defacba718e027311e1e1afbad2089fe', '{"ability_kind":"triggered","battle_model_scope":"xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1","destination":"hand","effect":"creature","etb_library_bottom_order":"random","etb_library_look_count":4,"etb_library_pick_count":1,"etb_library_pick_target":"kithkin_forest_or_plains","etb_library_pick_up_to_count":true,"etb_library_rest_destination":"library_bottom","library_bottom_order":"random","pick_up_to_count":true,"rest_destination":"library_bottom","target":"kithkin_forest_or_plains","target_constraints":{"any_of":[{"subtypes":["kithkin"]},{"card_types":["land"],"subtypes":["forest"]},{"card_types":["land"],"subtypes":["plains"]}],"controller":"self","zone":"library"},"trigger":"enters_battlefield","xmage_ability_class":"EntersBattlefieldTriggeredAbility","xmage_effect_class":"LookLibraryAndPickControllerEffect"}'::jsonb, '{"category":"unknown","effect":"creature","target":"kithkin_forest_or_plains"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class EclipsedKithkin translated into ManaLoom runtime scope xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1. This row is package-ready only because the source signature is a narrow creature enter-the-battlefield triggered ability with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('eclipsed merrow', 'Eclipsed Merrow', '430674e395638d853f8c3fa0e7759fe7', 'battle_rule_v1:477abd93b4a79f60485e3a8197340042', '{"ability_kind":"triggered","battle_model_scope":"xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1","destination":"hand","effect":"creature","etb_library_bottom_order":"random","etb_library_look_count":4,"etb_library_pick_count":1,"etb_library_pick_target":"merfolk_plains_or_island","etb_library_pick_up_to_count":true,"etb_library_rest_destination":"library_bottom","library_bottom_order":"random","pick_up_to_count":true,"rest_destination":"library_bottom","target":"merfolk_plains_or_island","target_constraints":{"any_of":[{"subtypes":["merfolk"]},{"card_types":["land"],"subtypes":["plains"]},{"card_types":["land"],"subtypes":["island"]}],"controller":"self","zone":"library"},"trigger":"enters_battlefield","xmage_ability_class":"EntersBattlefieldTriggeredAbility","xmage_effect_class":"LookLibraryAndPickControllerEffect"}'::jsonb, '{"category":"unknown","effect":"creature","target":"merfolk_plains_or_island"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class EclipsedMerrow translated into ManaLoom runtime scope xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1. This row is package-ready only because the source signature is a narrow creature enter-the-battlefield triggered ability with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('sea gate oracle', 'Sea Gate Oracle', '9ea9fb16f29a0c6092da5eda6e00a04e', 'battle_rule_v1:6807079ec4aada62c41e0444fb2ea8de', '{"ability_kind":"triggered","battle_model_scope":"xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1","destination":"hand","effect":"creature","etb_library_bottom_order":"any","etb_library_look_count":2,"etb_library_pick_count":1,"etb_library_pick_target":"any_card","etb_library_rest_destination":"library_bottom","library_bottom_order":"any","rest_destination":"library_bottom","target":"any_card","target_constraints":{"controller":"self","scope":"any_card","zone":"library"},"trigger":"enters_battlefield","xmage_ability_class":"EntersBattlefieldTriggeredAbility","xmage_effect_class":"LookLibraryAndPickControllerEffect"}'::jsonb, '{"category":"unknown","effect":"creature","target":"any_card"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class SeaGateOracle translated into ManaLoom runtime scope xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1. This row is package-ready only because the source signature is a narrow creature enter-the-battlefield triggered ability with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('skalla wolf', 'Skalla Wolf', '0bd92a7ca7f76eb36a4c2abe85d78e11', 'battle_rule_v1:15590162c5153067777396365efd9e64', '{"ability_kind":"triggered","battle_model_scope":"xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1","destination":"hand","effect":"creature","etb_library_bottom_order":"random","etb_library_look_count":5,"etb_library_pick_count":1,"etb_library_pick_target":"green_card","etb_library_pick_up_to_count":true,"etb_library_rest_destination":"library_bottom","library_bottom_order":"random","pick_up_to_count":true,"rest_destination":"library_bottom","target":"green_card","target_constraints":{"colors":["G"],"controller":"self","zone":"library"},"trigger":"enters_battlefield","xmage_ability_class":"EntersBattlefieldTriggeredAbility","xmage_effect_class":"LookLibraryAndPickControllerEffect"}'::jsonb, '{"category":"unknown","effect":"creature","target":"green_card"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class SkallaWolf translated into ManaLoom runtime scope xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1. This row is package-ready only because the source signature is a narrow creature enter-the-battlefield triggered ability with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('staunch crewmate', 'Staunch Crewmate', '7c9ecf31e2b7fe50e0568348df48c75b', 'battle_rule_v1:9b6de6e2550d80b3c10771cb920be527', '{"ability_kind":"triggered","battle_model_scope":"xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1","destination":"hand","effect":"creature","etb_library_bottom_order":"random","etb_library_look_count":4,"etb_library_pick_count":1,"etb_library_pick_target":"artifact_or_pirate","etb_library_pick_up_to_count":true,"etb_library_rest_destination":"library_bottom","library_bottom_order":"random","pick_up_to_count":true,"rest_destination":"library_bottom","target":"artifact_or_pirate","target_constraints":{"any_of":[{"card_types":["artifact"]},{"subtypes":["pirate"]}],"controller":"self","zone":"library"},"trigger":"enters_battlefield","xmage_ability_class":"EntersBattlefieldTriggeredAbility","xmage_effect_class":"LookLibraryAndPickControllerEffect"}'::jsonb, '{"category":"unknown","effect":"creature","target":"artifact_or_pirate"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class StaunchCrewmate translated into ManaLoom runtime scope xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1. This row is package-ready only because the source signature is a narrow creature enter-the-battlefield triggered ability with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('sumala woodshaper', 'Sumala Woodshaper', '2c2b65886f7fbc445aa18641c68bc28e', 'battle_rule_v1:ac1dc0c54e35d9cf940ce99c00eb7637', '{"ability_kind":"triggered","battle_model_scope":"xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1","destination":"hand","effect":"creature","etb_library_bottom_order":"random","etb_library_look_count":4,"etb_library_pick_count":1,"etb_library_pick_target":"creature_or_enchantment","etb_library_pick_up_to_count":true,"etb_library_rest_destination":"library_bottom","library_bottom_order":"random","pick_up_to_count":true,"rest_destination":"library_bottom","target":"creature_or_enchantment","target_constraints":{"card_types":["creature","enchantment"],"controller":"self","zone":"library"},"trigger":"enters_battlefield","xmage_ability_class":"EntersBattlefieldTriggeredAbility","xmage_effect_class":"LookLibraryAndPickControllerEffect"}'::jsonb, '{"category":"unknown","effect":"creature","target":"creature_or_enchantment"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class SumalaWoodshaper translated into ManaLoom runtime scope xmage_creature_etb_look_library_pick_to_hand_rest_bottom_v1. This row is package-ready only because the source signature is a narrow creature enter-the-battlefield triggered ability with focused runtime coverage.', 'deprecate_nonmatching_rows')
+),
+matched_cards AS (
+  SELECT
+    p.normalized_name,
+    p.card_name,
+    p.oracle_hash,
+    c.id AS card_id,
+    c.name AS db_card_name
+  FROM proposed p
+  LEFT JOIN public.cards c
+    ON (
+         lower(c.name) = p.normalized_name
+         OR split_part(lower(c.name), ' // ', 1) = p.normalized_name
+       )
+   AND md5(coalesce(c.oracle_text, '')) = p.oracle_hash
+),
+target_cards AS (
+  SELECT
+    normalized_name,
+    card_name,
+    oracle_hash,
+    count(card_id) AS target_card_rows,
+    min(card_id::text)::uuid AS canonical_card_id,
+    min(db_card_name) AS canonical_card_name
+  FROM matched_cards
+  GROUP BY normalized_name, card_name, oracle_hash
+),
+rule_rows AS (
+  SELECT p.normalized_name, count(r.*) AS existing_rule_rows
+  FROM proposed p
+  LEFT JOIN public.card_battle_rules r
+    ON (
+         r.normalized_name = p.normalized_name
+         OR r.normalized_name LIKE p.normalized_name || ' // %'
+       )
+  GROUP BY p.normalized_name
+),
+expected_rows AS (
+  SELECT p.normalized_name, count(r.*) AS expected_rule_rows_before
+  FROM proposed p
+  LEFT JOIN public.card_battle_rules r
+    ON (
+         r.normalized_name = p.normalized_name
+         OR r.normalized_name LIKE p.normalized_name || ' // %'
+       )
+   AND r.logical_rule_key = p.logical_rule_key
+  GROUP BY p.normalized_name
+),
+shadow_rows AS (
+  SELECT p.normalized_name, count(r.*) AS would_deprecate_shadow_rows
+  FROM proposed p
+  LEFT JOIN public.card_battle_rules r
+    ON (
+         r.normalized_name = p.normalized_name
+         OR r.normalized_name LIKE p.normalized_name || ' // %'
+       )
+   AND r.logical_rule_key <> p.logical_rule_key
+   AND r.review_status NOT IN ('deprecated', 'rejected')
+   AND r.execution_status <> 'disabled'
+  GROUP BY p.normalized_name
+)
+SELECT
+  p.card_name,
+  p.normalized_name,
+  p.oracle_hash,
+  p.logical_rule_key,
+  p.shadow_handling,
+  tc.target_card_rows,
+  tc.canonical_card_id,
+  rr.existing_rule_rows,
+  er.expected_rule_rows_before,
+  sr.would_deprecate_shadow_rows
+FROM proposed p
+JOIN target_cards tc USING (normalized_name, card_name, oracle_hash)
+JOIN rule_rows rr USING (normalized_name)
+JOIN expected_rows er USING (normalized_name)
+JOIN shadow_rows sr USING (normalized_name)
+ORDER BY p.card_name;
