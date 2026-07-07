@@ -951,6 +951,128 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertEqual(goblin["power"], 1)
         self.assertEqual(goblin["toughness"], 1)
 
+    def test_static_controlled_keyword_applies_to_controller_and_reverts(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        primal_rage = {
+            "name": "Primal Rage",
+            "type_line": "Enchantment",
+            "effect": "passive",
+            "battle_model_scope": "xmage_static_controlled_keyword_grant_v1",
+            "static_effect": "controlled_keyword_grant",
+            "static_granted_keywords": ["trample"],
+            "static_exclude_source": False,
+        }
+        bear = {"name": "Active Bear", "type_line": "Creature - Bear", "power": 2, "toughness": 2}
+        enemy = {"name": "Enemy Bear", "type_line": "Creature - Bear", "power": 2, "toughness": 2}
+        active.battlefield = [primal_rage, bear]
+        opponent.battlefield = [enemy]
+
+        self.battle.refresh_controlled_static_keywords(
+            active,
+            turn=1,
+            phase="test",
+            emit_events=True,
+        )
+
+        self.assertTrue(self.battle.card_has_keyword(bear, "trample"))
+        self.assertFalse(self.battle.card_has_keyword(enemy, "trample"))
+        self.assertEqual(bear["static_keyword_sources"], ["Primal Rage"])
+        self.assertTrue(
+            any(
+                event == "static_controlled_keyword_changed"
+                and data.get("card") == "Active Bear"
+                and data.get("granted_keywords") == ["trample"]
+                for event, data in self.events
+            )
+        )
+
+        active.battlefield.remove(primal_rage)
+        self.battle.refresh_controlled_static_keywords(active)
+
+        self.assertFalse(self.battle.card_has_keyword(bear, "trample"))
+        self.assertNotIn("static_keyword_sources", bear)
+        self.assertNotIn("_static_controlled_keyword_grants", bear)
+
+    def test_static_controlled_keyword_respects_exclude_source_and_subtype_filter(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        sliver_lord = {
+            "name": "Groundshaker Sliver",
+            "type_line": "Creature - Sliver",
+            "effect": "creature",
+            "power": 5,
+            "toughness": 5,
+            "battle_model_scope": "xmage_static_controlled_keyword_grant_v1",
+            "static_effect": "controlled_keyword_grant",
+            "static_granted_keywords": ["trample"],
+            "static_required_subtypes": ["sliver"],
+            "static_exclude_source": False,
+        }
+        sliver = {"name": "Ally Sliver", "type_line": "Creature - Sliver", "power": 2, "toughness": 2}
+        goblin = {"name": "Ally Goblin", "type_line": "Creature - Goblin", "power": 2, "toughness": 2}
+        active.battlefield = [sliver_lord, sliver, goblin]
+
+        self.battle.refresh_controlled_static_keywords(active)
+
+        self.assertTrue(self.battle.card_has_keyword(sliver_lord, "trample"))
+        self.assertTrue(self.battle.card_has_keyword(sliver, "trample"))
+        self.assertFalse(self.battle.card_has_keyword(goblin, "trample"))
+
+        mammoth = {
+            "name": "Aggressive Mammoth",
+            "type_line": "Creature - Elephant",
+            "effect": "creature",
+            "power": 8,
+            "toughness": 8,
+            "battle_model_scope": "xmage_static_controlled_keyword_grant_v1",
+            "static_effect": "controlled_keyword_grant",
+            "static_granted_keywords": ["trample"],
+            "static_exclude_source": True,
+        }
+        bear = {"name": "Ally Bear", "type_line": "Creature - Bear", "power": 2, "toughness": 2}
+        active.battlefield = [mammoth, bear]
+
+        self.battle.refresh_controlled_static_keywords(active)
+
+        self.assertFalse(self.battle.card_has_keyword(mammoth, "trample"))
+        self.assertTrue(self.battle.card_has_keyword(bear, "trample"))
+
+    def test_static_controlled_keyword_respects_color_filter(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        mentor = {
+            "name": "Roughshod Mentor",
+            "type_line": "Creature - Giant Warrior",
+            "effect": "creature",
+            "colors": ["G"],
+            "power": 5,
+            "toughness": 4,
+            "battle_model_scope": "xmage_static_controlled_keyword_grant_v1",
+            "static_effect": "controlled_keyword_grant",
+            "static_granted_keywords": ["trample"],
+            "static_required_colors": ["G"],
+        }
+        green_elf = {
+            "name": "Green Elf",
+            "type_line": "Creature - Elf",
+            "colors": ["G"],
+            "power": 1,
+            "toughness": 1,
+        }
+        red_goblin = {
+            "name": "Red Goblin",
+            "type_line": "Creature - Goblin",
+            "colors": ["R"],
+            "power": 1,
+            "toughness": 1,
+        }
+        active.battlefield = [mentor, green_elf, red_goblin]
+
+        self.battle.refresh_controlled_static_keywords(active)
+
+        self.assertTrue(self.battle.card_has_keyword(mentor, "trample"))
+        self.assertTrue(self.battle.card_has_keyword(green_elf, "trample"))
+        self.assertFalse(self.battle.card_has_keyword(red_goblin, "trample"))
+
     def test_static_global_power_toughness_boost_applies_without_accumulating(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

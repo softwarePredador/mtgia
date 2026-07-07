@@ -16942,6 +16942,115 @@ whose amount depends on attacking creatures, subtypes, power, graveyard state,
 or any other game-state value. Those remain blocked under
 `attack_self_boost_oracle_not_fixed` or future source-specific dynamic parsers.
 
+## PG586 Static Controlled Trample New Server Evidence
+
+PG586 evidence:
+
+- exact-scope split:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260707_pg586_static_controlled_trample_new_server.md`
+- exact-scope split JSON:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260707_pg586_static_controlled_trample_new_server.json`
+- package:
+  `docs/hermes-analysis/master_optimizer_reports/pg586_static_controlled_trample_new_server_package_package.md`
+- package manifest:
+  `docs/hermes-analysis/master_optimizer_reports/pg586_static_controlled_trample_new_server_package_manifest.json`
+- package SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg586_static_controlled_trample_new_server_package_precheck.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/pg586_static_controlled_trample_new_server_package_apply.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/pg586_static_controlled_trample_new_server_package_postcheck.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/pg586_static_controlled_trample_new_server_package_rollback.sql`
+- PG -> SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg586_static_controlled_trample_new_server_pg_to_sqlite_sync.json`
+- final PG -> SQLite sync after hash backfill:
+  `docs/hermes-analysis/master_optimizer_reports/pg586_static_controlled_trample_new_server_pg_to_sqlite_sync_after_hash_backfill.json`
+- metadata sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg586_static_controlled_trample_new_server_metadata_sync.json`
+- final metadata sync after hash backfill:
+  `docs/hermes-analysis/master_optimizer_reports/pg586_static_controlled_trample_new_server_metadata_sync_after_hash_backfill.json`
+- E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg586_static_controlled_trample_new_server_e2e_validation.md`
+- final E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg586_static_controlled_trample_new_server_e2e_validation_final.md`
+- post-PG586 queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260707_post_pg586_static_controlled_trample_new_server_commander_legal.md`
+- post-PG586 readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260707_post_pg586_static_controlled_trample_new_server.md`
+- post-PG586 exact split recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260707_post_pg586_static_controlled_trample_new_server_recheck.md`
+- final PG/Hermes/SQLite audit:
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260707_post_pg586_static_controlled_trample_new_server_final_after_hash_backfill.md`
+- final governance audits:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260707_post_pg586_static_controlled_trample_new_server_final.md`,
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260707_post_pg586_static_controlled_trample_new_server_final.md`,
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260707_post_pg586_static_controlled_trample_new_server_final.md`
+
+PG586 promoted `8` XMage-authoritative static controlled keyword rows under
+`xmage_static_controlled_keyword_grant_v1`:
+
+- `Aggressive Mammoth`;
+- `Bloodcrusher of Khorne`;
+- `Groundshaker Sliver`;
+- `Khenra Charioteer`;
+- `Nylea's Forerunner`;
+- `Primal Rage`;
+- `Roughshod Mentor`;
+- `Thicket Crasher`.
+
+Runtime/modeling change:
+
+- `xmage_authoritative_exact_scope_split.py` now routes the exact
+  `GainAbilityControlledEffect + SimpleStaticAbility + TrampleAbility` unit
+  into `xmage_static_controlled_keyword_grant_v1` only when Oracle text and
+  local XMage source agree on a static controlled trample grant;
+- the splitter supports exact filters for all controlled creatures, other
+  controlled creatures, subtype-filtered controlled creatures, and
+  color-filtered controlled creatures for this scope;
+- `battle_analyst_v9.py` now applies and revokes controlled static keyword
+  grants, preserves self-owned keywords, respects source exclusion, subtype,
+  supertype, artifact-creature, and color filters, and refreshes the keyword
+  state on relevant battlefield changes;
+- `xmage_batch_pg_package_builder.py` now preserves static keyword/filter
+  fields and creates `static_controlled_keyword` execution scenarios;
+- `battle_package_end_to_end_validation.py` now runs those scenarios and
+  validates positive controlled target, negative opponent/nonmatching target,
+  replay event emission, and keyword revocation when the source leaves.
+
+Validation:
+
+- split produced `proposal_count=8` and
+  `safe_for_batch_pg_package_count=8`;
+- precheck found `8/8` target rows, `0` existing expected executable rows,
+  and `0` shadow rows to deprecate;
+- apply upserted `8` PostgreSQL rows and deprecated `0` shadow rows;
+- postcheck confirmed `8/8` promoted rows, `8/8` `verified_auto` rows, and
+  `8/8` rows with `oracle_hash`;
+- first PG -> SQLite sync loaded `9265` PostgreSQL rows, updated `9029`
+  SQLite rows, and exported `6711` canonical snapshot rows;
+- metadata sync used `database_target=127.0.0.1:15432/halder`, matched
+  `7675` PostgreSQL cards before hash backfill and `7683` after final sync,
+  and left `deck_cards` at `2699/2699` matched `card_id` rows;
+- E2E validation passed PostgreSQL, SQLite, snapshot, runtime lookup, and `8`
+  battle execution scenarios with `16` replay events;
+- splitter suite passed `698` tests;
+- exact runtime suite passed `359` tests;
+- package builder suite passed `56` tests;
+- post-PG586 queue moved from PG585 `target_identity_count=25284` and
+  `xmage_authoritative_source_count=24970` to `25276` and `24962`;
+- final exact-scope recheck returned `proposal_count=0`;
+- final PG/Hermes/SQLite audit initially exposed `44` old trusted executable
+  PostgreSQL rows missing `oracle_hash`; reapplying the existing PG584B
+  hash-backfill SQL updated `44` rows, postcheck returned `0` missing rows,
+  final PG -> SQLite sync updated `9029` rows, and final contract audit passed
+  `51/51`;
+- final XMage strategy audit passed `26/26`;
+- final operational and legacy contamination audits passed;
+- `scripts/quality_gate.sh server-target` passed against the new-server target.
+
+Residual boundary: PG586 does not authorize controlled keyword grants for
+non-trample keywords, temporary end-of-turn grants, conditional/tapped/attacking
+filters, compound controlled abilities, ability-sharing effects, or static
+controlled P/T boosts. Those remain separate adapter contracts.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

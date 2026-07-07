@@ -37,6 +37,11 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "static_toughness_bonus",
     "static_controller_scope",
     "static_exclude_source",
+    "static_granted_keywords",
+    "static_required_subtypes",
+    "static_required_colors",
+    "static_required_supertypes",
+    "static_artifact_creature",
     "creature_filter",
     "permanent_type",
     "counter_unless_pays_generic",
@@ -945,6 +950,78 @@ def static_global_pt_execution_scenario_from_expected_rule(rule: dict[str, Any])
         "expected_power": target["base_power"] + power_bonus,
         "expected_toughness": expected_toughness,
         "expected_moved_to_graveyard": expected_toughness <= 0,
+        "expected_source": rule["card_name"],
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
+def static_controlled_keyword_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("static_effect") != "controlled_keyword_grant":
+        return None
+    keywords = [
+        str(value).strip().lower().replace(" ", "_")
+        for value in required.get("static_granted_keywords", []) or []
+        if str(value).strip()
+    ]
+    if not keywords:
+        return None
+    subtypes = [
+        str(value).strip().lower()
+        for value in required.get("static_required_subtypes", []) or []
+        if str(value).strip()
+    ]
+    colors = [
+        str(value).strip().upper()
+        for value in required.get("static_required_colors", []) or []
+        if str(value).strip()
+    ]
+    supertypes = [
+        str(value).strip().title()
+        for value in required.get("static_required_supertypes", []) or []
+        if str(value).strip()
+    ]
+    subtype = subtypes[0] if subtypes else "soldier"
+    type_prefix = "Artifact Creature" if required.get("static_artifact_creature") else "Creature"
+    if supertypes:
+        type_prefix = f"{' '.join(supertypes)} {type_prefix}"
+    matching_target = {
+        "name": f"E2E Controlled Keyword Target for {rule['card_name']}",
+        "type_line": f"{type_prefix} - {subtype.title()}",
+        "base_power": 2,
+        "base_toughness": 2,
+        "power": 2,
+        "toughness": 2,
+    }
+    if colors:
+        matching_target["colors"] = colors
+        matching_target["mana_cost"] = "".join(f"{{{color}}}" for color in colors)
+    nonmatching_target = None
+    if subtypes or colors or required.get("static_artifact_creature") or supertypes:
+        nonmatching_target = {
+            "name": f"E2E Nonmatching Keyword Target for {rule['card_name']}",
+            "type_line": "Creature - Goblin",
+            "base_power": 2,
+            "base_toughness": 2,
+            "power": 2,
+            "toughness": 2,
+        }
+        if colors:
+            off_color = "U" if "U" not in colors else "R"
+            nonmatching_target["colors"] = [off_color]
+            nonmatching_target["mana_cost"] = f"{{{off_color}}}"
+    opponent_target = dict(matching_target)
+    opponent_target["name"] = f"E2E Opponent Keyword Target for {rule['card_name']}"
+    return {
+        "name": f"{rule['card_name']} static controlled keyword applies",
+        "type": "static_controlled_keyword",
+        "card": {"name": rule["card_name"]},
+        "matching_target": matching_target,
+        "nonmatching_target": nonmatching_target,
+        "opponent_target": opponent_target,
+        "expected_keyword": keywords[0],
         "expected_source": rule["card_name"],
         "logical_rule_key": rule["logical_rule_key"],
     }
@@ -2355,7 +2432,8 @@ def single_target_removal_execution_scenario_from_expected_rule(
 
 def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any] | None:
     return (
-        static_global_pt_execution_scenario_from_expected_rule(rule)
+        static_controlled_keyword_execution_scenario_from_expected_rule(rule)
+        or static_global_pt_execution_scenario_from_expected_rule(rule)
         or aura_static_pt_execution_scenario_from_expected_rule(rule)
         or destroy_target_create_treasure_execution_scenario_from_expected_rule(rule)
         or creature_etb_create_treasure_execution_scenario_from_expected_rule(rule)

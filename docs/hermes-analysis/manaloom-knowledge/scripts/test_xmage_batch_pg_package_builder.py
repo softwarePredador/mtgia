@@ -1297,6 +1297,63 @@ def test_manifest_expected_rule_preserves_aura_static_power_toughness_fields() -
     }
 
 
+def test_manifest_expected_rule_preserves_static_controlled_keyword_fields() -> None:
+    proposal = {
+        "normalized_name": "groundshaker sliver",
+        "card_name": "Groundshaker Sliver",
+        "oracle_hash": "hash-groundshaker",
+        "logical_rule_key": "battle_rule_v1:groundshaker-sliver",
+        "effect_json": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_static_controlled_keyword_grant_v1",
+            "static_effect": "controlled_keyword_grant",
+            "static_applies_to": "creatures_you_control",
+            "static_granted_keywords": ["trample"],
+            "static_required_subtypes": ["sliver"],
+            "static_exclude_source": False,
+            "target": "controlled_creatures",
+            "target_controller": "self",
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+
+    assert expected["required_effect_fields"] == {
+        "effect": "creature",
+        "battle_model_scope": "xmage_static_controlled_keyword_grant_v1",
+        "target": "controlled_creatures",
+        "target_controller": "self",
+        "static_effect": "controlled_keyword_grant",
+        "static_applies_to": "creatures_you_control",
+        "static_exclude_source": False,
+        "static_granted_keywords": ["trample"],
+        "static_required_subtypes": ["sliver"],
+    }
+
+
+def test_static_controlled_keyword_execution_scenario_uses_filter_negative_and_opponent() -> None:
+    rule = {
+        "normalized_name": "roughshod mentor",
+        "card_name": "Roughshod Mentor",
+        "logical_rule_key": "battle_rule_v1:roughshod-mentor",
+        "required_effect_fields": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_static_controlled_keyword_grant_v1",
+            "static_effect": "controlled_keyword_grant",
+            "static_granted_keywords": ["trample"],
+            "static_required_colors": ["G"],
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario["type"] == "static_controlled_keyword"
+    assert scenario["expected_keyword"] == "trample"
+    assert scenario["matching_target"]["colors"] == ["G"]
+    assert scenario["nonmatching_target"]["colors"] == ["U"]
+    assert scenario["opponent_target"]["colors"] == ["G"]
+
+
 def test_aura_static_power_toughness_execution_scenario_targets_debuff_to_opponent() -> None:
     rule = {
         "normalized_name": "dead weight",

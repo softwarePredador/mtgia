@@ -3824,6 +3824,72 @@ def run_static_global_power_toughness_boost(
     }
 
 
+def run_static_controlled_keyword(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    source = battle.enrich_card({**card, **battle.get_card_effect(card)})
+    active = battle.Player(str(scenario.get("player") or "Static Keyword Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Static Keyword Opponent"), None, [])
+    matching_target = dict(scenario["matching_target"])
+    nonmatching_target = (
+        dict(scenario["nonmatching_target"])
+        if isinstance(scenario.get("nonmatching_target"), dict)
+        else None
+    )
+    opponent_target = dict(scenario["opponent_target"])
+    active.battlefield = [source, matching_target]
+    if nonmatching_target is not None:
+        active.battlefield.append(nonmatching_target)
+    opponent.battlefield = [opponent_target]
+    keyword = str(scenario["expected_keyword"]).strip().lower().replace(" ", "_")
+    refreshed = battle.refresh_controlled_static_keywords(
+        active,
+        turn=int(scenario.get("turn") or 3),
+        phase=str(scenario.get("phase") or "main"),
+        emit_events=True,
+    )
+    if not battle.card_has_keyword(matching_target, keyword):
+        fail("battle_execution", f"{card['name']} did not grant {keyword} to matching target")
+    if nonmatching_target is not None and battle.card_has_keyword(nonmatching_target, keyword):
+        fail("battle_execution", f"{card['name']} incorrectly granted {keyword} to nonmatching target")
+    if battle.card_has_keyword(opponent_target, keyword):
+        fail("battle_execution", f"{card['name']} incorrectly granted {keyword} to opponent target")
+    source_name = str(scenario.get("expected_source") or card.get("name"))
+    changed_event = next(
+        (
+            data
+            for event, data in events
+            if event == "static_controlled_keyword_changed"
+            and data.get("card") == matching_target.get("name")
+            and keyword in (data.get("granted_keywords") or [])
+            and source_name in (data.get("source_cards") or [])
+        ),
+        None,
+    )
+    if changed_event is None:
+        fail("battle_events", f"missing {card['name']} static_controlled_keyword_changed event")
+    active.battlefield.remove(source)
+    battle.refresh_controlled_static_keywords(
+        active,
+        turn=int(scenario.get("turn") or 3),
+        phase="source_left_battlefield",
+        emit_events=True,
+    )
+    if battle.card_has_keyword(matching_target, keyword):
+        fail("battle_execution", f"{card['name']} did not revoke {keyword} after source left")
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "matching_target": matching_target.get("name"),
+        "keyword": keyword,
+        "refreshed_count": len(refreshed),
+        "source_cards": changed_event.get("source_cards"),
+    }
+
+
 def run_aura_static_power_toughness_attachment(
     battle,
     scenario: dict[str, Any],
@@ -3954,6 +4020,7 @@ SCENARIO_RUNNERS = {
     "simple_activated_create_token": run_simple_activated_create_token,
     "spell_cast_gain_life": run_spell_cast_gain_life,
     "stat_modifier_until_eot": run_stat_modifier_until_eot,
+    "static_controlled_keyword": run_static_controlled_keyword,
     "static_global_power_toughness_boost": run_static_global_power_toughness_boost,
     "target_creature_cant_block": run_target_creature_cant_block,
     "token_maker_attack_each_opponent": run_token_maker_attack_each_opponent,

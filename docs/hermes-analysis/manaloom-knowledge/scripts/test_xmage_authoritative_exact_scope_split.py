@@ -2167,6 +2167,91 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "static_controlled_pt_oracle_filter_not_supported")
 
+    def test_static_controlled_keyword_other_creatures_trample_is_package_safe(self) -> None:
+        row = queue_row(
+            split.STATIC_CONTROLLED_KEYWORD_UNIT,
+            effect_classes=["GainAbilityControlledEffect"],
+            ability_classes=["SimpleStaticAbility", "TrampleAbility"],
+            xmage_signals=["static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Aggressive Mammoth",
+                type_line="Creature - Elephant",
+                oracle_text="Trample\nOther creatures you control have trample.",
+            ),
+            source_text=(
+                "this.addAbility(TrampleAbility.getInstance());"
+                "this.addAbility(new SimpleStaticAbility(new GainAbilityControlledEffect("
+                "TrampleAbility.getInstance(), Duration.WhileOnBattlefield, "
+                "StaticFilters.FILTER_PERMANENT_CREATURES, true)));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.STATIC_CONTROLLED_KEYWORD_SCOPE)
+        self.assertEqual(effect["static_granted_keywords"], ["trample"])
+        self.assertTrue(effect["static_exclude_source"])
+        self.assertEqual(effect["keywords"], ["trample"])
+        self.assertTrue(effect["_keywords_are_self"])
+
+    def test_static_controlled_keyword_subtype_filter_is_package_safe(self) -> None:
+        row = queue_row(
+            split.STATIC_CONTROLLED_KEYWORD_UNIT,
+            effect_classes=["GainAbilityControlledEffect"],
+            ability_classes=["SimpleStaticAbility", "TrampleAbility"],
+            xmage_signals=["static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Groundshaker Sliver",
+                type_line="Creature - Sliver",
+                oracle_text="Sliver creatures you control have trample.",
+            ),
+            source_text=(
+                "this.addAbility(new SimpleStaticAbility(new GainAbilityControlledEffect("
+                "TrampleAbility.getInstance(), Duration.WhileOnBattlefield, "
+                "StaticFilters.FILTER_PERMANENT_SLIVERS)));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["static_required_subtypes"], ["sliver"])
+        self.assertEqual(effect["target_constraints"]["subtypes"], ["sliver"])
+        self.assertFalse(effect["static_exclude_source"])
+
+    def test_static_controlled_keyword_color_filter_and_ability_word_are_package_safe(self) -> None:
+        row = queue_row(
+            split.STATIC_CONTROLLED_KEYWORD_UNIT,
+            effect_classes=["GainAbilityControlledEffect"],
+            ability_classes=["SimpleStaticAbility", "TrampleAbility"],
+            xmage_signals=["static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Roughshod Mentor",
+                type_line="Creature - Giant Warrior",
+                oracle_text="Dominance - Green creatures you control have trample.",
+            ),
+            source_text=(
+                "private static final FilterPermanent filter = new FilterCreaturePermanent(\"Green creatures\");"
+                "static { filter.add(new ColorPredicate(ObjectColor.GREEN)); }"
+                "this.addAbility(new SimpleStaticAbility(new GainAbilityControlledEffect("
+                "TrampleAbility.getInstance(), Duration.WhileOnBattlefield, filter)));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["static_required_colors"], ["G"])
+        self.assertEqual(effect["target_constraints"]["colors"], ["G"])
+        self.assertFalse(effect["static_exclude_source"])
+
     def test_static_global_power_toughness_boost_slivers_is_package_safe(self) -> None:
         row = queue_row(
             split.STATIC_GLOBAL_PT_UNIT,

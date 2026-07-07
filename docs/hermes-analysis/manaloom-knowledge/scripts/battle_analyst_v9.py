@@ -12929,6 +12929,12 @@ def move_permanent_from_battlefield_to_hand(owner, permanent, *, reason=None, so
         phase="leave_battlefield",
         emit_events=True,
     )
+    refresh_controlled_static_keywords(
+        owner,
+        turn=turn if turn is not None else CURRENT_REPLAY_TURN,
+        phase="leave_battlefield",
+        emit_events=True,
+    )
     return destination
 
 
@@ -19703,6 +19709,12 @@ def move_creature_from_battlefield(owner, creature, reason=None, source=None, al
         phase="leave_battlefield",
         emit_events=True,
     )
+    refresh_controlled_static_keywords(
+        owner,
+        turn=CURRENT_REPLAY_TURN,
+        phase="leave_battlefield",
+        emit_events=True,
+    )
     return destination
 
 
@@ -19805,6 +19817,12 @@ def move_permanent_from_battlefield(owner, permanent, reason=None, source=None, 
         emit_events=True,
     )
     refresh_controlled_static_power_toughness_bonuses(
+        owner,
+        turn=CURRENT_REPLAY_TURN,
+        phase="leave_battlefield",
+        emit_events=True,
+    )
+    refresh_controlled_static_keywords(
         owner,
         turn=CURRENT_REPLAY_TURN,
         phase="leave_battlefield",
@@ -20025,6 +20043,10 @@ def removal_target_candidates(player, effect_data=None, *, controller=None, sour
         phase="target_selection",
     )
     refresh_controlled_static_power_toughness_bonuses(
+        player,
+        phase="target_selection",
+    )
+    refresh_controlled_static_keywords(
         player,
         phase="target_selection",
     )
@@ -26313,6 +26335,12 @@ def move_permanent_from_battlefield_to_exile(owner, permanent, *, reason=None, s
         emit_events=True,
     )
     refresh_controlled_static_power_toughness_bonuses(
+        owner,
+        turn=current_turn,
+        phase="leave_battlefield",
+        emit_events=True,
+    )
+    refresh_controlled_static_keywords(
         owner,
         turn=current_turn,
         phase="leave_battlefield",
@@ -40391,6 +40419,7 @@ def refresh_all_controlled_static_indestructible(
 
 
 STATIC_CONTROLLED_POWER_TOUGHNESS_SCOPE = "xmage_static_controlled_power_toughness_boost_v1"
+STATIC_CONTROLLED_KEYWORD_SCOPE = "xmage_static_controlled_keyword_grant_v1"
 STATIC_GLOBAL_POWER_TOUGHNESS_SCOPE = "xmage_static_global_power_toughness_boost_v1"
 STATIC_GRAVEYARD_COUNT_POWER_TOUGHNESS_SCOPE = "xmage_static_source_power_toughness_equal_graveyard_count_v1"
 STATIC_GRAVEYARD_THRESHOLD_SOURCE_BOOST_SCOPE = "xmage_static_source_boost_if_graveyard_threshold_v1"
@@ -40819,6 +40848,13 @@ def static_controlled_power_toughness_applies_to(permanent, source, effect_data)
     }
     if required_subtypes and not required_subtypes.issubset(_static_pt_subtype_tokens(permanent)):
         return False
+    required_colors = {
+        str(value).strip()
+        for value in effect_data.get("static_required_colors", []) or []
+        if str(value).strip()
+    }
+    if required_colors and not any(card_has_color(permanent, color) for color in required_colors):
+        return False
     return True
 
 
@@ -40957,6 +40993,196 @@ def refresh_all_controlled_static_power_toughness_bonuses(
         seen.add(id(participant))
         refreshed.extend(
             refresh_controlled_static_power_toughness_bonuses(
+                participant,
+                turn=turn,
+                phase=phase,
+                emit_events=emit_events,
+            )
+        )
+    return refreshed
+
+
+def controlled_static_keyword_sources(controller):
+    sources = []
+    for source in getattr(controller, "battlefield", []) or []:
+        if not isinstance(source, dict):
+            continue
+        if (
+            source.get("battle_model_scope") == STATIC_CONTROLLED_KEYWORD_SCOPE
+            and source.get("static_effect") == "controlled_keyword_grant"
+        ):
+            sources.append(source)
+    return sources
+
+
+def _controlled_static_keyword_values(effect_data):
+    keywords = effect_data.get("static_granted_keywords") if isinstance(effect_data, dict) else []
+    if isinstance(keywords, str):
+        keywords = [keywords]
+    return [
+        str(keyword).strip().lower().replace(" ", "_")
+        for keyword in (keywords or [])
+        if str(keyword).strip()
+    ]
+
+
+def static_controlled_keywords_for_permanent(
+    permanent,
+    controller,
+    *,
+    sources=None,
+):
+    keywords = []
+    source_names = []
+    source_keys = []
+    for source in sources if sources is not None else controlled_static_keyword_sources(controller):
+        if not static_controlled_power_toughness_applies_to(permanent, source, source):
+            continue
+        source_keywords = _controlled_static_keyword_values(source)
+        if not source_keywords:
+            continue
+        for keyword in source_keywords:
+            if keyword not in keywords:
+                keywords.append(keyword)
+        source_names.append(source.get("name", "?"))
+        if source.get("_rule_logical_key"):
+            source_keys.append(source.get("_rule_logical_key"))
+    return keywords, source_names, source_keys
+
+
+def apply_controlled_static_keywords_to_permanent(
+    permanent,
+    controller,
+    *,
+    sources=None,
+    turn=None,
+    phase=None,
+    emit_event=False,
+):
+    if not isinstance(permanent, dict) or controller is None or not is_battlefield_creature(permanent):
+        return False
+    current_keywords = [
+        str(keyword).strip().lower().replace(" ", "_")
+        for keyword in (permanent.get("keywords") or [])
+        if str(keyword).strip()
+    ]
+    old_grants = {
+        str(keyword).strip().lower().replace(" ", "_")
+        for keyword in (permanent.get("_static_controlled_keyword_grants") or [])
+        if str(keyword).strip()
+    }
+    if "_static_controlled_keyword_base_keywords" in permanent:
+        base_keywords = [
+            str(keyword).strip().lower().replace(" ", "_")
+            for keyword in (permanent.get("_static_controlled_keyword_base_keywords") or [])
+            if str(keyword).strip()
+        ]
+        dynamic_keywords = [
+            keyword
+            for keyword in current_keywords
+            if keyword not in old_grants and keyword not in base_keywords
+        ]
+    else:
+        base_keywords = [keyword for keyword in current_keywords if keyword not in old_grants]
+        dynamic_keywords = []
+    new_keywords, source_names, source_keys = static_controlled_keywords_for_permanent(
+        permanent,
+        controller,
+        sources=sources,
+    )
+    merged_keywords = list(dict.fromkeys([*base_keywords, *dynamic_keywords, *new_keywords]))
+    before = {
+        "keywords": current_keywords,
+        "source_names": permanent.get("static_keyword_sources") or [],
+    }
+    changed = (
+        set(old_grants) != set(new_keywords)
+        or list(before["source_names"]) != source_names
+    )
+    if new_keywords:
+        permanent["_static_controlled_keyword_base_keywords"] = base_keywords
+        permanent["_static_controlled_keyword_grants"] = new_keywords
+        permanent["static_keyword_sources"] = source_names
+        permanent["static_keyword_rule_keys"] = source_keys
+    else:
+        permanent.pop("_static_controlled_keyword_base_keywords", None)
+        permanent.pop("_static_controlled_keyword_grants", None)
+        permanent.pop("static_keyword_sources", None)
+        permanent.pop("static_keyword_rule_keys", None)
+    if merged_keywords:
+        permanent["keywords"] = merged_keywords
+    else:
+        permanent.pop("keywords", None)
+    natural_keywords = _oracle_self_keyword_values(permanent)
+    if permanent.get("_keywords_are_self") or not str(permanent.get("oracle_text") or "").strip():
+        natural_keywords |= _keyword_values(permanent)
+    for keyword in old_grants - set(new_keywords):
+        if keyword not in merged_keywords and keyword not in natural_keywords:
+            permanent.pop(keyword, None)
+    for keyword in new_keywords:
+        permanent[keyword] = True
+    if emit_event and changed:
+        emit_replay_event(
+            "static_controlled_keyword_changed",
+            player=getattr(controller, "name", "?"),
+            card=permanent.get("name", "?"),
+            source_cards=source_names,
+            keywords_before=before["keywords"],
+            keywords_after=merged_keywords,
+            granted_keywords=new_keywords,
+            turn=turn,
+            phase=phase,
+            **replay_rule_fields(permanent),
+        )
+    return bool(new_keywords)
+
+
+def refresh_controlled_static_keywords(
+    controller,
+    *,
+    turn=None,
+    phase=None,
+    emit_events=False,
+):
+    sources = controlled_static_keyword_sources(controller)
+    refreshed = []
+    for permanent in list(getattr(controller, "battlefield", []) or []):
+        if not isinstance(permanent, dict) or not is_battlefield_creature(permanent):
+            continue
+        active = apply_controlled_static_keywords_to_permanent(
+            permanent,
+            controller,
+            sources=sources,
+            turn=turn,
+            phase=phase,
+            emit_event=emit_events,
+        )
+        if active or permanent.get("_static_controlled_keyword_grants"):
+            refreshed.append(
+                {
+                    "card": permanent.get("name", "?"),
+                    "keywords": permanent.get("keywords") or [],
+                    "sources": permanent.get("static_keyword_sources") or [],
+                }
+            )
+    return refreshed
+
+
+def refresh_all_controlled_static_keywords(
+    participants,
+    *,
+    turn=None,
+    phase=None,
+    emit_events=False,
+):
+    refreshed = []
+    seen = set()
+    for participant in participants or []:
+        if participant is None or id(participant) in seen:
+            continue
+        seen.add(id(participant))
+        refreshed.extend(
+            refresh_controlled_static_keywords(
                 participant,
                 turn=turn,
                 phase=phase,
@@ -41404,6 +41630,13 @@ def prepare_entering_permanent(permanent, controller=None, all_players=None, tur
         emit_event=True,
     )
     if is_battlefield_creature(permanent):
+        apply_controlled_static_keywords_to_permanent(
+            permanent,
+            controller,
+            turn=turn,
+            phase="enter_battlefield",
+            emit_event=True,
+        )
         permanent["haste"] = has_haste(permanent)
         permanent["summoning_sick"] = not permanent["haste"]
         permanent["tapped"] = enters_tapped
@@ -55795,6 +56028,12 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                     phase=phase,
                     emit_events=True,
                 )
+                refresh_controlled_static_keywords(
+                    player,
+                    turn=turn,
+                    phase=phase,
+                    emit_events=True,
+                )
                 emit_replay_event(
                     "creature_cast",
                     player=player.name,
@@ -57051,13 +57290,19 @@ def apply_effect_immediate(
             phase=phase or "resolution",
             emit_events=True,
         )
+        keyword_refreshed = refresh_controlled_static_keywords(
+            player,
+            turn=turn,
+            phase=phase or "resolution",
+            emit_events=True,
+        )
         global_refreshed = refresh_all_global_static_power_toughness_bonuses(
             all_players_for_entry,
             turn=turn,
             phase=phase or "resolution",
             emit_events=True,
         )
-        return controlled_refreshed + global_refreshed
+        return controlled_refreshed + keyword_refreshed + global_refreshed
 
     if effect == "composite_resolution":
         summary = resolve_composite_resolution_effect(

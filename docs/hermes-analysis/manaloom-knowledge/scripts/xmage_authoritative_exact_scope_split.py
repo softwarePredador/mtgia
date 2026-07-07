@@ -90,6 +90,10 @@ STATIC_CONTROLLED_PT_UNIT = (
     "xmage_signature::BoostControlledEffect::SimpleStaticAbility::"
     "no_target_class::no_condition_class::static_ability"
 )
+STATIC_CONTROLLED_KEYWORD_UNIT = (
+    "xmage_signature::GainAbilityControlledEffect::SimpleStaticAbility,TrampleAbility::"
+    "no_target_class::no_condition_class::static_ability"
+)
 STATIC_GLOBAL_PT_UNIT = (
     "xmage_signature::BoostAllEffect::SimpleStaticAbility::"
     "no_target_class::no_condition_class::static_ability"
@@ -159,6 +163,7 @@ SUPPORTED_UNITS = {
     BOOST_CONTROLLED_SPELL_UNIT,
     BOOST_ALL_SPELL_UNIT,
     STATIC_CONTROLLED_PT_UNIT,
+    STATIC_CONTROLLED_KEYWORD_UNIT,
     TOKEN_SPELL_UNIT,
     TOKEN_SPELL_FLASHBACK_UNIT,
     LOOK_LIBRARY_PICK_SPELL_UNIT,
@@ -307,6 +312,7 @@ STATIC_FLYING_CAN_BLOCK_ONLY_FLYING_CREATURE_SCOPE = (
 )
 STATIC_HORSEMANSHIP_CREATURE_SCOPE = "xmage_static_self_horsemanship_creature_v1"
 STATIC_CONTROLLED_PT_SCOPE = "xmage_static_controlled_power_toughness_boost_v1"
+STATIC_CONTROLLED_KEYWORD_SCOPE = "xmage_static_controlled_keyword_grant_v1"
 STATIC_GLOBAL_PT_SCOPE = "xmage_static_global_power_toughness_boost_v1"
 STATIC_GRAVEYARD_COUNT_PT_SCOPE = "xmage_static_source_power_toughness_equal_graveyard_count_v1"
 STATIC_GRAVEYARD_THRESHOLD_BOOST_SCOPE = "xmage_static_source_boost_if_graveyard_threshold_v1"
@@ -6653,6 +6659,213 @@ def static_controlled_pt_from_source(source: str) -> dict[str, Any] | str | None
     }
 
 
+STATIC_CONTROLLED_KEYWORD_COLOR_WORDS = {
+    "white": "W",
+    "blue": "U",
+    "black": "B",
+    "red": "R",
+    "green": "G",
+}
+
+
+def static_controlled_keyword_constraints_from_subject(
+    subject: str,
+) -> dict[str, Any] | str:
+    phrase = re.sub(r"\s+", " ", str(subject or "").strip().lower())
+    if not phrase or phrase in {"creature", "creatures"}:
+        return {}
+    if phrase.endswith(" creatures"):
+        phrase = phrase[: -len(" creatures")].strip()
+    elif phrase.endswith(" creature"):
+        phrase = phrase[: -len(" creature")].strip()
+    if not phrase:
+        return {}
+    blocked_words = STATIC_CONTROLLED_PT_BLOCKED_ORACLE_WORDS - set(
+        STATIC_CONTROLLED_KEYWORD_COLOR_WORDS
+    )
+    words = phrase.split()
+    if any(word in blocked_words for word in words):
+        return "static_controlled_keyword_oracle_filter_not_supported"
+    constraints: dict[str, Any] = {}
+    colors = [
+        STATIC_CONTROLLED_KEYWORD_COLOR_WORDS[word]
+        for word in words
+        if word in STATIC_CONTROLLED_KEYWORD_COLOR_WORDS
+    ]
+    subtypes: list[str] = []
+    for word in words:
+        if word in STATIC_CONTROLLED_KEYWORD_COLOR_WORDS:
+            continue
+        if word == "artifact":
+            constraints["static_artifact_creature"] = True
+            continue
+        if word == "legendary":
+            constraints["static_required_supertypes"] = ["legendary"]
+            continue
+        subtype = canonical_static_subtype(word)
+        if subtype:
+            subtypes.append(subtype)
+    if colors:
+        constraints["static_required_colors"] = ordered_color_symbols(colors)
+    if subtypes:
+        constraints["static_required_subtypes"] = sorted(set(subtypes))
+    return constraints
+
+
+def static_controlled_keyword_from_oracle(
+    metadata: dict[str, Any],
+    keyword: str,
+) -> dict[str, Any] | str | None:
+    text = strip_parenthetical_reminders(oracle_text_after_leading_static_keywords(metadata))
+    text = re.sub(r"\s+", " ", text).strip().lower()
+    text = re.sub(r"^[a-z0-9' -]+\s+[—-]\s+", "", text)
+    keyword_text = str(keyword or "").replace("_", " ").strip().lower()
+    if not keyword_text:
+        return None
+    match = re.match(
+        rf"^(?:each )?(?P<other>other )?(?P<subject>[a-z0-9' -]+?) "
+        rf"you control (?:have|has) {re.escape(keyword_text)}\.?$",
+        text,
+    )
+    if not match:
+        return None
+    constraints = static_controlled_keyword_constraints_from_subject(
+        match.group("subject").strip()
+    )
+    if isinstance(constraints, str):
+        return constraints
+    return {
+        "static_granted_keywords": [keyword],
+        "static_exclude_source": bool(match.group("other")),
+        **constraints,
+    }
+
+
+def static_controlled_keyword_filter_constraints_from_source(
+    source: str,
+    filter_name: str | None,
+) -> dict[str, Any] | str:
+    text = source or ""
+    unsupported_markers = set(STATIC_CONTROLLED_PT_BLOCKED_SOURCE_MARKERS) - {
+        "ColorPredicate"
+    }
+    if any(marker in text for marker in unsupported_markers):
+        return "static_controlled_keyword_source_filter_not_supported"
+    if not filter_name:
+        return {}
+    if filter_name in {
+        "StaticFilters.FILTER_PERMANENT_CREATURE",
+        "StaticFilters.FILTER_PERMANENT_CREATURES",
+        "StaticFilters.FILTER_CONTROLLED_CREATURES",
+    }:
+        return {}
+    if filter_name == "StaticFilters.FILTER_PERMANENT_SLIVERS":
+        return {"static_required_subtypes": ["sliver"]}
+    if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", filter_name):
+        return "static_controlled_keyword_source_filter_not_supported"
+    constraints: dict[str, Any] = {}
+    color_tokens = re.findall(
+        rf"{re.escape(filter_name)}\.add\s*\(\s*new\s+ColorPredicate\s*\(\s*ObjectColor\.([A-Z]+)\s*\)\s*\)",
+        text,
+    )
+    if color_tokens:
+        colors = [
+            OBJECT_COLOR_TO_SYMBOL[token]
+            for token in color_tokens
+            if token in OBJECT_COLOR_TO_SYMBOL
+        ]
+        if colors:
+            constraints["static_required_colors"] = ordered_color_symbols(colors)
+    subtype_tokens = re.findall(
+        rf"{re.escape(filter_name)}\s*=\s*new\s+Filter(?:Creature)?Permanent\s*\(\s*SubType\.([A-Z0-9_]+)",
+        text,
+    )
+    subtype_tokens += re.findall(
+        rf"{re.escape(filter_name)}\.add\s*\(\s*SubType\.([A-Z0-9_]+)\.getPredicate\s*\(\s*\)\s*\)",
+        text,
+    )
+    if subtype_tokens:
+        constraints["static_required_subtypes"] = sorted(
+            {canonical_static_subtype(token.replace("_", " ")) for token in subtype_tokens}
+        )
+    if re.search(rf"{re.escape(filter_name)}\.add\s*\(\s*CardType\.ARTIFACT\.getPredicate\s*\(\s*\)\s*\)", text):
+        constraints["static_artifact_creature"] = True
+    if re.search(rf"{re.escape(filter_name)}\.add\s*\(\s*SuperType\.LEGENDARY\.getPredicate\s*\(\s*\)\s*\)", text):
+        constraints["static_required_supertypes"] = ["legendary"]
+    safe_get_predicates = re.findall(
+        rf"{re.escape(filter_name)}\.add\s*\(\s*([A-Za-z]+)\.([A-Z0-9_]+)\.getPredicate",
+        text,
+    )
+    for owner, value in safe_get_predicates:
+        if owner == "SubType":
+            continue
+        if owner == "CardType" and value == "ARTIFACT":
+            continue
+        if owner == "SuperType" and value == "LEGENDARY":
+            continue
+        return "static_controlled_keyword_source_filter_not_supported"
+    if "ColorPredicate" in text and not constraints.get("static_required_colors"):
+        return "static_controlled_keyword_source_filter_not_supported"
+    if not constraints and filter_name != "filter":
+        return "static_controlled_keyword_source_filter_not_supported"
+    return constraints
+
+
+def static_controlled_keyword_from_source(
+    source: str,
+) -> dict[str, Any] | str | None:
+    text = source or ""
+    if len(re.findall(r"new\s+GainAbilityControlledEffect\s*\(", text)) != 1:
+        return None
+    gain_match = re.search(r"new\s+GainAbilityControlledEffect\s*\(", text)
+    window = text[gain_match.start() : gain_match.start() + 1600] if gain_match else text
+    if "Duration.WhileOnBattlefield" not in window or "Duration.EndOfTurn" in window:
+        return None
+    keyword_matches = re.findall(
+        r"(?:new\s+GainAbilityControlledEffect\s*\(\s*)"
+        r"(?:([A-Za-z0-9_]+Ability)\.getInstance\s*\(\s*\)|new\s+([A-Za-z0-9_]+Ability)\s*\()",
+        window,
+        re.S,
+    )
+    keywords = [
+        STATIC_SELF_KEYWORD_ABILITY_CLASSES.get(match[0] or match[1])
+        for match in keyword_matches
+        if STATIC_SELF_KEYWORD_ABILITY_CLASSES.get(match[0] or match[1])
+    ]
+    if len(keywords) != 1:
+        return None
+    after_duration = window.split("Duration.WhileOnBattlefield", 1)[1]
+    bool_args = re.findall(r"\b(true|false)\b", after_duration)
+    exclude_source = bool_args[-1] == "true" if bool_args else False
+    filter_name: str | None = None
+    static_filter_match = re.search(r"(StaticFilters\.FILTER_[A-Z0-9_]+)", after_duration)
+    if static_filter_match:
+        filter_name = static_filter_match.group(1)
+    elif re.search(r"new\s+FilterControlledCreaturePermanent\s*\(", after_duration):
+        filter_name = None
+    else:
+        filter_match = re.search(
+            r",\s*([A-Za-z_][A-Za-z0-9_]*)\s*(?:,\s*(?:true|false))?\s*\)",
+            after_duration,
+            re.S,
+        )
+        if filter_match:
+            candidate = filter_match.group(1)
+            if candidate not in {"true", "false"}:
+                filter_name = candidate
+    constraints = static_controlled_keyword_filter_constraints_from_source(
+        text,
+        filter_name,
+    )
+    if isinstance(constraints, str):
+        return constraints
+    return {
+        "static_granted_keywords": [keywords[0]],
+        "static_exclude_source": exclude_source,
+        **constraints,
+    }
+
+
 STATIC_GLOBAL_PT_BLOCKED_SOURCE_MARKERS = {
     "Duration.EndOfTurn",
     "DynamicValue",
@@ -7887,6 +8100,19 @@ def is_static_controlled_pt_unit(row: dict[str, Any]) -> bool:
         str(row.get("adapter_work_unit") or "") == STATIC_CONTROLLED_PT_UNIT
         and effect_classes(row) == {"BoostControlledEffect"}
         and ability_classes(row) == {"SimpleStaticAbility"}
+        and set(row.get("xmage_signals") or []) == {"static_ability"}
+    )
+
+
+def is_static_controlled_keyword_unit(row: dict[str, Any]) -> bool:
+    abilities = ability_classes(row)
+    keyword_abilities = abilities.intersection(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
+    return (
+        str(row.get("adapter_work_unit") or "") == STATIC_CONTROLLED_KEYWORD_UNIT
+        and effect_classes(row) == {"GainAbilityControlledEffect"}
+        and "SimpleStaticAbility" in abilities
+        and len(keyword_abilities) == 1
+        and abilities - {"SimpleStaticAbility"} - keyword_abilities == set()
         and set(row.get("xmage_signals") or []) == {"static_ability"}
     )
 
@@ -18196,6 +18422,7 @@ def split_row(
     attack_target_keyword_unit = is_creature_attack_target_keyword_unit(row)
     attack_self_boost_creature_unit = is_creature_attack_self_boost_unit(row)
     static_controlled_pt_unit = is_static_controlled_pt_unit(row)
+    static_controlled_keyword_unit = is_static_controlled_keyword_unit(row)
     static_global_pt_unit = is_static_global_pt_unit(row)
     simple_aura_static_pt_unit = is_simple_aura_static_pt_unit(row)
     simple_equipment_static_attachment_unit = is_simple_equipment_static_attachment_unit(row)
@@ -18321,6 +18548,7 @@ def split_row(
         and not attack_target_keyword_unit
         and not attack_self_boost_creature_unit
         and not static_controlled_pt_unit
+        and not static_controlled_keyword_unit
         and not static_global_pt_unit
         and not simple_aura_static_pt_unit
         and not simple_equipment_static_attachment_unit
@@ -21503,6 +21731,80 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_static_controlled_power_toughness_boost",
+        ), "selected_exact_scope"
+
+    if static_controlled_keyword_unit:
+        if not is_permanent_metadata(metadata) or is_spell(metadata):
+            return None, "static_controlled_keyword_not_permanent"
+        keyword_abilities = ability_classes(row).intersection(
+            STATIC_SELF_KEYWORD_ABILITY_CLASSES
+        )
+        if len(keyword_abilities) != 1:
+            return None, "static_controlled_keyword_ability_not_single"
+        keyword_ability_class = next(iter(keyword_abilities))
+        keyword = STATIC_SELF_KEYWORD_ABILITY_CLASSES[keyword_ability_class]
+        oracle_static = static_controlled_keyword_from_oracle(metadata, keyword)
+        if isinstance(oracle_static, str):
+            return None, oracle_static
+        if oracle_static is None:
+            return None, "static_controlled_keyword_oracle_not_exact"
+        source_static = static_controlled_keyword_from_source(source_text)
+        if isinstance(source_static, str):
+            return None, source_static
+        if source_static is None:
+            return None, "static_controlled_keyword_source_not_exact"
+        if source_static != oracle_static:
+            return None, "static_controlled_keyword_source_oracle_mismatch"
+        type_line = str(metadata.get("type_line") or "").lower()
+        permanent_type = (
+            "creature"
+            if "creature" in type_line
+            else "artifact"
+            if "artifact" in type_line
+            else "enchantment"
+            if "enchantment" in type_line
+            else "permanent"
+        )
+        permanent_effect = "creature" if permanent_type == "creature" else "passive"
+        target_constraints: dict[str, Any] = {
+            "controller": "self",
+            "card_types": ["creature"],
+        }
+        if source_static.get("static_required_subtypes"):
+            target_constraints["subtypes"] = source_static["static_required_subtypes"]
+        if source_static.get("static_required_colors"):
+            target_constraints["colors"] = source_static["static_required_colors"]
+        if source_static.get("static_required_supertypes"):
+            target_constraints["supertypes"] = source_static["static_required_supertypes"]
+        if source_static.get("static_artifact_creature"):
+            target_constraints["card_types"] = ["artifact", "creature"]
+        effect_json = {
+            "effect": permanent_effect,
+            "battle_model_scope": STATIC_CONTROLLED_KEYWORD_SCOPE,
+            "ability_kind": "static",
+            "static_effect": "controlled_keyword_grant",
+            "static_applies_to": "creatures_you_control",
+            "target": "controlled_creatures",
+            "target_controller": "self",
+            "target_constraints": target_constraints,
+            "xmage_effect_class": "GainAbilityControlledEffect",
+            "xmage_ability_class": "SimpleStaticAbility",
+            "xmage_granted_ability_class": keyword_ability_class,
+            **source_static,
+        }
+        effect_json["permanent_type"] = permanent_type
+        self_keywords = static_keywords_from_oracle(metadata)
+        if self_keywords:
+            keyword_list = ordered_keywords(self_keywords)
+            effect_json["keywords"] = keyword_list
+            effect_json["_keywords_are_self"] = True
+            for self_keyword in keyword_list:
+                effect_json[self_keyword] = True
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_static_controlled_keyword_grant",
         ), "selected_exact_scope"
 
     if static_global_pt_unit:

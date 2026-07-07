@@ -1,0 +1,980 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg586_static_controlled_trample_new_serv_20260707_021928",
+  "deploy_id": "PG586",
+  "execution_scenarios": [
+    {
+      "card": {
+        "name": "Aggressive Mammoth"
+      },
+      "expected_keyword": "trample",
+      "expected_source": "Aggressive Mammoth",
+      "logical_rule_key": "battle_rule_v1:31ed27eaaea6b43f5bce5a1219f39dc0",
+      "matching_target": {
+        "base_power": 2,
+        "base_toughness": 2,
+        "name": "E2E Controlled Keyword Target for Aggressive Mammoth",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "name": "Aggressive Mammoth static controlled keyword applies",
+      "nonmatching_target": null,
+      "opponent_target": {
+        "base_power": 2,
+        "base_toughness": 2,
+        "name": "E2E Opponent Keyword Target for Aggressive Mammoth",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "type": "static_controlled_keyword"
+    },
+    {
+      "card": {
+        "name": "Bloodcrusher of Khorne"
+      },
+      "expected_keyword": "trample",
+      "expected_source": "Bloodcrusher of Khorne",
+      "logical_rule_key": "battle_rule_v1:31ed27eaaea6b43f5bce5a1219f39dc0",
+      "matching_target": {
+        "base_power": 2,
+        "base_toughness": 2,
+        "name": "E2E Controlled Keyword Target for Bloodcrusher of Khorne",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "name": "Bloodcrusher of Khorne static controlled keyword applies",
+      "nonmatching_target": null,
+      "opponent_target": {
+        "base_power": 2,
+        "base_toughness": 2,
+        "name": "E2E Opponent Keyword Target for Bloodcrusher of Khorne",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "type": "static_controlled_keyword"
+    },
+    {
+      "card": {
+        "name": "Groundshaker Sliver"
+      },
+      "expected_keyword": "trample",
+      "expected_source": "Groundshaker Sliver",
+      "logical_rule_key": "battle_rule_v1:48e0618f7275569070a4db62d971a9ba",
+      "matching_target": {
+        "base_power": 2,
+        "base_toughness": 2,
+        "name": "E2E Controlled Keyword Target for Groundshaker Sliver",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Sliver"
+      },
+      "name": "Groundshaker Sliver static controlled keyword applies",
+      "nonmatching_target": {
+        "base_power": 2,
+        "base_toughness": 2,
+        "name": "E2E Nonmatching Keyword Target for Groundshaker Sliver",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Goblin"
+      },
+      "opponent_target": {
+        "base_power": 2,
+        "base_toughness": 2,
+        "name": "E2E Opponent Keyword Target for Groundshaker Sliver",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Sliver"
+      },
+      "type": "static_controlled_keyword"
+    },
+    {
+      "card": {
+        "name": "Khenra Charioteer"
+      },
+      "expected_keyword": "trample",
+      "expected_source": "Khenra Charioteer",
+      "logical_rule_key": "battle_rule_v1:31ed27eaaea6b43f5bce5a1219f39dc0",
+      "matching_target": {
+        "base_power": 2,
+        "base_toughness": 2,
+        "name": "E2E Controlled Keyword Target for Khenra Charioteer",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "name": "Khenra Charioteer static controlled keyword applies",
+      "nonmatching_target": null,
+      "opponent_target": {
+        "base_power": 2,
+        "base_toughness": 2,
+        "name": "E2E Opponent Keyword Target for Khenra Charioteer",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "type": "static_controlled_keyword"
+    },
+    {
+      "card": {
+        "name": "Nylea's Forerunner"
+      },
+      "expected_keyword": "trample",
+      "expected_source": "Nylea's Forerunner",
+      "logical_rule_key": "battle_rule_v1:31ed27eaaea6b43f5bce5a1219f39dc0",
+      "matching_target": {
+        "base_power": 2,
+        "base_toughness": 2,
+        "name": "E2E Controlled Keyword Target for Nylea's Forerunner",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "name": "Nylea's Forerunner static controlled keyword applies",
+      "nonmatching_target": null,
+      "opponent_target": {
+        "base_power": 2,
+        "base_toughness": 2,
+        "name": "E2E Opponent Keyword Target for Nylea's Forerunner",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "type": "static_controlled_keyword"
+    },
+    {
+      "card": {
+        "name": "Primal Rage"
+      },
+      "expected_keyword": "trample",
+      "expected_source": "Primal Rage",
+      "logical_rule_key": "battle_rule_v1:363974e6bda920ddcbd5655a2ba63caa",
+      "matching_target": {
+        "base_power": 2,
+        "base_toughness": 2,
+        "name": "E2E Controlled Keyword Target for Primal Rage",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "name": "Primal Rage static controlled keyword applies",
+      "nonmatching_target": null,
+      "opponent_target": {
+        "base_power": 2,
+        "base_toughness": 2,
+        "name": "E2E Opponent Keyword Target for Primal Rage",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "type": "static_controlled_keyword"
+    },
+    {
+      "card": {
+        "name": "Roughshod Mentor"
+      },
+      "expected_keyword": "trample",
+      "expected_source": "Roughshod Mentor",
+      "logical_rule_key": "battle_rule_v1:0e7575f499a93af361184ebc70967e84",
+      "matching_target": {
+        "base_power": 2,
+        "base_toughness": 2,
+        "colors": [
+          "G"
+        ],
+        "mana_cost": "{G}",
+        "name": "E2E Controlled Keyword Target for Roughshod Mentor",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "name": "Roughshod Mentor static controlled keyword applies",
+      "nonmatching_target": {
+        "base_power": 2,
+        "base_toughness": 2,
+        "colors": [
+          "U"
+        ],
+        "mana_cost": "{U}",
+        "name": "E2E Nonmatching Keyword Target for Roughshod Mentor",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Goblin"
+      },
+      "opponent_target": {
+        "base_power": 2,
+        "base_toughness": 2,
+        "colors": [
+          "G"
+        ],
+        "mana_cost": "{G}",
+        "name": "E2E Opponent Keyword Target for Roughshod Mentor",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "type": "static_controlled_keyword"
+    },
+    {
+      "card": {
+        "name": "Thicket Crasher"
+      },
+      "expected_keyword": "trample",
+      "expected_source": "Thicket Crasher",
+      "logical_rule_key": "battle_rule_v1:64dc5dab62cd8f17e3c7f4ede9228277",
+      "matching_target": {
+        "base_power": 2,
+        "base_toughness": 2,
+        "name": "E2E Controlled Keyword Target for Thicket Crasher",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Elemental"
+      },
+      "name": "Thicket Crasher static controlled keyword applies",
+      "nonmatching_target": {
+        "base_power": 2,
+        "base_toughness": 2,
+        "name": "E2E Nonmatching Keyword Target for Thicket Crasher",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Goblin"
+      },
+      "opponent_target": {
+        "base_power": 2,
+        "base_toughness": 2,
+        "name": "E2E Opponent Keyword Target for Thicket Crasher",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Elemental"
+      },
+      "type": "static_controlled_keyword"
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Aggressive Mammoth",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:31ed27eaaea6b43f5bce5a1219f39dc0",
+      "min_rule_version": 2,
+      "normalized_name": "aggressive mammoth",
+      "oracle_hash": "1a9fad0b7e938d5339fcb2a9a6c76427",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_controlled_keyword_grant_v1",
+        "effect": "creature",
+        "keywords": [
+          "trample"
+        ],
+        "permanent_type": "creature",
+        "static_applies_to": "creatures_you_control",
+        "static_effect": "controlled_keyword_grant",
+        "static_exclude_source": true,
+        "static_granted_keywords": [
+          "trample"
+        ],
+        "target": "controlled_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self"
+        },
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "GainAbilityControlledEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Bloodcrusher of Khorne",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:31ed27eaaea6b43f5bce5a1219f39dc0",
+      "min_rule_version": 2,
+      "normalized_name": "bloodcrusher of khorne",
+      "oracle_hash": "add52677a0e693e79ccd3290ab703076",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_controlled_keyword_grant_v1",
+        "effect": "creature",
+        "keywords": [
+          "trample"
+        ],
+        "permanent_type": "creature",
+        "static_applies_to": "creatures_you_control",
+        "static_effect": "controlled_keyword_grant",
+        "static_exclude_source": true,
+        "static_granted_keywords": [
+          "trample"
+        ],
+        "target": "controlled_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self"
+        },
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "GainAbilityControlledEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Groundshaker Sliver",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:48e0618f7275569070a4db62d971a9ba",
+      "min_rule_version": 2,
+      "normalized_name": "groundshaker sliver",
+      "oracle_hash": "585fdd46d978b86a9007554050630ca9",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_controlled_keyword_grant_v1",
+        "effect": "creature",
+        "permanent_type": "creature",
+        "static_applies_to": "creatures_you_control",
+        "static_effect": "controlled_keyword_grant",
+        "static_exclude_source": false,
+        "static_granted_keywords": [
+          "trample"
+        ],
+        "static_required_subtypes": [
+          "sliver"
+        ],
+        "target": "controlled_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "subtypes": [
+            "sliver"
+          ]
+        },
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "GainAbilityControlledEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Khenra Charioteer",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:31ed27eaaea6b43f5bce5a1219f39dc0",
+      "min_rule_version": 2,
+      "normalized_name": "khenra charioteer",
+      "oracle_hash": "65f7b9f5ecda0ab8578963164076b601",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_controlled_keyword_grant_v1",
+        "effect": "creature",
+        "keywords": [
+          "trample"
+        ],
+        "permanent_type": "creature",
+        "static_applies_to": "creatures_you_control",
+        "static_effect": "controlled_keyword_grant",
+        "static_exclude_source": true,
+        "static_granted_keywords": [
+          "trample"
+        ],
+        "target": "controlled_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self"
+        },
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "GainAbilityControlledEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Nylea's Forerunner",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:31ed27eaaea6b43f5bce5a1219f39dc0",
+      "min_rule_version": 2,
+      "normalized_name": "nylea's forerunner",
+      "oracle_hash": "65f7b9f5ecda0ab8578963164076b601",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_controlled_keyword_grant_v1",
+        "effect": "creature",
+        "keywords": [
+          "trample"
+        ],
+        "permanent_type": "creature",
+        "static_applies_to": "creatures_you_control",
+        "static_effect": "controlled_keyword_grant",
+        "static_exclude_source": true,
+        "static_granted_keywords": [
+          "trample"
+        ],
+        "target": "controlled_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self"
+        },
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "GainAbilityControlledEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Primal Rage",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:363974e6bda920ddcbd5655a2ba63caa",
+      "min_rule_version": 2,
+      "normalized_name": "primal rage",
+      "oracle_hash": "b532311af37638867a24270200d81d24",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_controlled_keyword_grant_v1",
+        "effect": "passive",
+        "permanent_type": "enchantment",
+        "static_applies_to": "creatures_you_control",
+        "static_effect": "controlled_keyword_grant",
+        "static_exclude_source": false,
+        "static_granted_keywords": [
+          "trample"
+        ],
+        "target": "controlled_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self"
+        },
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "GainAbilityControlledEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Roughshod Mentor",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0e7575f499a93af361184ebc70967e84",
+      "min_rule_version": 2,
+      "normalized_name": "roughshod mentor",
+      "oracle_hash": "03eba077ad4be2b9a9fbaad44087cf62",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_controlled_keyword_grant_v1",
+        "effect": "creature",
+        "permanent_type": "creature",
+        "static_applies_to": "creatures_you_control",
+        "static_effect": "controlled_keyword_grant",
+        "static_exclude_source": false,
+        "static_granted_keywords": [
+          "trample"
+        ],
+        "static_required_colors": [
+          "G"
+        ],
+        "target": "controlled_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "colors": [
+            "G"
+          ],
+          "controller": "self"
+        },
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "GainAbilityControlledEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Thicket Crasher",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:64dc5dab62cd8f17e3c7f4ede9228277",
+      "min_rule_version": 2,
+      "normalized_name": "thicket crasher",
+      "oracle_hash": "c0da9dbcfb5eff6e27a2929dbac73811",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_controlled_keyword_grant_v1",
+        "effect": "creature",
+        "keywords": [
+          "trample"
+        ],
+        "permanent_type": "creature",
+        "static_applies_to": "creatures_you_control",
+        "static_effect": "controlled_keyword_grant",
+        "static_exclude_source": true,
+        "static_granted_keywords": [
+          "trample"
+        ],
+        "static_required_subtypes": [
+          "elemental"
+        ],
+        "target": "controlled_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "subtypes": [
+            "elemental"
+          ]
+        },
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "GainAbilityControlledEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_static_controlled_keyword_grant": 8
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg586_static_controlled_trample_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg586_static_controlled_trample_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg586_static_controlled_trample_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg586_static_controlled_trample_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg586_static_controlled_trample_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg586_static_controlled_trample_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-07T02:19:28+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Aggressive Mammoth"
+      },
+      "card_name": "Aggressive Mammoth",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:31ed27eaaea6b43f5bce5a1219f39dc0",
+      "normalized_name": "aggressive mammoth",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_controlled_keyword_grant_v1",
+        "effect": "creature",
+        "keywords": [
+          "trample"
+        ],
+        "permanent_type": "creature",
+        "static_applies_to": "creatures_you_control",
+        "static_effect": "controlled_keyword_grant",
+        "static_exclude_source": true,
+        "static_granted_keywords": [
+          "trample"
+        ],
+        "target": "controlled_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self"
+        },
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "GainAbilityControlledEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Bloodcrusher of Khorne"
+      },
+      "card_name": "Bloodcrusher of Khorne",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:31ed27eaaea6b43f5bce5a1219f39dc0",
+      "normalized_name": "bloodcrusher of khorne",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_controlled_keyword_grant_v1",
+        "effect": "creature",
+        "keywords": [
+          "trample"
+        ],
+        "permanent_type": "creature",
+        "static_applies_to": "creatures_you_control",
+        "static_effect": "controlled_keyword_grant",
+        "static_exclude_source": true,
+        "static_granted_keywords": [
+          "trample"
+        ],
+        "target": "controlled_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self"
+        },
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "GainAbilityControlledEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Groundshaker Sliver"
+      },
+      "card_name": "Groundshaker Sliver",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:48e0618f7275569070a4db62d971a9ba",
+      "normalized_name": "groundshaker sliver",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_controlled_keyword_grant_v1",
+        "effect": "creature",
+        "permanent_type": "creature",
+        "static_applies_to": "creatures_you_control",
+        "static_effect": "controlled_keyword_grant",
+        "static_exclude_source": false,
+        "static_granted_keywords": [
+          "trample"
+        ],
+        "static_required_subtypes": [
+          "sliver"
+        ],
+        "target": "controlled_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "subtypes": [
+            "sliver"
+          ]
+        },
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "GainAbilityControlledEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Khenra Charioteer"
+      },
+      "card_name": "Khenra Charioteer",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:31ed27eaaea6b43f5bce5a1219f39dc0",
+      "normalized_name": "khenra charioteer",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_controlled_keyword_grant_v1",
+        "effect": "creature",
+        "keywords": [
+          "trample"
+        ],
+        "permanent_type": "creature",
+        "static_applies_to": "creatures_you_control",
+        "static_effect": "controlled_keyword_grant",
+        "static_exclude_source": true,
+        "static_granted_keywords": [
+          "trample"
+        ],
+        "target": "controlled_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self"
+        },
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "GainAbilityControlledEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Nylea's Forerunner"
+      },
+      "card_name": "Nylea's Forerunner",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:31ed27eaaea6b43f5bce5a1219f39dc0",
+      "normalized_name": "nylea's forerunner",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_controlled_keyword_grant_v1",
+        "effect": "creature",
+        "keywords": [
+          "trample"
+        ],
+        "permanent_type": "creature",
+        "static_applies_to": "creatures_you_control",
+        "static_effect": "controlled_keyword_grant",
+        "static_exclude_source": true,
+        "static_granted_keywords": [
+          "trample"
+        ],
+        "target": "controlled_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self"
+        },
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "GainAbilityControlledEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Primal Rage"
+      },
+      "card_name": "Primal Rage",
+      "effect": "passive",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:363974e6bda920ddcbd5655a2ba63caa",
+      "normalized_name": "primal rage",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_controlled_keyword_grant_v1",
+        "effect": "passive",
+        "permanent_type": "enchantment",
+        "static_applies_to": "creatures_you_control",
+        "static_effect": "controlled_keyword_grant",
+        "static_exclude_source": false,
+        "static_granted_keywords": [
+          "trample"
+        ],
+        "target": "controlled_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self"
+        },
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "GainAbilityControlledEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Roughshod Mentor"
+      },
+      "card_name": "Roughshod Mentor",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0e7575f499a93af361184ebc70967e84",
+      "normalized_name": "roughshod mentor",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_controlled_keyword_grant_v1",
+        "effect": "creature",
+        "permanent_type": "creature",
+        "static_applies_to": "creatures_you_control",
+        "static_effect": "controlled_keyword_grant",
+        "static_exclude_source": false,
+        "static_granted_keywords": [
+          "trample"
+        ],
+        "static_required_colors": [
+          "G"
+        ],
+        "target": "controlled_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "colors": [
+            "G"
+          ],
+          "controller": "self"
+        },
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "GainAbilityControlledEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Thicket Crasher"
+      },
+      "card_name": "Thicket Crasher",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:64dc5dab62cd8f17e3c7f4ede9228277",
+      "normalized_name": "thicket crasher",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_controlled_keyword_grant_v1",
+        "effect": "creature",
+        "keywords": [
+          "trample"
+        ],
+        "permanent_type": "creature",
+        "static_applies_to": "creatures_you_control",
+        "static_effect": "controlled_keyword_grant",
+        "static_exclude_source": true,
+        "static_granted_keywords": [
+          "trample"
+        ],
+        "static_required_subtypes": [
+          "elemental"
+        ],
+        "target": "controlled_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "subtypes": [
+            "elemental"
+          ]
+        },
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "GainAbilityControlledEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Aggressive Mammoth",
+    "Bloodcrusher of Khorne",
+    "Groundshaker Sliver",
+    "Khenra Charioteer",
+    "Nylea's Forerunner",
+    "Primal Rage",
+    "Roughshod Mentor",
+    "Thicket Crasher"
+  ],
+  "selected_count": 8,
+  "slug": "static_controlled_trample_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Aggressive Mammoth",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:31ed27eaaea6b43f5bce5a1219f39dc0",
+      "min_rule_version": 2,
+      "normalized_name": "aggressive mammoth",
+      "oracle_hash": "1a9fad0b7e938d5339fcb2a9a6c76427",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_controlled_keyword_grant_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Bloodcrusher of Khorne",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:31ed27eaaea6b43f5bce5a1219f39dc0",
+      "min_rule_version": 2,
+      "normalized_name": "bloodcrusher of khorne",
+      "oracle_hash": "add52677a0e693e79ccd3290ab703076",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_controlled_keyword_grant_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Groundshaker Sliver",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:48e0618f7275569070a4db62d971a9ba",
+      "min_rule_version": 2,
+      "normalized_name": "groundshaker sliver",
+      "oracle_hash": "585fdd46d978b86a9007554050630ca9",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_controlled_keyword_grant_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Khenra Charioteer",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:31ed27eaaea6b43f5bce5a1219f39dc0",
+      "min_rule_version": 2,
+      "normalized_name": "khenra charioteer",
+      "oracle_hash": "65f7b9f5ecda0ab8578963164076b601",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_controlled_keyword_grant_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Nylea's Forerunner",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:31ed27eaaea6b43f5bce5a1219f39dc0",
+      "min_rule_version": 2,
+      "normalized_name": "nylea's forerunner",
+      "oracle_hash": "65f7b9f5ecda0ab8578963164076b601",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_controlled_keyword_grant_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Primal Rage",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:363974e6bda920ddcbd5655a2ba63caa",
+      "min_rule_version": 2,
+      "normalized_name": "primal rage",
+      "oracle_hash": "b532311af37638867a24270200d81d24",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_controlled_keyword_grant_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Roughshod Mentor",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0e7575f499a93af361184ebc70967e84",
+      "min_rule_version": 2,
+      "normalized_name": "roughshod mentor",
+      "oracle_hash": "03eba077ad4be2b9a9fbaad44087cf62",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_controlled_keyword_grant_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Thicket Crasher",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:64dc5dab62cd8f17e3c7f4ede9228277",
+      "min_rule_version": 2,
+      "normalized_name": "thicket crasher",
+      "oracle_hash": "c0da9dbcfb5eff6e27a2929dbac73811",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_controlled_keyword_grant_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

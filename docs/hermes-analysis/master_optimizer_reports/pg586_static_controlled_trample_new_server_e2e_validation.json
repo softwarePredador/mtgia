@@ -1,0 +1,415 @@
+{
+  "battle_execution": {
+    "event_count": 16,
+    "results": [
+      {
+        "card_name": "Aggressive Mammoth",
+        "keyword": "trample",
+        "matching_target": "E2E Controlled Keyword Target for Aggressive Mammoth",
+        "refreshed_count": 1,
+        "scenario": "Aggressive Mammoth static controlled keyword applies",
+        "source_cards": [
+          "Aggressive Mammoth"
+        ]
+      },
+      {
+        "card_name": "Bloodcrusher of Khorne",
+        "keyword": "trample",
+        "matching_target": "E2E Controlled Keyword Target for Bloodcrusher of Khorne",
+        "refreshed_count": 1,
+        "scenario": "Bloodcrusher of Khorne static controlled keyword applies",
+        "source_cards": [
+          "Bloodcrusher of Khorne"
+        ]
+      },
+      {
+        "card_name": "Groundshaker Sliver",
+        "keyword": "trample",
+        "matching_target": "E2E Controlled Keyword Target for Groundshaker Sliver",
+        "refreshed_count": 1,
+        "scenario": "Groundshaker Sliver static controlled keyword applies",
+        "source_cards": [
+          "Groundshaker Sliver"
+        ]
+      },
+      {
+        "card_name": "Khenra Charioteer",
+        "keyword": "trample",
+        "matching_target": "E2E Controlled Keyword Target for Khenra Charioteer",
+        "refreshed_count": 1,
+        "scenario": "Khenra Charioteer static controlled keyword applies",
+        "source_cards": [
+          "Khenra Charioteer"
+        ]
+      },
+      {
+        "card_name": "Nylea's Forerunner",
+        "keyword": "trample",
+        "matching_target": "E2E Controlled Keyword Target for Nylea's Forerunner",
+        "refreshed_count": 1,
+        "scenario": "Nylea's Forerunner static controlled keyword applies",
+        "source_cards": [
+          "Nylea's Forerunner"
+        ]
+      },
+      {
+        "card_name": "Primal Rage",
+        "keyword": "trample",
+        "matching_target": "E2E Controlled Keyword Target for Primal Rage",
+        "refreshed_count": 1,
+        "scenario": "Primal Rage static controlled keyword applies",
+        "source_cards": [
+          "Primal Rage"
+        ]
+      },
+      {
+        "card_name": "Roughshod Mentor",
+        "keyword": "trample",
+        "matching_target": "E2E Controlled Keyword Target for Roughshod Mentor",
+        "refreshed_count": 1,
+        "scenario": "Roughshod Mentor static controlled keyword applies",
+        "source_cards": [
+          "Roughshod Mentor"
+        ]
+      },
+      {
+        "card_name": "Thicket Crasher",
+        "keyword": "trample",
+        "matching_target": "E2E Controlled Keyword Target for Thicket Crasher",
+        "refreshed_count": 1,
+        "scenario": "Thicket Crasher static controlled keyword applies",
+        "source_cards": [
+          "Thicket Crasher"
+        ]
+      }
+    ],
+    "scenario_count": 8
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-07T02:20:46.287030+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg586_static_controlled_trample_new_server_package_manifest.json",
+  "package_id": "pg586_static_controlled_trample_new_server_package_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 8
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_controlled_keyword_grant_v1",
+          "card_name": "Aggressive Mammoth",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:31ed27eaaea6b43f5bce5a1219f39dc0",
+          "oracle_hash": "1a9fad0b7e938d5339fcb2a9a6c76427",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_controlled_keyword_grant_v1",
+          "card_name": "Bloodcrusher of Khorne",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:31ed27eaaea6b43f5bce5a1219f39dc0",
+          "oracle_hash": "add52677a0e693e79ccd3290ab703076",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_controlled_keyword_grant_v1",
+          "card_name": "Groundshaker Sliver",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:48e0618f7275569070a4db62d971a9ba",
+          "oracle_hash": "585fdd46d978b86a9007554050630ca9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_controlled_keyword_grant_v1",
+          "card_name": "Khenra Charioteer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:31ed27eaaea6b43f5bce5a1219f39dc0",
+          "oracle_hash": "65f7b9f5ecda0ab8578963164076b601",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_controlled_keyword_grant_v1",
+          "card_name": "Nylea's Forerunner",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:31ed27eaaea6b43f5bce5a1219f39dc0",
+          "oracle_hash": "65f7b9f5ecda0ab8578963164076b601",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_controlled_keyword_grant_v1",
+          "card_name": "Primal Rage",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:363974e6bda920ddcbd5655a2ba63caa",
+          "oracle_hash": "b532311af37638867a24270200d81d24",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_controlled_keyword_grant_v1",
+          "card_name": "Roughshod Mentor",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0e7575f499a93af361184ebc70967e84",
+          "oracle_hash": "03eba077ad4be2b9a9fbaad44087cf62",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_controlled_keyword_grant_v1",
+          "card_name": "Thicket Crasher",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:64dc5dab62cd8f17e3c7f4ede9228277",
+          "oracle_hash": "c0da9dbcfb5eff6e27a2929dbac73811",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 8
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_controlled_keyword_grant_v1",
+          "card_name": "Aggressive Mammoth",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:31ed27eaaea6b43f5bce5a1219f39dc0",
+          "oracle_hash": "1a9fad0b7e938d5339fcb2a9a6c76427",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_controlled_keyword_grant_v1",
+          "card_name": "Bloodcrusher of Khorne",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:31ed27eaaea6b43f5bce5a1219f39dc0",
+          "oracle_hash": "add52677a0e693e79ccd3290ab703076",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_controlled_keyword_grant_v1",
+          "card_name": "Groundshaker Sliver",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:48e0618f7275569070a4db62d971a9ba",
+          "oracle_hash": "585fdd46d978b86a9007554050630ca9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_controlled_keyword_grant_v1",
+          "card_name": "Khenra Charioteer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:31ed27eaaea6b43f5bce5a1219f39dc0",
+          "oracle_hash": "65f7b9f5ecda0ab8578963164076b601",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_controlled_keyword_grant_v1",
+          "card_name": "Nylea's Forerunner",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:31ed27eaaea6b43f5bce5a1219f39dc0",
+          "oracle_hash": "65f7b9f5ecda0ab8578963164076b601",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_controlled_keyword_grant_v1",
+          "card_name": "Primal Rage",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:363974e6bda920ddcbd5655a2ba63caa",
+          "oracle_hash": "b532311af37638867a24270200d81d24",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_controlled_keyword_grant_v1",
+          "card_name": "Roughshod Mentor",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0e7575f499a93af361184ebc70967e84",
+          "oracle_hash": "03eba077ad4be2b9a9fbaad44087cf62",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_controlled_keyword_grant_v1",
+          "card_name": "Thicket Crasher",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:64dc5dab62cd8f17e3c7f4ede9228277",
+          "oracle_hash": "c0da9dbcfb5eff6e27a2929dbac73811",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 8
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_controlled_keyword_grant_v1",
+          "battle_rule_version": 2,
+          "card_name": "Aggressive Mammoth",
+          "logical_rule_key": "battle_rule_v1:31ed27eaaea6b43f5bce5a1219f39dc0"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_controlled_keyword_grant_v1",
+          "battle_rule_version": 2,
+          "card_name": "Bloodcrusher of Khorne",
+          "logical_rule_key": "battle_rule_v1:31ed27eaaea6b43f5bce5a1219f39dc0"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_controlled_keyword_grant_v1",
+          "battle_rule_version": 2,
+          "card_name": "Groundshaker Sliver",
+          "logical_rule_key": "battle_rule_v1:48e0618f7275569070a4db62d971a9ba"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_controlled_keyword_grant_v1",
+          "battle_rule_version": 2,
+          "card_name": "Khenra Charioteer",
+          "logical_rule_key": "battle_rule_v1:31ed27eaaea6b43f5bce5a1219f39dc0"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_controlled_keyword_grant_v1",
+          "battle_rule_version": 2,
+          "card_name": "Nylea's Forerunner",
+          "logical_rule_key": "battle_rule_v1:31ed27eaaea6b43f5bce5a1219f39dc0"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_controlled_keyword_grant_v1",
+          "battle_rule_version": 2,
+          "card_name": "Primal Rage",
+          "logical_rule_key": "battle_rule_v1:363974e6bda920ddcbd5655a2ba63caa"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_controlled_keyword_grant_v1",
+          "battle_rule_version": 2,
+          "card_name": "Roughshod Mentor",
+          "logical_rule_key": "battle_rule_v1:0e7575f499a93af361184ebc70967e84"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_controlled_keyword_grant_v1",
+          "battle_rule_version": 2,
+          "card_name": "Thicket Crasher",
+          "logical_rule_key": "battle_rule_v1:64dc5dab62cd8f17e3c7f4ede9228277"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 8
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Aggressive Mammoth",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:31ed27eaaea6b43f5bce5a1219f39dc0"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Bloodcrusher of Khorne",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:31ed27eaaea6b43f5bce5a1219f39dc0"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Groundshaker Sliver",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:48e0618f7275569070a4db62d971a9ba"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Khenra Charioteer",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:31ed27eaaea6b43f5bce5a1219f39dc0"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Nylea's Forerunner",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:31ed27eaaea6b43f5bce5a1219f39dc0"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Primal Rage",
+          "component_keys": [],
+          "effect": "passive",
+          "logical_rule_key": "battle_rule_v1:363974e6bda920ddcbd5655a2ba63caa"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Roughshod Mentor",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:0e7575f499a93af361184ebc70967e84"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Thicket Crasher",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:64dc5dab62cd8f17e3c7f4ede9228277"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 16,
+        "scenarios": 8
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}
