@@ -11854,6 +11854,7 @@ def activation_sacrifice_target_from_phrase(phrase: str) -> str | None:
     normalized = normalized.removeprefix("another ")
     mapping = {
         "artifact or creature": "artifact_or_creature",
+        "creature or artifact": "artifact_or_creature",
         "artifact or land": "artifact_or_land",
         "creature or enchantment": "creature_or_enchantment",
         "creature or land": "creature_or_land",
@@ -11911,7 +11912,7 @@ def activated_draw_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str
     sacrifice_target = None
     sacrifice_pattern = (
         r"(?:^|,\s*)sacrifice (?P<phrase>"
-        r"(?:an?|another) (?:artifact or creature|artifact or land|creature or land|"
+        r"(?:an?|another) (?:artifact or creature|creature or artifact|artifact or land|creature or land|"
         r"nontoken permanent|non-token permanent|token|creature|artifact|enchantment|land|permanent)"
         r")(?:\s*,?|$)"
     )
@@ -15145,13 +15146,15 @@ def activation_sacrifice_target_from_source(source: str, window: str) -> str | N
         return "creature_or_planeswalker"
     if "FILTER_PERMANENT_ARTIFACT_OR_CREATURE" in relevant:
         return "artifact_or_creature"
+    if "FILTER_CONTROLLED_ANOTHER_CREATURE_OR_ARTIFACT" in relevant:
+        return "artifact_or_creature"
     if "FilterControlledEnchantmentPermanent" in relevant:
         return "enchantment"
     if "SubType.SWAMP.getPredicate" in relevant:
         return "swamp"
     if "FILTER_PERMANENT_CREATURE" in relevant or "TargetControlledCreaturePermanent" in relevant:
         return "creature"
-    if "FILTER_PERMANENT_ARTIFACT" in relevant:
+    if "FILTER_PERMANENT_ARTIFACT" in relevant or "FILTER_CONTROLLED_PERMANENT_ARTIFACT" in relevant:
         return "artifact"
     if (
         "FILTER_CONTROLLED_LAND" in relevant

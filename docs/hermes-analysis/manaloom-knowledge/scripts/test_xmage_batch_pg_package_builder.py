@@ -860,6 +860,37 @@ def test_manifest_expected_rule_preserves_activation_discard_cost_fields() -> No
     assert expected["required_effect_fields"]["activation_discard_random"] is True
 
 
+def test_manifest_builds_simple_activated_draw_execution_scenario_with_sacrifice_target() -> None:
+    rule = {
+        "normalized_name": "thraxodemon",
+        "card_name": "Thraxodemon",
+        "oracle_hash": "hash-thraxodemon",
+        "logical_rule_key": "battle_rule_v1:thraxodemon",
+        "required_effect_fields": {
+            "effect": "draw_engine",
+            "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+            "activated_draw": True,
+            "activated_draw_count": 1,
+            "activation_cost_mana": "{3}",
+            "activation_cost_generic": 3,
+            "activation_cost_colors": [],
+            "activation_requires_tap": True,
+            "activation_requires_sacrifice_target": True,
+            "activation_sacrifice_target": "artifact_or_creature",
+        },
+    }
+
+    scenario = builder.simple_activated_draw_execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "simple_activated_draw"
+    assert scenario["controller_mana"]["generic"] == 3
+    assert scenario["expected_draw_count"] == 1
+    assert scenario["expected_tapped_source"] is True
+    assert scenario["expect_target_sacrificed"] is True
+    assert scenario["sacrifice_target"]["type_line"] == "Artifact"
+
+
 def test_manifest_builds_simple_activated_damage_execution_scenario() -> None:
     rule = {
         "normalized_name": "stormbind",

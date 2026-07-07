@@ -18315,6 +18315,83 @@ Current next high-volume queue after PG614:
 - `add_counters::source_add_counters_variant_v1` - `771`
 - `life_gain::xmage_life_gain_variant_review_v1` - `663`
 
+## PG615 Checkpoint - Activated Draw With Sacrifice Target Costs
+
+PG615 closes the narrow permanent activated draw subpattern where XMage and
+Oracle both show fixed draw-one abilities with a tap cost and a separate
+sacrifice-target cost. It uses the existing runtime scope:
+`xmage_permanent_simple_activated_draw_v1`.
+
+Promoted cards:
+
+- `Sage of Lat-Nam` - `{T}, Sacrifice an artifact: Draw a card.`
+- `Thraxodemon` - `{3}, {T}, Sacrifice another creature or artifact: Draw a card.`
+
+Implementation:
+
+- `xmage_authoritative_exact_scope_split.py` now recognizes the XMage constants
+  `FILTER_CONTROLLED_PERMANENT_ARTIFACT_AN` and
+  `FILTER_CONTROLLED_ANOTHER_CREATURE_OR_ARTIFACT`, plus the Oracle wording
+  `creature or artifact`, as sacrifice-target costs already supported by the
+  ManaLoom activation-cost model;
+- `xmage_batch_pg_package_builder.py` now emits
+  `simple_activated_draw` execution scenarios, including mana, tap,
+  discard/life placeholders, library fixtures, and sacrifice-target fixtures;
+- `battle_package_end_to_end_validation.py` now runs those scenarios through
+  the real `activate_utility_artifacts` path and validates cards drawn,
+  source tap, life/discard costs, source sacrifice, and target sacrifice;
+- focused tests were added for the splitter, package builder, and E2E runner.
+
+Validation:
+
+- focused Python compilation passed for the touched splitter, package builder,
+  and E2E validator;
+- focused pytest passed with `875` tests;
+- exact split produced `proposal_count=2` and
+  `safe_for_batch_pg_package_count=2`;
+- precheck found `2/2` target card rows, `0` existing expected rows, and `0`
+  shadow rows to deprecate;
+- apply/postcheck confirmed `upserted_rows=2`, `2/2` verified/auto promoted
+  rows, and `2/2` rows with `oracle_hash`;
+- PG battle-rules -> Hermes/SQLite sync loaded `5846` PostgreSQL rules,
+  inserted/updated `5833` SQLite rows, and exported `5812` canonical snapshot
+  rows;
+- metadata sync used `database_target=127.0.0.1:15432/halder`, matched `6980`
+  PostgreSQL cards, wrote `6899` SQLite cache alias rows, left `deck_cards` at
+  `2699/2699` matched, and kept `unresolved_count=1`;
+- E2E package validation passed PostgreSQL, SQLite, snapshot, runtime lookup,
+  and `2` battle execution scenarios with `2` runtime events;
+- final PG/Hermes/SQLite contract audit passed `51/51`;
+- legacy contamination audit passed;
+- operational surface alignment audit passed;
+- strategy consistency audit passed `26/26`;
+- multi-rule runtime readiness remained bounded to existing global review gaps
+  (`no_runtime_safe_primary=1101`, `single_primary_with_blocked_alternatives=282`,
+  `composite_resolution_ready=2`);
+- global readiness now reports `battle_and_oracle_ready=5905` and
+  `battle_family_mapper_required=27968`;
+- post-sync queue rebuild reduced `target_identity_count` from `25047` to
+  `25045`, `xmage_authoritative_source_count` from `24733` to `24731`,
+  `xmage_authoritative_adapter_required_count` from `24733` to `24731`, and
+  `draw_engine::xmage_draw_card_variant_review_v1` from `1577` to `1575`;
+- final exact-scope recheck against the post-PG615 queue returned
+  `proposal_count=0` and `safe_for_batch_pg_package_count=0`.
+
+Residual boundary: PG615 does not authorize tap-target costs such as Azami,
+reveal costs, discard-specific costs like "discard a creature card", remove
+counter costs, dynamic draw amounts, multiple activated draw abilities on the
+same permanent, graveyard activation costs, or self-sacrifice draw variants not
+covered by a separate E2E/package contract.
+
+Current next high-volume queue after PG615:
+
+- `recursion::xmage_graveyard_return_variant_review_v1` - `1795`
+- `draw_engine::xmage_draw_card_variant_review_v1` - `1575`
+- `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1` - `1085`
+- `direct_damage::targeted_damage_variant_v1` - `775`
+- `add_counters::source_add_counters_variant_v1` - `771`
+- `life_gain::xmage_life_gain_variant_review_v1` - `663`
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

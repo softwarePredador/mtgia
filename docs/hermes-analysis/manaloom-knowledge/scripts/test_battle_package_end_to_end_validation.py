@@ -145,6 +145,63 @@ def test_simple_activated_damage_runner_executes_random_discard_cost() -> None:
     assert result["opponent_life"] == 5
 
 
+def test_simple_activated_draw_runner_executes_sacrifice_target_cost() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "draw_engine",
+        "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+        "permanent_type": "creature",
+        "activated_draw": True,
+        "activated_draw_count": 1,
+        "activation_cost_mana": "{0}",
+        "activation_cost_generic": 0,
+        "activation_cost_colors": [],
+        "activation_requires_tap": True,
+        "activation_requires_sacrifice": False,
+        "activation_requires_sacrifice_target": True,
+        "activation_sacrifice_target": "artifact",
+        "_rule_logical_key": "battle_rule_v1:sage-of-lat-nam",
+    }
+    try:
+        result = validator.run_simple_activated_draw(
+            battle,
+            {
+                "name": "Sage of Lat-Nam activates draw ability",
+                "type": "simple_activated_draw",
+                "card": {"name": "Sage of Lat-Nam"},
+                "controller_mana": {"generic": 0},
+                "controller_library": [
+                    {"name": "E2E Activated Draw Card", "type_line": "Sorcery", "effect": "draw_cards"}
+                ],
+                "sacrifice_target": {
+                    "name": "E2E Artifact Sacrifice Target",
+                    "type_line": "Artifact",
+                    "effect": "artifact",
+                    "cmc": 1,
+                },
+                "expect_target_sacrificed": True,
+                "expected_draw_count": 1,
+                "expected_tapped_source": True,
+                "expected_discard_count": 0,
+                "expected_life_paid": 0,
+                "logical_rule_key": "battle_rule_v1:sage-of-lat-nam",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Sage of Lat-Nam"
+    assert result["cards_drawn"] == 1
+    assert result["source_tapped"] is True
+    assert result["target_sacrificed"] is True
+
+
 def test_single_target_removal_runner_validates_controller_life_gain() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

@@ -2510,6 +2510,63 @@ def simple_activated_damage_execution_scenario_from_expected_rule(
     }
 
 
+def simple_activated_draw_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_permanent_simple_activated_draw_v1":
+        return None
+    discard_count = int(required.get("activation_discard_count") or 0)
+    sacrifice_target_type = str(required.get("activation_sacrifice_target") or "").strip().lower()
+    controller_hand = []
+    if discard_count:
+        controller_hand = [
+            {"name": "E2E Spare Draw Cost Card", "type_line": "Sorcery", "effect": "draw_cards", "cmc": 2},
+            {"name": "E2E Backup Draw Cost Card", "type_line": "Instant", "effect": "direct_damage", "cmc": 1},
+        ]
+    scenario: dict[str, Any] = {
+        "name": f"{rule['card_name']} activates draw ability",
+        "type": "simple_activated_draw",
+        "card": {"name": rule["card_name"]},
+        "controller_mana": _manifest_mana_for_required_activation(required),
+        "controller_hand": controller_hand,
+        "controller_library": [
+            {"name": "E2E Activated Draw Card A", "type_line": "Sorcery", "effect": "draw_cards", "cmc": 2},
+            {"name": "E2E Activated Draw Card B", "type_line": "Instant", "effect": "direct_damage", "cmc": 1},
+            {"name": "E2E Activated Draw Card C", "type_line": "Creature - Fixture", "effect": "creature", "cmc": 3},
+            {"name": "E2E Activated Draw Card D", "type_line": "Artifact", "effect": "artifact", "cmc": 2},
+        ],
+        "expected_draw_count": int(required.get("activated_draw_count") or required.get("count") or 1),
+        "expected_tapped_source": bool(required.get("activation_requires_tap")),
+        "expected_discard_count": discard_count,
+        "expected_discard_target": str(required.get("activation_discard_target") or "any_card"),
+        "expected_life_paid": int(required.get("activation_life_cost") or 0),
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+    if sacrifice_target_type:
+        sacrifice_card_type = {
+            "artifact": "artifact",
+            "artifact_or_creature": "artifact",
+            "artifact_or_land": "artifact",
+            "creature": "creature",
+            "creature_or_land": "creature",
+            "land": "land",
+            "nontoken_permanent": "artifact",
+            "permanent": "artifact",
+            "token": "creature",
+        }.get(sacrifice_target_type, "creature")
+        scenario["sacrifice_target"] = _target_fixture_from_constraints(
+            "E2E Activated Draw Sacrifice Target",
+            {
+                "card_types": [sacrifice_card_type],
+                **({"token": True} if sacrifice_target_type == "token" else {}),
+            },
+            matching=True,
+        )
+        scenario["expect_target_sacrificed"] = True
+    return scenario
+
+
 def damage_each_opponent_spell_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
@@ -3563,6 +3620,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or sacrifice_mana_source_execution_scenario_from_expected_rule(rule)
         or damage_each_opponent_spell_execution_scenario_from_expected_rule(rule)
         or damage_gain_life_spell_execution_scenario_from_expected_rule(rule)
+        or simple_activated_draw_execution_scenario_from_expected_rule(rule)
         or simple_activated_damage_execution_scenario_from_expected_rule(rule)
         or simple_activated_tap_target_execution_scenario_from_expected_rule(rule)
         or simple_activated_add_counters_target_execution_scenario_from_expected_rule(rule)
