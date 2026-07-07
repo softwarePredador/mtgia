@@ -30,6 +30,39 @@ void main() {
               'score': 0.91,
             },
           ],
+          'visual_snapshots': [
+            {
+              'turn': 1,
+              'phase': 'main',
+              'action': 'casts',
+              'active_player': 'Player A',
+              'event': {
+                'turn': 1,
+                'player': 'Player A',
+                'phase': 'main',
+                'action': 'casts',
+                'card': 'Sol Ring',
+              },
+              'players': [
+                {
+                  'name': 'Player A',
+                  'life': 40,
+                  'mana': 1,
+                  'hand': [
+                    {
+                      'id': 'sol-ring',
+                      'name': 'Sol Ring',
+                      'image_url': 'https://img.example/sol-ring.jpg',
+                      'type_line': 'Artifact',
+                    },
+                  ],
+                  'battlefield': [],
+                  'graveyard': [],
+                  'library_size': 92,
+                },
+              ],
+            },
+          ],
         },
       }, fallbackDeckId: 'deck-1');
 
@@ -43,6 +76,12 @@ void main() {
       expect(detail.decisions, hasLength(1));
       expect(detail.decisions.single.reason, 'Accelerates commander turn.');
       expect(detail.decisions.single.score, 0.91);
+      expect(detail.visualSnapshots, hasLength(1));
+      expect(detail.visualSnapshots.single.message, 'Player A casts Sol Ring');
+      expect(
+        detail.visualSnapshots.single.players.single.hand.single.imageUrl,
+        'https://img.example/sol-ring.jpg',
+      );
     });
 
     test('accepts immediate simulate response shape', () {

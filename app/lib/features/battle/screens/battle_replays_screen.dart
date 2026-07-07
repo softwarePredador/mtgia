@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/cached_card_image.dart';
 import '../../../core/widgets/app_state_panel.dart';
 import '../models/battle_replay.dart';
 import '../services/battle_replay_service.dart';
@@ -511,7 +512,7 @@ class _BattleReplayDetailPane extends StatelessWidget {
                 segments: const [
                   ButtonSegment(
                     value: _ReplayDetailView.timeline,
-                    icon: Icon(Icons.timeline_outlined),
+                    icon: Icon(Icons.table_chart_outlined),
                     label: Text('Replay'),
                   ),
                   ButtonSegment(
@@ -551,6 +552,10 @@ class _ReplayTimeline extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (detail.visualSnapshots.isNotEmpty) {
+      return _ReplayVisualViewer(detail: detail);
+    }
+
     if (detail.events.isEmpty) {
       final text = detail.replayText?.trim();
       if (text != null && text.isNotEmpty) {
@@ -605,6 +610,369 @@ class _ReplayRaw extends StatelessWidget {
   Widget build(BuildContext context) {
     final text = const JsonEncoder.withIndent('  ').convert(detail.raw);
     return _ReplayTextBlock(text: text);
+  }
+}
+
+class _ReplayVisualViewer extends StatefulWidget {
+  const _ReplayVisualViewer({required this.detail});
+
+  final BattleReplayDetail detail;
+
+  @override
+  State<_ReplayVisualViewer> createState() => _ReplayVisualViewerState();
+}
+
+class _ReplayVisualViewerState extends State<_ReplayVisualViewer> {
+  int _index = 0;
+
+  @override
+  void didUpdateWidget(covariant _ReplayVisualViewer oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (_index >= widget.detail.visualSnapshots.length) {
+      _index = widget.detail.visualSnapshots.length - 1;
+    }
+  }
+
+  void _move(int delta) {
+    final next = (_index + delta).clamp(
+      0,
+      widget.detail.visualSnapshots.length - 1,
+    );
+    if (next == _index) return;
+    setState(() => _index = next);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final snapshots = widget.detail.visualSnapshots;
+    final snapshot = snapshots[_index];
+    final canMoveBack = _index > 0;
+    final canMoveForward = _index < snapshots.length - 1;
+
+    return Container(
+      key: const Key('battle-replay-visual-viewer'),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceSlate.withValues(alpha: 0.8),
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        border: Border.all(
+          color: AppTheme.outlineMuted.withValues(alpha: 0.58),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _ReplayStepBadge(label: snapshot.turnLabel),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        snapshot.phaseLabel,
+                        style: theme.textTheme.labelMedium?.copyWith(
+                          color: AppTheme.frost400,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        snapshot.message,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: AppTheme.textPrimary,
+                          height: 1.32,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      if (snapshot.activePlayer != null) ...[
+                        const SizedBox(height: 4),
+                        Text(
+                          'Ativo: ${snapshot.activePlayer}',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: AppTheme.textSecondary,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+                IconButton(
+                  key: const Key('battle-visual-prev-button'),
+                  tooltip: 'Anterior',
+                  onPressed: canMoveBack ? () => _move(-1) : null,
+                  icon: const Icon(Icons.chevron_left_rounded),
+                ),
+                IconButton(
+                  key: const Key('battle-visual-next-button'),
+                  tooltip: 'Proximo',
+                  onPressed: canMoveForward ? () => _move(1) : null,
+                  icon: const Icon(Icons.chevron_right_rounded),
+                ),
+              ],
+            ),
+          ),
+          if (snapshots.length > 1)
+            Slider(
+              key: const Key('battle-visual-turn-slider'),
+              value: _index.toDouble(),
+              min: 0,
+              max: (snapshots.length - 1).toDouble(),
+              divisions: snapshots.length - 1,
+              label: '${_index + 1}/${snapshots.length}',
+              onChanged: (value) => setState(() => _index = value.round()),
+            ),
+          ...snapshot.players.map(
+            (player) => _VisualPlayerBoard(
+              player: player,
+              isActive: player.name == snapshot.activePlayer,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _VisualPlayerBoard extends StatelessWidget {
+  const _VisualPlayerBoard({required this.player, required this.isActive});
+
+  final BattleReplayPlayerSnapshot player;
+  final bool isActive;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      margin: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color:
+            isActive
+                ? AppTheme.frost400.withValues(alpha: 0.08)
+                : AppTheme.surfaceElevated,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        border: Border.all(
+          color:
+              isActive
+                  ? AppTheme.frost400.withValues(alpha: 0.44)
+                  : AppTheme.outlineMuted.withValues(alpha: 0.54),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  player.name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    color: AppTheme.textPrimary,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ),
+              _ReplayMetaChip(label: '${player.life} vida'),
+              const SizedBox(width: 6),
+              _ReplayMetaChip(label: '${player.mana} mana'),
+            ],
+          ),
+          const SizedBox(height: 10),
+          _VisualCardZone(
+            key: Key('battle-visual-zone-battlefield-${player.name}'),
+            title: 'Campo',
+            cards: player.battlefield,
+            fallbackCount: player.lands,
+            fallbackLabel: 'terrenos',
+          ),
+          const SizedBox(height: 10),
+          _VisualCardZone(
+            key: Key('battle-visual-zone-hand-${player.name}'),
+            title: 'Mao',
+            cards: player.hand,
+            fallbackCount: player.handSize,
+            fallbackLabel: 'cartas',
+          ),
+          const SizedBox(height: 10),
+          _VisualCardZone(
+            key: Key('battle-visual-zone-graveyard-${player.name}'),
+            title: 'Cemiterio',
+            cards: player.graveyard,
+            fallbackCount: player.graveyardSize,
+            fallbackLabel: 'cartas',
+            compact: true,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Biblioteca: ${player.librarySize}',
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: AppTheme.textHint,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _VisualCardZone extends StatelessWidget {
+  const _VisualCardZone({
+    super.key,
+    required this.title,
+    required this.cards,
+    required this.fallbackCount,
+    required this.fallbackLabel,
+    this.compact = false,
+  });
+
+  final String title;
+  final List<BattleReplayVisualCard> cards;
+  final int fallbackCount;
+  final String fallbackLabel;
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                title,
+                style: theme.textTheme.labelMedium?.copyWith(
+                  color: AppTheme.textSecondary,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+            ),
+            Text(
+              cards.isNotEmpty
+                  ? '${cards.length}'
+                  : '$fallbackCount $fallbackLabel',
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: AppTheme.textHint,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 6),
+        if (cards.isEmpty)
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
+            decoration: BoxDecoration(
+              color: AppTheme.surfaceSlate.withValues(alpha: 0.68),
+              borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+              border: Border.all(
+                color: AppTheme.outlineMuted.withValues(alpha: 0.44),
+              ),
+            ),
+            child: Text(
+              fallbackCount > 0
+                  ? '$fallbackCount $fallbackLabel sem imagem neste replay'
+                  : 'Sem cartas nesta zona',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: AppTheme.textHint,
+              ),
+            ),
+          )
+        else
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: cards
+                  .map(
+                    (card) => Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: _VisualCardTile(card: card, compact: compact),
+                    ),
+                  )
+                  .toList(growable: false),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+class _VisualCardTile extends StatelessWidget {
+  const _VisualCardTile({required this.card, required this.compact});
+
+  final BattleReplayVisualCard card;
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context) {
+    final width = compact ? 54.0 : 66.0;
+    final height = compact ? 76.0 : 92.0;
+    final theme = Theme.of(context);
+
+    return SizedBox(
+      key: Key('battle-visual-card-${card.name}'),
+      width: width,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Stack(
+            children: [
+              CachedCardImage(
+                imageUrl: card.imageUrl,
+                width: width,
+                height: height,
+                borderRadius: BorderRadius.circular(AppTheme.radiusXs),
+              ),
+              if (card.isTapped)
+                Positioned.fill(
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: AppTheme.overlayBlack40,
+                      borderRadius: BorderRadius.circular(AppTheme.radiusXs),
+                    ),
+                    child: const Center(
+                      child: Icon(
+                        Icons.rotate_90_degrees_ccw_rounded,
+                        color: AppTheme.textPrimary,
+                        size: 18,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text(
+            card.name,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: AppTheme.textPrimary,
+              height: 1.08,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          if (card.powerToughnessLabel != null)
+            Text(
+              card.powerToughnessLabel!,
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: AppTheme.textHint,
+                height: 1.08,
+              ),
+            ),
+        ],
+      ),
+    );
   }
 }
 

@@ -201,6 +201,7 @@ class BattleReplayReadService {
     final gameLog = _jsonValue(row['game_log']);
     final events = _eventsFromGameLog(gameLog);
     final decisions = _decisionsFromGameLog(gameLog);
+    final visualSnapshots = _visualSnapshotsFromGameLog(gameLog);
     final gameLogMap = gameLog is Map ? gameLog : const {};
     final winnerLabel = gameLogMap['winner']?.toString();
     final gameLogType = gameLogMap['type']?.toString();
@@ -219,6 +220,7 @@ class BattleReplayReadService {
       'game_log': gameLog,
       'events': events,
       'decision_trace': decisions,
+      'visual_snapshots': visualSnapshots,
       'simulation_contract': const {
         'status': 'experimental_advisory',
         'advisory_only': true,
@@ -247,6 +249,52 @@ class BattleReplayReadService {
       final events = gameLog['events'];
       if (events is List) return events;
     }
+    return const [];
+  }
+
+  List<dynamic> _visualSnapshotsFromGameLog(Object? gameLog) {
+    if (gameLog is! Map) return const [];
+
+    for (final key in const [
+      'visual_snapshots',
+      'snapshots',
+      'replay_snapshots',
+    ]) {
+      final snapshots = gameLog[key];
+      if (snapshots is List && snapshots.isNotEmpty) return snapshots;
+    }
+
+    final events = _eventsFromGameLog(gameLog);
+    final eventSnapshots = events
+        .whereType<Map>()
+        .map((event) => event['snapshot'])
+        .whereType<Map>()
+        .toList(growable: false);
+    if (eventSnapshots.isNotEmpty) return eventSnapshots;
+
+    final finalState = gameLog['final_state'];
+    if (finalState is Map && finalState.isNotEmpty) {
+      return [
+        {
+          'index': 0,
+          'turn': _toInt(gameLog['turns']),
+          'phase': 'final',
+          'action': 'final_state',
+          'active_player': gameLog['winner']?.toString(),
+          'event': {
+            'turn': _toInt(gameLog['turns']),
+            'phase': 'final',
+            'action': 'final_state',
+            if (gameLog['winner'] != null) 'player': gameLog['winner'],
+          },
+          'players': [
+            if (finalState['player_a'] is Map) finalState['player_a'],
+            if (finalState['player_b'] is Map) finalState['player_b'],
+          ],
+        },
+      ];
+    }
+
     return const [];
   }
 

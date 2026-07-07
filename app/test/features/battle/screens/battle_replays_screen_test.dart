@@ -56,6 +56,46 @@ class _FakeBattleReplayGateway implements BattleReplayGateway {
               'reason': 'Fixes mana before commander turn.',
             },
           ],
+          'visual_snapshots': const [
+            {
+              'turn': 1,
+              'phase': 'main',
+              'action': 'casts',
+              'active_player': 'Player A',
+              'event': {
+                'turn': 1,
+                'player': 'Player A',
+                'phase': 'main',
+                'action': 'casts',
+                'card': 'Arcane Signet',
+              },
+              'players': [
+                {
+                  'name': 'Player A',
+                  'life': 40,
+                  'mana': 1,
+                  'hand': [
+                    {
+                      'id': 'arcane-signet',
+                      'name': 'Arcane Signet',
+                      'image_url': 'https://cards.example/arcane-signet.jpg',
+                      'type_line': 'Artifact',
+                    },
+                  ],
+                  'battlefield': [
+                    {
+                      'id': 'island',
+                      'name': 'Island',
+                      'image_url': 'https://cards.example/island.jpg',
+                      'type_line': 'Basic Land - Island',
+                    },
+                  ],
+                  'graveyard': [],
+                  'library_size': 91,
+                },
+              ],
+            },
+          ],
         },
       },
       fallbackDeckId: deckId,
@@ -106,7 +146,19 @@ void main() {
 
     expect(gateway.fetchCalls, 1);
     expect(find.byKey(const Key('battle-replay-detail-pane')), findsOneWidget);
+    expect(
+      find.byKey(const Key('battle-replay-visual-viewer')),
+      findsOneWidget,
+    );
     expect(find.text('Player A casts Arcane Signet'), findsOneWidget);
+    expect(
+      find.byKey(const Key('battle-visual-zone-hand-Player A')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const Key('battle-visual-card-Arcane Signet')),
+      findsOneWidget,
+    );
 
     await tester.tap(find.text('Decisoes'));
     await tester.pumpAndSettle();

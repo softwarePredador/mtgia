@@ -102,6 +102,27 @@ void main() {
                     'reason': 'two lands and ramp',
                   },
                 ],
+                'visual_snapshots': [
+                  {
+                    'turn': 1,
+                    'phase': 'main',
+                    'action': 'play_land',
+                    'players': [
+                      {
+                        'name': 'Deck A',
+                        'life': 40,
+                        'hand': [
+                          {
+                            'name': 'Arcane Signet',
+                            'image_url': 'https://cards.example/signet.jpg',
+                          },
+                        ],
+                        'battlefield': [],
+                        'graveyard': [],
+                      },
+                    ],
+                  },
+                ],
               },
               const {},
               DateTime.utc(2026, 7, 6, 12),
@@ -123,6 +144,7 @@ void main() {
       expect(replay!['winner_name'], 'Player A');
       expect(replay['events'], hasLength(1));
       expect(replay['decision_trace'], hasLength(1));
+      expect(replay['visual_snapshots'], hasLength(1));
       expect(
           replay['simulation_contract'], containsPair('advisory_only', true));
     });

@@ -190,6 +190,7 @@ class BattleReplayDetail {
     required this.summary,
     required this.events,
     required this.decisions,
+    this.visualSnapshots = const <BattleReplayVisualSnapshot>[],
     this.replayText,
     this.raw = const <String, dynamic>{},
   });
@@ -197,6 +198,7 @@ class BattleReplayDetail {
   final BattleReplaySummary summary;
   final List<BattleReplayEvent> events;
   final List<BattleReplayDecision> decisions;
+  final List<BattleReplayVisualSnapshot> visualSnapshots;
   final String? replayText;
   final Map<String, dynamic> raw;
 
@@ -231,6 +233,17 @@ class BattleReplayDetail {
           ),
         )
         .toList(growable: false);
+    final visualSnapshots = _extractVisualSnapshots(merged)
+        .asMap()
+        .entries
+        .map(
+          (entry) => BattleReplayVisualSnapshot.fromJson(
+            entry.value,
+            fallbackIndex: entry.key,
+          ),
+        )
+        .where((snapshot) => snapshot.players.isNotEmpty)
+        .toList(growable: false);
 
     return BattleReplayDetail(
       summary: BattleReplaySummary.fromJson(
@@ -240,13 +253,16 @@ class BattleReplayDetail {
       ),
       events: events,
       decisions: decisions,
+      visualSnapshots: visualSnapshots,
       replayText: _extractReplayText(merged),
       raw: Map<String, dynamic>.unmodifiable(merged),
     );
   }
 
   bool get hasReplayBody =>
-      events.isNotEmpty || (replayText?.trim().isNotEmpty ?? false);
+      visualSnapshots.isNotEmpty ||
+      events.isNotEmpty ||
+      (replayText?.trim().isNotEmpty ?? false);
 }
 
 class BattleReplayEvent {
@@ -369,6 +385,170 @@ class BattleReplayDecision {
   String get turnLabel => turn == null ? 'Decisao' : 'T$turn';
 }
 
+class BattleReplayVisualSnapshot {
+  const BattleReplayVisualSnapshot({
+    required this.index,
+    required this.action,
+    required this.players,
+    this.turn,
+    this.phase,
+    this.activePlayer,
+    this.event = const <String, dynamic>{},
+  });
+
+  final int index;
+  final int? turn;
+  final String? phase;
+  final String action;
+  final String? activePlayer;
+  final Map<String, dynamic> event;
+  final List<BattleReplayPlayerSnapshot> players;
+
+  factory BattleReplayVisualSnapshot.fromJson(
+    Map<String, dynamic> json, {
+    required int fallbackIndex,
+  }) {
+    final event = _asStringMap(json['event']);
+    final phase =
+        _optionalString(json['phase']) ?? _optionalString(event['phase']);
+    final action =
+        _optionalString(json['action']) ??
+        _optionalString(event['action']) ??
+        'snapshot';
+    return BattleReplayVisualSnapshot(
+      index: _parseInt(json['index']) ?? fallbackIndex,
+      turn: _parseInt(json['turn']) ?? _parseInt(event['turn']),
+      phase: phase,
+      action: action,
+      activePlayer:
+          _optionalString(json['active_player']) ??
+          _optionalString(event['player']),
+      event: Map<String, dynamic>.unmodifiable(event),
+      players: _extractSnapshotPlayers(
+        json,
+      ).map(BattleReplayPlayerSnapshot.fromJson).toList(growable: false),
+    );
+  }
+
+  String get turnLabel => turn == null || turn == 0 ? 'Setup' : 'T$turn';
+
+  String get phaseLabel {
+    final value = phase?.trim();
+    return value == null || value.isEmpty ? action : value;
+  }
+
+  String get message {
+    final explicit =
+        _optionalString(event['message']) ??
+        _optionalString(event['summary']) ??
+        _optionalString(event['description']);
+    if (explicit != null) return explicit;
+    final card =
+        _optionalString(event['card_name']) ??
+        _optionalString(event['card']) ??
+        _optionalString(event['creature']);
+    return _composeEventMessage(
+      action: action,
+      actor: activePlayer,
+      card: card,
+    );
+  }
+}
+
+class BattleReplayPlayerSnapshot {
+  const BattleReplayPlayerSnapshot({
+    required this.name,
+    required this.hand,
+    required this.battlefield,
+    required this.graveyard,
+    this.life = 0,
+    this.mana = 0,
+    this.handSize = 0,
+    this.librarySize = 0,
+    this.lands = 0,
+    this.graveyardSize = 0,
+  });
+
+  final String name;
+  final int life;
+  final int mana;
+  final int handSize;
+  final int librarySize;
+  final int lands;
+  final int graveyardSize;
+  final List<BattleReplayVisualCard> hand;
+  final List<BattleReplayVisualCard> battlefield;
+  final List<BattleReplayVisualCard> graveyard;
+
+  factory BattleReplayPlayerSnapshot.fromJson(Map<String, dynamic> json) {
+    final hand = _parseVisualCards(json['hand']);
+    final battlefield = _parseVisualCards(json['battlefield']);
+    final creatures = _parseVisualCards(json['creatures']);
+    final graveyard = _parseVisualCards(json['graveyard']);
+
+    return BattleReplayPlayerSnapshot(
+      name:
+          _optionalString(json['name']) ??
+          _optionalString(json['player']) ??
+          'Player',
+      life: _parseInt(json['life']) ?? 0,
+      mana: _parseInt(json['mana']) ?? _parseInt(json['mana_available']) ?? 0,
+      handSize: _parseInt(json['hand_size']) ?? hand.length,
+      librarySize: _parseInt(json['library_size']) ?? 0,
+      lands: _parseInt(json['lands']) ?? 0,
+      graveyardSize: _parseInt(json['graveyard_size']) ?? graveyard.length,
+      hand: hand,
+      battlefield: battlefield.isNotEmpty ? battlefield : creatures,
+      graveyard: graveyard,
+    );
+  }
+}
+
+class BattleReplayVisualCard {
+  const BattleReplayVisualCard({
+    required this.name,
+    this.id,
+    this.imageUrl,
+    this.typeLine,
+    this.manaCost,
+    this.power,
+    this.toughness,
+    this.isTapped = false,
+  });
+
+  final String? id;
+  final String name;
+  final String? imageUrl;
+  final String? typeLine;
+  final String? manaCost;
+  final String? power;
+  final String? toughness;
+  final bool isTapped;
+
+  factory BattleReplayVisualCard.fromJson(Map<String, dynamic> json) {
+    return BattleReplayVisualCard(
+      id: _optionalString(json['id']) ?? _optionalString(json['card_id']),
+      name:
+          _optionalString(json['name']) ??
+          _optionalString(json['card_name']) ??
+          _optionalString(json['card']) ??
+          'Carta',
+      imageUrl: _optionalString(json['image_url']),
+      typeLine:
+          _optionalString(json['type_line']) ?? _optionalString(json['type']),
+      manaCost: _optionalString(json['mana_cost']),
+      power: _optionalString(json['power']),
+      toughness: _optionalString(json['toughness']),
+      isTapped: _parseBool(json['tapped']) || _parseBool(json['is_tapped']),
+    );
+  }
+
+  String? get powerToughnessLabel {
+    if (power == null || toughness == null) return null;
+    return '$power/$toughness';
+  }
+}
+
 Map<String, dynamic> _normalReplayPayload(Map<String, dynamic> json) {
   final replay = _asStringMap(json['replay']);
   if (replay.isNotEmpty) return replay;
@@ -402,6 +582,60 @@ List<Map<String, dynamic>> _extractDecisions(Map<String, dynamic> json) {
   if (decisions.isNotEmpty) return decisions;
   final gameLog = _asStringMap(json['game_log']);
   return _asMapList(gameLog['decision_trace']);
+}
+
+List<Map<String, dynamic>> _extractVisualSnapshots(Map<String, dynamic> json) {
+  for (final key in const [
+    'visual_snapshots',
+    'snapshots',
+    'replay_snapshots',
+  ]) {
+    final direct = _asMapList(json[key]);
+    if (direct.isNotEmpty) return direct;
+  }
+
+  final gameLog = _asStringMap(json['game_log']);
+  for (final key in const [
+    'visual_snapshots',
+    'snapshots',
+    'replay_snapshots',
+  ]) {
+    final nested = _asMapList(gameLog[key]);
+    if (nested.isNotEmpty) return nested;
+  }
+
+  final finalState =
+      _asStringMap(json['final_state']).isNotEmpty
+          ? _asStringMap(json['final_state'])
+          : _asStringMap(gameLog['final_state']);
+  if (finalState.isNotEmpty) {
+    return [
+      <String, dynamic>{
+        'index': 0,
+        'turn': _parseInt(json['turns']) ?? _parseInt(gameLog['turns']),
+        'phase': 'final',
+        'action': 'final_state',
+        'active_player':
+            _optionalString(json['winner']) ??
+            _optionalString(gameLog['winner']),
+        'event': {
+          'turn': _parseInt(json['turns']) ?? _parseInt(gameLog['turns']),
+          'phase': 'final',
+          'action': 'final_state',
+          if (_optionalString(json['winner']) != null)
+            'player': _optionalString(json['winner']),
+        },
+        'players': [
+          if (_asStringMap(finalState['player_a']).isNotEmpty)
+            _asStringMap(finalState['player_a']),
+          if (_asStringMap(finalState['player_b']).isNotEmpty)
+            _asStringMap(finalState['player_b']),
+        ],
+      },
+    ];
+  }
+
+  return const <Map<String, dynamic>>[];
 }
 
 String? _extractReplayText(Map<String, dynamic> json) {
@@ -458,6 +692,30 @@ List<Map<String, dynamic>> _asMapList(Object? value) {
       .toList(growable: false);
 }
 
+List<Map<String, dynamic>> _extractSnapshotPlayers(Map<String, dynamic> json) {
+  final direct = _asMapList(json['players']);
+  if (direct.isNotEmpty) return direct;
+  final state = _asStringMap(json['state']);
+  final fromState = _playersFromMap(state);
+  if (fromState.isNotEmpty) return fromState;
+  return _playersFromMap(json);
+}
+
+List<Map<String, dynamic>> _playersFromMap(Map<String, dynamic> value) {
+  final players = <Map<String, dynamic>>[];
+  for (final key in const ['player_a', 'player_b', 'playerA', 'playerB']) {
+    final player = _asStringMap(value[key]);
+    if (player.isNotEmpty) players.add(player);
+  }
+  return players;
+}
+
+List<BattleReplayVisualCard> _parseVisualCards(Object? value) {
+  return _asMapList(
+    value,
+  ).map(BattleReplayVisualCard.fromJson).toList(growable: false);
+}
+
 String? _optionalString(Object? value) {
   if (value == null) return null;
   final text = value.toString().trim();
@@ -476,6 +734,16 @@ double? _parseDouble(Object? value) {
   if (value is num) return value.toDouble();
   if (value is String) return double.tryParse(value.trim());
   return null;
+}
+
+bool _parseBool(Object? value) {
+  if (value is bool) return value;
+  if (value is num) return value != 0;
+  if (value is String) {
+    final normalized = value.trim().toLowerCase();
+    return normalized == 'true' || normalized == '1' || normalized == 'yes';
+  }
+  return false;
 }
 
 DateTime? _parseDateTime(Object? value) {

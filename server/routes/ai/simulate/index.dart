@@ -192,6 +192,9 @@ Future<List<Map<String, dynamic>>> _fetchDeckCards(
         c.oracle_text,
         c.colors,
         c.color_identity,
+        c.image_url,
+        c.power,
+        c.toughness,
         dc.quantity,
         dc.is_commander
       FROM deck_cards dc
@@ -220,8 +223,11 @@ Future<List<Map<String, dynamic>>> _fetchDeckCards(
       'oracle_text': row[5],
       'colors': row[6],
       'color_identity': row[7],
-      'quantity': row[8],
-      'is_commander': row[9],
+      'image_url': row[8],
+      'power': row[9],
+      'toughness': row[10],
+      'quantity': row[11],
+      'is_commander': row[12],
     };
   }).toList();
 }

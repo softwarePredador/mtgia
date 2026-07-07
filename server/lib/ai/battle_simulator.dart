@@ -23,6 +23,7 @@ class GameCard {
   final int cmc;
   final String typeLine;
   final String? oracleText;
+  final String? imageUrl;
   final List<String> colors;
   final int? power;
   final int? toughness;
@@ -39,6 +40,7 @@ class GameCard {
     required this.cmc,
     required this.typeLine,
     this.oracleText,
+    this.imageUrl,
     required this.colors,
     this.power,
     this.toughness,
@@ -106,6 +108,7 @@ class GameCard {
         cmc: cmc,
         typeLine: typeLine,
         oracleText: oracleText,
+        imageUrl: imageUrl,
         colors: colors,
         power: power,
         toughness: toughness,
@@ -116,8 +119,11 @@ class GameCard {
         'name': name,
         'cmc': cmc,
         'type': typeLine,
+        'type_line': typeLine,
+        'image_url': imageUrl,
         'power': power,
         'toughness': toughness,
+        'tapped': isTapped,
       };
 
   @override
@@ -165,8 +171,11 @@ class PlayerState {
         'mana': manaAvailable,
         'hand_size': hand.length,
         'library_size': library.length,
+        'hand': hand.map((c) => c.toJson()).toList(),
+        'battlefield': battlefield.map((c) => c.toJson()).toList(),
         'creatures': creatures.map((c) => c.toJson()).toList(),
         'lands': lands.length,
+        'graveyard': graveyard.map((c) => c.toJson()).toList(),
         'graveyard_size': graveyard.length,
       };
 }
@@ -204,6 +213,7 @@ class BattleResult {
   final String winCondition;
   final List<GameAction> actions;
   final Map<String, dynamic> finalState;
+  final List<Map<String, dynamic>> visualSnapshots;
 
   BattleResult({
     required this.winner,
@@ -212,6 +222,7 @@ class BattleResult {
     required this.winCondition,
     required this.actions,
     required this.finalState,
+    required this.visualSnapshots,
   });
 
   Map<String, dynamic> toJson() => {
@@ -221,6 +232,7 @@ class BattleResult {
         'win_condition': winCondition,
         'action_count': actions.length,
         'final_state': finalState,
+        'visual_snapshots': visualSnapshots,
         'game_log': actions.map((a) => a.toJson()).toList(),
       };
 }
@@ -239,6 +251,7 @@ class BattleSimulator {
   late PlayerState playerA;
   late PlayerState playerB;
   final List<GameAction> _actions = [];
+  final List<Map<String, dynamic>> _visualSnapshots = [];
   int _currentTurn = 0;
 
   BattleSimulator({
@@ -275,6 +288,7 @@ class BattleSimulator {
         'player_a': playerA.toJson(),
         'player_b': playerB.toJson(),
       },
+      visualSnapshots: _visualSnapshots,
     );
   }
 
@@ -339,6 +353,7 @@ class BattleSimulator {
       cmc: _parseInt(card['cmc']) ?? 0,
       typeLine: typeLine,
       oracleText: card['oracle_text']?.toString(),
+      imageUrl: card['image_url']?.toString(),
       colors: (card['colors'] as List?)?.cast<String>() ?? [],
       power: power,
       toughness: toughness,
@@ -831,14 +846,29 @@ class BattleSimulator {
 
   void _log(PlayerState player, String phase, String action,
       {Map<String, dynamic>? details}) {
-    _actions.add(GameAction(
+    final loggedAction = GameAction(
       turn: _currentTurn,
       player: player.name,
       phase: phase,
       action: action,
       details: details,
-    ));
+    );
+    _actions.add(loggedAction);
+    _visualSnapshots.add(_snapshotFor(loggedAction));
   }
+
+  Map<String, dynamic> _snapshotFor(GameAction action) => {
+        'index': _visualSnapshots.length,
+        'turn': action.turn,
+        'phase': action.phase,
+        'action': action.action,
+        'active_player': action.player,
+        'event': action.toJson(),
+        'players': [
+          playerA.toJson(),
+          playerB.toJson(),
+        ],
+      };
 
   String? _checkGameOver() {
     if (playerA.life <= 0) return playerB.name;
