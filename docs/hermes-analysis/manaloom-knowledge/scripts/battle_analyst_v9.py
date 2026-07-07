@@ -24574,6 +24574,205 @@ def resolve_single_combat(player, opponents, card, effect_data, turn):
     finish_resolved_spell(player, card, turn=turn)
 
 
+def _permanent_matches_sacrifice_filter(permanent, effect_data):
+    card_types = {
+        str(value or "").strip().lower()
+        for value in _as_list((effect_data or {}).get("sacrifice_card_types") or ["creature"])
+        if str(value or "").strip()
+    }
+    if not card_types:
+        card_types = {"creature"}
+    type_line = _permanent_type_line(permanent)
+    type_matches = False
+    if "permanent" in card_types and is_permanent_card(permanent):
+        type_matches = True
+    if "creature" in card_types and is_battlefield_creature(permanent):
+        type_matches = True
+    if "land" in card_types and (
+        permanent == "land"
+        or type_line == "land"
+        or " land" in f" {type_line}"
+        or (isinstance(permanent, dict) and is_effective_land(permanent))
+    ):
+        type_matches = True
+    if "artifact" in card_types and "artifact" in type_line:
+        type_matches = True
+    if "enchantment" in card_types and "enchantment" in type_line:
+        type_matches = True
+    if "planeswalker" in card_types and "planeswalker" in type_line:
+        type_matches = True
+    if "battle" in card_types and "battle" in type_line:
+        type_matches = True
+    if not type_matches:
+        return False
+    if (effect_data or {}).get("sacrifice_requires_multicolored"):
+        if len(card_color_symbol_set(permanent)) < 2:
+            return False
+    return True
+
+
+def _move_sacrificed_permanent(controller, permanent, card, *, reason):
+    if is_battlefield_creature(permanent):
+        return move_creature_from_battlefield(
+            controller,
+            permanent,
+            reason=reason,
+            source=card,
+        )
+    if isinstance(permanent, dict):
+        return move_permanent_from_battlefield(
+            controller,
+            permanent,
+            reason=reason,
+            source=card,
+        )
+    try:
+        controller.battlefield.remove(permanent)
+    except ValueError:
+        pass
+    controller.graveyard.append(permanent)
+    return "graveyard"
+
+
+def resolve_each_player_sacrifice(player, opponents, card, effect_data, turn):
+    players = [player] + list(opponents or [])
+    context = board_wipe_decision_context(player, opponents)
+    sacrifice_count = max(1, int(effect_data.get("sacrifice_count") or effect_data.get("count") or 1))
+    sacrificed_cards = []
+    choices = []
+    permanents_seen = 0
+    creatures_seen = 0
+    own_permanents_sacrificed = 0
+    opponent_permanents_sacrificed = 0
+    live_opponent_permanents_sacrificed = 0
+    own_creatures_sacrificed = 0
+    opponent_creatures_sacrificed = 0
+    live_opponent_creatures_sacrificed = 0
+
+    for controller in players:
+        is_self = controller is player
+        is_live_opponent = (not is_self) and controller.is_alive()
+        candidates = [
+            permanent
+            for permanent in list(getattr(controller, "battlefield", []) or [])
+            if _permanent_matches_sacrifice_filter(permanent, effect_data)
+        ]
+        permanents_seen += len(candidates)
+        creatures_seen += sum(1 for permanent in candidates if is_battlefield_creature(permanent))
+        chosen = sorted(candidates, key=target_priority)[:sacrifice_count]
+        for permanent in chosen:
+            was_creature = is_battlefield_creature(permanent)
+            destination = _move_sacrificed_permanent(
+                controller,
+                permanent,
+                card,
+                reason="each_player_sacrifice",
+            )
+            record = {
+                "controller": controller.name,
+                "name": permanent.get("name", "?") if isinstance(permanent, dict) else str(permanent),
+                "type_line": _permanent_type_line(permanent),
+                "destination": destination,
+            }
+            choices.append(record)
+            sacrificed_cards.append(record)
+            if is_self:
+                own_permanents_sacrificed += 1
+                if was_creature:
+                    own_creatures_sacrificed += 1
+            else:
+                opponent_permanents_sacrificed += 1
+                if is_live_opponent:
+                    live_opponent_permanents_sacrificed += 1
+                if was_creature:
+                    opponent_creatures_sacrificed += 1
+                    if is_live_opponent:
+                        live_opponent_creatures_sacrificed += 1
+
+    actual_asymmetry = live_opponent_permanents_sacrificed - own_permanents_sacrificed
+    resolution_context = {
+        **context,
+        "sacrifice_count": sacrifice_count,
+        "sacrifice_card_types": list(effect_data.get("sacrifice_card_types") or ["creature"]),
+        "sacrifice_requires_multicolored": bool(effect_data.get("sacrifice_requires_multicolored")),
+        "permanents_seen": permanents_seen,
+        "creatures_seen": creatures_seen,
+        "actual_sacrificed": len(sacrificed_cards),
+        "own_permanents_sacrificed": own_permanents_sacrificed,
+        "opponent_permanents_sacrificed": opponent_permanents_sacrificed,
+        "live_opponent_permanents_sacrificed": live_opponent_permanents_sacrificed,
+        "own_creatures_sacrificed": own_creatures_sacrificed,
+        "opponent_creatures_sacrificed": opponent_creatures_sacrificed,
+        "live_opponent_creatures_sacrificed": live_opponent_creatures_sacrificed,
+        "effective_opponent_creatures_destroyed": live_opponent_creatures_sacrificed,
+        "actual_asymmetry": actual_asymmetry,
+        "timing_justified": bool(
+            context["timing_justified"]
+            or actual_asymmetry > 0
+            or live_opponent_permanents_sacrificed > own_permanents_sacrificed
+        ),
+    }
+    risk_flags = []
+    if not resolution_context["timing_justified"]:
+        risk_flags.append("wipe_without_timing_justification")
+    elif (
+        actual_asymmetry <= 0
+        and not context["lethal_pressure"]
+        and not context["behind_on_board"]
+    ):
+        risk_flags.append("wipe_without_clear_asymmetry")
+    fields = replay_rule_fields(effect_data)
+    emit_decision_trace(
+        decision_type="board_wipe",
+        player=player,
+        turn=turn,
+        phase="resolution",
+        available_options=[
+            decision_card_option(card, effect_data, action="resolve_each_player_sacrifice"),
+            {"action": "defer_wipe_not_available_after_resolution"},
+        ],
+        chosen_option=decision_card_option(card, effect_data, action="resolve_each_player_sacrifice"),
+        rejected_options=[{"action": "defer_wipe_not_available_after_resolution"}],
+        score_components=resolution_context,
+        rule_source=fields.get("rule_source", "battle_heuristic"),
+        rule_status=fields.get("rule_review_status", "heuristic"),
+        confidence="medium",
+        expected_benefit_score=max(0, actual_asymmetry * 10)
+        + min(live_opponent_permanents_sacrificed * 5, 35),
+        actual_outcome="each_player_sacrifice_resolved",
+        reason="each_player_sacrifices_lowest_value_matching_permanents",
+        strategic_principle="model_each_controller_choice_as_lowest_value_loss",
+        heuristic_version=DECISION_STRATEGY_VERSION,
+        resource_delta=resolution_context,
+        risk_flags=risk_flags,
+        rejected_reason="spell_already_resolving",
+    )
+    emit_replay_event(
+        "each_player_sacrifice_resolved",
+        player=player.name,
+        card=card.get("name", "?"),
+        sacrifice_count=sacrifice_count,
+        sacrifice_card_types=list(effect_data.get("sacrifice_card_types") or ["creature"]),
+        sacrifice_requires_multicolored=bool(effect_data.get("sacrifice_requires_multicolored")),
+        sacrificed=len(sacrificed_cards),
+        sacrificed_cards=sacrificed_cards[:24],
+        choices=choices[:24],
+        permanents_seen=permanents_seen,
+        creatures_seen=creatures_seen,
+        own_permanents_sacrificed=own_permanents_sacrificed,
+        opponent_permanents_sacrificed=opponent_permanents_sacrificed,
+        live_opponent_permanents_sacrificed=live_opponent_permanents_sacrificed,
+        own_creatures_sacrificed=own_creatures_sacrificed,
+        opponent_creatures_sacrificed=opponent_creatures_sacrificed,
+        live_opponent_creatures_sacrificed=live_opponent_creatures_sacrificed,
+        actual_asymmetry=actual_asymmetry,
+        risk_flags=risk_flags,
+        turn=turn,
+        **fields,
+    )
+    finish_resolved_spell(player, card, turn=turn)
+
+
 def permanent_matches_tragic_arrogance_choice(permanent, choice_type):
     if choice_type == "artifact":
         return is_artifact_permanent(permanent)
@@ -57978,6 +58177,8 @@ def apply_effect_immediate(
         resolve_starfall_invocation(player, opponents, card, effect_data, turn, rng)
     elif effect == "selective_nonland_sacrifice":
         resolve_tragic_arrogance(player, opponents, card, effect_data, turn)
+    elif effect == "each_player_sacrifice":
+        resolve_each_player_sacrifice(player, opponents, card, effect_data, turn)
     elif effect == "board_wipe":
         if effect_data.get("modal_destroy_modes") or effect_data.get("destroy_modes"):
             resolve_modal_destroy_board_wipe(player, opponents, card, effect_data, turn)

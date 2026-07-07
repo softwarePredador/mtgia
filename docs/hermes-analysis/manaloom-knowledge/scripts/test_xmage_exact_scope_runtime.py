@@ -17673,6 +17673,137 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertEqual([card["name"] for card in active.hand], ["First"])
         self.assertEqual([card["name"] for card in active.library], ["Second"])
 
+    def test_each_player_sacrifice_two_creatures_chooses_lowest_value(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.battlefield = [
+            {"name": "Own Token A", "type_line": "Creature - Soldier", "effect": "creature", "cmc": 0, "power": 1, "toughness": 1},
+            {"name": "Own Token B", "type_line": "Creature - Soldier", "effect": "creature", "cmc": 0, "power": 1, "toughness": 1},
+            {"name": "Own Commander", "type_line": "Legendary Creature - Wizard", "effect": "commander", "is_commander": True, "cmc": 5, "power": 4, "toughness": 4},
+        ]
+        opponent.battlefield = [
+            {"name": "Opponent Token A", "type_line": "Creature - Soldier", "effect": "creature", "cmc": 0, "power": 1, "toughness": 1},
+            {"name": "Opponent Token B", "type_line": "Creature - Soldier", "effect": "creature", "cmc": 0, "power": 1, "toughness": 1},
+            {"name": "Opponent Finisher", "type_line": "Creature - Dragon", "effect": "finisher", "cmc": 6, "power": 5, "toughness": 5},
+        ]
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Fixture Barter in Blood", "type_line": "Sorcery"},
+            turn=8,
+            rng=random.Random(8),
+            effect_data_override={
+                "effect": "each_player_sacrifice",
+                "battle_model_scope": "xmage_each_player_sacrifice_fixed_permanents_spell_v1",
+                "sacrifice_count": 2,
+                "sacrifice_card_types": ["creature"],
+                "sacrifice_scope": "each_player",
+                "sacrifice_choice": "controller_choice_lowest_value",
+            },
+        )
+
+        self.assertEqual([card["name"] for card in active.battlefield], ["Own Commander"])
+        self.assertEqual([card["name"] for card in opponent.battlefield], ["Opponent Finisher"])
+        self.assertTrue(
+            any(
+                event == "each_player_sacrifice_resolved"
+                and data.get("card") == "Fixture Barter in Blood"
+                and data.get("sacrificed") == 4
+                and data.get("own_permanents_sacrificed") == 2
+                and data.get("opponent_permanents_sacrificed") == 2
+                for event, data in self.events
+            )
+        )
+
+    def test_each_player_sacrifice_land_filter(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.battlefield = [
+            {"name": "Own Plains", "type_line": "Basic Land - Plains", "effect": "land"},
+            {"name": "Own Aura", "type_line": "Enchantment", "effect": "passive"},
+        ]
+        opponent.battlefield = [
+            {"name": "Opponent Mountain", "type_line": "Basic Land - Mountain", "effect": "land"},
+            {"name": "Opponent Bear", "type_line": "Creature - Bear", "effect": "creature", "power": 2, "toughness": 2},
+        ]
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Fixture Tremble", "type_line": "Sorcery"},
+            turn=9,
+            rng=random.Random(9),
+            effect_data_override={
+                "effect": "each_player_sacrifice",
+                "battle_model_scope": "xmage_each_player_sacrifice_fixed_permanents_spell_v1",
+                "sacrifice_count": 1,
+                "sacrifice_card_types": ["land"],
+                "sacrifice_scope": "each_player",
+                "sacrifice_choice": "controller_choice_lowest_value",
+            },
+        )
+
+        self.assertEqual([card["name"] for card in active.battlefield], ["Own Aura"])
+        self.assertEqual([card["name"] for card in opponent.battlefield], ["Opponent Bear"])
+
+    def test_each_player_sacrifice_multicolored_permanent_filter(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.battlefield = [
+            {
+                "name": "Own Multicolor",
+                "type_line": "Creature - Advisor",
+                "effect": "creature",
+                "colors": ["W", "U"],
+                "mana_cost": "{W}{U}",
+                "power": 1,
+                "toughness": 1,
+            },
+            {"name": "Own Monocolor", "type_line": "Creature - Soldier", "effect": "creature", "colors": ["W"], "mana_cost": "{W}"},
+        ]
+        opponent.battlefield = [
+            {
+                "name": "Opponent Multicolor",
+                "type_line": "Enchantment Creature - God",
+                "effect": "creature",
+                "colors": ["B", "R"],
+                "mana_cost": "{B}{R}",
+                "power": 2,
+                "toughness": 2,
+            },
+            {"name": "Opponent Monocolor", "type_line": "Artifact", "effect": "passive", "colors": [], "mana_cost": "{1}"},
+        ]
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Fixture Renounce the Guilds", "type_line": "Instant"},
+            turn=10,
+            rng=random.Random(10),
+            effect_data_override={
+                "effect": "each_player_sacrifice",
+                "battle_model_scope": "xmage_each_player_sacrifice_fixed_permanents_spell_v1",
+                "sacrifice_count": 1,
+                "sacrifice_card_types": ["permanent"],
+                "sacrifice_scope": "each_player",
+                "sacrifice_choice": "controller_choice_lowest_value",
+                "sacrifice_requires_multicolored": True,
+            },
+        )
+
+        self.assertEqual([card["name"] for card in active.battlefield], ["Own Monocolor"])
+        self.assertEqual([card["name"] for card in opponent.battlefield], ["Opponent Monocolor"])
+        self.assertTrue(
+            any(
+                event == "each_player_sacrifice_resolved"
+                and data.get("card") == "Fixture Renounce the Guilds"
+                and data.get("sacrifice_requires_multicolored") is True
+                and data.get("sacrificed") == 2
+                for event, data in self.events
+            )
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

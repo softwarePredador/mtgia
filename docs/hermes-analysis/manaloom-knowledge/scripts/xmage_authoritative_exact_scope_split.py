@@ -257,6 +257,7 @@ ETB_TUTOR_HAND_CREATURE_SCOPE = "xmage_creature_etb_library_search_to_hand_v1"
 ETB_TUTOR_TOP_CREATURE_SCOPE = "xmage_creature_etb_library_search_to_top_v1"
 BOARD_WIPE_SCOPE = "xmage_destroy_all_matching_permanents_spell_v1"
 DAMAGE_WIPE_SCOPE = "xmage_fixed_damage_all_matching_permanents_spell_v1"
+EACH_PLAYER_SACRIFICE_SCOPE = "xmage_each_player_sacrifice_fixed_permanents_spell_v1"
 ADD_COUNTERS_TARGET_SCOPE = "xmage_fixed_add_counters_target_creature_spell_v1"
 PERMANENT_ACTIVATED_SELF_ADD_COUNTERS_SCOPE = (
     "xmage_permanent_simple_activated_self_add_counters_v1"
@@ -5301,7 +5302,102 @@ def board_wipe_source_blocker(source: str, classes: set[str]) -> str | None:
         if re.search(r"additional\s+\d+\s+damage", text, re.I):
             return "board_wipe_damage_scope_not_supported"
         return None
+    if classes == {"SacrificeAllEffect"}:
+        if len(re.findall(r"new\s+SacrificeAllEffect\s*\(", text)) != 1:
+            return "board_wipe_source_multiple_sacrifice_all_effects"
+        if "GetXValue" in text:
+            return "board_wipe_sacrifice_count_not_fixed"
+        return None
     return None
+
+
+def fixed_sacrifice_count_word(value: str) -> int | None:
+    token = str(value or "").strip().lower()
+    if token in {"a", "an"}:
+        return 1
+    if token in NUMBER_WORDS:
+        return int(NUMBER_WORDS[token])
+    if token.isdigit():
+        return int(token)
+    return None
+
+
+def each_player_sacrifice_spec_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str | None:
+    text = oracle_text(metadata)
+    text = re.sub(r"\s*\([^)]*\)\s*", " ", text)
+    text = re.sub(r"\s+foretell\s+(?:\{[0-9wubrg]+\})+\s*$", "", text)
+    text = re.sub(r"\s+", " ", text).strip()
+    match = re.match(
+        r"^each player sacrifices (?P<count>a|an|one|two|three|four|five|\d+) "
+        r"(?P<target>creatures?|lands?|permanents?|enchantments?|multicolored permanents?)"
+        r"(?: of their choice)?\.?$",
+        text,
+    )
+    if not match:
+        return "board_wipe_sacrifice_oracle_not_exact"
+    count = fixed_sacrifice_count_word(match.group("count"))
+    if count is None or count <= 0:
+        return "board_wipe_sacrifice_count_not_fixed"
+    target = match.group("target").strip()
+    target_map = {
+        "creature": ["creature"],
+        "creatures": ["creature"],
+        "land": ["land"],
+        "lands": ["land"],
+        "permanent": ["permanent"],
+        "permanents": ["permanent"],
+        "enchantment": ["enchantment"],
+        "enchantments": ["enchantment"],
+        "multicolored permanent": ["permanent"],
+        "multicolored permanents": ["permanent"],
+    }
+    card_types = target_map.get(target)
+    if card_types is None:
+        return "board_wipe_sacrifice_target_not_supported"
+    spec: dict[str, Any] = {
+        "sacrifice_count": count,
+        "sacrifice_card_types": card_types,
+        "sacrifice_scope": "each_player",
+        "sacrifice_choice": "controller_choice_lowest_value",
+    }
+    if target.startswith("multicolored"):
+        spec["sacrifice_requires_multicolored"] = True
+    return spec
+
+
+def each_player_sacrifice_spec_from_source(source: str) -> dict[str, Any] | str:
+    text = source or ""
+    if "GetXValue" in text:
+        return "board_wipe_sacrifice_count_not_fixed"
+    matches = list(re.finditer(r"new\s+SacrificeAllEffect\s*\((?P<args>.*?)\)\s*;", text, re.S))
+    if len(matches) != 1:
+        return "board_wipe_source_multiple_sacrifice_all_effects"
+    args = matches[0].group("args")
+    count_match = re.match(r"\s*(\d+)\s*,", args, re.S)
+    count = int(count_match.group(1)) if count_match else 1
+    window = text
+    lowered_args = args.lower()
+    if "FILTER_PERMANENT_CREATURE" in args or "FilterControlledCreaturePermanent" in window:
+        card_types = ["creature"]
+    elif "FilterControlledLandPermanent" in window:
+        card_types = ["land"]
+    elif "FilterControlledEnchantmentPermanent" in window:
+        card_types = ["enchantment"]
+    elif re.search(r'FilterControlledPermanent\s*\(\s*"permanent"', window):
+        card_types = ["permanent"]
+    elif "MulticoloredPredicate" in window and re.search(r'FilterControlledPermanent\s*\(\s*"multicolored permanent"', window):
+        card_types = ["permanent"]
+    else:
+        return "board_wipe_sacrifice_source_target_not_supported"
+    spec: dict[str, Any] = {
+        "sacrifice_count": count,
+        "sacrifice_card_types": card_types,
+        "sacrifice_scope": "each_player",
+        "sacrifice_choice": "controller_choice_lowest_value",
+    }
+    if "multicoloredpredicate" in lowered_args or "MulticoloredPredicate" in window:
+        spec["sacrifice_requires_multicolored"] = True
+    return spec
 
 
 COUNTER_WORD_NUMBERS = {
@@ -25702,6 +25798,30 @@ def split_row(
                 **flags,
             }
             return build_proposal(row, metadata, effect_json, family_id="xmage_damage_all_spell"), "selected_exact_scope"
+        if classes == {"SacrificeAllEffect"}:
+            oracle_sacrifice = each_player_sacrifice_spec_from_oracle(metadata)
+            if isinstance(oracle_sacrifice, str):
+                return None, oracle_sacrifice
+            if oracle_sacrifice is None:
+                return None, "board_wipe_sacrifice_oracle_not_exact"
+            source_sacrifice = each_player_sacrifice_spec_from_source(source_text)
+            if isinstance(source_sacrifice, str):
+                return None, source_sacrifice
+            if source_sacrifice != oracle_sacrifice:
+                return None, "board_wipe_sacrifice_source_oracle_mismatch"
+            effect_json = {
+                "effect": "each_player_sacrifice",
+                "battle_model_scope": EACH_PLAYER_SACRIFICE_SCOPE,
+                "xmage_effect_class": "SacrificeAllEffect",
+                **oracle_sacrifice,
+                **flags,
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_each_player_sacrifice_fixed_permanents_spell",
+            ), "selected_exact_scope"
         return None, "board_wipe_effect_class_not_supported"
 
     if unit == ADD_COUNTERS_TARGET_UNIT:

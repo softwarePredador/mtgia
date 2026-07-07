@@ -1691,6 +1691,125 @@ def run_destroy_target_create_treasure(
     }
 
 
+def _sacrifice_fixture_permanent(name: str, card_type: str, *, multicolored: bool = False) -> dict[str, Any]:
+    if card_type == "land":
+        return {"name": name, "type_line": "Land", "effect": "land", "cmc": 0}
+    if card_type == "enchantment":
+        return {"name": name, "type_line": "Enchantment", "effect": "passive", "cmc": 2}
+    if card_type == "permanent" and multicolored:
+        return {
+            "name": name,
+            "type_line": "Creature - Advisor",
+            "effect": "creature",
+            "power": 1,
+            "toughness": 1,
+            "colors": ["W", "U"],
+            "color_identity": ["W", "U"],
+            "mana_cost": "{W}{U}",
+            "cmc": 2,
+        }
+    if card_type == "permanent":
+        return {"name": name, "type_line": "Artifact", "effect": "passive", "cmc": 1}
+    return {
+        "name": name,
+        "type_line": "Creature - Citizen",
+        "effect": "creature",
+        "power": 1,
+        "toughness": 1,
+        "cmc": 1,
+    }
+
+
+def run_each_player_sacrifice(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = scenario["card"]
+    active = battle.Player(str(scenario.get("player") or "Lorehold"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
+    sacrifice_count = max(1, int(scenario.get("sacrifice_count") or 1))
+    card_types = list(scenario.get("sacrifice_card_types") or ["creature"])
+    primary_type = str(card_types[0] if card_types else "creature")
+    multicolored = bool(scenario.get("sacrifice_requires_multicolored"))
+    expected_per_player = int(scenario.get("expected_sacrificed_per_player") or sacrifice_count)
+
+    active.battlefield = [
+        _sacrifice_fixture_permanent(f"Controller Sacrifice {idx + 1}", primary_type, multicolored=multicolored)
+        for idx in range(sacrifice_count + 1)
+    ]
+    opponent.battlefield = [
+        _sacrifice_fixture_permanent(f"Opponent Sacrifice {idx + 1}", primary_type, multicolored=multicolored)
+        for idx in range(sacrifice_count + 1)
+    ]
+    decoy_type = "enchantment" if primary_type != "enchantment" else "land"
+    active.battlefield.append(_sacrifice_fixture_permanent("Controller Nonmatching Decoy", decoy_type))
+    opponent.battlefield.append(_sacrifice_fixture_permanent("Opponent Nonmatching Decoy", decoy_type))
+    if multicolored:
+        active.battlefield.append(_sacrifice_fixture_permanent("Controller Monocolored Decoy", "creature"))
+        opponent.battlefield.append(_sacrifice_fixture_permanent("Opponent Monocolored Decoy", "creature"))
+
+    battle.apply_effect_immediate(
+        active,
+        [opponent],
+        card,
+        turn=int(scenario.get("turn") or 6),
+        rng=random.Random(int(scenario.get("seed") or 6080)),
+    )
+    event = next(
+        (
+            data
+            for event_name, data in events
+            if event_name == "each_player_sacrifice_resolved"
+            and data.get("card") == card.get("name")
+        ),
+        None,
+    )
+    if event is None:
+        fail("battle_events", f"missing {card['name']} each_player_sacrifice_resolved event")
+    expected_total = expected_per_player * 2
+    if int(event.get("sacrificed") or 0) != expected_total:
+        fail(
+            "battle_events",
+            f"{card['name']} sacrificed={event.get('sacrificed')}, expected {expected_total}",
+        )
+    if int(event.get("own_permanents_sacrificed") or 0) != expected_per_player:
+        fail("battle_events", f"{card['name']} own sacrifice count mismatch")
+    if int(event.get("opponent_permanents_sacrificed") or 0) != expected_per_player:
+        fail("battle_events", f"{card['name']} opponent sacrifice count mismatch")
+    active_sacrificed_graveyard = [
+        permanent
+        for permanent in active.graveyard
+        if not (isinstance(permanent, dict) and permanent.get("name") == card.get("name"))
+    ]
+    opponent_sacrificed_graveyard = [
+        permanent
+        for permanent in opponent.graveyard
+        if not (isinstance(permanent, dict) and permanent.get("name") == card.get("name"))
+    ]
+    if len(active_sacrificed_graveyard) != expected_per_player or len(opponent_sacrificed_graveyard) != expected_per_player:
+        fail(
+            "battle_execution",
+            f"{card['name']} graveyard counts active={len(active_sacrificed_graveyard)} opponent={len(opponent_sacrificed_graveyard)}",
+        )
+    if multicolored:
+        graveyard_names = [
+            permanent.get("name", "")
+            for permanent in [*active.graveyard, *opponent.graveyard]
+            if isinstance(permanent, dict)
+        ]
+        if any("Monocolored Decoy" in name for name in graveyard_names):
+            fail("battle_execution", f"{card['name']} sacrificed a monocolored decoy")
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "sacrificed": int(event.get("sacrificed") or 0),
+        "sacrifice_count": sacrifice_count,
+        "sacrifice_card_types": card_types,
+        "sacrifice_requires_multicolored": multicolored,
+    }
+
+
 def run_creature_etb_create_treasure(
     battle,
     scenario: dict[str, Any],
@@ -3540,6 +3659,7 @@ SCENARIO_RUNNERS = {
     "creature_etb_scry": run_creature_etb_scry,
     "destroy_target_create_treasure": run_destroy_target_create_treasure,
     "dynamic_life_gain": run_dynamic_life_gain,
+    "each_player_sacrifice": run_each_player_sacrifice,
     "fixed_create_creature_tokens": run_fixed_create_creature_tokens,
     "mana_source_life_cost_spend": run_mana_source_life_cost_spend,
     "multi_create_creature_tokens": run_multi_create_creature_tokens,

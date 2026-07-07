@@ -1,0 +1,530 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg581_each_player_sacrifice_new_server_20260706_235302",
+  "deploy_id": "PG581",
+  "execution_scenarios": [
+    {
+      "card": {
+        "name": "Barter in Blood",
+        "type_line": "Sorcery"
+      },
+      "expected_sacrificed_per_player": 2,
+      "logical_rule_key": "battle_rule_v1:4dc466c70a22a941f04f26618e8a6ee1",
+      "name": "Barter in Blood each player sacrifices matching permanents",
+      "sacrifice_card_types": [
+        "creature"
+      ],
+      "sacrifice_count": 2,
+      "sacrifice_requires_multicolored": false,
+      "type": "each_player_sacrifice"
+    },
+    {
+      "card": {
+        "name": "Crack the Earth",
+        "type_line": "Sorcery"
+      },
+      "expected_sacrificed_per_player": 1,
+      "logical_rule_key": "battle_rule_v1:d2aa51841d87625e029e0c1d78119c0b",
+      "name": "Crack the Earth each player sacrifices matching permanents",
+      "sacrifice_card_types": [
+        "permanent"
+      ],
+      "sacrifice_count": 1,
+      "sacrifice_requires_multicolored": false,
+      "type": "each_player_sacrifice"
+    },
+    {
+      "card": {
+        "name": "Innocent Blood",
+        "type_line": "Sorcery"
+      },
+      "expected_sacrificed_per_player": 1,
+      "logical_rule_key": "battle_rule_v1:e36e942e876596fa39c2abef5eac238f",
+      "name": "Innocent Blood each player sacrifices matching permanents",
+      "sacrifice_card_types": [
+        "creature"
+      ],
+      "sacrifice_count": 1,
+      "sacrifice_requires_multicolored": false,
+      "type": "each_player_sacrifice"
+    },
+    {
+      "card": {
+        "name": "Renounce the Guilds",
+        "type_line": "Sorcery"
+      },
+      "expected_sacrificed_per_player": 1,
+      "logical_rule_key": "battle_rule_v1:172ceadc506f12be79de7edc8edc647b",
+      "name": "Renounce the Guilds each player sacrifices matching permanents",
+      "sacrifice_card_types": [
+        "permanent"
+      ],
+      "sacrifice_count": 1,
+      "sacrifice_requires_multicolored": true,
+      "type": "each_player_sacrifice"
+    },
+    {
+      "card": {
+        "name": "Simplify",
+        "type_line": "Sorcery"
+      },
+      "expected_sacrificed_per_player": 1,
+      "logical_rule_key": "battle_rule_v1:8d62f54198483e3e3deeec43de124cd5",
+      "name": "Simplify each player sacrifices matching permanents",
+      "sacrifice_card_types": [
+        "enchantment"
+      ],
+      "sacrifice_count": 1,
+      "sacrifice_requires_multicolored": false,
+      "type": "each_player_sacrifice"
+    },
+    {
+      "card": {
+        "name": "Tergrid's Shadow",
+        "type_line": "Sorcery"
+      },
+      "expected_sacrificed_per_player": 2,
+      "logical_rule_key": "battle_rule_v1:d2088319b0a6c4d1bd660dfc024c73e6",
+      "name": "Tergrid's Shadow each player sacrifices matching permanents",
+      "sacrifice_card_types": [
+        "creature"
+      ],
+      "sacrifice_count": 2,
+      "sacrifice_requires_multicolored": false,
+      "type": "each_player_sacrifice"
+    },
+    {
+      "card": {
+        "name": "Tremble",
+        "type_line": "Sorcery"
+      },
+      "expected_sacrificed_per_player": 1,
+      "logical_rule_key": "battle_rule_v1:4aec324ab24ccc2a1adfe7a07131cf98",
+      "name": "Tremble each player sacrifices matching permanents",
+      "sacrifice_card_types": [
+        "land"
+      ],
+      "sacrifice_count": 1,
+      "sacrifice_requires_multicolored": false,
+      "type": "each_player_sacrifice"
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Barter in Blood",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4dc466c70a22a941f04f26618e8a6ee1",
+      "min_rule_version": 2,
+      "normalized_name": "barter in blood",
+      "oracle_hash": "be856a7f6d029bfa5be0bfe07f7915d7",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_each_player_sacrifice_fixed_permanents_spell_v1",
+        "effect": "each_player_sacrifice",
+        "sacrifice_card_types": [
+          "creature"
+        ],
+        "sacrifice_choice": "controller_choice_lowest_value",
+        "sacrifice_count": 2,
+        "sacrifice_scope": "each_player",
+        "xmage_effect_class": "SacrificeAllEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Crack the Earth",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d2aa51841d87625e029e0c1d78119c0b",
+      "min_rule_version": 2,
+      "normalized_name": "crack the earth",
+      "oracle_hash": "08446934f7df33a207467fb5b627fa50",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_each_player_sacrifice_fixed_permanents_spell_v1",
+        "effect": "each_player_sacrifice",
+        "sacrifice_card_types": [
+          "permanent"
+        ],
+        "sacrifice_choice": "controller_choice_lowest_value",
+        "sacrifice_count": 1,
+        "sacrifice_scope": "each_player",
+        "xmage_effect_class": "SacrificeAllEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Innocent Blood",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e36e942e876596fa39c2abef5eac238f",
+      "min_rule_version": 2,
+      "normalized_name": "innocent blood",
+      "oracle_hash": "936b01368e4684556867764af9ce37c5",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_each_player_sacrifice_fixed_permanents_spell_v1",
+        "effect": "each_player_sacrifice",
+        "sacrifice_card_types": [
+          "creature"
+        ],
+        "sacrifice_choice": "controller_choice_lowest_value",
+        "sacrifice_count": 1,
+        "sacrifice_scope": "each_player",
+        "xmage_effect_class": "SacrificeAllEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Renounce the Guilds",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:172ceadc506f12be79de7edc8edc647b",
+      "min_rule_version": 2,
+      "normalized_name": "renounce the guilds",
+      "oracle_hash": "3127e90fe826e0d6097996f889d848b9",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_each_player_sacrifice_fixed_permanents_spell_v1",
+        "effect": "each_player_sacrifice",
+        "sacrifice_card_types": [
+          "permanent"
+        ],
+        "sacrifice_choice": "controller_choice_lowest_value",
+        "sacrifice_count": 1,
+        "sacrifice_requires_multicolored": true,
+        "sacrifice_scope": "each_player",
+        "xmage_effect_class": "SacrificeAllEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Simplify",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8d62f54198483e3e3deeec43de124cd5",
+      "min_rule_version": 2,
+      "normalized_name": "simplify",
+      "oracle_hash": "3e5ca27a1aaa76ffa9aa0c13d1689aa5",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_each_player_sacrifice_fixed_permanents_spell_v1",
+        "effect": "each_player_sacrifice",
+        "sacrifice_card_types": [
+          "enchantment"
+        ],
+        "sacrifice_choice": "controller_choice_lowest_value",
+        "sacrifice_count": 1,
+        "sacrifice_scope": "each_player",
+        "xmage_effect_class": "SacrificeAllEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Tergrid's Shadow",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d2088319b0a6c4d1bd660dfc024c73e6",
+      "min_rule_version": 2,
+      "normalized_name": "tergrid's shadow",
+      "oracle_hash": "5a7e33d8e6b36112f4c1ac58776c8e12",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_each_player_sacrifice_fixed_permanents_spell_v1",
+        "effect": "each_player_sacrifice",
+        "sacrifice_card_types": [
+          "creature"
+        ],
+        "sacrifice_choice": "controller_choice_lowest_value",
+        "sacrifice_count": 2,
+        "sacrifice_scope": "each_player",
+        "xmage_effect_class": "SacrificeAllEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Tremble",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4aec324ab24ccc2a1adfe7a07131cf98",
+      "min_rule_version": 2,
+      "normalized_name": "tremble",
+      "oracle_hash": "e3d97dc178a6579b3b6f279e42e225db",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_each_player_sacrifice_fixed_permanents_spell_v1",
+        "effect": "each_player_sacrifice",
+        "sacrifice_card_types": [
+          "land"
+        ],
+        "sacrifice_choice": "controller_choice_lowest_value",
+        "sacrifice_count": 1,
+        "sacrifice_scope": "each_player",
+        "xmage_effect_class": "SacrificeAllEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_each_player_sacrifice_fixed_permanents_spell": 7
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg581_each_player_sacrifice_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg581_each_player_sacrifice_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg581_each_player_sacrifice_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg581_each_player_sacrifice_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg581_each_player_sacrifice_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg581_each_player_sacrifice_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-06T23:53:02+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Barter in Blood"
+      },
+      "card_name": "Barter in Blood",
+      "effect": "each_player_sacrifice",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4dc466c70a22a941f04f26618e8a6ee1",
+      "normalized_name": "barter in blood",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_each_player_sacrifice_fixed_permanents_spell_v1",
+        "effect": "each_player_sacrifice",
+        "sacrifice_card_types": [
+          "creature"
+        ],
+        "sacrifice_choice": "controller_choice_lowest_value",
+        "sacrifice_count": 2,
+        "sacrifice_scope": "each_player",
+        "xmage_effect_class": "SacrificeAllEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Crack the Earth"
+      },
+      "card_name": "Crack the Earth",
+      "effect": "each_player_sacrifice",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d2aa51841d87625e029e0c1d78119c0b",
+      "normalized_name": "crack the earth",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_each_player_sacrifice_fixed_permanents_spell_v1",
+        "effect": "each_player_sacrifice",
+        "sacrifice_card_types": [
+          "permanent"
+        ],
+        "sacrifice_choice": "controller_choice_lowest_value",
+        "sacrifice_count": 1,
+        "sacrifice_scope": "each_player",
+        "xmage_effect_class": "SacrificeAllEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Innocent Blood"
+      },
+      "card_name": "Innocent Blood",
+      "effect": "each_player_sacrifice",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e36e942e876596fa39c2abef5eac238f",
+      "normalized_name": "innocent blood",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_each_player_sacrifice_fixed_permanents_spell_v1",
+        "effect": "each_player_sacrifice",
+        "sacrifice_card_types": [
+          "creature"
+        ],
+        "sacrifice_choice": "controller_choice_lowest_value",
+        "sacrifice_count": 1,
+        "sacrifice_scope": "each_player",
+        "xmage_effect_class": "SacrificeAllEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Renounce the Guilds"
+      },
+      "card_name": "Renounce the Guilds",
+      "effect": "each_player_sacrifice",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:172ceadc506f12be79de7edc8edc647b",
+      "normalized_name": "renounce the guilds",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_each_player_sacrifice_fixed_permanents_spell_v1",
+        "effect": "each_player_sacrifice",
+        "sacrifice_card_types": [
+          "permanent"
+        ],
+        "sacrifice_choice": "controller_choice_lowest_value",
+        "sacrifice_count": 1,
+        "sacrifice_requires_multicolored": true,
+        "sacrifice_scope": "each_player",
+        "xmage_effect_class": "SacrificeAllEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Simplify"
+      },
+      "card_name": "Simplify",
+      "effect": "each_player_sacrifice",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8d62f54198483e3e3deeec43de124cd5",
+      "normalized_name": "simplify",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_each_player_sacrifice_fixed_permanents_spell_v1",
+        "effect": "each_player_sacrifice",
+        "sacrifice_card_types": [
+          "enchantment"
+        ],
+        "sacrifice_choice": "controller_choice_lowest_value",
+        "sacrifice_count": 1,
+        "sacrifice_scope": "each_player",
+        "xmage_effect_class": "SacrificeAllEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Tergrid's Shadow"
+      },
+      "card_name": "Tergrid's Shadow",
+      "effect": "each_player_sacrifice",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d2088319b0a6c4d1bd660dfc024c73e6",
+      "normalized_name": "tergrid's shadow",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_each_player_sacrifice_fixed_permanents_spell_v1",
+        "effect": "each_player_sacrifice",
+        "sacrifice_card_types": [
+          "creature"
+        ],
+        "sacrifice_choice": "controller_choice_lowest_value",
+        "sacrifice_count": 2,
+        "sacrifice_scope": "each_player",
+        "xmage_effect_class": "SacrificeAllEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Tremble"
+      },
+      "card_name": "Tremble",
+      "effect": "each_player_sacrifice",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4aec324ab24ccc2a1adfe7a07131cf98",
+      "normalized_name": "tremble",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_each_player_sacrifice_fixed_permanents_spell_v1",
+        "effect": "each_player_sacrifice",
+        "sacrifice_card_types": [
+          "land"
+        ],
+        "sacrifice_choice": "controller_choice_lowest_value",
+        "sacrifice_count": 1,
+        "sacrifice_scope": "each_player",
+        "xmage_effect_class": "SacrificeAllEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Barter in Blood",
+    "Crack the Earth",
+    "Innocent Blood",
+    "Renounce the Guilds",
+    "Simplify",
+    "Tergrid's Shadow",
+    "Tremble"
+  ],
+  "selected_count": 7,
+  "slug": "each_player_sacrifice_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Barter in Blood",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4dc466c70a22a941f04f26618e8a6ee1",
+      "min_rule_version": 2,
+      "normalized_name": "barter in blood",
+      "oracle_hash": "be856a7f6d029bfa5be0bfe07f7915d7",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_each_player_sacrifice_fixed_permanents_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Crack the Earth",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d2aa51841d87625e029e0c1d78119c0b",
+      "min_rule_version": 2,
+      "normalized_name": "crack the earth",
+      "oracle_hash": "08446934f7df33a207467fb5b627fa50",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_each_player_sacrifice_fixed_permanents_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Innocent Blood",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e36e942e876596fa39c2abef5eac238f",
+      "min_rule_version": 2,
+      "normalized_name": "innocent blood",
+      "oracle_hash": "936b01368e4684556867764af9ce37c5",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_each_player_sacrifice_fixed_permanents_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Renounce the Guilds",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:172ceadc506f12be79de7edc8edc647b",
+      "min_rule_version": 2,
+      "normalized_name": "renounce the guilds",
+      "oracle_hash": "3127e90fe826e0d6097996f889d848b9",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_each_player_sacrifice_fixed_permanents_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Simplify",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8d62f54198483e3e3deeec43de124cd5",
+      "min_rule_version": 2,
+      "normalized_name": "simplify",
+      "oracle_hash": "3e5ca27a1aaa76ffa9aa0c13d1689aa5",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_each_player_sacrifice_fixed_permanents_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Tergrid's Shadow",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d2088319b0a6c4d1bd660dfc024c73e6",
+      "min_rule_version": 2,
+      "normalized_name": "tergrid's shadow",
+      "oracle_hash": "5a7e33d8e6b36112f4c1ac58776c8e12",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_each_player_sacrifice_fixed_permanents_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Tremble",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4aec324ab24ccc2a1adfe7a07131cf98",
+      "min_rule_version": 2,
+      "normalized_name": "tremble",
+      "oracle_hash": "e3d97dc178a6579b3b6f279e42e225db",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_each_player_sacrifice_fixed_permanents_spell_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

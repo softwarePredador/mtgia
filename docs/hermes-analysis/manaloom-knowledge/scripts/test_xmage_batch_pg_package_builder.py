@@ -1780,6 +1780,41 @@ def test_creature_enters_draw_execution_scenario_uses_matching_entering_creature
     assert scenario["entering_creature"]["power"] == 3
 
 
+def test_each_player_sacrifice_fields_and_execution_scenario() -> None:
+    proposal = {
+        "normalized_name": "renounce the guilds",
+        "card_name": "Renounce the Guilds",
+        "oracle_hash": "hash-renounce-the-guilds",
+        "logical_rule_key": "battle_rule_v1:hash-renounce-the-guilds",
+        "effect_json": {
+            "effect": "each_player_sacrifice",
+            "battle_model_scope": "xmage_each_player_sacrifice_fixed_permanents_spell_v1",
+            "sacrifice_count": 1,
+            "sacrifice_card_types": ["permanent"],
+            "sacrifice_scope": "each_player",
+            "sacrifice_choice": "controller_choice_lowest_value",
+            "sacrifice_requires_multicolored": True,
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    required = expected["required_effect_fields"]
+
+    assert required["sacrifice_count"] == 1
+    assert required["sacrifice_card_types"] == ["permanent"]
+    assert required["sacrifice_scope"] == "each_player"
+    assert required["sacrifice_choice"] == "controller_choice_lowest_value"
+    assert required["sacrifice_requires_multicolored"] is True
+
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    assert scenario["type"] == "each_player_sacrifice"
+    assert scenario["sacrifice_count"] == 1
+    assert scenario["sacrifice_card_types"] == ["permanent"]
+    assert scenario["sacrifice_requires_multicolored"] is True
+    assert scenario["expected_sacrificed_per_player"] == 1
+
+
 def test_simple_activated_regenerate_source_execution_scenario_uses_activation_mana() -> None:
     rule = {
         "normalized_name": "cudgel troll",

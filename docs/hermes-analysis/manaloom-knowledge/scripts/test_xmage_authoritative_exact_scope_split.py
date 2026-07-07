@@ -21339,6 +21339,110 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(report["summary"]["proposal_count"], 1)
         self.assertEqual(report["summary"]["blocked_reason_counts"], {"x_damage_source_not_supported": 1})
 
+    def test_each_player_sacrifice_maps_fixed_creature_count(self) -> None:
+        proposal, reason = split.split_row(
+            queue_row(split.BOARD_WIPE_UNIT, effect_classes=["SacrificeAllEffect"]),
+            metadata(
+                name="Barter in Blood",
+                type_line="Sorcery",
+                oracle_text="Each player sacrifices two creatures.",
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new SacrificeAllEffect(
+                    2, StaticFilters.FILTER_PERMANENT_CREATURES));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "each_player_sacrifice")
+        self.assertEqual(effect["battle_model_scope"], split.EACH_PLAYER_SACRIFICE_SCOPE)
+        self.assertEqual(effect["sacrifice_count"], 2)
+        self.assertEqual(effect["sacrifice_card_types"], ["creature"])
+        self.assertEqual(effect["sacrifice_scope"], "each_player")
+        self.assertEqual(effect["sacrifice_choice"], "controller_choice_lowest_value")
+
+    def test_each_player_sacrifice_maps_fixed_land_count(self) -> None:
+        proposal, reason = split.split_row(
+            queue_row(split.BOARD_WIPE_UNIT, effect_classes=["SacrificeAllEffect"]),
+            metadata(
+                name="Tremble",
+                type_line="Sorcery",
+                oracle_text="Each player sacrifices a land.",
+            ),
+            source_text='this.getSpellAbility().addEffect(new SacrificeAllEffect(1, new FilterControlledLandPermanent("land")));',
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        self.assertEqual(proposal["effect_json"]["sacrifice_count"], 1)
+        self.assertEqual(proposal["effect_json"]["sacrifice_card_types"], ["land"])
+
+    def test_each_player_sacrifice_maps_multicolored_permanent_filter(self) -> None:
+        proposal, reason = split.split_row(
+            queue_row(split.BOARD_WIPE_UNIT, effect_classes=["SacrificeAllEffect"]),
+            metadata(
+                name="Renounce the Guilds",
+                type_line="Instant",
+                oracle_text="Each player sacrifices a multicolored permanent.",
+            ),
+            source_text="""
+                private static final FilterControlledPermanent filter =
+                    new FilterControlledPermanent("multicolored permanent");
+                static {
+                    filter.add(MulticoloredPredicate.instance);
+                }
+                this.getSpellAbility().addEffect(new SacrificeAllEffect(filter));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["sacrifice_count"], 1)
+        self.assertEqual(effect["sacrifice_card_types"], ["permanent"])
+        self.assertTrue(effect["sacrifice_requires_multicolored"])
+
+    def test_each_player_sacrifice_allows_foretell_auxiliary_text(self) -> None:
+        proposal, reason = split.split_row(
+            queue_row(
+                split.BOARD_WIPE_UNIT,
+                effect_classes=["SacrificeAllEffect"],
+                ability_classes=["ForetellAbility"],
+            ),
+            metadata(
+                name="Tergrid's Shadow",
+                type_line="Instant",
+                oracle_text=(
+                    "Each player sacrifices two creatures.\n"
+                    "Foretell {2}{B}{B} (During your turn, you may pay {2} and exile this card "
+                    "from your hand face down. Cast it on a later turn for its foretell cost.)"
+                ),
+            ),
+            source_text="""
+                private static final FilterControlledPermanent filter =
+                    new FilterControlledCreaturePermanent("creatures");
+                this.getSpellAbility().addEffect(new SacrificeAllEffect(2, filter));
+                this.addAbility(new ForetellAbility(this, "{2}{B}{B}"));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        self.assertEqual(proposal["effect_json"]["sacrifice_count"], 2)
+        self.assertEqual(proposal["effect_json"]["sacrifice_card_types"], ["creature"])
+
+    def test_each_player_sacrifice_blocks_x_count(self) -> None:
+        proposal, reason = split.split_row(
+            queue_row(split.BOARD_WIPE_UNIT, effect_classes=["SacrificeAllEffect"]),
+            metadata(
+                name="Tectonic Break",
+                type_line="Sorcery",
+                oracle_text="Each player sacrifices X lands.",
+            ),
+            source_text='this.getSpellAbility().addEffect(new SacrificeAllEffect(GetXValue.instance, new FilterControlledLandPermanent("lands")));',
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "board_wipe_sacrifice_count_not_fixed")
+
 
 if __name__ == "__main__":
     unittest.main()

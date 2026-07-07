@@ -254,6 +254,11 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "destroy_power_gte",
     "destroy_toughness_lte",
     "destroy_toughness_gte",
+    "sacrifice_count",
+    "sacrifice_card_types",
+    "sacrifice_scope",
+    "sacrifice_choice",
+    "sacrifice_requires_multicolored",
     "life_gain",
     "life_gain_amount",
     "life_gain_amount_source",
@@ -2050,6 +2055,26 @@ def target_keyword_spell_execution_scenario_from_expected_rule(
     }
 
 
+def each_player_sacrifice_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_each_player_sacrifice_fixed_permanents_spell_v1":
+        return None
+    card_types = list(required.get("sacrifice_card_types") or ["creature"])
+    sacrifice_count = max(1, int(required.get("sacrifice_count") or 1))
+    return {
+        "name": f"{rule['card_name']} each player sacrifices matching permanents",
+        "type": "each_player_sacrifice",
+        "card": {"name": rule["card_name"], "type_line": "Sorcery"},
+        "sacrifice_count": sacrifice_count,
+        "sacrifice_card_types": card_types,
+        "sacrifice_requires_multicolored": bool(required.get("sacrifice_requires_multicolored")),
+        "expected_sacrificed_per_player": sacrifice_count,
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any] | None:
     return (
         static_global_pt_execution_scenario_from_expected_rule(rule)
@@ -2066,6 +2091,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or simple_activated_self_keyword_execution_scenario_from_expected_rule(rule)
         or simple_activated_regenerate_source_execution_scenario_from_expected_rule(rule)
         or target_keyword_spell_execution_scenario_from_expected_rule(rule)
+        or each_player_sacrifice_execution_scenario_from_expected_rule(rule)
         or simple_activated_create_token_execution_scenario_from_expected_rule(rule)
         or fixed_create_creature_tokens_execution_scenario_from_expected_rule(rule)
         or multi_create_creature_tokens_execution_scenario_from_expected_rule(rule)

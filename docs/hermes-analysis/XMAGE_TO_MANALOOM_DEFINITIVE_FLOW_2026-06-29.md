@@ -16417,6 +16417,97 @@ Validation:
 - final XMage strategy audit passed `26/26`;
 - final operational and legacy contamination audits passed.
 
+## PG581 Each Player Sacrifice New Server Evidence
+
+PG581 evidence:
+
+- baseline readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260706_post_pg580_current.json`,
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260706_post_pg580_current.md`
+- baseline queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260706_post_pg580_current_commander_legal.json`,
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260706_post_pg580_current_commander_legal.md`
+- baseline exact split:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260706_post_pg580_current_analysis.json`,
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260706_post_pg580_current_analysis.md`
+- PG581 exact split:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260706_pg581_each_player_sacrifice_new_server.json`,
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260706_pg581_each_player_sacrifice_new_server.md`
+- package manifest and package summary:
+  `docs/hermes-analysis/master_optimizer_reports/pg581_each_player_sacrifice_new_server_package_manifest.json`,
+  `docs/hermes-analysis/master_optimizer_reports/pg581_each_player_sacrifice_new_server_package_package.md`
+- precheck/apply/postcheck/rollback SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg581_each_player_sacrifice_new_server_package_precheck.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/pg581_each_player_sacrifice_new_server_package_apply.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/pg581_each_player_sacrifice_new_server_package_postcheck.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/pg581_each_player_sacrifice_new_server_package_rollback.sql`
+- apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg581_each_player_sacrifice_new_server_apply_evidence.md`
+- sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg581_each_player_sacrifice_new_server_sync_report.json`
+- E2E:
+  `docs/hermes-analysis/master_optimizer_reports/pg581_each_player_sacrifice_new_server_e2e.json`,
+  `docs/hermes-analysis/master_optimizer_reports/pg581_each_player_sacrifice_new_server_e2e.md`
+- post-PG581 readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260706_post_pg581_each_player_sacrifice_new_server.json`,
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260706_post_pg581_each_player_sacrifice_new_server.md`
+- post-PG581 queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260706_post_pg581_each_player_sacrifice_new_server_commander_legal.json`,
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260706_post_pg581_each_player_sacrifice_new_server_commander_legal.md`
+- post-PG581 exact split recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260706_post_pg581_each_player_sacrifice_new_server_recheck.json`,
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260706_post_pg581_each_player_sacrifice_new_server_recheck.md`
+- final PG/Hermes/SQLite audit:
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260706_post_pg581_each_player_sacrifice_new_server_final.json`,
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260706_post_pg581_each_player_sacrifice_new_server_final.md`
+- final governance audits:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260706_post_pg581_each_player_sacrifice_new_server_final.json`,
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260706_post_pg581_each_player_sacrifice_new_server_final.md`,
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260706_post_pg581_each_player_sacrifice_new_server_final.json`,
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260706_post_pg581_each_player_sacrifice_new_server_final.md`,
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260706_post_pg581_each_player_sacrifice_new_server_final.json`,
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260706_post_pg581_each_player_sacrifice_new_server_final.md`
+
+PG581 promoted the exact XMage `SacrificeAllEffect` spell subpattern:
+`Each player sacrifices N matching permanents`, with fixed counts and
+controller-choice-lowest-value runtime modeling.
+
+Promoted cards:
+
+- Barter in Blood;
+- Crack the Earth;
+- Innocent Blood;
+- Renounce the Guilds;
+- Simplify;
+- Tergrid's Shadow;
+- Tremble.
+
+Validation:
+
+- split produced `proposal_count=7` and `safe_for_batch_pg_package_count=7`;
+- `Tectonic Break` remained blocked by
+  `board_wipe_sacrifice_count_not_fixed` because it uses X;
+- precheck found `7` target rows, `0` existing rules, and `0` shadow rows;
+- apply upserted `7` PostgreSQL rows and deprecated `0` shadow rows;
+- postcheck confirmed `7` promoted rows, `7` `verified_auto` rows, and `7`
+  rows with `oracle_hash`;
+- PG -> SQLite sync loaded `7` PostgreSQL rows, updated `7` SQLite rows, and
+  exported `6661` canonical snapshot rows;
+- package E2E passed `7` execution scenarios across PG, SQLite, snapshot,
+  runtime `get_card_effect`, and battle execution;
+- post-PG581 queue moved from `target_identity_count=25334` and
+  `xmage_authoritative_source_count=25020` to `25327` and `25013`;
+- board wipe work unit moved from `407` to `400`;
+- final exact-scope recheck returned `proposal_count=0`;
+- final PG/Hermes/SQLite contract passed `51/51`;
+- final XMage strategy audit passed `26/26`;
+- final operational and legacy contamination audits passed.
+
+Residual boundary: PG581 does not authorize variable-X sacrifice counts,
+triggered creature variants such as Fleshbag Marauder, dies/upkeep sacrifice
+variants, modal variants, or mode-selected sacrifice effects. Those remain in
+separate work units or blocked reasons and require their own runtime contract.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:
