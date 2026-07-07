@@ -4132,6 +4132,57 @@ def _source_explicit_mana_colors(source):
     return colors
 
 
+def _ordered_mana_colors(colors):
+    ordered = []
+    for color in ("white", "blue", "black", "red", "green", "colorless", "wildcard", "generic"):
+        if color in colors and color not in ordered:
+            ordered.append(color)
+    for color in colors:
+        if color not in ordered:
+            ordered.append(color)
+    return ordered
+
+
+def _land_mana_colors_for_controller(controller, land):
+    if not isinstance(land, dict):
+        return []
+    colors = []
+    if land.get("commander_identity_mana_source"):
+        colors.extend(_commander_identity_mana_colors_for_player(controller))
+    colors.extend(_source_explicit_mana_colors(land))
+    if not colors:
+        for color in source_colors(land) or []:
+            if color == "wildcard":
+                colors.extend(["white", "blue", "black", "red", "green"])
+            elif color in {
+                "white",
+                "blue",
+                "black",
+                "red",
+                "green",
+                "colorless",
+                "generic",
+            }:
+                colors.append(color)
+    return _ordered_mana_colors(colors)
+
+
+def _opponent_land_mana_colors_for_player(player):
+    colors = []
+    for opponent in _table_players_for(player):
+        if opponent is player:
+            continue
+        if hasattr(opponent, "is_alive") and not opponent.is_alive():
+            continue
+        for permanent in getattr(opponent, "battlefield", []) or []:
+            if not isinstance(permanent, dict) or not is_effective_land(permanent):
+                continue
+            for color in _land_mana_colors_for_controller(opponent, permanent):
+                if color not in colors:
+                    colors.append(color)
+    return _ordered_mana_colors(colors)
+
+
 def _read_conditional_mana_modes(source):
     modes = source.get("conditional_mana_modes") if isinstance(source, dict) else None
     if isinstance(modes, str):
@@ -4256,6 +4307,22 @@ def conditional_mana_source_for_state(player, source, produced):
             )
     if isinstance(source, dict) and source.get("mana_produced_from_colors_among_permanents"):
         return None
+    if isinstance(source, dict) and source.get("conditionally_produces_opponent_land_colors"):
+        opponent_land_colors = _opponent_land_mana_colors_for_player(player)
+        if opponent_land_colors:
+            return _conditional_mana_source_entry(
+                source,
+                produced,
+                [
+                    {
+                        "color": color,
+                        "restriction": "any_spell",
+                        "mode": "opponent_land_color_dependency",
+                    }
+                    for color in opponent_land_colors
+                ],
+                "opponent_land_color_mana_source",
+            )
     explicit_colors = _source_explicit_mana_colors(source)
     if len(explicit_colors) <= 1:
         return None

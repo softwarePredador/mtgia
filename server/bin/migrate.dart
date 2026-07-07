@@ -1003,6 +1003,16 @@ final migrations = <Migration>[
       DROP TABLE IF EXISTS deck_comments CASCADE;
     ''',
   ),
+  Migration(
+    version: '032',
+    name: 'refresh_card_intelligence_snapshot_rule_identity_fallback',
+    up: '''
+      $cardIntelligenceSnapshotViewStatement;
+    ''',
+    down: '''
+      DROP VIEW IF EXISTS card_intelligence_snapshot;
+    ''',
+  ),
 ];
 
 class Migration {

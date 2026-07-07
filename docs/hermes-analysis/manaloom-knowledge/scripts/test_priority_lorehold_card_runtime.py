@@ -50,6 +50,26 @@ class PriorityLoreholdCardRuntimeTests(unittest.TestCase):
             color_identity=["R", "W"],
         )
         player = battle.Player("Lorehold", commander, [], is_human=True)
+        opponent = battle.Player(
+            "Opponent",
+            card(
+                "Dimir Commander",
+                "Legendary Creature",
+                color_identity=["U", "B"],
+            ),
+            [],
+        )
+        opponent.battlefield = [
+            card("Island", "Basic Land — Island", effect="land"),
+            card("Blood Crypt", "Land — Swamp Mountain", effect="land", produces="BR"),
+            card(
+                "Command Tower",
+                "Land",
+                effect="land",
+                commander_identity_mana_source=True,
+            ),
+        ]
+        battle.bind_table_context([player, opponent])
         player.battlefield = [
             card(
                 "Command Tower",
@@ -96,6 +116,10 @@ class PriorityLoreholdCardRuntimeTests(unittest.TestCase):
         self.assertEqual(
             sorted(mode["color"] for mode in conditional_sources["Command Tower"]["modes"]),
             ["red", "white"],
+        )
+        self.assertEqual(
+            sorted(mode["color"] for mode in conditional_sources["Fellwar Stone"]["modes"]),
+            ["black", "blue", "red"],
         )
         self.assertEqual(
             sorted(mode["color"] for mode in conditional_sources["Talisman of Conviction"]["modes"]),

@@ -346,6 +346,64 @@ semantic_v2 AS (
   FROM card_semantic_tags_v2
   GROUP BY card_id
 ),
+battle_rule_matches AS (
+  SELECT DISTINCT ON (matched_card_id, logical_rule_key)
+    matched_card_id AS card_id,
+    logical_rule_key,
+    source,
+    confidence,
+    review_status,
+    execution_status,
+    rule_version,
+    effect_json,
+    deck_role_json,
+    notes,
+    updated_at
+  FROM (
+    SELECT
+      br.card_id AS matched_card_id,
+      br.logical_rule_key,
+      br.source,
+      br.confidence,
+      br.review_status,
+      br.execution_status,
+      br.rule_version,
+      br.effect_json,
+      br.deck_role_json,
+      br.notes,
+      br.updated_at
+    FROM card_battle_rules br
+    WHERE br.card_id IS NOT NULL
+
+    UNION ALL
+
+    SELECT
+      c.id AS matched_card_id,
+      br.logical_rule_key,
+      br.source,
+      br.confidence,
+      br.review_status,
+      br.execution_status,
+      br.rule_version,
+      br.effect_json,
+      br.deck_role_json,
+      br.notes,
+      br.updated_at
+    FROM card_battle_rules br
+    JOIN cards c
+      ON br.normalized_name IN (
+        LOWER(TRIM(c.name)),
+        LOWER(TRIM(SPLIT_PART(c.name, ' // ', 1)))
+      )
+  ) matched
+  WHERE matched_card_id IS NOT NULL
+  ORDER BY
+    matched_card_id,
+    logical_rule_key,
+    (review_status = 'verified') DESC,
+    confidence DESC,
+    source
+),
 battle_rules AS (
   SELECT
     card_id,
@@ -378,8 +436,7 @@ battle_rules AS (
       'updated_at', updated_at
     ) ORDER BY confidence DESC, source)
       FILTER (WHERE review_status = 'verified') AS verified_battle_rules
-  FROM card_battle_rules
-  WHERE card_id IS NOT NULL
+  FROM battle_rule_matches
   GROUP BY card_id
 ),
 legalities AS (

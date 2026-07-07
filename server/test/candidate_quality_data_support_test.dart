@@ -208,10 +208,15 @@ void main() {
       expect(view, contains('role_scores as'));
       expect(view, contains('commander_synergy as'));
       expect(view, contains('semantic_v2 as'));
+      expect(view, contains('battle_rule_matches as'));
       expect(view, contains('battle_rules as'));
       expect(view, contains('legalities as'));
       expect(view, contains('rulings as'));
       expect(view, contains('group by card_id'));
+      expect(view, contains('from battle_rule_matches'));
+      expect(view, contains('br.normalized_name in'));
+      expect(view, contains('lower(trim(c.name))'));
+      expect(view, contains("lower(trim(split_part(c.name, ' // ', 1)))"));
       expect(view, contains('from cards c'));
       expect(view, contains('left join function_tags ft on ft.card_id = c.id'));
       expect(view, contains('left join role_scores rs on rs.card_id = c.id'));

@@ -221,5 +221,22 @@ void main() {
       expect(down, contains('drop table if exists content_reports'));
       expect(down, contains('drop table if exists deck_comments'));
     });
+
+    test('migration 032 refreshes card snapshot rule identity fallback', () {
+      final migration = migrate.migrations.singleWhere(
+        (migration) => migration.version == '032',
+      );
+      final up = migration.up.toLowerCase();
+      final down = migration.down!.toLowerCase();
+
+      expect(
+        migration.name,
+        equals('refresh_card_intelligence_snapshot_rule_identity_fallback'),
+      );
+      expect(up, contains('create or replace view card_intelligence_snapshot'));
+      expect(up, contains('battle_rule_matches as'));
+      expect(up, contains('br.normalized_name in'));
+      expect(down, contains('drop view if exists card_intelligence_snapshot'));
+    });
   });
 }
