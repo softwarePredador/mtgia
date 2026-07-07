@@ -17536,6 +17536,70 @@ Validation:
 - global all-card readiness was refreshed at
   `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260707_post_pg604_destroy_surveil_new_server.md`.
 
+## PG605 Boost Plus Keyword Target-Creature Spell Checkpoint
+
+As of 2026-07-07, PG605 is applied and synced against the new server target.
+It maps exact XMage `BoostTargetEffect` + `GainAbilityTargetEffect` one-shot
+spells where Oracle and local XMage source both prove a single target creature
+gets fixed power/toughness and gains one supported keyword until end of turn.
+
+Closed cards:
+
+- `Armor of Shadows`
+- `Blitzball Shot`
+- `Massive Might`
+- `Masterful Flourish`
+
+Implementation:
+
+- `xmage_authoritative_exact_scope_split.py` now accepts the safe default
+  XMage constructors for `BoostTargetEffect` and `GainAbilityTargetEffect`
+  when Oracle confirms until-end-of-turn behavior, plus both exact Oracle
+  word orders: `target creature gets ... and gains ... until end of turn` and
+  `until end of turn, target creature gets ... and gains ...`;
+- the exact scope remains
+  `xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1` and emits
+  executable `stat_modifier_until_eot` rows with `granted_keywords_until_eot`;
+- `xmage_batch_pg_package_builder.py` now creates E2E
+  `stat_modifier_until_eot` scenarios for this boost+keyword scope.
+
+Validation:
+
+- split produced `proposal_count=4` and
+  `safe_for_batch_pg_package_count=4`;
+- precheck found `4/4` target rows, `0` existing expected executable rows, and
+  `0` shadow rows to deprecate;
+- apply upserted `4` PostgreSQL rows and deprecated `0` shadow rows;
+- postcheck confirmed `4/4` promoted rows, `4/4` `verified_auto` rows, and
+  `4/4` rows with `oracle_hash`;
+- focused tests passed: splitter `748` tests, exact runtime `379` tests,
+  package builder `74` tests, and Python compilation for the touched
+  splitter/package/runtime/E2E scripts;
+- PG -> SQLite/snapshot sync loaded `9415` PostgreSQL rows, updated `9179`
+  SQLite rows, and exported `6858` canonical snapshot rows;
+- metadata sync used `database_target=127.0.0.1:15432/halder`, matched `7822`
+  PostgreSQL cards after final sync, and left `deck_cards` at `2699/2699`
+  matched;
+- E2E validation passed PostgreSQL, SQLite, snapshot, runtime lookup, and `4`
+  battle execution scenarios with `8` runtime events;
+- post-sync queue rebuild reduced `target_identity_count` from `25130` to
+  `25126`, `xmage_authoritative_source_count` from `24816` to `24812`, and
+  `xmage_authoritative_adapter_required_count` from `24816` to `24812`;
+- final exact-scope recheck against the post-PG605 queue returned
+  `proposal_count=0` and `safe_for_batch_pg_package_count=0`;
+- final PG/Hermes/SQLite contract audit passed `51/51`;
+- final XMage strategy audit passed `26/26`;
+- final operational surface alignment audit passed;
+- final legacy contamination audit passed;
+- `scripts/quality_gate.sh server-target` passed against the new-server target;
+- global all-card readiness was refreshed at
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260707_post_pg605_boost_keyword_new_server.md`.
+
+Residual boundary: PG605 does not authorize dynamic-X boost spells, modal
+boost spells, multi-target boost spells, attacking-only targets, target
+subtype modes, or spells that combine boost+keyword with additional effects
+unless a later exact adapter models those constraints.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

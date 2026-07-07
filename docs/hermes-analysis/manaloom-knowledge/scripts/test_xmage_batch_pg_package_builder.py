@@ -1000,6 +1000,33 @@ def test_manifest_builds_target_keyword_spell_execution_scenario() -> None:
     assert scenario["expected_keywords"] == ["double_strike"]
 
 
+def test_manifest_builds_boost_keyword_spell_execution_scenario() -> None:
+    rule = {
+        "normalized_name": "massive might",
+        "card_name": "Massive Might",
+        "oracle_hash": "hash-massive-might",
+        "logical_rule_key": "battle_rule_v1:hash-massive-might",
+        "required_effect_fields": {
+            "effect": "stat_modifier_until_eot",
+            "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+            "target": "creature",
+            "target_controller": "any",
+            "target_constraints": {"card_types": ["creature"]},
+            "power_delta": 2,
+            "toughness_delta": 2,
+            "granted_keywords_until_eot": ["trample"],
+        },
+    }
+
+    scenario = builder.target_keyword_spell_execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "stat_modifier_until_eot"
+    assert scenario["expected_power_delta"] == 2
+    assert scenario["expected_toughness_delta"] == 2
+    assert scenario["expected_keywords"] == ["trample"]
+
+
 def test_manifest_builds_controlled_stat_modifier_filtered_execution_scenario() -> None:
     rule = {
         "normalized_name": "guardians' pledge",

@@ -2575,7 +2575,10 @@ def target_keyword_spell_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
     required = dict(rule.get("required_effect_fields") or {})
-    if required.get("battle_model_scope") != "xmage_fixed_keyword_target_creature_until_eot_spell_v1":
+    if required.get("battle_model_scope") not in {
+        "xmage_fixed_keyword_target_creature_until_eot_spell_v1",
+        "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+    }:
         return None
     type_line = "Sorcery" if required.get("sorcery") is True else "Instant"
     return {

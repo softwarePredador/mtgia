@@ -6617,7 +6617,8 @@ def fixed_boost_keyword_target_from_source(
 ) -> tuple[int, int, str] | None:
     text = source or ""
     boost_matches = re.findall(
-        r"new\s+BoostTargetEffect\s*\(\s*([+-]?\d+)\s*,\s*([+-]?\d+)\s*,\s*Duration\.EndOfTurn\s*\)",
+        r"new\s+BoostTargetEffect\s*\(\s*([+-]?\d+)\s*,\s*([+-]?\d+)\s*"
+        r"(?:,\s*Duration\.EndOfTurn\s*)?\)",
         text,
         re.S,
     )
@@ -6631,7 +6632,8 @@ def fixed_boost_keyword_target_from_source(
         rf"|new\s+{re.escape(keyword_ability_class)}\s*\([^)]*\))"
     )
     if not re.search(
-        rf"new\s+GainAbilityTargetEffect\s*\(\s*{ability_expr}\s*,\s*Duration\.EndOfTurn",
+        rf"new\s+GainAbilityTargetEffect\s*\(\s*{ability_expr}"
+        rf"\s*(?:,\s*Duration\.EndOfTurn\s*)?\)",
         text,
         re.S,
     ):
@@ -8469,10 +8471,16 @@ def fixed_boost_all_from_source(source: str) -> tuple[int, int, str, dict[str, A
 def fixed_boost_keyword_target_from_oracle(metadata: dict[str, Any]) -> tuple[int, int, str, str] | None:
     text = strip_parenthetical_reminders(oracle_text(metadata))
     keyword_words = "|".join(re.escape(word) for word in sorted(TARGET_GRANT_KEYWORD_ORACLE_WORDS, key=len, reverse=True))
-    match = re.match(
-        rf"^target creature( you control)? gets ([+-]?\d+)/([+-]?\d+) and gains ({keyword_words}) until end of turn\.?$",
-        text,
-    )
+    match = None
+    for pattern in (
+        rf"^target creature( you control)? gets ([+-]?\d+)/([+-]?\d+) "
+        rf"and gains ({keyword_words}) until end of turn\.?$",
+        rf"^until end of turn, target creature( you control)? gets ([+-]?\d+)/([+-]?\d+) "
+        rf"and gains ({keyword_words})\.?$",
+    ):
+        match = re.match(pattern, text)
+        if match:
+            break
     if not match:
         return None
     power = signed_int_from_oracle(match.group(2))

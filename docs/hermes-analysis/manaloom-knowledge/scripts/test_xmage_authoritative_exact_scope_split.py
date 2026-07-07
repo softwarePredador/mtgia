@@ -871,6 +871,98 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["keywords"], ["flying"])
         self.assertTrue(effect["_keywords_are_self"])
 
+    def test_fixed_boost_keyword_spell_accepts_default_xmage_duration(self) -> None:
+        row = queue_row(
+            split.BOOST_KEYWORD_UNIT,
+            effect_classes=["BoostTargetEffect", "GainAbilityTargetEffect"],
+            ability_classes=["TrampleAbility"],
+            xmage_signals=["targeting"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Blitzball Shot",
+                type_line="Instant",
+                oracle_text="Target creature gets +3/+3 and gains trample until end of turn.",
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new BoostTargetEffect(3, 3)
+                    .setText("target creature gets +3/+3"));
+                this.getSpellAbility().addEffect(new GainAbilityTargetEffect(
+                    TrampleAbility.getInstance()).setText("and gains trample until end of turn"));
+                this.getSpellAbility().addTarget(new TargetCreaturePermanent());
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.BOOST_KEYWORD_SCOPE)
+        self.assertEqual(effect["target_controller"], "any")
+        self.assertEqual(effect["power_delta"], 3)
+        self.assertEqual(effect["toughness_delta"], 3)
+        self.assertEqual(effect["granted_keywords_until_eot"], ["trample"])
+
+    def test_fixed_boost_keyword_spell_accepts_until_eot_prefix_and_controlled_target(self) -> None:
+        row = queue_row(
+            split.BOOST_KEYWORD_UNIT,
+            effect_classes=["BoostTargetEffect", "GainAbilityTargetEffect"],
+            ability_classes=["IndestructibleAbility"],
+            xmage_signals=["targeting"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Masterful Flourish",
+                type_line="Instant",
+                oracle_text=(
+                    "Until end of turn, target creature you control gets +1/+0 "
+                    "and gains indestructible."
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new BoostTargetEffect(1, 0)
+                    .setText("until end of turn, target creature you control gets +1/+0"));
+                this.getSpellAbility().addEffect(new GainAbilityTargetEffect(
+                    IndestructibleAbility.getInstance()).setText("and gains indestructible"));
+                this.getSpellAbility().addTarget(new TargetControlledCreaturePermanent());
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.BOOST_KEYWORD_SCOPE)
+        self.assertEqual(effect["target_controller"], "self")
+        self.assertEqual(effect["power_delta"], 1)
+        self.assertEqual(effect["toughness_delta"], 0)
+        self.assertEqual(effect["granted_keywords_until_eot"], ["indestructible"])
+
+    def test_fixed_boost_keyword_spell_blocks_multi_target_source(self) -> None:
+        row = queue_row(
+            split.BOOST_KEYWORD_UNIT,
+            effect_classes=["BoostTargetEffect", "GainAbilityTargetEffect"],
+            ability_classes=["FirstStrikeAbility"],
+            xmage_signals=["targeting"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Coordinated Assault",
+                type_line="Instant",
+                oracle_text=(
+                    "Up to two target creatures each get +1/+0 and gain first strike until end of turn."
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new BoostTargetEffect(1, 0, Duration.EndOfTurn));
+                this.getSpellAbility().addEffect(new GainAbilityTargetEffect(
+                    FirstStrikeAbility.getInstance(), Duration.EndOfTurn));
+                this.getSpellAbility().addTarget(new TargetCreaturePermanent(0, 2));
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "boost_keyword_source_not_single_fixed")
+
     def test_attack_trigger_self_boost_maps_fixed_positive_boost(self) -> None:
         row = queue_row(
             split.ATTACK_SELF_BOOST_UNIT,
