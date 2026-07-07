@@ -10005,6 +10005,77 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertEqual(permanent["power"], 2)
         self.assertEqual(permanent["toughness"], 2)
 
+    def test_limited_activated_self_boost_only_once_per_turn(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.mana_pool.add_generic(4)
+        active.mana_pool.add("green", 2)
+        rootwalla = {
+            "name": "Rootwalla",
+            "type_line": "Creature - Lizard",
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+            "activated_effect": "self_stat_modifier_until_eot",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+            "target": "self",
+            "target_controller": "self",
+            "power": 2,
+            "toughness": 2,
+            "power_delta": 2,
+            "toughness_delta": 2,
+            "power_boost": 2,
+            "toughness_boost": 2,
+            "activation_cost_mana": "{1}{G}",
+            "activation_cost_generic": 1,
+            "activation_cost_colors": ["G"],
+            "activation_requires_tap": False,
+            "activation_limit_per_turn": 1,
+            "_rule_logical_key": "battle_rule_v1:rootwalla-test",
+        }
+        active.battlefield.append(rootwalla)
+
+        first = self.battle.activate_generic_self_boost_permanent(
+            active,
+            [active, opponent],
+            rootwalla,
+            turn=18,
+            rng=random.Random(18),
+            phase="precombat_main",
+        )
+        second_same_turn = self.battle.activate_generic_self_boost_permanent(
+            active,
+            [active, opponent],
+            rootwalla,
+            turn=18,
+            rng=random.Random(19),
+            phase="precombat_main",
+        )
+        next_turn = self.battle.activate_generic_self_boost_permanent(
+            active,
+            [active, opponent],
+            rootwalla,
+            turn=19,
+            rng=random.Random(20),
+            phase="precombat_main",
+        )
+
+        self.assertTrue(first)
+        self.assertFalse(second_same_turn)
+        self.assertTrue(next_turn)
+        self.assertEqual(rootwalla["power"], 6)
+        self.assertEqual(rootwalla["toughness"], 6)
+        activation_events = [
+            data
+            for event, data in self.events
+            if event == "activated_ability"
+            and data.get("card") == "Rootwalla"
+            and data.get("activation_kind") == "simple_activated_self_boost"
+        ]
+        self.assertEqual(len(activation_events), 2)
+        self.assertTrue(
+            all(data.get("activation_limit_per_turn") == 1 for data in activation_events)
+        )
+
     def test_simple_activated_self_boost_blocks_summoning_sick_tap_creature(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

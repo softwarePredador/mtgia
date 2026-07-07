@@ -2987,6 +2987,129 @@ def run_stat_modifier_until_eot(
     }
 
 
+def run_simple_activated_self_boost(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    effect = battle.get_card_effect(card)
+    source = battle.enrich_card(
+        {
+            **card,
+            "type_line": card.get("type_line") or "Creature - Soldier",
+            "effect": "creature",
+            "power": int(card.get("power") or scenario.get("source_power") or 2),
+            "toughness": int(card.get("toughness") or scenario.get("source_toughness") or 2),
+            "summoning_sick": False,
+            **effect,
+            **dict(scenario.get("source_overrides") or {}),
+        }
+    )
+    active = battle.Player(str(scenario.get("player") or "Activated Controller"), None, [])
+    active.battlefield = [source]
+    add_manifest_mana(active, scenario.get("controller_mana") or {})
+    expected_power_delta = int(
+        scenario.get("expected_power_delta") or effect.get("power_delta") or effect.get("power_boost") or 0
+    )
+    expected_toughness_delta = int(
+        scenario.get("expected_toughness_delta")
+        or effect.get("toughness_delta")
+        or effect.get("toughness_boost")
+        or 0
+    )
+    expected_tapped_source = bool(scenario.get("expected_tapped_source", effect.get("activation_requires_tap", False)))
+    expected_limit = int(
+        scenario.get("expected_activation_limit_per_turn")
+        or effect.get("activation_limit_per_turn")
+        or 0
+    )
+    turn = int(scenario.get("turn") or 7)
+    before_events = len(events)
+    before_power = int(source.get("power") or 0)
+    before_toughness = int(source.get("toughness") or 0)
+    if not battle.can_activate_generic_self_boost_permanent(active, source):
+        fail("battle_execution", f"{card['name']} simple activated self boost cannot activate")
+    activated = battle.activate_generic_self_boost_permanent(
+        active,
+        [active],
+        source,
+        turn=turn,
+        rng=random.Random(int(scenario.get("seed") or 6073)),
+        phase=str(scenario.get("phase") or "precombat_main"),
+    )
+    if not activated:
+        fail("battle_execution", f"{card['name']} simple activated self boost activation failed")
+    expected_power = before_power + expected_power_delta
+    expected_toughness = before_toughness + expected_toughness_delta
+    if int(source.get("power") or 0) != expected_power:
+        fail("battle_execution", f"{card['name']} source power={source.get('power')!r}, expected {expected_power}")
+    if int(source.get("toughness") or 0) != expected_toughness:
+        fail(
+            "battle_execution",
+            f"{card['name']} source toughness={source.get('toughness')!r}, expected {expected_toughness}",
+        )
+    if bool(source.get("tapped")) != expected_tapped_source:
+        fail(
+            "battle_execution",
+            f"{card['name']} source tapped={bool(source.get('tapped'))}, expected {expected_tapped_source}",
+        )
+    if expected_limit:
+        add_manifest_mana(active, scenario.get("controller_mana") or {})
+        second_activation = battle.activate_generic_self_boost_permanent(
+            active,
+            [active],
+            source,
+            turn=turn,
+            rng=random.Random(int(scenario.get("seed") or 6073) + 1),
+            phase=str(scenario.get("phase") or "precombat_main"),
+        )
+        if second_activation:
+            fail("battle_execution", f"{card['name']} activated self boost exceeded per-turn limit")
+    activation_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "activated_ability"
+            and data.get("card") == card.get("name")
+            and data.get("activation_kind") == "simple_activated_self_boost"
+        ),
+        None,
+    )
+    if activation_event is None:
+        fail("battle_events", f"missing {card['name']} simple activated self boost event")
+    if int(activation_event.get("power_delta") or 0) != expected_power_delta:
+        fail("battle_events", f"{card['name']} power_delta={activation_event.get('power_delta')!r}")
+    if int(activation_event.get("toughness_delta") or 0) != expected_toughness_delta:
+        fail("battle_events", f"{card['name']} toughness_delta={activation_event.get('toughness_delta')!r}")
+    if expected_limit and int(activation_event.get("activation_limit_per_turn") or 0) != expected_limit:
+        fail(
+            "battle_events",
+            f"{card['name']} activation_limit_per_turn={activation_event.get('activation_limit_per_turn')!r}",
+        )
+    resolved_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "stat_modifier_until_eot_resolved"
+            and data.get("card") == card.get("name")
+            and data.get("target") == source.get("name")
+        ),
+        None,
+    )
+    if resolved_event is None:
+        fail("battle_events", f"missing {card['name']} simple activated self boost resolved event")
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "source_power": int(source.get("power") or 0),
+        "source_toughness": int(source.get("toughness") or 0),
+        "power_delta": expected_power_delta,
+        "toughness_delta": expected_toughness_delta,
+        "activation_limit_per_turn": expected_limit,
+    }
+
+
 def run_attack_self_boost(
     battle,
     scenario: dict[str, Any],
@@ -4146,6 +4269,7 @@ SCENARIO_RUNNERS = {
     "simple_activated_damage": run_simple_activated_damage,
     "simple_activated_tap_target": run_simple_activated_tap_target,
     "simple_activated_destroy": run_simple_activated_destroy,
+    "simple_activated_self_boost": run_simple_activated_self_boost,
     "simple_activated_self_keyword": run_simple_activated_self_keyword,
     "simple_activated_regenerate_source": run_simple_activated_regenerate_source,
     "simple_activated_create_token": run_simple_activated_create_token,

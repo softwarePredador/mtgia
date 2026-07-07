@@ -1,0 +1,2973 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg588_limited_activated_self_boost_new_s_20260707_030124",
+  "deploy_id": "PG588",
+  "execution_scenarios": [
+    {
+      "card": {
+        "name": "Azimaet Drake",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "controller_mana": {
+        "black": 0,
+        "blue": 1,
+        "generic": 0,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_activation_limit_per_turn": 1,
+      "expected_power_delta": 1,
+      "expected_tapped_source": false,
+      "expected_toughness_delta": 0,
+      "logical_rule_key": "battle_rule_v1:f8a70755c5080096962911a99387b30e",
+      "name": "Azimaet Drake activates self boost ability",
+      "type": "simple_activated_self_boost"
+    },
+    {
+      "card": {
+        "name": "Darkthicket Wolf",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 2,
+        "green": 1,
+        "red": 0,
+        "white": 0
+      },
+      "expected_activation_limit_per_turn": 1,
+      "expected_power_delta": 2,
+      "expected_tapped_source": false,
+      "expected_toughness_delta": 2,
+      "logical_rule_key": "battle_rule_v1:7117776ebbf78ea691e229682adc6a19",
+      "name": "Darkthicket Wolf activates self boost ability",
+      "type": "simple_activated_self_boost"
+    },
+    {
+      "card": {
+        "name": "Drake Hatchling",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "controller_mana": {
+        "black": 0,
+        "blue": 1,
+        "generic": 0,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_activation_limit_per_turn": 1,
+      "expected_power_delta": 1,
+      "expected_tapped_source": false,
+      "expected_toughness_delta": 0,
+      "logical_rule_key": "battle_rule_v1:f8a70755c5080096962911a99387b30e",
+      "name": "Drake Hatchling activates self boost ability",
+      "type": "simple_activated_self_boost"
+    },
+    {
+      "card": {
+        "name": "Fire Drake",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 0,
+        "green": 0,
+        "red": 1,
+        "white": 0
+      },
+      "expected_activation_limit_per_turn": 1,
+      "expected_power_delta": 1,
+      "expected_tapped_source": false,
+      "expected_toughness_delta": 0,
+      "logical_rule_key": "battle_rule_v1:51ab850a3252a785c52be4044b038574",
+      "name": "Fire Drake activates self boost ability",
+      "type": "simple_activated_self_boost"
+    },
+    {
+      "card": {
+        "name": "Frilled Oculus",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 1,
+        "green": 1,
+        "red": 0,
+        "white": 0
+      },
+      "expected_activation_limit_per_turn": 1,
+      "expected_power_delta": 2,
+      "expected_tapped_source": false,
+      "expected_toughness_delta": 2,
+      "logical_rule_key": "battle_rule_v1:f142a7f6bee719cf4e8d2be06e6d61fd",
+      "name": "Frilled Oculus activates self boost ability",
+      "type": "simple_activated_self_boost"
+    },
+    {
+      "card": {
+        "name": "Frilled Sandwalla",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 1,
+        "green": 1,
+        "red": 0,
+        "white": 0
+      },
+      "expected_activation_limit_per_turn": 1,
+      "expected_power_delta": 2,
+      "expected_tapped_source": false,
+      "expected_toughness_delta": 2,
+      "logical_rule_key": "battle_rule_v1:f142a7f6bee719cf4e8d2be06e6d61fd",
+      "name": "Frilled Sandwalla activates self boost ability",
+      "type": "simple_activated_self_boost"
+    },
+    {
+      "card": {
+        "name": "Ghor-Clan Bloodscale",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 3,
+        "green": 1,
+        "red": 0,
+        "white": 0
+      },
+      "expected_activation_limit_per_turn": 1,
+      "expected_power_delta": 2,
+      "expected_tapped_source": false,
+      "expected_toughness_delta": 2,
+      "logical_rule_key": "battle_rule_v1:bfd9968d97aff459392feaaaaf1e8ced",
+      "name": "Ghor-Clan Bloodscale activates self boost ability",
+      "type": "simple_activated_self_boost"
+    },
+    {
+      "card": {
+        "name": "Knight of the Skyward Eye",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 3,
+        "green": 1,
+        "red": 0,
+        "white": 0
+      },
+      "expected_activation_limit_per_turn": 1,
+      "expected_power_delta": 3,
+      "expected_tapped_source": false,
+      "expected_toughness_delta": 3,
+      "logical_rule_key": "battle_rule_v1:c927a8cd9c6fd3d6d8dd66bcb17e8348",
+      "name": "Knight of the Skyward Eye activates self boost ability",
+      "type": "simple_activated_self_boost"
+    },
+    {
+      "card": {
+        "name": "Kraven's Cats",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 2,
+        "green": 1,
+        "red": 0,
+        "white": 0
+      },
+      "expected_activation_limit_per_turn": 1,
+      "expected_power_delta": 2,
+      "expected_tapped_source": false,
+      "expected_toughness_delta": 2,
+      "logical_rule_key": "battle_rule_v1:7117776ebbf78ea691e229682adc6a19",
+      "name": "Kraven's Cats activates self boost ability",
+      "type": "simple_activated_self_boost"
+    },
+    {
+      "card": {
+        "name": "Plated Rootwalla",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 2,
+        "green": 1,
+        "red": 0,
+        "white": 0
+      },
+      "expected_activation_limit_per_turn": 1,
+      "expected_power_delta": 3,
+      "expected_tapped_source": false,
+      "expected_toughness_delta": 3,
+      "logical_rule_key": "battle_rule_v1:3dac63a6354d9f30e0052aba74e618b0",
+      "name": "Plated Rootwalla activates self boost ability",
+      "type": "simple_activated_self_boost"
+    },
+    {
+      "card": {
+        "name": "Rootwalla",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 1,
+        "green": 1,
+        "red": 0,
+        "white": 0
+      },
+      "expected_activation_limit_per_turn": 1,
+      "expected_power_delta": 2,
+      "expected_tapped_source": false,
+      "expected_toughness_delta": 2,
+      "logical_rule_key": "battle_rule_v1:f142a7f6bee719cf4e8d2be06e6d61fd",
+      "name": "Rootwalla activates self boost ability",
+      "type": "simple_activated_self_boost"
+    },
+    {
+      "card": {
+        "name": "Setessan Griffin",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 2,
+        "green": 2,
+        "red": 0,
+        "white": 0
+      },
+      "expected_activation_limit_per_turn": 1,
+      "expected_power_delta": 2,
+      "expected_tapped_source": false,
+      "expected_toughness_delta": 2,
+      "logical_rule_key": "battle_rule_v1:059ea2231131ceaf4f16b3a7ea1a0de5",
+      "name": "Setessan Griffin activates self boost ability",
+      "type": "simple_activated_self_boost"
+    },
+    {
+      "card": {
+        "name": "Snarling Wolf",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 1,
+        "green": 1,
+        "red": 0,
+        "white": 0
+      },
+      "expected_activation_limit_per_turn": 1,
+      "expected_power_delta": 2,
+      "expected_tapped_source": false,
+      "expected_toughness_delta": 2,
+      "logical_rule_key": "battle_rule_v1:f142a7f6bee719cf4e8d2be06e6d61fd",
+      "name": "Snarling Wolf activates self boost ability",
+      "type": "simple_activated_self_boost"
+    },
+    {
+      "card": {
+        "name": "Spitting Drake",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 0,
+        "green": 0,
+        "red": 1,
+        "white": 0
+      },
+      "expected_activation_limit_per_turn": 1,
+      "expected_power_delta": 1,
+      "expected_tapped_source": false,
+      "expected_toughness_delta": 0,
+      "logical_rule_key": "battle_rule_v1:51ab850a3252a785c52be4044b038574",
+      "name": "Spitting Drake activates self boost ability",
+      "type": "simple_activated_self_boost"
+    },
+    {
+      "card": {
+        "name": "Viashino Slaughtermaster",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "controller_mana": {
+        "black": 1,
+        "blue": 0,
+        "generic": 0,
+        "green": 1,
+        "red": 0,
+        "white": 0
+      },
+      "expected_activation_limit_per_turn": 1,
+      "expected_power_delta": 1,
+      "expected_tapped_source": false,
+      "expected_toughness_delta": 1,
+      "logical_rule_key": "battle_rule_v1:05c78e9f6eabbe6c46e8095feaae1644",
+      "name": "Viashino Slaughtermaster activates self boost ability",
+      "type": "simple_activated_self_boost"
+    },
+    {
+      "card": {
+        "name": "Wild Aesthir",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 0,
+        "green": 0,
+        "red": 0,
+        "white": 2
+      },
+      "expected_activation_limit_per_turn": 1,
+      "expected_power_delta": 2,
+      "expected_tapped_source": false,
+      "expected_toughness_delta": 0,
+      "logical_rule_key": "battle_rule_v1:8ca4c246e8546e434876625a878d2a18",
+      "name": "Wild Aesthir activates self boost ability",
+      "type": "simple_activated_self_boost"
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Azimaet Drake",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f8a70755c5080096962911a99387b30e",
+      "min_rule_version": 2,
+      "normalized_name": "azimaet drake",
+      "oracle_hash": "de885ee22bf304e3f0652b091bea3591",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "self_stat_modifier_until_eot",
+            "activation_cost_colors": [
+              "U"
+            ],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{U}",
+            "activation_limit_per_turn": 1,
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 1,
+            "power_delta": 1,
+            "target": "self",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "source": "self"
+            },
+            "target_controller": "self",
+            "toughness_boost": 0,
+            "toughness_delta": 0,
+            "xmage_ability_class": "LimitedTimesPerTurnActivatedAbility",
+            "xmage_effect_class": "BoostSourceEffect"
+          }
+        ],
+        "_keywords_are_self": true,
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "activated_effect": "self_stat_modifier_until_eot",
+        "activation_cost_colors": [
+          "U"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{U}",
+        "activation_limit_per_turn": 1,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "power_boost": 1,
+        "power_delta": 1,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "xmage_ability_class": "LimitedTimesPerTurnActivatedAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Darkthicket Wolf",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7117776ebbf78ea691e229682adc6a19",
+      "min_rule_version": 2,
+      "normalized_name": "darkthicket wolf",
+      "oracle_hash": "51632b3dffd1f4463568520122798c98",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "self_stat_modifier_until_eot",
+            "activation_cost_colors": [
+              "G"
+            ],
+            "activation_cost_generic": 2,
+            "activation_cost_mana": "{2}{G}",
+            "activation_limit_per_turn": 1,
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 2,
+            "power_delta": 2,
+            "target": "self",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "source": "self"
+            },
+            "target_controller": "self",
+            "toughness_boost": 2,
+            "toughness_delta": 2,
+            "xmage_ability_class": "LimitedTimesPerTurnActivatedAbility",
+            "xmage_effect_class": "BoostSourceEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "activated_effect": "self_stat_modifier_until_eot",
+        "activation_cost_colors": [
+          "G"
+        ],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}{G}",
+        "activation_limit_per_turn": 1,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 2,
+        "power_delta": 2,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 2,
+        "toughness_delta": 2,
+        "xmage_ability_class": "LimitedTimesPerTurnActivatedAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Drake Hatchling",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f8a70755c5080096962911a99387b30e",
+      "min_rule_version": 2,
+      "normalized_name": "drake hatchling",
+      "oracle_hash": "de885ee22bf304e3f0652b091bea3591",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "self_stat_modifier_until_eot",
+            "activation_cost_colors": [
+              "U"
+            ],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{U}",
+            "activation_limit_per_turn": 1,
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 1,
+            "power_delta": 1,
+            "target": "self",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "source": "self"
+            },
+            "target_controller": "self",
+            "toughness_boost": 0,
+            "toughness_delta": 0,
+            "xmage_ability_class": "LimitedTimesPerTurnActivatedAbility",
+            "xmage_effect_class": "BoostSourceEffect"
+          }
+        ],
+        "_keywords_are_self": true,
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "activated_effect": "self_stat_modifier_until_eot",
+        "activation_cost_colors": [
+          "U"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{U}",
+        "activation_limit_per_turn": 1,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "power_boost": 1,
+        "power_delta": 1,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "xmage_ability_class": "LimitedTimesPerTurnActivatedAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Fire Drake",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:51ab850a3252a785c52be4044b038574",
+      "min_rule_version": 2,
+      "normalized_name": "fire drake",
+      "oracle_hash": "20094d31326709799822cd22336ddf3d",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "self_stat_modifier_until_eot",
+            "activation_cost_colors": [
+              "R"
+            ],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{R}",
+            "activation_limit_per_turn": 1,
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 1,
+            "power_delta": 1,
+            "target": "self",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "source": "self"
+            },
+            "target_controller": "self",
+            "toughness_boost": 0,
+            "toughness_delta": 0,
+            "xmage_ability_class": "LimitedTimesPerTurnActivatedAbility",
+            "xmage_effect_class": "BoostSourceEffect"
+          }
+        ],
+        "_keywords_are_self": true,
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "activated_effect": "self_stat_modifier_until_eot",
+        "activation_cost_colors": [
+          "R"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{R}",
+        "activation_limit_per_turn": 1,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "power_boost": 1,
+        "power_delta": 1,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "xmage_ability_class": "LimitedTimesPerTurnActivatedAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Frilled Oculus",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f142a7f6bee719cf4e8d2be06e6d61fd",
+      "min_rule_version": 2,
+      "normalized_name": "frilled oculus",
+      "oracle_hash": "b16129e8bd621197891722a652a81918",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "self_stat_modifier_until_eot",
+            "activation_cost_colors": [
+              "G"
+            ],
+            "activation_cost_generic": 1,
+            "activation_cost_mana": "{1}{G}",
+            "activation_limit_per_turn": 1,
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 2,
+            "power_delta": 2,
+            "target": "self",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "source": "self"
+            },
+            "target_controller": "self",
+            "toughness_boost": 2,
+            "toughness_delta": 2,
+            "xmage_ability_class": "LimitedTimesPerTurnActivatedAbility",
+            "xmage_effect_class": "BoostSourceEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "activated_effect": "self_stat_modifier_until_eot",
+        "activation_cost_colors": [
+          "G"
+        ],
+        "activation_cost_generic": 1,
+        "activation_cost_mana": "{1}{G}",
+        "activation_limit_per_turn": 1,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 2,
+        "power_delta": 2,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 2,
+        "toughness_delta": 2,
+        "xmage_ability_class": "LimitedTimesPerTurnActivatedAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Frilled Sandwalla",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f142a7f6bee719cf4e8d2be06e6d61fd",
+      "min_rule_version": 2,
+      "normalized_name": "frilled sandwalla",
+      "oracle_hash": "b16129e8bd621197891722a652a81918",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "self_stat_modifier_until_eot",
+            "activation_cost_colors": [
+              "G"
+            ],
+            "activation_cost_generic": 1,
+            "activation_cost_mana": "{1}{G}",
+            "activation_limit_per_turn": 1,
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 2,
+            "power_delta": 2,
+            "target": "self",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "source": "self"
+            },
+            "target_controller": "self",
+            "toughness_boost": 2,
+            "toughness_delta": 2,
+            "xmage_ability_class": "LimitedTimesPerTurnActivatedAbility",
+            "xmage_effect_class": "BoostSourceEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "activated_effect": "self_stat_modifier_until_eot",
+        "activation_cost_colors": [
+          "G"
+        ],
+        "activation_cost_generic": 1,
+        "activation_cost_mana": "{1}{G}",
+        "activation_limit_per_turn": 1,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 2,
+        "power_delta": 2,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 2,
+        "toughness_delta": 2,
+        "xmage_ability_class": "LimitedTimesPerTurnActivatedAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Ghor-Clan Bloodscale",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:bfd9968d97aff459392feaaaaf1e8ced",
+      "min_rule_version": 2,
+      "normalized_name": "ghor-clan bloodscale",
+      "oracle_hash": "8240687a9d0baa682dafa09133be4e2b",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "self_stat_modifier_until_eot",
+            "activation_cost_colors": [
+              "G"
+            ],
+            "activation_cost_generic": 3,
+            "activation_cost_mana": "{3}{G}",
+            "activation_limit_per_turn": 1,
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 2,
+            "power_delta": 2,
+            "target": "self",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "source": "self"
+            },
+            "target_controller": "self",
+            "toughness_boost": 2,
+            "toughness_delta": 2,
+            "xmage_ability_class": "LimitedTimesPerTurnActivatedAbility",
+            "xmage_effect_class": "BoostSourceEffect"
+          }
+        ],
+        "_keywords_are_self": true,
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "activated_effect": "self_stat_modifier_until_eot",
+        "activation_cost_colors": [
+          "G"
+        ],
+        "activation_cost_generic": 3,
+        "activation_cost_mana": "{3}{G}",
+        "activation_limit_per_turn": 1,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "keywords": [
+          "first_strike"
+        ],
+        "power_boost": 2,
+        "power_delta": 2,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 2,
+        "toughness_delta": 2,
+        "xmage_ability_class": "LimitedTimesPerTurnActivatedAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Knight of the Skyward Eye",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c927a8cd9c6fd3d6d8dd66bcb17e8348",
+      "min_rule_version": 2,
+      "normalized_name": "knight of the skyward eye",
+      "oracle_hash": "65f7580e6f1b92c0d78785cc089ff37e",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "self_stat_modifier_until_eot",
+            "activation_cost_colors": [
+              "G"
+            ],
+            "activation_cost_generic": 3,
+            "activation_cost_mana": "{3}{G}",
+            "activation_limit_per_turn": 1,
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 3,
+            "power_delta": 3,
+            "target": "self",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "source": "self"
+            },
+            "target_controller": "self",
+            "toughness_boost": 3,
+            "toughness_delta": 3,
+            "xmage_ability_class": "LimitedTimesPerTurnActivatedAbility",
+            "xmage_effect_class": "BoostSourceEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "activated_effect": "self_stat_modifier_until_eot",
+        "activation_cost_colors": [
+          "G"
+        ],
+        "activation_cost_generic": 3,
+        "activation_cost_mana": "{3}{G}",
+        "activation_limit_per_turn": 1,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 3,
+        "power_delta": 3,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 3,
+        "toughness_delta": 3,
+        "xmage_ability_class": "LimitedTimesPerTurnActivatedAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Kraven's Cats",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7117776ebbf78ea691e229682adc6a19",
+      "min_rule_version": 2,
+      "normalized_name": "kraven's cats",
+      "oracle_hash": "51632b3dffd1f4463568520122798c98",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "self_stat_modifier_until_eot",
+            "activation_cost_colors": [
+              "G"
+            ],
+            "activation_cost_generic": 2,
+            "activation_cost_mana": "{2}{G}",
+            "activation_limit_per_turn": 1,
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 2,
+            "power_delta": 2,
+            "target": "self",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "source": "self"
+            },
+            "target_controller": "self",
+            "toughness_boost": 2,
+            "toughness_delta": 2,
+            "xmage_ability_class": "LimitedTimesPerTurnActivatedAbility",
+            "xmage_effect_class": "BoostSourceEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "activated_effect": "self_stat_modifier_until_eot",
+        "activation_cost_colors": [
+          "G"
+        ],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}{G}",
+        "activation_limit_per_turn": 1,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 2,
+        "power_delta": 2,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 2,
+        "toughness_delta": 2,
+        "xmage_ability_class": "LimitedTimesPerTurnActivatedAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Plated Rootwalla",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3dac63a6354d9f30e0052aba74e618b0",
+      "min_rule_version": 2,
+      "normalized_name": "plated rootwalla",
+      "oracle_hash": "e71108ff6262677d4b53dd2f360837a6",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "self_stat_modifier_until_eot",
+            "activation_cost_colors": [
+              "G"
+            ],
+            "activation_cost_generic": 2,
+            "activation_cost_mana": "{2}{G}",
+            "activation_limit_per_turn": 1,
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 3,
+            "power_delta": 3,
+            "target": "self",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "source": "self"
+            },
+            "target_controller": "self",
+            "toughness_boost": 3,
+            "toughness_delta": 3,
+            "xmage_ability_class": "LimitedTimesPerTurnActivatedAbility",
+            "xmage_effect_class": "BoostSourceEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "activated_effect": "self_stat_modifier_until_eot",
+        "activation_cost_colors": [
+          "G"
+        ],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}{G}",
+        "activation_limit_per_turn": 1,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 3,
+        "power_delta": 3,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 3,
+        "toughness_delta": 3,
+        "xmage_ability_class": "LimitedTimesPerTurnActivatedAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Rootwalla",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f142a7f6bee719cf4e8d2be06e6d61fd",
+      "min_rule_version": 2,
+      "normalized_name": "rootwalla",
+      "oracle_hash": "b16129e8bd621197891722a652a81918",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "self_stat_modifier_until_eot",
+            "activation_cost_colors": [
+              "G"
+            ],
+            "activation_cost_generic": 1,
+            "activation_cost_mana": "{1}{G}",
+            "activation_limit_per_turn": 1,
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 2,
+            "power_delta": 2,
+            "target": "self",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "source": "self"
+            },
+            "target_controller": "self",
+            "toughness_boost": 2,
+            "toughness_delta": 2,
+            "xmage_ability_class": "LimitedTimesPerTurnActivatedAbility",
+            "xmage_effect_class": "BoostSourceEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "activated_effect": "self_stat_modifier_until_eot",
+        "activation_cost_colors": [
+          "G"
+        ],
+        "activation_cost_generic": 1,
+        "activation_cost_mana": "{1}{G}",
+        "activation_limit_per_turn": 1,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 2,
+        "power_delta": 2,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 2,
+        "toughness_delta": 2,
+        "xmage_ability_class": "LimitedTimesPerTurnActivatedAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Setessan Griffin",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:059ea2231131ceaf4f16b3a7ea1a0de5",
+      "min_rule_version": 2,
+      "normalized_name": "setessan griffin",
+      "oracle_hash": "a21d2d8a99ac6ca50cb5f63512362994",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "self_stat_modifier_until_eot",
+            "activation_cost_colors": [
+              "G",
+              "G"
+            ],
+            "activation_cost_generic": 2,
+            "activation_cost_mana": "{2}{G}{G}",
+            "activation_limit_per_turn": 1,
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 2,
+            "power_delta": 2,
+            "target": "self",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "source": "self"
+            },
+            "target_controller": "self",
+            "toughness_boost": 2,
+            "toughness_delta": 2,
+            "xmage_ability_class": "LimitedTimesPerTurnActivatedAbility",
+            "xmage_effect_class": "BoostSourceEffect"
+          }
+        ],
+        "_keywords_are_self": true,
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "activated_effect": "self_stat_modifier_until_eot",
+        "activation_cost_colors": [
+          "G",
+          "G"
+        ],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}{G}{G}",
+        "activation_limit_per_turn": 1,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "power_boost": 2,
+        "power_delta": 2,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 2,
+        "toughness_delta": 2,
+        "xmage_ability_class": "LimitedTimesPerTurnActivatedAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Snarling Wolf",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f142a7f6bee719cf4e8d2be06e6d61fd",
+      "min_rule_version": 2,
+      "normalized_name": "snarling wolf",
+      "oracle_hash": "b16129e8bd621197891722a652a81918",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "self_stat_modifier_until_eot",
+            "activation_cost_colors": [
+              "G"
+            ],
+            "activation_cost_generic": 1,
+            "activation_cost_mana": "{1}{G}",
+            "activation_limit_per_turn": 1,
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 2,
+            "power_delta": 2,
+            "target": "self",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "source": "self"
+            },
+            "target_controller": "self",
+            "toughness_boost": 2,
+            "toughness_delta": 2,
+            "xmage_ability_class": "LimitedTimesPerTurnActivatedAbility",
+            "xmage_effect_class": "BoostSourceEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "activated_effect": "self_stat_modifier_until_eot",
+        "activation_cost_colors": [
+          "G"
+        ],
+        "activation_cost_generic": 1,
+        "activation_cost_mana": "{1}{G}",
+        "activation_limit_per_turn": 1,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 2,
+        "power_delta": 2,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 2,
+        "toughness_delta": 2,
+        "xmage_ability_class": "LimitedTimesPerTurnActivatedAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Spitting Drake",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:51ab850a3252a785c52be4044b038574",
+      "min_rule_version": 2,
+      "normalized_name": "spitting drake",
+      "oracle_hash": "20094d31326709799822cd22336ddf3d",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "self_stat_modifier_until_eot",
+            "activation_cost_colors": [
+              "R"
+            ],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{R}",
+            "activation_limit_per_turn": 1,
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 1,
+            "power_delta": 1,
+            "target": "self",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "source": "self"
+            },
+            "target_controller": "self",
+            "toughness_boost": 0,
+            "toughness_delta": 0,
+            "xmage_ability_class": "LimitedTimesPerTurnActivatedAbility",
+            "xmage_effect_class": "BoostSourceEffect"
+          }
+        ],
+        "_keywords_are_self": true,
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "activated_effect": "self_stat_modifier_until_eot",
+        "activation_cost_colors": [
+          "R"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{R}",
+        "activation_limit_per_turn": 1,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "power_boost": 1,
+        "power_delta": 1,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "xmage_ability_class": "LimitedTimesPerTurnActivatedAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Viashino Slaughtermaster",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:05c78e9f6eabbe6c46e8095feaae1644",
+      "min_rule_version": 2,
+      "normalized_name": "viashino slaughtermaster",
+      "oracle_hash": "695d755356fc06eb1b8cf7302cbedbbe",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "self_stat_modifier_until_eot",
+            "activation_cost_colors": [
+              "B",
+              "G"
+            ],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{B}{G}",
+            "activation_limit_per_turn": 1,
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 1,
+            "power_delta": 1,
+            "target": "self",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "source": "self"
+            },
+            "target_controller": "self",
+            "toughness_boost": 1,
+            "toughness_delta": 1,
+            "xmage_ability_class": "LimitedTimesPerTurnActivatedAbility",
+            "xmage_effect_class": "BoostSourceEffect"
+          }
+        ],
+        "_keywords_are_self": true,
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "activated_effect": "self_stat_modifier_until_eot",
+        "activation_cost_colors": [
+          "B",
+          "G"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{B}{G}",
+        "activation_limit_per_turn": 1,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "keywords": [
+          "double_strike"
+        ],
+        "power_boost": 1,
+        "power_delta": 1,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 1,
+        "toughness_delta": 1,
+        "xmage_ability_class": "LimitedTimesPerTurnActivatedAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Wild Aesthir",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8ca4c246e8546e434876625a878d2a18",
+      "min_rule_version": 2,
+      "normalized_name": "wild aesthir",
+      "oracle_hash": "08c4b43efa20a34803ff454d7d6d547c",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "self_stat_modifier_until_eot",
+            "activation_cost_colors": [
+              "W",
+              "W"
+            ],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{W}{W}",
+            "activation_limit_per_turn": 1,
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 2,
+            "power_delta": 2,
+            "target": "self",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "source": "self"
+            },
+            "target_controller": "self",
+            "toughness_boost": 0,
+            "toughness_delta": 0,
+            "xmage_ability_class": "LimitedTimesPerTurnActivatedAbility",
+            "xmage_effect_class": "BoostSourceEffect"
+          }
+        ],
+        "_keywords_are_self": true,
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "activated_effect": "self_stat_modifier_until_eot",
+        "activation_cost_colors": [
+          "W",
+          "W"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{W}{W}",
+        "activation_limit_per_turn": 1,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "keywords": [
+          "flying",
+          "first_strike"
+        ],
+        "power_boost": 2,
+        "power_delta": 2,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "xmage_ability_class": "LimitedTimesPerTurnActivatedAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_permanent_simple_activated_self_boost_until_eot": 16
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg588_limited_activated_self_boost_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg588_limited_activated_self_boost_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg588_limited_activated_self_boost_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg588_limited_activated_self_boost_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg588_limited_activated_self_boost_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg588_limited_activated_self_boost_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-07T03:01:24+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Azimaet Drake"
+      },
+      "card_name": "Azimaet Drake",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f8a70755c5080096962911a99387b30e",
+      "normalized_name": "azimaet drake",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "self_stat_modifier_until_eot",
+            "activation_cost_colors": [
+              "U"
+            ],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{U}",
+            "activation_limit_per_turn": 1,
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 1,
+            "power_delta": 1,
+            "target": "self",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "source": "self"
+            },
+            "target_controller": "self",
+            "toughness_boost": 0,
+            "toughness_delta": 0,
+            "xmage_ability_class": "LimitedTimesPerTurnActivatedAbility",
+            "xmage_effect_class": "BoostSourceEffect"
+          }
+        ],
+        "_keywords_are_self": true,
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "activated_effect": "self_stat_modifier_until_eot",
+        "activation_cost_colors": [
+          "U"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{U}",
+        "activation_limit_per_turn": 1,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "power_boost": 1,
+        "power_delta": 1,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "xmage_ability_class": "LimitedTimesPerTurnActivatedAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Darkthicket Wolf"
+      },
+      "card_name": "Darkthicket Wolf",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7117776ebbf78ea691e229682adc6a19",
+      "normalized_name": "darkthicket wolf",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "self_stat_modifier_until_eot",
+            "activation_cost_colors": [
+              "G"
+            ],
+            "activation_cost_generic": 2,
+            "activation_cost_mana": "{2}{G}",
+            "activation_limit_per_turn": 1,
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 2,
+            "power_delta": 2,
+            "target": "self",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "source": "self"
+            },
+            "target_controller": "self",
+            "toughness_boost": 2,
+            "toughness_delta": 2,
+            "xmage_ability_class": "LimitedTimesPerTurnActivatedAbility",
+            "xmage_effect_class": "BoostSourceEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "activated_effect": "self_stat_modifier_until_eot",
+        "activation_cost_colors": [
+          "G"
+        ],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}{G}",
+        "activation_limit_per_turn": 1,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 2,
+        "power_delta": 2,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 2,
+        "toughness_delta": 2,
+        "xmage_ability_class": "LimitedTimesPerTurnActivatedAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Drake Hatchling"
+      },
+      "card_name": "Drake Hatchling",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f8a70755c5080096962911a99387b30e",
+      "normalized_name": "drake hatchling",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "self_stat_modifier_until_eot",
+            "activation_cost_colors": [
+              "U"
+            ],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{U}",
+            "activation_limit_per_turn": 1,
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 1,
+            "power_delta": 1,
+            "target": "self",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "source": "self"
+            },
+            "target_controller": "self",
+            "toughness_boost": 0,
+            "toughness_delta": 0,
+            "xmage_ability_class": "LimitedTimesPerTurnActivatedAbility",
+            "xmage_effect_class": "BoostSourceEffect"
+          }
+        ],
+        "_keywords_are_self": true,
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "activated_effect": "self_stat_modifier_until_eot",
+        "activation_cost_colors": [
+          "U"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{U}",
+        "activation_limit_per_turn": 1,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "power_boost": 1,
+        "power_delta": 1,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "xmage_ability_class": "LimitedTimesPerTurnActivatedAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Fire Drake"
+      },
+      "card_name": "Fire Drake",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:51ab850a3252a785c52be4044b038574",
+      "normalized_name": "fire drake",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "self_stat_modifier_until_eot",
+            "activation_cost_colors": [
+              "R"
+            ],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{R}",
+            "activation_limit_per_turn": 1,
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 1,
+            "power_delta": 1,
+            "target": "self",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "source": "self"
+            },
+            "target_controller": "self",
+            "toughness_boost": 0,
+            "toughness_delta": 0,
+            "xmage_ability_class": "LimitedTimesPerTurnActivatedAbility",
+            "xmage_effect_class": "BoostSourceEffect"
+          }
+        ],
+        "_keywords_are_self": true,
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "activated_effect": "self_stat_modifier_until_eot",
+        "activation_cost_colors": [
+          "R"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{R}",
+        "activation_limit_per_turn": 1,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "power_boost": 1,
+        "power_delta": 1,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "xmage_ability_class": "LimitedTimesPerTurnActivatedAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Frilled Oculus"
+      },
+      "card_name": "Frilled Oculus",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f142a7f6bee719cf4e8d2be06e6d61fd",
+      "normalized_name": "frilled oculus",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "self_stat_modifier_until_eot",
+            "activation_cost_colors": [
+              "G"
+            ],
+            "activation_cost_generic": 1,
+            "activation_cost_mana": "{1}{G}",
+            "activation_limit_per_turn": 1,
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 2,
+            "power_delta": 2,
+            "target": "self",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "source": "self"
+            },
+            "target_controller": "self",
+            "toughness_boost": 2,
+            "toughness_delta": 2,
+            "xmage_ability_class": "LimitedTimesPerTurnActivatedAbility",
+            "xmage_effect_class": "BoostSourceEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "activated_effect": "self_stat_modifier_until_eot",
+        "activation_cost_colors": [
+          "G"
+        ],
+        "activation_cost_generic": 1,
+        "activation_cost_mana": "{1}{G}",
+        "activation_limit_per_turn": 1,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 2,
+        "power_delta": 2,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 2,
+        "toughness_delta": 2,
+        "xmage_ability_class": "LimitedTimesPerTurnActivatedAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Frilled Sandwalla"
+      },
+      "card_name": "Frilled Sandwalla",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f142a7f6bee719cf4e8d2be06e6d61fd",
+      "normalized_name": "frilled sandwalla",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "self_stat_modifier_until_eot",
+            "activation_cost_colors": [
+              "G"
+            ],
+            "activation_cost_generic": 1,
+            "activation_cost_mana": "{1}{G}",
+            "activation_limit_per_turn": 1,
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 2,
+            "power_delta": 2,
+            "target": "self",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "source": "self"
+            },
+            "target_controller": "self",
+            "toughness_boost": 2,
+            "toughness_delta": 2,
+            "xmage_ability_class": "LimitedTimesPerTurnActivatedAbility",
+            "xmage_effect_class": "BoostSourceEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "activated_effect": "self_stat_modifier_until_eot",
+        "activation_cost_colors": [
+          "G"
+        ],
+        "activation_cost_generic": 1,
+        "activation_cost_mana": "{1}{G}",
+        "activation_limit_per_turn": 1,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 2,
+        "power_delta": 2,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 2,
+        "toughness_delta": 2,
+        "xmage_ability_class": "LimitedTimesPerTurnActivatedAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Ghor-Clan Bloodscale"
+      },
+      "card_name": "Ghor-Clan Bloodscale",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:bfd9968d97aff459392feaaaaf1e8ced",
+      "normalized_name": "ghor-clan bloodscale",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "self_stat_modifier_until_eot",
+            "activation_cost_colors": [
+              "G"
+            ],
+            "activation_cost_generic": 3,
+            "activation_cost_mana": "{3}{G}",
+            "activation_limit_per_turn": 1,
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 2,
+            "power_delta": 2,
+            "target": "self",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "source": "self"
+            },
+            "target_controller": "self",
+            "toughness_boost": 2,
+            "toughness_delta": 2,
+            "xmage_ability_class": "LimitedTimesPerTurnActivatedAbility",
+            "xmage_effect_class": "BoostSourceEffect"
+          }
+        ],
+        "_keywords_are_self": true,
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "activated_effect": "self_stat_modifier_until_eot",
+        "activation_cost_colors": [
+          "G"
+        ],
+        "activation_cost_generic": 3,
+        "activation_cost_mana": "{3}{G}",
+        "activation_limit_per_turn": 1,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "keywords": [
+          "first_strike"
+        ],
+        "power_boost": 2,
+        "power_delta": 2,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 2,
+        "toughness_delta": 2,
+        "xmage_ability_class": "LimitedTimesPerTurnActivatedAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Knight of the Skyward Eye"
+      },
+      "card_name": "Knight of the Skyward Eye",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c927a8cd9c6fd3d6d8dd66bcb17e8348",
+      "normalized_name": "knight of the skyward eye",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "self_stat_modifier_until_eot",
+            "activation_cost_colors": [
+              "G"
+            ],
+            "activation_cost_generic": 3,
+            "activation_cost_mana": "{3}{G}",
+            "activation_limit_per_turn": 1,
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 3,
+            "power_delta": 3,
+            "target": "self",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "source": "self"
+            },
+            "target_controller": "self",
+            "toughness_boost": 3,
+            "toughness_delta": 3,
+            "xmage_ability_class": "LimitedTimesPerTurnActivatedAbility",
+            "xmage_effect_class": "BoostSourceEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "activated_effect": "self_stat_modifier_until_eot",
+        "activation_cost_colors": [
+          "G"
+        ],
+        "activation_cost_generic": 3,
+        "activation_cost_mana": "{3}{G}",
+        "activation_limit_per_turn": 1,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 3,
+        "power_delta": 3,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 3,
+        "toughness_delta": 3,
+        "xmage_ability_class": "LimitedTimesPerTurnActivatedAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Kraven's Cats"
+      },
+      "card_name": "Kraven's Cats",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7117776ebbf78ea691e229682adc6a19",
+      "normalized_name": "kraven's cats",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "self_stat_modifier_until_eot",
+            "activation_cost_colors": [
+              "G"
+            ],
+            "activation_cost_generic": 2,
+            "activation_cost_mana": "{2}{G}",
+            "activation_limit_per_turn": 1,
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 2,
+            "power_delta": 2,
+            "target": "self",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "source": "self"
+            },
+            "target_controller": "self",
+            "toughness_boost": 2,
+            "toughness_delta": 2,
+            "xmage_ability_class": "LimitedTimesPerTurnActivatedAbility",
+            "xmage_effect_class": "BoostSourceEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "activated_effect": "self_stat_modifier_until_eot",
+        "activation_cost_colors": [
+          "G"
+        ],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}{G}",
+        "activation_limit_per_turn": 1,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 2,
+        "power_delta": 2,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 2,
+        "toughness_delta": 2,
+        "xmage_ability_class": "LimitedTimesPerTurnActivatedAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Plated Rootwalla"
+      },
+      "card_name": "Plated Rootwalla",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3dac63a6354d9f30e0052aba74e618b0",
+      "normalized_name": "plated rootwalla",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "self_stat_modifier_until_eot",
+            "activation_cost_colors": [
+              "G"
+            ],
+            "activation_cost_generic": 2,
+            "activation_cost_mana": "{2}{G}",
+            "activation_limit_per_turn": 1,
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 3,
+            "power_delta": 3,
+            "target": "self",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "source": "self"
+            },
+            "target_controller": "self",
+            "toughness_boost": 3,
+            "toughness_delta": 3,
+            "xmage_ability_class": "LimitedTimesPerTurnActivatedAbility",
+            "xmage_effect_class": "BoostSourceEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "activated_effect": "self_stat_modifier_until_eot",
+        "activation_cost_colors": [
+          "G"
+        ],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}{G}",
+        "activation_limit_per_turn": 1,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 3,
+        "power_delta": 3,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 3,
+        "toughness_delta": 3,
+        "xmage_ability_class": "LimitedTimesPerTurnActivatedAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Rootwalla"
+      },
+      "card_name": "Rootwalla",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f142a7f6bee719cf4e8d2be06e6d61fd",
+      "normalized_name": "rootwalla",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "self_stat_modifier_until_eot",
+            "activation_cost_colors": [
+              "G"
+            ],
+            "activation_cost_generic": 1,
+            "activation_cost_mana": "{1}{G}",
+            "activation_limit_per_turn": 1,
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 2,
+            "power_delta": 2,
+            "target": "self",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "source": "self"
+            },
+            "target_controller": "self",
+            "toughness_boost": 2,
+            "toughness_delta": 2,
+            "xmage_ability_class": "LimitedTimesPerTurnActivatedAbility",
+            "xmage_effect_class": "BoostSourceEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "activated_effect": "self_stat_modifier_until_eot",
+        "activation_cost_colors": [
+          "G"
+        ],
+        "activation_cost_generic": 1,
+        "activation_cost_mana": "{1}{G}",
+        "activation_limit_per_turn": 1,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 2,
+        "power_delta": 2,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 2,
+        "toughness_delta": 2,
+        "xmage_ability_class": "LimitedTimesPerTurnActivatedAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Setessan Griffin"
+      },
+      "card_name": "Setessan Griffin",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:059ea2231131ceaf4f16b3a7ea1a0de5",
+      "normalized_name": "setessan griffin",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "self_stat_modifier_until_eot",
+            "activation_cost_colors": [
+              "G",
+              "G"
+            ],
+            "activation_cost_generic": 2,
+            "activation_cost_mana": "{2}{G}{G}",
+            "activation_limit_per_turn": 1,
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 2,
+            "power_delta": 2,
+            "target": "self",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "source": "self"
+            },
+            "target_controller": "self",
+            "toughness_boost": 2,
+            "toughness_delta": 2,
+            "xmage_ability_class": "LimitedTimesPerTurnActivatedAbility",
+            "xmage_effect_class": "BoostSourceEffect"
+          }
+        ],
+        "_keywords_are_self": true,
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "activated_effect": "self_stat_modifier_until_eot",
+        "activation_cost_colors": [
+          "G",
+          "G"
+        ],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}{G}{G}",
+        "activation_limit_per_turn": 1,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "power_boost": 2,
+        "power_delta": 2,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 2,
+        "toughness_delta": 2,
+        "xmage_ability_class": "LimitedTimesPerTurnActivatedAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Snarling Wolf"
+      },
+      "card_name": "Snarling Wolf",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f142a7f6bee719cf4e8d2be06e6d61fd",
+      "normalized_name": "snarling wolf",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "self_stat_modifier_until_eot",
+            "activation_cost_colors": [
+              "G"
+            ],
+            "activation_cost_generic": 1,
+            "activation_cost_mana": "{1}{G}",
+            "activation_limit_per_turn": 1,
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 2,
+            "power_delta": 2,
+            "target": "self",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "source": "self"
+            },
+            "target_controller": "self",
+            "toughness_boost": 2,
+            "toughness_delta": 2,
+            "xmage_ability_class": "LimitedTimesPerTurnActivatedAbility",
+            "xmage_effect_class": "BoostSourceEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "activated_effect": "self_stat_modifier_until_eot",
+        "activation_cost_colors": [
+          "G"
+        ],
+        "activation_cost_generic": 1,
+        "activation_cost_mana": "{1}{G}",
+        "activation_limit_per_turn": 1,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 2,
+        "power_delta": 2,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 2,
+        "toughness_delta": 2,
+        "xmage_ability_class": "LimitedTimesPerTurnActivatedAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Spitting Drake"
+      },
+      "card_name": "Spitting Drake",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:51ab850a3252a785c52be4044b038574",
+      "normalized_name": "spitting drake",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "self_stat_modifier_until_eot",
+            "activation_cost_colors": [
+              "R"
+            ],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{R}",
+            "activation_limit_per_turn": 1,
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 1,
+            "power_delta": 1,
+            "target": "self",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "source": "self"
+            },
+            "target_controller": "self",
+            "toughness_boost": 0,
+            "toughness_delta": 0,
+            "xmage_ability_class": "LimitedTimesPerTurnActivatedAbility",
+            "xmage_effect_class": "BoostSourceEffect"
+          }
+        ],
+        "_keywords_are_self": true,
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "activated_effect": "self_stat_modifier_until_eot",
+        "activation_cost_colors": [
+          "R"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{R}",
+        "activation_limit_per_turn": 1,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "power_boost": 1,
+        "power_delta": 1,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "xmage_ability_class": "LimitedTimesPerTurnActivatedAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Viashino Slaughtermaster"
+      },
+      "card_name": "Viashino Slaughtermaster",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:05c78e9f6eabbe6c46e8095feaae1644",
+      "normalized_name": "viashino slaughtermaster",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "self_stat_modifier_until_eot",
+            "activation_cost_colors": [
+              "B",
+              "G"
+            ],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{B}{G}",
+            "activation_limit_per_turn": 1,
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 1,
+            "power_delta": 1,
+            "target": "self",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "source": "self"
+            },
+            "target_controller": "self",
+            "toughness_boost": 1,
+            "toughness_delta": 1,
+            "xmage_ability_class": "LimitedTimesPerTurnActivatedAbility",
+            "xmage_effect_class": "BoostSourceEffect"
+          }
+        ],
+        "_keywords_are_self": true,
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "activated_effect": "self_stat_modifier_until_eot",
+        "activation_cost_colors": [
+          "B",
+          "G"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{B}{G}",
+        "activation_limit_per_turn": 1,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "keywords": [
+          "double_strike"
+        ],
+        "power_boost": 1,
+        "power_delta": 1,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 1,
+        "toughness_delta": 1,
+        "xmage_ability_class": "LimitedTimesPerTurnActivatedAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Wild Aesthir"
+      },
+      "card_name": "Wild Aesthir",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8ca4c246e8546e434876625a878d2a18",
+      "normalized_name": "wild aesthir",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "self_stat_modifier_until_eot",
+            "activation_cost_colors": [
+              "W",
+              "W"
+            ],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{W}{W}",
+            "activation_limit_per_turn": 1,
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 2,
+            "power_delta": 2,
+            "target": "self",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "source": "self"
+            },
+            "target_controller": "self",
+            "toughness_boost": 0,
+            "toughness_delta": 0,
+            "xmage_ability_class": "LimitedTimesPerTurnActivatedAbility",
+            "xmage_effect_class": "BoostSourceEffect"
+          }
+        ],
+        "_keywords_are_self": true,
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "activated_effect": "self_stat_modifier_until_eot",
+        "activation_cost_colors": [
+          "W",
+          "W"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{W}{W}",
+        "activation_limit_per_turn": 1,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "keywords": [
+          "flying",
+          "first_strike"
+        ],
+        "power_boost": 2,
+        "power_delta": 2,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "xmage_ability_class": "LimitedTimesPerTurnActivatedAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Azimaet Drake",
+    "Darkthicket Wolf",
+    "Drake Hatchling",
+    "Fire Drake",
+    "Frilled Oculus",
+    "Frilled Sandwalla",
+    "Ghor-Clan Bloodscale",
+    "Knight of the Skyward Eye",
+    "Kraven's Cats",
+    "Plated Rootwalla",
+    "Rootwalla",
+    "Setessan Griffin",
+    "Snarling Wolf",
+    "Spitting Drake",
+    "Viashino Slaughtermaster",
+    "Wild Aesthir"
+  ],
+  "selected_count": 16,
+  "slug": "limited_activated_self_boost_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Azimaet Drake",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f8a70755c5080096962911a99387b30e",
+      "min_rule_version": 2,
+      "normalized_name": "azimaet drake",
+      "oracle_hash": "de885ee22bf304e3f0652b091bea3591",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Darkthicket Wolf",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7117776ebbf78ea691e229682adc6a19",
+      "min_rule_version": 2,
+      "normalized_name": "darkthicket wolf",
+      "oracle_hash": "51632b3dffd1f4463568520122798c98",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Drake Hatchling",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f8a70755c5080096962911a99387b30e",
+      "min_rule_version": 2,
+      "normalized_name": "drake hatchling",
+      "oracle_hash": "de885ee22bf304e3f0652b091bea3591",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Fire Drake",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:51ab850a3252a785c52be4044b038574",
+      "min_rule_version": 2,
+      "normalized_name": "fire drake",
+      "oracle_hash": "20094d31326709799822cd22336ddf3d",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Frilled Oculus",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f142a7f6bee719cf4e8d2be06e6d61fd",
+      "min_rule_version": 2,
+      "normalized_name": "frilled oculus",
+      "oracle_hash": "b16129e8bd621197891722a652a81918",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Frilled Sandwalla",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f142a7f6bee719cf4e8d2be06e6d61fd",
+      "min_rule_version": 2,
+      "normalized_name": "frilled sandwalla",
+      "oracle_hash": "b16129e8bd621197891722a652a81918",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Ghor-Clan Bloodscale",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:bfd9968d97aff459392feaaaaf1e8ced",
+      "min_rule_version": 2,
+      "normalized_name": "ghor-clan bloodscale",
+      "oracle_hash": "8240687a9d0baa682dafa09133be4e2b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Knight of the Skyward Eye",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c927a8cd9c6fd3d6d8dd66bcb17e8348",
+      "min_rule_version": 2,
+      "normalized_name": "knight of the skyward eye",
+      "oracle_hash": "65f7580e6f1b92c0d78785cc089ff37e",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Kraven's Cats",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7117776ebbf78ea691e229682adc6a19",
+      "min_rule_version": 2,
+      "normalized_name": "kraven's cats",
+      "oracle_hash": "51632b3dffd1f4463568520122798c98",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Plated Rootwalla",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3dac63a6354d9f30e0052aba74e618b0",
+      "min_rule_version": 2,
+      "normalized_name": "plated rootwalla",
+      "oracle_hash": "e71108ff6262677d4b53dd2f360837a6",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Rootwalla",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f142a7f6bee719cf4e8d2be06e6d61fd",
+      "min_rule_version": 2,
+      "normalized_name": "rootwalla",
+      "oracle_hash": "b16129e8bd621197891722a652a81918",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Setessan Griffin",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:059ea2231131ceaf4f16b3a7ea1a0de5",
+      "min_rule_version": 2,
+      "normalized_name": "setessan griffin",
+      "oracle_hash": "a21d2d8a99ac6ca50cb5f63512362994",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Snarling Wolf",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f142a7f6bee719cf4e8d2be06e6d61fd",
+      "min_rule_version": 2,
+      "normalized_name": "snarling wolf",
+      "oracle_hash": "b16129e8bd621197891722a652a81918",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Spitting Drake",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:51ab850a3252a785c52be4044b038574",
+      "min_rule_version": 2,
+      "normalized_name": "spitting drake",
+      "oracle_hash": "20094d31326709799822cd22336ddf3d",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Viashino Slaughtermaster",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:05c78e9f6eabbe6c46e8095feaae1644",
+      "min_rule_version": 2,
+      "normalized_name": "viashino slaughtermaster",
+      "oracle_hash": "695d755356fc06eb1b8cf7302cbedbbe",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Wild Aesthir",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8ca4c246e8546e434876625a878d2a18",
+      "min_rule_version": 2,
+      "normalized_name": "wild aesthir",
+      "oracle_hash": "08c4b43efa20a34803ff454d7d6d547c",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

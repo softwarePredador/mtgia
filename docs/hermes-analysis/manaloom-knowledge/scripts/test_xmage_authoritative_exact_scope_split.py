@@ -16688,6 +16688,72 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertTrue(effect["_keywords_are_self"])
         self.assertTrue(effect["flying"])
 
+    def test_limited_activated_self_boost_maps_once_per_turn(self) -> None:
+        row = queue_row(
+            "xmage_signature::BoostSourceEffect::LimitedTimesPerTurnActivatedAbility::"
+            "no_target_class::no_condition_class::activated_ability",
+            effect_classes=["BoostSourceEffect"],
+            ability_kind="activated",
+            ability_classes=["LimitedTimesPerTurnActivatedAbility"],
+            xmage_signals=["activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Rootwalla",
+                type_line="Creature - Lizard",
+                oracle_text=(
+                    "{1}{G}: This creature gets +2/+2 until end of turn. "
+                    "Activate only once each turn."
+                ),
+            ),
+            source_text=(
+                "this.addAbility(new LimitedTimesPerTurnActivatedAbility("
+                "Zone.BATTLEFIELD, new BoostSourceEffect(2, 2, Duration.EndOfTurn), "
+                'new ManaCostsImpl<>("{1}{G}")));'
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.SELF_BOOST_ACTIVATED_SCOPE)
+        self.assertEqual(effect["power_delta"], 2)
+        self.assertEqual(effect["toughness_delta"], 2)
+        self.assertEqual(effect["activation_cost_mana"], "{1}{G}")
+        self.assertEqual(effect["activation_limit_per_turn"], 1)
+        self.assertEqual(effect["xmage_ability_class"], "LimitedTimesPerTurnActivatedAbility")
+        self.assertEqual(effect["_activated_rule_effects"][0]["activation_limit_per_turn"], 1)
+
+    def test_limited_activated_self_boost_rejects_three_times_per_turn(self) -> None:
+        row = queue_row(
+            "xmage_signature::BoostSourceEffect::LimitedTimesPerTurnActivatedAbility::"
+            "no_target_class::no_condition_class::activated_ability",
+            effect_classes=["BoostSourceEffect"],
+            ability_kind="activated",
+            ability_classes=["LimitedTimesPerTurnActivatedAbility"],
+            xmage_signals=["activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Sewer Rats",
+                type_line="Creature - Rat",
+                oracle_text=(
+                    "{B}, Pay 1 life: This creature gets +1/+0 until end of turn. "
+                    "Activate no more than three times each turn."
+                ),
+            ),
+            source_text=(
+                "Ability ability = new LimitedTimesPerTurnActivatedAbility("
+                "Zone.BATTLEFIELD, new BoostSourceEffect(1, 0, Duration.EndOfTurn), "
+                'new ManaCostsImpl<>("{B}"), 3);'
+                "ability.addCost(new PayLifeCost(1));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "activated_self_boost_oracle_activation_limit_not_supported")
+
     def test_activated_self_keyword_maps_to_keyword_until_eot(self) -> None:
         row = queue_row(
             "xmage_signature::GainAbilitySourceEffect::FlyingAbility,SimpleActivatedAbility::"

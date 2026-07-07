@@ -349,6 +349,7 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "activation_cost_colors",
     "activation_requires_tap",
     "activation_requires_sacrifice",
+    "activation_limit_per_turn",
     "activation_life_cost",
     "activation_discard_count",
     "activation_discard_target",
@@ -2125,6 +2126,32 @@ def simple_activated_self_keyword_execution_scenario_from_expected_rule(
     }
 
 
+def simple_activated_self_boost_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_permanent_simple_activated_self_boost_until_eot_v1":
+        return None
+    return {
+        "name": f"{rule['card_name']} activates self boost ability",
+        "type": "simple_activated_self_boost",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": "Creature - Soldier",
+            "power": 2,
+            "toughness": 2,
+        },
+        "controller_mana": _manifest_mana_for_required_activation(required),
+        "expected_tapped_source": bool(required.get("activation_requires_tap")),
+        "expected_power_delta": int(required.get("power_delta") or required.get("power_boost") or 0),
+        "expected_toughness_delta": int(
+            required.get("toughness_delta") or required.get("toughness_boost") or 0
+        ),
+        "expected_activation_limit_per_turn": int(required.get("activation_limit_per_turn") or 0),
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def simple_activated_regenerate_source_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
@@ -2475,6 +2502,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or simple_activated_damage_execution_scenario_from_expected_rule(rule)
         or simple_activated_tap_target_execution_scenario_from_expected_rule(rule)
         or simple_activated_destroy_execution_scenario_from_expected_rule(rule)
+        or simple_activated_self_boost_execution_scenario_from_expected_rule(rule)
         or simple_activated_self_keyword_execution_scenario_from_expected_rule(rule)
         or simple_activated_regenerate_source_execution_scenario_from_expected_rule(rule)
         or target_keyword_spell_execution_scenario_from_expected_rule(rule)

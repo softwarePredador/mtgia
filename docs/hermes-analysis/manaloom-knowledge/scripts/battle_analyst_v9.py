@@ -45356,6 +45356,7 @@ def _activated_rule_effects_for_permanent(permanent):
             "activation_requires_discard_card": permanent.get("activation_requires_discard_card"),
             "activation_discard_random": permanent.get("activation_discard_random"),
             "activation_life_cost": permanent.get("activation_life_cost"),
+            "activation_limit_per_turn": permanent.get("activation_limit_per_turn"),
             "target": "self",
             "target_controller": "self",
             "target_constraints": permanent.get("target_constraints") or {"source": "self", "card_types": ["creature"]},
@@ -47030,6 +47031,12 @@ def activate_generic_self_boost_permanent(
         return False
     phase = phase or "precombat_main"
     activation_cost = _self_boost_activation_cost(effect_data)
+    activation_limit = int(effect_data.get("activation_limit_per_turn") or 0)
+    activation_usage = permanent.setdefault("_activated_self_boost_usage", {})
+    activation_turn_key = str(turn)
+    activation_count_before = int(activation_usage.get(activation_turn_key) or 0)
+    if activation_limit > 0 and activation_count_before >= activation_limit:
+        return False
     if not player.spend_mana(activation_cost):
         return False
     if effect_data.get("activation_requires_tap"):
@@ -47102,6 +47109,8 @@ def activate_generic_self_boost_permanent(
         effect="stat_modifier_until_eot",
         activation_kind="simple_activated_self_boost",
         activation_cost=activation_cost,
+        activation_limit_per_turn=activation_limit or None,
+        activation_count_this_turn=activation_count_before + 1,
         tapped=bool(permanent.get("tapped")),
         mana_paid=mana_paid,
         power_delta=power_delta,
@@ -47110,6 +47119,8 @@ def activate_generic_self_boost_permanent(
         phase=phase,
         **fields,
     )
+    if activation_limit > 0:
+        activation_usage[activation_turn_key] = activation_count_before + 1
     destination = None
     result = "stat_modifier_until_eot_applied"
     if toughness_after <= 0 and permanent in player.battlefield:

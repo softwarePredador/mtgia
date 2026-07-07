@@ -8083,10 +8083,11 @@ def is_permanent_activated_self_boost_unit(row: dict[str, Any]) -> bool:
     if not adapter_work_unit.startswith(SELF_BOOST_ACTIVATED_UNIT_PREFIX):
         return False
     abilities = ability_classes(row)
-    remaining_abilities = abilities - {"SimpleActivatedAbility"}
+    activated_ability_classes = {"SimpleActivatedAbility", "LimitedTimesPerTurnActivatedAbility"}
+    remaining_abilities = abilities - activated_ability_classes
     return (
         effect_classes(row) == {"BoostSourceEffect"}
-        and "SimpleActivatedAbility" in abilities
+        and bool(abilities & activated_ability_classes)
         and remaining_abilities.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
         and "::no_target_class::no_condition_class::" in adapter_work_unit
         and set(row.get("xmage_signals") or []) == {"activated_ability"}
@@ -11898,6 +11899,12 @@ def activated_self_boost_from_oracle(metadata: dict[str, Any]) -> dict[str, Any]
     if text.count(":") != 1:
         return "activated_self_boost_oracle_not_simple"
     cost_text, effect_text = [part.strip() for part in text.split(":", 1)]
+    activation_limit_per_turn = None
+    if effect_text.endswith("activate only once each turn."):
+        activation_limit_per_turn = 1
+        effect_text = effect_text[: -len("activate only once each turn.")].strip()
+    elif "activate only" in effect_text or "activate no more than" in effect_text:
+        return "activated_self_boost_oracle_activation_limit_not_supported"
     card_name = normalize_name(str(metadata.get("name") or ""))
     source_pattern = r"(?:this creature"
     if card_name:
@@ -11916,6 +11923,7 @@ def activated_self_boost_from_oracle(metadata: dict[str, Any]) -> dict[str, Any]
         "power_delta": int(match.group(1)),
         "toughness_delta": int(match.group(2)),
         **activation,
+        **({"activation_limit_per_turn": activation_limit_per_turn} if activation_limit_per_turn else {}),
     }
 
 
@@ -11980,14 +11988,28 @@ def activated_self_boost_from_source(source: str) -> dict[str, Any] | str:
         return "activated_self_boost_source_not_single_fixed"
     boost_index = text.find("BoostSourceEffect")
     window = text[max(0, boost_index - 500) : boost_index + 2000]
-    if "SimpleActivatedAbility" not in window:
+    if "SimpleActivatedAbility" not in window and "LimitedTimesPerTurnActivatedAbility" not in window:
         return "activated_self_boost_source_not_simple_activated"
+    activation_limit_per_turn = None
+    xmage_ability_class = "SimpleActivatedAbility"
+    if "LimitedTimesPerTurnActivatedAbility" in window:
+        xmage_ability_class = "LimitedTimesPerTurnActivatedAbility"
+        args = extract_constructor_args(text, "LimitedTimesPerTurnActivatedAbility")
+        if args is None:
+            return "activated_self_boost_source_activation_limit_not_supported"
+        split_args = split_top_level_args(args)
+        if len(split_args) >= 4:
+            if not re.fullmatch(r"1", split_args[3].strip()):
+                return "activated_self_boost_source_activation_limit_not_supported"
+        activation_limit_per_turn = 1
     activation = activated_self_boost_cost_from_source(window)
     if isinstance(activation, str):
         return activation
     return {
         "power_delta": int(boost_matches[0][0]),
         "toughness_delta": int(boost_matches[0][1]),
+        "xmage_ability_class": xmage_ability_class,
+        **({"activation_limit_per_turn": activation_limit_per_turn} if activation_limit_per_turn else {}),
         **activation,
     }
 
@@ -19913,14 +19935,17 @@ def split_row(
             int(parsed_activation["activation_cost_generic"]),
             list(parsed_activation["activation_cost_colors"]),
             bool(parsed_activation["activation_requires_tap"]),
+            int(parsed_activation.get("activation_limit_per_turn") or 0),
         )
         oracle_cost = (
             int(oracle_boost["activation_cost_generic"]),
             list(oracle_boost["activation_cost_colors"]),
             bool(oracle_boost["activation_requires_tap"]),
+            int(oracle_boost.get("activation_limit_per_turn") or 0),
         )
         if source_cost != oracle_cost:
             return None, "activated_self_boost_source_oracle_cost_mismatch"
+        xmage_ability_class = str(parsed_activation.get("xmage_ability_class") or "SimpleActivatedAbility")
         activated_effect = {
             "effect": "stat_modifier_until_eot",
             "battle_model_scope": SELF_BOOST_ACTIVATED_SCOPE,
@@ -19935,7 +19960,7 @@ def split_row(
             "toughness_boost": int(oracle_boost["toughness_delta"]),
             "duration": "until_end_of_turn",
             "xmage_effect_class": "BoostSourceEffect",
-            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_ability_class": xmage_ability_class,
             "activation_cost_mana": parsed_activation["activation_cost_mana"],
             "activation_cost_generic": parsed_activation["activation_cost_generic"],
             "activation_cost_colors": parsed_activation["activation_cost_colors"],
@@ -19958,13 +19983,16 @@ def split_row(
             "duration": "until_end_of_turn",
             "_activated_rule_effects": [activated_effect],
             "xmage_effect_class": "BoostSourceEffect",
-            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_ability_class": xmage_ability_class,
             "activation_cost_mana": parsed_activation["activation_cost_mana"],
             "activation_cost_generic": parsed_activation["activation_cost_generic"],
             "activation_cost_colors": parsed_activation["activation_cost_colors"],
             "activation_requires_tap": parsed_activation["activation_requires_tap"],
             "activation_requires_sacrifice": False,
         }
+        if parsed_activation.get("activation_limit_per_turn"):
+            activated_effect["activation_limit_per_turn"] = int(parsed_activation["activation_limit_per_turn"])
+            effect_json["activation_limit_per_turn"] = int(parsed_activation["activation_limit_per_turn"])
         auxiliary_keywords = ordered_keywords(
             {
                 STATIC_SELF_KEYWORD_ABILITY_CLASSES[ability]

@@ -1,0 +1,751 @@
+{
+  "battle_execution": {
+    "event_count": 32,
+    "results": [
+      {
+        "activation_limit_per_turn": 1,
+        "card_name": "Azimaet Drake",
+        "power_delta": 1,
+        "scenario": "Azimaet Drake activates self boost ability",
+        "source_power": 3,
+        "source_toughness": 2,
+        "toughness_delta": 0
+      },
+      {
+        "activation_limit_per_turn": 1,
+        "card_name": "Darkthicket Wolf",
+        "power_delta": 2,
+        "scenario": "Darkthicket Wolf activates self boost ability",
+        "source_power": 4,
+        "source_toughness": 4,
+        "toughness_delta": 2
+      },
+      {
+        "activation_limit_per_turn": 1,
+        "card_name": "Drake Hatchling",
+        "power_delta": 1,
+        "scenario": "Drake Hatchling activates self boost ability",
+        "source_power": 3,
+        "source_toughness": 2,
+        "toughness_delta": 0
+      },
+      {
+        "activation_limit_per_turn": 1,
+        "card_name": "Fire Drake",
+        "power_delta": 1,
+        "scenario": "Fire Drake activates self boost ability",
+        "source_power": 3,
+        "source_toughness": 2,
+        "toughness_delta": 0
+      },
+      {
+        "activation_limit_per_turn": 1,
+        "card_name": "Frilled Oculus",
+        "power_delta": 2,
+        "scenario": "Frilled Oculus activates self boost ability",
+        "source_power": 4,
+        "source_toughness": 4,
+        "toughness_delta": 2
+      },
+      {
+        "activation_limit_per_turn": 1,
+        "card_name": "Frilled Sandwalla",
+        "power_delta": 2,
+        "scenario": "Frilled Sandwalla activates self boost ability",
+        "source_power": 4,
+        "source_toughness": 4,
+        "toughness_delta": 2
+      },
+      {
+        "activation_limit_per_turn": 1,
+        "card_name": "Ghor-Clan Bloodscale",
+        "power_delta": 2,
+        "scenario": "Ghor-Clan Bloodscale activates self boost ability",
+        "source_power": 4,
+        "source_toughness": 4,
+        "toughness_delta": 2
+      },
+      {
+        "activation_limit_per_turn": 1,
+        "card_name": "Knight of the Skyward Eye",
+        "power_delta": 3,
+        "scenario": "Knight of the Skyward Eye activates self boost ability",
+        "source_power": 5,
+        "source_toughness": 5,
+        "toughness_delta": 3
+      },
+      {
+        "activation_limit_per_turn": 1,
+        "card_name": "Kraven's Cats",
+        "power_delta": 2,
+        "scenario": "Kraven's Cats activates self boost ability",
+        "source_power": 4,
+        "source_toughness": 4,
+        "toughness_delta": 2
+      },
+      {
+        "activation_limit_per_turn": 1,
+        "card_name": "Plated Rootwalla",
+        "power_delta": 3,
+        "scenario": "Plated Rootwalla activates self boost ability",
+        "source_power": 5,
+        "source_toughness": 5,
+        "toughness_delta": 3
+      },
+      {
+        "activation_limit_per_turn": 1,
+        "card_name": "Rootwalla",
+        "power_delta": 2,
+        "scenario": "Rootwalla activates self boost ability",
+        "source_power": 4,
+        "source_toughness": 4,
+        "toughness_delta": 2
+      },
+      {
+        "activation_limit_per_turn": 1,
+        "card_name": "Setessan Griffin",
+        "power_delta": 2,
+        "scenario": "Setessan Griffin activates self boost ability",
+        "source_power": 4,
+        "source_toughness": 4,
+        "toughness_delta": 2
+      },
+      {
+        "activation_limit_per_turn": 1,
+        "card_name": "Snarling Wolf",
+        "power_delta": 2,
+        "scenario": "Snarling Wolf activates self boost ability",
+        "source_power": 4,
+        "source_toughness": 4,
+        "toughness_delta": 2
+      },
+      {
+        "activation_limit_per_turn": 1,
+        "card_name": "Spitting Drake",
+        "power_delta": 1,
+        "scenario": "Spitting Drake activates self boost ability",
+        "source_power": 3,
+        "source_toughness": 2,
+        "toughness_delta": 0
+      },
+      {
+        "activation_limit_per_turn": 1,
+        "card_name": "Viashino Slaughtermaster",
+        "power_delta": 1,
+        "scenario": "Viashino Slaughtermaster activates self boost ability",
+        "source_power": 3,
+        "source_toughness": 3,
+        "toughness_delta": 1
+      },
+      {
+        "activation_limit_per_turn": 1,
+        "card_name": "Wild Aesthir",
+        "power_delta": 2,
+        "scenario": "Wild Aesthir activates self boost ability",
+        "source_power": 4,
+        "source_toughness": 2,
+        "toughness_delta": 0
+      }
+    ],
+    "scenario_count": 16
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-07T03:02:22.809269+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg588_limited_activated_self_boost_new_server_package_manifest.json",
+  "package_id": "pg588_limited_activated_self_boost_new_server_package_manifest",
+  "snapshot": "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 16
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "card_name": "Azimaet Drake",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f8a70755c5080096962911a99387b30e",
+          "oracle_hash": "de885ee22bf304e3f0652b091bea3591",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "card_name": "Darkthicket Wolf",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7117776ebbf78ea691e229682adc6a19",
+          "oracle_hash": "51632b3dffd1f4463568520122798c98",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "card_name": "Drake Hatchling",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f8a70755c5080096962911a99387b30e",
+          "oracle_hash": "de885ee22bf304e3f0652b091bea3591",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "card_name": "Fire Drake",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:51ab850a3252a785c52be4044b038574",
+          "oracle_hash": "20094d31326709799822cd22336ddf3d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "card_name": "Frilled Oculus",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f142a7f6bee719cf4e8d2be06e6d61fd",
+          "oracle_hash": "b16129e8bd621197891722a652a81918",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "card_name": "Frilled Sandwalla",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f142a7f6bee719cf4e8d2be06e6d61fd",
+          "oracle_hash": "b16129e8bd621197891722a652a81918",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "card_name": "Ghor-Clan Bloodscale",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:bfd9968d97aff459392feaaaaf1e8ced",
+          "oracle_hash": "8240687a9d0baa682dafa09133be4e2b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "card_name": "Knight of the Skyward Eye",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c927a8cd9c6fd3d6d8dd66bcb17e8348",
+          "oracle_hash": "65f7580e6f1b92c0d78785cc089ff37e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "card_name": "Kraven's Cats",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7117776ebbf78ea691e229682adc6a19",
+          "oracle_hash": "51632b3dffd1f4463568520122798c98",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "card_name": "Plated Rootwalla",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3dac63a6354d9f30e0052aba74e618b0",
+          "oracle_hash": "e71108ff6262677d4b53dd2f360837a6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "card_name": "Rootwalla",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f142a7f6bee719cf4e8d2be06e6d61fd",
+          "oracle_hash": "b16129e8bd621197891722a652a81918",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "card_name": "Setessan Griffin",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:059ea2231131ceaf4f16b3a7ea1a0de5",
+          "oracle_hash": "a21d2d8a99ac6ca50cb5f63512362994",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "card_name": "Snarling Wolf",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f142a7f6bee719cf4e8d2be06e6d61fd",
+          "oracle_hash": "b16129e8bd621197891722a652a81918",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "card_name": "Spitting Drake",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:51ab850a3252a785c52be4044b038574",
+          "oracle_hash": "20094d31326709799822cd22336ddf3d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "card_name": "Viashino Slaughtermaster",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:05c78e9f6eabbe6c46e8095feaae1644",
+          "oracle_hash": "695d755356fc06eb1b8cf7302cbedbbe",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "card_name": "Wild Aesthir",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8ca4c246e8546e434876625a878d2a18",
+          "oracle_hash": "08c4b43efa20a34803ff454d7d6d547c",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 16
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "card_name": "Azimaet Drake",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f8a70755c5080096962911a99387b30e",
+          "oracle_hash": "de885ee22bf304e3f0652b091bea3591",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "card_name": "Darkthicket Wolf",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7117776ebbf78ea691e229682adc6a19",
+          "oracle_hash": "51632b3dffd1f4463568520122798c98",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "card_name": "Drake Hatchling",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f8a70755c5080096962911a99387b30e",
+          "oracle_hash": "de885ee22bf304e3f0652b091bea3591",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "card_name": "Fire Drake",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:51ab850a3252a785c52be4044b038574",
+          "oracle_hash": "20094d31326709799822cd22336ddf3d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "card_name": "Frilled Oculus",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f142a7f6bee719cf4e8d2be06e6d61fd",
+          "oracle_hash": "b16129e8bd621197891722a652a81918",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "card_name": "Frilled Sandwalla",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f142a7f6bee719cf4e8d2be06e6d61fd",
+          "oracle_hash": "b16129e8bd621197891722a652a81918",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "card_name": "Ghor-Clan Bloodscale",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:bfd9968d97aff459392feaaaaf1e8ced",
+          "oracle_hash": "8240687a9d0baa682dafa09133be4e2b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "card_name": "Knight of the Skyward Eye",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c927a8cd9c6fd3d6d8dd66bcb17e8348",
+          "oracle_hash": "65f7580e6f1b92c0d78785cc089ff37e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "card_name": "Kraven's Cats",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7117776ebbf78ea691e229682adc6a19",
+          "oracle_hash": "51632b3dffd1f4463568520122798c98",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "card_name": "Plated Rootwalla",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3dac63a6354d9f30e0052aba74e618b0",
+          "oracle_hash": "e71108ff6262677d4b53dd2f360837a6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "card_name": "Rootwalla",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f142a7f6bee719cf4e8d2be06e6d61fd",
+          "oracle_hash": "b16129e8bd621197891722a652a81918",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "card_name": "Setessan Griffin",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:059ea2231131ceaf4f16b3a7ea1a0de5",
+          "oracle_hash": "a21d2d8a99ac6ca50cb5f63512362994",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "card_name": "Snarling Wolf",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f142a7f6bee719cf4e8d2be06e6d61fd",
+          "oracle_hash": "b16129e8bd621197891722a652a81918",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "card_name": "Spitting Drake",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:51ab850a3252a785c52be4044b038574",
+          "oracle_hash": "20094d31326709799822cd22336ddf3d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "card_name": "Viashino Slaughtermaster",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:05c78e9f6eabbe6c46e8095feaae1644",
+          "oracle_hash": "695d755356fc06eb1b8cf7302cbedbbe",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "card_name": "Wild Aesthir",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8ca4c246e8546e434876625a878d2a18",
+          "oracle_hash": "08c4b43efa20a34803ff454d7d6d547c",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 16
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Azimaet Drake",
+          "logical_rule_key": "battle_rule_v1:f8a70755c5080096962911a99387b30e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Darkthicket Wolf",
+          "logical_rule_key": "battle_rule_v1:7117776ebbf78ea691e229682adc6a19"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Drake Hatchling",
+          "logical_rule_key": "battle_rule_v1:f8a70755c5080096962911a99387b30e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Fire Drake",
+          "logical_rule_key": "battle_rule_v1:51ab850a3252a785c52be4044b038574"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Frilled Oculus",
+          "logical_rule_key": "battle_rule_v1:f142a7f6bee719cf4e8d2be06e6d61fd"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Frilled Sandwalla",
+          "logical_rule_key": "battle_rule_v1:f142a7f6bee719cf4e8d2be06e6d61fd"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Ghor-Clan Bloodscale",
+          "logical_rule_key": "battle_rule_v1:bfd9968d97aff459392feaaaaf1e8ced"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Knight of the Skyward Eye",
+          "logical_rule_key": "battle_rule_v1:c927a8cd9c6fd3d6d8dd66bcb17e8348"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Kraven's Cats",
+          "logical_rule_key": "battle_rule_v1:7117776ebbf78ea691e229682adc6a19"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Plated Rootwalla",
+          "logical_rule_key": "battle_rule_v1:3dac63a6354d9f30e0052aba74e618b0"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Rootwalla",
+          "logical_rule_key": "battle_rule_v1:f142a7f6bee719cf4e8d2be06e6d61fd"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Setessan Griffin",
+          "logical_rule_key": "battle_rule_v1:059ea2231131ceaf4f16b3a7ea1a0de5"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Snarling Wolf",
+          "logical_rule_key": "battle_rule_v1:f142a7f6bee719cf4e8d2be06e6d61fd"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Spitting Drake",
+          "logical_rule_key": "battle_rule_v1:51ab850a3252a785c52be4044b038574"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Viashino Slaughtermaster",
+          "logical_rule_key": "battle_rule_v1:05c78e9f6eabbe6c46e8095feaae1644"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Wild Aesthir",
+          "logical_rule_key": "battle_rule_v1:8ca4c246e8546e434876625a878d2a18"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 16
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Azimaet Drake",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:f8a70755c5080096962911a99387b30e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Darkthicket Wolf",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:7117776ebbf78ea691e229682adc6a19"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Drake Hatchling",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:f8a70755c5080096962911a99387b30e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Fire Drake",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:51ab850a3252a785c52be4044b038574"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Frilled Oculus",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:f142a7f6bee719cf4e8d2be06e6d61fd"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Frilled Sandwalla",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:f142a7f6bee719cf4e8d2be06e6d61fd"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Ghor-Clan Bloodscale",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:bfd9968d97aff459392feaaaaf1e8ced"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Knight of the Skyward Eye",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:c927a8cd9c6fd3d6d8dd66bcb17e8348"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Kraven's Cats",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:7117776ebbf78ea691e229682adc6a19"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Plated Rootwalla",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:3dac63a6354d9f30e0052aba74e618b0"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Rootwalla",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:f142a7f6bee719cf4e8d2be06e6d61fd"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Setessan Griffin",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:059ea2231131ceaf4f16b3a7ea1a0de5"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Snarling Wolf",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:f142a7f6bee719cf4e8d2be06e6d61fd"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Spitting Drake",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:51ab850a3252a785c52be4044b038574"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Viashino Slaughtermaster",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:05c78e9f6eabbe6c46e8095feaae1644"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Wild Aesthir",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:8ca4c246e8546e434876625a878d2a18"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 32,
+        "scenarios": 16
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

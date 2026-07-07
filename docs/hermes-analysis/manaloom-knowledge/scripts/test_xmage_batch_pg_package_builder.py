@@ -748,6 +748,40 @@ def test_manifest_builds_simple_activated_self_keyword_execution_scenario() -> N
     assert len(scenario["controller_hand"]) == 2
 
 
+def test_manifest_builds_simple_activated_self_boost_execution_scenario() -> None:
+    rule = {
+        "normalized_name": "rootwalla",
+        "card_name": "Rootwalla",
+        "oracle_hash": "hash-rootwalla",
+        "logical_rule_key": "battle_rule_v1:hash-rootwalla",
+        "required_effect_fields": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+            "activated_effect": "self_stat_modifier_until_eot",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+            "target": "self",
+            "target_controller": "self",
+            "power_delta": 2,
+            "toughness_delta": 2,
+            "activation_cost_mana": "{1}{G}",
+            "activation_cost_generic": 1,
+            "activation_cost_colors": ["G"],
+            "activation_limit_per_turn": 1,
+        },
+    }
+
+    scenario = builder.simple_activated_self_boost_execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "simple_activated_self_boost"
+    assert scenario["card"]["name"] == "Rootwalla"
+    assert scenario["controller_mana"]["generic"] == 1
+    assert scenario["controller_mana"]["green"] == 1
+    assert scenario["expected_power_delta"] == 2
+    assert scenario["expected_toughness_delta"] == 2
+    assert scenario["expected_activation_limit_per_turn"] == 1
+
+
 def test_manifest_builds_target_keyword_spell_execution_scenario() -> None:
     rule = {
         "normalized_name": "double cleave",
