@@ -1,0 +1,364 @@
+{
+  "battle_execution": {
+    "event_count": 28,
+    "results": [
+      {
+        "activation_limit_per_turn": 1,
+        "available_mana": 1,
+        "card_name": "Barrels of Blasting Jelly",
+        "conditional_mana": 1,
+        "scenario": "Barrels of Blasting Jelly refreshes modeled mana source",
+        "sources": 2,
+        "tapped": false
+      },
+      {
+        "activation_limit_per_turn": 1,
+        "available_mana": 1,
+        "card_name": "Foraging Wickermaw",
+        "conditional_mana": 1,
+        "scenario": "Foraging Wickermaw refreshes modeled mana source",
+        "sources": 2,
+        "tapped": false
+      },
+      {
+        "activation_limit_per_turn": 1,
+        "available_mana": 1,
+        "card_name": "Gravestone Strider",
+        "conditional_mana": 1,
+        "scenario": "Gravestone Strider refreshes modeled mana source",
+        "sources": 2,
+        "tapped": false
+      },
+      {
+        "activation_limit_per_turn": 1,
+        "available_mana": 1,
+        "card_name": "Salvaged Manaworker",
+        "conditional_mana": 1,
+        "scenario": "Salvaged Manaworker refreshes modeled mana source",
+        "sources": 2,
+        "tapped": false
+      },
+      {
+        "activation_limit_per_turn": 1,
+        "available_mana": 1,
+        "card_name": "Scarecrow Guide",
+        "conditional_mana": 1,
+        "scenario": "Scarecrow Guide refreshes modeled mana source",
+        "sources": 2,
+        "tapped": false
+      },
+      {
+        "activation_limit_per_turn": 1,
+        "available_mana": 1,
+        "card_name": "Shire Scarecrow",
+        "conditional_mana": 1,
+        "scenario": "Shire Scarecrow refreshes modeled mana source",
+        "sources": 2,
+        "tapped": false
+      },
+      {
+        "activation_limit_per_turn": 1,
+        "available_mana": 1,
+        "card_name": "Three Tree Mascot",
+        "conditional_mana": 1,
+        "scenario": "Three Tree Mascot refreshes modeled mana source",
+        "sources": 2,
+        "tapped": false
+      }
+    ],
+    "scenario_count": 7
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-07T05:11:57.240047+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg595_limited_times_any_color_mana_new_server_package_manifest.json",
+  "package_id": "pg595_limited_times_any_color_mana_new_server_package_manifest",
+  "snapshot": "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 7
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Barrels of Blasting Jelly",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f0bb162937ccbfd72c8e910cc65998f2",
+          "oracle_hash": "1358ec0bd768ddbbe61d4f51da75d371",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Foraging Wickermaw",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:55658d4a6b69b4823da754648c7dbd95",
+          "oracle_hash": "b561eaa6ae6de6a44a544f77eedf8633",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Gravestone Strider",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3e54c7656b564d9a607ed69435e255d6",
+          "oracle_hash": "e82c9d20f6c97b9308ba55d02d973f08",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Salvaged Manaworker",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d19499df027fc37f6a1862428765a9c6",
+          "oracle_hash": "2fbc40e2067c411ec5f194d7ebae3317",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Scarecrow Guide",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a407bfb0d5db91d6d983a3e411b5941a",
+          "oracle_hash": "2b574d886916add2c83e13828a3c56bc",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Shire Scarecrow",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:eb31c0c9cacc01c00982e7e947066737",
+          "oracle_hash": "da5ac98e86a8c1b47220fe1f95eeb411",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Three Tree Mascot",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c2b8dfa7df8651fe720a44afa8e4f4fc",
+          "oracle_hash": "c19d8274215aab484e04c9afc964a00e",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 7
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Barrels of Blasting Jelly",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f0bb162937ccbfd72c8e910cc65998f2",
+          "oracle_hash": "1358ec0bd768ddbbe61d4f51da75d371",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Foraging Wickermaw",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:55658d4a6b69b4823da754648c7dbd95",
+          "oracle_hash": "b561eaa6ae6de6a44a544f77eedf8633",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Gravestone Strider",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3e54c7656b564d9a607ed69435e255d6",
+          "oracle_hash": "e82c9d20f6c97b9308ba55d02d973f08",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Salvaged Manaworker",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d19499df027fc37f6a1862428765a9c6",
+          "oracle_hash": "2fbc40e2067c411ec5f194d7ebae3317",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Scarecrow Guide",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a407bfb0d5db91d6d983a3e411b5941a",
+          "oracle_hash": "2b574d886916add2c83e13828a3c56bc",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Shire Scarecrow",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:eb31c0c9cacc01c00982e7e947066737",
+          "oracle_hash": "da5ac98e86a8c1b47220fe1f95eeb411",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Three Tree Mascot",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c2b8dfa7df8651fe720a44afa8e4f4fc",
+          "oracle_hash": "c19d8274215aab484e04c9afc964a00e",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 7
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Barrels of Blasting Jelly",
+          "logical_rule_key": "battle_rule_v1:f0bb162937ccbfd72c8e910cc65998f2"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Foraging Wickermaw",
+          "logical_rule_key": "battle_rule_v1:55658d4a6b69b4823da754648c7dbd95"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Gravestone Strider",
+          "logical_rule_key": "battle_rule_v1:3e54c7656b564d9a607ed69435e255d6"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Salvaged Manaworker",
+          "logical_rule_key": "battle_rule_v1:d19499df027fc37f6a1862428765a9c6"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Scarecrow Guide",
+          "logical_rule_key": "battle_rule_v1:a407bfb0d5db91d6d983a3e411b5941a"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Shire Scarecrow",
+          "logical_rule_key": "battle_rule_v1:eb31c0c9cacc01c00982e7e947066737"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Three Tree Mascot",
+          "logical_rule_key": "battle_rule_v1:c2b8dfa7df8651fe720a44afa8e4f4fc"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 7
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Barrels of Blasting Jelly",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:f0bb162937ccbfd72c8e910cc65998f2"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Foraging Wickermaw",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:55658d4a6b69b4823da754648c7dbd95"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Gravestone Strider",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:3e54c7656b564d9a607ed69435e255d6"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Salvaged Manaworker",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:d19499df027fc37f6a1862428765a9c6"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Scarecrow Guide",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:a407bfb0d5db91d6d983a3e411b5941a"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Shire Scarecrow",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:eb31c0c9cacc01c00982e7e947066737"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Three Tree Mascot",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:c2b8dfa7df8651fe720a44afa8e4f4fc"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 28,
+        "scenarios": 7
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

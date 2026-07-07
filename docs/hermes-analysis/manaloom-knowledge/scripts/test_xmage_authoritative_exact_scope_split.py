@@ -11665,6 +11665,138 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "limited_mana_source_conditional_not_supported")
 
+    def test_limited_times_any_color_mana_source_maps_with_turn_limit(self) -> None:
+        row = queue_row(
+            split.RAMP_ARTIFACT_UNIT,
+            effect_classes=["AddManaOfAnyColorEffect"],
+            ability_kind="activated",
+            ability_classes=["LimitedTimesPerTurnActivatedManaAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Salvaged Manaworker",
+                type_line="Artifact Creature - Construct",
+                oracle_text="{1}: Add one mana of any color. Activate only once each turn.",
+            ),
+            source_text=(
+                "this.addAbility(new LimitedTimesPerTurnActivatedManaAbility("
+                "Zone.BATTLEFIELD, new AddManaOfAnyColorEffect(), new GenericManaCost(1)));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(proposal["family_id"], "xmage_limited_times_any_color_mana_source_permanent")
+        self.assertEqual(effect["battle_model_scope"], split.MANA_SCOPE)
+        self.assertEqual(effect["produces"], "WUBRG")
+        self.assertEqual(effect["mana_produced"], 1)
+        self.assertEqual(effect["activation_mana_cost"], "{1}")
+        self.assertFalse(effect["mana_activation_requires_tap"])
+        self.assertEqual(effect["activation_limit_per_turn"], 1)
+        self.assertEqual(effect["xmage_mana_effect_class"], "AddManaOfAnyColorEffect")
+        self.assertNotIn("_runtime_partial", effect)
+
+    def test_limited_times_any_color_mana_source_with_auxiliary_maps_partial(self) -> None:
+        row = queue_row(
+            split.RAMP_ARTIFACT_UNIT,
+            effect_classes=["AddManaOfAnyColorEffect", "DamageTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["LimitedTimesPerTurnActivatedManaAbility", "SimpleActivatedAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Barrels of Blasting Jelly",
+                type_line="Artifact",
+                oracle_text=(
+                    "{1}: Add one mana of any color. Activate only once each turn.\n"
+                    "{5}, {T}, Sacrifice this artifact: It deals 5 damage to target creature."
+                ),
+            ),
+            source_text=(
+                "this.addAbility(new LimitedTimesPerTurnActivatedManaAbility("
+                "Zone.BATTLEFIELD, new AddManaOfAnyColorEffect(), new GenericManaCost(1)));"
+                "Ability ability = new SimpleActivatedAbility(new DamageTargetEffect(5, \"it\"), new GenericManaCost(5));"
+                "ability.addCost(new TapSourceCost());"
+                "ability.addCost(new SacrificeSourceCost());"
+                "this.addAbility(ability);"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertTrue(effect["_runtime_partial"])
+        self.assertEqual(effect["modeled_ability_subset"], "mana_source_only")
+        self.assertEqual(effect["xmage_unmodeled_auxiliary_ability_classes"], ["SimpleActivatedAbility"])
+        self.assertEqual(effect["xmage_unmodeled_effect_classes"], ["DamageTargetEffect"])
+
+    def test_limited_times_custom_any_color_mana_source_with_tail_maps_partial(self) -> None:
+        row = queue_row(
+            split.RAMP_CREATURE_UNIT,
+            effect_classes=[
+                "AddManaOfAnyColorEffect",
+                "BecomesColorTargetEffect",
+                "ForagingWickermawManaEffect",
+                "SurveilEffect",
+            ],
+            ability_kind="activated",
+            ability_classes=["EntersBattlefieldTriggeredAbility", "LimitedTimesPerTurnActivatedManaAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Foraging Wickermaw",
+                type_line="Artifact Creature - Scarecrow",
+                oracle_text=(
+                    "When this creature enters, surveil 1.\n"
+                    "{1}: Add one mana of any color. This creature becomes that color until end of turn. "
+                    "Activate only once each turn."
+                ),
+            ),
+            source_text=(
+                "this.addAbility(new EntersBattlefieldTriggeredAbility(new SurveilEffect(1)));"
+                "this.addAbility(new LimitedTimesPerTurnActivatedManaAbility("
+                "Zone.BATTLEFIELD, new ForagingWickermawManaEffect(), new GenericManaCost(1)));"
+                "class ForagingWickermawManaEffect extends AddManaOfAnyColorEffect {"
+                "ForagingWickermawManaEffect() { super(1); } }"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertTrue(effect["_runtime_partial"])
+        self.assertEqual(effect["xmage_mana_effect_class"], "ForagingWickermawManaEffect")
+        self.assertEqual(effect["_runtime_partial_mana_tail"], "this creature becomes that color until end of turn")
+        self.assertEqual(
+            effect["xmage_unmodeled_effect_classes"],
+            ["BecomesColorTargetEffect", "SurveilEffect"],
+        )
+
+    def test_limited_times_basic_mana_source_blocks_unpaid_life_cost(self) -> None:
+        row = queue_row(
+            split.RAMP_CREATURE_UNIT,
+            effect_classes=["BasicManaEffect"],
+            ability_kind="activated",
+            ability_classes=["DevoidAbility", "LimitedTimesPerTurnActivatedManaAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Kozilek's Translator",
+                type_line="Creature - Eldrazi Drone",
+                oracle_text="Devoid\nPay 1 life: Add {C}. Activate only once each turn.",
+            ),
+            source_text=(
+                "this.addAbility(new DevoidAbility(this.color));"
+                "this.addAbility(new LimitedTimesPerTurnActivatedManaAbility("
+                "Zone.BATTLEFIELD, new BasicManaEffect(Mana.ColorlessMana(1)), new PayLifeCost(1)));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "limited_mana_source_cost_not_supported")
+
     def test_limited_times_color_choice_mana_source_preserves_static_keyword(self) -> None:
         row = queue_row(
             split.RAMP_CREATURE_UNIT,
