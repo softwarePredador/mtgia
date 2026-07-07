@@ -347,6 +347,74 @@ def test_simple_activated_tap_target_runner_executes_restricted_target() -> None
     assert result["source_tapped"] is True
 
 
+def test_simple_activated_add_counters_target_runner_executes_minus_counter() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "artifact",
+        "battle_model_scope": "xmage_permanent_simple_activated_add_counters_target_creature_v1",
+        "activated_effect": "add_counters",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_add_counters_target_creature_v1",
+        "activated_add_counters": True,
+        "activated_add_counters_target": "creature",
+        "activated_add_counters_counter_type": "-1/-1",
+        "activated_add_counters_count": 1,
+        "target": "creature",
+        "target_constraints": {"card_types": ["creature"]},
+        "target_controller": "any",
+        "counter_type": "-1/-1",
+        "counter_count": 1,
+        "count": 1,
+        "activation_cost_mana": "{4}",
+        "activation_cost_generic": 4,
+        "activation_cost_colors": [],
+        "activation_requires_tap": True,
+        "activation_requires_sacrifice": False,
+        "_rule_logical_key": "battle_rule_v1:gnarled-effigy",
+    }
+    try:
+        result = validator.run_simple_activated_add_counters_target(
+            battle,
+            {
+                "name": "Gnarled Effigy puts a counter on target creature",
+                "type": "simple_activated_add_counters_target",
+                "card": {"name": "Gnarled Effigy"},
+                "target": {
+                    "name": "E2E Counter Target",
+                    "type_line": "Creature - Soldier",
+                    "effect": "creature",
+                    "power": 3,
+                    "toughness": 3,
+                },
+                "controller_mana": {"generic": 4},
+                "expected_tapped_source": True,
+                "expected_counter_type": "-1/-1",
+                "expected_counter_count": 1,
+                "logical_rule_key": "battle_rule_v1:gnarled-effigy",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Gnarled Effigy"
+    assert result["target"] == "E2E Counter Target"
+    assert result["counter_type"] == "-1/-1"
+    assert result["counters_added"] == 1
+    assert result["source_tapped"] is True
+    assert any(
+        event == "activated_add_counters_target_resolved"
+        and data.get("card") == "Gnarled Effigy"
+        and data.get("target") == "E2E Counter Target"
+        and data.get("counters_added") == 1
+        for event, data in events
+    )
+
+
 def test_simple_activated_self_keyword_runner_executes_keyword_effect() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

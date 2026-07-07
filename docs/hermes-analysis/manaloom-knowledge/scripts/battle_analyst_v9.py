@@ -14972,6 +14972,17 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
                 check_sbas_until_stable(all_players)
                 flush_triggers_in_apnap(active_player, all_players, stack)
                 return True
+            if activate_best_generic_add_counters_target_permanent(
+                active_player,
+                opponents,
+                all_players,
+                turn,
+                rng,
+                phase=phase,
+            ):
+                check_sbas_until_stable(all_players)
+                flush_triggers_in_apnap(active_player, all_players, stack)
+                return True
             if activate_best_generic_target_boost_permanent(
                 active_player,
                 opponents,
@@ -46004,6 +46015,9 @@ GENERIC_TAP_DAMAGE_ACTIVATED_SCOPE = "xmage_tap_fixed_damage_target_activated_ab
 SIMPLE_ACTIVATED_DAMAGE_SCOPE = "xmage_permanent_simple_activated_damage_v1"
 SIMPLE_ACTIVATED_DESTROY_SCOPE = "xmage_permanent_simple_activated_destroy_target_v1"
 SIMPLE_ACTIVATED_TAP_TARGET_SCOPE = "xmage_permanent_simple_activated_tap_target_v1"
+SIMPLE_ACTIVATED_TARGET_ADD_COUNTERS_SCOPE = (
+    "xmage_permanent_simple_activated_add_counters_target_creature_v1"
+)
 SIMPLE_ACTIVATED_SELF_BOOST_SCOPE = "xmage_permanent_simple_activated_self_boost_until_eot_v1"
 SIMPLE_ACTIVATED_SELF_KEYWORD_SCOPE = "xmage_permanent_simple_activated_self_keyword_until_eot_v1"
 SIMPLE_ACTIVATED_REGENERATE_SOURCE_SCOPE = "xmage_permanent_simple_activated_regenerate_source_v1"
@@ -46143,6 +46157,50 @@ def _activated_rule_effects_for_permanent(permanent):
         ):
             tap_target_effect[key] = permanent.get(key)
         effects.append(tap_target_effect)
+    if (
+        permanent.get("activated_effect") == "add_counters"
+        and permanent.get("activated_battle_model_scope") == SIMPLE_ACTIVATED_TARGET_ADD_COUNTERS_SCOPE
+        and str(permanent.get("activated_add_counters_target") or permanent.get("target") or "").lower() != "self"
+    ):
+        add_counters_effect = {
+            "effect": "add_counters",
+            "battle_model_scope": permanent.get("activated_battle_model_scope"),
+            "ability_kind": "activated",
+            "activated_effect": "add_counters",
+            "activated_add_counters": bool(permanent.get("activated_add_counters")),
+            "activated_add_counters_target": permanent.get("activated_add_counters_target")
+            or permanent.get("target")
+            or "creature",
+            "activated_add_counters_counter_type": permanent.get("activated_add_counters_counter_type")
+            or permanent.get("counter_type"),
+            "activated_add_counters_count": permanent.get("activated_add_counters_count")
+            or permanent.get("counter_count")
+            or permanent.get("count"),
+            "activation_requires_tap": bool(permanent.get("activation_requires_tap")),
+            "activation_requires_sacrifice": bool(permanent.get("activation_requires_sacrifice")),
+            "activation_cost_mana": permanent.get("activation_cost_mana"),
+            "activation_cost_generic": permanent.get("activation_cost_generic"),
+            "activation_cost_colors": permanent.get("activation_cost_colors"),
+            "target": permanent.get("target") or "creature",
+            "target_constraints": permanent.get("target_constraints") or {"card_types": ["creature"]},
+            "target_controller": permanent.get("target_controller") or "any",
+            "counter_type": permanent.get("counter_type") or permanent.get("activated_add_counters_counter_type"),
+            "counter_count": permanent.get("counter_count")
+            or permanent.get("activated_add_counters_count")
+            or permanent.get("count"),
+            "count": permanent.get("count") or permanent.get("activated_add_counters_count"),
+        }
+        for key in (
+            "_rule_source",
+            "_rule_review_status",
+            "_rule_execution_status",
+            "_rule_confidence",
+            "_rule_version",
+            "_rule_logical_key",
+            "_rule_oracle_hash",
+        ):
+            add_counters_effect[key] = permanent.get(key)
+        effects.append(add_counters_effect)
     if (
         not any(effect.get("battle_model_scope") in SIMPLE_ACTIVATED_TOKEN_SCOPES for effect in effects)
         and permanent.get("activated_effect") == "token_maker"
@@ -47798,6 +47856,248 @@ def activate_best_generic_tap_target_permanent(player, opponents, all_players, t
         return False
     options.sort(key=lambda item: (item[0], item[1], item[2]), reverse=True)
     return activate_generic_tap_target_permanent(
+        player,
+        opponents,
+        options[0][3],
+        turn,
+        rng,
+        phase=phase,
+    )
+
+
+def activated_target_add_counters_effect_for_permanent(permanent):
+    if not isinstance(permanent, dict):
+        return None
+    for effect_data in _activated_rule_effects_for_permanent(permanent):
+        if (
+            effect_data.get("battle_model_scope") == SIMPLE_ACTIVATED_TARGET_ADD_COUNTERS_SCOPE
+            and effect_data.get("ability_kind") == "activated"
+            and effect_data.get("activated_effect") == "add_counters"
+            and effect_data.get("activated_add_counters")
+            and str(effect_data.get("activated_add_counters_target") or effect_data.get("target") or "").lower()
+            != "self"
+        ):
+            return effect_data
+    return None
+
+
+def _activated_target_add_counters_resolution_effect(effect_data):
+    target = str(effect_data.get("activated_add_counters_target") or effect_data.get("target") or "creature").lower()
+    return {
+        **effect_data,
+        "effect": "add_counters",
+        "target": target,
+        "target_constraints": effect_data.get("target_constraints") or {"card_types": ["creature"]},
+        "target_controller": effect_data.get("target_controller") or "any",
+        "counter_type": (
+            effect_data.get("activated_add_counters_counter_type")
+            or effect_data.get("counter_type")
+            or "+1/+1"
+        ),
+        "counter_count": int(
+            effect_data.get("activated_add_counters_count")
+            or effect_data.get("counter_count")
+            or effect_data.get("count")
+            or 1
+        ),
+    }
+
+
+def can_activate_generic_add_counters_target_permanent(player, permanent, opponents, *, effect_data=None):
+    effect_data = effect_data or activated_target_add_counters_effect_for_permanent(permanent)
+    if effect_data is None:
+        return False
+    if permanent not in getattr(player, "battlefield", []):
+        return False
+    if effect_data.get("activation_requires_tap") and permanent.get("tapped"):
+        return False
+    if (
+        effect_data.get("activation_requires_tap")
+        and is_battlefield_creature(permanent)
+        and permanent.get("summoning_sick")
+        and not has_haste(permanent)
+    ):
+        return False
+    if effect_data.get("activation_requires_sacrifice"):
+        return False
+    activation_cost = effect_data.get("activation_cost_mana")
+    if not activation_cost:
+        activation_cost = _activation_cost_text(
+            int(effect_data.get("activation_cost_generic") or 0),
+            effect_data.get("activation_cost_colors") or [],
+        )
+    if not player.can_pay(activation_cost):
+        return False
+    selected_targets, _target_options = choose_add_counters_targets(
+        player,
+        opponents,
+        permanent,
+        _activated_target_add_counters_resolution_effect(effect_data),
+    )
+    return bool(selected_targets)
+
+
+def activate_generic_add_counters_target_permanent(player, opponents, permanent, turn, rng, *, phase=None):
+    effect_data = activated_target_add_counters_effect_for_permanent(permanent)
+    if not can_activate_generic_add_counters_target_permanent(
+        player,
+        permanent,
+        opponents,
+        effect_data=effect_data,
+    ):
+        return False
+    phase = phase or "postcombat_main"
+    activation_cost = effect_data.get("activation_cost_mana")
+    if not activation_cost:
+        activation_cost = _activation_cost_text(
+            int(effect_data.get("activation_cost_generic") or 0),
+            effect_data.get("activation_cost_colors") or [],
+        )
+    resolution_effect = _activated_target_add_counters_resolution_effect(effect_data)
+    selected_targets, target_options = choose_add_counters_targets(
+        player,
+        opponents,
+        permanent,
+        resolution_effect,
+    )
+    if not selected_targets:
+        return False
+    if not player.spend_mana(activation_cost):
+        return False
+    if effect_data.get("activation_requires_tap"):
+        permanent["tapped"] = True
+    target_owner, target = selected_targets[0]
+    activation_cost_generic = int(effect_data.get("activation_cost_generic") or 0)
+    activation_cost_colors = list(effect_data.get("activation_cost_colors") or [])
+    mana_paid = activation_cost_generic + len(activation_cost_colors)
+    target_type = str(resolution_effect.get("target") or "creature")
+    decision = targeting_decision(
+        permanent,
+        target,
+        player,
+        target_controller=target_owner,
+        target_type=target_type,
+    )
+    available_options = [
+        decision_card_option(
+            candidate,
+            get_card_effect(candidate),
+            action="activate_add_counters_target",
+            score=sum(target_priority(candidate)),
+            target_controller=owner.name,
+        )
+        for owner, candidate in selected_targets[:8]
+    ]
+    fields = replay_rule_fields(effect_data)
+    emit_decision_trace(
+        decision_type="activated_ability",
+        player=player,
+        turn=turn,
+        phase=phase,
+        available_options=available_options,
+        chosen_option=available_options[0] if available_options else decision_card_option(target, get_card_effect(target)),
+        rejected_options=[],
+        score_components={
+            "activation_cost": activation_cost,
+            "target": target.get("name", "?"),
+            "target_type": target_type,
+            "target_score": list(target_priority(target)),
+            "counter_type": resolution_effect.get("counter_type"),
+            "counter_count": resolution_effect.get("counter_count"),
+            "requires_tap": 1 if effect_data.get("activation_requires_tap") else 0,
+        },
+        rule_source=fields.get("rule_source", "battle_rule"),
+        rule_status=fields.get("rule_review_status", "verified"),
+        confidence="medium",
+        expected_benefit_score=max(10, sum(target_priority(target)) * 3),
+        actual_outcome="activated_add_counters_target_used",
+        reason="use_activated_add_counters_target_when_legal_target_available",
+        heuristic_version=DECISION_STRATEGY_VERSION,
+        resource_delta={
+            "mana": -mana_paid,
+            "tapped": 1 if effect_data.get("activation_requires_tap") else 0,
+            "counters": int(resolution_effect.get("counter_count") or 1),
+        },
+        risk_flags=[
+            flag
+            for flag, active in {
+                "tap_ability": bool(effect_data.get("activation_requires_tap")),
+                "activated_add_counters_target": True,
+                "simplified_target_choice": True,
+            }.items()
+            if active
+        ],
+    )
+    emit_replay_event(
+        "activated_ability",
+        player=player.name,
+        card=permanent.get("name", "?"),
+        effect="add_counters",
+        activation_kind="simple_activated_add_counters_target",
+        activation_cost=activation_cost,
+        tapped=bool(permanent.get("tapped")),
+        mana_paid=mana_paid,
+        target=target.get("name", "?"),
+        target_player=target_owner.name,
+        counter_type=resolution_effect.get("counter_type"),
+        counter_count=resolution_effect.get("counter_count"),
+        turn=turn,
+        phase=phase,
+        **decision,
+        **fields,
+    )
+    resolved = resolve_add_counters_target_effect(
+        player,
+        opponents,
+        permanent,
+        resolution_effect,
+        turn,
+        finish_spell=False,
+        event_name="activated_add_counters_target_resolved",
+        phase=phase,
+    )
+    return bool(resolved)
+
+
+def activate_best_generic_add_counters_target_permanent(player, opponents, all_players, turn, rng, *, phase=None):
+    options = []
+    for permanent in list(getattr(player, "battlefield", []) or []):
+        effect_data = activated_target_add_counters_effect_for_permanent(permanent)
+        if not can_activate_generic_add_counters_target_permanent(
+            player,
+            permanent,
+            opponents,
+            effect_data=effect_data,
+        ):
+            continue
+        resolution_effect = _activated_target_add_counters_resolution_effect(effect_data)
+        selected_targets, _target_options = choose_add_counters_targets(
+            player,
+            opponents,
+            permanent,
+            resolution_effect,
+        )
+        if not selected_targets:
+            continue
+        activation_cost = effect_data.get("activation_cost_mana")
+        if not activation_cost:
+            activation_cost = _activation_cost_text(
+                int(effect_data.get("activation_cost_generic") or 0),
+                effect_data.get("activation_cost_colors") or [],
+            )
+        target_owner, target = selected_targets[0]
+        options.append((
+            target_priority(target),
+            -_mana_cost_text_value(activation_cost),
+            str(permanent.get("name") or ""),
+            permanent,
+            target_owner,
+            target,
+        ))
+    if not options:
+        return False
+    options.sort(key=lambda item: (item[0], item[1], item[2]), reverse=True)
+    return activate_generic_add_counters_target_permanent(
         player,
         opponents,
         options[0][3],

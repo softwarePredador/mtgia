@@ -2594,6 +2594,38 @@ def simple_activated_tap_target_execution_scenario_from_expected_rule(
     }
 
 
+def simple_activated_add_counters_target_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_permanent_simple_activated_add_counters_target_creature_v1":
+        return None
+    target = required.get("activated_add_counters_target") or required.get("target") or "creature"
+    constraints = dict(required.get("target_constraints") or {"card_types": ["creature"]})
+    target_fixture = _target_fixture_from_constraints(
+        "E2E Legal Counter Target",
+        constraints,
+        matching=True,
+    )
+    return {
+        "name": f"{rule['card_name']} activates add counters ability",
+        "type": "simple_activated_add_counters_target",
+        "card": {"name": rule["card_name"]},
+        "controller_mana": _manifest_mana_for_required_activation(required),
+        "expected_tapped_source": bool(required.get("activation_requires_tap")),
+        "expected_target": target,
+        "expected_counter_type": required.get("activated_add_counters_counter_type") or required.get("counter_type"),
+        "expected_counter_count": int(
+            required.get("activated_add_counters_count")
+            or required.get("counter_count")
+            or required.get("count")
+            or 1
+        ),
+        "target": target_fixture,
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def simple_activated_destroy_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
@@ -3520,6 +3552,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or damage_gain_life_spell_execution_scenario_from_expected_rule(rule)
         or simple_activated_damage_execution_scenario_from_expected_rule(rule)
         or simple_activated_tap_target_execution_scenario_from_expected_rule(rule)
+        or simple_activated_add_counters_target_execution_scenario_from_expected_rule(rule)
         or simple_activated_destroy_execution_scenario_from_expected_rule(rule)
         or simple_activated_self_boost_execution_scenario_from_expected_rule(rule)
         or simple_activated_self_keyword_execution_scenario_from_expected_rule(rule)

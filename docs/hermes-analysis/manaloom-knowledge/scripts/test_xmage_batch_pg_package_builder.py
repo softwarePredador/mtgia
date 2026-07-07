@@ -1039,6 +1039,44 @@ def test_manifest_builds_simple_activated_tap_target_restricted_fixture() -> Non
     assert scenario["controller_mana"]["generic"] == 1
 
 
+def test_manifest_builds_simple_activated_add_counters_target_scenario() -> None:
+    rule = {
+        "normalized_name": "gnarled effigy",
+        "card_name": "Gnarled Effigy",
+        "oracle_hash": "hash-gnarled-effigy",
+        "logical_rule_key": "battle_rule_v1:hash-gnarled-effigy",
+        "required_effect_fields": {
+            "effect": "artifact",
+            "battle_model_scope": "xmage_permanent_simple_activated_add_counters_target_creature_v1",
+            "activated_effect": "add_counters",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_add_counters_target_creature_v1",
+            "activated_add_counters": True,
+            "activated_add_counters_target": "creature",
+            "activated_add_counters_counter_type": "-1/-1",
+            "activated_add_counters_count": 1,
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "counter_type": "-1/-1",
+            "counter_count": 1,
+            "activation_cost_mana": "{4}",
+            "activation_cost_generic": 4,
+            "activation_cost_colors": [],
+            "activation_requires_tap": True,
+        },
+    }
+
+    scenario = builder.simple_activated_add_counters_target_execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "simple_activated_add_counters_target"
+    assert scenario["expected_target"] == "creature"
+    assert scenario["expected_counter_type"] == "-1/-1"
+    assert scenario["expected_counter_count"] == 1
+    assert scenario["expected_tapped_source"] is True
+    assert scenario["target"]["type_line"] == "Creature - Soldier"
+    assert scenario["controller_mana"]["generic"] == 4
+
+
 def test_manifest_builds_simple_activated_destroy_execution_scenario() -> None:
     rule = {
         "normalized_name": "caustic caterpillar",

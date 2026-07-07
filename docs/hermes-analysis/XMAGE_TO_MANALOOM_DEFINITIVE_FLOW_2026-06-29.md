@@ -18154,6 +18154,79 @@ Current next high-volume queue after PG612:
 - `direct_damage::targeted_damage_variant_v1` - `775`
 - `add_counters::source_add_counters_variant_v1` - `771`
 
+## PG613 Checkpoint - Activated Target Add Counters
+
+PG613 adds a new exact runtime-backed scope for simple permanent activated
+abilities that put a fixed `+1/+1` or `-1/-1` counter on target creature:
+`xmage_permanent_simple_activated_add_counters_target_creature_v1`.
+
+Promoted cards:
+
+- `Dragon Blood` - `{3}, {T}: Put a +1/+1 counter on target creature.`
+- `Fevered Convulsions` - `{2}{B}{B}: Put a -1/-1 counter on target creature.`
+- `Gnarled Effigy` - `{4}, {T}: Put a -1/-1 counter on target creature.`
+
+Implementation:
+
+- `xmage_authoritative_exact_scope_split.py` now parses matching Oracle/XMage
+  signatures, rejects non-simple or extra-cost neighbors, and emits an exact
+  activated `add_counters` effect with target constraints;
+- `battle_analyst_v9.py` now activates top-level and `_activated_rule_effects`
+  forms of the new scope, pays mana, taps the source when required, chooses a
+  legal target, and resolves the counter placement through the existing target
+  counter resolver;
+- `xmage_batch_pg_package_builder.py` now creates executable package scenarios
+  for the new activated target-counter scope;
+- `battle_package_end_to_end_validation.py` now validates package scenarios for
+  both positive and negative counter placement.
+
+Validation:
+
+- focused Python compilation passed for the touched splitter, package builder,
+  E2E validator, and battle runtime scripts;
+- focused pytest passed with `865` tests and `161` subtests;
+- exact split produced `proposal_count=3` and
+  `safe_for_batch_pg_package_count=3`;
+- precheck found `3/3` target card rows, `0` existing expected rows, and `0`
+  shadow rows to deprecate;
+- apply/postcheck confirmed `upserted_rows=3`, `3/3` verified/auto promoted
+  rows, and `3/3` rows with `oracle_hash`;
+- PG -> SQLite/snapshot sync loaded `3` PostgreSQL rows, updated `3` SQLite
+  rows, and exported `5802` canonical snapshot rows;
+- metadata sync used `database_target=127.0.0.1:15432/halder`, matched `6970`
+  PostgreSQL cards, wrote `6889` SQLite cache alias rows, and left
+  `deck_cards` at `2699/2699` matched;
+- E2E validation passed PostgreSQL, SQLite, snapshot, runtime lookup, and `3`
+  battle execution scenarios with `6` runtime events;
+- PG/Hermes/SQLite contract audit passed `51/51`;
+- legacy contamination audit passed;
+- operational surface alignment audit passed;
+- strategy consistency audit passed `26/26`;
+- multi-rule runtime readiness remained bounded to existing global review gaps
+  (`no_runtime_safe_primary=1101`, `single_primary_with_blocked_alternatives=282`,
+  `composite_resolution_ready=2`);
+- global readiness now reports `battle_and_oracle_ready=5895` and
+  `battle_family_mapper_required=27978`;
+- post-sync queue rebuild reduced `target_identity_count` from `25058` to
+  `25055`, `xmage_authoritative_source_count` from `24744` to `24741`, and
+  `xmage_authoritative_adapter_required_count` from `24744` to `24741`;
+- final exact-scope recheck against the post-PG613 queue returned
+  `proposal_count=0` and `safe_for_batch_pg_package_count=0`.
+
+Residual boundary: PG613 does not authorize sacrifice/pay-life/discard/remove
+counter activation costs, non-creature targets, target restrictions beyond
+plain `target creature`, multiple-target counter placement, dynamic counter
+counts, charge/spore/non-P1P1/M1M1 counters, or source/self-counter variants.
+Those remain separate adapter contracts.
+
+Current next high-volume queue after PG613:
+
+- `recursion::xmage_graveyard_return_variant_review_v1` - `1795`
+- `draw_engine::xmage_draw_card_variant_review_v1` - `1577`
+- `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1` - `1085`
+- `direct_damage::targeted_damage_variant_v1` - `775`
+- `add_counters::source_add_counters_variant_v1` - `771`
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

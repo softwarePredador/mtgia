@@ -3522,6 +3522,108 @@ def run_simple_activated_tap_target(
     }
 
 
+def run_simple_activated_add_counters_target(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    effect = battle.get_card_effect(card)
+    permanent_type = str(effect.get("effect") or "permanent")
+    default_type_line = {
+        "creature": "Creature - Soldier",
+        "artifact": "Artifact",
+        "enchantment": "Enchantment",
+    }.get(permanent_type, "Artifact")
+    source = battle.enrich_card(
+        {
+            **card,
+            "type_line": default_type_line,
+            "summoning_sick": False,
+            **effect,
+            **dict(scenario.get("source_overrides") or {}),
+        }
+    )
+    active = battle.Player(str(scenario.get("player") or "Activated Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Activated Opponent"), None, [])
+    target_fixture = dict(scenario.get("target") or {})
+    target = battle.enrich_card(
+        {
+            "name": str(scenario.get("target_name") or f"E2E Counter Target for {card['name']}"),
+            "type_line": "Creature - Warrior",
+            "effect": "creature",
+            "power": int(scenario.get("target_power") or 3),
+            "toughness": int(scenario.get("target_toughness") or 3),
+            "cmc": int(scenario.get("target_cmc") or 3),
+            "tapped": False,
+            **target_fixture,
+        }
+    )
+    expected_counter_type = str(scenario.get("expected_counter_type") or effect.get("counter_type") or "+1/+1")
+    if expected_counter_type == "-1/-1":
+        active.battlefield = [source]
+        opponent.battlefield = [target]
+    else:
+        active.battlefield = [source, target]
+        opponent.battlefield = []
+    add_manifest_mana(active, scenario.get("controller_mana") or {})
+    expected_tapped_source = bool(scenario.get("expected_tapped_source", effect.get("activation_requires_tap", False)))
+    expected_counter_count = int(scenario.get("expected_counter_count") or effect.get("counter_count") or 1)
+    before = (
+        int(target.get("plus_one_counters") or 0)
+        if expected_counter_type == "+1/+1"
+        else int(target.get("minus_one_counters") or 0)
+    )
+
+    if not battle.can_activate_generic_add_counters_target_permanent(active, source, [opponent]):
+        fail("battle_execution", f"{card['name']} simple activated add counters target cannot activate")
+    activated = battle.activate_generic_add_counters_target_permanent(
+        active,
+        [opponent],
+        source,
+        turn=int(scenario.get("turn") or 6133),
+        rng=random.Random(int(scenario.get("seed") or 6133)),
+        phase=str(scenario.get("phase") or "postcombat_main"),
+    )
+    if not activated:
+        fail("battle_execution", f"{card['name']} simple activated add counters target activation failed")
+    after = (
+        int(target.get("plus_one_counters") or 0)
+        if expected_counter_type == "+1/+1"
+        else int(target.get("minus_one_counters") or 0)
+    )
+    if after - before != expected_counter_count:
+        fail(
+            "battle_execution",
+            f"{card['name']} expected {expected_counter_count} {expected_counter_type} counters, got {after - before}",
+        )
+    if bool(source.get("tapped")) != expected_tapped_source:
+        fail(
+            "battle_execution",
+            f"{card['name']} source tapped={source.get('tapped')} expected {expected_tapped_source}",
+        )
+    activation_event = next(
+        (
+            data
+            for event, data in reversed(events)
+            if event == "activated_ability"
+            and data.get("card") == card.get("name")
+            and data.get("activation_kind") == "simple_activated_add_counters_target"
+        ),
+        None,
+    )
+    if activation_event is None:
+        fail("battle_events", f"missing {card['name']} simple activated add counters event")
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "target": target.get("name"),
+        "counter_type": expected_counter_type,
+        "counters_added": after - before,
+        "source_tapped": bool(source.get("tapped")),
+    }
+
+
 def run_simple_activated_destroy(
     battle,
     scenario: dict[str, Any],
@@ -5627,6 +5729,7 @@ SCENARIO_RUNNERS = {
     "sacrifice_mana_source_activation": run_sacrifice_mana_source_activation,
     "simple_activated_damage": run_simple_activated_damage,
     "simple_activated_tap_target": run_simple_activated_tap_target,
+    "simple_activated_add_counters_target": run_simple_activated_add_counters_target,
     "simple_activated_destroy": run_simple_activated_destroy,
     "simple_activated_self_boost": run_simple_activated_self_boost,
     "simple_activated_self_keyword": run_simple_activated_self_keyword,

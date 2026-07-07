@@ -17698,6 +17698,107 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "activated_self_add_counters_source_cost_not_supported")
 
+    def test_activated_target_add_counters_maps_fixed_creature_targets(self) -> None:
+        cases = [
+            (
+                "Dragon Blood",
+                "Artifact",
+                "{3}, {T}: Put a +1/+1 counter on target creature.",
+                "new SimpleActivatedAbility(new AddCountersTargetEffect(CounterType.P1P1.createInstance(1)), "
+                "new GenericManaCost(3)); ability.addCost(new TapSourceCost()); "
+                "ability.addTarget(new TargetCreaturePermanent());",
+                "+1/+1",
+                1,
+                "{3}",
+                3,
+                [],
+                True,
+            ),
+            (
+                "Fevered Convulsions",
+                "Enchantment",
+                "{2}{B}{B}: Put a -1/-1 counter on target creature.",
+                "this.addAbility(new SimpleActivatedAbility("
+                "new AddCountersTargetEffect(CounterType.M1M1.createInstance(1)), "
+                "new ManaCostsImpl<>(\"{2}{B}{B}\")));"
+                "ability.addTarget(new TargetCreaturePermanent());",
+                "-1/-1",
+                1,
+                "{2}{B}{B}",
+                2,
+                ["B", "B"],
+                False,
+            ),
+            (
+                "Gnarled Effigy",
+                "Artifact",
+                "{4}, {T}: Put a -1/-1 counter on target creature.",
+                "Ability ability = new SimpleActivatedAbility("
+                "new AddCountersTargetEffect(CounterType.M1M1.createInstance()), "
+                "new ManaCostsImpl<>(\"{4}\")); ability.addCost(new TapSourceCost()); "
+                "ability.addTarget(new TargetCreaturePermanent());",
+                "-1/-1",
+                1,
+                "{4}",
+                4,
+                [],
+                True,
+            ),
+        ]
+        for card_name, type_line, oracle, source_text, counter_type, count, cost, generic, colors, requires_tap in cases:
+            with self.subTest(card_name=card_name):
+                row = queue_row(
+                    split.ADD_COUNTERS_TARGET_UNIT,
+                    effect_classes=["AddCountersTargetEffect"],
+                    ability_kind="activated",
+                    ability_classes=["SimpleActivatedAbility"],
+                    xmage_signals=["targeting", "counter", "activated_ability"],
+                )
+                proposal, reason = split.split_row(
+                    row,
+                    metadata(name=card_name, type_line=type_line, oracle_text=oracle),
+                    source_text=source_text,
+                )
+
+                self.assertEqual(reason, "selected_exact_scope")
+                effect = proposal["effect_json"]
+                self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_TARGET_ADD_COUNTERS_SCOPE)
+                self.assertEqual(effect["activated_add_counters_target"], "creature")
+                self.assertEqual(effect["target"], "creature")
+                self.assertEqual(effect["target_constraints"], {"card_types": ["creature"]})
+                self.assertEqual(effect["activated_add_counters_counter_type"], counter_type)
+                self.assertEqual(effect["activated_add_counters_count"], count)
+                self.assertEqual(effect["activation_cost_mana"], cost)
+                self.assertEqual(effect["activation_cost_generic"], generic)
+                self.assertEqual(effect["activation_cost_colors"], colors)
+                self.assertEqual(effect["activation_requires_tap"], requires_tap)
+
+    def test_activated_target_add_counters_extra_cost_stays_blocked(self) -> None:
+        row = queue_row(
+            split.ADD_COUNTERS_TARGET_UNIT,
+            effect_classes=["AddCountersTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "counter", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fume Spitter",
+                type_line="Creature - Phyrexian Horror",
+                oracle_text="Sacrifice this creature: Put a -1/-1 counter on target creature.",
+            ),
+            source_text=(
+                "this.addAbility(new SimpleActivatedAbility("
+                "new AddCountersTargetEffect(CounterType.M1M1.createInstance()), "
+                "new SacrificeSourceCost()));"
+                "ability.addTarget(new TargetCreaturePermanent());"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "activated_target_add_counters_source_cost_not_supported")
+
     def test_creature_etb_plus_one_counter_target_creature_maps_to_etb_scope(self) -> None:
         row = queue_row(
             split.ADD_COUNTERS_TARGET_UNIT,
