@@ -66,6 +66,23 @@ Cobertura pos-sync:
   - `template_first.matched_registered_deck_qa_unique_names=644`;
   - `template_plus_residual_family_units=28`.
 
+Atualizacao 2026-07-07 / PG646:
+
+- `Birds of Paradise // Birds of Paradise` SLD `1675` foi confirmado como
+  `reversible_card`: a API da Scryfall retorna campos raiz de Oracle vazios,
+  mas as duas faces carregam `oracle_id`, `type_line`, `mana_cost` e
+  `oracle_text`. O PostgreSQL foi backfilled a partir dessas faces.
+- `A-Alrund's Epiphany`, `A-Omnath, Locus of Creation` e `A-Unholy Heat`
+  continuam sem `oracle_id` oficial seguro e nao devem usar `scryfall_id` como
+  fallback de identidade; foram classificados como excecao digital decidida e
+  sincronizados como `commander=not_legal`.
+- Readiness pos-PG646: `oracle_data_sync=0`,
+  `commander_legality_sync=0`, `missing_commander_legality=0`,
+  `missing_type_line=0`, `official_oracle_identity_unavailable=3`.
+- Evidencia versionada:
+  `docs/hermes-analysis/master_optimizer_reports/pg646_oracle_identity_exceptions_new_server_precheck.sql`,
+  `..._apply.sql`, `..._postcheck.sql` e `..._rollback.sql`.
+
 Comandos globais:
 
 ```bash

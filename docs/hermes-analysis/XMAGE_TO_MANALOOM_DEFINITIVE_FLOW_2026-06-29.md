@@ -18534,13 +18534,58 @@ dynamic damage amounts, restricted combat-only targets, multiple activated
 damage modes, or source/Oracle pay-life mismatches. Those remain separate
 adapter contracts.
 
-Current next high-volume queue after PG617:
+## 2026-07-07 - PG646 Oracle Identity Exception Closure
 
-- `recursion::xmage_graveyard_return_variant_review_v1` - `1795`
+PG646 closed the remaining global Oracle/legalities data lanes without inventing
+unsafe identity fallbacks:
+
+- `Birds of Paradise // Birds of Paradise` SLD `1675` is a Scryfall
+  `reversible_card`: the root object has no `oracle_id`, `type_line`,
+  `mana_cost`, or `oracle_text`, but both card faces carry the same valid
+  `Birds of Paradise` Oracle identity and text. PG646 backfilled the PostgreSQL
+  card row from those faces and synced Hermes metadata.
+- `A-Alrund's Epiphany`, `A-Omnath, Locus of Creation`, and `A-Unholy Heat`
+  remain exact digital `A-` exceptions with no current safe official
+  `oracle_id`. PG646 did not set `cards.oracle_id = scryfall_id`; instead it
+  inserted `commander=not_legal` and the readiness router now reports them as
+  `official_oracle_identity_unavailable` plus
+  `digital_non_commander_rule_exception`.
+- Postcheck: `digital_exception_decided_count=3`,
+  `reversible_birds_backfilled_count=1`, and `target_count_ok=true`.
+- PG -> Hermes/SQLite sync after apply:
+  - metadata sync matched `7037` PostgreSQL cards, wrote `6956` SQLite cache
+    alias rows, and left `deck_cards` at `2699/2699` matched;
+  - Commander legalities sync wrote `35010` SQLite Commander legality rows;
+  - battle rules/snapshot sync loaded `5913` PostgreSQL rules, updated `5899`
+    SQLite rows, and exported `5876` canonical snapshot rows.
+- Global readiness after PG646:
+  `battle_and_oracle_ready=5973`, `oracle_data_sync=0`,
+  `commander_legality_sync=0`, `missing_commander_legality=0`,
+  `missing_type_line=0`, `official_oracle_identity_unavailable=3`,
+  `digital_non_commander_rule_exception=3`, and
+  `battle_family_mapper_required=27903`.
+
+Evidence:
+
+- `docs/hermes-analysis/master_optimizer_reports/pg646_oracle_identity_exceptions_new_server_precheck.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg646_oracle_identity_exceptions_new_server_apply.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg646_oracle_identity_exceptions_new_server_postcheck.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg646_oracle_identity_exceptions_new_server_rollback.sql`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260707_post_pg646_oracle_identity_exceptions.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260707_post_pg646_current.md`
+
+Current next high-volume queue after PG646:
+
+- target identities: `24980`
+- XMage authoritative sources: `24667`
+- missing-source exceptions: `313`
+- parser gaps: `0`
+- adapter-required identities: `24667`
+- `recursion::xmage_graveyard_return_variant_review_v1` - `1793`
 - `draw_engine::xmage_draw_card_variant_review_v1` - `1575`
-- `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1` - `1085`
-- `direct_damage::targeted_damage_variant_v1` - `773`
+- `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1` - `1080`
 - `add_counters::source_add_counters_variant_v1` - `771`
+- `direct_damage::targeted_damage_variant_v1` - `770`
 - `life_gain::xmage_life_gain_variant_review_v1` - `663`
 
 ## Required Artifacts Per Cycle

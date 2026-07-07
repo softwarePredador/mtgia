@@ -45,6 +45,11 @@ LOW_PRIORITY_RULE_FAMILIES = {
     "generic_vanilla_or_keyword_creature",
     "oracle_gap",
 }
+OFFICIAL_ORACLE_ID_UNAVAILABLE_NORMALIZED_NAMES = {
+    "a-alrund's epiphany",
+    "a-omnath, locus of creation",
+    "a-unholy heat",
+}
 
 
 def utc_now() -> str:
@@ -114,14 +119,52 @@ def card_rule_requirement(family: str, type_line: str, oracle_text: str) -> str:
     return "card_specific_or_family_rule_required"
 
 
+def unique_nonempty_face_values(card_faces: Any, key: str) -> list[str]:
+    if not isinstance(card_faces, list):
+        return []
+    values: list[str] = []
+    seen: set[str] = set()
+    for face in card_faces:
+        if not isinstance(face, dict):
+            continue
+        value = str(face.get(key) or "").strip()
+        if not value or value in seen:
+            continue
+        values.append(value)
+        seen.add(value)
+    return values
+
+
+def face_derived_field(card_faces: Any, key: str) -> str:
+    values = unique_nonempty_face_values(card_faces, key)
+    if not values:
+        return ""
+    if key == "oracle_id" and len(values) > 1:
+        return ""
+    return values[0] if len(values) == 1 else "\n//\n".join(values)
+
+
+def official_oracle_id_unavailable(card: dict[str, Any]) -> bool:
+    return (
+        normalize_name(str(card.get("name") or "")) in OFFICIAL_ORACLE_ID_UNAVAILABLE_NORMALIZED_NAMES
+        and not bool(card.get("oracle_id_present"))
+        and bool(card.get("oracle_text_present"))
+        and bool(card.get("type_line_present"))
+        and int(card.get("legality_format_count") or 0) > 0
+    )
+
+
 def lane_for_card(card: dict[str, Any]) -> list[str]:
     lanes: list[str] = []
+    oracle_identity_exception = official_oracle_id_unavailable(card)
     oracle_text_blocks_data = (
         not card["oracle_text_present"]
         and card["runtime_requirement"] != "generic_or_data_gate"
     )
-    if not card["oracle_id_present"] or not card["type_line_present"] or oracle_text_blocks_data:
+    if (not card["oracle_id_present"] and not oracle_identity_exception) or not card["type_line_present"] or oracle_text_blocks_data:
         lanes.append("oracle_data_sync")
+    if oracle_identity_exception:
+        lanes.append("official_oracle_identity_unavailable")
     if int(card["legality_format_count"] or 0) == 0:
         if int(card["oracle_identity_legality_format_count"] or 0) > 0:
             lanes.append("oracle_identity_legalities_copy_candidate")
@@ -134,6 +177,8 @@ def lane_for_card(card: dict[str, Any]) -> list[str]:
     if card["trusted_rule_count"] == 0:
         if card["runtime_requirement"] == "generic_or_data_gate":
             lanes.append("generic_runtime_or_no_card_rule")
+        elif oracle_identity_exception and card["commander_legality_status"] not in {"legal", "restricted"}:
+            lanes.append("digital_non_commander_rule_exception")
         elif int(card["oracle_identity_trusted_rule_count"] or 0) > 0:
             lanes.append("oracle_identity_rule_link_or_copy")
         elif "oracle_data_sync" not in lanes:
@@ -302,6 +347,7 @@ def fetch_all_card_rows(deck_scope: dict[str, dict[str, Any]]) -> list[dict[str,
                   COALESCE(c.oracle_text, '') AS oracle_text,
                   COALESCE(c.type_line, '') AS type_line,
                   COALESCE(c.mana_cost, '') AS mana_cost,
+                  c.card_faces_json,
                   COALESCE(c.set_code, '') AS set_code,
                   COALESCE(cl.status, '') AS commander_legality_status,
                   COALESCE(lc.legality_format_count, 0)::int AS legality_format_count,
@@ -349,21 +395,26 @@ def fetch_all_card_rows(deck_scope: dict[str, dict[str, Any]]) -> list[dict[str,
 def build_card_inventory(rows: list[dict[str, Any]], *, xmage_root: Path, xmage_limit: int) -> list[dict[str, Any]]:
     cards: list[dict[str, Any]] = []
     for row in rows:
-        oracle_text_excerpt = compact_text(row["oracle_text"])
-        family = card_family(row["type_line"], row["oracle_text"])
-        runtime_requirement = card_rule_requirement(family, row["type_line"], row["oracle_text"])
+        card_faces = row.get("card_faces_json")
+        oracle_id = str(row["oracle_id"] or "") or face_derived_field(card_faces, "oracle_id")
+        oracle_text = str(row["oracle_text"] or "") or face_derived_field(card_faces, "oracle_text")
+        type_line = str(row["type_line"] or "") or face_derived_field(card_faces, "type_line")
+        mana_cost = str(row["mana_cost"] or "") or face_derived_field(card_faces, "mana_cost")
+        oracle_text_excerpt = compact_text(oracle_text)
+        family = card_family(type_line, oracle_text)
+        runtime_requirement = card_rule_requirement(family, type_line, oracle_text)
         card = {
             "card_id": str(row["card_id"]),
             "name": row["name"],
             "normalized_name": normalize_name(row["name"]),
-            "oracle_id": str(row["oracle_id"] or ""),
-            "oracle_id_present": bool(row["oracle_id"]),
-            "oracle_text_present": bool(str(row["oracle_text"]).strip()),
-            "oracle_text_analysis": str(row["oracle_text"] or ""),
-            "type_line_present": bool(str(row["type_line"]).strip()),
-            "type_line": row["type_line"],
+            "oracle_id": oracle_id,
+            "oracle_id_present": bool(oracle_id),
+            "oracle_text_present": bool(oracle_text.strip()),
+            "oracle_text_analysis": oracle_text,
+            "type_line_present": bool(type_line.strip()),
+            "type_line": type_line,
             "oracle_text_excerpt": oracle_text_excerpt,
-            "mana_cost": row["mana_cost"],
+            "mana_cost": mana_cost,
             "set_codes": [row["set_code"]] if row["set_code"] else [],
             "commander_legality_status": row["commander_legality_status"],
             "legality_format_count": int(row["legality_format_count"] or 0),
@@ -384,7 +435,7 @@ def build_card_inventory(rows: list[dict[str, Any]], *, xmage_root: Path, xmage_
             "family": family,
             "runtime_requirement": runtime_requirement,
             "empty_oracle_text_generic_candidate": (
-                not bool(str(row["oracle_text"]).strip())
+                not bool(oracle_text.strip())
                 and runtime_requirement == "generic_or_data_gate"
             ),
         }

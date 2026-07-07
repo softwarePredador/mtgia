@@ -65,6 +65,40 @@ class GlobalCardOracleBattleReadinessTest(unittest.TestCase):
         )
         self.assertIn("oracle_data_sync", lanes)
 
+    def test_known_digital_oracle_identity_exception_is_not_oracle_sync(self) -> None:
+        lanes = audit.lane_for_card(
+            base_card(
+                name="A-Unholy Heat",
+                oracle_id_present=False,
+                commander_legality_status="not_legal",
+                legality_format_count=3,
+            )
+        )
+        self.assertIn("official_oracle_identity_unavailable", lanes)
+        self.assertIn("digital_non_commander_rule_exception", lanes)
+        self.assertNotIn("oracle_data_sync", lanes)
+        self.assertNotIn("battle_family_mapper_required", lanes)
+
+    def test_face_derived_field_uses_single_oracle_identity(self) -> None:
+        faces = [
+            {
+                "oracle_id": "d3a0b660-358c-41bd-9cd2-41fbf3491b1a",
+                "oracle_text": "Flying\n{T}: Add one mana of any color.",
+            },
+            {
+                "oracle_id": "d3a0b660-358c-41bd-9cd2-41fbf3491b1a",
+                "oracle_text": "Flying\n{T}: Add one mana of any color.",
+            },
+        ]
+        self.assertEqual(
+            audit.face_derived_field(faces, "oracle_id"),
+            "d3a0b660-358c-41bd-9cd2-41fbf3491b1a",
+        )
+        self.assertEqual(
+            audit.face_derived_field(faces, "oracle_text"),
+            "Flying\n{T}: Add one mana of any color.",
+        )
+
     def test_card_family_uses_effect_text_semantics(self) -> None:
         self.assertEqual(
             audit.card_family("Sorcery", "Create two 1/1 red Goblin creature tokens."),
