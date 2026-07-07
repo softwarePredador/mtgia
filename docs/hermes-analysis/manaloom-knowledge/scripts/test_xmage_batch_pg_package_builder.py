@@ -78,6 +78,36 @@ def test_counter_unless_pays_dynamic_fields_and_execution_scenario_are_manifeste
     assert scenario["expected_counter_unless_pays_count"] == 2
 
 
+def test_creature_etb_draw_discard_execution_scenario_is_manifested() -> None:
+    proposal = {
+        "normalized_name": "bazaar trademage",
+        "card_name": "Bazaar Trademage",
+        "oracle_hash": "hash-bazaar-trademage",
+        "logical_rule_key": "battle_rule_v1:bazaar-trademage",
+        "effect_json": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_etb_draw_discard_cards_v1",
+            "etb_draw_discard": True,
+            "etb_draw_count": 2,
+            "etb_discard_count": 3,
+            "draw_count": 2,
+            "discard_count": 3,
+            "draw_discard_order": "draw_then_discard",
+            "keywords": ["flying"],
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    assert scenario["type"] == "creature_etb_draw_discard"
+    assert scenario["expected_draw_count"] == 2
+    assert scenario["expected_discard_count"] == 3
+    assert scenario["expected_hand_after"] == 2
+    assert scenario["expected_graveyard_after"] == 3
+    assert scenario["expected_keywords"] == ["flying"]
+
+
 def test_manifest_expected_rule_from_proposal_contains_e2e_fields() -> None:
     proposal = {
         "normalized_name": "verge rangers",
@@ -722,6 +752,32 @@ def test_manifest_expected_rule_preserves_etb_optional_and_dynamic_draw_fields()
     assert required["etb_optional_discard_count"] == 1
     assert required["etb_optional_discard_draw_count"] == 1
     assert required["draw_count"] == 1
+
+    proposal["effect_json"] = {
+        "effect": "creature",
+        "battle_model_scope": "xmage_creature_etb_draw_discard_cards_v1",
+        "ability_kind": "triggered",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "draw_discard",
+        "etb_draw_discard": True,
+        "etb_draw_count": 2,
+        "etb_discard_count": 1,
+        "draw_count": 2,
+        "discard_count": 1,
+        "draw_discard_order": "draw_then_discard",
+        "xmage_effect_class": "DrawDiscardControllerEffect",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    required = expected["required_effect_fields"]
+    assert required["battle_model_scope"] == "xmage_creature_etb_draw_discard_cards_v1"
+    assert required["etb_draw_discard"] is True
+    assert required["etb_draw_count"] == 2
+    assert required["etb_discard_count"] == 1
+    assert required["draw_count"] == 2
+    assert required["discard_count"] == 1
+    assert required["draw_discard_order"] == "draw_then_discard"
 
     proposal["effect_json"] = {
         "effect": "creature",

@@ -17830,6 +17830,88 @@ destroy spells, conditional cast gates, ETB/dies triggered variants, activated
 destroy abilities, or destroy-plus-life patterns with multiple independent
 targets/effects.
 
+## 2026-07-07 PG609 Creature ETB Draw Then Discard Checkpoint
+
+PG609 closed the exact XMage subpattern:
+
+- `EntersBattlefieldTriggeredAbility`;
+- `DrawDiscardControllerEffect`;
+- creature permanent entering under its controller's control;
+- fixed draw count followed by fixed discard count;
+- optional static self keywords copied only when directly present in Oracle;
+- no conditional trigger, choice, cost, replacement, opponent discard,
+  hand-size-dependent discard, looting target, or non-ETB wrapper.
+
+Promoted cards:
+
+- `Bazaar Trademage`;
+- `Bellowing Crier`;
+- `Elite Instructor`;
+- `Icewind Elemental`;
+- `Merfolk Traders`;
+- `Owl Familiar`;
+- `Quicksilver Fisher`;
+- `Screeching Drake`;
+- `Sky-Eel School`;
+- `Temur Tawnyback`;
+- `Vodalian Merchant`.
+
+Implementation:
+
+- `xmage_authoritative_exact_scope_split.py` now maps exact
+  `DrawDiscardControllerEffect + EntersBattlefieldTriggeredAbility` creature
+  sources to `xmage_creature_etb_draw_discard_cards_v1`;
+- `xmage_batch_pg_package_builder.py` now preserves draw/discard ETB fields and
+  emits `creature_etb_draw_discard` E2E scenarios;
+- `battle_analyst_v9.py` now executes ETB draw-then-discard without double
+  applying the generic ETB draw branch;
+- `battle_package_end_to_end_validation.py` now validates focused ETB
+  draw/discard execution and static keyword preservation for this family.
+
+Validation:
+
+- split produced `proposal_count=11` and
+  `safe_for_batch_pg_package_count=11`;
+- precheck found `11/11` target card rows, `0` existing expected rule rows, and
+  `0` shadow rows to deprecate;
+- apply upserted `11` PostgreSQL rows and deprecated `0` shadow rows;
+- postcheck confirmed `11/11` promoted rows, `11/11` verified/auto rows, and
+  `11/11` rows with `oracle_hash`;
+- focused tests passed for splitter ETB draw/discard variants, package builder
+  field/scenario generation, E2E runner behavior, and Python compilation for
+  the touched splitter/package/runtime/E2E scripts;
+- PG -> SQLite/snapshot sync loaded `11` PostgreSQL rows, updated `11` SQLite
+  rows, and exported `5771` canonical snapshot rows;
+- metadata sync used `database_target=127.0.0.1:15432/halder`, matched `6939`
+  PostgreSQL cards, and left `deck_cards` at `2699/2699` matched;
+- E2E validation passed PostgreSQL, SQLite, snapshot, runtime lookup, and `11`
+  battle execution scenarios, each proving the card drew then discarded on ETB;
+- post-sync queue rebuild reduced `target_identity_count` from `25097` to
+  `25086`, `xmage_authoritative_source_count` from `24783` to `24772`,
+  `xmage_authoritative_adapter_required_count` from `24783` to `24772`, and
+  `draw_engine::xmage_draw_card_variant_review_v1` from `1588` to `1577`;
+- global readiness now reports `battle_and_oracle_ready=5864` and
+  `battle_family_mapper_required=28009`;
+- final exact-scope recheck against the post-PG609 queue returned
+  `proposal_count=0` and `safe_for_batch_pg_package_count=0`;
+- PG/Hermes/SQLite contract audit initially exposed `44` older trusted
+  executable rows missing `oracle_hash`; PG609B backfilled those hashes from
+  PostgreSQL `cards.oracle_text`, synced Hermes/SQLite, and the final contract
+  audit passed `51/51`;
+- XMage strategy audit passed `26/26`;
+- operational surface alignment audit passed;
+- legacy contamination audit passed;
+- multi-rule runtime readiness audit stayed bounded to known review/selector
+  gaps and did not expose a PG609 regression;
+- `scripts/quality_gate.sh server-target` passed against the new-server target.
+
+Residual boundary: PG609 models only fixed ETB draw-then-discard creature
+triggers using XMage `DrawDiscardControllerEffect`. It does not authorize
+activated looting, spell looting, combat-damage looting, conditional ETB
+draw/discard, target-player discard, draw-then-discard choices, hand-size or
+graveyard-dependent discard counts, replacement effects, or non-creature ETB
+wrappers. Those remain separate adapter contracts.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

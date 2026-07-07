@@ -18389,6 +18389,95 @@ def resolve_etb_optional_discard_draw(
     return drawn
 
 
+def resolve_etb_draw_discard(
+    player,
+    opponents,
+    permanent,
+    effect_data,
+    turn,
+    rng,
+    *,
+    stack=None,
+    all_players=None,
+    phase="battlefield_etb",
+):
+    draw_count = max(0, int(effect_data.get("etb_draw_count") or effect_data.get("draw_count") or 0))
+    discard_count = max(0, int(effect_data.get("etb_discard_count") or effect_data.get("discard_count") or 0))
+    order = str(effect_data.get("draw_discard_order") or "draw_then_discard")
+    if order != "draw_then_discard":
+        emit_replay_event(
+            "etb_draw_discard_skipped",
+            player=player.name,
+            card=permanent.get("name", "?"),
+            reason="unsupported_order",
+            order=order,
+            turn=turn,
+            phase=phase,
+            **replay_rule_fields(effect_data),
+        )
+        return []
+    hand_before = len(getattr(player, "hand", []) or [])
+    library_before = len(getattr(player, "library", []) or [])
+    drawn = player.draw(draw_count, rng) if draw_count > 0 else []
+    if all_players is not None and drawn:
+        process_player_draw_triggers(
+            player,
+            len(drawn),
+            turn,
+            phase,
+            all_players,
+            stack=stack,
+            turn_player=player,
+        )
+    discarded_cards = _draw_discard_spell_selected_discards(
+        player,
+        discard_count,
+        rng=rng,
+    )
+    discard_resolution = {
+        "to_top": [],
+        "to_graveyard": [],
+        "used_replacement": False,
+        "trigger_events": [],
+    }
+    if discarded_cards:
+        discard_resolution = resolve_effect_discard_cards(
+            player,
+            discarded_cards,
+            top_limit=0,
+            opponents=opponents,
+            turn=turn,
+            phase=phase,
+            rng=rng,
+        )
+    emit_replay_event(
+        "etb_draw_discard_resolved",
+        player=player.name,
+        card=permanent.get("name", "?"),
+        trigger="enters_battlefield",
+        effect="draw_discard",
+        order=order,
+        cards_requested=draw_count,
+        cards_drawn=len(drawn),
+        discard_requested=discard_count,
+        cards_discarded=len(discarded_cards),
+        discarded=[card.get("name", "?") for card in discarded_cards],
+        discarded_to_graveyard=[
+            entry.get("name", "?")
+            for entry in discard_resolution.get("to_graveyard", [])
+            if isinstance(entry, dict)
+        ],
+        hand_before=hand_before,
+        hand_after=len(player.hand),
+        library_before=library_before,
+        library_after=len(player.library),
+        turn=turn,
+        phase=phase,
+        **replay_rule_fields(effect_data),
+    )
+    return drawn
+
+
 def resolve_generic_permanent_etb(
     player,
     opponents,
@@ -18557,6 +18646,18 @@ def resolve_generic_permanent_etb(
             all_players=all_players,
             phase=phase,
         )
+    if effect_data.get("etb_draw_discard"):
+        resolve_etb_draw_discard(
+            player,
+            opponents,
+            permanent,
+            effect_data,
+            turn,
+            rng,
+            stack=stack,
+            all_players=all_players,
+            phase=phase,
+        )
     if effect_data.get("etb_dynamic_draw"):
         requested = max(0, int(etb_dynamic_draw_count(player, permanent, effect_data) or 0))
         hand_before = len(player.hand)
@@ -18589,7 +18690,7 @@ def resolve_generic_permanent_etb(
             phase=phase,
             **replay_rule_fields(effect_data),
         )
-    if effect_data.get("etb_draw_count"):
+    if effect_data.get("etb_draw_count") and not effect_data.get("etb_draw_discard"):
         requested = int(effect_data.get("etb_draw_count") or 1)
         hand_before = len(player.hand)
         library_before = len(player.library)

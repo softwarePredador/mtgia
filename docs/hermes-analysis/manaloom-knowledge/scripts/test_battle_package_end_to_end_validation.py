@@ -512,6 +512,64 @@ def test_creature_etb_scry_runner_executes_trigger() -> None:
     assert any(event == "etb_scry_resolved" for event, _ in events)
 
 
+def test_creature_etb_draw_discard_runner_executes_trigger() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "creature",
+        "battle_model_scope": "xmage_creature_etb_draw_discard_cards_v1",
+        "ability_kind": "triggered",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "draw_discard",
+        "etb_draw_discard": True,
+        "etb_draw_count": 2,
+        "etb_discard_count": 1,
+        "draw_count": 2,
+        "discard_count": 1,
+        "draw_discard_order": "draw_then_discard",
+        "keywords": ["flying"],
+        "flying": True,
+        "_rule_logical_key": "battle_rule_v1:bazaar-trademage",
+    }
+    try:
+        result = validator.run_creature_etb_draw_discard(
+            battle,
+            {
+                "name": "Bazaar Trademage enters and loots",
+                "type": "creature_etb_draw_discard",
+                "card": {"name": "Bazaar Trademage", "type_line": "Creature", "effect": "creature"},
+                "controller_hand": [
+                    {"name": "E2E Discard Candidate", "type_line": "Land", "effect": "land", "cmc": 0}
+                ],
+                "controller_library": [
+                    {"name": "E2E Drawn Card A", "type_line": "Instant", "effect": "draw_cards", "cmc": 2},
+                    {"name": "E2E Drawn Card B", "type_line": "Sorcery", "effect": "draw_cards", "cmc": 3},
+                ],
+                "expected_draw_count": 2,
+                "expected_discard_count": 1,
+                "expected_hand_after": 2,
+                "expected_graveyard_after": 1,
+                "expected_keywords": ["flying"],
+                "logical_rule_key": "battle_rule_v1:bazaar-trademage",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Bazaar Trademage"
+    assert result["cards_drawn"] == 2
+    assert result["cards_discarded"] == 1
+    assert result["hand_after"] == 2
+    assert result["graveyard_after"] == 1
+    assert result["validated_keywords"] == ["flying"]
+    assert any(event == "etb_draw_discard_resolved" for event, _ in events)
+
+
 def test_fixed_create_tokens_runner_counts_controlled_subtype_support() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

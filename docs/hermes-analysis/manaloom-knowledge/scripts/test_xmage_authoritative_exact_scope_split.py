@@ -19727,6 +19727,88 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["etb_optional_discard_draw_count"], 1)
         self.assertNotIn("etb_draw_count", effect)
 
+    def test_creature_etb_draw_discard_maps_to_triggered_creature_scope(self) -> None:
+        row = queue_row(
+            split.DRAW_ENGINE_UNIT,
+            effect_classes=["DrawDiscardControllerEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["draw", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Bellowing Crier",
+                type_line="Creature - Frog Advisor",
+                oracle_text="When this creature enters, draw a card, then discard a card.",
+            ),
+            source_text="""
+                this.addAbility(new EntersBattlefieldTriggeredAbility(
+                    new DrawDiscardControllerEffect()));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.ETB_DRAW_DISCARD_CREATURE_SCOPE)
+        self.assertTrue(effect["etb_draw_discard"])
+        self.assertEqual(effect["etb_draw_count"], 1)
+        self.assertEqual(effect["etb_discard_count"], 1)
+        self.assertEqual(effect["draw_discard_order"], "draw_then_discard")
+
+    def test_creature_etb_draw_discard_preserves_static_keywords(self) -> None:
+        row = queue_row(
+            split.DRAW_ENGINE_UNIT,
+            effect_classes=["DrawDiscardControllerEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility", "FlyingAbility"],
+            xmage_signals=["draw", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Bazaar Trademage",
+                type_line="Creature - Human Wizard",
+                oracle_text="Flying\nWhen this creature enters, draw two cards, then discard three cards.",
+            ),
+            source_text="""
+                this.addAbility(FlyingAbility.getInstance());
+                this.addAbility(new EntersBattlefieldTriggeredAbility(
+                    new DrawDiscardControllerEffect(2, 3)));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["etb_draw_count"], 2)
+        self.assertEqual(effect["etb_discard_count"], 3)
+        self.assertEqual(effect["keywords"], ["flying"])
+        self.assertTrue(effect["flying"])
+
+    def test_creature_etb_draw_discard_blocks_conditional_source(self) -> None:
+        row = queue_row(
+            split.DRAW_ENGINE_UNIT,
+            effect_classes=["DrawDiscardControllerEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["draw", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Conditional Looter",
+                type_line="Creature - Wizard",
+                oracle_text="When this creature enters, draw a card, then discard a card.",
+            ),
+            source_text="""
+                this.addAbility(new EntersBattlefieldTriggeredAbility(
+                    new ConditionalOneShotEffect(new DrawDiscardControllerEffect(), condition)));
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "etb_draw_discard_source_condition_not_supported")
+
     def test_creature_etb_dynamic_draw_maps_plus_one_counter_count(self) -> None:
         row = queue_row(
             split.DRAW_ENGINE_UNIT,

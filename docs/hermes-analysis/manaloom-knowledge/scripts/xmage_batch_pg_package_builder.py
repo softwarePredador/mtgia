@@ -71,6 +71,8 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "xmage_additional_cost_target",
     "count",
     "draw_count",
+    "discard_count",
+    "draw_discard_order",
     "put_land_from_hand",
     "put_land_tapped",
     "count_from_x",
@@ -104,6 +106,8 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "etb_optional_discard_draw",
     "etb_optional_discard_count",
     "etb_optional_discard_draw_count",
+    "etb_draw_discard",
+    "etb_discard_count",
     "etb_dynamic_draw",
     "draw_count_source",
     "etb_draw_count_source",
@@ -1990,6 +1994,51 @@ def creature_enters_draw_execution_scenario_from_expected_rule(
     }
 
 
+def creature_etb_draw_discard_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_creature_etb_draw_discard_cards_v1":
+        return None
+    draw_count = int(required.get("etb_draw_count") or required.get("draw_count") or 0)
+    discard_count = int(required.get("etb_discard_count") or required.get("discard_count") or 0)
+    if draw_count <= 0 or discard_count <= 0:
+        return None
+    return {
+        "name": f"{rule['card_name']} draws then discards on ETB",
+        "type": "creature_etb_draw_discard",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": "Creature - Wizard",
+            "effect": required.get("effect") or "creature",
+        },
+        "controller_hand": [
+            {
+                "name": f"E2E Discard Candidate {index + 1}",
+                "type_line": "Land",
+                "effect": "land",
+                "cmc": 0,
+            }
+            for index in range(discard_count)
+        ],
+        "controller_library": [
+            {
+                "name": f"E2E Drawn Card {index + 1}",
+                "type_line": "Instant",
+                "effect": "draw_cards",
+                "cmc": 2,
+            }
+            for index in range(draw_count)
+        ],
+        "expected_draw_count": draw_count,
+        "expected_discard_count": discard_count,
+        "expected_hand_after": draw_count,
+        "expected_graveyard_after": discard_count,
+        "expected_keywords": list(required.get("keywords") or []),
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def spell_cast_gain_life_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
@@ -3441,6 +3490,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or creature_etb_dynamic_life_gain_execution_scenario_from_expected_rule(rule)
         or creature_enters_life_gain_execution_scenario_from_expected_rule(rule)
         or creature_enters_draw_execution_scenario_from_expected_rule(rule)
+        or creature_etb_draw_discard_execution_scenario_from_expected_rule(rule)
         or spell_cast_gain_life_execution_scenario_from_expected_rule(rule)
     )
 

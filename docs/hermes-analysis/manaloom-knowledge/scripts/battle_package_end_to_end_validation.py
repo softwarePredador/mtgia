@@ -1536,6 +1536,108 @@ def run_creature_etb_scry(
     }
 
 
+def run_creature_etb_draw_discard(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    active = battle.Player(str(scenario.get("player") or "ETB Draw Discard Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
+    active.hand = [battle.enrich_card(dict(card)) for card in (scenario.get("controller_hand") or [])]
+    active.library = [battle.enrich_card(dict(card)) for card in (scenario.get("controller_library") or [])]
+    expected_draw_count = int(scenario.get("expected_draw_count") or 0)
+    expected_discard_count = int(scenario.get("expected_discard_count") or 0)
+    expected_hand_after = int(
+        scenario.get("expected_hand_after")
+        if scenario.get("expected_hand_after") is not None
+        else max(0, len(active.hand) + expected_draw_count - expected_discard_count)
+    )
+    expected_graveyard_after = int(
+        scenario.get("expected_graveyard_after")
+        if scenario.get("expected_graveyard_after") is not None
+        else expected_discard_count
+    )
+
+    effect_data = battle.get_card_effect(card)
+    permanent = battle.prepare_entering_permanent(
+        battle.enrich_card({**card, **effect_data}),
+        controller=active,
+        all_players=[active, opponent],
+        turn=int(scenario.get("turn") or 6),
+    )
+    active.battlefield.append(permanent)
+    expected_keywords = [str(value) for value in (scenario.get("expected_keywords") or [])]
+    missing_keywords = [
+        keyword
+        for keyword in expected_keywords
+        if not battle.card_has_keyword(permanent, keyword)
+    ]
+    if missing_keywords:
+        fail(
+            "battle_execution",
+            f"{card['name']} missing expected ETB permanent keywords: {missing_keywords}",
+        )
+
+    before_events = len(events)
+    library_before = len(active.library)
+    battle.resolve_generic_permanent_etb(
+        active,
+        [opponent],
+        permanent,
+        effect_data,
+        int(scenario.get("turn") or 6),
+        random.Random(int(scenario.get("seed") or 6079)),
+        all_players=[active, opponent],
+    )
+
+    event = next(
+        (
+            data
+            for event_name, data in events[before_events:]
+            if event_name == "etb_draw_discard_resolved"
+            and data.get("card") == card.get("name")
+        ),
+        None,
+    )
+    if event is None:
+        fail("battle_events", f"missing {card['name']} etb_draw_discard_resolved event")
+    if int(event.get("cards_drawn") or 0) != expected_draw_count:
+        fail(
+            "battle_events",
+            f"{card['name']} cards_drawn={event.get('cards_drawn')}, expected {expected_draw_count}",
+        )
+    if int(event.get("cards_discarded") or 0) != expected_discard_count:
+        fail(
+            "battle_events",
+            f"{card['name']} cards_discarded={event.get('cards_discarded')}, expected {expected_discard_count}",
+        )
+    if len(active.hand) != expected_hand_after:
+        fail(
+            "battle_execution",
+            f"{card['name']} hand after ETB draw/discard={len(active.hand)}, expected {expected_hand_after}",
+        )
+    if len(active.graveyard) != expected_graveyard_after:
+        fail(
+            "battle_execution",
+            f"{card['name']} graveyard after ETB draw/discard={len(active.graveyard)}, expected {expected_graveyard_after}",
+        )
+    if len(active.library) != library_before - expected_draw_count:
+        fail(
+            "battle_execution",
+            f"{card['name']} library after ETB draw/discard={len(active.library)}",
+        )
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "cards_drawn": expected_draw_count,
+        "cards_discarded": expected_discard_count,
+        "hand_after": len(active.hand),
+        "graveyard_after": len(active.graveyard),
+        "validated_keywords": expected_keywords,
+    }
+
+
 def run_creature_etb_library_pick(
     battle,
     scenario: dict[str, Any],
@@ -5412,6 +5514,7 @@ SCENARIO_RUNNERS = {
     "creature_etb_create_treasure": run_creature_etb_create_treasure,
     "creature_etb_create_tokens": run_creature_etb_create_tokens,
     "creature_etb_dynamic_life_gain": run_creature_etb_dynamic_life_gain,
+    "creature_etb_draw_discard": run_creature_etb_draw_discard,
     "creature_etb_library_pick": run_creature_etb_library_pick,
     "creature_enters_draw": run_creature_enters_draw,
     "creature_enters_life_gain": run_creature_enters_life_gain,
