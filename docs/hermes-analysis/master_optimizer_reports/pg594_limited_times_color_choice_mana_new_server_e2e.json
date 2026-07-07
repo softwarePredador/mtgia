@@ -1,0 +1,235 @@
+{
+  "battle_execution": {
+    "event_count": 16,
+    "results": [
+      {
+        "activation_limit_per_turn": 1,
+        "available_mana": 1,
+        "card_name": "Abzan Devotee",
+        "conditional_mana": 1,
+        "scenario": "Abzan Devotee refreshes modeled mana source",
+        "sources": 2,
+        "tapped": false
+      },
+      {
+        "activation_limit_per_turn": 1,
+        "available_mana": 1,
+        "card_name": "Jeskai Devotee",
+        "conditional_mana": 1,
+        "scenario": "Jeskai Devotee refreshes modeled mana source",
+        "sources": 2,
+        "tapped": false
+      },
+      {
+        "activation_limit_per_turn": 1,
+        "available_mana": 1,
+        "card_name": "Sultai Devotee",
+        "conditional_mana": 1,
+        "scenario": "Sultai Devotee refreshes modeled mana source",
+        "sources": 2,
+        "tapped": false
+      },
+      {
+        "activation_limit_per_turn": 1,
+        "available_mana": 1,
+        "card_name": "Temur Devotee",
+        "conditional_mana": 1,
+        "scenario": "Temur Devotee refreshes modeled mana source",
+        "sources": 2,
+        "tapped": false
+      }
+    ],
+    "scenario_count": 4
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-07T04:57:27.673440+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg594_limited_times_color_choice_mana_new_server_package_manifest.json",
+  "package_id": "pg594_limited_times_color_choice_mana_new_server_package_manifest",
+  "snapshot": "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 4
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Abzan Devotee",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ec27a3244974e2e7cc45b9291344b996",
+          "oracle_hash": "9c3a5db4e485b9bbc88ca9674cae5d2d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Jeskai Devotee",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:366a77726fbc36fee6bc986f7d5572f3",
+          "oracle_hash": "ed2d39b9737e32da59835c4f550998ef",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Sultai Devotee",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ac00d4cfa40a1f39085818b69fd432d9",
+          "oracle_hash": "f2c9254c4ec58cbfaeeb0f55a6107a14",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Temur Devotee",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7a52921eb54b9b61f5cbd0adaf50745f",
+          "oracle_hash": "b8d5f929ccf01696c7e8523a5a842d47",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 4
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Abzan Devotee",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ec27a3244974e2e7cc45b9291344b996",
+          "oracle_hash": "9c3a5db4e485b9bbc88ca9674cae5d2d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Jeskai Devotee",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:366a77726fbc36fee6bc986f7d5572f3",
+          "oracle_hash": "ed2d39b9737e32da59835c4f550998ef",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Sultai Devotee",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ac00d4cfa40a1f39085818b69fd432d9",
+          "oracle_hash": "f2c9254c4ec58cbfaeeb0f55a6107a14",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Temur Devotee",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7a52921eb54b9b61f5cbd0adaf50745f",
+          "oracle_hash": "b8d5f929ccf01696c7e8523a5a842d47",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 4
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Abzan Devotee",
+          "logical_rule_key": "battle_rule_v1:ec27a3244974e2e7cc45b9291344b996"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Jeskai Devotee",
+          "logical_rule_key": "battle_rule_v1:366a77726fbc36fee6bc986f7d5572f3"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Sultai Devotee",
+          "logical_rule_key": "battle_rule_v1:ac00d4cfa40a1f39085818b69fd432d9"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Temur Devotee",
+          "logical_rule_key": "battle_rule_v1:7a52921eb54b9b61f5cbd0adaf50745f"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 4
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Abzan Devotee",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:ec27a3244974e2e7cc45b9291344b996"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Jeskai Devotee",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:366a77726fbc36fee6bc986f7d5572f3"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Sultai Devotee",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:ac00d4cfa40a1f39085818b69fd432d9"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Temur Devotee",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:7a52921eb54b9b61f5cbd0adaf50745f"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 16,
+        "scenarios": 4
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

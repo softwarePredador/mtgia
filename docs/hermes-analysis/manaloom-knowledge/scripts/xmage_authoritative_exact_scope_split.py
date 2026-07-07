@@ -17080,72 +17080,116 @@ def mana_detail_from_add_phrase(mana_phrase: str) -> dict[str, Any] | None:
 def simple_mana_source_detail_from_line(text: str) -> dict[str, Any] | None:
     if any(token in text for token in UNSUPPORTED_SIMPLE_MANA_ORACLE_TOKENS):
         return None
-    if text == "{t}: add one mana of any color.":
-        return {"produces": "WUBRG", "mana_produced": 1, "mana_activation_requires_tap": True}
-    match = re.match(r"^\{t\}: add \{([wubrgc])\}\.?$", text)
+    activation_limit_per_turn = None
+    once_each_turn_suffix = " activate only once each turn."
+    working_text = text
+    if working_text.endswith(once_each_turn_suffix):
+        activation_limit_per_turn = 1
+        working_text = working_text[: -len(once_each_turn_suffix)].strip().rstrip(".") + "."
+    if working_text == "{t}: add one mana of any color.":
+        detail = {"produces": "WUBRG", "mana_produced": 1, "mana_activation_requires_tap": True}
+        if activation_limit_per_turn:
+            detail["activation_limit_per_turn"] = activation_limit_per_turn
+        return detail
+    match = re.match(r"^\{t\}: add \{([wubrgc])\}\.?$", working_text)
     if match:
         symbol = match.group(1).upper()
-        return {
+        detail = {
             "produces": symbol,
             "mana_produced": 1,
             "produced_mana_symbols": [symbol],
             "mana_activation_requires_tap": True,
         }
-    match = re.match(r"^\{t\}: add ((?:\{[wubrgc]\}){2,})\.?$", text)
+        if activation_limit_per_turn:
+            detail["activation_limit_per_turn"] = activation_limit_per_turn
+        return detail
+    match = re.match(r"^\{t\}: add ((?:\{[wubrgc]\}){2,})\.?$", working_text)
     if match:
         symbols = _brace_mana_symbols(match.group(1))
         if len(symbols) >= 2:
-            return {
+            detail = {
                 "produces": _unique_mana_symbols(symbols),
                 "mana_produced": len(symbols),
                 "produced_mana_symbols": symbols,
                 "mana_activation_requires_tap": True,
             }
-    match = re.match(r"^(?P<cost>(?:\{[0-9wubrgc]+\})+), \{t\}: add (?P<mana>(?:\{[wubrgc]\})+)\.?$", text)
+            if activation_limit_per_turn:
+                detail["activation_limit_per_turn"] = activation_limit_per_turn
+            return detail
+    match = re.match(r"^(?P<cost>(?:\{[0-9wubrgc]+\})+), \{t\}: add (?P<mana>(?:\{[wubrgc]\})+)\.?$", working_text)
     if match:
         symbols = _brace_mana_symbols(match.group("mana"))
         if symbols:
-            return {
+            detail = {
                 "produces": _unique_mana_symbols(symbols),
                 "mana_produced": len(symbols),
                 "produced_mana_symbols": symbols,
                 "activation_mana_cost": match.group("cost").upper(),
                 "mana_activation_requires_tap": True,
             }
-    match = re.match(r"^(?P<cost>(?:\{[0-9wubrgc]+\})+), \{t\}: add one mana of any color\.?$", text)
+            if activation_limit_per_turn:
+                detail["activation_limit_per_turn"] = activation_limit_per_turn
+            return detail
+    match = re.match(r"^(?P<cost>(?:\{[0-9wubrgc]+\})+), \{t\}: add one mana of any color\.?$", working_text)
     if match:
-        return {
+        detail = {
             "produces": "WUBRG",
             "mana_produced": 1,
             "activation_mana_cost": match.group("cost").upper(),
             "mana_activation_requires_tap": True,
         }
-    match = re.match(r"^(?P<cost>(?:\{[0-9wubrgc]+\})+): add one mana of any color\.?$", text)
+        if activation_limit_per_turn:
+            detail["activation_limit_per_turn"] = activation_limit_per_turn
+        return detail
+    match = re.match(r"^(?P<cost>(?:\{[0-9wubrgc]+\})+): add one mana of any color\.?$", working_text)
     if match:
-        return {
+        detail = {
             "produces": "WUBRG",
             "mana_produced": 1,
             "activation_mana_cost": match.group("cost").upper(),
             "mana_activation_requires_tap": False,
         }
-    match = re.match(r"^(?P<cost>(?:\{[0-9wubrgc]+\})+): add (?P<mana>(?:\{[wubrgc]\})+)\.?$", text)
+        if activation_limit_per_turn:
+            detail["activation_limit_per_turn"] = activation_limit_per_turn
+        return detail
+    match = re.match(r"^(?P<cost>(?:\{[0-9wubrgc]+\})+): add (?P<mana>(?:\{[wubrgc]\})+)\.?$", working_text)
     if match:
         symbols = _brace_mana_symbols(match.group("mana"))
         if symbols:
-            return {
+            detail = {
                 "produces": _unique_mana_symbols(symbols),
                 "mana_produced": len(symbols),
                 "produced_mana_symbols": symbols,
                 "activation_mana_cost": match.group("cost").upper(),
                 "mana_activation_requires_tap": False,
             }
+            if activation_limit_per_turn:
+                detail["activation_limit_per_turn"] = activation_limit_per_turn
+            return detail
+    match = re.match(
+        r"^(?P<cost>(?:\{[0-9wubrgc]+\})+): add (?P<choices>\{[wubrgc]\}(?:, \{[wubrgc]\})*(?:,? or \{[wubrgc]\}))\.?$",
+        working_text,
+    )
+    if match:
+        detail = {
+            "produces": _unique_mana_symbols(_brace_mana_symbols(match.group("choices"))),
+            "mana_produced": 1,
+            "activation_mana_cost": match.group("cost").upper(),
+            "mana_activation_requires_tap": False,
+        }
+        if activation_limit_per_turn:
+            detail["activation_limit_per_turn"] = activation_limit_per_turn
+        return detail
     match = re.match(
         r"^\{t\}: add (?P<choices>\{[wubrgc]\}(?:, \{[wubrgc]\})*(?:,? or \{[wubrgc]\}))\.?$",
-        text,
+        working_text,
     )
     if match:
         produced = _unique_mana_symbols(_brace_mana_symbols(match.group("choices")))
-        return {"produces": produced, "mana_produced": 1, "mana_activation_requires_tap": True}
+        detail = {"produces": produced, "mana_produced": 1, "mana_activation_requires_tap": True}
+        if activation_limit_per_turn:
+            detail["activation_limit_per_turn"] = activation_limit_per_turn
+        return detail
     return None
 
 
@@ -17366,6 +17410,50 @@ def java_any_color_mana_amount_from_source(source_text: str) -> int | None:
     if re.search(r"new\s+AnyColorManaAbility\s*\(", text):
         return 1
     return None
+
+
+MANA_TYPE_TO_SYMBOL = {
+    "WHITE": "W",
+    "BLUE": "U",
+    "BLACK": "B",
+    "RED": "R",
+    "GREEN": "G",
+    "COLORLESS": "C",
+}
+
+
+def limited_times_color_choice_mana_source_from_source(source_text: str) -> dict[str, Any] | str | None:
+    text = source_text or ""
+    if "LimitedTimesPerTurnActivatedManaAbility" not in text:
+        return None
+    if len(re.findall(r"new\s+LimitedTimesPerTurnActivatedManaAbility\s*\(", text)) != 1:
+        return "limited_mana_source_not_single"
+    if "ConditionalMana" in text or "ConditionalColoredManaAbility" in text or "ConditionalColorlessManaAbility" in text:
+        return "limited_mana_source_conditional_not_supported"
+    args_text = extract_constructor_args(text, "LimitedTimesPerTurnActivatedManaAbility")
+    if args_text is None:
+        return "limited_mana_source_constructor_not_supported"
+    if "AddManaFromColorChoicesEffect" not in args_text:
+        return "limited_mana_source_effect_not_supported"
+    mana_types = [
+        MANA_TYPE_TO_SYMBOL[token]
+        for token in re.findall(r"ManaType\.([A-Z]+)", args_text)
+        if token in MANA_TYPE_TO_SYMBOL
+    ]
+    if not mana_types:
+        return "limited_mana_source_choices_not_fixed"
+    cost_match = re.search(r"new\s+GenericManaCost\s*\(\s*(\d+)\s*\)", args_text)
+    if not cost_match:
+        return "limited_mana_source_cost_not_supported"
+    return {
+        "produces": _unique_mana_symbols(mana_types),
+        "mana_produced": 1,
+        "activation_mana_cost": f"{{{int(cost_match.group(1))}}}",
+        "mana_activation_requires_tap": False,
+        "activation_limit_per_turn": 1,
+        "xmage_mana_effect_class": "AddManaFromColorChoicesEffect",
+        "xmage_mana_ability_class": "LimitedTimesPerTurnActivatedManaAbility",
+    }
 
 
 MANA_ABILITY_CLASS_SYMBOLS = {
@@ -27545,9 +27633,17 @@ def split_row(
         if is_spell(metadata):
             return None, "mana_source_spell_not_supported"
         mana_ability_classes = ability_classes(row)
-        if mana_ability_classes.intersection(UNSAFE_MANA_ABILITY_CLASSES):
+        limited_choice_mana_source = limited_times_color_choice_mana_source_from_source(source_text)
+        if isinstance(limited_choice_mana_source, str):
+            return None, limited_choice_mana_source
+        limited_choice_mana_supported = (
+            limited_choice_mana_source is not None
+            and mana_ability_classes.intersection(UNSAFE_MANA_ABILITY_CLASSES)
+            == {"LimitedTimesPerTurnActivatedManaAbility"}
+        )
+        if mana_ability_classes.intersection(UNSAFE_MANA_ABILITY_CLASSES) and not limited_choice_mana_supported:
             return None, "mana_source_unsafe_ability_class"
-        if not mana_ability_classes.intersection(SAFE_MANA_ABILITY_CLASSES):
+        if not mana_ability_classes.intersection(SAFE_MANA_ABILITY_CLASSES) and not limited_choice_mana_supported:
             return None, "mana_source_safe_ability_missing"
         mana_source_with_activated_draw = (
             classes == {"DrawCardSourceControllerEffect"}
@@ -27959,6 +28055,82 @@ def split_row(
                 family_id="xmage_target_sacrifice_mana_source_permanent",
             ), "selected_exact_scope"
         auxiliary_abilities = mana_ability_classes - SAFE_MANA_ABILITY_CLASSES
+        if limited_choice_mana_supported:
+            mana_source_detail = simple_mana_source_detail_from_oracle(metadata)
+            if mana_source_detail is None:
+                return None, "mana_source_oracle_not_simple"
+            for key in (
+                "produces",
+                "mana_produced",
+                "activation_mana_cost",
+                "mana_activation_requires_tap",
+                "activation_limit_per_turn",
+            ):
+                if mana_source_detail.get(key) != limited_choice_mana_source.get(key):
+                    return None, f"limited_mana_source_source_oracle_{key}_mismatch"
+            source_blocker = simple_mana_source_source_blocker(
+                source_text,
+                mana_ability_classes,
+                mana_source_detail,
+            )
+            if source_blocker:
+                return None, source_blocker
+            non_mana_effect_classes = sorted(classes - {"AddManaFromColorChoicesEffect"})
+            limited_auxiliary_abilities = mana_ability_classes - {"LimitedTimesPerTurnActivatedManaAbility"}
+            unmodeled_auxiliary_abilities = sorted(
+                limited_auxiliary_abilities - SAFE_MANA_AUXILIARY_ABILITY_CLASSES
+            )
+            type_line = str(metadata.get("type_line") or "").lower()
+            permanent_type = (
+                "creature"
+                if "creature" in type_line
+                else "artifact"
+                if "artifact" in type_line
+                else "permanent"
+            )
+            mana_requires_tap = bool(mana_source_detail.get("mana_activation_requires_tap", True))
+            effect_json = {
+                "effect": "ramp_permanent",
+                "battle_model_scope": MANA_SCOPE,
+                "is_mana_source": True,
+                "mana_produced": int(mana_source_detail["mana_produced"]),
+                "produces": str(mana_source_detail["produces"]),
+                "activation_requires_tap": mana_requires_tap,
+                "mana_activation_requires_tap": mana_requires_tap,
+                "activation_mana_cost": mana_source_detail["activation_mana_cost"],
+                "activation_limit_per_turn": int(mana_source_detail["activation_limit_per_turn"]),
+                "permanent_type": permanent_type,
+                "ability_kind": "activated_mana",
+                "xmage_mana_ability_classes": ["LimitedTimesPerTurnActivatedManaAbility"],
+                "xmage_effect_classes": sorted(classes),
+                "xmage_ability_classes": sorted(mana_ability_classes),
+                "xmage_mana_effect_class": "AddManaFromColorChoicesEffect",
+            }
+            static_keywords = sorted(
+                {
+                    STATIC_SELF_KEYWORD_ABILITY_CLASSES[ability]
+                    for ability in limited_auxiliary_abilities
+                    if ability in STATIC_SELF_KEYWORD_ABILITY_CLASSES
+                }
+            )
+            if static_keywords:
+                effect_json["keywords"] = static_keywords
+            if non_mana_effect_classes or unmodeled_auxiliary_abilities:
+                effect_json["modeled_ability_subset"] = "mana_source_only"
+                effect_json["_runtime_partial"] = True
+                effect_json["_runtime_partial_reason"] = (
+                    "Only the XMage limited-times mana ability is executable in this rule; "
+                    "listed auxiliary ability/effect classes remain unmodeled."
+                )
+                effect_json["xmage_auxiliary_ability_classes"] = sorted(limited_auxiliary_abilities)
+                effect_json["xmage_unmodeled_auxiliary_ability_classes"] = unmodeled_auxiliary_abilities
+                effect_json["xmage_unmodeled_effect_classes"] = non_mana_effect_classes
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_limited_times_color_choice_mana_source_permanent",
+            ), "selected_exact_scope"
         unsupported_auxiliary_abilities = auxiliary_abilities - SAFE_MANA_AUXILIARY_ABILITY_CLASSES
         if unsupported_auxiliary_abilities:
             mana_source_detail = simple_mana_source_detail_from_oracle(metadata)

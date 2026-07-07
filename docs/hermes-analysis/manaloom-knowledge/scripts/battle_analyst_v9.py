@@ -3914,6 +3914,35 @@ def mark_mana_source_used_if_nonstandard_untap(source):
         source["tapped"] = True
 
 
+def mana_source_activation_turn_key(turn):
+    return str(turn if turn is not None else "unknown")
+
+
+def mana_source_activation_count(source, turn):
+    if not isinstance(source, dict):
+        return 0
+    usage = source.get("_mana_source_activation_usage") or {}
+    return int(usage.get(mana_source_activation_turn_key(turn)) or 0)
+
+
+def mana_source_activation_limit_reached(source, turn):
+    if not isinstance(source, dict):
+        return False
+    limit = int(source.get("activation_limit_per_turn") or 0)
+    return limit > 0 and mana_source_activation_count(source, turn) >= limit
+
+
+def record_mana_source_activation(source, turn):
+    if not isinstance(source, dict):
+        return
+    limit = int(source.get("activation_limit_per_turn") or 0)
+    if limit <= 0:
+        return
+    usage = source.setdefault("_mana_source_activation_usage", {})
+    key = mana_source_activation_turn_key(turn)
+    usage[key] = int(usage.get(key) or 0) + 1
+
+
 def _controls_creature_token_any_color_mana_passive(player):
     if player is None:
         return False
@@ -9543,20 +9572,35 @@ class Player:
             produced = mana_source_production_for_state(self, source)
             if produced <= 0:
                 continue
+            if mana_source_activation_limit_reached(source, turn):
+                emit_replay_event(
+                    "mana_source_activation_skipped",
+                    player=self.name,
+                    card=source.get("name", "?") if isinstance(source, dict) else str(source),
+                    reason="activation_limit_per_turn",
+                    activation_limit_per_turn=source.get("activation_limit_per_turn") if isinstance(source, dict) else None,
+                    activation_count_this_turn=mana_source_activation_count(source, turn),
+                    turn=turn,
+                    **replay_rule_fields(source if isinstance(source, dict) else {}),
+                )
+                continue
             if not pay_mana_source_activation_costs(self, source, turn=turn):
                 continue
             if add_fixed_produced_mana_symbols_to_pool(self, source, produced):
                 mark_mana_source_used_if_nonstandard_untap(source)
+                record_mana_source_activation(source, turn)
                 active_sources += 1
                 continue
             if add_distributed_controlled_color_mana_to_pool(self, source, produced):
                 mark_mana_source_used_if_nonstandard_untap(source)
+                record_mana_source_activation(source, turn)
                 active_sources += 1
                 continue
             conditional_source = conditional_mana_source_for_state(self, source, produced)
             if conditional_source:
                 self.conditional_mana_sources.append(conditional_source)
                 mark_mana_source_used_if_nonstandard_untap(source)
+                record_mana_source_activation(source, turn)
                 active_sources += 1
                 continue
             colors = mana_source_colors_for_state(self, source)
@@ -9565,6 +9609,7 @@ class Player:
             color = colors[0] if len(colors) == 1 else "generic"
             self.mana_pool.add(color, produced)
             mark_mana_source_used_if_nonstandard_untap(source)
+            record_mana_source_activation(source, turn)
             active_sources += 1
         emit_replay_event(
             "mana_refreshed",

@@ -2555,13 +2555,43 @@ def run_simple_mana_source_refresh(
             "battle_events",
             f"{card['name']} mana sources={event.get('sources')}, expected {expected_sources}",
         )
+    available_after_first_refresh = active.available_mana()
+    expected_activation_limit = int(scenario.get("expected_activation_limit_per_turn") or 0)
+    if expected_activation_limit:
+        before_second_refresh_events = len(events)
+        active.refresh_mana_sources(turn=turn)
+        second_event = next(
+            (
+                data
+                for replay_event, data in events[before_second_refresh_events:]
+                if replay_event == "mana_refreshed" and data.get("player") == active.name
+            ),
+            None,
+        )
+        if second_event is None:
+            fail("battle_events", f"missing {card['name']} second mana_refreshed event")
+        if int(second_event.get("sources") or 0) != 0:
+            fail(
+                "battle_events",
+                f"{card['name']} second same-turn mana sources={second_event.get('sources')}, expected 0",
+            )
+        skipped = [
+            data
+            for replay_event, data in events[before_second_refresh_events:]
+            if replay_event == "mana_source_activation_skipped"
+            and data.get("card") == card.get("name")
+            and data.get("reason") == "activation_limit_per_turn"
+        ]
+        if not skipped:
+            fail("battle_events", f"missing {card['name']} activation-limit skip event")
     return {
         "scenario": scenario.get("name"),
         "card_name": card["name"],
-        "available_mana": active.available_mana(),
+        "available_mana": available_after_first_refresh,
         "conditional_mana": conditional_total,
         "tapped": bool(source.get("tapped")),
         "sources": int(event.get("sources") or 0),
+        "activation_limit_per_turn": expected_activation_limit,
     }
 
 

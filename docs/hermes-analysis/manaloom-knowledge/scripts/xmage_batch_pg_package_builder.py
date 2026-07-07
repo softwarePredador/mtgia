@@ -2011,6 +2011,7 @@ def simple_mana_source_execution_scenario_from_expected_rule(rule: dict[str, Any
             and not enters_tapped
             else 0
         ),
+        "expected_activation_limit_per_turn": int(required.get("activation_limit_per_turn") or 0),
         "support_mana_sources": support_sources,
         "source_overrides": {"tapped": True} if enters_tapped else {},
         "logical_rule_key": rule["logical_rule_key"],

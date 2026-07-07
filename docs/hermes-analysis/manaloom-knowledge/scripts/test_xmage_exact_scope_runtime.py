@@ -10926,6 +10926,42 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_limited_mana_source_refreshes_only_once_per_turn(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        source = self.battle.enrich_card(
+            {
+                "name": "Fixture Devotee",
+                "type_line": "Creature - Cleric",
+                "effect": "ramp_permanent",
+                "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+                "is_mana_source": True,
+                "mana_produced": 1,
+                "produces": "WBG",
+                "activation_requires_tap": False,
+                "mana_activation_requires_tap": False,
+                "activation_limit_per_turn": 1,
+                "permanent_type": "creature",
+                "summoning_sick": False,
+            }
+        )
+        active.battlefield = [source]
+
+        active.refresh_mana_sources(turn=9)
+        self.assertEqual(len(active.conditional_mana_sources), 1)
+        self.assertEqual(active.conditional_mana_sources[0]["amount"], 1)
+
+        active.refresh_mana_sources(turn=9)
+        self.assertEqual(active.conditional_mana_sources, [])
+        self.assertTrue(
+            any(
+                event == "mana_source_activation_skipped"
+                and data.get("card") == "Fixture Devotee"
+                and data.get("reason") == "activation_limit_per_turn"
+                and data.get("activation_limit_per_turn") == 1
+                for event, data in self.events
+            )
+        )
+
     def test_self_sacrifice_mana_source_does_not_refresh_automatically(self) -> None:
         active = self.battle.Player("Active", None, [])
         blood_pet = {

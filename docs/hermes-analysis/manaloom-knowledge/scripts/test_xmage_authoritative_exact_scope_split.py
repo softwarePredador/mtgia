@@ -11608,6 +11608,122 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["activation_mana_cost"], "{R}")
         self.assertFalse(effect["mana_activation_requires_tap"])
 
+    def test_limited_times_color_choice_mana_source_maps_with_turn_limit(self) -> None:
+        row = queue_row(
+            split.RAMP_CREATURE_UNIT,
+            effect_classes=["AddManaFromColorChoicesEffect"],
+            ability_kind="activated",
+            ability_classes=["LimitedTimesPerTurnActivatedManaAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Abzan Devotee",
+                type_line="Creature - Dog Cleric",
+                oracle_text="{1}: Add {W}, {B}, or {G}. Activate only once each turn.",
+            ),
+            source_text=(
+                "this.addAbility(new LimitedTimesPerTurnActivatedManaAbility("
+                "new AddManaFromColorChoicesEffect(ManaType.WHITE, ManaType.BLACK, ManaType.GREEN), "
+                "new GenericManaCost(1)));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(proposal["family_id"], "xmage_limited_times_color_choice_mana_source_permanent")
+        self.assertEqual(effect["battle_model_scope"], split.MANA_SCOPE)
+        self.assertEqual(effect["effect"], "ramp_permanent")
+        self.assertEqual(effect["produces"], "WBG")
+        self.assertEqual(effect["mana_produced"], 1)
+        self.assertEqual(effect["activation_mana_cost"], "{1}")
+        self.assertFalse(effect["mana_activation_requires_tap"])
+        self.assertEqual(effect["activation_limit_per_turn"], 1)
+        self.assertEqual(effect["xmage_mana_effect_class"], "AddManaFromColorChoicesEffect")
+
+    def test_limited_times_color_choice_mana_source_blocks_conditional_mana(self) -> None:
+        row = queue_row(
+            split.RAMP_CREATURE_UNIT,
+            effect_classes=["BasicManaEffect"],
+            ability_kind="activated",
+            ability_classes=["LimitedTimesPerTurnActivatedManaAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Unsafe Devotee",
+                type_line="Creature - Druid",
+                oracle_text="{1}: Add {G}. Activate only once each turn.",
+            ),
+            source_text=(
+                "this.addAbility(new LimitedTimesPerTurnActivatedManaAbility("
+                "new ConditionalManaEffect(new BasicManaEffect(Mana.GreenMana(1))), "
+                "new GenericManaCost(1)));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "limited_mana_source_conditional_not_supported")
+
+    def test_limited_times_color_choice_mana_source_preserves_static_keyword(self) -> None:
+        row = queue_row(
+            split.RAMP_CREATURE_UNIT,
+            effect_classes=["AddManaFromColorChoicesEffect"],
+            ability_kind="activated",
+            ability_classes=["DeathtouchAbility", "LimitedTimesPerTurnActivatedManaAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Sultai Devotee",
+                type_line="Creature - Zombie Snake Druid",
+                oracle_text="Deathtouch\n{1}: Add {B}, {G}, or {U}. Activate only once each turn.",
+            ),
+            source_text=(
+                "this.addAbility(DeathtouchAbility.getInstance());"
+                "this.addAbility(new LimitedTimesPerTurnActivatedManaAbility("
+                "new AddManaFromColorChoicesEffect(ManaType.BLACK, ManaType.GREEN, ManaType.BLUE), "
+                "new GenericManaCost(1)));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["keywords"], ["deathtouch"])
+        self.assertNotIn("_runtime_partial", effect)
+
+    def test_limited_times_color_choice_mana_source_with_auxiliary_maps_partial(self) -> None:
+        row = queue_row(
+            split.RAMP_CREATURE_UNIT,
+            effect_classes=["AddManaFromColorChoicesEffect", "BoostSourceEffect"],
+            ability_kind="activated",
+            ability_classes=["FlurryAbility", "LimitedTimesPerTurnActivatedManaAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Jeskai Devotee",
+                type_line="Creature - Orc Monk",
+                oracle_text=(
+                    "Flurry -- Whenever you cast your second spell each turn, this creature gets +1/+1 until end of turn.\n"
+                    "{1}: Add {U}, {R}, or {W}. Activate only once each turn."
+                ),
+            ),
+            source_text=(
+                "this.addAbility(new FlurryAbility(new BoostSourceEffect(1, 1, Duration.EndOfTurn)));"
+                "this.addAbility(new LimitedTimesPerTurnActivatedManaAbility("
+                "new AddManaFromColorChoicesEffect(ManaType.BLUE, ManaType.RED, ManaType.WHITE), "
+                "new GenericManaCost(1)));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertTrue(effect["_runtime_partial"])
+        self.assertEqual(effect["modeled_ability_subset"], "mana_source_only")
+        self.assertEqual(effect["xmage_unmodeled_auxiliary_ability_classes"], ["FlurryAbility"])
+        self.assertEqual(effect["xmage_unmodeled_effect_classes"], ["BoostSourceEffect"])
+
     def test_mana_source_with_etb_draw_and_food_sacrifice_mana_maps_partial(self) -> None:
         row = queue_row(
             split.RAMP_ARTIFACT_UNIT,
