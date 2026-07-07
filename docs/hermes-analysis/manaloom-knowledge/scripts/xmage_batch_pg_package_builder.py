@@ -2649,6 +2649,52 @@ def multi_target_removal_execution_scenario_from_expected_rule(
     }
 
 
+def multi_target_damage_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_fixed_multi_target_damage_spell_v1":
+        return None
+    if required.get("effect") != "multi_target_damage":
+        return None
+    total_damage = int(required.get("amount") or required.get("damage") or 0)
+    target_count = int(required.get("target_count_max") or required.get("max_targets") or required.get("target_count") or 1)
+    if total_damage <= 1 or target_count <= 1:
+        return None
+    target_count = max(2, min(target_count, total_damage, 3))
+    constraints = dict(required.get("target_constraints") or {})
+    targets = []
+    for index in range(1, target_count + 1):
+        fixture = _target_fixture_from_constraints(
+            f"E2E Legal Damage Target {index}",
+            constraints,
+            matching=True,
+        )
+        if "creature" in str(fixture.get("type_line") or "").lower():
+            fixture["toughness"] = max(6, int(fixture.get("toughness") or 0))
+        targets.append(fixture)
+    nonmatching = _target_fixture_from_constraints(
+        "E2E Illegal Damage Target",
+        constraints,
+        matching=False,
+    )
+    return {
+        "name": f"{rule['card_name']} divides {total_damage} damage",
+        "type": "multi_target_damage",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": "Sorcery" if required.get("sorcery") is True else "Instant",
+        },
+        "targets": targets,
+        "nonmatching_target": nonmatching,
+        "expected_total_damage": total_damage,
+        "expected_target_count": target_count,
+        "expected_effect": required.get("effect"),
+        "expected_target_constraints": constraints,
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any] | None:
     return (
         static_controlled_keyword_execution_scenario_from_expected_rule(rule)
@@ -2673,6 +2719,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or attack_self_boost_execution_scenario_from_expected_rule(rule)
         or becomes_blocked_self_boost_execution_scenario_from_expected_rule(rule)
         or each_player_sacrifice_execution_scenario_from_expected_rule(rule)
+        or multi_target_damage_execution_scenario_from_expected_rule(rule)
         or multi_target_removal_execution_scenario_from_expected_rule(rule)
         or single_target_removal_execution_scenario_from_expected_rule(rule)
         or simple_activated_create_token_execution_scenario_from_expected_rule(rule)

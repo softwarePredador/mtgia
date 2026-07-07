@@ -1,0 +1,1853 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg593_multi_target_damage_new_server_20260707_043446",
+  "deploy_id": "PG593",
+  "execution_scenarios": [
+    {
+      "card": {
+        "name": "Aerial Volley",
+        "type_line": "Instant"
+      },
+      "expected_effect": "multi_target_damage",
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ],
+        "required_keywords": [
+          "flying"
+        ]
+      },
+      "expected_target_count": 3,
+      "expected_total_damage": 3,
+      "logical_rule_key": "battle_rule_v1:8c3af016c2a83571c684414e12f6ba8f",
+      "name": "Aerial Volley divides 3 damage",
+      "nonmatching_target": {
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Illegal Damage Target",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "targets": [
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "keywords": [
+            "flying"
+          ],
+          "name": "E2E Legal Damage Target 1",
+          "power": 2,
+          "toughness": 6,
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "keywords": [
+            "flying"
+          ],
+          "name": "E2E Legal Damage Target 2",
+          "power": 2,
+          "toughness": 6,
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "keywords": [
+            "flying"
+          ],
+          "name": "E2E Legal Damage Target 3",
+          "power": 2,
+          "toughness": 6,
+          "type_line": "Creature - Soldier"
+        }
+      ],
+      "type": "multi_target_damage"
+    },
+    {
+      "card": {
+        "name": "Arc Lightning",
+        "type_line": "Instant"
+      },
+      "expected_effect": "multi_target_damage",
+      "expected_target_constraints": {
+        "scope": "any_target"
+      },
+      "expected_target_count": 3,
+      "expected_total_damage": 3,
+      "logical_rule_key": "battle_rule_v1:f2c5e312fa1842f2baf7ae6283fe5313",
+      "name": "Arc Lightning divides 3 damage",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Damage Target",
+        "type_line": "Land"
+      },
+      "targets": [
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Damage Target 1",
+          "power": 2,
+          "toughness": 6,
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Damage Target 2",
+          "power": 2,
+          "toughness": 6,
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Damage Target 3",
+          "power": 2,
+          "toughness": 6,
+          "type_line": "Creature - Soldier"
+        }
+      ],
+      "type": "multi_target_damage"
+    },
+    {
+      "card": {
+        "name": "Boulderfall",
+        "type_line": "Instant"
+      },
+      "expected_effect": "multi_target_damage",
+      "expected_target_constraints": {
+        "scope": "any_target"
+      },
+      "expected_target_count": 3,
+      "expected_total_damage": 5,
+      "logical_rule_key": "battle_rule_v1:5e9ebeeda9437feb0ac9a01d61ae3a3b",
+      "name": "Boulderfall divides 5 damage",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Damage Target",
+        "type_line": "Land"
+      },
+      "targets": [
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Damage Target 1",
+          "power": 2,
+          "toughness": 6,
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Damage Target 2",
+          "power": 2,
+          "toughness": 6,
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Damage Target 3",
+          "power": 2,
+          "toughness": 6,
+          "type_line": "Creature - Soldier"
+        }
+      ],
+      "type": "multi_target_damage"
+    },
+    {
+      "card": {
+        "name": "Chandra's Pyrohelix",
+        "type_line": "Instant"
+      },
+      "expected_effect": "multi_target_damage",
+      "expected_target_constraints": {
+        "scope": "any_target"
+      },
+      "expected_target_count": 2,
+      "expected_total_damage": 2,
+      "logical_rule_key": "battle_rule_v1:39027367cdd1f0f585b9d0f240d3a039",
+      "name": "Chandra's Pyrohelix divides 2 damage",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Damage Target",
+        "type_line": "Land"
+      },
+      "targets": [
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Damage Target 1",
+          "power": 2,
+          "toughness": 6,
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Damage Target 2",
+          "power": 2,
+          "toughness": 6,
+          "type_line": "Creature - Soldier"
+        }
+      ],
+      "type": "multi_target_damage"
+    },
+    {
+      "card": {
+        "name": "Deft Dismissal",
+        "type_line": "Instant"
+      },
+      "expected_effect": "multi_target_damage",
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ],
+        "combat_state": "attacking_or_blocking"
+      },
+      "expected_target_count": 3,
+      "expected_total_damage": 3,
+      "logical_rule_key": "battle_rule_v1:4bdf19bcd2790da7cb3d56a14be59ea3",
+      "name": "Deft Dismissal divides 3 damage",
+      "nonmatching_target": {
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Illegal Damage Target",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "targets": [
+        {
+          "attacking": true,
+          "blocking": true,
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Damage Target 1",
+          "power": 2,
+          "toughness": 6,
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "attacking": true,
+          "blocking": true,
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Damage Target 2",
+          "power": 2,
+          "toughness": 6,
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "attacking": true,
+          "blocking": true,
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Damage Target 3",
+          "power": 2,
+          "toughness": 6,
+          "type_line": "Creature - Soldier"
+        }
+      ],
+      "type": "multi_target_damage"
+    },
+    {
+      "card": {
+        "name": "Fire at Will",
+        "type_line": "Instant"
+      },
+      "expected_effect": "multi_target_damage",
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ],
+        "combat_state": "attacking_or_blocking"
+      },
+      "expected_target_count": 3,
+      "expected_total_damage": 3,
+      "logical_rule_key": "battle_rule_v1:4bdf19bcd2790da7cb3d56a14be59ea3",
+      "name": "Fire at Will divides 3 damage",
+      "nonmatching_target": {
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Illegal Damage Target",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "targets": [
+        {
+          "attacking": true,
+          "blocking": true,
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Damage Target 1",
+          "power": 2,
+          "toughness": 6,
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "attacking": true,
+          "blocking": true,
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Damage Target 2",
+          "power": 2,
+          "toughness": 6,
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "attacking": true,
+          "blocking": true,
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Damage Target 3",
+          "power": 2,
+          "toughness": 6,
+          "type_line": "Creature - Soldier"
+        }
+      ],
+      "type": "multi_target_damage"
+    },
+    {
+      "card": {
+        "name": "Flames of the Firebrand",
+        "type_line": "Instant"
+      },
+      "expected_effect": "multi_target_damage",
+      "expected_target_constraints": {
+        "scope": "any_target"
+      },
+      "expected_target_count": 3,
+      "expected_total_damage": 3,
+      "logical_rule_key": "battle_rule_v1:f2c5e312fa1842f2baf7ae6283fe5313",
+      "name": "Flames of the Firebrand divides 3 damage",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Damage Target",
+        "type_line": "Land"
+      },
+      "targets": [
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Damage Target 1",
+          "power": 2,
+          "toughness": 6,
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Damage Target 2",
+          "power": 2,
+          "toughness": 6,
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Damage Target 3",
+          "power": 2,
+          "toughness": 6,
+          "type_line": "Creature - Soldier"
+        }
+      ],
+      "type": "multi_target_damage"
+    },
+    {
+      "card": {
+        "name": "Forked Bolt",
+        "type_line": "Instant"
+      },
+      "expected_effect": "multi_target_damage",
+      "expected_target_constraints": {
+        "scope": "any_target"
+      },
+      "expected_target_count": 2,
+      "expected_total_damage": 2,
+      "logical_rule_key": "battle_rule_v1:70d511bda849f87dc14022fdd9c1d3cc",
+      "name": "Forked Bolt divides 2 damage",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Damage Target",
+        "type_line": "Land"
+      },
+      "targets": [
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Damage Target 1",
+          "power": 2,
+          "toughness": 6,
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Damage Target 2",
+          "power": 2,
+          "toughness": 6,
+          "type_line": "Creature - Soldier"
+        }
+      ],
+      "type": "multi_target_damage"
+    },
+    {
+      "card": {
+        "name": "Forked Lightning",
+        "type_line": "Instant"
+      },
+      "expected_effect": "multi_target_damage",
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ]
+      },
+      "expected_target_count": 3,
+      "expected_total_damage": 4,
+      "logical_rule_key": "battle_rule_v1:04a2875b32e0ede63cdf997841853f38",
+      "name": "Forked Lightning divides 4 damage",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Damage Target",
+        "type_line": "Land"
+      },
+      "targets": [
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Damage Target 1",
+          "power": 2,
+          "toughness": 6,
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Damage Target 2",
+          "power": 2,
+          "toughness": 6,
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Damage Target 3",
+          "power": 2,
+          "toughness": 6,
+          "type_line": "Creature - Soldier"
+        }
+      ],
+      "type": "multi_target_damage"
+    },
+    {
+      "card": {
+        "name": "Ignite Disorder",
+        "type_line": "Instant"
+      },
+      "expected_effect": "multi_target_damage",
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ],
+        "target_colors": [
+          "W",
+          "U"
+        ]
+      },
+      "expected_target_count": 3,
+      "expected_total_damage": 3,
+      "logical_rule_key": "battle_rule_v1:9eb46af2f059e444167117db8701ca0b",
+      "name": "Ignite Disorder divides 3 damage",
+      "nonmatching_target": {
+        "cmc": 3,
+        "colors": [
+          "B"
+        ],
+        "effect": "creature",
+        "name": "E2E Illegal Damage Target",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "targets": [
+        {
+          "cmc": 3,
+          "colors": [
+            "W"
+          ],
+          "effect": "creature",
+          "name": "E2E Legal Damage Target 1",
+          "power": 2,
+          "toughness": 6,
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "cmc": 3,
+          "colors": [
+            "W"
+          ],
+          "effect": "creature",
+          "name": "E2E Legal Damage Target 2",
+          "power": 2,
+          "toughness": 6,
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "cmc": 3,
+          "colors": [
+            "W"
+          ],
+          "effect": "creature",
+          "name": "E2E Legal Damage Target 3",
+          "power": 2,
+          "toughness": 6,
+          "type_line": "Creature - Soldier"
+        }
+      ],
+      "type": "multi_target_damage"
+    },
+    {
+      "card": {
+        "name": "Magic Missile",
+        "type_line": "Instant"
+      },
+      "expected_effect": "multi_target_damage",
+      "expected_target_constraints": {
+        "scope": "any_target"
+      },
+      "expected_target_count": 3,
+      "expected_total_damage": 3,
+      "logical_rule_key": "battle_rule_v1:f2c5e312fa1842f2baf7ae6283fe5313",
+      "name": "Magic Missile divides 3 damage",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Damage Target",
+        "type_line": "Land"
+      },
+      "targets": [
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Damage Target 1",
+          "power": 2,
+          "toughness": 6,
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Damage Target 2",
+          "power": 2,
+          "toughness": 6,
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Damage Target 3",
+          "power": 2,
+          "toughness": 6,
+          "type_line": "Creature - Soldier"
+        }
+      ],
+      "type": "multi_target_damage"
+    },
+    {
+      "card": {
+        "name": "Pyrotechnics",
+        "type_line": "Instant"
+      },
+      "expected_effect": "multi_target_damage",
+      "expected_target_constraints": {
+        "scope": "any_target"
+      },
+      "expected_target_count": 3,
+      "expected_total_damage": 4,
+      "logical_rule_key": "battle_rule_v1:9d6e4255475c9b2528d2db4de3a11552",
+      "name": "Pyrotechnics divides 4 damage",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Damage Target",
+        "type_line": "Land"
+      },
+      "targets": [
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Damage Target 1",
+          "power": 2,
+          "toughness": 6,
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Damage Target 2",
+          "power": 2,
+          "toughness": 6,
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Damage Target 3",
+          "power": 2,
+          "toughness": 6,
+          "type_line": "Creature - Soldier"
+        }
+      ],
+      "type": "multi_target_damage"
+    },
+    {
+      "card": {
+        "name": "Roil's Retribution",
+        "type_line": "Instant"
+      },
+      "expected_effect": "multi_target_damage",
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ],
+        "combat_state": "attacking_or_blocking"
+      },
+      "expected_target_count": 3,
+      "expected_total_damage": 5,
+      "logical_rule_key": "battle_rule_v1:08cd518f4a35b21a9a199668f1a8840d",
+      "name": "Roil's Retribution divides 5 damage",
+      "nonmatching_target": {
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Illegal Damage Target",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "targets": [
+        {
+          "attacking": true,
+          "blocking": true,
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Damage Target 1",
+          "power": 2,
+          "toughness": 6,
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "attacking": true,
+          "blocking": true,
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Damage Target 2",
+          "power": 2,
+          "toughness": 6,
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "attacking": true,
+          "blocking": true,
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Damage Target 3",
+          "power": 2,
+          "toughness": 6,
+          "type_line": "Creature - Soldier"
+        }
+      ],
+      "type": "multi_target_damage"
+    },
+    {
+      "card": {
+        "name": "Spreading Flames",
+        "type_line": "Instant"
+      },
+      "expected_effect": "multi_target_damage",
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ]
+      },
+      "expected_target_count": 3,
+      "expected_total_damage": 6,
+      "logical_rule_key": "battle_rule_v1:0858be9b7e3ddcf7f58281af8926b485",
+      "name": "Spreading Flames divides 6 damage",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Damage Target",
+        "type_line": "Land"
+      },
+      "targets": [
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Damage Target 1",
+          "power": 2,
+          "toughness": 6,
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Damage Target 2",
+          "power": 2,
+          "toughness": 6,
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Damage Target 3",
+          "power": 2,
+          "toughness": 6,
+          "type_line": "Creature - Soldier"
+        }
+      ],
+      "type": "multi_target_damage"
+    },
+    {
+      "card": {
+        "name": "Twin Bolt",
+        "type_line": "Instant"
+      },
+      "expected_effect": "multi_target_damage",
+      "expected_target_constraints": {
+        "scope": "any_target"
+      },
+      "expected_target_count": 2,
+      "expected_total_damage": 2,
+      "logical_rule_key": "battle_rule_v1:39027367cdd1f0f585b9d0f240d3a039",
+      "name": "Twin Bolt divides 2 damage",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Damage Target",
+        "type_line": "Land"
+      },
+      "targets": [
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Damage Target 1",
+          "power": 2,
+          "toughness": 6,
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Damage Target 2",
+          "power": 2,
+          "toughness": 6,
+          "type_line": "Creature - Soldier"
+        }
+      ],
+      "type": "multi_target_damage"
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Aerial Volley",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8c3af016c2a83571c684414e12f6ba8f",
+      "min_rule_version": 2,
+      "normalized_name": "aerial volley",
+      "oracle_hash": "00609b4fb1c5ac75b66f8573ebf8e43d",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "amount": 3,
+        "battle_model_scope": "xmage_fixed_multi_target_damage_spell_v1",
+        "damage": 3,
+        "effect": "multi_target_damage",
+        "max_targets": 3,
+        "target": "flying_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "required_keywords": [
+            "flying"
+          ]
+        },
+        "target_count": 3,
+        "target_count_max": 3,
+        "target_count_min": 1,
+        "up_to_count": false,
+        "xmage_effect_class": "DamageMultiEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Arc Lightning",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f2c5e312fa1842f2baf7ae6283fe5313",
+      "min_rule_version": 2,
+      "normalized_name": "arc lightning",
+      "oracle_hash": "74204b1dabfd1c5919ff3fd2f0744f71",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "amount": 3,
+        "battle_model_scope": "xmage_fixed_multi_target_damage_spell_v1",
+        "damage": 3,
+        "effect": "multi_target_damage",
+        "max_targets": 3,
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "target_count": 3,
+        "target_count_max": 3,
+        "target_count_min": 1,
+        "up_to_count": false,
+        "xmage_effect_class": "DamageMultiEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Boulderfall",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5e9ebeeda9437feb0ac9a01d61ae3a3b",
+      "min_rule_version": 2,
+      "normalized_name": "boulderfall",
+      "oracle_hash": "41d7708efeb4a68047e6ee18b9273336",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "amount": 5,
+        "battle_model_scope": "xmage_fixed_multi_target_damage_spell_v1",
+        "damage": 5,
+        "effect": "multi_target_damage",
+        "max_targets": 5,
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "target_count": 5,
+        "target_count_max": 5,
+        "target_count_min": 0,
+        "up_to_count": true,
+        "xmage_effect_class": "DamageMultiEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Chandra's Pyrohelix",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:39027367cdd1f0f585b9d0f240d3a039",
+      "min_rule_version": 2,
+      "normalized_name": "chandra's pyrohelix",
+      "oracle_hash": "1ba0332667f38202bea076b467d2c71a",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "amount": 2,
+        "battle_model_scope": "xmage_fixed_multi_target_damage_spell_v1",
+        "damage": 2,
+        "effect": "multi_target_damage",
+        "max_targets": 2,
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "target_count": 2,
+        "target_count_max": 2,
+        "target_count_min": 1,
+        "up_to_count": false,
+        "xmage_effect_class": "DamageMultiEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Deft Dismissal",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4bdf19bcd2790da7cb3d56a14be59ea3",
+      "min_rule_version": 2,
+      "normalized_name": "deft dismissal",
+      "oracle_hash": "18576ea60d74ab1ed1c5c2ffb1272372",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "amount": 3,
+        "battle_model_scope": "xmage_fixed_multi_target_damage_spell_v1",
+        "damage": 3,
+        "effect": "multi_target_damage",
+        "max_targets": 3,
+        "target": "attacking_or_blocking_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "combat_state": "attacking_or_blocking"
+        },
+        "target_count": 3,
+        "target_count_max": 3,
+        "target_count_min": 1,
+        "up_to_count": false,
+        "xmage_effect_class": "DamageMultiEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Fire at Will",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4bdf19bcd2790da7cb3d56a14be59ea3",
+      "min_rule_version": 2,
+      "normalized_name": "fire at will",
+      "oracle_hash": "8646a4a7ed02c0d2cd6f6ff343ec1a11",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "amount": 3,
+        "battle_model_scope": "xmage_fixed_multi_target_damage_spell_v1",
+        "damage": 3,
+        "effect": "multi_target_damage",
+        "max_targets": 3,
+        "target": "attacking_or_blocking_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "combat_state": "attacking_or_blocking"
+        },
+        "target_count": 3,
+        "target_count_max": 3,
+        "target_count_min": 1,
+        "up_to_count": false,
+        "xmage_effect_class": "DamageMultiEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Flames of the Firebrand",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f2c5e312fa1842f2baf7ae6283fe5313",
+      "min_rule_version": 2,
+      "normalized_name": "flames of the firebrand",
+      "oracle_hash": "a9e2e1aa166282dc86b7279ff3da02f3",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "amount": 3,
+        "battle_model_scope": "xmage_fixed_multi_target_damage_spell_v1",
+        "damage": 3,
+        "effect": "multi_target_damage",
+        "max_targets": 3,
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "target_count": 3,
+        "target_count_max": 3,
+        "target_count_min": 1,
+        "up_to_count": false,
+        "xmage_effect_class": "DamageMultiEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Forked Bolt",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:70d511bda849f87dc14022fdd9c1d3cc",
+      "min_rule_version": 2,
+      "normalized_name": "forked bolt",
+      "oracle_hash": "52abe6d8587fe0540e6df205a9bff961",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "amount": 2,
+        "battle_model_scope": "xmage_fixed_multi_target_damage_spell_v1",
+        "damage": 2,
+        "effect": "multi_target_damage",
+        "max_targets": 2,
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "target_count": 2,
+        "target_count_max": 2,
+        "target_count_min": 1,
+        "up_to_count": false,
+        "xmage_effect_class": "DamageMultiEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Forked Lightning",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:04a2875b32e0ede63cdf997841853f38",
+      "min_rule_version": 2,
+      "normalized_name": "forked lightning",
+      "oracle_hash": "0a28e75daca9fdef081f1fd949da8aa5",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "amount": 4,
+        "battle_model_scope": "xmage_fixed_multi_target_damage_spell_v1",
+        "damage": 4,
+        "effect": "multi_target_damage",
+        "max_targets": 3,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_count": 3,
+        "target_count_max": 3,
+        "target_count_min": 1,
+        "up_to_count": false,
+        "xmage_effect_class": "DamageMultiEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Ignite Disorder",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9eb46af2f059e444167117db8701ca0b",
+      "min_rule_version": 2,
+      "normalized_name": "ignite disorder",
+      "oracle_hash": "62b8a9bea0d1331e23b20b0278ddbe85",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "amount": 3,
+        "battle_model_scope": "xmage_fixed_multi_target_damage_spell_v1",
+        "damage": 3,
+        "effect": "multi_target_damage",
+        "max_targets": 3,
+        "target": "white_or_blue_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "target_colors": [
+            "W",
+            "U"
+          ]
+        },
+        "target_count": 3,
+        "target_count_max": 3,
+        "target_count_min": 1,
+        "up_to_count": false,
+        "xmage_effect_class": "DamageMultiEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Magic Missile",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f2c5e312fa1842f2baf7ae6283fe5313",
+      "min_rule_version": 2,
+      "normalized_name": "magic missile",
+      "oracle_hash": "6f6aa371529551318248e64805ef22ff",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "amount": 3,
+        "battle_model_scope": "xmage_fixed_multi_target_damage_spell_v1",
+        "damage": 3,
+        "effect": "multi_target_damage",
+        "max_targets": 3,
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "target_count": 3,
+        "target_count_max": 3,
+        "target_count_min": 1,
+        "up_to_count": false,
+        "xmage_effect_class": "DamageMultiEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Pyrotechnics",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9d6e4255475c9b2528d2db4de3a11552",
+      "min_rule_version": 2,
+      "normalized_name": "pyrotechnics",
+      "oracle_hash": "848c99c225e90a5f56ff353cbfc0c94b",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "amount": 4,
+        "battle_model_scope": "xmage_fixed_multi_target_damage_spell_v1",
+        "damage": 4,
+        "effect": "multi_target_damage",
+        "max_targets": 4,
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "target_count": 4,
+        "target_count_max": 4,
+        "target_count_min": 0,
+        "up_to_count": true,
+        "xmage_effect_class": "DamageMultiEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Roil's Retribution",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:08cd518f4a35b21a9a199668f1a8840d",
+      "min_rule_version": 2,
+      "normalized_name": "roil's retribution",
+      "oracle_hash": "cd25ab62a52fc0244dd6142f49161fc2",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "amount": 5,
+        "battle_model_scope": "xmage_fixed_multi_target_damage_spell_v1",
+        "damage": 5,
+        "effect": "multi_target_damage",
+        "max_targets": 5,
+        "target": "attacking_or_blocking_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "combat_state": "attacking_or_blocking"
+        },
+        "target_count": 5,
+        "target_count_max": 5,
+        "target_count_min": 0,
+        "up_to_count": true,
+        "xmage_effect_class": "DamageMultiEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Spreading Flames",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0858be9b7e3ddcf7f58281af8926b485",
+      "min_rule_version": 2,
+      "normalized_name": "spreading flames",
+      "oracle_hash": "1075550ab89dbc75776e18619545a0ee",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "amount": 6,
+        "battle_model_scope": "xmage_fixed_multi_target_damage_spell_v1",
+        "damage": 6,
+        "effect": "multi_target_damage",
+        "max_targets": 6,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_count": 6,
+        "target_count_max": 6,
+        "target_count_min": 0,
+        "up_to_count": true,
+        "xmage_effect_class": "DamageMultiEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Twin Bolt",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:39027367cdd1f0f585b9d0f240d3a039",
+      "min_rule_version": 2,
+      "normalized_name": "twin bolt",
+      "oracle_hash": "1dbae0c5025714853d78e2fbee68418e",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "amount": 2,
+        "battle_model_scope": "xmage_fixed_multi_target_damage_spell_v1",
+        "damage": 2,
+        "effect": "multi_target_damage",
+        "max_targets": 2,
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "target_count": 2,
+        "target_count_max": 2,
+        "target_count_min": 1,
+        "up_to_count": false,
+        "xmage_effect_class": "DamageMultiEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_fixed_multi_target_damage_spell": 15
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg593_multi_target_damage_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg593_multi_target_damage_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg593_multi_target_damage_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg593_multi_target_damage_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg593_multi_target_damage_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg593_multi_target_damage_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-07T04:34:46+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Aerial Volley"
+      },
+      "card_name": "Aerial Volley",
+      "effect": "multi_target_damage",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8c3af016c2a83571c684414e12f6ba8f",
+      "normalized_name": "aerial volley",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "amount": 3,
+        "battle_model_scope": "xmage_fixed_multi_target_damage_spell_v1",
+        "damage": 3,
+        "effect": "multi_target_damage",
+        "max_targets": 3,
+        "target": "flying_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "required_keywords": [
+            "flying"
+          ]
+        },
+        "target_count": 3,
+        "target_count_max": 3,
+        "target_count_min": 1,
+        "up_to_count": false,
+        "xmage_effect_class": "DamageMultiEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Arc Lightning"
+      },
+      "card_name": "Arc Lightning",
+      "effect": "multi_target_damage",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f2c5e312fa1842f2baf7ae6283fe5313",
+      "normalized_name": "arc lightning",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "amount": 3,
+        "battle_model_scope": "xmage_fixed_multi_target_damage_spell_v1",
+        "damage": 3,
+        "effect": "multi_target_damage",
+        "max_targets": 3,
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "target_count": 3,
+        "target_count_max": 3,
+        "target_count_min": 1,
+        "up_to_count": false,
+        "xmage_effect_class": "DamageMultiEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Boulderfall"
+      },
+      "card_name": "Boulderfall",
+      "effect": "multi_target_damage",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5e9ebeeda9437feb0ac9a01d61ae3a3b",
+      "normalized_name": "boulderfall",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "amount": 5,
+        "battle_model_scope": "xmage_fixed_multi_target_damage_spell_v1",
+        "damage": 5,
+        "effect": "multi_target_damage",
+        "max_targets": 5,
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "target_count": 5,
+        "target_count_max": 5,
+        "target_count_min": 0,
+        "up_to_count": true,
+        "xmage_effect_class": "DamageMultiEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Chandra's Pyrohelix"
+      },
+      "card_name": "Chandra's Pyrohelix",
+      "effect": "multi_target_damage",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:39027367cdd1f0f585b9d0f240d3a039",
+      "normalized_name": "chandra's pyrohelix",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "amount": 2,
+        "battle_model_scope": "xmage_fixed_multi_target_damage_spell_v1",
+        "damage": 2,
+        "effect": "multi_target_damage",
+        "max_targets": 2,
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "target_count": 2,
+        "target_count_max": 2,
+        "target_count_min": 1,
+        "up_to_count": false,
+        "xmage_effect_class": "DamageMultiEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Deft Dismissal"
+      },
+      "card_name": "Deft Dismissal",
+      "effect": "multi_target_damage",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4bdf19bcd2790da7cb3d56a14be59ea3",
+      "normalized_name": "deft dismissal",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "amount": 3,
+        "battle_model_scope": "xmage_fixed_multi_target_damage_spell_v1",
+        "damage": 3,
+        "effect": "multi_target_damage",
+        "max_targets": 3,
+        "target": "attacking_or_blocking_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "combat_state": "attacking_or_blocking"
+        },
+        "target_count": 3,
+        "target_count_max": 3,
+        "target_count_min": 1,
+        "up_to_count": false,
+        "xmage_effect_class": "DamageMultiEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Fire at Will"
+      },
+      "card_name": "Fire at Will",
+      "effect": "multi_target_damage",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4bdf19bcd2790da7cb3d56a14be59ea3",
+      "normalized_name": "fire at will",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "amount": 3,
+        "battle_model_scope": "xmage_fixed_multi_target_damage_spell_v1",
+        "damage": 3,
+        "effect": "multi_target_damage",
+        "max_targets": 3,
+        "target": "attacking_or_blocking_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "combat_state": "attacking_or_blocking"
+        },
+        "target_count": 3,
+        "target_count_max": 3,
+        "target_count_min": 1,
+        "up_to_count": false,
+        "xmage_effect_class": "DamageMultiEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Flames of the Firebrand"
+      },
+      "card_name": "Flames of the Firebrand",
+      "effect": "multi_target_damage",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f2c5e312fa1842f2baf7ae6283fe5313",
+      "normalized_name": "flames of the firebrand",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "amount": 3,
+        "battle_model_scope": "xmage_fixed_multi_target_damage_spell_v1",
+        "damage": 3,
+        "effect": "multi_target_damage",
+        "max_targets": 3,
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "target_count": 3,
+        "target_count_max": 3,
+        "target_count_min": 1,
+        "up_to_count": false,
+        "xmage_effect_class": "DamageMultiEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Forked Bolt"
+      },
+      "card_name": "Forked Bolt",
+      "effect": "multi_target_damage",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:70d511bda849f87dc14022fdd9c1d3cc",
+      "normalized_name": "forked bolt",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "amount": 2,
+        "battle_model_scope": "xmage_fixed_multi_target_damage_spell_v1",
+        "damage": 2,
+        "effect": "multi_target_damage",
+        "max_targets": 2,
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "target_count": 2,
+        "target_count_max": 2,
+        "target_count_min": 1,
+        "up_to_count": false,
+        "xmage_effect_class": "DamageMultiEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Forked Lightning"
+      },
+      "card_name": "Forked Lightning",
+      "effect": "multi_target_damage",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:04a2875b32e0ede63cdf997841853f38",
+      "normalized_name": "forked lightning",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "amount": 4,
+        "battle_model_scope": "xmage_fixed_multi_target_damage_spell_v1",
+        "damage": 4,
+        "effect": "multi_target_damage",
+        "max_targets": 3,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_count": 3,
+        "target_count_max": 3,
+        "target_count_min": 1,
+        "up_to_count": false,
+        "xmage_effect_class": "DamageMultiEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Ignite Disorder"
+      },
+      "card_name": "Ignite Disorder",
+      "effect": "multi_target_damage",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9eb46af2f059e444167117db8701ca0b",
+      "normalized_name": "ignite disorder",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "amount": 3,
+        "battle_model_scope": "xmage_fixed_multi_target_damage_spell_v1",
+        "damage": 3,
+        "effect": "multi_target_damage",
+        "max_targets": 3,
+        "target": "white_or_blue_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "target_colors": [
+            "W",
+            "U"
+          ]
+        },
+        "target_count": 3,
+        "target_count_max": 3,
+        "target_count_min": 1,
+        "up_to_count": false,
+        "xmage_effect_class": "DamageMultiEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Magic Missile"
+      },
+      "card_name": "Magic Missile",
+      "effect": "multi_target_damage",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f2c5e312fa1842f2baf7ae6283fe5313",
+      "normalized_name": "magic missile",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "amount": 3,
+        "battle_model_scope": "xmage_fixed_multi_target_damage_spell_v1",
+        "damage": 3,
+        "effect": "multi_target_damage",
+        "max_targets": 3,
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "target_count": 3,
+        "target_count_max": 3,
+        "target_count_min": 1,
+        "up_to_count": false,
+        "xmage_effect_class": "DamageMultiEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Pyrotechnics"
+      },
+      "card_name": "Pyrotechnics",
+      "effect": "multi_target_damage",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9d6e4255475c9b2528d2db4de3a11552",
+      "normalized_name": "pyrotechnics",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "amount": 4,
+        "battle_model_scope": "xmage_fixed_multi_target_damage_spell_v1",
+        "damage": 4,
+        "effect": "multi_target_damage",
+        "max_targets": 4,
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "target_count": 4,
+        "target_count_max": 4,
+        "target_count_min": 0,
+        "up_to_count": true,
+        "xmage_effect_class": "DamageMultiEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Roil's Retribution"
+      },
+      "card_name": "Roil's Retribution",
+      "effect": "multi_target_damage",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:08cd518f4a35b21a9a199668f1a8840d",
+      "normalized_name": "roil's retribution",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "amount": 5,
+        "battle_model_scope": "xmage_fixed_multi_target_damage_spell_v1",
+        "damage": 5,
+        "effect": "multi_target_damage",
+        "max_targets": 5,
+        "target": "attacking_or_blocking_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "combat_state": "attacking_or_blocking"
+        },
+        "target_count": 5,
+        "target_count_max": 5,
+        "target_count_min": 0,
+        "up_to_count": true,
+        "xmage_effect_class": "DamageMultiEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Spreading Flames"
+      },
+      "card_name": "Spreading Flames",
+      "effect": "multi_target_damage",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0858be9b7e3ddcf7f58281af8926b485",
+      "normalized_name": "spreading flames",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "amount": 6,
+        "battle_model_scope": "xmage_fixed_multi_target_damage_spell_v1",
+        "damage": 6,
+        "effect": "multi_target_damage",
+        "max_targets": 6,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_count": 6,
+        "target_count_max": 6,
+        "target_count_min": 0,
+        "up_to_count": true,
+        "xmage_effect_class": "DamageMultiEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Twin Bolt"
+      },
+      "card_name": "Twin Bolt",
+      "effect": "multi_target_damage",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:39027367cdd1f0f585b9d0f240d3a039",
+      "normalized_name": "twin bolt",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "amount": 2,
+        "battle_model_scope": "xmage_fixed_multi_target_damage_spell_v1",
+        "damage": 2,
+        "effect": "multi_target_damage",
+        "max_targets": 2,
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "target_count": 2,
+        "target_count_max": 2,
+        "target_count_min": 1,
+        "up_to_count": false,
+        "xmage_effect_class": "DamageMultiEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Aerial Volley",
+    "Arc Lightning",
+    "Boulderfall",
+    "Chandra's Pyrohelix",
+    "Deft Dismissal",
+    "Fire at Will",
+    "Flames of the Firebrand",
+    "Forked Bolt",
+    "Forked Lightning",
+    "Ignite Disorder",
+    "Magic Missile",
+    "Pyrotechnics",
+    "Roil's Retribution",
+    "Spreading Flames",
+    "Twin Bolt"
+  ],
+  "selected_count": 15,
+  "slug": "multi_target_damage_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Aerial Volley",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8c3af016c2a83571c684414e12f6ba8f",
+      "min_rule_version": 2,
+      "normalized_name": "aerial volley",
+      "oracle_hash": "00609b4fb1c5ac75b66f8573ebf8e43d",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_multi_target_damage_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Arc Lightning",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f2c5e312fa1842f2baf7ae6283fe5313",
+      "min_rule_version": 2,
+      "normalized_name": "arc lightning",
+      "oracle_hash": "74204b1dabfd1c5919ff3fd2f0744f71",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_multi_target_damage_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Boulderfall",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5e9ebeeda9437feb0ac9a01d61ae3a3b",
+      "min_rule_version": 2,
+      "normalized_name": "boulderfall",
+      "oracle_hash": "41d7708efeb4a68047e6ee18b9273336",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_multi_target_damage_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Chandra's Pyrohelix",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:39027367cdd1f0f585b9d0f240d3a039",
+      "min_rule_version": 2,
+      "normalized_name": "chandra's pyrohelix",
+      "oracle_hash": "1ba0332667f38202bea076b467d2c71a",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_multi_target_damage_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Deft Dismissal",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4bdf19bcd2790da7cb3d56a14be59ea3",
+      "min_rule_version": 2,
+      "normalized_name": "deft dismissal",
+      "oracle_hash": "18576ea60d74ab1ed1c5c2ffb1272372",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_multi_target_damage_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Fire at Will",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4bdf19bcd2790da7cb3d56a14be59ea3",
+      "min_rule_version": 2,
+      "normalized_name": "fire at will",
+      "oracle_hash": "8646a4a7ed02c0d2cd6f6ff343ec1a11",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_multi_target_damage_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Flames of the Firebrand",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f2c5e312fa1842f2baf7ae6283fe5313",
+      "min_rule_version": 2,
+      "normalized_name": "flames of the firebrand",
+      "oracle_hash": "a9e2e1aa166282dc86b7279ff3da02f3",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_multi_target_damage_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Forked Bolt",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:70d511bda849f87dc14022fdd9c1d3cc",
+      "min_rule_version": 2,
+      "normalized_name": "forked bolt",
+      "oracle_hash": "52abe6d8587fe0540e6df205a9bff961",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_multi_target_damage_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Forked Lightning",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:04a2875b32e0ede63cdf997841853f38",
+      "min_rule_version": 2,
+      "normalized_name": "forked lightning",
+      "oracle_hash": "0a28e75daca9fdef081f1fd949da8aa5",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_multi_target_damage_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Ignite Disorder",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9eb46af2f059e444167117db8701ca0b",
+      "min_rule_version": 2,
+      "normalized_name": "ignite disorder",
+      "oracle_hash": "62b8a9bea0d1331e23b20b0278ddbe85",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_multi_target_damage_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Magic Missile",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f2c5e312fa1842f2baf7ae6283fe5313",
+      "min_rule_version": 2,
+      "normalized_name": "magic missile",
+      "oracle_hash": "6f6aa371529551318248e64805ef22ff",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_multi_target_damage_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Pyrotechnics",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9d6e4255475c9b2528d2db4de3a11552",
+      "min_rule_version": 2,
+      "normalized_name": "pyrotechnics",
+      "oracle_hash": "848c99c225e90a5f56ff353cbfc0c94b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_multi_target_damage_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Roil's Retribution",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:08cd518f4a35b21a9a199668f1a8840d",
+      "min_rule_version": 2,
+      "normalized_name": "roil's retribution",
+      "oracle_hash": "cd25ab62a52fc0244dd6142f49161fc2",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_multi_target_damage_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Spreading Flames",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0858be9b7e3ddcf7f58281af8926b485",
+      "min_rule_version": 2,
+      "normalized_name": "spreading flames",
+      "oracle_hash": "1075550ab89dbc75776e18619545a0ee",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_multi_target_damage_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Twin Bolt",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:39027367cdd1f0f585b9d0f240d3a039",
+      "min_rule_version": 2,
+      "normalized_name": "twin bolt",
+      "oracle_hash": "1dbae0c5025714853d78e2fbee68418e",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_multi_target_damage_spell_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

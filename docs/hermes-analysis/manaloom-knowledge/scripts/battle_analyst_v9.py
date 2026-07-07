@@ -44896,6 +44896,299 @@ def trigger_white_instant_sorcery_lifegain_damage(
     return resolved
 
 
+def multi_target_damage_target_type(effect_data):
+    target = str((effect_data or {}).get("target") or "").lower()
+    if target:
+        return target
+    constrained = _target_type_from_constraints(effect_data)
+    return constrained or "any_target"
+
+
+def _multi_target_damage_candidate_entries(player, opponents, card, effect_data):
+    target_type = multi_target_damage_target_type(effect_data)
+    spell_data = {**(card or {}), **(effect_data or {})}
+    entries = []
+    for participant in direct_damage_target_participants(player, opponents, effect_data):
+        if direct_damage_targets_player(effect_data) and participant.is_alive():
+            entries.append(
+                {
+                    "kind": "player",
+                    "controller": participant,
+                    "target": participant,
+                    "name": participant.name,
+                    "priority": (0, 0, 0, 0, 0, max(0, 100 - int(participant.life or 0))),
+                }
+            )
+        for permanent in list(getattr(participant, "battlefield", []) or []):
+            if not isinstance(permanent, dict):
+                continue
+            if not is_legal_target(
+                spell_data,
+                permanent,
+                player,
+                target_type=target_type,
+                target_controller=participant,
+            ):
+                continue
+            kind = "permanent"
+            if is_battlefield_creature(permanent):
+                kind = "creature"
+            elif is_planeswalker_permanent(permanent):
+                kind = "planeswalker"
+            elif is_battle_permanent(permanent):
+                kind = "battle"
+            entries.append(
+                {
+                    "kind": kind,
+                    "controller": participant,
+                    "target": permanent,
+                    "name": permanent.get("name", "?"),
+                    "priority": (1, *target_priority(permanent)),
+                }
+            )
+    return sorted(entries, key=lambda entry: entry["priority"], reverse=True)
+
+
+def _multi_target_damage_finish_amount(entry):
+    target = entry.get("target")
+    kind = entry.get("kind")
+    if kind == "player":
+        try:
+            return max(1, int(getattr(target, "life", 1) or 1))
+        except Exception:
+            return 1
+    if not isinstance(target, dict):
+        return 1
+    if kind == "creature":
+        toughness = int(target.get("toughness") or target.get("power") or 1)
+        marked = int(target.get("damage_marked_this_turn") or 0)
+        return max(1, toughness - marked)
+    if kind == "planeswalker":
+        return max(1, int(target.get("loyalty", target.get("starting_loyalty", 1)) or 1))
+    if kind == "battle":
+        return max(1, int(target.get("defense", target.get("starting_defense", 1)) or 1))
+    return 1
+
+
+def _multi_target_damage_assignments(entries, total_damage, max_targets):
+    selected = entries[: max(0, min(len(entries), int(max_targets or 1), int(total_damage or 0)))]
+    if not selected:
+        return []
+    assignments = [{"entry": entry, "amount": 1} for entry in selected]
+    remaining = max(0, int(total_damage or 0) - len(assignments))
+    for assignment in assignments:
+        if remaining <= 0:
+            break
+        desired = _multi_target_damage_finish_amount(assignment["entry"])
+        needed = max(0, desired - int(assignment["amount"] or 0))
+        if needed <= 0:
+            continue
+        add = min(remaining, needed)
+        assignment["amount"] += add
+        remaining -= add
+    if remaining > 0:
+        assignments[0]["amount"] += remaining
+    return assignments
+
+
+def apply_multi_target_damage(player, opponents, card, effect_data, turn, rng, *, finish_spell=True, phase="resolution"):
+    try:
+        total_damage = int(effect_data.get("amount") or effect_data.get("damage") or 0)
+    except Exception:
+        total_damage = 0
+    try:
+        max_targets = int(
+            first_present_value(effect_data, ("target_count_max", "max_targets", "target_count"))
+            or total_damage
+            or 1
+        )
+    except Exception:
+        max_targets = max(1, total_damage)
+    candidates = _multi_target_damage_candidate_entries(player, opponents, card, effect_data)
+    assignments = _multi_target_damage_assignments(candidates, total_damage, max_targets)
+    if not assignments:
+        emit_replay_event(
+            "multi_target_damage_resolved",
+            player=player.name,
+            card=card.get("name", "?"),
+            total_damage=total_damage,
+            result="no_legal_targets",
+            turn=turn,
+            phase=phase,
+            **replay_rule_fields(effect_data),
+        )
+        if finish_spell:
+            finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+        return
+
+    resolved = []
+    total_dealt = 0
+    for assignment in assignments:
+        entry = assignment["entry"]
+        raw_amount = int(assignment["amount"] or 0)
+        target = entry["target"]
+        target_controller = entry["controller"]
+        kind = entry["kind"]
+        result = "damage_resolved"
+        destination = None
+        life_before = None
+        life_after = None
+        loyalty_before = None
+        loyalty_after = None
+        defense_before = None
+        defense_after = None
+        dealt_amount = 0
+        final_amount = raw_amount
+        if kind == "player":
+            life_before = target.life
+            dealt_amount, final_amount, dealt = deal_damage_to_player_with_static_replacements(
+                player,
+                target,
+                card,
+                raw_amount,
+                turn=turn,
+                phase=phase,
+                damage_event_type="player",
+            )
+            life_after = target.life
+            result = "player_damage" if dealt else "prevented"
+        else:
+            final_amount = apply_static_damage_replacements(
+                player,
+                target_controller,
+                target,
+                card,
+                raw_amount,
+                damage_event_type="permanent",
+                turn=turn,
+                phase=phase,
+            )
+            dealt_amount = final_amount
+            mark_permanent_dealt_damage_this_turn(target, final_amount, turn)
+            trigger_creature_damage_controller_reflect(
+                [player, *list(opponents)],
+                player,
+                target_controller,
+                card,
+                target,
+                final_amount,
+                turn=turn,
+                phase=phase,
+                damage_event="multi_target_damage",
+            )
+            if kind == "creature":
+                process_taii_wakeen_noncombat_damage_to_creature(
+                    player,
+                    target_controller,
+                    card,
+                    target,
+                    final_amount,
+                    turn=turn,
+                    phase=phase,
+                )
+                marked = int(target.get("damage_marked_this_turn") or 0)
+                lethal = marked >= int(target.get("toughness") or target.get("power") or 1)
+                if lethal and not target.get("indestructible"):
+                    destination = move_creature_from_battlefield(
+                        target_controller,
+                        target,
+                        reason="multi_target_damage",
+                        source=card,
+                        all_players=[player, *list(opponents)],
+                    )
+                    result = "creature_destroyed" if destination != "battlefield" else "creature_regenerated"
+                else:
+                    destination = "battlefield"
+                    result = "creature_damaged"
+            elif kind == "planeswalker":
+                loyalty_before = int(target.get("loyalty", 0) or 0)
+                damage_to_planeswalker(card, target, final_amount)
+                loyalty_after = int(target.get("loyalty", 0) or 0)
+                if loyalty_after <= 0:
+                    destination = move_permanent_from_battlefield(
+                        target_controller,
+                        target,
+                        reason="multi_target_damage",
+                        source=card,
+                        all_players=[player, *list(opponents)],
+                    )
+                    result = "planeswalker_destroyed"
+                else:
+                    result = "planeswalker_damage"
+            elif kind == "battle":
+                defense_before = int(target.get("defense", 0) or 0)
+                battle_takes_damage(target, final_amount)
+                defense_after = int(target.get("defense", 0) or 0)
+                result = "battle_damage"
+        total_dealt += max(0, int(dealt_amount or 0))
+        resolved_entry = {
+            "target": entry["name"],
+            "target_controller": getattr(target_controller, "name", None),
+            "kind": kind,
+            "assigned_amount": raw_amount,
+            "amount": final_amount,
+            "dealt": dealt_amount,
+            "result": result,
+            "destination": destination,
+            "life_before": life_before,
+            "life_after": life_after,
+            "loyalty_before": loyalty_before,
+            "loyalty_after": loyalty_after,
+            "defense_before": defense_before,
+            "defense_after": defense_after,
+        }
+        resolved.append(resolved_entry)
+        emit_replay_event(
+            "damage_resolved",
+            player=player.name,
+            card=card.get("name", "?"),
+            multi_target_damage=True,
+            amount=final_amount,
+            original_amount=raw_amount,
+            target_player=getattr(target_controller, "name", None),
+            target=entry["name"],
+            result=result,
+            destination=destination,
+            permanent_type=kind,
+            turn=turn,
+            phase=phase,
+            **replay_rule_fields(effect_data),
+        )
+
+    life_gained = 0
+    lifelink_sources = spell_lifelink_sources(player, card)
+    if lifelink_sources and total_dealt > 0:
+        before = player.life
+        gain_life(player, total_dealt)
+        life_gained = player.life - before
+    emit_replay_event(
+        "multi_target_damage_resolved",
+        player=player.name,
+        card=card.get("name", "?"),
+        total_damage=total_damage,
+        max_targets=max_targets,
+        selected_target_count=len(assignments),
+        targets=[entry["target"] for entry in resolved],
+        assignments=resolved,
+        total_dealt=total_dealt,
+        spell_lifelink_sources=lifelink_sources,
+        life_gained=life_gained,
+        turn=turn,
+        phase=phase,
+        **replay_rule_fields(effect_data),
+    )
+    trigger_white_instant_sorcery_lifegain_damage(
+        player,
+        opponents,
+        card,
+        life_gained,
+        turn,
+        phase=phase,
+    )
+    if finish_spell:
+        finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+
+
 def apply_direct_damage(player, opponents, card, effect_data, turn, rng, *, finish_spell=True, phase="resolution"):
     dynamic_amount, dynamic_amount_fields = dynamic_damage_amount(player, opponents, effect_data)
     if dynamic_amount is not None:
@@ -58757,6 +59050,11 @@ def apply_effect_immediate(
             finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
             return
         apply_direct_damage(player, opponents, card, effect_data, turn, rng)
+    elif effect == "multi_target_damage":
+        if not pay_additional_card_costs(player, card, effect_data, turn=turn):
+            finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+            return
+        apply_multi_target_damage(player, opponents, card, effect_data, turn, rng)
     elif effect == "add_counters":
         resolve_add_counters_target_spell(player, opponents, card, effect_data, turn)
     elif effect == "stat_modifier_until_eot":

@@ -12555,6 +12555,78 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_multi_target_damage_distributes_to_legal_targets_only(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        illegal_target = {
+            "name": "Plain Land",
+            "type_line": "Land",
+            "effect": "land",
+            "cmc": 0,
+        }
+        target_one = {
+            "name": "First Creature",
+            "type_line": "Creature - Wizard",
+            "cmc": 2,
+            "power": 2,
+            "toughness": 6,
+        }
+        target_two = {
+            "name": "Second Creature",
+            "type_line": "Creature - Soldier",
+            "cmc": 3,
+            "power": 3,
+            "toughness": 6,
+        }
+        opponent.battlefield.extend([illegal_target, target_one, target_two])
+        effect = {
+            "effect": "multi_target_damage",
+            "battle_model_scope": "xmage_fixed_multi_target_damage_spell_v1",
+            "amount": 3,
+            "damage": 3,
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "target_count": 2,
+            "target_count_min": 1,
+            "target_count_max": 2,
+            "max_targets": 2,
+            "up_to_count": False,
+            "divided_damage": True,
+            "instant": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Chandra's Pyrohelix",
+                "type_line": "Instant",
+                "oracle_text": "Chandra's Pyrohelix deals 2 damage divided as you choose among one or two targets.",
+            },
+            turn=7,
+            rng=random.Random(18),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual([card["name"] for card in opponent.battlefield], ["Plain Land", "First Creature", "Second Creature"])
+        self.assertEqual(illegal_target.get("damage_marked_this_turn"), None)
+        self.assertGreaterEqual(target_one.get("damage_marked_this_turn", 0), 1)
+        self.assertGreaterEqual(target_two.get("damage_marked_this_turn", 0), 1)
+        self.assertEqual(
+            target_one.get("damage_marked_this_turn", 0) + target_two.get("damage_marked_this_turn", 0),
+            3,
+        )
+        self.assertTrue(
+            any(
+                event == "multi_target_damage_resolved"
+                and data.get("card") == "Chandra's Pyrohelix"
+                and data.get("selected_target_count") == 2
+                and data.get("total_damage") == 3
+                and sorted(data.get("targets") or []) == ["First Creature", "Second Creature"]
+                for event, data in self.events
+            )
+        )
+
     def test_graveyard_to_hand_recursion_returns_matching_card_only(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

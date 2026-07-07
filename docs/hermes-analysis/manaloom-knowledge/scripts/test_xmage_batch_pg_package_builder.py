@@ -990,6 +990,34 @@ def test_multi_target_removal_scenario_uses_declared_target_count() -> None:
     assert builder.single_target_removal_execution_scenario_from_expected_rule(rule) is None
 
 
+def test_multi_target_damage_scenario_exercises_divided_damage() -> None:
+    rule = {
+        "normalized_name": "arc lightning",
+        "card_name": "Arc Lightning",
+        "oracle_hash": "hash-arc-lightning",
+        "logical_rule_key": "battle_rule_v1:hash-arc-lightning",
+        "required_effect_fields": {
+            "effect": "multi_target_damage",
+            "battle_model_scope": "xmage_fixed_multi_target_damage_spell_v1",
+            "amount": 3,
+            "damage": 3,
+            "target": "any_target",
+            "target_constraints": {"scope": "any_target"},
+            "target_count_min": 1,
+            "target_count_max": 3,
+            "max_targets": 3,
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "multi_target_damage"
+    assert scenario["expected_total_damage"] == 3
+    assert scenario["expected_target_count"] == 3
+    assert len(scenario["targets"]) == 3
+
+
 def test_single_target_removal_scenario_models_excluded_color_and_combat_state() -> None:
     rule = {
         "normalized_name": "assassins blade",

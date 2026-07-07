@@ -1924,6 +1924,91 @@ def run_multi_target_removal(
     }
 
 
+def run_multi_target_damage(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    active = battle.Player(str(scenario.get("player") or "Active"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
+    targets = [dict(target) for target in scenario.get("targets") or []]
+    if len(targets) <= 1:
+        fail("battle_execution", f"{card['name']} multi-target damage scenario has {len(targets)} targets")
+    nonmatching = dict(
+        scenario.get("nonmatching_target")
+        or {
+            "name": "E2E Illegal Damage Target",
+            "type_line": "Land",
+            "effect": "land",
+            "cmc": 0,
+        }
+    )
+    opponent.battlefield = [nonmatching, *targets]
+    before_events = len(events)
+
+    effect_data = battle.get_card_effect(card)
+    expected_effect = scenario.get("expected_effect")
+    if expected_effect and effect_data.get("effect") != expected_effect:
+        fail("battle_execution", f"{card['name']} effect={effect_data.get('effect')!r}")
+
+    battle.apply_effect_immediate(
+        active,
+        [opponent],
+        card,
+        turn=int(scenario.get("turn") or 6),
+        rng=random.Random(int(scenario.get("seed") or 6066)),
+    )
+
+    target_names = [str(target.get("name") or "") for target in targets]
+    nonmatching_name = str(nonmatching.get("name") or "")
+    resolution_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "multi_target_damage_resolved"
+            and data.get("card") == card.get("name")
+        ),
+        None,
+    )
+    if resolution_event is None:
+        fail("battle_events", f"missing {card['name']} multi_target_damage_resolved event")
+    assignments = resolution_event.get("assignments") or []
+    damaged_names = [str(item.get("target") or "") for item in assignments if isinstance(item, dict)]
+    missing = [name for name in target_names if name not in damaged_names]
+    if missing:
+        fail("battle_execution", f"{card['name']} did not damage legal targets {missing}")
+    if nonmatching_name in damaged_names:
+        fail("battle_execution", f"{card['name']} damaged illegal target {nonmatching_name}")
+    expected_total = int(scenario.get("expected_total_damage") or 0)
+    assigned_total = sum(int(item.get("assigned_amount") or 0) for item in assignments if isinstance(item, dict))
+    if expected_total and assigned_total != expected_total:
+        fail("battle_execution", f"{card['name']} assigned_total={assigned_total}, expected={expected_total}")
+    battlefield_names = [str(item.get("name") or "") for item in opponent.battlefield if isinstance(item, dict)]
+    if nonmatching_name not in battlefield_names:
+        fail("battle_execution", f"{card['name']} moved illegal target {nonmatching_name}")
+    damage_markers = {
+        str(item.get("name") or ""): int(item.get("damage_marked_this_turn") or 0)
+        for item in opponent.battlefield
+        if isinstance(item, dict)
+    }
+    for name in target_names:
+        if damage_markers.get(name, 0) <= 0:
+            fail("battle_execution", f"{card['name']} target {name} has no damage marker")
+    if damage_markers.get(nonmatching_name, 0) > 0:
+        fail("battle_execution", f"{card['name']} illegal target {nonmatching_name} has damage marker")
+
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "targets": target_names,
+        "nonmatching_target": nonmatching_name,
+        "assigned_total": assigned_total,
+        "damaged_names": damaged_names,
+        "damage_markers": damage_markers,
+    }
+
+
 def run_destroy_target_create_treasure(
     battle,
     scenario: dict[str, Any],
@@ -4484,6 +4569,7 @@ SCENARIO_RUNNERS = {
     "fixed_create_creature_tokens": run_fixed_create_creature_tokens,
     "mana_source_life_cost_spend": run_mana_source_life_cost_spend,
     "multi_create_creature_tokens": run_multi_create_creature_tokens,
+    "multi_target_damage": run_multi_target_damage,
     "nonfliers_cant_block_rider": run_nonfliers_cant_block_rider,
     "remove_permanent_basic_land_compensation": run_remove_permanent_basic_land_compensation,
     "single_target_removal": run_single_target_removal,

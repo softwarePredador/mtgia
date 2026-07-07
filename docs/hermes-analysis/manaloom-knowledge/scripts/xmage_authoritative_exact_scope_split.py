@@ -38,6 +38,7 @@ def as_list(value: Any) -> list[Any]:
 DRAW_UNIT = "draw_cards::xmage_draw_card_variant_review_v1"
 DRAW_ENGINE_UNIT = "draw_engine::xmage_draw_card_variant_review_v1"
 DAMAGE_UNIT = "direct_damage::targeted_damage_variant_v1"
+MULTI_TARGET_DAMAGE_UNIT = "multi_target_damage::xmage_multi_target_damage_variant_review_v1"
 DAMAGE_EACH_OPPONENT_UNIT = "damage_each_opponent::spell_damage_each_opponent_v1"
 DESTROY_UNIT = "removal_destroy::targeted_destroy_variant_v1"
 ACTIVATED_SELF_SAC_DESTROY_ARTIFACT_OR_ENCHANTMENT_UNIT = (
@@ -153,6 +154,7 @@ ETB_SCRY_CREATURE_UNIT = (
 SUPPORTED_UNITS = {
     DRAW_UNIT,
     DAMAGE_UNIT,
+    MULTI_TARGET_DAMAGE_UNIT,
     DAMAGE_EACH_OPPONENT_UNIT,
     DESTROY_UNIT,
     TAP_TARGET_CREATURE_UNIT,
@@ -192,6 +194,7 @@ DRAW_DISCARD_SPELL_SCOPE = "xmage_fixed_draw_discard_spell_v1"
 DRAW_LOSE_LIFE_SPELL_SCOPE = "xmage_fixed_controller_draw_lose_life_spell_v1"
 TARGET_DRAW_LOSE_LIFE_SPELL_SCOPE = "xmage_fixed_target_player_draw_lose_life_spell_v1"
 DAMAGE_SCOPE = "xmage_fixed_damage_target_spell_v1"
+MULTI_TARGET_DAMAGE_SCOPE = "xmage_fixed_multi_target_damage_spell_v1"
 DAMAGE_EACH_OPPONENT_SCOPE = "spell_damage_each_opponent_v1"
 X_DAMAGE_SCOPE = "xmage_x_damage_target_spell_v1"
 DAMAGE_EXILE_IF_DIES_SCOPE = "xmage_fixed_damage_target_exile_if_dies_spell_v1"
@@ -389,6 +392,7 @@ ETB_ADD_COUNTERS_CREATURE_SCOPE = "xmage_creature_etb_add_counters_target_creatu
 SPELL_UNITS = {
     DRAW_UNIT,
     DAMAGE_UNIT,
+    MULTI_TARGET_DAMAGE_UNIT,
     DESTROY_UNIT,
     TREASURE_UNIT,
     LIFE_UNIT,
@@ -9611,6 +9615,174 @@ def damage_target_from_oracle(metadata: dict[str, Any]) -> str | None:
     return None
 
 
+def multi_target_damage_count_from_phrase(phrase: str, amount: int) -> tuple[int, int] | None:
+    normalized = re.sub(r"\s+", " ", str(phrase or "").strip().lower())
+    if normalized == "any number of":
+        return 0, max(1, int(amount))
+    if normalized == "one or two":
+        return 1, 2
+    if normalized == "one, two, or three":
+        return 1, 3
+    up_to_match = re.fullmatch(r"up to (?P<count>one|two|three|four|five|six|seven|eight|nine|ten|\d+)", normalized)
+    if up_to_match:
+        count = word_count_value(up_to_match.group("count"))
+        if count is None or count <= 0:
+            return None
+        return 0, int(count)
+    return None
+
+
+def multi_target_damage_target_from_phrase(phrase: str) -> tuple[str, str | None] | None:
+    normalized = re.sub(r"\s+", " ", str(phrase or "").strip().lower())
+    normalized = normalized.removesuffix(".")
+    target_controller: str | None = None
+    if normalized.endswith(" your opponents control"):
+        target_controller = "opponent"
+        normalized = normalized.removesuffix(" your opponents control").strip()
+    mapping = {
+        "targets": "any_target",
+        "target": "any_target",
+        "target creatures": "creature",
+        "target creature": "creature",
+        "target creatures with flying": "flying_creature",
+        "target attacking creatures": "attacking_creature",
+        "target attacking creature": "attacking_creature",
+        "target attacking or blocking creatures": "attacking_or_blocking_creature",
+        "target attacking or blocking creature": "attacking_or_blocking_creature",
+        "target creatures and/or planeswalkers": "creature_or_planeswalker",
+        "target creature or planeswalker": "creature_or_planeswalker",
+        "target white and/or blue creatures": "white_or_blue_creature",
+        "target white and/or blue creature": "white_or_blue_creature",
+    }
+    target = mapping.get(normalized)
+    if target is None:
+        return None
+    return target, target_controller
+
+
+def fixed_multi_target_damage_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str | None:
+    text = strip_parenthetical_reminders(oracle_text(metadata))
+    text = re.sub(r"\s+", " ", text.strip().lower())
+    if " x damage " in text or "where x is" in text:
+        return "multi_target_damage_oracle_x_not_supported"
+    match = re.fullmatch(
+        r".+ deals (?P<amount>\d+) damage divided as you choose among (?P<body>.+?)\.?",
+        text,
+    )
+    if not match:
+        return "multi_target_damage_oracle_not_exact_fixed"
+    amount = int(match.group("amount"))
+    if amount <= 0:
+        return "multi_target_damage_oracle_amount_not_fixed"
+    body = match.group("body").strip()
+    count_prefixes = [
+        "one, two, or three",
+        "one or two",
+        "any number of",
+        "up to ten",
+        "up to nine",
+        "up to eight",
+        "up to seven",
+        "up to six",
+        "up to five",
+        "up to four",
+        "up to three",
+        "up to two",
+        "up to one",
+    ]
+    count_phrase = None
+    target_phrase = None
+    for prefix in count_prefixes:
+        if body == prefix or body.startswith(prefix + " "):
+            count_phrase = prefix
+            target_phrase = body[len(prefix) :].strip()
+            break
+    if not count_phrase or not target_phrase:
+        return "multi_target_damage_oracle_count_not_supported"
+    count_range = multi_target_damage_count_from_phrase(count_phrase, amount)
+    if count_range is None:
+        return "multi_target_damage_oracle_count_not_supported"
+    target_spec = multi_target_damage_target_from_phrase(target_phrase)
+    if target_spec is None:
+        return "multi_target_damage_oracle_target_not_supported"
+    target, target_controller = target_spec
+    target_count_min, target_count_max = count_range
+    if target_count_max <= 1:
+        return "multi_target_damage_oracle_count_not_supported"
+    return {
+        "amount": amount,
+        "damage": amount,
+        "target": target,
+        "target_controller": target_controller,
+        "target_count_min": int(target_count_min),
+        "target_count_max": int(target_count_max),
+        "up_to_count": int(target_count_min) == 0,
+    }
+
+
+def fixed_multi_target_damage_from_source(source: str) -> dict[str, Any] | str | None:
+    text = source or ""
+    if has_additional_cost(text) or "AlternativeCostSourceAbility" in text:
+        return "multi_target_damage_additional_cost_not_supported"
+    if any(token in text for token in ("GetXValue", "ManacostVariableValue", "XValue", "xValue")):
+        return "multi_target_damage_source_x_not_supported"
+    if "TargetPointer" in text or ".setTargetPointer" in text:
+        return "multi_target_damage_source_target_pointer_not_supported"
+    if len(re.findall(r"new\s+DamageMultiEffect\s*\(", text)) != 1:
+        return "multi_target_damage_source_not_single"
+    target_matches = list(
+        re.finditer(
+            r"new\s+(?P<class>TargetAnyTargetAmount|TargetCreaturePermanentAmount|TargetCreatureOrPlaneswalkerAmount)\s*\(",
+            text,
+        )
+    )
+    if len(target_matches) != 1:
+        return "multi_target_damage_source_target_constructor_not_single"
+    target_class = target_matches[0].group("class")
+    args = extract_constructor_args(text[target_matches[0].start() :], target_class)
+    if args is None:
+        return "multi_target_damage_source_target_constructor_not_supported"
+    parts = split_top_level_args(args)
+    if not parts or not re.fullmatch(r"\d+", str(parts[0] or "").strip()):
+        return "multi_target_damage_source_amount_not_fixed"
+    amount = int(str(parts[0]).strip())
+    if amount <= 0:
+        return "multi_target_damage_source_amount_not_fixed"
+    numeric_tail = [int(str(part).strip()) for part in parts[1:3] if re.fullmatch(r"\d+", str(part or "").strip())]
+    if len(numeric_tail) >= 2:
+        target_count_min, target_count_max = numeric_tail[0], numeric_tail[1]
+    else:
+        target_count_min = 0 if amount > 3 else 1
+        target_count_max = amount
+    target_map = {
+        "TargetAnyTargetAmount": "any_target",
+        "TargetCreaturePermanentAmount": "creature",
+        "TargetCreatureOrPlaneswalkerAmount": "creature_or_planeswalker",
+    }
+    target = target_map[target_class]
+    target_controller = None
+    if target_class == "TargetCreaturePermanentAmount":
+        if "FILTER_ATTACKING_OR_BLOCKING_CREATURES" in text:
+            target = "attacking_or_blocking_creature"
+        elif "FILTER_ATTACKING_CREATURES" in text:
+            target = "attacking_creature"
+        elif "FlyingAbility.class" in text or "creatures with flying" in text:
+            target = "flying_creature"
+        elif "ObjectColor.WHITE" in text and "ObjectColor.BLUE" in text:
+            target = "white_or_blue_creature"
+    if "TargetController.OPPONENT" in text:
+        target_controller = "opponent"
+    return {
+        "amount": amount,
+        "damage": amount,
+        "target": target,
+        "target_controller": target_controller,
+        "target_count_min": int(target_count_min),
+        "target_count_max": int(target_count_max),
+        "up_to_count": int(target_count_min) == 0,
+    }
+
+
 def fixed_damage_each_opponent_from_oracle(metadata: dict[str, Any]) -> int | str:
     text = strip_parenthetical_reminders(oracle_text(metadata))
     match = re.fullmatch(r".+ deals (\d+) damage to each opponent\.?", text)
@@ -18325,6 +18497,8 @@ def target_constraints_for(target: str) -> dict[str, Any]:
         return {"card_types": ["creature"], "target_colors": ["U"]}
     if target == "green_creature":
         return {"card_types": ["creature"], "target_colors": ["G"]}
+    if target == "white_or_blue_creature":
+        return {"card_types": ["creature"], "target_colors": ["W", "U"]}
     if target == "green_or_white_creature":
         return {"card_types": ["creature"], "target_colors": ["G", "W"]}
     if target == "artifact_creature":
@@ -25233,6 +25407,54 @@ def split_row(
             family_id="xmage_spell_damage_each_opponent",
         ), "selected_exact_scope"
 
+    if unit == MULTI_TARGET_DAMAGE_UNIT:
+        if not is_spell(metadata):
+            return None, "not_instant_or_sorcery_spell"
+        if classes != {"DamageMultiEffect"}:
+            return None, "multi_target_damage_effect_class_not_pure"
+        oracle_damage = fixed_multi_target_damage_from_oracle(metadata)
+        if isinstance(oracle_damage, str):
+            return None, oracle_damage
+        if oracle_damage is None:
+            return None, "multi_target_damage_oracle_not_exact_fixed"
+        source_damage = fixed_multi_target_damage_from_source(source_text)
+        if isinstance(source_damage, str):
+            return None, source_damage
+        if source_damage is None:
+            return None, "multi_target_damage_source_not_supported"
+        for key in ("amount", "target", "target_controller", "target_count_min", "target_count_max", "up_to_count"):
+            if source_damage.get(key) != oracle_damage.get(key):
+                return None, f"multi_target_damage_source_oracle_{key}_mismatch"
+        target_type = str(oracle_damage["target"])
+        target_constraints = target_constraints_for(target_type)
+        if oracle_damage.get("target_controller"):
+            target_constraints["controller_scope"] = oracle_damage["target_controller"]
+        effect_json = {
+            "effect": "multi_target_damage",
+            "battle_model_scope": MULTI_TARGET_DAMAGE_SCOPE,
+            "ability_kind": "one_shot",
+            "amount": int(oracle_damage["amount"]),
+            "damage": int(oracle_damage["damage"]),
+            "target": target_type,
+            "target_constraints": target_constraints,
+            "target_count": int(oracle_damage["target_count_max"]),
+            "target_count_min": int(oracle_damage["target_count_min"]),
+            "target_count_max": int(oracle_damage["target_count_max"]),
+            "max_targets": int(oracle_damage["target_count_max"]),
+            "up_to_count": bool(oracle_damage["up_to_count"]),
+            "divided_damage": True,
+            "xmage_effect_class": "DamageMultiEffect",
+            **flags,
+        }
+        if oracle_damage.get("target_controller"):
+            effect_json["target_controller"] = oracle_damage["target_controller"]
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_fixed_multi_target_damage_spell",
+        ), "selected_exact_scope"
+
     if unit == DAMAGE_UNIT:
         if classes == {"DamageTargetEffect", "ExileTargetIfDiesEffect"}:
             if has_additional_cost(source_text) or "additional cost" in oracle_text(metadata):
@@ -28016,6 +28238,7 @@ def build_exact_split_report(
                 "tutor::xmage_library_search_variant_review_v1 rows with SearchLibraryPutOnLibraryEffect, EntersBattlefieldTriggeredAbility, exact ETB tutor-to-library-top Oracle/source agreement, and only static self keywords",
                 "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, SimpleActivatedAbility, exact creature Oracle tap damage, and TapSourceCost only",
                 "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, SimpleActivatedAbility plus only static self keywords, fixed activated damage, mana/tap/self-sacrifice source costs only, and simple any-target or creature targets",
+                "multi_target_damage::xmage_multi_target_damage_variant_review_v1 rows with one-shot DamageMultiEffect, fixed total damage, exact Oracle/source target-count range, and supported TargetAmount filters",
                 "removal_destroy::targeted_destroy_variant_v1 rows with DestroyTargetEffect, SimpleActivatedAbility, exact activated destroy-target Oracle text, and mana/tap/self-sacrifice source costs only",
                 "life_gain::xmage_life_gain_variant_review_v1 rows with GainLifeEffect, SimpleActivatedAbility, exact fixed activated life-gain Oracle text, and mana/tap/source self-sacrifice costs only",
                 "tutor::xmage_library_search_variant_review_v1 rows with SearchLibraryPutInHandEffect, SimpleActivatedAbility, exact activated tutor-to-hand Oracle/source agreement, noncreature permanent type, and mana/tap/source self-sacrifice costs only",

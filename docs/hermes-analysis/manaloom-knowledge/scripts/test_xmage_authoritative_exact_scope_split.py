@@ -13113,6 +13113,34 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["target_count_min"], 2)
         self.assertEqual(effect["target_count_max"], 2)
 
+    def test_arc_lightning_maps_to_fixed_multi_target_damage(self) -> None:
+        row = queue_row(split.MULTI_TARGET_DAMAGE_UNIT, effect_classes=["DamageMultiEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                oracle_text=(
+                    "Arc Lightning deals 3 damage divided as you choose among one, two, or three targets."
+                ),
+                type_line="Sorcery",
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new DamageMultiEffect());"
+                "this.getSpellAbility().addTarget(new TargetAnyTargetAmount(3));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "multi_target_damage")
+        self.assertEqual(effect["battle_model_scope"], split.MULTI_TARGET_DAMAGE_SCOPE)
+        self.assertEqual(effect["amount"], 3)
+        self.assertEqual(effect["target"], "any_target")
+        self.assertEqual(effect["target_constraints"], {"scope": "any_target"})
+        self.assertEqual(effect["target_count_min"], 1)
+        self.assertEqual(effect["target_count_max"], 3)
+        self.assertEqual(effect["max_targets"], 3)
+        self.assertTrue(effect["divided_damage"])
+
     def test_bounce_spell_with_compound_effect_stays_blocked(self) -> None:
         row = queue_row(
             split.BOUNCE_UNIT,
