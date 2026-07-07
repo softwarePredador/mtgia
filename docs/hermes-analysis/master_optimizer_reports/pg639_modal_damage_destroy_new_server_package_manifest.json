@@ -1,0 +1,780 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg639_modal_damage_destroy_new_server_20260707_205654",
+  "deploy_id": "pg639",
+  "execution_scenarios": [
+    {
+      "card": {
+        "name": "Fiery Intervention",
+        "type_line": "Instant"
+      },
+      "damage_target": {
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Legal Modal Damage Target",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "destroy_target": {
+        "cmc": 3,
+        "effect": "artifact",
+        "name": "E2E Legal Modal Destroy Target",
+        "type_line": "Artifact"
+      },
+      "expected_damage_target_survives": "E2E Legal Modal Damage Target",
+      "expected_destination": "graveyard",
+      "expected_removed_target": "E2E Legal Modal Destroy Target",
+      "expected_selected_mode": "destroy_target",
+      "logical_rule_key": "battle_rule_v1:1e991355b361b8abe50e7d5691deb28e",
+      "name": "Fiery Intervention chooses destroy mode over damage mode",
+      "type": "modal_damage_or_destroy"
+    },
+    {
+      "card": {
+        "name": "Molten Blast",
+        "type_line": "Instant"
+      },
+      "damage_target": {
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Legal Modal Damage Target",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "destroy_target": {
+        "cmc": 3,
+        "effect": "artifact",
+        "name": "E2E Legal Modal Destroy Target",
+        "type_line": "Artifact"
+      },
+      "expected_damage_target_survives": "E2E Legal Modal Damage Target",
+      "expected_destination": "graveyard",
+      "expected_removed_target": "E2E Legal Modal Destroy Target",
+      "expected_selected_mode": "destroy_target",
+      "logical_rule_key": "battle_rule_v1:e998291e1e60347aa41461c93b95f96c",
+      "name": "Molten Blast chooses destroy mode over damage mode",
+      "type": "modal_damage_or_destroy"
+    },
+    {
+      "card": {
+        "name": "Ready to Rumble",
+        "type_line": "Instant"
+      },
+      "damage_target": {
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Legal Modal Damage Target",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "destroy_target": {
+        "cmc": 3,
+        "effect": "artifact",
+        "name": "E2E Legal Modal Destroy Target",
+        "type_line": "Artifact"
+      },
+      "expected_damage_target_survives": "E2E Legal Modal Damage Target",
+      "expected_destination": "graveyard",
+      "expected_removed_target": "E2E Legal Modal Destroy Target",
+      "expected_selected_mode": "destroy_target",
+      "logical_rule_key": "battle_rule_v1:38e830b8075b9dba2a7cac8552482b1c",
+      "name": "Ready to Rumble chooses destroy mode over damage mode",
+      "type": "modal_damage_or_destroy"
+    },
+    {
+      "card": {
+        "name": "Rip Apart",
+        "type_line": "Instant"
+      },
+      "damage_target": {
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Legal Modal Damage Target",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "destroy_target": {
+        "cmc": 3,
+        "effect": "artifact",
+        "name": "E2E Legal Modal Destroy Target",
+        "type_line": "Artifact"
+      },
+      "expected_damage_target_survives": "E2E Legal Modal Damage Target",
+      "expected_destination": "graveyard",
+      "expected_removed_target": "E2E Legal Modal Destroy Target",
+      "expected_selected_mode": "destroy_target",
+      "logical_rule_key": "battle_rule_v1:073e0388dec40505ed458810a01163e2",
+      "name": "Rip Apart chooses destroy mode over damage mode",
+      "type": "modal_damage_or_destroy"
+    },
+    {
+      "card": {
+        "name": "Start from Scratch",
+        "type_line": "Instant"
+      },
+      "damage_target": {
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Legal Modal Damage Target",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "destroy_target": {
+        "cmc": 3,
+        "effect": "artifact",
+        "name": "E2E Legal Modal Destroy Target",
+        "type_line": "Artifact"
+      },
+      "expected_damage_target_survives": "E2E Legal Modal Damage Target",
+      "expected_destination": "graveyard",
+      "expected_removed_target": "E2E Legal Modal Destroy Target",
+      "expected_selected_mode": "destroy_target",
+      "logical_rule_key": "battle_rule_v1:e205b3066f443fdc3dd7a440b13d9702",
+      "name": "Start from Scratch chooses destroy mode over damage mode",
+      "type": "modal_damage_or_destroy"
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Fiery Intervention",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1e991355b361b8abe50e7d5691deb28e",
+      "min_rule_version": 2,
+      "normalized_name": "fiery intervention",
+      "oracle_hash": "47787c728dae66ae04ff9ff992da2bd0",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_choose_one_damage_or_destroy_target_spell_v1",
+        "damage_amount": 5,
+        "damage_target": "creature",
+        "destroy_target": "artifact",
+        "effect": "modal_spell",
+        "modal_modes": [
+          {
+            "amount": 5,
+            "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+            "damage": 5,
+            "effect": "direct_damage",
+            "mode": "direct_damage",
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "xmage_effect_class": "DamageTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_destroy_target_spell_v1",
+            "destination": "graveyard",
+            "effect": "remove_permanent",
+            "mode": "destroy_target",
+            "target": "artifact",
+            "target_constraints": {
+              "card_types": [
+                "artifact"
+              ]
+            },
+            "xmage_effect_class": "DestroyTargetEffect"
+          }
+        ],
+        "mode_max": 1,
+        "mode_min": 1,
+        "mode_selection": "choose_one",
+        "mode_selection_model": "best_available_mode",
+        "xmage_effect_classes": [
+          "DamageTargetEffect",
+          "DestroyTargetEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Molten Blast",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e998291e1e60347aa41461c93b95f96c",
+      "min_rule_version": 2,
+      "normalized_name": "molten blast",
+      "oracle_hash": "44816ac1adb1341cffead9049d6b033c",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_choose_one_damage_or_destroy_target_spell_v1",
+        "damage_amount": 2,
+        "damage_target": "creature_or_planeswalker",
+        "destroy_target": "artifact",
+        "effect": "modal_spell",
+        "modal_modes": [
+          {
+            "amount": 2,
+            "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+            "damage": 2,
+            "effect": "direct_damage",
+            "mode": "direct_damage",
+            "target": "creature_or_planeswalker",
+            "target_constraints": {
+              "card_types": [
+                "creature",
+                "planeswalker"
+              ]
+            },
+            "xmage_effect_class": "DamageTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_destroy_target_spell_v1",
+            "destination": "graveyard",
+            "effect": "remove_permanent",
+            "mode": "destroy_target",
+            "target": "artifact",
+            "target_constraints": {
+              "card_types": [
+                "artifact"
+              ]
+            },
+            "xmage_effect_class": "DestroyTargetEffect"
+          }
+        ],
+        "mode_max": 1,
+        "mode_min": 1,
+        "mode_selection": "choose_one",
+        "mode_selection_model": "best_available_mode",
+        "xmage_effect_classes": [
+          "DamageTargetEffect",
+          "DestroyTargetEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Ready to Rumble",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:38e830b8075b9dba2a7cac8552482b1c",
+      "min_rule_version": 2,
+      "normalized_name": "ready to rumble",
+      "oracle_hash": "c7cb7c5eb0212ec928cd31fc246d9afb",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_choose_one_damage_or_destroy_target_spell_v1",
+        "damage_amount": 5,
+        "damage_target": "creature_or_planeswalker",
+        "destroy_target": "artifact",
+        "effect": "modal_spell",
+        "modal_modes": [
+          {
+            "amount": 5,
+            "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+            "damage": 5,
+            "effect": "direct_damage",
+            "mode": "direct_damage",
+            "target": "creature_or_planeswalker",
+            "target_constraints": {
+              "card_types": [
+                "creature",
+                "planeswalker"
+              ]
+            },
+            "xmage_effect_class": "DamageTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_destroy_target_spell_v1",
+            "destination": "graveyard",
+            "effect": "remove_permanent",
+            "mode": "destroy_target",
+            "target": "artifact",
+            "target_constraints": {
+              "card_types": [
+                "artifact"
+              ]
+            },
+            "xmage_effect_class": "DestroyTargetEffect"
+          }
+        ],
+        "mode_max": 1,
+        "mode_min": 1,
+        "mode_selection": "choose_one",
+        "mode_selection_model": "best_available_mode",
+        "xmage_effect_classes": [
+          "DamageTargetEffect",
+          "DestroyTargetEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Rip Apart",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:073e0388dec40505ed458810a01163e2",
+      "min_rule_version": 2,
+      "normalized_name": "rip apart",
+      "oracle_hash": "3d5fb02284dcccd2fedcd1a2b7699706",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_choose_one_damage_or_destroy_target_spell_v1",
+        "damage_amount": 3,
+        "damage_target": "creature_or_planeswalker",
+        "destroy_target": "artifact_or_enchantment",
+        "effect": "modal_spell",
+        "modal_modes": [
+          {
+            "amount": 3,
+            "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+            "damage": 3,
+            "effect": "direct_damage",
+            "mode": "direct_damage",
+            "target": "creature_or_planeswalker",
+            "target_constraints": {
+              "card_types": [
+                "creature",
+                "planeswalker"
+              ]
+            },
+            "xmage_effect_class": "DamageTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_destroy_target_spell_v1",
+            "destination": "graveyard",
+            "effect": "remove_permanent",
+            "mode": "destroy_target",
+            "target": "artifact_or_enchantment",
+            "target_constraints": {
+              "card_types": [
+                "artifact",
+                "enchantment"
+              ]
+            },
+            "xmage_effect_class": "DestroyTargetEffect"
+          }
+        ],
+        "mode_max": 1,
+        "mode_min": 1,
+        "mode_selection": "choose_one",
+        "mode_selection_model": "best_available_mode",
+        "xmage_effect_classes": [
+          "DamageTargetEffect",
+          "DestroyTargetEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Start from Scratch",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e205b3066f443fdc3dd7a440b13d9702",
+      "min_rule_version": 2,
+      "normalized_name": "start from scratch",
+      "oracle_hash": "f6573945c4b7b6d57b25b00792e29b0b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_choose_one_damage_or_destroy_target_spell_v1",
+        "damage_amount": 1,
+        "damage_target": "any_target",
+        "destroy_target": "artifact",
+        "effect": "modal_spell",
+        "modal_modes": [
+          {
+            "amount": 1,
+            "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+            "damage": 1,
+            "effect": "direct_damage",
+            "mode": "direct_damage",
+            "target": "any_target",
+            "target_constraints": {
+              "scope": "any_target"
+            },
+            "xmage_effect_class": "DamageTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_destroy_target_spell_v1",
+            "destination": "graveyard",
+            "effect": "remove_permanent",
+            "mode": "destroy_target",
+            "target": "artifact",
+            "target_constraints": {
+              "card_types": [
+                "artifact"
+              ]
+            },
+            "xmage_effect_class": "DestroyTargetEffect"
+          }
+        ],
+        "mode_max": 1,
+        "mode_min": 1,
+        "mode_selection": "choose_one",
+        "mode_selection_model": "best_available_mode",
+        "xmage_effect_classes": [
+          "DamageTargetEffect",
+          "DestroyTargetEffect"
+        ]
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_choose_one_damage_or_destroy_target_spell": 5
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg639_modal_damage_destroy_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg639_modal_damage_destroy_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg639_modal_damage_destroy_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg639_modal_damage_destroy_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg639_modal_damage_destroy_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg639_modal_damage_destroy_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-07T20:56:54+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Fiery Intervention"
+      },
+      "card_name": "Fiery Intervention",
+      "effect": "modal_spell",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1e991355b361b8abe50e7d5691deb28e",
+      "normalized_name": "fiery intervention",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_choose_one_damage_or_destroy_target_spell_v1",
+        "damage_amount": 5,
+        "damage_target": "creature",
+        "destroy_target": "artifact",
+        "effect": "modal_spell",
+        "modal_modes": [
+          {
+            "amount": 5,
+            "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+            "damage": 5,
+            "effect": "direct_damage",
+            "mode": "direct_damage",
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "xmage_effect_class": "DamageTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_destroy_target_spell_v1",
+            "destination": "graveyard",
+            "effect": "remove_permanent",
+            "mode": "destroy_target",
+            "target": "artifact",
+            "target_constraints": {
+              "card_types": [
+                "artifact"
+              ]
+            },
+            "xmage_effect_class": "DestroyTargetEffect"
+          }
+        ],
+        "mode_max": 1,
+        "mode_min": 1,
+        "mode_selection": "choose_one",
+        "mode_selection_model": "best_available_mode",
+        "xmage_effect_classes": [
+          "DamageTargetEffect",
+          "DestroyTargetEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Molten Blast"
+      },
+      "card_name": "Molten Blast",
+      "effect": "modal_spell",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e998291e1e60347aa41461c93b95f96c",
+      "normalized_name": "molten blast",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_choose_one_damage_or_destroy_target_spell_v1",
+        "damage_amount": 2,
+        "damage_target": "creature_or_planeswalker",
+        "destroy_target": "artifact",
+        "effect": "modal_spell",
+        "modal_modes": [
+          {
+            "amount": 2,
+            "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+            "damage": 2,
+            "effect": "direct_damage",
+            "mode": "direct_damage",
+            "target": "creature_or_planeswalker",
+            "target_constraints": {
+              "card_types": [
+                "creature",
+                "planeswalker"
+              ]
+            },
+            "xmage_effect_class": "DamageTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_destroy_target_spell_v1",
+            "destination": "graveyard",
+            "effect": "remove_permanent",
+            "mode": "destroy_target",
+            "target": "artifact",
+            "target_constraints": {
+              "card_types": [
+                "artifact"
+              ]
+            },
+            "xmage_effect_class": "DestroyTargetEffect"
+          }
+        ],
+        "mode_max": 1,
+        "mode_min": 1,
+        "mode_selection": "choose_one",
+        "mode_selection_model": "best_available_mode",
+        "xmage_effect_classes": [
+          "DamageTargetEffect",
+          "DestroyTargetEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Ready to Rumble"
+      },
+      "card_name": "Ready to Rumble",
+      "effect": "modal_spell",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:38e830b8075b9dba2a7cac8552482b1c",
+      "normalized_name": "ready to rumble",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_choose_one_damage_or_destroy_target_spell_v1",
+        "damage_amount": 5,
+        "damage_target": "creature_or_planeswalker",
+        "destroy_target": "artifact",
+        "effect": "modal_spell",
+        "modal_modes": [
+          {
+            "amount": 5,
+            "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+            "damage": 5,
+            "effect": "direct_damage",
+            "mode": "direct_damage",
+            "target": "creature_or_planeswalker",
+            "target_constraints": {
+              "card_types": [
+                "creature",
+                "planeswalker"
+              ]
+            },
+            "xmage_effect_class": "DamageTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_destroy_target_spell_v1",
+            "destination": "graveyard",
+            "effect": "remove_permanent",
+            "mode": "destroy_target",
+            "target": "artifact",
+            "target_constraints": {
+              "card_types": [
+                "artifact"
+              ]
+            },
+            "xmage_effect_class": "DestroyTargetEffect"
+          }
+        ],
+        "mode_max": 1,
+        "mode_min": 1,
+        "mode_selection": "choose_one",
+        "mode_selection_model": "best_available_mode",
+        "xmage_effect_classes": [
+          "DamageTargetEffect",
+          "DestroyTargetEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Rip Apart"
+      },
+      "card_name": "Rip Apart",
+      "effect": "modal_spell",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:073e0388dec40505ed458810a01163e2",
+      "normalized_name": "rip apart",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_choose_one_damage_or_destroy_target_spell_v1",
+        "damage_amount": 3,
+        "damage_target": "creature_or_planeswalker",
+        "destroy_target": "artifact_or_enchantment",
+        "effect": "modal_spell",
+        "modal_modes": [
+          {
+            "amount": 3,
+            "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+            "damage": 3,
+            "effect": "direct_damage",
+            "mode": "direct_damage",
+            "target": "creature_or_planeswalker",
+            "target_constraints": {
+              "card_types": [
+                "creature",
+                "planeswalker"
+              ]
+            },
+            "xmage_effect_class": "DamageTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_destroy_target_spell_v1",
+            "destination": "graveyard",
+            "effect": "remove_permanent",
+            "mode": "destroy_target",
+            "target": "artifact_or_enchantment",
+            "target_constraints": {
+              "card_types": [
+                "artifact",
+                "enchantment"
+              ]
+            },
+            "xmage_effect_class": "DestroyTargetEffect"
+          }
+        ],
+        "mode_max": 1,
+        "mode_min": 1,
+        "mode_selection": "choose_one",
+        "mode_selection_model": "best_available_mode",
+        "xmage_effect_classes": [
+          "DamageTargetEffect",
+          "DestroyTargetEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Start from Scratch"
+      },
+      "card_name": "Start from Scratch",
+      "effect": "modal_spell",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e205b3066f443fdc3dd7a440b13d9702",
+      "normalized_name": "start from scratch",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_choose_one_damage_or_destroy_target_spell_v1",
+        "damage_amount": 1,
+        "damage_target": "any_target",
+        "destroy_target": "artifact",
+        "effect": "modal_spell",
+        "modal_modes": [
+          {
+            "amount": 1,
+            "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+            "damage": 1,
+            "effect": "direct_damage",
+            "mode": "direct_damage",
+            "target": "any_target",
+            "target_constraints": {
+              "scope": "any_target"
+            },
+            "xmage_effect_class": "DamageTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_destroy_target_spell_v1",
+            "destination": "graveyard",
+            "effect": "remove_permanent",
+            "mode": "destroy_target",
+            "target": "artifact",
+            "target_constraints": {
+              "card_types": [
+                "artifact"
+              ]
+            },
+            "xmage_effect_class": "DestroyTargetEffect"
+          }
+        ],
+        "mode_max": 1,
+        "mode_min": 1,
+        "mode_selection": "choose_one",
+        "mode_selection_model": "best_available_mode",
+        "xmage_effect_classes": [
+          "DamageTargetEffect",
+          "DestroyTargetEffect"
+        ]
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Fiery Intervention",
+    "Molten Blast",
+    "Ready to Rumble",
+    "Rip Apart",
+    "Start from Scratch"
+  ],
+  "selected_count": 5,
+  "slug": "modal_damage_destroy_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Fiery Intervention",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1e991355b361b8abe50e7d5691deb28e",
+      "min_rule_version": 2,
+      "normalized_name": "fiery intervention",
+      "oracle_hash": "47787c728dae66ae04ff9ff992da2bd0",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_choose_one_damage_or_destroy_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Molten Blast",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e998291e1e60347aa41461c93b95f96c",
+      "min_rule_version": 2,
+      "normalized_name": "molten blast",
+      "oracle_hash": "44816ac1adb1341cffead9049d6b033c",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_choose_one_damage_or_destroy_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Ready to Rumble",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:38e830b8075b9dba2a7cac8552482b1c",
+      "min_rule_version": 2,
+      "normalized_name": "ready to rumble",
+      "oracle_hash": "c7cb7c5eb0212ec928cd31fc246d9afb",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_choose_one_damage_or_destroy_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Rip Apart",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:073e0388dec40505ed458810a01163e2",
+      "min_rule_version": 2,
+      "normalized_name": "rip apart",
+      "oracle_hash": "3d5fb02284dcccd2fedcd1a2b7699706",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_choose_one_damage_or_destroy_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Start from Scratch",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e205b3066f443fdc3dd7a440b13d9702",
+      "min_rule_version": 2,
+      "normalized_name": "start from scratch",
+      "oracle_hash": "f6573945c4b7b6d57b25b00792e29b0b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_choose_one_damage_or_destroy_target_spell_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

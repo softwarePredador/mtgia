@@ -109,6 +109,13 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "enters_tapped",
     "exiles_self",
     "mode_selection",
+    "mode_selection_model",
+    "mode_min",
+    "mode_max",
+    "modal_modes",
+    "damage_amount",
+    "damage_target",
+    "destroy_target",
     "_composite_rule_components",
     "recursion_components",
     "recursion_mana_value_max",
@@ -3566,6 +3573,53 @@ def single_target_removal_execution_scenario_from_expected_rule(
     return scenario
 
 
+def modal_damage_or_destroy_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_choose_one_damage_or_destroy_target_spell_v1":
+        return None
+    if required.get("effect") != "modal_spell":
+        return None
+    modes = [mode for mode in required.get("modal_modes") or [] if isinstance(mode, dict)]
+    damage_mode = next((mode for mode in modes if mode.get("effect") == "direct_damage"), None)
+    destroy_mode = next(
+        (
+            mode
+            for mode in modes
+            if mode.get("effect") in {"remove_creature", "remove_permanent"}
+        ),
+        None,
+    )
+    if damage_mode is None or destroy_mode is None:
+        return None
+    destroy_constraints = dict(destroy_mode.get("target_constraints") or {})
+    damage_constraints = dict(damage_mode.get("target_constraints") or {})
+    return {
+        "name": f"{rule['card_name']} chooses destroy mode over damage mode",
+        "type": "modal_damage_or_destroy",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": "Sorcery" if required.get("sorcery") is True else "Instant",
+        },
+        "destroy_target": _target_fixture_from_constraints(
+            "E2E Legal Modal Destroy Target",
+            destroy_constraints,
+            matching=True,
+        ),
+        "damage_target": _target_fixture_from_constraints(
+            "E2E Legal Modal Damage Target",
+            damage_constraints,
+            matching=True,
+        ),
+        "expected_selected_mode": "destroy_target",
+        "expected_removed_target": "E2E Legal Modal Destroy Target",
+        "expected_damage_target_survives": "E2E Legal Modal Damage Target",
+        "expected_destination": str(destroy_mode.get("destination") or "graveyard").lower(),
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def single_target_removal_and_surveil_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
@@ -4009,6 +4063,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or multi_target_damage_execution_scenario_from_expected_rule(rule)
         or multi_target_removal_execution_scenario_from_expected_rule(rule)
         or single_target_removal_and_surveil_execution_scenario_from_expected_rule(rule)
+        or modal_damage_or_destroy_execution_scenario_from_expected_rule(rule)
         or single_target_removal_execution_scenario_from_expected_rule(rule)
         or simple_activated_create_token_execution_scenario_from_expected_rule(rule)
         or fixed_create_creature_tokens_execution_scenario_from_expected_rule(rule)

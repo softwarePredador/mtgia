@@ -59491,6 +59491,205 @@ def resolve_composite_resolution_effect(player, opponents, card, effect_data, tu
     return {"applied": applied, "skipped": skipped}
 
 
+def _mode_with_parent_rule_fields(mode, parent_effect):
+    payload = dict(mode or {})
+    for key in (
+        "_rule_source",
+        "_rule_review_status",
+        "_rule_execution_status",
+        "_rule_confidence",
+        "_rule_version",
+        "_rule_logical_key",
+        "_rule_oracle_hash",
+        "card_id",
+        "semantic_hash",
+        "semantics_hash",
+    ):
+        if key in parent_effect and key not in payload:
+            payload[key] = parent_effect[key]
+    return payload
+
+
+def _modal_mode_score(player, opponents, card, mode, turn, *, phase="resolution"):
+    mode_effect = str((mode or {}).get("effect") or "")
+    if mode_effect == "direct_damage":
+        amount = int((mode or {}).get("amount") or (mode or {}).get("damage") or 0)
+        if amount <= 0:
+            return 0
+        best = 0
+        for opp in direct_damage_target_participants(player, opponents, mode):
+            for target in removal_target_candidates(opp, mode, controller=player, source=card):
+                target_amount = apply_static_damage_replacements(
+                    player,
+                    opp,
+                    target,
+                    card,
+                    amount,
+                    damage_event_type="permanent",
+                    turn=turn,
+                    phase=phase,
+                    emit=False,
+                )
+                lethal = False
+                if is_battlefield_creature(target):
+                    lethal = card_toughness_value(target, default=2) <= target_amount
+                elif is_planeswalker_permanent(target):
+                    lethal = int(target.get("loyalty", target.get("starting_loyalty", 0)) or 0) <= target_amount
+                elif is_battle_permanent(target):
+                    lethal = int(target.get("defense", target.get("starting_defense", 0)) or 0) <= target_amount
+                best = max(best, (90 if lethal else 40) + target_priority(target)[1])
+        if direct_damage_targets_player(mode):
+            for opp in opponents or []:
+                if not opp.is_alive():
+                    continue
+                best = max(best, 120 if opp.life <= amount else 20 + min(amount, 10))
+        return best
+    if mode_effect in {"remove_creature", "remove_permanent", "remove_artifact_or_3dmg"}:
+        best = 0
+        for opp in opponents or []:
+            for target in removal_target_candidates(opp, mode, controller=player, source=card):
+                priority = target_priority(target)
+                best = max(best, 100 + priority[1] + priority[2])
+        return best
+    return 0
+
+
+def _resolve_modal_single_removal_mode(player, opponents, card, mode, turn, rng, *, phase="resolution"):
+    for opp in opponents or []:
+        target_type = str(mode.get("target") or "").lower()
+        if not target_type:
+            target_type = "creature" if mode.get("effect") == "remove_creature" else "nonland_permanent"
+        targets = removal_target_candidates(opp, mode, controller=player, source=card)
+        if not targets:
+            continue
+        target = choose_best_creature_target(targets)
+        decision = targeting_decision(
+            card,
+            target,
+            player,
+            target_controller=opp,
+            target_type=target_type,
+        )
+        if check_ward(target, card, player, rng):
+            emit_replay_event(
+                "removal_countered_by_ward",
+                player=player.name,
+                card=card.get("name", "?"),
+                target_player=opp.name,
+                target=target.get("name", "?"),
+                turn=turn,
+                phase=phase,
+                **decision,
+                **replay_rule_fields(mode),
+            )
+            return {"effect": mode.get("effect"), "outcome": "countered_by_ward", "target": target.get("name", "?")}
+        destination = removal_destination(mode)
+        emit_replay_event(
+            "removal_resolved",
+            player=player.name,
+            card=card.get("name", "?"),
+            target_player=opp.name,
+            target=target.get("name", "?"),
+            target_effect=get_card_effect(target).get("effect", target.get("effect")),
+            target_power=target.get("power"),
+            target_toughness=target.get("toughness"),
+            target_is_creature=is_battlefield_creature(target),
+            target_type_line=target.get("type_line", ""),
+            available_targets=len(targets),
+            **target_selection_replay_fields(target, targets),
+            destination=destination,
+            turn=turn,
+            phase=phase,
+            **decision,
+            **replay_rule_fields(mode),
+        )
+        move_removed_permanent_to_destination(
+            opp,
+            target,
+            card,
+            mode,
+            turn,
+            rng,
+            all_players=[player, *list(opponents or [])],
+        )
+        return {
+            "effect": mode.get("effect"),
+            "outcome": "removal_resolved",
+            "target": target.get("name", "?"),
+            "target_player": opp.name,
+            "destination": destination,
+        }
+    return {"effect": mode.get("effect"), "outcome": "no_legal_target"}
+
+
+def resolve_modal_damage_or_destroy_spell(player, opponents, card, effect_data, turn, rng, *, phase="resolution"):
+    modes = [
+        mode
+        for mode in (effect_data.get("modal_modes") or [])
+        if isinstance(mode, dict)
+    ]
+    scored_modes = [
+        (_modal_mode_score(player, opponents, card, mode, turn, phase=phase), -index, index, mode)
+        for index, mode in enumerate(modes)
+    ]
+    scored_modes = [item for item in scored_modes if item[0] > 0]
+    if scored_modes:
+        _score, _tie, selected_index, selected_mode = max(scored_modes)
+    elif modes:
+        selected_index, selected_mode = 0, modes[0]
+    else:
+        selected_index, selected_mode = -1, {}
+    selected_payload = _mode_with_parent_rule_fields(selected_mode, effect_data)
+    selected_payload["modal_mode_index"] = selected_index
+    selected_payload["modal_mode"] = selected_mode.get("mode")
+    if selected_mode.get("effect") == "direct_damage":
+        apply_direct_damage(
+            player,
+            opponents,
+            card,
+            selected_payload,
+            turn,
+            rng,
+            finish_spell=False,
+            phase=phase,
+        )
+        outcome = "direct_damage_resolved"
+    elif selected_mode.get("effect") in {"remove_creature", "remove_permanent", "remove_artifact_or_3dmg"}:
+        removal_summary = _resolve_modal_single_removal_mode(
+            player,
+            opponents,
+            card,
+            selected_payload,
+            turn,
+            rng,
+            phase=phase,
+        )
+        outcome = str(removal_summary.get("outcome") or "unknown")
+    else:
+        outcome = "unsupported_mode"
+    selected_summary = {
+        "index": selected_index,
+        "mode": selected_mode.get("mode"),
+        "effect": selected_mode.get("effect"),
+        "outcome": outcome,
+    }
+    emit_replay_event(
+        "modal_spell_resolved",
+        player=player.name,
+        card=card.get("name", "?"),
+        selected_modes=[selected_summary] if selected_index >= 0 else [],
+        mode_count=1 if selected_index >= 0 else 0,
+        mode_min=int(effect_data.get("mode_min") or 1),
+        mode_max=int(effect_data.get("mode_max") or 1),
+        mode_selection=effect_data.get("mode_selection"),
+        mode_selection_model=effect_data.get("mode_selection_model"),
+        turn=turn,
+        phase=phase,
+        **replay_rule_fields(effect_data),
+    )
+    finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+
+
 def _life_total_change_target(player, opponents, effect_data):
     target = str((effect_data or {}).get("target") or "self").lower()
     if target in {"self", "controller"}:
@@ -60755,6 +60954,17 @@ def apply_effect_immediate(
     elif effect == "land_recursion_creature":
         resolve_land_recursion_creature(player, card, effect_data, turn)
     elif effect == "modal_spell":
+        if effect_data.get("battle_model_scope") == "xmage_choose_one_damage_or_destroy_target_spell_v1":
+            resolve_modal_damage_or_destroy_spell(
+                player,
+                opponents,
+                card,
+                effect_data,
+                turn,
+                rng,
+                phase=phase or "resolution",
+            )
+            return
         if effect_data.get("battle_model_scope") == "modal_artifact_tutor_or_artifact_graveyard_to_hand_v1":
             fields = replay_rule_fields(effect_data)
             selected_modes = []

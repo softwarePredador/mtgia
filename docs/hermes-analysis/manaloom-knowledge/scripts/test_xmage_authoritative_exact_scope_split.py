@@ -25457,6 +25457,67 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             },
         )
 
+    def test_choose_one_fixed_damage_or_destroy_maps_modal_scope(self) -> None:
+        proposal, reason = split.split_row(
+            queue_row(
+                split.DESTROY_UNIT,
+                effect_classes=["DamageTargetEffect", "DestroyTargetEffect"],
+            ),
+            metadata(
+                name="Fiery Intervention",
+                type_line="Sorcery",
+                oracle_text=(
+                    "Choose one —\n"
+                    "• Fiery Intervention deals 5 damage to target creature.\n"
+                    "• Destroy target artifact."
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new DamageTargetEffect(5));
+                this.getSpellAbility().addTarget(new TargetCreaturePermanent());
+                Mode mode = new Mode(new DestroyTargetEffect());
+                mode.addTarget(new TargetArtifactPermanent());
+                this.getSpellAbility().addMode(mode);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "modal_spell")
+        self.assertEqual(effect["battle_model_scope"], split.MODAL_DAMAGE_DESTROY_SCOPE)
+        self.assertEqual(effect["mode_selection"], "choose_one")
+        self.assertEqual(effect["mode_selection_model"], "best_available_mode")
+        self.assertEqual(effect["damage_amount"], 5)
+        self.assertEqual(effect["damage_target"], "creature")
+        self.assertEqual(effect["destroy_target"], "artifact")
+        self.assertEqual([mode["mode"] for mode in effect["modal_modes"]], ["direct_damage", "destroy_target"])
+
+    def test_choose_one_dynamic_damage_or_destroy_stays_blocked(self) -> None:
+        proposal, reason = split.split_row(
+            queue_row(
+                split.DESTROY_UNIT,
+                effect_classes=["DamageTargetEffect", "DestroyTargetEffect"],
+            ),
+            metadata(
+                name="Bumi Bash",
+                type_line="Sorcery",
+                oracle_text=(
+                    "Choose one —\n"
+                    "• Bumi Bash deals damage equal to the number of lands you control to target creature.\n"
+                    "• Destroy target land creature or nonbasic land."
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new DamageTargetEffect(LandsYouControlCount.instance));
+                this.getSpellAbility().addTarget(new TargetCreaturePermanent());
+                this.getSpellAbility().addHint(LandsYouControlHint.instance);
+                this.getSpellAbility().addMode(new Mode(new DestroyTargetEffect()).addTarget(new TargetPermanent(filter)));
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "modal_damage_destroy_oracle_mode_not_supported")
+
 
 if __name__ == "__main__":
     unittest.main()

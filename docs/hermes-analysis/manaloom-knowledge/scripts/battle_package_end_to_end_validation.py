@@ -2212,6 +2212,110 @@ def run_single_target_removal(
     return result
 
 
+def run_modal_damage_or_destroy(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    active = battle.Player(str(scenario.get("player") or "Active"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
+    destroy_target = battle.enrich_card(dict(scenario["destroy_target"]))
+    damage_target = battle.enrich_card(dict(scenario["damage_target"]))
+    opponent.battlefield = [damage_target, destroy_target]
+    before_events = len(events)
+
+    effect_data = battle.get_card_effect(card)
+    if effect_data.get("effect") != "modal_spell":
+        fail("battle_execution", f"{card['name']} effect={effect_data.get('effect')!r}")
+    if effect_data.get("battle_model_scope") != "xmage_choose_one_damage_or_destroy_target_spell_v1":
+        fail("battle_execution", f"{card['name']} scope={effect_data.get('battle_model_scope')!r}")
+
+    battle.apply_effect_immediate(
+        active,
+        [opponent],
+        card,
+        turn=int(scenario.get("turn") or 6),
+        rng=random.Random(int(scenario.get("seed") or 6077)),
+    )
+
+    expected_mode = str(scenario.get("expected_selected_mode") or "destroy_target")
+    expected_removed = str(scenario.get("expected_removed_target") or destroy_target.get("name") or "")
+    expected_damage_survives = str(
+        scenario.get("expected_damage_target_survives") or damage_target.get("name") or ""
+    )
+    destination = str(scenario.get("expected_destination") or "graveyard").lower()
+    destination_zone_name = "exile" if destination == "exile" else "hand" if destination == "hand" else "graveyard"
+    moved_names = [
+        str(item.get("name") or "")
+        for item in getattr(opponent, destination_zone_name)
+        if isinstance(item, dict)
+    ]
+    battlefield_names = [
+        str(item.get("name") or "")
+        for item in opponent.battlefield
+        if isinstance(item, dict)
+    ]
+    if expected_removed not in moved_names:
+        fail("battle_execution", f"{card['name']} did not move modal destroy target {expected_removed}")
+    if expected_damage_survives not in battlefield_names:
+        fail("battle_execution", f"{card['name']} incorrectly removed modal damage target {expected_damage_survives}")
+
+    modal_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "modal_spell_resolved"
+            and data.get("card") == card.get("name")
+        ),
+        None,
+    )
+    if modal_event is None:
+        fail("battle_events", f"missing {card['name']} modal_spell_resolved event")
+    selected_modes = modal_event.get("selected_modes") or []
+    selected_mode = selected_modes[0] if selected_modes else {}
+    if selected_mode.get("mode") != expected_mode:
+        fail("battle_events", f"{card['name']} selected mode={selected_mode.get('mode')!r}")
+    if modal_event.get("mode_selection") != "choose_one":
+        fail("battle_events", f"{card['name']} mode_selection={modal_event.get('mode_selection')!r}")
+
+    removal_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "removal_resolved"
+            and data.get("card") == card.get("name")
+            and data.get("target") == expected_removed
+        ),
+        None,
+    )
+    if removal_event is None:
+        fail("battle_events", f"missing {card['name']} modal removal_resolved event")
+    if str(removal_event.get("destination") or "").lower() != destination:
+        fail("battle_events", f"{card['name']} destination={removal_event.get('destination')!r}")
+    damage_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "damage_resolved"
+            and data.get("card") == card.get("name")
+            and data.get("target") == expected_damage_survives
+        ),
+        None,
+    )
+    if damage_event is not None:
+        fail("battle_events", f"{card['name']} also damaged non-selected modal target")
+
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "selected_mode": expected_mode,
+        "removed_target": expected_removed,
+        "damage_target_survived": expected_damage_survives,
+        "destination": destination,
+    }
+
+
 def run_single_target_removal_and_surveil(
     battle,
     scenario: dict[str, Any],
@@ -6333,6 +6437,7 @@ SCENARIO_RUNNERS = {
     "each_player_sacrifice": run_each_player_sacrifice,
     "fixed_create_creature_tokens": run_fixed_create_creature_tokens,
     "mana_source_life_cost_spend": run_mana_source_life_cost_spend,
+    "modal_damage_or_destroy": run_modal_damage_or_destroy,
     "multi_create_creature_tokens": run_multi_create_creature_tokens,
     "multi_target_damage": run_multi_target_damage,
     "nonfliers_cant_block_rider": run_nonfliers_cant_block_rider,

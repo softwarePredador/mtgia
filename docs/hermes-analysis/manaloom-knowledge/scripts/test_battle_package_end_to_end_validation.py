@@ -1817,3 +1817,75 @@ def test_spell_cast_gain_life_runner_blocks_nonmatching_and_resolves_matching_sp
     assert result["life_after"] == 22
     assert result["trigger"] == "noncreature_spell_cast"
     assert result["trigger_spell"] == "Blue Instant"
+
+
+def test_modal_damage_or_destroy_runner_executes_chosen_destroy_mode() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "modal_spell",
+        "battle_model_scope": "xmage_choose_one_damage_or_destroy_target_spell_v1",
+        "mode_selection": "choose_one",
+        "mode_selection_model": "best_available_mode",
+        "mode_min": 1,
+        "mode_max": 1,
+        "modal_modes": [
+            {
+                "mode": "direct_damage",
+                "effect": "direct_damage",
+                "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+                "amount": 5,
+                "damage": 5,
+                "target": "creature",
+                "target_constraints": {"card_types": ["creature"]},
+            },
+            {
+                "mode": "destroy_target",
+                "effect": "remove_permanent",
+                "battle_model_scope": "xmage_destroy_target_spell_v1",
+                "target": "artifact",
+                "target_constraints": {"card_types": ["artifact"]},
+                "destination": "graveyard",
+            },
+        ],
+        "_rule_logical_key": "battle_rule_v1:fiery-intervention",
+    }
+    try:
+        result = validator.run_modal_damage_or_destroy(
+            battle,
+            {
+                "name": "Fiery Intervention chooses destroy mode over damage mode",
+                "type": "modal_damage_or_destroy",
+                "card": {"name": "Fiery Intervention", "type_line": "Sorcery"},
+                "destroy_target": {
+                    "name": "E2E Legal Modal Destroy Target",
+                    "type_line": "Artifact",
+                    "effect": "artifact",
+                    "cmc": 3,
+                },
+                "damage_target": {
+                    "name": "E2E Legal Modal Damage Target",
+                    "type_line": "Creature - Goblin",
+                    "effect": "creature",
+                    "power": 2,
+                    "toughness": 2,
+                    "cmc": 2,
+                },
+                "expected_selected_mode": "destroy_target",
+                "expected_removed_target": "E2E Legal Modal Destroy Target",
+                "expected_damage_target_survives": "E2E Legal Modal Damage Target",
+                "expected_destination": "graveyard",
+                "logical_rule_key": "battle_rule_v1:fiery-intervention",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Fiery Intervention"
+    assert result["selected_mode"] == "destroy_target"
+    assert result["removed_target"] == "E2E Legal Modal Destroy Target"

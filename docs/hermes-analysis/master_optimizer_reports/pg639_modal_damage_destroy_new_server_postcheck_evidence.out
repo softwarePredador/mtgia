@@ -1,0 +1,8 @@
+     card_name      |  normalized_name   |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
+--------------------+--------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
+ Fiery Intervention | fiery intervention | battle_rule_v1:1e991355b361b8abe50e7d5691deb28e |                  1 |                           1 |                         1 |           0
+ Molten Blast       | molten blast       | battle_rule_v1:e998291e1e60347aa41461c93b95f96c |                  1 |                           1 |                         1 |           0
+ Ready to Rumble    | ready to rumble    | battle_rule_v1:38e830b8075b9dba2a7cac8552482b1c |                  1 |                           1 |                         1 |           0
+ Rip Apart          | rip apart          | battle_rule_v1:073e0388dec40505ed458810a01163e2 |                  1 |                           1 |                         1 |           0
+ Start from Scratch | start from scratch | battle_rule_v1:e205b3066f443fdc3dd7a440b13d9702 |                  1 |                           1 |                         1 |           0
+(5 rows)

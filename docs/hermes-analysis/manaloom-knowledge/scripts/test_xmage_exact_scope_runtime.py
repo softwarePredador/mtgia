@@ -20330,6 +20330,161 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertEqual(attacking_creature.get("damage_marked_this_turn", 0), 0)
         self.assertEqual(blocker.get("damage_marked_this_turn", 0), 0)
 
+    def test_modal_damage_or_destroy_chooses_destroy_when_target_exists(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        damage_target = {
+            "name": "Modal Damage Creature",
+            "type_line": "Creature - Goblin",
+            "effect": "creature",
+            "power": 2,
+            "toughness": 2,
+        }
+        destroy_target = {
+            "name": "Modal Destroy Artifact",
+            "type_line": "Artifact",
+            "effect": "artifact",
+            "cmc": 3,
+        }
+        opponent.battlefield = [damage_target, destroy_target]
+        effect = {
+            "effect": "modal_spell",
+            "battle_model_scope": "xmage_choose_one_damage_or_destroy_target_spell_v1",
+            "mode_selection": "choose_one",
+            "mode_selection_model": "best_available_mode",
+            "mode_min": 1,
+            "mode_max": 1,
+            "modal_modes": [
+                {
+                    "mode": "direct_damage",
+                    "effect": "direct_damage",
+                    "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+                    "amount": 5,
+                    "damage": 5,
+                    "target": "creature",
+                    "target_constraints": {"card_types": ["creature"]},
+                },
+                {
+                    "mode": "destroy_target",
+                    "effect": "remove_permanent",
+                    "battle_model_scope": "xmage_destroy_target_spell_v1",
+                    "target": "artifact",
+                    "target_constraints": {"card_types": ["artifact"]},
+                    "destination": "graveyard",
+                },
+            ],
+            "_rule_logical_key": "battle_rule_v1:modal",
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Fixture Modal Spell", "type_line": "Sorcery"},
+            turn=8,
+            rng=random.Random(8),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(
+            [card["name"] for card in opponent.graveyard],
+            ["Modal Destroy Artifact"],
+        )
+        self.assertEqual([card["name"] for card in active.graveyard], ["Fixture Modal Spell"])
+        self.assertEqual([card["name"] for card in opponent.battlefield], ["Modal Damage Creature"])
+        self.assertTrue(
+            any(
+                event == "modal_spell_resolved"
+                and data.get("mode_selection") == "choose_one"
+                and data.get("selected_modes", [{}])[0].get("mode") == "destroy_target"
+                and data.get("rule_logical_key") == "battle_rule_v1:modal"
+                for event, data in self.events
+            )
+        )
+        self.assertTrue(
+            any(
+                event == "removal_resolved"
+                and data.get("target") == "Modal Destroy Artifact"
+                and data.get("rule_logical_key") == "battle_rule_v1:modal"
+                for event, data in self.events
+            )
+        )
+        self.assertFalse(
+            any(
+                event == "damage_resolved"
+                and data.get("target") == "Modal Damage Creature"
+                for event, data in self.events
+            )
+        )
+
+    def test_modal_damage_or_destroy_chooses_damage_when_no_destroy_target_exists(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        damage_target = {
+            "name": "Only Damage Creature",
+            "type_line": "Creature - Goblin",
+            "effect": "creature",
+            "power": 2,
+            "toughness": 2,
+        }
+        opponent.battlefield = [damage_target]
+        effect = {
+            "effect": "modal_spell",
+            "battle_model_scope": "xmage_choose_one_damage_or_destroy_target_spell_v1",
+            "mode_selection": "choose_one",
+            "mode_selection_model": "best_available_mode",
+            "mode_min": 1,
+            "mode_max": 1,
+            "modal_modes": [
+                {
+                    "mode": "direct_damage",
+                    "effect": "direct_damage",
+                    "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+                    "amount": 5,
+                    "damage": 5,
+                    "target": "creature",
+                    "target_constraints": {"card_types": ["creature"]},
+                },
+                {
+                    "mode": "destroy_target",
+                    "effect": "remove_permanent",
+                    "battle_model_scope": "xmage_destroy_target_spell_v1",
+                    "target": "artifact",
+                    "target_constraints": {"card_types": ["artifact"]},
+                    "destination": "graveyard",
+                },
+            ],
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Fixture Modal Spell", "type_line": "Sorcery"},
+            turn=8,
+            rng=random.Random(8),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(
+            [card["name"] for card in opponent.graveyard],
+            ["Only Damage Creature"],
+        )
+        self.assertEqual([card["name"] for card in active.graveyard], ["Fixture Modal Spell"])
+        self.assertTrue(
+            any(
+                event == "modal_spell_resolved"
+                and data.get("selected_modes", [{}])[0].get("mode") == "direct_damage"
+                for event, data in self.events
+            )
+        )
+        self.assertTrue(
+            any(
+                event == "damage_resolved"
+                and data.get("target") == "Only Damage Creature"
+                and data.get("result") == "creature_destroyed"
+                for event, data in self.events
+            )
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

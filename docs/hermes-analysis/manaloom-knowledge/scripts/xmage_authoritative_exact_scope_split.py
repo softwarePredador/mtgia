@@ -422,6 +422,7 @@ DIES_TOKEN_CREATURE_SCOPE = "xmage_creature_dies_create_tokens_v1"
 PERMANENT_ACTIVATED_TOKEN_SCOPE = "xmage_permanent_simple_activated_create_token_v1"
 GRAVEYARD_SELF_EXILE_ACTIVATED_TOKEN_SCOPE = "xmage_graveyard_self_exile_activated_create_token_v1"
 ETB_ADD_COUNTERS_CREATURE_SCOPE = "xmage_creature_etb_add_counters_target_creature_v1"
+MODAL_DAMAGE_DESTROY_SCOPE = "xmage_choose_one_damage_or_destroy_target_spell_v1"
 
 SPELL_UNITS = {
     DRAW_UNIT,
@@ -2267,6 +2268,116 @@ def destroy_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, str] | No
         return "remove_permanent", "land"
     if re.search(r"destroy target permanent\b", text):
         return "remove_permanent", "permanent"
+    return None
+
+
+def choose_one_mode_texts_from_oracle(metadata: dict[str, Any]) -> list[str] | None:
+    raw_text = strip_parenthetical_reminders(str(metadata.get("oracle_text") or ""))
+    normalized = re.sub(r"\s+", " ", raw_text.strip()).lower()
+    if not normalized.startswith("choose one") or normalized.startswith("choose one or both"):
+        return None
+    modes: list[str] = []
+    for raw_line in raw_text.splitlines():
+        line = re.sub(r"\s+", " ", raw_line.strip()).strip()
+        if not line:
+            continue
+        line = re.sub(r"^choose one\s*[—-]*\s*", "", line, flags=re.I).strip()
+        if not line:
+            continue
+        if line.lower().startswith("choose one"):
+            continue
+        line = re.sub(r"^[•*\\-]\s*", "", line).strip()
+        if line:
+            modes.append(line)
+    if not modes and "•" in raw_text:
+        parts = [part.strip() for part in raw_text.split("•")]
+        for part in parts[1:]:
+            line = re.sub(r"\s+", " ", part).strip()
+            if line:
+                modes.append(line)
+    normalized_modes = [
+        re.sub(r"\s+", " ", mode.strip()).strip().rstrip(".").lower()
+        for mode in modes
+        if mode.strip()
+    ]
+    return normalized_modes or None
+
+
+def modal_damage_or_destroy_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str | None:
+    modes = choose_one_mode_texts_from_oracle(metadata)
+    if modes is None:
+        return None
+    if len(modes) != 2:
+        return "modal_damage_destroy_oracle_mode_count_not_supported"
+    damage_mode: dict[str, Any] | None = None
+    destroy_mode: dict[str, Any] | None = None
+    for mode in modes:
+        mode_metadata = {**metadata, "oracle_text": mode}
+        damage_match = re.search(
+            r"\bdeals\s+(?P<amount>\d+|one|two|three|four|five|six|seven|eight|nine|ten)\s+damage\s+to\b",
+            mode,
+        )
+        if damage_match:
+            amount = word_count_value(damage_match.group("amount"))
+            target = damage_target_from_oracle(mode_metadata)
+            if amount is None or amount <= 0 or target is None:
+                return "modal_damage_destroy_oracle_damage_not_supported"
+            damage_mode = {
+                "mode": "direct_damage",
+                "effect": "direct_damage",
+                "battle_model_scope": DAMAGE_SCOPE,
+                "amount": int(amount),
+                "damage": int(amount),
+                "target": restricted_target_base(target),
+                "target_constraints": target_constraints_for(target),
+                "xmage_effect_class": "DamageTargetEffect",
+            }
+            continue
+        destroy_target = destroy_target_from_oracle(mode_metadata)
+        if destroy_target is not None:
+            effect, target_type = destroy_target
+            destroy_mode = {
+                "mode": "destroy_target",
+                "effect": effect,
+                "battle_model_scope": DESTROY_SCOPE,
+                "target": restricted_target_base(target_type),
+                "target_constraints": target_constraints_for(target_type),
+                "destination": "graveyard",
+                "xmage_effect_class": "DestroyTargetEffect",
+            }
+            continue
+        return "modal_damage_destroy_oracle_mode_not_supported"
+    if damage_mode is None or destroy_mode is None:
+        return "modal_damage_destroy_oracle_modes_not_supported"
+    return {
+        "damage_mode": damage_mode,
+        "destroy_mode": destroy_mode,
+        "mode_count": len(modes),
+    }
+
+
+def source_supports_modal_damage_or_destroy(source_text: str, spec: dict[str, Any]) -> str | None:
+    text = source_text or ""
+    if "addMode" not in text or text.count("new Mode(") < 1:
+        return "modal_damage_destroy_source_mode_not_supported"
+    if len(re.findall(r"new\s+DamageTargetEffect\s*\(", text, re.S)) != 1:
+        return "modal_damage_destroy_source_damage_count_not_supported"
+    if len(re.findall(r"new\s+DestroyTargetEffect\s*\(", text, re.S)) != 1:
+        return "modal_damage_destroy_source_destroy_count_not_supported"
+    damage_constructor = re.search(r"new\s+DamageTargetEffect\s*\(", text, re.S)
+    destroy_constructor = re.search(r"new\s+DestroyTargetEffect\s*\(", text, re.S)
+    if damage_constructor is None or destroy_constructor is None:
+        return "modal_damage_destroy_source_effect_missing"
+    if java_constructor_int(text, "DamageTargetEffect") != int(spec["damage_mode"]["amount"]):
+        return "modal_damage_destroy_source_damage_amount_mismatch"
+    damage_target = str(spec["damage_mode"]["target"])
+    damage_window = source_effect_target_window(text, damage_constructor.start())
+    if damage_target_from_source(damage_window) != damage_target:
+        return "modal_damage_destroy_source_damage_target_mismatch"
+    destroy_target = str(spec["destroy_mode"]["target"])
+    destroy_window = source_effect_target_window(text, destroy_constructor.start())
+    if activated_destroy_target_from_source(destroy_window) != destroy_target:
+        return "modal_damage_destroy_source_destroy_target_mismatch"
     return None
 
 
@@ -28109,6 +28220,42 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_fixed_multi_target_damage_spell",
+        ), "selected_exact_scope"
+
+    if unit in {DAMAGE_UNIT, DESTROY_UNIT} and classes == {"DamageTargetEffect", "DestroyTargetEffect"}:
+        if not is_spell(metadata):
+            return None, "not_instant_or_sorcery_spell"
+        unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+        if unsupported_abilities:
+            return None, "modal_damage_destroy_ability_class_not_simple"
+        oracle_modal = modal_damage_or_destroy_from_oracle(metadata)
+        if isinstance(oracle_modal, str):
+            return None, oracle_modal
+        if oracle_modal is None:
+            return None, "modal_damage_destroy_oracle_not_exact"
+        source_reason = source_supports_modal_damage_or_destroy(source_text, oracle_modal)
+        if source_reason is not None:
+            return None, source_reason
+        modal_modes = [oracle_modal["damage_mode"], oracle_modal["destroy_mode"]]
+        effect_json = {
+            "effect": "modal_spell",
+            "battle_model_scope": MODAL_DAMAGE_DESTROY_SCOPE,
+            "mode_selection": "choose_one",
+            "mode_selection_model": "best_available_mode",
+            "mode_min": 1,
+            "mode_max": 1,
+            "modal_modes": modal_modes,
+            "damage_amount": int(oracle_modal["damage_mode"]["amount"]),
+            "damage_target": oracle_modal["damage_mode"]["target"],
+            "destroy_target": oracle_modal["destroy_mode"]["target"],
+            "xmage_effect_classes": ["DamageTargetEffect", "DestroyTargetEffect"],
+            **flags,
+        }
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_choose_one_damage_or_destroy_target_spell",
         ), "selected_exact_scope"
 
     if unit == DAMAGE_UNIT:

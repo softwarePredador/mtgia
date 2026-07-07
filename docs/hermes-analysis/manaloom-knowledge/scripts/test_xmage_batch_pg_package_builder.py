@@ -3217,3 +3217,58 @@ def test_simple_activated_regenerate_source_execution_scenario_uses_activation_m
         "green": 1,
     }
     assert scenario["expected_regeneration_shields"] == 1
+
+
+def test_modal_damage_or_destroy_fields_and_execution_scenario_are_manifested() -> None:
+    proposal = {
+        "normalized_name": "fiery intervention",
+        "card_name": "Fiery Intervention",
+        "oracle_hash": "hash-fiery-intervention",
+        "logical_rule_key": "battle_rule_v1:fiery-intervention",
+        "effect_json": {
+            "effect": "modal_spell",
+            "battle_model_scope": "xmage_choose_one_damage_or_destroy_target_spell_v1",
+            "mode_selection": "choose_one",
+            "mode_selection_model": "best_available_mode",
+            "mode_min": 1,
+            "mode_max": 1,
+            "modal_modes": [
+                {
+                    "mode": "direct_damage",
+                    "effect": "direct_damage",
+                    "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+                    "amount": 5,
+                    "damage": 5,
+                    "target": "creature",
+                    "target_constraints": {"card_types": ["creature"]},
+                },
+                {
+                    "mode": "destroy_target",
+                    "effect": "remove_permanent",
+                    "battle_model_scope": "xmage_destroy_target_spell_v1",
+                    "target": "artifact",
+                    "target_constraints": {"card_types": ["artifact"]},
+                    "destination": "graveyard",
+                },
+            ],
+            "damage_amount": 5,
+            "damage_target": "creature",
+            "destroy_target": "artifact",
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    required = expected["required_effect_fields"]
+
+    assert required["modal_modes"][0]["mode"] == "direct_damage"
+    assert required["modal_modes"][1]["mode"] == "destroy_target"
+    assert required["mode_selection_model"] == "best_available_mode"
+    assert required["damage_amount"] == 5
+    assert required["destroy_target"] == "artifact"
+
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    assert scenario["type"] == "modal_damage_or_destroy"
+    assert scenario["expected_selected_mode"] == "destroy_target"
+    assert scenario["destroy_target"]["name"] == "E2E Legal Modal Destroy Target"
+    assert scenario["damage_target"]["name"] == "E2E Legal Modal Damage Target"
