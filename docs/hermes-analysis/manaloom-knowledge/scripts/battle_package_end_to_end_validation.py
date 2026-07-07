@@ -2505,6 +2505,8 @@ def run_simple_mana_source_refresh(
         }
     )
     active = battle.Player(str(scenario.get("player") or "Mana Source Controller"), None, [])
+    if scenario.get("starting_life") is not None:
+        active.life = int(scenario["starting_life"])
     support_sources = [
         battle.enrich_card(dict(support))
         for support in (
@@ -2538,6 +2540,12 @@ def run_simple_mana_source_refresh(
         fail(
             "battle_execution",
             f"{card['name']} conditional mana={conditional_total}, expected {expected_conditional}",
+        )
+    expected_life_after = scenario.get("expected_life_after_refresh")
+    if expected_life_after is not None and active.life != int(expected_life_after):
+        fail(
+            "battle_execution",
+            f"{card['name']} life after refresh={active.life}, expected {expected_life_after}",
         )
     event = next(
         (
@@ -2584,6 +2592,24 @@ def run_simple_mana_source_refresh(
         ]
         if not skipped:
             fail("battle_events", f"missing {card['name']} activation-limit skip event")
+    expected_life_paid = int(scenario.get("expected_life_paid") or 0)
+    if expected_life_paid:
+        life_event = next(
+            (
+                data
+                for replay_event, data in events[before_events:]
+                if replay_event == "mana_source_activation_life_cost_paid"
+                and data.get("card") == card.get("name")
+            ),
+            None,
+        )
+        if life_event is None:
+            fail("battle_events", f"missing {card['name']} mana-source life payment event")
+        if int(life_event.get("life_paid") or 0) != expected_life_paid:
+            fail(
+                "battle_events",
+                f"{card['name']} life_paid={life_event.get('life_paid')}, expected {expected_life_paid}",
+            )
     return {
         "scenario": scenario.get("name"),
         "card_name": card["name"],
@@ -2592,6 +2618,8 @@ def run_simple_mana_source_refresh(
         "tapped": bool(source.get("tapped")),
         "sources": int(event.get("sources") or 0),
         "activation_limit_per_turn": expected_activation_limit,
+        "life_paid": expected_life_paid,
+        "life_after_refresh": active.life,
     }
 
 

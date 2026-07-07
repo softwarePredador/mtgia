@@ -17079,15 +17079,116 @@ def mana_detail_from_add_phrase(mana_phrase: str) -> dict[str, Any] | None:
     }
 
 
+def simple_mana_source_costs_from_phrase(cost_phrase: str) -> dict[str, Any] | None:
+    requires_tap = False
+    activation_symbols: list[str] = []
+    activation_life_cost = 0
+    tokens = [
+        re.sub(r"\s+", " ", token.strip().lower())
+        for token in str(cost_phrase or "").split(",")
+        if token.strip()
+    ]
+    if not tokens:
+        return None
+    for token in tokens:
+        if token == "{t}":
+            requires_tap = True
+            continue
+        life_match = re.fullmatch(r"pay (?P<life>\d+) life", token)
+        if life_match:
+            activation_life_cost += int(life_match.group("life"))
+            continue
+        if re.fullmatch(r"(?:\{[0-9wubrgc]+\})+", token):
+            activation_symbols.extend(
+                symbol.upper()
+                for symbol in re.findall(r"\{([0-9wubrgc]+)\}", token)
+                if symbol.lower() != "t"
+            )
+            if "{t}" in token:
+                requires_tap = True
+            continue
+        return None
+    detail: dict[str, Any] = {"mana_activation_requires_tap": requires_tap}
+    if activation_symbols:
+        detail["activation_mana_cost"] = "".join(f"{{{symbol}}}" for symbol in activation_symbols)
+    if activation_life_cost:
+        detail["activation_life_cost"] = activation_life_cost
+    return detail
+
+
+def simple_mana_detail_from_add_phrase(mana_phrase: str) -> dict[str, Any] | None:
+    normalized = re.sub(r"\s+", " ", str(mana_phrase or "").strip().lower()).strip(".")
+    choice_match = re.fullmatch(
+        r"\{[wubrgc]\}(?:,\s*\{[wubrgc]\})*(?:,?\s*or\s*\{[wubrgc]\})",
+        normalized,
+    )
+    if choice_match:
+        symbols = _brace_mana_symbols(normalized)
+        if not symbols:
+            return None
+        return {
+            "produces": _unique_mana_symbols(symbols),
+            "mana_produced": 1,
+        }
+    fixed_symbols = _brace_mana_symbols(normalized)
+    if fixed_symbols and re.fullmatch(r"(?:\{[wubrgc]\})+", normalized):
+        return {
+            "produces": _unique_mana_symbols(fixed_symbols),
+            "mana_produced": len(fixed_symbols),
+            "produced_mana_symbols": fixed_symbols,
+        }
+    return mana_detail_from_add_phrase(normalized)
+
+
+def add_simple_mana_source_common_details(
+    detail: dict[str, Any],
+    *,
+    activation_limit_per_turn: int | None = None,
+) -> dict[str, Any]:
+    if activation_limit_per_turn:
+        detail["activation_limit_per_turn"] = activation_limit_per_turn
+    return detail
+
+
+def simple_mana_source_detail_from_generic_line(
+    text: str,
+    *,
+    activation_limit_per_turn: int | None = None,
+) -> dict[str, Any] | None:
+    match = re.match(r"^(?P<costs>.+?): add (?P<mana>.+?)\.?$", text)
+    if not match:
+        return None
+    cost_detail = simple_mana_source_costs_from_phrase(match.group("costs"))
+    mana_detail = simple_mana_detail_from_add_phrase(match.group("mana"))
+    if cost_detail is None or mana_detail is None:
+        return None
+    return add_simple_mana_source_common_details(
+        {**mana_detail, **cost_detail},
+        activation_limit_per_turn=activation_limit_per_turn,
+    )
+
+
 def simple_mana_source_detail_from_line(text: str) -> dict[str, Any] | None:
-    if any(token in text for token in UNSUPPORTED_SIMPLE_MANA_ORACLE_TOKENS):
+    working_text = strip_parenthetical_reminders(
+        re.sub(r"\s+", " ", str(text or "").strip().lower())
+    ).strip()
+    unsupported_tokens = set(UNSUPPORTED_SIMPLE_MANA_ORACLE_TOKENS)
+    if re.search(r"(?:^|,\s*)pay \d+ life(?=[:,])", working_text):
+        unsupported_tokens.discard("pay ")
+    if any(token in working_text for token in unsupported_tokens):
         return None
     activation_limit_per_turn = None
     once_each_turn_suffix = " activate only once each turn."
-    working_text = text
     if working_text.endswith(once_each_turn_suffix):
         activation_limit_per_turn = 1
         working_text = working_text[: -len(once_each_turn_suffix)].strip().rstrip(".") + "."
+    if re.search(r"(?:^|,\s*)pay \d+ life(?=[:,])", working_text):
+        generic_detail = simple_mana_source_detail_from_generic_line(
+            working_text,
+            activation_limit_per_turn=activation_limit_per_turn,
+        )
+        if generic_detail is not None:
+            return generic_detail
     if working_text == "{t}: add one mana of any color.":
         detail = {"produces": "WUBRG", "mana_produced": 1, "mana_activation_requires_tap": True}
         if activation_limit_per_turn:
@@ -17838,7 +17939,6 @@ def simple_mana_source_source_blocker(
         "SacrificeSourceCost": "mana_source_source_sacrifice_cost_not_supported",
         "SacrificeTargetCost": "mana_source_source_sacrifice_target_cost_not_supported",
         "Discard": "mana_source_source_discard_cost_not_supported",
-        "PayLifeCost": "mana_source_source_pay_life_cost_not_supported",
         "ExileSourceCost": "mana_source_source_exile_cost_not_supported",
         "ConditionalMana": "mana_source_source_conditional_mana_not_supported",
         "spend this mana only": "mana_source_source_restricted_spend_not_supported",
@@ -17848,6 +17948,24 @@ def simple_mana_source_source_blocker(
             if marker == "SacrificeSourceCost" and has_independent_mana:
                 continue
             return reason
+    source_life_costs = [
+        int(value)
+        for value in re.findall(r"PayLifeCost\s*\(\s*(\d+)\s*\)", text)
+    ]
+    expected_life_cost = (
+        int(mana_source_detail.get("activation_life_cost") or 0)
+        if mana_source_detail is not None
+        else 0
+    )
+    if source_life_costs:
+        if expected_life_cost <= 0:
+            return "mana_source_source_pay_life_cost_not_supported"
+        if len(source_life_costs) != 1:
+            return "mana_source_source_pay_life_cost_not_single"
+        if source_life_costs[0] != expected_life_cost:
+            return "mana_source_source_pay_life_cost_mismatch"
+    elif expected_life_cost:
+        return "mana_source_source_pay_life_cost_missing"
     if mana_source_detail is not None:
         requires_tap = bool(mana_source_detail.get("mana_activation_requires_tap", True))
         if "TapSourceCost" in text and not requires_tap:
@@ -28301,6 +28419,8 @@ def split_row(
                 )
             if mana_source_detail.get("activation_mana_cost"):
                 effect_json["activation_mana_cost"] = mana_source_detail["activation_mana_cost"]
+            if mana_source_detail.get("activation_life_cost"):
+                effect_json["activation_life_cost"] = int(mana_source_detail["activation_life_cost"])
             return build_proposal(
                 row,
                 metadata,
@@ -28352,6 +28472,8 @@ def split_row(
             effect_json["produced_mana_symbols"] = list(mana_source_detail["produced_mana_symbols"])
         if mana_source_detail.get("activation_mana_cost"):
             effect_json["activation_mana_cost"] = mana_source_detail["activation_mana_cost"]
+        if mana_source_detail.get("activation_life_cost"):
+            effect_json["activation_life_cost"] = int(mana_source_detail["activation_life_cost"])
         return build_proposal(row, metadata, effect_json, family_id="xmage_simple_mana_source_permanent"), "selected_exact_scope"
 
     return None, "unsupported_adapter_work_unit"

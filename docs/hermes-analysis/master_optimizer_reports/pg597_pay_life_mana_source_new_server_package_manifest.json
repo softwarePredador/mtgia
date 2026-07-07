@@ -1,0 +1,530 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg597_pay_life_mana_source_new_server_20260707_060115",
+  "deploy_id": "PG597",
+  "execution_scenarios": [
+    {
+      "card": {
+        "name": "Blightsoil Druid"
+      },
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 0,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_activation_limit_per_turn": 0,
+      "expected_available_mana_after_refresh": 1,
+      "expected_conditional_mana": 0,
+      "expected_life_after_refresh": 39,
+      "expected_life_paid": 1,
+      "expected_produced_mana_symbols": [
+        "G"
+      ],
+      "expected_sources": 1,
+      "expected_tapped": true,
+      "logical_rule_key": "battle_rule_v1:5f73fcc3cefa312b9682139e529f1252",
+      "name": "Blightsoil Druid refreshes modeled mana source",
+      "source_overrides": {},
+      "starting_life": 40,
+      "support_mana_sources": [],
+      "type": "simple_mana_source_refresh"
+    },
+    {
+      "card": {
+        "name": "Blood Celebrant"
+      },
+      "controller_mana": {
+        "black": 1,
+        "blue": 0,
+        "generic": 0,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_activation_limit_per_turn": 0,
+      "expected_available_mana_after_refresh": 1,
+      "expected_conditional_mana": 1,
+      "expected_life_after_refresh": 39,
+      "expected_life_paid": 1,
+      "expected_produced_mana_symbols": [],
+      "expected_sources": 2,
+      "expected_tapped": false,
+      "logical_rule_key": "battle_rule_v1:c1577aeb4797a0a5583875b4a061b8fd",
+      "name": "Blood Celebrant refreshes modeled mana source",
+      "source_overrides": {},
+      "starting_life": 40,
+      "support_mana_sources": [
+        {
+          "battle_model_scope": "e2e_support_mana_source_v1",
+          "effect": "ramp_permanent",
+          "is_mana_source": true,
+          "mana_activation_requires_tap": true,
+          "mana_produced": 1,
+          "name": "E2E Black Support Source 1",
+          "produced_mana_symbols": [
+            "B"
+          ],
+          "produces": "B",
+          "type_line": "Artifact"
+        }
+      ],
+      "type": "simple_mana_source_refresh"
+    },
+    {
+      "card": {
+        "name": "Phyrexian Lens"
+      },
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 0,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_activation_limit_per_turn": 0,
+      "expected_available_mana_after_refresh": 1,
+      "expected_conditional_mana": 1,
+      "expected_life_after_refresh": 39,
+      "expected_life_paid": 1,
+      "expected_produced_mana_symbols": [],
+      "expected_sources": 1,
+      "expected_tapped": true,
+      "logical_rule_key": "battle_rule_v1:f5ae536080279067330e49e9f862205a",
+      "name": "Phyrexian Lens refreshes modeled mana source",
+      "source_overrides": {},
+      "starting_life": 40,
+      "support_mana_sources": [],
+      "type": "simple_mana_source_refresh"
+    },
+    {
+      "card": {
+        "name": "Standing Stones"
+      },
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 1,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_activation_limit_per_turn": 0,
+      "expected_available_mana_after_refresh": 1,
+      "expected_conditional_mana": 1,
+      "expected_life_after_refresh": 39,
+      "expected_life_paid": 1,
+      "expected_produced_mana_symbols": [],
+      "expected_sources": 2,
+      "expected_tapped": true,
+      "logical_rule_key": "battle_rule_v1:7db7dc0f9b81aa3616ed977f5038d9ac",
+      "name": "Standing Stones refreshes modeled mana source",
+      "source_overrides": {},
+      "starting_life": 40,
+      "support_mana_sources": [
+        {
+          "battle_model_scope": "e2e_support_mana_source_v1",
+          "effect": "ramp_permanent",
+          "is_mana_source": true,
+          "mana_activation_requires_tap": true,
+          "mana_produced": 1,
+          "name": "E2E Generic Support Source 1",
+          "produced_mana_symbols": [
+            "C"
+          ],
+          "produces": "C",
+          "type_line": "Artifact"
+        }
+      ],
+      "type": "simple_mana_source_refresh"
+    },
+    {
+      "card": {
+        "name": "Vesper Ghoul"
+      },
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 0,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_activation_limit_per_turn": 0,
+      "expected_available_mana_after_refresh": 1,
+      "expected_conditional_mana": 1,
+      "expected_life_after_refresh": 39,
+      "expected_life_paid": 1,
+      "expected_produced_mana_symbols": [],
+      "expected_sources": 1,
+      "expected_tapped": true,
+      "logical_rule_key": "battle_rule_v1:8c9b709a651b166e63e08dd5e0d49ad8",
+      "name": "Vesper Ghoul refreshes modeled mana source",
+      "source_overrides": {},
+      "starting_life": 40,
+      "support_mana_sources": [],
+      "type": "simple_mana_source_refresh"
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Blightsoil Druid",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5f73fcc3cefa312b9682139e529f1252",
+      "min_rule_version": 2,
+      "normalized_name": "blightsoil druid",
+      "oracle_hash": "acb4823834bbabca1f93c2ed8255954c",
+      "required_effect_fields": {
+        "activation_life_cost": 1,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "creature",
+        "produced_mana_symbols": [
+          "G"
+        ],
+        "produces": "G",
+        "xmage_effect_classes": [],
+        "xmage_mana_ability_classes": [
+          "GreenManaAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Blood Celebrant",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c1577aeb4797a0a5583875b4a061b8fd",
+      "min_rule_version": 2,
+      "normalized_name": "blood celebrant",
+      "oracle_hash": "d3a5736c50c3a6233b5a614226cac2d9",
+      "required_effect_fields": {
+        "activation_life_cost": 1,
+        "activation_mana_cost": "{B}",
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": false,
+        "mana_produced": 1,
+        "permanent_type": "creature",
+        "produces": "WUBRG",
+        "xmage_effect_classes": [],
+        "xmage_mana_ability_classes": [
+          "AnyColorManaAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Phyrexian Lens",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f5ae536080279067330e49e9f862205a",
+      "min_rule_version": 2,
+      "normalized_name": "phyrexian lens",
+      "oracle_hash": "11173c5296485bfd3cdd28822d4634e9",
+      "required_effect_fields": {
+        "activation_life_cost": 1,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "artifact",
+        "produces": "WUBRG",
+        "xmage_effect_classes": [],
+        "xmage_mana_ability_classes": [
+          "AnyColorManaAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Standing Stones",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7db7dc0f9b81aa3616ed977f5038d9ac",
+      "min_rule_version": 2,
+      "normalized_name": "standing stones",
+      "oracle_hash": "e2aacb563505ce0ff79a709c99c03ab3",
+      "required_effect_fields": {
+        "activation_life_cost": 1,
+        "activation_mana_cost": "{1}",
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "artifact",
+        "produces": "WUBRG",
+        "xmage_effect_classes": [],
+        "xmage_mana_ability_classes": [
+          "AnyColorManaAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Vesper Ghoul",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8c9b709a651b166e63e08dd5e0d49ad8",
+      "min_rule_version": 2,
+      "normalized_name": "vesper ghoul",
+      "oracle_hash": "11173c5296485bfd3cdd28822d4634e9",
+      "required_effect_fields": {
+        "activation_life_cost": 1,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "creature",
+        "produces": "WUBRG",
+        "xmage_effect_classes": [
+          "AddManaOfAnyColorEffect"
+        ],
+        "xmage_mana_ability_classes": [
+          "SimpleManaAbility"
+        ]
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_simple_mana_source_permanent": 5
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg597_pay_life_mana_source_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg597_pay_life_mana_source_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg597_pay_life_mana_source_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg597_pay_life_mana_source_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg597_pay_life_mana_source_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg597_pay_life_mana_source_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-07T06:01:15+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Blightsoil Druid"
+      },
+      "card_name": "Blightsoil Druid",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5f73fcc3cefa312b9682139e529f1252",
+      "normalized_name": "blightsoil druid",
+      "required_effect_fields": {
+        "activation_life_cost": 1,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "creature",
+        "produced_mana_symbols": [
+          "G"
+        ],
+        "produces": "G",
+        "xmage_effect_classes": [],
+        "xmage_mana_ability_classes": [
+          "GreenManaAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Blood Celebrant"
+      },
+      "card_name": "Blood Celebrant",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c1577aeb4797a0a5583875b4a061b8fd",
+      "normalized_name": "blood celebrant",
+      "required_effect_fields": {
+        "activation_life_cost": 1,
+        "activation_mana_cost": "{B}",
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": false,
+        "mana_produced": 1,
+        "permanent_type": "creature",
+        "produces": "WUBRG",
+        "xmage_effect_classes": [],
+        "xmage_mana_ability_classes": [
+          "AnyColorManaAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Phyrexian Lens"
+      },
+      "card_name": "Phyrexian Lens",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f5ae536080279067330e49e9f862205a",
+      "normalized_name": "phyrexian lens",
+      "required_effect_fields": {
+        "activation_life_cost": 1,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "artifact",
+        "produces": "WUBRG",
+        "xmage_effect_classes": [],
+        "xmage_mana_ability_classes": [
+          "AnyColorManaAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Standing Stones"
+      },
+      "card_name": "Standing Stones",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7db7dc0f9b81aa3616ed977f5038d9ac",
+      "normalized_name": "standing stones",
+      "required_effect_fields": {
+        "activation_life_cost": 1,
+        "activation_mana_cost": "{1}",
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "artifact",
+        "produces": "WUBRG",
+        "xmage_effect_classes": [],
+        "xmage_mana_ability_classes": [
+          "AnyColorManaAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Vesper Ghoul"
+      },
+      "card_name": "Vesper Ghoul",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8c9b709a651b166e63e08dd5e0d49ad8",
+      "normalized_name": "vesper ghoul",
+      "required_effect_fields": {
+        "activation_life_cost": 1,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "creature",
+        "produces": "WUBRG",
+        "xmage_effect_classes": [
+          "AddManaOfAnyColorEffect"
+        ],
+        "xmage_mana_ability_classes": [
+          "SimpleManaAbility"
+        ]
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Blightsoil Druid",
+    "Blood Celebrant",
+    "Phyrexian Lens",
+    "Standing Stones",
+    "Vesper Ghoul"
+  ],
+  "selected_count": 5,
+  "slug": "pay_life_mana_source_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Blightsoil Druid",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5f73fcc3cefa312b9682139e529f1252",
+      "min_rule_version": 2,
+      "normalized_name": "blightsoil druid",
+      "oracle_hash": "acb4823834bbabca1f93c2ed8255954c",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Blood Celebrant",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c1577aeb4797a0a5583875b4a061b8fd",
+      "min_rule_version": 2,
+      "normalized_name": "blood celebrant",
+      "oracle_hash": "d3a5736c50c3a6233b5a614226cac2d9",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Phyrexian Lens",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f5ae536080279067330e49e9f862205a",
+      "min_rule_version": 2,
+      "normalized_name": "phyrexian lens",
+      "oracle_hash": "11173c5296485bfd3cdd28822d4634e9",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Standing Stones",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7db7dc0f9b81aa3616ed977f5038d9ac",
+      "min_rule_version": 2,
+      "normalized_name": "standing stones",
+      "oracle_hash": "e2aacb563505ce0ff79a709c99c03ab3",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Vesper Ghoul",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8c9b709a651b166e63e08dd5e0d49ad8",
+      "min_rule_version": 2,
+      "normalized_name": "vesper ghoul",
+      "oracle_hash": "11173c5296485bfd3cdd28822d4634e9",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

@@ -415,6 +415,30 @@ def test_simple_mana_source_execution_scenario_pays_activation_cost() -> None:
     assert scenario["expected_sources"] == 2
 
 
+def test_simple_mana_source_execution_scenario_pays_life_cost() -> None:
+    rule = {
+        "card_name": "Phyrexian Lens",
+        "logical_rule_key": "battle_rule_v1:phyrexian_lens",
+        "required_effect_fields": {
+            "effect": "ramp_permanent",
+            "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+            "is_mana_source": True,
+            "mana_produced": 1,
+            "produces": "WUBRG",
+            "mana_activation_requires_tap": True,
+            "activation_life_cost": 1,
+        },
+    }
+
+    scenario = builder.simple_mana_source_execution_scenario_from_expected_rule(rule)
+
+    assert scenario["type"] == "simple_mana_source_refresh"
+    assert scenario["starting_life"] == 40
+    assert scenario["expected_life_paid"] == 1
+    assert scenario["expected_life_after_refresh"] == 39
+    assert scenario["expected_conditional_mana"] == 1
+
+
 def test_simple_mana_source_execution_scenario_preserves_activation_limit() -> None:
     rule = {
         "card_name": "Abzan Devotee",

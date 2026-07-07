@@ -1992,7 +1992,8 @@ def simple_mana_source_execution_scenario_from_expected_rule(rule: dict[str, Any
     activation_cost_total = sum(controller_mana.values())
     support_sources = _manifest_support_sources_for_controller_mana(controller_mana)
     enters_tapped = bool(required.get("enters_tapped"))
-    return {
+    activation_life_cost = int(required.get("activation_life_cost") or 0)
+    scenario = {
         "name": f"{rule['card_name']} refreshes modeled mana source",
         "type": "simple_mana_source_refresh",
         "card": {"name": rule["card_name"]},
@@ -2017,6 +2018,11 @@ def simple_mana_source_execution_scenario_from_expected_rule(rule: dict[str, Any
         "source_overrides": {"tapped": True} if enters_tapped else {},
         "logical_rule_key": rule["logical_rule_key"],
     }
+    if activation_life_cost:
+        scenario["starting_life"] = 40
+        scenario["expected_life_paid"] = activation_life_cost
+        scenario["expected_life_after_refresh"] = 40 - activation_life_cost
+    return scenario
 
 
 def _manifest_unlock_cost_for_mana_source(required: dict[str, Any]) -> str:

@@ -10926,6 +10926,77 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_simple_mana_source_permanent_pays_life_cost_on_refresh(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        lens = self.battle.enrich_card(
+            {
+                "name": "Fixture Lens",
+                "type_line": "Artifact",
+                "effect": "ramp_permanent",
+                "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+                "is_mana_source": True,
+                "mana_produced": 1,
+                "produces": "WUBRG",
+                "activation_life_cost": 1,
+                "activation_requires_tap": True,
+                "mana_activation_requires_tap": True,
+                "permanent_type": "artifact",
+                "_rule_logical_key": "battle_rule_v1:fixture_lens",
+            }
+        )
+        active.battlefield = [lens]
+
+        active.refresh_mana_sources(turn=7)
+
+        self.assertEqual(active.life, 39)
+        self.assertEqual(len(active.conditional_mana_sources), 1)
+        self.assertTrue(lens["tapped"])
+        self.assertTrue(
+            any(
+                event == "mana_source_activation_life_cost_paid"
+                and data.get("card") == "Fixture Lens"
+                and data.get("life_paid") == 1
+                and data.get("life_before") == 40
+                and data.get("life_after") == 39
+                and data.get("rule_logical_key") == "battle_rule_v1:fixture_lens"
+                for event, data in self.events
+            )
+        )
+
+    def test_simple_mana_source_permanent_skips_life_cost_when_life_low(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        active.life = 2
+        lens = self.battle.enrich_card(
+            {
+                "name": "Fixture Lens",
+                "type_line": "Artifact",
+                "effect": "ramp_permanent",
+                "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+                "is_mana_source": True,
+                "mana_produced": 1,
+                "produces": "WUBRG",
+                "activation_life_cost": 1,
+                "activation_requires_tap": True,
+                "mana_activation_requires_tap": True,
+                "permanent_type": "artifact",
+            }
+        )
+        active.battlefield = [lens]
+
+        active.refresh_mana_sources(turn=8)
+
+        self.assertEqual(active.life, 2)
+        self.assertEqual(active.conditional_mana_sources, [])
+        self.assertFalse(lens.get("tapped", False))
+        self.assertTrue(
+            any(
+                event == "mana_source_activation_skipped"
+                and data.get("card") == "Fixture Lens"
+                and data.get("reason") == "insufficient_life_for_activation_cost"
+                for event, data in self.events
+            )
+        )
+
     def test_limited_mana_source_refreshes_only_once_per_turn(self) -> None:
         active = self.battle.Player("Active", None, [])
         source = self.battle.enrich_card(

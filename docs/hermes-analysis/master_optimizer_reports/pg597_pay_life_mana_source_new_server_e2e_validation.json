@@ -1,0 +1,288 @@
+{
+  "battle_execution": {
+    "event_count": 12,
+    "results": [
+      {
+        "activation_limit_per_turn": 0,
+        "available_mana": 1,
+        "card_name": "Blightsoil Druid",
+        "conditional_mana": 0,
+        "life_after_refresh": 39,
+        "life_paid": 1,
+        "scenario": "Blightsoil Druid refreshes modeled mana source",
+        "sources": 1,
+        "tapped": true
+      },
+      {
+        "activation_limit_per_turn": 0,
+        "available_mana": 1,
+        "card_name": "Blood Celebrant",
+        "conditional_mana": 1,
+        "life_after_refresh": 39,
+        "life_paid": 1,
+        "scenario": "Blood Celebrant refreshes modeled mana source",
+        "sources": 2,
+        "tapped": false
+      },
+      {
+        "activation_limit_per_turn": 0,
+        "available_mana": 1,
+        "card_name": "Phyrexian Lens",
+        "conditional_mana": 1,
+        "life_after_refresh": 39,
+        "life_paid": 1,
+        "scenario": "Phyrexian Lens refreshes modeled mana source",
+        "sources": 1,
+        "tapped": true
+      },
+      {
+        "activation_limit_per_turn": 0,
+        "available_mana": 1,
+        "card_name": "Standing Stones",
+        "conditional_mana": 1,
+        "life_after_refresh": 39,
+        "life_paid": 1,
+        "scenario": "Standing Stones refreshes modeled mana source",
+        "sources": 2,
+        "tapped": true
+      },
+      {
+        "activation_limit_per_turn": 0,
+        "available_mana": 1,
+        "card_name": "Vesper Ghoul",
+        "conditional_mana": 1,
+        "life_after_refresh": 39,
+        "life_paid": 1,
+        "scenario": "Vesper Ghoul refreshes modeled mana source",
+        "sources": 1,
+        "tapped": true
+      }
+    ],
+    "scenario_count": 5
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-07T06:02:42.390568+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg597_pay_life_mana_source_new_server_package_manifest.json",
+  "package_id": "pg597_pay_life_mana_source_new_server_package_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 5
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Blightsoil Druid",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5f73fcc3cefa312b9682139e529f1252",
+          "oracle_hash": "acb4823834bbabca1f93c2ed8255954c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Blood Celebrant",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c1577aeb4797a0a5583875b4a061b8fd",
+          "oracle_hash": "d3a5736c50c3a6233b5a614226cac2d9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Phyrexian Lens",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f5ae536080279067330e49e9f862205a",
+          "oracle_hash": "11173c5296485bfd3cdd28822d4634e9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Standing Stones",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7db7dc0f9b81aa3616ed977f5038d9ac",
+          "oracle_hash": "e2aacb563505ce0ff79a709c99c03ab3",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Vesper Ghoul",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8c9b709a651b166e63e08dd5e0d49ad8",
+          "oracle_hash": "11173c5296485bfd3cdd28822d4634e9",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 5
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Blightsoil Druid",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5f73fcc3cefa312b9682139e529f1252",
+          "oracle_hash": "acb4823834bbabca1f93c2ed8255954c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Blood Celebrant",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c1577aeb4797a0a5583875b4a061b8fd",
+          "oracle_hash": "d3a5736c50c3a6233b5a614226cac2d9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Phyrexian Lens",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f5ae536080279067330e49e9f862205a",
+          "oracle_hash": "11173c5296485bfd3cdd28822d4634e9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Standing Stones",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7db7dc0f9b81aa3616ed977f5038d9ac",
+          "oracle_hash": "e2aacb563505ce0ff79a709c99c03ab3",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Vesper Ghoul",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8c9b709a651b166e63e08dd5e0d49ad8",
+          "oracle_hash": "11173c5296485bfd3cdd28822d4634e9",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 5
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Blightsoil Druid",
+          "logical_rule_key": "battle_rule_v1:5f73fcc3cefa312b9682139e529f1252"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Blood Celebrant",
+          "logical_rule_key": "battle_rule_v1:c1577aeb4797a0a5583875b4a061b8fd"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Phyrexian Lens",
+          "logical_rule_key": "battle_rule_v1:f5ae536080279067330e49e9f862205a"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Standing Stones",
+          "logical_rule_key": "battle_rule_v1:7db7dc0f9b81aa3616ed977f5038d9ac"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Vesper Ghoul",
+          "logical_rule_key": "battle_rule_v1:8c9b709a651b166e63e08dd5e0d49ad8"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 5
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Blightsoil Druid",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:5f73fcc3cefa312b9682139e529f1252"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Blood Celebrant",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:c1577aeb4797a0a5583875b4a061b8fd"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Phyrexian Lens",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:f5ae536080279067330e49e9f862205a"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Standing Stones",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:7db7dc0f9b81aa3616ed977f5038d9ac"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Vesper Ghoul",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:8c9b709a651b166e63e08dd5e0d49ad8"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 12,
+        "scenarios": 5
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

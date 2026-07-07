@@ -5531,6 +5531,48 @@ def pay_mana_source_activation_costs(player, source, turn=None):
             turn=turn,
             **replay_rule_fields(source),
         )
+    life_cost = max(
+        0,
+        int(source.get("activation_life_cost") or source.get("mana_activation_life_cost") or 0),
+    )
+    if life_cost > 0:
+        if getattr(player, "life_cant_change", False):
+            emit_replay_event(
+                "mana_source_activation_skipped",
+                player=getattr(player, "name", "?"),
+                card=source.get("name", "?"),
+                reason="life_payment_forbidden",
+                activation_life_cost=life_cost,
+                life=getattr(player, "life", None),
+                turn=turn,
+                **replay_rule_fields(source),
+            )
+            return False
+        if getattr(player, "life", 0) <= life_cost + 1:
+            emit_replay_event(
+                "mana_source_activation_skipped",
+                player=getattr(player, "name", "?"),
+                card=source.get("name", "?"),
+                reason="insufficient_life_for_activation_cost",
+                activation_life_cost=life_cost,
+                life=getattr(player, "life", None),
+                turn=turn,
+                **replay_rule_fields(source),
+            )
+            return False
+        life_before = player.life
+        change_life(player, -life_cost)
+        emit_replay_event(
+            "mana_source_activation_life_cost_paid",
+            player=getattr(player, "name", "?"),
+            card=source.get("name", "?"),
+            activation_life_cost=life_cost,
+            life_paid=life_cost,
+            life_before=life_before,
+            life_after=player.life,
+            turn=turn,
+            **replay_rule_fields(source),
+        )
     if source.get("mana_activation_requires_tap"):
         source["tapped"] = True
     return True
