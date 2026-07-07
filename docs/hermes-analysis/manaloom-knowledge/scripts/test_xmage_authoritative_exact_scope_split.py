@@ -2714,6 +2714,108 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                 self.assertEqual(effect["stat_modifier_amount_source"], amount_source)
                 self.assertEqual(effect["static_power_toughness_count_multiplier"], multiplier)
 
+    def test_static_count_power_toughness_filtered_battlefield_variants_are_package_safe(self) -> None:
+        fixtures = [
+            (
+                "Drove of Elves",
+                ["HexproofAbility", "SimpleStaticAbility"],
+                "Hexproof\nDrove of Elves's power and toughness are each equal to the number of green permanents you control.",
+                "private static final FilterControlledPermanent filter = new FilterControlledPermanent(\"green permanents you control\");"
+                "filter.add(new ColorPredicate(ObjectColor.GREEN));"
+                "this.addAbility(new SimpleStaticAbility(Zone.ALL, "
+                "new SetBasePowerToughnessSourceEffect(new PermanentsOnBattlefieldCount(filter))));",
+                {"battlefield_count_card_types": ["permanent"], "battlefield_count_required_colors": ["G"]},
+            ),
+            (
+                "Matca Rioters",
+                ["SimpleStaticAbility"],
+                "Domain - Matca Rioters's power and toughness are each equal to the number of basic land types among lands you control.",
+                "Effect effect = new SetBasePowerToughnessSourceEffect(DomainValue.REGULAR);",
+                {
+                    "static_power_toughness_source": "domain_basic_land_types",
+                    "stat_modifier_amount_source": "domain_basic_land_types",
+                    "static_power_toughness_count_multiplier": 1,
+                },
+            ),
+            (
+                "Territorial Maro",
+                ["SimpleStaticAbility"],
+                "Domain - Territorial Maro's power and toughness are each equal to twice the number of basic land types among lands you control.",
+                "DynamicValue xValue = new MultipliedValue(DomainValue.REGULAR, 2);"
+                "this.addAbility(new SimpleStaticAbility(Zone.ALL, new SetBasePowerToughnessSourceEffect(xValue)));",
+                {
+                    "static_power_toughness_source": "domain_basic_land_types",
+                    "stat_modifier_amount_source": "domain_basic_land_types",
+                    "static_power_toughness_count_multiplier": 2,
+                },
+            ),
+            (
+                "Keldon Warlord",
+                ["SimpleStaticAbility"],
+                "Keldon Warlord's power and toughness are each equal to the number of non-Wall creatures you control.",
+                "filter.add(Predicates.not(SubType.WALL.getPredicate()));"
+                "this.addAbility(new SimpleStaticAbility(Zone.ALL, "
+                "new SetBasePowerToughnessSourceEffect(new PermanentsOnBattlefieldCount(filter))));",
+                {"battlefield_count_card_types": ["creature"], "battlefield_count_excluded_subtypes": ["wall"]},
+            ),
+            (
+                "Regal Bunnicorn",
+                ["SimpleStaticAbility"],
+                "Regal Bunnicorn's power and toughness are each equal to the number of nonland permanents you control.",
+                "filter.add(Predicates.not(CardType.LAND.getPredicate()));"
+                "DynamicValue starValue = new PermanentsOnBattlefieldCount(filter);"
+                "this.addAbility(new SimpleStaticAbility(Zone.ALL, new SetBasePowerToughnessSourceEffect(starValue)));",
+                {"battlefield_count_card_types": ["permanent"], "battlefield_count_excluded_card_types": ["land"]},
+            ),
+            (
+                "Maraxus of Keld",
+                ["SimpleStaticAbility"],
+                "Maraxus's power and toughness are each equal to the number of untapped artifacts, creatures, and lands you control.",
+                "filter.add(TappedPredicate.UNTAPPED);"
+                "filter.add(Predicates.or(CardType.ARTIFACT.getPredicate(), CardType.CREATURE.getPredicate(), CardType.LAND.getPredicate()));"
+                "this.addAbility(new SimpleStaticAbility(Zone.ALL, "
+                "new SetBasePowerToughnessSourceEffect(new PermanentsOnBattlefieldCount(filter))));",
+                {
+                    "battlefield_count_card_types": ["artifact", "creature", "land"],
+                    "battlefield_count_tapped_state": "untapped",
+                },
+            ),
+            (
+                "Plague Rats",
+                ["SimpleStaticAbility"],
+                "Plague Rats's power and toughness are each equal to the number of creatures named Plague Rats on the battlefield.",
+                "plagueRatsFilter.add(new NamePredicate(\"Plague Rats\"));"
+                "DynamicValue amount = new PermanentsOnBattlefieldCount(plagueRatsFilter);"
+                "this.addAbility(new SimpleStaticAbility(Zone.ALL, new SetBasePowerToughnessSourceEffect(amount)));",
+                {
+                    "battlefield_count_scope": "all_battlefields",
+                    "battlefield_count_card_types": ["creature"],
+                    "battlefield_count_card_names": ["plague rats"],
+                },
+            ),
+        ]
+        for name, ability_classes, oracle, source, expected_fields in fixtures:
+            with self.subTest(name=name):
+                row = queue_row(
+                    "xmage_signature::SetBasePowerToughnessSourceEffect::SimpleStaticAbility::"
+                    "no_target_class::no_condition_class::static_ability",
+                    effect_classes=["SetBasePowerToughnessSourceEffect"],
+                    ability_kind="static",
+                    ability_classes=ability_classes,
+                    xmage_signals=["static_ability"],
+                )
+                proposal, reason = split.split_row(
+                    row,
+                    metadata(name=name, type_line="Creature - Elemental", oracle_text=oracle),
+                    source_text=source,
+                )
+
+                self.assertEqual(reason, "selected_exact_scope")
+                effect = proposal["effect_json"]
+                self.assertEqual(effect["battle_model_scope"], split.STATIC_COUNT_PT_SCOPE)
+                for field, value in expected_fields.items():
+                    self.assertEqual(effect[field], value)
+
     def test_static_count_power_toughness_blocks_extra_attack_restriction_oracle(self) -> None:
         row = queue_row(
             "xmage_signature::SetBasePowerToughnessSourceEffect::SimpleStaticAbility::"

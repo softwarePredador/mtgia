@@ -7526,6 +7526,20 @@ STATIC_COUNT_PT_BASIC_LAND_SUBTYPES = {
 STATIC_COUNT_PT_IRREGULAR_SUBTYPES = {
     "elves": "elf",
 }
+STATIC_COUNT_PT_COLOR_WORDS = {
+    "white": "W",
+    "blue": "U",
+    "black": "B",
+    "red": "R",
+    "green": "G",
+}
+STATIC_COUNT_PT_OBJECT_COLOR_SYMBOLS = {
+    "WHITE": "W",
+    "BLUE": "U",
+    "BLACK": "B",
+    "RED": "R",
+    "GREEN": "G",
+}
 
 
 def static_count_pt_subtype_token(value: str) -> str:
@@ -7576,6 +7590,68 @@ def static_count_pt_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | No
         return static_count_pt_result(
             battlefield_count_scope="controller_battlefield",
             battlefield_count_card_types=["land"],
+        )
+    domain_match = re.match(
+        r"^[a-z0-9' ,./-]+ power and toughness are each equal to "
+        r"(?P<twice>twice )?the number of basic land types among lands you control\.?$",
+        text,
+    )
+    if domain_match:
+        return static_count_pt_result(
+            static_power_toughness_source="domain_basic_land_types",
+            stat_modifier_amount_source="domain_basic_land_types",
+            static_power_toughness_count_multiplier=2 if domain_match.group("twice") else 1,
+        )
+    color_match = re.match(
+        r"^[a-z0-9' ,./-]+ power and toughness are each equal to the number of "
+        r"(?P<color>white|blue|black|red|green) permanents you control\.?$",
+        text,
+    )
+    if color_match:
+        return static_count_pt_result(
+            battlefield_count_scope="controller_battlefield",
+            battlefield_count_card_types=["permanent"],
+            battlefield_count_required_colors=[
+                STATIC_COUNT_PT_COLOR_WORDS[color_match.group("color")]
+            ],
+        )
+    if re.match(
+        r"^[a-z0-9' ,./-]+ power and toughness are each equal to the number of nonland permanents you control\.?$",
+        text,
+    ):
+        return static_count_pt_result(
+            battlefield_count_scope="controller_battlefield",
+            battlefield_count_card_types=["permanent"],
+            battlefield_count_excluded_card_types=["land"],
+        )
+    non_wall_match = re.match(
+        r"^[a-z0-9' ,./-]+ power and toughness are each equal to the number of non-wall creatures you control\.?$",
+        text,
+    )
+    if non_wall_match:
+        return static_count_pt_result(
+            battlefield_count_scope="controller_battlefield",
+            battlefield_count_card_types=["creature"],
+            battlefield_count_excluded_subtypes=["wall"],
+        )
+    if re.match(
+        r"^[a-z0-9' ,./-]+ power and toughness are each equal to the number of untapped artifacts, creatures, and lands you control\.?$",
+        text,
+    ):
+        return static_count_pt_result(
+            battlefield_count_scope="controller_battlefield",
+            battlefield_count_card_types=["artifact", "creature", "land"],
+            battlefield_count_tapped_state="untapped",
+        )
+    named_match = re.match(
+        r"^[a-z0-9' ,./-]+ power and toughness are each equal to the number of creatures named (?P<name>[a-z0-9' ,./-]+) on the battlefield\.?$",
+        text,
+    )
+    if named_match:
+        return static_count_pt_result(
+            battlefield_count_scope="all_battlefields",
+            battlefield_count_card_types=["creature"],
+            battlefield_count_card_names=[named_match.group("name").strip()],
         )
     basic_land_match = re.match(
         r"^[a-z0-9' ,./-]+ power and toughness are each equal to the number of "
@@ -7644,10 +7720,37 @@ def static_count_pt_source_subtypes(source: str) -> list[str]:
     ]
 
 
+def static_count_pt_source_color_symbols(source: str) -> list[str]:
+    return [
+        STATIC_COUNT_PT_OBJECT_COLOR_SYMBOLS[token]
+        for token in re.findall(r"ColorPredicate\s*\(\s*ObjectColor\.([A-Z]+)\s*\)", source or "")
+        if token in STATIC_COUNT_PT_OBJECT_COLOR_SYMBOLS
+    ]
+
+
 def static_count_pt_from_source(source: str) -> dict[str, Any] | str | None:
     text = source or ""
     if len(re.findall(r"new\s+SetBasePowerToughnessSourceEffect\s*\(", text)) != 1:
         return None
+    if "DomainValue.REGULAR" in text:
+        multiplier = 1
+        if re.search(
+            r"new\s+MultipliedValue\s*\(\s*DomainValue\.REGULAR\s*,\s*([0-9]+)\s*\)",
+            text,
+        ):
+            multiplier = int(
+                re.search(
+                    r"new\s+MultipliedValue\s*\(\s*DomainValue\.REGULAR\s*,\s*([0-9]+)\s*\)",
+                    text,
+                ).group(1)
+            )
+        elif "MultipliedValue" in text:
+            return "static_count_pt_source_count_not_supported"
+        return static_count_pt_result(
+            static_power_toughness_source="domain_basic_land_types",
+            stat_modifier_amount_source="domain_basic_land_types",
+            static_power_toughness_count_multiplier=multiplier,
+        )
     if "MostCardsInOpponentsHandCount" in text:
         return static_count_pt_result(
             static_power_toughness_source="opponent_max_hand_count",
@@ -7679,7 +7782,6 @@ def static_count_pt_from_source(source: str) -> dict[str, Any] | str | None:
         "MultipliedValue",
         "CardsInControllerHandCount",
         "MostCardsInOpponentsHandCount",
-        "DomainValue",
         "DevotionCount",
         "ManaSymbolsCount",
         "ColorsAmongControlledPermanentsCount",
@@ -7701,6 +7803,43 @@ def static_count_pt_from_source(source: str) -> dict[str, Any] | str | None:
         return static_count_pt_result(
             battlefield_count_scope="controller_battlefield",
             battlefield_count_card_types=["land"],
+        )
+    colors = static_count_pt_source_color_symbols(text)
+    if colors and "PermanentsOnBattlefieldCount" in text and "FilterControlledPermanent" in text:
+        return static_count_pt_result(
+            battlefield_count_scope="controller_battlefield",
+            battlefield_count_card_types=["permanent"],
+            battlefield_count_required_colors=colors,
+        )
+    if "PermanentsOnBattlefieldCount" in text and "Predicates.not(CardType.LAND.getPredicate())" in text:
+        return static_count_pt_result(
+            battlefield_count_scope="controller_battlefield",
+            battlefield_count_card_types=["permanent"],
+            battlefield_count_excluded_card_types=["land"],
+        )
+    if "PermanentsOnBattlefieldCount" in text and "Predicates.not(SubType.WALL.getPredicate())" in text:
+        return static_count_pt_result(
+            battlefield_count_scope="controller_battlefield",
+            battlefield_count_card_types=["creature"],
+            battlefield_count_excluded_subtypes=["wall"],
+        )
+    if "PermanentsOnBattlefieldCount" in text and "TappedPredicate.UNTAPPED" in text:
+        card_types = [
+            card_type.lower()
+            for card_type in re.findall(r"CardType\.([A-Z]+)\.getPredicate\s*\(\s*\)", text)
+        ]
+        if card_types:
+            return static_count_pt_result(
+                battlefield_count_scope="controller_battlefield",
+                battlefield_count_card_types=card_types,
+                battlefield_count_tapped_state="untapped",
+            )
+    name_match = re.search(r"new\s+NamePredicate\s*\(\s*\"([^\"]+)\"\s*\)", text)
+    if "PermanentsOnBattlefieldCount" in text and name_match:
+        return static_count_pt_result(
+            battlefield_count_scope="all_battlefields",
+            battlefield_count_card_types=["creature"],
+            battlefield_count_card_names=[name_match.group(1).strip().lower()],
         )
     subtypes = static_count_pt_source_subtypes(text)
     if subtypes:

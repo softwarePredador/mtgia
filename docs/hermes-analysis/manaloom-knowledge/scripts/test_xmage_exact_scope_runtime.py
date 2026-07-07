@@ -1503,6 +1503,147 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
                     )
                 )
 
+    def test_static_count_power_toughness_counts_filtered_battlefield_sources(self) -> None:
+        fixtures = [
+            (
+                "Drove of Elves",
+                {
+                    "static_power_toughness_source": "battlefield_permanent_count",
+                    "stat_modifier_amount_source": "battlefield_permanent_count",
+                    "battlefield_count_scope": "controller_battlefield",
+                    "battlefield_count_card_types": ["permanent"],
+                    "battlefield_count_required_colors": ["G"],
+                    "colors": ["G"],
+                    "mana_cost": "{3}{G}",
+                },
+                [
+                    {"name": "Green Artifact", "type_line": "Artifact", "colors": ["G"], "mana_cost": "{G}"},
+                    {"name": "Blue Artifact", "type_line": "Artifact", "colors": ["U"], "mana_cost": "{U}"},
+                ],
+                [],
+                2,
+            ),
+            (
+                "Matca Rioters",
+                {
+                    "static_power_toughness_source": "domain_basic_land_types",
+                    "stat_modifier_amount_source": "domain_basic_land_types",
+                },
+                [
+                    {"name": "Plains", "type_line": "Basic Land - Plains", "subtypes": ["Plains"]},
+                    {"name": "Island", "type_line": "Basic Land - Island", "subtypes": ["Island"]},
+                    {"name": "Swamp", "type_line": "Basic Land - Swamp", "subtypes": ["Swamp"]},
+                ],
+                [],
+                3,
+            ),
+            (
+                "Keldon Warlord",
+                {
+                    "static_power_toughness_source": "battlefield_permanent_count",
+                    "stat_modifier_amount_source": "battlefield_permanent_count",
+                    "battlefield_count_scope": "controller_battlefield",
+                    "battlefield_count_card_types": ["creature"],
+                    "battlefield_count_excluded_subtypes": ["wall"],
+                },
+                [
+                    {"name": "Soldier", "type_line": "Creature - Soldier"},
+                    {"name": "Wall", "type_line": "Creature - Wall"},
+                ],
+                [],
+                2,
+            ),
+            (
+                "Regal Bunnicorn",
+                {
+                    "static_power_toughness_source": "battlefield_permanent_count",
+                    "stat_modifier_amount_source": "battlefield_permanent_count",
+                    "battlefield_count_scope": "controller_battlefield",
+                    "battlefield_count_card_types": ["permanent"],
+                    "battlefield_count_excluded_card_types": ["land"],
+                },
+                [
+                    {"name": "Artifact", "type_line": "Artifact"},
+                    {"name": "Forest", "type_line": "Basic Land - Forest"},
+                ],
+                [],
+                2,
+            ),
+            (
+                "Maraxus of Keld",
+                {
+                    "static_power_toughness_source": "battlefield_permanent_count",
+                    "stat_modifier_amount_source": "battlefield_permanent_count",
+                    "battlefield_count_scope": "controller_battlefield",
+                    "battlefield_count_card_types": ["artifact", "creature", "land"],
+                    "battlefield_count_tapped_state": "untapped",
+                    "tapped": False,
+                },
+                [
+                    {"name": "Untapped Artifact", "type_line": "Artifact", "tapped": False},
+                    {"name": "Tapped Creature", "type_line": "Creature - Soldier", "tapped": True},
+                    {"name": "Untapped Land", "type_line": "Land", "tapped": False},
+                ],
+                [],
+                3,
+            ),
+            (
+                "Plague Rats",
+                {
+                    "static_power_toughness_source": "battlefield_permanent_count",
+                    "stat_modifier_amount_source": "battlefield_permanent_count",
+                    "battlefield_count_scope": "all_battlefields",
+                    "battlefield_count_card_types": ["creature"],
+                    "battlefield_count_card_names": ["plague rats"],
+                },
+                [
+                    {"name": "Plague Rats", "type_line": "Creature - Rat"},
+                    {"name": "Other Rats", "type_line": "Creature - Rat"},
+                ],
+                [{"name": "Plague Rats", "type_line": "Creature - Rat"}],
+                3,
+            ),
+        ]
+        for name, fields, controller_battlefield, opponent_battlefield, expected in fixtures:
+            with self.subTest(name=name):
+                active = self.battle.Player("Active", None, [])
+                opponent = self.battle.Player("Opponent", None, [])
+                permanent = {
+                    "name": name,
+                    "type_line": "Creature - Elemental",
+                    "effect": "creature",
+                    "power": 0,
+                    "toughness": 0,
+                    "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+                    "static_effect": "source_power_toughness_equal_count",
+                    "static_power_toughness_base": 0,
+                    "static_power_toughness_count_multiplier": 1,
+                    **fields,
+                }
+                active.battlefield = [dict(card) for card in controller_battlefield] + [permanent]
+                opponent.battlefield = [dict(card) for card in opponent_battlefield]
+                self.events.clear()
+
+                self.battle.refresh_graveyard_count_creature_statics_for_player(
+                    active,
+                    turn=5,
+                    phase="test",
+                    emit_events=True,
+                    all_players=[active, opponent],
+                )
+
+                self.assertEqual(permanent["static_count_power_toughness_current"], expected)
+                self.assertEqual(permanent["power"], expected)
+                self.assertEqual(permanent["toughness"], expected)
+                self.assertTrue(
+                    any(
+                        event == "static_count_power_toughness_changed"
+                        and data.get("card") == name
+                        and data.get("static_count_power_toughness_count") == expected
+                        for event, data in self.events
+                    )
+                )
+
     def test_static_graveyard_threshold_source_boost_toggles_without_cumulative_bonus(self) -> None:
         active = self.battle.Player("Active", None, [])
         active.graveyard = [

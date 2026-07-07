@@ -17252,6 +17252,79 @@ filters, source-exclusion formulas, or cards whose Oracle text contains
 additional unsupported static restrictions. Those remain separate adapter
 contracts.
 
+## PG601 Static Filtered Count Power/Toughness Checkpoint
+
+As of 2026-07-07, PG601 is applied and synced against the new server target.
+It extends the PG599/PG600 static count P/T runtime to exact filtered
+battlefield counts and domain formulas.
+
+Closed cards:
+
+- `Drove of Elves`
+- `Faerie Swarm`
+- `Horde of Boggarts`
+- `Keldon Warlord`
+- `Kithkin Rabble`
+- `Maraxus of Keld`
+- `Matca Rioters`
+- `Plague Rats`
+- `Regal Bunnicorn`
+- `Territorial Maro`
+
+Runtime/modeling change:
+
+- `xmage_authoritative_exact_scope_split.py` now accepts exact
+  `SetBasePowerToughnessSourceEffect` matches for required permanent colors,
+  excluded card types, excluded subtypes, card-name battlefield counts, tapped
+  state filters, and `DomainValue.REGULAR` with optional multiplier;
+- `battle_analyst_v9.py` now applies those filters through the static count
+  P/T path, including color, nonland, non-Wall, named-card, untapped, and
+  domain-backed counts;
+- `xmage_batch_pg_package_builder.py` now emits focused execution scenarios for
+  those filtered count sources.
+
+Validation:
+
+- split produced `proposal_count=10` and `safe_for_batch_pg_package_count=10`;
+- precheck found `10/10` target rows, `0` existing expected executable rows,
+  and `0` shadow rows to deprecate;
+- apply upserted `10` PostgreSQL rows and deprecated `0` shadow rows;
+- postcheck confirmed `10/10` promoted rows, `10/10` `verified_auto` rows,
+  and `10/10` rows with `oracle_hash`;
+- focused tests passed: splitter `6` static-count tests and exact runtime `3`
+  static-count tests, plus Python compilation for the touched
+  splitter/runtime/package/E2E scripts;
+- initial PG -> SQLite/snapshot sync loaded `9398` PostgreSQL rows, updated
+  `9162` SQLite rows, and exported `6841` canonical snapshot rows;
+- metadata sync used `database_target=127.0.0.1:15432/halder`, matched `7809`
+  PostgreSQL cards, and left `deck_cards` at `2699/2699` matched;
+- E2E validation passed PostgreSQL, SQLite, snapshot, runtime lookup, and `10`
+  battle execution scenarios/events;
+- post-sync queue rebuild reduced `target_identity_count` from `25153` to
+  `25143`, `xmage_authoritative_source_count` from `24839` to `24829`, and
+  `xmage_authoritative_adapter_required_count` from `24839` to `24829`;
+- final exact-scope recheck returned `proposal_count=0`, and
+  `static_graveyard_count_pt_oracle_not_exact` fell from `18` to `8`;
+- a PG601 integrity backfill populated `oracle_hash` for `44` previously
+  promoted executable curated rows that already matched `cards.oracle_text`,
+  leaving `remaining_pg_missing_oracle_hash_rows=0` with `44` backup rows;
+- final PG -> SQLite/snapshot sync after the hash backfill loaded `9398`
+  PostgreSQL rows, updated `9162` SQLite rows, and exported `6841` canonical
+  snapshot rows;
+- final E2E validation after the hash backfill passed PostgreSQL, SQLite,
+  snapshot, runtime lookup, and `10` battle execution scenarios/events;
+- final PG/Hermes/SQLite contract audit passed `51/51`;
+- final XMage strategy audit passed `26/26`;
+- final operational surface alignment audit passed;
+- final legacy contamination audit passed;
+- `scripts/quality_gate.sh server-target` passed against the new-server target.
+
+Residual boundary: PG601 does not authorize additive battlefield+graveyard
+formulas, total mana value, differently named land counts, base-plus-subtype
+formulas, chroma/devotion or mana-symbol counts, source-exclusion formulas, or
+cards whose Oracle text contains additional unsupported static restrictions.
+Those remain separate adapter contracts.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

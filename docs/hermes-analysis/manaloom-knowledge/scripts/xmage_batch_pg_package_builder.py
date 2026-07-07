@@ -289,6 +289,10 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "battlefield_count_scope",
     "battlefield_count_card_types",
     "battlefield_count_subtypes",
+    "battlefield_count_required_colors",
+    "battlefield_count_excluded_card_types",
+    "battlefield_count_excluded_subtypes",
+    "battlefield_count_card_names",
     "battlefield_count_keywords",
     "battlefield_count_combat_state",
     "battlefield_count_tapped_state",
@@ -1093,6 +1097,15 @@ def static_count_pt_execution_scenario_from_expected_rule(rule: dict[str, Any]) 
     scope = str(required.get("battlefield_count_scope") or "controller_battlefield")
     card_types = [str(value).lower() for value in required.get("battlefield_count_card_types") or []]
     subtypes = [str(value).lower() for value in required.get("battlefield_count_subtypes") or []]
+    required_colors = [str(value).upper() for value in required.get("battlefield_count_required_colors") or []]
+    excluded_card_types = [
+        str(value).lower() for value in required.get("battlefield_count_excluded_card_types") or []
+    ]
+    excluded_subtypes = [
+        str(value).lower() for value in required.get("battlefield_count_excluded_subtypes") or []
+    ]
+    card_names = [str(value) for value in required.get("battlefield_count_card_names") or []]
+    tapped_state = str(required.get("battlefield_count_tapped_state") or "").lower()
     source_type_line = "Creature - Avatar"
     matching_type_line = "Creature - Soldier"
     if "land" in card_types:
@@ -1113,6 +1126,11 @@ def static_count_pt_execution_scenario_from_expected_rule(rule: dict[str, Any]) 
         "power": 0,
         "toughness": 0,
     }
+    if required_colors:
+        source_card["colors"] = [required_colors[0]]
+        source_card["mana_cost"] = f"{{{required_colors[0]}}}"
+    if tapped_state == "untapped":
+        source_card["tapped"] = False
     controller_battlefield = []
     opponent_battlefield = []
     controller_hand = []
@@ -1139,8 +1157,68 @@ def static_count_pt_execution_scenario_from_expected_rule(rule: dict[str, Any]) 
             for index in range(3)
         ]
         expected_count = len(controller_hand) + len(opponent_hand)
+    elif amount_source == "domain_basic_land_types":
+        controller_battlefield = [
+            {"name": subtype, "type_line": f"Basic Land - {subtype}", "subtypes": [subtype]}
+            for subtype in ("Plains", "Island", "Swamp", "Mountain")
+        ]
+        expected_count = len(controller_battlefield)
     elif amount_source != "battlefield_permanent_count":
         return None
+    elif card_names:
+        matching_name = card_names[0]
+        source_card["type_line"] = "Creature - Rat"
+        controller_battlefield.extend(
+            [
+                {"name": matching_name.title(), "type_line": "Creature - Rat"},
+                {"name": "E2E Nonmatching Rat", "type_line": "Creature - Rat"},
+            ]
+        )
+        expected_count = 2
+    elif required_colors:
+        color = required_colors[0]
+        controller_battlefield.extend(
+            [
+                {
+                    "name": f"E2E Matching {color} Permanent",
+                    "type_line": "Artifact",
+                    "colors": [color],
+                    "mana_cost": f"{{{color}}}",
+                },
+                {
+                    "name": "E2E Off Color Permanent",
+                    "type_line": "Artifact",
+                    "colors": ["U" if color != "U" else "R"],
+                    "mana_cost": "{U}" if color != "U" else "{R}",
+                },
+            ]
+        )
+        expected_count = 2
+    elif excluded_card_types:
+        controller_battlefield.extend(
+            [
+                {"name": "E2E Matching Artifact", "type_line": "Artifact"},
+                {"name": "E2E Excluded Land", "type_line": "Land"},
+            ]
+        )
+        expected_count = 2
+    elif excluded_subtypes:
+        controller_battlefield.extend(
+            [
+                {"name": "E2E Matching Creature", "type_line": "Creature - Soldier"},
+                {"name": "E2E Excluded Wall", "type_line": "Creature - Wall"},
+            ]
+        )
+        expected_count = 2
+    elif tapped_state == "untapped":
+        controller_battlefield.extend(
+            [
+                {"name": "E2E Untapped Artifact", "type_line": "Artifact", "tapped": False},
+                {"name": "E2E Untapped Land", "type_line": "Land", "tapped": False},
+                {"name": "E2E Tapped Creature", "type_line": "Creature - Soldier", "tapped": True},
+            ]
+        )
+        expected_count = 3
     elif scope == "all_battlefields":
         controller_battlefield.append(
             {

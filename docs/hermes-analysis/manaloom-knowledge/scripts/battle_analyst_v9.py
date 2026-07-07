@@ -48986,12 +48986,46 @@ def _battlefield_count_card_matches(card, effect_data):
     ]
     if allowed_types and "permanent" not in allowed_types and not _card_type_matches(card, allowed_types):
         return False
+    excluded_types = [
+        str(value).strip().lower()
+        for value in _as_list(effect_data.get("battlefield_count_excluded_card_types"))
+        if str(value).strip()
+    ]
+    if excluded_types and _card_type_matches(card, excluded_types):
+        return False
     allowed_subtypes = [
         str(value).strip().lower()
         for value in _as_list(effect_data.get("battlefield_count_subtypes"))
         if str(value).strip()
     ]
     if allowed_subtypes and not any(permanent_has_subtype(card, subtype) for subtype in allowed_subtypes):
+        return False
+    excluded_subtypes = [
+        str(value).strip().lower()
+        for value in _as_list(effect_data.get("battlefield_count_excluded_subtypes"))
+        if str(value).strip()
+    ]
+    if excluded_subtypes and any(permanent_has_subtype(card, subtype) for subtype in excluded_subtypes):
+        return False
+    allowed_names = {
+        re.sub(r"[^a-z0-9]+", " ", str(value).lower()).strip()
+        for value in _as_list(effect_data.get("battlefield_count_card_names"))
+        if str(value).strip()
+    }
+    if allowed_names:
+        card_name = re.sub(
+            r"[^a-z0-9]+",
+            " ",
+            str(card.get("name") or card.get("card_name") or "").lower(),
+        ).strip()
+        if card_name not in allowed_names:
+            return False
+    required_colors = [
+        str(value).strip()
+        for value in _as_list(effect_data.get("battlefield_count_required_colors"))
+        if str(value).strip()
+    ]
+    if required_colors and not any(card_has_color(card, color) for color in required_colors):
         return False
     allowed_keywords = [
         str(value).strip().lower().replace(" ", "_")
@@ -49012,7 +49046,16 @@ def _battlefield_count_card_matches(card, effect_data):
         return False
     if tapped_state == "untapped" and bool(card.get("tapped")):
         return False
-    return bool(allowed_types or allowed_subtypes or allowed_keywords)
+    return bool(
+        allowed_types
+        or excluded_types
+        or allowed_subtypes
+        or excluded_subtypes
+        or allowed_names
+        or required_colors
+        or allowed_keywords
+        or tapped_state
+    )
 
 
 def _battlefield_count_for_stat_modifier(player, opponents, effect_data):
