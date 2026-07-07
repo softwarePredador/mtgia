@@ -10804,6 +10804,51 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["activation_cost_mana"], "{0}")
         self.assertTrue(effect["activation_requires_tap"])
 
+    def test_permanent_activated_damage_maps_tap_target_artifact_cost(self) -> None:
+        row = queue_row(
+            split.DAMAGE_UNIT,
+            effect_classes=["DamageTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Ghirapur Aether Grid",
+                type_line="Enchantment",
+                oracle_text="Tap two untapped artifacts you control: Ghirapur Aether Grid deals 1 damage to any target.",
+            ),
+            source_text="""
+                private static final FilterControlledPermanent filter = new FilterControlledPermanent("untapped artifacts you control");
+                static {
+                    filter.add(CardType.ARTIFACT.getPredicate());
+                    filter.add(TappedPredicate.UNTAPPED);
+                }
+                SimpleActivatedAbility ability = new SimpleActivatedAbility(
+                    new DamageTargetEffect(1),
+                    new TapTargetCost(new TargetControlledPermanent(2, 2, filter, true)));
+                ability.addTarget(new TargetAnyTarget());
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_DAMAGE_SCOPE)
+        self.assertEqual(effect["activated_damage_amount"], 1)
+        self.assertFalse(effect["activation_requires_tap"])
+        self.assertTrue(effect["activation_requires_tap_target"])
+        self.assertEqual(
+            effect["activation_tap_cost"],
+            {
+                "count": 2,
+                "target_controller": "self",
+                "constraints": {"card_types": ["artifact"], "tapped_state": "untapped"},
+            },
+        )
+        self.assertEqual(effect["_activated_rule_effects"][0]["activation_tap_cost"], effect["activation_tap_cost"])
+
     def test_permanent_activated_damage_blocks_dynamic_amount(self) -> None:
         row = queue_row(
             split.DAMAGE_UNIT,
@@ -11789,6 +11834,57 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(
             effect["_activated_rule_effects"][0]["activation_sacrifice_cost"],
             effect["activation_sacrifice_cost"],
+        )
+
+    def test_permanent_activated_destroy_maps_tap_target_white_creature_cost(self) -> None:
+        row = queue_row(
+            split.DESTROY_UNIT,
+            effect_classes=["DestroyTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Hand of Justice",
+                type_line="Creature - Avatar",
+                oracle_text="{T}, Tap three untapped white creatures you control: Destroy target creature.",
+            ),
+            source_text="""
+                private static final FilterControlledPermanent filter = new FilterControlledCreaturePermanent("untapped white creatures you control");
+                static {
+                    filter.add(new ColorPredicate(ObjectColor.WHITE));
+                    filter.add(TappedPredicate.UNTAPPED);
+                }
+                Ability ability = new SimpleActivatedAbility(new DestroyTargetEffect(), new TapSourceCost());
+                ability.addCost(new TapTargetCost(3, filter));
+                ability.addTarget(new TargetCreaturePermanent());
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_DESTROY_SCOPE)
+        self.assertEqual(effect["activated_remove_target"], "creature")
+        self.assertTrue(effect["activation_requires_tap"])
+        self.assertTrue(effect["activation_requires_tap_target"])
+        self.assertEqual(
+            effect["activation_tap_cost"],
+            {
+                "count": 3,
+                "target_controller": "self",
+                "constraints": {
+                    "card_types": ["creature"],
+                    "target_colors": ["W"],
+                    "tapped_state": "untapped",
+                },
+            },
+        )
+        self.assertEqual(
+            effect["_activated_rule_effects"][0]["activation_tap_cost"],
+            effect["activation_tap_cost"],
         )
 
     def test_permanent_activated_destroy_blocks_extra_oracle_clause(self) -> None:

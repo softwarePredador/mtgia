@@ -14486,6 +14486,36 @@ def normalized_activation_sacrifice_cost(cost: dict[str, Any] | None) -> dict[st
     }
 
 
+def normalized_activation_tap_cost(cost: dict[str, Any] | None) -> dict[str, Any] | None:
+    if not isinstance(cost, dict):
+        return None
+    constraints = dict(cost.get("constraints") or {})
+    for key in ("card_types", "exclude_card_types", "target_subtypes", "required_subtypes"):
+        if key in constraints:
+            constraints[key] = sorted(
+                {
+                    str(value or "").strip().lower()
+                    for value in as_list(constraints.get(key))
+                    if str(value or "").strip()
+                }
+            )
+    if "target_colors" in constraints:
+        constraints["target_colors"] = sorted(
+            {
+                str(value or "").strip().upper()
+                for value in as_list(constraints.get("target_colors"))
+                if str(value or "").strip()
+            }
+        )
+    if "tapped_state" in constraints:
+        constraints["tapped_state"] = str(constraints.get("tapped_state") or "").strip().lower()
+    return {
+        "count": int(cost.get("count") or 1),
+        "target_controller": str(cost.get("target_controller") or "self"),
+        "constraints": constraints,
+    }
+
+
 def activation_sacrifice_cost_from_phrase(phrase: str) -> dict[str, Any] | str:
     text = re.sub(r"\s+", " ", str(phrase or "").strip().lower())
     count = 1
@@ -14635,6 +14665,180 @@ def activation_sacrifice_target_from_cost(cost: dict[str, Any] | None) -> str | 
     return None
 
 
+def symbol_name_from_symbol(symbol: str) -> str:
+    return {
+        "W": "WHITE",
+        "U": "BLUE",
+        "B": "BLACK",
+        "R": "RED",
+        "G": "GREEN",
+    }.get(str(symbol or "").upper(), "")
+
+
+def activation_tap_cost_from_phrase(phrase: str) -> dict[str, Any] | str:
+    text = re.sub(r"\s+", " ", str(phrase or "").strip().lower())
+    count = 1
+    count_match = re.match(
+        r"(?P<count>an?|one|two|three|four|five|six|seven|eight|nine|ten|\d+)\s+(?P<object>.+)$",
+        text,
+    )
+    if count_match:
+        count_word = count_match.group("count")
+        count = 1 if count_word in {"a", "an"} else number_word_to_int(count_word)
+        text = count_match.group("object").strip()
+    if count <= 0 or not text.startswith("untapped "):
+        return "activation_tap_cost_not_supported"
+    text = text[len("untapped ") :].strip()
+    text = re.sub(r"\s+you control$", "", text).strip()
+    words = text.split()
+    target_colors = []
+    while words and words[0] in TOKEN_COLOR_WORDS:
+        target_colors.append(TOKEN_COLOR_WORDS[words.pop(0)])
+    object_text = " ".join(words).strip()
+    constraints: dict[str, Any] = {"tapped_state": "untapped"}
+    if target_colors:
+        constraints["target_colors"] = target_colors
+    if object_text in {"creature", "creatures"}:
+        constraints["card_types"] = ["creature"]
+    elif object_text in {"artifact", "artifacts"}:
+        constraints["card_types"] = ["artifact"]
+    elif object_text in {"permanent", "permanents"}:
+        constraints["card_types"] = ["permanent"]
+    elif object_text in {"soldier", "soldiers"}:
+        constraints["card_types"] = ["creature"]
+        constraints["required_subtypes"] = ["soldier"]
+    else:
+        return "activation_tap_cost_not_supported"
+    return normalized_activation_tap_cost(
+        {"count": count, "target_controller": "self", "constraints": constraints}
+    )
+
+
+def activation_tap_cost_from_oracle(text: str) -> dict[str, Any] | str | None:
+    cost_text = str(text or "").lower().rsplit(":", 1)[0]
+    matches = list(
+        re.finditer(
+            r"(?:^|,\s*)tap\s+(?P<object>(?:an?|one|two|three|four|five|six|seven|eight|nine|ten|\d+)\s+[^,]+?)(?:,|$)",
+            cost_text,
+        )
+    )
+    if not matches:
+        return None
+    if len(matches) != 1:
+        return "activation_tap_cost_not_supported"
+    return activation_tap_cost_from_phrase(matches[0].group("object"))
+
+
+def source_filter_window(text: str, filter_name: str) -> str:
+    name = str(filter_name or "").strip()
+    if not re.match(r"^[A-Za-z_][A-Za-z0-9_]*$", name):
+        return ""
+    pattern = (
+        r"(?:private\s+static\s+final\s+)?"
+        r"(?:Filter\w+|FilterControlledPermanent|FilterPermanent|FilterCreaturePermanent|FilterControlledCreaturePermanent)"
+        rf"\s+{re.escape(name)}\s*=.*?;"
+    )
+    match = re.search(pattern, text or "", re.S)
+    if not match:
+        return ""
+    return (text or "")[match.start() : match.start() + 1400]
+
+
+def source_effect_target_window(text: str, effect_index: int) -> str:
+    source = text or ""
+    search_area = source[max(0, effect_index) :]
+    add_target_match = re.search(r"\.addTarget\s*\(", search_area)
+    if add_target_match:
+        target_window = search_area[add_target_match.start() : add_target_match.start() + 1400]
+    else:
+        target_window = search_area[:1400]
+    filter_refs = re.findall(r"\b(?:TargetPermanent|TargetCreaturePermanent|TargetArtifactPermanent)\s*\(\s*([A-Za-z_][A-Za-z0-9_]*)\s*\)", target_window)
+    for filter_name in filter_refs:
+        filter_window = source_filter_window(source, filter_name)
+        if not filter_window:
+            filter_window = source[max(0, effect_index - 900) : max(0, effect_index)]
+        target_window += "\n" + filter_window
+    return target_window
+
+
+def activation_tap_cost_source_constraints(search_text: str) -> dict[str, Any] | None:
+    text = search_text or ""
+    constraints: dict[str, Any] = {"tapped_state": "untapped"}
+    if (
+        "FILTER_CONTROLLED_UNTAPPED_PERMANENT" in text
+        or re.search(r"\buntapped permanents?\b", text, re.I)
+    ):
+        constraints["card_types"] = ["permanent"]
+    if (
+        "FILTER_CONTROLLED_UNTAPPED_CREATURE" in text
+        or "FilterControlledCreaturePermanent" in text
+        or re.search(r"\buntapped creatures?\b", text, re.I)
+    ):
+        constraints["card_types"] = ["creature"]
+    if "SubType.SOLDIER" in text or re.search(r"\buntapped soldiers?\b", text, re.I):
+        constraints["card_types"] = ["creature"]
+        constraints["required_subtypes"] = ["soldier"]
+    if "CardType.ARTIFACT" in text or re.search(r"\buntapped artifacts?\b", text, re.I):
+        constraints["card_types"] = ["artifact"]
+    color_matches = [
+        symbol
+        for color_word, symbol in TOKEN_COLOR_WORDS.items()
+        if (
+            re.search(rf"\buntapped\s+{re.escape(color_word)}\s+creatures?\b", text, re.I)
+            or f"ObjectColor.{symbol_name_from_symbol(symbol)}" in text
+        )
+    ]
+    if color_matches:
+        constraints["target_colors"] = sorted(set(color_matches))
+        constraints.setdefault("card_types", ["creature"])
+    if "card_types" not in constraints and "required_subtypes" not in constraints:
+        return None
+    return constraints
+
+
+def activation_tap_cost_from_source(text: str, window: str) -> dict[str, Any] | str | None:
+    if "TapTargetCost" not in (window or ""):
+        return None
+    if len(re.findall(r"new\s+TapTargetCost\s*\(", window or "")) != 1:
+        return "activation_tap_source_cost_not_supported"
+    tap_args_text = extract_constructor_args(window or "", "TapTargetCost")
+    if tap_args_text is None:
+        return "activation_tap_source_cost_not_supported"
+    tap_args = split_top_level_args(tap_args_text)
+    count = 1
+    filter_arg = ""
+    if len(tap_args) >= 2 and re.fullmatch(r"\d+", tap_args[0].strip()):
+        count = int(tap_args[0].strip())
+        filter_arg = tap_args[1].strip()
+    elif len(tap_args) == 1 and tap_args[0].strip().startswith("new TargetControlledPermanent"):
+        target_args_text = extract_constructor_args(tap_args[0], "TargetControlledPermanent")
+        target_args = split_top_level_args(target_args_text or "")
+        if target_args and re.fullmatch(r"\d+", target_args[0].strip()):
+            count = int(target_args[0].strip())
+            filter_arg = (
+                target_args[2].strip()
+                if len(target_args) >= 3
+                else (target_args[1].strip() if len(target_args) >= 2 else "")
+            )
+        elif target_args:
+            filter_arg = target_args[0].strip()
+    elif len(tap_args) == 1:
+        filter_arg = tap_args[0].strip()
+    else:
+        return "activation_tap_source_cost_not_supported"
+    if count <= 0:
+        return "activation_tap_source_cost_not_supported"
+    search_text = filter_arg
+    if re.match(r"^[A-Za-z_][A-Za-z0-9_]*$", filter_arg):
+        search_text = f"{filter_arg}\n{source_filter_window(text, filter_arg)}"
+    constraints = activation_tap_cost_source_constraints(search_text)
+    if constraints is None:
+        return "activation_tap_source_cost_not_supported"
+    return normalized_activation_tap_cost(
+        {"count": count, "target_controller": "self", "constraints": constraints}
+    )
+
+
 def activation_discard_cost_from_oracle(text: str) -> dict[str, Any] | None:
     cost_text = str(text or "").lower().rsplit(":", 1)[0]
     random_count_match = re.search(r"(?:^|,)\s*discard (?P<count>two|three|\d+) cards at random\s*$", cost_text)
@@ -14738,6 +14942,9 @@ def activated_damage_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | N
     life_cost = activation_life_cost_from_oracle(text)
     if life_cost is None:
         return None
+    tap_cost = activation_tap_cost_from_oracle(text)
+    if isinstance(tap_cost, str):
+        return None
     effect_text = text.rsplit(":", 1)[1].strip()
     restricted = restricted_battlefield_target_from_oracle({"oracle_text": effect_text}, "damage")
     if restricted is not None:
@@ -14754,6 +14961,7 @@ def activated_damage_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | N
             "amount": int(match.group(1)),
             "target": restricted,
             "activation_sacrifice_cost": sacrifice_cost,
+            "activation_tap_cost": tap_cost,
             "activation_life_cost": life_cost,
             **(discard_cost or {}),
         }
@@ -14780,6 +14988,7 @@ def activated_damage_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | N
         "amount": int(match.group(1)),
         "target": target_map[match.group(2)],
         "activation_sacrifice_cost": sacrifice_cost,
+        "activation_tap_cost": tap_cost,
         "activation_life_cost": life_cost,
         **(discard_cost or {}),
     }
@@ -14795,7 +15004,6 @@ def activated_damage_from_source(source: str) -> dict[str, Any] | str:
         "RemoveCounterCost",
         "ReturnToHandSourceCost",
         "RevealTargetFromHandCost",
-        "TapTargetCost",
     }
     if "Zone.GRAVEYARD" in text:
         return "activated_damage_source_not_battlefield"
@@ -14805,26 +15013,27 @@ def activated_damage_from_source(source: str) -> dict[str, Any] | str:
     count = int(damage_matches[0] or "0")
     if count <= 0:
         return "activated_damage_source_count_not_fixed"
-    restricted = restricted_battlefield_target_from_source(text)
+    damage_index = text.find("DamageTargetEffect")
+    target_text = source_effect_target_window(text, damage_index)
+    restricted = restricted_battlefield_target_from_source(target_text)
     if restricted is not None:
         target = restricted
-    elif "new TargetAnyTarget(" in text:
+    elif "new TargetAnyTarget(" in target_text:
         target = "any_target"
-    elif "new TargetPlayerOrPlaneswalker(" in text:
+    elif "new TargetPlayerOrPlaneswalker(" in target_text:
         target = "player_or_planeswalker"
-    elif "new TargetOpponentOrPlaneswalker(" in text:
+    elif "new TargetOpponentOrPlaneswalker(" in target_text:
         target = "opponent_or_planeswalker"
-    elif "new TargetCreatureOrPlaneswalker(" in text:
+    elif "new TargetCreatureOrPlaneswalker(" in target_text:
         target = "creature_or_planeswalker"
-    elif "new TargetOpponent(" in text:
+    elif "new TargetOpponent(" in target_text:
         target = "opponent"
-    elif "new TargetPlayer(" in text:
+    elif "new TargetPlayer(" in target_text:
         target = "player"
-    elif "new TargetCreaturePermanent(" in text:
+    elif "new TargetCreaturePermanent(" in target_text:
         target = "creature"
     else:
         return "activated_damage_source_target_not_supported"
-    damage_index = text.find("DamageTargetEffect")
     window = text[max(0, damage_index - 300) : damage_index + 1600]
     if "SimpleActivatedAbility" not in window:
         return "activated_damage_source_not_simple_activated"
@@ -14843,6 +15052,9 @@ def activated_damage_from_source(source: str) -> dict[str, Any] | str:
     sacrifice_cost = activation_sacrifice_cost_from_source(text, window)
     if isinstance(sacrifice_cost, str):
         return sacrifice_cost
+    tap_cost = activation_tap_cost_from_source(text, window)
+    if isinstance(tap_cost, str):
+        return tap_cost.replace("activation_tap", "activated_damage")
     cost_text = "{0}"
     mana_match = re.search(r'ManaCostsImpl<[^>]*>\s*\(\s*"([^"]+)"\s*\)', window)
     generic_match = re.search(r"GenericManaCost\s*\(\s*(\d+)\s*\)", window)
@@ -14869,6 +15081,8 @@ def activated_damage_from_source(source: str) -> dict[str, Any] | str:
         "activation_requires_tap": requires_tap,
         "activation_requires_sacrifice": requires_sacrifice,
         "activation_sacrifice_cost": sacrifice_cost,
+        "activation_tap_cost": tap_cost,
+        **({"activation_requires_tap_target": True} if tap_cost is not None else {}),
         "activation_life_cost": activation_life_cost,
         **(discard_cost or {}),
     }
@@ -14881,6 +15095,9 @@ def activated_destroy_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | 
     discard_cost = activation_discard_cost_from_oracle(text)
     sacrifice_cost = activation_sacrifice_cost_from_oracle(text)
     if isinstance(sacrifice_cost, str):
+        return None
+    tap_cost = activation_tap_cost_from_oracle(text)
+    if isinstance(tap_cost, str):
         return None
     effect_text = text.rsplit(":", 1)[1].strip()
     extra_sentences = [
@@ -14900,6 +15117,7 @@ def activated_destroy_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | 
         "effect": effect,
         "target": target_type,
         "activation_sacrifice_cost": sacrifice_cost,
+        "activation_tap_cost": tap_cost,
         **(discard_cost or {}),
     }
 
@@ -14923,12 +15141,12 @@ def activated_destroy_sacrifice_target_from_oracle(metadata: dict[str, Any]) -> 
 def activated_destroy_target_from_source(text: str) -> str | None:
     if "TargetPointer" in text or ".setTargetPointer" in text or "EachTargetPointer" in text:
         return None
-    target_classes = re.findall(r"new\s+(Target\w+)\s*\(", text)
-    if len(target_classes) != 1:
-        return None
     restricted = restricted_battlefield_target_from_source(text)
     if restricted is not None:
         return restricted
+    target_classes = list(dict.fromkeys(re.findall(r"new\s+(Target\w+)\s*\(", text)))
+    if len(target_classes) != 1:
+        return None
     target_patterns = [
         (
             "artifact_or_enchantment",
@@ -14986,7 +15204,6 @@ def activated_destroy_from_source(source: str) -> dict[str, Any] | str:
         "RemoveCounterCost",
         "ReturnToHandSourceCost",
         "RevealTargetFromHandCost",
-        "TapTargetCost",
     }
     if "Zone.GRAVEYARD" in text:
         return "activated_destroy_source_not_battlefield"
@@ -15011,7 +15228,11 @@ def activated_destroy_from_source(source: str) -> dict[str, Any] | str:
         if sacrifice_cost is None:
             return "activated_destroy_source_cost_not_supported"
         sacrifice_target = activation_sacrifice_target_from_cost(sacrifice_cost)
-    target = activated_destroy_target_from_source(text)
+    tap_cost = activation_tap_cost_from_source(text, window)
+    if isinstance(tap_cost, str):
+        return tap_cost.replace("activation_tap", "activated_destroy")
+    target_text = source_effect_target_window(text, destroy_index)
+    target = activated_destroy_target_from_source(target_text)
     if target is None:
         return "activated_destroy_source_target_not_supported"
     cost_text = "{0}"
@@ -15052,6 +15273,14 @@ def activated_destroy_from_source(source: str) -> dict[str, Any] | str:
                 "activation_requires_sacrifice_target": True,
             }
             if sacrifice_target is not None
+            else {}
+        ),
+        **(
+            {
+                "activation_tap_cost": tap_cost,
+                "activation_requires_tap_target": True,
+            }
+            if tap_cost is not None
             else {}
         ),
         **(discard_cost or {}),
@@ -21998,6 +22227,14 @@ def split_row(
         )
         if source_sacrifice_cost != oracle_sacrifice_cost:
             return None, "activated_destroy_source_oracle_sacrifice_cost_mismatch"
+        oracle_tap_cost = normalized_activation_tap_cost(
+            oracle_destroy.get("activation_tap_cost")
+        )
+        source_tap_cost = normalized_activation_tap_cost(
+            parsed_activation.get("activation_tap_cost")
+        )
+        if source_tap_cost != oracle_tap_cost:
+            return None, "activated_destroy_source_oracle_tap_cost_mismatch"
         if parsed_activation.get("activation_sacrifice_target") and not source_sacrifice_cost:
             oracle_sacrifice_target = activated_destroy_sacrifice_target_from_oracle(metadata)
             if oracle_sacrifice_target != parsed_activation.get("activation_sacrifice_target"):
@@ -22048,6 +22285,8 @@ def split_row(
                     "activation_sacrifice_cost",
                     "activation_sacrifice_target",
                     "activation_requires_sacrifice_target",
+                    "activation_tap_cost",
+                    "activation_requires_tap_target",
                     "activation_discard_count",
                     "activation_discard_target",
                     "activation_requires_discard_card",
@@ -22081,6 +22320,8 @@ def split_row(
                     "activation_sacrifice_cost",
                     "activation_sacrifice_target",
                     "activation_requires_sacrifice_target",
+                    "activation_tap_cost",
+                    "activation_requires_tap_target",
                     "activation_discard_count",
                     "activation_discard_target",
                     "activation_requires_discard_card",
@@ -26259,6 +26500,14 @@ def split_row(
         )
         if source_sacrifice_cost != oracle_sacrifice_cost:
             return None, "activated_damage_source_oracle_sacrifice_cost_mismatch"
+        oracle_tap_cost = normalized_activation_tap_cost(
+            oracle_damage.get("activation_tap_cost")
+        )
+        source_tap_cost = normalized_activation_tap_cost(
+            parsed_activation.get("activation_tap_cost")
+        )
+        if source_tap_cost != oracle_tap_cost:
+            return None, "activated_damage_source_oracle_tap_cost_mismatch"
         oracle_discard_count = int(oracle_damage.get("activation_discard_count") or 0)
         source_discard_count = int(parsed_activation.get("activation_discard_count") or 0)
         if source_discard_count != oracle_discard_count:
@@ -26315,6 +26564,8 @@ def split_row(
                     "activation_cost_colors",
                     "activation_requires_tap",
                     "activation_requires_sacrifice",
+                    "activation_tap_cost",
+                    "activation_requires_tap_target",
                     "activation_discard_count",
                     "activation_discard_target",
                     "activation_requires_discard_card",

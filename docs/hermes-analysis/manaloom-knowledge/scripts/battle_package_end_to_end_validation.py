@@ -3356,6 +3356,17 @@ def run_simple_activated_damage(
     active.life = int(scenario.get("starting_life") or 40)
     opponent.life = int(scenario.get("opponent_life") or 7)
     active.battlefield = [source]
+    tap_cost_targets = [
+        battle.enrich_card(dict(item))
+        for item in (scenario.get("tap_cost_targets") or [])
+        if isinstance(item, dict)
+    ]
+    if tap_cost_targets:
+        active.battlefield.extend(tap_cost_targets)
+    target = None
+    if isinstance(scenario.get("target"), dict):
+        target = battle.enrich_card(dict(scenario["target"]))
+        opponent.battlefield = [target]
     active.hand = [dict(card) for card in scenario.get("controller_hand", [])]
     add_manifest_mana(active, scenario.get("controller_mana") or {})
     starting_life = opponent.life
@@ -3378,11 +3389,39 @@ def run_simple_activated_damage(
     )
     if not activated:
         fail("battle_execution", f"{card['name']} simple activated damage activation failed")
-    if opponent.life != starting_life - expected_damage:
+    damage_event = next(
+        (
+            data
+            for event, data in reversed(events)
+            if event == "damage_resolved"
+            and data.get("card") == card.get("name")
+            and (target is None or data.get("target") == target.get("name"))
+        ),
+        None,
+    )
+    if damage_event is None:
+        fail("battle_events", f"missing {card['name']} damage resolved event")
+    if int(damage_event.get("amount") or 0) != expected_damage:
         fail(
-            "battle_execution",
-            f"{card['name']} opponent life={opponent.life}, expected {starting_life - expected_damage}",
+            "battle_events",
+            f"{card['name']} damage amount={damage_event.get('amount')}, expected {expected_damage}",
         )
+    if target is None:
+        if opponent.life != starting_life - expected_damage:
+            fail(
+                "battle_execution",
+                f"{card['name']} opponent life={opponent.life}, expected {starting_life - expected_damage}",
+            )
+        if damage_event.get("target_player") != opponent.name:
+            fail("battle_events", f"{card['name']} target_player={damage_event.get('target_player')!r}")
+    else:
+        if damage_event.get("target") != target.get("name"):
+            fail("battle_events", f"{card['name']} target={damage_event.get('target')!r}, expected {target.get('name')!r}")
+        if int(target.get("damage_marked_this_turn") or 0) < expected_damage and target in opponent.battlefield:
+            fail(
+                "battle_execution",
+                f"{card['name']} target damage={target.get('damage_marked_this_turn')}, expected at least {expected_damage}",
+            )
     if active.life != starting_active_life - expected_life_paid:
         fail(
             "battle_execution",
@@ -3400,6 +3439,20 @@ def run_simple_activated_damage(
     )
     if activation_event is None:
         fail("battle_events", f"missing {card['name']} simple activated damage event")
+    expected_tap_cost_count = int(scenario.get("expected_tap_cost_count") or len(tap_cost_targets) or 0)
+    if expected_tap_cost_count:
+        if len(tap_cost_targets) < expected_tap_cost_count:
+            fail("battle_execution", f"{card['name']} expected tap cost target was not configured")
+        for tapped_target in tap_cost_targets[:expected_tap_cost_count]:
+            if not bool(tapped_target.get("tapped")):
+                fail("battle_execution", f"{card['name']} tap cost target was not tapped")
+        expected_tapped_names = [item.get("name") for item in tap_cost_targets[:expected_tap_cost_count]]
+        event_tapped_names = list(activation_event.get("tapped_cost_targets") or [])
+        if expected_tapped_names and not set(expected_tapped_names).issubset(set(event_tapped_names)):
+            fail(
+                "battle_events",
+                f"{card['name']} tapped_cost_targets={event_tapped_names!r}, expected {expected_tapped_names!r}",
+            )
     if activation_event.get("discarded_count") != expected_discard_count:
         fail(
             "battle_events",
@@ -3438,6 +3491,10 @@ def run_simple_activated_damage(
         "controller_life": active.life,
         "discarded_count": expected_discard_count,
         "discard_target": expected_discard_target if expected_discard_count else None,
+        "target": target.get("name") if target else damage_event.get("target_player"),
+        "target_result": damage_event.get("result"),
+        "target_destination": damage_event.get("destination"),
+        "tapped_cost_targets": [item.get("name") for item in tap_cost_targets if bool(item.get("tapped"))],
     }
 
 
@@ -3822,6 +3879,13 @@ def run_simple_activated_destroy(
     active = battle.Player(str(scenario.get("player") or "Activated Controller"), None, [])
     opponent = battle.Player(str(scenario.get("opponent") or "Activated Opponent"), None, [])
     active.battlefield = [source]
+    tap_cost_targets = [
+        battle.enrich_card(dict(item))
+        for item in (scenario.get("tap_cost_targets") or [])
+        if isinstance(item, dict)
+    ]
+    if tap_cost_targets:
+        active.battlefield.extend(tap_cost_targets)
     controller_hand = [
         battle.enrich_card(dict(item))
         for item in (scenario.get("controller_hand") or [])
@@ -3917,6 +3981,20 @@ def run_simple_activated_destroy(
             "battle_events",
             f"{card['name']} sacrificed_source={activation_event.get('sacrificed_source')!r}, expected {expected_sacrificed_source}",
         )
+    expected_tap_cost_count = int(scenario.get("expected_tap_cost_count") or len(tap_cost_targets) or 0)
+    if expected_tap_cost_count:
+        if len(tap_cost_targets) < expected_tap_cost_count:
+            fail("battle_execution", f"{card['name']} expected tap cost target was not configured")
+        for tapped_target in tap_cost_targets[:expected_tap_cost_count]:
+            if not bool(tapped_target.get("tapped")):
+                fail("battle_execution", f"{card['name']} tap cost target was not tapped")
+        expected_tapped_names = [item.get("name") for item in tap_cost_targets[:expected_tap_cost_count]]
+        event_tapped_names = list(activation_event.get("tapped_cost_targets") or [])
+        if expected_tapped_names and not set(expected_tapped_names).issubset(set(event_tapped_names)):
+            fail(
+                "battle_events",
+                f"{card['name']} tapped_cost_targets={event_tapped_names!r}, expected {expected_tapped_names!r}",
+            )
     if bool(scenario.get("expect_target_sacrificed")):
         expected_sacrificed_names = [item.get("name") for item in sacrifice_targets if isinstance(item, dict)]
         event_sacrificed_names = list(activation_event.get("sacrificed_targets") or [])
@@ -3976,6 +4054,7 @@ def run_simple_activated_destroy(
         "discarded_count": expected_discard_count,
         "target_sacrificed": bool(sacrifice_targets and all(item in active.graveyard for item in sacrifice_targets)),
         "sacrificed_targets": [item.get("name") for item in sacrifice_targets if isinstance(item, dict)],
+        "tapped_cost_targets": [item.get("name") for item in tap_cost_targets if bool(item.get("tapped"))],
     }
 
 

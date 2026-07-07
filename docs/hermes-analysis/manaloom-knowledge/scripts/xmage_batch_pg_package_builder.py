@@ -390,6 +390,8 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "activation_sacrifice_cost",
     "activation_sacrifice_target",
     "activation_requires_sacrifice_target",
+    "activation_tap_cost",
+    "activation_requires_tap_target",
     "permanent_type",
     "spell_cast_draw_count",
     "spell_cast_draw_card_types",
@@ -2429,6 +2431,32 @@ def _manifest_sacrifice_cost_fixtures(
     ]
 
 
+def _manifest_tap_cost_fixtures(
+    base_name: str,
+    tap_cost: dict[str, Any] | None,
+) -> list[dict[str, Any]]:
+    if not isinstance(tap_cost, dict):
+        return []
+    count = max(1, int(tap_cost.get("count") or 1))
+    constraints = dict(tap_cost.get("constraints") or {})
+    if constraints.get("target_subtypes") and not constraints.get("required_subtypes"):
+        constraints["required_subtypes"] = list(constraints.get("target_subtypes") or [])
+    if constraints.get("required_subtypes") and not constraints.get("card_types"):
+        constraints["card_types"] = ["creature"]
+    constraints.setdefault("tapped_state", "untapped")
+    fixtures = [
+        _target_fixture_from_constraints(
+            f"{base_name} {index + 1}" if count > 1 else base_name,
+            constraints,
+            matching=True,
+        )
+        for index in range(count)
+    ]
+    for fixture in fixtures:
+        fixture["tapped"] = False
+    return fixtures
+
+
 def sacrifice_mana_source_execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any] | None:
     required = dict(rule.get("required_effect_fields") or {})
     if required.get("effect") != "ramp_permanent" or not required.get("is_mana_source"):
@@ -2518,7 +2546,7 @@ def simple_activated_damage_execution_scenario_from_expected_rule(
                 {"name": "E2E Spare Card A", "type_line": "Sorcery", "effect": "draw_cards", "cmc": 2},
                 {"name": "E2E Spare Card B", "type_line": "Instant", "effect": "direct_damage", "cmc": 1},
             ]
-    return {
+    scenario = {
         "name": f"{rule['card_name']} activates damage ability",
         "type": "simple_activated_damage",
         "card": {"name": rule["card_name"]},
@@ -2533,6 +2561,32 @@ def simple_activated_damage_execution_scenario_from_expected_rule(
         "expected_life_paid": int(required.get("activation_life_cost") or 0),
         "logical_rule_key": rule["logical_rule_key"],
     }
+    tap_cost_targets = _manifest_tap_cost_fixtures(
+        "E2E Activated Damage Tap Cost Target",
+        required.get("activation_tap_cost") if isinstance(required.get("activation_tap_cost"), dict) else None,
+    )
+    if tap_cost_targets:
+        scenario["tap_cost_targets"] = tap_cost_targets
+        scenario["expected_tap_cost_count"] = len(tap_cost_targets)
+    target = str(required.get("target") or "").strip().lower()
+    constraints = dict(required.get("target_constraints") or {})
+    player_targets = {
+        "any_target",
+        "opponent",
+        "opponent_or_planeswalker",
+        "player",
+        "player_or_planeswalker",
+        "target_opponent",
+        "target_player",
+    }
+    if str(constraints.get("scope") or "").strip().lower() != "any_target" and target not in player_targets:
+        scenario["target"] = _target_fixture_from_constraints(
+            "E2E Legal Activated Damage Target",
+            constraints,
+            matching=True,
+        )
+        scenario["expected_target"] = target or None
+    return scenario
 
 
 def simple_activated_draw_execution_scenario_from_expected_rule(
@@ -2767,6 +2821,13 @@ def simple_activated_destroy_execution_scenario_from_expected_rule(
             matching=True,
         )
         scenario["expect_target_sacrificed"] = True
+    tap_cost_targets = _manifest_tap_cost_fixtures(
+        "E2E Activated Destroy Tap Cost Target",
+        required.get("activation_tap_cost") if isinstance(required.get("activation_tap_cost"), dict) else None,
+    )
+    if tap_cost_targets:
+        scenario["tap_cost_targets"] = tap_cost_targets
+        scenario["expected_tap_cost_count"] = len(tap_cost_targets)
     return scenario
 
 
@@ -3382,7 +3443,7 @@ def _target_fixture_from_constraints(
     if matching and combat_state:
         if combat_state in {"attacking", "attacking_or_blocking"}:
             fixture["attacking"] = True
-        if combat_state in {"blocking", "attacking_or_blocking"}:
+        if combat_state == "blocking":
             fixture["blocking"] = True
     tapped_state = str(active_constraints.get("tapped_state") or active_constraints.get("tap_state") or "").strip().lower()
     if tapped_state:

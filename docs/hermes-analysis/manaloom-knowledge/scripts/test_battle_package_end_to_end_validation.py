@@ -8,6 +8,7 @@ from pathlib import Path
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 MODULE_PATH = SCRIPT_DIR / "battle_package_end_to_end_validation.py"
+PACKAGE_BUILDER_PATH = SCRIPT_DIR / "xmage_batch_pg_package_builder.py"
 
 
 def load_module():
@@ -17,7 +18,15 @@ def load_module():
     return module
 
 
+def load_package_builder():
+    spec = importlib.util.spec_from_file_location("xmage_batch_pg_package_builder_mod", PACKAGE_BUILDER_PATH)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
 validator = load_module()
+package_builder = load_package_builder()
 
 
 def manifest_with_expected_rule() -> dict:
@@ -192,6 +201,130 @@ def test_simple_activated_damage_runner_executes_life_cost() -> None:
     assert result["life_paid"] == 2
     assert result["controller_life"] == 8
     assert result["opponent_life"] == 6
+
+
+def test_simple_activated_damage_runner_executes_tap_cost_targets() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "enchantment",
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_effect": "direct_damage",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_damage_amount": 1,
+        "target": "any_target",
+        "target_constraints": {"scope": "any_target"},
+        "activation_cost_mana": "{0}",
+        "activation_cost_generic": 0,
+        "activation_cost_colors": [],
+        "activation_requires_tap": False,
+        "activation_requires_sacrifice": False,
+        "activation_requires_tap_target": True,
+        "activation_tap_cost": {
+            "count": 2,
+            "target_controller": "self",
+            "constraints": {"card_types": ["artifact"], "tapped_state": "untapped"},
+        },
+        "_rule_logical_key": "battle_rule_v1:ghirapur-aether-grid",
+    }
+    try:
+        result = validator.run_simple_activated_damage(
+            battle,
+            {
+                "name": "Ghirapur Aether Grid taps artifacts for damage",
+                "type": "simple_activated_damage",
+                "card": {"name": "Ghirapur Aether Grid"},
+                "opponent_life": 7,
+                "expected_damage": 1,
+                "tap_cost_targets": [
+                    {"name": "E2E Tap Artifact 1", "type_line": "Artifact", "effect": "artifact"},
+                    {"name": "E2E Tap Artifact 2", "type_line": "Artifact", "effect": "artifact"},
+                ],
+                "expected_tap_cost_count": 2,
+                "logical_rule_key": "battle_rule_v1:ghirapur-aether-grid",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Ghirapur Aether Grid"
+    assert result["opponent_life"] == 6
+    assert result["tapped_cost_targets"] == ["E2E Tap Artifact 1", "E2E Tap Artifact 2"]
+    assert any(
+        event == "activated_ability"
+        and data.get("card") == "Ghirapur Aether Grid"
+        and data.get("tapped_cost_targets") == ["E2E Tap Artifact 1", "E2E Tap Artifact 2"]
+        for event, data in events
+    )
+
+
+def test_simple_activated_damage_runner_executes_restricted_battlefield_target() -> None:
+    effect = {
+        "effect": "creature",
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_effect": "direct_damage",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_damage_amount": 2,
+        "amount": 2,
+        "damage": 2,
+        "target": "attacking_or_blocking_creature",
+        "target_constraints": {"card_types": ["creature"], "combat_state": "attacking_or_blocking"},
+        "activation_cost_mana": "{0}",
+        "activation_cost_generic": 0,
+        "activation_cost_colors": [],
+        "activation_requires_tap": False,
+        "activation_requires_sacrifice": False,
+        "activation_requires_tap_target": True,
+        "activation_tap_cost": {
+            "count": 2,
+            "target_controller": "self",
+            "constraints": {
+                "card_types": ["creature"],
+                "required_subtypes": ["soldier"],
+                "tapped_state": "untapped",
+            },
+        },
+        "_rule_logical_key": "battle_rule_v1:catapult-squad",
+    }
+    scenario = package_builder.simple_activated_damage_execution_scenario_from_expected_rule(
+        {
+            "card_name": "Catapult Squad",
+            "logical_rule_key": "battle_rule_v1:catapult-squad",
+            "required_effect_fields": effect,
+        }
+    )
+
+    assert scenario is not None
+    assert scenario["expected_target"] == "attacking_or_blocking_creature"
+    assert scenario["target"]["attacking"] is True
+    assert "blocking" not in scenario["target"]
+
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: dict(effect)
+    try:
+        result = validator.run_simple_activated_damage(battle, scenario, events)
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Catapult Squad"
+    assert result["target"] == "E2E Legal Activated Damage Target"
+    assert result["target_result"] == "creature_destroyed"
+    assert result["target_destination"] == "graveyard"
+    assert result["opponent_life"] == 7
+    assert result["tapped_cost_targets"] == [
+        "E2E Activated Damage Tap Cost Target 1",
+        "E2E Activated Damage Tap Cost Target 2",
+    ]
 
 
 def test_simple_activated_draw_runner_executes_sacrifice_target_cost() -> None:
@@ -737,6 +870,94 @@ def test_simple_activated_destroy_runner_executes_structured_multi_sacrifice_cos
         and data.get("card") == "Keldon Arsonist"
         and data.get("sacrificed_targets") == ["E2E Sacrifice Land 1", "E2E Sacrifice Land 2"]
         and data.get("mana_paid") == 1
+        for event, data in events
+    )
+
+
+def test_simple_activated_destroy_runner_executes_tap_cost_targets() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "creature",
+        "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+        "activated_effect": "destroy_target",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+        "activated_remove_effect": "remove_creature",
+        "activated_remove_target": "creature",
+        "target": "creature",
+        "target_constraints": {"card_types": ["creature"]},
+        "target_controller": "opponent",
+        "destination": "graveyard",
+        "activation_cost_mana": "{0}",
+        "activation_cost_generic": 0,
+        "activation_cost_colors": [],
+        "activation_requires_tap": True,
+        "activation_requires_sacrifice": False,
+        "activation_requires_tap_target": True,
+        "activation_tap_cost": {
+            "count": 3,
+            "target_controller": "self",
+            "constraints": {
+                "card_types": ["creature"],
+                "target_colors": ["W"],
+                "tapped_state": "untapped",
+            },
+        },
+        "_rule_logical_key": "battle_rule_v1:hand-of-justice",
+    }
+    try:
+        result = validator.run_simple_activated_destroy(
+            battle,
+            {
+                "name": "Hand of Justice destroys creature with white tap cost",
+                "type": "simple_activated_destroy",
+                "card": {"name": "Hand of Justice"},
+                "source_overrides": {"colors": ["W"]},
+                "target": {
+                    "name": "E2E Creature Target",
+                    "type_line": "Creature - Ogre",
+                    "effect": "creature",
+                    "power": 4,
+                    "toughness": 4,
+                },
+                "tap_cost_targets": [
+                    {
+                        "name": f"E2E White Tap Creature {index}",
+                        "type_line": "Creature - Soldier",
+                        "effect": "creature",
+                        "colors": ["W"],
+                        "power": 1,
+                        "toughness": 1,
+                    }
+                    for index in range(1, 4)
+                ],
+                "expected_tapped_source": True,
+                "expected_destination": "graveyard",
+                "expected_tap_cost_count": 3,
+                "logical_rule_key": "battle_rule_v1:hand-of-justice",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Hand of Justice"
+    assert result["target"] == "E2E Creature Target"
+    assert result["source_tapped"] is True
+    assert result["tapped_cost_targets"] == [
+        "E2E White Tap Creature 1",
+        "E2E White Tap Creature 2",
+        "E2E White Tap Creature 3",
+    ]
+    assert any(
+        event == "activated_ability"
+        and data.get("card") == "Hand of Justice"
+        and data.get("tapped_cost_targets")
+        == ["E2E White Tap Creature 1", "E2E White Tap Creature 2", "E2E White Tap Creature 3"]
         for event, data in events
     )
 

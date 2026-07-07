@@ -9763,6 +9763,72 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertEqual(active.available_mana(), 1)
         self.assertEqual(opponent.life, 6)
 
+    def test_simple_activated_damage_taps_matching_cost_targets_and_damages_player(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        opponent.life = 6
+        permanent = {
+            "name": "Ghirapur Aether Grid",
+            "type_line": "Enchantment",
+            "effect": "enchantment",
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "activated_effect": "direct_damage",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "activated_damage_amount": 1,
+            "target": "any_target",
+            "target_constraints": {"scope": "any_target"},
+            "activation_cost_mana": "{0}",
+            "activation_cost_generic": 0,
+            "activation_cost_colors": [],
+            "activation_requires_tap": False,
+            "activation_requires_sacrifice": False,
+            "activation_requires_tap_target": True,
+            "activation_tap_cost": {
+                "count": 2,
+                "target_controller": "self",
+                "constraints": {"card_types": ["artifact"], "tapped_state": "untapped"},
+            },
+            "_rule_logical_key": "battle_rule_v1:ghirapur-aether-grid",
+        }
+        gear_a = {"name": "Spare Gear A", "type_line": "Artifact", "effect": "artifact"}
+        gear_b = {"name": "Spare Gear B", "type_line": "Artifact", "effect": "artifact"}
+        tapped_gear = {"name": "Tapped Gear", "type_line": "Artifact", "effect": "artifact", "tapped": True}
+        active.battlefield.extend([permanent, gear_a, gear_b, tapped_gear])
+
+        self.assertTrue(
+            self.battle.can_activate_generic_tap_damage_permanent(
+                active,
+                permanent,
+                [opponent],
+            )
+        )
+        activated = self.battle.activate_generic_tap_damage_permanent(
+            active,
+            [opponent],
+            permanent,
+            turn=7,
+            rng=random.Random(67),
+            phase="precombat_main",
+        )
+
+        self.assertTrue(activated)
+        self.assertFalse(permanent.get("tapped", False))
+        self.assertTrue(gear_a.get("tapped"))
+        self.assertTrue(gear_b.get("tapped"))
+        self.assertTrue(tapped_gear.get("tapped"))
+        self.assertEqual(opponent.life, 5)
+        self.assertTrue(
+            any(
+                event == "activated_ability"
+                and data.get("card") == "Ghirapur Aether Grid"
+                and data.get("activation_kind") == "simple_activated_damage"
+                and data.get("tapped_cost_targets") == ["Spare Gear A", "Spare Gear B"]
+                and data.get("tap_cost_available_targets") == 2
+                and data.get("rule_logical_key") == "battle_rule_v1:ghirapur-aether-grid"
+                for event, data in self.events
+            )
+        )
+
     def test_simple_activated_damage_creature_preserves_self_keyword_and_activates(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])
@@ -10385,6 +10451,103 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
                 and data.get("card") == "Fixture Assassin"
                 and data.get("target") == "Tapped Piker"
                 and data.get("destination") == "graveyard"
+                for event, data in self.events
+            )
+        )
+
+    def test_simple_activated_destroy_taps_matching_cost_targets_and_destroys_creature(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        target = {
+            "name": "Target Ogre",
+            "type_line": "Creature - Ogre",
+            "power": 4,
+            "toughness": 4,
+        }
+        opponent.battlefield.append(target)
+        permanent = {
+            "name": "Hand of Justice",
+            "type_line": "Creature - Avatar",
+            "effect": "creature",
+            "colors": ["W"],
+            "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+            "activated_effect": "destroy_target",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+            "activated_remove_effect": "remove_creature",
+            "activated_remove_target": "creature",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "destination": "graveyard",
+            "activation_cost_mana": "{0}",
+            "activation_cost_generic": 0,
+            "activation_cost_colors": [],
+            "activation_requires_tap": True,
+            "activation_requires_sacrifice": False,
+            "activation_requires_tap_target": True,
+            "activation_tap_cost": {
+                "count": 3,
+                "target_controller": "self",
+                "constraints": {
+                    "card_types": ["creature"],
+                    "target_colors": ["W"],
+                    "tapped_state": "untapped",
+                },
+            },
+            "summoning_sick": False,
+            "_rule_logical_key": "battle_rule_v1:hand-of-justice",
+        }
+        cost_creatures = [
+            {
+                "name": f"White Helper {index}",
+                "type_line": "Creature - Soldier",
+                "effect": "creature",
+                "colors": ["W"],
+                "power": 1,
+                "toughness": 1,
+            }
+            for index in range(1, 4)
+        ]
+        green_helper = {
+            "name": "Green Helper",
+            "type_line": "Creature - Elf",
+            "effect": "creature",
+            "colors": ["G"],
+            "power": 1,
+            "toughness": 1,
+        }
+        active.battlefield.extend([permanent, *cost_creatures, green_helper])
+
+        self.assertTrue(
+            self.battle.can_activate_generic_destroy_permanent(
+                active,
+                permanent,
+                [opponent],
+            )
+        )
+        activated = self.battle.activate_generic_destroy_permanent(
+            active,
+            [opponent],
+            [active, opponent],
+            permanent,
+            turn=16,
+            rng=random.Random(68),
+            phase="precombat_main",
+        )
+
+        self.assertTrue(activated)
+        self.assertTrue(permanent.get("tapped"))
+        self.assertTrue(all(creature.get("tapped") for creature in cost_creatures))
+        self.assertFalse(green_helper.get("tapped", False))
+        self.assertNotIn(target, opponent.battlefield)
+        self.assertIn(target, opponent.graveyard)
+        self.assertTrue(
+            any(
+                event == "activated_ability"
+                and data.get("card") == "Hand of Justice"
+                and data.get("activation_kind") == "simple_activated_destroy"
+                and data.get("tapped_cost_targets") == ["White Helper 1", "White Helper 2", "White Helper 3"]
+                and data.get("tap_cost_available_targets") == 3
+                and data.get("rule_logical_key") == "battle_rule_v1:hand-of-justice"
                 for event, data in self.events
             )
         )
