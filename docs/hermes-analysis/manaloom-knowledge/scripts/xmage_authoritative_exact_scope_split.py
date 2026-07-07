@@ -6773,32 +6773,29 @@ def fixed_boost_keyword_draw_target_from_source(
 
 
 STATIC_CONTROLLED_PT_BLOCKED_ORACLE_WORDS = {
-    "attacking",
     "blocking",
     "blocked",
     "enchanted",
     "equipped",
     "modified",
     "tapped",
-    "untapped",
-    "white",
-    "blue",
-    "black",
-    "red",
-    "green",
 }
 
 STATIC_CONTROLLED_PT_BLOCKED_SOURCE_MARKERS = (
-    "ColorPredicate",
-    "TappedPredicate",
     "Predicates.or",
     "Predicates.and",
     "EnchantedPredicate",
     "EquippedPredicate",
-    "AttackingPredicate",
     "BlockingPredicate",
     "ControlledByControllerPredicate",
 )
+STATIC_CONTROLLED_PT_COLOR_WORDS = {
+    "white": "W",
+    "blue": "U",
+    "black": "B",
+    "red": "R",
+    "green": "G",
+}
 
 STATIC_CONTROLLED_PT_IRREGULAR_SUBTYPES = {
     "elves": "elf",
@@ -6836,8 +6833,18 @@ def static_controlled_pt_constraints_from_subject(subject: str) -> dict[str, Any
     if any(word in STATIC_CONTROLLED_PT_BLOCKED_ORACLE_WORDS for word in words):
         return "static_controlled_pt_oracle_filter_not_supported"
     constraints: dict[str, Any] = {}
+    colors: list[str] = []
     subtypes: list[str] = []
     for word in words:
+        if word in STATIC_CONTROLLED_PT_COLOR_WORDS:
+            colors.append(STATIC_CONTROLLED_PT_COLOR_WORDS[word])
+            continue
+        if word == "attacking":
+            constraints["static_required_combat_state"] = "attacking"
+            continue
+        if word == "untapped":
+            constraints["static_required_tapped_state"] = "untapped"
+            continue
         if word == "artifact":
             constraints["static_artifact_creature"] = True
             continue
@@ -6847,6 +6854,8 @@ def static_controlled_pt_constraints_from_subject(subject: str) -> dict[str, Any
         subtype = canonical_static_subtype(word)
         if subtype:
             subtypes.append(subtype)
+    if colors:
+        constraints["static_required_colors"] = ordered_color_symbols(colors)
     if subtypes:
         constraints["static_required_subtypes"] = sorted(set(subtypes))
     return constraints
@@ -6885,6 +6894,8 @@ def static_controlled_pt_filter_constraints_from_source(source: str, filter_name
         return {}
     if filter_name == "StaticFilters.FILTER_PERMANENT_CREATURES":
         return {}
+    if filter_name == "StaticFilters.FILTER_ATTACKING_CREATURES":
+        return {"static_required_combat_state": "attacking"}
     if filter_name == "StaticFilters.FILTER_PERMANENT_SLIVERS":
         return {"static_required_subtypes": ["sliver"]}
     if filter_name == "StaticFilters.FILTER_PERMANENTS_ARTIFACT_CREATURE":
@@ -6892,6 +6903,18 @@ def static_controlled_pt_filter_constraints_from_source(source: str, filter_name
     if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", filter_name):
         return "static_controlled_pt_source_filter_not_supported"
     constraints: dict[str, Any] = {}
+    color_tokens = re.findall(
+        rf"{re.escape(filter_name)}\.add\s*\(\s*new\s+ColorPredicate\s*\(\s*ObjectColor\.([A-Z]+)\s*\)\s*\)",
+        text,
+    )
+    if color_tokens:
+        colors = [
+            OBJECT_COLOR_TO_SYMBOL[token]
+            for token in color_tokens
+            if token in OBJECT_COLOR_TO_SYMBOL
+        ]
+        if colors:
+            constraints["static_required_colors"] = ordered_color_symbols(colors)
     subtype_tokens = re.findall(
         rf"{re.escape(filter_name)}\s*=\s*new\s+Filter(?:Creature)?Permanent\s*\(\s*SubType\.([A-Z0-9_]+)",
         text,
@@ -6905,6 +6928,14 @@ def static_controlled_pt_filter_constraints_from_source(source: str, filter_name
         constraints["static_artifact_creature"] = True
     if re.search(rf"{re.escape(filter_name)}\.add\s*\(\s*SuperType\.LEGENDARY\.getPredicate\s*\(\s*\)\s*\)", text):
         constraints["static_required_supertypes"] = ["legendary"]
+    if re.search(rf"{re.escape(filter_name)}\.add\s*\(\s*TappedPredicate\.UNTAPPED\s*\)", text):
+        constraints["static_required_tapped_state"] = "untapped"
+    if "TappedPredicate.TAPPED" in text:
+        return "static_controlled_pt_source_filter_not_supported"
+    if re.search(rf"{re.escape(filter_name)}\.add\s*\(\s*AttackingPredicate\.instance\s*\)", text):
+        constraints["static_required_combat_state"] = "attacking"
+    if "AttackingPredicate" in text and constraints.get("static_required_combat_state") != "attacking":
+        return "static_controlled_pt_source_filter_not_supported"
     safe_get_predicates = re.findall(rf"{re.escape(filter_name)}\.add\s*\(\s*([A-Za-z]+)\.([A-Z0-9_]+)\.getPredicate", text)
     for owner, value in safe_get_predicates:
         if owner == "SubType":
@@ -6913,6 +6944,8 @@ def static_controlled_pt_filter_constraints_from_source(source: str, filter_name
             continue
         if owner == "SuperType" and value == "LEGENDARY":
             continue
+        return "static_controlled_pt_source_filter_not_supported"
+    if "ColorPredicate" in text and not constraints.get("static_required_colors"):
         return "static_controlled_pt_source_filter_not_supported"
     if not constraints and filter_name != "filter":
         return "static_controlled_pt_source_filter_not_supported"
@@ -23088,6 +23121,12 @@ def split_row(
             target_constraints["subtypes"] = source_static["static_required_subtypes"]
         if source_static.get("static_required_supertypes"):
             target_constraints["supertypes"] = source_static["static_required_supertypes"]
+        if source_static.get("static_required_colors"):
+            target_constraints["colors"] = source_static["static_required_colors"]
+        if source_static.get("static_required_combat_state"):
+            target_constraints["combat_state"] = source_static["static_required_combat_state"]
+        if source_static.get("static_required_tapped_state"):
+            target_constraints["tapped_state"] = source_static["static_required_tapped_state"]
         if source_static.get("static_artifact_creature"):
             target_constraints["card_types"] = ["artifact", "creature"]
         effect_json = {

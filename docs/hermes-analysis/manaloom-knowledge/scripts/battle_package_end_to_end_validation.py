@@ -4642,6 +4642,85 @@ def run_static_global_power_toughness_boost(
     }
 
 
+def run_static_controlled_power_toughness_boost(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    source = battle.enrich_card({**card, **battle.get_card_effect(card)})
+    active = battle.Player(str(scenario.get("player") or "Static P/T Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Static P/T Opponent"), None, [])
+    matching_target = dict(scenario["matching_target"])
+    nonmatching_target = (
+        dict(scenario["nonmatching_target"])
+        if isinstance(scenario.get("nonmatching_target"), dict)
+        else None
+    )
+    opponent_target = dict(scenario["opponent_target"])
+    active.battlefield = [source, matching_target]
+    if nonmatching_target is not None:
+        active.battlefield.append(nonmatching_target)
+    opponent.battlefield = [opponent_target]
+    refreshed = battle.refresh_controlled_static_power_toughness_bonuses(
+        active,
+        turn=int(scenario.get("turn") or 3),
+        phase=str(scenario.get("phase") or "main"),
+        emit_events=True,
+    )
+    expected_power = int(scenario["expected_power"])
+    expected_toughness = int(scenario["expected_toughness"])
+    if int(matching_target.get("power") or 0) != expected_power:
+        fail("battle_execution", f"{card['name']} matching power={matching_target.get('power')}, expected {expected_power}")
+    if int(matching_target.get("toughness") or 0) != expected_toughness:
+        fail(
+            "battle_execution",
+            f"{card['name']} matching toughness={matching_target.get('toughness')}, expected {expected_toughness}",
+        )
+    if nonmatching_target is not None:
+        if int(nonmatching_target.get("power") or 0) != int(nonmatching_target.get("base_power") or 0):
+            fail("battle_execution", f"{card['name']} incorrectly boosted nonmatching target power")
+        if int(nonmatching_target.get("toughness") or 0) != int(nonmatching_target.get("base_toughness") or 0):
+            fail("battle_execution", f"{card['name']} incorrectly boosted nonmatching target toughness")
+    if int(opponent_target.get("power") or 0) != int(opponent_target.get("base_power") or 0):
+        fail("battle_execution", f"{card['name']} incorrectly boosted opponent target power")
+    if int(opponent_target.get("toughness") or 0) != int(opponent_target.get("base_toughness") or 0):
+        fail("battle_execution", f"{card['name']} incorrectly boosted opponent target toughness")
+    source_name = str(scenario.get("expected_source") or card.get("name"))
+    changed_event = next(
+        (
+            data
+            for event, data in events
+            if event == "static_power_toughness_boost_changed"
+            and data.get("card") == matching_target.get("name")
+            and source_name in (data.get("source_cards") or [])
+        ),
+        None,
+    )
+    if changed_event is None:
+        fail("battle_events", f"missing {card['name']} static_power_toughness_boost_changed event")
+    active.battlefield.remove(source)
+    battle.refresh_controlled_static_power_toughness_bonuses(
+        active,
+        turn=int(scenario.get("turn") or 3),
+        phase="source_left_battlefield",
+        emit_events=True,
+    )
+    if int(matching_target.get("power") or 0) != int(matching_target.get("base_power") or 0):
+        fail("battle_execution", f"{card['name']} did not revoke power bonus after source left")
+    if int(matching_target.get("toughness") or 0) != int(matching_target.get("base_toughness") or 0):
+        fail("battle_execution", f"{card['name']} did not revoke toughness bonus after source left")
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "matching_target": matching_target.get("name"),
+        "target_power": expected_power,
+        "target_toughness": expected_toughness,
+        "refreshed_count": len(refreshed),
+        "source_cards": changed_event.get("source_cards"),
+    }
+
+
 def run_static_controlled_keyword(
     battle,
     scenario: dict[str, Any],
@@ -4900,6 +4979,7 @@ SCENARIO_RUNNERS = {
     "simple_activated_create_token": run_simple_activated_create_token,
     "spell_cast_gain_life": run_spell_cast_gain_life,
     "stat_modifier_until_eot": run_stat_modifier_until_eot,
+    "static_controlled_power_toughness_boost": run_static_controlled_power_toughness_boost,
     "static_controlled_keyword": run_static_controlled_keyword,
     "static_count_power_toughness": run_static_count_power_toughness,
     "static_global_power_toughness_boost": run_static_global_power_toughness_boost,

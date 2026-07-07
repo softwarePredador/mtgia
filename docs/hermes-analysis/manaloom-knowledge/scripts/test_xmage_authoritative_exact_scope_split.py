@@ -2265,7 +2265,99 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["static_power_bonus"], 2)
         self.assertEqual(effect["static_toughness_bonus"], 0)
 
-    def test_static_controlled_power_toughness_boost_blocks_color_filtered_lord(self) -> None:
+    def test_static_controlled_power_toughness_boost_filtered_variants_are_package_safe(self) -> None:
+        fixtures = [
+            (
+                "Honor of the Pure",
+                "White creatures you control get +1/+1.",
+                "filter.add(new ColorPredicate(ObjectColor.WHITE));"
+                "this.addAbility(new SimpleStaticAbility(new BoostControlledEffect("
+                "1, 1, Duration.WhileOnBattlefield, filter, false)));",
+                {
+                    "static_required_colors": ["W"],
+                    "static_power_bonus": 1,
+                    "static_toughness_bonus": 1,
+                    "target_constraints": {
+                        "controller": "self",
+                        "card_types": ["creature"],
+                        "colors": ["W"],
+                    },
+                },
+            ),
+            (
+                "Builder's Blessing",
+                "Untapped creatures you control get +0/+2.",
+                "private static final FilterCreaturePermanent filter = new FilterCreaturePermanent(\"untapped creatures\");"
+                "filter.add(TappedPredicate.UNTAPPED);"
+                "this.addAbility(new SimpleStaticAbility(new BoostControlledEffect(0, 2, Duration.WhileOnBattlefield, filter)));",
+                {
+                    "static_required_tapped_state": "untapped",
+                    "static_power_bonus": 0,
+                    "static_toughness_bonus": 2,
+                    "target_constraints": {
+                        "controller": "self",
+                        "card_types": ["creature"],
+                        "tapped_state": "untapped",
+                    },
+                },
+            ),
+            (
+                "Dire Fleet Neckbreaker",
+                "Attacking Pirates you control get +2/+0.",
+                "private static final FilterCreaturePermanent filter = new FilterCreaturePermanent(SubType.PIRATE, \"attacking Pirates\");"
+                "filter.add(AttackingPredicate.instance);"
+                "this.addAbility(new SimpleStaticAbility(new BoostControlledEffect(2, 0, Duration.WhileOnBattlefield, filter)));",
+                {
+                    "static_required_subtypes": ["pirate"],
+                    "static_required_combat_state": "attacking",
+                    "static_power_bonus": 2,
+                    "static_toughness_bonus": 0,
+                    "target_constraints": {
+                        "controller": "self",
+                        "card_types": ["creature"],
+                        "subtypes": ["pirate"],
+                        "combat_state": "attacking",
+                    },
+                },
+            ),
+            (
+                "War Horn",
+                "Attacking creatures you control get +1/+0.",
+                "this.addAbility(new SimpleStaticAbility(new BoostControlledEffect("
+                "1, 0, Duration.WhileOnBattlefield, StaticFilters.FILTER_ATTACKING_CREATURES)));",
+                {
+                    "static_required_combat_state": "attacking",
+                    "static_power_bonus": 1,
+                    "static_toughness_bonus": 0,
+                    "target_constraints": {
+                        "controller": "self",
+                        "card_types": ["creature"],
+                        "combat_state": "attacking",
+                    },
+                },
+            ),
+        ]
+        for name, oracle, source, expected_fields in fixtures:
+            with self.subTest(name=name):
+                row = queue_row(
+                    split.STATIC_CONTROLLED_PT_UNIT,
+                    effect_classes=["BoostControlledEffect"],
+                    ability_classes=["SimpleStaticAbility"],
+                    xmage_signals=["static_ability"],
+                )
+                proposal, reason = split.split_row(
+                    row,
+                    metadata(name=name, type_line="Enchantment", oracle_text=oracle),
+                    source_text=source,
+                )
+
+                self.assertEqual(reason, "selected_exact_scope")
+                effect = proposal["effect_json"]
+                self.assertEqual(effect["battle_model_scope"], split.STATIC_CONTROLLED_PT_SCOPE)
+                for field, value in expected_fields.items():
+                    self.assertEqual(effect[field], value)
+
+    def test_static_controlled_power_toughness_boost_blocks_enchanted_creatures(self) -> None:
         row = queue_row(
             split.STATIC_CONTROLLED_PT_UNIT,
             effect_classes=["BoostControlledEffect"],
@@ -2275,14 +2367,14 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         proposal, reason = split.split_row(
             row,
             metadata(
-                name="Honor of the Pure",
+                name="A Tale for the Ages",
                 type_line="Enchantment",
-                oracle_text="White creatures you control get +1/+1.",
+                oracle_text="Enchanted creatures you control get +2/+2.",
             ),
             source_text=(
-                "filter.add(new ColorPredicate(ObjectColor.WHITE));"
+                "filter.add(EnchantedPredicate.instance);"
                 "this.addAbility(new SimpleStaticAbility(new BoostControlledEffect("
-                "1, 1, Duration.WhileOnBattlefield, filter, false)));"
+                "2, 2, Duration.WhileOnBattlefield, filter, false)));"
             ),
         )
 

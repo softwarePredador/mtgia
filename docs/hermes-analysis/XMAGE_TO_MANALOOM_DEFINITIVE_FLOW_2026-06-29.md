@@ -17325,6 +17325,75 @@ formulas, chroma/devotion or mana-symbol counts, source-exclusion formulas, or
 cards whose Oracle text contains additional unsupported static restrictions.
 Those remain separate adapter contracts.
 
+## PG602 Static Controlled Power/Toughness Filter Checkpoint
+
+As of 2026-07-07, PG602 is applied and synced against the new server target.
+It extends controlled-creature static P/T boosts to exact color, attacking, and
+untapped filters resolved from local XMage source.
+
+Closed cards:
+
+- `Builder's Blessing`
+- `Castle`
+- `Dire Fleet Neckbreaker`
+- `Goblin Oriflamme`
+- `Honor of the Pure`
+- `Jacques le Vert`
+- `Kaysa`
+- `Orcish Oriflamme`
+- `War Horn`
+
+Runtime/modeling change:
+
+- `xmage_authoritative_exact_scope_split.py` now accepts exact
+  `BoostControlledEffect` style controlled-creature P/T boosts filtered by
+  source subtype, required colors, attacking state, and untapped state;
+- the splitter maps XMage `ColorPredicate`, `StaticFilters.FILTER_ATTACKING_CREATURES`,
+  `AttackingPredicate.instance`, and `TappedPredicate.UNTAPPED` into explicit
+  ManaLoom rule fields instead of blocking the entire subfamily;
+- `battle_analyst_v9.py` now applies `static_required_colors`,
+  `static_required_combat_state`, and `static_required_tapped_state` when
+  refreshing controlled static P/T boosts;
+- `xmage_batch_pg_package_builder.py` and
+  `battle_package_end_to_end_validation.py` now emit and execute focused
+  `static_controlled_power_toughness_boost` scenarios with matching,
+  nonmatching, opponent, and source-removed checks.
+
+Validation:
+
+- split produced `proposal_count=9` and `safe_for_batch_pg_package_count=9`;
+- precheck found `9/9` target rows, `0` existing expected executable rows, and
+  `0` shadow rows to deprecate;
+- apply upserted `9` PostgreSQL rows and deprecated `0` shadow rows;
+- postcheck confirmed `9/9` promoted rows, `9/9` `verified_auto` rows, and
+  `9/9` rows with `oracle_hash`;
+- focused tests passed: splitter `6` static-controlled P/T tests, exact
+  runtime `5` static-controlled P/T tests, direct package-builder scenario
+  tests `4/4`, and Python compilation for the touched
+  splitter/runtime/package/E2E scripts;
+- PG -> SQLite/snapshot sync loaded `9407` PostgreSQL rows, updated `9171`
+  SQLite rows, and exported `6850` canonical snapshot rows;
+- metadata sync used `database_target=127.0.0.1:15432/halder`, matched `7818`
+  PostgreSQL cards, and left `deck_cards` at `2699/2699` matched;
+- E2E validation passed PostgreSQL, SQLite, snapshot, runtime lookup, and `9`
+  battle execution scenarios with `18` runtime events;
+- post-sync queue rebuild reduced `target_identity_count` from `25143` to
+  `25134`, `xmage_authoritative_source_count` from `24829` to `24820`, and
+  `xmage_authoritative_adapter_required_count` from `24829` to `24820`;
+- final exact-scope recheck returned `proposal_count=0` and
+  `safe_for_batch_pg_package_count=0`;
+- final PG/Hermes/SQLite contract audit passed `51/51`;
+- final XMage strategy audit passed `26/26`;
+- final operational surface alignment audit passed;
+- final legacy contamination audit passed;
+- `scripts/quality_gate.sh server-target` passed against the new-server target.
+
+Residual boundary: PG602 does not authorize enchanted/equipped/modified or
+attachment-state filters. `A Tale for the Ages` remains blocked under
+`static_controlled_pt_oracle_filter_not_supported` until ManaLoom has an
+explicit aura/attachment state contract and focused execution scenario for
+enchanted creatures.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

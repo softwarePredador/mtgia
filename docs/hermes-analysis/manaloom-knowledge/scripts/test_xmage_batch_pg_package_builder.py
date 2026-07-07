@@ -1665,6 +1665,69 @@ def test_manifest_expected_rule_preserves_static_controlled_keyword_fields() -> 
     }
 
 
+def test_manifest_expected_rule_preserves_static_controlled_pt_filtered_fields() -> None:
+    proposal = {
+        "normalized_name": "dire fleet neckbreaker",
+        "card_name": "Dire Fleet Neckbreaker",
+        "oracle_hash": "hash-neckbreaker",
+        "logical_rule_key": "battle_rule_v1:dire-fleet-neckbreaker",
+        "effect_json": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+            "static_effect": "controlled_power_toughness_boost",
+            "static_applies_to": "creatures_you_control",
+            "static_power_bonus": 2,
+            "static_toughness_bonus": 0,
+            "static_required_subtypes": ["pirate"],
+            "static_required_combat_state": "attacking",
+            "static_exclude_source": False,
+            "target": "controlled_creatures",
+            "target_controller": "self",
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+
+    assert expected["required_effect_fields"] == {
+        "effect": "creature",
+        "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+        "target": "controlled_creatures",
+        "target_controller": "self",
+        "static_effect": "controlled_power_toughness_boost",
+        "static_applies_to": "creatures_you_control",
+        "static_power_bonus": 2,
+        "static_toughness_bonus": 0,
+        "static_exclude_source": False,
+        "static_required_subtypes": ["pirate"],
+        "static_required_combat_state": "attacking",
+    }
+
+
+def test_static_controlled_pt_execution_scenario_uses_filter_negative_and_opponent() -> None:
+    rule = {
+        "normalized_name": "builder's blessing",
+        "card_name": "Builder's Blessing",
+        "logical_rule_key": "battle_rule_v1:builders-blessing",
+        "required_effect_fields": {
+            "effect": "passive",
+            "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+            "static_effect": "controlled_power_toughness_boost",
+            "static_power_bonus": 0,
+            "static_toughness_bonus": 2,
+            "static_required_tapped_state": "untapped",
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario["type"] == "static_controlled_power_toughness_boost"
+    assert scenario["expected_power"] == 2
+    assert scenario["expected_toughness"] == 4
+    assert scenario["matching_target"]["tapped"] is False
+    assert scenario["nonmatching_target"]["tapped"] is True
+    assert scenario["opponent_target"]["tapped"] is False
+
+
 def test_static_controlled_keyword_execution_scenario_uses_filter_negative_and_opponent() -> None:
     rule = {
         "normalized_name": "roughshod mentor",

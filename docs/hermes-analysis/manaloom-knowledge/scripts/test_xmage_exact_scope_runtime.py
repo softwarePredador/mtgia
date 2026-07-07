@@ -951,6 +951,71 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertEqual(goblin["power"], 1)
         self.assertEqual(goblin["toughness"], 1)
 
+    def test_static_controlled_power_toughness_boost_respects_color_combat_and_tapped_filters(self) -> None:
+        fixtures = [
+            (
+                {
+                    "name": "Honor of the Pure",
+                    "static_power_bonus": 1,
+                    "static_toughness_bonus": 1,
+                    "static_required_colors": ["W"],
+                },
+                {"name": "White Soldier", "type_line": "Creature - Soldier", "colors": ["W"], "power": 2, "toughness": 2},
+                {"name": "Blue Soldier", "type_line": "Creature - Soldier", "colors": ["U"], "power": 2, "toughness": 2},
+                3,
+                3,
+            ),
+            (
+                {
+                    "name": "Builder's Blessing",
+                    "static_power_bonus": 0,
+                    "static_toughness_bonus": 2,
+                    "static_required_tapped_state": "untapped",
+                },
+                {"name": "Ready Soldier", "type_line": "Creature - Soldier", "power": 2, "toughness": 2, "tapped": False},
+                {"name": "Tapped Soldier", "type_line": "Creature - Soldier", "power": 2, "toughness": 2, "tapped": True},
+                2,
+                4,
+            ),
+            (
+                {
+                    "name": "Dire Fleet Neckbreaker",
+                    "static_power_bonus": 2,
+                    "static_toughness_bonus": 0,
+                    "static_required_subtypes": ["pirate"],
+                    "static_required_combat_state": "attacking",
+                },
+                {"name": "Charging Pirate", "type_line": "Creature - Pirate", "power": 2, "toughness": 2, "attacking": True},
+                {"name": "Idle Pirate", "type_line": "Creature - Pirate", "power": 2, "toughness": 2, "attacking": False},
+                4,
+                2,
+            ),
+        ]
+        for source_fields, matching, nonmatching, expected_power, expected_toughness in fixtures:
+            with self.subTest(name=source_fields["name"]):
+                active = self.battle.Player("Active", None, [])
+                opponent = self.battle.Player("Opponent", None, [])
+                source = {
+                    "type_line": "Enchantment",
+                    "effect": "passive",
+                    "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+                    "static_effect": "controlled_power_toughness_boost",
+                    **source_fields,
+                }
+                opponent_match = dict(matching)
+                opponent_match["name"] = "Opponent Matching Creature"
+                active.battlefield = [source, matching, nonmatching]
+                opponent.battlefield = [opponent_match]
+
+                self.battle.refresh_controlled_static_power_toughness_bonuses(active)
+
+                self.assertEqual(matching["power"], expected_power)
+                self.assertEqual(matching["toughness"], expected_toughness)
+                self.assertEqual(nonmatching["power"], 2)
+                self.assertEqual(nonmatching["toughness"], 2)
+                self.assertEqual(opponent_match["power"], 2)
+                self.assertEqual(opponent_match["toughness"], 2)
+
     def test_static_controlled_keyword_applies_to_controller_and_reverts(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

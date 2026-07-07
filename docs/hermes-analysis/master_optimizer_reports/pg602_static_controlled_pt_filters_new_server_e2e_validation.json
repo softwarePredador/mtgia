@@ -1,0 +1,468 @@
+{
+  "battle_execution": {
+    "event_count": 18,
+    "results": [
+      {
+        "card_name": "Builder's Blessing",
+        "matching_target": "E2E Controlled P/T Target for Builder's Blessing",
+        "refreshed_count": 1,
+        "scenario": "Builder's Blessing static controlled P/T applies",
+        "source_cards": [
+          "Builder's Blessing"
+        ],
+        "target_power": 2,
+        "target_toughness": 4
+      },
+      {
+        "card_name": "Castle",
+        "matching_target": "E2E Controlled P/T Target for Castle",
+        "refreshed_count": 1,
+        "scenario": "Castle static controlled P/T applies",
+        "source_cards": [
+          "Castle"
+        ],
+        "target_power": 2,
+        "target_toughness": 4
+      },
+      {
+        "card_name": "Dire Fleet Neckbreaker",
+        "matching_target": "E2E Controlled P/T Target for Dire Fleet Neckbreaker",
+        "refreshed_count": 1,
+        "scenario": "Dire Fleet Neckbreaker static controlled P/T applies",
+        "source_cards": [
+          "Dire Fleet Neckbreaker"
+        ],
+        "target_power": 4,
+        "target_toughness": 2
+      },
+      {
+        "card_name": "Goblin Oriflamme",
+        "matching_target": "E2E Controlled P/T Target for Goblin Oriflamme",
+        "refreshed_count": 1,
+        "scenario": "Goblin Oriflamme static controlled P/T applies",
+        "source_cards": [
+          "Goblin Oriflamme"
+        ],
+        "target_power": 3,
+        "target_toughness": 2
+      },
+      {
+        "card_name": "Honor of the Pure",
+        "matching_target": "E2E Controlled P/T Target for Honor of the Pure",
+        "refreshed_count": 1,
+        "scenario": "Honor of the Pure static controlled P/T applies",
+        "source_cards": [
+          "Honor of the Pure"
+        ],
+        "target_power": 3,
+        "target_toughness": 3
+      },
+      {
+        "card_name": "Jacques le Vert",
+        "matching_target": "E2E Controlled P/T Target for Jacques le Vert",
+        "refreshed_count": 1,
+        "scenario": "Jacques le Vert static controlled P/T applies",
+        "source_cards": [
+          "Jacques le Vert"
+        ],
+        "target_power": 2,
+        "target_toughness": 4
+      },
+      {
+        "card_name": "Kaysa",
+        "matching_target": "E2E Controlled P/T Target for Kaysa",
+        "refreshed_count": 1,
+        "scenario": "Kaysa static controlled P/T applies",
+        "source_cards": [
+          "Kaysa"
+        ],
+        "target_power": 3,
+        "target_toughness": 3
+      },
+      {
+        "card_name": "Orcish Oriflamme",
+        "matching_target": "E2E Controlled P/T Target for Orcish Oriflamme",
+        "refreshed_count": 1,
+        "scenario": "Orcish Oriflamme static controlled P/T applies",
+        "source_cards": [
+          "Orcish Oriflamme"
+        ],
+        "target_power": 3,
+        "target_toughness": 2
+      },
+      {
+        "card_name": "War Horn",
+        "matching_target": "E2E Controlled P/T Target for War Horn",
+        "refreshed_count": 1,
+        "scenario": "War Horn static controlled P/T applies",
+        "source_cards": [
+          "War Horn"
+        ],
+        "target_power": 3,
+        "target_toughness": 2
+      }
+    ],
+    "scenario_count": 9
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-07T07:51:45.915842+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg602_static_controlled_pt_filters_new_server_manifest.json",
+  "package_id": "pg602_static_controlled_pt_filters_new_server_manifest",
+  "snapshot": "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 9
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+          "card_name": "Builder's Blessing",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:879c6fd1182165350d95adb96bccf042",
+          "oracle_hash": "ad19443ea215d62f8c1bd4fb81e0d6aa",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+          "card_name": "Castle",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:879c6fd1182165350d95adb96bccf042",
+          "oracle_hash": "ad19443ea215d62f8c1bd4fb81e0d6aa",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+          "card_name": "Dire Fleet Neckbreaker",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7ee525c101a785af954a07783655f297",
+          "oracle_hash": "b4eb782b3781b4f82e89f44d8600c582",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+          "card_name": "Goblin Oriflamme",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4b0f6181adb21e48fae116054fe4e08b",
+          "oracle_hash": "ac2e29ddff9b3a465105f4582b40f012",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+          "card_name": "Honor of the Pure",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8ab29fd8f0c26aceb442058cc885461f",
+          "oracle_hash": "7278ea48e2b98eab9c6802bb5d454ed7",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+          "card_name": "Jacques le Vert",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:964e27bcaf5c95d549770883d5697b90",
+          "oracle_hash": "4cb50df0f1c67841d4e69aaaf617d95d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+          "card_name": "Kaysa",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c5d36e3805d11b92e963645e9f2eb522",
+          "oracle_hash": "2d6428d94870902d477189d5c7405c5f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+          "card_name": "Orcish Oriflamme",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4b0f6181adb21e48fae116054fe4e08b",
+          "oracle_hash": "ac2e29ddff9b3a465105f4582b40f012",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+          "card_name": "War Horn",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0eedfd9a81253b55467d6dfbd75213ba",
+          "oracle_hash": "ac2e29ddff9b3a465105f4582b40f012",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 9
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+          "card_name": "Builder's Blessing",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:879c6fd1182165350d95adb96bccf042",
+          "oracle_hash": "ad19443ea215d62f8c1bd4fb81e0d6aa",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+          "card_name": "Castle",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:879c6fd1182165350d95adb96bccf042",
+          "oracle_hash": "ad19443ea215d62f8c1bd4fb81e0d6aa",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+          "card_name": "Dire Fleet Neckbreaker",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7ee525c101a785af954a07783655f297",
+          "oracle_hash": "b4eb782b3781b4f82e89f44d8600c582",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+          "card_name": "Goblin Oriflamme",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4b0f6181adb21e48fae116054fe4e08b",
+          "oracle_hash": "ac2e29ddff9b3a465105f4582b40f012",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+          "card_name": "Honor of the Pure",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8ab29fd8f0c26aceb442058cc885461f",
+          "oracle_hash": "7278ea48e2b98eab9c6802bb5d454ed7",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+          "card_name": "Jacques le Vert",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:964e27bcaf5c95d549770883d5697b90",
+          "oracle_hash": "4cb50df0f1c67841d4e69aaaf617d95d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+          "card_name": "Kaysa",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c5d36e3805d11b92e963645e9f2eb522",
+          "oracle_hash": "2d6428d94870902d477189d5c7405c5f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+          "card_name": "Orcish Oriflamme",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4b0f6181adb21e48fae116054fe4e08b",
+          "oracle_hash": "ac2e29ddff9b3a465105f4582b40f012",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+          "card_name": "War Horn",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0eedfd9a81253b55467d6dfbd75213ba",
+          "oracle_hash": "ac2e29ddff9b3a465105f4582b40f012",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 9
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+          "battle_rule_version": 2,
+          "card_name": "Builder's Blessing",
+          "logical_rule_key": "battle_rule_v1:879c6fd1182165350d95adb96bccf042"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+          "battle_rule_version": 2,
+          "card_name": "Castle",
+          "logical_rule_key": "battle_rule_v1:879c6fd1182165350d95adb96bccf042"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+          "battle_rule_version": 2,
+          "card_name": "Dire Fleet Neckbreaker",
+          "logical_rule_key": "battle_rule_v1:7ee525c101a785af954a07783655f297"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+          "battle_rule_version": 2,
+          "card_name": "Goblin Oriflamme",
+          "logical_rule_key": "battle_rule_v1:4b0f6181adb21e48fae116054fe4e08b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+          "battle_rule_version": 2,
+          "card_name": "Honor of the Pure",
+          "logical_rule_key": "battle_rule_v1:8ab29fd8f0c26aceb442058cc885461f"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+          "battle_rule_version": 2,
+          "card_name": "Jacques le Vert",
+          "logical_rule_key": "battle_rule_v1:964e27bcaf5c95d549770883d5697b90"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+          "battle_rule_version": 2,
+          "card_name": "Kaysa",
+          "logical_rule_key": "battle_rule_v1:c5d36e3805d11b92e963645e9f2eb522"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+          "battle_rule_version": 2,
+          "card_name": "Orcish Oriflamme",
+          "logical_rule_key": "battle_rule_v1:4b0f6181adb21e48fae116054fe4e08b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+          "battle_rule_version": 2,
+          "card_name": "War Horn",
+          "logical_rule_key": "battle_rule_v1:0eedfd9a81253b55467d6dfbd75213ba"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 9
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Builder's Blessing",
+          "component_keys": [],
+          "effect": "passive",
+          "logical_rule_key": "battle_rule_v1:879c6fd1182165350d95adb96bccf042"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Castle",
+          "component_keys": [],
+          "effect": "passive",
+          "logical_rule_key": "battle_rule_v1:879c6fd1182165350d95adb96bccf042"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Dire Fleet Neckbreaker",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:7ee525c101a785af954a07783655f297"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Goblin Oriflamme",
+          "component_keys": [],
+          "effect": "passive",
+          "logical_rule_key": "battle_rule_v1:4b0f6181adb21e48fae116054fe4e08b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Honor of the Pure",
+          "component_keys": [],
+          "effect": "passive",
+          "logical_rule_key": "battle_rule_v1:8ab29fd8f0c26aceb442058cc885461f"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Jacques le Vert",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:964e27bcaf5c95d549770883d5697b90"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Kaysa",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:c5d36e3805d11b92e963645e9f2eb522"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Orcish Oriflamme",
+          "component_keys": [],
+          "effect": "passive",
+          "logical_rule_key": "battle_rule_v1:4b0f6181adb21e48fae116054fe4e08b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "War Horn",
+          "component_keys": [],
+          "effect": "passive",
+          "logical_rule_key": "battle_rule_v1:0eedfd9a81253b55467d6dfbd75213ba"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 18,
+        "scenarios": 9
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

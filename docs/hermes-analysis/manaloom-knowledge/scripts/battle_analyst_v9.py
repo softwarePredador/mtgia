@@ -41351,6 +41351,20 @@ def static_controlled_power_toughness_applies_to(permanent, source, effect_data)
     }
     if required_colors and not any(card_has_color(permanent, color) for color in required_colors):
         return False
+    combat_state = str(effect_data.get("static_required_combat_state") or "").strip().lower()
+    if combat_state == "attacking" and not bool(permanent.get("attacking")):
+        return False
+    if combat_state == "blocking" and not bool(permanent.get("blocking")):
+        return False
+    if combat_state == "attacking_or_blocking" and not (
+        bool(permanent.get("attacking")) or bool(permanent.get("blocking"))
+    ):
+        return False
+    tapped_state = str(effect_data.get("static_required_tapped_state") or "").strip().lower()
+    if tapped_state == "tapped" and not bool(permanent.get("tapped")):
+        return False
+    if tapped_state == "untapped" and bool(permanent.get("tapped")):
+        return False
     return True
 
 

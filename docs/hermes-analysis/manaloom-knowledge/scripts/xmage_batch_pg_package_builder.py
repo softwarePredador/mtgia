@@ -41,6 +41,8 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "static_required_subtypes",
     "static_required_colors",
     "static_required_supertypes",
+    "static_required_combat_state",
+    "static_required_tapped_state",
     "static_artifact_creature",
     "creature_filter",
     "permanent_type",
@@ -976,6 +978,82 @@ def static_global_pt_execution_scenario_from_expected_rule(rule: dict[str, Any])
         "expected_power": target["base_power"] + power_bonus,
         "expected_toughness": expected_toughness,
         "expected_moved_to_graveyard": expected_toughness <= 0,
+        "expected_source": rule["card_name"],
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
+def static_controlled_pt_execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("static_effect") != "controlled_power_toughness_boost":
+        return None
+    subtypes = [
+        str(value).strip().lower()
+        for value in required.get("static_required_subtypes", []) or []
+        if str(value).strip()
+    ]
+    colors = [
+        str(value).strip().upper()
+        for value in required.get("static_required_colors", []) or []
+        if str(value).strip()
+    ]
+    supertypes = [
+        str(value).strip().title()
+        for value in required.get("static_required_supertypes", []) or []
+        if str(value).strip()
+    ]
+    combat_state = str(required.get("static_required_combat_state") or "").strip().lower()
+    tapped_state = str(required.get("static_required_tapped_state") or "").strip().lower()
+    subtype = subtypes[0] if subtypes else "soldier"
+    type_prefix = "Artifact Creature" if required.get("static_artifact_creature") else "Creature"
+    if supertypes:
+        type_prefix = f"{' '.join(supertypes)} {type_prefix}"
+    matching_target = {
+        "name": f"E2E Controlled P/T Target for {rule['card_name']}",
+        "type_line": f"{type_prefix} - {subtype.title()}",
+        "base_power": 2,
+        "base_toughness": 2,
+        "power": 2,
+        "toughness": 2,
+    }
+    if colors:
+        matching_target["colors"] = colors
+        matching_target["mana_cost"] = "".join(f"{{{color}}}" for color in colors)
+    if combat_state == "attacking":
+        matching_target["attacking"] = True
+    if tapped_state == "untapped":
+        matching_target["tapped"] = False
+    nonmatching_target = None
+    if subtypes or colors or required.get("static_artifact_creature") or supertypes or combat_state or tapped_state:
+        nonmatching_target = {
+            "name": f"E2E Nonmatching P/T Target for {rule['card_name']}",
+            "type_line": "Creature - Goblin",
+            "base_power": 2,
+            "base_toughness": 2,
+            "power": 2,
+            "toughness": 2,
+        }
+        if colors:
+            off_color = "U" if "U" not in colors else "R"
+            nonmatching_target["colors"] = [off_color]
+            nonmatching_target["mana_cost"] = f"{{{off_color}}}"
+        if combat_state == "attacking":
+            nonmatching_target["attacking"] = False
+        if tapped_state == "untapped":
+            nonmatching_target["tapped"] = True
+    opponent_target = dict(matching_target)
+    opponent_target["name"] = f"E2E Opponent P/T Target for {rule['card_name']}"
+    power_bonus = int(required.get("static_power_bonus") or 0)
+    toughness_bonus = int(required.get("static_toughness_bonus") or 0)
+    return {
+        "name": f"{rule['card_name']} static controlled P/T applies",
+        "type": "static_controlled_power_toughness_boost",
+        "card": {"name": rule["card_name"]},
+        "matching_target": matching_target,
+        "nonmatching_target": nonmatching_target,
+        "opponent_target": opponent_target,
+        "expected_power": matching_target["base_power"] + power_bonus,
+        "expected_toughness": matching_target["base_toughness"] + toughness_bonus,
         "expected_source": rule["card_name"],
         "logical_rule_key": rule["logical_rule_key"],
     }
@@ -3104,6 +3182,7 @@ def counter_unless_pays_execution_scenario_from_expected_rule(
 def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any] | None:
     return (
         counter_unless_pays_execution_scenario_from_expected_rule(rule)
+        or static_controlled_pt_execution_scenario_from_expected_rule(rule)
         or static_controlled_keyword_execution_scenario_from_expected_rule(rule)
         or static_global_pt_execution_scenario_from_expected_rule(rule)
         or aura_static_pt_execution_scenario_from_expected_rule(rule)
