@@ -4689,6 +4689,29 @@ def resolve_etb_add_counters_target(player, opponents, permanent, effect_data, t
     )
 
 
+def resolve_etb_target_stat_modifier(player, opponents, permanent, effect_data, turn, *, phase="battlefield_etb"):
+    etb_effect = {
+        **effect_data,
+        "effect": "stat_modifier_until_eot",
+        "target": effect_data.get("target") or "creature",
+        "target_constraints": effect_data.get("target_constraints") or {"card_types": ["creature"]},
+        "target_controller": effect_data.get("target_controller") or "any",
+        "power_delta": int(effect_data.get("power_delta") or effect_data.get("power_boost") or 0),
+        "toughness_delta": int(effect_data.get("toughness_delta") or effect_data.get("toughness_boost") or 0),
+        "power_boost": int(effect_data.get("power_boost") or effect_data.get("power_delta") or 0),
+        "toughness_boost": int(effect_data.get("toughness_boost") or effect_data.get("toughness_delta") or 0),
+        "duration": "until_end_of_turn",
+    }
+    return resolve_stat_modifier_until_eot_spell(
+        player,
+        opponents,
+        permanent,
+        etb_effect,
+        turn,
+        finish=False,
+    )
+
+
 def stat_modifier_is_harmful(effect_data):
     power_delta = int((effect_data or {}).get("power_delta") or (effect_data or {}).get("power_boost") or 0)
     toughness_delta = int((effect_data or {}).get("toughness_delta") or (effect_data or {}).get("toughness_boost") or 0)
@@ -18656,6 +18679,15 @@ def resolve_generic_permanent_etb(
             rng,
             stack=stack,
             all_players=all_players,
+            phase=phase,
+        )
+    if effect_data.get("etb_target_stat_modifier"):
+        resolve_etb_target_stat_modifier(
+            player,
+            opponents,
+            permanent,
+            effect_data,
+            turn,
             phase=phase,
         )
     if effect_data.get("etb_dynamic_draw"):

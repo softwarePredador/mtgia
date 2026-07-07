@@ -570,6 +570,58 @@ def test_creature_etb_draw_discard_runner_executes_trigger() -> None:
     assert any(event == "etb_draw_discard_resolved" for event, _ in events)
 
 
+def test_creature_etb_target_stat_modifier_runner_executes_trigger() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "creature",
+        "battle_model_scope": "xmage_creature_etb_fixed_boost_target_until_eot_v1",
+        "ability_kind": "triggered",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "stat_modifier_until_eot",
+        "etb_target_stat_modifier": True,
+        "target": "creature",
+        "target_controller": "any",
+        "target_constraints": {"card_types": ["creature"]},
+        "power_delta": -1,
+        "toughness_delta": -1,
+        "power_boost": -1,
+        "toughness_boost": -1,
+        "duration": "until_end_of_turn",
+        "_rule_logical_key": "battle_rule_v1:blister-beetle",
+    }
+    try:
+        result = validator.run_creature_etb_target_stat_modifier(
+            battle,
+            {
+                "name": "Blister Beetle weakens a target creature",
+                "type": "creature_etb_target_stat_modifier",
+                "card": {"name": "Blister Beetle", "type_line": "Creature - Insect", "power": 1, "toughness": 1},
+                "expected_power_delta": -1,
+                "expected_toughness_delta": -1,
+                "logical_rule_key": "battle_rule_v1:blister-beetle",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Blister Beetle"
+    assert result["target"] == "E2E Target Creature"
+    assert result["target_power"] == 3
+    assert result["target_toughness"] == 3
+    assert result["power_delta"] == -1
+    assert result["toughness_delta"] == -1
+    assert any(
+        event == "stat_modifier_until_eot_resolved" and data.get("card") == "Blister Beetle"
+        for event, data in events
+    )
+
+
 def test_fixed_create_tokens_runner_counts_controlled_subtype_support() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

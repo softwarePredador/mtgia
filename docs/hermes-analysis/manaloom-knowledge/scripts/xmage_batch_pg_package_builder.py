@@ -108,6 +108,7 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "etb_optional_discard_draw_count",
     "etb_draw_discard",
     "etb_discard_count",
+    "etb_target_stat_modifier",
     "etb_dynamic_draw",
     "draw_count_source",
     "etb_draw_count_source",
@@ -2039,6 +2040,35 @@ def creature_etb_draw_discard_execution_scenario_from_expected_rule(
     }
 
 
+def creature_etb_target_stat_modifier_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_creature_etb_fixed_boost_target_until_eot_v1":
+        return None
+    return {
+        "name": f"{rule['card_name']} boosts target creature on ETB",
+        "type": "creature_etb_target_stat_modifier",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": "Creature - Soldier",
+            "power": 2,
+            "toughness": 2,
+        },
+        "target": {
+            "name": "E2E Target Creature",
+            "type_line": "Creature - Soldier",
+            "power": 2,
+            "toughness": 2,
+        },
+        "expected_power_delta": int(required.get("power_delta") or required.get("power_boost") or 0),
+        "expected_toughness_delta": int(
+            required.get("toughness_delta") or required.get("toughness_boost") or 0
+        ),
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def spell_cast_gain_life_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
@@ -3491,6 +3521,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or creature_enters_life_gain_execution_scenario_from_expected_rule(rule)
         or creature_enters_draw_execution_scenario_from_expected_rule(rule)
         or creature_etb_draw_discard_execution_scenario_from_expected_rule(rule)
+        or creature_etb_target_stat_modifier_execution_scenario_from_expected_rule(rule)
         or spell_cast_gain_life_execution_scenario_from_expected_rule(rule)
     )
 

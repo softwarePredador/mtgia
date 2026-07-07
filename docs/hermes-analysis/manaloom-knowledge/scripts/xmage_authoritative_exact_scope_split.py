@@ -362,6 +362,7 @@ ETB_DRAW_DISCARD_CREATURE_SCOPE = "xmage_creature_etb_draw_discard_cards_v1"
 ETB_DYNAMIC_DRAW_CREATURE_SCOPE = "xmage_creature_etb_dynamic_draw_cards_v1"
 ETB_DRAW_LOSE_LIFE_CREATURE_SCOPE = "xmage_creature_etb_draw_lose_life_v1"
 ETB_DAMAGE_CREATURE_SCOPE = "xmage_creature_etb_fixed_damage_target_v1"
+ETB_TARGET_BOOST_CREATURE_SCOPE = "xmage_creature_etb_fixed_boost_target_until_eot_v1"
 ETB_DYNAMIC_COUNT_DAMAGE_CREATURE_SCOPE = (
     "xmage_creature_etb_dynamic_count_damage_target_v1"
 )
@@ -8303,6 +8304,25 @@ def fixed_boost_target_from_oracle(metadata: dict[str, Any]) -> tuple[int, int] 
     return power, toughness
 
 
+def etb_fixed_boost_target_from_oracle(metadata: dict[str, Any]) -> tuple[int, int] | str:
+    text = strip_parenthetical_reminders(oracle_text_after_leading_static_keywords(metadata))
+    text = re.sub(r"\s+", " ", text).strip().lower()
+    if "choose one" in text or "+x/" in text or "/+x" in text or "-x/" in text or "/-x" in text:
+        return "etb_target_boost_oracle_not_exact_fixed"
+    match = re.fullmatch(
+        r"(?:when|whenever) (?:this creature|[^.]+?) enters(?: the battlefield)?[, ]+"
+        r"target creature gets ([+-]?\d+)/([+-]?\d+) until end of turn\.?",
+        text,
+    )
+    if not match:
+        return "etb_target_boost_oracle_not_exact_fixed"
+    power = signed_int_from_oracle(match.group(1))
+    toughness = signed_int_from_oracle(match.group(2))
+    if power is None or toughness is None:
+        return "etb_target_boost_oracle_not_exact_fixed"
+    return power, toughness
+
+
 def fixed_boost_controlled_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str | None:
     text = strip_leading_parenthetical_reminders(oracle_text(metadata))
     if "choose one" in text.lower() or "+x/" in text.lower() or "/+x" in text.lower():
@@ -9182,6 +9202,19 @@ def is_creature_etb_damage_unit(row: dict[str, Any]) -> bool:
         return False
     return (
         effect_classes(row) == {"DamageTargetEffect"}
+        and ability_classes(row) == {"EntersBattlefieldTriggeredAbility"}
+        and set(row.get("xmage_signals") or []) == {"targeting", "triggered_ability"}
+    )
+
+
+def is_creature_etb_target_boost_unit(row: dict[str, Any]) -> bool:
+    unit = str(row.get("adapter_work_unit") or "")
+    return (
+        unit.startswith(
+            "xmage_signature::BoostTargetEffect::EntersBattlefieldTriggeredAbility::"
+            "TargetCreaturePermanent::no_condition_class::targeting,triggered_ability"
+        )
+        and effect_classes(row) == {"BoostTargetEffect"}
         and ability_classes(row) == {"EntersBattlefieldTriggeredAbility"}
         and set(row.get("xmage_signals") or []) == {"targeting", "triggered_ability"}
     )
@@ -19998,6 +20031,7 @@ def split_row(
     permanent_activated_draw_discard_unit = is_permanent_activated_draw_discard_unit(row)
     dies_recursion_creature_unit = is_creature_dies_recursion_unit(row)
     etb_damage_creature_unit = is_creature_etb_damage_unit(row)
+    etb_target_boost_creature_unit = is_creature_etb_target_boost_unit(row)
     etb_graveyard_count_damage_creature_unit = is_creature_etb_graveyard_count_damage_unit(row)
     etb_destroy_creature_unit = is_creature_etb_destroy_unit(row)
     etb_bounce_creature_unit = is_creature_etb_bounce_unit(row)
@@ -20134,6 +20168,7 @@ def split_row(
         and not permanent_activated_draw_discard_unit
         and not dies_recursion_creature_unit
         and not etb_damage_creature_unit
+        and not etb_target_boost_creature_unit
         and not etb_graveyard_count_damage_creature_unit
         and not etb_destroy_creature_unit
         and not etb_bounce_creature_unit
@@ -20222,6 +20257,7 @@ def split_row(
         and not permanent_activated_draw_discard_unit
         and not dies_recursion_creature_unit
         and not etb_damage_creature_unit
+        and not etb_target_boost_creature_unit
         and not etb_graveyard_count_damage_creature_unit
         and not etb_destroy_creature_unit
         and not etb_bounce_creature_unit
@@ -24539,6 +24575,43 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_creature_etb_fixed_damage_target",
+        ), "selected_exact_scope"
+
+    if etb_target_boost_creature_unit:
+        if not is_creature_metadata(metadata):
+            return None, "etb_target_boost_not_creature"
+        source_boost = fixed_boost_target_from_source(source_text)
+        if source_boost is None:
+            return None, "etb_target_boost_source_not_single_fixed"
+        oracle_boost = etb_fixed_boost_target_from_oracle(metadata)
+        if isinstance(oracle_boost, str):
+            return None, oracle_boost
+        if source_boost != oracle_boost:
+            return None, "etb_target_boost_source_oracle_mismatch"
+        power_delta, toughness_delta = oracle_boost
+        effect_json = {
+            "effect": "creature",
+            "battle_model_scope": ETB_TARGET_BOOST_CREATURE_SCOPE,
+            "ability_kind": "triggered",
+            "trigger": "enters_battlefield",
+            "trigger_effect": "stat_modifier_until_eot",
+            "etb_target_stat_modifier": True,
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "target_controller": "any",
+            "power_delta": power_delta,
+            "toughness_delta": toughness_delta,
+            "power_boost": power_delta,
+            "toughness_boost": toughness_delta,
+            "duration": "until_end_of_turn",
+            "xmage_effect_class": "BoostTargetEffect",
+            "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        }
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_creature_etb_fixed_boost_target_until_eot",
         ), "selected_exact_scope"
 
     if etb_destroy_creature_unit:
@@ -29519,6 +29592,7 @@ def build_exact_split_report(
             and not is_creature_etb_tutor_to_hand_unit(row)
             and not is_creature_etb_bounce_unit(row)
             and not is_creature_tap_damage_unit(row)
+            and not is_creature_etb_target_boost_unit(row)
             and not is_creature_etb_token_unit(row)
             and not is_creature_dies_token_unit(row)
             and not is_permanent_activated_token_unit(row)
@@ -29610,6 +29684,7 @@ def build_exact_split_report(
                 "add_counters::source_add_counters_variant_v1 rows with AddCountersSourceEffect and SpellCastControllerTriggeredAbility, exact source self-counter count, supported spell filters, and only static self keywords",
                 "life_gain::xmage_life_gain_variant_review_v1 rows with GainLifeEffect and SpellCastControllerTriggeredAbility, exact controller life gain, and supported spell filters",
                 "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, EntersBattlefieldTriggeredAbility, and exact fixed ETB damage Oracle text",
+                "xmage_signature BoostTargetEffect + EntersBattlefieldTriggeredAbility rows with exact fixed target-creature boost until EOT and generic TargetCreaturePermanent source target",
                 "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, DiesSourceTriggeredAbility, exact fixed dies-damage Oracle/source agreement, and no auxiliary ability class",
                 "direct_damage::targeted_damage_variant_v1 rows with one-shot DamageTargetEffect whose amount is an exact supported battlefield/hand/domain count, optional fixed base amount, and supported target constraints",
                 "removal_destroy::targeted_destroy_variant_v1 rows with DestroyTargetEffect, EntersBattlefieldTriggeredAbility, and exact ETB destroy Oracle/source target constraints",

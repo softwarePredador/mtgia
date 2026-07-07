@@ -17912,6 +17912,88 @@ draw/discard, target-player discard, draw-then-discard choices, hand-size or
 graveyard-dependent discard counts, replacement effects, or non-creature ETB
 wrappers. Those remain separate adapter contracts.
 
+## 2026-07-07 PG610 Creature ETB Target Power/Toughness Modifier Checkpoint
+
+PG610 closed the exact XMage subpattern:
+
+- `EntersBattlefieldTriggeredAbility`;
+- `BoostTargetEffect`;
+- exact `TargetCreaturePermanent` with no condition class;
+- creature permanent entering the battlefield;
+- fixed `+N/+M` or `-N/-M` target creature modifier until end of turn;
+- no dynamic X/count, party-size scaling, modal choice, optional trigger,
+  restricted controller target, non-creature target, or multiple independent
+  target/effect branches.
+
+Promoted cards:
+
+- `Blister Beetle`;
+- `Daybreak Charger`;
+- `Farbog Boneflinger`;
+- `Guardian of Pilgrims`;
+- `Jadecraft Artisan`;
+- `Kinsbaile Skirmisher`;
+- `Rubblebelt Boar`;
+- `Tenth District Guard`;
+- `Vulshok Heartstoker`;
+- `Yeva's Forcemage`.
+
+Implementation:
+
+- `xmage_authoritative_exact_scope_split.py` now maps exact
+  `BoostTargetEffect + EntersBattlefieldTriggeredAbility +
+  TargetCreaturePermanent` creature sources to
+  `xmage_creature_etb_fixed_boost_target_until_eot_v1`;
+- `xmage_batch_pg_package_builder.py` now preserves
+  `etb_target_stat_modifier` fields and emits
+  `creature_etb_target_stat_modifier` E2E scenarios;
+- `battle_analyst_v9.py` now executes ETB target stat modifiers through the
+  existing until-end-of-turn stat modifier runtime path;
+- `battle_package_end_to_end_validation.py` now validates focused ETB target
+  power/toughness modification and the emitted
+  `stat_modifier_until_eot_resolved` event.
+
+Validation:
+
+- split produced `proposal_count=10` and
+  `safe_for_batch_pg_package_count=10`;
+- precheck found `10/10` target card rows, `0` existing expected rule rows, and
+  `0` shadow rows to deprecate;
+- apply upserted `10` PostgreSQL rows and deprecated `0` shadow rows;
+- postcheck confirmed `10/10` promoted rows, `10/10` verified/auto rows, and
+  `10/10` rows with `oracle_hash`;
+- focused tests passed for splitter ETB target boost variants, package builder
+  scenario generation, E2E runner behavior, and Python compilation for the
+  touched splitter/package/runtime/E2E scripts;
+- PG -> SQLite/snapshot sync loaded `10` PostgreSQL rows, updated `10` SQLite
+  rows, and exported `5781` canonical snapshot rows;
+- metadata sync used `database_target=127.0.0.1:15432/halder`, matched `6949`
+  PostgreSQL cards, and left `deck_cards` at `2699/2699` matched;
+- E2E validation passed PostgreSQL, SQLite, snapshot, runtime lookup, and `10`
+  battle execution scenarios, each proving ETB target power/toughness
+  modification;
+- post-sync queue rebuild reduced `target_identity_count` from `25086` to
+  `25076`, `xmage_authoritative_source_count` from `24772` to `24762`, and
+  `xmage_authoritative_adapter_required_count` from `24772` to `24762`;
+- global readiness now reports `battle_and_oracle_ready=5874` and
+  `battle_family_mapper_required=27999`;
+- final exact-scope recheck against the post-PG610 queue returned
+  `proposal_count=0` and `safe_for_batch_pg_package_count=0`;
+- PG/Hermes/SQLite contract audit passed `51/51`;
+- XMage strategy audit passed `26/26`;
+- operational surface alignment audit passed;
+- legacy contamination audit passed;
+- multi-rule runtime readiness stayed bounded to known review/selector gaps and
+  did not expose a PG610 regression;
+- `scripts/quality_gate.sh server-target` passed against the new-server target.
+
+Residual boundary: PG610 models only fixed ETB target creature stat modifiers
+using XMage `BoostTargetEffect` with exact generic `TargetCreaturePermanent`.
+It does not authorize dynamic X/count modifiers, controller-restricted targets,
+modal/optional branches, activated or spell-based target boosts, static
+auras/equipment boosts, attack triggers, or non-creature target variants. Those
+remain separate adapter contracts.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

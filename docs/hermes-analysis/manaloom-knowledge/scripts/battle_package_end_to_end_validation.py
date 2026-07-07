@@ -1638,6 +1638,95 @@ def run_creature_etb_draw_discard(
     }
 
 
+def run_creature_etb_target_stat_modifier(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    effect = battle.get_card_effect(card)
+    active = battle.Player(str(scenario.get("player") or "ETB Boost Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
+    target = battle.enrich_card(
+        {
+            "name": "E2E Target Creature",
+            "type_line": "Creature - Soldier",
+            "power": 4,
+            "toughness": 4,
+            **dict(scenario.get("target") or {}),
+        }
+    )
+    expected_power_delta = int(
+        scenario.get("expected_power_delta") or effect.get("power_delta") or effect.get("power_boost") or 0
+    )
+    expected_toughness_delta = int(
+        scenario.get("expected_toughness_delta")
+        or effect.get("toughness_delta")
+        or effect.get("toughness_boost")
+        or 0
+    )
+    harmful = expected_toughness_delta < 0 or (expected_power_delta < 0 and expected_toughness_delta <= 0)
+    if harmful:
+        active.battlefield = []
+        opponent.battlefield = [target]
+    else:
+        active.battlefield = [target]
+        opponent.battlefield = []
+    permanent = battle.prepare_entering_permanent(
+        battle.enrich_card({**card, **effect}),
+        controller=active,
+        all_players=[active, opponent],
+        turn=int(scenario.get("turn") or 6),
+    )
+    active.battlefield.append(permanent)
+    before_events = len(events)
+    before_power = int(target.get("power") or 0)
+    before_toughness = int(target.get("toughness") or 0)
+    battle.resolve_generic_permanent_etb(
+        active,
+        [opponent],
+        permanent,
+        effect,
+        int(scenario.get("turn") or 6),
+        random.Random(int(scenario.get("seed") or 6080)),
+        all_players=[active, opponent],
+    )
+    expected_power = before_power + expected_power_delta
+    expected_toughness = before_toughness + expected_toughness_delta
+    if int(target.get("power") or 0) != expected_power:
+        fail("battle_execution", f"{card['name']} target power={target.get('power')!r}, expected {expected_power}")
+    if int(target.get("toughness") or 0) != expected_toughness:
+        fail(
+            "battle_execution",
+            f"{card['name']} target toughness={target.get('toughness')!r}, expected {expected_toughness}",
+        )
+    resolved_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "stat_modifier_until_eot_resolved"
+            and data.get("card") == card.get("name")
+            and data.get("target") == target.get("name")
+        ),
+        None,
+    )
+    if resolved_event is None:
+        fail("battle_events", f"missing {card['name']} ETB target stat modifier event")
+    if int(resolved_event.get("power_delta") or 0) != expected_power_delta:
+        fail("battle_events", f"{card['name']} power_delta={resolved_event.get('power_delta')!r}")
+    if int(resolved_event.get("toughness_delta") or 0) != expected_toughness_delta:
+        fail("battle_events", f"{card['name']} toughness_delta={resolved_event.get('toughness_delta')!r}")
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "target": target.get("name"),
+        "target_power": int(target.get("power") or 0),
+        "target_toughness": int(target.get("toughness") or 0),
+        "power_delta": expected_power_delta,
+        "toughness_delta": expected_toughness_delta,
+    }
+
+
 def run_creature_etb_library_pick(
     battle,
     scenario: dict[str, Any],
@@ -5515,6 +5604,7 @@ SCENARIO_RUNNERS = {
     "creature_etb_create_tokens": run_creature_etb_create_tokens,
     "creature_etb_dynamic_life_gain": run_creature_etb_dynamic_life_gain,
     "creature_etb_draw_discard": run_creature_etb_draw_discard,
+    "creature_etb_target_stat_modifier": run_creature_etb_target_stat_modifier,
     "creature_etb_library_pick": run_creature_etb_library_pick,
     "creature_enters_draw": run_creature_enters_draw,
     "creature_enters_life_gain": run_creature_enters_life_gain,

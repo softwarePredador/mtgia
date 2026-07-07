@@ -19809,6 +19809,68 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "etb_draw_discard_source_condition_not_supported")
 
+    def test_creature_etb_target_boost_maps_fixed_generic_target(self) -> None:
+        row = queue_row(
+            "xmage_signature::BoostTargetEffect::EntersBattlefieldTriggeredAbility::"
+            "TargetCreaturePermanent::no_condition_class::targeting,triggered_ability",
+            effect_classes=["BoostTargetEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["targeting", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Blister Beetle",
+                type_line="Creature - Insect",
+                oracle_text="When this creature enters, target creature gets -1/-1 until end of turn.",
+            ),
+            source_text="""
+                Ability ability = new EntersBattlefieldTriggeredAbility(
+                    new BoostTargetEffect(-1, -1, Duration.EndOfTurn));
+                ability.addTarget(new TargetCreaturePermanent());
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.ETB_TARGET_BOOST_CREATURE_SCOPE)
+        self.assertTrue(effect["etb_target_stat_modifier"])
+        self.assertEqual(effect["power_delta"], -1)
+        self.assertEqual(effect["toughness_delta"], -1)
+        self.assertEqual(effect["target_controller"], "any")
+
+    def test_creature_etb_target_boost_blocks_dynamic_oracle(self) -> None:
+        row = queue_row(
+            "xmage_signature::BoostTargetEffect::EntersBattlefieldTriggeredAbility::"
+            "TargetCreaturePermanent::no_condition_class::targeting,triggered_ability",
+            effect_classes=["BoostTargetEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["targeting", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Kabira Outrider",
+                type_line="Creature - Human Warrior",
+                oracle_text=(
+                    "When this creature enters, target creature gets +1/+1 until end of turn "
+                    "for each creature in your party."
+                ),
+            ),
+            source_text="""
+                Ability ability = new EntersBattlefieldTriggeredAbility(
+                    new BoostTargetEffect(1, 1, Duration.EndOfTurn));
+                ability.addTarget(new TargetCreaturePermanent());
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "etb_target_boost_oracle_not_exact_fixed")
+
     def test_creature_etb_dynamic_draw_maps_plus_one_counter_count(self) -> None:
         row = queue_row(
             split.DRAW_ENGINE_UNIT,

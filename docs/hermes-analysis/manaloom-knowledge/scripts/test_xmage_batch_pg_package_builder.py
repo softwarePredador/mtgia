@@ -108,6 +108,35 @@ def test_creature_etb_draw_discard_execution_scenario_is_manifested() -> None:
     assert scenario["expected_keywords"] == ["flying"]
 
 
+def test_creature_etb_target_stat_modifier_execution_scenario_is_manifested() -> None:
+    proposal = {
+        "normalized_name": "blister beetle",
+        "card_name": "Blister Beetle",
+        "oracle_hash": "hash-blister-beetle",
+        "logical_rule_key": "battle_rule_v1:blister-beetle",
+        "effect_json": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_etb_fixed_boost_target_until_eot_v1",
+            "etb_target_stat_modifier": True,
+            "target": "creature",
+            "target_controller": "any",
+            "power_delta": -1,
+            "toughness_delta": -1,
+            "power_boost": -1,
+            "toughness_boost": -1,
+            "duration": "until_end_of_turn",
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    assert expected["required_effect_fields"]["etb_target_stat_modifier"] is True
+    assert scenario["type"] == "creature_etb_target_stat_modifier"
+    assert scenario["expected_power_delta"] == -1
+    assert scenario["expected_toughness_delta"] == -1
+
+
 def test_manifest_expected_rule_from_proposal_contains_e2e_fields() -> None:
     proposal = {
         "normalized_name": "verge rangers",
