@@ -800,6 +800,34 @@ def test_manifest_builds_attack_self_boost_execution_scenario() -> None:
     assert scenario["expected_toughness_delta"] == 1
 
 
+def test_manifest_builds_becomes_blocked_self_boost_execution_scenario() -> None:
+    rule = {
+        "normalized_name": "gang of elk",
+        "card_name": "Gang of Elk",
+        "oracle_hash": "hash-gang-of-elk",
+        "logical_rule_key": "battle_rule_v1:hash-gang-of-elk",
+        "required_effect_fields": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_becomes_blocked_self_boost_until_eot_v1",
+            "trigger": "becomes_blocked",
+            "trigger_effect": "self_stat_modifier_until_eot",
+            "power_delta": 2,
+            "toughness_delta": 2,
+            "blocker_count_mode": "per_blocker",
+        },
+    }
+
+    scenario = builder.becomes_blocked_self_boost_execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "becomes_blocked_self_boost"
+    assert scenario["card"]["name"] == "Gang of Elk"
+    assert scenario["expected_base_power_delta"] == 2
+    assert scenario["expected_base_toughness_delta"] == 2
+    assert scenario["expected_blocker_count_mode"] == "per_blocker"
+    assert scenario["blocker_count"] == 3
+
+
 def test_manifest_builds_single_target_exile_execution_scenario() -> None:
     rule = {
         "normalized_name": "radiant purge",

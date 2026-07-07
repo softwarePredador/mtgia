@@ -1,0 +1,93 @@
+WITH proposed(normalized_name, card_name, oracle_hash, logical_rule_key, effect_json, deck_role_json, source, confidence, review_status, execution_status, notes, shadow_handling) AS (
+  VALUES
+    ('deeproot warrior', 'Deeproot Warrior', '248374b82cbda19a694ef3ac63476c3f', 'battle_rule_v1:6f335f90caaa0411ff4a36a67b424b8b', '{"ability_kind":"triggered","battle_model_scope":"xmage_creature_becomes_blocked_self_boost_until_eot_v1","becomes_blocked_trigger_self_boost":true,"blocker_count_mode":"fixed","duration":"until_end_of_turn","effect":"creature","power_boost":1,"power_delta":1,"target":"self","target_constraints":{"card_types":["creature"],"source":"self"},"target_controller":"self","toughness_boost":1,"toughness_delta":1,"trigger":"becomes_blocked","trigger_effect":"self_stat_modifier_until_eot","xmage_ability_class":"BecomesBlockedSourceTriggeredAbility","xmage_effect_class":"BoostSourceEffect"}'::jsonb, '{"category":"unknown","effect":"creature","target":"self"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class DeeprootWarrior translated into ManaLoom runtime scope xmage_creature_becomes_blocked_self_boost_until_eot_v1. This row is package-ready only because the source signature is a narrow creature becomes-blocked trigger self power/toughness boost until end of turn with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('deepwood wolverine', 'Deepwood Wolverine', 'df50ed4f553343d9cc60a31703ed063c', 'battle_rule_v1:0321b0ee556c069923c0933f9725875a', '{"ability_kind":"triggered","battle_model_scope":"xmage_creature_becomes_blocked_self_boost_until_eot_v1","becomes_blocked_trigger_self_boost":true,"blocker_count_mode":"fixed","duration":"until_end_of_turn","effect":"creature","power_boost":2,"power_delta":2,"target":"self","target_constraints":{"card_types":["creature"],"source":"self"},"target_controller":"self","toughness_boost":0,"toughness_delta":0,"trigger":"becomes_blocked","trigger_effect":"self_stat_modifier_until_eot","xmage_ability_class":"BecomesBlockedSourceTriggeredAbility","xmage_effect_class":"BoostSourceEffect"}'::jsonb, '{"category":"unknown","effect":"creature","target":"self"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class DeepwoodWolverine translated into ManaLoom runtime scope xmage_creature_becomes_blocked_self_boost_until_eot_v1. This row is package-ready only because the source signature is a narrow creature becomes-blocked trigger self power/toughness boost until end of turn with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('elvish berserker', 'Elvish Berserker', 'd15f21a4118fb42c49d197c466d96982', 'battle_rule_v1:148179706cd79d57c1519c9dc6d174fc', '{"ability_kind":"triggered","battle_model_scope":"xmage_creature_becomes_blocked_self_boost_until_eot_v1","becomes_blocked_trigger_self_boost":true,"blocker_count_mode":"per_blocker","duration":"until_end_of_turn","effect":"creature","power_boost":1,"power_delta":1,"target":"self","target_constraints":{"card_types":["creature"],"source":"self"},"target_controller":"self","toughness_boost":1,"toughness_delta":1,"trigger":"becomes_blocked","trigger_effect":"self_stat_modifier_until_eot","xmage_ability_class":"BecomesBlockedSourceTriggeredAbility","xmage_effect_class":"BoostSourceEffect"}'::jsonb, '{"category":"unknown","effect":"creature","target":"self"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class ElvishBerserker translated into ManaLoom runtime scope xmage_creature_becomes_blocked_self_boost_until_eot_v1. This row is package-ready only because the source signature is a narrow creature becomes-blocked trigger self power/toughness boost until end of turn with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('gang of elk', 'Gang of Elk', 'b5f2e8453cdf86a27892048ec3c776b0', 'battle_rule_v1:7fcd200587196e506a3467fd99c7d234', '{"ability_kind":"triggered","battle_model_scope":"xmage_creature_becomes_blocked_self_boost_until_eot_v1","becomes_blocked_trigger_self_boost":true,"blocker_count_mode":"per_blocker","duration":"until_end_of_turn","effect":"creature","power_boost":2,"power_delta":2,"target":"self","target_constraints":{"card_types":["creature"],"source":"self"},"target_controller":"self","toughness_boost":2,"toughness_delta":2,"trigger":"becomes_blocked","trigger_effect":"self_stat_modifier_until_eot","xmage_ability_class":"BecomesBlockedSourceTriggeredAbility","xmage_effect_class":"BoostSourceEffect"}'::jsonb, '{"category":"unknown","effect":"creature","target":"self"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class GangOfElk translated into ManaLoom runtime scope xmage_creature_becomes_blocked_self_boost_until_eot_v1. This row is package-ready only because the source signature is a narrow creature becomes-blocked trigger self power/toughness boost until end of turn with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('johtull wurm', 'Johtull Wurm', 'ac2948cddc801bf58bc397ea576f33b9', 'battle_rule_v1:b72d6cfd8ffcbbd3158762e9e7f5cb99', '{"ability_kind":"triggered","battle_model_scope":"xmage_creature_becomes_blocked_self_boost_until_eot_v1","becomes_blocked_trigger_self_boost":true,"blocker_count_mode":"beyond_first","duration":"until_end_of_turn","effect":"creature","power_boost":-2,"power_delta":-2,"target":"self","target_constraints":{"card_types":["creature"],"source":"self"},"target_controller":"self","toughness_boost":-1,"toughness_delta":-1,"trigger":"becomes_blocked","trigger_effect":"self_stat_modifier_until_eot","xmage_ability_class":"BecomesBlockedSourceTriggeredAbility","xmage_effect_class":"BoostSourceEffect"}'::jsonb, '{"category":"unknown","effect":"creature","target":"self"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class JohtullWurm translated into ManaLoom runtime scope xmage_creature_becomes_blocked_self_boost_until_eot_v1. This row is package-ready only because the source signature is a narrow creature becomes-blocked trigger self power/toughness boost until end of turn with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('jungle wurm', 'Jungle Wurm', '01e587895d132435b9e16a0b38722863', 'battle_rule_v1:6cab8c73bb979d47e172f61a46aad7a4', '{"ability_kind":"triggered","battle_model_scope":"xmage_creature_becomes_blocked_self_boost_until_eot_v1","becomes_blocked_trigger_self_boost":true,"blocker_count_mode":"beyond_first","duration":"until_end_of_turn","effect":"creature","power_boost":-1,"power_delta":-1,"target":"self","target_constraints":{"card_types":["creature"],"source":"self"},"target_controller":"self","toughness_boost":-1,"toughness_delta":-1,"trigger":"becomes_blocked","trigger_effect":"self_stat_modifier_until_eot","xmage_ability_class":"BecomesBlockedSourceTriggeredAbility","xmage_effect_class":"BoostSourceEffect"}'::jsonb, '{"category":"unknown","effect":"creature","target":"self"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class JungleWurm translated into ManaLoom runtime scope xmage_creature_becomes_blocked_self_boost_until_eot_v1. This row is package-ready only because the source signature is a narrow creature becomes-blocked trigger self power/toughness boost until end of turn with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('norwood warrior', 'Norwood Warrior', '248374b82cbda19a694ef3ac63476c3f', 'battle_rule_v1:6f335f90caaa0411ff4a36a67b424b8b', '{"ability_kind":"triggered","battle_model_scope":"xmage_creature_becomes_blocked_self_boost_until_eot_v1","becomes_blocked_trigger_self_boost":true,"blocker_count_mode":"fixed","duration":"until_end_of_turn","effect":"creature","power_boost":1,"power_delta":1,"target":"self","target_constraints":{"card_types":["creature"],"source":"self"},"target_controller":"self","toughness_boost":1,"toughness_delta":1,"trigger":"becomes_blocked","trigger_effect":"self_stat_modifier_until_eot","xmage_ability_class":"BecomesBlockedSourceTriggeredAbility","xmage_effect_class":"BoostSourceEffect"}'::jsonb, '{"category":"unknown","effect":"creature","target":"self"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class NorwoodWarrior translated into ManaLoom runtime scope xmage_creature_becomes_blocked_self_boost_until_eot_v1. This row is package-ready only because the source signature is a narrow creature becomes-blocked trigger self power/toughness boost until end of turn with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('rabid elephant', 'Rabid Elephant', 'b5f2e8453cdf86a27892048ec3c776b0', 'battle_rule_v1:7fcd200587196e506a3467fd99c7d234', '{"ability_kind":"triggered","battle_model_scope":"xmage_creature_becomes_blocked_self_boost_until_eot_v1","becomes_blocked_trigger_self_boost":true,"blocker_count_mode":"per_blocker","duration":"until_end_of_turn","effect":"creature","power_boost":2,"power_delta":2,"target":"self","target_constraints":{"card_types":["creature"],"source":"self"},"target_controller":"self","toughness_boost":2,"toughness_delta":2,"trigger":"becomes_blocked","trigger_effect":"self_stat_modifier_until_eot","xmage_ability_class":"BecomesBlockedSourceTriggeredAbility","xmage_effect_class":"BoostSourceEffect"}'::jsonb, '{"category":"unknown","effect":"creature","target":"self"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class RabidElephant translated into ManaLoom runtime scope xmage_creature_becomes_blocked_self_boost_until_eot_v1. This row is package-ready only because the source signature is a narrow creature becomes-blocked trigger self power/toughness boost until end of turn with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('razorclaw bear', 'Razorclaw Bear', 'b560b7660d402777e61e7ef11523c7c5', 'battle_rule_v1:c906168a4a78f3aed5c07090c2998e2c', '{"ability_kind":"triggered","battle_model_scope":"xmage_creature_becomes_blocked_self_boost_until_eot_v1","becomes_blocked_trigger_self_boost":true,"blocker_count_mode":"fixed","duration":"until_end_of_turn","effect":"creature","power_boost":2,"power_delta":2,"target":"self","target_constraints":{"card_types":["creature"],"source":"self"},"target_controller":"self","toughness_boost":2,"toughness_delta":2,"trigger":"becomes_blocked","trigger_effect":"self_stat_modifier_until_eot","xmage_ability_class":"BecomesBlockedSourceTriggeredAbility","xmage_effect_class":"BoostSourceEffect"}'::jsonb, '{"category":"unknown","effect":"creature","target":"self"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class RazorclawBear translated into ManaLoom runtime scope xmage_creature_becomes_blocked_self_boost_until_eot_v1. This row is package-ready only because the source signature is a narrow creature becomes-blocked trigger self power/toughness boost until end of turn with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('slashing tiger', 'Slashing Tiger', 'b560b7660d402777e61e7ef11523c7c5', 'battle_rule_v1:c906168a4a78f3aed5c07090c2998e2c', '{"ability_kind":"triggered","battle_model_scope":"xmage_creature_becomes_blocked_self_boost_until_eot_v1","becomes_blocked_trigger_self_boost":true,"blocker_count_mode":"fixed","duration":"until_end_of_turn","effect":"creature","power_boost":2,"power_delta":2,"target":"self","target_constraints":{"card_types":["creature"],"source":"self"},"target_controller":"self","toughness_boost":2,"toughness_delta":2,"trigger":"becomes_blocked","trigger_effect":"self_stat_modifier_until_eot","xmage_ability_class":"BecomesBlockedSourceTriggeredAbility","xmage_effect_class":"BoostSourceEffect"}'::jsonb, '{"category":"unknown","effect":"creature","target":"self"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class SlashingTiger translated into ManaLoom runtime scope xmage_creature_becomes_blocked_self_boost_until_eot_v1. This row is package-ready only because the source signature is a narrow creature becomes-blocked trigger self power/toughness boost until end of turn with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('snorting gahr', 'Snorting Gahr', 'b560b7660d402777e61e7ef11523c7c5', 'battle_rule_v1:c906168a4a78f3aed5c07090c2998e2c', '{"ability_kind":"triggered","battle_model_scope":"xmage_creature_becomes_blocked_self_boost_until_eot_v1","becomes_blocked_trigger_self_boost":true,"blocker_count_mode":"fixed","duration":"until_end_of_turn","effect":"creature","power_boost":2,"power_delta":2,"target":"self","target_constraints":{"card_types":["creature"],"source":"self"},"target_controller":"self","toughness_boost":2,"toughness_delta":2,"trigger":"becomes_blocked","trigger_effect":"self_stat_modifier_until_eot","xmage_ability_class":"BecomesBlockedSourceTriggeredAbility","xmage_effect_class":"BoostSourceEffect"}'::jsonb, '{"category":"unknown","effect":"creature","target":"self"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class SnortingGahr translated into ManaLoom runtime scope xmage_creature_becomes_blocked_self_boost_until_eot_v1. This row is package-ready only because the source signature is a narrow creature becomes-blocked trigger self power/toughness boost until end of turn with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('sparring golem', 'Sparring Golem', 'd15f21a4118fb42c49d197c466d96982', 'battle_rule_v1:148179706cd79d57c1519c9dc6d174fc', '{"ability_kind":"triggered","battle_model_scope":"xmage_creature_becomes_blocked_self_boost_until_eot_v1","becomes_blocked_trigger_self_boost":true,"blocker_count_mode":"per_blocker","duration":"until_end_of_turn","effect":"creature","power_boost":1,"power_delta":1,"target":"self","target_constraints":{"card_types":["creature"],"source":"self"},"target_controller":"self","toughness_boost":1,"toughness_delta":1,"trigger":"becomes_blocked","trigger_effect":"self_stat_modifier_until_eot","xmage_ability_class":"BecomesBlockedSourceTriggeredAbility","xmage_effect_class":"BoostSourceEffect"}'::jsonb, '{"category":"unknown","effect":"creature","target":"self"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class SparringGolem translated into ManaLoom runtime scope xmage_creature_becomes_blocked_self_boost_until_eot_v1. This row is package-ready only because the source signature is a narrow creature becomes-blocked trigger self power/toughness boost until end of turn with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('trained cheetah', 'Trained Cheetah', '248374b82cbda19a694ef3ac63476c3f', 'battle_rule_v1:6f335f90caaa0411ff4a36a67b424b8b', '{"ability_kind":"triggered","battle_model_scope":"xmage_creature_becomes_blocked_self_boost_until_eot_v1","becomes_blocked_trigger_self_boost":true,"blocker_count_mode":"fixed","duration":"until_end_of_turn","effect":"creature","power_boost":1,"power_delta":1,"target":"self","target_constraints":{"card_types":["creature"],"source":"self"},"target_controller":"self","toughness_boost":1,"toughness_delta":1,"trigger":"becomes_blocked","trigger_effect":"self_stat_modifier_until_eot","xmage_ability_class":"BecomesBlockedSourceTriggeredAbility","xmage_effect_class":"BoostSourceEffect"}'::jsonb, '{"category":"unknown","effect":"creature","target":"self"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class TrainedCheetah translated into ManaLoom runtime scope xmage_creature_becomes_blocked_self_boost_until_eot_v1. This row is package-ready only because the source signature is a narrow creature becomes-blocked trigger self power/toughness boost until end of turn with focused runtime coverage.', 'deprecate_nonmatching_rows')
+),
+matched_cards AS (
+  SELECT
+    p.normalized_name,
+    p.card_name,
+    p.oracle_hash,
+    c.id AS card_id,
+    c.name AS db_card_name
+  FROM proposed p
+  LEFT JOIN public.cards c
+    ON (
+         lower(c.name) = p.normalized_name
+         OR split_part(lower(c.name), ' // ', 1) = p.normalized_name
+       )
+   AND md5(coalesce(c.oracle_text, '')) = p.oracle_hash
+),
+target_cards AS (
+  SELECT
+    normalized_name,
+    card_name,
+    oracle_hash,
+    count(card_id) AS target_card_rows,
+    min(card_id::text)::uuid AS canonical_card_id,
+    min(db_card_name) AS canonical_card_name
+  FROM matched_cards
+  GROUP BY normalized_name, card_name, oracle_hash
+),
+rule_rows AS (
+  SELECT p.normalized_name, count(r.*) AS existing_rule_rows
+  FROM proposed p
+  LEFT JOIN public.card_battle_rules r
+    ON (
+         r.normalized_name = p.normalized_name
+         OR r.normalized_name LIKE p.normalized_name || ' // %'
+       )
+  GROUP BY p.normalized_name
+),
+expected_rows AS (
+  SELECT p.normalized_name, count(r.*) AS expected_rule_rows_before
+  FROM proposed p
+  LEFT JOIN public.card_battle_rules r
+    ON (
+         r.normalized_name = p.normalized_name
+         OR r.normalized_name LIKE p.normalized_name || ' // %'
+       )
+   AND r.logical_rule_key = p.logical_rule_key
+  GROUP BY p.normalized_name
+),
+shadow_rows AS (
+  SELECT p.normalized_name, count(r.*) AS would_deprecate_shadow_rows
+  FROM proposed p
+  LEFT JOIN public.card_battle_rules r
+    ON (
+         r.normalized_name = p.normalized_name
+         OR r.normalized_name LIKE p.normalized_name || ' // %'
+       )
+   AND r.logical_rule_key <> p.logical_rule_key
+   AND r.review_status NOT IN ('deprecated', 'rejected')
+   AND r.execution_status <> 'disabled'
+  GROUP BY p.normalized_name
+)
+SELECT
+  p.card_name,
+  p.normalized_name,
+  p.oracle_hash,
+  p.logical_rule_key,
+  p.shadow_handling,
+  tc.target_card_rows,
+  tc.canonical_card_id,
+  rr.existing_rule_rows,
+  er.expected_rule_rows_before,
+  sr.would_deprecate_shadow_rows
+FROM proposed p
+JOIN target_cards tc USING (normalized_name, card_name, oracle_hash)
+JOIN rule_rows rr USING (normalized_name)
+JOIN expected_rows er USING (normalized_name)
+JOIN shadow_rows sr USING (normalized_name)
+ORDER BY p.card_name;

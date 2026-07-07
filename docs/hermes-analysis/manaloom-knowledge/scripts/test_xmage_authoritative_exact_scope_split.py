@@ -957,6 +957,128 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "attack_self_boost_oracle_not_fixed")
 
+    def test_becomes_blocked_self_boost_maps_fixed_boost(self) -> None:
+        row = queue_row(
+            split.BECOMES_BLOCKED_SELF_BOOST_UNIT,
+            effect_classes=["BoostSourceEffect"],
+            ability_kind="triggered",
+            ability_classes=["BecomesBlockedSourceTriggeredAbility"],
+            xmage_signals=["triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Razorclaw Bear",
+                type_line="Creature - Bear",
+                oracle_text="Whenever Razorclaw Bear becomes blocked, it gets +2/+2 until end of turn.",
+            ),
+            source_text="""
+                Effect effect = new BoostSourceEffect(2, 2, Duration.EndOfTurn);
+                effect.setText("it gets +2/+2 until end of turn");
+                this.addAbility(new BecomesBlockedSourceTriggeredAbility(effect, false));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.BECOMES_BLOCKED_SELF_BOOST_CREATURE_SCOPE)
+        self.assertEqual(effect["trigger"], "becomes_blocked")
+        self.assertEqual(effect["trigger_effect"], "self_stat_modifier_until_eot")
+        self.assertEqual(effect["power_delta"], 2)
+        self.assertEqual(effect["toughness_delta"], 2)
+        self.assertEqual(effect["blocker_count_mode"], "fixed")
+        self.assertTrue(effect["becomes_blocked_trigger_self_boost"])
+
+    def test_becomes_blocked_self_boost_maps_per_blocker_boost(self) -> None:
+        row = queue_row(
+            split.BECOMES_BLOCKED_SELF_BOOST_UNIT,
+            effect_classes=["BoostSourceEffect"],
+            ability_kind="triggered",
+            ability_classes=["BecomesBlockedSourceTriggeredAbility"],
+            xmage_signals=["triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Gang of Elk",
+                type_line="Creature - Elk Beast",
+                oracle_text=(
+                    "Whenever Gang of Elk becomes blocked, it gets +2/+2 until end of turn "
+                    "for each creature blocking it."
+                ),
+            ),
+            source_text="""
+                private static final DynamicValue xValue =
+                    new MultipliedValue(BlockingCreatureCount.SOURCE, 2);
+                this.addAbility(new BecomesBlockedSourceTriggeredAbility(
+                    new BoostSourceEffect(xValue, xValue, Duration.EndOfTurn, "it"), false));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["power_delta"], 2)
+        self.assertEqual(effect["toughness_delta"], 2)
+        self.assertEqual(effect["blocker_count_mode"], "per_blocker")
+
+    def test_becomes_blocked_self_boost_maps_beyond_first_penalty(self) -> None:
+        row = queue_row(
+            split.BECOMES_BLOCKED_SELF_BOOST_UNIT,
+            effect_classes=["BoostSourceEffect"],
+            ability_kind="triggered",
+            ability_classes=["BecomesBlockedSourceTriggeredAbility"],
+            xmage_signals=["triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Johtull Wurm",
+                type_line="Creature - Wurm",
+                oracle_text=(
+                    "Whenever Johtull Wurm becomes blocked, it gets -2/-1 until end of turn "
+                    "for each creature blocking it beyond the first."
+                ),
+            ),
+            source_text="""
+                private static final DynamicValue xValue1 =
+                    new MultipliedValue(BlockingCreatureCount.BEYOND_FIRST, -1);
+                private static final DynamicValue xValue2 =
+                    new MultipliedValue(BlockingCreatureCount.BEYOND_FIRST, -2);
+                this.addAbility(new BecomesBlockedSourceTriggeredAbility(
+                    new BoostSourceEffect(xValue2, xValue1, Duration.EndOfTurn, "it"), false));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["power_delta"], -2)
+        self.assertEqual(effect["toughness_delta"], -1)
+        self.assertEqual(effect["blocker_count_mode"], "beyond_first")
+
+    def test_becomes_blocked_self_boost_rejects_source_oracle_mismatch(self) -> None:
+        row = queue_row(
+            split.BECOMES_BLOCKED_SELF_BOOST_UNIT,
+            effect_classes=["BoostSourceEffect"],
+            ability_kind="triggered",
+            ability_classes=["BecomesBlockedSourceTriggeredAbility"],
+            xmage_signals=["triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Mismatch Bear",
+                type_line="Creature - Bear",
+                oracle_text="Whenever Mismatch Bear becomes blocked, it gets +1/+1 until end of turn.",
+            ),
+            source_text="""
+                this.addAbility(new BecomesBlockedSourceTriggeredAbility(
+                    new BoostSourceEffect(2, 2, Duration.EndOfTurn), false));
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "becomes_blocked_self_boost_source_oracle_mismatch")
+
     def test_attack_trigger_grants_flying_to_controlled_subtype_without_flying(self) -> None:
         row = queue_row(
             split.BOOST_KEYWORD_UNIT,

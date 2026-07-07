@@ -1,0 +1,635 @@
+{
+  "battle_execution": {
+    "event_count": 26,
+    "results": [
+      {
+        "blocker_count": 1,
+        "blocker_count_mode": "fixed",
+        "card_name": "Deeproot Warrior",
+        "power_delta": 1,
+        "scenario": "Deeproot Warrior boosts itself when blocked",
+        "source_power": 3,
+        "source_toughness": 3,
+        "toughness_delta": 1
+      },
+      {
+        "blocker_count": 1,
+        "blocker_count_mode": "fixed",
+        "card_name": "Deepwood Wolverine",
+        "power_delta": 2,
+        "scenario": "Deepwood Wolverine boosts itself when blocked",
+        "source_power": 4,
+        "source_toughness": 2,
+        "toughness_delta": 0
+      },
+      {
+        "blocker_count": 3,
+        "blocker_count_mode": "per_blocker",
+        "card_name": "Elvish Berserker",
+        "power_delta": 3,
+        "scenario": "Elvish Berserker boosts itself when blocked",
+        "source_power": 5,
+        "source_toughness": 5,
+        "toughness_delta": 3
+      },
+      {
+        "blocker_count": 3,
+        "blocker_count_mode": "per_blocker",
+        "card_name": "Gang of Elk",
+        "power_delta": 6,
+        "scenario": "Gang of Elk boosts itself when blocked",
+        "source_power": 8,
+        "source_toughness": 8,
+        "toughness_delta": 6
+      },
+      {
+        "blocker_count": 3,
+        "blocker_count_mode": "beyond_first",
+        "card_name": "Johtull Wurm",
+        "power_delta": -4,
+        "scenario": "Johtull Wurm boosts itself when blocked",
+        "source_power": 2,
+        "source_toughness": 4,
+        "toughness_delta": -2
+      },
+      {
+        "blocker_count": 3,
+        "blocker_count_mode": "beyond_first",
+        "card_name": "Jungle Wurm",
+        "power_delta": -2,
+        "scenario": "Jungle Wurm boosts itself when blocked",
+        "source_power": 4,
+        "source_toughness": 4,
+        "toughness_delta": -2
+      },
+      {
+        "blocker_count": 1,
+        "blocker_count_mode": "fixed",
+        "card_name": "Norwood Warrior",
+        "power_delta": 1,
+        "scenario": "Norwood Warrior boosts itself when blocked",
+        "source_power": 3,
+        "source_toughness": 3,
+        "toughness_delta": 1
+      },
+      {
+        "blocker_count": 3,
+        "blocker_count_mode": "per_blocker",
+        "card_name": "Rabid Elephant",
+        "power_delta": 6,
+        "scenario": "Rabid Elephant boosts itself when blocked",
+        "source_power": 8,
+        "source_toughness": 8,
+        "toughness_delta": 6
+      },
+      {
+        "blocker_count": 1,
+        "blocker_count_mode": "fixed",
+        "card_name": "Razorclaw Bear",
+        "power_delta": 2,
+        "scenario": "Razorclaw Bear boosts itself when blocked",
+        "source_power": 4,
+        "source_toughness": 4,
+        "toughness_delta": 2
+      },
+      {
+        "blocker_count": 1,
+        "blocker_count_mode": "fixed",
+        "card_name": "Slashing Tiger",
+        "power_delta": 2,
+        "scenario": "Slashing Tiger boosts itself when blocked",
+        "source_power": 4,
+        "source_toughness": 4,
+        "toughness_delta": 2
+      },
+      {
+        "blocker_count": 1,
+        "blocker_count_mode": "fixed",
+        "card_name": "Snorting Gahr",
+        "power_delta": 2,
+        "scenario": "Snorting Gahr boosts itself when blocked",
+        "source_power": 4,
+        "source_toughness": 4,
+        "toughness_delta": 2
+      },
+      {
+        "blocker_count": 3,
+        "blocker_count_mode": "per_blocker",
+        "card_name": "Sparring Golem",
+        "power_delta": 3,
+        "scenario": "Sparring Golem boosts itself when blocked",
+        "source_power": 5,
+        "source_toughness": 5,
+        "toughness_delta": 3
+      },
+      {
+        "blocker_count": 1,
+        "blocker_count_mode": "fixed",
+        "card_name": "Trained Cheetah",
+        "power_delta": 1,
+        "scenario": "Trained Cheetah boosts itself when blocked",
+        "source_power": 3,
+        "source_toughness": 3,
+        "toughness_delta": 1
+      }
+    ],
+    "scenario_count": 13
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-07T02:43:26.956804+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg587_becomes_blocked_self_boost_new_server_package_manifest.json",
+  "package_id": "pg587_becomes_blocked_self_boost_new_server_package_manifest",
+  "snapshot": "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 13
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_becomes_blocked_self_boost_until_eot_v1",
+          "card_name": "Deeproot Warrior",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6f335f90caaa0411ff4a36a67b424b8b",
+          "oracle_hash": "248374b82cbda19a694ef3ac63476c3f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_becomes_blocked_self_boost_until_eot_v1",
+          "card_name": "Deepwood Wolverine",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0321b0ee556c069923c0933f9725875a",
+          "oracle_hash": "df50ed4f553343d9cc60a31703ed063c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_becomes_blocked_self_boost_until_eot_v1",
+          "card_name": "Elvish Berserker",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:148179706cd79d57c1519c9dc6d174fc",
+          "oracle_hash": "d15f21a4118fb42c49d197c466d96982",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_becomes_blocked_self_boost_until_eot_v1",
+          "card_name": "Gang of Elk",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7fcd200587196e506a3467fd99c7d234",
+          "oracle_hash": "b5f2e8453cdf86a27892048ec3c776b0",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_becomes_blocked_self_boost_until_eot_v1",
+          "card_name": "Johtull Wurm",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b72d6cfd8ffcbbd3158762e9e7f5cb99",
+          "oracle_hash": "ac2948cddc801bf58bc397ea576f33b9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_becomes_blocked_self_boost_until_eot_v1",
+          "card_name": "Jungle Wurm",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6cab8c73bb979d47e172f61a46aad7a4",
+          "oracle_hash": "01e587895d132435b9e16a0b38722863",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_becomes_blocked_self_boost_until_eot_v1",
+          "card_name": "Norwood Warrior",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6f335f90caaa0411ff4a36a67b424b8b",
+          "oracle_hash": "248374b82cbda19a694ef3ac63476c3f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_becomes_blocked_self_boost_until_eot_v1",
+          "card_name": "Rabid Elephant",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7fcd200587196e506a3467fd99c7d234",
+          "oracle_hash": "b5f2e8453cdf86a27892048ec3c776b0",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_becomes_blocked_self_boost_until_eot_v1",
+          "card_name": "Razorclaw Bear",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c906168a4a78f3aed5c07090c2998e2c",
+          "oracle_hash": "b560b7660d402777e61e7ef11523c7c5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_becomes_blocked_self_boost_until_eot_v1",
+          "card_name": "Slashing Tiger",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c906168a4a78f3aed5c07090c2998e2c",
+          "oracle_hash": "b560b7660d402777e61e7ef11523c7c5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_becomes_blocked_self_boost_until_eot_v1",
+          "card_name": "Snorting Gahr",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c906168a4a78f3aed5c07090c2998e2c",
+          "oracle_hash": "b560b7660d402777e61e7ef11523c7c5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_becomes_blocked_self_boost_until_eot_v1",
+          "card_name": "Sparring Golem",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:148179706cd79d57c1519c9dc6d174fc",
+          "oracle_hash": "d15f21a4118fb42c49d197c466d96982",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_becomes_blocked_self_boost_until_eot_v1",
+          "card_name": "Trained Cheetah",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6f335f90caaa0411ff4a36a67b424b8b",
+          "oracle_hash": "248374b82cbda19a694ef3ac63476c3f",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 13
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_becomes_blocked_self_boost_until_eot_v1",
+          "card_name": "Deeproot Warrior",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6f335f90caaa0411ff4a36a67b424b8b",
+          "oracle_hash": "248374b82cbda19a694ef3ac63476c3f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_becomes_blocked_self_boost_until_eot_v1",
+          "card_name": "Deepwood Wolverine",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0321b0ee556c069923c0933f9725875a",
+          "oracle_hash": "df50ed4f553343d9cc60a31703ed063c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_becomes_blocked_self_boost_until_eot_v1",
+          "card_name": "Elvish Berserker",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:148179706cd79d57c1519c9dc6d174fc",
+          "oracle_hash": "d15f21a4118fb42c49d197c466d96982",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_becomes_blocked_self_boost_until_eot_v1",
+          "card_name": "Gang of Elk",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7fcd200587196e506a3467fd99c7d234",
+          "oracle_hash": "b5f2e8453cdf86a27892048ec3c776b0",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_becomes_blocked_self_boost_until_eot_v1",
+          "card_name": "Johtull Wurm",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b72d6cfd8ffcbbd3158762e9e7f5cb99",
+          "oracle_hash": "ac2948cddc801bf58bc397ea576f33b9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_becomes_blocked_self_boost_until_eot_v1",
+          "card_name": "Jungle Wurm",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6cab8c73bb979d47e172f61a46aad7a4",
+          "oracle_hash": "01e587895d132435b9e16a0b38722863",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_becomes_blocked_self_boost_until_eot_v1",
+          "card_name": "Norwood Warrior",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6f335f90caaa0411ff4a36a67b424b8b",
+          "oracle_hash": "248374b82cbda19a694ef3ac63476c3f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_becomes_blocked_self_boost_until_eot_v1",
+          "card_name": "Rabid Elephant",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7fcd200587196e506a3467fd99c7d234",
+          "oracle_hash": "b5f2e8453cdf86a27892048ec3c776b0",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_becomes_blocked_self_boost_until_eot_v1",
+          "card_name": "Razorclaw Bear",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c906168a4a78f3aed5c07090c2998e2c",
+          "oracle_hash": "b560b7660d402777e61e7ef11523c7c5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_becomes_blocked_self_boost_until_eot_v1",
+          "card_name": "Slashing Tiger",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c906168a4a78f3aed5c07090c2998e2c",
+          "oracle_hash": "b560b7660d402777e61e7ef11523c7c5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_becomes_blocked_self_boost_until_eot_v1",
+          "card_name": "Snorting Gahr",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c906168a4a78f3aed5c07090c2998e2c",
+          "oracle_hash": "b560b7660d402777e61e7ef11523c7c5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_becomes_blocked_self_boost_until_eot_v1",
+          "card_name": "Sparring Golem",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:148179706cd79d57c1519c9dc6d174fc",
+          "oracle_hash": "d15f21a4118fb42c49d197c466d96982",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_becomes_blocked_self_boost_until_eot_v1",
+          "card_name": "Trained Cheetah",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6f335f90caaa0411ff4a36a67b424b8b",
+          "oracle_hash": "248374b82cbda19a694ef3ac63476c3f",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 13
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_becomes_blocked_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Deeproot Warrior",
+          "logical_rule_key": "battle_rule_v1:6f335f90caaa0411ff4a36a67b424b8b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_becomes_blocked_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Deepwood Wolverine",
+          "logical_rule_key": "battle_rule_v1:0321b0ee556c069923c0933f9725875a"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_becomes_blocked_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Elvish Berserker",
+          "logical_rule_key": "battle_rule_v1:148179706cd79d57c1519c9dc6d174fc"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_becomes_blocked_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Gang of Elk",
+          "logical_rule_key": "battle_rule_v1:7fcd200587196e506a3467fd99c7d234"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_becomes_blocked_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Johtull Wurm",
+          "logical_rule_key": "battle_rule_v1:b72d6cfd8ffcbbd3158762e9e7f5cb99"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_becomes_blocked_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Jungle Wurm",
+          "logical_rule_key": "battle_rule_v1:6cab8c73bb979d47e172f61a46aad7a4"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_becomes_blocked_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Norwood Warrior",
+          "logical_rule_key": "battle_rule_v1:6f335f90caaa0411ff4a36a67b424b8b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_becomes_blocked_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Rabid Elephant",
+          "logical_rule_key": "battle_rule_v1:7fcd200587196e506a3467fd99c7d234"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_becomes_blocked_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Razorclaw Bear",
+          "logical_rule_key": "battle_rule_v1:c906168a4a78f3aed5c07090c2998e2c"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_becomes_blocked_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Slashing Tiger",
+          "logical_rule_key": "battle_rule_v1:c906168a4a78f3aed5c07090c2998e2c"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_becomes_blocked_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Snorting Gahr",
+          "logical_rule_key": "battle_rule_v1:c906168a4a78f3aed5c07090c2998e2c"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_becomes_blocked_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Sparring Golem",
+          "logical_rule_key": "battle_rule_v1:148179706cd79d57c1519c9dc6d174fc"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_becomes_blocked_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Trained Cheetah",
+          "logical_rule_key": "battle_rule_v1:6f335f90caaa0411ff4a36a67b424b8b"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 13
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Deeproot Warrior",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:6f335f90caaa0411ff4a36a67b424b8b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Deepwood Wolverine",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:0321b0ee556c069923c0933f9725875a"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Elvish Berserker",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:148179706cd79d57c1519c9dc6d174fc"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Gang of Elk",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:7fcd200587196e506a3467fd99c7d234"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Johtull Wurm",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:b72d6cfd8ffcbbd3158762e9e7f5cb99"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Jungle Wurm",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:6cab8c73bb979d47e172f61a46aad7a4"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Norwood Warrior",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:6f335f90caaa0411ff4a36a67b424b8b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Rabid Elephant",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:7fcd200587196e506a3467fd99c7d234"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Razorclaw Bear",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:c906168a4a78f3aed5c07090c2998e2c"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Slashing Tiger",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:c906168a4a78f3aed5c07090c2998e2c"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Snorting Gahr",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:c906168a4a78f3aed5c07090c2998e2c"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Sparring Golem",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:148179706cd79d57c1519c9dc6d174fc"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Trained Cheetah",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:6f335f90caaa0411ff4a36a67b424b8b"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 26,
+        "scenarios": 13
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

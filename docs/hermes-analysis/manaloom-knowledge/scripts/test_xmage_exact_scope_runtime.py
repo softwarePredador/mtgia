@@ -4215,6 +4215,159 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertEqual(veteran["power"], 2)
         self.assertEqual(veteran["toughness"], 2)
 
+    def test_becomes_blocked_self_boosts_source_until_eot(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        bear = {
+            "name": "Razorclaw Bear",
+            "type_line": "Creature - Bear",
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_becomes_blocked_self_boost_until_eot_v1",
+            "ability_kind": "triggered",
+            "trigger": "becomes_blocked",
+            "trigger_effect": "self_stat_modifier_until_eot",
+            "target": "self",
+            "target_controller": "self",
+            "power_delta": 2,
+            "toughness_delta": 2,
+            "blocker_count_mode": "fixed",
+            "becomes_blocked_trigger_self_boost": True,
+            "power": 2,
+            "toughness": 2,
+            "attacking": True,
+            "_rule_logical_key": "battle_rule_v1:razorclaw-bear-test",
+        }
+        blocker = {"name": "Blocker", "type_line": "Creature - Soldier", "power": 2, "toughness": 2}
+        active.battlefield.append(bear)
+        opponent.battlefield.append(blocker)
+
+        resolved = self.battle.resolve_becomes_blocked_self_boost_triggers(
+            active,
+            [(bear, [blocker])],
+            [active, opponent],
+            turn=4,
+            phase="declare_blockers",
+        )
+
+        self.assertEqual(resolved, 1)
+        self.assertEqual(bear["power"], 4)
+        self.assertEqual(bear["toughness"], 4)
+        self.assertTrue(
+            any(
+                event == "trigger_resolved"
+                and data.get("card") == "Razorclaw Bear"
+                and data.get("trigger") == "becomes_blocked"
+                and data.get("blocker_count") == 1
+                and data.get("power_delta") == 2
+                and data.get("toughness_delta") == 2
+                for event, data in self.events
+            )
+        )
+
+        self.battle.clear_until_eot(active)
+
+        self.assertEqual(bear["power"], 2)
+        self.assertEqual(bear["toughness"], 2)
+
+    def test_becomes_blocked_self_boost_counts_each_blocker(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        elk = {
+            "name": "Gang of Elk",
+            "type_line": "Creature - Elk Beast",
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_becomes_blocked_self_boost_until_eot_v1",
+            "ability_kind": "triggered",
+            "trigger": "becomes_blocked",
+            "trigger_effect": "self_stat_modifier_until_eot",
+            "power_delta": 2,
+            "toughness_delta": 2,
+            "blocker_count_mode": "per_blocker",
+            "becomes_blocked_trigger_self_boost": True,
+            "power": 5,
+            "toughness": 4,
+            "attacking": True,
+        }
+        blockers = [
+            {"name": "Blocker A", "type_line": "Creature - Soldier", "power": 2, "toughness": 2},
+            {"name": "Blocker B", "type_line": "Creature - Soldier", "power": 2, "toughness": 2},
+        ]
+        active.battlefield.append(elk)
+        opponent.battlefield.extend(blockers)
+
+        resolved = self.battle.resolve_becomes_blocked_self_boost_triggers(
+            active,
+            [(elk, blockers)],
+            [active, opponent],
+            turn=4,
+            phase="declare_blockers",
+        )
+
+        self.assertEqual(resolved, 1)
+        self.assertEqual(elk["power"], 9)
+        self.assertEqual(elk["toughness"], 8)
+        self.assertTrue(
+            any(
+                event == "stat_modifier_until_eot_resolved"
+                and data.get("card") == "Gang of Elk"
+                and data.get("blocker_count") == 2
+                and data.get("multiplier") == 2
+                and data.get("power_delta") == 4
+                and data.get("toughness_delta") == 4
+                for event, data in self.events
+            )
+        )
+
+    def test_becomes_blocked_self_boost_counts_beyond_first_penalty(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        wurm = {
+            "name": "Johtull Wurm",
+            "type_line": "Creature - Wurm",
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_becomes_blocked_self_boost_until_eot_v1",
+            "ability_kind": "triggered",
+            "trigger": "becomes_blocked",
+            "trigger_effect": "self_stat_modifier_until_eot",
+            "power_delta": -2,
+            "toughness_delta": -1,
+            "blocker_count_mode": "beyond_first",
+            "becomes_blocked_trigger_self_boost": True,
+            "power": 6,
+            "toughness": 6,
+            "attacking": True,
+        }
+        blockers = [
+            {"name": "Blocker A", "type_line": "Creature - Soldier", "power": 2, "toughness": 2},
+            {"name": "Blocker B", "type_line": "Creature - Soldier", "power": 2, "toughness": 2},
+            {"name": "Blocker C", "type_line": "Creature - Soldier", "power": 2, "toughness": 2},
+        ]
+        active.battlefield.append(wurm)
+        opponent.battlefield.extend(blockers)
+
+        resolved = self.battle.resolve_becomes_blocked_self_boost_triggers(
+            active,
+            [(wurm, blockers)],
+            [active, opponent],
+            turn=4,
+            phase="declare_blockers",
+        )
+
+        self.assertEqual(resolved, 1)
+        self.assertEqual(wurm["power"], 2)
+        self.assertEqual(wurm["toughness"], 4)
+        self.assertTrue(
+            any(
+                event == "stat_modifier_until_eot_resolved"
+                and data.get("card") == "Johtull Wurm"
+                and data.get("blocker_count_mode") == "beyond_first"
+                and data.get("multiplier") == 2
+                and data.get("power_delta") == -4
+                and data.get("toughness_delta") == -2
+                for event, data in self.events
+            )
+        )
+
     def test_simple_activated_life_gain_permanent_pays_mana_taps_and_gains_life(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

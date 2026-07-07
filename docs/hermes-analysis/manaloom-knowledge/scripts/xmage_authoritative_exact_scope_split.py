@@ -107,6 +107,10 @@ ATTACK_SELF_BOOST_UNIT = (
     "xmage_signature::BoostSourceEffect::AttacksTriggeredAbility::"
     "no_target_class::no_condition_class::triggered_ability"
 )
+BECOMES_BLOCKED_SELF_BOOST_UNIT = (
+    "xmage_signature::BoostSourceEffect::BecomesBlockedSourceTriggeredAbility::"
+    "no_target_class::no_condition_class::triggered_ability"
+)
 TOKEN_SPELL_UNIT = (
     "token_maker::xmage_signature::CreateTokenEffect::no_ability_class::"
     "no_target_class::no_condition_class::token"
@@ -162,6 +166,7 @@ SUPPORTED_UNITS = {
     BOOST_TARGET_UNIT,
     BOOST_CONTROLLED_SPELL_UNIT,
     BOOST_ALL_SPELL_UNIT,
+    BECOMES_BLOCKED_SELF_BOOST_UNIT,
     STATIC_CONTROLLED_PT_UNIT,
     STATIC_CONTROLLED_KEYWORD_UNIT,
     TOKEN_SPELL_UNIT,
@@ -351,6 +356,9 @@ DAMAGE_RECURSION_CREATURE_SCOPE = "xmage_creature_combat_damage_return_graveyard
 COMBAT_DAMAGE_DRAW_CREATURE_SCOPE = "xmage_creature_combat_damage_draw_cards_v1"
 ATTACK_RECURSION_PERMANENT_SCOPE = "xmage_permanent_attack_return_graveyard_card_to_hand_v1"
 ATTACK_SELF_BOOST_CREATURE_SCOPE = "xmage_creature_attack_self_boost_until_eot_v1"
+BECOMES_BLOCKED_SELF_BOOST_CREATURE_SCOPE = (
+    "xmage_creature_becomes_blocked_self_boost_until_eot_v1"
+)
 DIES_DRAW_CREATURE_SCOPE = "xmage_creature_dies_draw_cards_v1"
 DIES_LIFE_GAIN_CREATURE_SCOPE = "xmage_creature_dies_gain_life_v1"
 DIES_DAMAGE_CREATURE_SCOPE = "xmage_creature_dies_fixed_damage_target_v1"
@@ -8679,6 +8687,18 @@ def is_creature_attack_self_boost_unit(row: dict[str, Any]) -> bool:
     )
 
 
+def is_creature_becomes_blocked_self_boost_unit(row: dict[str, Any]) -> bool:
+    abilities = ability_classes(row)
+    remaining = abilities - {"BecomesBlockedSourceTriggeredAbility"}
+    return (
+        str(row.get("adapter_work_unit") or "") == BECOMES_BLOCKED_SELF_BOOST_UNIT
+        and effect_classes(row) == {"BoostSourceEffect"}
+        and "BecomesBlockedSourceTriggeredAbility" in abilities
+        and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
+        and set(row.get("xmage_signals") or []) == {"triggered_ability"}
+    )
+
+
 def keywords_from_ability_classes(row: dict[str, Any]) -> set[str]:
     return {
         STATIC_SELF_KEYWORD_ABILITY_CLASSES[ability]
@@ -12727,6 +12747,117 @@ def attack_self_boost_from_source(source: str) -> dict[str, int] | str:
     return {
         "power_delta": int(args[0].strip()),
         "toughness_delta": int(args[1].strip()),
+    }
+
+
+def becomes_blocked_self_boost_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    text = strip_parenthetical_reminders(
+        oracle_text_after_leading_static_keywords(metadata)
+    )
+    text = re.sub(r"\s+", " ", text).strip().lower()
+    match = re.search(
+        r"whenever (?:this creature|[^,.]+?) becomes blocked, it gets "
+        r"(?P<power>[+-]\d+)/(?P<toughness>[+-]\d+) until end of turn"
+        r"(?: for (?P<mode>each creature blocking it|each creature blocking it beyond the first))?\.?$",
+        text,
+    )
+    if not match:
+        return "becomes_blocked_self_boost_oracle_not_supported"
+    mode_text = match.group("mode") or ""
+    blocker_count_mode = "fixed"
+    if mode_text == "each creature blocking it":
+        blocker_count_mode = "per_blocker"
+    elif mode_text == "each creature blocking it beyond the first":
+        blocker_count_mode = "beyond_first"
+    return {
+        "power_delta": int(match.group("power")),
+        "toughness_delta": int(match.group("toughness")),
+        "blocker_count_mode": blocker_count_mode,
+    }
+
+
+def _java_int_assignment_value(source: str, variable_name: str) -> int | None:
+    match = re.search(
+        rf"(?:private\s+static\s+final\s+)?DynamicValue\s+{re.escape(variable_name)}\s*="
+        r"\s*new\s+MultipliedValue\s*\(\s*BlockingCreatureCount\.(?:SOURCE|BEYOND_FIRST)\s*,\s*([+-]?\d+)\s*\)",
+        source,
+        re.S,
+    )
+    if match:
+        return int(match.group(1))
+    match = re.search(
+        rf"(?:private\s+static\s+final\s+)?DynamicValue\s+{re.escape(variable_name)}\s*="
+        r"\s*new\s+SignInversionDynamicValue\s*\(\s*BlockingCreatureCount\.BEYOND_FIRST\s*\)",
+        source,
+        re.S,
+    )
+    if match:
+        return -1
+    return None
+
+
+def _parse_blocking_count_boost_arg(arg: str, source: str) -> tuple[int, str] | str:
+    cleaned = str(arg or "").strip()
+    if re.fullmatch(r"[+-]?\d+", cleaned):
+        return int(cleaned), "fixed"
+    if cleaned == "BlockingCreatureCount.SOURCE":
+        return 1, "per_blocker"
+    if cleaned == "BlockingCreatureCount.BEYOND_FIRST":
+        return 1, "beyond_first"
+    multiplied = re.fullmatch(
+        r"new\s+MultipliedValue\s*\(\s*BlockingCreatureCount\.(SOURCE|BEYOND_FIRST)\s*,\s*([+-]?\d+)\s*\)",
+        cleaned,
+        re.S,
+    )
+    if multiplied:
+        return int(multiplied.group(2)), "per_blocker" if multiplied.group(1) == "SOURCE" else "beyond_first"
+    inverted = re.fullmatch(
+        r"new\s+SignInversionDynamicValue\s*\(\s*BlockingCreatureCount\.BEYOND_FIRST\s*\)",
+        cleaned,
+        re.S,
+    )
+    if inverted:
+        return -1, "beyond_first"
+    assigned = _java_int_assignment_value(source, cleaned)
+    if assigned is not None:
+        if re.search(
+            rf"{re.escape(cleaned)}\s*=\s*new\s+MultipliedValue\s*\(\s*BlockingCreatureCount\.SOURCE",
+            source,
+            re.S,
+        ):
+            return assigned, "per_blocker"
+        return assigned, "beyond_first"
+    return "becomes_blocked_self_boost_source_not_supported_dynamic_value"
+
+
+def becomes_blocked_self_boost_from_source(source: str) -> dict[str, Any] | str:
+    text = source or ""
+    if "BecomesBlockedSourceTriggeredAbility" not in text:
+        return "becomes_blocked_self_boost_source_not_trigger"
+    constructor_args = extract_constructor_args(text, "BoostSourceEffect")
+    if constructor_args is None:
+        return "becomes_blocked_self_boost_source_not_single_effect"
+    if len(re.findall(r"new\s+BoostSourceEffect\s*\(", text)) != 1:
+        return "becomes_blocked_self_boost_source_not_single_effect"
+    args = split_top_level_args(constructor_args)
+    if len(args) < 3:
+        return "becomes_blocked_self_boost_source_not_single_effect"
+    if args[2].strip() != "Duration.EndOfTurn":
+        return "becomes_blocked_self_boost_source_not_end_of_turn"
+    power = _parse_blocking_count_boost_arg(args[0], text)
+    toughness = _parse_blocking_count_boost_arg(args[1], text)
+    if isinstance(power, str):
+        return power
+    if isinstance(toughness, str):
+        return toughness
+    power_delta, power_mode = power
+    toughness_delta, toughness_mode = toughness
+    if power_mode != toughness_mode:
+        return "becomes_blocked_self_boost_source_mixed_count_modes"
+    return {
+        "power_delta": int(power_delta),
+        "toughness_delta": int(toughness_delta),
+        "blocker_count_mode": power_mode,
     }
 
 
@@ -18190,6 +18321,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "creature attack trigger grants a target creature a keyword until end of turn"
     elif scope == ATTACK_SELF_BOOST_CREATURE_SCOPE:
         scope_kind = "creature attack trigger self power/toughness boost until end of turn"
+    elif scope == BECOMES_BLOCKED_SELF_BOOST_CREATURE_SCOPE:
+        scope_kind = "creature becomes-blocked trigger self power/toughness boost until end of turn"
     elif scope == STATIC_CONTROLLED_PT_SCOPE:
         scope_kind = "permanent static controlled-creature power/toughness boost"
     elif scope == STATIC_GLOBAL_PT_SCOPE:
@@ -18421,6 +18554,7 @@ def split_row(
     permanent_activated_tutor_hand_unit = is_permanent_activated_tutor_hand_unit(row)
     attack_target_keyword_unit = is_creature_attack_target_keyword_unit(row)
     attack_self_boost_creature_unit = is_creature_attack_self_boost_unit(row)
+    becomes_blocked_self_boost_creature_unit = is_creature_becomes_blocked_self_boost_unit(row)
     static_controlled_pt_unit = is_static_controlled_pt_unit(row)
     static_controlled_keyword_unit = is_static_controlled_keyword_unit(row)
     static_global_pt_unit = is_static_global_pt_unit(row)
@@ -18547,6 +18681,7 @@ def split_row(
         and not permanent_activated_tutor_hand_unit
         and not attack_target_keyword_unit
         and not attack_self_boost_creature_unit
+        and not becomes_blocked_self_boost_creature_unit
         and not static_controlled_pt_unit
         and not static_controlled_keyword_unit
         and not static_global_pt_unit
@@ -18631,6 +18766,7 @@ def split_row(
         and not permanent_activated_tutor_hand_unit
         and not attack_target_keyword_unit
         and not attack_self_boost_creature_unit
+        and not becomes_blocked_self_boost_creature_unit
         and not static_controlled_pt_unit
         and not static_global_pt_unit
         and not simple_aura_static_pt_unit
@@ -20266,6 +20402,49 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_creature_attack_self_boost_until_eot",
+        ), "selected_exact_scope"
+
+    if becomes_blocked_self_boost_creature_unit:
+        if not is_creature_metadata(metadata):
+            return None, "becomes_blocked_self_boost_not_creature"
+        oracle_boost = becomes_blocked_self_boost_from_oracle(metadata)
+        if isinstance(oracle_boost, str):
+            return None, oracle_boost
+        source_boost = becomes_blocked_self_boost_from_source(source_text)
+        if isinstance(source_boost, str):
+            return None, source_boost
+        if source_boost != oracle_boost:
+            return None, "becomes_blocked_self_boost_source_oracle_mismatch"
+        effect_json = {
+            "effect": "creature",
+            "battle_model_scope": BECOMES_BLOCKED_SELF_BOOST_CREATURE_SCOPE,
+            "ability_kind": "triggered",
+            "trigger": "becomes_blocked",
+            "trigger_effect": "self_stat_modifier_until_eot",
+            "target": "self",
+            "target_controller": "self",
+            "target_constraints": {"source": "self", "card_types": ["creature"]},
+            "power_delta": int(oracle_boost["power_delta"]),
+            "toughness_delta": int(oracle_boost["toughness_delta"]),
+            "power_boost": int(oracle_boost["power_delta"]),
+            "toughness_boost": int(oracle_boost["toughness_delta"]),
+            "blocker_count_mode": oracle_boost["blocker_count_mode"],
+            "duration": "until_end_of_turn",
+            "becomes_blocked_trigger_self_boost": True,
+            "xmage_effect_class": "BoostSourceEffect",
+            "xmage_ability_class": "BecomesBlockedSourceTriggeredAbility",
+        }
+        keyword_list = ordered_keywords(keywords_from_ability_classes(row))
+        if keyword_list:
+            effect_json["keywords"] = keyword_list
+            effect_json["_keywords_are_self"] = True
+            for keyword in keyword_list:
+                effect_json[keyword] = True
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_creature_becomes_blocked_self_boost_until_eot",
         ), "selected_exact_scope"
 
     if attack_target_keyword_unit:
