@@ -1,0 +1,254 @@
+{
+  "battle_execution": {
+    "event_count": 12,
+    "results": [
+      {
+        "card_name": "Earthblighter",
+        "destination": "graveyard",
+        "discarded_count": 0,
+        "sacrificed_source": false,
+        "sacrificed_targets": [
+          "E2E Activated Destroy Sacrifice Target"
+        ],
+        "scenario": "Earthblighter activates destroy ability",
+        "source_tapped": true,
+        "target": "E2E Legal Activated Destroy Target",
+        "target_sacrificed": true
+      },
+      {
+        "card_name": "Keldon Arsonist",
+        "destination": "graveyard",
+        "discarded_count": 0,
+        "sacrificed_source": false,
+        "sacrificed_targets": [
+          "E2E Activated Destroy Sacrifice Target 1",
+          "E2E Activated Destroy Sacrifice Target 2"
+        ],
+        "scenario": "Keldon Arsonist activates destroy ability",
+        "source_tapped": false,
+        "target": "E2E Legal Activated Destroy Target",
+        "target_sacrificed": true
+      },
+      {
+        "card_name": "Krark-Clan Engineers",
+        "destination": "graveyard",
+        "discarded_count": 0,
+        "sacrificed_source": false,
+        "sacrificed_targets": [
+          "E2E Activated Destroy Sacrifice Target 1",
+          "E2E Activated Destroy Sacrifice Target 2"
+        ],
+        "scenario": "Krark-Clan Engineers activates destroy ability",
+        "source_tapped": false,
+        "target": "E2E Legal Activated Destroy Target",
+        "target_sacrificed": true
+      },
+      {
+        "card_name": "Sandstone Deadfall",
+        "destination": "graveyard",
+        "discarded_count": 0,
+        "sacrificed_source": true,
+        "sacrificed_targets": [
+          "E2E Activated Destroy Sacrifice Target 1",
+          "E2E Activated Destroy Sacrifice Target 2"
+        ],
+        "scenario": "Sandstone Deadfall activates destroy ability",
+        "source_tapped": true,
+        "target": "E2E Legal Activated Destroy Target",
+        "target_sacrificed": true
+      }
+    ],
+    "scenario_count": 4
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-07T18:11:33.277404+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg629_activated_destroy_multi_sacrifice_new_server_package_manifest.json",
+  "package_id": "pg629_activated_destroy_multi_sacrifice_new_server_package_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 4
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+          "card_name": "Earthblighter",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5a02d463ae3227ecdfa5e79a1dc61f02",
+          "oracle_hash": "a609a168f73ac8403e9a5bb434e4dd87",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+          "card_name": "Keldon Arsonist",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5fc918ece0734a39ee3c3c769dcf2e90",
+          "oracle_hash": "90a229a35b52b4ff9de4f8c2cf326ad3",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+          "card_name": "Krark-Clan Engineers",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:30271844421547419ce80f41ac149976",
+          "oracle_hash": "2f1cda4d8f42234f9842aa5a97f228cf",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+          "card_name": "Sandstone Deadfall",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:fe81aae4282d4895faf30755ec9f8989",
+          "oracle_hash": "802dab23ebd4e4fff2c2917fff7cdc24",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 4
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+          "card_name": "Earthblighter",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5a02d463ae3227ecdfa5e79a1dc61f02",
+          "oracle_hash": "a609a168f73ac8403e9a5bb434e4dd87",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+          "card_name": "Keldon Arsonist",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5fc918ece0734a39ee3c3c769dcf2e90",
+          "oracle_hash": "90a229a35b52b4ff9de4f8c2cf326ad3",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+          "card_name": "Krark-Clan Engineers",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:30271844421547419ce80f41ac149976",
+          "oracle_hash": "2f1cda4d8f42234f9842aa5a97f228cf",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+          "card_name": "Sandstone Deadfall",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:fe81aae4282d4895faf30755ec9f8989",
+          "oracle_hash": "802dab23ebd4e4fff2c2917fff7cdc24",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 4
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+          "battle_rule_version": 2,
+          "card_name": "Earthblighter",
+          "logical_rule_key": "battle_rule_v1:5a02d463ae3227ecdfa5e79a1dc61f02"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+          "battle_rule_version": 2,
+          "card_name": "Keldon Arsonist",
+          "logical_rule_key": "battle_rule_v1:5fc918ece0734a39ee3c3c769dcf2e90"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+          "battle_rule_version": 2,
+          "card_name": "Krark-Clan Engineers",
+          "logical_rule_key": "battle_rule_v1:30271844421547419ce80f41ac149976"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+          "battle_rule_version": 2,
+          "card_name": "Sandstone Deadfall",
+          "logical_rule_key": "battle_rule_v1:fe81aae4282d4895faf30755ec9f8989"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 4
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Earthblighter",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:5a02d463ae3227ecdfa5e79a1dc61f02"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Keldon Arsonist",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:5fc918ece0734a39ee3c3c769dcf2e90"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Krark-Clan Engineers",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:30271844421547419ce80f41ac149976"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Sandstone Deadfall",
+          "component_keys": [],
+          "effect": "artifact",
+          "logical_rule_key": "battle_rule_v1:fe81aae4282d4895faf30755ec9f8989"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 12,
+        "scenarios": 4
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

@@ -3828,10 +3828,18 @@ def run_simple_activated_destroy(
         if isinstance(item, dict)
     ]
     active.hand = list(controller_hand)
+    sacrifice_targets = []
     sacrifice_target = None
-    if scenario.get("sacrifice_target"):
+    if isinstance(scenario.get("sacrifice_targets"), list):
+        for item in scenario.get("sacrifice_targets") or []:
+            if isinstance(item, dict):
+                sacrifice_targets.append(battle.enrich_card(dict(item)))
+    elif scenario.get("sacrifice_target"):
         sacrifice_target = battle.enrich_card(dict(scenario["sacrifice_target"]))
-        active.battlefield.append(sacrifice_target)
+        sacrifice_targets.append(sacrifice_target)
+    if sacrifice_targets:
+        sacrifice_target = sacrifice_targets[0]
+        active.battlefield.extend(sacrifice_targets)
     opponent.battlefield = [target]
     add_manifest_mana(active, scenario.get("controller_mana") or {})
     all_players = [active, opponent]
@@ -3884,10 +3892,14 @@ def run_simple_activated_destroy(
     elif source not in active.battlefield:
         fail("battle_execution", f"{card['name']} source left battlefield unexpectedly")
     if bool(scenario.get("expect_target_sacrificed")):
-        if sacrifice_target is None:
+        expected_sacrifice_count = int(
+            scenario.get("expected_sacrifice_count") or len(sacrifice_targets) or 1
+        )
+        if len(sacrifice_targets) < expected_sacrifice_count:
             fail("battle_execution", f"{card['name']} expected sacrifice target was not configured")
-        if sacrifice_target in active.battlefield or sacrifice_target not in active.graveyard:
-            fail("battle_execution", f"{card['name']} sacrifice target zone mismatch")
+        for sacrificed_target in sacrifice_targets[:expected_sacrifice_count]:
+            if sacrificed_target in active.battlefield or sacrificed_target not in active.graveyard:
+                fail("battle_execution", f"{card['name']} sacrifice target zone mismatch")
     activation_event = next(
         (
             data
@@ -3905,6 +3917,14 @@ def run_simple_activated_destroy(
             "battle_events",
             f"{card['name']} sacrificed_source={activation_event.get('sacrificed_source')!r}, expected {expected_sacrificed_source}",
         )
+    if bool(scenario.get("expect_target_sacrificed")):
+        expected_sacrificed_names = [item.get("name") for item in sacrifice_targets if isinstance(item, dict)]
+        event_sacrificed_names = list(activation_event.get("sacrificed_targets") or [])
+        if expected_sacrificed_names and not set(expected_sacrificed_names).issubset(set(event_sacrificed_names)):
+            fail(
+                "battle_events",
+                f"{card['name']} sacrificed_targets={event_sacrificed_names!r}, expected {expected_sacrificed_names!r}",
+            )
     expected_discard_count = int(
         scenario.get("expected_discard_count", effect.get("activation_discard_count") or 0) or 0
     )
@@ -3954,7 +3974,8 @@ def run_simple_activated_destroy(
         "source_tapped": bool(source.get("tapped")),
         "sacrificed_source": expected_sacrificed_source,
         "discarded_count": expected_discard_count,
-        "target_sacrificed": bool(sacrifice_target is not None and sacrifice_target in active.graveyard),
+        "target_sacrificed": bool(sacrifice_targets and all(item in active.graveyard for item in sacrifice_targets)),
+        "sacrificed_targets": [item.get("name") for item in sacrifice_targets if isinstance(item, dict)],
     }
 
 

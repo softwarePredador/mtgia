@@ -47540,8 +47540,6 @@ def _activation_sacrifice_cost_candidates(player, source, effect_data):
     cost = _activation_sacrifice_cost(effect_data)
     if not cost:
         return []
-    if int(cost.get("count") or 1) != 1:
-        return []
     if str(cost.get("target_controller") or "self") not in {"self", "you", "controller"}:
         return []
     constraints = dict(cost.get("constraints") or {})
@@ -47553,10 +47551,19 @@ def _activation_sacrifice_cost_candidates(player, source, effect_data):
 
 
 def _choose_activation_sacrifice_cost_candidate(player, source, effect_data):
+    chosen, candidates = _choose_activation_sacrifice_cost_candidates(player, source, effect_data)
+    return (chosen[0] if chosen else None), candidates
+
+
+def _choose_activation_sacrifice_cost_candidates(player, source, effect_data):
+    cost = _activation_sacrifice_cost(effect_data)
+    if not cost:
+        return [], []
+    count = max(1, int(cost.get("count") or 1))
     candidates = _activation_sacrifice_cost_candidates(player, source, effect_data)
-    if not candidates:
-        return None, []
-    chosen = min(
+    if len(candidates) < count:
+        return [], candidates
+    candidates = sorted(
         candidates,
         key=lambda candidate: (
             1 if candidate is source else 0,
@@ -47564,7 +47571,44 @@ def _choose_activation_sacrifice_cost_candidate(player, source, effect_data):
             str(candidate.get("name") or ""),
         ),
     )
-    return chosen, candidates
+    return candidates[:count], candidates
+
+
+def _sacrifice_activation_cost_candidates(player, candidates, turn):
+    sacrificed = []
+    for candidate in list(candidates or []):
+        sacrifice_permanent_for_activation(player, candidate, turn)
+        sacrificed.append(candidate)
+    return sacrificed
+
+
+def _sacrificed_cost_target_names(candidates):
+    return [candidate.get("name", "?") for candidate in candidates or []]
+
+
+def _first_sacrificed_cost_target(candidates):
+    return (candidates or [None])[0]
+
+
+def _sacrifice_cost_count(effect_data):
+    cost = _activation_sacrifice_cost(effect_data)
+    return int(cost.get("count") or 0) if cost else 0
+
+
+def _sacrifice_cost_constraints(effect_data):
+    cost = _activation_sacrifice_cost(effect_data)
+    return dict(cost.get("constraints") or {}) if cost else {}
+
+
+def _sacrifice_cost_label(effect_data):
+    cost = _activation_sacrifice_cost(effect_data)
+    if not cost:
+        return None
+    constraints = _sacrifice_cost_constraints(effect_data)
+    return {
+        "count": int(cost.get("count") or 1),
+        "constraints": constraints,
+    }
 
 
 def _activation_discard_cost_candidates(player, count, target_type):
@@ -47624,12 +47668,12 @@ def can_activate_generic_tap_damage_permanent(player, permanent, opponents, *, e
     if not player.can_pay(activation_cost):
         return False
     if _activation_sacrifice_cost(effect_data):
-        sacrifice_candidate, _sacrifice_options = _choose_activation_sacrifice_cost_candidate(
+        sacrifice_candidates, _sacrifice_options = _choose_activation_sacrifice_cost_candidates(
             player,
             permanent,
             effect_data,
         )
-        if sacrifice_candidate is None:
+        if len(sacrifice_candidates) != _sacrifice_cost_count(effect_data):
             return False
     activation_discard_count = int(effect_data.get("activation_discard_count") or 0)
     activation_discard_target = effect_data.get("activation_discard_target") or "any_card"
@@ -47714,20 +47758,19 @@ def activate_generic_tap_damage_permanent(player, opponents, permanent, turn, rn
         player.graveyard.append(permanent)
         player.record_permanent_sacrificed(permanent, turn)
         sacrificed_source = True
+    sacrificed_cost_targets = []
     sacrificed_cost_target = None
     sacrifice_cost_options = []
     if _activation_sacrifice_cost(effect_data):
-        sacrificed_cost_target, sacrifice_cost_options = _choose_activation_sacrifice_cost_candidate(
+        sacrifice_candidates, sacrifice_cost_options = _choose_activation_sacrifice_cost_candidates(
             player,
             permanent,
             effect_data,
         )
-        if sacrificed_cost_target is None:
+        if len(sacrifice_candidates) != _sacrifice_cost_count(effect_data):
             return False
-        if sacrificed_cost_target in player.battlefield:
-            player.battlefield.remove(sacrificed_cost_target)
-        player.graveyard.append(sacrificed_cost_target)
-        player.record_permanent_sacrificed(sacrificed_cost_target, turn)
+        sacrificed_cost_targets = _sacrifice_activation_cost_candidates(player, sacrifice_candidates, turn)
+        sacrificed_cost_target = _first_sacrificed_cost_target(sacrificed_cost_targets)
     fields = replay_rule_fields(effect_data)
     damage = int(effect_data.get("amount") or effect_data.get("damage") or 0)
     requires_tap = bool(effect_data.get("activation_requires_tap"))
@@ -47758,6 +47801,8 @@ def activate_generic_tap_damage_permanent(player, opponents, permanent, turn, rn
             "requires_tap": 1 if requires_tap else 0,
             "requires_sacrifice": 1 if sacrificed_source else 0,
             "sacrifice_cost_target": (sacrificed_cost_target or {}).get("name"),
+            "sacrifice_cost_targets": _sacrificed_cost_target_names(sacrificed_cost_targets),
+            "sacrifice_cost": _sacrifice_cost_label(effect_data),
             "discarded": [card.get("name", "?") for card in discard_cards],
             "discarded_count": activation_discard_count,
             "discard_target": activation_discard_target if activation_discard_count else None,
@@ -47777,7 +47822,7 @@ def activate_generic_tap_damage_permanent(player, opponents, permanent, turn, rn
             "mana": -mana_paid,
             "tapped": 1 if requires_tap else 0,
             "permanents": -(
-                (1 if sacrificed_source else 0) + (1 if sacrificed_cost_target is not None else 0)
+                (1 if sacrificed_source else 0) + len(sacrificed_cost_targets)
             ),
             "graveyard": len(discard_resolution.get("to_graveyard") or []),
             "cards_discarded": activation_discard_count,
@@ -47788,7 +47833,7 @@ def activate_generic_tap_damage_permanent(player, opponents, permanent, turn, rn
             for flag, active in {
                 "tap_ability": requires_tap,
                 "sacrifice_source": sacrificed_source,
-                "sacrifice_cost_target": sacrificed_cost_target is not None,
+                "sacrifice_cost_target": bool(sacrificed_cost_targets),
                 "discard_cost": activation_discard_count > 0,
                 "life_payment": life_cost > 0,
                 "simplified_target_choice": True,
@@ -47806,6 +47851,7 @@ def activate_generic_tap_damage_permanent(player, opponents, permanent, turn, rn
         tapped=bool(permanent.get("tapped")),
         sacrificed_source=sacrificed_source,
         sacrificed_cost_target=(sacrificed_cost_target or {}).get("name"),
+        sacrificed_cost_targets=_sacrificed_cost_target_names(sacrificed_cost_targets),
         sacrifice_cost_available_targets=len(sacrifice_cost_options),
         discarded=[card.get("name", "?") for card in discard_cards],
         discarded_count=activation_discard_count,
@@ -48203,7 +48249,15 @@ def can_activate_generic_destroy_permanent(player, permanent, opponents, *, effe
         if len(discard_cards) != activation_discard_count:
             return False
     sacrifice_target_type = str(effect_data.get("activation_sacrifice_target") or "").strip()
-    if sacrifice_target_type:
+    if _activation_sacrifice_cost(effect_data):
+        sacrifice_candidates, _options = _choose_activation_sacrifice_cost_candidates(
+            player,
+            permanent,
+            effect_data,
+        )
+        if len(sacrifice_candidates) != _sacrifice_cost_count(effect_data):
+            return False
+    elif sacrifice_target_type:
         sacrifice_target, _options = choose_activation_sacrifice_target(
             player,
             permanent,
@@ -48260,9 +48314,20 @@ def activate_generic_destroy_permanent(player, opponents, all_players, permanent
     if not target_type:
         target_type = "creature" if effect_data.get("effect") == "remove_creature" else "nonland_permanent"
     sacrifice_target_type = str(effect_data.get("activation_sacrifice_target") or "").strip()
+    sacrificed_targets = []
     sacrificed_target = None
     sacrifice_options = []
-    if sacrifice_target_type:
+    if _activation_sacrifice_cost(effect_data):
+        sacrifice_candidates, sacrifice_options = _choose_activation_sacrifice_cost_candidates(
+            player,
+            permanent,
+            effect_data,
+        )
+        if len(sacrifice_candidates) != _sacrifice_cost_count(effect_data):
+            return False
+        sacrificed_targets = sacrifice_candidates
+        sacrificed_target = _first_sacrificed_cost_target(sacrificed_targets)
+    elif sacrifice_target_type:
         sacrificed_target, sacrifice_options = choose_activation_sacrifice_target(
             player,
             permanent,
@@ -48320,8 +48385,12 @@ def activate_generic_destroy_permanent(player, opponents, all_players, permanent
         player.graveyard.append(permanent)
         player.record_permanent_sacrificed(permanent, turn)
         sacrificed_source = True
-    if sacrificed_target is not None:
+    if sacrificed_targets:
+        sacrificed_targets = _sacrifice_activation_cost_candidates(player, sacrificed_targets, turn)
+        sacrificed_target = _first_sacrificed_cost_target(sacrificed_targets)
+    elif sacrificed_target is not None:
         sacrifice_permanent_for_activation(player, sacrificed_target, turn)
+        sacrificed_targets = [sacrificed_target]
     if check_ward(target, permanent, player, rng):
         emit_replay_event(
             "removal_countered_by_ward",
@@ -48367,6 +48436,8 @@ def activate_generic_destroy_permanent(player, opponents, all_players, permanent
             "requires_sacrifice": 1 if sacrificed_source else 0,
             "sacrifice_target": sacrifice_target_type or None,
             "sacrificed_target": (sacrificed_target or {}).get("name"),
+            "sacrificed_targets": _sacrificed_cost_target_names(sacrificed_targets),
+            "sacrifice_cost": _sacrifice_cost_label(effect_data),
             "sacrifice_options": [
                 option.get("name", "?")
                 for option in (sacrifice_options or [])[:6]
@@ -48387,7 +48458,7 @@ def activate_generic_destroy_permanent(player, opponents, all_players, permanent
             "tapped": 1 if effect_data.get("activation_requires_tap") else 0,
             "permanents": -(
                 (1 if sacrificed_source else 0)
-                + (1 if sacrificed_target is not None else 0)
+                + len(sacrificed_targets)
             ),
             "graveyard": len(discard_resolution.get("to_graveyard") or []),
             "cards_discarded": activation_discard_count,
@@ -48398,7 +48469,7 @@ def activate_generic_destroy_permanent(player, opponents, all_players, permanent
             for flag, active in {
                 "tap_ability": bool(effect_data.get("activation_requires_tap")),
                 "sacrifice_source": sacrificed_source,
-                "sacrifice_target": sacrificed_target is not None,
+                "sacrifice_target": bool(sacrificed_targets),
                 "discard_cost": activation_discard_count > 0,
                 "activated_destroy_target": True,
             }.items()
@@ -48416,6 +48487,7 @@ def activate_generic_destroy_permanent(player, opponents, all_players, permanent
         sacrificed_source=sacrificed_source,
         sacrifice_target=sacrifice_target_type or None,
         sacrificed_target=(sacrificed_target or {}).get("name"),
+        sacrificed_targets=_sacrificed_cost_target_names(sacrificed_targets),
         discarded=[card.get("name", "?") for card in discard_cards],
         discarded_count=activation_discard_count,
         discard_target=activation_discard_target if activation_discard_count else None,

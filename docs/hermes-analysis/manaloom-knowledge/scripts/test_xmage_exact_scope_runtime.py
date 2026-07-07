@@ -10626,6 +10626,73 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertEqual([card["name"] for card in opponent.graveyard], ["Plain Relic"])
         self.assertTrue(joven.get("tapped"))
 
+    def test_simple_activated_destroy_pays_multi_sacrifice_cost(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.mana_pool.add("colorless", 1)
+        cost_land_a = {"name": "Cost Plains", "type_line": "Basic Land - Plains"}
+        cost_land_b = {"name": "Cost Mountain", "type_line": "Basic Land - Mountain"}
+        source = {
+            "name": "Keldon Arsonist",
+            "type_line": "Creature - Human Soldier",
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+            "activated_effect": "destroy_target",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+            "activated_remove_effect": "remove_permanent",
+            "activated_remove_target": "land",
+            "target": "land",
+            "target_constraints": {"card_types": ["land"]},
+            "destination": "graveyard",
+            "activation_cost_mana": "{1}",
+            "activation_cost_generic": 1,
+            "activation_cost_colors": [],
+            "activation_requires_tap": False,
+            "activation_requires_sacrifice": False,
+            "activation_requires_sacrifice_target": True,
+            "activation_sacrifice_cost": {
+                "count": 2,
+                "target_controller": "self",
+                "constraints": {"card_types": ["land"]},
+            },
+            "summoning_sick": True,
+            "_rule_logical_key": "battle_rule_v1:keldon_arsonist",
+        }
+        target_land = {"name": "Target Field", "type_line": "Land"}
+        active.battlefield.extend([source, cost_land_a, cost_land_b])
+        opponent.battlefield.append(target_land)
+
+        activated = self.battle.activate_generic_destroy_permanent(
+            active,
+            [opponent],
+            [active, opponent],
+            source,
+            turn=20,
+            rng=random.Random(120),
+            phase="precombat_main",
+        )
+
+        self.assertTrue(activated)
+        self.assertIn(source, active.battlefield)
+        self.assertNotIn(cost_land_a, active.battlefield)
+        self.assertNotIn(cost_land_b, active.battlefield)
+        self.assertIn(cost_land_a, active.graveyard)
+        self.assertIn(cost_land_b, active.graveyard)
+        self.assertNotIn(target_land, opponent.battlefield)
+        self.assertIn(target_land, opponent.graveyard)
+        self.assertEqual(active.available_mana(), 0)
+        self.assertTrue(
+            any(
+                event == "activated_ability"
+                and data.get("card") == "Keldon Arsonist"
+                and data.get("activation_kind") == "simple_activated_destroy"
+                and data.get("target") == "Target Field"
+                and data.get("sacrificed_targets") == ["Cost Mountain", "Cost Plains"]
+                and data.get("rule_logical_key") == "battle_rule_v1:keldon_arsonist"
+                for event, data in self.events
+            )
+        )
+
     def test_simple_activated_destroy_blocks_summoning_sick_tap_creature(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

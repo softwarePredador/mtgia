@@ -11744,7 +11744,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertTrue(effect["activation_requires_sacrifice_target"])
         self.assertFalse(effect["activation_requires_sacrifice"])
 
-    def test_permanent_activated_destroy_blocks_multi_sacrifice_target_cost(self) -> None:
+    def test_permanent_activated_destroy_maps_multi_sacrifice_target_cost(self) -> None:
         row = queue_row(
             split.DESTROY_UNIT,
             effect_classes=["DestroyTargetEffect"],
@@ -11770,8 +11770,26 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             """,
         )
 
-        self.assertIsNone(proposal)
-        self.assertEqual(reason, "activated_destroy_source_cost_not_supported")
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_DESTROY_SCOPE)
+        self.assertEqual(effect["activated_remove_target"], "land")
+        self.assertEqual(effect["target"], "land")
+        self.assertEqual(effect["activation_cost_mana"], "{1}")
+        self.assertEqual(
+            effect["activation_sacrifice_cost"],
+            {
+                "count": 2,
+                "target_controller": "self",
+                "constraints": {"card_types": ["land"]},
+            },
+        )
+        self.assertTrue(effect["activation_requires_sacrifice_target"])
+        self.assertNotIn("activation_sacrifice_target", effect)
+        self.assertEqual(
+            effect["_activated_rule_effects"][0]["activation_sacrifice_cost"],
+            effect["activation_sacrifice_cost"],
+        )
 
     def test_permanent_activated_destroy_blocks_extra_oracle_clause(self) -> None:
         row = queue_row(

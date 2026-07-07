@@ -14488,11 +14488,23 @@ def normalized_activation_sacrifice_cost(cost: dict[str, Any] | None) -> dict[st
 
 def activation_sacrifice_cost_from_phrase(phrase: str) -> dict[str, Any] | str:
     text = re.sub(r"\s+", " ", str(phrase or "").strip().lower())
+    count = 1
+    count_match = re.match(
+        r"(?P<count>one|two|three|four|five|six|seven|eight|nine|ten|\d+)\s+(?P<object>.+)$",
+        text,
+    )
+    if count_match:
+        count = number_word_to_int(count_match.group("count"))
+        text = count_match.group("object").strip()
+    if count <= 0:
+        return "activated_damage_sacrifice_cost_not_supported"
     text = re.sub(r"^(?:a|an)\s+", "", text).strip()
     exclude_source = False
     if text.startswith("another "):
         exclude_source = True
         text = text[len("another ") :].strip()
+    if count > 1 and " and " in text:
+        text = text.split(" and ", 1)[0].strip()
     constraints: dict[str, Any] = {}
     if text in {"creature", "creatures"}:
         constraints["card_types"] = ["creature"]
@@ -14519,18 +14531,23 @@ def activation_sacrifice_cost_from_phrase(phrase: str) -> dict[str, Any] | str:
     if exclude_source:
         constraints["exclude_source"] = True
     return normalized_activation_sacrifice_cost(
-        {"count": 1, "target_controller": "self", "constraints": constraints}
+        {"count": count, "target_controller": "self", "constraints": constraints}
     )
 
 
 def activation_sacrifice_cost_from_oracle(text: str) -> dict[str, Any] | str | None:
-    match = re.search(
-        r"sacrifice\s+(?P<object>another\s+[^.:]+|(?:a|an)\s+[^.:]+):",
-        str(text or "").lower(),
+    cost_text = str(text or "").lower().rsplit(":", 1)[0]
+    matches = list(
+        re.finditer(
+            r"(?:^|,\s*)sacrifice\s+(?P<object>(?:another|an?|one|two|three|four|five|six|seven|eight|nine|ten|\d+)\s+[^,]+?)(?:,|$)",
+            cost_text,
+        )
     )
-    if not match:
+    if not matches:
         return None
-    return activation_sacrifice_cost_from_phrase(match.group("object"))
+    if len(matches) != 1:
+        return "activated_damage_sacrifice_cost_not_supported"
+    return activation_sacrifice_cost_from_phrase(matches[0].group("object"))
 
 
 def activation_sacrifice_cost_from_source(text: str, window: str) -> dict[str, Any] | str | None:
@@ -14540,7 +14557,12 @@ def activation_sacrifice_cost_from_source(text: str, window: str) -> dict[str, A
     if len(cost_matches) != 1:
         return "activated_damage_source_sacrifice_cost_not_supported"
     cost_arg = re.sub(r"\s+", " ", cost_matches[0]).strip()
-    if re.match(r"\d+\s*,", cost_arg):
+    count = 1
+    count_match = re.match(r"(?P<count>\d+)\s*,\s*(?P<rest>.+)$", cost_arg, re.S)
+    if count_match:
+        count = int(count_match.group("count"))
+        cost_arg = count_match.group("rest").strip()
+    if count <= 0:
         return "activated_damage_source_sacrifice_cost_not_supported"
     constraints: dict[str, Any] = {}
     if "FILTER_PERMANENT_CREATURE_OR_ENCHANTMENT" in cost_arg:
@@ -14555,6 +14577,8 @@ def activation_sacrifice_cost_from_source(text: str, window: str) -> dict[str, A
         constraints["card_types"] = ["creature"]
     elif "FILTER_CONTROLLED_PERMANENT_ARTIFACT" in cost_arg or "FILTER_PERMANENT_ARTIFACT" in cost_arg:
         constraints["card_types"] = ["artifact"]
+    elif "FILTER_LANDS" in cost_arg or "FILTER_LAND" in cost_arg or "FilterControlledLandPermanent" in cost_arg:
+        constraints["card_types"] = ["land"]
     elif "filter" in cost_arg:
         filter_match = re.search(
             r"FilterControlledPermanent\s+filter\s*=\s*new\s+FilterControlledPermanent\s*\((.*?)\)\s*;",
@@ -14579,8 +14603,36 @@ def activation_sacrifice_cost_from_source(text: str, window: str) -> dict[str, A
     else:
         return "activated_damage_source_sacrifice_cost_not_supported"
     return normalized_activation_sacrifice_cost(
-        {"count": 1, "target_controller": "self", "constraints": constraints}
+        {"count": count, "target_controller": "self", "constraints": constraints}
     )
+
+
+def activation_sacrifice_target_from_cost(cost: dict[str, Any] | None) -> str | None:
+    normalized = normalized_activation_sacrifice_cost(cost)
+    if not normalized or int(normalized.get("count") or 1) != 1:
+        return None
+    constraints = dict(normalized.get("constraints") or {})
+    subtypes = [
+        str(value or "").strip().lower()
+        for value in as_list(constraints.get("target_subtypes") or constraints.get("required_subtypes"))
+        if str(value or "").strip()
+    ]
+    if len(subtypes) == 1:
+        return subtypes[0]
+    card_types = sorted(
+        {
+            str(value or "").strip().lower()
+            for value in as_list(constraints.get("card_types"))
+            if str(value or "").strip()
+        }
+    )
+    if card_types == ["artifact", "creature"]:
+        return "artifact_or_creature"
+    if card_types == ["creature", "enchantment"]:
+        return "creature_or_enchantment"
+    if len(card_types) == 1:
+        return card_types[0]
+    return None
 
 
 def activation_discard_cost_from_oracle(text: str) -> dict[str, Any] | None:
@@ -14827,6 +14879,9 @@ def activated_destroy_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | 
     if text.count(":") != 1:
         return None
     discard_cost = activation_discard_cost_from_oracle(text)
+    sacrifice_cost = activation_sacrifice_cost_from_oracle(text)
+    if isinstance(sacrifice_cost, str):
+        return None
     effect_text = text.rsplit(":", 1)[1].strip()
     extra_sentences = [
         sentence.strip()
@@ -14844,6 +14899,7 @@ def activated_destroy_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | 
     return {
         "effect": effect,
         "target": target_type,
+        "activation_sacrifice_cost": sacrifice_cost,
         **(discard_cost or {}),
     }
 
@@ -14946,14 +15002,15 @@ def activated_destroy_from_source(source: str) -> dict[str, Any] | str:
     discard_cost = activation_discard_cost_from_source(window)
     if isinstance(discard_cost, str):
         return discard_cost.replace("activated_damage", "activated_destroy")
+    sacrifice_cost = None
     sacrifice_target = None
     if "SacrificeTargetCost" in window:
-        sacrifice_cost_count = len(re.findall(r"new\s+SacrificeTargetCost\s*\(", window))
-        if sacrifice_cost_count != 1 or re.search(r"new\s+SacrificeTargetCost\s*\(\s*[2-9]\d*\s*,", window):
+        sacrifice_cost = activation_sacrifice_cost_from_source(text, window)
+        if isinstance(sacrifice_cost, str):
+            return sacrifice_cost.replace("activated_damage", "activated_destroy")
+        if sacrifice_cost is None:
             return "activated_destroy_source_cost_not_supported"
-        sacrifice_target = activation_sacrifice_target_from_source(text, window)
-        if sacrifice_target is None:
-            return "activated_destroy_source_cost_not_supported"
+        sacrifice_target = activation_sacrifice_target_from_cost(sacrifice_cost)
     target = activated_destroy_target_from_source(text)
     if target is None:
         return "activated_destroy_source_target_not_supported"
@@ -14981,6 +15038,14 @@ def activated_destroy_from_source(source: str) -> dict[str, Any] | str:
         "activation_cost_colors": activation_cost_colors,
         "activation_requires_tap": "TapSourceCost" in window,
         "activation_requires_sacrifice": "SacrificeSourceCost" in window,
+        **(
+            {
+                "activation_sacrifice_cost": sacrifice_cost,
+                "activation_requires_sacrifice_target": True,
+            }
+            if sacrifice_cost is not None
+            else {}
+        ),
         **(
             {
                 "activation_sacrifice_target": sacrifice_target,
@@ -21925,7 +21990,15 @@ def split_row(
         oracle_target_type = str(oracle_destroy["target"])
         if str(parsed_activation["target"]) != str(oracle_target_type):
             return None, "activated_destroy_source_oracle_target_mismatch"
-        if parsed_activation.get("activation_sacrifice_target"):
+        oracle_sacrifice_cost = normalized_activation_sacrifice_cost(
+            oracle_destroy.get("activation_sacrifice_cost")
+        )
+        source_sacrifice_cost = normalized_activation_sacrifice_cost(
+            parsed_activation.get("activation_sacrifice_cost")
+        )
+        if source_sacrifice_cost != oracle_sacrifice_cost:
+            return None, "activated_destroy_source_oracle_sacrifice_cost_mismatch"
+        if parsed_activation.get("activation_sacrifice_target") and not source_sacrifice_cost:
             oracle_sacrifice_target = activated_destroy_sacrifice_target_from_oracle(metadata)
             if oracle_sacrifice_target != parsed_activation.get("activation_sacrifice_target"):
                 return None, "activated_destroy_source_oracle_sacrifice_target_mismatch"
@@ -21972,6 +22045,7 @@ def split_row(
                     "activation_cost_colors",
                     "activation_requires_tap",
                     "activation_requires_sacrifice",
+                    "activation_sacrifice_cost",
                     "activation_sacrifice_target",
                     "activation_requires_sacrifice_target",
                     "activation_discard_count",
@@ -22004,6 +22078,7 @@ def split_row(
                     "activation_cost_colors",
                     "activation_requires_tap",
                     "activation_requires_sacrifice",
+                    "activation_sacrifice_cost",
                     "activation_sacrifice_target",
                     "activation_requires_sacrifice_target",
                     "activation_discard_count",

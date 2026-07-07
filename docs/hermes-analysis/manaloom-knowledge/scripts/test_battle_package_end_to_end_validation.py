@@ -658,6 +658,89 @@ def test_simple_activated_destroy_runner_executes_sacrifice_target_cost() -> Non
     )
 
 
+def test_simple_activated_destroy_runner_executes_structured_multi_sacrifice_cost() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "creature",
+        "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+        "activated_effect": "destroy_target",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+        "activated_remove_effect": "remove_permanent",
+        "activated_remove_target": "land",
+        "target": "land",
+        "target_constraints": {"card_types": ["land"]},
+        "target_controller": "opponent",
+        "destination": "graveyard",
+        "activation_cost_mana": "{1}",
+        "activation_cost_generic": 1,
+        "activation_cost_colors": [],
+        "activation_requires_tap": False,
+        "activation_requires_sacrifice": False,
+        "activation_requires_sacrifice_target": True,
+        "activation_sacrifice_cost": {
+            "count": 2,
+            "target_controller": "self",
+            "constraints": {"card_types": ["land"]},
+        },
+        "_rule_logical_key": "battle_rule_v1:keldon-arsonist",
+    }
+    try:
+        result = validator.run_simple_activated_destroy(
+            battle,
+            {
+                "name": "Keldon Arsonist destroys land with two sacrificed lands",
+                "type": "simple_activated_destroy",
+                "card": {"name": "Keldon Arsonist"},
+                "target": {
+                    "name": "E2E Land Target",
+                    "type_line": "Land",
+                    "effect": "land",
+                    "cmc": 0,
+                },
+                "sacrifice_targets": [
+                    {
+                        "name": "E2E Sacrifice Land 1",
+                        "type_line": "Land",
+                        "effect": "land",
+                        "cmc": 0,
+                    },
+                    {
+                        "name": "E2E Sacrifice Land 2",
+                        "type_line": "Land",
+                        "effect": "land",
+                        "cmc": 0,
+                    },
+                ],
+                "controller_mana": {"generic": 1},
+                "expected_destination": "graveyard",
+                "expect_target_sacrificed": True,
+                "expected_sacrifice_count": 2,
+                "logical_rule_key": "battle_rule_v1:keldon-arsonist",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Keldon Arsonist"
+    assert result["target"] == "E2E Land Target"
+    assert result["destination"] == "graveyard"
+    assert result["target_sacrificed"] is True
+    assert result["sacrificed_targets"] == ["E2E Sacrifice Land 1", "E2E Sacrifice Land 2"]
+    assert any(
+        event == "activated_ability"
+        and data.get("card") == "Keldon Arsonist"
+        and data.get("sacrificed_targets") == ["E2E Sacrifice Land 1", "E2E Sacrifice Land 2"]
+        and data.get("mana_paid") == 1
+        for event, data in events
+    )
+
+
 def test_simple_activated_destroy_runner_executes_discard_cost() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

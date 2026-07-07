@@ -387,6 +387,7 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "activation_discard_random",
     "activation_zone",
     "activation_requires_exile_source_from_graveyard",
+    "activation_sacrifice_cost",
     "activation_sacrifice_target",
     "activation_requires_sacrifice_target",
     "permanent_type",
@@ -2406,6 +2407,28 @@ def _manifest_unlock_cost_for_mana_source(required: dict[str, Any]) -> str:
     return "{1}"
 
 
+def _manifest_sacrifice_cost_fixtures(
+    base_name: str,
+    sacrifice_cost: dict[str, Any] | None,
+) -> list[dict[str, Any]]:
+    if not isinstance(sacrifice_cost, dict):
+        return []
+    count = max(1, int(sacrifice_cost.get("count") or 1))
+    constraints = dict(sacrifice_cost.get("constraints") or {})
+    if constraints.get("target_subtypes") and not constraints.get("required_subtypes"):
+        constraints["required_subtypes"] = list(constraints.get("target_subtypes") or [])
+    if constraints.get("required_subtypes") and not constraints.get("card_types"):
+        constraints["card_types"] = ["creature"]
+    return [
+        _target_fixture_from_constraints(
+            f"{base_name} {index + 1}" if count > 1 else base_name,
+            constraints,
+            matching=True,
+        )
+        for index in range(count)
+    ]
+
+
 def sacrifice_mana_source_execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any] | None:
     required = dict(rule.get("required_effect_fields") or {})
     if required.get("effect") != "ramp_permanent" or not required.get("is_mana_source"):
@@ -2726,8 +2749,17 @@ def simple_activated_destroy_execution_scenario_from_expected_rule(
         ]
         scenario["expected_discard_count"] = discard_count
         scenario["expected_discard_target"] = required.get("activation_discard_target") or "any_card"
+    sacrifice_targets = _manifest_sacrifice_cost_fixtures(
+        "E2E Activated Destroy Sacrifice Target",
+        required.get("activation_sacrifice_cost") if isinstance(required.get("activation_sacrifice_cost"), dict) else None,
+    )
     sacrifice_target_type = str(required.get("activation_sacrifice_target") or "").strip().lower()
-    if required.get("activation_requires_sacrifice_target") or sacrifice_target_type:
+    if sacrifice_targets:
+        scenario["sacrifice_targets"] = sacrifice_targets
+        scenario["sacrifice_target"] = sacrifice_targets[0]
+        scenario["expected_sacrifice_count"] = len(sacrifice_targets)
+        scenario["expect_target_sacrificed"] = True
+    elif required.get("activation_requires_sacrifice_target") or sacrifice_target_type:
         sacrifice_card_type = "creature" if sacrifice_target_type == "creature" else "permanent"
         scenario["sacrifice_target"] = _target_fixture_from_constraints(
             "E2E Activated Destroy Sacrifice Target",
