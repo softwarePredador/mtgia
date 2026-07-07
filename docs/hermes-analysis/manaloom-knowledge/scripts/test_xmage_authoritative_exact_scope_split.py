@@ -10558,6 +10558,133 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["destination"], "exile")
         self.assertEqual(effect["target_constraints"], {"card_types": ["creature", "enchantment"]})
 
+    def test_exile_target_spell_maps_restricted_single_targets(self) -> None:
+        cases = [
+            (
+                "Complete Disregard",
+                "Devoid (This card has no color.) Exile target creature with power 3 or less.",
+                'new FilterCreaturePermanent("creature with power 3 or less");'
+                "filter.add(new PowerPredicate(ComparisonType.FEWER_THAN, 4));",
+                "remove_creature",
+                "creature",
+                {"card_types": ["creature"], "power_max": 3},
+            ),
+            (
+                "Pillar of Light",
+                "Exile target creature with toughness 4 or greater.",
+                'new FilterCreaturePermanent("creature with toughness 4 or greater");'
+                "filter.add(new ToughnessPredicate(ComparisonType.MORE_THAN, 3));",
+                "remove_creature",
+                "creature",
+                {"card_types": ["creature"], "toughness_min": 4},
+            ),
+            (
+                "Glare of Heresy",
+                "Exile target white permanent.",
+                'new FilterPermanent("white permanent");'
+                "filter.add(new ColorPredicate(ObjectColor.WHITE));",
+                "remove_permanent",
+                "permanent",
+                {"card_types": ["permanent"], "target_colors": ["W"]},
+            ),
+            (
+                "Radiant Purge",
+                "Exile target multicolored creature or multicolored enchantment.",
+                'new FilterPermanent("multicolored creature or multicolored enchantment");'
+                "filter.add(Predicates.or("
+                "Predicates.and(CardType.CREATURE.getPredicate(), MulticoloredPredicate.instance),"
+                "Predicates.and(CardType.ENCHANTMENT.getPredicate(), MulticoloredPredicate.instance)));",
+                "remove_permanent",
+                "permanent",
+                {"card_types": ["creature", "enchantment"], "color_count_min": 2},
+            ),
+            (
+                "Exorcise",
+                "Exile target artifact, enchantment, or creature with power 4 or greater.",
+                'new FilterPermanent("artifact, enchantment, or creature with power 4 or greater");'
+                "filter.add(Predicates.or(CardType.ARTIFACT.getPredicate(),"
+                "CardType.ENCHANTMENT.getPredicate(),"
+                "Predicates.and(CardType.CREATURE.getPredicate(),"
+                "new PowerPredicate(ComparisonType.MORE_THAN, 3))));",
+                "remove_permanent",
+                "permanent",
+                {
+                    "any_of": [
+                        {"card_types": ["artifact"]},
+                        {"card_types": ["enchantment"]},
+                        {"card_types": ["creature"], "power_min": 4},
+                    ]
+                },
+            ),
+            (
+                "Oblivion Strike",
+                "Devoid (This card has no color.) Exile target creature.",
+                "this.getSpellAbility().addTarget(new TargetCreaturePermanent());",
+                "remove_creature",
+                "creature",
+                {"card_types": ["creature"]},
+            ),
+            (
+                "Gravkill",
+                "Exile target creature or Spacecraft.",
+                'new FilterPermanent("creature or Spacecraft");'
+                "filter.add(Predicates.or(CardType.CREATURE.getPredicate(), SubType.SPACECRAFT.getPredicate()));",
+                "remove_permanent",
+                "permanent",
+                {
+                    "any_of": [
+                        {"card_types": ["creature"]},
+                        {"card_types": ["artifact"], "required_subtypes": ["spacecraft"]},
+                    ]
+                },
+            ),
+        ]
+        for name, oracle, source_filter, effect_name, target, constraints in cases:
+            with self.subTest(name=name):
+                row = queue_row(split.EXILE_UNIT, effect_classes=["ExileTargetEffect"])
+                proposal, reason = split.split_row(
+                    row,
+                    metadata(name=name, oracle_text=oracle),
+                    source_text=(
+                        source_filter
+                        + "this.getSpellAbility().addEffect(new ExileTargetEffect());"
+                        + "this.getSpellAbility().addTarget(new TargetPermanent(filter));"
+                    ),
+                )
+
+                self.assertEqual(reason, "selected_exact_scope")
+                effect = proposal["effect_json"]
+                self.assertEqual(effect["effect"], effect_name)
+                self.assertEqual(effect["battle_model_scope"], split.EXILE_SCOPE)
+                self.assertEqual(effect["target"], target)
+                self.assertEqual(effect["destination"], "exile")
+                self.assertEqual(effect["target_constraints"], constraints)
+
+    def test_exile_target_spell_keeps_dynamic_and_multi_target_blocked(self) -> None:
+        blocked = [
+            (
+                "Blazing Hope",
+                "Exile target creature with power greater than or equal to your life total.",
+                "new FilterCreaturePermanent(); new PowerPredicate(ComparisonType.MORE_THAN, LifeValue.instance);",
+            ),
+            (
+                "Dust to Dust",
+                "Exile two target artifacts.",
+                "this.getSpellAbility().addTarget(new TargetArtifactPermanent(2));",
+            ),
+        ]
+        for name, oracle, source in blocked:
+            with self.subTest(name=name):
+                row = queue_row(split.EXILE_UNIT, effect_classes=["ExileTargetEffect"])
+                proposal, reason = split.split_row(
+                    row,
+                    metadata(name=name, oracle_text=oracle),
+                    source_text=f"{source} this.getSpellAbility().addEffect(new ExileTargetEffect());",
+                )
+
+                self.assertIsNone(proposal)
+                self.assertIn(reason, {"exile_target_not_supported", "exile_target_source_mismatch"})
+
     def test_exile_spell_with_additional_cost_stays_blocked(self) -> None:
         row = queue_row(split.EXILE_UNIT, effect_classes=["ExileTargetEffect"])
         proposal, reason = split.split_row(

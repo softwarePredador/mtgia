@@ -1,0 +1,486 @@
+{
+  "battle_execution": {
+    "event_count": 18,
+    "results": [
+      {
+        "battlefield_names": [
+          "E2E Illegal Removal Target"
+        ],
+        "card_name": "Complete Disregard",
+        "destination": "exile",
+        "moved_names": [
+          "E2E Legal Removal Target"
+        ],
+        "nonmatching_target": "E2E Illegal Removal Target",
+        "scenario": "Complete Disregard removes one legal target",
+        "target": "E2E Legal Removal Target"
+      },
+      {
+        "battlefield_names": [
+          "E2E Illegal Removal Target"
+        ],
+        "card_name": "Exorcise",
+        "destination": "exile",
+        "moved_names": [
+          "E2E Legal Removal Target"
+        ],
+        "nonmatching_target": "E2E Illegal Removal Target",
+        "scenario": "Exorcise removes one legal target",
+        "target": "E2E Legal Removal Target"
+      },
+      {
+        "battlefield_names": [
+          "E2E Illegal Removal Target"
+        ],
+        "card_name": "Glare of Heresy",
+        "destination": "exile",
+        "moved_names": [
+          "E2E Legal Removal Target"
+        ],
+        "nonmatching_target": "E2E Illegal Removal Target",
+        "scenario": "Glare of Heresy removes one legal target",
+        "target": "E2E Legal Removal Target"
+      },
+      {
+        "battlefield_names": [
+          "E2E Illegal Removal Target"
+        ],
+        "card_name": "Gravkill",
+        "destination": "exile",
+        "moved_names": [
+          "E2E Legal Removal Target"
+        ],
+        "nonmatching_target": "E2E Illegal Removal Target",
+        "scenario": "Gravkill removes one legal target",
+        "target": "E2E Legal Removal Target"
+      },
+      {
+        "battlefield_names": [
+          "E2E Illegal Removal Target"
+        ],
+        "card_name": "Grotesque Demise",
+        "destination": "exile",
+        "moved_names": [
+          "E2E Legal Removal Target"
+        ],
+        "nonmatching_target": "E2E Illegal Removal Target",
+        "scenario": "Grotesque Demise removes one legal target",
+        "target": "E2E Legal Removal Target"
+      },
+      {
+        "battlefield_names": [
+          "E2E Illegal Removal Target"
+        ],
+        "card_name": "Oblivion Strike",
+        "destination": "exile",
+        "moved_names": [
+          "E2E Legal Removal Target"
+        ],
+        "nonmatching_target": "E2E Illegal Removal Target",
+        "scenario": "Oblivion Strike removes one legal target",
+        "target": "E2E Legal Removal Target"
+      },
+      {
+        "battlefield_names": [
+          "E2E Illegal Removal Target"
+        ],
+        "card_name": "Pillar of Light",
+        "destination": "exile",
+        "moved_names": [
+          "E2E Legal Removal Target"
+        ],
+        "nonmatching_target": "E2E Illegal Removal Target",
+        "scenario": "Pillar of Light removes one legal target",
+        "target": "E2E Legal Removal Target"
+      },
+      {
+        "battlefield_names": [
+          "E2E Illegal Removal Target"
+        ],
+        "card_name": "Radiant Purge",
+        "destination": "exile",
+        "moved_names": [
+          "E2E Legal Removal Target"
+        ],
+        "nonmatching_target": "E2E Illegal Removal Target",
+        "scenario": "Radiant Purge removes one legal target",
+        "target": "E2E Legal Removal Target"
+      },
+      {
+        "battlefield_names": [
+          "E2E Illegal Removal Target"
+        ],
+        "card_name": "Reaver Ambush",
+        "destination": "exile",
+        "moved_names": [
+          "E2E Legal Removal Target"
+        ],
+        "nonmatching_target": "E2E Illegal Removal Target",
+        "scenario": "Reaver Ambush removes one legal target",
+        "target": "E2E Legal Removal Target"
+      }
+    ],
+    "scenario_count": 9
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-07T00:19:52.760657+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg582_exile_restricted_targets_new_server_manifest.json",
+  "package_id": "pg582_exile_restricted_targets_new_server_manifest",
+  "snapshot": "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 9
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_spell_v1",
+          "card_name": "Complete Disregard",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:71b5118405b21546b3a73044e33d2653",
+          "oracle_hash": "ecabafea2b250cebca1454ee258e13b3",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_spell_v1",
+          "card_name": "Exorcise",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:eac8dd4ac2d8c459b0f62e9635df4728",
+          "oracle_hash": "cf19a0545534c990f1987d8c7bf3763b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_spell_v1",
+          "card_name": "Glare of Heresy",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c0d3466809078f80f13b7f9b83920f0e",
+          "oracle_hash": "2a6ca1c2201f8882344e2cfaf9c3d77a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_spell_v1",
+          "card_name": "Gravkill",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a50a14ae548bb34dae68539002471f72",
+          "oracle_hash": "23477afc51668be8a688d628a33a9fd5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_spell_v1",
+          "card_name": "Grotesque Demise",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:71b5118405b21546b3a73044e33d2653",
+          "oracle_hash": "7134294c8e8d9d4833854bfb9d731abe",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_spell_v1",
+          "card_name": "Oblivion Strike",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3cac595bc15482b8fc94d43faae3e0d9",
+          "oracle_hash": "c8f7dff168beab44a9ead1e577ef1582",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_spell_v1",
+          "card_name": "Pillar of Light",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b5fbabd1217648a47f85b94887983c13",
+          "oracle_hash": "2f715b9c556074e81dff1bb81bac2764",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_spell_v1",
+          "card_name": "Radiant Purge",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:520d36d2340627c968c4aa5f93fa888b",
+          "oracle_hash": "bbe445b6a97ef992958ce574ee110997",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_spell_v1",
+          "card_name": "Reaver Ambush",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:71b5118405b21546b3a73044e33d2653",
+          "oracle_hash": "7134294c8e8d9d4833854bfb9d731abe",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 9
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_spell_v1",
+          "card_name": "Complete Disregard",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:71b5118405b21546b3a73044e33d2653",
+          "oracle_hash": "ecabafea2b250cebca1454ee258e13b3",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_spell_v1",
+          "card_name": "Exorcise",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:eac8dd4ac2d8c459b0f62e9635df4728",
+          "oracle_hash": "cf19a0545534c990f1987d8c7bf3763b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_spell_v1",
+          "card_name": "Glare of Heresy",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c0d3466809078f80f13b7f9b83920f0e",
+          "oracle_hash": "2a6ca1c2201f8882344e2cfaf9c3d77a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_spell_v1",
+          "card_name": "Gravkill",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a50a14ae548bb34dae68539002471f72",
+          "oracle_hash": "23477afc51668be8a688d628a33a9fd5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_spell_v1",
+          "card_name": "Grotesque Demise",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:71b5118405b21546b3a73044e33d2653",
+          "oracle_hash": "7134294c8e8d9d4833854bfb9d731abe",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_spell_v1",
+          "card_name": "Oblivion Strike",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3cac595bc15482b8fc94d43faae3e0d9",
+          "oracle_hash": "c8f7dff168beab44a9ead1e577ef1582",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_spell_v1",
+          "card_name": "Pillar of Light",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b5fbabd1217648a47f85b94887983c13",
+          "oracle_hash": "2f715b9c556074e81dff1bb81bac2764",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_spell_v1",
+          "card_name": "Radiant Purge",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:520d36d2340627c968c4aa5f93fa888b",
+          "oracle_hash": "bbe445b6a97ef992958ce574ee110997",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_spell_v1",
+          "card_name": "Reaver Ambush",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:71b5118405b21546b3a73044e33d2653",
+          "oracle_hash": "7134294c8e8d9d4833854bfb9d731abe",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 9
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Complete Disregard",
+          "logical_rule_key": "battle_rule_v1:71b5118405b21546b3a73044e33d2653"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Exorcise",
+          "logical_rule_key": "battle_rule_v1:eac8dd4ac2d8c459b0f62e9635df4728"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Glare of Heresy",
+          "logical_rule_key": "battle_rule_v1:c0d3466809078f80f13b7f9b83920f0e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Gravkill",
+          "logical_rule_key": "battle_rule_v1:a50a14ae548bb34dae68539002471f72"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Grotesque Demise",
+          "logical_rule_key": "battle_rule_v1:71b5118405b21546b3a73044e33d2653"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Oblivion Strike",
+          "logical_rule_key": "battle_rule_v1:3cac595bc15482b8fc94d43faae3e0d9"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Pillar of Light",
+          "logical_rule_key": "battle_rule_v1:b5fbabd1217648a47f85b94887983c13"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Radiant Purge",
+          "logical_rule_key": "battle_rule_v1:520d36d2340627c968c4aa5f93fa888b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Reaver Ambush",
+          "logical_rule_key": "battle_rule_v1:71b5118405b21546b3a73044e33d2653"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 9
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Complete Disregard",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:71b5118405b21546b3a73044e33d2653"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Exorcise",
+          "component_keys": [],
+          "effect": "remove_permanent",
+          "logical_rule_key": "battle_rule_v1:eac8dd4ac2d8c459b0f62e9635df4728"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Glare of Heresy",
+          "component_keys": [],
+          "effect": "remove_permanent",
+          "logical_rule_key": "battle_rule_v1:c0d3466809078f80f13b7f9b83920f0e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Gravkill",
+          "component_keys": [],
+          "effect": "remove_permanent",
+          "logical_rule_key": "battle_rule_v1:a50a14ae548bb34dae68539002471f72"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Grotesque Demise",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:71b5118405b21546b3a73044e33d2653"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Oblivion Strike",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:3cac595bc15482b8fc94d43faae3e0d9"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Pillar of Light",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:b5fbabd1217648a47f85b94887983c13"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Radiant Purge",
+          "component_keys": [],
+          "effect": "remove_permanent",
+          "logical_rule_key": "battle_rule_v1:520d36d2340627c968c4aa5f93fa888b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Reaver Ambush",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:71b5118405b21546b3a73044e33d2653"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 18,
+        "scenarios": 9
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

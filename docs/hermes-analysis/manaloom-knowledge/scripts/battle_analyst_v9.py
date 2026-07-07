@@ -12015,6 +12015,20 @@ def is_legal_target(spell, target, controller, all_players=None, target_type=Non
                 return False
         except Exception:
             return False
+    color_count_min = first_present_value(constraints, ("color_count_min", "target_color_count_min"))
+    if color_count_min is not None:
+        try:
+            if len(card_color_symbol_set(target)) < int(float(color_count_min)):
+                return False
+        except Exception:
+            return False
+    color_count_max = first_present_value(constraints, ("color_count_max", "target_color_count_max"))
+    if color_count_max is not None:
+        try:
+            if len(card_color_symbol_set(target)) > int(float(color_count_max)):
+                return False
+        except Exception:
+            return False
     power_min = first_present_value(constraints, ("power_min", "target_power_min"))
     if power_min is not None:
         try:

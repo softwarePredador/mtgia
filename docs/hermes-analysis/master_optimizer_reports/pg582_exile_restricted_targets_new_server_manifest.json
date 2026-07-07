@@ -1,0 +1,950 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg582_exile_restricted_targets_new_serve_20260707_001645",
+  "deploy_id": "PG582",
+  "execution_scenarios": [
+    {
+      "card": {
+        "name": "Complete Disregard",
+        "type_line": "Instant"
+      },
+      "expected_destination": "exile",
+      "expected_effect": "remove_creature",
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ],
+        "power_max": 3
+      },
+      "logical_rule_key": "battle_rule_v1:71b5118405b21546b3a73044e33d2653",
+      "name": "Complete Disregard removes one legal target",
+      "nonmatching_target": {
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Illegal Removal Target",
+        "power": 4,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "target": {
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Legal Removal Target",
+        "power": 3,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "type": "single_target_removal"
+    },
+    {
+      "card": {
+        "name": "Exorcise",
+        "type_line": "Instant"
+      },
+      "expected_destination": "exile",
+      "expected_effect": "remove_permanent",
+      "expected_target_constraints": {
+        "any_of": [
+          {
+            "card_types": [
+              "artifact"
+            ]
+          },
+          {
+            "card_types": [
+              "enchantment"
+            ]
+          },
+          {
+            "card_types": [
+              "creature"
+            ],
+            "power_min": 4
+          }
+        ]
+      },
+      "logical_rule_key": "battle_rule_v1:eac8dd4ac2d8c459b0f62e9635df4728",
+      "name": "Exorcise removes one legal target",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Removal Target",
+        "type_line": "Land"
+      },
+      "target": {
+        "cmc": 3,
+        "effect": "artifact",
+        "name": "E2E Legal Removal Target",
+        "type_line": "Artifact"
+      },
+      "type": "single_target_removal"
+    },
+    {
+      "card": {
+        "name": "Glare of Heresy",
+        "type_line": "Instant"
+      },
+      "expected_destination": "exile",
+      "expected_effect": "remove_permanent",
+      "expected_target_constraints": {
+        "card_types": [
+          "permanent"
+        ],
+        "target_colors": [
+          "W"
+        ]
+      },
+      "logical_rule_key": "battle_rule_v1:c0d3466809078f80f13b7f9b83920f0e",
+      "name": "Glare of Heresy removes one legal target",
+      "nonmatching_target": {
+        "cmc": 3,
+        "colors": [
+          "B"
+        ],
+        "effect": "enchantment",
+        "name": "E2E Illegal Removal Target",
+        "type_line": "Enchantment"
+      },
+      "target": {
+        "cmc": 3,
+        "colors": [
+          "W"
+        ],
+        "effect": "enchantment",
+        "name": "E2E Legal Removal Target",
+        "type_line": "Enchantment"
+      },
+      "type": "single_target_removal"
+    },
+    {
+      "card": {
+        "name": "Gravkill",
+        "type_line": "Instant"
+      },
+      "expected_destination": "exile",
+      "expected_effect": "remove_permanent",
+      "expected_target_constraints": {
+        "any_of": [
+          {
+            "card_types": [
+              "creature"
+            ]
+          },
+          {
+            "card_types": [
+              "artifact"
+            ],
+            "required_subtypes": [
+              "spacecraft"
+            ]
+          }
+        ]
+      },
+      "logical_rule_key": "battle_rule_v1:a50a14ae548bb34dae68539002471f72",
+      "name": "Gravkill removes one legal target",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Removal Target",
+        "type_line": "Land"
+      },
+      "target": {
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Legal Removal Target",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "type": "single_target_removal"
+    },
+    {
+      "card": {
+        "name": "Grotesque Demise",
+        "type_line": "Instant"
+      },
+      "expected_destination": "exile",
+      "expected_effect": "remove_creature",
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ],
+        "power_max": 3
+      },
+      "logical_rule_key": "battle_rule_v1:71b5118405b21546b3a73044e33d2653",
+      "name": "Grotesque Demise removes one legal target",
+      "nonmatching_target": {
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Illegal Removal Target",
+        "power": 4,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "target": {
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Legal Removal Target",
+        "power": 3,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "type": "single_target_removal"
+    },
+    {
+      "card": {
+        "name": "Oblivion Strike",
+        "type_line": "Instant"
+      },
+      "expected_destination": "exile",
+      "expected_effect": "remove_creature",
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ]
+      },
+      "logical_rule_key": "battle_rule_v1:3cac595bc15482b8fc94d43faae3e0d9",
+      "name": "Oblivion Strike removes one legal target",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Removal Target",
+        "type_line": "Land"
+      },
+      "target": {
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Legal Removal Target",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "type": "single_target_removal"
+    },
+    {
+      "card": {
+        "name": "Pillar of Light",
+        "type_line": "Instant"
+      },
+      "expected_destination": "exile",
+      "expected_effect": "remove_creature",
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ],
+        "toughness_min": 4
+      },
+      "logical_rule_key": "battle_rule_v1:b5fbabd1217648a47f85b94887983c13",
+      "name": "Pillar of Light removes one legal target",
+      "nonmatching_target": {
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Illegal Removal Target",
+        "power": 2,
+        "toughness": 3,
+        "type_line": "Creature - Soldier"
+      },
+      "target": {
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Legal Removal Target",
+        "power": 2,
+        "toughness": 4,
+        "type_line": "Creature - Soldier"
+      },
+      "type": "single_target_removal"
+    },
+    {
+      "card": {
+        "name": "Radiant Purge",
+        "type_line": "Instant"
+      },
+      "expected_destination": "exile",
+      "expected_effect": "remove_permanent",
+      "expected_target_constraints": {
+        "card_types": [
+          "creature",
+          "enchantment"
+        ],
+        "color_count_min": 2
+      },
+      "logical_rule_key": "battle_rule_v1:520d36d2340627c968c4aa5f93fa888b",
+      "name": "Radiant Purge removes one legal target",
+      "nonmatching_target": {
+        "cmc": 3,
+        "colors": [
+          "W"
+        ],
+        "effect": "creature",
+        "name": "E2E Illegal Removal Target",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "target": {
+        "cmc": 3,
+        "colors": [
+          "W",
+          "U"
+        ],
+        "effect": "creature",
+        "name": "E2E Legal Removal Target",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "type": "single_target_removal"
+    },
+    {
+      "card": {
+        "name": "Reaver Ambush",
+        "type_line": "Instant"
+      },
+      "expected_destination": "exile",
+      "expected_effect": "remove_creature",
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ],
+        "power_max": 3
+      },
+      "logical_rule_key": "battle_rule_v1:71b5118405b21546b3a73044e33d2653",
+      "name": "Reaver Ambush removes one legal target",
+      "nonmatching_target": {
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Illegal Removal Target",
+        "power": 4,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "target": {
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Legal Removal Target",
+        "power": 3,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "type": "single_target_removal"
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Complete Disregard",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:71b5118405b21546b3a73044e33d2653",
+      "min_rule_version": 2,
+      "normalized_name": "complete disregard",
+      "oracle_hash": "ecabafea2b250cebca1454ee258e13b3",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "destination": "exile",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "power_max": 3
+        },
+        "xmage_effect_class": "ExileTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Exorcise",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:eac8dd4ac2d8c459b0f62e9635df4728",
+      "min_rule_version": 2,
+      "normalized_name": "exorcise",
+      "oracle_hash": "cf19a0545534c990f1987d8c7bf3763b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "destination": "exile",
+        "effect": "remove_permanent",
+        "target": "permanent",
+        "target_constraints": {
+          "any_of": [
+            {
+              "card_types": [
+                "artifact"
+              ]
+            },
+            {
+              "card_types": [
+                "enchantment"
+              ]
+            },
+            {
+              "card_types": [
+                "creature"
+              ],
+              "power_min": 4
+            }
+          ]
+        },
+        "xmage_effect_class": "ExileTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Glare of Heresy",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c0d3466809078f80f13b7f9b83920f0e",
+      "min_rule_version": 2,
+      "normalized_name": "glare of heresy",
+      "oracle_hash": "2a6ca1c2201f8882344e2cfaf9c3d77a",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "destination": "exile",
+        "effect": "remove_permanent",
+        "target": "permanent",
+        "target_constraints": {
+          "card_types": [
+            "permanent"
+          ],
+          "target_colors": [
+            "W"
+          ]
+        },
+        "xmage_effect_class": "ExileTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Gravkill",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a50a14ae548bb34dae68539002471f72",
+      "min_rule_version": 2,
+      "normalized_name": "gravkill",
+      "oracle_hash": "23477afc51668be8a688d628a33a9fd5",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "destination": "exile",
+        "effect": "remove_permanent",
+        "target": "permanent",
+        "target_constraints": {
+          "any_of": [
+            {
+              "card_types": [
+                "creature"
+              ]
+            },
+            {
+              "card_types": [
+                "artifact"
+              ],
+              "required_subtypes": [
+                "spacecraft"
+              ]
+            }
+          ]
+        },
+        "xmage_effect_class": "ExileTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Grotesque Demise",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:71b5118405b21546b3a73044e33d2653",
+      "min_rule_version": 2,
+      "normalized_name": "grotesque demise",
+      "oracle_hash": "7134294c8e8d9d4833854bfb9d731abe",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "destination": "exile",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "power_max": 3
+        },
+        "xmage_effect_class": "ExileTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Oblivion Strike",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3cac595bc15482b8fc94d43faae3e0d9",
+      "min_rule_version": 2,
+      "normalized_name": "oblivion strike",
+      "oracle_hash": "c8f7dff168beab44a9ead1e577ef1582",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "destination": "exile",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_effect_class": "ExileTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Pillar of Light",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b5fbabd1217648a47f85b94887983c13",
+      "min_rule_version": 2,
+      "normalized_name": "pillar of light",
+      "oracle_hash": "2f715b9c556074e81dff1bb81bac2764",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "destination": "exile",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "toughness_min": 4
+        },
+        "xmage_effect_class": "ExileTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Radiant Purge",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:520d36d2340627c968c4aa5f93fa888b",
+      "min_rule_version": 2,
+      "normalized_name": "radiant purge",
+      "oracle_hash": "bbe445b6a97ef992958ce574ee110997",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "destination": "exile",
+        "effect": "remove_permanent",
+        "target": "permanent",
+        "target_constraints": {
+          "card_types": [
+            "creature",
+            "enchantment"
+          ],
+          "color_count_min": 2
+        },
+        "xmage_effect_class": "ExileTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Reaver Ambush",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:71b5118405b21546b3a73044e33d2653",
+      "min_rule_version": 2,
+      "normalized_name": "reaver ambush",
+      "oracle_hash": "7134294c8e8d9d4833854bfb9d731abe",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "destination": "exile",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "power_max": 3
+        },
+        "xmage_effect_class": "ExileTargetEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_exile_target_spell": 9
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg582_exile_restricted_targets_new_server_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg582_exile_restricted_targets_new_server_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg582_exile_restricted_targets_new_server_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg582_exile_restricted_targets_new_server_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg582_exile_restricted_targets_new_server_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg582_exile_restricted_targets_new_server_rollback.sql"
+  },
+  "generated_at": "2026-07-07T00:19:41+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Complete Disregard"
+      },
+      "card_name": "Complete Disregard",
+      "effect": "remove_creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:71b5118405b21546b3a73044e33d2653",
+      "normalized_name": "complete disregard",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "destination": "exile",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "power_max": 3
+        },
+        "xmage_effect_class": "ExileTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Exorcise"
+      },
+      "card_name": "Exorcise",
+      "effect": "remove_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:eac8dd4ac2d8c459b0f62e9635df4728",
+      "normalized_name": "exorcise",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "destination": "exile",
+        "effect": "remove_permanent",
+        "target": "permanent",
+        "target_constraints": {
+          "any_of": [
+            {
+              "card_types": [
+                "artifact"
+              ]
+            },
+            {
+              "card_types": [
+                "enchantment"
+              ]
+            },
+            {
+              "card_types": [
+                "creature"
+              ],
+              "power_min": 4
+            }
+          ]
+        },
+        "xmage_effect_class": "ExileTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Glare of Heresy"
+      },
+      "card_name": "Glare of Heresy",
+      "effect": "remove_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c0d3466809078f80f13b7f9b83920f0e",
+      "normalized_name": "glare of heresy",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "destination": "exile",
+        "effect": "remove_permanent",
+        "target": "permanent",
+        "target_constraints": {
+          "card_types": [
+            "permanent"
+          ],
+          "target_colors": [
+            "W"
+          ]
+        },
+        "xmage_effect_class": "ExileTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Gravkill"
+      },
+      "card_name": "Gravkill",
+      "effect": "remove_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a50a14ae548bb34dae68539002471f72",
+      "normalized_name": "gravkill",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "destination": "exile",
+        "effect": "remove_permanent",
+        "target": "permanent",
+        "target_constraints": {
+          "any_of": [
+            {
+              "card_types": [
+                "creature"
+              ]
+            },
+            {
+              "card_types": [
+                "artifact"
+              ],
+              "required_subtypes": [
+                "spacecraft"
+              ]
+            }
+          ]
+        },
+        "xmage_effect_class": "ExileTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Grotesque Demise"
+      },
+      "card_name": "Grotesque Demise",
+      "effect": "remove_creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:71b5118405b21546b3a73044e33d2653",
+      "normalized_name": "grotesque demise",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "destination": "exile",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "power_max": 3
+        },
+        "xmage_effect_class": "ExileTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Oblivion Strike"
+      },
+      "card_name": "Oblivion Strike",
+      "effect": "remove_creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3cac595bc15482b8fc94d43faae3e0d9",
+      "normalized_name": "oblivion strike",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "destination": "exile",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_effect_class": "ExileTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Pillar of Light"
+      },
+      "card_name": "Pillar of Light",
+      "effect": "remove_creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b5fbabd1217648a47f85b94887983c13",
+      "normalized_name": "pillar of light",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "destination": "exile",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "toughness_min": 4
+        },
+        "xmage_effect_class": "ExileTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Radiant Purge"
+      },
+      "card_name": "Radiant Purge",
+      "effect": "remove_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:520d36d2340627c968c4aa5f93fa888b",
+      "normalized_name": "radiant purge",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "destination": "exile",
+        "effect": "remove_permanent",
+        "target": "permanent",
+        "target_constraints": {
+          "card_types": [
+            "creature",
+            "enchantment"
+          ],
+          "color_count_min": 2
+        },
+        "xmage_effect_class": "ExileTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Reaver Ambush"
+      },
+      "card_name": "Reaver Ambush",
+      "effect": "remove_creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:71b5118405b21546b3a73044e33d2653",
+      "normalized_name": "reaver ambush",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "destination": "exile",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "power_max": 3
+        },
+        "xmage_effect_class": "ExileTargetEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Complete Disregard",
+    "Exorcise",
+    "Glare of Heresy",
+    "Gravkill",
+    "Grotesque Demise",
+    "Oblivion Strike",
+    "Pillar of Light",
+    "Radiant Purge",
+    "Reaver Ambush"
+  ],
+  "selected_count": 9,
+  "slug": "exile_restricted_targets_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Complete Disregard",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:71b5118405b21546b3a73044e33d2653",
+      "min_rule_version": 2,
+      "normalized_name": "complete disregard",
+      "oracle_hash": "ecabafea2b250cebca1454ee258e13b3",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Exorcise",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:eac8dd4ac2d8c459b0f62e9635df4728",
+      "min_rule_version": 2,
+      "normalized_name": "exorcise",
+      "oracle_hash": "cf19a0545534c990f1987d8c7bf3763b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Glare of Heresy",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c0d3466809078f80f13b7f9b83920f0e",
+      "min_rule_version": 2,
+      "normalized_name": "glare of heresy",
+      "oracle_hash": "2a6ca1c2201f8882344e2cfaf9c3d77a",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Gravkill",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a50a14ae548bb34dae68539002471f72",
+      "min_rule_version": 2,
+      "normalized_name": "gravkill",
+      "oracle_hash": "23477afc51668be8a688d628a33a9fd5",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Grotesque Demise",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:71b5118405b21546b3a73044e33d2653",
+      "min_rule_version": 2,
+      "normalized_name": "grotesque demise",
+      "oracle_hash": "7134294c8e8d9d4833854bfb9d731abe",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Oblivion Strike",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3cac595bc15482b8fc94d43faae3e0d9",
+      "min_rule_version": 2,
+      "normalized_name": "oblivion strike",
+      "oracle_hash": "c8f7dff168beab44a9ead1e577ef1582",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Pillar of Light",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b5fbabd1217648a47f85b94887983c13",
+      "min_rule_version": 2,
+      "normalized_name": "pillar of light",
+      "oracle_hash": "2f715b9c556074e81dff1bb81bac2764",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Radiant Purge",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:520d36d2340627c968c4aa5f93fa888b",
+      "min_rule_version": 2,
+      "normalized_name": "radiant purge",
+      "oracle_hash": "bbe445b6a97ef992958ce574ee110997",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Reaver Ambush",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:71b5118405b21546b3a73044e33d2653",
+      "min_rule_version": 2,
+      "normalized_name": "reaver ambush",
+      "oracle_hash": "7134294c8e8d9d4833854bfb9d731abe",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

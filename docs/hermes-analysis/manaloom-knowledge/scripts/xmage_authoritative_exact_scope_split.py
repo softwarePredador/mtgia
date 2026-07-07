@@ -2090,6 +2090,11 @@ def oracle_text(metadata: dict[str, Any]) -> str:
     return re.sub(r"\s+", " ", str(metadata.get("oracle_text") or "").strip()).lower()
 
 
+def oracle_text_without_leading_devoid(metadata: dict[str, Any]) -> str:
+    text = strip_parenthetical_reminders(oracle_text(metadata))
+    return re.sub(r"^devoid\s+", "", text).strip()
+
+
 def oracle_is_play_lands_from_graveyard(metadata: dict[str, Any]) -> bool:
     return oracle_text(metadata) == "you may play lands from your graveyard."
 
@@ -2846,7 +2851,7 @@ def etb_bounce_source_supported(source: str, oracle_spec: dict[str, Any]) -> str
 
 
 def exile_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, str] | None:
-    text = oracle_text(metadata)
+    text = oracle_text_without_leading_devoid(metadata)
     restricted = restricted_battlefield_target_from_oracle(metadata, "exile")
     if restricted is not None:
         return ("remove_creature" if restricted_target_base(restricted) == "creature" else "remove_permanent"), restricted
@@ -9738,7 +9743,9 @@ def restricted_target_base(target: str) -> str:
         "blue_or_black_flying_creature",
         "creature_power_3_or_greater",
         "creature_power_4_or_greater",
+        "creature_power_3_or_less",
         "creature_power_1_or_less",
+        "creature_toughness_4_or_greater",
         "creature_toughness_2_or_less",
         "creature_damaged_this_turn",
         "creature_damaged_this_turn_opponent_controls",
@@ -9761,6 +9768,10 @@ def restricted_target_base(target: str) -> str:
     if target in {
         "black_or_red_creature_or_planeswalker",
         "black_or_red_permanent",
+        "white_permanent",
+        "multicolored_creature_or_enchantment",
+        "artifact_enchantment_or_creature_power_4_or_greater",
+        "creature_or_spacecraft",
         "creature_vehicle_or_nonbasic_land",
         "nonwhite_permanent",
         "noncreature_permanent",
@@ -9806,14 +9817,16 @@ def mana_value_restricted_target_name(base: str, value: int, op: str) -> str:
 
 
 def restricted_battlefield_target_from_oracle(metadata: dict[str, Any], action: str) -> str | None:
-    text = oracle_text(metadata)
     if action == "damage":
+        text = oracle_text(metadata)
         prefix = r"^.+ deals \d+ damage to "
         suffix = r"(?:\.|$)"
     elif action == "destroy":
+        text = oracle_text(metadata)
         prefix = r"^destroy "
         suffix = r"\.?$"
     elif action == "exile":
+        text = oracle_text_without_leading_devoid(metadata)
         prefix = r"^exile "
         suffix = r"\.?$"
     else:
@@ -9861,9 +9874,18 @@ def restricted_battlefield_target_from_oracle(metadata: dict[str, Any], action: 
         (r"target creature or planeswalker that's black or red", "black_or_red_creature_or_planeswalker"),
         (r"target creature, vehicle, or nonbasic land", "creature_vehicle_or_nonbasic_land"),
         (r"target black or red permanent", "black_or_red_permanent"),
+        (r"target white permanent", "white_permanent"),
         (r"target nonwhite permanent", "nonwhite_permanent"),
+        (r"target multicolored creature or multicolored enchantment", "multicolored_creature_or_enchantment"),
+        (
+            r"target artifact, enchantment, or creature with power 4 or greater",
+            "artifact_enchantment_or_creature_power_4_or_greater",
+        ),
+        (r"target creature or spacecraft", "creature_or_spacecraft"),
+        (r"target creature with power 3 or less", "creature_power_3_or_less"),
         (r"target creature with power 3 or greater", "creature_power_3_or_greater"),
         (r"target creature with power 4 or greater", "creature_power_4_or_greater"),
+        (r"target creature with toughness 4 or greater", "creature_toughness_4_or_greater"),
         (r"target creature that was dealt damage this turn", "creature_damaged_this_turn"),
         (r"target creature with (?:mana value|converted mana cost) 3 or greater", "creature_mana_value_3_or_greater"),
     ]
@@ -10039,10 +10061,41 @@ def restricted_battlefield_target_from_source(source: str) -> str | None:
         return "creature_vehicle_or_nonbasic_land"
     if 'FilterPermanent("nonwhite permanent")' in text or "nonwhite permanent" in text:
         return "nonwhite_permanent"
+    if 'FilterPermanent("white permanent")' in text or (
+        "FilterPermanent" in text
+        and "ObjectColor.WHITE" in text
+        and "ColorPredicate" in text
+        and "Predicates.not" not in text
+    ):
+        return "white_permanent"
+    if 'FilterPermanent("multicolored creature or multicolored enchantment")' in text or (
+        "MulticoloredPredicate" in text
+        and "CardType.CREATURE" in text
+        and "CardType.ENCHANTMENT" in text
+    ):
+        return "multicolored_creature_or_enchantment"
+    if 'FilterPermanent("artifact, enchantment, or creature with power 4 or greater")' in text or (
+        "CardType.ARTIFACT" in text
+        and "CardType.ENCHANTMENT" in text
+        and "CardType.CREATURE" in text
+        and re.search(r"PowerPredicate\s*\(\s*ComparisonType\.MORE_THAN\s*,\s*3\s*\)", text)
+    ):
+        return "artifact_enchantment_or_creature_power_4_or_greater"
+    if 'FilterPermanent("creature or Spacecraft")' in text or (
+        "CardType.CREATURE" in text and "SubType.SPACECRAFT" in text
+    ):
+        return "creature_or_spacecraft"
+    if (
+        "FilterCreaturePermanent" in text
+        and re.search(r"PowerPredicate\s*\(\s*ComparisonType\.FEWER_THAN\s*,\s*4\s*\)", text)
+    ):
+        return "creature_power_3_or_less"
     if re.search(r"PowerPredicate\s*\(\s*ComparisonType\.MORE_THAN\s*,\s*2\s*\)", text):
         return "creature_power_3_or_greater"
     if re.search(r"PowerPredicate\s*\(\s*ComparisonType\.MORE_THAN\s*,\s*3\s*\)", text):
         return "creature_power_4_or_greater"
+    if re.search(r"ToughnessPredicate\s*\(\s*ComparisonType\.MORE_THAN\s*,\s*3\s*\)", text):
+        return "creature_toughness_4_or_greater"
     if "FILTER_OPPONENTS_CREATURE_DAMAGED_THIS_TURN" in text:
         return "creature_damaged_this_turn_opponent_controls"
     if "FILTER_CREATURE_DAMAGED_THIS_TURN" in text:
@@ -17508,8 +17561,12 @@ def target_constraints_for(target: str) -> dict[str, Any]:
         return {"card_types": ["creature"], "exclude_subtypes": ["spirit"]}
     if target == "non_vampire_werewolf_zombie_creature":
         return {"card_types": ["creature"], "exclude_subtypes": ["vampire", "werewolf", "zombie"]}
+    if target == "creature_power_3_or_less":
+        return {"card_types": ["creature"], "power_max": 3}
     if target == "creature_power_1_or_less":
         return {"card_types": ["creature"], "power_max": 1}
+    if target == "creature_toughness_4_or_greater":
+        return {"card_types": ["creature"], "toughness_min": 4}
     if target == "creature_toughness_2_or_less":
         return {"card_types": ["creature"], "toughness_max": 2}
     if target == "creature_damaged_this_turn":
@@ -17551,6 +17608,25 @@ def target_constraints_for(target: str) -> dict[str, Any]:
         return {"card_types": ["creature", "planeswalker"], "target_colors": ["B", "R"]}
     if target == "black_or_red_permanent":
         return {"card_types": ["permanent"], "target_colors": ["B", "R"]}
+    if target == "white_permanent":
+        return {"card_types": ["permanent"], "target_colors": ["W"]}
+    if target == "multicolored_creature_or_enchantment":
+        return {"card_types": ["creature", "enchantment"], "color_count_min": 2}
+    if target == "artifact_enchantment_or_creature_power_4_or_greater":
+        return {
+            "any_of": [
+                {"card_types": ["artifact"]},
+                {"card_types": ["enchantment"]},
+                {"card_types": ["creature"], "power_min": 4},
+            ]
+        }
+    if target == "creature_or_spacecraft":
+        return {
+            "any_of": [
+                {"card_types": ["creature"]},
+                {"card_types": ["artifact"], "required_subtypes": ["spacecraft"]},
+            ]
+        }
     if target == "creature_vehicle_or_nonbasic_land":
         return {
             "any_of": [

@@ -2075,6 +2075,173 @@ def each_player_sacrifice_execution_scenario_from_expected_rule(
     }
 
 
+def _primary_fixture_card_type(constraints: dict[str, Any]) -> str:
+    card_types = [
+        str(value or "").strip().lower()
+        for value in constraints.get("card_types") or []
+        if str(value or "").strip()
+    ]
+    for card_type in ("creature", "artifact", "enchantment", "planeswalker", "land"):
+        if card_type in card_types:
+            return card_type
+    return "enchantment" if "permanent" in card_types else "creature"
+
+
+def _type_line_for_fixture(card_type: str, subtypes: list[str] | None = None) -> str:
+    clean_type = str(card_type or "creature").strip().lower()
+    subtype_suffix = ""
+    if subtypes:
+        subtype_suffix = " - " + " ".join(str(value).title() for value in subtypes if value)
+    if clean_type == "creature":
+        return f"Creature{subtype_suffix or ' - Soldier'}"
+    if clean_type == "artifact":
+        return f"Artifact{subtype_suffix}"
+    if clean_type == "enchantment":
+        return f"Enchantment{subtype_suffix}"
+    if clean_type == "planeswalker":
+        return "Planeswalker"
+    if clean_type == "land":
+        return f"Land{subtype_suffix}"
+    return f"Permanent{subtype_suffix}"
+
+
+def _merge_first_any_of_option(constraints: dict[str, Any]) -> dict[str, Any]:
+    merged = dict(constraints)
+    options = merged.pop("any_of", None)
+    if isinstance(options, list):
+        for option in options:
+            if isinstance(option, dict):
+                merged.update(option)
+                break
+    return merged
+
+
+def _target_fixture_from_constraints(
+    name: str,
+    constraints: dict[str, Any],
+    *,
+    matching: bool,
+) -> dict[str, Any]:
+    if not matching and isinstance(constraints.get("any_of"), list):
+        return {
+            "name": name,
+            "type_line": "Land",
+            "effect": "land",
+            "cmc": 0,
+        }
+    if not matching and not any(
+        key in constraints
+        for key in (
+            "target_colors",
+            "color_count_min",
+            "color_count_max",
+            "color_count_exact",
+            "power_min",
+            "power_max",
+            "toughness_min",
+            "toughness_max",
+            "required_subtypes",
+        )
+    ):
+        card_types = {str(value or "").strip().lower() for value in constraints.get("card_types") or []}
+        if "permanent" in card_types or "land" in card_types:
+            return {
+                "name": name,
+                "type_line": "Instant",
+                "effect": "draw_cards",
+                "cmc": 1,
+            }
+        return {
+            "name": name,
+            "type_line": "Land",
+            "effect": "land",
+            "cmc": 0,
+        }
+
+    active_constraints = _merge_first_any_of_option(constraints) if matching else dict(constraints)
+    card_type = _primary_fixture_card_type(active_constraints)
+    colors: list[str] = []
+    if matching:
+        target_colors = [str(value) for value in active_constraints.get("target_colors") or [] if value]
+        if target_colors:
+            colors = [target_colors[0]]
+        elif active_constraints.get("color_count_min") is not None:
+            colors = ["W", "U"]
+        elif active_constraints.get("color_count_exact") is not None:
+            colors = ["W", "U", "B", "R", "G"][: max(1, int(active_constraints.get("color_count_exact") or 1))]
+    else:
+        if active_constraints.get("target_colors"):
+            colors = ["B"]
+            if "B" in {str(value) for value in active_constraints.get("target_colors") or []}:
+                colors = ["W"]
+        elif active_constraints.get("color_count_min") is not None:
+            colors = ["W"]
+
+    power = 2
+    toughness = 2
+    if active_constraints.get("power_min") is not None:
+        minimum = int(active_constraints["power_min"])
+        power = minimum if matching else max(0, minimum - 1)
+    if active_constraints.get("power_max") is not None:
+        maximum = int(active_constraints["power_max"])
+        power = maximum if matching else maximum + 1
+    if active_constraints.get("toughness_min") is not None:
+        minimum = int(active_constraints["toughness_min"])
+        toughness = minimum if matching else max(0, minimum - 1)
+    if active_constraints.get("toughness_max") is not None:
+        maximum = int(active_constraints["toughness_max"])
+        toughness = maximum if matching else maximum + 1
+
+    subtypes = [str(value).lower() for value in active_constraints.get("required_subtypes") or [] if value]
+    fixture = {
+        "name": name,
+        "type_line": _type_line_for_fixture(card_type, subtypes),
+        "effect": "creature" if card_type == "creature" else card_type,
+        "cmc": 3,
+    }
+    if card_type == "creature":
+        fixture["power"] = power
+        fixture["toughness"] = toughness
+    if colors:
+        fixture["colors"] = colors
+    if subtypes:
+        fixture["subtypes"] = subtypes
+    return fixture
+
+
+def single_target_removal_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") not in {
+        "xmage_exile_target_spell_v1",
+        "xmage_destroy_target_spell_v1",
+    }:
+        return None
+    if required.get("effect") not in {"remove_creature", "remove_permanent"}:
+        return None
+    constraints = dict(required.get("target_constraints") or {})
+    destination = str(required.get("destination") or "graveyard").lower()
+    return {
+        "name": f"{rule['card_name']} removes one legal target",
+        "type": "single_target_removal",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": "Sorcery" if required.get("sorcery") is True else "Instant",
+        },
+        "target": _target_fixture_from_constraints("E2E Legal Removal Target", constraints, matching=True),
+        "nonmatching_target": _target_fixture_from_constraints(
+            "E2E Illegal Removal Target",
+            constraints,
+            matching=False,
+        ),
+        "expected_destination": destination,
+        "expected_effect": required.get("effect"),
+        "expected_target_constraints": constraints,
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any] | None:
     return (
         static_global_pt_execution_scenario_from_expected_rule(rule)
@@ -2092,6 +2259,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or simple_activated_regenerate_source_execution_scenario_from_expected_rule(rule)
         or target_keyword_spell_execution_scenario_from_expected_rule(rule)
         or each_player_sacrifice_execution_scenario_from_expected_rule(rule)
+        or single_target_removal_execution_scenario_from_expected_rule(rule)
         or simple_activated_create_token_execution_scenario_from_expected_rule(rule)
         or fixed_create_creature_tokens_execution_scenario_from_expected_rule(rule)
         or multi_create_creature_tokens_execution_scenario_from_expected_rule(rule)

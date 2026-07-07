@@ -6484,6 +6484,111 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertEqual(opponent.battlefield, [])
         self.assertEqual([card["name"] for card in opponent.exile], ["Large Green Bear", "Small Black Bear"])
 
+    def test_exile_target_spell_respects_extended_target_constraints(self) -> None:
+        active = self.battle.Player("Active", None, [])
+
+        power_opponent = self.battle.Player("Power Opponent", None, [])
+        power_opponent.battlefield.extend(
+            [
+                {"name": "Large Bear", "type_line": "Creature - Bear", "power": 4, "toughness": 4},
+                {"name": "Small Bear", "type_line": "Creature - Bear", "power": 3, "toughness": 3},
+            ]
+        )
+        self.battle.apply_effect_immediate(
+            active,
+            [power_opponent],
+            {"name": "Fixture Disregard", "type_line": "Instant"},
+            turn=6,
+            rng=random.Random(36),
+            effect_data_override={
+                "effect": "remove_creature",
+                "battle_model_scope": "xmage_exile_target_spell_v1",
+                "target": "creature",
+                "target_constraints": {"card_types": ["creature"], "power_max": 3},
+                "destination": "exile",
+            },
+        )
+        self.assertEqual([card["name"] for card in power_opponent.battlefield], ["Large Bear"])
+        self.assertEqual([card["name"] for card in power_opponent.exile], ["Small Bear"])
+
+        toughness_opponent = self.battle.Player("Toughness Opponent", None, [])
+        toughness_opponent.battlefield.extend(
+            [
+                {"name": "Fragile Bear", "type_line": "Creature - Bear", "power": 3, "toughness": 3},
+                {"name": "Sturdy Bear", "type_line": "Creature - Bear", "power": 2, "toughness": 4},
+            ]
+        )
+        self.battle.apply_effect_immediate(
+            active,
+            [toughness_opponent],
+            {"name": "Fixture Pillar", "type_line": "Instant"},
+            turn=6,
+            rng=random.Random(37),
+            effect_data_override={
+                "effect": "remove_creature",
+                "battle_model_scope": "xmage_exile_target_spell_v1",
+                "target": "creature",
+                "target_constraints": {"card_types": ["creature"], "toughness_min": 4},
+                "destination": "exile",
+            },
+        )
+        self.assertEqual([card["name"] for card in toughness_opponent.battlefield], ["Fragile Bear"])
+        self.assertEqual([card["name"] for card in toughness_opponent.exile], ["Sturdy Bear"])
+
+        multicolor_opponent = self.battle.Player("Multicolor Opponent", None, [])
+        multicolor_opponent.battlefield.extend(
+            [
+                {"name": "Mono Creature", "type_line": "Creature - Cleric", "colors": ["W"], "power": 2, "toughness": 2},
+                {"name": "Multicolor Enchantment", "type_line": "Enchantment", "colors": ["W", "U"], "cmc": 3},
+            ]
+        )
+        self.battle.apply_effect_immediate(
+            active,
+            [multicolor_opponent],
+            {"name": "Fixture Radiant Purge", "type_line": "Instant"},
+            turn=6,
+            rng=random.Random(38),
+            effect_data_override={
+                "effect": "remove_permanent",
+                "battle_model_scope": "xmage_exile_target_spell_v1",
+                "target": "permanent",
+                "target_constraints": {"card_types": ["creature", "enchantment"], "color_count_min": 2},
+                "destination": "exile",
+            },
+        )
+        self.assertEqual([card["name"] for card in multicolor_opponent.battlefield], ["Mono Creature"])
+        self.assertEqual([card["name"] for card in multicolor_opponent.exile], ["Multicolor Enchantment"])
+
+        any_of_opponent = self.battle.Player("Any Of Opponent", None, [])
+        any_of_opponent.battlefield.extend(
+            [
+                {"name": "Fixture Land", "type_line": "Land", "effect": "land", "cmc": 0},
+                {"name": "Fixture Artifact", "type_line": "Artifact", "effect": "artifact", "cmc": 2},
+            ]
+        )
+        self.battle.apply_effect_immediate(
+            active,
+            [any_of_opponent],
+            {"name": "Fixture Exorcise", "type_line": "Instant"},
+            turn=6,
+            rng=random.Random(39),
+            effect_data_override={
+                "effect": "remove_permanent",
+                "battle_model_scope": "xmage_exile_target_spell_v1",
+                "target": "permanent",
+                "target_constraints": {
+                    "any_of": [
+                        {"card_types": ["artifact"]},
+                        {"card_types": ["enchantment"]},
+                        {"card_types": ["creature"], "power_min": 4},
+                    ]
+                },
+                "destination": "exile",
+            },
+        )
+        self.assertEqual([card["name"] for card in any_of_opponent.battlefield], ["Fixture Land"])
+        self.assertEqual([card["name"] for card in any_of_opponent.exile], ["Fixture Artifact"])
+
     def test_destroy_target_spell_moves_creature_to_graveyard(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

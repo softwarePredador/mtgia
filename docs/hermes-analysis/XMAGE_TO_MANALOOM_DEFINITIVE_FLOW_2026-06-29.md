@@ -16508,6 +16508,104 @@ triggered creature variants such as Fleshbag Marauder, dies/upkeep sacrifice
 variants, modal variants, or mode-selected sacrifice effects. Those remain in
 separate work units or blocked reasons and require their own runtime contract.
 
+## PG582 Exile Restricted Targets New Server Evidence
+
+PG582 evidence:
+
+- exact split:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260707_pg582_exile_restricted_targets_new_server.json`,
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260707_pg582_exile_restricted_targets_new_server.md`
+- package manifest and summary:
+  `docs/hermes-analysis/master_optimizer_reports/pg582_exile_restricted_targets_new_server_manifest.json`,
+  `docs/hermes-analysis/master_optimizer_reports/pg582_exile_restricted_targets_new_server_package.md`
+- precheck/apply/postcheck/rollback SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg582_exile_restricted_targets_new_server_precheck.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/pg582_exile_restricted_targets_new_server_apply.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/pg582_exile_restricted_targets_new_server_postcheck.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/pg582_exile_restricted_targets_new_server_rollback.sql`
+- apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg582_exile_restricted_targets_new_server_apply_evidence.md`
+- sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg582_exile_restricted_targets_new_server_sync_report.json`
+- E2E:
+  `docs/hermes-analysis/master_optimizer_reports/pg582_exile_restricted_targets_new_server_e2e.json`,
+  `docs/hermes-analysis/master_optimizer_reports/pg582_exile_restricted_targets_new_server_e2e.md`
+- post-PG582 readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260707_post_pg582_exile_restricted_targets_new_server.json`,
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260707_post_pg582_exile_restricted_targets_new_server.md`
+- post-PG582 queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260707_post_pg582_exile_restricted_targets_new_server_commander_legal.json`,
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260707_post_pg582_exile_restricted_targets_new_server_commander_legal.md`
+- post-PG582 exact split recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260707_post_pg582_exile_restricted_targets_new_server_recheck.json`,
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260707_post_pg582_exile_restricted_targets_new_server_recheck.md`
+- final PG/Hermes/SQLite audit after hash backfill:
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260707_post_pg582_exile_restricted_targets_new_server_final_after_hash_backfill.json`,
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260707_post_pg582_exile_restricted_targets_new_server_final_after_hash_backfill.md`
+- initial failed PG/Hermes/SQLite audit retained for traceability:
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260707_post_pg582_exile_restricted_targets_new_server_final.json`,
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260707_post_pg582_exile_restricted_targets_new_server_final.md`
+- PG582 hash backfill SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg582_trusted_rule_oracle_hash_backfill_new_server_precheck.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/pg582_trusted_rule_oracle_hash_backfill_new_server_apply.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/pg582_trusted_rule_oracle_hash_backfill_new_server_postcheck.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/pg582_trusted_rule_oracle_hash_backfill_new_server_rollback.sql`
+- final governance audits:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260707_post_pg582_exile_restricted_targets_new_server_final.json`,
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260707_post_pg582_exile_restricted_targets_new_server_final.md`,
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260707_post_pg582_exile_restricted_targets_new_server_final.json`,
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260707_post_pg582_exile_restricted_targets_new_server_final.md`,
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260707_post_pg582_exile_restricted_targets_new_server_final.json`,
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260707_post_pg582_exile_restricted_targets_new_server_final.md`
+
+PG582 promoted the exact XMage single-target exile spell subpattern for
+restricted legal targets. The runtime now supports these target constraints:
+creature power `3` or less, creature toughness `4` or greater, white
+permanent, multicolored creature or enchantment, artifact/enchantment/creature
+with power `4` or greater, and creature or Spacecraft. The splitter also strips
+leading Devoid reminder text before matching the executable exile sentence.
+
+Promoted cards:
+
+- Complete Disregard;
+- Exorcise;
+- Glare of Heresy;
+- Gravkill;
+- Grotesque Demise;
+- Oblivion Strike;
+- Pillar of Light;
+- Radiant Purge;
+- Reaver Ambush.
+
+Validation:
+
+- split produced `proposal_count=9` and `safe_for_batch_pg_package_count=9`;
+- all `9` proposals were `xmage_exile_target_spell_v1`;
+- precheck found `9` target rows, `0` existing rules, and `0` shadow rows;
+- apply upserted `9` PostgreSQL rows and deprecated `0` shadow rows;
+- postcheck confirmed `9` promoted rows, `9` `verified_auto` rows, and `9`
+  rows with `oracle_hash`;
+- PG -> SQLite sync loaded `9` PostgreSQL rows, updated `9` SQLite rows, and
+  exported `6670` canonical snapshot rows;
+- package E2E passed `9` execution scenarios and `18` battle events across PG,
+  SQLite, snapshot, runtime `get_card_effect`, and battle execution;
+- post-PG582 queue moved from `target_identity_count=25327` and
+  `xmage_authoritative_source_count=25013` to `25318` and `25004`;
+- `removal_exile::targeted_exile_variant_v1` moved to `131` remaining queue
+  items after the batch;
+- final exact-scope recheck returned `proposal_count=0`;
+- final PG/Hermes/SQLite contract passed `51/51` after a metadata-only
+  `oracle_hash` backfill for `44` older trusted executable rows;
+- final XMage strategy audit passed `26/26`;
+- final operational and legacy contamination audits passed.
+
+Residual boundary: PG582 does not authorize multi-target exile variants such as
+Dust to Dust, Into the Core, or Grip of Desolation; dynamic target restrictions
+such as Blazing Hope's life-total condition; additional-cost exile variants;
+exile plus scry/composite variants; compensation-token exile; graveyard exile;
+or stack exile. Those remain in separate work units or blocked reasons and
+require their own runtime contract.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

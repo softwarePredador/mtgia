@@ -740,6 +740,53 @@ def test_manifest_builds_target_keyword_spell_execution_scenario() -> None:
     assert scenario["expected_keywords"] == ["double_strike"]
 
 
+def test_manifest_builds_single_target_exile_execution_scenario() -> None:
+    rule = {
+        "normalized_name": "radiant purge",
+        "card_name": "Radiant Purge",
+        "oracle_hash": "hash-radiant-purge",
+        "logical_rule_key": "battle_rule_v1:hash-radiant-purge",
+        "required_effect_fields": {
+            "effect": "remove_permanent",
+            "battle_model_scope": "xmage_exile_target_spell_v1",
+            "target": "permanent",
+            "target_constraints": {"card_types": ["creature", "enchantment"], "color_count_min": 2},
+            "destination": "exile",
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "single_target_removal"
+    assert scenario["expected_effect"] == "remove_permanent"
+    assert scenario["expected_destination"] == "exile"
+    assert scenario["target"]["colors"] == ["W", "U"]
+    assert scenario["nonmatching_target"]["colors"] == ["W"]
+
+
+def test_single_target_removal_scenario_uses_illegal_fixture_for_simple_creature_target() -> None:
+    rule = {
+        "normalized_name": "oblivion strike",
+        "card_name": "Oblivion Strike",
+        "oracle_hash": "hash-oblivion-strike",
+        "logical_rule_key": "battle_rule_v1:hash-oblivion-strike",
+        "required_effect_fields": {
+            "effect": "remove_creature",
+            "battle_model_scope": "xmage_exile_target_spell_v1",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "destination": "exile",
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["target"]["type_line"].startswith("Creature")
+    assert scenario["nonmatching_target"]["type_line"] == "Land"
+
+
 def test_manifest_expected_rule_preserves_spell_additional_sacrifice_cost_fields() -> None:
     proposal = {
         "normalized_name": "bone splinters",

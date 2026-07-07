@@ -1630,6 +1630,79 @@ def run_remove_permanent_basic_land_compensation(
     }
 
 
+def run_single_target_removal(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    active = battle.Player(str(scenario.get("player") or "Active"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
+    target = dict(scenario["target"])
+    nonmatching = dict(
+        scenario.get("nonmatching_target")
+        or {
+            "name": "E2E Illegal Removal Target",
+            "type_line": "Land",
+            "effect": "land",
+            "cmc": 0,
+        }
+    )
+    opponent.battlefield = [nonmatching, target]
+    before_events = len(events)
+
+    effect_data = battle.get_card_effect(card)
+    expected_effect = scenario.get("expected_effect")
+    if expected_effect and effect_data.get("effect") != expected_effect:
+        fail("battle_execution", f"{card['name']} effect={effect_data.get('effect')!r}")
+
+    battle.apply_effect_immediate(
+        active,
+        [opponent],
+        card,
+        turn=int(scenario.get("turn") or 6),
+        rng=random.Random(int(scenario.get("seed") or 6065)),
+    )
+
+    target_name = str(target.get("name") or "")
+    nonmatching_name = str(nonmatching.get("name") or "")
+    destination = str(scenario.get("expected_destination") or "graveyard").lower()
+    destination_zone = getattr(opponent, "exile" if destination == "exile" else "graveyard")
+    moved_names = [str(item.get("name") or "") for item in destination_zone if isinstance(item, dict)]
+    battlefield_names = [str(item.get("name") or "") for item in opponent.battlefield if isinstance(item, dict)]
+    if target_name not in moved_names:
+        fail("battle_execution", f"{card['name']} did not move legal target {target_name} to {destination}")
+    if nonmatching_name not in battlefield_names:
+        fail("battle_execution", f"{card['name']} removed illegal target {nonmatching_name}")
+
+    removal_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "removal_resolved"
+            and data.get("card") == card.get("name")
+            and data.get("target") == target_name
+        ),
+        None,
+    )
+    if removal_event is None:
+        fail("battle_events", f"missing {card['name']} removal_resolved event for {target_name}")
+    if removal_event.get("target_legal") is not True:
+        fail("battle_events", f"{card['name']} target_legal={removal_event.get('target_legal')!r}")
+    if str(removal_event.get("destination") or "").lower() != destination:
+        fail("battle_events", f"{card['name']} destination={removal_event.get('destination')!r}")
+
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "target": target_name,
+        "nonmatching_target": nonmatching_name,
+        "destination": destination,
+        "moved_names": moved_names,
+        "battlefield_names": battlefield_names,
+    }
+
+
 def run_destroy_target_create_treasure(
     battle,
     scenario: dict[str, Any],
@@ -3665,6 +3738,7 @@ SCENARIO_RUNNERS = {
     "multi_create_creature_tokens": run_multi_create_creature_tokens,
     "nonfliers_cant_block_rider": run_nonfliers_cant_block_rider,
     "remove_permanent_basic_land_compensation": run_remove_permanent_basic_land_compensation,
+    "single_target_removal": run_single_target_removal,
     "simple_mana_source_refresh": run_simple_mana_source_refresh,
     "simple_activated_damage": run_simple_activated_damage,
     "simple_activated_tap_target": run_simple_activated_tap_target,
