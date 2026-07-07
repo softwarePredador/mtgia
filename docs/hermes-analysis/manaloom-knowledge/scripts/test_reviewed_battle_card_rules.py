@@ -259,7 +259,7 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
             "nonland_hand_miracle_zero_static_v1",
         )
         self.assertEqual(by_name["Thor, God of Thunder"]["source"], "curated")
-        self.assertEqual(by_name["Thor, God of Thunder"]["review_status"], "active")
+        self.assertEqual(by_name["Thor, God of Thunder"]["review_status"], "verified")
         self.assertEqual(by_name["Thor, God of Thunder"]["execution_status"], "auto")
         self.assertEqual(
             by_name["Thor, God of Thunder"]["logical_rule_key"],
@@ -657,7 +657,7 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
         self.assertTrue(by_name["Ether"]["effect_json"]["activated_exile_self_for_mana"])
         self.assertTrue(by_name["Ether"]["effect_json"]["copy_next_instant_or_sorcery_this_turn"])
         self.assertEqual(by_name["Fellwar Stone"]["source"], "curated")
-        self.assertEqual(by_name["Fellwar Stone"]["review_status"], "active")
+        self.assertEqual(by_name["Fellwar Stone"]["review_status"], "verified")
         self.assertEqual(by_name["Fellwar Stone"]["effect_json"]["effect"], "ramp_permanent")
         self.assertTrue(by_name["Fellwar Stone"]["effect_json"]["conditionally_produces_opponent_land_colors"])
         self.assertEqual(by_name["Electroduplicate"]["source"], "curated")
@@ -722,7 +722,7 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
             by_name["Lapse of Certainty"]["effect_json"]["counter_own_approach_to_top"]
         )
         self.assertEqual(by_name["Library of Leng"]["source"], "curated")
-        self.assertEqual(by_name["Library of Leng"]["review_status"], "active")
+        self.assertEqual(by_name["Library of Leng"]["review_status"], "verified")
         self.assertTrue(by_name["Library of Leng"]["effect_json"]["no_max_hand_size"])
         self.assertTrue(
             by_name["Library of Leng"]["effect_json"]["discard_effect_to_top_replacement"]
@@ -736,7 +736,7 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
         self.assertEqual(by_name["Laughing Mad"]["effect_json"]["effect"], "draw_cards")
         self.assertTrue(by_name["Laughing Mad"]["effect_json"]["requires_discard_card"])
         self.assertEqual(by_name["Lorehold, the Historian"]["source"], "curated")
-        self.assertEqual(by_name["Lorehold, the Historian"]["review_status"], "active")
+        self.assertEqual(by_name["Lorehold, the Historian"]["review_status"], "verified")
         self.assertEqual(by_name["Lorehold, the Historian"]["effect_json"]["effect"], "passive")
         self.assertEqual(
             by_name["Lorehold, the Historian"]["effect_json"]["grants_miracle_cost"],
@@ -884,12 +884,12 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
         self.assertTrue(by_name["Spelltwine"]["effect_json"]["exiles_self"])
         self.assertEqual(by_name["Sunbaked Canyon"]["effect_json"]["produces"], "WR")
         self.assertEqual(by_name["Talisman of Conviction"]["source"], "curated")
-        self.assertEqual(by_name["Talisman of Conviction"]["review_status"], "active")
+        self.assertEqual(by_name["Talisman of Conviction"]["review_status"], "verified")
         self.assertEqual(by_name["Talisman of Conviction"]["effect_json"]["effect"], "ramp_permanent")
         self.assertEqual(by_name["Talisman of Conviction"]["effect_json"]["mana_produced"], 1)
         self.assertEqual(by_name["Talisman of Conviction"]["effect_json"]["life_for_colored_mana"], 1)
         self.assertEqual(by_name["Teferi's Protection"]["source"], "curated")
-        self.assertEqual(by_name["Teferi's Protection"]["review_status"], "active")
+        self.assertEqual(by_name["Teferi's Protection"]["review_status"], "verified")
         self.assertEqual(by_name["Teferi's Protection"]["execution_status"], "auto")
         self.assertEqual(by_name["Teferi's Protection"]["oracle_hash"], "bdc0faecf4420dc6162c7e72e98cc0eb")
         self.assertEqual(by_name["Teferi's Protection"]["effect_json"]["effect"], "phase_out")
@@ -941,7 +941,7 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
             "multiplayer_discard_draw_v1",
         )
         self.assertEqual(by_name["Scroll Rack"]["source"], "curated")
-        self.assertEqual(by_name["Scroll Rack"]["review_status"], "active")
+        self.assertEqual(by_name["Scroll Rack"]["review_status"], "verified")
         self.assertTrue(by_name["Scroll Rack"]["effect_json"]["hand_to_top_exchange"])
         self.assertEqual(
             by_name["Scroll Rack"]["effect_json"]["battle_model_scope"],
@@ -1427,7 +1427,7 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
             "opponent_artifact_creature_enter_tapped_extort_annotation_v1",
         )
         self.assertEqual(fellwar_stone["_rule_source"], "curated")
-        self.assertEqual(fellwar_stone["_rule_review_status"], "active")
+        self.assertEqual(fellwar_stone["_rule_review_status"], "verified")
         self.assertEqual(fellwar_stone["effect"], "ramp_permanent")
         self.assertEqual(fellwar_stone["mana_produced"], 1)
         self.assertTrue(fellwar_stone["conditionally_produces_opponent_land_colors"])
@@ -1498,7 +1498,7 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
         self.assertTrue(path_to_exile["exile_target"])
         self.assertTrue(path_to_exile["target_controller_basic_land_tapped"])
         self.assertEqual(swords_to_plowshares["_rule_source"], "curated")
-        self.assertEqual(swords_to_plowshares["_rule_review_status"], "active")
+        self.assertEqual(swords_to_plowshares["_rule_review_status"], "verified")
         self.assertEqual(swords_to_plowshares["effect"], "remove_creature")
         self.assertEqual(swords_to_plowshares["target"], "creature")
         self.assertEqual(swords_to_plowshares["destination"], "exile")
@@ -1511,7 +1511,7 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
             "dynamic_target_power_executor",
         )
         self.assertEqual(teferis_protection["_rule_source"], "curated")
-        self.assertEqual(teferis_protection["_rule_review_status"], "active")
+        self.assertEqual(teferis_protection["_rule_review_status"], "verified")
         self.assertEqual(
             teferis_protection["_rule_logical_key"],
             "battle_rule_v1:c8b6905f312e06fe599dfb81bf4f3f4a",
@@ -1566,7 +1566,7 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
         self.assertEqual(skullclamp["effect"], "passive")
         self.assertEqual(skullclamp["draw_on_equipped_death"], 2)
         self.assertEqual(talisman["_rule_source"], "curated")
-        self.assertEqual(talisman["_rule_review_status"], "active")
+        self.assertEqual(talisman["_rule_review_status"], "verified")
         self.assertEqual(talisman["effect"], "ramp_permanent")
         self.assertEqual(talisman["mana_produced"], 1)
         self.assertEqual(talisman["produces"], "CRW")

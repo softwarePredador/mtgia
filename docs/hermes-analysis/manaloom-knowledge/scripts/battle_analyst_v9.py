@@ -4217,10 +4217,27 @@ def conditional_mana_source_for_state(player, source, produced):
     explicit_colors = _source_explicit_mana_colors(source)
     if len(explicit_colors) <= 1:
         return None
+    life_for_colored_mana = int(source.get("life_for_colored_mana") or 0) if isinstance(source, dict) else 0
     return _conditional_mana_source_entry(
         source,
         produced,
-        [{"color": color, "restriction": "any_spell", "mode": "explicit_mana_choice"} for color in explicit_colors],
+        [
+            {
+                "color": color,
+                "restriction": "any_spell",
+                "mode": "explicit_mana_choice",
+                "life_loss_on_spend": (
+                    life_for_colored_mana if color not in {"colorless", "generic"} else 0
+                ),
+                "life_loss_kind": "life_loss",
+                "life_loss_status": (
+                    "pain_mana_runtime_v1"
+                    if life_for_colored_mana and color not in {"colorless", "generic"}
+                    else None
+                ),
+            }
+            for color in explicit_colors
+        ],
         "explicit_mana_choices",
     )
 
@@ -24195,6 +24212,160 @@ def _permanent_matches_destroy_card_types(permanent, destroy_card_types, effect_
         ):
             return False
     return True
+
+
+def _normalized_modal_exile_modes(effect_data):
+    modes = effect_data.get("exile_modes") if isinstance(effect_data, dict) else []
+    normalized = {
+        str(mode or "").replace("_", " ").strip().lower()
+        for mode in _as_list(modes)
+        if str(mode or "").strip()
+    }
+    aliases = {
+        "artifact": "artifacts",
+        "creature": "creatures",
+        "enchantment": "enchantments",
+        "graveyard": "graveyards",
+    }
+    return {aliases.get(mode, mode) for mode in normalized}
+
+
+def _permanent_matches_modal_exile_modes(permanent, modes):
+    type_line = _permanent_type_line(permanent)
+    if "artifacts" in modes and "artifact" in type_line:
+        return True
+    if "creatures" in modes and is_battlefield_creature(permanent):
+        return True
+    if "enchantments" in modes and "enchantment" in type_line:
+        return True
+    return False
+
+
+def resolve_modal_exile_board_wipe(player, opponents, card, effect_data, turn):
+    modes = _normalized_modal_exile_modes(effect_data)
+    participants = [player] + list(opponents or [])
+    battlefield_exiled = 0
+    graveyard_exiled = 0
+    artifact_exiled = 0
+    creature_exiled = 0
+    enchantment_exiled = 0
+    per_player = []
+
+    for participant in participants:
+        battlefield_names = []
+        graveyard_names = []
+        for permanent in list(getattr(participant, "battlefield", []) or []):
+            if not _permanent_matches_modal_exile_modes(permanent, modes):
+                continue
+            type_line = _permanent_type_line(permanent)
+            if "artifact" in type_line:
+                artifact_exiled += 1
+            if is_battlefield_creature(permanent):
+                creature_exiled += 1
+            if "enchantment" in type_line:
+                enchantment_exiled += 1
+            destination = move_zone_object_to_exile(
+                participant,
+                "battlefield",
+                permanent,
+                reason="modal_exile_board_wipe",
+                source=card,
+                turn=turn,
+            )
+            if destination != "vanished_token":
+                battlefield_exiled += 1
+            battlefield_names.append(
+                permanent.get("name", "?") if isinstance(permanent, dict) else str(permanent)
+            )
+
+        if "graveyards" in modes:
+            for grave_card in list(getattr(participant, "graveyard", []) or []):
+                destination = move_zone_object_to_exile(
+                    participant,
+                    "graveyard",
+                    grave_card,
+                    reason="modal_exile_board_wipe",
+                    source=card,
+                    turn=turn,
+                )
+                if destination != "vanished_token":
+                    graveyard_exiled += 1
+                graveyard_names.append(
+                    grave_card.get("name", "?") if isinstance(grave_card, dict) else str(grave_card)
+                )
+
+        per_player.append(
+            {
+                "player": getattr(participant, "name", "?"),
+                "battlefield_exiled": len(battlefield_names),
+                "graveyard_exiled": len(graveyard_names),
+                "battlefield_cards": battlefield_names[:20],
+                "graveyard_cards": graveyard_names[:20],
+            }
+        )
+
+    fields = replay_rule_fields(effect_data)
+    emit_decision_trace(
+        decision_type="modal_exile_board_wipe",
+        player=player,
+        turn=turn,
+        phase="resolution",
+        available_options=[
+            decision_card_option(card, effect_data, action="resolve_modal_exile_board_wipe"),
+            {"action": "defer_wipe_not_available_after_resolution"},
+        ],
+        chosen_option=decision_card_option(
+            card,
+            effect_data,
+            action="resolve_modal_exile_board_wipe",
+        ),
+        rejected_options=[{"action": "defer_wipe_not_available_after_resolution"}],
+        score_components={
+            "exile_modes": sorted(modes),
+            "battlefield_exiled": battlefield_exiled,
+            "graveyard_exiled": graveyard_exiled,
+            "artifact_exiled": artifact_exiled,
+            "creature_exiled": creature_exiled,
+            "enchantment_exiled": enchantment_exiled,
+        },
+        rule_source=fields.get("rule_source", "battle_rule"),
+        rule_status=fields.get("rule_review_status", "active"),
+        confidence="medium",
+        expected_benefit_score=battlefield_exiled * 8 + graveyard_exiled * 2,
+        actual_outcome="modal_exile_board_wipe_resolved",
+        reason="selected_modal_exile_modes",
+        strategic_principle="exile_problem_permanent_types_and_graveyards_when_modal_wipe_resolves",
+        heuristic_version=DECISION_STRATEGY_VERSION,
+        resource_delta={
+            "battlefield": -battlefield_exiled,
+            "graveyard": -graveyard_exiled,
+            "exile": battlefield_exiled + graveyard_exiled,
+        },
+        risk_flags=[],
+        rejected_reason="spell_already_resolving",
+    )
+    emit_replay_event(
+        "modal_exile_board_wipe_resolved",
+        player=player.name,
+        card=card.get("name", "?") if isinstance(card, dict) else str(card),
+        exile_modes=sorted(modes),
+        battlefield_exiled=battlefield_exiled,
+        graveyard_exiled=graveyard_exiled,
+        artifact_exiled=artifact_exiled,
+        creature_exiled=creature_exiled,
+        enchantment_exiled=enchantment_exiled,
+        per_player=per_player,
+        turn=turn,
+        **fields,
+    )
+    finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+    return {
+        "battlefield_exiled": battlefield_exiled,
+        "graveyard_exiled": graveyard_exiled,
+        "artifact_exiled": artifact_exiled,
+        "creature_exiled": creature_exiled,
+        "enchantment_exiled": enchantment_exiled,
+    }
 
 
 def turn_ended_by_effect(player):
@@ -60120,6 +60291,9 @@ def apply_effect_immediate(
     elif effect == "each_player_sacrifice":
         resolve_each_player_sacrifice(player, opponents, card, effect_data, turn)
     elif effect == "board_wipe":
+        if effect_data.get("exile_modes"):
+            resolve_modal_exile_board_wipe(player, opponents, card, effect_data, turn)
+            return
         if effect_data.get("modal_destroy_modes") or effect_data.get("destroy_modes"):
             resolve_modal_destroy_board_wipe(player, opponents, card, effect_data, turn)
             return

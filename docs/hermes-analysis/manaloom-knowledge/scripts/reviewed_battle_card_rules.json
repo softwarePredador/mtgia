@@ -684,8 +684,9 @@
     },
     "source": "curated",
     "confidence": 0.9,
-    "review_status": "active",
-    "notes": "Oracle-reviewed on 2026-06-18 against official Gatherer text: Fellwar Stone taps for one mana of any color that a land an opponent controls could produce. Runtime intentionally models the safe baseline as a live one-mana rock with conditional color flexibility, while exact opponent color derivation remains a tracked refinement."
+    "review_status": "verified",
+    "oracle_hash": "d63befc8ac40d9a38732f9b5c1a7414a",
+    "notes": "Oracle-reviewed on 2026-06-18 against official Gatherer text: Fellwar Stone taps for one mana of any color that a land an opponent controls could produce. Runtime verification on 2026-07-07 covers the one-mana source and conditional color-mode exposure used by battle mana payment."
   },
   "Pirate's Pillage": {
     "effect_json": {
@@ -1050,8 +1051,9 @@
     },
     "source": "curated",
     "confidence": 0.93,
-    "review_status": "active",
-    "notes": "Oracle-reviewed on 2026-06-17 against official/Gatherer-Scryfall text: you have no maximum hand size, and if an effect causes you to discard a card you may discard it to the top of your library instead of to your graveyard. This is especially relevant for Lorehold miracle turns and rummage lines; it is not a mana rock."
+    "review_status": "verified",
+    "oracle_hash": "575aef3cc2523831e440ea7dcd55fa6e",
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Gatherer-Scryfall text: you have no maximum hand size, and if an effect causes you to discard a card you may discard it to the top of your library instead of to your graveyard. Runtime verification on 2026-07-07 covers the discard-to-top replacement used by Lorehold miracle/rummage lines; it is not a mana rock."
   },
   "Laughing Mad": {
     "effect_json": {
@@ -1092,9 +1094,9 @@
     },
     "source": "curated",
     "confidence": 0.94,
-    "review_status": "active",
-    "oracle_hash": "f1b6d4f38a533e56f0efb5a3f1547214",
-    "notes": "PG-035 oracle-reviewed against PostgreSQL/Scryfall text: Lorehold is a five-mana flying, haste commander; instants and sorceries in hand gain miracle {2}; at the beginning of each opponent's upkeep you may discard a card, and if you do draw a card. Runtime currently models the opponent-upkeep rummage and miracle window, not every policy edge."
+    "review_status": "verified",
+    "oracle_hash": "11d814aa6546578eab746b36fdb98582",
+    "notes": "PG-035 oracle-reviewed against PostgreSQL/Scryfall text: Lorehold is a five-mana flying, haste commander; instants and sorceries in hand gain miracle {2}; at the beginning of each opponent's upkeep you may discard a card, and if you do draw a card. Runtime verification on 2026-07-07 covers opponent-upkeep rummage, Library of Leng replacement, and first-draw miracle casting."
   },
   "Lumra, Bellow of the Woods": {
     "effect_json": {
@@ -1343,8 +1345,9 @@
     },
     "source": "curated",
     "confidence": 0.8,
-    "review_status": "active",
-    "notes": "Oracle-reviewed on 2026-06-17: {1}, {T}, Exile any number of cards from your hand face down, put that many cards from the top of your library into your hand, then put the exiled cards on top in any order. Runtime now supports a low-risk Lorehold-only upkeep slice that exchanges a single high-priority instant/sorcery from hand onto the top for the next first-draw miracle window; full arbitrary exchange sequencing remains pending."
+    "review_status": "verified",
+    "oracle_hash": "8133928f03d5a5a77f2beecfcbd09e30",
+    "notes": "Oracle-reviewed on 2026-06-17: {1}, {T}, Exile any number of cards from your hand face down, put that many cards from the top of your library into your hand, then put the exiled cards on top in any order. Runtime verification on 2026-07-07 covers the Lorehold upkeep slice that exchanges a single high-priority instant/sorcery from hand onto the top for the next first-draw miracle window; full arbitrary multi-card exchange sequencing remains out of scope."
   },
   "Skullclamp": {
     "effect_json": {
@@ -1466,8 +1469,9 @@
     },
     "source": "curated",
     "confidence": 0.9,
-    "review_status": "active",
-    "notes": "Oracle-reviewed on 2026-06-18 against official Gatherer text: Talisman of Conviction can tap for colorless freely or for red/white while dealing 1 damage to its controller. Runtime safely models the card as a one-mana rock with tracked pain-color metadata; exact per-tap color-choice and pain sequencing remain partial."
+    "review_status": "verified",
+    "oracle_hash": "d49ceec937367a344a9f0948eea4f8f2",
+    "notes": "Oracle-reviewed on 2026-06-18 against official Gatherer text: Talisman of Conviction can tap for colorless freely or for red/white while dealing 1 damage to its controller. Runtime verification on 2026-07-07 covers one-mana production and color-mode pain metadata used by conditional mana payment."
   },
   "Ur-Golem's Eye": {
     "effect_json": {
@@ -2547,9 +2551,10 @@
     },
     "source": "curated",
     "confidence": 0.9,
-    "review_status": "active",
+    "review_status": "verified",
     "execution_status": "auto",
-    "notes": "Oracle-reviewed on 2026-06-22 against local Scryfall/PostgreSQL cache: choose one or more exile modes for artifacts, creatures, enchantments, and graveyards. Runtime executes the creature-wipe baseline and records the broader exile modes for audit."
+    "oracle_hash": "4f0536b65096d1326139fe7f7f9435db",
+    "notes": "Oracle-reviewed on 2026-06-22 against local Scryfall/PostgreSQL cache: choose one or more exile modes for artifacts, creatures, enchantments, and graveyards. Runtime verification on 2026-07-07 covers modal exiling of battlefield artifacts, creatures, enchantments, and graveyards instead of destructive wipe fallback."
   },
   "Hit the Mother Lode": {
     "rules": [
@@ -2844,7 +2849,7 @@
     },
     "source": "curated",
     "confidence": 0.95,
-    "review_status": "active",
+    "review_status": "verified",
     "execution_status": "auto",
     "oracle_hash": "702f566e95dd477f5cf5a551e41e9df8",
     "notes": "PG-040 mirror of PostgreSQL source rule: Swords to Plowshares exiles target creature and the target controller gains life equal to that creature's power. Runtime executes both exile destination and dynamic target-power life gain."
@@ -2870,7 +2875,7 @@
     },
     "source": "curated",
     "confidence": 0.95,
-    "review_status": "active",
+    "review_status": "verified",
     "execution_status": "auto",
     "oracle_hash": "bdc0faecf4420dc6162c7e72e98cc0eb",
     "notes": "PG-041 mirror of PostgreSQL source rule: Teferi's Protection locks life total changes until the next turn, grants protection from everything, phases out all permanents controlled including lands, and exiles itself on resolution."
@@ -2924,11 +2929,11 @@
     },
     "source": "curated",
     "confidence": 0.9,
-    "review_status": "active",
+    "review_status": "verified",
     "execution_status": "auto",
     "oracle_hash": "0f2238f2ce8e4f2c0bbc2d5cea55f4d7",
     "logical_rule_key": "battle_rule_v1:280e17ec34ac105baeb6989491c6ff25",
-    "notes": "Oracle-reviewed on 2026-06-27 against local PostgreSQL/Hermes cache: 5/5 flying creature; ETB exiles an Equipment, instant, or sorcery from your graveyard for play until next turn; noncreature spell casts deal damage equal to that spell's mana value to any target. Runtime executes the noncreature spell damage trigger and records the ETB graveyard recast branch as explicit annotation."
+    "notes": "Oracle-reviewed on 2026-06-27 against local PostgreSQL/Hermes cache: 5/5 flying creature; ETB exiles an Equipment, instant, or sorcery from your graveyard for play until next turn; noncreature spell casts deal damage equal to that spell's mana value to any target. Runtime verification on 2026-07-07 covers the noncreature spell damage trigger and records the ETB graveyard recast branch as explicit annotation."
   },
   "Tibalt's Trickery": {
     "effect_json": {
