@@ -1,0 +1,153 @@
+{
+  "battle_execution": {
+    "event_count": 2,
+    "results": [
+      {
+        "activation_limit_per_turn": 0,
+        "available_mana": 1,
+        "card_name": "Birds of Paradise // Birds of Paradise",
+        "conditional_mana": 1,
+        "life_after_refresh": 40,
+        "life_paid": 0,
+        "scenario": "Birds of Paradise // Birds of Paradise produces one mana",
+        "sources": 1,
+        "tapped": true
+      },
+      {
+        "activation_limit_per_turn": 0,
+        "available_mana": 2,
+        "card_name": "Sol Ring // Sol Ring",
+        "conditional_mana": 0,
+        "life_after_refresh": 40,
+        "life_paid": 0,
+        "scenario": "Sol Ring // Sol Ring produces two colorless mana",
+        "sources": 1,
+        "tapped": true
+      }
+    ],
+    "scenario_count": 2
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-07T22:26:25.567016+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg644_oracle_identity_mana_source_role_link_new_server_manifest.json",
+  "package_id": "pg644_oracle_identity_mana_source_role_link_new_server",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 2
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "one_mana_zero_one_flying_any_color_mana_dork_v1",
+          "card_name": "Birds of Paradise // Birds of Paradise",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5d3ec3f1d92cfe2044d0172c4e3765ba",
+          "oracle_hash": "2119fc1976cfab2480a9d86c57f1859b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "two_colorless_mana_rock_v1",
+          "card_name": "Sol Ring // Sol Ring",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:42621fcae461313f674d46db0da059af",
+          "oracle_hash": "7d286f5619ac8934fb07abf152ffcb60",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 2
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "one_mana_zero_one_flying_any_color_mana_dork_v1",
+          "card_name": "Birds of Paradise // Birds of Paradise",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5d3ec3f1d92cfe2044d0172c4e3765ba",
+          "oracle_hash": "2119fc1976cfab2480a9d86c57f1859b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "two_colorless_mana_rock_v1",
+          "card_name": "Sol Ring // Sol Ring",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:42621fcae461313f674d46db0da059af",
+          "oracle_hash": "7d286f5619ac8934fb07abf152ffcb60",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 2
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "one_mana_zero_one_flying_any_color_mana_dork_v1",
+          "battle_rule_version": 2,
+          "card_name": "Birds of Paradise // Birds of Paradise",
+          "logical_rule_key": "battle_rule_v1:5d3ec3f1d92cfe2044d0172c4e3765ba"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "two_colorless_mana_rock_v1",
+          "battle_rule_version": 2,
+          "card_name": "Sol Ring // Sol Ring",
+          "logical_rule_key": "battle_rule_v1:42621fcae461313f674d46db0da059af"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 2
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Birds of Paradise // Birds of Paradise",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:5d3ec3f1d92cfe2044d0172c4e3765ba"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Sol Ring // Sol Ring",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:42621fcae461313f674d46db0da059af"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 2,
+        "scenarios": 2
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "PG644 Oracle Identity Mana Source Rule Link"
+}
