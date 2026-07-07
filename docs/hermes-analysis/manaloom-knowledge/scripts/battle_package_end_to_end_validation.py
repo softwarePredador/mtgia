@@ -5566,6 +5566,97 @@ def run_counter_unless_pays_response(
     }
 
 
+def run_counter_target_response(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    response_card = dict(scenario["card"])
+    turn = int(scenario.get("turn") or 7)
+    phase = str(scenario.get("phase") or "precombat_main")
+    active = battle.Player(str(scenario.get("active_player") or "Active"), None, [])
+    responder = battle.Player(str(scenario.get("responder") or "Responder"), None, [])
+    add_manifest_mana(responder, scenario.get("responder_mana") or {"generic": 3, "blue": 2})
+    responder.hand = [response_card]
+    target_stack_object = dict(
+        scenario.get("target_stack_object")
+        or scenario.get("target_spell")
+        or {
+            "name": "Counter Target Fixture",
+            "cmc": 7,
+            "mana_cost": "{5}{R}{R}",
+            "type_line": "Creature - Dragon",
+            "effect": "finisher",
+        }
+    )
+    target_stack_effect = dict(scenario.get("target_stack_effect") or {"effect": "finisher"})
+    target_stack_item = battle.StackItem(target_stack_object, active, target_stack_effect)
+    if not battle.counter_can_target(
+        response_card,
+        response_card,
+        target_stack_object,
+        stack_item=target_stack_item,
+    ):
+        fail("battle_execution", f"{response_card['name']} cannot target legal stack fixture")
+
+    nonmatching_stack_object = scenario.get("nonmatching_stack_object")
+    if isinstance(nonmatching_stack_object, dict):
+        nonmatching_stack_effect = dict(scenario.get("nonmatching_stack_effect") or {"effect": "mana_ability"})
+        nonmatching_stack_item = battle.StackItem(
+            dict(nonmatching_stack_object),
+            active,
+            nonmatching_stack_effect,
+        )
+        if battle.counter_can_target(
+            response_card,
+            response_card,
+            dict(nonmatching_stack_object),
+            stack_item=nonmatching_stack_item,
+        ):
+            fail("battle_execution", f"{response_card['name']} can target illegal stack fixture")
+
+    stack = battle.Stack()
+    stack.push(target_stack_object, active, target_stack_effect)
+
+    if not battle.priority_round(
+        active,
+        [active, responder],
+        stack,
+        turn,
+        random.Random(int(scenario.get("seed") or 6072)),
+        phase=phase,
+    ):
+        fail("battle_execution", f"{response_card['name']} was not cast as counter response")
+
+    actual_countered = bool(stack.items and getattr(stack.items[-1], "countered", False))
+    if not actual_countered:
+        fail("battle_execution", f"{response_card['name']} did not counter legal stack object")
+
+    counter_event = next(
+        (
+            data
+            for event, data in reversed(events)
+            if event == "spell_countered" and data.get("counter") == response_card.get("name")
+        ),
+        None,
+    )
+    if counter_event is None:
+        fail("battle_events", f"missing {response_card['name']} spell_countered event")
+
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": response_card["name"],
+        "target": target_stack_object.get("name"),
+        "target_stack_effect": target_stack_effect.get("effect"),
+        "countered": actual_countered,
+        "nonmatching_target": (
+            nonmatching_stack_object.get("name")
+            if isinstance(nonmatching_stack_object, dict)
+            else None
+        ),
+    }
+
+
 def run_change_single_target_response(
     battle,
     scenario: dict[str, Any],
@@ -6461,6 +6552,7 @@ SCENARIO_RUNNERS = {
     "simple_activated_create_token": run_simple_activated_create_token,
     "spell_cast_gain_life": run_spell_cast_gain_life,
     "controlled_stat_modifier_until_eot": run_controlled_stat_modifier_until_eot,
+    "counter_target_response": run_counter_target_response,
     "stat_modifier_until_eot": run_stat_modifier_until_eot,
     "boost_scry_spell": run_boost_scry_spell,
     "static_controlled_power_toughness_boost": run_static_controlled_power_toughness_boost,

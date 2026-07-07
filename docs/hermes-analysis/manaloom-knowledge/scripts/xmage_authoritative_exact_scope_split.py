@@ -3357,12 +3357,24 @@ def counter_target_from_oracle(metadata: dict[str, Any]) -> str | None:
         (r"^counter target spell with mana value (?P<value>\d+) or greater\.?$", "spell_mana_value_{value}_or_greater"),
         (r"^counter target spell with mana value (?P<value>\d+) or less\.?$", "spell_mana_value_{value}_or_less"),
         (r"^counter target spell with mana value (?P<value>\d+)\.?$", "spell_mana_value_{value}"),
+        (
+            r"^counter target creature spell with power or toughness (?P<value>\d+) or less\.?$",
+            "creature_spell_power_or_toughness_{value}_or_less",
+        ),
     ]
     for pattern, target_template in mana_value_patterns:
         match = re.match(pattern, text)
         if match:
             return target_template.format(value=int(match.group("value")))
     patterns: list[tuple[str, str]] = [
+        (
+            r"^counter target spell, activated ability, or triggered ability\.?$",
+            "spell_or_activated_or_triggered_ability",
+        ),
+        (
+            r"^counter target activated ability, triggered ability, or legendary spell\.?$",
+            "activated_or_triggered_ability_or_legendary_spell",
+        ),
         (r"^counter target red or green spell\.?$", "red_or_green_spell"),
         (r"^counter target blue instant spell\.?$", "blue_instant_spell"),
         (r"^counter target creature or sorcery spell\.?$", "creature_or_sorcery_spell"),
@@ -3459,6 +3471,19 @@ def fixed_counter_gain_life_from_source(source_text: str) -> tuple[int, str] | N
 
 def counter_target_from_source(source_text: str) -> str | None:
     text = str(source_text or "")
+    if (
+        "TalesEndPredicate" in text
+        or "activated ability, triggered ability, or legendary spell" in text
+    ):
+        return "activated_or_triggered_ability_or_legendary_spell"
+    if (
+        "FilterCreatureSpell" in text
+        and "PowerPredicate(ComparisonType.FEWER_THAN, 3)" in text
+        and "ToughnessPredicate(ComparisonType.FEWER_THAN, 3)" in text
+    ):
+        return "creature_spell_power_or_toughness_2_or_less"
+    if "new TargetStackObject()" in text or re.search(r"new\s+TargetStackObject\s*\(\s*\)", text):
+        return "spell_or_activated_or_triggered_ability"
     if "new TargetSpell()" in text or "new TargetSpell(StaticFilters.FILTER_SPELL)" in text:
         return "spell"
     if (
@@ -3663,6 +3688,24 @@ def dynamic_counter_unless_pays_from_source(source_text: str) -> tuple[dict[str,
 
 def counter_target_constraints_for(target: str) -> dict[str, Any]:
     constraints: dict[str, Any] = {"zone": "stack", "stack_object": "spell"}
+    if target == "spell_or_activated_or_triggered_ability":
+        return {
+            "zone": "stack",
+            "any_of": [
+                {"stack_object": "spell"},
+                {"stack_object": "activated_ability"},
+                {"stack_object": "triggered_ability"},
+            ],
+        }
+    if target == "activated_or_triggered_ability_or_legendary_spell":
+        return {
+            "zone": "stack",
+            "any_of": [
+                {"stack_object": "activated_ability"},
+                {"stack_object": "triggered_ability"},
+                {"stack_object": "spell", "require_legendary": True},
+            ],
+        }
     mana_value_match = re.match(r"^spell_mana_value_(?P<value>\d+)(?P<op>_or_greater|_or_less)?$", target)
     if mana_value_match:
         value = int(mana_value_match.group("value"))
@@ -3673,6 +3716,12 @@ def counter_target_constraints_for(target: str) -> dict[str, Any]:
             constraints["counter_target_mana_value_max"] = value
         else:
             constraints["counter_target_mana_value"] = value
+    elif (power_toughness_match := re.match(
+        r"^creature_spell_power_or_toughness_(?P<value>\d+)_or_less$",
+        target,
+    )):
+        constraints["card_types"] = ["creature"]
+        constraints["power_or_toughness_max"] = int(power_toughness_match.group("value"))
     elif target == "red_or_green_spell":
         constraints["spell_colors"] = ["R", "G"]
     elif target == "blue_instant_spell":
@@ -28989,6 +29038,14 @@ def split_row(
         target = counter_target_from_oracle(metadata)
         if target is None:
             return None, "counter_target_not_supported"
+        if target in {
+            "spell_or_activated_or_triggered_ability",
+            "activated_or_triggered_ability_or_legendary_spell",
+            "creature_spell_power_or_toughness_2_or_less",
+        }:
+            source_target = counter_target_from_source(source_text)
+            if source_target != target:
+                return None, "counter_source_target_not_supported"
         effect_json = {
             "effect": "counter",
             "battle_model_scope": COUNTER_SCOPE,

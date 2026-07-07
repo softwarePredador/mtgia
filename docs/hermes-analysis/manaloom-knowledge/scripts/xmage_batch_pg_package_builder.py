@@ -3545,6 +3545,141 @@ def _target_fixture_from_constraints(
     return fixture
 
 
+def _stack_object_fixture_from_constraints(
+    name: str,
+    constraints: dict[str, Any],
+    *,
+    matching: bool,
+) -> dict[str, Any]:
+    if not matching and isinstance(constraints.get("any_of"), list):
+        return {
+            "card": {
+                "name": name,
+                "type_line": "Mana Ability",
+                "effect": "mana_ability",
+                "cmc": 0,
+            },
+            "effect": {"effect": "mana_ability"},
+        }
+
+    if matching and isinstance(constraints.get("any_of"), list):
+        active_constraints = dict(constraints)
+        for option in constraints.get("any_of") or []:
+            if isinstance(option, dict) and str(option.get("stack_object") or "").lower() == "spell":
+                active_constraints.update(option)
+                break
+        else:
+            active_constraints = _merge_first_any_of_option(constraints)
+    else:
+        active_constraints = dict(constraints)
+    stack_object = str(active_constraints.get("stack_object") or "spell").strip().lower()
+    if not matching and active_constraints.get("require_legendary"):
+        stack_object = "spell"
+
+    if stack_object in {"activated_ability", "triggered_ability", "mana_ability"}:
+        label = {
+            "activated_ability": "Activated Ability",
+            "triggered_ability": "Triggered Ability",
+            "mana_ability": "Mana Ability",
+        }[stack_object]
+        return {
+            "card": {
+                "name": name,
+                "type_line": label,
+                "effect": stack_object,
+                "cmc": 0,
+            },
+            "effect": {"effect": stack_object},
+        }
+
+    if active_constraints.get("card_types"):
+        card = _target_fixture_from_constraints(name, active_constraints, matching=matching)
+    else:
+        spell_types = [str(value).strip().lower() for value in active_constraints.get("spell_types") or [] if value]
+        type_line = "Instant"
+        if spell_types:
+            type_line = spell_types[0].title()
+            if not matching:
+                type_line = "Sorcery" if spell_types[0] != "sorcery" else "Instant"
+        card = {
+            "name": name,
+            "type_line": type_line,
+            "effect": "finisher",
+            "cmc": 3,
+            "mana_cost": "{2}{U}",
+        }
+
+    if active_constraints.get("require_legendary"):
+        if matching:
+            if "legendary" not in str(card.get("type_line") or "").lower():
+                card["type_line"] = f"Legendary {card.get('type_line') or 'Creature'}"
+            card["legendary"] = True
+            card["supertypes"] = ["legendary"]
+        else:
+            card["legendary"] = False
+            card["supertypes"] = []
+            card["type_line"] = str(card.get("type_line") or "Creature").replace("Legendary ", "")
+
+    power_or_toughness_max = active_constraints.get("power_or_toughness_max")
+    if power_or_toughness_max is not None:
+        maximum = int(power_or_toughness_max)
+        card["power"] = maximum if matching else maximum + 2
+        card["toughness"] = maximum + 3 if matching else maximum + 2
+        if matching and int(card["power"]) > maximum and int(card["toughness"]) > maximum:
+            card["power"] = maximum
+
+    if active_constraints.get("spell_colors"):
+        colors = [str(active_constraints["spell_colors"][0]).strip().upper()]
+        if not matching:
+            colors = ["W"] if colors[0] != "W" else ["R"]
+        card["colors"] = colors
+        card["mana_cost"] = "".join(f"{{{color}}}" for color in colors)
+
+    if matching and stack_object == "spell":
+        card["effect"] = "finisher"
+
+    return {"card": card, "effect": {"effect": card.get("effect") or "finisher"}}
+
+
+def counter_target_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if (
+        required.get("effect") != "counter"
+        or required.get("battle_model_scope") != "xmage_counter_target_spell_v1"
+    ):
+        return None
+    constraints = dict(required.get("target_constraints") or {"zone": "stack", "stack_object": "spell"})
+    matching = _stack_object_fixture_from_constraints(
+        "E2E Legal Counter Target",
+        constraints,
+        matching=True,
+    )
+    nonmatching = _stack_object_fixture_from_constraints(
+        "E2E Illegal Counter Target",
+        constraints,
+        matching=False,
+    )
+    return {
+        "name": f"{rule['card_name']} counters a legal stack object",
+        "type": "counter_target_response",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": "Instant",
+            "mana_cost": "{1}{U}",
+            "cmc": 2,
+            **required,
+        },
+        "target_stack_object": matching["card"],
+        "target_stack_effect": matching["effect"],
+        "nonmatching_stack_object": nonmatching["card"],
+        "nonmatching_stack_effect": nonmatching["effect"],
+        "expected_target_constraints": constraints,
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def single_target_removal_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
@@ -4040,7 +4175,8 @@ def static_cost_reduction_execution_scenario_from_expected_rule(
 
 def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any] | None:
     return (
-        counter_unless_pays_execution_scenario_from_expected_rule(rule)
+        counter_target_execution_scenario_from_expected_rule(rule)
+        or counter_unless_pays_execution_scenario_from_expected_rule(rule)
         or static_cost_reduction_execution_scenario_from_expected_rule(rule)
         or static_cost_increase_execution_scenario_from_expected_rule(rule)
         or static_controlled_pt_execution_scenario_from_expected_rule(rule)

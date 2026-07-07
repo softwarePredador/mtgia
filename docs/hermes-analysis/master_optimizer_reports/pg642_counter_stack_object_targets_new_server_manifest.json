@@ -1,0 +1,562 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg642_counter_stack_object_targets_new_s_20260707_213839",
+  "deploy_id": "PG642",
+  "execution_scenarios": [
+    {
+      "card": {
+        "battle_model_scope": "xmage_counter_target_spell_v1",
+        "cmc": 2,
+        "effect": "counter",
+        "mana_cost": "{1}{U}",
+        "name": "Disallow",
+        "target": "spell_or_activated_or_triggered_ability",
+        "target_constraints": {
+          "any_of": [
+            {
+              "stack_object": "spell"
+            },
+            {
+              "stack_object": "activated_ability"
+            },
+            {
+              "stack_object": "triggered_ability"
+            }
+          ],
+          "zone": "stack"
+        },
+        "type_line": "Instant",
+        "xmage_effect_class": "CounterTargetEffect"
+      },
+      "expected_target_constraints": {
+        "any_of": [
+          {
+            "stack_object": "spell"
+          },
+          {
+            "stack_object": "activated_ability"
+          },
+          {
+            "stack_object": "triggered_ability"
+          }
+        ],
+        "zone": "stack"
+      },
+      "logical_rule_key": "battle_rule_v1:5072c4680123be4302b45c3d15980230",
+      "name": "Disallow counters a legal stack object",
+      "nonmatching_stack_effect": {
+        "effect": "mana_ability"
+      },
+      "nonmatching_stack_object": {
+        "cmc": 0,
+        "effect": "mana_ability",
+        "name": "E2E Illegal Counter Target",
+        "type_line": "Mana Ability"
+      },
+      "target_stack_effect": {
+        "effect": "finisher"
+      },
+      "target_stack_object": {
+        "cmc": 3,
+        "effect": "finisher",
+        "mana_cost": "{2}{U}",
+        "name": "E2E Legal Counter Target",
+        "type_line": "Instant"
+      },
+      "type": "counter_target_response"
+    },
+    {
+      "card": {
+        "battle_model_scope": "xmage_counter_target_spell_v1",
+        "cmc": 2,
+        "effect": "counter",
+        "mana_cost": "{1}{U}",
+        "name": "Stern Scolding",
+        "target": "creature_spell_power_or_toughness_2_or_less",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "power_or_toughness_max": 2,
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "type_line": "Instant",
+        "xmage_effect_class": "CounterTargetEffect"
+      },
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ],
+        "power_or_toughness_max": 2,
+        "stack_object": "spell",
+        "zone": "stack"
+      },
+      "logical_rule_key": "battle_rule_v1:5286b6c6a626a88c60e657c46eef1105",
+      "name": "Stern Scolding counters a legal stack object",
+      "nonmatching_stack_effect": {
+        "effect": "land"
+      },
+      "nonmatching_stack_object": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Counter Target",
+        "power": 4,
+        "toughness": 4,
+        "type_line": "Land"
+      },
+      "target_stack_effect": {
+        "effect": "finisher"
+      },
+      "target_stack_object": {
+        "cmc": 3,
+        "effect": "finisher",
+        "name": "E2E Legal Counter Target",
+        "power": 2,
+        "toughness": 5,
+        "type_line": "Creature - Soldier"
+      },
+      "type": "counter_target_response"
+    },
+    {
+      "card": {
+        "battle_model_scope": "xmage_counter_target_spell_v1",
+        "cmc": 2,
+        "effect": "counter",
+        "mana_cost": "{1}{U}",
+        "name": "Tale's End",
+        "target": "activated_or_triggered_ability_or_legendary_spell",
+        "target_constraints": {
+          "any_of": [
+            {
+              "stack_object": "activated_ability"
+            },
+            {
+              "stack_object": "triggered_ability"
+            },
+            {
+              "require_legendary": true,
+              "stack_object": "spell"
+            }
+          ],
+          "zone": "stack"
+        },
+        "type_line": "Instant",
+        "xmage_effect_class": "CounterTargetEffect"
+      },
+      "expected_target_constraints": {
+        "any_of": [
+          {
+            "stack_object": "activated_ability"
+          },
+          {
+            "stack_object": "triggered_ability"
+          },
+          {
+            "require_legendary": true,
+            "stack_object": "spell"
+          }
+        ],
+        "zone": "stack"
+      },
+      "logical_rule_key": "battle_rule_v1:f70b57cccbd61a55ec60298342a6613c",
+      "name": "Tale's End counters a legal stack object",
+      "nonmatching_stack_effect": {
+        "effect": "mana_ability"
+      },
+      "nonmatching_stack_object": {
+        "cmc": 0,
+        "effect": "mana_ability",
+        "name": "E2E Illegal Counter Target",
+        "type_line": "Mana Ability"
+      },
+      "target_stack_effect": {
+        "effect": "finisher"
+      },
+      "target_stack_object": {
+        "cmc": 3,
+        "effect": "finisher",
+        "legendary": true,
+        "mana_cost": "{2}{U}",
+        "name": "E2E Legal Counter Target",
+        "supertypes": [
+          "legendary"
+        ],
+        "type_line": "Legendary Instant"
+      },
+      "type": "counter_target_response"
+    },
+    {
+      "card": {
+        "battle_model_scope": "xmage_counter_target_spell_v1",
+        "cmc": 2,
+        "effect": "counter",
+        "mana_cost": "{1}{U}",
+        "name": "Voidslime",
+        "target": "spell_or_activated_or_triggered_ability",
+        "target_constraints": {
+          "any_of": [
+            {
+              "stack_object": "spell"
+            },
+            {
+              "stack_object": "activated_ability"
+            },
+            {
+              "stack_object": "triggered_ability"
+            }
+          ],
+          "zone": "stack"
+        },
+        "type_line": "Instant",
+        "xmage_effect_class": "CounterTargetEffect"
+      },
+      "expected_target_constraints": {
+        "any_of": [
+          {
+            "stack_object": "spell"
+          },
+          {
+            "stack_object": "activated_ability"
+          },
+          {
+            "stack_object": "triggered_ability"
+          }
+        ],
+        "zone": "stack"
+      },
+      "logical_rule_key": "battle_rule_v1:5072c4680123be4302b45c3d15980230",
+      "name": "Voidslime counters a legal stack object",
+      "nonmatching_stack_effect": {
+        "effect": "mana_ability"
+      },
+      "nonmatching_stack_object": {
+        "cmc": 0,
+        "effect": "mana_ability",
+        "name": "E2E Illegal Counter Target",
+        "type_line": "Mana Ability"
+      },
+      "target_stack_effect": {
+        "effect": "finisher"
+      },
+      "target_stack_object": {
+        "cmc": 3,
+        "effect": "finisher",
+        "mana_cost": "{2}{U}",
+        "name": "E2E Legal Counter Target",
+        "type_line": "Instant"
+      },
+      "type": "counter_target_response"
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Disallow",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5072c4680123be4302b45c3d15980230",
+      "min_rule_version": 2,
+      "normalized_name": "disallow",
+      "oracle_hash": "dab97474ff3f3f0c35c8a01c3841de37",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_v1",
+        "effect": "counter",
+        "target": "spell_or_activated_or_triggered_ability",
+        "target_constraints": {
+          "any_of": [
+            {
+              "stack_object": "spell"
+            },
+            {
+              "stack_object": "activated_ability"
+            },
+            {
+              "stack_object": "triggered_ability"
+            }
+          ],
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Stern Scolding",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5286b6c6a626a88c60e657c46eef1105",
+      "min_rule_version": 2,
+      "normalized_name": "stern scolding",
+      "oracle_hash": "f26dd82537e6e5c9206d47a50fa691c3",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_v1",
+        "effect": "counter",
+        "target": "creature_spell_power_or_toughness_2_or_less",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "power_or_toughness_max": 2,
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Tale's End",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f70b57cccbd61a55ec60298342a6613c",
+      "min_rule_version": 2,
+      "normalized_name": "tale's end",
+      "oracle_hash": "1347d000d1e4acf8d2675e1ed216b6f7",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_v1",
+        "effect": "counter",
+        "target": "activated_or_triggered_ability_or_legendary_spell",
+        "target_constraints": {
+          "any_of": [
+            {
+              "stack_object": "activated_ability"
+            },
+            {
+              "stack_object": "triggered_ability"
+            },
+            {
+              "require_legendary": true,
+              "stack_object": "spell"
+            }
+          ],
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Voidslime",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5072c4680123be4302b45c3d15980230",
+      "min_rule_version": 2,
+      "normalized_name": "voidslime",
+      "oracle_hash": "dab97474ff3f3f0c35c8a01c3841de37",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_v1",
+        "effect": "counter",
+        "target": "spell_or_activated_or_triggered_ability",
+        "target_constraints": {
+          "any_of": [
+            {
+              "stack_object": "spell"
+            },
+            {
+              "stack_object": "activated_ability"
+            },
+            {
+              "stack_object": "triggered_ability"
+            }
+          ],
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterTargetEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_counter_target_spell": 4
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg642_counter_stack_object_targets_new_server_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg642_counter_stack_object_targets_new_server_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg642_counter_stack_object_targets_new_server_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg642_counter_stack_object_targets_new_server_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg642_counter_stack_object_targets_new_server_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg642_counter_stack_object_targets_new_server_rollback.sql"
+  },
+  "generated_at": "2026-07-07T21:42:24+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Disallow"
+      },
+      "card_name": "Disallow",
+      "effect": "counter",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5072c4680123be4302b45c3d15980230",
+      "normalized_name": "disallow",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_v1",
+        "effect": "counter",
+        "target": "spell_or_activated_or_triggered_ability",
+        "target_constraints": {
+          "any_of": [
+            {
+              "stack_object": "spell"
+            },
+            {
+              "stack_object": "activated_ability"
+            },
+            {
+              "stack_object": "triggered_ability"
+            }
+          ],
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Stern Scolding"
+      },
+      "card_name": "Stern Scolding",
+      "effect": "counter",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5286b6c6a626a88c60e657c46eef1105",
+      "normalized_name": "stern scolding",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_v1",
+        "effect": "counter",
+        "target": "creature_spell_power_or_toughness_2_or_less",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "power_or_toughness_max": 2,
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Tale's End"
+      },
+      "card_name": "Tale's End",
+      "effect": "counter",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f70b57cccbd61a55ec60298342a6613c",
+      "normalized_name": "tale's end",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_v1",
+        "effect": "counter",
+        "target": "activated_or_triggered_ability_or_legendary_spell",
+        "target_constraints": {
+          "any_of": [
+            {
+              "stack_object": "activated_ability"
+            },
+            {
+              "stack_object": "triggered_ability"
+            },
+            {
+              "require_legendary": true,
+              "stack_object": "spell"
+            }
+          ],
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Voidslime"
+      },
+      "card_name": "Voidslime",
+      "effect": "counter",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5072c4680123be4302b45c3d15980230",
+      "normalized_name": "voidslime",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_v1",
+        "effect": "counter",
+        "target": "spell_or_activated_or_triggered_ability",
+        "target_constraints": {
+          "any_of": [
+            {
+              "stack_object": "spell"
+            },
+            {
+              "stack_object": "activated_ability"
+            },
+            {
+              "stack_object": "triggered_ability"
+            }
+          ],
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterTargetEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Disallow",
+    "Stern Scolding",
+    "Tale's End",
+    "Voidslime"
+  ],
+  "selected_count": 4,
+  "slug": "counter_stack_object_targets_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Disallow",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5072c4680123be4302b45c3d15980230",
+      "min_rule_version": 2,
+      "normalized_name": "disallow",
+      "oracle_hash": "dab97474ff3f3f0c35c8a01c3841de37",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Stern Scolding",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5286b6c6a626a88c60e657c46eef1105",
+      "min_rule_version": 2,
+      "normalized_name": "stern scolding",
+      "oracle_hash": "f26dd82537e6e5c9206d47a50fa691c3",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Tale's End",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f70b57cccbd61a55ec60298342a6613c",
+      "min_rule_version": 2,
+      "normalized_name": "tale's end",
+      "oracle_hash": "1347d000d1e4acf8d2675e1ed216b6f7",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Voidslime",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5072c4680123be4302b45c3d15980230",
+      "min_rule_version": 2,
+      "normalized_name": "voidslime",
+      "oracle_hash": "dab97474ff3f3f0c35c8a01c3841de37",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

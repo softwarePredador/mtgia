@@ -13241,6 +13241,156 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_counter_target_spell_or_ability_filters_stack_object_kind(self) -> None:
+        opponent = self.battle.Player("Opponent", None, [])
+        counter_effect = {
+            "effect": "counter",
+            "battle_model_scope": "xmage_counter_target_spell_v1",
+            "target": "spell_or_activated_or_triggered_ability",
+            "target_constraints": {
+                "zone": "stack",
+                "any_of": [
+                    {"stack_object": "spell"},
+                    {"stack_object": "activated_ability"},
+                    {"stack_object": "triggered_ability"},
+                ],
+            },
+            "instant": True,
+        }
+        spell = {"name": "Target Spell", "type_line": "Instant", "cmc": 2}
+        activated = {"name": "Target Activated Ability", "type_line": "Activated Ability", "cmc": 0}
+        triggered = {"name": "Target Triggered Ability", "type_line": "Triggered Ability", "cmc": 0}
+        mana_ability = {"name": "Target Mana Ability", "type_line": "Mana Ability", "cmc": 0}
+
+        self.assertTrue(
+            self.battle.counter_can_target(
+                {},
+                counter_effect,
+                spell,
+                stack_item=self.battle.StackItem(spell, opponent, {"effect": "draw_cards"}),
+            )
+        )
+        self.assertTrue(
+            self.battle.counter_can_target(
+                {},
+                counter_effect,
+                activated,
+                stack_item=self.battle.StackItem(activated, opponent, {"effect": "activated_ability"}),
+            )
+        )
+        self.assertTrue(
+            self.battle.counter_can_target(
+                {},
+                counter_effect,
+                triggered,
+                stack_item=self.battle.StackItem(triggered, opponent, {"effect": "triggered_ability"}),
+            )
+        )
+        self.assertFalse(
+            self.battle.counter_can_target(
+                {},
+                counter_effect,
+                mana_ability,
+                stack_item=self.battle.StackItem(mana_ability, opponent, {"effect": "mana_ability"}),
+            )
+        )
+
+    def test_counter_target_activated_triggered_or_legendary_spell_filters_stack_object_kind(self) -> None:
+        opponent = self.battle.Player("Opponent", None, [])
+        counter_effect = {
+            "effect": "counter",
+            "battle_model_scope": "xmage_counter_target_spell_v1",
+            "target": "activated_or_triggered_ability_or_legendary_spell",
+            "target_constraints": {
+                "zone": "stack",
+                "any_of": [
+                    {"stack_object": "activated_ability"},
+                    {"stack_object": "triggered_ability"},
+                    {"stack_object": "spell", "require_legendary": True},
+                ],
+            },
+            "instant": True,
+        }
+        legendary_spell = {
+            "name": "Target Legend",
+            "type_line": "Legendary Creature - Wizard",
+            "cmc": 3,
+            "legendary": True,
+        }
+        nonlegendary_spell = {"name": "Target Bear", "type_line": "Creature - Bear", "cmc": 2}
+        activated = {"name": "Target Activated Ability", "type_line": "Activated Ability", "cmc": 0}
+
+        self.assertTrue(
+            self.battle.counter_can_target(
+                {},
+                counter_effect,
+                legendary_spell,
+                stack_item=self.battle.StackItem(legendary_spell, opponent, {"effect": "creature"}),
+            )
+        )
+        self.assertTrue(
+            self.battle.counter_can_target(
+                {},
+                counter_effect,
+                activated,
+                stack_item=self.battle.StackItem(activated, opponent, {"effect": "activated_ability"}),
+            )
+        )
+        self.assertFalse(
+            self.battle.counter_can_target(
+                {},
+                counter_effect,
+                nonlegendary_spell,
+                stack_item=self.battle.StackItem(nonlegendary_spell, opponent, {"effect": "creature"}),
+            )
+        )
+
+    def test_counter_target_creature_spell_power_or_toughness_constraint(self) -> None:
+        opponent = self.battle.Player("Opponent", None, [])
+        counter_effect = {
+            "effect": "counter",
+            "battle_model_scope": "xmage_counter_target_spell_v1",
+            "target": "creature_spell_power_or_toughness_2_or_less",
+            "target_constraints": {
+                "zone": "stack",
+                "stack_object": "spell",
+                "card_types": ["creature"],
+                "power_or_toughness_max": 2,
+            },
+            "instant": True,
+        }
+        low_power_creature = {
+            "name": "Target Utility Creature",
+            "type_line": "Creature - Wizard",
+            "power": 2,
+            "toughness": 5,
+            "cmc": 3,
+        }
+        large_creature = {
+            "name": "Target Large Creature",
+            "type_line": "Creature - Beast",
+            "power": 4,
+            "toughness": 4,
+            "cmc": 4,
+        }
+
+        self.assertTrue(
+            self.battle.counter_can_target(
+                {},
+                counter_effect,
+                low_power_creature,
+                stack_item=self.battle.StackItem(low_power_creature, opponent, {"effect": "creature"}),
+            )
+        )
+        self.assertFalse(
+            self.battle.counter_can_target(
+                {},
+                counter_effect,
+                large_creature,
+                stack_item=self.battle.StackItem(large_creature, opponent, {"effect": "creature"}),
+            )
+        )
+
     def test_counterspell_cards_uses_exact_stack_target_constraints(self) -> None:
         opponent = self.battle.Player("Opponent", None, [])
         opponent.mana_pool.add_generic(1)

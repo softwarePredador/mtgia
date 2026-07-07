@@ -78,6 +78,66 @@ def test_counter_unless_pays_dynamic_fields_and_execution_scenario_are_manifeste
     assert scenario["expected_counter_unless_pays_count"] == 2
 
 
+def test_counter_target_stack_object_execution_scenario_is_manifested() -> None:
+    proposal = {
+        "normalized_name": "disallow",
+        "card_name": "Disallow",
+        "oracle_hash": "hash-disallow",
+        "logical_rule_key": "battle_rule_v1:disallow",
+        "effect_json": {
+            "effect": "counter",
+            "battle_model_scope": "xmage_counter_target_spell_v1",
+            "target": "spell_or_activated_or_triggered_ability",
+            "target_constraints": {
+                "zone": "stack",
+                "any_of": [
+                    {"stack_object": "spell"},
+                    {"stack_object": "activated_ability"},
+                    {"stack_object": "triggered_ability"},
+                ],
+            },
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    assert scenario["type"] == "counter_target_response"
+    assert scenario["target_stack_object"]["type_line"] == "Instant"
+    assert scenario["target_stack_effect"]["effect"] == "finisher"
+    assert scenario["nonmatching_stack_object"]["type_line"] == "Mana Ability"
+    assert scenario["nonmatching_stack_effect"]["effect"] == "mana_ability"
+
+
+def test_counter_target_creature_power_or_toughness_fixture_is_manifested() -> None:
+    proposal = {
+        "normalized_name": "stern scolding",
+        "card_name": "Stern Scolding",
+        "oracle_hash": "hash-stern",
+        "logical_rule_key": "battle_rule_v1:stern",
+        "effect_json": {
+            "effect": "counter",
+            "battle_model_scope": "xmage_counter_target_spell_v1",
+            "target": "creature_spell_power_or_toughness_2_or_less",
+            "target_constraints": {
+                "zone": "stack",
+                "stack_object": "spell",
+                "card_types": ["creature"],
+                "power_or_toughness_max": 2,
+            },
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    assert scenario["type"] == "counter_target_response"
+    assert scenario["target_stack_object"]["power"] == 2
+    assert scenario["target_stack_object"]["toughness"] == 5
+    assert scenario["nonmatching_stack_object"]["power"] == 4
+    assert scenario["nonmatching_stack_object"]["toughness"] == 4
+
+
 def test_static_cost_increase_colored_tax_fields_and_execution_scenario_are_manifested() -> None:
     proposal = {
         "normalized_name": "derelor",

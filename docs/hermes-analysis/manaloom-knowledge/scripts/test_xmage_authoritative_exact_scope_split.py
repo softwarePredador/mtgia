@@ -14881,7 +14881,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(reason, "selected_exact_scope")
         self.assertEqual(proposal["effect_json"]["target_constraints"], {"zone": "stack", "stack_object": "spell"})
 
-    def test_counter_target_stack_ability_or_spell_stays_blocked(self) -> None:
+    def test_counter_target_stack_ability_or_spell_maps_to_stack_object_constraints(self) -> None:
         row = queue_row(split.COUNTER_UNIT, effect_classes=["CounterTargetEffect"])
         proposal, reason = split.split_row(
             row,
@@ -14895,8 +14895,99 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             ),
         )
 
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["target"], "spell_or_activated_or_triggered_ability")
+        self.assertEqual(
+            effect["target_constraints"],
+            {
+                "zone": "stack",
+                "any_of": [
+                    {"stack_object": "spell"},
+                    {"stack_object": "activated_ability"},
+                    {"stack_object": "triggered_ability"},
+                ],
+            },
+        )
+
+    def test_counter_target_activated_triggered_or_legendary_spell_maps_to_stack_object_constraints(self) -> None:
+        row = queue_row(split.COUNTER_UNIT, effect_classes=["CounterTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Tale's End",
+                oracle_text="Counter target activated ability, triggered ability, or legendary spell.",
+            ),
+            source_text=(
+                'private static final FilterStackObject filter = new FilterStackObject("activated ability, triggered ability, or legendary spell");'
+                "filter.add(TalesEndPredicate.instance);"
+                "this.getSpellAbility().addEffect(new CounterTargetEffect());"
+                "this.getSpellAbility().addTarget(new TargetStackObject(filter));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["target"], "activated_or_triggered_ability_or_legendary_spell")
+        self.assertEqual(
+            effect["target_constraints"],
+            {
+                "zone": "stack",
+                "any_of": [
+                    {"stack_object": "activated_ability"},
+                    {"stack_object": "triggered_ability"},
+                    {"stack_object": "spell", "require_legendary": True},
+                ],
+            },
+        )
+
+    def test_counter_target_creature_power_or_toughness_spell_maps_to_stack_constraints(self) -> None:
+        row = queue_row(split.COUNTER_UNIT, effect_classes=["CounterTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Stern Scolding",
+                oracle_text="Counter target creature spell with power or toughness 2 or less.",
+            ),
+            source_text=(
+                'private static final FilterSpell filter = new FilterCreatureSpell("creature spell with power or toughness 2 or less");'
+                "filter.add(Predicates.or("
+                "new PowerPredicate(ComparisonType.FEWER_THAN, 3),"
+                "new ToughnessPredicate(ComparisonType.FEWER_THAN, 3)));"
+                "this.getSpellAbility().addEffect(new CounterTargetEffect());"
+                "this.getSpellAbility().addTarget(new TargetSpell(filter));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["target"], "creature_spell_power_or_toughness_2_or_less")
+        self.assertEqual(
+            effect["target_constraints"],
+            {
+                "zone": "stack",
+                "stack_object": "spell",
+                "card_types": ["creature"],
+                "power_or_toughness_max": 2,
+            },
+        )
+
+    def test_counter_target_new_special_stack_targets_require_matching_xmage_source(self) -> None:
+        row = queue_row(split.COUNTER_UNIT, effect_classes=["CounterTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Disallow",
+                oracle_text="Counter target spell, activated ability, or triggered ability.",
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new CounterTargetEffect());"
+                "this.getSpellAbility().addTarget(new TargetSpell());"
+            ),
+        )
+
         self.assertIsNone(proposal)
-        self.assertEqual(reason, "counter_target_not_supported")
+        self.assertEqual(reason, "counter_source_target_not_supported")
 
     def test_counter_target_mana_value_spell_maps_to_stack_mana_value_constraints(self) -> None:
         row = queue_row(split.COUNTER_UNIT, effect_classes=["CounterTargetEffect"])

@@ -9565,7 +9565,28 @@ def spell_cant_be_countered(target_card, stack_item=None):
 def _counter_target_label_constraints(target_label):
     target = str(target_label or "").strip().lower()
     constraints = {"zone": "stack", "stack_object": "spell"} if target.endswith("spell") else {}
-    if target == "artifact_or_enchantment_spell":
+    if target == "spell_or_activated_or_triggered_ability":
+        return {
+            "zone": "stack",
+            "any_of": [
+                {"stack_object": "spell"},
+                {"stack_object": "activated_ability"},
+                {"stack_object": "triggered_ability"},
+            ],
+        }
+    if target == "activated_or_triggered_ability_or_legendary_spell":
+        return {
+            "zone": "stack",
+            "any_of": [
+                {"stack_object": "activated_ability"},
+                {"stack_object": "triggered_ability"},
+                {"stack_object": "spell", "require_legendary": True},
+            ],
+        }
+    if target == "creature_spell_power_or_toughness_2_or_less":
+        constraints["card_types"] = ["creature"]
+        constraints["power_or_toughness_max"] = 2
+    elif target == "artifact_or_enchantment_spell":
         constraints["card_types"] = ["artifact", "enchantment"]
     elif target == "artifact_or_creature_spell":
         constraints["card_types"] = ["artifact", "creature"]
@@ -9598,13 +9619,36 @@ def _counter_effect_constraints(counter_effect):
 
 
 def _counter_target_is_spell_object(target_card, stack_item=None):
-    effect_data = getattr(stack_item, "effect_data", None) or {}
-    if str(effect_data.get("effect") or "").lower() == "triggered_ability":
-        return False
-    type_line = str((target_card or {}).get("type_line") or "").lower()
-    if "triggered ability" in type_line or "activated ability" in type_line:
+    if _counter_target_stack_object_kind(target_card, stack_item=stack_item) != "spell":
         return False
     return True
+
+
+def _counter_target_stack_object_kind(target_card, stack_item=None):
+    effect_data = getattr(stack_item, "effect_data", None) or {}
+    effect = str(effect_data.get("effect") or "").lower()
+    type_line = str((target_card or {}).get("type_line") or "").lower()
+    if effect == "mana_ability" or "mana ability" in type_line:
+        return "mana_ability"
+    if effect == "activated_ability" or "activated ability" in type_line:
+        return "activated_ability"
+    if effect == "triggered_ability" or "triggered ability" in type_line:
+        return "triggered_ability"
+    return "spell"
+
+
+def _counter_target_is_legendary(target_card):
+    type_line = str((target_card or {}).get("type_line") or "").lower()
+    if "legendary" in type_line:
+        return True
+    if bool((target_card or {}).get("legendary")):
+        return True
+    supertypes = {
+        str(value or "").strip().lower()
+        for value in _as_list((target_card or {}).get("supertypes"))
+        if str(value or "").strip()
+    }
+    return "legendary" in supertypes
 
 
 def _counter_target_matches_constraints(counter_effect, target_card, stack_item=None):
@@ -9629,6 +9673,17 @@ def _counter_target_matches_constraints(counter_effect, target_card, stack_item=
         constraints.get("stack_object") or constraints.get("stack_object_type") or ""
     ).lower()
     if expected_stack_object == "spell" and not _counter_target_is_spell_object(target_card, stack_item):
+        return False
+    if expected_stack_object in {"activated_ability", "triggered_ability", "mana_ability"}:
+        if _counter_target_stack_object_kind(target_card, stack_item=stack_item) != expected_stack_object:
+            return False
+    if expected_stack_object == "ability":
+        if _counter_target_stack_object_kind(target_card, stack_item=stack_item) not in {
+            "activated_ability",
+            "triggered_ability",
+        }:
+            return False
+    if constraints.get("require_legendary") and not _counter_target_is_legendary(target_card):
         return False
 
     type_line = str((target_card or {}).get("type_line") or "").lower()
@@ -9706,6 +9761,19 @@ def _counter_target_matches_constraints(counter_effect, target_card, stack_item=
             if len(card_color_symbol_set(target_card)) < int(float(spell_color_count_min)):
                 return False
         except Exception:
+            return False
+    power_or_toughness_max = first_present_value(
+        constraints,
+        ("power_or_toughness_max", "target_power_or_toughness_max"),
+    )
+    if power_or_toughness_max is not None:
+        try:
+            max_value = int(float(power_or_toughness_max))
+            power = int(float((target_card or {}).get("power")))
+            toughness = int(float((target_card or {}).get("toughness")))
+        except Exception:
+            return False
+        if power > max_value and toughness > max_value:
             return False
     return True
 
