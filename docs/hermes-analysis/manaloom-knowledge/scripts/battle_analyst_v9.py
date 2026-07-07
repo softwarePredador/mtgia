@@ -40582,6 +40582,34 @@ def refresh_graveyard_count_creature_statics_for_player(
             )
             if moved:
                 row["state_based_action"] = "zero_toughness_to_graveyard"
+        if permanent.get("battle_model_scope") == STATIC_COUNT_POWER_TOUGHNESS_SCOPE:
+            apply_static_count_power_toughness(
+                permanent,
+                player,
+                all_players=participants,
+                turn=turn,
+                phase=phase,
+                emit_event=emit_events,
+            )
+            row.update(
+                {
+                    "static_count_power_toughness": permanent.get(
+                        "static_count_power_toughness_current"
+                    ),
+                    "power": permanent.get("power"),
+                    "toughness": permanent.get("toughness"),
+                }
+            )
+            touched = True
+            moved = move_zero_toughness_graveyard_count_creature_to_graveyard(
+                player,
+                permanent,
+                turn=turn,
+                phase=phase,
+                emit_event=emit_events,
+            )
+            if moved:
+                row["state_based_action"] = "zero_toughness_to_graveyard"
         if permanent.get("battle_model_scope") == STATIC_GRAVEYARD_THRESHOLD_SOURCE_BOOST_SCOPE:
             active = apply_static_graveyard_threshold_source_boost(
                 permanent,
@@ -40800,6 +40828,7 @@ STATIC_CONTROLLED_POWER_TOUGHNESS_SCOPE = "xmage_static_controlled_power_toughne
 STATIC_CONTROLLED_KEYWORD_SCOPE = "xmage_static_controlled_keyword_grant_v1"
 STATIC_GLOBAL_POWER_TOUGHNESS_SCOPE = "xmage_static_global_power_toughness_boost_v1"
 STATIC_GRAVEYARD_COUNT_POWER_TOUGHNESS_SCOPE = "xmage_static_source_power_toughness_equal_graveyard_count_v1"
+STATIC_COUNT_POWER_TOUGHNESS_SCOPE = "xmage_static_source_power_toughness_equal_count_v1"
 STATIC_GRAVEYARD_THRESHOLD_SOURCE_BOOST_SCOPE = "xmage_static_source_boost_if_graveyard_threshold_v1"
 STATIC_GRAVEYARD_COUNT_SOURCE_BOOST_SCOPE = "xmage_static_source_boost_equal_graveyard_count_v1"
 
@@ -40920,6 +40949,94 @@ def apply_static_graveyard_count_power_toughness(
             turn=turn,
             phase=phase,
             **replay_rule_fields(permanent),
+        )
+    return True
+
+
+def static_count_power_toughness_value(permanent, controller, all_players=None):
+    if not isinstance(permanent, dict):
+        return None, {}
+    if (
+        permanent.get("battle_model_scope") != STATIC_COUNT_POWER_TOUGHNESS_SCOPE
+        or permanent.get("static_effect") != "source_power_toughness_equal_count"
+    ):
+        return None, {}
+    participants = [player for player in (all_players or []) if player is not None]
+    if controller is not None and all(id(player) != id(controller) for player in participants):
+        participants.insert(0, controller)
+    opponents = [
+        player
+        for player in participants
+        if controller is None or id(player) != id(controller)
+    ]
+    count_effect = {
+        **permanent,
+        "stat_modifier_amount_source": permanent.get("static_power_toughness_source")
+        or permanent.get("stat_modifier_amount_source")
+        or "battlefield_permanent_count",
+        "_count_source_permanent": permanent,
+    }
+    count, replay_fields = _stat_modifier_count_from_source(controller, opponents, count_effect)
+    if count is None:
+        return None, replay_fields
+    base = _static_pt_int(permanent.get("static_power_toughness_base"), default=0)
+    multiplier = _static_pt_int(permanent.get("static_power_toughness_count_multiplier"), default=1)
+    return base + (int(count) * multiplier), {
+        **replay_fields,
+        "static_power_toughness_source": count_effect["stat_modifier_amount_source"],
+        "static_power_toughness_base": base,
+        "static_power_toughness_count_multiplier": multiplier,
+        "static_count_power_toughness_count": int(count),
+    }
+
+
+def apply_static_count_power_toughness(
+    permanent,
+    controller,
+    all_players=None,
+    *,
+    turn=None,
+    phase=None,
+    emit_event=False,
+):
+    value, replay_fields = static_count_power_toughness_value(
+        permanent,
+        controller,
+        all_players=all_players,
+    )
+    if value is None:
+        return False
+    before = {
+        "power": permanent.get("power"),
+        "toughness": permanent.get("toughness"),
+        "value": permanent.get("static_count_power_toughness_current"),
+    }
+    plus_one = _static_pt_int(permanent.get("plus_one_counters"), default=0)
+    minus_one = _static_pt_int(permanent.get("minus_one_counters"), default=0)
+    adjusted = int(value) + plus_one - minus_one
+    permanent["power"] = adjusted
+    permanent["toughness"] = adjusted
+    permanent["static_count_power_toughness_current"] = int(value)
+    permanent["_static_count_pt_base"] = int(value)
+    changed = (
+        before["power"] != permanent.get("power")
+        or before["toughness"] != permanent.get("toughness")
+        or before["value"] != int(value)
+    )
+    if emit_event and changed:
+        emit_replay_event(
+            "static_count_power_toughness_changed",
+            player=getattr(controller, "name", "?"),
+            card=permanent.get("name", "?"),
+            count=int(replay_fields.get("static_count_power_toughness_count") or value),
+            power_before=before["power"],
+            toughness_before=before["toughness"],
+            power_after=permanent.get("power"),
+            toughness_after=permanent.get("toughness"),
+            turn=turn,
+            phase=phase,
+            **replay_rule_fields(permanent),
+            **replay_fields,
         )
     return True
 
@@ -41162,7 +41279,8 @@ def move_zero_toughness_graveyard_count_creature_to_graveyard(
     if (
         player is None
         or not isinstance(permanent, dict)
-        or permanent.get("battle_model_scope") != STATIC_GRAVEYARD_COUNT_POWER_TOUGHNESS_SCOPE
+        or permanent.get("battle_model_scope")
+        not in {STATIC_GRAVEYARD_COUNT_POWER_TOUGHNESS_SCOPE, STATIC_COUNT_POWER_TOUGHNESS_SCOPE}
         or not is_battlefield_creature(permanent)
     ):
         return False
@@ -42033,6 +42151,14 @@ def prepare_entering_permanent(permanent, controller=None, all_players=None, tur
         except (TypeError, ValueError):
             permanent["toughness"] = permanent["power"] or 1
         apply_static_graveyard_count_power_toughness(
+            permanent,
+            controller,
+            all_players=all_players,
+            turn=turn,
+            phase="enter_battlefield",
+            emit_event=True,
+        )
+        apply_static_count_power_toughness(
             permanent,
             controller,
             all_players=all_players,

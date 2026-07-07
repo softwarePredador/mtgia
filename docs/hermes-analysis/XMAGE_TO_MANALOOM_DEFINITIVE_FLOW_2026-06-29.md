@@ -17119,6 +17119,81 @@ activated/triggered stack interaction, modal counters, non-spell targets, or
 counter-unless formulas outside the exact source/oracle matches listed above.
 Those remain separate adapter contracts.
 
+## PG599 Static Count Power/Toughness Checkpoint
+
+As of 2026-07-07, PG599 is applied and synced against the new server target.
+It closes the exact `SetBasePowerToughnessSourceEffect` subset where a
+creature's power and toughness are each equal to a simple battlefield count.
+
+Closed cards:
+
+- `Battle Squadron`
+- `Beast of Burden`
+- `Burrowguard Mentor`
+- `Crusader of Odric`
+- `Dakkon Blackblade`
+- `Dungrove Elder`
+- `Heedless One`
+- `Krovikan Mist`
+- `Molimo, Maro-Sorcerer`
+- `Nightmare`
+- `Reckless One`
+- `Scion of the Wild`
+- `Squelching Leeches`
+
+Runtime/modeling change:
+
+- `xmage_authoritative_exact_scope_split.py` now emits
+  `xmage_static_source_power_toughness_equal_count_v1` for exact
+  Oracle/XMage matches backed by `CreaturesYouControlCount`,
+  controlled/all-battlefield creature counts, controlled land counts, and
+  controlled/all-battlefield subtype counts;
+- formulas with additive components, hand size, domain, devotion, mana-symbol
+  count, color filters, `non-*` exclusions, or extra Oracle sentences remain
+  blocked for separate scopes;
+- `battle_analyst_v9.py` now recalculates this static count P/T through the
+  existing `battlefield_permanent_count` counter path on battlefield entry and
+  refresh, applies counters after the base value, emits
+  `static_count_power_toughness_changed`, and shares the zero-toughness
+  state-based action path;
+- `xmage_batch_pg_package_builder.py` and
+  `battle_package_end_to_end_validation.py` now generate and execute
+  `static_count_power_toughness` scenarios.
+
+Validation:
+
+- split produced `proposal_count=13` and
+  `safe_for_batch_pg_package_count=13`;
+- precheck found `13/13` target rows, `0` existing expected executable rows,
+  and `0` shadow rows to deprecate;
+- apply upserted `13` PostgreSQL rows and deprecated `0` shadow rows;
+- postcheck confirmed `13/13` promoted rows, `13/13` `verified_auto` rows,
+  and `13/13` rows with `oracle_hash`;
+- focused tests passed: splitter `4` and exact runtime `1`, plus Python
+  compilation for the touched splitter/runtime/package/E2E scripts;
+- PG -> SQLite/snapshot sync loaded `9384` PostgreSQL rows, updated `9148`
+  SQLite rows, and exported `6827` canonical snapshot rows;
+- metadata sync used `database_target=127.0.0.1:15432/halder`, matched `7795`
+  PostgreSQL cards, and left `deck_cards` at `2699/2699` matched;
+- E2E validation passed PostgreSQL, SQLite, snapshot, runtime lookup, and `13`
+  battle execution scenarios/events;
+- post-sync queue rebuild reduced `target_identity_count` from `25170` to
+  `25157`, `xmage_authoritative_source_count` from `24856` to `24843`, and
+  `xmage_authoritative_adapter_required_count` from `24856` to `24843`;
+- final exact-scope recheck returned `proposal_count=0`, and
+  `static_graveyard_count_pt_oracle_not_exact` fell from `35` to `22`;
+- final PG/Hermes/SQLite contract audit passed `51/51`;
+- final XMage strategy audit passed `26/26`;
+- final operational surface alignment audit passed;
+- final legacy contamination audit passed.
+
+Residual boundary: PG599 does not authorize additive battlefield+graveyard
+formulas, total mana value, differently named land counts, hand-size counts,
+domain/chroma/devotion counts, color permanent counts, nonland/non-Wall
+filters, tapped filters, source-exclusion formulas, or cards whose Oracle text
+contains additional unsupported static restrictions. Those remain separate
+adapter contracts.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

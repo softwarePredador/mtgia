@@ -444,8 +444,13 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "graveyard_count_threshold",
     "static_power_bonus",
     "static_toughness_bonus",
+    "stat_modifier_amount_source",
+    "static_power_toughness_base",
+    "static_power_toughness_count_multiplier",
     "static_power_bonus_per_graveyard_count",
     "static_toughness_bonus_per_graveyard_count",
+    "dynamic_power_equals_count",
+    "dynamic_toughness_equals_count",
     "dynamic_power_equals_graveyard_count",
     "dynamic_toughness_equals_graveyard_count",
     "_activated_rule_effects",
@@ -1076,6 +1081,92 @@ def aura_static_pt_execution_scenario_from_expected_rule(rule: dict[str, Any]) -
         "expected_toughness": expected_toughness,
         "expected_moved_to_graveyard": expected_toughness <= 0,
         "expected_source": rule["card_name"],
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
+def static_count_pt_execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_static_source_power_toughness_equal_count_v1":
+        return None
+    if required.get("static_power_toughness_source") != "battlefield_permanent_count":
+        return None
+    scope = str(required.get("battlefield_count_scope") or "controller_battlefield")
+    card_types = [str(value).lower() for value in required.get("battlefield_count_card_types") or []]
+    subtypes = [str(value).lower() for value in required.get("battlefield_count_subtypes") or []]
+    source_type_line = "Creature - Avatar"
+    matching_type_line = "Creature - Soldier"
+    if "land" in card_types:
+        source_type_line = "Creature - Avatar"
+        matching_type_line = "Land"
+    elif subtypes:
+        subtype_title = subtypes[0].title()
+        if subtypes[0] in {"plains", "island", "swamp", "mountain", "forest"}:
+            source_type_line = "Creature - Avatar"
+            matching_type_line = f"Land - {subtype_title}"
+        else:
+            source_type_line = f"Creature - {subtype_title}"
+            matching_type_line = f"Creature - {subtype_title}"
+    source_card = {
+        "name": rule["card_name"],
+        "type_line": source_type_line,
+        "effect": "creature",
+        "power": 0,
+        "toughness": 0,
+    }
+    controller_battlefield = []
+    opponent_battlefield = []
+    if scope == "all_battlefields":
+        controller_battlefield.append(
+            {
+                "name": f"E2E Controller Matching Permanent for {rule['card_name']}",
+                "type_line": matching_type_line,
+            }
+        )
+        opponent_battlefield.append(
+            {
+                "name": f"E2E Opponent Matching Permanent for {rule['card_name']}",
+                "type_line": matching_type_line,
+            }
+        )
+        expected_count = 3 if not card_types or "creature" in card_types or subtypes else 2
+    else:
+        if "creature" in card_types or (
+            subtypes and subtypes[0] not in {"plains", "island", "swamp", "mountain", "forest"}
+        ):
+            controller_battlefield.append(
+                {
+                    "name": f"E2E Matching Creature for {rule['card_name']}",
+                    "type_line": matching_type_line,
+                }
+            )
+            expected_count = 2
+        else:
+            controller_battlefield.extend(
+                [
+                    {
+                        "name": f"E2E Matching Land A for {rule['card_name']}",
+                        "type_line": matching_type_line,
+                    },
+                    {
+                        "name": f"E2E Matching Land B for {rule['card_name']}",
+                        "type_line": matching_type_line,
+                    },
+                ]
+            )
+            expected_count = 2
+    base = int(required.get("static_power_toughness_base") or 0)
+    multiplier = int(required.get("static_power_toughness_count_multiplier") or 1)
+    expected_value = base + (expected_count * multiplier)
+    return {
+        "name": f"{rule['card_name']} static count P/T recalculates",
+        "type": "static_count_power_toughness",
+        "card": source_card,
+        "controller_battlefield": controller_battlefield,
+        "opponent_battlefield": opponent_battlefield,
+        "expected_count": expected_count,
+        "expected_power": expected_value,
+        "expected_toughness": expected_value,
         "logical_rule_key": rule["logical_rule_key"],
     }
 
@@ -2911,6 +3002,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or static_controlled_keyword_execution_scenario_from_expected_rule(rule)
         or static_global_pt_execution_scenario_from_expected_rule(rule)
         or aura_static_pt_execution_scenario_from_expected_rule(rule)
+        or static_count_pt_execution_scenario_from_expected_rule(rule)
         or destroy_target_create_treasure_execution_scenario_from_expected_rule(rule)
         or creature_etb_create_treasure_execution_scenario_from_expected_rule(rule)
         or creature_dies_create_treasure_execution_scenario_from_expected_rule(rule)

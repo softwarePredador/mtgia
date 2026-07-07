@@ -4805,6 +4805,58 @@ def run_aura_static_power_toughness_attachment(
     }
 
 
+def run_static_count_power_toughness(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    source = battle.enrich_card({**card, **battle.get_card_effect(card)})
+    active = battle.Player(str(scenario.get("player") or "Static Count Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Static Count Opponent"), None, [])
+    active.battlefield.extend(dict(card) for card in scenario.get("controller_battlefield") or [])
+    active.battlefield.append(source)
+    opponent.battlefield.extend(dict(card) for card in scenario.get("opponent_battlefield") or [])
+    before_events = len(events)
+    battle.refresh_graveyard_count_creature_statics_for_player(
+        active,
+        turn=int(scenario.get("turn") or 3),
+        phase="e2e_static_count_pt",
+        emit_events=True,
+        all_players=[active, opponent],
+    )
+    expected_power = int(scenario["expected_power"])
+    expected_toughness = int(scenario["expected_toughness"])
+    if int(source.get("power") or 0) != expected_power:
+        fail("battle_execution", f"{card['name']} power={source.get('power')}, expected {expected_power}")
+    if int(source.get("toughness") or 0) != expected_toughness:
+        fail("battle_execution", f"{card['name']} toughness={source.get('toughness')}, expected {expected_toughness}")
+    changed_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "static_count_power_toughness_changed"
+            and data.get("card") == card.get("name")
+        ),
+        None,
+    )
+    if changed_event is None:
+        fail("battle_events", f"missing {card['name']} static_count_power_toughness_changed event")
+    expected_count = int(scenario["expected_count"])
+    if int(changed_event.get("static_count_power_toughness_count") or 0) != expected_count:
+        fail(
+            "battle_events",
+            f"{card['name']} count={changed_event.get('static_count_power_toughness_count')}, expected {expected_count}",
+        )
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "power": source.get("power"),
+        "toughness": source.get("toughness"),
+        "count": changed_event.get("static_count_power_toughness_count"),
+    }
+
+
 SCENARIO_RUNNERS = {
     "attack_self_boost": run_attack_self_boost,
     "aura_static_power_toughness_attachment": run_aura_static_power_toughness_attachment,
@@ -4847,6 +4899,7 @@ SCENARIO_RUNNERS = {
     "spell_cast_gain_life": run_spell_cast_gain_life,
     "stat_modifier_until_eot": run_stat_modifier_until_eot,
     "static_controlled_keyword": run_static_controlled_keyword,
+    "static_count_power_toughness": run_static_count_power_toughness,
     "static_global_power_toughness_boost": run_static_global_power_toughness_boost,
     "target_creature_cant_block": run_target_creature_cant_block,
     "token_maker_attack_each_opponent": run_token_maker_attack_each_opponent,

@@ -1406,6 +1406,54 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_static_count_power_toughness_counts_battlefield_creatures_and_counters(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        beast = {
+            "name": "Beast of Burden",
+            "type_line": "Artifact Creature - Golem",
+            "effect": "creature",
+            "power": 0,
+            "toughness": 0,
+            "plus_one_counters": 1,
+            "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+            "static_effect": "source_power_toughness_equal_count",
+            "static_power_toughness_source": "battlefield_permanent_count",
+            "stat_modifier_amount_source": "battlefield_permanent_count",
+            "battlefield_count_scope": "all_battlefields",
+            "battlefield_count_card_types": ["creature"],
+            "static_power_toughness_base": 0,
+            "static_power_toughness_count_multiplier": 1,
+        }
+        active.battlefield = [
+            {"name": "Active Bear", "type_line": "Creature - Bear"},
+            beast,
+        ]
+        opponent.battlefield = [
+            {"name": "Opponent Soldier", "type_line": "Creature - Soldier"},
+            {"name": "Opponent Relic", "type_line": "Artifact"},
+        ]
+
+        self.battle.refresh_graveyard_count_creature_statics_for_player(
+            active,
+            turn=4,
+            phase="test",
+            emit_events=True,
+            all_players=[active, opponent],
+        )
+
+        self.assertEqual(beast["static_count_power_toughness_current"], 3)
+        self.assertEqual(beast["power"], 4)
+        self.assertEqual(beast["toughness"], 4)
+        self.assertTrue(
+            any(
+                event == "static_count_power_toughness_changed"
+                and data.get("card") == "Beast of Burden"
+                and data.get("static_count_power_toughness_count") == 3
+                for event, data in self.events
+            )
+        )
+
     def test_static_graveyard_threshold_source_boost_toggles_without_cumulative_bonus(self) -> None:
         active = self.battle.Player("Active", None, [])
         active.graveyard = [

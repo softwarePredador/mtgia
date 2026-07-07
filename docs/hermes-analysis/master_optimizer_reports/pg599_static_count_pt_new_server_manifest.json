@@ -1,0 +1,1383 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg599_static_count_pt_new_server_pg599_s_20260707_065427",
+  "deploy_id": "pg599_static_count_pt_new_server",
+  "execution_scenarios": [
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Battle Squadron",
+        "power": 0,
+        "toughness": 0,
+        "type_line": "Creature - Avatar"
+      },
+      "controller_battlefield": [
+        {
+          "name": "E2E Matching Creature for Battle Squadron",
+          "type_line": "Creature - Soldier"
+        }
+      ],
+      "expected_count": 2,
+      "expected_power": 2,
+      "expected_toughness": 2,
+      "logical_rule_key": "battle_rule_v1:ec791b2d863c71363969c862ca3ccf2c",
+      "name": "Battle Squadron static count P/T recalculates",
+      "opponent_battlefield": [],
+      "type": "static_count_power_toughness"
+    },
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Beast of Burden",
+        "power": 0,
+        "toughness": 0,
+        "type_line": "Creature - Avatar"
+      },
+      "controller_battlefield": [
+        {
+          "name": "E2E Controller Matching Permanent for Beast of Burden",
+          "type_line": "Creature - Soldier"
+        }
+      ],
+      "expected_count": 3,
+      "expected_power": 3,
+      "expected_toughness": 3,
+      "logical_rule_key": "battle_rule_v1:136b70454eb9fcca66ba5ece186ac353",
+      "name": "Beast of Burden static count P/T recalculates",
+      "opponent_battlefield": [
+        {
+          "name": "E2E Opponent Matching Permanent for Beast of Burden",
+          "type_line": "Creature - Soldier"
+        }
+      ],
+      "type": "static_count_power_toughness"
+    },
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Burrowguard Mentor",
+        "power": 0,
+        "toughness": 0,
+        "type_line": "Creature - Avatar"
+      },
+      "controller_battlefield": [
+        {
+          "name": "E2E Matching Creature for Burrowguard Mentor",
+          "type_line": "Creature - Soldier"
+        }
+      ],
+      "expected_count": 2,
+      "expected_power": 2,
+      "expected_toughness": 2,
+      "logical_rule_key": "battle_rule_v1:e3adc8c2dafa4b887700286f69f2d8c2",
+      "name": "Burrowguard Mentor static count P/T recalculates",
+      "opponent_battlefield": [],
+      "type": "static_count_power_toughness"
+    },
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Crusader of Odric",
+        "power": 0,
+        "toughness": 0,
+        "type_line": "Creature - Avatar"
+      },
+      "controller_battlefield": [
+        {
+          "name": "E2E Matching Creature for Crusader of Odric",
+          "type_line": "Creature - Soldier"
+        }
+      ],
+      "expected_count": 2,
+      "expected_power": 2,
+      "expected_toughness": 2,
+      "logical_rule_key": "battle_rule_v1:820a8ad5c37c5719b38b1e539e39da2e",
+      "name": "Crusader of Odric static count P/T recalculates",
+      "opponent_battlefield": [],
+      "type": "static_count_power_toughness"
+    },
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Dakkon Blackblade",
+        "power": 0,
+        "toughness": 0,
+        "type_line": "Creature - Avatar"
+      },
+      "controller_battlefield": [
+        {
+          "name": "E2E Matching Land A for Dakkon Blackblade",
+          "type_line": "Land"
+        },
+        {
+          "name": "E2E Matching Land B for Dakkon Blackblade",
+          "type_line": "Land"
+        }
+      ],
+      "expected_count": 2,
+      "expected_power": 2,
+      "expected_toughness": 2,
+      "logical_rule_key": "battle_rule_v1:1f42f00fc1cc603f1c65780965053847",
+      "name": "Dakkon Blackblade static count P/T recalculates",
+      "opponent_battlefield": [],
+      "type": "static_count_power_toughness"
+    },
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Dungrove Elder",
+        "power": 0,
+        "toughness": 0,
+        "type_line": "Creature - Avatar"
+      },
+      "controller_battlefield": [
+        {
+          "name": "E2E Matching Land A for Dungrove Elder",
+          "type_line": "Land - Forest"
+        },
+        {
+          "name": "E2E Matching Land B for Dungrove Elder",
+          "type_line": "Land - Forest"
+        }
+      ],
+      "expected_count": 2,
+      "expected_power": 2,
+      "expected_toughness": 2,
+      "logical_rule_key": "battle_rule_v1:bf8a60853984464cbccbc04390912c71",
+      "name": "Dungrove Elder static count P/T recalculates",
+      "opponent_battlefield": [],
+      "type": "static_count_power_toughness"
+    },
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Heedless One",
+        "power": 0,
+        "toughness": 0,
+        "type_line": "Creature - Elf"
+      },
+      "controller_battlefield": [
+        {
+          "name": "E2E Controller Matching Permanent for Heedless One",
+          "type_line": "Creature - Elf"
+        }
+      ],
+      "expected_count": 3,
+      "expected_power": 3,
+      "expected_toughness": 3,
+      "logical_rule_key": "battle_rule_v1:cdaf89e78885301d5ad6f4a1b359e116",
+      "name": "Heedless One static count P/T recalculates",
+      "opponent_battlefield": [
+        {
+          "name": "E2E Opponent Matching Permanent for Heedless One",
+          "type_line": "Creature - Elf"
+        }
+      ],
+      "type": "static_count_power_toughness"
+    },
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Krovikan Mist",
+        "power": 0,
+        "toughness": 0,
+        "type_line": "Creature - Illusion"
+      },
+      "controller_battlefield": [
+        {
+          "name": "E2E Controller Matching Permanent for Krovikan Mist",
+          "type_line": "Creature - Illusion"
+        }
+      ],
+      "expected_count": 3,
+      "expected_power": 3,
+      "expected_toughness": 3,
+      "logical_rule_key": "battle_rule_v1:80e25825f55c60b7d9d000cb94a4b18a",
+      "name": "Krovikan Mist static count P/T recalculates",
+      "opponent_battlefield": [
+        {
+          "name": "E2E Opponent Matching Permanent for Krovikan Mist",
+          "type_line": "Creature - Illusion"
+        }
+      ],
+      "type": "static_count_power_toughness"
+    },
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Molimo, Maro-Sorcerer",
+        "power": 0,
+        "toughness": 0,
+        "type_line": "Creature - Avatar"
+      },
+      "controller_battlefield": [
+        {
+          "name": "E2E Matching Land A for Molimo, Maro-Sorcerer",
+          "type_line": "Land"
+        },
+        {
+          "name": "E2E Matching Land B for Molimo, Maro-Sorcerer",
+          "type_line": "Land"
+        }
+      ],
+      "expected_count": 2,
+      "expected_power": 2,
+      "expected_toughness": 2,
+      "logical_rule_key": "battle_rule_v1:7543ee17ee09db67db4dc4116b8d615f",
+      "name": "Molimo, Maro-Sorcerer static count P/T recalculates",
+      "opponent_battlefield": [],
+      "type": "static_count_power_toughness"
+    },
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Nightmare",
+        "power": 0,
+        "toughness": 0,
+        "type_line": "Creature - Avatar"
+      },
+      "controller_battlefield": [
+        {
+          "name": "E2E Matching Land A for Nightmare",
+          "type_line": "Land - Swamp"
+        },
+        {
+          "name": "E2E Matching Land B for Nightmare",
+          "type_line": "Land - Swamp"
+        }
+      ],
+      "expected_count": 2,
+      "expected_power": 2,
+      "expected_toughness": 2,
+      "logical_rule_key": "battle_rule_v1:b41d5f32080b20ec833bc33817b776f4",
+      "name": "Nightmare static count P/T recalculates",
+      "opponent_battlefield": [],
+      "type": "static_count_power_toughness"
+    },
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Reckless One",
+        "power": 0,
+        "toughness": 0,
+        "type_line": "Creature - Goblin"
+      },
+      "controller_battlefield": [
+        {
+          "name": "E2E Controller Matching Permanent for Reckless One",
+          "type_line": "Creature - Goblin"
+        }
+      ],
+      "expected_count": 3,
+      "expected_power": 3,
+      "expected_toughness": 3,
+      "logical_rule_key": "battle_rule_v1:ec088bc0a46b257e3b5529abc139942b",
+      "name": "Reckless One static count P/T recalculates",
+      "opponent_battlefield": [
+        {
+          "name": "E2E Opponent Matching Permanent for Reckless One",
+          "type_line": "Creature - Goblin"
+        }
+      ],
+      "type": "static_count_power_toughness"
+    },
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Scion of the Wild",
+        "power": 0,
+        "toughness": 0,
+        "type_line": "Creature - Avatar"
+      },
+      "controller_battlefield": [
+        {
+          "name": "E2E Matching Creature for Scion of the Wild",
+          "type_line": "Creature - Soldier"
+        }
+      ],
+      "expected_count": 2,
+      "expected_power": 2,
+      "expected_toughness": 2,
+      "logical_rule_key": "battle_rule_v1:820a8ad5c37c5719b38b1e539e39da2e",
+      "name": "Scion of the Wild static count P/T recalculates",
+      "opponent_battlefield": [],
+      "type": "static_count_power_toughness"
+    },
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Squelching Leeches",
+        "power": 0,
+        "toughness": 0,
+        "type_line": "Creature - Avatar"
+      },
+      "controller_battlefield": [
+        {
+          "name": "E2E Matching Land A for Squelching Leeches",
+          "type_line": "Land - Swamp"
+        },
+        {
+          "name": "E2E Matching Land B for Squelching Leeches",
+          "type_line": "Land - Swamp"
+        }
+      ],
+      "expected_count": 2,
+      "expected_power": 2,
+      "expected_toughness": 2,
+      "logical_rule_key": "battle_rule_v1:7f72518fa923e6cd43ad930f2251327c",
+      "name": "Squelching Leeches static count P/T recalculates",
+      "opponent_battlefield": [],
+      "type": "static_count_power_toughness"
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Battle Squadron",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ec791b2d863c71363969c862ca3ccf2c",
+      "min_rule_version": 2,
+      "normalized_name": "battle squadron",
+      "oracle_hash": "45704bc9a005b8331fb2532257474fb7",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+        "battlefield_count_card_types": [
+          "creature"
+        ],
+        "battlefield_count_scope": "controller_battlefield",
+        "dynamic_power_equals_count": true,
+        "dynamic_toughness_equals_count": true,
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "stat_modifier_amount_source": "battlefield_permanent_count",
+        "static_effect": "source_power_toughness_equal_count",
+        "static_power_toughness_base": 0,
+        "static_power_toughness_count_multiplier": 1,
+        "static_power_toughness_source": "battlefield_permanent_count",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SetBasePowerToughnessSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Beast of Burden",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:136b70454eb9fcca66ba5ece186ac353",
+      "min_rule_version": 2,
+      "normalized_name": "beast of burden",
+      "oracle_hash": "de4db2713d1b3a583bb8820b36623106",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+        "battlefield_count_card_types": [
+          "creature"
+        ],
+        "battlefield_count_scope": "all_battlefields",
+        "dynamic_power_equals_count": true,
+        "dynamic_toughness_equals_count": true,
+        "effect": "creature",
+        "stat_modifier_amount_source": "battlefield_permanent_count",
+        "static_effect": "source_power_toughness_equal_count",
+        "static_power_toughness_base": 0,
+        "static_power_toughness_count_multiplier": 1,
+        "static_power_toughness_source": "battlefield_permanent_count",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SetBasePowerToughnessSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Burrowguard Mentor",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e3adc8c2dafa4b887700286f69f2d8c2",
+      "min_rule_version": 2,
+      "normalized_name": "burrowguard mentor",
+      "oracle_hash": "281c52b88eea46d985060ab24e2364ae",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+        "battlefield_count_card_types": [
+          "creature"
+        ],
+        "battlefield_count_scope": "controller_battlefield",
+        "dynamic_power_equals_count": true,
+        "dynamic_toughness_equals_count": true,
+        "effect": "creature",
+        "keywords": [
+          "trample"
+        ],
+        "stat_modifier_amount_source": "battlefield_permanent_count",
+        "static_effect": "source_power_toughness_equal_count",
+        "static_power_toughness_base": 0,
+        "static_power_toughness_count_multiplier": 1,
+        "static_power_toughness_source": "battlefield_permanent_count",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SetBasePowerToughnessSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Crusader of Odric",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:820a8ad5c37c5719b38b1e539e39da2e",
+      "min_rule_version": 2,
+      "normalized_name": "crusader of odric",
+      "oracle_hash": "6a5d332813b3838fe0d0cfc32180acf6",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+        "battlefield_count_card_types": [
+          "creature"
+        ],
+        "battlefield_count_scope": "controller_battlefield",
+        "dynamic_power_equals_count": true,
+        "dynamic_toughness_equals_count": true,
+        "effect": "creature",
+        "stat_modifier_amount_source": "battlefield_permanent_count",
+        "static_effect": "source_power_toughness_equal_count",
+        "static_power_toughness_base": 0,
+        "static_power_toughness_count_multiplier": 1,
+        "static_power_toughness_source": "battlefield_permanent_count",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SetBasePowerToughnessSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Dakkon Blackblade",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1f42f00fc1cc603f1c65780965053847",
+      "min_rule_version": 2,
+      "normalized_name": "dakkon blackblade",
+      "oracle_hash": "c708f85e86aa992a817fabcefac3a73f",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+        "battlefield_count_card_types": [
+          "land"
+        ],
+        "battlefield_count_scope": "controller_battlefield",
+        "dynamic_power_equals_count": true,
+        "dynamic_toughness_equals_count": true,
+        "effect": "creature",
+        "stat_modifier_amount_source": "battlefield_permanent_count",
+        "static_effect": "source_power_toughness_equal_count",
+        "static_power_toughness_base": 0,
+        "static_power_toughness_count_multiplier": 1,
+        "static_power_toughness_source": "battlefield_permanent_count",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SetBasePowerToughnessSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Dungrove Elder",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:bf8a60853984464cbccbc04390912c71",
+      "min_rule_version": 2,
+      "normalized_name": "dungrove elder",
+      "oracle_hash": "a7aa0aa484ec0503200ab026b5f225bb",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+        "battlefield_count_scope": "controller_battlefield",
+        "battlefield_count_subtypes": [
+          "forest"
+        ],
+        "dynamic_power_equals_count": true,
+        "dynamic_toughness_equals_count": true,
+        "effect": "creature",
+        "keywords": [
+          "hexproof"
+        ],
+        "stat_modifier_amount_source": "battlefield_permanent_count",
+        "static_effect": "source_power_toughness_equal_count",
+        "static_power_toughness_base": 0,
+        "static_power_toughness_count_multiplier": 1,
+        "static_power_toughness_source": "battlefield_permanent_count",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SetBasePowerToughnessSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Heedless One",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cdaf89e78885301d5ad6f4a1b359e116",
+      "min_rule_version": 2,
+      "normalized_name": "heedless one",
+      "oracle_hash": "61ce4fccfa7d353167a5a8f59e1a0e30",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+        "battlefield_count_scope": "all_battlefields",
+        "battlefield_count_subtypes": [
+          "elf"
+        ],
+        "dynamic_power_equals_count": true,
+        "dynamic_toughness_equals_count": true,
+        "effect": "creature",
+        "keywords": [
+          "trample"
+        ],
+        "stat_modifier_amount_source": "battlefield_permanent_count",
+        "static_effect": "source_power_toughness_equal_count",
+        "static_power_toughness_base": 0,
+        "static_power_toughness_count_multiplier": 1,
+        "static_power_toughness_source": "battlefield_permanent_count",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SetBasePowerToughnessSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Krovikan Mist",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:80e25825f55c60b7d9d000cb94a4b18a",
+      "min_rule_version": 2,
+      "normalized_name": "krovikan mist",
+      "oracle_hash": "2957084da1b25a6bf23e43d11b2d3378",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+        "battlefield_count_scope": "all_battlefields",
+        "battlefield_count_subtypes": [
+          "illusion"
+        ],
+        "dynamic_power_equals_count": true,
+        "dynamic_toughness_equals_count": true,
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "stat_modifier_amount_source": "battlefield_permanent_count",
+        "static_effect": "source_power_toughness_equal_count",
+        "static_power_toughness_base": 0,
+        "static_power_toughness_count_multiplier": 1,
+        "static_power_toughness_source": "battlefield_permanent_count",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SetBasePowerToughnessSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Molimo, Maro-Sorcerer",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7543ee17ee09db67db4dc4116b8d615f",
+      "min_rule_version": 2,
+      "normalized_name": "molimo, maro-sorcerer",
+      "oracle_hash": "060d413dce1098ec0f36f6ab6821b34d",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+        "battlefield_count_card_types": [
+          "land"
+        ],
+        "battlefield_count_scope": "controller_battlefield",
+        "dynamic_power_equals_count": true,
+        "dynamic_toughness_equals_count": true,
+        "effect": "creature",
+        "keywords": [
+          "trample"
+        ],
+        "stat_modifier_amount_source": "battlefield_permanent_count",
+        "static_effect": "source_power_toughness_equal_count",
+        "static_power_toughness_base": 0,
+        "static_power_toughness_count_multiplier": 1,
+        "static_power_toughness_source": "battlefield_permanent_count",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SetBasePowerToughnessSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Nightmare",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b41d5f32080b20ec833bc33817b776f4",
+      "min_rule_version": 2,
+      "normalized_name": "nightmare",
+      "oracle_hash": "91872b8e6ea68993ef8da8311ad33a9c",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+        "battlefield_count_scope": "controller_battlefield",
+        "battlefield_count_subtypes": [
+          "swamp"
+        ],
+        "dynamic_power_equals_count": true,
+        "dynamic_toughness_equals_count": true,
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "stat_modifier_amount_source": "battlefield_permanent_count",
+        "static_effect": "source_power_toughness_equal_count",
+        "static_power_toughness_base": 0,
+        "static_power_toughness_count_multiplier": 1,
+        "static_power_toughness_source": "battlefield_permanent_count",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SetBasePowerToughnessSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Reckless One",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ec088bc0a46b257e3b5529abc139942b",
+      "min_rule_version": 2,
+      "normalized_name": "reckless one",
+      "oracle_hash": "9bef702083e872f779609fcc77cb3cf6",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+        "battlefield_count_scope": "all_battlefields",
+        "battlefield_count_subtypes": [
+          "goblin"
+        ],
+        "dynamic_power_equals_count": true,
+        "dynamic_toughness_equals_count": true,
+        "effect": "creature",
+        "keywords": [
+          "haste"
+        ],
+        "stat_modifier_amount_source": "battlefield_permanent_count",
+        "static_effect": "source_power_toughness_equal_count",
+        "static_power_toughness_base": 0,
+        "static_power_toughness_count_multiplier": 1,
+        "static_power_toughness_source": "battlefield_permanent_count",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SetBasePowerToughnessSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Scion of the Wild",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:820a8ad5c37c5719b38b1e539e39da2e",
+      "min_rule_version": 2,
+      "normalized_name": "scion of the wild",
+      "oracle_hash": "2640eba1d95249d87c19b490d51ad4bd",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+        "battlefield_count_card_types": [
+          "creature"
+        ],
+        "battlefield_count_scope": "controller_battlefield",
+        "dynamic_power_equals_count": true,
+        "dynamic_toughness_equals_count": true,
+        "effect": "creature",
+        "stat_modifier_amount_source": "battlefield_permanent_count",
+        "static_effect": "source_power_toughness_equal_count",
+        "static_power_toughness_base": 0,
+        "static_power_toughness_count_multiplier": 1,
+        "static_power_toughness_source": "battlefield_permanent_count",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SetBasePowerToughnessSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Squelching Leeches",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7f72518fa923e6cd43ad930f2251327c",
+      "min_rule_version": 2,
+      "normalized_name": "squelching leeches",
+      "oracle_hash": "c09b514e4887dee491cece6a50fe7079",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+        "battlefield_count_scope": "controller_battlefield",
+        "battlefield_count_subtypes": [
+          "swamp"
+        ],
+        "dynamic_power_equals_count": true,
+        "dynamic_toughness_equals_count": true,
+        "effect": "creature",
+        "stat_modifier_amount_source": "battlefield_permanent_count",
+        "static_effect": "source_power_toughness_equal_count",
+        "static_power_toughness_base": 0,
+        "static_power_toughness_count_multiplier": 1,
+        "static_power_toughness_source": "battlefield_permanent_count",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SetBasePowerToughnessSourceEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_static_source_power_toughness_equal_count": 13
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg599_static_count_pt_new_server_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg599_static_count_pt_new_server_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg599_static_count_pt_new_server_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg599_static_count_pt_new_server_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg599_static_count_pt_new_server_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg599_static_count_pt_new_server_rollback.sql"
+  },
+  "generated_at": "2026-07-07T06:54:27+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Battle Squadron"
+      },
+      "card_name": "Battle Squadron",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ec791b2d863c71363969c862ca3ccf2c",
+      "normalized_name": "battle squadron",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+        "battlefield_count_card_types": [
+          "creature"
+        ],
+        "battlefield_count_scope": "controller_battlefield",
+        "dynamic_power_equals_count": true,
+        "dynamic_toughness_equals_count": true,
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "stat_modifier_amount_source": "battlefield_permanent_count",
+        "static_effect": "source_power_toughness_equal_count",
+        "static_power_toughness_base": 0,
+        "static_power_toughness_count_multiplier": 1,
+        "static_power_toughness_source": "battlefield_permanent_count",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SetBasePowerToughnessSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Beast of Burden"
+      },
+      "card_name": "Beast of Burden",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:136b70454eb9fcca66ba5ece186ac353",
+      "normalized_name": "beast of burden",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+        "battlefield_count_card_types": [
+          "creature"
+        ],
+        "battlefield_count_scope": "all_battlefields",
+        "dynamic_power_equals_count": true,
+        "dynamic_toughness_equals_count": true,
+        "effect": "creature",
+        "stat_modifier_amount_source": "battlefield_permanent_count",
+        "static_effect": "source_power_toughness_equal_count",
+        "static_power_toughness_base": 0,
+        "static_power_toughness_count_multiplier": 1,
+        "static_power_toughness_source": "battlefield_permanent_count",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SetBasePowerToughnessSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Burrowguard Mentor"
+      },
+      "card_name": "Burrowguard Mentor",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e3adc8c2dafa4b887700286f69f2d8c2",
+      "normalized_name": "burrowguard mentor",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+        "battlefield_count_card_types": [
+          "creature"
+        ],
+        "battlefield_count_scope": "controller_battlefield",
+        "dynamic_power_equals_count": true,
+        "dynamic_toughness_equals_count": true,
+        "effect": "creature",
+        "keywords": [
+          "trample"
+        ],
+        "stat_modifier_amount_source": "battlefield_permanent_count",
+        "static_effect": "source_power_toughness_equal_count",
+        "static_power_toughness_base": 0,
+        "static_power_toughness_count_multiplier": 1,
+        "static_power_toughness_source": "battlefield_permanent_count",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SetBasePowerToughnessSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Crusader of Odric"
+      },
+      "card_name": "Crusader of Odric",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:820a8ad5c37c5719b38b1e539e39da2e",
+      "normalized_name": "crusader of odric",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+        "battlefield_count_card_types": [
+          "creature"
+        ],
+        "battlefield_count_scope": "controller_battlefield",
+        "dynamic_power_equals_count": true,
+        "dynamic_toughness_equals_count": true,
+        "effect": "creature",
+        "stat_modifier_amount_source": "battlefield_permanent_count",
+        "static_effect": "source_power_toughness_equal_count",
+        "static_power_toughness_base": 0,
+        "static_power_toughness_count_multiplier": 1,
+        "static_power_toughness_source": "battlefield_permanent_count",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SetBasePowerToughnessSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Dakkon Blackblade"
+      },
+      "card_name": "Dakkon Blackblade",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1f42f00fc1cc603f1c65780965053847",
+      "normalized_name": "dakkon blackblade",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+        "battlefield_count_card_types": [
+          "land"
+        ],
+        "battlefield_count_scope": "controller_battlefield",
+        "dynamic_power_equals_count": true,
+        "dynamic_toughness_equals_count": true,
+        "effect": "creature",
+        "stat_modifier_amount_source": "battlefield_permanent_count",
+        "static_effect": "source_power_toughness_equal_count",
+        "static_power_toughness_base": 0,
+        "static_power_toughness_count_multiplier": 1,
+        "static_power_toughness_source": "battlefield_permanent_count",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SetBasePowerToughnessSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Dungrove Elder"
+      },
+      "card_name": "Dungrove Elder",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:bf8a60853984464cbccbc04390912c71",
+      "normalized_name": "dungrove elder",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+        "battlefield_count_scope": "controller_battlefield",
+        "battlefield_count_subtypes": [
+          "forest"
+        ],
+        "dynamic_power_equals_count": true,
+        "dynamic_toughness_equals_count": true,
+        "effect": "creature",
+        "keywords": [
+          "hexproof"
+        ],
+        "stat_modifier_amount_source": "battlefield_permanent_count",
+        "static_effect": "source_power_toughness_equal_count",
+        "static_power_toughness_base": 0,
+        "static_power_toughness_count_multiplier": 1,
+        "static_power_toughness_source": "battlefield_permanent_count",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SetBasePowerToughnessSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Heedless One"
+      },
+      "card_name": "Heedless One",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cdaf89e78885301d5ad6f4a1b359e116",
+      "normalized_name": "heedless one",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+        "battlefield_count_scope": "all_battlefields",
+        "battlefield_count_subtypes": [
+          "elf"
+        ],
+        "dynamic_power_equals_count": true,
+        "dynamic_toughness_equals_count": true,
+        "effect": "creature",
+        "keywords": [
+          "trample"
+        ],
+        "stat_modifier_amount_source": "battlefield_permanent_count",
+        "static_effect": "source_power_toughness_equal_count",
+        "static_power_toughness_base": 0,
+        "static_power_toughness_count_multiplier": 1,
+        "static_power_toughness_source": "battlefield_permanent_count",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SetBasePowerToughnessSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Krovikan Mist"
+      },
+      "card_name": "Krovikan Mist",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:80e25825f55c60b7d9d000cb94a4b18a",
+      "normalized_name": "krovikan mist",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+        "battlefield_count_scope": "all_battlefields",
+        "battlefield_count_subtypes": [
+          "illusion"
+        ],
+        "dynamic_power_equals_count": true,
+        "dynamic_toughness_equals_count": true,
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "stat_modifier_amount_source": "battlefield_permanent_count",
+        "static_effect": "source_power_toughness_equal_count",
+        "static_power_toughness_base": 0,
+        "static_power_toughness_count_multiplier": 1,
+        "static_power_toughness_source": "battlefield_permanent_count",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SetBasePowerToughnessSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Molimo, Maro-Sorcerer"
+      },
+      "card_name": "Molimo, Maro-Sorcerer",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7543ee17ee09db67db4dc4116b8d615f",
+      "normalized_name": "molimo, maro-sorcerer",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+        "battlefield_count_card_types": [
+          "land"
+        ],
+        "battlefield_count_scope": "controller_battlefield",
+        "dynamic_power_equals_count": true,
+        "dynamic_toughness_equals_count": true,
+        "effect": "creature",
+        "keywords": [
+          "trample"
+        ],
+        "stat_modifier_amount_source": "battlefield_permanent_count",
+        "static_effect": "source_power_toughness_equal_count",
+        "static_power_toughness_base": 0,
+        "static_power_toughness_count_multiplier": 1,
+        "static_power_toughness_source": "battlefield_permanent_count",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SetBasePowerToughnessSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Nightmare"
+      },
+      "card_name": "Nightmare",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b41d5f32080b20ec833bc33817b776f4",
+      "normalized_name": "nightmare",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+        "battlefield_count_scope": "controller_battlefield",
+        "battlefield_count_subtypes": [
+          "swamp"
+        ],
+        "dynamic_power_equals_count": true,
+        "dynamic_toughness_equals_count": true,
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "stat_modifier_amount_source": "battlefield_permanent_count",
+        "static_effect": "source_power_toughness_equal_count",
+        "static_power_toughness_base": 0,
+        "static_power_toughness_count_multiplier": 1,
+        "static_power_toughness_source": "battlefield_permanent_count",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SetBasePowerToughnessSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Reckless One"
+      },
+      "card_name": "Reckless One",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ec088bc0a46b257e3b5529abc139942b",
+      "normalized_name": "reckless one",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+        "battlefield_count_scope": "all_battlefields",
+        "battlefield_count_subtypes": [
+          "goblin"
+        ],
+        "dynamic_power_equals_count": true,
+        "dynamic_toughness_equals_count": true,
+        "effect": "creature",
+        "keywords": [
+          "haste"
+        ],
+        "stat_modifier_amount_source": "battlefield_permanent_count",
+        "static_effect": "source_power_toughness_equal_count",
+        "static_power_toughness_base": 0,
+        "static_power_toughness_count_multiplier": 1,
+        "static_power_toughness_source": "battlefield_permanent_count",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SetBasePowerToughnessSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Scion of the Wild"
+      },
+      "card_name": "Scion of the Wild",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:820a8ad5c37c5719b38b1e539e39da2e",
+      "normalized_name": "scion of the wild",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+        "battlefield_count_card_types": [
+          "creature"
+        ],
+        "battlefield_count_scope": "controller_battlefield",
+        "dynamic_power_equals_count": true,
+        "dynamic_toughness_equals_count": true,
+        "effect": "creature",
+        "stat_modifier_amount_source": "battlefield_permanent_count",
+        "static_effect": "source_power_toughness_equal_count",
+        "static_power_toughness_base": 0,
+        "static_power_toughness_count_multiplier": 1,
+        "static_power_toughness_source": "battlefield_permanent_count",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SetBasePowerToughnessSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Squelching Leeches"
+      },
+      "card_name": "Squelching Leeches",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7f72518fa923e6cd43ad930f2251327c",
+      "normalized_name": "squelching leeches",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+        "battlefield_count_scope": "controller_battlefield",
+        "battlefield_count_subtypes": [
+          "swamp"
+        ],
+        "dynamic_power_equals_count": true,
+        "dynamic_toughness_equals_count": true,
+        "effect": "creature",
+        "stat_modifier_amount_source": "battlefield_permanent_count",
+        "static_effect": "source_power_toughness_equal_count",
+        "static_power_toughness_base": 0,
+        "static_power_toughness_count_multiplier": 1,
+        "static_power_toughness_source": "battlefield_permanent_count",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SetBasePowerToughnessSourceEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Battle Squadron",
+    "Beast of Burden",
+    "Burrowguard Mentor",
+    "Crusader of Odric",
+    "Dakkon Blackblade",
+    "Dungrove Elder",
+    "Heedless One",
+    "Krovikan Mist",
+    "Molimo, Maro-Sorcerer",
+    "Nightmare",
+    "Reckless One",
+    "Scion of the Wild",
+    "Squelching Leeches"
+  ],
+  "selected_count": 13,
+  "slug": "pg599_static_count_pt_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Battle Squadron",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ec791b2d863c71363969c862ca3ccf2c",
+      "min_rule_version": 2,
+      "normalized_name": "battle squadron",
+      "oracle_hash": "45704bc9a005b8331fb2532257474fb7",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Beast of Burden",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:136b70454eb9fcca66ba5ece186ac353",
+      "min_rule_version": 2,
+      "normalized_name": "beast of burden",
+      "oracle_hash": "de4db2713d1b3a583bb8820b36623106",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Burrowguard Mentor",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e3adc8c2dafa4b887700286f69f2d8c2",
+      "min_rule_version": 2,
+      "normalized_name": "burrowguard mentor",
+      "oracle_hash": "281c52b88eea46d985060ab24e2364ae",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Crusader of Odric",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:820a8ad5c37c5719b38b1e539e39da2e",
+      "min_rule_version": 2,
+      "normalized_name": "crusader of odric",
+      "oracle_hash": "6a5d332813b3838fe0d0cfc32180acf6",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Dakkon Blackblade",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1f42f00fc1cc603f1c65780965053847",
+      "min_rule_version": 2,
+      "normalized_name": "dakkon blackblade",
+      "oracle_hash": "c708f85e86aa992a817fabcefac3a73f",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Dungrove Elder",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:bf8a60853984464cbccbc04390912c71",
+      "min_rule_version": 2,
+      "normalized_name": "dungrove elder",
+      "oracle_hash": "a7aa0aa484ec0503200ab026b5f225bb",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Heedless One",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cdaf89e78885301d5ad6f4a1b359e116",
+      "min_rule_version": 2,
+      "normalized_name": "heedless one",
+      "oracle_hash": "61ce4fccfa7d353167a5a8f59e1a0e30",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Krovikan Mist",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:80e25825f55c60b7d9d000cb94a4b18a",
+      "min_rule_version": 2,
+      "normalized_name": "krovikan mist",
+      "oracle_hash": "2957084da1b25a6bf23e43d11b2d3378",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Molimo, Maro-Sorcerer",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7543ee17ee09db67db4dc4116b8d615f",
+      "min_rule_version": 2,
+      "normalized_name": "molimo, maro-sorcerer",
+      "oracle_hash": "060d413dce1098ec0f36f6ab6821b34d",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Nightmare",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b41d5f32080b20ec833bc33817b776f4",
+      "min_rule_version": 2,
+      "normalized_name": "nightmare",
+      "oracle_hash": "91872b8e6ea68993ef8da8311ad33a9c",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Reckless One",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ec088bc0a46b257e3b5529abc139942b",
+      "min_rule_version": 2,
+      "normalized_name": "reckless one",
+      "oracle_hash": "9bef702083e872f779609fcc77cb3cf6",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Scion of the Wild",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:820a8ad5c37c5719b38b1e539e39da2e",
+      "min_rule_version": 2,
+      "normalized_name": "scion of the wild",
+      "oracle_hash": "2640eba1d95249d87c19b490d51ad4bd",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Squelching Leeches",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7f72518fa923e6cd43ad930f2251327c",
+      "min_rule_version": 2,
+      "normalized_name": "squelching leeches",
+      "oracle_hash": "c09b514e4887dee491cece6a50fe7079",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

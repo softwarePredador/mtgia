@@ -2554,6 +2554,131 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["keywords"], ["haste"])
         self.assertTrue(effect["haste"])
 
+    def test_static_count_power_toughness_creatures_you_control_is_package_safe(self) -> None:
+        row = queue_row(
+            "xmage_signature::SetBasePowerToughnessSourceEffect::FlyingAbility,SimpleStaticAbility::"
+            "no_target_class::no_condition_class::static_ability",
+            effect_classes=["SetBasePowerToughnessSourceEffect"],
+            ability_kind="static",
+            ability_classes=["FlyingAbility", "SimpleStaticAbility"],
+            xmage_signals=["static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Battle Squadron",
+                type_line="Creature - Goblin",
+                oracle_text=(
+                    "Flying\n"
+                    "Battle Squadron's power and toughness are each equal to the number of creatures you control."
+                ),
+            ),
+            source_text=(
+                "this.addAbility(new SimpleStaticAbility(Zone.ALL, "
+                "new SetBasePowerToughnessSourceEffect(CreaturesYouControlCount.PLURAL)));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.STATIC_COUNT_PT_SCOPE)
+        self.assertEqual(effect["static_power_toughness_source"], "battlefield_permanent_count")
+        self.assertEqual(effect["battlefield_count_scope"], "controller_battlefield")
+        self.assertEqual(effect["battlefield_count_card_types"], ["creature"])
+        self.assertEqual(effect["keywords"], ["flying"])
+
+    def test_static_count_power_toughness_creatures_on_battlefield_is_package_safe(self) -> None:
+        row = queue_row(
+            "xmage_signature::SetBasePowerToughnessSourceEffect::SimpleStaticAbility::"
+            "no_target_class::no_condition_class::static_ability",
+            effect_classes=["SetBasePowerToughnessSourceEffect"],
+            ability_kind="static",
+            ability_classes=["SimpleStaticAbility"],
+            xmage_signals=["static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Beast of Burden",
+                type_line="Artifact Creature - Golem",
+                oracle_text=(
+                    "Beast of Burden's power and toughness are each equal to the number of creatures on the battlefield."
+                ),
+            ),
+            source_text=(
+                "this.addAbility(new SimpleStaticAbility(Zone.ALL, "
+                "new SetBasePowerToughnessSourceEffect(new PermanentsOnBattlefieldCount("
+                "new FilterCreaturePermanent(\"creatures on the battlefield\")))));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battlefield_count_scope"], "all_battlefields")
+        self.assertEqual(effect["battlefield_count_card_types"], ["creature"])
+
+    def test_static_count_power_toughness_basic_land_subtype_you_control_is_package_safe(self) -> None:
+        row = queue_row(
+            "xmage_signature::SetBasePowerToughnessSourceEffect::HexproofAbility,SimpleStaticAbility::"
+            "no_target_class::no_condition_class::static_ability",
+            effect_classes=["SetBasePowerToughnessSourceEffect"],
+            ability_kind="static",
+            ability_classes=["HexproofAbility", "SimpleStaticAbility"],
+            xmage_signals=["static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Dungrove Elder",
+                type_line="Creature - Treefolk",
+                oracle_text=(
+                    "Hexproof\n"
+                    "Dungrove Elder's power and toughness are each equal to the number of Forests you control."
+                ),
+            ),
+            source_text=(
+                "static final FilterControlledPermanent filterLands = new FilterControlledPermanent(\"Forests you control\");"
+                "filterLands.add(SubType.FOREST.getPredicate());"
+                "this.addAbility(new SimpleStaticAbility(Zone.ALL, "
+                "new SetBasePowerToughnessSourceEffect(new PermanentsOnBattlefieldCount(filterLands))));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battlefield_count_scope"], "controller_battlefield")
+        self.assertEqual(effect["battlefield_count_subtypes"], ["forest"])
+        self.assertEqual(effect["keywords"], ["hexproof"])
+
+    def test_static_count_power_toughness_blocks_extra_attack_restriction_oracle(self) -> None:
+        row = queue_row(
+            "xmage_signature::SetBasePowerToughnessSourceEffect::SimpleStaticAbility::"
+            "no_target_class::no_condition_class::static_ability",
+            effect_classes=["SetBasePowerToughnessSourceEffect"],
+            ability_kind="static",
+            ability_classes=["SimpleStaticAbility"],
+            xmage_signals=["static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Serpent of the Endless Sea",
+                type_line="Creature - Serpent",
+                oracle_text=(
+                    "Serpent of the Endless Sea's power and toughness are each equal to the number of Islands you control.\n"
+                    "This creature can't attack unless defending player controls an Island."
+                ),
+            ),
+            source_text=(
+                "filter.add(SubType.ISLAND.getPredicate());"
+                "this.addAbility(new SimpleStaticAbility(Zone.ALL, "
+                "new SetBasePowerToughnessSourceEffect(new PermanentsOnBattlefieldCount(filter))));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "static_graveyard_count_pt_oracle_not_exact")
+
     def test_static_graveyard_count_power_toughness_blocks_battlefield_plus_graveyard_formula(self) -> None:
         row = queue_row(
             split.RECURSION_UNIT,

@@ -333,6 +333,7 @@ STATIC_CONTROLLED_PT_SCOPE = "xmage_static_controlled_power_toughness_boost_v1"
 STATIC_CONTROLLED_KEYWORD_SCOPE = "xmage_static_controlled_keyword_grant_v1"
 STATIC_GLOBAL_PT_SCOPE = "xmage_static_global_power_toughness_boost_v1"
 STATIC_GRAVEYARD_COUNT_PT_SCOPE = "xmage_static_source_power_toughness_equal_graveyard_count_v1"
+STATIC_COUNT_PT_SCOPE = "xmage_static_source_power_toughness_equal_count_v1"
 STATIC_GRAVEYARD_THRESHOLD_BOOST_SCOPE = "xmage_static_source_boost_if_graveyard_threshold_v1"
 STATIC_GRAVEYARD_COUNT_BOOST_SCOPE = "xmage_static_source_boost_equal_graveyard_count_v1"
 AURA_STATIC_PT_ATTACHMENT_SCOPE = "xmage_aura_static_power_toughness_attachment_v1"
@@ -7509,6 +7510,152 @@ def static_graveyard_count_pt_from_source(source: str) -> dict[str, Any] | str |
         "graveyard_count_scope": scope,
         "graveyard_count_card_types": card_types or ["card"],
     }
+
+
+STATIC_COUNT_PT_BASIC_LAND_SUBTYPES = {
+    "plains": "plains",
+    "islands": "island",
+    "island": "island",
+    "swamps": "swamp",
+    "swamp": "swamp",
+    "mountains": "mountain",
+    "mountain": "mountain",
+    "forests": "forest",
+    "forest": "forest",
+}
+STATIC_COUNT_PT_IRREGULAR_SUBTYPES = {
+    "elves": "elf",
+}
+
+
+def static_count_pt_subtype_token(value: str) -> str:
+    token = re.sub(r"[^a-z0-9]+", " ", str(value or "").lower()).strip()
+    token = re.sub(r"\s+", " ", token)
+    if token in STATIC_COUNT_PT_IRREGULAR_SUBTYPES:
+        return STATIC_COUNT_PT_IRREGULAR_SUBTYPES[token]
+    if token.endswith("ies") and len(token) > 3:
+        return f"{token[:-3]}y"
+    if token.endswith("s") and len(token) > 1:
+        return token[:-1]
+    return token
+
+
+def static_count_pt_result(**fields: Any) -> dict[str, Any]:
+    return {
+        "static_power_toughness_source": "battlefield_permanent_count",
+        "stat_modifier_amount_source": "battlefield_permanent_count",
+        "static_power_toughness_base": 0,
+        "static_power_toughness_count_multiplier": 1,
+        **fields,
+    }
+
+
+def static_count_pt_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
+    text = oracle_text_after_leading_static_keywords(metadata)
+    text = re.sub(r"\b(domain|chroma)\s+[\u2014-]\s+", "", text)
+    if re.match(
+        r"^[a-z0-9' ,./-]+ power and toughness are each equal to the number of creatures you control\.?$",
+        text,
+    ):
+        return static_count_pt_result(
+            battlefield_count_scope="controller_battlefield",
+            battlefield_count_card_types=["creature"],
+        )
+    if re.match(
+        r"^[a-z0-9' ,./-]+ power and toughness are each equal to the number of creatures on the battlefield\.?$",
+        text,
+    ):
+        return static_count_pt_result(
+            battlefield_count_scope="all_battlefields",
+            battlefield_count_card_types=["creature"],
+        )
+    if re.match(
+        r"^[a-z0-9' ,./-]+ power and toughness are each equal to the number of lands you control\.?$",
+        text,
+    ):
+        return static_count_pt_result(
+            battlefield_count_scope="controller_battlefield",
+            battlefield_count_card_types=["land"],
+        )
+    basic_land_match = re.match(
+        r"^[a-z0-9' ,./-]+ power and toughness are each equal to the number of "
+        r"(?P<subtype>plains|islands|swamps|mountains|forests) you control\.?$",
+        text,
+    )
+    if basic_land_match:
+        return static_count_pt_result(
+            battlefield_count_scope="controller_battlefield",
+            battlefield_count_subtypes=[
+                STATIC_COUNT_PT_BASIC_LAND_SUBTYPES[basic_land_match.group("subtype")]
+            ],
+        )
+    subtype_battlefield_match = re.match(
+        r"^[a-z0-9' ,./-]+ power and toughness are each equal to the number of "
+        r"(?P<subtype>[a-z][a-z -]+) on the battlefield\.?$",
+        text,
+    )
+    if subtype_battlefield_match:
+        subtype = static_count_pt_subtype_token(subtype_battlefield_match.group("subtype"))
+        if subtype and " " not in subtype:
+            return static_count_pt_result(
+                battlefield_count_scope="all_battlefields",
+                battlefield_count_subtypes=[subtype],
+            )
+    return None
+
+
+def static_count_pt_source_subtypes(source: str) -> list[str]:
+    return [
+        token.lower().replace("_", " ")
+        for token in re.findall(r"\.add\s*\(\s*SubType\.([A-Z0-9_]+)\.getPredicate\s*\(\s*\)\s*\)", source or "")
+    ]
+
+
+def static_count_pt_from_source(source: str) -> dict[str, Any] | str | None:
+    text = source or ""
+    if len(re.findall(r"new\s+SetBasePowerToughnessSourceEffect\s*\(", text)) != 1:
+        return None
+    blocked_markers = (
+        "AdditiveDynamicValue",
+        "IntPlusDynamicValue",
+        "MultipliedValue",
+        "CardsInControllerHandCount",
+        "MostCardsInOpponentsHandCount",
+        "DomainValue",
+        "DevotionCount",
+        "ManaSymbolsCount",
+        "ColorsAmongControlledPermanentsCount",
+        "getHand().size()",
+    )
+    if any(marker in text for marker in blocked_markers):
+        return "static_count_pt_source_count_not_supported"
+    if "CreaturesYouControlCount" in text or "StaticFilters.FILTER_CONTROLLED_CREATURES" in text:
+        return static_count_pt_result(
+            battlefield_count_scope="controller_battlefield",
+            battlefield_count_card_types=["creature"],
+        )
+    if "new FilterCreaturePermanent" in text and "creatures on the battlefield" in text:
+        return static_count_pt_result(
+            battlefield_count_scope="all_battlefields",
+            battlefield_count_card_types=["creature"],
+        )
+    if "FilterControlledLandPermanent" in text or "StaticFilters.FILTER_CONTROLLED_PERMANENT_LAND" in text:
+        return static_count_pt_result(
+            battlefield_count_scope="controller_battlefield",
+            battlefield_count_card_types=["land"],
+        )
+    subtypes = static_count_pt_source_subtypes(text)
+    if subtypes:
+        controlled = (
+            "FilterControlledPermanent" in text
+            or "FilterControlledLandPermanent" in text
+            or "you control" in text
+        )
+        return static_count_pt_result(
+            battlefield_count_scope="controller_battlefield" if controlled else "all_battlefields",
+            battlefield_count_subtypes=subtypes,
+        )
+    return None
 
 
 STATIC_GRAVEYARD_THRESHOLD_WORDS = {
@@ -22957,6 +23104,40 @@ def split_row(
     if static_graveyard_count_pt_unit:
         if not is_creature_metadata(metadata):
             return None, "static_graveyard_count_pt_not_creature"
+        oracle_count = static_count_pt_from_oracle(metadata)
+        if oracle_count is not None:
+            source_count = static_count_pt_from_source(source_text)
+            if isinstance(source_count, str):
+                return None, source_count
+            if source_count is None:
+                return None, "static_count_pt_source_not_exact"
+            if source_count != oracle_count:
+                return None, "static_count_pt_source_oracle_mismatch"
+            keyword_list = ordered_keywords(keywords_from_ability_classes(row))
+            effect_json = {
+                "effect": "creature",
+                "battle_model_scope": STATIC_COUNT_PT_SCOPE,
+                "ability_kind": "static",
+                "static_effect": "source_power_toughness_equal_count",
+                "target": "self",
+                "target_controller": "self",
+                "dynamic_power_equals_count": True,
+                "dynamic_toughness_equals_count": True,
+                "xmage_effect_class": "SetBasePowerToughnessSourceEffect",
+                "xmage_ability_class": "SimpleStaticAbility",
+                **source_count,
+            }
+            if keyword_list:
+                effect_json["keywords"] = keyword_list
+                effect_json["_keywords_are_self"] = True
+                for keyword in keyword_list:
+                    effect_json[keyword] = True
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_static_source_power_toughness_equal_count",
+            ), "selected_exact_scope"
         oracle_static = static_graveyard_count_pt_from_oracle(metadata)
         if oracle_static is None:
             return None, "static_graveyard_count_pt_oracle_not_exact"

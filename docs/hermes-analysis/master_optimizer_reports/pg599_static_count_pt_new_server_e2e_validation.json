@@ -1,0 +1,596 @@
+{
+  "battle_execution": {
+    "event_count": 13,
+    "results": [
+      {
+        "card_name": "Battle Squadron",
+        "count": 2,
+        "power": 2,
+        "scenario": "Battle Squadron static count P/T recalculates",
+        "toughness": 2
+      },
+      {
+        "card_name": "Beast of Burden",
+        "count": 3,
+        "power": 3,
+        "scenario": "Beast of Burden static count P/T recalculates",
+        "toughness": 3
+      },
+      {
+        "card_name": "Burrowguard Mentor",
+        "count": 2,
+        "power": 2,
+        "scenario": "Burrowguard Mentor static count P/T recalculates",
+        "toughness": 2
+      },
+      {
+        "card_name": "Crusader of Odric",
+        "count": 2,
+        "power": 2,
+        "scenario": "Crusader of Odric static count P/T recalculates",
+        "toughness": 2
+      },
+      {
+        "card_name": "Dakkon Blackblade",
+        "count": 2,
+        "power": 2,
+        "scenario": "Dakkon Blackblade static count P/T recalculates",
+        "toughness": 2
+      },
+      {
+        "card_name": "Dungrove Elder",
+        "count": 2,
+        "power": 2,
+        "scenario": "Dungrove Elder static count P/T recalculates",
+        "toughness": 2
+      },
+      {
+        "card_name": "Heedless One",
+        "count": 3,
+        "power": 3,
+        "scenario": "Heedless One static count P/T recalculates",
+        "toughness": 3
+      },
+      {
+        "card_name": "Krovikan Mist",
+        "count": 3,
+        "power": 3,
+        "scenario": "Krovikan Mist static count P/T recalculates",
+        "toughness": 3
+      },
+      {
+        "card_name": "Molimo, Maro-Sorcerer",
+        "count": 2,
+        "power": 2,
+        "scenario": "Molimo, Maro-Sorcerer static count P/T recalculates",
+        "toughness": 2
+      },
+      {
+        "card_name": "Nightmare",
+        "count": 2,
+        "power": 2,
+        "scenario": "Nightmare static count P/T recalculates",
+        "toughness": 2
+      },
+      {
+        "card_name": "Reckless One",
+        "count": 3,
+        "power": 3,
+        "scenario": "Reckless One static count P/T recalculates",
+        "toughness": 3
+      },
+      {
+        "card_name": "Scion of the Wild",
+        "count": 2,
+        "power": 2,
+        "scenario": "Scion of the Wild static count P/T recalculates",
+        "toughness": 2
+      },
+      {
+        "card_name": "Squelching Leeches",
+        "count": 2,
+        "power": 2,
+        "scenario": "Squelching Leeches static count P/T recalculates",
+        "toughness": 2
+      }
+    ],
+    "scenario_count": 13
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-07T06:56:26.382155+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg599_static_count_pt_new_server_manifest.json",
+  "package_id": "pg599_static_count_pt_new_server_manifest",
+  "snapshot": "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 13
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+          "card_name": "Battle Squadron",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ec791b2d863c71363969c862ca3ccf2c",
+          "oracle_hash": "45704bc9a005b8331fb2532257474fb7",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+          "card_name": "Beast of Burden",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:136b70454eb9fcca66ba5ece186ac353",
+          "oracle_hash": "de4db2713d1b3a583bb8820b36623106",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+          "card_name": "Burrowguard Mentor",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e3adc8c2dafa4b887700286f69f2d8c2",
+          "oracle_hash": "281c52b88eea46d985060ab24e2364ae",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+          "card_name": "Crusader of Odric",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:820a8ad5c37c5719b38b1e539e39da2e",
+          "oracle_hash": "6a5d332813b3838fe0d0cfc32180acf6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+          "card_name": "Dakkon Blackblade",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1f42f00fc1cc603f1c65780965053847",
+          "oracle_hash": "c708f85e86aa992a817fabcefac3a73f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+          "card_name": "Dungrove Elder",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:bf8a60853984464cbccbc04390912c71",
+          "oracle_hash": "a7aa0aa484ec0503200ab026b5f225bb",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+          "card_name": "Heedless One",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:cdaf89e78885301d5ad6f4a1b359e116",
+          "oracle_hash": "61ce4fccfa7d353167a5a8f59e1a0e30",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+          "card_name": "Krovikan Mist",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:80e25825f55c60b7d9d000cb94a4b18a",
+          "oracle_hash": "2957084da1b25a6bf23e43d11b2d3378",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+          "card_name": "Molimo, Maro-Sorcerer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7543ee17ee09db67db4dc4116b8d615f",
+          "oracle_hash": "060d413dce1098ec0f36f6ab6821b34d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+          "card_name": "Nightmare",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b41d5f32080b20ec833bc33817b776f4",
+          "oracle_hash": "91872b8e6ea68993ef8da8311ad33a9c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+          "card_name": "Reckless One",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ec088bc0a46b257e3b5529abc139942b",
+          "oracle_hash": "9bef702083e872f779609fcc77cb3cf6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+          "card_name": "Scion of the Wild",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:820a8ad5c37c5719b38b1e539e39da2e",
+          "oracle_hash": "2640eba1d95249d87c19b490d51ad4bd",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+          "card_name": "Squelching Leeches",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7f72518fa923e6cd43ad930f2251327c",
+          "oracle_hash": "c09b514e4887dee491cece6a50fe7079",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 13
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+          "card_name": "Battle Squadron",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ec791b2d863c71363969c862ca3ccf2c",
+          "oracle_hash": "45704bc9a005b8331fb2532257474fb7",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+          "card_name": "Beast of Burden",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:136b70454eb9fcca66ba5ece186ac353",
+          "oracle_hash": "de4db2713d1b3a583bb8820b36623106",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+          "card_name": "Burrowguard Mentor",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e3adc8c2dafa4b887700286f69f2d8c2",
+          "oracle_hash": "281c52b88eea46d985060ab24e2364ae",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+          "card_name": "Crusader of Odric",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:820a8ad5c37c5719b38b1e539e39da2e",
+          "oracle_hash": "6a5d332813b3838fe0d0cfc32180acf6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+          "card_name": "Dakkon Blackblade",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1f42f00fc1cc603f1c65780965053847",
+          "oracle_hash": "c708f85e86aa992a817fabcefac3a73f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+          "card_name": "Dungrove Elder",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:bf8a60853984464cbccbc04390912c71",
+          "oracle_hash": "a7aa0aa484ec0503200ab026b5f225bb",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+          "card_name": "Heedless One",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:cdaf89e78885301d5ad6f4a1b359e116",
+          "oracle_hash": "61ce4fccfa7d353167a5a8f59e1a0e30",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+          "card_name": "Krovikan Mist",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:80e25825f55c60b7d9d000cb94a4b18a",
+          "oracle_hash": "2957084da1b25a6bf23e43d11b2d3378",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+          "card_name": "Molimo, Maro-Sorcerer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7543ee17ee09db67db4dc4116b8d615f",
+          "oracle_hash": "060d413dce1098ec0f36f6ab6821b34d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+          "card_name": "Nightmare",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b41d5f32080b20ec833bc33817b776f4",
+          "oracle_hash": "91872b8e6ea68993ef8da8311ad33a9c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+          "card_name": "Reckless One",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ec088bc0a46b257e3b5529abc139942b",
+          "oracle_hash": "9bef702083e872f779609fcc77cb3cf6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+          "card_name": "Scion of the Wild",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:820a8ad5c37c5719b38b1e539e39da2e",
+          "oracle_hash": "2640eba1d95249d87c19b490d51ad4bd",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+          "card_name": "Squelching Leeches",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7f72518fa923e6cd43ad930f2251327c",
+          "oracle_hash": "c09b514e4887dee491cece6a50fe7079",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 13
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+          "battle_rule_version": 2,
+          "card_name": "Battle Squadron",
+          "logical_rule_key": "battle_rule_v1:ec791b2d863c71363969c862ca3ccf2c"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+          "battle_rule_version": 2,
+          "card_name": "Beast of Burden",
+          "logical_rule_key": "battle_rule_v1:136b70454eb9fcca66ba5ece186ac353"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+          "battle_rule_version": 2,
+          "card_name": "Burrowguard Mentor",
+          "logical_rule_key": "battle_rule_v1:e3adc8c2dafa4b887700286f69f2d8c2"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+          "battle_rule_version": 2,
+          "card_name": "Crusader of Odric",
+          "logical_rule_key": "battle_rule_v1:820a8ad5c37c5719b38b1e539e39da2e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+          "battle_rule_version": 2,
+          "card_name": "Dakkon Blackblade",
+          "logical_rule_key": "battle_rule_v1:1f42f00fc1cc603f1c65780965053847"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+          "battle_rule_version": 2,
+          "card_name": "Dungrove Elder",
+          "logical_rule_key": "battle_rule_v1:bf8a60853984464cbccbc04390912c71"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+          "battle_rule_version": 2,
+          "card_name": "Heedless One",
+          "logical_rule_key": "battle_rule_v1:cdaf89e78885301d5ad6f4a1b359e116"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+          "battle_rule_version": 2,
+          "card_name": "Krovikan Mist",
+          "logical_rule_key": "battle_rule_v1:80e25825f55c60b7d9d000cb94a4b18a"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+          "battle_rule_version": 2,
+          "card_name": "Molimo, Maro-Sorcerer",
+          "logical_rule_key": "battle_rule_v1:7543ee17ee09db67db4dc4116b8d615f"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+          "battle_rule_version": 2,
+          "card_name": "Nightmare",
+          "logical_rule_key": "battle_rule_v1:b41d5f32080b20ec833bc33817b776f4"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+          "battle_rule_version": 2,
+          "card_name": "Reckless One",
+          "logical_rule_key": "battle_rule_v1:ec088bc0a46b257e3b5529abc139942b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+          "battle_rule_version": 2,
+          "card_name": "Scion of the Wild",
+          "logical_rule_key": "battle_rule_v1:820a8ad5c37c5719b38b1e539e39da2e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+          "battle_rule_version": 2,
+          "card_name": "Squelching Leeches",
+          "logical_rule_key": "battle_rule_v1:7f72518fa923e6cd43ad930f2251327c"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 13
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Battle Squadron",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:ec791b2d863c71363969c862ca3ccf2c"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Beast of Burden",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:136b70454eb9fcca66ba5ece186ac353"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Burrowguard Mentor",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:e3adc8c2dafa4b887700286f69f2d8c2"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Crusader of Odric",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:820a8ad5c37c5719b38b1e539e39da2e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Dakkon Blackblade",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:1f42f00fc1cc603f1c65780965053847"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Dungrove Elder",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:bf8a60853984464cbccbc04390912c71"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Heedless One",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:cdaf89e78885301d5ad6f4a1b359e116"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Krovikan Mist",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:80e25825f55c60b7d9d000cb94a4b18a"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Molimo, Maro-Sorcerer",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:7543ee17ee09db67db4dc4116b8d615f"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Nightmare",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:b41d5f32080b20ec833bc33817b776f4"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Reckless One",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:ec088bc0a46b257e3b5529abc139942b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Scion of the Wild",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:820a8ad5c37c5719b38b1e539e39da2e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Squelching Leeches",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:7f72518fa923e6cd43ad930f2251327c"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 13,
+        "scenarios": 13
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}
