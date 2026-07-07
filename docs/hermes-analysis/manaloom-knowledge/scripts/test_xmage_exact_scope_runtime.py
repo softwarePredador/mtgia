@@ -12922,6 +12922,48 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertNotIn("static_cost_increase_total", opponent_cost)
         self.assertEqual(opponent_cost["generic"], 1)
 
+    def test_static_spell_tax_can_add_colored_mana_requirement(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        active.battlefield.append(
+            {
+                "name": "Derelor",
+                "type_line": "Creature - Thrull",
+                "effect": "static_cost_increase",
+                "battle_model_scope": "xmage_static_generic_cost_increase_for_matching_spells_v1",
+                "cost_increase_applies_to": "spells_you_cast",
+                "cost_increase_generic": 0,
+                "cost_increase_color_symbols": ["B"],
+                "cost_increase_filters": [{"applies_to_spell_colors": ["B"]}],
+            }
+        )
+
+        black_spell_cost = self.battle.card_cost_for_player_state(
+            active,
+            {
+                "name": "Fixture Doom",
+                "type_line": "Sorcery",
+                "colors": ["B"],
+                "mana_cost": "{1}{B}",
+            },
+        )
+        red_spell_cost = self.battle.card_cost_for_player_state(
+            active,
+            {
+                "name": "Fixture Bolt",
+                "type_line": "Instant",
+                "colors": ["R"],
+                "mana_cost": "{R}",
+            },
+        )
+
+        self.assertEqual(black_spell_cost["generic"], 1)
+        self.assertEqual(black_spell_cost["colored"]["black"], 2)
+        self.assertEqual(black_spell_cost["static_cost_increase_total"], 1)
+        self.assertEqual(black_spell_cost["static_cost_increase_color_symbols"], ["B"])
+        self.assertEqual(black_spell_cost["static_cost_increases"][0]["colored_symbols"], ["B"])
+        self.assertNotIn("static_cost_increase_total", red_spell_cost)
+        self.assertEqual(red_spell_cost["colored"]["red"], 1)
+
     def test_counter_target_creature_spell_filters_stack_target_type(self) -> None:
         opponent = self.battle.Player("Opponent", None, [])
         counter_effect = {

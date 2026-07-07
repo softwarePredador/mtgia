@@ -44,6 +44,12 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "static_required_combat_state",
     "static_required_tapped_state",
     "static_artifact_creature",
+    "cost_increase_applies_to",
+    "cost_increase_amount_source",
+    "cost_increase_generic",
+    "cost_increase_color_symbols",
+    "cost_increase_filters",
+    "applies_to_spell_colors",
     "creature_filter",
     "permanent_type",
     "counter_unless_pays_generic",
@@ -3761,9 +3767,69 @@ def counter_unless_pays_execution_scenario_from_expected_rule(
     }
 
 
+def static_cost_increase_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_static_generic_cost_increase_for_matching_spells_v1":
+        return None
+    if required.get("effect") != "static_cost_increase":
+        return None
+    filters = [
+        spec
+        for spec in (required.get("cost_increase_filters") or [{}])
+        if isinstance(spec, dict)
+    ] or [{}]
+    first_filter = dict(filters[0])
+    spell_colors = [str(value).upper() for value in first_filter.get("applies_to_spell_colors") or [] if value]
+    spell_types = [str(value).lower() for value in first_filter.get("applies_to_card_types") or [] if value]
+    color_symbol = spell_colors[0] if spell_colors else "W"
+    color_name = {
+        "W": "White",
+        "U": "Blue",
+        "B": "Black",
+        "R": "Red",
+        "G": "Green",
+    }.get(color_symbol, "White")
+    type_line = "Creature" if "creature" in spell_types else "Sorcery"
+    target_spell = {
+        "name": "E2E Matching Taxed Spell",
+        "type_line": type_line,
+        "colors": [color_symbol],
+        "mana_cost": f"{{1}}{{{color_symbol}}}",
+        "cmc": 2,
+    }
+    if type_line == "Creature":
+        target_spell["effect"] = "creature"
+    expected_colored = {color_name.lower(): 1}
+    for symbol in required.get("cost_increase_color_symbols") or []:
+        mapped = {
+            "W": "white",
+            "U": "blue",
+            "B": "black",
+            "R": "red",
+            "G": "green",
+        }.get(str(symbol).upper())
+        if mapped:
+            expected_colored[mapped] = expected_colored.get(mapped, 0) + 1
+    return {
+        "name": f"{rule['card_name']} increases matching spell cost",
+        "type": "static_cost_increase_spell_cost",
+        "card": {"name": rule["card_name"]},
+        "target_spell": target_spell,
+        "expected_generic": 1 + int(required.get("cost_increase_generic") or 0),
+        "expected_colored": expected_colored,
+        "expected_static_cost_increase_total": int(required.get("cost_increase_generic") or 0)
+        + len(required.get("cost_increase_color_symbols") or []),
+        "expected_static_cost_increase_color_symbols": list(required.get("cost_increase_color_symbols") or []),
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any] | None:
     return (
         counter_unless_pays_execution_scenario_from_expected_rule(rule)
+        or static_cost_increase_execution_scenario_from_expected_rule(rule)
         or static_controlled_pt_execution_scenario_from_expected_rule(rule)
         or static_controlled_keyword_execution_scenario_from_expected_rule(rule)
         or static_global_pt_execution_scenario_from_expected_rule(rule)

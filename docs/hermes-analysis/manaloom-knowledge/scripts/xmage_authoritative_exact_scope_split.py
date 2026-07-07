@@ -12715,28 +12715,27 @@ def static_cost_increase_from_oracle(metadata: dict[str, Any]) -> dict[str, Any]
     if len(lines) != 1:
         return "static_cost_increase_oracle_not_exact_generic"
     text = lines[0]
-    colored_match = re.search(r"costs?\s+\{([wubrg])\}\s+more to cast", text, re.I)
-    if colored_match:
-        return "static_cost_increase_colored_mana_not_supported"
     patterns = [
         re.compile(
             r"^(?P<subject>spells your opponents cast) costs? "
-            r"\{(?P<amount>\d+)\} more to cast\.?$"
+            r"\{(?P<amount>\d+|[wubrg])\} more to cast\.?$"
         ),
         re.compile(
             r"^(?P<subject>.+? spells)(?: you cast)? costs? "
-            r"\{(?P<amount>\d+)\} more to cast\.?$"
+            r"\{(?P<amount>\d+|[wubrg])\} more to cast\.?$"
         ),
         re.compile(
-            r"^spells costs? \{(?P<amount>\d+)\} more to cast\.?$"
+            r"^spells costs? \{(?P<amount>\d+|[wubrg])\} more to cast\.?$"
         ),
     ]
     for pattern in patterns:
         match = pattern.fullmatch(text)
         if not match:
             continue
-        amount = int(match.group("amount"))
-        if amount <= 0:
+        raw_amount = str(match.group("amount") or "").upper()
+        amount = int(raw_amount) if raw_amount.isdigit() else 0
+        color_symbols = [] if raw_amount.isdigit() else [raw_amount]
+        if amount <= 0 and not color_symbols:
             return "static_cost_increase_oracle_amount_not_positive"
         if text.startswith("spells your opponents cast"):
             applies_to = "spells_opponents_cast"
@@ -12754,6 +12753,7 @@ def static_cost_increase_from_oracle(metadata: dict[str, Any]) -> dict[str, Any]
             **subject_spec,
             "cost_increase_applies_to": applies_to,
             "cost_increase_generic": amount,
+            "cost_increase_color_symbols": color_symbols,
             "cost_increase_amount_source": "fixed",
         }
     return "static_cost_increase_oracle_not_exact_generic"
@@ -12770,14 +12770,26 @@ def static_cost_increase_from_source(source_text: str) -> dict[str, Any] | str:
     args = split_top_level_args(constructor_args)
     if len(args) < 3:
         return "static_cost_increase_source_args_not_supported"
+    color_symbols: list[str] = []
     if "new ManaCostsImpl" in args[0]:
-        return "static_cost_increase_colored_mana_not_supported"
-    amount_match = re.fullmatch(r"\d+", args[0].strip())
-    if not amount_match:
+        mana_match = re.search(r"new\s+ManaCostsImpl<[^>]*>\s*\(\s*\"(?P<cost>[^\"]+)\"\s*\)", args[0])
+        if mana_match is None:
+            return "static_cost_increase_source_amount_not_fixed"
+        parsed_cost = parse_mana_cost_text(mana_match.group("cost"))
+        if parsed_cost is None:
+            return "static_cost_increase_source_amount_not_fixed"
+        parsed_generic, parsed_colors = parsed_cost
+        if parsed_generic:
+            return "static_cost_increase_source_amount_not_fixed"
+        color_symbols = ordered_color_symbols(parsed_colors)
+        amount = 0
+    else:
+        amount_match = re.fullmatch(r"\d+", args[0].strip())
+        if not amount_match:
+            return "static_cost_increase_source_amount_not_fixed"
+        amount = int(args[0].strip())
+    if amount <= 0 and not color_symbols:
         return "static_cost_increase_source_amount_not_fixed"
-    amount = int(args[0].strip())
-    if amount <= 0:
-        return "static_cost_increase_source_amount_not_positive"
     target_match = re.search(r"TargetController\.(ANY|YOU|OPPONENT)\b", args[-1])
     if not target_match:
         return "static_cost_increase_source_target_controller_not_supported"
@@ -12839,6 +12851,7 @@ def static_cost_increase_from_source(source_text: str) -> dict[str, Any] | str:
     return {
         "cost_increase_applies_to": applies_to,
         "cost_increase_generic": amount,
+        "cost_increase_color_symbols": color_symbols,
         "cost_increase_amount_source": "fixed",
         "cost_increase_filters": ordered_cost_increase_filters([spec]),
     }
@@ -12846,6 +12859,10 @@ def static_cost_increase_from_source(source_text: str) -> dict[str, Any] | str:
 
 def static_cost_increase_specs_match(source: dict[str, Any], oracle: dict[str, Any]) -> bool:
     if int(source.get("cost_increase_generic") or 0) != int(oracle.get("cost_increase_generic") or 0):
+        return False
+    if ordered_color_symbols(source.get("cost_increase_color_symbols") or []) != ordered_color_symbols(
+        oracle.get("cost_increase_color_symbols") or []
+    ):
         return False
     if str(source.get("cost_increase_applies_to") or "") != str(oracle.get("cost_increase_applies_to") or ""):
         return False
@@ -24852,6 +24869,9 @@ def split_row(
             "static_effect": "generic_cost_increase_for_matching_spells",
             "cost_increase_applies_to": str(oracle_increase["cost_increase_applies_to"]),
             "cost_increase_generic": int(oracle_increase["cost_increase_generic"]),
+            "cost_increase_color_symbols": ordered_color_symbols(
+                oracle_increase.get("cost_increase_color_symbols") or []
+            ),
             "cost_increase_amount_source": "fixed",
             "cost_increase_filters": ordered_cost_increase_filters(
                 oracle_increase.get("cost_increase_filters")

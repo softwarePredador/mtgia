@@ -6135,6 +6135,63 @@ def run_static_count_power_toughness(
     }
 
 
+def run_static_cost_increase_spell_cost(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    effect = battle.get_card_effect(card)
+    source = battle.enrich_card(
+        {
+            **card,
+            "type_line": scenario.get("source_type_line") or "Creature - Fixture",
+            **effect,
+        }
+    )
+    active = battle.Player(str(scenario.get("player") or "Tax Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Tax Opponent"), None, [])
+    battle.bind_table_context([active, opponent])
+    active.battlefield = [source]
+    spell = battle.enrich_card(dict(scenario["target_spell"]))
+    cost = battle.card_cost_for_player_state(active, spell)
+    expected_generic = int(scenario.get("expected_generic") or 0)
+    if int(cost.get("generic") or 0) != expected_generic:
+        fail(
+            "battle_execution",
+            f"{card['name']} generic cost={cost.get('generic')}, expected {expected_generic}",
+        )
+    expected_colored = dict(scenario.get("expected_colored") or {})
+    colored_cost = dict(cost.get("colored") or {})
+    for color, expected in expected_colored.items():
+        if int(colored_cost.get(color) or 0) != int(expected):
+            fail(
+                "battle_execution",
+                f"{card['name']} {color} cost={colored_cost.get(color)}, expected {expected}",
+            )
+    expected_total = int(scenario.get("expected_static_cost_increase_total") or 0)
+    if int(cost.get("static_cost_increase_total") or 0) != expected_total:
+        fail(
+            "battle_execution",
+            f"{card['name']} static increase={cost.get('static_cost_increase_total')}, expected {expected_total}",
+        )
+    expected_symbols = list(scenario.get("expected_static_cost_increase_color_symbols") or [])
+    if expected_symbols and list(cost.get("static_cost_increase_color_symbols") or []) != expected_symbols:
+        fail(
+            "battle_execution",
+            f"{card['name']} color tax={cost.get('static_cost_increase_color_symbols')}, expected {expected_symbols}",
+        )
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "target_spell": spell.get("name"),
+        "generic": cost.get("generic"),
+        "colored": colored_cost,
+        "static_cost_increase_total": cost.get("static_cost_increase_total"),
+        "static_cost_increase_color_symbols": cost.get("static_cost_increase_color_symbols", []),
+    }
+
+
 SCENARIO_RUNNERS = {
     "attack_self_boost": run_attack_self_boost,
     "aura_static_power_toughness_attachment": run_aura_static_power_toughness_attachment,
@@ -6187,6 +6244,7 @@ SCENARIO_RUNNERS = {
     "boost_scry_spell": run_boost_scry_spell,
     "static_controlled_power_toughness_boost": run_static_controlled_power_toughness_boost,
     "static_controlled_keyword": run_static_controlled_keyword,
+    "static_cost_increase_spell_cost": run_static_cost_increase_spell_cost,
     "static_count_power_toughness": run_static_count_power_toughness,
     "static_global_power_toughness_boost": run_static_global_power_toughness_boost,
     "target_creature_cant_block": run_target_creature_cant_block,

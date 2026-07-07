@@ -154,6 +154,48 @@ def test_simple_activated_damage_runner_executes_random_discard_cost() -> None:
     assert result["opponent_life"] == 5
 
 
+def test_static_cost_increase_runner_executes_colored_tax() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    previous_get_card_effect = battle.get_card_effect
+    battle.get_card_effect = lambda card: {
+        "effect": "static_cost_increase",
+        "battle_model_scope": "xmage_static_generic_cost_increase_for_matching_spells_v1",
+        "cost_increase_applies_to": "spells_you_cast",
+        "cost_increase_generic": 0,
+        "cost_increase_color_symbols": ["B"],
+        "cost_increase_filters": [{"applies_to_spell_colors": ["B"]}],
+        "_rule_logical_key": "battle_rule_v1:derelor",
+    }
+    try:
+        result = validator.run_static_cost_increase_spell_cost(
+            battle,
+            {
+                "name": "Derelor increases black spell cost",
+                "type": "static_cost_increase_spell_cost",
+                "card": {"name": "Derelor"},
+                "target_spell": {
+                    "name": "E2E Matching Taxed Spell",
+                    "type_line": "Sorcery",
+                    "colors": ["B"],
+                    "mana_cost": "{1}{B}",
+                    "cmc": 2,
+                },
+                "expected_generic": 1,
+                "expected_colored": {"black": 2},
+                "expected_static_cost_increase_total": 1,
+                "expected_static_cost_increase_color_symbols": ["B"],
+            },
+            [],
+        )
+    finally:
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Derelor"
+    assert result["generic"] == 1
+    assert result["colored"]["black"] == 2
+    assert result["static_cost_increase_color_symbols"] == ["B"]
+
+
 def test_simple_activated_damage_runner_executes_life_cost() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

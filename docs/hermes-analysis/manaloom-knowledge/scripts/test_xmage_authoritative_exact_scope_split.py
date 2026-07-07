@@ -24877,7 +24877,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             [{"applies_to_card_types": ["creature"], "applies_to_spell_colors": ["R", "G"]}],
         )
 
-    def test_static_generic_cost_increase_blocks_colored_tax(self) -> None:
+    def test_static_cost_increase_maps_colored_tax(self) -> None:
         row = queue_row(
             split.STATIC_GENERIC_COST_INCREASE_UNIT,
             effect_classes=["SpellsCostIncreasingAllEffect"],
@@ -24902,8 +24902,14 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             """,
         )
 
-        self.assertIsNone(proposal)
-        self.assertEqual(reason, "static_cost_increase_colored_mana_not_supported")
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "static_cost_increase")
+        self.assertEqual(effect["battle_model_scope"], split.STATIC_GENERIC_COST_INCREASE_SCOPE)
+        self.assertEqual(effect["cost_increase_applies_to"], "spells_you_cast")
+        self.assertEqual(effect["cost_increase_generic"], 0)
+        self.assertEqual(effect["cost_increase_color_symbols"], ["B"])
+        self.assertEqual(effect["cost_increase_filters"], [{"applies_to_spell_colors": ["B"]}])
 
     def test_creature_enters_life_gain_maps_global_another_creature_trigger(self) -> None:
         row = queue_row(

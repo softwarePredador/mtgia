@@ -1842,6 +1842,21 @@ def _static_cost_increase_amount(effect_data):
     return 0
 
 
+def _static_cost_increase_color_symbols(effect_data):
+    symbols = []
+    for key in (
+        "cost_increase_color_symbols",
+        "cost_increase_colors",
+        "cost_increase_colored_symbols",
+        "colored_cost_increase_symbols",
+    ):
+        for value in _as_list(effect_data.get(key)):
+            symbol = _color_symbol(value)
+            if symbol in SYMBOL_TO_COLOR_NAME and symbol not in symbols:
+                symbols.append(symbol)
+    return symbols
+
+
 def _source_static_cost_increase_effect(source):
     if not isinstance(source, dict):
         return {}
@@ -1921,7 +1936,8 @@ def _static_cost_increase_filter_matches(card, spec):
 
 def _static_cost_increase_matches_spell(source, effect_data, card, *, caster, source_controller):
     amount = _static_cost_increase_amount(effect_data)
-    if amount <= 0:
+    colored_symbols = _static_cost_increase_color_symbols(effect_data)
+    if amount <= 0 and not colored_symbols:
         return None
     if not _static_cost_increase_controller_matches(source_controller, caster, effect_data):
         return None
@@ -1935,6 +1951,7 @@ def _static_cost_increase_matches_spell(source, effect_data, card, *, caster, so
     return {
         "source": source.get("name", "unknown"),
         "amount": amount,
+        "colored_symbols": list(colored_symbols),
         "scope": str(effect_data.get("battle_model_scope") or STATIC_GENERIC_COST_INCREASE_SCOPE),
         "cost_increase_applies_to": str(
             effect_data.get("cost_increase_applies_to") or "spells_each_player_cast"
@@ -2318,6 +2335,12 @@ def card_cost_for_player_state(
 ):
     increases = static_cost_increases_for_spell(player, card)
     static_tax = sum(max(0, int(increase.get("amount", 0) or 0)) for increase in increases)
+    static_colored_tax = [
+        symbol
+        for increase in increases
+        for symbol in _as_list(increase.get("colored_symbols"))
+        if symbol in SYMBOL_TO_COLOR_NAME
+    ]
     cost = card_mana_cost(
         card,
         additional_generic + static_tax,
@@ -2325,8 +2348,13 @@ def card_cost_for_player_state(
         x_value=x_value,
         additional_costs=additional_costs,
     )
+    for symbol in static_colored_tax:
+        cost["colored"][SYMBOL_TO_COLOR_NAME[symbol]] += 1
     if increases:
-        cost["static_cost_increase_total"] = static_tax
+        cost["static_cost_increase_total"] = static_tax + len(static_colored_tax)
+        cost["static_cost_increase_generic_total"] = static_tax
+        if static_colored_tax:
+            cost["static_cost_increase_color_symbols"] = list(static_colored_tax)
         cost["static_cost_increases"] = increases
     reductions = static_cost_reductions_for_spell(player, card)
     self_effect = _card_self_cost_reduction_effect(card)
