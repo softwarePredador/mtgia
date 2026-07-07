@@ -10461,6 +10461,42 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertTrue(effect["activation_discard_random"])
         self.assertTrue(effect["_activated_rule_effects"][0]["activation_discard_random"])
 
+    def test_permanent_activated_damage_maps_random_discard_two_cards_cost(self) -> None:
+        row = queue_row(
+            split.DAMAGE_UNIT,
+            effect_classes=["DamageTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Meteor Storm",
+                type_line="Enchantment",
+                oracle_text="{2}{R}{G}, Discard two cards at random: Meteor Storm deals 4 damage to any target.",
+            ),
+            source_text='''
+                Ability ability = new SimpleActivatedAbility(new DamageTargetEffect(4), new ManaCostsImpl<>("{2}{R}{G}"));
+                ability.addCost(new DiscardTargetCost(new TargetCardInHand(2, new FilterCard("cards at random")), true));
+                ability.addTarget(new TargetAnyTarget());
+                this.addAbility(ability);
+            ''',
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "enchantment")
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_DAMAGE_SCOPE)
+        self.assertEqual(effect["activated_damage_amount"], 4)
+        self.assertEqual(effect["activation_cost_mana"], "{2}{R}{G}")
+        self.assertEqual(effect["activation_discard_count"], 2)
+        self.assertEqual(effect["activation_discard_target"], "any_card")
+        self.assertTrue(effect["activation_requires_discard_card"])
+        self.assertTrue(effect["activation_discard_random"])
+        self.assertEqual(effect["_activated_rule_effects"][0]["activation_discard_count"], 2)
+        self.assertTrue(effect["_activated_rule_effects"][0]["activation_discard_random"])
+
     def test_permanent_activated_damage_maps_land_discard_cost(self) -> None:
         row = queue_row(
             split.DAMAGE_UNIT,

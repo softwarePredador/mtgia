@@ -14241,6 +14241,16 @@ def activation_sacrifice_cost_from_source(text: str, window: str) -> dict[str, A
 
 def activation_discard_cost_from_oracle(text: str) -> dict[str, Any] | None:
     cost_text = str(text or "").lower().rsplit(":", 1)[0]
+    random_count_match = re.search(r"(?:^|,)\s*discard (?P<count>two|three|\d+) cards at random\s*$", cost_text)
+    if random_count_match:
+        count = number_word_to_int(random_count_match.group("count"))
+        if count > 1:
+            return {
+                "activation_discard_count": count,
+                "activation_discard_target": "any_card",
+                "activation_requires_discard_card": True,
+                "activation_discard_random": True,
+            }
     if re.search(r"(?:^|,)\s*discard a card at random\s*$", cost_text):
         return {
             "activation_discard_count": 1,
@@ -14266,15 +14276,30 @@ def activation_discard_cost_from_oracle(text: str) -> dict[str, Any] | None:
 def activation_discard_cost_from_source(window: str) -> dict[str, Any] | str | None:
     if "DiscardCardCost" not in (window or "") and "DiscardTargetCost" not in (window or ""):
         return None
+    random_target_matches = re.findall(
+        r"new\s+DiscardTargetCost\s*\(\s*new\s+TargetCardInHand\s*\(\s*(?P<count>\d+)\s*,\s*new\s+FilterCard\s*\(\s*\"cards at random\"\s*\)\s*\)\s*,\s*true\s*\)",
+        window or "",
+        re.S,
+    )
     random_matches = re.findall(r"new\s+DiscardCardCost\s*\(\s*true\s*\)", window or "")
     plain_matches = re.findall(r"new\s+DiscardCardCost\s*\(\s*\)", window or "")
     land_matches = re.findall(
         r"new\s+DiscardTargetCost\s*\(\s*new\s+TargetCardInHand\s*\(\s*StaticFilters\.FILTER_CARD_LAND_A\s*\)\s*\)",
         window or "",
     )
-    supported_count = len(random_matches) + len(plain_matches) + len(land_matches)
+    supported_count = len(random_target_matches) + len(random_matches) + len(plain_matches) + len(land_matches)
     if supported_count != 1:
         return "activated_damage_source_discard_cost_not_supported"
+    if random_target_matches:
+        count = int(random_target_matches[0])
+        if count <= 0:
+            return "activated_damage_source_discard_cost_not_supported"
+        return {
+            "activation_discard_count": count,
+            "activation_discard_target": "any_card",
+            "activation_requires_discard_card": True,
+            "activation_discard_random": True,
+        }
     if random_matches:
         return {
             "activation_discard_count": 1,

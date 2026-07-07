@@ -18392,6 +18392,76 @@ Current next high-volume queue after PG615:
 - `add_counters::source_add_counters_variant_v1` - `771`
 - `life_gain::xmage_life_gain_variant_review_v1` - `663`
 
+## PG616 Checkpoint - Activated Damage With Random Discard-Two Cost
+
+PG616 closes the narrow permanent activated damage subpattern where XMage and
+Oracle both show fixed direct damage with a fixed random discard-two cost. It
+uses the existing runtime scope: `xmage_permanent_simple_activated_damage_v1`.
+
+Promoted card:
+
+- `Meteor Storm` - `{2}{R}{G}, Discard two cards at random: This enchantment deals 4 damage to any target.`
+
+Implementation:
+
+- `xmage_authoritative_exact_scope_split.py` now recognizes Oracle wording
+  `discard two/three/N cards at random` and XMage
+  `DiscardTargetCost(new TargetCardInHand(N, new FilterCard("cards at random")), true)`
+  as fixed random discard costs for activated damage;
+- the existing activated damage runtime, package builder, and E2E runner were
+  reused because they already support fixed discard counts and random discard
+  metadata;
+- focused splitter coverage was added for the Meteor Storm source/Oracle
+  pattern.
+
+Validation:
+
+- focused Python compilation passed for the touched splitter;
+- focused pytest passed with `876` tests;
+- exact split produced `proposal_count=1` and
+  `safe_for_batch_pg_package_count=1`;
+- precheck found `1/1` target card row, `0` existing expected rows, and `0`
+  shadow rows to deprecate;
+- apply/postcheck confirmed `upserted_rows=1`, `1/1` verified/auto promoted
+  row, and `1/1` row with `oracle_hash`;
+- PG battle-rules -> Hermes/SQLite sync loaded `5847` PostgreSQL rules,
+  inserted/updated `5834` SQLite rows, and exported `5813` canonical snapshot
+  rows;
+- metadata sync used `database_target=127.0.0.1:15432/halder`, matched `6981`
+  PostgreSQL cards, wrote `6900` SQLite cache alias rows, left `deck_cards` at
+  `2699/2699` matched, and kept `unresolved_count=1`;
+- E2E package validation passed PostgreSQL, SQLite, snapshot, runtime lookup,
+  and `1` battle execution scenario with `2` runtime events; the scenario
+  discarded `2` cards and dealt `4` damage;
+- final PG/Hermes/SQLite contract audit passed `51/51`;
+- legacy contamination audit passed;
+- operational surface alignment audit passed;
+- strategy consistency audit passed `26/26`;
+- multi-rule runtime readiness remained bounded to existing global review gaps
+  (`no_runtime_safe_primary=1101`, `single_primary_with_blocked_alternatives=282`,
+  `composite_resolution_ready=2`);
+- global readiness now reports `battle_and_oracle_ready=5906` and
+  `battle_family_mapper_required=27967`;
+- post-sync queue rebuild reduced `target_identity_count` from `25045` to
+  `25044`, `xmage_authoritative_source_count` from `24731` to `24730`,
+  `xmage_authoritative_adapter_required_count` from `24731` to `24730`, and
+  `direct_damage::targeted_damage_variant_v1` from `775` to `774`;
+- final exact-scope recheck against the post-PG616 queue returned
+  `proposal_count=0` and `safe_for_batch_pg_package_count=0`.
+
+Residual boundary: PG616 does not authorize pay-life activated damage costs,
+remove-counter costs, exile-library costs, tap-target costs, dynamic damage
+amounts, restricted combat-only targets, or multiple activated damage modes.
+
+Current next high-volume queue after PG616:
+
+- `recursion::xmage_graveyard_return_variant_review_v1` - `1795`
+- `draw_engine::xmage_draw_card_variant_review_v1` - `1575`
+- `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1` - `1085`
+- `direct_damage::targeted_damage_variant_v1` - `774`
+- `add_counters::source_add_counters_variant_v1` - `771`
+- `life_gain::xmage_life_gain_variant_review_v1` - `663`
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:
