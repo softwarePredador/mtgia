@@ -2713,6 +2713,19 @@ def simple_activated_destroy_execution_scenario_from_expected_rule(
         "expected_target_constraints": constraints,
         "logical_rule_key": rule["logical_rule_key"],
     }
+    discard_count = max(0, int(required.get("activation_discard_count") or 0))
+    if discard_count:
+        scenario["controller_hand"] = [
+            {
+                "name": f"E2E Activated Destroy Discard {index + 1}",
+                "type_line": "Instant",
+                "effect": "draw_cards",
+                "cmc": 2,
+            }
+            for index in range(discard_count)
+        ]
+        scenario["expected_discard_count"] = discard_count
+        scenario["expected_discard_target"] = required.get("activation_discard_target") or "any_card"
     sacrifice_target_type = str(required.get("activation_sacrifice_target") or "").strip().lower()
     if required.get("activation_requires_sacrifice_target") or sacrifice_target_type:
         sacrifice_card_type = "creature" if sacrifice_target_type == "creature" else "permanent"

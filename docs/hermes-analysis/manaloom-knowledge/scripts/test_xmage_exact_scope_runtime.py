@@ -10443,6 +10443,90 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_simple_activated_destroy_pays_discard_cost_and_respects_nonblack_target(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.mana_pool.add("black", 1)
+        active.mana_pool.add("colorless", 2)
+        discard_card = {
+            "name": "Spare Lesson",
+            "type_line": "Sorcery",
+            "cmc": 2,
+            "effect": "draw",
+        }
+        active.hand.append(discard_card)
+        green_threat = {
+            "name": "Green Giant",
+            "type_line": "Creature - Giant",
+            "colors": ["G"],
+            "power": 8,
+            "toughness": 8,
+        }
+        black_creature = {
+            "name": "Black Piker",
+            "type_line": "Creature - Zombie",
+            "colors": ["B"],
+            "power": 2,
+            "toughness": 2,
+        }
+        opponent.battlefield.extend([green_threat, black_creature])
+        permanent = {
+            "name": "Notorious Assassin",
+            "type_line": "Creature - Human Spellshaper Assassin",
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+            "activated_effect": "destroy_target",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+            "activated_remove_effect": "remove_creature",
+            "activated_remove_target": "nonblack_creature",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"], "exclude_colors": ["B"]},
+            "destination": "graveyard",
+            "activation_cost_mana": "{2}{B}",
+            "activation_cost_generic": 2,
+            "activation_cost_colors": ["B"],
+            "activation_requires_tap": True,
+            "activation_requires_sacrifice": False,
+            "activation_discard_count": 1,
+            "activation_discard_target": "any_card",
+            "activation_requires_discard_card": True,
+            "summoning_sick": False,
+            "_rule_logical_key": "battle_rule_v1:notorious_assassin",
+        }
+        active.battlefield.append(permanent)
+
+        activated = self.battle.activate_generic_destroy_permanent(
+            active,
+            [opponent],
+            [active, opponent],
+            permanent,
+            turn=19,
+            rng=random.Random(119),
+            phase="precombat_main",
+        )
+
+        self.assertTrue(activated)
+        self.assertTrue(permanent.get("tapped"))
+        self.assertNotIn(discard_card, active.hand)
+        self.assertIn(discard_card, active.graveyard)
+        self.assertNotIn(green_threat, opponent.battlefield)
+        self.assertIn(green_threat, opponent.graveyard)
+        self.assertIn(black_creature, opponent.battlefield)
+        self.assertEqual(active.available_mana(), 0)
+        self.assertTrue(
+            any(
+                event == "activated_ability"
+                and data.get("card") == "Notorious Assassin"
+                and data.get("activation_kind") == "simple_activated_destroy"
+                and data.get("discarded") == ["Spare Lesson"]
+                and data.get("discarded_count") == 1
+                and data.get("discard_target") == "any_card"
+                and data.get("target") == "Green Giant"
+                and data.get("rule_logical_key") == "battle_rule_v1:notorious_assassin"
+                for event, data in self.events
+            )
+        )
+
     def test_simple_activated_destroy_respects_color_and_noncreature_artifact_constraints(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

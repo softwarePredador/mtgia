@@ -14822,10 +14822,11 @@ def activated_damage_from_source(source: str) -> dict[str, Any] | str:
     }
 
 
-def activated_destroy_from_oracle(metadata: dict[str, Any]) -> tuple[str, str] | None:
+def activated_destroy_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
     text = re.sub(r"\s+", " ", oracle_text(metadata)).strip().lower()
     if text.count(":") != 1:
         return None
+    discard_cost = activation_discard_cost_from_oracle(text)
     effect_text = text.rsplit(":", 1)[1].strip()
     extra_sentences = [
         sentence.strip()
@@ -14836,7 +14837,15 @@ def activated_destroy_from_oracle(metadata: dict[str, Any]) -> tuple[str, str] |
         return None
     effect_metadata = dict(metadata)
     effect_metadata["oracle_text"] = effect_text
-    return destroy_target_from_oracle(effect_metadata)
+    target = destroy_target_from_oracle(effect_metadata)
+    if target is None:
+        return None
+    effect, target_type = target
+    return {
+        "effect": effect,
+        "target": target_type,
+        **(discard_cost or {}),
+    }
 
 
 def activated_destroy_sacrifice_target_from_oracle(metadata: dict[str, Any]) -> str | None:
@@ -14912,8 +14921,6 @@ def activated_destroy_from_source(source: str) -> dict[str, Any] | str:
     text = source or ""
     risky_cost_classes = {
         "CompositeCost",
-        "DiscardCardCost",
-        "DiscardTargetCost",
         "ExileFrom",
         "ExileFromGraveCost",
         "ExileSourceFromGraveCost",
@@ -14936,6 +14943,9 @@ def activated_destroy_from_source(source: str) -> dict[str, Any] | str:
     window = text[max(0, destroy_index - 500) : destroy_index + 2000]
     if "SimpleActivatedAbility" not in window:
         return "activated_destroy_source_not_simple_activated"
+    discard_cost = activation_discard_cost_from_source(window)
+    if isinstance(discard_cost, str):
+        return discard_cost.replace("activated_damage", "activated_destroy")
     sacrifice_target = None
     if "SacrificeTargetCost" in window:
         sacrifice_cost_count = len(re.findall(r"new\s+SacrificeTargetCost\s*\(", window))
@@ -14979,6 +14989,7 @@ def activated_destroy_from_source(source: str) -> dict[str, Any] | str:
             if sacrifice_target is not None
             else {}
         ),
+        **(discard_cost or {}),
     }
 
 
@@ -21910,13 +21921,26 @@ def split_row(
         parsed_activation = activated_destroy_from_source(source_text)
         if isinstance(parsed_activation, str):
             return None, parsed_activation
-        oracle_effect, oracle_target_type = oracle_destroy
+        oracle_effect = str(oracle_destroy["effect"])
+        oracle_target_type = str(oracle_destroy["target"])
         if str(parsed_activation["target"]) != str(oracle_target_type):
             return None, "activated_destroy_source_oracle_target_mismatch"
         if parsed_activation.get("activation_sacrifice_target"):
             oracle_sacrifice_target = activated_destroy_sacrifice_target_from_oracle(metadata)
             if oracle_sacrifice_target != parsed_activation.get("activation_sacrifice_target"):
                 return None, "activated_destroy_source_oracle_sacrifice_target_mismatch"
+        oracle_discard_count = int(oracle_destroy.get("activation_discard_count") or 0)
+        source_discard_count = int(parsed_activation.get("activation_discard_count") or 0)
+        if source_discard_count != oracle_discard_count:
+            return None, "activated_destroy_source_oracle_discard_cost_mismatch"
+        if str(parsed_activation.get("activation_discard_target") or "any_card") != str(
+            oracle_destroy.get("activation_discard_target") or "any_card"
+        ):
+            return None, "activated_destroy_source_oracle_discard_cost_mismatch"
+        if bool(parsed_activation.get("activation_discard_random")) != bool(
+            oracle_destroy.get("activation_discard_random")
+        ):
+            return None, "activated_destroy_source_oracle_discard_cost_mismatch"
         type_line = str(metadata.get("type_line") or "").lower()
         permanent_effect = (
             "creature"
@@ -21950,6 +21974,10 @@ def split_row(
                     "activation_requires_sacrifice",
                     "activation_sacrifice_target",
                     "activation_requires_sacrifice_target",
+                    "activation_discard_count",
+                    "activation_discard_target",
+                    "activation_requires_discard_card",
+                    "activation_discard_random",
                 )
                 if key in parsed_activation
             },
@@ -21978,6 +22006,10 @@ def split_row(
                     "activation_requires_sacrifice",
                     "activation_sacrifice_target",
                     "activation_requires_sacrifice_target",
+                    "activation_discard_count",
+                    "activation_discard_target",
+                    "activation_requires_discard_card",
+                    "activation_discard_random",
                 )
                 if key in parsed_activation
             },

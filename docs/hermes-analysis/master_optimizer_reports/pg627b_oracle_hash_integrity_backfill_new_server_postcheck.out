@@ -1,0 +1,5 @@
+ trusted_executable_missing_oracle_hash_rows | backup_rows | restored_rows 
+---------------------------------------------+-------------+---------------
+                                           0 |          44 |            44
+(1 row)
+

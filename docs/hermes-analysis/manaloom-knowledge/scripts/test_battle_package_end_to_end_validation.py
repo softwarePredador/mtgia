@@ -658,6 +658,83 @@ def test_simple_activated_destroy_runner_executes_sacrifice_target_cost() -> Non
     )
 
 
+def test_simple_activated_destroy_runner_executes_discard_cost() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "creature",
+        "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+        "activated_effect": "destroy_target",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+        "activated_remove_effect": "remove_creature",
+        "activated_remove_target": "nonblack_creature",
+        "target": "creature",
+        "target_constraints": {"card_types": ["creature"], "exclude_colors": ["B"]},
+        "target_controller": "opponent",
+        "destination": "graveyard",
+        "activation_cost_mana": "{2}{B}",
+        "activation_cost_generic": 2,
+        "activation_cost_colors": ["B"],
+        "activation_requires_tap": True,
+        "activation_requires_sacrifice": False,
+        "activation_discard_count": 1,
+        "activation_discard_target": "any_card",
+        "activation_requires_discard_card": True,
+        "_rule_logical_key": "battle_rule_v1:notorious-assassin",
+    }
+    try:
+        result = validator.run_simple_activated_destroy(
+            battle,
+            {
+                "name": "Notorious Assassin destroys nonblack creature with discard cost",
+                "type": "simple_activated_destroy",
+                "card": {"name": "Notorious Assassin"},
+                "target": {
+                    "name": "E2E Nonblack Creature Target",
+                    "type_line": "Creature - Giant",
+                    "effect": "creature",
+                    "colors": ["G"],
+                    "power": 6,
+                    "toughness": 6,
+                },
+                "controller_hand": [
+                    {
+                        "name": "E2E Activated Destroy Discard 1",
+                        "type_line": "Instant",
+                        "effect": "draw_cards",
+                        "cmc": 2,
+                    }
+                ],
+                "controller_mana": {"generic": 2, "black": 1},
+                "expected_tapped_source": True,
+                "expected_destination": "graveyard",
+                "expected_discard_count": 1,
+                "expected_discard_target": "any_card",
+                "logical_rule_key": "battle_rule_v1:notorious-assassin",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Notorious Assassin"
+    assert result["target"] == "E2E Nonblack Creature Target"
+    assert result["discarded_count"] == 1
+    assert result["source_tapped"] is True
+    assert any(
+        event == "activated_ability"
+        and data.get("card") == "Notorious Assassin"
+        and data.get("discarded") == ["E2E Activated Destroy Discard 1"]
+        and data.get("discard_target") == "any_card"
+        and data.get("mana_paid") == 3
+        for event, data in events
+    )
+
+
 def test_simple_activated_self_keyword_runner_executes_keyword_effect() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

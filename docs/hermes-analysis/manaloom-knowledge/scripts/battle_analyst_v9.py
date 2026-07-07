@@ -46923,6 +46923,10 @@ def _activated_rule_effects_for_permanent(permanent):
             "activation_requires_sacrifice_target": bool(permanent.get("activation_requires_sacrifice_target")),
             "activation_sacrifice_target": permanent.get("activation_sacrifice_target"),
             "activation_sacrifice_cost": permanent.get("activation_sacrifice_cost"),
+            "activation_discard_count": permanent.get("activation_discard_count"),
+            "activation_discard_target": permanent.get("activation_discard_target"),
+            "activation_requires_discard_card": permanent.get("activation_requires_discard_card"),
+            "activation_discard_random": permanent.get("activation_discard_random"),
             "activation_cost_mana": permanent.get("activation_cost_mana"),
             "activation_cost_generic": permanent.get("activation_cost_generic"),
             "activation_cost_colors": permanent.get("activation_cost_colors"),
@@ -48187,6 +48191,17 @@ def can_activate_generic_destroy_permanent(player, permanent, opponents, *, effe
         )
     if not player.can_pay(activation_cost):
         return False
+    activation_discard_count = int(effect_data.get("activation_discard_count") or 0)
+    activation_discard_target = effect_data.get("activation_discard_target") or "any_card"
+    if activation_discard_count:
+        discard_cards = _choose_activation_discard_cost_cards(
+            player,
+            activation_discard_count,
+            activation_discard_target,
+            random_discard=bool(effect_data.get("activation_discard_random")),
+        )
+        if len(discard_cards) != activation_discard_count:
+            return False
     sacrifice_target_type = str(effect_data.get("activation_sacrifice_target") or "").strip()
     if sacrifice_target_type:
         sacrifice_target, _options = choose_activation_sacrifice_target(
@@ -48270,6 +48285,32 @@ def activate_generic_destroy_permanent(player, opponents, all_players, permanent
         )
     if not player.spend_mana(activation_cost):
         return False
+    activation_discard_count = int(effect_data.get("activation_discard_count") or 0)
+    activation_discard_target = effect_data.get("activation_discard_target") or "any_card"
+    discard_cards = []
+    discard_resolution = {"to_top": [], "to_graveyard": [], "used_replacement": False}
+    if activation_discard_count:
+        discard_cards = _choose_activation_discard_cost_cards(
+            player,
+            activation_discard_count,
+            activation_discard_target,
+            random_discard=bool(effect_data.get("activation_discard_random")),
+            rng=rng,
+        )
+        if len(discard_cards) != activation_discard_count:
+            return False
+        removed_cards = _remove_exact_cards_from_hand(player, discard_cards)
+        if len(removed_cards) != activation_discard_count:
+            return False
+        discard_resolution = resolve_effect_discard_cards(
+            player,
+            removed_cards,
+            top_limit=0,
+            opponents=opponents,
+            turn=turn,
+            phase=phase,
+            rng=rng,
+        )
     if effect_data.get("activation_requires_tap"):
         permanent["tapped"] = True
     sacrificed_source = False
@@ -48330,6 +48371,9 @@ def activate_generic_destroy_permanent(player, opponents, all_players, permanent
                 option.get("name", "?")
                 for option in (sacrifice_options or [])[:6]
             ],
+            "discarded": [card.get("name", "?") for card in discard_cards],
+            "discarded_count": activation_discard_count,
+            "discard_target": activation_discard_target if activation_discard_count else None,
         },
         rule_source=fields.get("rule_source", "battle_rule"),
         rule_status=fields.get("rule_review_status", "verified"),
@@ -48345,6 +48389,8 @@ def activate_generic_destroy_permanent(player, opponents, all_players, permanent
                 (1 if sacrificed_source else 0)
                 + (1 if sacrificed_target is not None else 0)
             ),
+            "graveyard": len(discard_resolution.get("to_graveyard") or []),
+            "cards_discarded": activation_discard_count,
             "opponent_permanents_removed": 1,
         },
         risk_flags=[
@@ -48353,6 +48399,7 @@ def activate_generic_destroy_permanent(player, opponents, all_players, permanent
                 "tap_ability": bool(effect_data.get("activation_requires_tap")),
                 "sacrifice_source": sacrificed_source,
                 "sacrifice_target": sacrificed_target is not None,
+                "discard_cost": activation_discard_count > 0,
                 "activated_destroy_target": True,
             }.items()
             if active
@@ -48369,6 +48416,12 @@ def activate_generic_destroy_permanent(player, opponents, all_players, permanent
         sacrificed_source=sacrificed_source,
         sacrifice_target=sacrifice_target_type or None,
         sacrificed_target=(sacrificed_target or {}).get("name"),
+        discarded=[card.get("name", "?") for card in discard_cards],
+        discarded_count=activation_discard_count,
+        discard_target=activation_discard_target if activation_discard_count else None,
+        discard_to_graveyard=[card.get("name", "?") for card in discard_resolution.get("to_graveyard") or []],
+        discard_to_library_top=[card.get("name", "?") for card in discard_resolution.get("to_top") or []],
+        discard_replacement_used=bool(discard_resolution.get("used_replacement")),
         mana_paid=mana_paid,
         target=target.get("name", "?"),
         target_player=target_player.name,

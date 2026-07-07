@@ -1243,6 +1243,51 @@ def test_manifest_builds_simple_activated_destroy_sacrifice_target_scenario() ->
     assert scenario["sacrifice_target"]["type_line"] == "Creature - Soldier"
 
 
+def test_manifest_builds_simple_activated_destroy_discard_cost_scenario() -> None:
+    rule = {
+        "normalized_name": "notorious assassin",
+        "card_name": "Notorious Assassin",
+        "oracle_hash": "hash-notorious-assassin",
+        "logical_rule_key": "battle_rule_v1:hash-notorious-assassin",
+        "required_effect_fields": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+            "activated_effect": "destroy_target",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+            "activated_remove_effect": "remove_creature",
+            "activated_remove_target": "nonblack_creature",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"], "exclude_colors": ["B"]},
+            "destination": "graveyard",
+            "activation_cost_mana": "{2}{B}",
+            "activation_cost_generic": 2,
+            "activation_cost_colors": ["B"],
+            "activation_requires_tap": True,
+            "activation_discard_count": 1,
+            "activation_discard_target": "any_card",
+            "activation_requires_discard_card": True,
+        },
+    }
+
+    scenario = builder.simple_activated_destroy_execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "simple_activated_destroy"
+    assert scenario["controller_mana"]["generic"] == 2
+    assert scenario["controller_mana"]["black"] == 1
+    assert scenario["expected_discard_count"] == 1
+    assert scenario["expected_discard_target"] == "any_card"
+    assert scenario["controller_hand"] == [
+        {
+            "name": "E2E Activated Destroy Discard 1",
+            "type_line": "Instant",
+            "effect": "draw_cards",
+            "cmc": 2,
+        }
+    ]
+    assert scenario["target"]["colors"] == ["W"]
+
+
 def test_manifest_builds_simple_activated_self_keyword_execution_scenario() -> None:
     rule = {
         "normalized_name": "cobalt golem",

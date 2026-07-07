@@ -1,0 +1,15 @@
+BEGIN
+CREATE SCHEMA
+DROP TABLE
+SELECT 44
+ updated_rows 
+--------------
+           44
+(1 row)
+
+ backup_rows 
+-------------
+          44
+(1 row)
+
+COMMIT

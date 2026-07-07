@@ -11541,6 +11541,138 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(power_proposal["effect_json"]["activated_remove_target"], "creature_power_4_or_greater")
         self.assertEqual(power_proposal["effect_json"]["target_constraints"], {"card_types": ["creature"], "power_min": 4})
 
+    def test_permanent_activated_destroy_maps_spellshaper_discard_cost(self) -> None:
+        row = queue_row(
+            split.DESTROY_UNIT,
+            effect_classes=["DestroyTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        cases = [
+            (
+                "Blaster Mage",
+                "Creature - Human Spellshaper",
+                "{R}, {T}, Discard a card: Destroy target Wall.",
+                """
+                    private static final FilterPermanent filter = new FilterPermanent(SubType.WALL);
+                    Ability ability = new SimpleActivatedAbility(
+                        new DestroyTargetEffect(),
+                        new ManaCostsImpl<>("{R}")
+                    );
+                    ability.addTarget(new TargetPermanent(filter));
+                    ability.addCost(new TapSourceCost());
+                    ability.addCost(new DiscardCardCost());
+                    this.addAbility(ability);
+                """,
+                "wall_creature",
+                "creature",
+                "{R}",
+                0,
+                ["R"],
+                {"card_types": ["creature"], "required_subtypes": ["wall"]},
+            ),
+            (
+                "Devout Witness",
+                "Creature - Human Spellshaper",
+                "{1}{W}, {T}, Discard a card: Destroy target artifact or enchantment.",
+                """
+                    Ability ability = new SimpleActivatedAbility(
+                        new DestroyTargetEffect(),
+                        new ManaCostsImpl<>("{1}{W}")
+                    );
+                    ability.addTarget(new TargetPermanent(StaticFilters.FILTER_PERMANENT_ARTIFACT_OR_ENCHANTMENT));
+                    ability.addCost(new TapSourceCost());
+                    ability.addCost(new DiscardCardCost());
+                    this.addAbility(ability);
+                """,
+                "artifact_or_enchantment",
+                "artifact_or_enchantment",
+                "{1}{W}",
+                1,
+                ["W"],
+                {"card_types": ["artifact", "enchantment"]},
+            ),
+            (
+                "Notorious Assassin",
+                "Creature - Human Spellshaper Assassin",
+                "{2}{B}, {T}, Discard a card: Destroy target nonblack creature. It can't be regenerated.",
+                """
+                    Ability ability = new SimpleActivatedAbility(
+                        new DestroyTargetEffect(true),
+                        new ManaCostsImpl<>("{2}{B}")
+                    );
+                    ability.addTarget(new TargetPermanent(FILTER_PERMANENT_CREATURE_NON_BLACK));
+                    ability.addCost(new TapSourceCost());
+                    ability.addCost(new DiscardCardCost());
+                    this.addAbility(ability);
+                """,
+                "nonblack_creature",
+                "creature",
+                "{2}{B}",
+                2,
+                ["B"],
+                {"card_types": ["creature"], "exclude_colors": ["B"]},
+            ),
+            (
+                "Seismic Mage",
+                "Creature - Human Spellshaper",
+                "{2}{R}, {T}, Discard a card: Destroy target land.",
+                """
+                    Ability ability = new SimpleActivatedAbility(
+                        new DestroyTargetEffect(),
+                        new ManaCostsImpl<>("{2}{R}")
+                    );
+                    ability.addTarget(new TargetLandPermanent());
+                    ability.addCost(new TapSourceCost());
+                    ability.addCost(new DiscardCardCost());
+                    this.addAbility(ability);
+                """,
+                "land",
+                "land",
+                "{2}{R}",
+                2,
+                ["R"],
+                {"card_types": ["land"]},
+            ),
+        ]
+
+        for (
+            name,
+            type_line,
+            oracle_text,
+            source_text,
+            remove_target,
+            target,
+            mana_cost,
+            generic_cost,
+            color_cost,
+            constraints,
+        ) in cases:
+            with self.subTest(name=name):
+                proposal, reason = split.split_row(
+                    row,
+                    metadata(name=name, type_line=type_line, oracle_text=oracle_text),
+                    source_text=source_text,
+                )
+
+                self.assertEqual(reason, "selected_exact_scope")
+                effect = proposal["effect_json"]
+                self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_DESTROY_SCOPE)
+                self.assertEqual(effect["activated_remove_target"], remove_target)
+                self.assertEqual(effect["target"], target)
+                self.assertEqual(effect["target_constraints"], constraints)
+                self.assertEqual(effect["activation_cost_mana"], mana_cost)
+                self.assertEqual(effect["activation_cost_generic"], generic_cost)
+                self.assertEqual(effect["activation_cost_colors"], color_cost)
+                self.assertTrue(effect["activation_requires_tap"])
+                self.assertEqual(effect["activation_discard_count"], 1)
+                self.assertEqual(effect["activation_discard_target"], "any_card")
+                self.assertTrue(effect["activation_requires_discard_card"])
+                activated = effect["_activated_rule_effects"][0]
+                self.assertEqual(activated["activation_discard_count"], 1)
+                self.assertEqual(activated["activation_discard_target"], "any_card")
+
     def test_permanent_activated_destroy_maps_damaged_this_turn_creature_target(self) -> None:
         row = queue_row(
             split.DESTROY_UNIT,

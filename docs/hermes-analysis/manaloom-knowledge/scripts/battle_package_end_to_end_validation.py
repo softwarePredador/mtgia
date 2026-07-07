@@ -3822,6 +3822,12 @@ def run_simple_activated_destroy(
     active = battle.Player(str(scenario.get("player") or "Activated Controller"), None, [])
     opponent = battle.Player(str(scenario.get("opponent") or "Activated Opponent"), None, [])
     active.battlefield = [source]
+    controller_hand = [
+        battle.enrich_card(dict(item))
+        for item in (scenario.get("controller_hand") or [])
+        if isinstance(item, dict)
+    ]
+    active.hand = list(controller_hand)
     sacrifice_target = None
     if scenario.get("sacrifice_target"):
         sacrifice_target = battle.enrich_card(dict(scenario["sacrifice_target"]))
@@ -3899,6 +3905,30 @@ def run_simple_activated_destroy(
             "battle_events",
             f"{card['name']} sacrificed_source={activation_event.get('sacrificed_source')!r}, expected {expected_sacrificed_source}",
         )
+    expected_discard_count = int(
+        scenario.get("expected_discard_count", effect.get("activation_discard_count") or 0) or 0
+    )
+    if int(activation_event.get("discarded_count") or 0) != expected_discard_count:
+        fail(
+            "battle_events",
+            f"{card['name']} discarded_count={activation_event.get('discarded_count')!r}, expected {expected_discard_count}",
+        )
+    if expected_discard_count:
+        expected_discard_target = str(
+            scenario.get("expected_discard_target") or effect.get("activation_discard_target") or "any_card"
+        )
+        if str(activation_event.get("discard_target") or "") != expected_discard_target:
+            fail(
+                "battle_events",
+                f"{card['name']} discard_target={activation_event.get('discard_target')!r}, expected {expected_discard_target!r}",
+            )
+        graveyard_names = {item.get("name") for item in active.graveyard if isinstance(item, dict)}
+        discarded_names = set(activation_event.get("discarded") or [])
+        if len(discarded_names) != expected_discard_count or not discarded_names.issubset(graveyard_names):
+            fail(
+                "battle_execution",
+                f"{card['name']} discarded cards not found in graveyard: {sorted(discarded_names)}",
+            )
     resolved_event = next(
         (
             data
@@ -3923,6 +3953,7 @@ def run_simple_activated_destroy(
         "destination": expected_destination,
         "source_tapped": bool(source.get("tapped")),
         "sacrificed_source": expected_sacrificed_source,
+        "discarded_count": expected_discard_count,
         "target_sacrificed": bool(sacrifice_target is not None and sacrifice_target in active.graveyard),
     }
 
