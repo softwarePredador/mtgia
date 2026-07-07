@@ -415,6 +415,143 @@ def test_simple_activated_add_counters_target_runner_executes_minus_counter() ->
     )
 
 
+def test_simple_activated_destroy_runner_executes_token_target_constraint() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "creature",
+        "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+        "activated_effect": "destroy_target",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+        "activated_remove_effect": "remove_creature",
+        "activated_remove_target": "creature_token",
+        "target": "creature",
+        "target_constraints": {"card_types": ["creature"], "token": True},
+        "target_controller": "opponent",
+        "destination": "graveyard",
+        "activation_cost_mana": "{0}",
+        "activation_cost_generic": 0,
+        "activation_cost_colors": [],
+        "activation_requires_tap": True,
+        "activation_requires_sacrifice": False,
+        "_rule_logical_key": "battle_rule_v1:dogged-hunter",
+    }
+    try:
+        result = validator.run_simple_activated_destroy(
+            battle,
+            {
+                "name": "Dogged Hunter destroys target creature token",
+                "type": "simple_activated_destroy",
+                "card": {"name": "Dogged Hunter"},
+                "target": {
+                    "name": "E2E Token Target",
+                    "type_line": "Creature - Goblin",
+                    "effect": "creature",
+                    "token": True,
+                    "is_token": True,
+                    "power": 1,
+                    "toughness": 1,
+                },
+                "controller_mana": {},
+                "expected_tapped_source": True,
+                "expected_destination": "graveyard",
+                "logical_rule_key": "battle_rule_v1:dogged-hunter",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Dogged Hunter"
+    assert result["target"] == "E2E Token Target"
+    assert result["destination"] == "graveyard"
+    assert result["source_tapped"] is True
+    assert any(
+        event == "activated_ability"
+        and data.get("card") == "Dogged Hunter"
+        and data.get("target") == "E2E Token Target"
+        and data.get("activation_kind") == "simple_activated_destroy"
+        for event, data in events
+    )
+
+
+def test_simple_activated_destroy_runner_executes_sacrifice_target_cost() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "creature",
+        "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+        "activated_effect": "destroy_target",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+        "activated_remove_effect": "remove_permanent",
+        "activated_remove_target": "enchantment",
+        "target": "enchantment",
+        "target_constraints": {"card_types": ["enchantment"]},
+        "target_controller": "opponent",
+        "destination": "graveyard",
+        "activation_cost_mana": "{G}",
+        "activation_cost_generic": 0,
+        "activation_cost_colors": ["G"],
+        "activation_requires_tap": True,
+        "activation_requires_sacrifice": False,
+        "activation_requires_sacrifice_target": True,
+        "activation_sacrifice_target": "creature",
+        "_rule_logical_key": "battle_rule_v1:quagmire-druid",
+    }
+    try:
+        result = validator.run_simple_activated_destroy(
+            battle,
+            {
+                "name": "Quagmire Druid destroys enchantment with sacrifice target cost",
+                "type": "simple_activated_destroy",
+                "card": {"name": "Quagmire Druid"},
+                "target": {
+                    "name": "E2E Enchantment Target",
+                    "type_line": "Enchantment",
+                    "effect": "enchantment",
+                    "cmc": 3,
+                },
+                "sacrifice_target": {
+                    "name": "E2E Sacrifice Creature",
+                    "type_line": "Creature - Soldier",
+                    "effect": "creature",
+                    "power": 1,
+                    "toughness": 1,
+                },
+                "controller_mana": {"green": 1},
+                "expected_tapped_source": True,
+                "expected_destination": "graveyard",
+                "expect_target_sacrificed": True,
+                "logical_rule_key": "battle_rule_v1:quagmire-druid",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Quagmire Druid"
+    assert result["target"] == "E2E Enchantment Target"
+    assert result["destination"] == "graveyard"
+    assert result["source_tapped"] is True
+    assert result["target_sacrificed"] is True
+    assert any(
+        event == "activated_ability"
+        and data.get("card") == "Quagmire Druid"
+        and data.get("sacrifice_target") == "creature"
+        and data.get("sacrificed_target") == "E2E Sacrifice Creature"
+        and data.get("mana_paid") == 1
+        for event, data in events
+    )
+
+
 def test_simple_activated_self_keyword_runner_executes_keyword_effect() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

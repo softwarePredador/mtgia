@@ -9286,6 +9286,266 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["activation_cost_mana"], "{B}{B}")
         self.assertTrue(effect["activation_requires_tap"])
 
+    def test_permanent_activated_destroy_maps_restricted_real_targets(self) -> None:
+        cases = [
+            (
+                "Dogged Hunter",
+                "Creature - Human Nomad",
+                "{T}: Destroy target creature token.",
+                """
+                    private static final FilterCreaturePermanent filter =
+                        new FilterCreaturePermanent("creature token");
+                    static { filter.add(TokenPredicate.TRUE); }
+                    Ability ability = new SimpleActivatedAbility(
+                        new DestroyTargetEffect(),
+                        new GenericManaCost(0)
+                    );
+                    ability.addTarget(new TargetPermanent(filter));
+                    ability.addCost(new TapSourceCost());
+                    this.addAbility(ability);
+                """,
+                "creature_token",
+                "creature",
+                {"card_types": ["creature"], "token": True},
+                "{0}",
+                True,
+                False,
+                0,
+                [],
+            ),
+            (
+                "King Suleiman",
+                "Creature - Human Noble",
+                "{T}: Destroy target Djinn or Efreet.",
+                """
+                    private static final FilterPermanent filter =
+                        new FilterPermanent("Djinn or Efreet");
+                    static {
+                        filter.add(Predicates.or(
+                            SubType.DJINN.getPredicate(),
+                            SubType.EFREET.getPredicate()
+                        ));
+                    }
+                    Ability ability = new SimpleActivatedAbility(
+                        new DestroyTargetEffect(),
+                        new GenericManaCost(0)
+                    );
+                    ability.addTarget(new TargetPermanent(filter));
+                    ability.addCost(new TapSourceCost());
+                    this.addAbility(ability);
+                """,
+                "djinn_or_efreet_permanent",
+                "permanent",
+                {"card_types": ["permanent"], "required_subtypes": ["djinn", "efreet"]},
+                "{0}",
+                True,
+                False,
+                0,
+                [],
+            ),
+            (
+                "Northern Paladin",
+                "Creature - Human Knight",
+                "{W}{W}, {T}: Destroy target black permanent.",
+                """
+                    private static final FilterPermanent filter =
+                        new FilterPermanent("black permanent");
+                    static { filter.add(new ColorPredicate(ObjectColor.BLACK)); }
+                    Ability ability = new SimpleActivatedAbility(
+                        new DestroyTargetEffect(),
+                        new ManaCostsImpl<>("{W}{W}")
+                    );
+                    ability.addTarget(new TargetPermanent(filter));
+                    ability.addCost(new TapSourceCost());
+                    this.addAbility(ability);
+                """,
+                "black_permanent",
+                "permanent",
+                {"card_types": ["permanent"], "target_colors": ["B"]},
+                "{W}{W}",
+                True,
+                False,
+                0,
+                ["W", "W"],
+            ),
+            (
+                "Southern Paladin",
+                "Creature - Human Knight",
+                "{W}{W}, {T}: Destroy target red permanent.",
+                """
+                    private static final FilterPermanent filter =
+                        new FilterPermanent("red permanent");
+                    static { filter.add(new ColorPredicate(ObjectColor.RED)); }
+                    Ability ability = new SimpleActivatedAbility(
+                        new DestroyTargetEffect(),
+                        new ManaCostsImpl<>("{W}{W}")
+                    );
+                    ability.addTarget(new TargetPermanent(filter));
+                    ability.addCost(new TapSourceCost());
+                    this.addAbility(ability);
+                """,
+                "red_permanent",
+                "permanent",
+                {"card_types": ["permanent"], "target_colors": ["R"]},
+                "{W}{W}",
+                True,
+                False,
+                0,
+                ["W", "W"],
+            ),
+            (
+                "Haazda Exonerator",
+                "Creature - Human Soldier",
+                "{T}, Sacrifice this creature: Destroy target Aura.",
+                """
+                    private static final FilterPermanent filter =
+                        new FilterPermanent("Aura");
+                    static { filter.add(SubType.AURA.getPredicate()); }
+                    Ability ability = new SimpleActivatedAbility(
+                        new DestroyTargetEffect(),
+                        new GenericManaCost(0)
+                    );
+                    ability.addTarget(new TargetPermanent(filter));
+                    ability.addCost(new TapSourceCost());
+                    ability.addCost(new SacrificeSourceCost());
+                    this.addAbility(ability);
+                """,
+                "aura",
+                "enchantment",
+                {"card_types": ["enchantment"], "required_subtypes": ["aura"]},
+                "{0}",
+                True,
+                True,
+                0,
+                [],
+            ),
+            (
+                "Seal of Doom",
+                "Enchantment",
+                "Sacrifice this enchantment: Destroy target nonblack creature. It can't be regenerated.",
+                """
+                    Ability ability = new SimpleActivatedAbility(
+                        new DestroyTargetEffect(true),
+                        new SacrificeSourceCost()
+                    );
+                    ability.addTarget(new TargetPermanent(StaticFilters.FILTER_PERMANENT_CREATURE_NON_BLACK));
+                    this.addAbility(ability);
+                """,
+                "nonblack_creature",
+                "creature",
+                {"card_types": ["creature"], "exclude_colors": ["B"]},
+                "{0}",
+                False,
+                True,
+                0,
+                [],
+            ),
+            (
+                "Nezumi Shadow-Watcher",
+                "Creature - Rat Warrior",
+                "Sacrifice this creature: Destroy target Ninja.",
+                """
+                    private static final FilterPermanent filter =
+                        new FilterPermanent("Ninja");
+                    static { filter.add(SubType.NINJA.getPredicate()); }
+                    Ability ability = new SimpleActivatedAbility(
+                        new DestroyTargetEffect(),
+                        new SacrificeSourceCost()
+                    );
+                    ability.addTarget(new TargetPermanent(filter));
+                    this.addAbility(ability);
+                """,
+                "ninja_permanent",
+                "permanent",
+                {"card_types": ["permanent"], "required_subtypes": ["ninja"]},
+                "{0}",
+                False,
+                True,
+                0,
+                [],
+            ),
+        ]
+        for (
+            name,
+            type_line,
+            oracle,
+            source,
+            expected_target,
+            expected_base,
+            expected_constraints,
+            expected_cost,
+            expected_tap,
+            expected_sacrifice,
+            expected_generic,
+            expected_colors,
+        ) in cases:
+            with self.subTest(card=name):
+                row = queue_row(
+                    split.DESTROY_UNIT,
+                    effect_classes=["DestroyTargetEffect"],
+                    ability_kind="activated",
+                    ability_classes=["SimpleActivatedAbility"],
+                    xmage_signals=["targeting", "activated_ability"],
+                )
+                proposal, reason = split.split_row(
+                    row,
+                    metadata(name=name, type_line=type_line, oracle_text=oracle),
+                    source_text=source,
+                )
+
+                self.assertEqual(reason, "selected_exact_scope")
+                effect = proposal["effect_json"]
+                self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_DESTROY_SCOPE)
+                self.assertEqual(effect["activated_remove_target"], expected_target)
+                self.assertEqual(effect["target"], expected_base)
+                self.assertEqual(effect["target_constraints"], expected_constraints)
+                self.assertEqual(effect["activation_cost_mana"], expected_cost)
+                self.assertEqual(effect["activation_cost_generic"], expected_generic)
+                self.assertEqual(effect["activation_cost_colors"], expected_colors)
+                self.assertEqual(effect["activation_requires_tap"], expected_tap)
+                self.assertEqual(effect["activation_requires_sacrifice"], expected_sacrifice)
+
+    def test_permanent_activated_destroy_maps_colored_sacrifice_target_cost(self) -> None:
+        row = queue_row(
+            split.DESTROY_UNIT,
+            effect_classes=["DestroyTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Quagmire Druid",
+                type_line="Creature - Zombie Druid",
+                oracle_text="{G}, {T}, Sacrifice a creature: Destroy target enchantment.",
+            ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(
+                    new DestroyTargetEffect(false),
+                    new ColoredManaCost(ColoredManaSymbol.G)
+                );
+                ability.addCost(new TapSourceCost());
+                ability.addCost(new SacrificeTargetCost(StaticFilters.FILTER_PERMANENT_CREATURE));
+                ability.addTarget(new TargetEnchantmentPermanent());
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_DESTROY_SCOPE)
+        self.assertEqual(effect["activated_remove_target"], "enchantment")
+        self.assertEqual(effect["target"], "enchantment")
+        self.assertEqual(effect["target_constraints"], {"card_types": ["enchantment"]})
+        self.assertEqual(effect["activation_cost_mana"], "{G}")
+        self.assertEqual(effect["activation_cost_generic"], 0)
+        self.assertEqual(effect["activation_cost_colors"], ["G"])
+        self.assertTrue(effect["activation_requires_tap"])
+        self.assertFalse(effect["activation_requires_sacrifice"])
+        self.assertTrue(effect["activation_requires_sacrifice_target"])
+        self.assertEqual(effect["activation_sacrifice_target"], "creature")
+
     def test_permanent_activated_tap_target_creature_maps_exact_scope(self) -> None:
         row = queue_row(
             split.TAP_TARGET_CREATURE_UNIT,

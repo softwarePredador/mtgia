@@ -3655,6 +3655,10 @@ def run_simple_activated_destroy(
     active = battle.Player(str(scenario.get("player") or "Activated Controller"), None, [])
     opponent = battle.Player(str(scenario.get("opponent") or "Activated Opponent"), None, [])
     active.battlefield = [source]
+    sacrifice_target = None
+    if scenario.get("sacrifice_target"):
+        sacrifice_target = battle.enrich_card(dict(scenario["sacrifice_target"]))
+        active.battlefield.append(sacrifice_target)
     opponent.battlefield = [target]
     add_manifest_mana(active, scenario.get("controller_mana") or {})
     all_players = [active, opponent]
@@ -3681,10 +3685,21 @@ def run_simple_activated_destroy(
         fail("battle_execution", f"{card['name']} target remained on battlefield")
     expected_zone = opponent.exile if expected_destination == "exile" else opponent.graveyard
     if target not in expected_zone:
-        fail(
-            "battle_execution",
-            f"{card['name']} target not in expected {expected_destination}: {target.get('name')}",
+        token_ceased = (
+            expected_destination == "graveyard"
+            and bool(target.get("token") or target.get("is_token") or str(target.get("tag") or "").lower() == "token")
+            and any(
+                event == "token_ceased_to_exist"
+                and data.get("token") == target.get("name")
+                and str(data.get("zone") or "").lower() == expected_destination
+                for event, data in events
+            )
         )
+        if not token_ceased:
+            fail(
+                "battle_execution",
+                f"{card['name']} target not in expected {expected_destination}: {target.get('name')}",
+            )
     if bool(source.get("tapped")) != expected_tapped_source:
         fail(
             "battle_execution",
@@ -3695,6 +3710,11 @@ def run_simple_activated_destroy(
             fail("battle_execution", f"{card['name']} source sacrifice zone mismatch")
     elif source not in active.battlefield:
         fail("battle_execution", f"{card['name']} source left battlefield unexpectedly")
+    if bool(scenario.get("expect_target_sacrificed")):
+        if sacrifice_target is None:
+            fail("battle_execution", f"{card['name']} expected sacrifice target was not configured")
+        if sacrifice_target in active.battlefield or sacrifice_target not in active.graveyard:
+            fail("battle_execution", f"{card['name']} sacrifice target zone mismatch")
     activation_event = next(
         (
             data
@@ -3736,6 +3756,7 @@ def run_simple_activated_destroy(
         "destination": expected_destination,
         "source_tapped": bool(source.get("tapped")),
         "sacrificed_source": expected_sacrificed_source,
+        "target_sacrificed": bool(sacrifice_target is not None and sacrifice_target in active.graveyard),
     }
 
 

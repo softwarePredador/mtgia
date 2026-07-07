@@ -11235,6 +11235,7 @@ def restricted_target_base(target: str) -> str:
         "creature_damaged_this_turn",
         "creature_damaged_this_turn_opponent_controls",
         "creature_opponent_controls",
+        "creature_token",
         "creature_up_to_three",
         "creature_with_defender",
         "creature_mana_value_3_or_greater",
@@ -11253,6 +11254,10 @@ def restricted_target_base(target: str) -> str:
     if target in {
         "black_or_red_creature_or_planeswalker",
         "black_or_red_permanent",
+        "black_permanent",
+        "red_permanent",
+        "djinn_or_efreet_permanent",
+        "ninja_permanent",
         "green_or_white_creature_or_planeswalker",
         "artifact_or_tapped_creature",
         "white_permanent",
@@ -11335,6 +11340,7 @@ def restricted_battlefield_target_from_oracle(metadata: dict[str, Any], action: 
         (r"target tapped creature", "tapped_creature"),
         (r"target untapped creature", "untapped_creature"),
         (r"target creature with flying", "flying_creature"),
+        (r"target creature token", "creature_token"),
         (r"target nonartifact, nonblack creature(?:\. it can't be regenerated)?", "nonartifact_nonblack_creature"),
         (r"target nonartifact creature", "nonartifact_creature"),
         (r"target nonblack creature(?:\. it can't be regenerated)?", "nonblack_creature"),
@@ -11358,6 +11364,9 @@ def restricted_battlefield_target_from_oracle(metadata: dict[str, Any], action: 
         (r"target human creature", "human_creature"),
         (r"target spirit(?:\.|$)", "spirit_creature"),
         (r"target wall(?:\. it can't be regenerated)?", "wall_creature"),
+        (r"target djinn or efreet", "djinn_or_efreet_permanent"),
+        (r"target ninja", "ninja_permanent"),
+        (r"target aura", "aura"),
         (r"target spirit or enchantment", "spirit_or_enchantment"),
         (r"target monocolored creature", "monocolored_creature"),
         (r"target noncreature permanent", "noncreature_permanent"),
@@ -11368,6 +11377,8 @@ def restricted_battlefield_target_from_oracle(metadata: dict[str, Any], action: 
         (r"target creature or planeswalker that's black or red", "black_or_red_creature_or_planeswalker"),
         (r"target creature, vehicle, or nonbasic land", "creature_vehicle_or_nonbasic_land"),
         (r"target black or red permanent", "black_or_red_permanent"),
+        (r"target black permanent", "black_permanent"),
+        (r"target red permanent", "red_permanent"),
         (r"target white permanent", "white_permanent"),
         (r"target monocolored permanent", "monocolored_permanent"),
         (r"target nonwhite permanent", "nonwhite_permanent"),
@@ -11545,6 +11556,21 @@ def restricted_battlefield_target_from_source(source: str) -> str | None:
             return target
     if 'FilterPermanent("Spirit")' in text and "SubType.SPIRIT.getPredicate()" in text:
         return "spirit_creature"
+    if (
+        'FilterCreaturePermanent("creature token")' in text
+        or ("FilterCreaturePermanent" in text and "TokenPredicate.TRUE" in text)
+    ):
+        return "creature_token"
+    if (
+        'FilterPermanent("Djinn or Efreet")' in text
+        and "SubType.DJINN.getPredicate()" in text
+        and "SubType.EFREET.getPredicate()" in text
+    ):
+        return "djinn_or_efreet_permanent"
+    if 'FilterPermanent("Ninja")' in text and "SubType.NINJA.getPredicate()" in text:
+        return "ninja_permanent"
+    if 'FilterPermanent("Aura")' in text and "SubType.AURA.getPredicate()" in text:
+        return "aura"
     if 'FilterPermanent("Spirit or enchantment")' in text and "SubType.SPIRIT.getPredicate()" in text:
         return "spirit_or_enchantment"
     if (
@@ -11588,6 +11614,28 @@ def restricted_battlefield_target_from_source(source: str) -> str | None:
         return "flying_creature"
     if "ObjectColor.BLACK" in text and "ObjectColor.RED" in text and "FilterPermanent(\"black or red permanent\")" in text:
         return "black_or_red_permanent"
+    if (
+        'FilterPermanent("black permanent")' in text
+        or (
+            "FilterPermanent" in text
+            and "ObjectColor.BLACK" in text
+            and "ColorPredicate" in text
+            and "ObjectColor.RED" not in text
+            and "Predicates.not" not in text
+        )
+    ):
+        return "black_permanent"
+    if (
+        'FilterPermanent("red permanent")' in text
+        or (
+            "FilterPermanent" in text
+            and "ObjectColor.RED" in text
+            and "ColorPredicate" in text
+            and "ObjectColor.BLACK" not in text
+            and "Predicates.not" not in text
+        )
+    ):
+        return "red_permanent"
     if (
         "ObjectColor.BLACK" in text
         and "ObjectColor.RED" in text
@@ -14487,7 +14535,7 @@ def activated_destroy_from_source(source: str) -> dict[str, Any] | str:
     present_risky = sorted(cost for cost in risky_cost_classes if cost in text)
     if present_risky:
         return "activated_destroy_source_cost_not_supported"
-    if len(re.findall(r"new\s+DestroyTargetEffect\s*\(\s*\)", text, re.S)) != 1:
+    if len(re.findall(r"new\s+DestroyTargetEffect\s*\(\s*(?:true|false)?\s*\)", text, re.S)) != 1:
         return "activated_destroy_source_not_simple_destroy_effect"
     destroy_index = text.find("DestroyTargetEffect")
     window = text[max(0, destroy_index - 500) : destroy_index + 2000]
@@ -14507,10 +14555,16 @@ def activated_destroy_from_source(source: str) -> dict[str, Any] | str:
     cost_text = "{0}"
     mana_match = re.search(r'ManaCostsImpl<[^>]*>\s*\(\s*"([^"]+)"\s*\)', window)
     generic_match = re.search(r"GenericManaCost\s*\(\s*(\d+)\s*\)", window)
+    colored_match = re.search(r"ColoredManaCost\s*\(\s*ColoredManaSymbol\.([WUBRG])\s*\)", window)
+    cost_kinds = sum(1 for match in (mana_match, generic_match, colored_match) if match)
+    if cost_kinds > 1:
+        return "activated_destroy_source_mana_cost_not_supported"
     if mana_match:
-        cost_text = mana_match.group(1)
+        cost_text = canonical_mana_cost_text(mana_match.group(1))
     elif generic_match:
         cost_text = "{" + generic_match.group(1) + "}"
+    elif colored_match:
+        cost_text = "{" + colored_match.group(1) + "}"
     parsed_cost = parse_mana_cost_text(cost_text)
     if parsed_cost is None:
         return "activated_destroy_source_mana_cost_not_supported"
@@ -19759,6 +19813,8 @@ def target_constraints_for(target: str) -> dict[str, Any]:
         return {"card_types": ["creature"], "toughness_max": 2}
     if target == "creature_damaged_this_turn":
         return {"card_types": ["creature"], "damaged_this_turn": True}
+    if target == "creature_token":
+        return {"card_types": ["creature"], "token": True}
     if target == "creature_up_to_three":
         return {"card_types": ["creature"]}
     if target == "creature_damaged_this_turn_opponent_controls":
@@ -19796,6 +19852,14 @@ def target_constraints_for(target: str) -> dict[str, Any]:
         return {"card_types": ["creature", "planeswalker"], "target_colors": ["B", "R"]}
     if target == "black_or_red_permanent":
         return {"card_types": ["permanent"], "target_colors": ["B", "R"]}
+    if target == "black_permanent":
+        return {"card_types": ["permanent"], "target_colors": ["B"]}
+    if target == "red_permanent":
+        return {"card_types": ["permanent"], "target_colors": ["R"]}
+    if target == "djinn_or_efreet_permanent":
+        return {"card_types": ["permanent"], "required_subtypes": ["djinn", "efreet"]}
+    if target == "ninja_permanent":
+        return {"card_types": ["permanent"], "required_subtypes": ["ninja"]}
     if target == "green_or_white_creature_or_planeswalker":
         return {"card_types": ["creature", "planeswalker"], "target_colors": ["G", "W"]}
     if target == "artifact_or_tapped_creature":

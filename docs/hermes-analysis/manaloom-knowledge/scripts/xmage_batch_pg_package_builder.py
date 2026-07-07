@@ -2637,7 +2637,7 @@ def simple_activated_destroy_execution_scenario_from_expected_rule(
     if fixture_constraints.get("card_types_any") and not fixture_constraints.get("card_types"):
         first_type = str((fixture_constraints.get("card_types_any") or ["artifact"])[0]).strip().lower()
         fixture_constraints["card_types"] = [first_type]
-    return {
+    scenario = {
         "name": f"{rule['card_name']} activates destroy ability",
         "type": "simple_activated_destroy",
         "card": {"name": rule["card_name"]},
@@ -2654,6 +2654,16 @@ def simple_activated_destroy_execution_scenario_from_expected_rule(
         "expected_target_constraints": constraints,
         "logical_rule_key": rule["logical_rule_key"],
     }
+    sacrifice_target_type = str(required.get("activation_sacrifice_target") or "").strip().lower()
+    if required.get("activation_requires_sacrifice_target") or sacrifice_target_type:
+        sacrifice_card_type = "creature" if sacrifice_target_type == "creature" else "permanent"
+        scenario["sacrifice_target"] = _target_fixture_from_constraints(
+            "E2E Activated Destroy Sacrifice Target",
+            {"card_types": [sacrifice_card_type]},
+            matching=True,
+        )
+        scenario["expect_target_sacrificed"] = True
+    return scenario
 
 
 def simple_activated_self_keyword_execution_scenario_from_expected_rule(
@@ -3196,6 +3206,9 @@ def _target_fixture_from_constraints(
         fixture["toughness"] = toughness
     if colors:
         fixture["colors"] = colors
+    if active_constraints.get("token"):
+        fixture["token"] = bool(matching)
+        fixture["is_token"] = bool(matching)
     if subtypes:
         fixture["subtypes"] = subtypes
     if active_constraints.get("enchanted") or active_constraints.get("is_enchanted"):

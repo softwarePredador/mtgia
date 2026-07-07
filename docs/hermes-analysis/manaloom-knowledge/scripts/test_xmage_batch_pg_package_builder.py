@@ -1112,6 +1112,77 @@ def test_manifest_builds_simple_activated_destroy_execution_scenario() -> None:
     assert scenario["target"]["type_line"] == "Artifact"
 
 
+def test_manifest_builds_simple_activated_destroy_token_target_scenario() -> None:
+    rule = {
+        "normalized_name": "dogged hunter",
+        "card_name": "Dogged Hunter",
+        "oracle_hash": "hash-dogged-hunter",
+        "logical_rule_key": "battle_rule_v1:hash-dogged-hunter",
+        "required_effect_fields": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+            "activated_effect": "destroy_target",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+            "activated_remove_effect": "remove_creature",
+            "activated_remove_target": "creature_token",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"], "token": True},
+            "destination": "graveyard",
+            "activation_cost_mana": "{0}",
+            "activation_cost_generic": 0,
+            "activation_cost_colors": [],
+            "activation_requires_tap": True,
+        },
+    }
+
+    scenario = builder.simple_activated_destroy_execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "simple_activated_destroy"
+    assert scenario["expected_target"] == "creature_token"
+    assert scenario["expected_target_constraints"] == {"card_types": ["creature"], "token": True}
+    assert scenario["expected_tapped_source"] is True
+    assert scenario["target"]["type_line"] == "Creature - Soldier"
+    assert scenario["target"]["token"] is True
+    assert scenario["target"]["is_token"] is True
+
+
+def test_manifest_builds_simple_activated_destroy_sacrifice_target_scenario() -> None:
+    rule = {
+        "normalized_name": "quagmire druid",
+        "card_name": "Quagmire Druid",
+        "oracle_hash": "hash-quagmire-druid",
+        "logical_rule_key": "battle_rule_v1:hash-quagmire-druid",
+        "required_effect_fields": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+            "activated_effect": "destroy_target",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+            "activated_remove_effect": "remove_permanent",
+            "activated_remove_target": "enchantment",
+            "target": "enchantment",
+            "target_constraints": {"card_types": ["enchantment"]},
+            "destination": "graveyard",
+            "activation_cost_mana": "{G}",
+            "activation_cost_generic": 0,
+            "activation_cost_colors": ["G"],
+            "activation_requires_tap": True,
+            "activation_requires_sacrifice_target": True,
+            "activation_sacrifice_target": "creature",
+        },
+    }
+
+    scenario = builder.simple_activated_destroy_execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "simple_activated_destroy"
+    assert scenario["controller_mana"]["green"] == 1
+    assert scenario["expected_target"] == "enchantment"
+    assert scenario["target"]["type_line"] == "Enchantment"
+    assert scenario["expect_target_sacrificed"] is True
+    assert scenario["sacrifice_target"]["type_line"] == "Creature - Soldier"
+
+
 def test_manifest_builds_simple_activated_self_keyword_execution_scenario() -> None:
     rule = {
         "normalized_name": "cobalt golem",

@@ -18227,6 +18227,94 @@ Current next high-volume queue after PG613:
 - `direct_damage::targeted_damage_variant_v1` - `775`
 - `add_counters::source_add_counters_variant_v1` - `771`
 
+## PG614 Checkpoint - Restricted Activated Destroy Targets
+
+PG614 extends the existing permanent activated destroy-target scope to
+restricted target variants that still resolve through the runtime-backed scope:
+`xmage_permanent_simple_activated_destroy_target_v1`.
+
+Promoted cards:
+
+- `Dogged Hunter` - `{T}: Destroy target creature token.`
+- `Haazda Exonerator` - `{T}, Sacrifice this creature: Destroy target Aura.`
+- `King Suleiman` - `{T}: Destroy target Djinn or Efreet.`
+- `Nezumi Shadow-Watcher` - `Sacrifice this creature: Destroy target Ninja.`
+- `Northern Paladin` - `{W}{W}, {T}: Destroy target black permanent.`
+- `Quagmire Druid` - `{G}, {T}, Sacrifice a creature: Destroy target enchantment.`
+- `Seal of Doom` - `Sacrifice this enchantment: Destroy target nonblack creature. It can't be regenerated.`
+- `Southern Paladin` - `{W}{W}, {T}: Destroy target red permanent.`
+
+Implementation:
+
+- `xmage_authoritative_exact_scope_split.py` now recognizes restricted
+  destroy-target Oracle/XMage signatures for creature tokens, Aura, Ninja,
+  Djinn/Efreet, black permanent, and red permanent targets;
+- the same splitter now parses XMage `ColoredManaCost(ColoredManaSymbol.X)`
+  for activated destroy abilities, preventing a false `{0}` activation cost on
+  cards such as `Quagmire Druid`;
+- `battle_analyst_v9.py` now preserves `activation_requires_sacrifice_target`
+  and `activation_sacrifice_target` when a destroy ability is represented as a
+  top-level activated rule rather than only inside `_activated_rule_effects`;
+- `xmage_batch_pg_package_builder.py` now emits token-aware target fixtures and
+  sacrifice-target fixtures for simple activated destroy scenarios;
+- `battle_package_end_to_end_validation.py` now handles the normal token
+  lifecycle where a destroyed token moves to graveyard, then ceases to exist,
+  and validates sacrifice-target costs during simple activated destroy tests.
+
+Validation:
+
+- focused Python compilation passed for the touched splitter, package builder,
+  E2E validator, and battle runtime scripts;
+- focused pytest passed with `871` tests and `168` subtests;
+- exact split produced `proposal_count=8` and
+  `safe_for_batch_pg_package_count=8`;
+- precheck found `8/8` target card rows, `0` existing expected rows, and `0`
+  shadow rows to deprecate;
+- apply/postcheck confirmed `upserted_rows=8`, `8/8` verified/auto promoted
+  rows, and `8/8` rows with `oracle_hash`;
+- PG -> SQLite/snapshot sync loaded `8` PostgreSQL rows, updated `8` SQLite
+  rows, and exported `5810` canonical snapshot rows;
+- metadata sync used `database_target=127.0.0.1:15432/halder`, matched `6978`
+  PostgreSQL cards, wrote `6897` SQLite cache alias rows, left `deck_cards`
+  at `2699/2699` matched, and kept `unresolved_count=1`;
+- E2E validation passed PostgreSQL, SQLite, snapshot, runtime lookup, and `8`
+  battle execution scenarios with `25` runtime events;
+- PG614 validation exposed `44` older trusted executable rows without
+  `oracle_hash`; the companion `xmage_pg614_oracle_hash_backfill_new_server`
+  package backed up and backfilled `44/44` rows from `md5(cards.oracle_text)`,
+  then resynced SQLite/snapshot;
+- final PG/Hermes/SQLite contract audit passed `51/51`;
+- legacy contamination audit passed;
+- operational surface alignment audit passed;
+- strategy consistency audit passed `26/26`;
+- multi-rule runtime readiness remained bounded to existing global review gaps
+  (`no_runtime_safe_primary=1101`, `single_primary_with_blocked_alternatives=282`,
+  `composite_resolution_ready=2`);
+- global readiness now reports `battle_and_oracle_ready=5903` and
+  `battle_family_mapper_required=27970`;
+- post-sync queue rebuild reduced `target_identity_count` from `25055` to
+  `25047`, `xmage_authoritative_source_count` from `24741` to `24733`, and
+  `xmage_authoritative_adapter_required_count` from `24741` to `24733`;
+- final exact-scope recheck against the post-PG614 queue returned
+  `proposal_count=0` and `safe_for_batch_pg_package_count=0`.
+
+Residual boundary: PG614 does not authorize dynamic `X` activation costs,
+targets restricted by battlefield relationships such as "blocking this
+creature", attachment-specific Aura targets, destroy targets you control,
+multi-target destroy abilities, conditional destroy effects, regeneration
+replacement modeling beyond the existing destroy destination, or non-simple
+cost structures not represented by the current activation-cost fields. Those
+remain separate adapter contracts.
+
+Current next high-volume queue after PG614:
+
+- `recursion::xmage_graveyard_return_variant_review_v1` - `1795`
+- `draw_engine::xmage_draw_card_variant_review_v1` - `1577`
+- `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1` - `1085`
+- `direct_damage::targeted_damage_variant_v1` - `775`
+- `add_counters::source_add_counters_variant_v1` - `771`
+- `life_gain::xmage_life_gain_variant_review_v1` - `663`
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:
