@@ -321,6 +321,8 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "ability_kind",
     "activated_effect",
     "activated_battle_model_scope",
+    "activated_remove_effect",
+    "activated_remove_target",
     "activated_tap_target",
     "activated_add_counters",
     "activated_add_counters_target",
@@ -334,6 +336,7 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "activated_self_sacrifice_tutor_to_hand",
     "activated_self_sacrifice_draw",
     "activated_self_sacrifice_draw_discard",
+    "activated_self_sacrifice_destroy",
     "regenerate_source",
     "activation_cost_mana",
     "activation_cost_generic",
@@ -1981,6 +1984,36 @@ def simple_activated_tap_target_execution_scenario_from_expected_rule(
     }
 
 
+def simple_activated_destroy_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_permanent_simple_activated_destroy_target_v1":
+        return None
+    constraints = dict(required.get("target_constraints") or {})
+    fixture_constraints = dict(constraints)
+    if fixture_constraints.get("card_types_any") and not fixture_constraints.get("card_types"):
+        first_type = str((fixture_constraints.get("card_types_any") or ["artifact"])[0]).strip().lower()
+        fixture_constraints["card_types"] = [first_type]
+    return {
+        "name": f"{rule['card_name']} activates destroy ability",
+        "type": "simple_activated_destroy",
+        "card": {"name": rule["card_name"]},
+        "target": _target_fixture_from_constraints(
+            "E2E Legal Activated Destroy Target",
+            fixture_constraints,
+            matching=True,
+        ),
+        "controller_mana": _manifest_mana_for_required_activation(required),
+        "expected_tapped_source": bool(required.get("activation_requires_tap")),
+        "expected_sacrificed_source": bool(required.get("activation_requires_sacrifice")),
+        "expected_destination": str(required.get("destination") or "graveyard").lower(),
+        "expected_target": required.get("activated_remove_target") or required.get("target"),
+        "expected_target_constraints": constraints,
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def simple_activated_self_keyword_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
@@ -2310,6 +2343,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or simple_mana_source_execution_scenario_from_expected_rule(rule)
         or simple_activated_damage_execution_scenario_from_expected_rule(rule)
         or simple_activated_tap_target_execution_scenario_from_expected_rule(rule)
+        or simple_activated_destroy_execution_scenario_from_expected_rule(rule)
         or simple_activated_self_keyword_execution_scenario_from_expected_rule(rule)
         or simple_activated_regenerate_source_execution_scenario_from_expected_rule(rule)
         or target_keyword_spell_execution_scenario_from_expected_rule(rule)

@@ -39,6 +39,9 @@ DRAW_UNIT = "draw_cards::xmage_draw_card_variant_review_v1"
 DRAW_ENGINE_UNIT = "draw_engine::xmage_draw_card_variant_review_v1"
 DAMAGE_UNIT = "direct_damage::targeted_damage_variant_v1"
 DESTROY_UNIT = "removal_destroy::targeted_destroy_variant_v1"
+ACTIVATED_SELF_SAC_DESTROY_ARTIFACT_OR_ENCHANTMENT_UNIT = (
+    "remove_permanent::activated_sacrifice_self_destroy_artifact_or_enchantment_v1"
+)
 TAP_TARGET_CREATURE_UNIT = (
     "xmage_signature::TapTargetEffect::SimpleActivatedAbility::"
     "TargetCreaturePermanent::no_condition_class::targeting,activated_ability"
@@ -7806,7 +7809,11 @@ def is_permanent_activated_damage_unit(row: dict[str, Any]) -> bool:
 
 
 def is_permanent_activated_destroy_unit(row: dict[str, Any]) -> bool:
-    if str(row.get("adapter_work_unit") or "") != DESTROY_UNIT:
+    unit = str(row.get("adapter_work_unit") or "")
+    if unit not in {
+        DESTROY_UNIT,
+        ACTIVATED_SELF_SAC_DESTROY_ARTIFACT_OR_ENCHANTMENT_UNIT,
+    }:
         return False
     return (
         effect_classes(row) == {"DestroyTargetEffect"}

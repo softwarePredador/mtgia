@@ -2591,6 +2591,121 @@ def run_simple_activated_tap_target(
     }
 
 
+def run_simple_activated_destroy(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    effect = battle.get_card_effect(card)
+    permanent_type = str(effect.get("effect") or "permanent")
+    default_type_line = {
+        "creature": "Creature - Soldier",
+        "artifact": "Artifact",
+        "enchantment": "Enchantment",
+    }.get(permanent_type, "Artifact")
+    source = battle.enrich_card(
+        {
+            **card,
+            "type_line": default_type_line,
+            "summoning_sick": False,
+            **effect,
+            **dict(scenario.get("source_overrides") or {}),
+        }
+    )
+    target = battle.enrich_card(dict(scenario.get("target") or {
+        "name": f"E2E Artifact Target for {card['name']}",
+        "type_line": "Artifact",
+        "effect": "artifact",
+        "cmc": 2,
+    }))
+    active = battle.Player(str(scenario.get("player") or "Activated Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Activated Opponent"), None, [])
+    active.battlefield = [source]
+    opponent.battlefield = [target]
+    add_manifest_mana(active, scenario.get("controller_mana") or {})
+    all_players = [active, opponent]
+    expected_destination = str(scenario.get("expected_destination") or "graveyard").lower()
+    expected_tapped_source = bool(scenario.get("expected_tapped_source", effect.get("activation_requires_tap", False)))
+    expected_sacrificed_source = bool(
+        scenario.get("expected_sacrificed_source", effect.get("activation_requires_sacrifice", False))
+    )
+
+    if not battle.can_activate_generic_destroy_permanent(active, source, [opponent]):
+        fail("battle_execution", f"{card['name']} simple activated destroy cannot activate")
+    activated = battle.activate_generic_destroy_permanent(
+        active,
+        [opponent],
+        all_players,
+        source,
+        turn=int(scenario.get("turn") or 7),
+        rng=random.Random(int(scenario.get("seed") or 6074)),
+        phase=str(scenario.get("phase") or "precombat_main"),
+    )
+    if not activated:
+        fail("battle_execution", f"{card['name']} simple activated destroy activation failed")
+    if target in opponent.battlefield:
+        fail("battle_execution", f"{card['name']} target remained on battlefield")
+    expected_zone = opponent.exile if expected_destination == "exile" else opponent.graveyard
+    if target not in expected_zone:
+        fail(
+            "battle_execution",
+            f"{card['name']} target not in expected {expected_destination}: {target.get('name')}",
+        )
+    if bool(source.get("tapped")) != expected_tapped_source:
+        fail(
+            "battle_execution",
+            f"{card['name']} source tapped={bool(source.get('tapped'))}, expected {expected_tapped_source}",
+        )
+    if expected_sacrificed_source:
+        if source in active.battlefield or source not in active.graveyard:
+            fail("battle_execution", f"{card['name']} source sacrifice zone mismatch")
+    elif source not in active.battlefield:
+        fail("battle_execution", f"{card['name']} source left battlefield unexpectedly")
+    activation_event = next(
+        (
+            data
+            for event, data in reversed(events)
+            if event == "activated_ability"
+            and data.get("card") == card.get("name")
+            and data.get("activation_kind") == "simple_activated_destroy"
+        ),
+        None,
+    )
+    if activation_event is None:
+        fail("battle_events", f"missing {card['name']} simple activated destroy event")
+    if bool(activation_event.get("sacrificed_source")) != expected_sacrificed_source:
+        fail(
+            "battle_events",
+            f"{card['name']} sacrificed_source={activation_event.get('sacrificed_source')!r}, expected {expected_sacrificed_source}",
+        )
+    resolved_event = next(
+        (
+            data
+            for event, data in reversed(events)
+            if event == "removal_resolved"
+            and data.get("card") == card.get("name")
+            and data.get("target") == target.get("name")
+        ),
+        None,
+    )
+    if resolved_event is None:
+        fail("battle_events", f"missing {card['name']} removal resolved event")
+    if str(resolved_event.get("destination") or "").lower() != expected_destination:
+        fail(
+            "battle_events",
+            f"{card['name']} destination={resolved_event.get('destination')!r}, expected {expected_destination!r}",
+        )
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "target": target.get("name"),
+        "destination": expected_destination,
+        "source_tapped": bool(source.get("tapped")),
+        "sacrificed_source": expected_sacrificed_source,
+    }
+
+
 def run_simple_activated_self_keyword(
     battle,
     scenario: dict[str, Any],
@@ -3742,6 +3857,7 @@ SCENARIO_RUNNERS = {
     "simple_mana_source_refresh": run_simple_mana_source_refresh,
     "simple_activated_damage": run_simple_activated_damage,
     "simple_activated_tap_target": run_simple_activated_tap_target,
+    "simple_activated_destroy": run_simple_activated_destroy,
     "simple_activated_self_keyword": run_simple_activated_self_keyword,
     "simple_activated_regenerate_source": run_simple_activated_regenerate_source,
     "simple_activated_create_token": run_simple_activated_create_token,

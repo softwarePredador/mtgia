@@ -9375,6 +9375,80 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertTrue(effect["activation_requires_sacrifice"])
         self.assertTrue(effect["activated_self_sacrifice_destroy"])
 
+    def test_permanent_activated_destroy_maps_self_sacrifice_artifact_or_enchantment_unit(self) -> None:
+        row = queue_row(
+            split.ACTIVATED_SELF_SAC_DESTROY_ARTIFACT_OR_ENCHANTMENT_UNIT,
+            effect_classes=["DestroyTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Caustic Caterpillar",
+                type_line="Creature - Insect",
+                oracle_text="{1}{G}, Sacrifice this creature: Destroy target artifact or enchantment.",
+            ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(
+                    new DestroyTargetEffect(),
+                    new ManaCostsImpl<>("{1}{G}")
+                );
+                ability.addCost(new SacrificeSourceCost());
+                ability.addTarget(new TargetPermanent(StaticFilters.FILTER_PERMANENT_ARTIFACT_OR_ENCHANTMENT));
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "creature")
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_DESTROY_SCOPE)
+        self.assertEqual(effect["activated_remove_effect"], "remove_permanent")
+        self.assertEqual(effect["activated_remove_target"], "artifact_or_enchantment")
+        self.assertEqual(effect["target"], "artifact_or_enchantment")
+        self.assertEqual(
+            effect["target_constraints"],
+            {"card_types": ["artifact", "enchantment"]},
+        )
+        self.assertEqual(effect["activation_cost_mana"], "{1}{G}")
+        self.assertEqual(effect["activation_cost_generic"], 1)
+        self.assertEqual(effect["activation_cost_colors"], ["G"])
+        self.assertFalse(effect["activation_requires_tap"])
+        self.assertTrue(effect["activation_requires_sacrifice"])
+        self.assertTrue(effect["activated_self_sacrifice_destroy"])
+
+    def test_permanent_activated_destroy_blocks_artifact_or_enchantment_unit_with_auxiliary_ability(self) -> None:
+        row = queue_row(
+            split.ACTIVATED_SELF_SAC_DESTROY_ARTIFACT_OR_ENCHANTMENT_UNIT,
+            effect_classes=["DestroyTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["FlashAbility", "SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Cathar Commando",
+                type_line="Creature - Human Soldier",
+                oracle_text="Flash\n{1}, Sacrifice this creature: Destroy target artifact or enchantment.",
+            ),
+            source_text="""
+                this.addAbility(FlashAbility.getInstance());
+                Ability ability = new SimpleActivatedAbility(
+                    new DestroyTargetEffect(),
+                    new GenericManaCost(1)
+                );
+                ability.addCost(new SacrificeSourceCost());
+                ability.addTarget(new TargetPermanent(StaticFilters.FILTER_PERMANENT_ARTIFACT_OR_ENCHANTMENT));
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "unsupported_adapter_work_unit")
+
     def test_permanent_activated_destroy_maps_artifact_creature_target(self) -> None:
         row = queue_row(
             split.DESTROY_UNIT,

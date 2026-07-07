@@ -16728,6 +16728,114 @@ exile variants, compensation-token removal, graveyard exile, stack exile, or
 non-pure destroy/exile effect classes. Those remain in separate work units or
 blocked reasons and require their own runtime contract.
 
+## PG584 Activated Self-Sac Destroy Artifact/Enchantment New Server Evidence
+
+PG584 evidence:
+
+- exact-scope split:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260707_pg584_activated_self_sac_destroy_artifact_enchantment_new_server.md`
+- exact-scope split JSON:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260707_pg584_activated_self_sac_destroy_artifact_enchantment_new_server.json`
+- package:
+  `docs/hermes-analysis/master_optimizer_reports/pg584_activated_self_sac_destroy_artifact_enchantment_new_server_package.md`
+- package manifest:
+  `docs/hermes-analysis/master_optimizer_reports/pg584_activated_self_sac_destroy_artifact_enchantment_new_server_manifest.json`
+- package SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg584_activated_self_sac_destroy_artifact_enchantment_new_server_precheck.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/pg584_activated_self_sac_destroy_artifact_enchantment_new_server_apply.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/pg584_activated_self_sac_destroy_artifact_enchantment_new_server_postcheck.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/pg584_activated_self_sac_destroy_artifact_enchantment_new_server_rollback.sql`
+- PG -> SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg584_activated_self_sac_destroy_artifact_enchantment_new_server_pg_to_sqlite_sync.json`
+- E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg584_activated_self_sac_destroy_artifact_enchantment_new_server_e2e_after_pg584b.md`
+- post-PG584 queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260707_post_pg584_activated_self_sac_destroy_artifact_enchantment_new_server_commander_legal.md`
+- post-PG584 readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260707_post_pg584_activated_self_sac_destroy_artifact_enchantment_new_server.md`
+- post-PG584 exact split recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260707_post_pg584_activated_self_sac_destroy_artifact_enchantment_new_server_recheck.md`
+- final PG/Hermes/SQLite audit:
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260707_post_pg584_pg584b_activated_self_sac_destroy_final.md`
+- final governance audits:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260707_post_pg584_pg584b_activated_self_sac_destroy_final.md`,
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260707_post_pg584_pg584b_activated_self_sac_destroy_final.md`,
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260707_post_pg584_pg584b_activated_self_sac_destroy_final.md`
+
+PG584 promoted `8` XMage-authoritative activated self-sacrifice destroy
+artifact/enchantment rows under
+`xmage_permanent_simple_activated_destroy_target_v1`:
+
+- `Capashen Unicorn`;
+- `Caustic Caterpillar`;
+- `Dispeller's Capsule`;
+- `Inspired Insurgent`;
+- `Seal of Cleansing`;
+- `Sylvok Replica`;
+- `Thrashing Brontodon`;
+- `Viridian Zealot`.
+
+Runtime/modeling change:
+
+- `xmage_authoritative_exact_scope_split.py` now routes the specialized
+  `remove_permanent::activated_sacrifice_self_destroy_artifact_or_enchantment_v1`
+  work unit into the existing permanent activated destroy runtime, but only
+  when the XMage row has exactly `DestroyTargetEffect +
+  SimpleActivatedAbility` and the activated source parser confirms supported
+  mana/tap/source-self-sacrifice costs;
+- `xmage_batch_pg_package_builder.py` now preserves activated destroy fields
+  such as `activated_remove_target` and
+  `activated_self_sacrifice_destroy` in E2E required fields;
+- `battle_package_end_to_end_validation.py` now has a focused
+  `simple_activated_destroy` execution scenario that pays activation cost,
+  activates the permanent, verifies source sacrifice when required, and
+  verifies the target moved to the expected zone.
+
+Validation:
+
+- split produced `proposal_count=8` and
+  `safe_for_batch_pg_package_count=8`;
+- precheck found `8/8` target rows, no existing expected executable rows, and
+  no shadow rows to deprecate;
+- apply upserted `8` PostgreSQL rows and deprecated `0` shadow rows;
+- postcheck confirmed `8` promoted rows, `8` `verified_auto` rows, and `8`
+  rows with `oracle_hash`;
+- PG -> SQLite sync loaded `8` PostgreSQL rows, updated `8` SQLite rows, and
+  exported `6687` canonical snapshot rows;
+- E2E validation passed PostgreSQL, SQLite, snapshot, runtime lookup, and `8`
+  battle execution scenarios with `24` replay events;
+- splitter suite passed `692` tests;
+- exact runtime suite passed `355` tests;
+- package builder suite passed `53` tests;
+- post-PG584 queue moved from PG583B `target_identity_count=25308` and
+  `xmage_authoritative_source_count=24994` to `25300` and `24986`;
+- final exact-scope recheck returned `proposal_count=0`.
+
+PG584B metadata-only closeout:
+
+- PG/Hermes/SQLite audit exposed `44` older trusted executable PostgreSQL rows
+  missing `oracle_hash`;
+- PG584B backfilled those `44` hashes from `public.cards.oracle_text` via
+  `cards.id = card_battle_rules.card_id`, without changing behavior JSON;
+- PG584B SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg584b_trusted_rule_oracle_hash_backfill_new_server_precheck.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/pg584b_trusted_rule_oracle_hash_backfill_new_server_apply.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/pg584b_trusted_rule_oracle_hash_backfill_new_server_postcheck.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/pg584b_trusted_rule_oracle_hash_backfill_new_server_rollback.sql`;
+- postcheck left `0` trusted executable PostgreSQL rows missing `oracle_hash`;
+- PG584B sync loaded `65` PostgreSQL rows, updated `66` SQLite rows, and
+  exported `6687` canonical snapshot rows;
+- final PG/Hermes/SQLite contract passed `51/51`;
+- final XMage strategy audit passed `26/26`;
+- final operational and legacy contamination audits passed.
+
+Residual boundary: PG584 does not authorize activated destroy rows with Flash,
+Exalted, Daybound/Nightbound, Lifelink, Vigilance, Valiant, dies triggers,
+additional gain-life effects, `Activate only as a sorcery`, unsupported
+sacrifice-target costs, or any other auxiliary ability/effect class. Those
+remain blocked under the exact recheck reasons and require separate adapter
+contracts.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

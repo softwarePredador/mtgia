@@ -676,6 +676,41 @@ def test_manifest_builds_simple_activated_tap_target_execution_scenario() -> Non
     assert scenario["controller_mana"]["white"] == 1
 
 
+def test_manifest_builds_simple_activated_destroy_execution_scenario() -> None:
+    rule = {
+        "normalized_name": "caustic caterpillar",
+        "card_name": "Caustic Caterpillar",
+        "oracle_hash": "hash-caustic-caterpillar",
+        "logical_rule_key": "battle_rule_v1:hash-caustic-caterpillar",
+        "required_effect_fields": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+            "activated_effect": "destroy_target",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+            "activated_remove_effect": "remove_permanent",
+            "activated_remove_target": "artifact_or_enchantment",
+            "target": "permanent",
+            "target_constraints": {"card_types_any": ["artifact", "enchantment"]},
+            "destination": "graveyard",
+            "activation_cost_mana": "{1}{G}",
+            "activation_cost_generic": 1,
+            "activation_cost_colors": ["G"],
+            "activation_requires_sacrifice": True,
+            "activated_self_sacrifice_destroy": True,
+        },
+    }
+
+    scenario = builder.simple_activated_destroy_execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "simple_activated_destroy"
+    assert scenario["expected_sacrificed_source"] is True
+    assert scenario["expected_destination"] == "graveyard"
+    assert scenario["controller_mana"]["generic"] == 1
+    assert scenario["controller_mana"]["green"] == 1
+    assert scenario["target"]["type_line"] == "Artifact"
+
+
 def test_manifest_builds_simple_activated_self_keyword_execution_scenario() -> None:
     rule = {
         "normalized_name": "cobalt golem",
