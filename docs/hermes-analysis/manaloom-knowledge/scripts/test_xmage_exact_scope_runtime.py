@@ -18240,6 +18240,48 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_damage_wipe_respects_excluded_subtypes(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        opponent.battlefield.extend(
+            [
+                {"name": "Opp Dragon", "type_line": "Creature - Dragon", "toughness": 1},
+                {"name": "Opp Goblin", "type_line": "Creature - Goblin", "toughness": 1},
+            ]
+        )
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Breath",
+                "type_line": "Instant",
+                "oracle_text": "Fixture Breath deals 1 damage to each non-Dragon creature.",
+            },
+            turn=13,
+            rng=random.Random(13),
+            effect_data_override={
+                "effect": "damage_wipe",
+                "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+                "amount": 1,
+                "damage": 1,
+                "damage_scope": "each_creature",
+                "damage_excluded_subtypes": ["dragon"],
+            },
+        )
+
+        self.assertEqual([card["name"] for card in opponent.battlefield], ["Opp Dragon"])
+        self.assertEqual([card["name"] for card in opponent.graveyard], ["Opp Goblin"])
+        self.assertTrue(
+            any(
+                event == "damage_wipe_resolved"
+                and data.get("card") == "Fixture Breath"
+                and data.get("damage_excluded_subtypes") == ["dragon"]
+                and data.get("opponent_creatures_destroyed") == 1
+                for event, data in self.events
+            )
+        )
+
     def test_simple_activated_recursion_permanent_pays_colored_taps_and_returns_matching_card(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

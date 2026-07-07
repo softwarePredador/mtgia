@@ -52066,6 +52066,11 @@ def apply_damage_wipe(player, opponents, card, effect_data, turn, *, finish_spel
         phase="resolution",
     )
     damage_scope = effect_data.get("damage_scope", "each_creature")
+    damage_excluded_subtypes = [
+        str(value or "").replace("_", " ").strip().lower()
+        for value in _as_list(effect_data.get("damage_excluded_subtypes"))
+        if str(value or "").strip()
+    ]
     affected_players = (
         list(opponents)
         if damage_scope
@@ -52101,6 +52106,11 @@ def apply_damage_wipe(player, opponents, card, effect_data, turn, *, finish_spel
                 if damage_scope == "each_attacking_creature" and not bool(permanent.get("attacking")):
                     continue
                 if damage_scope == "each_nonartifact_creature" and "artifact" in _permanent_type_line(permanent):
+                    continue
+                if damage_excluded_subtypes and any(
+                    permanent_has_subtype(permanent, subtype)
+                    for subtype in damage_excluded_subtypes
+                ):
                     continue
                 creatures_seen += 1
                 permanent_amount = apply_static_damage_replacements(
@@ -52231,6 +52241,7 @@ def apply_damage_wipe(player, opponents, card, effect_data, turn, *, finish_spel
         card=card.get("name", "?"),
         damage=amount,
         damage_scope=damage_scope,
+        damage_excluded_subtypes=damage_excluded_subtypes,
         damage_amount_source=effect_data.get("damage_amount_source"),
         current_spell_mana_value=card_mana_value(card),
         spell_mana_value_cast_this_turn=getattr(

@@ -18588,6 +18588,49 @@ Current next high-volume queue after PG646:
 - `direct_damage::targeted_damage_variant_v1` - `770`
 - `life_gain::xmage_life_gain_variant_review_v1` - `663`
 
+## 2026-07-07 - PG647 Damage Wipe Excluded Subtype Checkpoint
+
+PG647 closed the exact board-wipe damage subpattern where XMage and Oracle both
+state "damage to each non-X creature":
+
+- runtime contract added: `damage_excluded_subtypes` for
+  `xmage_fixed_damage_all_matching_permanents_spell_v1`;
+- split contract added:
+  - Oracle must match `each non-X creature`;
+  - XMage source must contain the same
+    `Predicates.not(SubType.X.getPredicate())`;
+  - mismatched Oracle/source subtype stays blocked as
+    `board_wipe_damage_source_scope_mismatch`;
+- promoted cards: `Breath Weapon` and `Fiery Cannonade`;
+- postcheck: each card has `promoted_rule_rows=1`,
+  `promoted_verified_auto_rows=1`, and `promoted_oracle_hash_rows=1`;
+- PG -> Hermes/SQLite sync after apply:
+  `pg_rows_loaded=5915`, `sqlite_inserted_or_updated=5901`,
+  `canonical_snapshot_rows_exported=5878`;
+- E2E package validation passed PostgreSQL, SQLite, canonical snapshot, and
+  `runtime_get_card_effect` for both cards;
+- global readiness after PG647:
+  `battle_and_oracle_ready=5975`, `battle_family_mapper_required=27901`,
+  `snapshot_has_verified_rule=6003`, `snapshot_has_any_rule=7210`;
+- authoritative queue after PG647:
+  `target_identity_count=24978`,
+  `xmage_authoritative_source_count=24665`,
+  `xmage_missing_source_exception_count=313`,
+  `xmage_authoritative_parser_gap_count=0`,
+  `xmage_authoritative_adapter_required_count=24665`;
+- exact-scope recheck after PG647 returned `proposal_count=0`, so the next
+  cycle must implement a different subpattern rather than repackage the same
+  family.
+
+Evidence:
+
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260707_pg647_damage_excluded_subtype_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg647_damage_excluded_subtype_new_server_package_package.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg647_damage_excluded_subtype_new_server_e2e_validation.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260707_post_pg647_damage_excluded_subtype_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260707_post_pg647_damage_excluded_subtype_new_server_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260707_post_pg647_damage_excluded_subtype_new_server_recheck.md`
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

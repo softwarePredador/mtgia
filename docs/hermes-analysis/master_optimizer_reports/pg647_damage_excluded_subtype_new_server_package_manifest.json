@@ -1,0 +1,142 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg647_damage_excluded_subtype_new_server_20260707_230507",
+  "deploy_id": "pg647",
+  "execution_scenarios": [],
+  "expected_rules": [
+    {
+      "card_name": "Breath Weapon",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5eb318327327094cfa8893781006d89c",
+      "min_rule_version": 2,
+      "normalized_name": "breath weapon",
+      "oracle_hash": "0de1b909e451631ca6b95f8302279307",
+      "required_effect_fields": {
+        "amount": 2,
+        "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+        "damage": 2,
+        "damage_excluded_subtypes": [
+          "dragon"
+        ],
+        "damage_scope": "each_creature",
+        "effect": "damage_wipe",
+        "xmage_effect_class": "DamageAllEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Fiery Cannonade",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:449ab5d278fee06601ac051fc0a9c9db",
+      "min_rule_version": 2,
+      "normalized_name": "fiery cannonade",
+      "oracle_hash": "9a3917d8fa861c8a3fa8b3ded68c3340",
+      "required_effect_fields": {
+        "amount": 2,
+        "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+        "damage": 2,
+        "damage_excluded_subtypes": [
+          "pirate"
+        ],
+        "damage_scope": "each_creature",
+        "effect": "damage_wipe",
+        "xmage_effect_class": "DamageAllEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_damage_all_spell": 2
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg647_damage_excluded_subtype_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg647_damage_excluded_subtype_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg647_damage_excluded_subtype_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg647_damage_excluded_subtype_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg647_damage_excluded_subtype_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg647_damage_excluded_subtype_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-07T23:05:07+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Breath Weapon"
+      },
+      "card_name": "Breath Weapon",
+      "effect": "damage_wipe",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5eb318327327094cfa8893781006d89c",
+      "normalized_name": "breath weapon",
+      "required_effect_fields": {
+        "amount": 2,
+        "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+        "damage": 2,
+        "damage_excluded_subtypes": [
+          "dragon"
+        ],
+        "damage_scope": "each_creature",
+        "effect": "damage_wipe",
+        "xmage_effect_class": "DamageAllEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Fiery Cannonade"
+      },
+      "card_name": "Fiery Cannonade",
+      "effect": "damage_wipe",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:449ab5d278fee06601ac051fc0a9c9db",
+      "normalized_name": "fiery cannonade",
+      "required_effect_fields": {
+        "amount": 2,
+        "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+        "damage": 2,
+        "damage_excluded_subtypes": [
+          "pirate"
+        ],
+        "damage_scope": "each_creature",
+        "effect": "damage_wipe",
+        "xmage_effect_class": "DamageAllEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Breath Weapon",
+    "Fiery Cannonade"
+  ],
+  "selected_count": 2,
+  "slug": "damage_excluded_subtype_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Breath Weapon",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5eb318327327094cfa8893781006d89c",
+      "min_rule_version": 2,
+      "normalized_name": "breath weapon",
+      "oracle_hash": "0de1b909e451631ca6b95f8302279307",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Fiery Cannonade",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:449ab5d278fee06601ac051fc0a9c9db",
+      "min_rule_version": 2,
+      "normalized_name": "fiery cannonade",
+      "oracle_hash": "9a3917d8fa861c8a3fa8b3ded68c3340",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

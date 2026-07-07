@@ -5896,27 +5896,62 @@ def destroy_all_types_from_oracle(metadata: dict[str, Any]) -> list[str] | None:
     return list(spec.get("destroy_card_types") or [])
 
 
-def damage_all_scope_from_oracle(metadata: dict[str, Any]) -> str | None:
+def damage_all_spec_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
     text = oracle_text(metadata)
     if re.match(r"^.+ deals? \d+ damage to each creature\.?$", text):
-        return "each_creature"
+        return {"damage_scope": "each_creature"}
     if re.match(r"^.+ deals? \d+ damage to each creature and each planeswalker\.?$", text):
-        return "each_creature_and_planeswalker"
+        return {"damage_scope": "each_creature_and_planeswalker"}
     if re.match(r"^.+ deals? \d+ damage to each creature your opponents control\.?$", text):
-        return "each_creature_opponents_control"
+        return {"damage_scope": "each_creature_opponents_control"}
     if re.match(r"^.+ deals? \d+ damage to each creature with flying\.?$", text):
-        return "each_flying_creature"
+        return {"damage_scope": "each_flying_creature"}
     if re.match(r"^.+ deals? \d+ damage to each creature without flying\.?$", text):
-        return "each_creature_without_flying"
+        return {"damage_scope": "each_creature_without_flying"}
     if re.match(r"^.+ deals? \d+ damage to each attacking creature\.?$", text):
-        return "each_attacking_creature"
+        return {"damage_scope": "each_attacking_creature"}
     if re.match(r"^.+ deals? \d+ damage to each tapped creature\.?$", text):
-        return "each_tapped_creature"
+        return {"damage_scope": "each_tapped_creature"}
     if re.match(r"^.+ deals? \d+ damage to each untapped creature\.?$", text):
-        return "each_untapped_creature"
+        return {"damage_scope": "each_untapped_creature"}
     if re.match(r"^.+ deals? \d+ damage to each nonartifact creature\.?$", text):
-        return "each_nonartifact_creature"
+        return {"damage_scope": "each_nonartifact_creature"}
+    excluded_subtype = re.match(
+        r"^.+ deals? \d+ damage to each non[- ](?P<subtype>[a-z][a-z ]*) creature\.?$",
+        text,
+    )
+    if excluded_subtype:
+        subtype = re.sub(r"\s+", " ", excluded_subtype.group("subtype")).strip().lower()
+        if subtype and subtype not in {"artifact", "token"}:
+            return {
+                "damage_scope": "each_creature",
+                "damage_excluded_subtypes": [subtype],
+            }
     return None
+
+
+def damage_all_scope_from_oracle(metadata: dict[str, Any]) -> str | None:
+    spec = damage_all_spec_from_oracle(metadata)
+    if not spec:
+        return None
+    return str(spec["damage_scope"])
+
+
+def damage_all_source_matches_spec(source: str, spec: dict[str, Any]) -> bool:
+    excluded_subtypes = [
+        str(value or "").strip().lower()
+        for value in as_list(spec.get("damage_excluded_subtypes"))
+        if str(value or "").strip()
+    ]
+    for subtype in excluded_subtypes:
+        subtype_constant = re.sub(r"[^A-Z0-9]+", "_", subtype.upper()).strip("_")
+        if not re.search(
+            rf"Predicates\.not\s*\(\s*SubType\.{re.escape(subtype_constant)}\.getPredicate\s*\(\s*\)\s*\)",
+            source or "",
+            flags=re.DOTALL,
+        ):
+            return False
+    return True
 
 
 def board_wipe_source_blocker(source: str, classes: set[str]) -> str | None:
@@ -30309,15 +30344,17 @@ def split_row(
             amount = java_constructor_int(source_text, "DamageAllEffect")
             if amount is None or amount <= 0:
                 return None, "board_wipe_damage_amount_not_fixed"
-            damage_scope = damage_all_scope_from_oracle(metadata)
-            if damage_scope is None:
+            damage_spec = damage_all_spec_from_oracle(metadata)
+            if damage_spec is None:
                 return None, "board_wipe_damage_scope_not_supported"
+            if not damage_all_source_matches_spec(source_text, damage_spec):
+                return None, "board_wipe_damage_source_scope_mismatch"
             effect_json = {
                 "effect": "damage_wipe",
                 "battle_model_scope": DAMAGE_WIPE_SCOPE,
                 "amount": amount,
                 "damage": amount,
-                "damage_scope": damage_scope,
+                **damage_spec,
                 "xmage_effect_class": "DamageAllEffect",
                 **flags,
             }

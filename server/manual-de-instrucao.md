@@ -83,6 +83,25 @@ Atualizacao 2026-07-07 / PG646:
   `docs/hermes-analysis/master_optimizer_reports/pg646_oracle_identity_exceptions_new_server_precheck.sql`,
   `..._apply.sql`, `..._postcheck.sql` e `..._rollback.sql`.
 
+Atualizacao 2026-07-07 / PG647:
+
+- Fechado o subpadrao seguro de board wipe de dano com subtipo excluido:
+  `DamageAllEffect` + Oracle `each non-X creature` + fonte XMage com
+  `Predicates.not(SubType.X.getPredicate())`.
+- Runtime `battle_analyst_v9.py` agora respeita
+  `damage_excluded_subtypes` em `xmage_fixed_damage_all_matching_permanents_spell_v1`.
+- PostgreSQL novo recebeu regras verificadas para `Breath Weapon` e
+  `Fiery Cannonade`; postcheck confirmou `promoted_verified_auto_rows=1` e
+  `promoted_oracle_hash_rows=1` por carta.
+- Sync PG -> Hermes/SQLite pos-apply: `pg_rows_loaded=5915`,
+  `sqlite_inserted_or_updated=5901`, `canonical_snapshot_rows_exported=5878`.
+- Readiness pos-PG647: `battle_and_oracle_ready=5975`,
+  `battle_family_mapper_required=27901`,
+  `snapshot_has_verified_rule=6003`, `snapshot_has_any_rule=7210`.
+- Rebuild da fila pos-PG647: `target_identity_count=24978`,
+  `xmage_authoritative_adapter_required_count=24665`, `parser_gap=0`,
+  `missing_source_exception_count=313`.
+
 Comandos globais:
 
 ```bash
