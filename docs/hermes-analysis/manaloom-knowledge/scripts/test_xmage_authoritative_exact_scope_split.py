@@ -8516,6 +8516,111 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["target"], "creature")
         self.assertEqual(effect["target_constraints"], {"card_types": ["creature"], "power_min": 3})
 
+    def test_fixed_destroy_surveil_spell_maps_to_composite_runtime(self) -> None:
+        row = queue_row(split.DESTROY_UNIT, effect_classes=["DestroyTargetEffect", "SurveilEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Destroy target creature. Surveil 2."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new DestroyTargetEffect());"
+                "this.getSpellAbility().addTarget(new TargetCreaturePermanent());"
+                "this.getSpellAbility().addEffect(new SurveilEffect(2));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DESTROY_SURVEIL_SCOPE)
+        self.assertEqual(effect["target"], "creature")
+        self.assertEqual(effect["destination"], "graveyard")
+        self.assertEqual(effect["surveil_count"], 2)
+        self.assertEqual(effect["resolution_order"], "destroy_then_surveil")
+        self.assertEqual(effect["_composite_rule_components"][0]["effect"], "remove_creature")
+        self.assertEqual(effect["_composite_rule_components"][1]["effect"], "surveil")
+
+    def test_fixed_destroy_surveil_spell_accepts_convoke_auxiliary(self) -> None:
+        row = queue_row(
+            split.DESTROY_UNIT,
+            effect_classes=["DestroyTargetEffect", "SurveilEffect"],
+            ability_classes=["ConvokeAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Destroy target creature or planeswalker. Surveil 2."),
+            source_text=(
+                "this.addAbility(new ConvokeAbility());"
+                "this.getSpellAbility().addEffect(new DestroyTargetEffect());"
+                "this.getSpellAbility().addTarget(new TargetCreatureOrPlaneswalker());"
+                "this.getSpellAbility().addEffect(new SurveilEffect(2));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["target"], "creature_or_planeswalker")
+        self.assertEqual(effect["target_constraints"], {"card_types": ["creature", "planeswalker"]})
+
+    def test_fixed_destroy_surveil_spell_accepts_flying_filter_ability(self) -> None:
+        row = queue_row(
+            split.DESTROY_UNIT,
+            effect_classes=["DestroyTargetEffect", "SurveilEffect"],
+            ability_classes=["FlyingAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Destroy target artifact, enchantment, or creature with flying. Surveil 1."),
+            source_text=(
+                "filter.add(Predicates.or(CardType.ARTIFACT.getPredicate(),"
+                "CardType.ENCHANTMENT.getPredicate(),"
+                "Predicates.and(CardType.CREATURE.getPredicate(),"
+                "new AbilityPredicate(FlyingAbility.class))));"
+                "this.getSpellAbility().addEffect(new DestroyTargetEffect());"
+                "this.getSpellAbility().addTarget(new TargetPermanent(filter));"
+                "this.getSpellAbility().addEffect(new SurveilEffect(1));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["target"], "permanent")
+        self.assertEqual(
+            effect["target_constraints"],
+            {
+                "any_of": [
+                    {"card_types": ["artifact"]},
+                    {"card_types": ["enchantment"]},
+                    {"card_types": ["creature"], "required_keywords": ["flying"]},
+                ]
+            },
+        )
+
+    def test_fixed_destroy_surveil_spell_blocks_separate_activated_abilities(self) -> None:
+        row = queue_row(
+            split.DESTROY_UNIT,
+            effect_classes=["DestroyTargetEffect", "SurveilEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                type_line="Legendary Artifact",
+                oracle_text=(
+                    "{2}, {T}: Surveil 1.\n"
+                    "{6}, {T}, Sacrifice Lunatic Pandora: Destroy target nonland permanent."
+                ),
+            ),
+            source_text=(
+                "this.addAbility(new SimpleActivatedAbility(new SurveilEffect(1), new GenericManaCost(2)));"
+                "Ability ability = new SimpleActivatedAbility(new DestroyTargetEffect(), new GenericManaCost(6));"
+                "ability.addTarget(new TargetNonlandPermanent());"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "not_instant_or_sorcery_spell")
+
     def test_fixed_exile_scry_spell_maps_to_composite_runtime(self) -> None:
         row = queue_row(split.EXILE_UNIT, effect_classes=["ExileTargetEffect", "ScryEffect"])
         proposal, reason = split.split_row(

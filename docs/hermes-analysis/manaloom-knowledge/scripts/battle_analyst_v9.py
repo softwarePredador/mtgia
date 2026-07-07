@@ -35176,6 +35176,50 @@ def scry_library_for_controller(player, count):
     }
 
 
+def surveil_library_for_controller(player, count):
+    look_count = max(0, min(int(count or 0), len(getattr(player, "library", []) or [])))
+    if look_count <= 0:
+        return {
+            "looked_at": [],
+            "kept_on_top": [],
+            "moved_to_graveyard": [],
+            "top_after": [],
+        }
+
+    looked_at = list(player.library[:look_count])
+    ranked = sorted(
+        looked_at,
+        key=lambda card: (
+            -lorehold_draw_priority(card, player),
+            -card_mana_value(card),
+            card.get("name", "?") if isinstance(card, dict) else str(card),
+        ),
+    )
+    kept_on_top = []
+    moved_to_graveyard = []
+    for card in ranked:
+        if lorehold_draw_priority(card, player) < 15:
+            moved_to_graveyard.append(card)
+        else:
+            kept_on_top.append(card)
+
+    remainder = list(player.library[look_count:])
+    player.library[:] = [*kept_on_top, *remainder]
+    player.graveyard.extend(moved_to_graveyard)
+    return {
+        "looked_at": [card.get("name", "?") if isinstance(card, dict) else str(card) for card in looked_at],
+        "kept_on_top": [card.get("name", "?") if isinstance(card, dict) else str(card) for card in kept_on_top],
+        "moved_to_graveyard": [
+            card.get("name", "?") if isinstance(card, dict) else str(card)
+            for card in moved_to_graveyard
+        ],
+        "top_after": [
+            card.get("name", "?") if isinstance(card, dict) else str(card)
+            for card in player.library[:look_count]
+        ],
+    }
+
+
 def planetarium_top_card_free_castable(card, effect_data):
     if not isinstance(card, dict):
         return False
@@ -57557,6 +57601,34 @@ def resolve_composite_resolution_effect(player, opponents, card, effect_data, tu
                 kept_on_top=scry_result["kept_on_top"],
                 bottomed=scry_result["bottomed"],
                 top_after=scry_result["top_after"],
+                component_index=index,
+                turn=turn,
+                phase=phase,
+                **component_fields,
+            )
+        elif component_effect == "surveil":
+            count = int(component.get("count") or component.get("surveil_count") or 1)
+            surveil_result = surveil_library_for_controller(player, count)
+            outcome = "surveil_resolved"
+            applied.append(
+                {
+                    "effect": component_effect,
+                    "count": count,
+                    "looked_at": surveil_result["looked_at"],
+                    "kept_on_top": surveil_result["kept_on_top"],
+                    "moved_to_graveyard": surveil_result["moved_to_graveyard"],
+                    "top_after": surveil_result["top_after"],
+                }
+            )
+            emit_replay_event(
+                "surveil_resolved",
+                player=player.name,
+                card=card.get("name", "?"),
+                surveil_count=count,
+                looked_at=surveil_result["looked_at"],
+                kept_on_top=surveil_result["kept_on_top"],
+                moved_to_graveyard=surveil_result["moved_to_graveyard"],
+                top_after=surveil_result["top_after"],
                 component_index=index,
                 turn=turn,
                 phase=phase,

@@ -1158,6 +1158,49 @@ def test_single_target_bounce_scenario_moves_target_to_hand() -> None:
     assert scenario["nonmatching_target"].get("enchanted") is False
 
 
+def test_single_target_removal_and_surveil_scenario_exercises_surveillance() -> None:
+    rule = {
+        "normalized_name": "deadly visit",
+        "card_name": "Deadly Visit",
+        "oracle_hash": "hash-deadly-visit",
+        "logical_rule_key": "battle_rule_v1:hash-deadly-visit",
+        "required_effect_fields": {
+            "effect": "composite_resolution",
+            "battle_model_scope": "xmage_destroy_target_and_surveil_spell_v1",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "destination": "graveyard",
+            "surveil_count": 2,
+            "_composite_rule_components": [
+                {
+                    "effect": "remove_creature",
+                    "battle_model_scope": "xmage_destroy_target_spell_v1",
+                    "target": "creature",
+                    "target_constraints": {"card_types": ["creature"]},
+                    "destination": "graveyard",
+                },
+                {
+                    "effect": "surveil",
+                    "battle_model_scope": "xmage_fixed_surveil_spell_v1",
+                    "count": 2,
+                    "surveil_count": 2,
+                },
+            ],
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "single_target_removal_and_surveil"
+    assert scenario["expected_effect"] == "remove_creature"
+    assert scenario["expected_surveil_count"] == 2
+    assert scenario["target"]["type_line"].startswith("Creature")
+    assert scenario["nonmatching_target"]["type_line"] == "Land"
+    assert len(scenario["library"]) == 3
+    assert len(scenario["player_battlefield"]) == 4
+
+
 def test_multi_target_removal_scenario_uses_declared_target_count() -> None:
     rule = {
         "normalized_name": "into the void",

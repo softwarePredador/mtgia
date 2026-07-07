@@ -8692,6 +8692,91 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_composite_destroy_surveil_spell_removes_target_then_surveils(self) -> None:
+        active = self.battle.Player(
+            "Active",
+            None,
+            [
+                {"name": "Low Priority Land", "type_line": "Land", "effect": "land", "cmc": 0},
+                {"name": "Approach of the Second Sun", "type_line": "Sorcery", "cmc": 7},
+                {"name": "Library Remainder", "type_line": "Instant", "cmc": 2},
+            ],
+        )
+        active.battlefield = [
+            {"name": f"Existing Land {index}", "type_line": "Land", "effect": "land", "cmc": 0}
+            for index in range(1, 5)
+        ]
+        opponent = self.battle.Player("Opponent", None, [])
+        target = {
+            "name": "Target Creature",
+            "type_line": "Creature - Zombie",
+            "effect": "creature",
+            "power": 2,
+            "toughness": 2,
+            "cmc": 2,
+        }
+        opponent.battlefield.append(target)
+        effect = {
+            "effect": "composite_resolution",
+            "battle_model_scope": "xmage_destroy_target_and_surveil_spell_v1",
+            "_composite_rule_components": [
+                {
+                    "effect": "remove_creature",
+                    "battle_model_scope": "xmage_destroy_target_spell_v1",
+                    "target": "creature",
+                    "target_constraints": {"card_types": ["creature"]},
+                    "destination": "graveyard",
+                    "compose_on_resolution": True,
+                },
+                {
+                    "effect": "surveil",
+                    "battle_model_scope": "xmage_fixed_surveil_spell_v1",
+                    "count": 2,
+                    "surveil_count": 2,
+                    "compose_on_resolution": True,
+                },
+            ],
+        }
+        card = {
+            "name": "Fixture Deadly Visit",
+            "type_line": "Sorcery",
+            "oracle_text": "Destroy target creature. Surveil 2.",
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            card,
+            turn=5,
+            rng=random.Random(54),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(opponent.battlefield, [])
+        self.assertEqual([card["name"] for card in opponent.graveyard], ["Target Creature"])
+        self.assertEqual(active.library[0]["name"], "Approach of the Second Sun")
+        self.assertIn("Low Priority Land", [card["name"] for card in active.graveyard])
+        self.assertIn("Fixture Deadly Visit", [card["name"] for card in active.graveyard])
+        self.assertTrue(
+            any(
+                event == "surveil_resolved"
+                and data.get("card") == "Fixture Deadly Visit"
+                and data.get("component_index") == 1
+                and data.get("surveil_count") == 2
+                and data.get("moved_to_graveyard") == ["Low Priority Land"]
+                for event, data in self.events
+            )
+        )
+        self.assertTrue(
+            any(
+                event == "composite_rule_resolved"
+                and data.get("card") == "Fixture Deadly Visit"
+                and data.get("components_applied") == 2
+                and data.get("components_skipped") == 0
+                for event, data in self.events
+            )
+        )
+
     def test_creature_etb_gain_life_resolves_after_entering_battlefield(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

@@ -226,9 +226,11 @@ LIFE_SCOPE = "xmage_fixed_controller_gain_life_spell_v1"
 DYNAMIC_LIFE_GAIN_SCOPE = "xmage_dynamic_controller_gain_life_spell_v1"
 LIFE_GAIN_DRAW_SCOPE = "xmage_fixed_controller_gain_life_draw_card_spell_v1"
 SCRY_SCOPE = "xmage_fixed_scry_spell_v1"
+SURVEIL_SCOPE = "xmage_fixed_surveil_spell_v1"
 SCRY_DRAW_SCOPE = "xmage_fixed_scry_and_draw_cards_spell_v1"
 DAMAGE_SCRY_SCOPE = "xmage_fixed_damage_target_and_scry_spell_v1"
 DESTROY_SCRY_SCOPE = "xmage_destroy_target_and_scry_spell_v1"
+DESTROY_SURVEIL_SCOPE = "xmage_destroy_target_and_surveil_spell_v1"
 EXILE_SCRY_SCOPE = "xmage_exile_target_and_scry_spell_v1"
 BOUNCE_SCRY_SCOPE = "xmage_return_target_to_hand_and_scry_spell_v1"
 DAMAGE_DRAW_SCOPE = "xmage_fixed_damage_target_and_draw_card_spell_v1"
@@ -2648,6 +2650,15 @@ def fixed_scry_count_match_from_source(source: str) -> tuple[int, int] | None:
     return int(matches[0].group(1)), matches[0].start()
 
 
+def fixed_surveil_count_match_from_source(source: str) -> tuple[int, int] | None:
+    matches = list(
+        re.finditer(r"new\s+SurveilEffect\s*\(\s*(\d+)\s*(?:,\s*false\s*)?\)", source or "", re.S)
+    )
+    if len(matches) != 1:
+        return None
+    return int(matches[0].group(1)), matches[0].start()
+
+
 def fixed_damage_scry_from_oracle(metadata: dict[str, Any]) -> tuple[int, int, str] | None:
     text = strip_parenthetical_reminders(oracle_text(metadata))
     text = re.sub(r"\s+", " ", text).strip()
@@ -2707,6 +2718,44 @@ def fixed_destroy_scry_from_source(source: str) -> int | None:
     if destroy_matches[0].start() > scry_index:
         return None
     return scry_count
+
+
+def fixed_destroy_surveil_from_oracle(metadata: dict[str, Any]) -> tuple[str, str, int] | None:
+    text = " ".join(oracle_effect_lines_without_neutral_auxiliary(metadata))
+    text = re.sub(r"\s+", " ", text).strip()
+    match = re.match(r"^(destroy target .+?)(\. it can't be regenerated)?\. surveil (?P<surveil>\d+)\.?$", text)
+    if not match:
+        return None
+    simple_metadata = dict(metadata)
+    simple_metadata["oracle_text"] = f"{match.group(1)}{match.group(2) or ''}."
+    parsed = destroy_target_from_oracle(simple_metadata)
+    if parsed is None:
+        return None
+    effect, target = parsed
+    return effect, target, int(match.group("surveil"))
+
+
+def fixed_destroy_surveil_from_source(source: str) -> int | None:
+    text = source or ""
+    if has_additional_cost(text):
+        return None
+    if "TargetPointer" in text or ".setTargetPointer" in text:
+        return None
+    destroy_matches = list(re.finditer(r"new\s+DestroyTargetEffect\s*\(\s*\)", text, re.S))
+    surveil_match = fixed_surveil_count_match_from_source(text)
+    if len(destroy_matches) != 1 or surveil_match is None:
+        return None
+    surveil_count, surveil_index = surveil_match
+    if destroy_matches[0].start() > surveil_index:
+        return None
+    return surveil_count
+
+
+def destroy_surveil_allowed_ability_classes(target_type: str) -> set[str]:
+    allowed = set(ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES)
+    if target_type == "artifact_enchantment_or_flying_creature":
+        allowed.add("FlyingAbility")
+    return allowed
 
 
 def fixed_exile_scry_from_oracle(metadata: dict[str, Any]) -> tuple[str, str, int] | None:
@@ -25306,6 +25355,58 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_destroy_target_scry_spell",
+        ), "selected_exact_scope"
+
+    if unit == DESTROY_UNIT and classes == {"DestroyTargetEffect", "SurveilEffect"}:
+        oracle_destroy_surveil = fixed_destroy_surveil_from_oracle(metadata)
+        if oracle_destroy_surveil is None:
+            return None, "destroy_surveil_oracle_not_exact_fixed"
+        effect, target_type, surveil_count = oracle_destroy_surveil
+        unsupported_abilities = ability_classes(row) - destroy_surveil_allowed_ability_classes(target_type)
+        if unsupported_abilities:
+            return None, "destroy_surveil_ability_class_not_simple"
+        source_surveil_count = fixed_destroy_surveil_from_source(source_text)
+        if source_surveil_count is None:
+            return None, "destroy_surveil_source_not_fixed"
+        if source_surveil_count != surveil_count:
+            return None, "destroy_surveil_source_oracle_mismatch"
+        if not source_matches_target_constraint(source_text, target_type):
+            return None, "destroy_surveil_target_source_mismatch"
+        target_base = restricted_target_base(target_type)
+        destroy_component = {
+            "effect": effect,
+            "battle_model_scope": DESTROY_SCOPE,
+            "target": target_base,
+            "target_constraints": target_constraints_for(target_type),
+            "destination": "graveyard",
+            "compose_on_resolution": True,
+            "xmage_effect_class": "DestroyTargetEffect",
+        }
+        surveil_component = {
+            "effect": "surveil",
+            "battle_model_scope": SURVEIL_SCOPE,
+            "count": surveil_count,
+            "surveil_count": surveil_count,
+            "compose_on_resolution": True,
+            "xmage_effect_class": "SurveilEffect",
+        }
+        effect_json = {
+            "effect": "composite_resolution",
+            "battle_model_scope": DESTROY_SURVEIL_SCOPE,
+            "target": target_base,
+            "target_constraints": target_constraints_for(target_type),
+            "destination": "graveyard",
+            "surveil_count": surveil_count,
+            "resolution_order": "destroy_then_surveil",
+            "_composite_rule_components": [destroy_component, surveil_component],
+            "xmage_effect_classes": ["DestroyTargetEffect", "SurveilEffect"],
+            **flags,
+        }
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_destroy_target_surveil_spell",
         ), "selected_exact_scope"
 
     if unit == EXILE_UNIT and classes == {"ExileTargetEffect", "ScryEffect"}:

@@ -17449,6 +17449,93 @@ Residual boundary: PG603 does not authorize modal controlled boosts, multiple
 `BoostControlledEffect` modes, X/dynamic controlled boosts, or non-color
 controlled spell filters. Those remain separate adapter contracts.
 
+## PG604 Destroy Target Then Surveil Checkpoint
+
+As of 2026-07-07, PG604 is applied and synced against the new server target.
+It adds an exact composite runtime scope for spells that destroy one legal
+target and then surveil a fixed number from local XMage `DestroyTargetEffect`
+plus `SurveilEffect` source.
+
+Closed cards:
+
+- `Deadly Visit`
+- `Pile On`
+- `Shattered Wings`
+
+Runtime/modeling change:
+
+- `xmage_authoritative_exact_scope_split.py` now maps exact
+  `DestroyTargetEffect` + `SurveilEffect(N)` spell resolutions into
+  `xmage_destroy_target_and_surveil_spell_v1`;
+- leading resolution-neutral casting text such as `Convoke` is ignored only
+  for Oracle parsing of the resolved effect, while unsupported activated or
+  separate abilities remain blocked;
+- the target contract supports simple creature, creature-or-planeswalker, and
+  the exact artifact/enchantment/flying-creature filter used by
+  `Shattered Wings`;
+- `battle_analyst_v9.py` now resolves a composite `surveil` component by
+  looking at the top N cards, keeping high-priority cards on top, moving
+  low-priority cards to graveyard, and emitting `surveil_resolved`;
+- `xmage_batch_pg_package_builder.py` and
+  `battle_package_end_to_end_validation.py` now emit and execute
+  `single_target_removal_and_surveil` scenarios that prove legal target
+  removal, illegal target preservation, and surveil execution.
+
+Validation:
+
+- split produced `proposal_count=3` and
+  `safe_for_batch_pg_package_count=3`;
+- precheck found `3/3` target rows, `0` existing expected executable rows, and
+  `0` shadow rows to deprecate;
+- apply upserted `3` PostgreSQL rows and deprecated `0` shadow rows;
+- postcheck confirmed `3/3` promoted rows, `3/3` `verified_auto` rows, and
+  `3/3` rows with `oracle_hash`;
+- focused tests passed: splitter `4` destroy-surveil tests, exact runtime `1`
+  destroy-surveil test, direct package-builder scenario test `1/1`, and Python
+  compilation for the touched splitter/runtime/package/E2E scripts;
+- PG -> SQLite/snapshot sync loaded `9411` PostgreSQL rows, updated `9175`
+  SQLite rows, and exported `6854` canonical snapshot rows;
+- metadata sync used `database_target=127.0.0.1:15432/halder`, matched `7822`
+  PostgreSQL cards after final sync, and left `deck_cards` at `2699/2699`
+  matched;
+- E2E validation passed PostgreSQL, SQLite, snapshot, runtime lookup, and `3`
+  battle execution scenarios with `21` runtime events;
+- post-sync queue rebuild reduced `target_identity_count` from `25133` to
+  `25130`, `xmage_authoritative_source_count` from `24819` to `24816`, and
+  `xmage_authoritative_adapter_required_count` from `24819` to `24816`;
+- final exact-scope recheck returned `proposal_count=0` and
+  `safe_for_batch_pg_package_count=0`.
+
+Residual boundary: PG604 does not authorize separate activated surveil/destroy
+abilities such as `Lunatic Pandora`, dynamic surveil counts, modal destroy
+spells, mass removal, or any destroy+surveil target filter that lacks an exact
+ManaLoom target-constraint contract.
+
+## PG604B Trusted Rule Oracle Hash Backfill Checkpoint
+
+As of 2026-07-07, PG604B is applied and synced against the new server target.
+It backfills `oracle_hash` on older trusted executable curated/manual
+PostgreSQL `card_battle_rules` rows that predated the current hash contract.
+
+Validation:
+
+- precheck found `44` missing trusted executable rule hashes, `44` safe
+  candidates, `0` no-card matches, and `0` ambiguous hashes;
+- apply inserted `44` backup rows into
+  `manaloom_deploy_audit.pg604b_trusted_rule_oracle_hash_backfill_new_server_backup`
+  and updated `44` PostgreSQL rows;
+- postcheck confirmed `trusted_executable_rules_missing_oracle_hash=0` and
+  `44/44` sampled backup rows now carry an `oracle_hash`;
+- final PG -> SQLite/snapshot sync loaded `9411` PostgreSQL rows, updated
+  `9175` SQLite rows, and exported `6854` canonical snapshot rows;
+- final PG/Hermes/SQLite contract audit passed `51/51`;
+- final XMage strategy audit passed `26/26`;
+- final operational surface alignment audit passed;
+- final legacy contamination audit passed;
+- `scripts/quality_gate.sh server-target` passed against the new-server target;
+- global all-card readiness was refreshed at
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260707_post_pg604_destroy_surveil_new_server.md`.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:
