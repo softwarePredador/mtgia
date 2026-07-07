@@ -48,6 +48,10 @@ TAP_TARGET_CREATURE_UNIT = (
     "xmage_signature::TapTargetEffect::SimpleActivatedAbility::"
     "TargetCreaturePermanent::no_condition_class::targeting,activated_ability"
 )
+TAP_TARGET_PERMANENT_UNIT = (
+    "xmage_signature::TapTargetEffect::SimpleActivatedAbility::"
+    "TargetPermanent::no_condition_class::targeting,activated_ability"
+)
 TREASURE_UNIT = "treasure_maker::single_treasure_creation_v1"
 LIFE_UNIT = "life_gain::xmage_life_gain_variant_review_v1"
 EXILE_UNIT = "removal_exile::targeted_exile_variant_v1"
@@ -163,6 +167,7 @@ SUPPORTED_UNITS = {
     DAMAGE_EACH_OPPONENT_UNIT,
     DESTROY_UNIT,
     TAP_TARGET_CREATURE_UNIT,
+    TAP_TARGET_PERMANENT_UNIT,
     TREASURE_UNIT,
     LIFE_UNIT,
     EXILE_UNIT,
@@ -3687,6 +3692,8 @@ def recursion_target_constraints_for(
         constraints["card_types"] = ["artifact", "enchantment"]
     elif target == "artifact_or_creature":
         constraints["card_types"] = ["artifact", "creature"]
+    elif target == "artifact_creature_or_land":
+        constraints["card_types"] = ["artifact", "creature", "land"]
     elif target == "artifact_or_creature_or_enchantment":
         constraints["card_types"] = ["artifact", "creature", "enchantment"]
     elif target == "artifact_or_enchantment_or_planeswalker":
@@ -8908,7 +8915,7 @@ def is_permanent_activated_destroy_unit(row: dict[str, Any]) -> bool:
 def is_permanent_activated_tap_target_unit(row: dict[str, Any]) -> bool:
     unit = str(row.get("adapter_work_unit") or "")
     return (
-        unit == TAP_TARGET_CREATURE_UNIT
+        unit in {TAP_TARGET_CREATURE_UNIT, TAP_TARGET_PERMANENT_UNIT}
         and effect_classes(row) == {"TapTargetEffect"}
         and ability_classes(row) == {"SimpleActivatedAbility"}
         and {"targeting", "activated_ability"}.issubset(set(row.get("xmage_signals") or []))
@@ -14443,18 +14450,31 @@ def activated_destroy_from_source(source: str) -> dict[str, Any] | str:
 
 
 def activated_tap_target_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
-    text = re.sub(r"\s+", " ", oracle_text(metadata)).strip().lower()
+    text = strip_parenthetical_reminders(oracle_text(metadata))
+    text = re.sub(r"\s+", " ", text).strip().lower()
     if text.count(":") != 1:
         return "activated_tap_target_oracle_not_simple"
     cost_text, effect_text = [part.strip() for part in text.split(":", 1)]
-    if not re.fullmatch(r"tap target creature\.?", effect_text):
+    target_patterns = [
+        (r"tap target creature\.?", "creature"),
+        (r"tap target artifact\.?", "artifact"),
+        (r"tap target artifact or creature\.?", "artifact_or_creature"),
+        (r"tap target artifact, creature, or land\.?", "artifact_creature_or_land"),
+        (r"tap target permanent\.?", "permanent"),
+    ]
+    target = None
+    for pattern, candidate in target_patterns:
+        if re.fullmatch(pattern, effect_text):
+            target = candidate
+            break
+    if target is None:
         return "activated_tap_target_oracle_not_simple"
     activation = activation_cost_from_oracle_prefix(cost_text)
     if isinstance(activation, str):
         return activation.replace("activated_self_boost", "activated_tap_target")
     return {
-        "target": "creature",
-        "target_constraints": {"card_types": ["creature"]},
+        "target": target,
+        "target_constraints": target_constraints_for(target),
         **activation,
     }
 
@@ -14489,22 +14509,41 @@ def activated_tap_target_from_source(source: str) -> dict[str, Any] | str:
     window = text[max(0, tap_index - 500) : tap_index + 2000]
     if "SimpleActivatedAbility" not in window:
         return "activated_tap_target_source_not_simple_activated"
-    if not re.search(r"new\s+TargetCreaturePermanent\s*\(\s*\)", text, re.S):
+    target = None
+    if re.search(r"new\s+TargetCreaturePermanent\s*\(\s*\)", text, re.S):
+        target = "creature"
+    elif "FILTER_PERMANENT_ARTIFACT_OR_CREATURE" in text:
+        target = "artifact_or_creature"
+    elif re.search(r'FilterPermanent\s*\(\s*"artifact"\s*\)', text) and "CardType.ARTIFACT" in text:
+        target = "artifact"
+    elif re.search(r'FilterPermanent\s*\(\s*"artifact,\s*creature,\s*or\s*land"\s*\)', text) and all(
+        marker in text for marker in ("CardType.ARTIFACT", "CardType.CREATURE", "CardType.LAND")
+    ):
+        target = "artifact_creature_or_land"
+    elif re.search(r"new\s+TargetPermanent\s*\(\s*\)", text, re.S):
+        target = "permanent"
+    if target is None:
         return "activated_tap_target_source_target_not_supported"
     cost_text = "{0}"
     mana_match = re.search(r'ManaCostsImpl<[^>]*>\s*\(\s*"([^"]+)"\s*\)', window)
     generic_match = re.search(r"GenericManaCost\s*\(\s*(\d+)\s*\)", window)
+    colored_match = re.search(r"ColoredManaCost\s*\(\s*ColoredManaSymbol\.([WUBRG])\s*\)", window)
+    cost_kinds = sum(1 for match in (mana_match, generic_match, colored_match) if match)
+    if cost_kinds > 1:
+        return "activated_tap_target_source_mana_cost_not_supported"
     if mana_match:
         cost_text = canonical_mana_cost_text(mana_match.group(1))
     elif generic_match:
         cost_text = "{" + generic_match.group(1) + "}"
+    elif colored_match:
+        cost_text = "{" + colored_match.group(1) + "}"
     parsed_cost = parse_mana_cost_text(cost_text)
     if parsed_cost is None:
         return "activated_tap_target_source_mana_cost_not_supported"
     activation_cost_generic, activation_cost_colors = parsed_cost
     return {
-        "target": "creature",
-        "target_constraints": {"card_types": ["creature"]},
+        "target": target,
+        "target_constraints": target_constraints_for(target),
         "activation_cost_mana": cost_text,
         "activation_cost_generic": activation_cost_generic,
         "activation_cost_colors": activation_cost_colors,
@@ -21288,6 +21327,10 @@ def split_row(
         ):
             if parsed_activation.get(key) != oracle_activation.get(key):
                 return None, "activated_tap_target_source_oracle_mismatch"
+        tap_target = str(parsed_activation.get("target") or "creature")
+        tap_target_constraints = dict(
+            parsed_activation.get("target_constraints") or target_constraints_for(tap_target)
+        )
         type_line = str(metadata.get("type_line") or "").lower()
         permanent_effect = (
             "creature"
@@ -21303,9 +21346,9 @@ def split_row(
             "battle_model_scope": PERMANENT_ACTIVATED_TAP_TARGET_SCOPE,
             "ability_kind": "activated",
             "activated_effect": "tap_target",
-            "activated_tap_target": "creature",
-            "target": "creature",
-            "target_constraints": {"card_types": ["creature"]},
+            "activated_tap_target": tap_target,
+            "target": tap_target,
+            "target_constraints": tap_target_constraints,
             "xmage_effect_class": "TapTargetEffect",
             "xmage_ability_class": "SimpleActivatedAbility",
             **parsed_activation,
@@ -21316,9 +21359,9 @@ def split_row(
             "ability_kind": "static_and_activated",
             "activated_effect": "tap_target",
             "activated_battle_model_scope": PERMANENT_ACTIVATED_TAP_TARGET_SCOPE,
-            "activated_tap_target": "creature",
-            "target": "creature",
-            "target_constraints": {"card_types": ["creature"]},
+            "activated_tap_target": tap_target,
+            "target": tap_target,
+            "target_constraints": tap_target_constraints,
             "_activated_rule_effects": [activated_effect],
             "xmage_effect_class": "TapTargetEffect",
             "xmage_ability_class": "SimpleActivatedAbility",

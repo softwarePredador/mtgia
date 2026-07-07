@@ -980,6 +980,35 @@ def test_manifest_builds_simple_activated_tap_target_execution_scenario() -> Non
     assert scenario["controller_mana"]["white"] == 1
 
 
+def test_manifest_builds_simple_activated_tap_target_noncreature_fixture() -> None:
+    rule = {
+        "normalized_name": "icy manipulator",
+        "card_name": "Icy Manipulator",
+        "oracle_hash": "hash-icy-manipulator",
+        "logical_rule_key": "battle_rule_v1:hash-icy-manipulator",
+        "required_effect_fields": {
+            "effect": "artifact",
+            "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+            "activated_effect": "tap_target",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+            "activated_tap_target": "artifact_creature_or_land",
+            "target": "artifact_creature_or_land",
+            "target_constraints": {"card_types": ["artifact", "creature", "land"]},
+            "activation_cost_mana": "{1}",
+            "activation_cost_generic": 1,
+            "activation_cost_colors": [],
+            "activation_requires_tap": True,
+        },
+    }
+
+    scenario = builder.simple_activated_tap_target_execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["expected_target"] == "artifact_creature_or_land"
+    assert scenario["target"]["type_line"] == "Land"
+    assert scenario["controller_mana"]["generic"] == 1
+
+
 def test_manifest_builds_simple_activated_destroy_execution_scenario() -> None:
     rule = {
         "normalized_name": "caustic caterpillar",

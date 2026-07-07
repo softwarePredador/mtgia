@@ -9325,6 +9325,148 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertTrue(effect["activation_requires_tap"])
         self.assertEqual(effect["_activated_rule_effects"][0]["battle_model_scope"], split.PERMANENT_ACTIVATED_TAP_TARGET_SCOPE)
 
+    def test_permanent_activated_tap_target_permanent_variants_map_exact_scope(self) -> None:
+        cases = [
+            (
+                "Auriok Transfixer",
+                "{W}, {T}: Tap target artifact.",
+                "Creature - Human Scout",
+                """
+                    private static final FilterPermanent filter = new FilterPermanent("artifact");
+                    static {
+                        filter.add(CardType.ARTIFACT.getPredicate());
+                    }
+                    Ability ability = new SimpleActivatedAbility(
+                        new TapTargetEffect(),
+                        new ColoredManaCost(ColoredManaSymbol.W)
+                    );
+                    ability.addCost(new TapSourceCost());
+                    ability.addTarget(new TargetPermanent(filter));
+                    this.addAbility(ability);
+                """,
+                "artifact",
+                "{W}",
+                0,
+                ["W"],
+            ),
+            (
+                "Icy Manipulator",
+                "{1}, {T}: Tap target artifact, creature, or land.",
+                "Artifact",
+                """
+                    private static final FilterPermanent filter = new FilterPermanent("artifact, creature, or land");
+                    static {
+                        filter.add(Predicates.or(
+                            CardType.ARTIFACT.getPredicate(),
+                            CardType.CREATURE.getPredicate(),
+                            CardType.LAND.getPredicate()
+                        ));
+                    }
+                    Ability ability = new SimpleActivatedAbility(
+                        new TapTargetEffect(),
+                        new GenericManaCost(1)
+                    );
+                    ability.addCost(new TapSourceCost());
+                    ability.addTarget(new TargetPermanent(filter));
+                    this.addAbility(ability);
+                """,
+                "artifact_creature_or_land",
+                "{1}",
+                1,
+                [],
+            ),
+            (
+                "Pacification Array",
+                "{2}, {T}: Tap target artifact or creature.",
+                "Artifact",
+                """
+                    Ability ability = new SimpleActivatedAbility(
+                        new TapTargetEffect(),
+                        new ManaCostsImpl<>("{2}")
+                    );
+                    ability.addCost(new TapSourceCost());
+                    ability.addTarget(new TargetPermanent(StaticFilters.FILTER_PERMANENT_ARTIFACT_OR_CREATURE));
+                    this.addAbility(ability);
+                """,
+                "artifact_or_creature",
+                "{2}",
+                2,
+                [],
+            ),
+            (
+                "Scepter of Dominance",
+                "{W}, {T}: Tap target permanent.",
+                "Artifact",
+                """
+                    SimpleActivatedAbility ability = new SimpleActivatedAbility(
+                        new TapTargetEffect(),
+                        new ManaCostsImpl<>("{W}")
+                    );
+                    ability.addCost(new TapSourceCost());
+                    ability.addTarget(new TargetPermanent());
+                    this.addAbility(ability);
+                """,
+                "permanent",
+                "{W}",
+                0,
+                ["W"],
+            ),
+        ]
+        for card_name, oracle, type_line, source_text, target, cost, generic, colors in cases:
+            with self.subTest(card_name=card_name):
+                row = queue_row(
+                    split.TAP_TARGET_PERMANENT_UNIT,
+                    effect_classes=["TapTargetEffect"],
+                    ability_kind="activated",
+                    ability_classes=["SimpleActivatedAbility"],
+                    xmage_signals=["targeting", "activated_ability"],
+                )
+                proposal, reason = split.split_row(
+                    row,
+                    metadata(name=card_name, type_line=type_line, oracle_text=oracle),
+                    source_text=source_text,
+                )
+
+                self.assertEqual(reason, "selected_exact_scope")
+                effect = proposal["effect_json"]
+                self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_TAP_TARGET_SCOPE)
+                self.assertEqual(effect["activated_tap_target"], target)
+                self.assertEqual(effect["target"], target)
+                self.assertEqual(effect["target_constraints"], split.target_constraints_for(target))
+                self.assertEqual(effect["activation_cost_mana"], cost)
+                self.assertEqual(effect["activation_cost_generic"], generic)
+                self.assertEqual(effect["activation_cost_colors"], colors)
+                self.assertTrue(effect["activation_requires_tap"])
+
+    def test_permanent_activated_tap_target_blocks_snow_cost(self) -> None:
+        row = queue_row(
+            split.TAP_TARGET_PERMANENT_UNIT,
+            effect_classes=["TapTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Icebind Pillar",
+                type_line="Snow Artifact",
+                oracle_text="{S}, {T}: Tap target artifact or creature. ({S} can be paid with one mana from a snow source.)",
+            ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(
+                    new TapTargetEffect(),
+                    new ManaCostsImpl<>("{S}")
+                );
+                ability.addCost(new TapSourceCost());
+                ability.addTarget(new TargetPermanent(StaticFilters.FILTER_PERMANENT_ARTIFACT_OR_CREATURE));
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "activated_tap_target_oracle_cost_not_supported")
+
     def test_fixed_destroy_draw_spell_blocks_dynamic_source_draw(self) -> None:
         row = queue_row(
             split.DRAW_UNIT,

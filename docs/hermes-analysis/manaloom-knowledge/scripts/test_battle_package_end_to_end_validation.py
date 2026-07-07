@@ -240,6 +240,63 @@ def test_simple_activated_tap_target_runner_executes_tap_effect() -> None:
     assert result["source_tapped"] is True
 
 
+def test_simple_activated_tap_target_runner_executes_noncreature_target() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "artifact",
+        "battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+        "activated_effect": "tap_target",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_tap_target_v1",
+        "activated_tap_target": "artifact_creature_or_land",
+        "target": "artifact_creature_or_land",
+        "target_constraints": {"card_types": ["artifact", "creature", "land"]},
+        "activation_cost_mana": "{1}",
+        "activation_cost_generic": 1,
+        "activation_cost_colors": [],
+        "activation_requires_tap": True,
+        "activation_requires_sacrifice": False,
+        "_rule_logical_key": "battle_rule_v1:icy-manipulator",
+    }
+    try:
+        result = validator.run_simple_activated_tap_target(
+            battle,
+            {
+                "name": "Icy Manipulator taps a land",
+                "type": "simple_activated_tap_target",
+                "card": {"name": "Icy Manipulator"},
+                "target": {
+                    "name": "E2E Land Target",
+                    "type_line": "Land",
+                    "effect": "land",
+                    "cmc": 0,
+                },
+                "controller_mana": {"generic": 1},
+                "expected_tapped_source": True,
+                "logical_rule_key": "battle_rule_v1:icy-manipulator",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Icy Manipulator"
+    assert result["target"] == "E2E Land Target"
+    assert result["target_tapped"] is True
+    assert result["source_tapped"] is True
+    assert any(
+        event == "tap_target_resolved"
+        and data.get("card") == "Icy Manipulator"
+        and data.get("target") == "E2E Land Target"
+        and data.get("target_tapped") is True
+        for event, data in events
+    )
+
+
 def test_simple_activated_self_keyword_runner_executes_keyword_effect() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

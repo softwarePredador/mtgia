@@ -3450,6 +3450,7 @@ def run_simple_activated_tap_target(
     )
     active = battle.Player(str(scenario.get("player") or "Activated Controller"), None, [])
     opponent = battle.Player(str(scenario.get("opponent") or "Activated Opponent"), None, [])
+    target_fixture = dict(scenario.get("target") or {})
     target = battle.enrich_card(
         {
             "name": str(scenario.get("target_name") or f"E2E Creature Target for {card['name']}"),
@@ -3459,6 +3460,7 @@ def run_simple_activated_tap_target(
             "toughness": int(scenario.get("target_toughness") or 3),
             "cmc": int(scenario.get("target_cmc") or 3),
             "tapped": False,
+            **target_fixture,
         }
     )
     active.battlefield = [source]

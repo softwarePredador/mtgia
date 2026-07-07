@@ -11931,6 +11931,12 @@ def target_matches_type(target, target_type):
         return is_artifact_permanent(target) or is_enchantment_permanent(target)
     if target_type == "artifact_or_creature":
         return is_artifact_permanent(target) or is_battlefield_creature(target)
+    if target_type == "artifact_creature_or_land":
+        return (
+            is_artifact_permanent(target)
+            or is_battlefield_creature(target)
+            or is_effective_land(target)
+        )
     if target_type == "creature_or_enchantment":
         return is_battlefield_creature(target) or is_enchantment_permanent(target)
     if target_type in ("creature_or_planeswalker", "creature_planeswalker"):

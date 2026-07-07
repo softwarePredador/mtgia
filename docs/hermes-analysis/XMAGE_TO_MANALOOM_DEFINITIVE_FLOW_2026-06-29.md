@@ -17994,6 +17994,91 @@ modal/optional branches, activated or spell-based target boosts, static
 auras/equipment boosts, attack triggers, or non-creature target variants. Those
 remain separate adapter contracts.
 
+## PG611 Checkpoint - Activated Tap Target Permanents
+
+PG611 extended the existing activated tap-target family from creature-only
+targets to exact permanent subtargets when XMage and Oracle agree on a simple
+tap ability.
+
+Promoted cards:
+
+- `Auriok Transfixer`
+- `Benalish Trapper`
+- `Blinding Souleater`
+- `Gideon's Lawkeeper`
+- `Icy Manipulator`
+- `Loxodon Mystic`
+- `Master Decoy`
+- `Minister of Impediments`
+- `Ostiary Thrull`
+- `Pacification Array`
+- `Scepter of Dominance`
+
+Implementation:
+
+- `xmage_authoritative_exact_scope_split.py` now parses simple activated
+  `TapTargetEffect` permanents with supported targets: creature, artifact,
+  artifact or creature, artifact/creature/land, and permanent;
+- the splitter now reads simple `ColoredManaCost(...)`, `GenericManaCost(...)`,
+  and `ManaCostsImpl(...)` activation costs for this family, including
+  Phyrexian mana when the runtime already supports payment planning;
+- `battle_analyst_v9.py` now treats `artifact_creature_or_land` as a valid
+  target constraint for tap-target execution;
+- `xmage_batch_pg_package_builder.py` and
+  `battle_package_end_to_end_validation.py` now emit and run non-creature
+  target fixtures for this family, proving artifact, land, and enchantment
+  target execution instead of only creature fixtures.
+
+Validation:
+
+- focused Python compilation passed for the touched splitter, package builder,
+  runtime, and E2E validator scripts;
+- splitter focused tests passed with `760` tests and `151` subtests;
+- package/E2E focused tests passed with `98` tests;
+- exact split produced `proposal_count=11` and
+  `safe_for_batch_pg_package_count=11`;
+- precheck found `11/11` target card rows, `0` existing expected rule rows, and
+  `0` shadow rows to deprecate;
+- apply/postcheck confirmed `11/11` promoted rows, `11/11`
+  verified/auto rows, and `11/11` rows with `oracle_hash`;
+- PG -> SQLite/snapshot sync loaded `11` PostgreSQL rows, updated `11` SQLite
+  rows, and exported `5792` canonical snapshot rows;
+- metadata sync used `database_target=127.0.0.1:15432/halder`, matched `6960`
+  PostgreSQL cards, and left `deck_cards` at `2699/2699` matched;
+- E2E validation passed PostgreSQL, SQLite, snapshot, runtime lookup, and `11`
+  battle execution scenarios with `22` runtime events;
+- strategy audit passed `26/26`;
+- operational surface alignment audit passed;
+- legacy contamination audit passed;
+- multi-rule runtime readiness stayed bounded to known review/selector gaps;
+- PG/Hermes/SQLite contract audit initially caught `44` legacy trusted
+  executable curated rules without `oracle_hash`; a narrow backfill package set
+  `oracle_hash = md5(cards.oracle_text)` for those exact rows without changing
+  rule behavior, then a full PG -> SQLite/snapshot sync loaded `5826` PG rows,
+  updated `5813` SQLite rows, and contract audit passed `51/51`;
+- `scripts/quality_gate.sh server-target` passed against the new-server target;
+- post-sync queue rebuild reduced `target_identity_count` from `25076` to
+  `25065`, `xmage_authoritative_source_count` from `24762` to `24751`, and
+  `xmage_authoritative_adapter_required_count` from `24762` to `24751`;
+- global readiness now reports `battle_and_oracle_ready=5885` and
+  `battle_family_mapper_required=27988`;
+- final exact-scope recheck against the post-PG611 queue returned
+  `proposal_count=0` and `safe_for_batch_pg_package_count=0`.
+
+Residual boundary: PG611 does not authorize Snow `{S}` activation costs,
+subtype-restricted tap targets, target count/mana-value filters, non-simple
+activation costs, tap-all effects, untap effects, destroy/damage effects, or
+dynamic conditional target restrictions. Those remain separate adapter
+contracts.
+
+Current next high-volume queue after PG611:
+
+- `recursion::xmage_graveyard_return_variant_review_v1` - `1795`
+- `draw_engine::xmage_draw_card_variant_review_v1` - `1577`
+- `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1` - `1085`
+- `direct_damage::targeted_damage_variant_v1` - `775`
+- `add_counters::source_add_counters_variant_v1` - `771`
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

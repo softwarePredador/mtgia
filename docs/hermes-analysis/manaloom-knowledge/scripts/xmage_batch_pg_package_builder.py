@@ -2570,13 +2570,41 @@ def simple_activated_tap_target_execution_scenario_from_expected_rule(
     required = dict(rule.get("required_effect_fields") or {})
     if required.get("battle_model_scope") != "xmage_permanent_simple_activated_tap_target_v1":
         return None
+    target = required.get("activated_tap_target") or required.get("target") or "creature"
+    target_fixture = {
+        "artifact": {
+            "name": "E2E Artifact Target",
+            "type_line": "Artifact",
+            "effect": "artifact",
+            "cmc": 2,
+        },
+        "artifact_or_creature": {
+            "name": "E2E Artifact Target",
+            "type_line": "Artifact",
+            "effect": "artifact",
+            "cmc": 2,
+        },
+        "artifact_creature_or_land": {
+            "name": "E2E Land Target",
+            "type_line": "Land",
+            "effect": "land",
+            "cmc": 0,
+        },
+        "permanent": {
+            "name": "E2E Enchantment Target",
+            "type_line": "Enchantment",
+            "effect": "enchantment",
+            "cmc": 3,
+        },
+    }.get(str(target), {})
     return {
         "name": f"{rule['card_name']} activates tap target ability",
         "type": "simple_activated_tap_target",
         "card": {"name": rule["card_name"]},
         "controller_mana": _manifest_mana_for_required_activation(required),
         "expected_tapped_source": bool(required.get("activation_requires_tap")),
-        "expected_target": required.get("activated_tap_target") or required.get("target") or "creature",
+        "expected_target": target,
+        "target": target_fixture,
         "logical_rule_key": rule["logical_rule_key"],
     }
 
