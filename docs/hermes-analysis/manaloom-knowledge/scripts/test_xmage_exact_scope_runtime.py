@@ -18343,6 +18343,57 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_damage_wipe_respects_exclude_tokens(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        opponent.battlefield.extend(
+            [
+                {
+                    "name": "Opp Token",
+                    "type_line": "Token Creature - Soldier",
+                    "token": True,
+                    "toughness": 3,
+                },
+                {
+                    "name": "Opp Real",
+                    "type_line": "Creature - Cleric",
+                    "toughness": 3,
+                },
+            ]
+        )
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Incandescent Aria",
+                "type_line": "Sorcery",
+                "oracle_text": "Fixture Incandescent Aria deals 3 damage to each nontoken creature.",
+            },
+            turn=14,
+            rng=random.Random(14),
+            effect_data_override={
+                "effect": "damage_wipe",
+                "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+                "amount": 3,
+                "damage": 3,
+                "damage_scope": "each_creature",
+                "damage_exclude_tokens": True,
+            },
+        )
+
+        self.assertEqual([card["name"] for card in opponent.battlefield], ["Opp Token"])
+        self.assertEqual([card["name"] for card in opponent.graveyard], ["Opp Real"])
+        self.assertTrue(
+            any(
+                event == "damage_wipe_resolved"
+                and data.get("card") == "Fixture Incandescent Aria"
+                and data.get("damage_exclude_tokens") is True
+                and data.get("opponent_creatures_destroyed") == 1
+                for event, data in self.events
+            )
+        )
+
     def test_simple_activated_recursion_permanent_pays_colored_taps_and_returns_matching_card(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

@@ -18437,6 +18437,35 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "board_wipe_damage_source_scope_mismatch")
 
+    def test_damage_wipe_nontoken_scope_maps_when_source_matches(self) -> None:
+        row = queue_row(split.BOARD_WIPE_UNIT, effect_classes=["DamageAllEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Incandescent Aria deals 3 damage to each nontoken creature."),
+            source_text=(
+                "private static final FilterPermanent filter = "
+                "new FilterCreaturePermanent(\"nontoken creature\");"
+                "static { filter.add(TokenPredicate.FALSE); }"
+                "this.getSpellAbility().addEffect(new DamageAllEffect(3, filter));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["damage_scope"], "each_creature")
+        self.assertTrue(effect["damage_exclude_tokens"])
+
+    def test_damage_wipe_nontoken_scope_requires_matching_source(self) -> None:
+        row = queue_row(split.BOARD_WIPE_UNIT, effect_classes=["DamageAllEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Incandescent Aria deals 3 damage to each nontoken creature."),
+            source_text="this.getSpellAbility().addEffect(new DamageAllEffect(3));",
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "board_wipe_damage_source_scope_mismatch")
+
     def test_fixed_plus_one_counter_target_creature_maps_to_add_counters_runtime(self) -> None:
         row = queue_row(split.ADD_COUNTERS_TARGET_UNIT, effect_classes=["AddCountersTargetEffect"])
         proposal, reason = split.split_row(

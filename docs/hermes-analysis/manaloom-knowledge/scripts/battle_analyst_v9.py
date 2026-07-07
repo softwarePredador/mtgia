@@ -52076,6 +52076,7 @@ def apply_damage_wipe(player, opponents, card, effect_data, turn, *, finish_spel
         for value in _as_list(effect_data.get("damage_required_colors"))
         if str(value or "").strip()
     ]
+    damage_exclude_tokens = bool(effect_data.get("damage_exclude_tokens"))
     affected_players = (
         list(opponents)
         if damage_scope
@@ -52111,6 +52112,10 @@ def apply_damage_wipe(player, opponents, card, effect_data, turn, *, finish_spel
                 if damage_scope == "each_attacking_creature" and not bool(permanent.get("attacking")):
                     continue
                 if damage_scope == "each_nonartifact_creature" and "artifact" in _permanent_type_line(permanent):
+                    continue
+                if damage_exclude_tokens and (
+                    is_token_permanent(permanent) or bool(permanent.get("is_token"))
+                ):
                     continue
                 if damage_excluded_subtypes and any(
                     permanent_has_subtype(permanent, subtype)
@@ -52253,6 +52258,7 @@ def apply_damage_wipe(player, opponents, card, effect_data, turn, *, finish_spel
         damage_scope=damage_scope,
         damage_excluded_subtypes=damage_excluded_subtypes,
         damage_required_colors=damage_required_colors,
+        damage_exclude_tokens=damage_exclude_tokens,
         damage_amount_source=effect_data.get("damage_amount_source"),
         current_spell_mana_value=card_mana_value(card),
         spell_mana_value_cast_this_turn=getattr(

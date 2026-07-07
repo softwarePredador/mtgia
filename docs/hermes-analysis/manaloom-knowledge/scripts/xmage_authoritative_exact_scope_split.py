@@ -5916,6 +5916,11 @@ def damage_all_spec_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | No
         return {"damage_scope": "each_untapped_creature"}
     if re.match(r"^.+ deals? \d+ damage to each nonartifact creature\.?$", text):
         return {"damage_scope": "each_nonartifact_creature"}
+    if re.match(r"^.+ deals? \d+ damage to each non[- ]?token creature\.?$", text):
+        return {
+            "damage_scope": "each_creature",
+            "damage_exclude_tokens": True,
+        }
     color_match = re.match(
         r"^.+ deals? \d+ damage to each (?P<colors>(?:white|blue|black|red|green)(?: and/or (?:white|blue|black|red|green))*) creature\.?$",
         text,
@@ -5958,6 +5963,8 @@ def damage_all_scope_from_oracle(metadata: dict[str, Any]) -> str | None:
 
 
 def damage_all_source_matches_spec(source: str, spec: dict[str, Any]) -> bool:
+    if spec.get("damage_exclude_tokens") and "TokenPredicate.FALSE" not in (source or ""):
+        return False
     required_colors = ordered_color_symbols(
         [
             str(value or "").strip().upper()

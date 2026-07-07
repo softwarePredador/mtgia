@@ -126,6 +126,25 @@ Atualizacao 2026-07-07 / PG648-PG649:
   `xmage_authoritative_adapter_required_count=24664`, `parser_gap=0`,
   `missing_source_exception_count=313`.
 
+Atualizacao 2026-07-07 / PG650:
+
+- Fechado o subpadrao seguro de board wipe de dano com exclusao de tokens:
+  `DamageAllEffect` + Oracle `each nontoken creature` + fonte XMage com
+  `TokenPredicate.FALSE`.
+- Runtime `battle_analyst_v9.py` agora respeita `damage_exclude_tokens` em
+  `xmage_fixed_damage_all_matching_permanents_spell_v1`.
+- PostgreSQL novo recebeu a regra verificada de `Incandescent Aria`; precheck
+  confirmou `target_card_rows=1`, apply retornou `upserted_rows=1` e postcheck
+  confirmou `promoted_verified_auto_rows=1` e `promoted_oracle_hash_rows=1`.
+- Sync PG -> Hermes/SQLite pos-PG650: `pg_rows_loaded=5917`,
+  `sqlite_inserted_or_updated=5903`, `canonical_snapshot_rows_exported=5880`.
+- Readiness pos-PG650: `battle_and_oracle_ready=5977`,
+  `battle_family_mapper_required=27899`,
+  `snapshot_has_verified_rule=6005`, `snapshot_has_any_rule=7212`.
+- Rebuild da fila pos-PG650: `target_identity_count=24976`,
+  `xmage_authoritative_adapter_required_count=24663`, `parser_gap=0`,
+  `missing_source_exception_count=313`, `board_wipe=396`.
+
 Comandos globais:
 
 ```bash
