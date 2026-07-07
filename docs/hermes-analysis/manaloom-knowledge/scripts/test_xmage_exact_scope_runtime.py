@@ -4031,6 +4031,68 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertEqual(ground_attacker.get("keywords"), None)
         self.assertTrue(self.battle.card_has_keyword(guide, "flying"))
 
+    def test_attack_trigger_self_boosts_source_until_eot(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        veteran = {
+            "name": "Benalish Veteran",
+            "type_line": "Creature - Human Soldier",
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+            "ability_kind": "triggered",
+            "trigger": "attack",
+            "trigger_effect": "self_stat_modifier_until_eot",
+            "target": "self",
+            "target_controller": "self",
+            "power_delta": 1,
+            "toughness_delta": 1,
+            "attack_trigger_self_boost": True,
+            "power": 2,
+            "toughness": 2,
+            "attacking": True,
+            "_rule_logical_key": "battle_rule_v1:benalish-veteran-test",
+        }
+        active.battlefield.append(veteran)
+
+        resolved = self.battle.resolve_attack_self_boost_triggers(
+            active,
+            [veteran],
+            [active, opponent],
+            turn=4,
+            phase="combat",
+        )
+
+        self.assertEqual(resolved, 1)
+        self.assertEqual(veteran["power"], 3)
+        self.assertEqual(veteran["toughness"], 3)
+        self.assertTrue(
+            any(
+                event == "trigger_resolved"
+                and data.get("card") == "Benalish Veteran"
+                and data.get("effect") == "self_stat_modifier_until_eot"
+                and data.get("power_delta") == 1
+                and data.get("toughness_delta") == 1
+                for event, data in self.events
+            )
+        )
+        self.assertTrue(
+            any(
+                event == "stat_modifier_until_eot_resolved"
+                and data.get("card") == "Benalish Veteran"
+                and data.get("target") == "Benalish Veteran"
+                and data.get("target_power_before") == 2
+                and data.get("target_power_after") == 3
+                and data.get("target_toughness_before") == 2
+                and data.get("target_toughness_after") == 3
+                for event, data in self.events
+            )
+        )
+
+        self.battle.clear_until_eot(active)
+
+        self.assertEqual(veteran["power"], 2)
+        self.assertEqual(veteran["toughness"], 2)
+
     def test_simple_activated_life_gain_permanent_pays_mana_taps_and_gains_life(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

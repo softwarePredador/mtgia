@@ -2987,6 +2987,96 @@ def run_stat_modifier_until_eot(
     }
 
 
+def run_attack_self_boost(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    effect = battle.get_card_effect(card)
+    source = battle.enrich_card(
+        {
+            **card,
+            "type_line": card.get("type_line") or "Creature - Soldier",
+            "effect": "creature",
+            "power": int(card.get("power") or scenario.get("source_power") or 2),
+            "toughness": int(card.get("toughness") or scenario.get("source_toughness") or 2),
+            "attacking": True,
+            "summoning_sick": False,
+            **effect,
+        }
+    )
+    active = battle.Player(str(scenario.get("player") or "Attack Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
+    active.battlefield = [source]
+    before_events = len(events)
+    before_power = int(source.get("power") or 0)
+    before_toughness = int(source.get("toughness") or 0)
+    expected_power_delta = int(
+        scenario.get("expected_power_delta") or effect.get("power_delta") or effect.get("power_boost") or 0
+    )
+    expected_toughness_delta = int(
+        scenario.get("expected_toughness_delta")
+        or effect.get("toughness_delta")
+        or effect.get("toughness_boost")
+        or 0
+    )
+    resolved = battle.resolve_attack_self_boost_triggers(
+        active,
+        [source],
+        [active, opponent],
+        turn=int(scenario.get("turn") or 7),
+        phase=str(scenario.get("phase") or "combat"),
+    )
+    if resolved != 1:
+        fail("battle_execution", f"{card['name']} attack self-boost resolved={resolved}, expected 1")
+    expected_power = before_power + expected_power_delta
+    expected_toughness = before_toughness + expected_toughness_delta
+    if int(source.get("power") or 0) != expected_power:
+        fail("battle_execution", f"{card['name']} source power={source.get('power')!r}, expected {expected_power}")
+    if int(source.get("toughness") or 0) != expected_toughness:
+        fail(
+            "battle_execution",
+            f"{card['name']} source toughness={source.get('toughness')!r}, expected {expected_toughness}",
+        )
+    trigger_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "trigger_resolved"
+            and data.get("card") == card.get("name")
+            and data.get("effect") == "self_stat_modifier_until_eot"
+        ),
+        None,
+    )
+    if trigger_event is None:
+        fail("battle_events", f"missing {card['name']} attack self-boost trigger event")
+    resolved_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "stat_modifier_until_eot_resolved"
+            and data.get("card") == card.get("name")
+            and data.get("target") == source.get("name")
+        ),
+        None,
+    )
+    if resolved_event is None:
+        fail("battle_events", f"missing {card['name']} attack self-boost resolved event")
+    if int(resolved_event.get("power_delta") or 0) != expected_power_delta:
+        fail("battle_events", f"{card['name']} power_delta={resolved_event.get('power_delta')!r}")
+    if int(resolved_event.get("toughness_delta") or 0) != expected_toughness_delta:
+        fail("battle_events", f"{card['name']} toughness_delta={resolved_event.get('toughness_delta')!r}")
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "source_power": int(source.get("power") or 0),
+        "source_toughness": int(source.get("toughness") or 0),
+        "power_delta": expected_power_delta,
+        "toughness_delta": expected_toughness_delta,
+    }
+
+
 def assert_expected_event_fields(stage: str, card_name: str, event_data: dict[str, Any], expected: dict[str, Any]) -> None:
     for key, expected_value in expected.items():
         if event_data.get(key) != expected_value:
@@ -3832,6 +3922,7 @@ def run_aura_static_power_toughness_attachment(
 
 
 SCENARIO_RUNNERS = {
+    "attack_self_boost": run_attack_self_boost,
     "aura_static_power_toughness_attachment": run_aura_static_power_toughness_attachment,
     "conditional_land_play": run_conditional_land_play,
     "copy_stack_ability_response": run_copy_stack_ability_response,

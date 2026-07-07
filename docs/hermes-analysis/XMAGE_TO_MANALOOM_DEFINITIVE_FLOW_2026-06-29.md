@@ -333,20 +333,20 @@ to build this queue. Current evidence:
 - `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260704_post_pg408_mana_etb_draw_new_server_after_docs_final.md`
 - `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260704_post_pg408_mana_etb_draw_new_server_after_docs_final.md`
 
-Current measured queue:
+Current measured queue after PG585:
 
-- target all-card battle-gap identities: `26667`
-- XMage authoritative source resolved: `26353`
+- target Commander-legal battle-gap identities: `25284`
+- XMage authoritative source resolved: `24970`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `26353`
-- ManaLoom adapter work-unit keys: `11427`
-- authoritative source coverage ratio: `0.9882`
+- XMage authoritative adapter required: `24970`
+- ManaLoom adapter work-unit keys: `11343`
+- authoritative source coverage ratio: `0.9876`
 
 Interpretation:
 
 - The old mental model, "review 28k cards manually", is wrong.
-- For `26353` identities, card semantics are accepted from XMage; work is now
+- For `24970` identities, card semantics are accepted from XMage; work is now
   adapter implementation and effect-family classification.
 - `314` identities remain residual exceptions because the local XMage checkout
   did not resolve a source class in the all-card scope. These are a separate
@@ -16835,6 +16835,112 @@ additional gain-life effects, `Activate only as a sorcery`, unsupported
 sacrifice-target costs, or any other auxiliary ability/effect class. Those
 remain blocked under the exact recheck reasons and require separate adapter
 contracts.
+
+## PG585 Attack Self-Boost New Server Evidence
+
+PG585 evidence:
+
+- exact-scope split:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260707_pg585_attack_self_boost_new_server.md`
+- exact-scope split JSON:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260707_pg585_attack_self_boost_new_server.json`
+- package:
+  `docs/hermes-analysis/master_optimizer_reports/pg585_attack_self_boost_new_server_package_package.md`
+- package manifest:
+  `docs/hermes-analysis/master_optimizer_reports/pg585_attack_self_boost_new_server_package_manifest.json`
+- package SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg585_attack_self_boost_new_server_package_precheck.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/pg585_attack_self_boost_new_server_package_apply.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/pg585_attack_self_boost_new_server_package_postcheck.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/pg585_attack_self_boost_new_server_package_rollback.sql`
+- PG -> SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg585_attack_self_boost_new_server_pg_to_sqlite_sync.json`
+- metadata sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg585_attack_self_boost_new_server_metadata_sync.json`
+- E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg585_attack_self_boost_new_server_e2e_validation.md`
+- post-PG585 queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260707_post_pg585_attack_self_boost_new_server_commander_legal.md`
+- post-PG585 readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260707_post_pg585_attack_self_boost_new_server.md`
+- post-PG585 exact split recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260707_post_pg585_attack_self_boost_new_server_recheck.md`
+- final PG/Hermes/SQLite audit:
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260707_post_pg585_attack_self_boost_new_server_final.md`
+- final governance audits:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260707_post_pg585_attack_self_boost_new_server_final.md`,
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260707_post_pg585_attack_self_boost_new_server_final.md`,
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260707_post_pg585_attack_self_boost_new_server_final.md`
+
+PG585 promoted `16` XMage-authoritative creature attack self-boost rows under
+`xmage_creature_attack_self_boost_until_eot_v1`:
+
+- `Benalish Veteran`;
+- `Borderland Marauder`;
+- `Bramble Creeper`;
+- `Brazen Wolves`;
+- `Charging Bandits`;
+- `Charging Paladin`;
+- `Flowstone Charger`;
+- `Graceful Cat`;
+- `Hollow Dogs`;
+- `Jumbo Cactuar`;
+- `Kiln Walker`;
+- `Lurking Nightstalker`;
+- `Reckless Pangolin`;
+- `Steadfast Cathar`;
+- `Vicious Kavu`;
+- `Wei Ambush Force`.
+
+Runtime/modeling change:
+
+- `xmage_authoritative_exact_scope_split.py` now routes
+  `xmage_signature::BoostSourceEffect::AttacksTriggeredAbility` rows into
+  `xmage_creature_attack_self_boost_until_eot_v1` only when Oracle text and
+  XMage source agree on fixed `+N/+M until end of turn`;
+- `battle_analyst_v9.py` now resolves `attack_trigger_self_boost` during the
+  combat attack-trigger step, applies the temporary stat change to the source,
+  emits decision/replay evidence, handles zero-toughness movement, and relies
+  on existing cleanup to revert until-end-of-turn changes;
+- `xmage_batch_pg_package_builder.py` now creates `attack_self_boost`
+  execution scenarios for this scope;
+- `battle_package_end_to_end_validation.py` now executes those scenarios by
+  declaring the source as attacking and validating the resulting stats and
+  replay events.
+
+Validation:
+
+- split produced `proposal_count=16` and
+  `safe_for_batch_pg_package_count=16`;
+- the neighboring dynamic rows remained blocked as
+  `attack_self_boost_oracle_not_fixed=9`;
+- precheck found `16/16` target rows, no existing expected executable rows,
+  and no shadow rows to deprecate;
+- apply upserted `16` PostgreSQL rows and deprecated `0` shadow rows;
+- postcheck confirmed `16` promoted rows, `16` `verified_auto` rows, and `16`
+  rows with `oracle_hash`;
+- PG -> SQLite sync loaded `9257` PostgreSQL rows, updated `9021` SQLite rows,
+  and exported `6703` canonical snapshot rows;
+- metadata sync used `database_target=127.0.0.1:15432/halder`, matched
+  `7675` PostgreSQL cards, and left `deck_cards` at `2699/2699` matched
+  `card_id` rows;
+- E2E validation passed PostgreSQL, SQLite, snapshot, runtime lookup, and
+  `16` battle execution scenarios with `33` replay events;
+- splitter suite passed `695` tests;
+- exact runtime suite passed `356` tests;
+- package builder suite passed `54` tests;
+- post-PG585 queue moved from PG584 `target_identity_count=25300` and
+  `xmage_authoritative_source_count=24986` to `25284` and `24970`;
+- final exact-scope recheck returned `proposal_count=0`;
+- final PG/Hermes/SQLite contract passed `51/51`;
+- final XMage strategy audit passed `26/26`;
+- final operational and legacy contamination audits passed;
+- `scripts/quality_gate.sh server-target` passed against the new-server target.
+
+Residual boundary: PG585 does not authorize dynamic attack self-boost rows
+whose amount depends on attacking creatures, subtypes, power, graveyard state,
+or any other game-state value. Those remain blocked under
+`attack_self_boost_oracle_not_fixed` or future source-specific dynamic parsers.
 
 ## Required Artifacts Per Cycle
 

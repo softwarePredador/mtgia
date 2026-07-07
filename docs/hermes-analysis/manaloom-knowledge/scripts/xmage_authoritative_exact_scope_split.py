@@ -99,6 +99,10 @@ STATIC_GENERIC_COST_REDUCTION_UNIT = (
     "no_target_class::no_condition_class::cost_reduction,static_ability"
 )
 BOOST_KEYWORD_UNIT = "grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1"
+ATTACK_SELF_BOOST_UNIT = (
+    "xmage_signature::BoostSourceEffect::AttacksTriggeredAbility::"
+    "no_target_class::no_condition_class::triggered_ability"
+)
 TOKEN_SPELL_UNIT = (
     "token_maker::xmage_signature::CreateTokenEffect::no_ability_class::"
     "no_target_class::no_condition_class::token"
@@ -340,6 +344,7 @@ ETB_LIBRARY_PICK_CREATURE_SCOPE = "xmage_creature_etb_look_library_pick_to_hand_
 DAMAGE_RECURSION_CREATURE_SCOPE = "xmage_creature_combat_damage_return_graveyard_card_to_hand_v1"
 COMBAT_DAMAGE_DRAW_CREATURE_SCOPE = "xmage_creature_combat_damage_draw_cards_v1"
 ATTACK_RECURSION_PERMANENT_SCOPE = "xmage_permanent_attack_return_graveyard_card_to_hand_v1"
+ATTACK_SELF_BOOST_CREATURE_SCOPE = "xmage_creature_attack_self_boost_until_eot_v1"
 DIES_DRAW_CREATURE_SCOPE = "xmage_creature_dies_draw_cards_v1"
 DIES_LIFE_GAIN_CREATURE_SCOPE = "xmage_creature_dies_gain_life_v1"
 DIES_DAMAGE_CREATURE_SCOPE = "xmage_creature_dies_fixed_damage_target_v1"
@@ -8436,6 +8441,18 @@ def is_creature_attack_target_keyword_unit(row: dict[str, Any]) -> bool:
     )
 
 
+def is_creature_attack_self_boost_unit(row: dict[str, Any]) -> bool:
+    abilities = ability_classes(row)
+    remaining = abilities - {"AttacksTriggeredAbility"}
+    return (
+        str(row.get("adapter_work_unit") or "") == ATTACK_SELF_BOOST_UNIT
+        and effect_classes(row) == {"BoostSourceEffect"}
+        and "AttacksTriggeredAbility" in abilities
+        and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
+        and set(row.get("xmage_signals") or []) == {"triggered_ability"}
+    )
+
+
 def keywords_from_ability_classes(row: dict[str, Any]) -> set[str]:
     return {
         STATIC_SELF_KEYWORD_ABILITY_CLASSES[ability]
@@ -12441,6 +12458,49 @@ def attack_target_keyword_from_source(source: str, keyword_ability_class: str) -
         "keyword": TARGET_GRANT_KEYWORD_ABILITY_CLASSES[keyword_ability_class],
         "optional_trigger": optional_trigger,
         **target_data,
+    }
+
+
+def attack_self_boost_from_oracle(metadata: dict[str, Any]) -> dict[str, int] | str:
+    text = strip_parenthetical_reminders(
+        oracle_text_after_leading_static_keywords(metadata)
+    )
+    text = re.sub(r"\s+", " ", text).strip().lower()
+    match = re.search(
+        r"whenever (?:this creature|[^,.]+?) attacks, it gets "
+        r"(?P<power>[+-]\d+)/(?P<toughness>[+-]\d+) until end of turn\.?$",
+        text,
+    )
+    if not match:
+        return "attack_self_boost_oracle_not_fixed"
+    return {
+        "power_delta": int(match.group("power")),
+        "toughness_delta": int(match.group("toughness")),
+    }
+
+
+def attack_self_boost_from_source(source: str) -> dict[str, int] | str:
+    text = source or ""
+    if "AttacksTriggeredAbility" not in text:
+        return "attack_self_boost_source_not_attack_trigger"
+    constructor_args = extract_constructor_args(text, "BoostSourceEffect")
+    if constructor_args is None:
+        return "attack_self_boost_source_not_single_fixed"
+    args = split_top_level_args(constructor_args)
+    if len(args) < 3:
+        return "attack_self_boost_source_not_single_fixed"
+    if args[2].strip() != "Duration.EndOfTurn":
+        return "attack_self_boost_source_not_end_of_turn"
+    if not re.fullmatch(r"[+-]?\d+", args[0].strip()) or not re.fullmatch(
+        r"[+-]?\d+",
+        args[1].strip(),
+    ):
+        return "attack_self_boost_source_not_single_fixed"
+    if len(re.findall(r"new\s+BoostSourceEffect\s*\(", text)) != 1:
+        return "attack_self_boost_source_not_single_fixed"
+    return {
+        "power_delta": int(args[0].strip()),
+        "toughness_delta": int(args[1].strip()),
     }
 
 
@@ -17902,6 +17962,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "permanent simple activated target-creature keyword until end of turn"
     elif scope == ATTACK_TRIGGER_TARGET_KEYWORD_SCOPE:
         scope_kind = "creature attack trigger grants a target creature a keyword until end of turn"
+    elif scope == ATTACK_SELF_BOOST_CREATURE_SCOPE:
+        scope_kind = "creature attack trigger self power/toughness boost until end of turn"
     elif scope == STATIC_CONTROLLED_PT_SCOPE:
         scope_kind = "permanent static controlled-creature power/toughness boost"
     elif scope == STATIC_GLOBAL_PT_SCOPE:
@@ -18132,6 +18194,7 @@ def split_row(
     permanent_activated_tutor_battlefield_unit = is_permanent_activated_tutor_battlefield_unit(row)
     permanent_activated_tutor_hand_unit = is_permanent_activated_tutor_hand_unit(row)
     attack_target_keyword_unit = is_creature_attack_target_keyword_unit(row)
+    attack_self_boost_creature_unit = is_creature_attack_self_boost_unit(row)
     static_controlled_pt_unit = is_static_controlled_pt_unit(row)
     static_global_pt_unit = is_static_global_pt_unit(row)
     simple_aura_static_pt_unit = is_simple_aura_static_pt_unit(row)
@@ -18256,6 +18319,7 @@ def split_row(
         and not permanent_activated_tutor_battlefield_unit
         and not permanent_activated_tutor_hand_unit
         and not attack_target_keyword_unit
+        and not attack_self_boost_creature_unit
         and not static_controlled_pt_unit
         and not static_global_pt_unit
         and not simple_aura_static_pt_unit
@@ -18338,6 +18402,7 @@ def split_row(
         and not permanent_activated_tutor_battlefield_unit
         and not permanent_activated_tutor_hand_unit
         and not attack_target_keyword_unit
+        and not attack_self_boost_creature_unit
         and not static_controlled_pt_unit
         and not static_global_pt_unit
         and not simple_aura_static_pt_unit
@@ -19931,6 +19996,48 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_permanent_simple_activated_regenerate_source",
+        ), "selected_exact_scope"
+
+    if attack_self_boost_creature_unit:
+        if not is_creature_metadata(metadata):
+            return None, "attack_self_boost_not_creature"
+        oracle_boost = attack_self_boost_from_oracle(metadata)
+        if isinstance(oracle_boost, str):
+            return None, oracle_boost
+        source_boost = attack_self_boost_from_source(source_text)
+        if isinstance(source_boost, str):
+            return None, source_boost
+        if source_boost != oracle_boost:
+            return None, "attack_self_boost_source_oracle_mismatch"
+        effect_json = {
+            "effect": "creature",
+            "battle_model_scope": ATTACK_SELF_BOOST_CREATURE_SCOPE,
+            "ability_kind": "triggered",
+            "trigger": "attack",
+            "trigger_effect": "self_stat_modifier_until_eot",
+            "target": "self",
+            "target_controller": "self",
+            "target_constraints": {"source": "self", "card_types": ["creature"]},
+            "power_delta": int(oracle_boost["power_delta"]),
+            "toughness_delta": int(oracle_boost["toughness_delta"]),
+            "power_boost": int(oracle_boost["power_delta"]),
+            "toughness_boost": int(oracle_boost["toughness_delta"]),
+            "duration": "until_end_of_turn",
+            "attack_trigger_self_boost": True,
+            "xmage_effect_class": "BoostSourceEffect",
+            "xmage_ability_class": "AttacksTriggeredAbility",
+        }
+        keyword_list = ordered_keywords(keywords_from_ability_classes(row))
+        if keyword_list:
+            effect_json["keywords"] = keyword_list
+            effect_json["_keywords_are_self"] = True
+            for keyword in keyword_list:
+                effect_json[keyword] = True
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_creature_attack_self_boost_until_eot",
         ), "selected_exact_scope"
 
     if attack_target_keyword_unit:
@@ -26920,6 +27027,7 @@ def build_exact_split_report(
             and not is_permanent_activated_regenerate_source_unit(row)
             and not is_permanent_activated_tutor_hand_unit(row)
             and not is_creature_attack_target_keyword_unit(row)
+            and not is_creature_attack_self_boost_unit(row)
             and not is_static_controlled_pt_unit(row)
             and not is_static_global_pt_unit(row)
             and not is_simple_aura_static_pt_unit(row)
@@ -27023,6 +27131,7 @@ def build_exact_split_report(
                 "SetBasePowerToughnessSourceEffect + SimpleStaticAbility creature rows whose source and Oracle both set source power/toughness to a direct controller/all-graveyards card-type count",
                 "grant_protection_from_chosen_color rows with GainAbilityTargetEffect + SimpleActivatedAbility, exact activated target-creature keyword until EOT, and simple mana/tap source costs only",
                 "grant_protection_from_chosen_color rows with GainAbilityTargetEffect + AttacksTriggeredAbility, exact attack-trigger target-creature keyword until EOT, and Oracle/source target constraints agreement",
+                "xmage_signature BoostSourceEffect + AttacksTriggeredAbility rows with exact fixed self boost until EOT and Oracle/source agreement",
                 "grant_protection_from_chosen_color rows with pure GainAbilityTargetEffect one-shot spells, exact target-creature keyword until EOT, and no auxiliary ability classes",
                 "ramp_permanent::xmage_creature_mana_source_variant_review_v1 rows with EntersBattlefieldTriggeredAbility + BasicManaEffect, exact unconditional fixed ETB mana Oracle/source agreement, and no auxiliary ability class",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with ReturnFromGraveyardToHandTargetEffect, SimpleActivatedAbility, exact activated graveyard-to-hand Oracle text, and mana/tap/self-sacrifice/discard-a-card source costs only",

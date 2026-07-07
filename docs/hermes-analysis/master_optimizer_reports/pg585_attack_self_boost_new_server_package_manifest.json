@@ -1,0 +1,1487 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg585_attack_self_boost_new_server_20260707_014926",
+  "deploy_id": "PG585",
+  "execution_scenarios": [
+    {
+      "card": {
+        "name": "Benalish Veteran",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "expected_power_delta": 1,
+      "expected_toughness_delta": 1,
+      "logical_rule_key": "battle_rule_v1:f7c15a13e6074f630dd53656c0a3ef87",
+      "name": "Benalish Veteran boosts itself when attacking",
+      "type": "attack_self_boost"
+    },
+    {
+      "card": {
+        "name": "Borderland Marauder",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "expected_power_delta": 2,
+      "expected_toughness_delta": 0,
+      "logical_rule_key": "battle_rule_v1:5d6b99106f80d9a0e221b0767aa32e93",
+      "name": "Borderland Marauder boosts itself when attacking",
+      "type": "attack_self_boost"
+    },
+    {
+      "card": {
+        "name": "Bramble Creeper",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "expected_power_delta": 5,
+      "expected_toughness_delta": 0,
+      "logical_rule_key": "battle_rule_v1:d3b29e43948508ae1af120cde3e86fa0",
+      "name": "Bramble Creeper boosts itself when attacking",
+      "type": "attack_self_boost"
+    },
+    {
+      "card": {
+        "name": "Brazen Wolves",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "expected_power_delta": 2,
+      "expected_toughness_delta": 0,
+      "logical_rule_key": "battle_rule_v1:5d6b99106f80d9a0e221b0767aa32e93",
+      "name": "Brazen Wolves boosts itself when attacking",
+      "type": "attack_self_boost"
+    },
+    {
+      "card": {
+        "name": "Charging Bandits",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "expected_power_delta": 2,
+      "expected_toughness_delta": 0,
+      "logical_rule_key": "battle_rule_v1:5d6b99106f80d9a0e221b0767aa32e93",
+      "name": "Charging Bandits boosts itself when attacking",
+      "type": "attack_self_boost"
+    },
+    {
+      "card": {
+        "name": "Charging Paladin",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "expected_power_delta": 0,
+      "expected_toughness_delta": 3,
+      "logical_rule_key": "battle_rule_v1:443b0ce5e0fa6ef1a923ecce419c4599",
+      "name": "Charging Paladin boosts itself when attacking",
+      "type": "attack_self_boost"
+    },
+    {
+      "card": {
+        "name": "Flowstone Charger",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "expected_power_delta": 3,
+      "expected_toughness_delta": -3,
+      "logical_rule_key": "battle_rule_v1:bc30c0cad05020ac03f021fbe30be392",
+      "name": "Flowstone Charger boosts itself when attacking",
+      "type": "attack_self_boost"
+    },
+    {
+      "card": {
+        "name": "Graceful Cat",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "expected_power_delta": 1,
+      "expected_toughness_delta": 1,
+      "logical_rule_key": "battle_rule_v1:f7c15a13e6074f630dd53656c0a3ef87",
+      "name": "Graceful Cat boosts itself when attacking",
+      "type": "attack_self_boost"
+    },
+    {
+      "card": {
+        "name": "Hollow Dogs",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "expected_power_delta": 2,
+      "expected_toughness_delta": 0,
+      "logical_rule_key": "battle_rule_v1:5d6b99106f80d9a0e221b0767aa32e93",
+      "name": "Hollow Dogs boosts itself when attacking",
+      "type": "attack_self_boost"
+    },
+    {
+      "card": {
+        "name": "Jumbo Cactuar",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "expected_power_delta": 9999,
+      "expected_toughness_delta": 0,
+      "logical_rule_key": "battle_rule_v1:3bf34039afbdb4bc847b80f88e04c534",
+      "name": "Jumbo Cactuar boosts itself when attacking",
+      "type": "attack_self_boost"
+    },
+    {
+      "card": {
+        "name": "Kiln Walker",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "expected_power_delta": 3,
+      "expected_toughness_delta": 0,
+      "logical_rule_key": "battle_rule_v1:8ece0c43f6f27accedc1e20248a665c5",
+      "name": "Kiln Walker boosts itself when attacking",
+      "type": "attack_self_boost"
+    },
+    {
+      "card": {
+        "name": "Lurking Nightstalker",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "expected_power_delta": 2,
+      "expected_toughness_delta": 0,
+      "logical_rule_key": "battle_rule_v1:5d6b99106f80d9a0e221b0767aa32e93",
+      "name": "Lurking Nightstalker boosts itself when attacking",
+      "type": "attack_self_boost"
+    },
+    {
+      "card": {
+        "name": "Reckless Pangolin",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "expected_power_delta": 1,
+      "expected_toughness_delta": 1,
+      "logical_rule_key": "battle_rule_v1:f7c15a13e6074f630dd53656c0a3ef87",
+      "name": "Reckless Pangolin boosts itself when attacking",
+      "type": "attack_self_boost"
+    },
+    {
+      "card": {
+        "name": "Steadfast Cathar",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "expected_power_delta": 0,
+      "expected_toughness_delta": 2,
+      "logical_rule_key": "battle_rule_v1:35192ce2cfd55d8045e8c2f607062561",
+      "name": "Steadfast Cathar boosts itself when attacking",
+      "type": "attack_self_boost"
+    },
+    {
+      "card": {
+        "name": "Vicious Kavu",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "expected_power_delta": 2,
+      "expected_toughness_delta": 0,
+      "logical_rule_key": "battle_rule_v1:5d6b99106f80d9a0e221b0767aa32e93",
+      "name": "Vicious Kavu boosts itself when attacking",
+      "type": "attack_self_boost"
+    },
+    {
+      "card": {
+        "name": "Wei Ambush Force",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "expected_power_delta": 2,
+      "expected_toughness_delta": 0,
+      "logical_rule_key": "battle_rule_v1:5d6b99106f80d9a0e221b0767aa32e93",
+      "name": "Wei Ambush Force boosts itself when attacking",
+      "type": "attack_self_boost"
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Benalish Veteran",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f7c15a13e6074f630dd53656c0a3ef87",
+      "min_rule_version": 2,
+      "normalized_name": "benalish veteran",
+      "oracle_hash": "b83ef5987add804ac3909c091b88763e",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 1,
+        "power_delta": 1,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 1,
+        "toughness_delta": 1,
+        "trigger": "attack",
+        "trigger_effect": "self_stat_modifier_until_eot",
+        "xmage_ability_class": "AttacksTriggeredAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Borderland Marauder",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5d6b99106f80d9a0e221b0767aa32e93",
+      "min_rule_version": 2,
+      "normalized_name": "borderland marauder",
+      "oracle_hash": "fc61c3304254cd16883b99b6552a1f82",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 2,
+        "power_delta": 2,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "trigger": "attack",
+        "trigger_effect": "self_stat_modifier_until_eot",
+        "xmage_ability_class": "AttacksTriggeredAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Bramble Creeper",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d3b29e43948508ae1af120cde3e86fa0",
+      "min_rule_version": 2,
+      "normalized_name": "bramble creeper",
+      "oracle_hash": "28f1a0b740aca3e6035fdfb65c261e87",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 5,
+        "power_delta": 5,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "trigger": "attack",
+        "trigger_effect": "self_stat_modifier_until_eot",
+        "xmage_ability_class": "AttacksTriggeredAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Brazen Wolves",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5d6b99106f80d9a0e221b0767aa32e93",
+      "min_rule_version": 2,
+      "normalized_name": "brazen wolves",
+      "oracle_hash": "fc61c3304254cd16883b99b6552a1f82",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 2,
+        "power_delta": 2,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "trigger": "attack",
+        "trigger_effect": "self_stat_modifier_until_eot",
+        "xmage_ability_class": "AttacksTriggeredAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Charging Bandits",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5d6b99106f80d9a0e221b0767aa32e93",
+      "min_rule_version": 2,
+      "normalized_name": "charging bandits",
+      "oracle_hash": "fc61c3304254cd16883b99b6552a1f82",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 2,
+        "power_delta": 2,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "trigger": "attack",
+        "trigger_effect": "self_stat_modifier_until_eot",
+        "xmage_ability_class": "AttacksTriggeredAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Charging Paladin",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:443b0ce5e0fa6ef1a923ecce419c4599",
+      "min_rule_version": 2,
+      "normalized_name": "charging paladin",
+      "oracle_hash": "2acb7c6a8ca7b8dc467a56632c5721b6",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 0,
+        "power_delta": 0,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 3,
+        "toughness_delta": 3,
+        "trigger": "attack",
+        "trigger_effect": "self_stat_modifier_until_eot",
+        "xmage_ability_class": "AttacksTriggeredAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Flowstone Charger",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:bc30c0cad05020ac03f021fbe30be392",
+      "min_rule_version": 2,
+      "normalized_name": "flowstone charger",
+      "oracle_hash": "4532a8a40759c09b33635e6102203b00",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 3,
+        "power_delta": 3,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": -3,
+        "toughness_delta": -3,
+        "trigger": "attack",
+        "trigger_effect": "self_stat_modifier_until_eot",
+        "xmage_ability_class": "AttacksTriggeredAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Graceful Cat",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f7c15a13e6074f630dd53656c0a3ef87",
+      "min_rule_version": 2,
+      "normalized_name": "graceful cat",
+      "oracle_hash": "b83ef5987add804ac3909c091b88763e",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 1,
+        "power_delta": 1,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 1,
+        "toughness_delta": 1,
+        "trigger": "attack",
+        "trigger_effect": "self_stat_modifier_until_eot",
+        "xmage_ability_class": "AttacksTriggeredAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Hollow Dogs",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5d6b99106f80d9a0e221b0767aa32e93",
+      "min_rule_version": 2,
+      "normalized_name": "hollow dogs",
+      "oracle_hash": "fc61c3304254cd16883b99b6552a1f82",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 2,
+        "power_delta": 2,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "trigger": "attack",
+        "trigger_effect": "self_stat_modifier_until_eot",
+        "xmage_ability_class": "AttacksTriggeredAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Jumbo Cactuar",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3bf34039afbdb4bc847b80f88e04c534",
+      "min_rule_version": 2,
+      "normalized_name": "jumbo cactuar",
+      "oracle_hash": "8142f19997c3b84fa66a81d91da43979",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 9999,
+        "power_delta": 9999,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "trigger": "attack",
+        "trigger_effect": "self_stat_modifier_until_eot",
+        "xmage_ability_class": "AttacksTriggeredAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Kiln Walker",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8ece0c43f6f27accedc1e20248a665c5",
+      "min_rule_version": 2,
+      "normalized_name": "kiln walker",
+      "oracle_hash": "43db51ac096576cdd208505dff52db97",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 3,
+        "power_delta": 3,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "trigger": "attack",
+        "trigger_effect": "self_stat_modifier_until_eot",
+        "xmage_ability_class": "AttacksTriggeredAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Lurking Nightstalker",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5d6b99106f80d9a0e221b0767aa32e93",
+      "min_rule_version": 2,
+      "normalized_name": "lurking nightstalker",
+      "oracle_hash": "fc61c3304254cd16883b99b6552a1f82",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 2,
+        "power_delta": 2,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "trigger": "attack",
+        "trigger_effect": "self_stat_modifier_until_eot",
+        "xmage_ability_class": "AttacksTriggeredAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Reckless Pangolin",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f7c15a13e6074f630dd53656c0a3ef87",
+      "min_rule_version": 2,
+      "normalized_name": "reckless pangolin",
+      "oracle_hash": "b83ef5987add804ac3909c091b88763e",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 1,
+        "power_delta": 1,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 1,
+        "toughness_delta": 1,
+        "trigger": "attack",
+        "trigger_effect": "self_stat_modifier_until_eot",
+        "xmage_ability_class": "AttacksTriggeredAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Steadfast Cathar",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:35192ce2cfd55d8045e8c2f607062561",
+      "min_rule_version": 2,
+      "normalized_name": "steadfast cathar",
+      "oracle_hash": "e57c0105a3a28215a70de605c76c097b",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 0,
+        "power_delta": 0,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 2,
+        "toughness_delta": 2,
+        "trigger": "attack",
+        "trigger_effect": "self_stat_modifier_until_eot",
+        "xmage_ability_class": "AttacksTriggeredAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Vicious Kavu",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5d6b99106f80d9a0e221b0767aa32e93",
+      "min_rule_version": 2,
+      "normalized_name": "vicious kavu",
+      "oracle_hash": "fc61c3304254cd16883b99b6552a1f82",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 2,
+        "power_delta": 2,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "trigger": "attack",
+        "trigger_effect": "self_stat_modifier_until_eot",
+        "xmage_ability_class": "AttacksTriggeredAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Wei Ambush Force",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5d6b99106f80d9a0e221b0767aa32e93",
+      "min_rule_version": 2,
+      "normalized_name": "wei ambush force",
+      "oracle_hash": "fc61c3304254cd16883b99b6552a1f82",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 2,
+        "power_delta": 2,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "trigger": "attack",
+        "trigger_effect": "self_stat_modifier_until_eot",
+        "xmage_ability_class": "AttacksTriggeredAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_creature_attack_self_boost_until_eot": 16
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg585_attack_self_boost_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg585_attack_self_boost_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg585_attack_self_boost_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg585_attack_self_boost_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg585_attack_self_boost_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg585_attack_self_boost_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-07T01:49:26+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Benalish Veteran"
+      },
+      "card_name": "Benalish Veteran",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f7c15a13e6074f630dd53656c0a3ef87",
+      "normalized_name": "benalish veteran",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 1,
+        "power_delta": 1,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 1,
+        "toughness_delta": 1,
+        "trigger": "attack",
+        "trigger_effect": "self_stat_modifier_until_eot",
+        "xmage_ability_class": "AttacksTriggeredAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Borderland Marauder"
+      },
+      "card_name": "Borderland Marauder",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5d6b99106f80d9a0e221b0767aa32e93",
+      "normalized_name": "borderland marauder",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 2,
+        "power_delta": 2,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "trigger": "attack",
+        "trigger_effect": "self_stat_modifier_until_eot",
+        "xmage_ability_class": "AttacksTriggeredAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Bramble Creeper"
+      },
+      "card_name": "Bramble Creeper",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d3b29e43948508ae1af120cde3e86fa0",
+      "normalized_name": "bramble creeper",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 5,
+        "power_delta": 5,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "trigger": "attack",
+        "trigger_effect": "self_stat_modifier_until_eot",
+        "xmage_ability_class": "AttacksTriggeredAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Brazen Wolves"
+      },
+      "card_name": "Brazen Wolves",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5d6b99106f80d9a0e221b0767aa32e93",
+      "normalized_name": "brazen wolves",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 2,
+        "power_delta": 2,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "trigger": "attack",
+        "trigger_effect": "self_stat_modifier_until_eot",
+        "xmage_ability_class": "AttacksTriggeredAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Charging Bandits"
+      },
+      "card_name": "Charging Bandits",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5d6b99106f80d9a0e221b0767aa32e93",
+      "normalized_name": "charging bandits",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 2,
+        "power_delta": 2,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "trigger": "attack",
+        "trigger_effect": "self_stat_modifier_until_eot",
+        "xmage_ability_class": "AttacksTriggeredAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Charging Paladin"
+      },
+      "card_name": "Charging Paladin",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:443b0ce5e0fa6ef1a923ecce419c4599",
+      "normalized_name": "charging paladin",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 0,
+        "power_delta": 0,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 3,
+        "toughness_delta": 3,
+        "trigger": "attack",
+        "trigger_effect": "self_stat_modifier_until_eot",
+        "xmage_ability_class": "AttacksTriggeredAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Flowstone Charger"
+      },
+      "card_name": "Flowstone Charger",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:bc30c0cad05020ac03f021fbe30be392",
+      "normalized_name": "flowstone charger",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 3,
+        "power_delta": 3,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": -3,
+        "toughness_delta": -3,
+        "trigger": "attack",
+        "trigger_effect": "self_stat_modifier_until_eot",
+        "xmage_ability_class": "AttacksTriggeredAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Graceful Cat"
+      },
+      "card_name": "Graceful Cat",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f7c15a13e6074f630dd53656c0a3ef87",
+      "normalized_name": "graceful cat",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 1,
+        "power_delta": 1,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 1,
+        "toughness_delta": 1,
+        "trigger": "attack",
+        "trigger_effect": "self_stat_modifier_until_eot",
+        "xmage_ability_class": "AttacksTriggeredAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Hollow Dogs"
+      },
+      "card_name": "Hollow Dogs",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5d6b99106f80d9a0e221b0767aa32e93",
+      "normalized_name": "hollow dogs",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 2,
+        "power_delta": 2,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "trigger": "attack",
+        "trigger_effect": "self_stat_modifier_until_eot",
+        "xmage_ability_class": "AttacksTriggeredAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Jumbo Cactuar"
+      },
+      "card_name": "Jumbo Cactuar",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3bf34039afbdb4bc847b80f88e04c534",
+      "normalized_name": "jumbo cactuar",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 9999,
+        "power_delta": 9999,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "trigger": "attack",
+        "trigger_effect": "self_stat_modifier_until_eot",
+        "xmage_ability_class": "AttacksTriggeredAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Kiln Walker"
+      },
+      "card_name": "Kiln Walker",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8ece0c43f6f27accedc1e20248a665c5",
+      "normalized_name": "kiln walker",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 3,
+        "power_delta": 3,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "trigger": "attack",
+        "trigger_effect": "self_stat_modifier_until_eot",
+        "xmage_ability_class": "AttacksTriggeredAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Lurking Nightstalker"
+      },
+      "card_name": "Lurking Nightstalker",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5d6b99106f80d9a0e221b0767aa32e93",
+      "normalized_name": "lurking nightstalker",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 2,
+        "power_delta": 2,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "trigger": "attack",
+        "trigger_effect": "self_stat_modifier_until_eot",
+        "xmage_ability_class": "AttacksTriggeredAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Reckless Pangolin"
+      },
+      "card_name": "Reckless Pangolin",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f7c15a13e6074f630dd53656c0a3ef87",
+      "normalized_name": "reckless pangolin",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 1,
+        "power_delta": 1,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 1,
+        "toughness_delta": 1,
+        "trigger": "attack",
+        "trigger_effect": "self_stat_modifier_until_eot",
+        "xmage_ability_class": "AttacksTriggeredAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Steadfast Cathar"
+      },
+      "card_name": "Steadfast Cathar",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:35192ce2cfd55d8045e8c2f607062561",
+      "normalized_name": "steadfast cathar",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 0,
+        "power_delta": 0,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 2,
+        "toughness_delta": 2,
+        "trigger": "attack",
+        "trigger_effect": "self_stat_modifier_until_eot",
+        "xmage_ability_class": "AttacksTriggeredAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Vicious Kavu"
+      },
+      "card_name": "Vicious Kavu",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5d6b99106f80d9a0e221b0767aa32e93",
+      "normalized_name": "vicious kavu",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 2,
+        "power_delta": 2,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "trigger": "attack",
+        "trigger_effect": "self_stat_modifier_until_eot",
+        "xmage_ability_class": "AttacksTriggeredAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Wei Ambush Force"
+      },
+      "card_name": "Wei Ambush Force",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5d6b99106f80d9a0e221b0767aa32e93",
+      "normalized_name": "wei ambush force",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "power_boost": 2,
+        "power_delta": 2,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "trigger": "attack",
+        "trigger_effect": "self_stat_modifier_until_eot",
+        "xmage_ability_class": "AttacksTriggeredAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Benalish Veteran",
+    "Borderland Marauder",
+    "Bramble Creeper",
+    "Brazen Wolves",
+    "Charging Bandits",
+    "Charging Paladin",
+    "Flowstone Charger",
+    "Graceful Cat",
+    "Hollow Dogs",
+    "Jumbo Cactuar",
+    "Kiln Walker",
+    "Lurking Nightstalker",
+    "Reckless Pangolin",
+    "Steadfast Cathar",
+    "Vicious Kavu",
+    "Wei Ambush Force"
+  ],
+  "selected_count": 16,
+  "slug": "attack_self_boost_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Benalish Veteran",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f7c15a13e6074f630dd53656c0a3ef87",
+      "min_rule_version": 2,
+      "normalized_name": "benalish veteran",
+      "oracle_hash": "b83ef5987add804ac3909c091b88763e",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Borderland Marauder",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5d6b99106f80d9a0e221b0767aa32e93",
+      "min_rule_version": 2,
+      "normalized_name": "borderland marauder",
+      "oracle_hash": "fc61c3304254cd16883b99b6552a1f82",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Bramble Creeper",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d3b29e43948508ae1af120cde3e86fa0",
+      "min_rule_version": 2,
+      "normalized_name": "bramble creeper",
+      "oracle_hash": "28f1a0b740aca3e6035fdfb65c261e87",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Brazen Wolves",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5d6b99106f80d9a0e221b0767aa32e93",
+      "min_rule_version": 2,
+      "normalized_name": "brazen wolves",
+      "oracle_hash": "fc61c3304254cd16883b99b6552a1f82",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Charging Bandits",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5d6b99106f80d9a0e221b0767aa32e93",
+      "min_rule_version": 2,
+      "normalized_name": "charging bandits",
+      "oracle_hash": "fc61c3304254cd16883b99b6552a1f82",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Charging Paladin",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:443b0ce5e0fa6ef1a923ecce419c4599",
+      "min_rule_version": 2,
+      "normalized_name": "charging paladin",
+      "oracle_hash": "2acb7c6a8ca7b8dc467a56632c5721b6",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Flowstone Charger",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:bc30c0cad05020ac03f021fbe30be392",
+      "min_rule_version": 2,
+      "normalized_name": "flowstone charger",
+      "oracle_hash": "4532a8a40759c09b33635e6102203b00",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Graceful Cat",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f7c15a13e6074f630dd53656c0a3ef87",
+      "min_rule_version": 2,
+      "normalized_name": "graceful cat",
+      "oracle_hash": "b83ef5987add804ac3909c091b88763e",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Hollow Dogs",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5d6b99106f80d9a0e221b0767aa32e93",
+      "min_rule_version": 2,
+      "normalized_name": "hollow dogs",
+      "oracle_hash": "fc61c3304254cd16883b99b6552a1f82",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Jumbo Cactuar",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3bf34039afbdb4bc847b80f88e04c534",
+      "min_rule_version": 2,
+      "normalized_name": "jumbo cactuar",
+      "oracle_hash": "8142f19997c3b84fa66a81d91da43979",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Kiln Walker",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8ece0c43f6f27accedc1e20248a665c5",
+      "min_rule_version": 2,
+      "normalized_name": "kiln walker",
+      "oracle_hash": "43db51ac096576cdd208505dff52db97",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Lurking Nightstalker",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5d6b99106f80d9a0e221b0767aa32e93",
+      "min_rule_version": 2,
+      "normalized_name": "lurking nightstalker",
+      "oracle_hash": "fc61c3304254cd16883b99b6552a1f82",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Reckless Pangolin",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f7c15a13e6074f630dd53656c0a3ef87",
+      "min_rule_version": 2,
+      "normalized_name": "reckless pangolin",
+      "oracle_hash": "b83ef5987add804ac3909c091b88763e",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Steadfast Cathar",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:35192ce2cfd55d8045e8c2f607062561",
+      "min_rule_version": 2,
+      "normalized_name": "steadfast cathar",
+      "oracle_hash": "e57c0105a3a28215a70de605c76c097b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Vicious Kavu",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5d6b99106f80d9a0e221b0767aa32e93",
+      "min_rule_version": 2,
+      "normalized_name": "vicious kavu",
+      "oracle_hash": "fc61c3304254cd16883b99b6552a1f82",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Wei Ambush Force",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5d6b99106f80d9a0e221b0767aa32e93",
+      "min_rule_version": 2,
+      "normalized_name": "wei ambush force",
+      "oracle_hash": "fc61c3304254cd16883b99b6552a1f82",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

@@ -2088,6 +2088,29 @@ def target_keyword_spell_execution_scenario_from_expected_rule(
     }
 
 
+def attack_self_boost_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_creature_attack_self_boost_until_eot_v1":
+        return None
+    return {
+        "name": f"{rule['card_name']} boosts itself when attacking",
+        "type": "attack_self_boost",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": "Creature - Soldier",
+            "power": 2,
+            "toughness": 2,
+        },
+        "expected_power_delta": int(required.get("power_delta") or required.get("power_boost") or 0),
+        "expected_toughness_delta": int(
+            required.get("toughness_delta") or required.get("toughness_boost") or 0
+        ),
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def each_player_sacrifice_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
@@ -2347,6 +2370,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or simple_activated_self_keyword_execution_scenario_from_expected_rule(rule)
         or simple_activated_regenerate_source_execution_scenario_from_expected_rule(rule)
         or target_keyword_spell_execution_scenario_from_expected_rule(rule)
+        or attack_self_boost_execution_scenario_from_expected_rule(rule)
         or each_player_sacrifice_execution_scenario_from_expected_rule(rule)
         or single_target_removal_execution_scenario_from_expected_rule(rule)
         or simple_activated_create_token_execution_scenario_from_expected_rule(rule)

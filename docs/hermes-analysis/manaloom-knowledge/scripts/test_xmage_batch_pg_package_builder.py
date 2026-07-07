@@ -775,6 +775,31 @@ def test_manifest_builds_target_keyword_spell_execution_scenario() -> None:
     assert scenario["expected_keywords"] == ["double_strike"]
 
 
+def test_manifest_builds_attack_self_boost_execution_scenario() -> None:
+    rule = {
+        "normalized_name": "benalish veteran",
+        "card_name": "Benalish Veteran",
+        "oracle_hash": "hash-benalish-veteran",
+        "logical_rule_key": "battle_rule_v1:hash-benalish-veteran",
+        "required_effect_fields": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+            "trigger": "attack",
+            "trigger_effect": "self_stat_modifier_until_eot",
+            "power_delta": 1,
+            "toughness_delta": 1,
+        },
+    }
+
+    scenario = builder.attack_self_boost_execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "attack_self_boost"
+    assert scenario["card"]["name"] == "Benalish Veteran"
+    assert scenario["expected_power_delta"] == 1
+    assert scenario["expected_toughness_delta"] == 1
+
+
 def test_manifest_builds_single_target_exile_execution_scenario() -> None:
     rule = {
         "normalized_name": "radiant purge",

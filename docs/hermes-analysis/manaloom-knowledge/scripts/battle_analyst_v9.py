@@ -28167,6 +28167,143 @@ def resolve_attack_treasure_triggers(player, attackers, turn, *, phase="combat")
 ATTACK_TRIGGER_TARGET_KEYWORD_SCOPE = (
     "xmage_creature_attack_grant_keyword_target_creature_until_eot_v1"
 )
+ATTACK_SELF_BOOST_SCOPE = "xmage_creature_attack_self_boost_until_eot_v1"
+
+
+def attack_self_boost_effect_for_permanent(permanent):
+    if not isinstance(permanent, dict):
+        return None
+    candidates = []
+    if permanent.get("battle_model_scope") == ATTACK_SELF_BOOST_SCOPE:
+        candidates.append(dict(permanent))
+    try:
+        resolved = get_card_effect(permanent)
+    except Exception:
+        resolved = {}
+    if (
+        isinstance(resolved, dict)
+        and resolved.get("battle_model_scope") == ATTACK_SELF_BOOST_SCOPE
+    ):
+        candidates.append(resolved)
+    for effect_data in candidates:
+        if (
+            effect_data.get("ability_kind") == "triggered"
+            and effect_data.get("trigger") == "attack"
+            and (
+                effect_data.get("trigger_effect") == "self_stat_modifier_until_eot"
+                or effect_data.get("attack_trigger_self_boost") is True
+            )
+        ):
+            return effect_data
+    return None
+
+
+def resolve_attack_self_boost_triggers(player, attackers, all_players, turn, *, phase="combat"):
+    resolved = 0
+    for source in list(attackers or []):
+        if source not in getattr(player, "battlefield", []):
+            continue
+        effect_data = attack_self_boost_effect_for_permanent(source)
+        if effect_data is None:
+            continue
+        power_delta = int(effect_data.get("power_delta") or effect_data.get("power_boost") or 0)
+        toughness_delta = int(
+            effect_data.get("toughness_delta") or effect_data.get("toughness_boost") or 0
+        )
+        if power_delta == 0 and toughness_delta == 0:
+            continue
+        fields = replay_rule_fields(effect_data)
+        power_before = _numeric_card_stat(source, "power")
+        toughness_before = _numeric_card_stat(source, "toughness", "power")
+        set_until_eot(source, "power", power_before + power_delta)
+        set_until_eot(source, "toughness", toughness_before + toughness_delta)
+        power_after = _numeric_card_stat(source, "power")
+        toughness_after = _numeric_card_stat(source, "toughness", "power")
+        destination = None
+        result = "stat_modifier_until_eot_applied"
+        if toughness_after <= 0 and is_battlefield_creature(source):
+            destination = move_creature_from_battlefield(
+                player,
+                source,
+                reason="zero_toughness",
+                source=source,
+                all_players=all_players,
+            )
+            result = "creature_put_into_graveyard_zero_toughness"
+        emit_decision_trace(
+            decision_type="attack_trigger_self_boost",
+            player=player,
+            turn=turn,
+            phase=phase,
+            available_options=[
+                decision_card_option(
+                    source,
+                    effect_data,
+                    action="attack_trigger_self_boost",
+                    score=max(1, sum(target_priority(source))),
+                )
+            ],
+            chosen_option=decision_card_option(
+                source,
+                effect_data,
+                action="attack_trigger_self_boost",
+            ),
+            rejected_options=[],
+            score_components={
+                "source": source.get("name", "?"),
+                "power_delta": power_delta,
+                "toughness_delta": toughness_delta,
+                "power_before": power_before,
+                "toughness_before": toughness_before,
+                "power_after": power_after,
+                "toughness_after": toughness_after,
+            },
+            rule_source=fields.get("rule_source", "battle_rule"),
+            rule_status=fields.get("rule_review_status", "verified"),
+            confidence="high",
+            expected_benefit_score=max(3, power_delta + max(0, toughness_delta)),
+            actual_outcome="attack_trigger_self_boost_used",
+            reason="apply_attack_trigger_self_stat_modifier",
+            heuristic_version=DECISION_STRATEGY_VERSION,
+            resource_delta={"temporary_power": power_delta, "temporary_toughness": toughness_delta},
+            risk_flags=["temporary_stat_modifier", "attack_trigger"],
+        )
+        emit_replay_event(
+            "trigger_resolved",
+            player=player.name,
+            card=source.get("name", "?"),
+            trigger="attack",
+            effect="self_stat_modifier_until_eot",
+            target=source.get("name", "?"),
+            target_player=player.name,
+            power_delta=power_delta,
+            toughness_delta=toughness_delta,
+            turn=turn,
+            phase=phase,
+            **fields,
+        )
+        emit_replay_event(
+            "stat_modifier_until_eot_resolved",
+            player=player.name,
+            card=source.get("name", "?"),
+            target_player=player.name,
+            target=source.get("name", "?"),
+            target_power_before=power_before,
+            target_power_after=power_after,
+            target_toughness_before=toughness_before,
+            target_toughness_after=toughness_after,
+            power_delta=power_delta,
+            toughness_delta=toughness_delta,
+            granted_keywords_until_eot=[],
+            result=result,
+            destination=destination,
+            turn=turn,
+            phase=phase,
+            **fields,
+        )
+        check_sbas_until_stable(all_players)
+        resolved += 1
+    return resolved
 
 
 def attack_target_keyword_effect_for_permanent(permanent):
@@ -62108,6 +62245,13 @@ def combat_phase_v8(attacker, opponents, all_players, turn, rng, stack):
         attacker,
         attackers,
         alive_defenders,
+        all_players,
+        turn,
+        phase="combat",
+    )
+    resolve_attack_self_boost_triggers(
+        attacker,
+        attackers,
         all_players,
         turn,
         phase="combat",

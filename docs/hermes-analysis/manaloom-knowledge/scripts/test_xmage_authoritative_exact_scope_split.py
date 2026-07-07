@@ -871,6 +871,92 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["keywords"], ["flying"])
         self.assertTrue(effect["_keywords_are_self"])
 
+    def test_attack_trigger_self_boost_maps_fixed_positive_boost(self) -> None:
+        row = queue_row(
+            split.ATTACK_SELF_BOOST_UNIT,
+            effect_classes=["BoostSourceEffect"],
+            ability_kind="triggered",
+            ability_classes=["AttacksTriggeredAbility"],
+            xmage_signals=["triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Benalish Veteran",
+                type_line="Creature - Human Soldier",
+                oracle_text="Whenever Benalish Veteran attacks, it gets +1/+1 until end of turn.",
+            ),
+            source_text="""
+                this.addAbility(new AttacksTriggeredAbility(
+                    new BoostSourceEffect(1, 1, Duration.EndOfTurn), false));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.ATTACK_SELF_BOOST_CREATURE_SCOPE)
+        self.assertEqual(effect["trigger"], "attack")
+        self.assertEqual(effect["trigger_effect"], "self_stat_modifier_until_eot")
+        self.assertEqual(effect["target"], "self")
+        self.assertEqual(effect["power_delta"], 1)
+        self.assertEqual(effect["toughness_delta"], 1)
+        self.assertTrue(effect["attack_trigger_self_boost"])
+
+    def test_attack_trigger_self_boost_maps_fixed_negative_toughness_boost(self) -> None:
+        row = queue_row(
+            split.ATTACK_SELF_BOOST_UNIT,
+            effect_classes=["BoostSourceEffect"],
+            ability_kind="triggered",
+            ability_classes=["AttacksTriggeredAbility"],
+            xmage_signals=["triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Flowstone Charger",
+                type_line="Creature - Beast",
+                oracle_text="Whenever Flowstone Charger attacks, it gets +3/-3 until end of turn.",
+            ),
+            source_text="""
+                this.addAbility(new AttacksTriggeredAbility(
+                    new BoostSourceEffect(3, -3, Duration.EndOfTurn, "it"), false));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.ATTACK_SELF_BOOST_CREATURE_SCOPE)
+        self.assertEqual(effect["power_delta"], 3)
+        self.assertEqual(effect["toughness_delta"], -3)
+
+    def test_attack_trigger_self_boost_blocks_dynamic_attack_count(self) -> None:
+        row = queue_row(
+            split.ATTACK_SELF_BOOST_UNIT,
+            effect_classes=["BoostSourceEffect"],
+            ability_kind="triggered",
+            ability_classes=["AttacksTriggeredAbility"],
+            xmage_signals=["triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Cenn's Heir",
+                type_line="Creature - Kithkin Soldier",
+                oracle_text=(
+                    "Whenever Cenn's Heir attacks, it gets +1/+1 until end of turn "
+                    "for each other attacking Kithkin."
+                ),
+            ),
+            source_text="""
+                this.addAbility(new AttacksTriggeredAbility(
+                    new BoostSourceEffect(new PermanentsOnBattlefieldCount(filter),
+                    new PermanentsOnBattlefieldCount(filter), Duration.EndOfTurn), false));
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "attack_self_boost_oracle_not_fixed")
+
     def test_attack_trigger_grants_flying_to_controlled_subtype_without_flying(self) -> None:
         row = queue_row(
             split.BOOST_KEYWORD_UNIT,

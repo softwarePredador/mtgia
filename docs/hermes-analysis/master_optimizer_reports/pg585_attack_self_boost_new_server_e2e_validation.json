@@ -1,0 +1,735 @@
+{
+  "battle_execution": {
+    "event_count": 33,
+    "results": [
+      {
+        "card_name": "Benalish Veteran",
+        "power_delta": 1,
+        "scenario": "Benalish Veteran boosts itself when attacking",
+        "source_power": 3,
+        "source_toughness": 3,
+        "toughness_delta": 1
+      },
+      {
+        "card_name": "Borderland Marauder",
+        "power_delta": 2,
+        "scenario": "Borderland Marauder boosts itself when attacking",
+        "source_power": 4,
+        "source_toughness": 2,
+        "toughness_delta": 0
+      },
+      {
+        "card_name": "Bramble Creeper",
+        "power_delta": 5,
+        "scenario": "Bramble Creeper boosts itself when attacking",
+        "source_power": 7,
+        "source_toughness": 2,
+        "toughness_delta": 0
+      },
+      {
+        "card_name": "Brazen Wolves",
+        "power_delta": 2,
+        "scenario": "Brazen Wolves boosts itself when attacking",
+        "source_power": 4,
+        "source_toughness": 2,
+        "toughness_delta": 0
+      },
+      {
+        "card_name": "Charging Bandits",
+        "power_delta": 2,
+        "scenario": "Charging Bandits boosts itself when attacking",
+        "source_power": 4,
+        "source_toughness": 2,
+        "toughness_delta": 0
+      },
+      {
+        "card_name": "Charging Paladin",
+        "power_delta": 0,
+        "scenario": "Charging Paladin boosts itself when attacking",
+        "source_power": 2,
+        "source_toughness": 5,
+        "toughness_delta": 3
+      },
+      {
+        "card_name": "Flowstone Charger",
+        "power_delta": 3,
+        "scenario": "Flowstone Charger boosts itself when attacking",
+        "source_power": 5,
+        "source_toughness": -1,
+        "toughness_delta": -3
+      },
+      {
+        "card_name": "Graceful Cat",
+        "power_delta": 1,
+        "scenario": "Graceful Cat boosts itself when attacking",
+        "source_power": 3,
+        "source_toughness": 3,
+        "toughness_delta": 1
+      },
+      {
+        "card_name": "Hollow Dogs",
+        "power_delta": 2,
+        "scenario": "Hollow Dogs boosts itself when attacking",
+        "source_power": 4,
+        "source_toughness": 2,
+        "toughness_delta": 0
+      },
+      {
+        "card_name": "Jumbo Cactuar",
+        "power_delta": 9999,
+        "scenario": "Jumbo Cactuar boosts itself when attacking",
+        "source_power": 10001,
+        "source_toughness": 2,
+        "toughness_delta": 0
+      },
+      {
+        "card_name": "Kiln Walker",
+        "power_delta": 3,
+        "scenario": "Kiln Walker boosts itself when attacking",
+        "source_power": 5,
+        "source_toughness": 2,
+        "toughness_delta": 0
+      },
+      {
+        "card_name": "Lurking Nightstalker",
+        "power_delta": 2,
+        "scenario": "Lurking Nightstalker boosts itself when attacking",
+        "source_power": 4,
+        "source_toughness": 2,
+        "toughness_delta": 0
+      },
+      {
+        "card_name": "Reckless Pangolin",
+        "power_delta": 1,
+        "scenario": "Reckless Pangolin boosts itself when attacking",
+        "source_power": 3,
+        "source_toughness": 3,
+        "toughness_delta": 1
+      },
+      {
+        "card_name": "Steadfast Cathar",
+        "power_delta": 0,
+        "scenario": "Steadfast Cathar boosts itself when attacking",
+        "source_power": 2,
+        "source_toughness": 4,
+        "toughness_delta": 2
+      },
+      {
+        "card_name": "Vicious Kavu",
+        "power_delta": 2,
+        "scenario": "Vicious Kavu boosts itself when attacking",
+        "source_power": 4,
+        "source_toughness": 2,
+        "toughness_delta": 0
+      },
+      {
+        "card_name": "Wei Ambush Force",
+        "power_delta": 2,
+        "scenario": "Wei Ambush Force boosts itself when attacking",
+        "source_power": 4,
+        "source_toughness": 2,
+        "toughness_delta": 0
+      }
+    ],
+    "scenario_count": 16
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-07T01:51:32.019135+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg585_attack_self_boost_new_server_package_manifest.json",
+  "package_id": "pg585_attack_self_boost_new_server_package_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 16
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+          "card_name": "Benalish Veteran",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f7c15a13e6074f630dd53656c0a3ef87",
+          "oracle_hash": "b83ef5987add804ac3909c091b88763e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+          "card_name": "Borderland Marauder",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5d6b99106f80d9a0e221b0767aa32e93",
+          "oracle_hash": "fc61c3304254cd16883b99b6552a1f82",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+          "card_name": "Bramble Creeper",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d3b29e43948508ae1af120cde3e86fa0",
+          "oracle_hash": "28f1a0b740aca3e6035fdfb65c261e87",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+          "card_name": "Brazen Wolves",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5d6b99106f80d9a0e221b0767aa32e93",
+          "oracle_hash": "fc61c3304254cd16883b99b6552a1f82",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+          "card_name": "Charging Bandits",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5d6b99106f80d9a0e221b0767aa32e93",
+          "oracle_hash": "fc61c3304254cd16883b99b6552a1f82",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+          "card_name": "Charging Paladin",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:443b0ce5e0fa6ef1a923ecce419c4599",
+          "oracle_hash": "2acb7c6a8ca7b8dc467a56632c5721b6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+          "card_name": "Flowstone Charger",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:bc30c0cad05020ac03f021fbe30be392",
+          "oracle_hash": "4532a8a40759c09b33635e6102203b00",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+          "card_name": "Graceful Cat",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f7c15a13e6074f630dd53656c0a3ef87",
+          "oracle_hash": "b83ef5987add804ac3909c091b88763e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+          "card_name": "Hollow Dogs",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5d6b99106f80d9a0e221b0767aa32e93",
+          "oracle_hash": "fc61c3304254cd16883b99b6552a1f82",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+          "card_name": "Jumbo Cactuar",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3bf34039afbdb4bc847b80f88e04c534",
+          "oracle_hash": "8142f19997c3b84fa66a81d91da43979",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+          "card_name": "Kiln Walker",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8ece0c43f6f27accedc1e20248a665c5",
+          "oracle_hash": "43db51ac096576cdd208505dff52db97",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+          "card_name": "Lurking Nightstalker",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5d6b99106f80d9a0e221b0767aa32e93",
+          "oracle_hash": "fc61c3304254cd16883b99b6552a1f82",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+          "card_name": "Reckless Pangolin",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f7c15a13e6074f630dd53656c0a3ef87",
+          "oracle_hash": "b83ef5987add804ac3909c091b88763e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+          "card_name": "Steadfast Cathar",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:35192ce2cfd55d8045e8c2f607062561",
+          "oracle_hash": "e57c0105a3a28215a70de605c76c097b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+          "card_name": "Vicious Kavu",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5d6b99106f80d9a0e221b0767aa32e93",
+          "oracle_hash": "fc61c3304254cd16883b99b6552a1f82",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+          "card_name": "Wei Ambush Force",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5d6b99106f80d9a0e221b0767aa32e93",
+          "oracle_hash": "fc61c3304254cd16883b99b6552a1f82",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 16
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+          "card_name": "Benalish Veteran",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f7c15a13e6074f630dd53656c0a3ef87",
+          "oracle_hash": "b83ef5987add804ac3909c091b88763e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+          "card_name": "Borderland Marauder",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5d6b99106f80d9a0e221b0767aa32e93",
+          "oracle_hash": "fc61c3304254cd16883b99b6552a1f82",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+          "card_name": "Bramble Creeper",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d3b29e43948508ae1af120cde3e86fa0",
+          "oracle_hash": "28f1a0b740aca3e6035fdfb65c261e87",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+          "card_name": "Brazen Wolves",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5d6b99106f80d9a0e221b0767aa32e93",
+          "oracle_hash": "fc61c3304254cd16883b99b6552a1f82",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+          "card_name": "Charging Bandits",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5d6b99106f80d9a0e221b0767aa32e93",
+          "oracle_hash": "fc61c3304254cd16883b99b6552a1f82",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+          "card_name": "Charging Paladin",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:443b0ce5e0fa6ef1a923ecce419c4599",
+          "oracle_hash": "2acb7c6a8ca7b8dc467a56632c5721b6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+          "card_name": "Flowstone Charger",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:bc30c0cad05020ac03f021fbe30be392",
+          "oracle_hash": "4532a8a40759c09b33635e6102203b00",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+          "card_name": "Graceful Cat",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f7c15a13e6074f630dd53656c0a3ef87",
+          "oracle_hash": "b83ef5987add804ac3909c091b88763e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+          "card_name": "Hollow Dogs",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5d6b99106f80d9a0e221b0767aa32e93",
+          "oracle_hash": "fc61c3304254cd16883b99b6552a1f82",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+          "card_name": "Jumbo Cactuar",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3bf34039afbdb4bc847b80f88e04c534",
+          "oracle_hash": "8142f19997c3b84fa66a81d91da43979",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+          "card_name": "Kiln Walker",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8ece0c43f6f27accedc1e20248a665c5",
+          "oracle_hash": "43db51ac096576cdd208505dff52db97",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+          "card_name": "Lurking Nightstalker",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5d6b99106f80d9a0e221b0767aa32e93",
+          "oracle_hash": "fc61c3304254cd16883b99b6552a1f82",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+          "card_name": "Reckless Pangolin",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f7c15a13e6074f630dd53656c0a3ef87",
+          "oracle_hash": "b83ef5987add804ac3909c091b88763e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+          "card_name": "Steadfast Cathar",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:35192ce2cfd55d8045e8c2f607062561",
+          "oracle_hash": "e57c0105a3a28215a70de605c76c097b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+          "card_name": "Vicious Kavu",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5d6b99106f80d9a0e221b0767aa32e93",
+          "oracle_hash": "fc61c3304254cd16883b99b6552a1f82",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+          "card_name": "Wei Ambush Force",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5d6b99106f80d9a0e221b0767aa32e93",
+          "oracle_hash": "fc61c3304254cd16883b99b6552a1f82",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 16
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Benalish Veteran",
+          "logical_rule_key": "battle_rule_v1:f7c15a13e6074f630dd53656c0a3ef87"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Borderland Marauder",
+          "logical_rule_key": "battle_rule_v1:5d6b99106f80d9a0e221b0767aa32e93"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Bramble Creeper",
+          "logical_rule_key": "battle_rule_v1:d3b29e43948508ae1af120cde3e86fa0"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Brazen Wolves",
+          "logical_rule_key": "battle_rule_v1:5d6b99106f80d9a0e221b0767aa32e93"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Charging Bandits",
+          "logical_rule_key": "battle_rule_v1:5d6b99106f80d9a0e221b0767aa32e93"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Charging Paladin",
+          "logical_rule_key": "battle_rule_v1:443b0ce5e0fa6ef1a923ecce419c4599"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Flowstone Charger",
+          "logical_rule_key": "battle_rule_v1:bc30c0cad05020ac03f021fbe30be392"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Graceful Cat",
+          "logical_rule_key": "battle_rule_v1:f7c15a13e6074f630dd53656c0a3ef87"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Hollow Dogs",
+          "logical_rule_key": "battle_rule_v1:5d6b99106f80d9a0e221b0767aa32e93"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Jumbo Cactuar",
+          "logical_rule_key": "battle_rule_v1:3bf34039afbdb4bc847b80f88e04c534"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Kiln Walker",
+          "logical_rule_key": "battle_rule_v1:8ece0c43f6f27accedc1e20248a665c5"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Lurking Nightstalker",
+          "logical_rule_key": "battle_rule_v1:5d6b99106f80d9a0e221b0767aa32e93"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Reckless Pangolin",
+          "logical_rule_key": "battle_rule_v1:f7c15a13e6074f630dd53656c0a3ef87"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Steadfast Cathar",
+          "logical_rule_key": "battle_rule_v1:35192ce2cfd55d8045e8c2f607062561"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Vicious Kavu",
+          "logical_rule_key": "battle_rule_v1:5d6b99106f80d9a0e221b0767aa32e93"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Wei Ambush Force",
+          "logical_rule_key": "battle_rule_v1:5d6b99106f80d9a0e221b0767aa32e93"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 16
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Benalish Veteran",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:f7c15a13e6074f630dd53656c0a3ef87"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Borderland Marauder",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:5d6b99106f80d9a0e221b0767aa32e93"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Bramble Creeper",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:d3b29e43948508ae1af120cde3e86fa0"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Brazen Wolves",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:5d6b99106f80d9a0e221b0767aa32e93"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Charging Bandits",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:5d6b99106f80d9a0e221b0767aa32e93"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Charging Paladin",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:443b0ce5e0fa6ef1a923ecce419c4599"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Flowstone Charger",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:bc30c0cad05020ac03f021fbe30be392"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Graceful Cat",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:f7c15a13e6074f630dd53656c0a3ef87"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Hollow Dogs",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:5d6b99106f80d9a0e221b0767aa32e93"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Jumbo Cactuar",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:3bf34039afbdb4bc847b80f88e04c534"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Kiln Walker",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:8ece0c43f6f27accedc1e20248a665c5"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Lurking Nightstalker",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:5d6b99106f80d9a0e221b0767aa32e93"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Reckless Pangolin",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:f7c15a13e6074f630dd53656c0a3ef87"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Steadfast Cathar",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:35192ce2cfd55d8045e8c2f607062561"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Vicious Kavu",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:5d6b99106f80d9a0e221b0767aa32e93"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Wei Ambush Force",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:5d6b99106f80d9a0e221b0767aa32e93"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 33,
+        "scenarios": 16
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}
