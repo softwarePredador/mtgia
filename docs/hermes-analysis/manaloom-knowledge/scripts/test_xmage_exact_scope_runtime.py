@@ -11314,6 +11314,101 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertNotIn("flying", wrong)
         self.assertTrue(target["flying"])
 
+    def test_simple_activated_target_keyword_sacrifices_source(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        source = {
+            "name": "Fixture Savior",
+            "type_line": "Creature - Dog",
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+            "activated_effect": "target_keyword_until_eot",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+            "target": "creature",
+            "target_controller": "self",
+            "target_constraints": {"card_types": ["creature"], "exclude_source": True},
+            "granted_keywords_until_eot": ["indestructible"],
+            "activation_cost_mana": "{0}",
+            "activation_cost_generic": 0,
+            "activation_cost_colors": [],
+            "activation_requires_sacrifice": True,
+        }
+        target = {"name": "Protected Bear", "type_line": "Creature - Bear", "power": 3, "toughness": 3}
+        active.battlefield.extend([source, target])
+
+        activated = self.battle.activate_generic_target_keyword_permanent(
+            active,
+            [opponent],
+            [active, opponent],
+            source,
+            turn=26,
+            rng=random.Random(26),
+            phase="precombat_main",
+        )
+
+        self.assertTrue(activated)
+        self.assertNotIn(source, active.battlefield)
+        self.assertIn(source, active.graveyard)
+        self.assertTrue(target["indestructible"])
+        self.assertTrue(
+            any(
+                event == "activated_ability"
+                and data.get("activation_kind") == "simple_activated_target_keyword"
+                and data.get("sacrificed_source") is True
+                and data.get("target") == "Protected Bear"
+                for event, data in self.events
+            )
+        )
+
+    def test_simple_activated_target_keyword_sacrifices_cost_target_not_effect_target(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        source = {
+            "name": "Fixture Tinkerer",
+            "type_line": "Creature - Goblin Artificer",
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+            "activated_effect": "target_keyword_until_eot",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+            "target": "artifact",
+            "target_controller": "self",
+            "target_constraints": {"card_types": ["artifact"]},
+            "granted_keywords_until_eot": ["indestructible"],
+            "activation_cost_mana": "{0}",
+            "activation_cost_generic": 0,
+            "activation_cost_colors": [],
+            "activation_requires_sacrifice_target": True,
+            "activation_sacrifice_target": "artifact",
+        }
+        sacrifice = {"name": "Cheap Bauble", "type_line": "Artifact", "effect": "artifact", "cmc": 0}
+        target = {"name": "Important Relic", "type_line": "Artifact", "effect": "artifact", "cmc": 5}
+        active.battlefield.extend([source, sacrifice, target])
+
+        activated = self.battle.activate_generic_target_keyword_permanent(
+            active,
+            [opponent],
+            [active, opponent],
+            source,
+            turn=27,
+            rng=random.Random(27),
+            phase="precombat_main",
+        )
+
+        self.assertTrue(activated)
+        self.assertIn(target, active.battlefield)
+        self.assertTrue(target["indestructible"])
+        self.assertNotIn(sacrifice, active.battlefield)
+        self.assertIn(sacrifice, active.graveyard)
+        self.assertTrue(
+            any(
+                event == "activated_ability"
+                and data.get("activation_kind") == "simple_activated_target_keyword"
+                and data.get("sacrificed_cost_target") == "Cheap Bauble"
+                and data.get("target") == "Important Relic"
+                for event, data in self.events
+            )
+        )
+
     def test_creature_tap_damage_blocks_summoning_sick_activation(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

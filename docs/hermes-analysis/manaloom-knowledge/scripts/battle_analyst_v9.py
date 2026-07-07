@@ -46300,7 +46300,10 @@ def _activated_rule_effects_for_permanent(permanent):
             "ability_kind": "activated",
             "activated_effect": "target_keyword_until_eot",
             "activation_requires_tap": bool(permanent.get("activation_requires_tap")),
-            "activation_requires_sacrifice": False,
+            "activation_requires_sacrifice": bool(permanent.get("activation_requires_sacrifice")),
+            "activation_requires_sacrifice_target": bool(permanent.get("activation_requires_sacrifice_target")),
+            "activation_sacrifice_target": permanent.get("activation_sacrifice_target"),
+            "activation_sacrifice_cost": permanent.get("activation_sacrifice_cost"),
             "activation_cost_mana": permanent.get("activation_cost_mana"),
             "activation_cost_generic": permanent.get("activation_cost_generic"),
             "activation_cost_colors": permanent.get("activation_cost_colors"),
@@ -48761,6 +48764,35 @@ def _choose_activated_target_keyword_target(player, opponents, permanent, effect
     return owner, target, [target for _owner, target in candidates]
 
 
+def _choose_activated_target_keyword_sacrifice_target(player, source, target, effect_data):
+    if _activation_sacrifice_cost(effect_data):
+        candidates = [
+            candidate
+            for candidate in _activation_sacrifice_cost_candidates(player, source, effect_data)
+            if candidate is not target
+        ]
+        candidates.sort(
+            key=lambda candidate: (
+                1 if candidate is source else 0,
+                target_priority(candidate),
+                str(candidate.get("name") or ""),
+            )
+        )
+        return candidates[0] if candidates else None, candidates
+    sacrifice_target_type = str(effect_data.get("activation_sacrifice_target") or "").strip()
+    if not sacrifice_target_type:
+        return None, []
+    _chosen, candidates = choose_activation_sacrifice_target(player, source, sacrifice_target_type)
+    candidates = [candidate for candidate in candidates if candidate is not target]
+    candidates.sort(
+        key=lambda candidate: (
+            activation_sacrifice_candidate_score(player, candidate),
+            str(candidate.get("name") or ""),
+        )
+    )
+    return candidates[0] if candidates else None, candidates
+
+
 def can_activate_generic_target_keyword_permanent(player, opponents, permanent, *, effect_data=None, auto_only=False):
     effect_data = effect_data or activated_target_keyword_effect_for_permanent(permanent)
     if effect_data is None:
@@ -48786,7 +48818,24 @@ def can_activate_generic_target_keyword_permanent(player, opponents, permanent, 
         effect_data,
         auto_only=auto_only,
     )
-    return target_owner is not None and target is not None
+    if target_owner is None or target is None:
+        return False
+    if effect_data.get("activation_requires_sacrifice") and target is permanent:
+        return False
+    if (
+        effect_data.get("activation_requires_sacrifice_target")
+        or effect_data.get("activation_sacrifice_target")
+        or _activation_sacrifice_cost(effect_data)
+    ):
+        sacrifice_target, _options = _choose_activated_target_keyword_sacrifice_target(
+            player,
+            permanent,
+            target,
+            effect_data,
+        )
+        if sacrifice_target is None:
+            return False
+    return True
 
 
 def activate_generic_target_keyword_permanent(
@@ -48824,6 +48873,32 @@ def activate_generic_target_keyword_permanent(
         return False
     if effect_data.get("activation_requires_tap"):
         permanent["tapped"] = True
+    sacrificed_source = False
+    if effect_data.get("activation_requires_sacrifice"):
+        if permanent in player.battlefield:
+            player.battlefield.remove(permanent)
+        player.graveyard.append(permanent)
+        player.record_permanent_sacrificed(permanent, turn)
+        sacrificed_source = True
+    sacrificed_cost_target = None
+    sacrifice_cost_options = []
+    if (
+        effect_data.get("activation_requires_sacrifice_target")
+        or effect_data.get("activation_sacrifice_target")
+        or _activation_sacrifice_cost(effect_data)
+    ):
+        sacrificed_cost_target, sacrifice_cost_options = _choose_activated_target_keyword_sacrifice_target(
+            player,
+            permanent,
+            target,
+            effect_data,
+        )
+        if sacrificed_cost_target is None:
+            return False
+        if sacrificed_cost_target in player.battlefield:
+            player.battlefield.remove(sacrificed_cost_target)
+        player.graveyard.append(sacrificed_cost_target)
+        player.record_permanent_sacrificed(sacrificed_cost_target, turn)
     keywords = [
         str(keyword or "").strip().lower().replace(" ", "_")
         for keyword in (effect_data.get("granted_keywords_until_eot") or [])
@@ -48879,6 +48954,8 @@ def activate_generic_target_keyword_permanent(
             "target": target.get("name", "?"),
             "keywords": keywords,
             "requires_tap": 1 if effect_data.get("activation_requires_tap") else 0,
+            "sacrificed_source": 1 if sacrificed_source else 0,
+            "sacrificed_cost_target": 1 if sacrificed_cost_target is not None else 0,
         },
         rule_source=fields.get("rule_source", "battle_rule"),
         rule_status=fields.get("rule_review_status", "verified"),
@@ -48890,12 +48967,16 @@ def activate_generic_target_keyword_permanent(
         resource_delta={
             "mana": -mana_paid,
             "tapped": 1 if effect_data.get("activation_requires_tap") else 0,
+            "sacrificed_source": -1 if sacrificed_source else 0,
+            "sacrificed_cost_target": -1 if sacrificed_cost_target is not None else 0,
             "temporary_keywords": len(keywords),
         },
         risk_flags=[
             flag
             for flag, active in {
                 "tap_ability": bool(effect_data.get("activation_requires_tap")),
+                "sacrifice_source": sacrificed_source,
+                "sacrifice_cost_target": sacrificed_cost_target is not None,
                 "temporary_keyword": bool(keywords),
             }.items()
             if active
@@ -48910,6 +48991,13 @@ def activate_generic_target_keyword_permanent(
         activation_cost=activation_cost,
         tapped=bool(permanent.get("tapped")),
         mana_paid=mana_paid,
+        sacrificed_source=sacrificed_source,
+        sacrificed_cost_target=(
+            sacrificed_cost_target.get("name", "?")
+            if isinstance(sacrificed_cost_target, dict)
+            else None
+        ),
+        sacrifice_cost_options=len(sacrifice_cost_options),
         target=target.get("name", "?"),
         target_player=target_owner.name,
         granted_keywords_until_eot=keywords,

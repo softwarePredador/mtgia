@@ -13463,7 +13463,7 @@ def activated_target_keyword_from_oracle(metadata: dict[str, Any]) -> dict[str, 
     if match.group(1):
         target_data["exclude_source"] = True
         target_data.setdefault("target_constraints", {})["exclude_source"] = True
-    activation = activation_cost_from_oracle_prefix(cost_text)
+    activation = activated_target_keyword_activation_cost_from_oracle(cost_text)
     if isinstance(activation, str):
         return str(activation).replace("activated_self_boost", "activated_target_keyword")
     return {
@@ -13565,6 +13565,16 @@ def activated_target_keyword_target_phrase_data(phrase: str) -> dict[str, Any] |
             "exclude_source": exclude_source,
             "target_constraints": constraints,
         }
+    if target_phrase in {"artifact", "enchantment", "land", "permanent"}:
+        return {
+            "target": target_phrase,
+            "target_controller": target_controller,
+            "exclude_source": exclude_source,
+            "target_constraints": {
+                "card_types": [target_phrase],
+                **({"exclude_source": True} if exclude_source else {}),
+            },
+        }
     if target_phrase.endswith(" creature"):
         modifier = target_phrase[: -len(" creature")].strip()
         if not modifier:
@@ -13609,7 +13619,39 @@ def activated_target_keyword_target_phrase_data(phrase: str) -> dict[str, Any] |
     }
 
 
-def activated_target_keyword_cost_from_source(window: str) -> dict[str, Any] | str:
+def activated_target_keyword_activation_cost_from_oracle(cost_text: str) -> dict[str, Any] | str:
+    normalized_cost = re.sub(r"\s+", " ", str(cost_text or "").strip().lower())
+    sacrifice_target = None
+    sacrifice_pattern = (
+        r"(?:^|,\s*)sacrifice (?P<phrase>"
+        r"(?:a|an|another) (?:artifact|creature|enchantment|land|permanent)"
+        r")(?:\s*,?|$)"
+    )
+    sacrifice_matches = list(re.finditer(sacrifice_pattern, normalized_cost))
+    if len(sacrifice_matches) > 1:
+        return "activated_target_keyword_oracle_cost_not_supported"
+    if sacrifice_matches:
+        sacrifice_target = activation_sacrifice_target_from_phrase(
+            sacrifice_matches[0].group("phrase")
+        )
+        if sacrifice_target is None:
+            return "activated_target_keyword_oracle_cost_not_supported"
+        normalized_cost = re.sub(sacrifice_pattern, ",", normalized_cost).strip(" ,")
+    activation = activation_cost_from_oracle_prefix(
+        normalized_cost,
+        allow_source_sacrifice=True,
+    )
+    if isinstance(activation, str):
+        return str(activation).replace("activated_self_boost", "activated_target_keyword")
+    if activation.get("activation_requires_sacrifice") and sacrifice_target:
+        return "activated_target_keyword_oracle_cost_not_supported"
+    if sacrifice_target:
+        activation["activation_sacrifice_target"] = sacrifice_target
+        activation["activation_requires_sacrifice_target"] = True
+    return activation
+
+
+def activated_target_keyword_cost_from_source(source: str, window: str) -> dict[str, Any] | str:
     risky_cost_classes = {
         "CompositeCost",
         "DiscardCardCost",
@@ -13621,8 +13663,6 @@ def activated_target_keyword_cost_from_source(window: str) -> dict[str, Any] | s
         "PayLifeCost",
         "RemoveCounterCost",
         "ReturnToHandSourceCost",
-        "SacrificeSourceCost",
-        "SacrificeTargetCost",
         "TapTargetCost",
         "UntapSourceCost",
     }
@@ -13649,13 +13689,26 @@ def activated_target_keyword_cost_from_source(window: str) -> dict[str, Any] | s
     if parsed is None:
         return "activated_target_keyword_source_mana_cost_not_supported"
     generic, colors = parsed
-    return {
+    source_sacrifice_count = len(re.findall(r"new\s+SacrificeSourceCost\s*\(", window))
+    target_sacrifice_count = len(re.findall(r"new\s+SacrificeTargetCost\s*\(", window))
+    if source_sacrifice_count > 1 or target_sacrifice_count > 1:
+        return "activated_target_keyword_source_cost_not_supported"
+    if source_sacrifice_count and target_sacrifice_count:
+        return "activated_target_keyword_source_cost_not_supported"
+    result = {
         "activation_cost_mana": cost_text,
         "activation_cost_generic": generic,
         "activation_cost_colors": colors,
         "activation_requires_tap": "TapSourceCost" in window,
-        "activation_requires_sacrifice": False,
+        "activation_requires_sacrifice": bool(source_sacrifice_count),
     }
+    if target_sacrifice_count:
+        sacrifice_target = activation_sacrifice_target_from_source(source, window)
+        if sacrifice_target is None:
+            return "activated_target_keyword_source_cost_not_supported"
+        result["activation_sacrifice_target"] = sacrifice_target
+        result["activation_requires_sacrifice_target"] = True
+    return result
 
 
 def activated_target_keyword_target_from_source(source: str) -> dict[str, Any] | str:
@@ -13722,6 +13775,13 @@ def activated_target_keyword_target_from_source(source: str) -> dict[str, Any] |
     )
     if phrase_match and re.search(r"new\s+TargetPermanent\s*\(", text, re.S):
         return activated_target_keyword_target_phrase_data(phrase_match.group(1))
+    phrase_match = re.search(
+        r"new\s+FilterPermanent\s*\(\s*\"([^\"]+)\"\s*\)",
+        text,
+        re.S,
+    )
+    if phrase_match and re.search(r"new\s+TargetPermanent\s*\(", text, re.S):
+        return activated_target_keyword_target_phrase_data(phrase_match.group(1))
     subtype_match = re.search(
         r"new\s+Filter(Creature)?Permanent\s*\(\s*SubType\.([A-Z0-9_]+)\s*,\s*\"([^\"]+)\"\s*\)",
         text,
@@ -13754,7 +13814,7 @@ def activated_target_keyword_from_source(source: str, keyword_ability_class: str
     window = text[max(0, gain_index - 500) : gain_index + 2000]
     if "SimpleActivatedAbility" not in window:
         return "activated_target_keyword_source_not_simple_activated"
-    activation = activated_target_keyword_cost_from_source(window)
+    activation = activated_target_keyword_cost_from_source(text, window)
     if isinstance(activation, str):
         return activation
     target_data = activated_target_keyword_target_from_source(text)
@@ -15170,6 +15230,16 @@ def activation_sacrifice_target_from_source(source: str, window: str) -> str | N
     cost_var_match = re.search(r"new\s+SacrificeTargetCost\s*\(\s*([A-Za-z_][A-Za-z0-9_]*)\s*\)", window or "")
     if cost_var_match:
         var_name = cost_var_match.group(1)
+        var_filter_match = re.search(
+            rf"FilterControlledPermanent\s+{re.escape(var_name)}\s*=\s*"
+            r"new\s+FilterControlledPermanent\s*\(\s*\"([^\"]+)\"\s*\)",
+            text,
+            re.S,
+        )
+        if var_filter_match:
+            named_target = activation_sacrifice_target_from_phrase(var_filter_match.group(1))
+            if named_target is not None:
+                return named_target
         var_pattern = re.compile(
             rf"\b{re.escape(var_name)}\.add\s*\(\s*SubType\.([A-Z_]+)\.getPredicate\s*\(\s*\)\s*\)",
             re.S,
@@ -21909,11 +21979,17 @@ def split_row(
             int(parsed_activation["activation_cost_generic"]),
             list(parsed_activation["activation_cost_colors"]),
             bool(parsed_activation["activation_requires_tap"]),
+            bool(parsed_activation.get("activation_requires_sacrifice")),
+            bool(parsed_activation.get("activation_requires_sacrifice_target")),
+            parsed_activation.get("activation_sacrifice_target"),
         )
         oracle_cost = (
             int(oracle_keyword["activation_cost_generic"]),
             list(oracle_keyword["activation_cost_colors"]),
             bool(oracle_keyword["activation_requires_tap"]),
+            bool(oracle_keyword.get("activation_requires_sacrifice")),
+            bool(oracle_keyword.get("activation_requires_sacrifice_target")),
+            oracle_keyword.get("activation_sacrifice_target"),
         )
         if source_cost != oracle_cost:
             return None, "activated_target_keyword_source_oracle_cost_mismatch"
@@ -21944,8 +22020,13 @@ def split_row(
             "activation_cost_generic": parsed_activation["activation_cost_generic"],
             "activation_cost_colors": parsed_activation["activation_cost_colors"],
             "activation_requires_tap": parsed_activation["activation_requires_tap"],
-            "activation_requires_sacrifice": False,
+            "activation_requires_sacrifice": bool(parsed_activation.get("activation_requires_sacrifice")),
         }
+        if parsed_activation.get("activation_requires_sacrifice_target") or parsed_activation.get("activation_sacrifice_target"):
+            activated_effect["activation_requires_sacrifice_target"] = bool(
+                parsed_activation.get("activation_requires_sacrifice_target")
+            )
+            activated_effect["activation_sacrifice_target"] = parsed_activation.get("activation_sacrifice_target")
         type_line = str(metadata.get("type_line") or "").lower()
         permanent_effect = (
             "creature"
@@ -21977,8 +22058,13 @@ def split_row(
             "activation_cost_generic": parsed_activation["activation_cost_generic"],
             "activation_cost_colors": parsed_activation["activation_cost_colors"],
             "activation_requires_tap": parsed_activation["activation_requires_tap"],
-            "activation_requires_sacrifice": False,
+            "activation_requires_sacrifice": bool(parsed_activation.get("activation_requires_sacrifice")),
         }
+        if parsed_activation.get("activation_requires_sacrifice_target") or parsed_activation.get("activation_sacrifice_target"):
+            effect_json["activation_requires_sacrifice_target"] = bool(
+                parsed_activation.get("activation_requires_sacrifice_target")
+            )
+            effect_json["activation_sacrifice_target"] = parsed_activation.get("activation_sacrifice_target")
         if self_keyword_list:
             effect_json["keywords"] = self_keyword_list
             effect_json["_keywords_are_self"] = True

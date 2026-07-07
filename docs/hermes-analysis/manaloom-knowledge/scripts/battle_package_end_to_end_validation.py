@@ -3927,6 +3927,129 @@ def run_simple_activated_destroy(
     }
 
 
+def run_simple_activated_target_keyword(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    effect = battle.get_card_effect(card)
+    permanent_type = str(effect.get("effect") or "creature")
+    default_type_line = {
+        "creature": "Creature - Soldier",
+        "artifact": "Artifact",
+        "enchantment": "Enchantment",
+    }.get(permanent_type, "Creature - Soldier")
+    source = battle.enrich_card(
+        {
+            **card,
+            "type_line": default_type_line,
+            "effect": permanent_type,
+            "power": int(scenario.get("source_power") or 2),
+            "toughness": int(scenario.get("source_toughness") or 2),
+            "summoning_sick": False,
+            **effect,
+            **dict(scenario.get("source_overrides") or {}),
+        }
+    )
+    target = battle.enrich_card(dict(scenario["target"]))
+    active = battle.Player(str(scenario.get("player") or "Activated Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Activated Opponent"), None, [])
+    active.battlefield = [source]
+    target_controller = str(effect.get("target_controller") or scenario.get("target_controller") or "self").lower()
+    if target_controller in {"opponent", "opponents"}:
+        opponent.battlefield = [target]
+    else:
+        active.battlefield.append(target)
+    sacrifice_target = None
+    if scenario.get("sacrifice_target"):
+        sacrifice_target = battle.enrich_card(dict(scenario["sacrifice_target"]))
+        active.battlefield.append(sacrifice_target)
+    add_manifest_mana(active, scenario.get("controller_mana") or {})
+    expected_keywords = [
+        str(keyword or "").strip().lower().replace(" ", "_")
+        for keyword in (scenario.get("expected_keywords") or effect.get("granted_keywords_until_eot") or [])
+        if str(keyword or "").strip()
+    ]
+    expected_tapped_source = bool(scenario.get("expected_tapped_source", effect.get("activation_requires_tap", False)))
+    expected_sacrificed_source = bool(
+        scenario.get("expected_sacrificed_source", effect.get("activation_requires_sacrifice", False))
+    )
+    all_players = [active, opponent]
+
+    if not battle.can_activate_generic_target_keyword_permanent(active, [opponent], source):
+        fail("battle_execution", f"{card['name']} simple activated target keyword cannot activate")
+    activated = battle.activate_generic_target_keyword_permanent(
+        active,
+        [opponent],
+        all_players,
+        source,
+        turn=int(scenario.get("turn") or 7),
+        rng=random.Random(int(scenario.get("seed") or 6075)),
+        phase=str(scenario.get("phase") or "precombat_main"),
+    )
+    if not activated:
+        fail("battle_execution", f"{card['name']} simple activated target keyword activation failed")
+    for keyword in expected_keywords:
+        if not battle.card_has_keyword(target, keyword):
+            fail("battle_execution", f"{card['name']} target missing keyword {keyword!r}")
+    if bool(source.get("tapped")) != expected_tapped_source:
+        fail(
+            "battle_execution",
+            f"{card['name']} source tapped={bool(source.get('tapped'))}, expected {expected_tapped_source}",
+        )
+    if expected_sacrificed_source:
+        if source in active.battlefield or source not in active.graveyard:
+            fail("battle_execution", f"{card['name']} source sacrifice zone mismatch")
+    elif source not in active.battlefield:
+        fail("battle_execution", f"{card['name']} source left battlefield unexpectedly")
+    if bool(scenario.get("expect_target_sacrificed")):
+        if sacrifice_target is None:
+            fail("battle_execution", f"{card['name']} expected sacrifice target was not configured")
+        if sacrifice_target in active.battlefield or sacrifice_target not in active.graveyard:
+            fail("battle_execution", f"{card['name']} sacrifice target zone mismatch")
+        if target not in active.battlefield and target_controller not in {"opponent", "opponents"}:
+            fail("battle_execution", f"{card['name']} effect target was sacrificed")
+    activation_event = next(
+        (
+            data
+            for event, data in reversed(events)
+            if event == "activated_ability"
+            and data.get("card") == card.get("name")
+            and data.get("activation_kind") == "simple_activated_target_keyword"
+        ),
+        None,
+    )
+    if activation_event is None:
+        fail("battle_events", f"missing {card['name']} simple activated target keyword event")
+    if bool(activation_event.get("sacrificed_source")) != expected_sacrificed_source:
+        fail(
+            "battle_events",
+            f"{card['name']} sacrificed_source={activation_event.get('sacrificed_source')!r}",
+        )
+    resolved_event = next(
+        (
+            data
+            for event, data in reversed(events)
+            if event == "stat_modifier_until_eot_resolved"
+            and data.get("card") == card.get("name")
+            and data.get("target") == target.get("name")
+        ),
+        None,
+    )
+    if resolved_event is None:
+        fail("battle_events", f"missing {card['name']} target keyword resolved event")
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "target": target.get("name"),
+        "keywords": expected_keywords,
+        "source_tapped": bool(source.get("tapped")),
+        "sacrificed_source": expected_sacrificed_source,
+        "target_sacrificed": bool(sacrifice_target is not None and sacrifice_target in active.graveyard),
+    }
+
+
 def run_simple_activated_self_keyword(
     battle,
     scenario: dict[str, Any],
@@ -5920,6 +6043,7 @@ SCENARIO_RUNNERS = {
     "simple_activated_tap_target": run_simple_activated_tap_target,
     "simple_activated_add_counters_target": run_simple_activated_add_counters_target,
     "simple_activated_destroy": run_simple_activated_destroy,
+    "simple_activated_target_keyword": run_simple_activated_target_keyword,
     "simple_activated_self_boost": run_simple_activated_self_boost,
     "simple_activated_self_keyword": run_simple_activated_self_keyword,
     "simple_activated_regenerate_source": run_simple_activated_regenerate_source,

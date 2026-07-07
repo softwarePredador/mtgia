@@ -1314,6 +1314,70 @@ def test_manifest_builds_simple_activated_self_boost_execution_scenario() -> Non
     assert scenario["expected_activation_limit_per_turn"] == 1
 
 
+def test_manifest_builds_simple_activated_target_keyword_execution_scenario() -> None:
+    rule = {
+        "normalized_name": "selfless savior",
+        "card_name": "Selfless Savior",
+        "oracle_hash": "hash-selfless-savior",
+        "logical_rule_key": "battle_rule_v1:hash-selfless-savior",
+        "required_effect_fields": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+            "activated_effect": "target_keyword_until_eot",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+            "target": "creature",
+            "target_controller": "self",
+            "target_constraints": {"card_types": ["creature"], "exclude_source": True},
+            "granted_keywords_until_eot": ["indestructible"],
+            "activation_cost_mana": "{0}",
+            "activation_cost_generic": 0,
+            "activation_cost_colors": [],
+            "activation_requires_sacrifice": True,
+        },
+    }
+
+    scenario = builder.simple_activated_target_keyword_execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "simple_activated_target_keyword"
+    assert scenario["expected_keywords"] == ["indestructible"]
+    assert scenario["expected_sacrificed_source"] is True
+    assert scenario["target"]["type_line"].startswith("Creature")
+
+
+def test_manifest_builds_simple_activated_target_keyword_sacrifice_target_scenario() -> None:
+    rule = {
+        "normalized_name": "slobad goblin tinkerer",
+        "card_name": "Slobad, Goblin Tinkerer",
+        "oracle_hash": "hash-slobad",
+        "logical_rule_key": "battle_rule_v1:hash-slobad",
+        "required_effect_fields": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+            "activated_effect": "target_keyword_until_eot",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+            "target": "artifact",
+            "target_controller": "self",
+            "target_constraints": {"card_types": ["artifact"]},
+            "granted_keywords_until_eot": ["indestructible"],
+            "activation_cost_mana": "{0}",
+            "activation_cost_generic": 0,
+            "activation_cost_colors": [],
+            "activation_requires_sacrifice_target": True,
+            "activation_sacrifice_target": "artifact",
+        },
+    }
+
+    scenario = builder.simple_activated_target_keyword_execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "simple_activated_target_keyword"
+    assert scenario["expected_keywords"] == ["indestructible"]
+    assert scenario["target"]["type_line"] == "Artifact"
+    assert scenario["expect_target_sacrificed"] is True
+    assert scenario["sacrifice_target"]["type_line"] == "Artifact"
+
+
 def test_manifest_builds_target_keyword_spell_execution_scenario() -> None:
     rule = {
         "normalized_name": "double cleave",

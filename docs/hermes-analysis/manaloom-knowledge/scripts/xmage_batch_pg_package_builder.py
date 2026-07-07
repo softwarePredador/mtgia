@@ -2801,6 +2801,58 @@ def simple_activated_regenerate_source_execution_scenario_from_expected_rule(
     }
 
 
+def simple_activated_target_keyword_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_permanent_simple_activated_target_keyword_until_eot_v1":
+        return None
+    constraints = dict(required.get("target_constraints") or {})
+    if not constraints.get("card_types"):
+        target_type = str(required.get("target") or "creature").strip().lower()
+        constraints["card_types"] = [target_type if target_type else "creature"]
+    target = _target_fixture_from_constraints(
+        "E2E Target Keyword Legal Target",
+        constraints,
+        matching=True,
+    )
+    target["cmc"] = max(int(target.get("cmc") or 0), 5)
+    scenario: dict[str, Any] = {
+        "name": f"{rule['card_name']} activates target keyword ability",
+        "type": "simple_activated_target_keyword",
+        "card": {"name": rule["card_name"]},
+        "target": target,
+        "controller_mana": _manifest_mana_for_required_activation(required),
+        "expected_tapped_source": bool(required.get("activation_requires_tap")),
+        "expected_sacrificed_source": bool(required.get("activation_requires_sacrifice")),
+        "expected_keywords": list(required.get("granted_keywords_until_eot") or []),
+        "expected_target": required.get("target") or "creature",
+        "expected_target_constraints": constraints,
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+    sacrifice_target_type = str(required.get("activation_sacrifice_target") or "").strip().lower()
+    if required.get("activation_requires_sacrifice_target") or sacrifice_target_type:
+        sacrifice_card_type = {
+            "artifact": "artifact",
+            "artifact_or_creature": "artifact",
+            "artifact_or_land": "artifact",
+            "creature": "creature",
+            "creature_or_land": "creature",
+            "enchantment": "enchantment",
+            "land": "land",
+            "permanent": "artifact",
+        }.get(sacrifice_target_type, "artifact")
+        sacrifice_target = _target_fixture_from_constraints(
+            "E2E Target Keyword Sacrifice Cost",
+            {"card_types": [sacrifice_card_type]},
+            matching=True,
+        )
+        sacrifice_target["cmc"] = 0
+        scenario["sacrifice_target"] = sacrifice_target
+        scenario["expect_target_sacrificed"] = True
+    return scenario
+
+
 def target_keyword_spell_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
@@ -3630,6 +3682,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or simple_activated_self_boost_execution_scenario_from_expected_rule(rule)
         or simple_activated_self_keyword_execution_scenario_from_expected_rule(rule)
         or simple_activated_regenerate_source_execution_scenario_from_expected_rule(rule)
+        or simple_activated_target_keyword_execution_scenario_from_expected_rule(rule)
         or controlled_stat_modifier_execution_scenario_from_expected_rule(rule)
         or target_keyword_spell_execution_scenario_from_expected_rule(rule)
         or boost_scry_spell_execution_scenario_from_expected_rule(rule)

@@ -20022,7 +20022,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         )
         self.assertEqual(effect["activation_cost_colors"], ["B"])
 
-    def test_activated_target_keyword_blocks_source_sacrifice_cost(self) -> None:
+    def test_activated_target_keyword_accepts_source_sacrifice_cost(self) -> None:
         row = queue_row(
             split.BOOST_KEYWORD_UNIT,
             effect_classes=["GainAbilityTargetEffect"],
@@ -20035,7 +20035,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             metadata(
                 name="Fixture Savior",
                 type_line="Creature - Dog",
-                oracle_text="Sacrifice Fixture Savior: Another target creature you control gains indestructible until end of turn.",
+                oracle_text="Sacrifice this creature: Another target creature you control gains indestructible until end of turn.",
             ),
             source_text=(
                 "Ability ability = new SimpleActivatedAbility("
@@ -20045,8 +20045,78 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             ),
         )
 
-        self.assertIsNone(proposal)
-        self.assertEqual(reason, "activated_target_keyword_oracle_cost_not_supported")
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertTrue(effect["activation_requires_sacrifice"])
+        self.assertEqual(effect["target_controller"], "self")
+        self.assertEqual(effect["granted_keywords_until_eot"], ["indestructible"])
+        self.assertTrue(effect["_activated_rule_effects"][0]["activation_requires_sacrifice"])
+
+    def test_activated_target_keyword_accepts_mana_and_source_sacrifice_cost(self) -> None:
+        row = queue_row(
+            split.BOOST_KEYWORD_UNIT,
+            effect_classes=["GainAbilityTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["DeathtouchAbility", "SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Vial",
+                type_line="Artifact",
+                oracle_text="{1}, Sacrifice this artifact: Target creature gains deathtouch until end of turn.",
+            ),
+            source_text=(
+                "Ability ability = new SimpleActivatedAbility("
+                "new GainAbilityTargetEffect(DeathtouchAbility.getInstance(), Duration.EndOfTurn), "
+                'new ManaCostsImpl<>("{1}"));'
+                "ability.addCost(new SacrificeSourceCost());"
+                "ability.addTarget(new TargetCreaturePermanent());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["activation_cost_generic"], 1)
+        self.assertTrue(effect["activation_requires_sacrifice"])
+        self.assertEqual(effect["target"], "creature")
+        self.assertEqual(effect["granted_keywords_until_eot"], ["deathtouch"])
+
+    def test_activated_target_keyword_accepts_sacrifice_target_cost(self) -> None:
+        row = queue_row(
+            split.BOOST_KEYWORD_UNIT,
+            effect_classes=["GainAbilityTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["IndestructibleAbility", "SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Tinkerer",
+                type_line="Legendary Creature - Goblin Artificer",
+                oracle_text="Sacrifice an artifact: Target artifact gains indestructible until end of turn.",
+            ),
+            source_text=(
+                'private static final FilterPermanent filter = new FilterPermanent("artifact");'
+                "filter.add(CardType.ARTIFACT.getPredicate());"
+                'private static final FilterControlledPermanent filterControlled = new FilterControlledPermanent("an artifact");'
+                "filterControlled.add(CardType.ARTIFACT.getPredicate());"
+                "Ability ability = new SimpleActivatedAbility("
+                "new GainAbilityTargetEffect(IndestructibleAbility.getInstance(), Duration.EndOfTurn), "
+                "new SacrificeTargetCost(filterControlled));"
+                "ability.addTarget(new TargetPermanent(filter));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["target"], "artifact")
+        self.assertEqual(effect["target_constraints"], {"card_types": ["artifact"]})
+        self.assertTrue(effect["activation_requires_sacrifice_target"])
+        self.assertEqual(effect["activation_sacrifice_target"], "artifact")
+        self.assertEqual(effect["_activated_rule_effects"][0]["activation_sacrifice_target"], "artifact")
 
     def test_activated_target_keyword_blocks_snow_mana_cost_until_supported(self) -> None:
         row = queue_row(
