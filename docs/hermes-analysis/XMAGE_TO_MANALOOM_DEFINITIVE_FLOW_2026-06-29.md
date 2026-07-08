@@ -19102,6 +19102,93 @@ Evidence:
 - `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260708_post_pg656_damage_sacrifice_artifact_goblin_new_server.md`
 - `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260708_post_pg656_damage_sacrifice_artifact_goblin_new_server.md`
 
+## 2026-07-08 PG657 Target-Player Discard Trigger Checkpoint
+
+PG657 implemented the next exact XMage family for creature-triggered target
+player discard:
+
+- `xmage_creature_etb_target_player_discard_v1`;
+- `xmage_creature_dies_target_player_discard_v1`;
+- `xmage_creature_combat_damage_target_player_discard_v1`.
+
+This wave closed `10` Commander-legal XMage-authoritative identities:
+`Abyssal Horror`, `Black Cat`, `Blazing Specter`, `Brutal Nightstalker`,
+`Corrupt Court Official`, `Deadbridge Shaman`, `Ebon Dragon`,
+`Ravenous Rats`, `Rottenheart Ghoul`, and `Sanity Gnawers`.
+
+Runtime/test changes:
+
+- `battle_analyst_v9.py` now routes fixed target-player discard through a
+  shared resolver used by spell, ETB, dies, and combat-damage triggers;
+- death-trigger discard emits source/reason evidence when available;
+- combat-damage discard forces the damaged player as target;
+- focused tests cover splitter mapping, unsafe conditional/dynamic blockers,
+  ETB discard, dies discard, and combat-damage discard;
+- `python3 -m unittest test_xmage_authoritative_exact_scope_split.py
+  test_xmage_exact_scope_runtime.py` passed `1239` tests.
+
+PG657 apply/postcheck evidence:
+
+- split produced `10` safe package candidates: `6` ETB, `3` dies, and `1`
+  combat-damage trigger;
+- precheck found `10` target rows, `0` existing rules, and `0` shadow rows to
+  deprecate;
+- apply committed `10` promoted rows;
+- postcheck confirmed `10/10` promoted verified/auto rows with `oracle_hash`;
+- PG -> Hermes/SQLite sync loaded `5942` PG rows, updated `5928` SQLite rows,
+  and exported a `5905` row canonical snapshot;
+- E2E package validation passed PostgreSQL, SQLite/Hermes, canonical snapshot,
+  and `runtime_get_card_effect` for all `10` selected cards;
+- exact-scope recheck on the rebuilt queue returned `proposal_count=0` and
+  `safe_for_batch_pg_package_count=0`.
+
+PG657b metadata repair:
+
+- the PG/Hermes/SQLite contract audit surfaced `44` historical trusted
+  executable rules missing `oracle_hash` in PostgreSQL;
+- PG657b backfilled those hashes from `md5(cards.oracle_text)` only where
+  `card_id` and non-empty Oracle text were present;
+- precheck found `44` backfillable rows and `0` unsafe rows;
+- postcheck confirmed `remaining_trusted_executable_missing_hash_rows=0` and
+  `repaired_rows_with_expected_hash=44`;
+- PG -> Hermes/SQLite sync after the repair preserved `5942` PG rows loaded
+  and `5928` SQLite rows updated;
+- final `pg_hermes_sqlite_contract_audit` passed `51/51`.
+
+Final post-PG657b state:
+
+- global readiness:
+  `battle_and_oracle_ready=6002`, `battle_family_mapper_required=27874`,
+  `snapshot_has_verified_rule=6030`, `snapshot_has_any_rule=7234`;
+- authoritative queue:
+  `target_identity_count=24951`,
+  `xmage_authoritative_source_count=24638`,
+  `xmage_missing_source_exception_count=313`,
+  `xmage_authoritative_parser_gap_count=0`,
+  `xmage_authoritative_adapter_required_count=24638`;
+- validation gates:
+  `xmage_strategy_consistency_audit` passed `26/26`,
+  `pg_hermes_sqlite_contract_audit` passed `51/51`,
+  `operational_surface_alignment_audit` passed, and
+  `legacy_contamination_audit` passed.
+
+Evidence:
+
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260708_pg657_target_player_discard_triggers_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg657_target_player_discard_triggers_new_server_package_package.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg657_target_player_discard_triggers_new_server_pg_to_sqlite_sync.json`
+- `docs/hermes-analysis/master_optimizer_reports/pg657_target_player_discard_triggers_new_server_metadata_sync.json`
+- `docs/hermes-analysis/master_optimizer_reports/pg657_target_player_discard_triggers_new_server_e2e_validation.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260708_post_pg657_target_player_discard_triggers_new_server_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260708_post_pg657_target_player_discard_triggers_new_server_recheck.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg657b_trusted_oracle_hash_backfill_new_server_package.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg657b_trusted_oracle_hash_backfill_new_server_pg_to_sqlite_sync.json`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260708_post_pg657b_hash_backfill_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260708_post_pg657_target_player_discard_triggers_new_server_final.md`
+- `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260708_post_pg657_target_player_discard_triggers_new_server_final.md`
+- `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260708_post_pg657_target_player_discard_triggers_new_server_final.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260708_post_pg657b_hash_backfill_new_server_final.md`
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

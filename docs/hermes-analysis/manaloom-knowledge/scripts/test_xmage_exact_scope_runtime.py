@@ -2353,6 +2353,146 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_creature_etb_target_player_discard_discards_from_opponent(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        opponent.hand = [
+            {"name": "A Low", "type_line": "Creature", "mana_cost": "{1}"},
+            {"name": "B High", "type_line": "Creature", "mana_cost": "{4}"},
+        ]
+        permanent = {
+            "name": "Ravenous Rats",
+            "type_line": "Creature - Rat",
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_etb_target_player_discard_v1",
+            "etb_target_player_discard": True,
+            "etb_discard_count": 1,
+            "discard_count": 1,
+            "target_controller": "target_opponent",
+            "target_preference": "opponent",
+            "_rule_logical_key": "battle_rule_v1:fixture_etb_discard",
+        }
+
+        self.battle.resolve_generic_permanent_etb(
+            active,
+            [opponent],
+            permanent,
+            permanent,
+            turn=5,
+            rng=random.Random(5),
+            all_players=[active, opponent],
+        )
+
+        self.assertEqual([card["name"] for card in opponent.hand], ["B High"])
+        self.assertEqual([card["name"] for card in opponent.graveyard], ["A Low"])
+        self.assertTrue(
+            any(
+                event == "etb_target_player_discard_resolved"
+                and data.get("card") == "Ravenous Rats"
+                and data.get("target_player") == "Opponent"
+                and data.get("trigger") == "enters_battlefield"
+                and data.get("discarded_count") == 1
+                and data.get("rule_logical_key") == "battle_rule_v1:fixture_etb_discard"
+                for event, data in self.events
+            )
+        )
+
+    def test_creature_dies_target_player_discard_triggers_on_graveyard_move(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        opponent.hand = [
+            {"name": "Card A", "type_line": "Creature"},
+            {"name": "Card B", "type_line": "Creature"},
+            {"name": "Card C", "type_line": "Creature"},
+        ]
+        permanent = {
+            "name": "Black Cat",
+            "type_line": "Creature - Zombie Cat",
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_dies_target_player_discard_v1",
+            "dies_target_player_discard": True,
+            "dies_discard_count": 1,
+            "discard_count": 1,
+            "discard_random": True,
+            "target_controller": "target_opponent",
+            "target_preference": "opponent",
+            "_rule_logical_key": "battle_rule_v1:fixture_dies_discard",
+        }
+        active.battlefield.append(permanent)
+        self.battle.CURRENT_REPLAY_TURN = 6
+
+        destination = self.battle.move_creature_from_battlefield(
+            active,
+            permanent,
+            reason="test_destroy",
+            source={"name": "Fixture Removal"},
+            all_players=[active, opponent],
+        )
+
+        self.assertEqual(destination, "graveyard")
+        self.assertEqual([card["name"] for card in active.graveyard], ["Black Cat"])
+        self.assertEqual(len(opponent.hand), 2)
+        self.assertEqual(len(opponent.graveyard), 1)
+        self.assertTrue(
+            any(
+                event == "dies_target_player_discard_resolved"
+                and data.get("card") == "Black Cat"
+                and data.get("target_player") == "Opponent"
+                and data.get("trigger") == "dies"
+                and data.get("discard_random") is True
+                and data.get("source") == "Fixture Removal"
+                and data.get("rule_logical_key") == "battle_rule_v1:fixture_dies_discard"
+                for event, data in self.events
+            )
+        )
+
+    def test_combat_damage_target_player_discard_targets_damaged_player(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        opponent.hand = [
+            {"name": "A Low", "type_line": "Creature", "mana_cost": "{1}"},
+            {"name": "B Mid", "type_line": "Creature", "mana_cost": "{2}"},
+        ]
+        permanent = {
+            "name": "Blazing Specter",
+            "type_line": "Creature - Specter",
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_combat_damage_target_player_discard_v1",
+            "combat_damage_player_discard": True,
+            "combat_damage_discard_count": 1,
+            "discard_count": 1,
+            "target_controller": "damaged_player",
+            "target_preference": "damaged_player",
+            "_rule_logical_key": "battle_rule_v1:fixture_combat_discard",
+        }
+        active.battlefield.append(permanent)
+
+        resolved = self.battle.resolve_combat_damage_discard_triggers(
+            active,
+            [permanent],
+            opponent,
+            turn=7,
+            phase="combat_damage",
+            rng=random.Random(7),
+            all_players=[active, opponent],
+        )
+
+        self.assertEqual(len(resolved), 1)
+        self.assertEqual([card["name"] for card in opponent.hand], ["B Mid"])
+        self.assertEqual([card["name"] for card in opponent.graveyard], ["A Low"])
+        self.assertTrue(
+            any(
+                event == "combat_damage_target_player_discard_resolved"
+                and data.get("card") == "Blazing Specter"
+                and data.get("target_player") == "Opponent"
+                and data.get("target_reason") == "damaged_player"
+                and data.get("trigger") == "combat_damage_to_player"
+                and data.get("damaged_player") == "Opponent"
+                and data.get("rule_logical_key") == "battle_rule_v1:fixture_combat_discard"
+                for event, data in self.events
+            )
+        )
+
     def test_fixed_source_controller_draw_spell_pays_creature_sacrifice_cost(self) -> None:
         active = self.battle.Player(
             "Active",

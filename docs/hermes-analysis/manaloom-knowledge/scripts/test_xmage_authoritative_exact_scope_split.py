@@ -21570,6 +21570,94 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "etb_draw_discard_source_condition_not_supported")
 
+    def test_creature_etb_target_player_discard_maps_to_triggered_creature_scope(self) -> None:
+        row = queue_row(
+            "xmage_signature::DiscardTargetEffect::EntersBattlefieldTriggeredAbility::"
+            "TargetOpponent::no_condition_class::targeting,triggered_ability",
+            effect_classes=["DiscardTargetEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["targeting", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Ravenous Rats",
+                type_line="Creature - Rat",
+                oracle_text="When this creature enters, target opponent discards a card.",
+            ),
+            source_text="""
+                Ability ability = new EntersBattlefieldTriggeredAbility(new DiscardTargetEffect(1));
+                ability.addTarget(new TargetOpponent());
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "creature")
+        self.assertEqual(effect["battle_model_scope"], split.ETB_TARGET_PLAYER_DISCARD_CREATURE_SCOPE)
+        self.assertTrue(effect["etb_target_player_discard"])
+        self.assertEqual(effect["trigger"], "enters_battlefield")
+        self.assertEqual(effect["etb_discard_count"], 1)
+        self.assertEqual(effect["discard_count"], 1)
+        self.assertEqual(effect["target_controller"], "target_opponent")
+        self.assertFalse(effect["discard_random"])
+
+    def test_creature_etb_target_player_discard_maps_random_target_player(self) -> None:
+        row = queue_row(
+            "xmage_signature::DiscardTargetEffect::EntersBattlefieldTriggeredAbility::"
+            "TargetPlayer::no_condition_class::targeting,triggered_ability",
+            effect_classes=["DiscardTargetEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["targeting", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Sanity Gnawers",
+                type_line="Creature - Rat",
+                oracle_text="When this creature enters, target player discards a card at random.",
+            ),
+            source_text="""
+                Ability ability = new EntersBattlefieldTriggeredAbility(new DiscardTargetEffect(1, true));
+                ability.addTarget(new TargetPlayer());
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.ETB_TARGET_PLAYER_DISCARD_CREATURE_SCOPE)
+        self.assertEqual(effect["target_controller"], "target_player")
+        self.assertTrue(effect["discard_random"])
+
+    def test_creature_etb_target_player_discard_blocks_cost_paid_source(self) -> None:
+        row = queue_row(
+            "xmage_signature::DiscardTargetEffect::EntersBattlefieldTriggeredAbility::"
+            "TargetOpponent::no_condition_class::targeting,triggered_ability",
+            effect_classes=["DiscardTargetEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["targeting", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Ritualist",
+                type_line="Creature - Vampire",
+                oracle_text="When this creature enters, target opponent discards a card.",
+            ),
+            source_text="""
+                this.addAbility(new EntersBattlefieldTriggeredAbility(new DoIfCostPaid(
+                    new DiscardTargetEffect(1), new ManaCostsImpl<>("{B}"))));
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "etb_target_player_discard_source_not_simple")
+
     def test_creature_etb_target_boost_maps_fixed_generic_target(self) -> None:
         row = queue_row(
             "xmage_signature::BoostTargetEffect::EntersBattlefieldTriggeredAbility::"
@@ -21896,6 +21984,66 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "dies_draw_count_not_fixed")
 
+    def test_creature_dies_target_player_discard_maps_to_triggered_creature_scope(self) -> None:
+        row = queue_row(
+            "xmage_signature::DiscardTargetEffect::DiesSourceTriggeredAbility::"
+            "TargetOpponent::no_condition_class::targeting,triggered_ability",
+            effect_classes=["DiscardTargetEffect"],
+            ability_kind="triggered",
+            ability_classes=["DiesSourceTriggeredAbility"],
+            xmage_signals=["targeting", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Black Cat",
+                type_line="Creature - Zombie Cat",
+                oracle_text="When this creature dies, target opponent discards a card at random.",
+            ),
+            source_text="""
+                Ability ability = new DiesSourceTriggeredAbility(new DiscardTargetEffect(1, true));
+                ability.addTarget(new TargetOpponent());
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "creature")
+        self.assertEqual(effect["battle_model_scope"], split.DIES_TARGET_PLAYER_DISCARD_CREATURE_SCOPE)
+        self.assertTrue(effect["dies_target_player_discard"])
+        self.assertEqual(effect["trigger"], "dies")
+        self.assertEqual(effect["dies_discard_count"], 1)
+        self.assertEqual(effect["target_controller"], "target_opponent")
+        self.assertTrue(effect["discard_random"])
+
+    def test_creature_dies_target_player_discard_blocks_dynamic_zubera_source(self) -> None:
+        row = queue_row(
+            "xmage_signature::DiscardTargetEffect::DiesSourceTriggeredAbility::"
+            "TargetPlayer::no_condition_class::targeting,triggered_ability",
+            effect_classes=["DiscardTargetEffect"],
+            ability_kind="triggered",
+            ability_classes=["DiesSourceTriggeredAbility"],
+            xmage_signals=["targeting", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Ashen-Skin Zubera",
+                type_line="Creature - Zubera Spirit",
+                oracle_text="When this creature dies, target opponent discards a card.",
+            ),
+            source_text="""
+                Ability ability = new DiesSourceTriggeredAbility(
+                    new DiscardTargetEffect(new ZuberasDiedDynamicValue()));
+                ability.addTarget(new TargetPlayer());
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "dies_target_player_discard_source_not_simple")
+
     def test_creature_combat_damage_draw_maps_to_triggered_creature_scope(self) -> None:
         row = queue_row(
             split.DRAW_ENGINE_UNIT,
@@ -22013,6 +22161,44 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
 
         self.assertIsNone(proposal)
         self.assertEqual(reason, "combat_damage_draw_amount_damage_dealt_not_supported")
+
+    def test_creature_combat_damage_target_player_discard_maps_to_triggered_creature_scope(self) -> None:
+        row = queue_row(
+            "xmage_signature::DiscardTargetEffect::DealsCombatDamageToAPlayerTriggeredAbility::"
+            "no_target_class::no_condition_class::triggered_ability",
+            effect_classes=["DiscardTargetEffect"],
+            ability_kind="triggered",
+            ability_classes=["DealsCombatDamageToAPlayerTriggeredAbility", "FlyingAbility", "HasteAbility"],
+            xmage_signals=["triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Blazing Specter",
+                type_line="Creature - Specter",
+                oracle_text=(
+                    "Flying, haste\n"
+                    "Whenever this creature deals combat damage to a player, that player discards a card."
+                ),
+            ),
+            source_text="""
+                this.addAbility(FlyingAbility.getInstance());
+                this.addAbility(HasteAbility.getInstance());
+                this.addAbility(new DealsCombatDamageToAPlayerTriggeredAbility(
+                    new DiscardTargetEffect(1), false));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "creature")
+        self.assertEqual(effect["battle_model_scope"], split.COMBAT_DAMAGE_DISCARD_CREATURE_SCOPE)
+        self.assertTrue(effect["combat_damage_player_discard"])
+        self.assertEqual(effect["trigger"], "combat_damage_to_player")
+        self.assertEqual(effect["combat_damage_discard_count"], 1)
+        self.assertEqual(effect["target_controller"], "damaged_player")
+        self.assertEqual(effect["target_preference"], "damaged_player")
+        self.assertEqual(effect["keywords"], ["flying", "haste"])
 
     def test_creature_combat_damage_draw_blocks_unmodeled_auxiliary_ability(self) -> None:
         row = queue_row(

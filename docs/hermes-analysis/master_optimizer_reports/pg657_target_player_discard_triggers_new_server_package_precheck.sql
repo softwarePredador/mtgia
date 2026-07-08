@@ -1,0 +1,90 @@
+WITH proposed(normalized_name, card_name, oracle_hash, logical_rule_key, effect_json, deck_role_json, source, confidence, review_status, execution_status, notes, shadow_handling) AS (
+  VALUES
+    ('abyssal horror', 'Abyssal Horror', 'c16d9923d5aaca37e0c078e0f7e03088', 'battle_rule_v1:72fbea20c61c5a8664a823621e059d20', '{"_keywords_are_self":true,"ability_kind":"triggered","battle_model_scope":"xmage_creature_etb_target_player_discard_v1","count":2,"discard_count":2,"discard_random":false,"effect":"creature","etb_discard_count":2,"etb_target_player_discard":true,"flying":true,"keywords":["flying"],"target_controller":"target_player","target_preference":"opponent","trigger":"enters_battlefield","trigger_effect":"target_player_discard","xmage_ability_class":"EntersBattlefieldTriggeredAbility","xmage_effect_class":"DiscardTargetEffect"}'::jsonb, '{"category":"unknown","effect":"creature"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class AbyssalHorror translated into ManaLoom runtime scope xmage_creature_etb_target_player_discard_v1. This row is package-ready only because the source signature is a narrow creature ETB triggered fixed target-player discard ability with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('black cat', 'Black Cat', '3f5e18e014e342645d0ecab60381cd04', 'battle_rule_v1:7f3271cd03557e2e025752643fcc9e33', '{"ability_kind":"triggered","battle_model_scope":"xmage_creature_dies_target_player_discard_v1","count":1,"dies_discard_count":1,"dies_target_player_discard":true,"dies_trigger_effect":"target_player_discard","discard_count":1,"discard_random":true,"effect":"creature","target_controller":"target_opponent","target_preference":"opponent","trigger":"dies","trigger_effect":"target_player_discard","xmage_ability_class":"DiesSourceTriggeredAbility","xmage_effect_class":"DiscardTargetEffect"}'::jsonb, '{"category":"unknown","effect":"creature"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class BlackCat translated into ManaLoom runtime scope xmage_creature_dies_target_player_discard_v1. This row is package-ready only because the source signature is a narrow creature dies triggered fixed target-player discard ability with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('blazing specter', 'Blazing Specter', 'fc0e7f6b3eb9fdd8f1382bd96476288a', 'battle_rule_v1:e1ef63a3c253e0ab1ad7e0018aec5521', '{"_keywords_are_self":true,"ability_kind":"triggered","battle_model_scope":"xmage_creature_combat_damage_target_player_discard_v1","combat_damage_discard_count":1,"combat_damage_player_discard":true,"count":1,"discard_count":1,"discard_random":false,"effect":"creature","flying":true,"haste":true,"keywords":["flying","haste"],"target_controller":"damaged_player","target_preference":"damaged_player","trigger":"combat_damage_to_player","trigger_effect":"target_player_discard","xmage_ability_class":"DealsCombatDamageToAPlayerTriggeredAbility","xmage_effect_class":"DiscardTargetEffect"}'::jsonb, '{"category":"unknown","effect":"creature"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class BlazingSpecter translated into ManaLoom runtime scope xmage_creature_combat_damage_target_player_discard_v1. This row is package-ready only because the source signature is a narrow creature combat-damage-to-player triggered fixed target-player discard ability with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('brutal nightstalker', 'Brutal Nightstalker', '2acfdd0ee96e113f65be9776e38a634b', 'battle_rule_v1:f020303c69f642760ad3ccf2150bf201', '{"ability_kind":"triggered","battle_model_scope":"xmage_creature_etb_target_player_discard_v1","count":1,"discard_count":1,"discard_random":false,"effect":"creature","etb_discard_count":1,"etb_target_player_discard":true,"etb_target_player_discard_optional":true,"target_controller":"target_opponent","target_preference":"opponent","trigger":"enters_battlefield","trigger_effect":"target_player_discard","xmage_ability_class":"EntersBattlefieldTriggeredAbility","xmage_effect_class":"DiscardTargetEffect"}'::jsonb, '{"category":"unknown","effect":"creature"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class BrutalNightstalker translated into ManaLoom runtime scope xmage_creature_etb_target_player_discard_v1. This row is package-ready only because the source signature is a narrow creature ETB triggered fixed target-player discard ability with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('corrupt court official', 'Corrupt Court Official', '81b939ee0dc1fab11ffa9fe87d968fa2', 'battle_rule_v1:740765619169a04218ec484157e99989', '{"ability_kind":"triggered","battle_model_scope":"xmage_creature_etb_target_player_discard_v1","count":1,"discard_count":1,"discard_random":false,"effect":"creature","etb_discard_count":1,"etb_target_player_discard":true,"target_controller":"target_opponent","target_preference":"opponent","trigger":"enters_battlefield","trigger_effect":"target_player_discard","xmage_ability_class":"EntersBattlefieldTriggeredAbility","xmage_effect_class":"DiscardTargetEffect"}'::jsonb, '{"category":"unknown","effect":"creature"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class CorruptCourtOfficial translated into ManaLoom runtime scope xmage_creature_etb_target_player_discard_v1. This row is package-ready only because the source signature is a narrow creature ETB triggered fixed target-player discard ability with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('deadbridge shaman', 'Deadbridge Shaman', 'a4bca977852f242f1722064feb2a9136', 'battle_rule_v1:b2125674b1aac8fd6dfafb74ed17c280', '{"ability_kind":"triggered","battle_model_scope":"xmage_creature_dies_target_player_discard_v1","count":1,"dies_discard_count":1,"dies_target_player_discard":true,"dies_trigger_effect":"target_player_discard","discard_count":1,"discard_random":false,"effect":"creature","target_controller":"target_opponent","target_preference":"opponent","trigger":"dies","trigger_effect":"target_player_discard","xmage_ability_class":"DiesSourceTriggeredAbility","xmage_effect_class":"DiscardTargetEffect"}'::jsonb, '{"category":"unknown","effect":"creature"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class DeadbridgeShaman translated into ManaLoom runtime scope xmage_creature_dies_target_player_discard_v1. This row is package-ready only because the source signature is a narrow creature dies triggered fixed target-player discard ability with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('ebon dragon', 'Ebon Dragon', 'cfdf197c4f1722f3cef0fa5629380a0a', 'battle_rule_v1:7395367c4e0ccb1eb281ee5422476a18', '{"_keywords_are_self":true,"ability_kind":"triggered","battle_model_scope":"xmage_creature_etb_target_player_discard_v1","count":1,"discard_count":1,"discard_random":false,"effect":"creature","etb_discard_count":1,"etb_target_player_discard":true,"etb_target_player_discard_optional":true,"flying":true,"keywords":["flying"],"target_controller":"target_opponent","target_preference":"opponent","trigger":"enters_battlefield","trigger_effect":"target_player_discard","xmage_ability_class":"EntersBattlefieldTriggeredAbility","xmage_effect_class":"DiscardTargetEffect"}'::jsonb, '{"category":"unknown","effect":"creature"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class EbonDragon translated into ManaLoom runtime scope xmage_creature_etb_target_player_discard_v1. This row is package-ready only because the source signature is a narrow creature ETB triggered fixed target-player discard ability with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('ravenous rats', 'Ravenous Rats', '81b939ee0dc1fab11ffa9fe87d968fa2', 'battle_rule_v1:740765619169a04218ec484157e99989', '{"ability_kind":"triggered","battle_model_scope":"xmage_creature_etb_target_player_discard_v1","count":1,"discard_count":1,"discard_random":false,"effect":"creature","etb_discard_count":1,"etb_target_player_discard":true,"target_controller":"target_opponent","target_preference":"opponent","trigger":"enters_battlefield","trigger_effect":"target_player_discard","xmage_ability_class":"EntersBattlefieldTriggeredAbility","xmage_effect_class":"DiscardTargetEffect"}'::jsonb, '{"category":"unknown","effect":"creature"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class RavenousRats translated into ManaLoom runtime scope xmage_creature_etb_target_player_discard_v1. This row is package-ready only because the source signature is a narrow creature ETB triggered fixed target-player discard ability with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('rottenheart ghoul', 'Rottenheart Ghoul', 'f7ee9f344b38cbc4f158356352435147', 'battle_rule_v1:985b466d11034468e56d8bfe14712e94', '{"ability_kind":"triggered","battle_model_scope":"xmage_creature_dies_target_player_discard_v1","count":1,"dies_discard_count":1,"dies_target_player_discard":true,"dies_trigger_effect":"target_player_discard","discard_count":1,"discard_random":false,"effect":"creature","target_controller":"target_player","target_preference":"opponent","trigger":"dies","trigger_effect":"target_player_discard","xmage_ability_class":"DiesSourceTriggeredAbility","xmage_effect_class":"DiscardTargetEffect"}'::jsonb, '{"category":"unknown","effect":"creature"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class RottenheartGhoul translated into ManaLoom runtime scope xmage_creature_dies_target_player_discard_v1. This row is package-ready only because the source signature is a narrow creature dies triggered fixed target-player discard ability with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('sanity gnawers', 'Sanity Gnawers', '6830e7df5723c4f0186d529081602cdb', 'battle_rule_v1:87b9ea000e05ba185ab812cf3f9304b4', '{"ability_kind":"triggered","battle_model_scope":"xmage_creature_etb_target_player_discard_v1","count":1,"discard_count":1,"discard_random":true,"effect":"creature","etb_discard_count":1,"etb_target_player_discard":true,"target_controller":"target_player","target_preference":"opponent","trigger":"enters_battlefield","trigger_effect":"target_player_discard","xmage_ability_class":"EntersBattlefieldTriggeredAbility","xmage_effect_class":"DiscardTargetEffect"}'::jsonb, '{"category":"unknown","effect":"creature"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class SanityGnawers translated into ManaLoom runtime scope xmage_creature_etb_target_player_discard_v1. This row is package-ready only because the source signature is a narrow creature ETB triggered fixed target-player discard ability with focused runtime coverage.', 'deprecate_nonmatching_rows')
+),
+matched_cards AS (
+  SELECT
+    p.normalized_name,
+    p.card_name,
+    p.oracle_hash,
+    c.id AS card_id,
+    c.name AS db_card_name
+  FROM proposed p
+  LEFT JOIN public.cards c
+    ON (
+         lower(c.name) = p.normalized_name
+         OR split_part(lower(c.name), ' // ', 1) = p.normalized_name
+       )
+   AND md5(coalesce(c.oracle_text, '')) = p.oracle_hash
+),
+target_cards AS (
+  SELECT
+    normalized_name,
+    card_name,
+    oracle_hash,
+    count(card_id) AS target_card_rows,
+    min(card_id::text)::uuid AS canonical_card_id,
+    min(db_card_name) AS canonical_card_name
+  FROM matched_cards
+  GROUP BY normalized_name, card_name, oracle_hash
+),
+rule_rows AS (
+  SELECT p.normalized_name, count(r.*) AS existing_rule_rows
+  FROM proposed p
+  LEFT JOIN public.card_battle_rules r
+    ON (
+         r.normalized_name = p.normalized_name
+         OR r.normalized_name LIKE p.normalized_name || ' // %'
+       )
+  GROUP BY p.normalized_name
+),
+expected_rows AS (
+  SELECT p.normalized_name, count(r.*) AS expected_rule_rows_before
+  FROM proposed p
+  LEFT JOIN public.card_battle_rules r
+    ON (
+         r.normalized_name = p.normalized_name
+         OR r.normalized_name LIKE p.normalized_name || ' // %'
+       )
+   AND r.logical_rule_key = p.logical_rule_key
+  GROUP BY p.normalized_name
+),
+shadow_rows AS (
+  SELECT p.normalized_name, count(r.*) AS would_deprecate_shadow_rows
+  FROM proposed p
+  LEFT JOIN public.card_battle_rules r
+    ON (
+         r.normalized_name = p.normalized_name
+         OR r.normalized_name LIKE p.normalized_name || ' // %'
+       )
+   AND r.logical_rule_key <> p.logical_rule_key
+   AND r.review_status NOT IN ('deprecated', 'rejected')
+   AND r.execution_status <> 'disabled'
+  GROUP BY p.normalized_name
+)
+SELECT
+  p.card_name,
+  p.normalized_name,
+  p.oracle_hash,
+  p.logical_rule_key,
+  p.shadow_handling,
+  tc.target_card_rows,
+  tc.canonical_card_id,
+  rr.existing_rule_rows,
+  er.expected_rule_rows_before,
+  sr.would_deprecate_shadow_rows
+FROM proposed p
+JOIN target_cards tc USING (normalized_name, card_name, oracle_hash)
+JOIN rule_rows rr USING (normalized_name)
+JOIN expected_rows er USING (normalized_name)
+JOIN shadow_rows sr USING (normalized_name)
+ORDER BY p.card_name;

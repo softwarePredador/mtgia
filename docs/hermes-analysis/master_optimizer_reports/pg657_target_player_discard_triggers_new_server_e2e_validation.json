@@ -1,0 +1,402 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-08T13:22:56.884686+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg657_target_player_discard_triggers_new_server_package_manifest.json",
+  "package_id": "pg657_target_player_discard_triggers_new_server_package_manifest",
+  "snapshot": "/tmp/pg657_target_player_discard_triggers_new_server_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 10
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_target_player_discard_v1",
+          "card_name": "Abyssal Horror",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:72fbea20c61c5a8664a823621e059d20",
+          "oracle_hash": "c16d9923d5aaca37e0c078e0f7e03088",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_target_player_discard_v1",
+          "card_name": "Black Cat",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7f3271cd03557e2e025752643fcc9e33",
+          "oracle_hash": "3f5e18e014e342645d0ecab60381cd04",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_combat_damage_target_player_discard_v1",
+          "card_name": "Blazing Specter",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e1ef63a3c253e0ab1ad7e0018aec5521",
+          "oracle_hash": "fc0e7f6b3eb9fdd8f1382bd96476288a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_target_player_discard_v1",
+          "card_name": "Brutal Nightstalker",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f020303c69f642760ad3ccf2150bf201",
+          "oracle_hash": "2acfdd0ee96e113f65be9776e38a634b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_target_player_discard_v1",
+          "card_name": "Corrupt Court Official",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:740765619169a04218ec484157e99989",
+          "oracle_hash": "81b939ee0dc1fab11ffa9fe87d968fa2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_target_player_discard_v1",
+          "card_name": "Deadbridge Shaman",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b2125674b1aac8fd6dfafb74ed17c280",
+          "oracle_hash": "a4bca977852f242f1722064feb2a9136",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_target_player_discard_v1",
+          "card_name": "Ebon Dragon",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7395367c4e0ccb1eb281ee5422476a18",
+          "oracle_hash": "cfdf197c4f1722f3cef0fa5629380a0a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_target_player_discard_v1",
+          "card_name": "Ravenous Rats",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:740765619169a04218ec484157e99989",
+          "oracle_hash": "81b939ee0dc1fab11ffa9fe87d968fa2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_target_player_discard_v1",
+          "card_name": "Rottenheart Ghoul",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:985b466d11034468e56d8bfe14712e94",
+          "oracle_hash": "f7ee9f344b38cbc4f158356352435147",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_target_player_discard_v1",
+          "card_name": "Sanity Gnawers",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:87b9ea000e05ba185ab812cf3f9304b4",
+          "oracle_hash": "6830e7df5723c4f0186d529081602cdb",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 10
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_target_player_discard_v1",
+          "card_name": "Abyssal Horror",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:72fbea20c61c5a8664a823621e059d20",
+          "oracle_hash": "c16d9923d5aaca37e0c078e0f7e03088",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_target_player_discard_v1",
+          "card_name": "Black Cat",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7f3271cd03557e2e025752643fcc9e33",
+          "oracle_hash": "3f5e18e014e342645d0ecab60381cd04",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_combat_damage_target_player_discard_v1",
+          "card_name": "Blazing Specter",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e1ef63a3c253e0ab1ad7e0018aec5521",
+          "oracle_hash": "fc0e7f6b3eb9fdd8f1382bd96476288a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_target_player_discard_v1",
+          "card_name": "Brutal Nightstalker",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f020303c69f642760ad3ccf2150bf201",
+          "oracle_hash": "2acfdd0ee96e113f65be9776e38a634b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_target_player_discard_v1",
+          "card_name": "Corrupt Court Official",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:740765619169a04218ec484157e99989",
+          "oracle_hash": "81b939ee0dc1fab11ffa9fe87d968fa2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_target_player_discard_v1",
+          "card_name": "Deadbridge Shaman",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b2125674b1aac8fd6dfafb74ed17c280",
+          "oracle_hash": "a4bca977852f242f1722064feb2a9136",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_target_player_discard_v1",
+          "card_name": "Ebon Dragon",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7395367c4e0ccb1eb281ee5422476a18",
+          "oracle_hash": "cfdf197c4f1722f3cef0fa5629380a0a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_target_player_discard_v1",
+          "card_name": "Ravenous Rats",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:740765619169a04218ec484157e99989",
+          "oracle_hash": "81b939ee0dc1fab11ffa9fe87d968fa2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_target_player_discard_v1",
+          "card_name": "Rottenheart Ghoul",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:985b466d11034468e56d8bfe14712e94",
+          "oracle_hash": "f7ee9f344b38cbc4f158356352435147",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_target_player_discard_v1",
+          "card_name": "Sanity Gnawers",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:87b9ea000e05ba185ab812cf3f9304b4",
+          "oracle_hash": "6830e7df5723c4f0186d529081602cdb",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 10
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_target_player_discard_v1",
+          "battle_rule_version": 2,
+          "card_name": "Abyssal Horror",
+          "logical_rule_key": "battle_rule_v1:72fbea20c61c5a8664a823621e059d20"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_target_player_discard_v1",
+          "battle_rule_version": 2,
+          "card_name": "Black Cat",
+          "logical_rule_key": "battle_rule_v1:7f3271cd03557e2e025752643fcc9e33"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_combat_damage_target_player_discard_v1",
+          "battle_rule_version": 2,
+          "card_name": "Blazing Specter",
+          "logical_rule_key": "battle_rule_v1:e1ef63a3c253e0ab1ad7e0018aec5521"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_target_player_discard_v1",
+          "battle_rule_version": 2,
+          "card_name": "Brutal Nightstalker",
+          "logical_rule_key": "battle_rule_v1:f020303c69f642760ad3ccf2150bf201"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_target_player_discard_v1",
+          "battle_rule_version": 2,
+          "card_name": "Corrupt Court Official",
+          "logical_rule_key": "battle_rule_v1:740765619169a04218ec484157e99989"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_target_player_discard_v1",
+          "battle_rule_version": 2,
+          "card_name": "Deadbridge Shaman",
+          "logical_rule_key": "battle_rule_v1:b2125674b1aac8fd6dfafb74ed17c280"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_target_player_discard_v1",
+          "battle_rule_version": 2,
+          "card_name": "Ebon Dragon",
+          "logical_rule_key": "battle_rule_v1:7395367c4e0ccb1eb281ee5422476a18"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_target_player_discard_v1",
+          "battle_rule_version": 2,
+          "card_name": "Ravenous Rats",
+          "logical_rule_key": "battle_rule_v1:740765619169a04218ec484157e99989"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_target_player_discard_v1",
+          "battle_rule_version": 2,
+          "card_name": "Rottenheart Ghoul",
+          "logical_rule_key": "battle_rule_v1:985b466d11034468e56d8bfe14712e94"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_target_player_discard_v1",
+          "battle_rule_version": 2,
+          "card_name": "Sanity Gnawers",
+          "logical_rule_key": "battle_rule_v1:87b9ea000e05ba185ab812cf3f9304b4"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 10
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Abyssal Horror",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:72fbea20c61c5a8664a823621e059d20"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Black Cat",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:7f3271cd03557e2e025752643fcc9e33"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Blazing Specter",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:e1ef63a3c253e0ab1ad7e0018aec5521"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Brutal Nightstalker",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:f020303c69f642760ad3ccf2150bf201"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Corrupt Court Official",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:740765619169a04218ec484157e99989"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Deadbridge Shaman",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:b2125674b1aac8fd6dfafb74ed17c280"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Ebon Dragon",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:7395367c4e0ccb1eb281ee5422476a18"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Ravenous Rats",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:740765619169a04218ec484157e99989"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Rottenheart Ghoul",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:985b466d11034468e56d8bfe14712e94"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Sanity Gnawers",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:87b9ea000e05ba185ab812cf3f9304b4"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

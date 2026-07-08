@@ -19184,6 +19184,24 @@ def resolve_generic_permanent_etb(
             all_players=all_players,
             phase=phase,
         )
+    if effect_data.get("etb_target_player_discard"):
+        discard_effect = {
+            **effect_data,
+            "discard_count": int(effect_data.get("etb_discard_count") or effect_data.get("discard_count") or 1),
+            "discard_random": bool(effect_data.get("discard_random")),
+        }
+        resolve_target_player_discard_effect(
+            player,
+            opponents,
+            permanent,
+            discard_effect,
+            turn,
+            rng,
+            phase=phase,
+            all_players=all_players,
+            event_name="etb_target_player_discard_resolved",
+            trigger="enters_battlefield",
+        )
     if effect_data.get("etb_target_stat_modifier"):
         resolve_etb_target_stat_modifier(
             player,
@@ -20261,6 +20279,59 @@ def resolve_permanent_dies_damage(
     return amount
 
 
+def resolve_permanent_dies_target_player_discard(
+    owner,
+    permanent,
+    *,
+    destination=None,
+    reason=None,
+    source=None,
+    opponents=None,
+    all_players=None,
+):
+    if destination != "graveyard" or not isinstance(permanent, dict):
+        return None
+    if not permanent.get("dies_target_player_discard"):
+        return None
+    discard_count = max(0, int(permanent.get("dies_discard_count") or permanent.get("discard_count") or 0))
+    if discard_count <= 0:
+        return None
+    participants = list(all_players or [])
+    if not participants:
+        participants = [owner] + list(opponents or [])
+    resolved_opponents = [
+        player for player in (opponents or [participant for participant in participants if participant is not owner])
+        if player is not None
+    ]
+    effect_data = {
+        **permanent,
+        "effect": "target_player_discard",
+        "ability_kind": "triggered",
+        "trigger": "dies",
+        "discard_count": discard_count,
+        "count": discard_count,
+        "discard_random": bool(permanent.get("discard_random")),
+        "reason": reason,
+        "source": source.get("name", "?") if isinstance(source, dict) else source,
+    }
+    payload = resolve_target_player_discard_effect(
+        owner,
+        resolved_opponents,
+        permanent,
+        effect_data,
+        CURRENT_REPLAY_TURN,
+        random.Random(CURRENT_REPLAY_TURN or 0),
+        phase="dies_trigger",
+        all_players=participants,
+        event_name="dies_target_player_discard_resolved",
+        trigger="dies",
+    )
+    if payload is not None:
+        payload["reason"] = reason
+        payload["source"] = source.get("name", "?") if isinstance(source, dict) else source
+    return payload
+
+
 def resolve_permanent_dies_recursion(owner, permanent, *, destination=None, reason=None, source=None):
     if destination != "graveyard" or not isinstance(permanent, dict):
         return []
@@ -20516,6 +20587,14 @@ def move_creature_from_battlefield(owner, creature, reason=None, source=None, al
         source=source,
         all_players=all_players,
     )
+    resolve_permanent_dies_target_player_discard(
+        owner,
+        creature,
+        destination=destination,
+        reason=reason,
+        source=source,
+        all_players=all_players,
+    )
     resolve_permanent_dies_recursion(
         owner,
         creature,
@@ -20615,6 +20694,14 @@ def move_permanent_from_battlefield(owner, permanent, reason=None, source=None, 
         source=source,
     )
     resolve_permanent_dies_damage(
+        owner,
+        permanent,
+        destination=destination,
+        reason=reason,
+        source=source,
+        all_players=all_players,
+    )
+    resolve_permanent_dies_target_player_discard(
         owner,
         permanent,
         destination=destination,
@@ -45522,6 +45609,58 @@ def resolve_combat_damage_draw_triggers(
     return trigger_events
 
 
+def resolve_combat_damage_discard_triggers(
+    player,
+    damaging_creatures,
+    damaged_player,
+    turn,
+    *,
+    phase="combat_damage",
+    rng=None,
+    all_players=None,
+):
+    trigger_events = []
+    rng = rng or random.Random(turn or 0)
+    for permanent in list(damaging_creatures or []):
+        if not isinstance(permanent, dict):
+            continue
+        if not (
+            permanent.get("combat_damage_player_discard")
+            or permanent.get("combat_damage_discard_count")
+        ):
+            continue
+        if permanent not in getattr(player, "battlefield", []):
+            continue
+        count = max(1, int(permanent.get("combat_damage_discard_count") or permanent.get("discard_count") or 1))
+        effect_data = {
+            **permanent,
+            "effect": "target_player_discard",
+            "trigger": "combat_damage_to_player",
+            "discard_count": count,
+            "count": count,
+            "discard_random": bool(permanent.get("discard_random")),
+            "damaged_player": getattr(damaged_player, "name", None),
+        }
+        payload = resolve_target_player_discard_effect(
+            player,
+            [participant for participant in (all_players or []) if participant is not player],
+            permanent,
+            effect_data,
+            turn,
+            rng,
+            phase=phase,
+            all_players=all_players or [player, damaged_player],
+            event_name="combat_damage_target_player_discard_resolved",
+            trigger="combat_damage_to_player",
+            forced_target_player=damaged_player,
+            forced_target_reason="damaged_player",
+        )
+        if payload is not None:
+            payload["damaged_player"] = getattr(damaged_player, "name", None)
+            trigger_events.append(payload)
+    return trigger_events
+
+
 def resolve_etb_removal(player, opponents, card, effect_data, turn, rng):
     target_type = (
         effect_data.get("etb_remove_target")
@@ -60480,7 +60619,7 @@ def _target_player_discard_cards(target_player, discard_count, discard_random, r
     )[:count]
 
 
-def resolve_target_player_discard_spell(
+def resolve_target_player_discard_effect(
     player,
     opponents,
     card,
@@ -60490,10 +60629,18 @@ def resolve_target_player_discard_spell(
     *,
     phase=None,
     all_players=None,
+    event_name="target_player_discard_resolved",
+    trigger=None,
+    forced_target_player=None,
+    forced_target_reason=None,
 ):
     discard_count = max(0, int(effect_data.get("discard_count") or effect_data.get("count") or 0))
     discard_random = bool(effect_data.get("discard_random"))
-    target_player, target_reason = _target_player_discard_target_player(player, opponents, effect_data)
+    if forced_target_player is not None:
+        target_player = forced_target_player
+        target_reason = forced_target_reason or "forced_target_player"
+    else:
+        target_player, target_reason = _target_player_discard_target_player(player, opponents, effect_data)
     hand_size_before = len(getattr(target_player, "hand", []) or [])
     discard_cards = _target_player_discard_cards(target_player, discard_count, discard_random, rng)
     removed = _remove_exact_cards_from_hand(target_player, discard_cards)
@@ -60507,29 +60654,62 @@ def resolve_target_player_discard_spell(
         phase=phase or "resolution",
         rng=rng,
     )
-    emit_replay_event(
-        "target_player_discard_resolved",
-        player=player.name,
-        card=card.get("name", "?"),
-        target_player=getattr(target_player, "name", "?"),
-        target_reason=target_reason,
-        requested_discard_count=discard_count,
-        discarded_count=len(removed),
-        discard_random=discard_random,
-        discarded=[discarded.get("name", "?") for discarded in removed],
-        discarded_to_graveyard=[
+    payload = {
+        "player": player.name,
+        "card": card.get("name", "?"),
+        "target_player": getattr(target_player, "name", "?"),
+        "target_reason": target_reason,
+        "trigger": trigger or effect_data.get("trigger"),
+        "effect": "target_player_discard",
+        "requested_discard_count": discard_count,
+        "discarded_count": len(removed),
+        "discard_random": discard_random,
+        "discarded": [discarded.get("name", "?") for discarded in removed],
+        "discarded_to_graveyard": [
             discarded.get("name", "?")
             for discarded in discard_resolution.get("to_graveyard", [])
         ],
-        discarded_to_top=[
+        "discarded_to_top": [
             discarded.get("name", "?")
             for discarded in discard_resolution.get("to_top", [])
         ],
-        hand_size_before=hand_size_before,
-        hand_size_after=len(getattr(target_player, "hand", []) or []),
-        turn=turn,
-        phase=phase or "resolution",
+        "hand_size_before": hand_size_before,
+        "hand_size_after": len(getattr(target_player, "hand", []) or []),
+        "turn": turn,
+        "phase": phase or "resolution",
         **replay_rule_fields(effect_data),
+    }
+    if effect_data.get("damaged_player"):
+        payload["damaged_player"] = effect_data.get("damaged_player")
+    if effect_data.get("reason") is not None:
+        payload["reason"] = effect_data.get("reason")
+    if effect_data.get("source") is not None:
+        payload["source"] = effect_data.get("source")
+    emit_replay_event(event_name, **payload)
+    return payload
+
+
+def resolve_target_player_discard_spell(
+    player,
+    opponents,
+    card,
+    effect_data,
+    turn,
+    rng,
+    *,
+    phase=None,
+    all_players=None,
+):
+    return resolve_target_player_discard_effect(
+        player,
+        opponents,
+        card,
+        effect_data,
+        turn,
+        rng,
+        phase=phase,
+        all_players=all_players,
+        event_name="target_player_discard_resolved",
     )
 
 
@@ -65833,6 +66013,15 @@ def combat_damage_steps(attacker, opponents, target, attackers, block_assignment
                 rng=rng,
                 all_players=all_players or [attacker, *list(opponents or [])],
                 stack=stack,
+            )
+            resolve_combat_damage_discard_triggers(
+                attacker,
+                damaging_creatures_to_player,
+                target,
+                turn,
+                phase="first_strike_damage" if first_strike_phase else "combat_damage",
+                rng=rng,
+                all_players=all_players or [attacker, *list(opponents or [])],
             )
         destroy_lethal_creatures()
 

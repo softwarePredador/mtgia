@@ -214,6 +214,9 @@ STATIC_GENERIC_COST_REDUCTION_SCOPE = "xmage_static_generic_cost_reduction_for_m
 STATIC_GENERIC_COST_INCREASE_SCOPE = "xmage_static_generic_cost_increase_for_matching_spells_v1"
 TARGET_DRAW_SCOPE = "xmage_fixed_target_player_draw_spell_v1"
 TARGET_PLAYER_DISCARD_SCOPE = "xmage_fixed_target_player_discard_spell_v1"
+ETB_TARGET_PLAYER_DISCARD_CREATURE_SCOPE = "xmage_creature_etb_target_player_discard_v1"
+DIES_TARGET_PLAYER_DISCARD_CREATURE_SCOPE = "xmage_creature_dies_target_player_discard_v1"
+COMBAT_DAMAGE_DISCARD_CREATURE_SCOPE = "xmage_creature_combat_damage_target_player_discard_v1"
 PREVENT_ALL_COMBAT_DAMAGE_SPELL_SCOPE = "xmage_prevent_all_combat_damage_spell_v1"
 PREVENT_DAMAGE_FROM_CREATURES_SPELL_SCOPE = "xmage_prevent_damage_from_creatures_spell_v1"
 DRAW_DISCARD_SPELL_SCOPE = "xmage_fixed_draw_discard_spell_v1"
@@ -9683,6 +9686,39 @@ def is_creature_combat_damage_draw_unit(row: dict[str, Any]) -> bool:
     )
 
 
+def is_creature_etb_target_player_discard_unit(row: dict[str, Any]) -> bool:
+    abilities = ability_classes(row)
+    remaining = abilities - {"EntersBattlefieldTriggeredAbility"}
+    return (
+        effect_classes(row) == {"DiscardTargetEffect"}
+        and "EntersBattlefieldTriggeredAbility" in abilities
+        and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
+        and set(row.get("xmage_signals") or []).issubset({"targeting", "triggered_ability"})
+    )
+
+
+def is_creature_dies_target_player_discard_unit(row: dict[str, Any]) -> bool:
+    abilities = ability_classes(row)
+    remaining = abilities - {"DiesSourceTriggeredAbility"}
+    return (
+        effect_classes(row) == {"DiscardTargetEffect"}
+        and "DiesSourceTriggeredAbility" in abilities
+        and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
+        and set(row.get("xmage_signals") or []).issubset({"targeting", "triggered_ability"})
+    )
+
+
+def is_creature_combat_damage_target_player_discard_unit(row: dict[str, Any]) -> bool:
+    abilities = ability_classes(row)
+    remaining = abilities - {"DealsCombatDamageToAPlayerTriggeredAbility"}
+    return (
+        effect_classes(row) == {"DiscardTargetEffect"}
+        and "DealsCombatDamageToAPlayerTriggeredAbility" in abilities
+        and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
+        and set(row.get("xmage_signals") or []).issubset({"triggered_ability"})
+    )
+
+
 def is_spell_cast_draw_engine_unit(row: dict[str, Any]) -> bool:
     if str(row.get("adapter_work_unit") or "") != DRAW_ENGINE_UNIT:
         return False
@@ -16389,6 +16425,139 @@ def fixed_target_player_discard_spell_from_source(source: str) -> dict[str, Any]
     }
 
 
+def _discard_count_phrase_to_int(value: str) -> int:
+    token = str(value or "").strip().lower()
+    if token in {"a", "an"}:
+        return 1
+    if token.isdigit():
+        return int(token)
+    return number_word_to_int(token)
+
+
+def triggered_target_player_discard_from_source(
+    source: str,
+    *,
+    trigger_class: str,
+    damaged_player_target: bool = False,
+) -> dict[str, Any] | str:
+    text = source or ""
+    unsupported_markers = {
+        "DoIfCostPaid",
+        "ConditionalOneShotEffect",
+        "MultikickerAbility",
+        "KickerAbility",
+        "DevourAbility",
+        "RaidCondition",
+        "ManaWasSpentCondition",
+        "GetXValue",
+        "DynamicValue",
+        "ZuberasDiedDynamicValue",
+    }
+    if any(marker in text for marker in unsupported_markers):
+        return "target_player_discard_trigger_source_not_simple"
+    if trigger_class not in text:
+        return "target_player_discard_trigger_source_trigger_mismatch"
+    matches = re.findall(
+        r"\bDiscardTargetEffect\s*\(\s*(\d+)(?:\s*,\s*(true|false))?\s*\)",
+        text,
+        re.S,
+    )
+    if len(matches) != 1:
+        return "target_player_discard_trigger_source_not_simple"
+    count_raw, random_raw = matches[0]
+    discard_count = int(count_raw)
+    if discard_count <= 0:
+        return "target_player_discard_trigger_source_count_not_fixed"
+    target_controller = "damaged_player"
+    if not damaged_player_target:
+        has_target_opponent = bool(re.search(r"new\s+TargetOpponent\s*\(", text))
+        has_target_player = bool(re.search(r"new\s+TargetPlayer\s*\(", text))
+        if has_target_opponent == has_target_player:
+            return "target_player_discard_trigger_source_target_not_supported"
+        target_controller = "target_opponent" if has_target_opponent else "target_player"
+    return {
+        "discard_count": discard_count,
+        "discard_random": random_raw == "true",
+        "target_controller": target_controller,
+        "target_preference": "opponent",
+        "xmage_effect_class": "DiscardTargetEffect",
+    }
+
+
+def etb_target_player_discard_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    text = re.sub(r"\s+", " ", oracle_text_after_leading_static_keywords(metadata)).strip()
+    prefix = r"when this creature enters(?: the battlefield)?"
+    patterns = [
+        (
+            rf"^{prefix}, you may have target (?P<target>opponent|player) discard "
+            rf"(?P<count>a|an|one|two|three|four|five|\d+) cards?(?P<random> at random)?\.?$",
+            True,
+        ),
+        (
+            rf"^{prefix}, target (?P<target>opponent|player) discards "
+            rf"(?P<count>a|an|one|two|three|four|five|\d+) cards?(?P<random> at random)?\.?$",
+            False,
+        ),
+    ]
+    for pattern, optional in patterns:
+        match = re.fullmatch(pattern, text)
+        if not match:
+            continue
+        count = _discard_count_phrase_to_int(match.group("count"))
+        if count <= 0:
+            return "etb_target_player_discard_oracle_count_not_fixed"
+        target = match.group("target")
+        return {
+            "discard_count": count,
+            "discard_random": bool(match.group("random")),
+            "target_controller": "target_opponent" if target == "opponent" else "target_player",
+            "target_preference": "opponent",
+            "optional": optional,
+        }
+    return "etb_target_player_discard_oracle_not_simple"
+
+
+def dies_target_player_discard_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    text = re.sub(r"\s+", " ", oracle_text_after_leading_static_keywords(metadata)).strip()
+    match = re.fullmatch(
+        r"when this creature dies, target (?P<target>opponent|player) discards "
+        r"(?P<count>a|an|one|two|three|four|five|\d+) cards?(?P<random> at random)?\.?",
+        text,
+    )
+    if not match:
+        return "dies_target_player_discard_oracle_not_simple"
+    count = _discard_count_phrase_to_int(match.group("count"))
+    if count <= 0:
+        return "dies_target_player_discard_oracle_count_not_fixed"
+    target = match.group("target")
+    return {
+        "discard_count": count,
+        "discard_random": bool(match.group("random")),
+        "target_controller": "target_opponent" if target == "opponent" else "target_player",
+        "target_preference": "opponent",
+    }
+
+
+def combat_damage_target_player_discard_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    text = re.sub(r"\s+", " ", oracle_text_after_leading_static_keywords(metadata)).strip()
+    match = re.fullmatch(
+        r"whenever this creature deals combat damage to a player, that player discards "
+        r"(?P<count>a|an|one|two|three|four|five|\d+) cards?(?P<random> at random)?\.?",
+        text,
+    )
+    if not match:
+        return "combat_damage_target_player_discard_oracle_not_simple"
+    count = _discard_count_phrase_to_int(match.group("count"))
+    if count <= 0:
+        return "combat_damage_target_player_discard_oracle_count_not_fixed"
+    return {
+        "discard_count": count,
+        "discard_random": bool(match.group("random")),
+        "target_controller": "damaged_player",
+        "target_preference": "damaged_player",
+    }
+
+
 def activated_draw_discard_from_source(source: str) -> dict[str, Any] | str:
     text = source or ""
     if "Zone.GRAVEYARD" in text:
@@ -21593,6 +21762,12 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "fixed controller life-gain plus draw-card spell"
     elif scope == TARGET_PLAYER_DISCARD_SCOPE:
         scope_kind = "fixed target-player discard spell"
+    elif scope == ETB_TARGET_PLAYER_DISCARD_CREATURE_SCOPE:
+        scope_kind = "creature ETB triggered fixed target-player discard ability"
+    elif scope == DIES_TARGET_PLAYER_DISCARD_CREATURE_SCOPE:
+        scope_kind = "creature dies triggered fixed target-player discard ability"
+    elif scope == COMBAT_DAMAGE_DISCARD_CREATURE_SCOPE:
+        scope_kind = "creature combat-damage-to-player triggered fixed target-player discard ability"
     elif scope == PREVENT_ALL_COMBAT_DAMAGE_SPELL_SCOPE:
         scope_kind = "fixed spell-resolution prevention of all combat damage until end of turn"
     elif scope == PREVENT_DAMAGE_FROM_CREATURES_SPELL_SCOPE:
@@ -21817,6 +21992,11 @@ def split_row(
     etb_draw_discard_creature_unit = is_creature_etb_draw_discard_unit(row)
     dies_draw_creature_unit = is_creature_dies_draw_unit(row)
     combat_damage_draw_creature_unit = is_creature_combat_damage_draw_unit(row)
+    etb_target_player_discard_creature_unit = is_creature_etb_target_player_discard_unit(row)
+    dies_target_player_discard_creature_unit = is_creature_dies_target_player_discard_unit(row)
+    combat_damage_target_player_discard_creature_unit = (
+        is_creature_combat_damage_target_player_discard_unit(row)
+    )
     dies_damage_creature_unit = is_creature_dies_damage_unit(row)
     spell_cast_draw_engine_unit = is_spell_cast_draw_engine_unit(row)
     spell_cast_add_counters_source_unit = is_spell_cast_add_counters_source_unit(row)
@@ -21962,6 +22142,9 @@ def split_row(
         and not etb_draw_discard_creature_unit
         and not dies_draw_creature_unit
         and not combat_damage_draw_creature_unit
+        and not etb_target_player_discard_creature_unit
+        and not dies_target_player_discard_creature_unit
+        and not combat_damage_target_player_discard_creature_unit
         and not dies_damage_creature_unit
         and not spell_cast_draw_engine_unit
         and not spell_cast_add_counters_source_unit
@@ -22053,6 +22236,9 @@ def split_row(
         and not etb_draw_discard_creature_unit
         and not dies_draw_creature_unit
         and not combat_damage_draw_creature_unit
+        and not etb_target_player_discard_creature_unit
+        and not dies_target_player_discard_creature_unit
+        and not combat_damage_target_player_discard_creature_unit
         and not dies_damage_creature_unit
         and not spell_cast_draw_engine_unit
         and not spell_cast_add_counters_source_unit
@@ -26512,6 +26698,154 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_creature_combat_damage_draw_cards",
+        ), "selected_exact_scope"
+
+    if etb_target_player_discard_creature_unit:
+        if not is_creature_metadata(metadata):
+            return None, "etb_target_player_discard_not_creature"
+        oracle_discard = etb_target_player_discard_from_oracle(metadata)
+        if isinstance(oracle_discard, str):
+            return None, oracle_discard
+        source_discard = triggered_target_player_discard_from_source(
+            source_text,
+            trigger_class="EntersBattlefieldTriggeredAbility",
+        )
+        if isinstance(source_discard, str):
+            return None, source_discard.replace(
+                "target_player_discard_trigger",
+                "etb_target_player_discard",
+            )
+        for key in ("discard_count", "discard_random", "target_controller"):
+            if oracle_discard.get(key) != source_discard.get(key):
+                return None, "etb_target_player_discard_source_oracle_mismatch"
+        keyword_list = ordered_keywords(keywords_from_ability_classes(row))
+        discard_count = int(oracle_discard["discard_count"])
+        effect_json = {
+            "effect": "creature",
+            "battle_model_scope": ETB_TARGET_PLAYER_DISCARD_CREATURE_SCOPE,
+            "ability_kind": "triggered",
+            "trigger": "enters_battlefield",
+            "trigger_effect": "target_player_discard",
+            "etb_target_player_discard": True,
+            "etb_discard_count": discard_count,
+            "discard_count": discard_count,
+            "count": discard_count,
+            "discard_random": bool(oracle_discard.get("discard_random")),
+            "target_controller": oracle_discard["target_controller"],
+            "target_preference": oracle_discard.get("target_preference") or "opponent",
+            "xmage_effect_class": "DiscardTargetEffect",
+            "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        }
+        if oracle_discard.get("optional"):
+            effect_json["etb_target_player_discard_optional"] = True
+        if keyword_list:
+            effect_json["keywords"] = keyword_list
+            effect_json["_keywords_are_self"] = True
+            for keyword in keyword_list:
+                effect_json[keyword] = True
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_creature_etb_target_player_discard",
+        ), "selected_exact_scope"
+
+    if dies_target_player_discard_creature_unit:
+        if not is_creature_metadata(metadata):
+            return None, "dies_target_player_discard_not_creature"
+        oracle_discard = dies_target_player_discard_from_oracle(metadata)
+        if isinstance(oracle_discard, str):
+            return None, oracle_discard
+        source_discard = triggered_target_player_discard_from_source(
+            source_text,
+            trigger_class="DiesSourceTriggeredAbility",
+        )
+        if isinstance(source_discard, str):
+            return None, source_discard.replace(
+                "target_player_discard_trigger",
+                "dies_target_player_discard",
+            )
+        for key in ("discard_count", "discard_random", "target_controller"):
+            if oracle_discard.get(key) != source_discard.get(key):
+                return None, "dies_target_player_discard_source_oracle_mismatch"
+        keyword_list = ordered_keywords(keywords_from_ability_classes(row))
+        discard_count = int(oracle_discard["discard_count"])
+        effect_json = {
+            "effect": "creature",
+            "battle_model_scope": DIES_TARGET_PLAYER_DISCARD_CREATURE_SCOPE,
+            "ability_kind": "triggered",
+            "trigger": "dies",
+            "trigger_effect": "target_player_discard",
+            "dies_trigger_effect": "target_player_discard",
+            "dies_target_player_discard": True,
+            "dies_discard_count": discard_count,
+            "discard_count": discard_count,
+            "count": discard_count,
+            "discard_random": bool(oracle_discard.get("discard_random")),
+            "target_controller": oracle_discard["target_controller"],
+            "target_preference": oracle_discard.get("target_preference") or "opponent",
+            "xmage_effect_class": "DiscardTargetEffect",
+            "xmage_ability_class": "DiesSourceTriggeredAbility",
+        }
+        if keyword_list:
+            effect_json["keywords"] = keyword_list
+            effect_json["_keywords_are_self"] = True
+            for keyword in keyword_list:
+                effect_json[keyword] = True
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_creature_dies_target_player_discard",
+        ), "selected_exact_scope"
+
+    if combat_damage_target_player_discard_creature_unit:
+        if not is_creature_metadata(metadata):
+            return None, "combat_damage_target_player_discard_not_creature"
+        oracle_discard = combat_damage_target_player_discard_from_oracle(metadata)
+        if isinstance(oracle_discard, str):
+            return None, oracle_discard
+        source_discard = triggered_target_player_discard_from_source(
+            source_text,
+            trigger_class="DealsCombatDamageToAPlayerTriggeredAbility",
+            damaged_player_target=True,
+        )
+        if isinstance(source_discard, str):
+            return None, source_discard.replace(
+                "target_player_discard_trigger",
+                "combat_damage_target_player_discard",
+            )
+        for key in ("discard_count", "discard_random", "target_controller"):
+            if oracle_discard.get(key) != source_discard.get(key):
+                return None, "combat_damage_target_player_discard_source_oracle_mismatch"
+        keyword_list = ordered_keywords(keywords_from_source_added_ability_classes(source_text, row))
+        discard_count = int(oracle_discard["discard_count"])
+        effect_json = {
+            "effect": "creature",
+            "battle_model_scope": COMBAT_DAMAGE_DISCARD_CREATURE_SCOPE,
+            "ability_kind": "triggered",
+            "trigger": "combat_damage_to_player",
+            "trigger_effect": "target_player_discard",
+            "combat_damage_player_discard": True,
+            "combat_damage_discard_count": discard_count,
+            "discard_count": discard_count,
+            "count": discard_count,
+            "discard_random": bool(oracle_discard.get("discard_random")),
+            "target_controller": "damaged_player",
+            "target_preference": "damaged_player",
+            "xmage_effect_class": "DiscardTargetEffect",
+            "xmage_ability_class": "DealsCombatDamageToAPlayerTriggeredAbility",
+        }
+        if keyword_list:
+            effect_json["keywords"] = keyword_list
+            effect_json["_keywords_are_self"] = True
+            for keyword in keyword_list:
+                effect_json[keyword] = True
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_creature_combat_damage_target_player_discard",
         ), "selected_exact_scope"
 
     if dies_recursion_creature_unit:
@@ -31805,6 +32139,9 @@ def build_exact_split_report(
             and not is_creature_etb_draw_lose_life_unit(row)
             and not is_creature_dies_draw_unit(row)
             and not is_creature_combat_damage_draw_unit(row)
+            and not is_creature_etb_target_player_discard_unit(row)
+            and not is_creature_dies_target_player_discard_unit(row)
+            and not is_creature_combat_damage_target_player_discard_unit(row)
             and not is_creature_dies_damage_unit(row)
             and not is_spell_cast_draw_engine_unit(row)
             and not is_spell_cast_add_counters_source_unit(row)
@@ -31904,6 +32241,9 @@ def build_exact_split_report(
                 "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect + LoseLifeSourceControllerEffect, EntersBattlefieldTriggeredAbility, exact fixed draw/life-loss Oracle/source agreement, and only static self keywords",
                 "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect and DiesSourceTriggeredAbility plus only static self keywords",
                 "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect and DealsCombatDamageToAPlayerTriggeredAbility, exact fixed combat-damage-to-player draw Oracle/source agreement, and only static self keywords",
+                "DiscardTargetEffect rows with EntersBattlefieldTriggeredAbility, exact fixed ETB target-player/opponent discard Oracle/source agreement, and only static self keywords",
+                "DiscardTargetEffect rows with DiesSourceTriggeredAbility, exact fixed dies target-player/opponent discard Oracle/source agreement, and only static self keywords",
+                "DiscardTargetEffect rows with DealsCombatDamageToAPlayerTriggeredAbility, exact fixed damaged-player discard Oracle/source agreement, and only static self keywords",
                 "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect and SpellCastControllerTriggeredAbility, exact draw count, and supported spell filters",
                 "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawDiscardControllerEffect and SimpleActivatedAbility, exact draw-then-discard counts, and mana/tap/life/source self-sacrifice costs only",
                 "add_counters::source_add_counters_variant_v1 rows with AddCountersSourceEffect and SpellCastControllerTriggeredAbility, exact source self-counter count, supported spell filters, and only static self keywords",
