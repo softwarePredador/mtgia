@@ -18369,6 +18369,68 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "board_wipe_damage_amount_not_fixed")
 
+    def test_damage_wipe_damaged_this_turn_scope_maps_when_source_matches(self) -> None:
+        row = queue_row(split.BOARD_WIPE_UNIT, effect_classes=["DamageAllEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Inflame deals 2 damage to each creature dealt damage this turn."),
+            source_text=(
+                "private static final FilterCreaturePermanent filter = "
+                "new FilterCreaturePermanent(\"creature dealt damage this turn\");"
+                "static { filter.add(WasDealtDamageThisTurnPredicate.instance); }"
+                "this.getSpellAbility().addEffect(new DamageAllEffect(2, filter));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["damage_scope"], "each_creature_dealt_damage_this_turn")
+
+    def test_damage_wipe_damaged_this_turn_scope_requires_matching_source(self) -> None:
+        row = queue_row(split.BOARD_WIPE_UNIT, effect_classes=["DamageAllEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Inflame deals 2 damage to each creature dealt damage this turn."),
+            source_text="this.getSpellAbility().addEffect(new DamageAllEffect(2));",
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "board_wipe_damage_source_scope_mismatch")
+
+    def test_damage_wipe_blocking_or_blocked_scope_maps_when_source_matches(self) -> None:
+        row = queue_row(split.BOARD_WIPE_UNIT, effect_classes=["DamageAllEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Warpath deals 3 damage to each blocking creature and each blocked creature."),
+            source_text=(
+                "private static final FilterCreaturePermanent filter = "
+                "new FilterCreaturePermanent(\"blocking creature and each blocked creature\");"
+                "static { filter.add(Predicates.or("
+                "BlockingPredicate.instance, BlockedPredicate.instance)); }"
+                "this.getSpellAbility().addEffect(new DamageAllEffect(3, filter));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["damage_scope"], "each_blocking_or_blocked_creature")
+
+    def test_damage_wipe_blocking_or_blocked_scope_requires_matching_source(self) -> None:
+        row = queue_row(split.BOARD_WIPE_UNIT, effect_classes=["DamageAllEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Warpath deals 3 damage to each blocking creature and each blocked creature."),
+            source_text=(
+                "private static final FilterCreaturePermanent filter = "
+                "new FilterCreaturePermanent(\"blocking creature\");"
+                "static { filter.add(BlockingPredicate.instance); }"
+                "this.getSpellAbility().addEffect(new DamageAllEffect(3, filter));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "board_wipe_damage_source_scope_mismatch")
+
     def test_damage_wipe_excluded_subtype_scope_maps_when_source_matches(self) -> None:
         row = queue_row(split.BOARD_WIPE_UNIT, effect_classes=["DamageAllEffect"])
         proposal, reason = split.split_row(

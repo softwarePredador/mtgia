@@ -18394,6 +18394,115 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_damage_wipe_respects_damaged_this_turn_scope(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        opponent.battlefield.extend(
+            [
+                {
+                    "name": "Damaged Bear",
+                    "type_line": "Creature - Bear",
+                    "toughness": 2,
+                    "damage_marked_this_turn": 1,
+                },
+                {
+                    "name": "Fresh Bear",
+                    "type_line": "Creature - Bear",
+                    "toughness": 2,
+                },
+            ]
+        )
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Inflame",
+                "type_line": "Instant",
+                "oracle_text": "Fixture Inflame deals 2 damage to each creature dealt damage this turn.",
+            },
+            turn=15,
+            rng=random.Random(15),
+            effect_data_override={
+                "effect": "damage_wipe",
+                "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+                "amount": 2,
+                "damage": 2,
+                "damage_scope": "each_creature_dealt_damage_this_turn",
+            },
+        )
+
+        self.assertEqual([card["name"] for card in opponent.battlefield], ["Fresh Bear"])
+        self.assertEqual([card["name"] for card in opponent.graveyard], ["Damaged Bear"])
+        self.assertTrue(
+            any(
+                event == "damage_wipe_resolved"
+                and data.get("card") == "Fixture Inflame"
+                and data.get("damage_scope") == "each_creature_dealt_damage_this_turn"
+                and data.get("opponent_creatures_destroyed") == 1
+                for event, data in self.events
+            )
+        )
+
+    def test_damage_wipe_respects_blocking_or_blocked_scope(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        opponent.battlefield.extend(
+            [
+                {
+                    "name": "Blocking Soldier",
+                    "type_line": "Creature - Soldier",
+                    "toughness": 3,
+                    "blocking": True,
+                },
+                {
+                    "name": "Blocked Giant",
+                    "type_line": "Creature - Giant",
+                    "toughness": 3,
+                    "blocked": True,
+                },
+                {
+                    "name": "Idle Bear",
+                    "type_line": "Creature - Bear",
+                    "toughness": 3,
+                },
+            ]
+        )
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Warpath",
+                "type_line": "Instant",
+                "oracle_text": "Fixture Warpath deals 3 damage to each blocking creature and each blocked creature.",
+            },
+            turn=16,
+            rng=random.Random(16),
+            effect_data_override={
+                "effect": "damage_wipe",
+                "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+                "amount": 3,
+                "damage": 3,
+                "damage_scope": "each_blocking_or_blocked_creature",
+            },
+        )
+
+        self.assertEqual([card["name"] for card in opponent.battlefield], ["Idle Bear"])
+        self.assertEqual(
+            [card["name"] for card in opponent.graveyard],
+            ["Blocking Soldier", "Blocked Giant"],
+        )
+        self.assertTrue(
+            any(
+                event == "damage_wipe_resolved"
+                and data.get("card") == "Fixture Warpath"
+                and data.get("damage_scope") == "each_blocking_or_blocked_creature"
+                and data.get("opponent_creatures_destroyed") == 2
+                for event, data in self.events
+            )
+        )
+
     def test_simple_activated_recursion_permanent_pays_colored_taps_and_returns_matching_card(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

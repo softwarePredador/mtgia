@@ -52111,6 +52111,15 @@ def apply_damage_wipe(player, opponents, card, effect_data, turn, *, finish_spel
                     continue
                 if damage_scope == "each_attacking_creature" and not bool(permanent.get("attacking")):
                     continue
+                if damage_scope == "each_blocking_or_blocked_creature" and not (
+                    bool(permanent.get("blocking")) or bool(permanent.get("blocked"))
+                ):
+                    continue
+                if (
+                    damage_scope == "each_creature_dealt_damage_this_turn"
+                    and not permanent_was_dealt_damage_this_turn(permanent, turn)
+                ):
+                    continue
                 if damage_scope == "each_nonartifact_creature" and "artifact" in _permanent_type_line(permanent):
                     continue
                 if damage_exclude_tokens and (

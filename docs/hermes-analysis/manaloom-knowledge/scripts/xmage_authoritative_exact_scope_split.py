@@ -5910,6 +5910,10 @@ def damage_all_spec_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | No
         return {"damage_scope": "each_creature_without_flying"}
     if re.match(r"^.+ deals? \d+ damage to each attacking creature\.?$", text):
         return {"damage_scope": "each_attacking_creature"}
+    if re.match(r"^.+ deals? \d+ damage to each blocking creature and each blocked creature\.?$", text):
+        return {"damage_scope": "each_blocking_or_blocked_creature"}
+    if re.match(r"^.+ deals? \d+ damage to each creature dealt damage this turn\.?$", text):
+        return {"damage_scope": "each_creature_dealt_damage_this_turn"}
     if re.match(r"^.+ deals? \d+ damage to each tapped creature\.?$", text):
         return {"damage_scope": "each_tapped_creature"}
     if re.match(r"^.+ deals? \d+ damage to each untapped creature\.?$", text):
@@ -5963,6 +5967,16 @@ def damage_all_scope_from_oracle(metadata: dict[str, Any]) -> str | None:
 
 
 def damage_all_source_matches_spec(source: str, spec: dict[str, Any]) -> bool:
+    damage_scope = str(spec.get("damage_scope") or "")
+    if (
+        damage_scope == "each_creature_dealt_damage_this_turn"
+        and "WasDealtDamageThisTurnPredicate.instance" not in (source or "")
+    ):
+        return False
+    if damage_scope == "each_blocking_or_blocked_creature":
+        text = source or ""
+        if "BlockingPredicate.instance" not in text or "BlockedPredicate.instance" not in text:
+            return False
     if spec.get("damage_exclude_tokens") and "TokenPredicate.FALSE" not in (source or ""):
         return False
     required_colors = ordered_color_symbols(
