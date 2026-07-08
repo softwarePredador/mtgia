@@ -109,6 +109,34 @@ def test_counter_target_stack_object_execution_scenario_is_manifested() -> None:
     assert scenario["nonmatching_stack_effect"]["effect"] == "mana_ability"
 
 
+def test_counter_draw_special_target_execution_scenario_is_manifested() -> None:
+    proposal = {
+        "normalized_name": "keep safe",
+        "card_name": "Keep Safe",
+        "oracle_hash": "hash-keep-safe",
+        "logical_rule_key": "battle_rule_v1:keep-safe",
+        "effect_json": {
+            "effect": "counter",
+            "battle_model_scope": "xmage_counter_target_and_draw_card_spell_v1",
+            "target": "spell_targeting_permanent_you_control",
+            "target_constraints": {
+                "zone": "stack",
+                "stack_object": "spell",
+                "spell_targets": "permanent_you_control",
+            },
+            "draw_on_counter": 1,
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    assert scenario["type"] == "counter_target_response"
+    assert scenario["expected_cards_drawn"] == 1
+    assert scenario["target_stack_effect"]["targets"][0]["target_controller"] == "Responder"
+    assert scenario["nonmatching_stack_effect"]["targets"][0]["target_controller"] == "Active"
+
+
 def test_counter_target_creature_power_or_toughness_fixture_is_manifested() -> None:
     proposal = {
         "normalized_name": "stern scolding",

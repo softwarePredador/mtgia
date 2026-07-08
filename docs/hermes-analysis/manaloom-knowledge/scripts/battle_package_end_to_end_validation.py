@@ -5577,6 +5577,12 @@ def run_counter_target_response(
     active = battle.Player(str(scenario.get("active_player") or "Active"), None, [])
     responder = battle.Player(str(scenario.get("responder") or "Responder"), None, [])
     add_manifest_mana(responder, scenario.get("responder_mana") or {"generic": 3, "blue": 2})
+    expected_cards_drawn = int(scenario.get("expected_cards_drawn") or response_card.get("draw_on_counter") or 0)
+    if expected_cards_drawn and not getattr(responder, "library", []):
+        responder.library = [
+            {"name": f"E2E Counter Draw {index + 1}", "type_line": "Instant", "cmc": 1}
+            for index in range(expected_cards_drawn)
+        ]
     responder.hand = [response_card]
     target_stack_object = dict(
         scenario.get("target_stack_object")
@@ -5596,6 +5602,7 @@ def run_counter_target_response(
         response_card,
         target_stack_object,
         stack_item=target_stack_item,
+        counter_controller=responder,
     ):
         fail("battle_execution", f"{response_card['name']} cannot target legal stack fixture")
 
@@ -5612,6 +5619,7 @@ def run_counter_target_response(
             response_card,
             dict(nonmatching_stack_object),
             stack_item=nonmatching_stack_item,
+            counter_controller=responder,
         ):
             fail("battle_execution", f"{response_card['name']} can target illegal stack fixture")
 
@@ -5642,6 +5650,11 @@ def run_counter_target_response(
     )
     if counter_event is None:
         fail("battle_events", f"missing {response_card['name']} spell_countered event")
+    if expected_cards_drawn and int(counter_event.get("cards_drawn") or 0) != expected_cards_drawn:
+        fail(
+            "battle_events",
+            f"{response_card['name']} expected to draw {expected_cards_drawn} on counter; event={counter_event.get('cards_drawn')}",
+        )
 
     return {
         "scenario": scenario.get("name"),
@@ -5649,6 +5662,7 @@ def run_counter_target_response(
         "target": target_stack_object.get("name"),
         "target_stack_effect": target_stack_effect.get("effect"),
         "countered": actual_countered,
+        "cards_drawn": int(counter_event.get("cards_drawn") or 0),
         "nonmatching_target": (
             nonmatching_stack_object.get("name")
             if isinstance(nonmatching_stack_object, dict)

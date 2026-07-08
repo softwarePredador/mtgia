@@ -9594,6 +9594,14 @@ def _counter_target_label_constraints(target_label):
         constraints["card_types"] = ["creature", "planeswalker"]
     elif target == "instant_or_sorcery_spell":
         constraints["spell_types"] = ["instant", "sorcery"]
+    elif target == "spell_targeting_creature":
+        constraints["spell_targets"] = "creature"
+    elif target == "spell_targeting_permanent_you_control":
+        constraints["spell_targets"] = "permanent_you_control"
+    elif target == "spell_targeting_you_or_permanent_you_control":
+        constraints["spell_targets"] = "you_or_permanent_you_control"
+    elif target == "spell_cast_from_graveyard":
+        constraints["source_zone"] = "graveyard"
     elif target == "noncreature_spell":
         constraints["exclude_card_types"] = ["creature"]
     elif target in {"creature_spell", "artifact_spell", "enchantment_spell"}:
@@ -9651,7 +9659,123 @@ def _counter_target_is_legendary(target_card):
     return "legendary" in supertypes
 
 
-def _counter_target_matches_constraints(counter_effect, target_card, stack_item=None):
+def _stack_item_source_zone(stack_item, target_card=None):
+    effect_data = getattr(stack_item, "effect_data", None) or {}
+    cast_context = effect_data.get("_cast_context") or {}
+    if isinstance(cast_context, dict):
+        source_zone = cast_context.get("source_zone") or cast_context.get("from_zone")
+        if source_zone:
+            return str(source_zone).strip().lower()
+    for source in (effect_data, target_card or {}):
+        if isinstance(source, dict):
+            source_zone = source.get("source_zone") or source.get("from_zone")
+            if source_zone:
+                return str(source_zone).strip().lower()
+    return "hand"
+
+
+def _stack_item_targets(stack_item):
+    effect_data = getattr(stack_item, "effect_data", None) or {}
+    targets = effect_data.get("targets")
+    if targets is None and isinstance(effect_data.get("_cast_context"), dict):
+        targets = effect_data["_cast_context"].get("targets")
+    if targets is None:
+        targets = getattr(stack_item, "targets", None)
+    return list(targets or [])
+
+
+def _controller_name(controller):
+    if controller is None:
+        return None
+    return str(getattr(controller, "name", controller) or "").strip()
+
+
+def _target_controller_name(target):
+    if not isinstance(target, dict):
+        return None
+    value = target.get("target_controller") or target.get("controller") or target.get("owner")
+    if value is None:
+        return None
+    return str(getattr(value, "name", value) or "").strip()
+
+
+def _stack_target_is_creature(target):
+    if not isinstance(target, dict):
+        return False
+    type_line = str(target.get("type_line") or "").lower()
+    if "creature" in type_line:
+        return True
+    card_types = {
+        str(value or "").strip().lower()
+        for value in _as_list(target.get("card_types") or target.get("types"))
+        if str(value or "").strip()
+    }
+    return (
+        "creature" in card_types
+        or str(target.get("target_type") or target.get("type") or "").strip().lower() == "creature"
+        or bool(target.get("is_creature"))
+    )
+
+
+def _stack_target_is_permanent(target):
+    if not isinstance(target, dict):
+        return False
+    target_kind = str(target.get("target_kind") or target.get("zone") or "").strip().lower()
+    if target_kind == "battlefield":
+        return True
+    type_line = str(target.get("type_line") or "").lower()
+    if any(card_type in type_line for card_type in ("creature", "artifact", "enchantment", "land", "planeswalker", "battle")):
+        return True
+    return bool(target.get("is_permanent")) or str(target.get("target_type") or "").strip().lower() == "permanent"
+
+
+def _stack_target_is_controller_player(target, counter_controller):
+    controller_name = _controller_name(counter_controller)
+    if not controller_name or not isinstance(target, dict):
+        return False
+    target_name = str(
+        target.get("target_player")
+        or target.get("player")
+        or target.get("target_name")
+        or target.get("name")
+        or target.get("target")
+        or ""
+    ).strip()
+    target_type = str(target.get("target_type") or target.get("type") or "").strip().lower()
+    return target_name == controller_name and target_type in {"", "player"}
+
+
+def _stack_targets_match_spell_targets_constraint(spell_targets, stack_item, counter_controller=None):
+    targets = _stack_item_targets(stack_item)
+    if not targets:
+        return False
+    wanted = str(spell_targets or "").strip().lower()
+    controller_name = _controller_name(counter_controller)
+    if wanted == "creature":
+        return any(_stack_target_is_creature(target) for target in targets)
+    if wanted == "permanent_you_control":
+        if not controller_name:
+            return False
+        return any(
+            _stack_target_is_permanent(target)
+            and _target_controller_name(target) == controller_name
+            for target in targets
+        )
+    if wanted == "you_or_permanent_you_control":
+        if not controller_name:
+            return False
+        return any(
+            _stack_target_is_controller_player(target, counter_controller)
+            or (
+                _stack_target_is_permanent(target)
+                and _target_controller_name(target) == controller_name
+            )
+            for target in targets
+        )
+    return True
+
+
+def _counter_target_matches_constraints(counter_effect, target_card, stack_item=None, counter_controller=None):
     constraints = _counter_effect_constraints(counter_effect)
     if not constraints:
         return True
@@ -9666,7 +9790,12 @@ def _counter_target_matches_constraints(counter_effect, target_card, stack_item=
             nested_constraints = dict(base_constraints)
             nested_constraints.update(option)
             nested_effect["target_constraints"] = nested_constraints
-            if _counter_target_matches_constraints(nested_effect, target_card, stack_item=stack_item):
+            if _counter_target_matches_constraints(
+                nested_effect,
+                target_card,
+                stack_item=stack_item,
+                counter_controller=counter_controller,
+            ):
                 return True
         return False
     expected_stack_object = str(
@@ -9684,6 +9813,18 @@ def _counter_target_matches_constraints(counter_effect, target_card, stack_item=
         }:
             return False
     if constraints.get("require_legendary") and not _counter_target_is_legendary(target_card):
+        return False
+    required_source_zone = str(
+        constraints.get("source_zone") or constraints.get("spell_source_zone") or ""
+    ).strip().lower()
+    if required_source_zone and _stack_item_source_zone(stack_item, target_card) != required_source_zone:
+        return False
+    spell_targets = constraints.get("spell_targets") or constraints.get("target_spell_targets")
+    if spell_targets and not _stack_targets_match_spell_targets_constraint(
+        spell_targets,
+        stack_item,
+        counter_controller=counter_controller,
+    ):
         return False
 
     type_line = str((target_card or {}).get("type_line") or "").lower()
@@ -9778,7 +9919,7 @@ def _counter_target_matches_constraints(counter_effect, target_card, stack_item=
     return True
 
 
-def counter_can_target(counter_card, counter_effect, target_card, stack_item=None):
+def counter_can_target(counter_card, counter_effect, target_card, stack_item=None, counter_controller=None):
     if not isinstance(target_card, dict):
         return True
     if spell_cant_be_countered(target_card, stack_item=stack_item):
@@ -9789,7 +9930,12 @@ def counter_can_target(counter_card, counter_effect, target_card, stack_item=Non
     ):
         if not card_is_blue(target_card):
             return False
-    if not _counter_target_matches_constraints(counter_effect, target_card, stack_item=stack_item):
+    if not _counter_target_matches_constraints(
+        counter_effect,
+        target_card,
+        stack_item=stack_item,
+        counter_controller=counter_controller,
+    ):
         return False
     constraints = _counter_effect_constraints(counter_effect)
     target_value = card_mana_value(target_card)
@@ -10729,6 +10875,7 @@ class Player:
                     get_card_effect(card),
                     target_card,
                     stack_item=stack_item,
+                    counter_controller=self,
                 )
             ]
         return counters

@@ -19423,6 +19423,92 @@ Evidence:
 - `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260708_post_pg661_hash_backfill_new_server_final.md`
 - `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260708_post_pg661_hash_backfill_new_server_final.md`
 
+## PG662 Counter Special Target Constraint Wave
+
+PG662 added exact stack-target constraints for counters that care about what a
+spell targets or where it was cast from. This closed seven local-XMage-backed
+cards:
+
+- `Confound`: counter target spell that targets one or more creatures, then
+  draw a card;
+- `Hindering Light`: counter target spell that targets you or a permanent you
+  control, then draw a card;
+- `Keep Safe`: counter target spell that targets a permanent you control, then
+  draw a card;
+- `Laquatus's Disdain`: counter target spell cast from a graveyard, then draw a
+  card;
+- `Intervene`: counter target spell that targets a creature;
+- `Rebuff the Wicked`: counter target spell that targets a permanent you
+  control;
+- `Turn Aside`: counter target spell that targets a permanent you control.
+
+Runtime/test changes:
+
+- `counter_target_from_oracle` and `counter_target_from_source` now recognize
+  `spell_targeting_creature`, `spell_targeting_permanent_you_control`,
+  `spell_targeting_you_or_permanent_you_control`, and
+  `spell_cast_from_graveyard`;
+- `counter_target_constraints_for` emits `spell_targets` or `source_zone`
+  constraints for those targets;
+- `battle_analyst_v9.py` now evaluates stack spell targets and spell source
+  zone, using the counter controller for "you/permanent you control";
+- `xmage_batch_pg_package_builder.py` creates legal and illegal stack fixtures
+  for those constraints and preserves `draw_on_counter` in E2E required fields;
+- `battle_package_end_to_end_validation.py` validates `cards_drawn` for
+  counter+draw scenarios.
+
+PG662 apply/postcheck evidence:
+
+- split produced `7` safe package candidates:
+  `4` in `xmage_counter_target_draw_card_spell` and
+  `3` in `xmage_counter_target_spell`;
+- precheck found `7` target rows, `0` existing expected rows, and `2` stale
+  generated `Rebuff the Wicked` review-only rows to deprecate;
+- apply committed `7` promoted rows and deprecated `2` stale shadows;
+- postcheck confirmed `7/7` promoted verified/auto rows with `oracle_hash`;
+- PG -> Hermes/SQLite sync loaded `5969` PG rows, updated `5955` SQLite rows,
+  and exported a `5932` row canonical snapshot;
+- metadata sync matched `7092` PostgreSQL card rows, updated `79`
+  `deck_cards.card_id` cache rows, and left the known `1` unresolved alias;
+- E2E package validation passed PostgreSQL, SQLite/Hermes, canonical snapshot,
+  `runtime_get_card_effect`, and `7` battle-execution scenarios. The four
+  counter+draw cards each drew `1` card on counter;
+- exact-scope recheck on the rebuilt queue returned `proposal_count=0` and
+  `safe_for_batch_pg_package_count=0`.
+
+Final post-PG662 state:
+
+- global readiness:
+  `battle_and_oracle_ready=6029`, `battle_family_mapper_required=27847`,
+  `snapshot_has_verified_rule=6057`, `snapshot_has_any_rule=7260`;
+- authoritative queue:
+  `target_identity_count=24924`,
+  `xmage_authoritative_source_count=24611`,
+  `xmage_missing_source_exception_count=313`,
+  `xmage_authoritative_parser_gap_count=0`,
+  `xmage_authoritative_adapter_required_count=24611`;
+- validation gates:
+  `xmage_strategy_consistency_audit` passed `26/26`,
+  `pg_hermes_sqlite_contract_audit` passed `51/51`,
+  `operational_surface_alignment_audit` passed, and
+  `legacy_contamination_audit` passed.
+
+Evidence:
+
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260708_pg662_counter_draw_special_targets_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg662_counter_draw_special_targets_new_server_package_package.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg662_counter_draw_special_targets_new_server_apply_evidence.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg662_counter_draw_special_targets_new_server_pg_to_sqlite_sync.json`
+- `docs/hermes-analysis/master_optimizer_reports/pg662_counter_draw_special_targets_new_server_metadata_sync.json`
+- `docs/hermes-analysis/master_optimizer_reports/pg662_counter_draw_special_targets_new_server_e2e_validation.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260708_post_pg662_counter_draw_special_targets_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260708_post_pg662_counter_draw_special_targets_new_server_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260708_post_pg662_counter_draw_special_targets_new_server_recheck.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260708_post_pg662_counter_draw_special_targets_new_server_final.md`
+- `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260708_post_pg662_counter_draw_special_targets_new_server_final.md`
+- `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260708_post_pg662_counter_draw_special_targets_new_server_final.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260708_post_pg662_counter_draw_special_targets_new_server_final.md`
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

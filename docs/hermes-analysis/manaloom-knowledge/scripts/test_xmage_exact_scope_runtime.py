@@ -13876,6 +13876,179 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_counter_target_spell_targeting_creature_constraint(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        responder = self.battle.Player("Responder", None, [])
+        counter_effect = {
+            "effect": "counter",
+            "battle_model_scope": "xmage_counter_target_and_draw_card_spell_v1",
+            "target": "spell_targeting_creature",
+            "target_constraints": {
+                "zone": "stack",
+                "stack_object": "spell",
+                "spell_targets": "creature",
+            },
+            "draw_on_counter": 1,
+            "instant": True,
+        }
+        target_spell = {"name": "Target Trick", "type_line": "Instant", "cmc": 2}
+        legal_stack = self.battle.StackItem(
+            target_spell,
+            active,
+            {
+                "effect": "target_spell",
+                "targets": [
+                    {
+                        "name": "Target Bear",
+                        "type_line": "Creature - Bear",
+                        "target_type": "creature",
+                        "target_controller": "Active",
+                    }
+                ],
+            },
+        )
+        illegal_stack = self.battle.StackItem(
+            target_spell,
+            active,
+            {
+                "effect": "target_spell",
+                "targets": [{"name": "Active", "target_type": "player"}],
+            },
+        )
+
+        self.assertTrue(
+            self.battle.counter_can_target(
+                {},
+                counter_effect,
+                target_spell,
+                stack_item=legal_stack,
+                counter_controller=responder,
+            )
+        )
+        self.assertFalse(
+            self.battle.counter_can_target(
+                {},
+                counter_effect,
+                target_spell,
+                stack_item=illegal_stack,
+                counter_controller=responder,
+            )
+        )
+
+    def test_counter_target_spell_targeting_controlled_permanent_constraint(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        responder = self.battle.Player("Responder", None, [])
+        counter_effect = {
+            "effect": "counter",
+            "battle_model_scope": "xmage_counter_target_and_draw_card_spell_v1",
+            "target": "spell_targeting_permanent_you_control",
+            "target_constraints": {
+                "zone": "stack",
+                "stack_object": "spell",
+                "spell_targets": "permanent_you_control",
+            },
+            "draw_on_counter": 1,
+            "instant": True,
+        }
+        target_spell = {"name": "Target Removal", "type_line": "Instant", "cmc": 2}
+        legal_stack = self.battle.StackItem(
+            target_spell,
+            active,
+            {
+                "effect": "remove_permanent",
+                "targets": [
+                    {
+                        "name": "Protected Permanent",
+                        "type_line": "Artifact Creature - Thopter",
+                        "target_type": "permanent",
+                        "target_controller": "Responder",
+                        "zone": "battlefield",
+                    }
+                ],
+            },
+        )
+        illegal_stack = self.battle.StackItem(
+            target_spell,
+            active,
+            {
+                "effect": "remove_permanent",
+                "targets": [
+                    {
+                        "name": "Opponent Permanent",
+                        "type_line": "Creature - Bear",
+                        "target_type": "permanent",
+                        "target_controller": "Active",
+                        "zone": "battlefield",
+                    }
+                ],
+            },
+        )
+
+        self.assertTrue(
+            self.battle.counter_can_target(
+                {},
+                counter_effect,
+                target_spell,
+                stack_item=legal_stack,
+                counter_controller=responder,
+            )
+        )
+        self.assertFalse(
+            self.battle.counter_can_target(
+                {},
+                counter_effect,
+                target_spell,
+                stack_item=illegal_stack,
+                counter_controller=responder,
+            )
+        )
+
+    def test_counter_target_spell_cast_from_graveyard_constraint(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        responder = self.battle.Player("Responder", None, [])
+        counter_effect = {
+            "effect": "counter",
+            "battle_model_scope": "xmage_counter_target_and_draw_card_spell_v1",
+            "target": "spell_cast_from_graveyard",
+            "target_constraints": {
+                "zone": "stack",
+                "stack_object": "spell",
+                "source_zone": "graveyard",
+            },
+            "draw_on_counter": 1,
+            "instant": True,
+        }
+        target_spell = {"name": "Target Flashback", "type_line": "Sorcery", "cmc": 2}
+        graveyard_stack = self.battle.StackItem(
+            target_spell,
+            active,
+            {"effect": "draw_cards", "source_zone": "graveyard"},
+        )
+        hand_stack = self.battle.StackItem(
+            target_spell,
+            active,
+            {"effect": "draw_cards", "source_zone": "hand"},
+        )
+
+        self.assertTrue(
+            self.battle.counter_can_target(
+                {},
+                counter_effect,
+                target_spell,
+                stack_item=graveyard_stack,
+                counter_controller=responder,
+            )
+        )
+        self.assertFalse(
+            self.battle.counter_can_target(
+                {},
+                counter_effect,
+                target_spell,
+                stack_item=hand_stack,
+                counter_controller=responder,
+            )
+        )
+
     def test_counter_scry_scope_is_stack_response_and_scries_on_counter(self) -> None:
         active = self.battle.Player("Active", None, [])
         responder = self.battle.Player(

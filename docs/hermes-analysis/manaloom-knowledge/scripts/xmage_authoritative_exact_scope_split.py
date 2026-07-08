@@ -3395,6 +3395,17 @@ def counter_target_from_oracle(metadata: dict[str, Any]) -> str | None:
         (r"^counter target creature or planeswalker spell\.?$", "creature_or_planeswalker_spell"),
         (r"^counter target artifact or enchantment spell\.?$", "artifact_or_enchantment_spell"),
         (r"^counter target instant or sorcery spell\.?$", "instant_or_sorcery_spell"),
+        (r"^counter target spell that targets one or more creatures\.?$", "spell_targeting_creature"),
+        (r"^counter target spell that targets a creature\.?$", "spell_targeting_creature"),
+        (
+            r"^counter target spell that targets you or a permanent you control\.?$",
+            "spell_targeting_you_or_permanent_you_control",
+        ),
+        (
+            r"^counter target spell that targets a permanent you control\.?$",
+            "spell_targeting_permanent_you_control",
+        ),
+        (r"^counter target spell cast from a graveyard\.?$", "spell_cast_from_graveyard"),
         (r"^counter target noncreature spell\.?$", "noncreature_spell"),
         (r"^counter target nonartifact spell\.?$", "nonartifact_spell"),
         (r"^counter target colorless spell\.?$", "colorless_spell"),
@@ -3517,6 +3528,36 @@ def counter_target_from_source(source_text: str) -> str | None:
         return "instant_or_sorcery_spell"
     if "FILTER_SPELL_A_MULTICOLORED" in text:
         return "multicolored_spell"
+    if (
+        "HinderingLightPredicate" in text
+        or "spell that targets you or a permanent you control" in text
+    ):
+        return "spell_targeting_you_or_permanent_you_control"
+    if (
+        "TargetsPermanentPredicate" in text
+        and (
+            "FILTER_CONTROLLED_PERMANENT" in text
+            or "FilterControlledPermanent" in text
+            or "spell that targets a permanent you control" in text
+        )
+    ):
+        return "spell_targeting_permanent_you_control"
+    if (
+        "TargetsPermanentPredicate" in text
+        and (
+            "FilterCreaturePermanent" in text
+            or "FILTER_PERMANENT_CREATURE" in text
+            or "spell that targets a creature" in text
+            or "spell that targets one or more creatures" in text
+        )
+    ):
+        return "spell_targeting_creature"
+    if (
+        "LaquatussDisdainPredicate" in text
+        or "spell cast from a graveyard" in text
+        or ("Zone.GRAVEYARD" in text and "instanceof Spell" in text)
+    ):
+        return "spell_cast_from_graveyard"
     return None
 
 
@@ -3758,6 +3799,14 @@ def counter_target_constraints_for(target: str) -> dict[str, Any]:
         constraints["card_types"] = ["artifact", "enchantment"]
     elif target == "instant_or_sorcery_spell":
         constraints["spell_types"] = ["instant", "sorcery"]
+    elif target == "spell_targeting_creature":
+        constraints["spell_targets"] = "creature"
+    elif target == "spell_targeting_permanent_you_control":
+        constraints["spell_targets"] = "permanent_you_control"
+    elif target == "spell_targeting_you_or_permanent_you_control":
+        constraints["spell_targets"] = "you_or_permanent_you_control"
+    elif target == "spell_cast_from_graveyard":
+        constraints["source_zone"] = "graveyard"
     elif target == "noncreature_spell":
         constraints["exclude_card_types"] = ["creature"]
     elif target == "nonartifact_spell":
@@ -28832,6 +28881,15 @@ def split_row(
             target = counter_draw_target_from_oracle(metadata)
             if target is None:
                 return None, "counter_draw_target_not_supported"
+            if target in {
+                "spell_targeting_creature",
+                "spell_targeting_permanent_you_control",
+                "spell_targeting_you_or_permanent_you_control",
+                "spell_cast_from_graveyard",
+            }:
+                source_target = counter_target_from_source(source_text)
+                if source_target != target:
+                    return None, "counter_draw_source_target_not_supported"
             draw_count = java_constructor_int(source_text, "DrawCardSourceControllerEffect", default=1)
             if draw_count != 1:
                 return None, "counter_draw_count_not_fixed"

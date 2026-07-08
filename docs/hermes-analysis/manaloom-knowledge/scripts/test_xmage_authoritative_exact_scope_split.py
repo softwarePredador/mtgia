@@ -15285,6 +15285,78 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             ["counter", "draw_cards"],
         )
 
+    def test_counter_draw_special_spell_targets_map_to_stack_constraints(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=["CounterTargetEffect", "DrawCardSourceControllerEffect"],
+        )
+        cases = [
+            (
+                "Confound",
+                "Counter target spell that targets one or more creatures. Draw a card.",
+                (
+                    "filter.add(new TargetsPermanentPredicate(new FilterCreaturePermanent()));"
+                    "this.getSpellAbility().addEffect(new CounterTargetEffect());"
+                    "this.getSpellAbility().addTarget(new TargetSpell(filter));"
+                    "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(1));"
+                ),
+                "spell_targeting_creature",
+                {"spell_targets": "creature"},
+            ),
+            (
+                "Hindering Light",
+                "Counter target spell that targets you or a permanent you control. Draw a card.",
+                (
+                    "filter.add(new HinderingLightPredicate());"
+                    "this.getSpellAbility().addEffect(new CounterTargetEffect());"
+                    "this.getSpellAbility().addTarget(new TargetSpell(filter));"
+                    "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(1));"
+                ),
+                "spell_targeting_you_or_permanent_you_control",
+                {"spell_targets": "you_or_permanent_you_control"},
+            ),
+            (
+                "Keep Safe",
+                "Counter target spell that targets a permanent you control. Draw a card.",
+                (
+                    "filter.add(new TargetsPermanentPredicate(StaticFilters.FILTER_CONTROLLED_PERMANENT));"
+                    "this.getSpellAbility().addEffect(new CounterTargetEffect());"
+                    "this.getSpellAbility().addTarget(new TargetSpell(filter));"
+                    "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(1));"
+                ),
+                "spell_targeting_permanent_you_control",
+                {"spell_targets": "permanent_you_control"},
+            ),
+            (
+                "Laquatus's Disdain",
+                "Counter target spell cast from a graveyard. Draw a card.",
+                (
+                    "filter.add(new LaquatussDisdainPredicate());"
+                    "if (((Spell) input).getFromZone() == Zone.GRAVEYARD) return true;"
+                    "this.getSpellAbility().addEffect(new CounterTargetEffect());"
+                    "this.getSpellAbility().addTarget(new TargetSpell(filter));"
+                    "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(1));"
+                ),
+                "spell_cast_from_graveyard",
+                {"source_zone": "graveyard"},
+            ),
+        ]
+
+        for card_name, oracle, source, target, expected_constraints in cases:
+            with self.subTest(card_name=card_name):
+                proposal, reason = split.split_row(
+                    row,
+                    metadata(name=card_name, oracle_text=oracle),
+                    source_text=source,
+                )
+                self.assertEqual(reason, "selected_exact_scope")
+                effect = proposal["effect_json"]
+                self.assertEqual(effect["battle_model_scope"], split.COUNTER_DRAW_SCOPE)
+                self.assertEqual(effect["target"], target)
+                self.assertEqual(effect["draw_on_counter"], 1)
+                for key, value in expected_constraints.items():
+                    self.assertEqual(effect["target_constraints"][key], value)
+
     def test_counter_scry_spell_maps_to_counter_runtime_with_scry_on_counter(self) -> None:
         row = queue_row(
             split.COUNTER_UNIT,

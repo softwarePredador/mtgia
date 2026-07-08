@@ -69,6 +69,11 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "countered_spell_to_top_library",
     "countered_spell_to_exile",
     "countered_spell_to_exile_reason",
+    "draw_on_counter",
+    "scry_on_counter",
+    "life_gain_on_counter",
+    "life_loss_on_counter",
+    "target_controller_life_loss_on_counter",
     "power_delta",
     "toughness_delta",
     "power_boost",
@@ -3684,19 +3689,63 @@ def _stack_object_fixture_from_constraints(
         card["colors"] = colors
         card["mana_cost"] = "".join(f"{{{color}}}" for color in colors)
 
+    effect = {"effect": card.get("effect") or "finisher"}
+    source_zone = active_constraints.get("source_zone") or active_constraints.get("spell_source_zone")
+    if source_zone:
+        effect["source_zone"] = str(source_zone)
+        if not matching:
+            effect["source_zone"] = "hand" if str(source_zone).lower() != "hand" else "graveyard"
+    spell_targets = active_constraints.get("spell_targets") or active_constraints.get("target_spell_targets")
+    if spell_targets:
+        target_controller = "Responder" if matching else "Active"
+        if str(spell_targets) == "creature":
+            effect["targets"] = [
+                {
+                    "name": "Target Creature",
+                    "type_line": "Creature - Soldier" if matching else "Planeswalker",
+                    "target_controller": "Active",
+                    "target_type": "creature" if matching else "planeswalker",
+                }
+            ]
+        elif str(spell_targets) == "permanent_you_control":
+            effect["targets"] = [
+                {
+                    "name": "Protected Permanent",
+                    "type_line": "Creature - Soldier",
+                    "target_controller": target_controller,
+                    "target_type": "permanent",
+                    "zone": "battlefield",
+                }
+            ]
+        elif str(spell_targets) == "you_or_permanent_you_control":
+            effect["targets"] = [
+                {
+                    "name": "Protected Permanent",
+                    "type_line": "Creature - Soldier",
+                    "target_controller": target_controller,
+                    "target_type": "permanent",
+                    "zone": "battlefield",
+                }
+            ]
+
     if matching and stack_object == "spell":
         card["effect"] = "finisher"
+        effect["effect"] = "finisher"
 
-    return {"card": card, "effect": {"effect": card.get("effect") or "finisher"}}
+    return {"card": card, "effect": effect}
 
 
 def counter_target_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
     required = dict(rule.get("required_effect_fields") or {})
+    scope = str(required.get("battle_model_scope") or "")
     if (
         required.get("effect") != "counter"
-        or required.get("battle_model_scope") != "xmage_counter_target_spell_v1"
+        or scope not in {
+            "xmage_counter_target_spell_v1",
+            "xmage_counter_target_and_draw_card_spell_v1",
+        }
     ):
         return None
     constraints = dict(required.get("target_constraints") or {"zone": "stack", "stack_object": "spell"})
@@ -3725,6 +3774,7 @@ def counter_target_execution_scenario_from_expected_rule(
         "nonmatching_stack_object": nonmatching["card"],
         "nonmatching_stack_effect": nonmatching["effect"],
         "expected_target_constraints": constraints,
+        "expected_cards_drawn": int(required.get("draw_on_counter") or 0),
         "logical_rule_key": rule["logical_rule_key"],
     }
 

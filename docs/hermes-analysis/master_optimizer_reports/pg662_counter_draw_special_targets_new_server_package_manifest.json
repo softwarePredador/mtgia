@@ -1,0 +1,1164 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg662_counter_draw_special_targets_new_s_20260708_145709",
+  "deploy_id": "pg662",
+  "execution_scenarios": [
+    {
+      "card": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_counter_target_spell_v1",
+            "effect": "counter",
+            "target": "spell_targeting_creature",
+            "target_constraints": {
+              "spell_targets": "creature",
+              "stack_object": "spell",
+              "zone": "stack"
+            },
+            "xmage_effect_class": "CounterTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+            "compose_on_resolution": true,
+            "count": 1,
+            "effect": "draw_cards",
+            "xmage_effect_class": "DrawCardSourceControllerEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_counter_target_and_draw_card_spell_v1",
+        "cmc": 2,
+        "count": 1,
+        "draw_count": 1,
+        "draw_on_counter": 1,
+        "effect": "counter",
+        "mana_cost": "{1}{U}",
+        "name": "Confound",
+        "target": "spell_targeting_creature",
+        "target_constraints": {
+          "spell_targets": "creature",
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "type_line": "Instant",
+        "xmage_effect_classes": [
+          "CounterTargetEffect",
+          "DrawCardSourceControllerEffect"
+        ]
+      },
+      "expected_cards_drawn": 1,
+      "expected_target_constraints": {
+        "spell_targets": "creature",
+        "stack_object": "spell",
+        "zone": "stack"
+      },
+      "logical_rule_key": "battle_rule_v1:973f09fc1fbc60ee902e6c8b5293ca71",
+      "name": "Confound counters a legal stack object",
+      "nonmatching_stack_effect": {
+        "effect": "finisher",
+        "targets": [
+          {
+            "name": "Target Creature",
+            "target_controller": "Active",
+            "target_type": "planeswalker",
+            "type_line": "Planeswalker"
+          }
+        ]
+      },
+      "nonmatching_stack_object": {
+        "cmc": 3,
+        "effect": "finisher",
+        "mana_cost": "{2}{U}",
+        "name": "E2E Illegal Counter Target",
+        "type_line": "Instant"
+      },
+      "target_stack_effect": {
+        "effect": "finisher",
+        "targets": [
+          {
+            "name": "Target Creature",
+            "target_controller": "Active",
+            "target_type": "creature",
+            "type_line": "Creature - Soldier"
+          }
+        ]
+      },
+      "target_stack_object": {
+        "cmc": 3,
+        "effect": "finisher",
+        "mana_cost": "{2}{U}",
+        "name": "E2E Legal Counter Target",
+        "type_line": "Instant"
+      },
+      "type": "counter_target_response"
+    },
+    {
+      "card": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_counter_target_spell_v1",
+            "effect": "counter",
+            "target": "spell_targeting_you_or_permanent_you_control",
+            "target_constraints": {
+              "spell_targets": "you_or_permanent_you_control",
+              "stack_object": "spell",
+              "zone": "stack"
+            },
+            "xmage_effect_class": "CounterTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+            "compose_on_resolution": true,
+            "count": 1,
+            "effect": "draw_cards",
+            "xmage_effect_class": "DrawCardSourceControllerEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_counter_target_and_draw_card_spell_v1",
+        "cmc": 2,
+        "count": 1,
+        "draw_count": 1,
+        "draw_on_counter": 1,
+        "effect": "counter",
+        "mana_cost": "{1}{U}",
+        "name": "Hindering Light",
+        "target": "spell_targeting_you_or_permanent_you_control",
+        "target_constraints": {
+          "spell_targets": "you_or_permanent_you_control",
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "type_line": "Instant",
+        "xmage_effect_classes": [
+          "CounterTargetEffect",
+          "DrawCardSourceControllerEffect"
+        ]
+      },
+      "expected_cards_drawn": 1,
+      "expected_target_constraints": {
+        "spell_targets": "you_or_permanent_you_control",
+        "stack_object": "spell",
+        "zone": "stack"
+      },
+      "logical_rule_key": "battle_rule_v1:bdf2d49f3c45f3ebffb9e0cd65c40475",
+      "name": "Hindering Light counters a legal stack object",
+      "nonmatching_stack_effect": {
+        "effect": "finisher",
+        "targets": [
+          {
+            "name": "Protected Permanent",
+            "target_controller": "Active",
+            "target_type": "permanent",
+            "type_line": "Creature - Soldier",
+            "zone": "battlefield"
+          }
+        ]
+      },
+      "nonmatching_stack_object": {
+        "cmc": 3,
+        "effect": "finisher",
+        "mana_cost": "{2}{U}",
+        "name": "E2E Illegal Counter Target",
+        "type_line": "Instant"
+      },
+      "target_stack_effect": {
+        "effect": "finisher",
+        "targets": [
+          {
+            "name": "Protected Permanent",
+            "target_controller": "Responder",
+            "target_type": "permanent",
+            "type_line": "Creature - Soldier",
+            "zone": "battlefield"
+          }
+        ]
+      },
+      "target_stack_object": {
+        "cmc": 3,
+        "effect": "finisher",
+        "mana_cost": "{2}{U}",
+        "name": "E2E Legal Counter Target",
+        "type_line": "Instant"
+      },
+      "type": "counter_target_response"
+    },
+    {
+      "card": {
+        "battle_model_scope": "xmage_counter_target_spell_v1",
+        "cmc": 2,
+        "effect": "counter",
+        "mana_cost": "{1}{U}",
+        "name": "Intervene",
+        "target": "spell_targeting_creature",
+        "target_constraints": {
+          "spell_targets": "creature",
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "type_line": "Instant",
+        "xmage_effect_class": "CounterTargetEffect"
+      },
+      "expected_cards_drawn": 0,
+      "expected_target_constraints": {
+        "spell_targets": "creature",
+        "stack_object": "spell",
+        "zone": "stack"
+      },
+      "logical_rule_key": "battle_rule_v1:8753c98846c4c9fdc76f8877e03a28e7",
+      "name": "Intervene counters a legal stack object",
+      "nonmatching_stack_effect": {
+        "effect": "finisher",
+        "targets": [
+          {
+            "name": "Target Creature",
+            "target_controller": "Active",
+            "target_type": "planeswalker",
+            "type_line": "Planeswalker"
+          }
+        ]
+      },
+      "nonmatching_stack_object": {
+        "cmc": 3,
+        "effect": "finisher",
+        "mana_cost": "{2}{U}",
+        "name": "E2E Illegal Counter Target",
+        "type_line": "Instant"
+      },
+      "target_stack_effect": {
+        "effect": "finisher",
+        "targets": [
+          {
+            "name": "Target Creature",
+            "target_controller": "Active",
+            "target_type": "creature",
+            "type_line": "Creature - Soldier"
+          }
+        ]
+      },
+      "target_stack_object": {
+        "cmc": 3,
+        "effect": "finisher",
+        "mana_cost": "{2}{U}",
+        "name": "E2E Legal Counter Target",
+        "type_line": "Instant"
+      },
+      "type": "counter_target_response"
+    },
+    {
+      "card": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_counter_target_spell_v1",
+            "effect": "counter",
+            "target": "spell_targeting_permanent_you_control",
+            "target_constraints": {
+              "spell_targets": "permanent_you_control",
+              "stack_object": "spell",
+              "zone": "stack"
+            },
+            "xmage_effect_class": "CounterTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+            "compose_on_resolution": true,
+            "count": 1,
+            "effect": "draw_cards",
+            "xmage_effect_class": "DrawCardSourceControllerEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_counter_target_and_draw_card_spell_v1",
+        "cmc": 2,
+        "count": 1,
+        "draw_count": 1,
+        "draw_on_counter": 1,
+        "effect": "counter",
+        "mana_cost": "{1}{U}",
+        "name": "Keep Safe",
+        "target": "spell_targeting_permanent_you_control",
+        "target_constraints": {
+          "spell_targets": "permanent_you_control",
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "type_line": "Instant",
+        "xmage_effect_classes": [
+          "CounterTargetEffect",
+          "DrawCardSourceControllerEffect"
+        ]
+      },
+      "expected_cards_drawn": 1,
+      "expected_target_constraints": {
+        "spell_targets": "permanent_you_control",
+        "stack_object": "spell",
+        "zone": "stack"
+      },
+      "logical_rule_key": "battle_rule_v1:64881cff065b4dbf246ddbe1f7d2b64b",
+      "name": "Keep Safe counters a legal stack object",
+      "nonmatching_stack_effect": {
+        "effect": "finisher",
+        "targets": [
+          {
+            "name": "Protected Permanent",
+            "target_controller": "Active",
+            "target_type": "permanent",
+            "type_line": "Creature - Soldier",
+            "zone": "battlefield"
+          }
+        ]
+      },
+      "nonmatching_stack_object": {
+        "cmc": 3,
+        "effect": "finisher",
+        "mana_cost": "{2}{U}",
+        "name": "E2E Illegal Counter Target",
+        "type_line": "Instant"
+      },
+      "target_stack_effect": {
+        "effect": "finisher",
+        "targets": [
+          {
+            "name": "Protected Permanent",
+            "target_controller": "Responder",
+            "target_type": "permanent",
+            "type_line": "Creature - Soldier",
+            "zone": "battlefield"
+          }
+        ]
+      },
+      "target_stack_object": {
+        "cmc": 3,
+        "effect": "finisher",
+        "mana_cost": "{2}{U}",
+        "name": "E2E Legal Counter Target",
+        "type_line": "Instant"
+      },
+      "type": "counter_target_response"
+    },
+    {
+      "card": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_counter_target_spell_v1",
+            "effect": "counter",
+            "target": "spell_cast_from_graveyard",
+            "target_constraints": {
+              "source_zone": "graveyard",
+              "stack_object": "spell",
+              "zone": "stack"
+            },
+            "xmage_effect_class": "CounterTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+            "compose_on_resolution": true,
+            "count": 1,
+            "effect": "draw_cards",
+            "xmage_effect_class": "DrawCardSourceControllerEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_counter_target_and_draw_card_spell_v1",
+        "cmc": 2,
+        "count": 1,
+        "draw_count": 1,
+        "draw_on_counter": 1,
+        "effect": "counter",
+        "mana_cost": "{1}{U}",
+        "name": "Laquatus's Disdain",
+        "target": "spell_cast_from_graveyard",
+        "target_constraints": {
+          "source_zone": "graveyard",
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "type_line": "Instant",
+        "xmage_effect_classes": [
+          "CounterTargetEffect",
+          "DrawCardSourceControllerEffect"
+        ]
+      },
+      "expected_cards_drawn": 1,
+      "expected_target_constraints": {
+        "source_zone": "graveyard",
+        "stack_object": "spell",
+        "zone": "stack"
+      },
+      "logical_rule_key": "battle_rule_v1:9379b90defe177d1125b1c573613ef6e",
+      "name": "Laquatus's Disdain counters a legal stack object",
+      "nonmatching_stack_effect": {
+        "effect": "finisher",
+        "source_zone": "hand"
+      },
+      "nonmatching_stack_object": {
+        "cmc": 3,
+        "effect": "finisher",
+        "mana_cost": "{2}{U}",
+        "name": "E2E Illegal Counter Target",
+        "type_line": "Instant"
+      },
+      "target_stack_effect": {
+        "effect": "finisher",
+        "source_zone": "graveyard"
+      },
+      "target_stack_object": {
+        "cmc": 3,
+        "effect": "finisher",
+        "mana_cost": "{2}{U}",
+        "name": "E2E Legal Counter Target",
+        "type_line": "Instant"
+      },
+      "type": "counter_target_response"
+    },
+    {
+      "card": {
+        "battle_model_scope": "xmage_counter_target_spell_v1",
+        "cmc": 2,
+        "effect": "counter",
+        "mana_cost": "{1}{U}",
+        "name": "Rebuff the Wicked",
+        "target": "spell_targeting_permanent_you_control",
+        "target_constraints": {
+          "spell_targets": "permanent_you_control",
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "type_line": "Instant",
+        "xmage_effect_class": "CounterTargetEffect"
+      },
+      "expected_cards_drawn": 0,
+      "expected_target_constraints": {
+        "spell_targets": "permanent_you_control",
+        "stack_object": "spell",
+        "zone": "stack"
+      },
+      "logical_rule_key": "battle_rule_v1:517b4ad1e1663e8fc5525b265695ae51",
+      "name": "Rebuff the Wicked counters a legal stack object",
+      "nonmatching_stack_effect": {
+        "effect": "finisher",
+        "targets": [
+          {
+            "name": "Protected Permanent",
+            "target_controller": "Active",
+            "target_type": "permanent",
+            "type_line": "Creature - Soldier",
+            "zone": "battlefield"
+          }
+        ]
+      },
+      "nonmatching_stack_object": {
+        "cmc": 3,
+        "effect": "finisher",
+        "mana_cost": "{2}{U}",
+        "name": "E2E Illegal Counter Target",
+        "type_line": "Instant"
+      },
+      "target_stack_effect": {
+        "effect": "finisher",
+        "targets": [
+          {
+            "name": "Protected Permanent",
+            "target_controller": "Responder",
+            "target_type": "permanent",
+            "type_line": "Creature - Soldier",
+            "zone": "battlefield"
+          }
+        ]
+      },
+      "target_stack_object": {
+        "cmc": 3,
+        "effect": "finisher",
+        "mana_cost": "{2}{U}",
+        "name": "E2E Legal Counter Target",
+        "type_line": "Instant"
+      },
+      "type": "counter_target_response"
+    },
+    {
+      "card": {
+        "battle_model_scope": "xmage_counter_target_spell_v1",
+        "cmc": 2,
+        "effect": "counter",
+        "mana_cost": "{1}{U}",
+        "name": "Turn Aside",
+        "target": "spell_targeting_permanent_you_control",
+        "target_constraints": {
+          "spell_targets": "permanent_you_control",
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "type_line": "Instant",
+        "xmage_effect_class": "CounterTargetEffect"
+      },
+      "expected_cards_drawn": 0,
+      "expected_target_constraints": {
+        "spell_targets": "permanent_you_control",
+        "stack_object": "spell",
+        "zone": "stack"
+      },
+      "logical_rule_key": "battle_rule_v1:517b4ad1e1663e8fc5525b265695ae51",
+      "name": "Turn Aside counters a legal stack object",
+      "nonmatching_stack_effect": {
+        "effect": "finisher",
+        "targets": [
+          {
+            "name": "Protected Permanent",
+            "target_controller": "Active",
+            "target_type": "permanent",
+            "type_line": "Creature - Soldier",
+            "zone": "battlefield"
+          }
+        ]
+      },
+      "nonmatching_stack_object": {
+        "cmc": 3,
+        "effect": "finisher",
+        "mana_cost": "{2}{U}",
+        "name": "E2E Illegal Counter Target",
+        "type_line": "Instant"
+      },
+      "target_stack_effect": {
+        "effect": "finisher",
+        "targets": [
+          {
+            "name": "Protected Permanent",
+            "target_controller": "Responder",
+            "target_type": "permanent",
+            "type_line": "Creature - Soldier",
+            "zone": "battlefield"
+          }
+        ]
+      },
+      "target_stack_object": {
+        "cmc": 3,
+        "effect": "finisher",
+        "mana_cost": "{2}{U}",
+        "name": "E2E Legal Counter Target",
+        "type_line": "Instant"
+      },
+      "type": "counter_target_response"
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Confound",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:973f09fc1fbc60ee902e6c8b5293ca71",
+      "min_rule_version": 2,
+      "normalized_name": "confound",
+      "oracle_hash": "cb655de4f0cddfa66c7353ec6e942831",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_counter_target_spell_v1",
+            "effect": "counter",
+            "target": "spell_targeting_creature",
+            "target_constraints": {
+              "spell_targets": "creature",
+              "stack_object": "spell",
+              "zone": "stack"
+            },
+            "xmage_effect_class": "CounterTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+            "compose_on_resolution": true,
+            "count": 1,
+            "effect": "draw_cards",
+            "xmage_effect_class": "DrawCardSourceControllerEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_counter_target_and_draw_card_spell_v1",
+        "count": 1,
+        "draw_count": 1,
+        "draw_on_counter": 1,
+        "effect": "counter",
+        "target": "spell_targeting_creature",
+        "target_constraints": {
+          "spell_targets": "creature",
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_classes": [
+          "CounterTargetEffect",
+          "DrawCardSourceControllerEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Hindering Light",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:bdf2d49f3c45f3ebffb9e0cd65c40475",
+      "min_rule_version": 2,
+      "normalized_name": "hindering light",
+      "oracle_hash": "f1dec48f9f1ac2b9e2d5ad5aadb8249a",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_counter_target_spell_v1",
+            "effect": "counter",
+            "target": "spell_targeting_you_or_permanent_you_control",
+            "target_constraints": {
+              "spell_targets": "you_or_permanent_you_control",
+              "stack_object": "spell",
+              "zone": "stack"
+            },
+            "xmage_effect_class": "CounterTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+            "compose_on_resolution": true,
+            "count": 1,
+            "effect": "draw_cards",
+            "xmage_effect_class": "DrawCardSourceControllerEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_counter_target_and_draw_card_spell_v1",
+        "count": 1,
+        "draw_count": 1,
+        "draw_on_counter": 1,
+        "effect": "counter",
+        "target": "spell_targeting_you_or_permanent_you_control",
+        "target_constraints": {
+          "spell_targets": "you_or_permanent_you_control",
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_classes": [
+          "CounterTargetEffect",
+          "DrawCardSourceControllerEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Intervene",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8753c98846c4c9fdc76f8877e03a28e7",
+      "min_rule_version": 2,
+      "normalized_name": "intervene",
+      "oracle_hash": "e5d3c9db58fede5883e18c6d9bc03790",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_v1",
+        "effect": "counter",
+        "target": "spell_targeting_creature",
+        "target_constraints": {
+          "spell_targets": "creature",
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Keep Safe",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:64881cff065b4dbf246ddbe1f7d2b64b",
+      "min_rule_version": 2,
+      "normalized_name": "keep safe",
+      "oracle_hash": "dae570243ab24759ace67222a3e55c17",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_counter_target_spell_v1",
+            "effect": "counter",
+            "target": "spell_targeting_permanent_you_control",
+            "target_constraints": {
+              "spell_targets": "permanent_you_control",
+              "stack_object": "spell",
+              "zone": "stack"
+            },
+            "xmage_effect_class": "CounterTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+            "compose_on_resolution": true,
+            "count": 1,
+            "effect": "draw_cards",
+            "xmage_effect_class": "DrawCardSourceControllerEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_counter_target_and_draw_card_spell_v1",
+        "count": 1,
+        "draw_count": 1,
+        "draw_on_counter": 1,
+        "effect": "counter",
+        "target": "spell_targeting_permanent_you_control",
+        "target_constraints": {
+          "spell_targets": "permanent_you_control",
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_classes": [
+          "CounterTargetEffect",
+          "DrawCardSourceControllerEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Laquatus's Disdain",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9379b90defe177d1125b1c573613ef6e",
+      "min_rule_version": 2,
+      "normalized_name": "laquatus's disdain",
+      "oracle_hash": "aa168487f1430a45022a19b4e7f3c71d",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_counter_target_spell_v1",
+            "effect": "counter",
+            "target": "spell_cast_from_graveyard",
+            "target_constraints": {
+              "source_zone": "graveyard",
+              "stack_object": "spell",
+              "zone": "stack"
+            },
+            "xmage_effect_class": "CounterTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+            "compose_on_resolution": true,
+            "count": 1,
+            "effect": "draw_cards",
+            "xmage_effect_class": "DrawCardSourceControllerEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_counter_target_and_draw_card_spell_v1",
+        "count": 1,
+        "draw_count": 1,
+        "draw_on_counter": 1,
+        "effect": "counter",
+        "target": "spell_cast_from_graveyard",
+        "target_constraints": {
+          "source_zone": "graveyard",
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_classes": [
+          "CounterTargetEffect",
+          "DrawCardSourceControllerEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Rebuff the Wicked",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:517b4ad1e1663e8fc5525b265695ae51",
+      "min_rule_version": 2,
+      "normalized_name": "rebuff the wicked",
+      "oracle_hash": "c369e72747613701d18018f65f35031e",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_v1",
+        "effect": "counter",
+        "target": "spell_targeting_permanent_you_control",
+        "target_constraints": {
+          "spell_targets": "permanent_you_control",
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Turn Aside",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:517b4ad1e1663e8fc5525b265695ae51",
+      "min_rule_version": 2,
+      "normalized_name": "turn aside",
+      "oracle_hash": "c369e72747613701d18018f65f35031e",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_v1",
+        "effect": "counter",
+        "target": "spell_targeting_permanent_you_control",
+        "target_constraints": {
+          "spell_targets": "permanent_you_control",
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterTargetEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_counter_target_draw_card_spell": 4,
+    "xmage_counter_target_spell": 3
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg662_counter_draw_special_targets_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg662_counter_draw_special_targets_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg662_counter_draw_special_targets_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg662_counter_draw_special_targets_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg662_counter_draw_special_targets_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg662_counter_draw_special_targets_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-08T14:57:53+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Confound"
+      },
+      "card_name": "Confound",
+      "effect": "counter",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:973f09fc1fbc60ee902e6c8b5293ca71",
+      "normalized_name": "confound",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_counter_target_spell_v1",
+            "effect": "counter",
+            "target": "spell_targeting_creature",
+            "target_constraints": {
+              "spell_targets": "creature",
+              "stack_object": "spell",
+              "zone": "stack"
+            },
+            "xmage_effect_class": "CounterTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+            "compose_on_resolution": true,
+            "count": 1,
+            "effect": "draw_cards",
+            "xmage_effect_class": "DrawCardSourceControllerEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_counter_target_and_draw_card_spell_v1",
+        "count": 1,
+        "draw_count": 1,
+        "draw_on_counter": 1,
+        "effect": "counter",
+        "target": "spell_targeting_creature",
+        "target_constraints": {
+          "spell_targets": "creature",
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_classes": [
+          "CounterTargetEffect",
+          "DrawCardSourceControllerEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Hindering Light"
+      },
+      "card_name": "Hindering Light",
+      "effect": "counter",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:bdf2d49f3c45f3ebffb9e0cd65c40475",
+      "normalized_name": "hindering light",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_counter_target_spell_v1",
+            "effect": "counter",
+            "target": "spell_targeting_you_or_permanent_you_control",
+            "target_constraints": {
+              "spell_targets": "you_or_permanent_you_control",
+              "stack_object": "spell",
+              "zone": "stack"
+            },
+            "xmage_effect_class": "CounterTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+            "compose_on_resolution": true,
+            "count": 1,
+            "effect": "draw_cards",
+            "xmage_effect_class": "DrawCardSourceControllerEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_counter_target_and_draw_card_spell_v1",
+        "count": 1,
+        "draw_count": 1,
+        "draw_on_counter": 1,
+        "effect": "counter",
+        "target": "spell_targeting_you_or_permanent_you_control",
+        "target_constraints": {
+          "spell_targets": "you_or_permanent_you_control",
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_classes": [
+          "CounterTargetEffect",
+          "DrawCardSourceControllerEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Intervene"
+      },
+      "card_name": "Intervene",
+      "effect": "counter",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8753c98846c4c9fdc76f8877e03a28e7",
+      "normalized_name": "intervene",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_v1",
+        "effect": "counter",
+        "target": "spell_targeting_creature",
+        "target_constraints": {
+          "spell_targets": "creature",
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Keep Safe"
+      },
+      "card_name": "Keep Safe",
+      "effect": "counter",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:64881cff065b4dbf246ddbe1f7d2b64b",
+      "normalized_name": "keep safe",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_counter_target_spell_v1",
+            "effect": "counter",
+            "target": "spell_targeting_permanent_you_control",
+            "target_constraints": {
+              "spell_targets": "permanent_you_control",
+              "stack_object": "spell",
+              "zone": "stack"
+            },
+            "xmage_effect_class": "CounterTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+            "compose_on_resolution": true,
+            "count": 1,
+            "effect": "draw_cards",
+            "xmage_effect_class": "DrawCardSourceControllerEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_counter_target_and_draw_card_spell_v1",
+        "count": 1,
+        "draw_count": 1,
+        "draw_on_counter": 1,
+        "effect": "counter",
+        "target": "spell_targeting_permanent_you_control",
+        "target_constraints": {
+          "spell_targets": "permanent_you_control",
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_classes": [
+          "CounterTargetEffect",
+          "DrawCardSourceControllerEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Laquatus's Disdain"
+      },
+      "card_name": "Laquatus's Disdain",
+      "effect": "counter",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9379b90defe177d1125b1c573613ef6e",
+      "normalized_name": "laquatus's disdain",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_counter_target_spell_v1",
+            "effect": "counter",
+            "target": "spell_cast_from_graveyard",
+            "target_constraints": {
+              "source_zone": "graveyard",
+              "stack_object": "spell",
+              "zone": "stack"
+            },
+            "xmage_effect_class": "CounterTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+            "compose_on_resolution": true,
+            "count": 1,
+            "effect": "draw_cards",
+            "xmage_effect_class": "DrawCardSourceControllerEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_counter_target_and_draw_card_spell_v1",
+        "count": 1,
+        "draw_count": 1,
+        "draw_on_counter": 1,
+        "effect": "counter",
+        "target": "spell_cast_from_graveyard",
+        "target_constraints": {
+          "source_zone": "graveyard",
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_classes": [
+          "CounterTargetEffect",
+          "DrawCardSourceControllerEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Rebuff the Wicked"
+      },
+      "card_name": "Rebuff the Wicked",
+      "effect": "counter",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:517b4ad1e1663e8fc5525b265695ae51",
+      "normalized_name": "rebuff the wicked",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_v1",
+        "effect": "counter",
+        "target": "spell_targeting_permanent_you_control",
+        "target_constraints": {
+          "spell_targets": "permanent_you_control",
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Turn Aside"
+      },
+      "card_name": "Turn Aside",
+      "effect": "counter",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:517b4ad1e1663e8fc5525b265695ae51",
+      "normalized_name": "turn aside",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_v1",
+        "effect": "counter",
+        "target": "spell_targeting_permanent_you_control",
+        "target_constraints": {
+          "spell_targets": "permanent_you_control",
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterTargetEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Confound",
+    "Hindering Light",
+    "Intervene",
+    "Keep Safe",
+    "Laquatus's Disdain",
+    "Rebuff the Wicked",
+    "Turn Aside"
+  ],
+  "selected_count": 7,
+  "slug": "counter_draw_special_targets_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Confound",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:973f09fc1fbc60ee902e6c8b5293ca71",
+      "min_rule_version": 2,
+      "normalized_name": "confound",
+      "oracle_hash": "cb655de4f0cddfa66c7353ec6e942831",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_and_draw_card_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Hindering Light",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:bdf2d49f3c45f3ebffb9e0cd65c40475",
+      "min_rule_version": 2,
+      "normalized_name": "hindering light",
+      "oracle_hash": "f1dec48f9f1ac2b9e2d5ad5aadb8249a",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_and_draw_card_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Intervene",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8753c98846c4c9fdc76f8877e03a28e7",
+      "min_rule_version": 2,
+      "normalized_name": "intervene",
+      "oracle_hash": "e5d3c9db58fede5883e18c6d9bc03790",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Keep Safe",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:64881cff065b4dbf246ddbe1f7d2b64b",
+      "min_rule_version": 2,
+      "normalized_name": "keep safe",
+      "oracle_hash": "dae570243ab24759ace67222a3e55c17",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_and_draw_card_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Laquatus's Disdain",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9379b90defe177d1125b1c573613ef6e",
+      "min_rule_version": 2,
+      "normalized_name": "laquatus's disdain",
+      "oracle_hash": "aa168487f1430a45022a19b4e7f3c71d",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_and_draw_card_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Rebuff the Wicked",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:517b4ad1e1663e8fc5525b265695ae51",
+      "min_rule_version": 2,
+      "normalized_name": "rebuff the wicked",
+      "oracle_hash": "c369e72747613701d18018f65f35031e",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Turn Aside",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:517b4ad1e1663e8fc5525b265695ae51",
+      "min_rule_version": 2,
+      "normalized_name": "turn aside",
+      "oracle_hash": "c369e72747613701d18018f65f35031e",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}
