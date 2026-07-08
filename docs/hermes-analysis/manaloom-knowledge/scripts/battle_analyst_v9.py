@@ -21301,6 +21301,45 @@ def choose_creature_for_resource_cost(player, *, required_color=None):
     return ranked[0], option_rows, selection_reason
 
 
+def choose_creature_for_sacrificed_power_damage(player):
+    candidates = [
+        permanent
+        for permanent in player.battlefield
+        if is_battlefield_creature(permanent)
+    ]
+    if not candidates:
+        return None, [], "no_matching_creature"
+
+    def selection_key(permanent):
+        type_line = str(permanent.get("type_line") or "").lower()
+        is_token = permanent.get("tag") == "token" or "token" in type_line
+        return (
+            1 if permanent.get("is_commander") else 0,
+            -int(float(permanent.get("power") or 0)),
+            0 if is_token else 1,
+            int(float(permanent.get("cmc") or 0)),
+            int(float(permanent.get("toughness") or 0)),
+            permanent.get("name", ""),
+        )
+
+    ranked = sorted(candidates, key=selection_key)
+    option_rows = []
+    for rank, permanent in enumerate(ranked, start=1):
+        type_line = str(permanent.get("type_line") or "").lower()
+        option_rows.append(
+            {
+                "name": permanent.get("name", "?"),
+                "selection_rank": rank,
+                "is_commander": bool(permanent.get("is_commander")),
+                "is_token": permanent.get("tag") == "token" or "token" in type_line,
+                "power": int(float(permanent.get("power") or 0)),
+                "toughness": int(float(permanent.get("toughness") or 0)),
+                "cmc": int(float(permanent.get("cmc") or 0)),
+            }
+        )
+    return ranked[0], option_rows, "maximize_sacrificed_creature_power_without_commander_first"
+
+
 def choose_blight_x_cost_plan(player, opponents, effect_data):
     if not effect_data.get("requires_blight_x"):
         return None
@@ -21709,10 +21748,16 @@ def pay_additional_card_costs(player, card, effect_data, *, turn=None, cost_cont
         )
     required_color = "G" if effect_data.get("requires_sacrifice_green_creature") else None
     if effect_data.get("requires_sacrifice_creature") or required_color:
-        sacrifice, creature_options, selection_reason = choose_creature_for_resource_cost(
-            player,
-            required_color=required_color,
-        )
+        if (
+            not required_color
+            and str(effect_data.get("damage_amount_source") or "").lower() == "sacrificed_creature_power"
+        ):
+            sacrifice, creature_options, selection_reason = choose_creature_for_sacrificed_power_damage(player)
+        else:
+            sacrifice, creature_options, selection_reason = choose_creature_for_resource_cost(
+                player,
+                required_color=required_color,
+            )
         cost_name = "sacrifice_green_creature" if required_color else "sacrifice_creature"
         if not sacrifice:
             emit_replay_event(
@@ -21730,15 +21775,19 @@ def pay_additional_card_costs(player, card, effect_data, *, turn=None, cost_cont
             reason=cost_name,
             source=card,
         )
+        sacrificed_power = int(float(sacrifice.get("power") or 0))
+        effect_data["_last_sacrificed_power"] = sacrificed_power
+        effect_data["_last_sacrificed_creature_power"] = sacrificed_power
+        effect_data["_last_sacrificed_name"] = sacrifice.get("name", "?")
         if effect_data.get("mana_produced_from_sacrificed_cmc"):
             effect_data["_last_sacrificed_cmc"] = int(float(sacrifice.get("cmc") or 0))
-            effect_data["_last_sacrificed_name"] = sacrifice.get("name", "?")
         emit_replay_event(
             "additional_cost_paid",
             player=player.name,
             card=card.get("name", "?"),
             cost=cost_name,
             sacrificed=sacrifice.get("name", "?"),
+            sacrificed_creature_power=sacrificed_power,
             destination=destination,
             creature_options=creature_options,
             selection_reason=selection_reason,
@@ -51132,6 +51181,18 @@ def dynamic_stat_modifier_deltas(player, opponents, effect_data):
 
 def _dynamic_damage_count_from_source(player, opponents, effect_data):
     amount_source = str(effect_data.get("damage_amount_source") or "").lower()
+    if amount_source == "sacrificed_creature_power":
+        if "_last_sacrificed_power" not in effect_data:
+            return None, {
+                "damage_amount_source": amount_source,
+                "sacrificed_creature_power_status": "missing_cost_context",
+            }
+        count = max(0, int(float(effect_data.get("_last_sacrificed_power") or 0)))
+        return count, {
+            "damage_amount_source": amount_source,
+            "sacrificed_creature_power": count,
+            "sacrificed_creature": effect_data.get("_last_sacrificed_name"),
+        }
     if amount_source == "graveyard_card_count":
         scope = str(effect_data.get("graveyard_count_scope") or "controller_graveyard").lower()
         if scope == "controller_graveyard":
@@ -51262,6 +51323,7 @@ def dynamic_damage_amount(player, opponents, effect_data):
         "party_count",
         "greatest_shared_creature_type_count",
         "controlled_permanents_mana_symbol_count",
+        "sacrificed_creature_power",
     }:
         return None, {}
     count, replay_fields = _dynamic_damage_count_from_source(player, opponents, effect_data)

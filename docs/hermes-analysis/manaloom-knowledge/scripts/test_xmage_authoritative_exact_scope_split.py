@@ -7824,6 +7824,87 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["additional_cost"], "sacrifice_creature")
         self.assertEqual(effect["xmage_additional_cost_target"], "creature")
 
+    def test_sacrifice_creature_power_damage_spell_maps_to_runtime(self) -> None:
+        cases = [
+            (
+                "Fling",
+                (
+                    "As an additional cost to cast this spell, sacrifice a creature. "
+                    "Fling deals damage equal to the sacrificed creature's power to any target."
+                ),
+                "new TargetAnyTarget()",
+                "any_target",
+                {"scope": "any_target"},
+            ),
+            (
+                "Final Strike",
+                (
+                    "As an additional cost to cast Final Strike, sacrifice a creature. "
+                    "Final Strike deals damage to target opponent or planeswalker equal to the sacrificed creature's power."
+                ),
+                "new TargetOpponentOrPlaneswalker()",
+                "opponent_or_planeswalker",
+                {"scope": "opponent_or_planeswalker"},
+            ),
+            (
+                "Kazuul's Fury",
+                (
+                    "As an additional cost to cast this spell, sacrifice a creature. "
+                    "Kazuul's Fury deals damage equal to the sacrificed creature's power to any target."
+                ),
+                "new TargetAnyTarget()",
+                "any_target",
+                {"scope": "any_target"},
+            ),
+        ]
+        for name, oracle, source_target, target, constraints in cases:
+            with self.subTest(card=name):
+                row = queue_row(split.DAMAGE_UNIT, effect_classes=["DamageTargetEffect"], xmage_signals=["targeting"])
+                proposal, reason = split.split_row(
+                    row,
+                    metadata(name=name, type_line="Instant", oracle_text=oracle),
+                    source_text=(
+                        "this.getSpellAbility().addCost(new SacrificeTargetCost("
+                        "StaticFilters.FILTER_PERMANENT_CREATURE));"
+                        "this.getSpellAbility().addEffect(new DamageTargetEffect("
+                        "SacrificeCostCreaturesPower.instance));"
+                        f"this.getSpellAbility().addTarget({source_target});"
+                    ),
+                )
+
+                self.assertEqual(reason, "selected_exact_scope")
+                effect = proposal["effect_json"]
+                self.assertEqual(effect["battle_model_scope"], split.SACRIFICE_CREATURE_POWER_DAMAGE_SCOPE)
+                self.assertEqual(effect["target"], target)
+                self.assertEqual(effect["target_constraints"], constraints)
+                self.assertEqual(effect["amount"], 0)
+                self.assertEqual(effect["damage_amount_source"], "sacrificed_creature_power")
+                self.assertEqual(effect["damage_base_amount"], 0)
+                self.assertEqual(effect["damage_per_count"], 1)
+                self.assertTrue(effect["requires_sacrifice_creature"])
+                self.assertEqual(effect["additional_cost"], "sacrifice_creature")
+                self.assertEqual(effect["xmage_dynamic_value_class"], "SacrificeCostCreaturesPower")
+
+    def test_sacrifice_creature_power_damage_blocks_missing_sacrifice_cost(self) -> None:
+        row = queue_row(split.DAMAGE_UNIT, effect_classes=["DamageTargetEffect"], xmage_signals=["targeting"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                oracle_text=(
+                    "As an additional cost to cast this spell, sacrifice a creature. "
+                    "Fixture Fling deals damage equal to the sacrificed creature's power to any target."
+                )
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new DamageTargetEffect("
+                "SacrificeCostCreaturesPower.instance));"
+                "this.getSpellAbility().addTarget(new TargetAnyTarget());"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "damage_additional_cost_not_supported")
+
     def test_fixed_damage_spell_maps_land_sacrifice_additional_cost(self) -> None:
         row = queue_row(split.DAMAGE_UNIT, effect_classes=["DamageTargetEffect"])
         proposal, reason = split.split_row(

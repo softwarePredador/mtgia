@@ -6659,6 +6659,92 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_sacrifice_creature_power_damage_uses_sacrificed_power(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        small = {
+            "name": "Small Token",
+            "type_line": "Token Creature - Goblin",
+            "effect": "creature",
+            "tag": "token",
+            "power": 1,
+            "toughness": 1,
+        }
+        large = {
+            "name": "Large Beast",
+            "type_line": "Creature - Beast",
+            "effect": "creature",
+            "power": 4,
+            "toughness": 4,
+        }
+        target = {
+            "name": "Target Rhino",
+            "type_line": "Creature - Rhino",
+            "effect": "creature",
+            "power": 4,
+            "toughness": 4,
+        }
+        active.battlefield.extend([small, large])
+        opponent.battlefield.append(target)
+        effect = {
+            "effect": "direct_damage",
+            "battle_model_scope": "xmage_sacrifice_creature_power_damage_spell_v1",
+            "amount": 0,
+            "damage": 0,
+            "target": "any_target",
+            "target_constraints": {"scope": "any_target"},
+            "damage_amount_source": "sacrificed_creature_power",
+            "damage_base_amount": 0,
+            "damage_per_count": 1,
+            "requires_sacrifice_creature": True,
+            "additional_cost": "sacrifice_creature",
+            "instant": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fling",
+                "type_line": "Instant",
+                "oracle_text": (
+                    "As an additional cost to cast this spell, sacrifice a creature. "
+                    "Fling deals damage equal to the sacrificed creature's power to any target."
+                ),
+            },
+            turn=4,
+            rng=random.Random(35),
+            effect_data_override=effect,
+        )
+
+        self.assertIn(small, active.battlefield)
+        self.assertNotIn(large, active.battlefield)
+        self.assertIn(large, active.graveyard)
+        self.assertNotIn(target, opponent.battlefield)
+        self.assertIn(target, opponent.graveyard)
+        self.assertTrue(
+            any(
+                event == "additional_cost_paid"
+                and data.get("card") == "Fling"
+                and data.get("cost") == "sacrifice_creature"
+                and data.get("sacrificed") == "Large Beast"
+                and data.get("sacrificed_creature_power") == 4
+                for event, data in self.events
+            )
+        )
+        self.assertTrue(
+            any(
+                event == "damage_resolved"
+                and data.get("card") == "Fling"
+                and data.get("amount") == 4
+                and data.get("damage_amount_source") == "sacrificed_creature_power"
+                and data.get("sacrificed_creature_power") == 4
+                and data.get("sacrificed_creature") == "Large Beast"
+                and data.get("result") == "creature_destroyed"
+                for event, data in self.events
+            )
+        )
+
     def test_fixed_damage_spell_pays_artifact_or_creature_sacrifice_cost(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

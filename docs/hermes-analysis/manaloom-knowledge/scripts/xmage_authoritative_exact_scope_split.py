@@ -224,6 +224,7 @@ MULTI_TARGET_DAMAGE_SCOPE = "xmage_fixed_multi_target_damage_spell_v1"
 DAMAGE_EACH_OPPONENT_SCOPE = "spell_damage_each_opponent_v1"
 X_DAMAGE_SCOPE = "xmage_x_damage_target_spell_v1"
 DAMAGE_EXILE_IF_DIES_SCOPE = "xmage_fixed_damage_target_exile_if_dies_spell_v1"
+SACRIFICE_CREATURE_POWER_DAMAGE_SCOPE = "xmage_sacrifice_creature_power_damage_spell_v1"
 DAMAGE_GAIN_LIFE_SCOPE = "xmage_fixed_damage_target_and_controller_gain_life_spell_v1"
 GRAVEYARD_COUNT_DAMAGE_SCOPE = "xmage_dynamic_graveyard_count_damage_spell_v1"
 DYNAMIC_COUNT_DAMAGE_SCOPE = "xmage_dynamic_count_damage_spell_v1"
@@ -11290,6 +11291,75 @@ def _dynamic_count_damage_dict(
         "damage_base_amount": int(base),
         "damage_per_count": int(per),
         **count_fields,
+    }
+
+
+def sacrifice_creature_power_damage_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str | None:
+    text = strip_parenthetical_reminders(oracle_text(metadata))
+    normalized = re.sub(r"\s+", " ", text).strip().lower().replace("\u2019", "'")
+    if not re.search(
+        r"as an additional cost to cast (?:this spell|[^.]+), sacrifice (?:a|one) creature\.",
+        normalized,
+    ):
+        return None
+    if "sacrificed creature" not in normalized or "power" not in normalized:
+        return None
+    target_pattern = (
+        r"any target|target opponent or planeswalker|target player or planeswalker|"
+        r"target creature or planeswalker|target opponent|target player|target creature"
+    )
+    target_phrase: str | None = None
+    match = re.search(
+        rf"\bdeals damage equal to the sacrificed creature'?s power to (?P<target>{target_pattern})\.?",
+        normalized,
+    )
+    if match:
+        target_phrase = match.group("target")
+    if target_phrase is None:
+        match = re.search(
+            rf"\bdeals damage to (?P<target>{target_pattern}) equal to the sacrificed creature'?s power\.?",
+            normalized,
+        )
+        if match:
+            target_phrase = match.group("target")
+    if target_phrase is None:
+        return "sacrifice_creature_power_damage_oracle_not_exact"
+    target = _dynamic_damage_target_from_phrase(target_phrase)
+    if target is None:
+        return "sacrifice_creature_power_damage_target_not_supported"
+    return _dynamic_count_damage_dict(
+        "sacrificed_creature_power",
+        target=target,
+        base=0,
+        per=1,
+    )
+
+
+def sacrifice_creature_power_damage_from_source(source: str) -> dict[str, Any] | str | None:
+    text = source or ""
+    if len(re.findall(r"new\s+DamageTargetEffect\s*\(", text)) != 1:
+        return "sacrifice_creature_power_damage_source_not_single"
+    if "TargetPointer" in text or ".setTargetPointer" in text:
+        return "sacrifice_creature_power_damage_target_pointer_not_supported"
+    constructor_args = extract_constructor_args(text, "DamageTargetEffect")
+    if constructor_args is None:
+        return None
+    normalized_args = re.sub(r"\s+", "", constructor_args)
+    if normalized_args != "SacrificeCostCreaturesPower.instance":
+        return "sacrifice_creature_power_damage_source_value_not_supported"
+    if "SacrificeTargetCost" not in text:
+        return "sacrifice_creature_power_damage_source_cost_missing"
+    sacrifice_target = activation_sacrifice_target_from_source(text, text)
+    if sacrifice_target != "creature":
+        return "sacrifice_creature_power_damage_source_cost_not_creature"
+    target = damage_target_from_source(text)
+    if target is None:
+        return "sacrifice_creature_power_damage_source_target_not_supported"
+    return {
+        "target": target,
+        "damage_amount_source": "sacrificed_creature_power",
+        "damage_base_amount": 0,
+        "damage_per_count": 1,
     }
 
 
@@ -28836,6 +28906,49 @@ def split_row(
         )
         if additional_cost_reason is not None:
             return None, additional_cost_reason
+        sacrifice_power_damage = sacrifice_creature_power_damage_from_oracle(metadata)
+        if isinstance(sacrifice_power_damage, str):
+            return None, sacrifice_power_damage
+        if sacrifice_power_damage is not None:
+            if not (additional_cost_fields or {}).get("requires_sacrifice_creature"):
+                return None, "sacrifice_creature_power_damage_additional_cost_not_creature"
+            source_sacrifice_power_damage = sacrifice_creature_power_damage_from_source(source_text)
+            if isinstance(source_sacrifice_power_damage, str):
+                return None, source_sacrifice_power_damage
+            if source_sacrifice_power_damage is None:
+                return None, "sacrifice_creature_power_damage_source_not_supported"
+            for key in (
+                "target",
+                "damage_amount_source",
+                "damage_base_amount",
+                "damage_per_count",
+            ):
+                if sacrifice_power_damage.get(key) != source_sacrifice_power_damage.get(key):
+                    return None, f"sacrifice_creature_power_damage_source_oracle_{key}_mismatch"
+            target = str(sacrifice_power_damage["target"])
+            target_base = restricted_target_base(target)
+            sacrifice_power_damage_fields = {
+                key: value for key, value in sacrifice_power_damage.items() if key != "target"
+            }
+            effect_json = {
+                "effect": "direct_damage",
+                "battle_model_scope": SACRIFICE_CREATURE_POWER_DAMAGE_SCOPE,
+                "amount": 0,
+                "damage": 0,
+                "target": target_base,
+                "target_constraints": target_constraints_for(target),
+                "xmage_effect_class": "DamageTargetEffect",
+                "xmage_dynamic_value_class": "SacrificeCostCreaturesPower",
+                **sacrifice_power_damage_fields,
+                **flags,
+                **(additional_cost_fields or {}),
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_sacrifice_creature_power_damage_spell",
+            ), "selected_exact_scope"
         dynamic_damage = dynamic_count_damage_from_oracle(metadata)
         if isinstance(dynamic_damage, str):
             return None, dynamic_damage

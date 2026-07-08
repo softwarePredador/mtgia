@@ -1,0 +1,164 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-08T12:23:43.298127+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg655_sacrifice_creature_power_damage_new_server_package_manifest.json",
+  "package_id": "pg655_sacrifice_creature_power_damage_new_server_package_manifest",
+  "snapshot": "/tmp/pg655_sacrifice_creature_power_damage_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 3
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_sacrifice_creature_power_damage_spell_v1",
+          "card_name": "Final Strike",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:346223fcdea57c534e7b783dcff541b1",
+          "oracle_hash": "d9a916ef14b7d8bfe05d74858bf92c64",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_sacrifice_creature_power_damage_spell_v1",
+          "card_name": "Fling",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:86b3e07368c2b2ef1190c6b2a5977e45",
+          "oracle_hash": "4e8893193f72e0e545d986f00e6edd8e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_sacrifice_creature_power_damage_spell_v1",
+          "card_name": "Thud",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6d05535b98987d48dddf63d3c6e08ad3",
+          "oracle_hash": "faee9a2d7c30b63149791b1e1d0b0891",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 3
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_sacrifice_creature_power_damage_spell_v1",
+          "card_name": "Final Strike",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:346223fcdea57c534e7b783dcff541b1",
+          "oracle_hash": "d9a916ef14b7d8bfe05d74858bf92c64",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_sacrifice_creature_power_damage_spell_v1",
+          "card_name": "Fling",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:86b3e07368c2b2ef1190c6b2a5977e45",
+          "oracle_hash": "4e8893193f72e0e545d986f00e6edd8e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_sacrifice_creature_power_damage_spell_v1",
+          "card_name": "Thud",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6d05535b98987d48dddf63d3c6e08ad3",
+          "oracle_hash": "faee9a2d7c30b63149791b1e1d0b0891",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 3
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_sacrifice_creature_power_damage_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Final Strike",
+          "logical_rule_key": "battle_rule_v1:346223fcdea57c534e7b783dcff541b1"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_sacrifice_creature_power_damage_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Fling",
+          "logical_rule_key": "battle_rule_v1:86b3e07368c2b2ef1190c6b2a5977e45"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_sacrifice_creature_power_damage_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Thud",
+          "logical_rule_key": "battle_rule_v1:6d05535b98987d48dddf63d3c6e08ad3"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 3
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Final Strike",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:346223fcdea57c534e7b783dcff541b1"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Fling",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:86b3e07368c2b2ef1190c6b2a5977e45"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Thud",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:6d05535b98987d48dddf63d3c6e08ad3"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

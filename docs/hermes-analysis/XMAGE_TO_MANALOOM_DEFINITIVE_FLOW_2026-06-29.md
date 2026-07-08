@@ -18951,6 +18951,89 @@ Evidence:
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260708_post_pg654_dynamic_damage_wipe_new_server_recheck.md`
 - `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260708_post_pg654_dynamic_damage_wipe_new_server.md`
 
+## 2026-07-08 - PG655 Sacrificed Creature Power Damage Checkpoint
+
+PG655 closed the exact instant/sorcery subpattern where XMage models an
+additional creature sacrifice cost and the spell deals damage equal to the
+sacrificed creature's power:
+
+- new executable scope:
+  `xmage_sacrifice_creature_power_damage_spell_v1`;
+- new direct-damage metadata:
+  `damage_amount_source=sacrificed_creature_power`,
+  `damage_base_amount=0`, `damage_per_count=1`,
+  `requires_sacrifice_creature=true`, and
+  `additional_cost=sacrifice_creature`;
+- XMage source agreement requires `DamageTargetEffect` with
+  `SacrificeCostCreaturesPower.instance` plus a `SacrificeTargetCost` for a
+  creature;
+- promoted cards: `Final Strike`, `Fling`, and `Thud`;
+- runtime now chooses a sacrificed creature for power-scaled damage, stores the
+  sacrificed power/name, resolves damage from that paid cost, and records replay
+  evidence for the dynamic amount;
+- residual boundary: other additional-cost damage spells such as discard,
+  artifact sacrifice, or mixed sacrifice filters remain blocked until their own
+  exact subpattern is implemented.
+
+PG655 apply/postcheck evidence:
+
+- precheck found `3` target rows and `2` existing shadow rows for `Fling`;
+- apply committed `3` promoted rows and deprecated `2` shadow rows;
+- postcheck confirmed `3/3` promoted verified/auto rows with `oracle_hash`;
+- E2E package validation passed PostgreSQL, SQLite/Hermes, canonical snapshot,
+  and `runtime_get_card_effect` for all `3` selected cards;
+- focused tests:
+  `python3 -m unittest test_xmage_authoritative_exact_scope_split.py test_xmage_exact_scope_runtime.py`
+  passed `1226` tests.
+
+During the same validation gate, PG655b repaired `44` trusted executable rows
+missing `oracle_hash`, across `43` card ids and `44` normalized names. It used
+`cards.oracle_text`, changed no `effect_json`, review status, execution status,
+or runtime behavior, and postcheck left
+`remaining_trusted_executable_missing_hash_rows=0`.
+
+Final post-PG655b state:
+
+- PG -> Hermes/SQLite sync:
+  `pg_rows_loaded=5930`, `sqlite_inserted_or_updated=5916`,
+  `canonical_snapshot_rows_exported=5893`;
+- global readiness:
+  `battle_and_oracle_ready=5990`, `battle_family_mapper_required=27886`,
+  `snapshot_has_verified_rule=6018`, `snapshot_has_any_rule=7222`;
+- authoritative queue:
+  `target_identity_count=24963`,
+  `xmage_authoritative_source_count=24650`,
+  `xmage_missing_source_exception_count=313`,
+  `xmage_authoritative_parser_gap_count=0`,
+  `xmage_authoritative_adapter_required_count=24650`,
+  `direct_damage::targeted_damage_variant_v1=767`;
+- final exact-scope recheck returned `proposal_count=0` and
+  `safe_for_batch_pg_package_count=0`;
+- validation gates:
+  `xmage_strategy_consistency_audit` passed `26/26`,
+  `pg_hermes_sqlite_contract_audit` passed `51/51` with the new-server wrapper,
+  `operational_surface_alignment_audit` passed, and
+  `legacy_contamination_audit` passed;
+- public deploy ready checks returned HTTP `200` for `/health`,
+  `/health/ready`, and `/ready` with request id
+  `manual-req-20260708093404`.
+
+Evidence:
+
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260708_pg655_sacrifice_creature_power_damage_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg655_sacrifice_creature_power_damage_new_server_package_package.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg655_sacrifice_creature_power_damage_new_server_battle_rule_sync.json`
+- `docs/hermes-analysis/master_optimizer_reports/pg655_sacrifice_creature_power_damage_new_server_e2e_validation.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg655b_trusted_oracle_hash_backfill_new_server_package.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg655b_trusted_oracle_hash_backfill_new_server_battle_rule_sync.json`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260708_post_pg655b_hash_backfill_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260708_post_pg655b_hash_backfill_new_server_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260708_post_pg655b_hash_backfill_new_server_recheck.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260708_post_pg655b_hash_backfill_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260708_post_pg655b_hash_backfill_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260708_post_pg655b_hash_backfill_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260708_post_pg655b_hash_backfill_new_server.md`
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

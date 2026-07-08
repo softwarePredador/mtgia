@@ -1,0 +1,240 @@
+{
+    "apply_gate": "Applied on 2026-07-08 against the new-server PostgreSQL target; do not rerun apply SQL unless a fresh precheck justifies it.",
+  "backup_table": "manaloom_deploy_audit.pg655_sacrifice_creature_power_damage_ne_20260708_122228",
+  "deploy_id": "PG655",
+  "execution_scenarios": [],
+  "expected_rules": [
+    {
+      "card_name": "Final Strike",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:346223fcdea57c534e7b783dcff541b1",
+      "min_rule_version": 2,
+      "normalized_name": "final strike",
+      "oracle_hash": "d9a916ef14b7d8bfe05d74858bf92c64",
+      "required_effect_fields": {
+        "additional_cost": "sacrifice_creature",
+        "amount": 0,
+        "battle_model_scope": "xmage_sacrifice_creature_power_damage_spell_v1",
+        "damage": 0,
+        "damage_amount_source": "sacrificed_creature_power",
+        "damage_base_amount": 0,
+        "effect": "direct_damage",
+        "requires_sacrifice_creature": true,
+        "target": "opponent_or_planeswalker",
+        "target_constraints": {
+          "scope": "opponent_or_planeswalker"
+        },
+        "xmage_additional_cost_class": "SacrificeTargetCost",
+        "xmage_additional_cost_target": "creature",
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Fling",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:86b3e07368c2b2ef1190c6b2a5977e45",
+      "min_rule_version": 2,
+      "normalized_name": "fling",
+      "oracle_hash": "4e8893193f72e0e545d986f00e6edd8e",
+      "required_effect_fields": {
+        "additional_cost": "sacrifice_creature",
+        "amount": 0,
+        "battle_model_scope": "xmage_sacrifice_creature_power_damage_spell_v1",
+        "damage": 0,
+        "damage_amount_source": "sacrificed_creature_power",
+        "damage_base_amount": 0,
+        "effect": "direct_damage",
+        "requires_sacrifice_creature": true,
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_additional_cost_class": "SacrificeTargetCost",
+        "xmage_additional_cost_target": "creature",
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Thud",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6d05535b98987d48dddf63d3c6e08ad3",
+      "min_rule_version": 2,
+      "normalized_name": "thud",
+      "oracle_hash": "faee9a2d7c30b63149791b1e1d0b0891",
+      "required_effect_fields": {
+        "additional_cost": "sacrifice_creature",
+        "amount": 0,
+        "battle_model_scope": "xmage_sacrifice_creature_power_damage_spell_v1",
+        "damage": 0,
+        "damage_amount_source": "sacrificed_creature_power",
+        "damage_base_amount": 0,
+        "effect": "direct_damage",
+        "requires_sacrifice_creature": true,
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_additional_cost_class": "SacrificeTargetCost",
+        "xmage_additional_cost_target": "creature",
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_sacrifice_creature_power_damage_spell": 3
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg655_sacrifice_creature_power_damage_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg655_sacrifice_creature_power_damage_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg655_sacrifice_creature_power_damage_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg655_sacrifice_creature_power_damage_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg655_sacrifice_creature_power_damage_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg655_sacrifice_creature_power_damage_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-08T12:22:28+00:00",
+    "mutations_performed": [
+        "precheck completed against 127.0.0.1:15432/halder",
+        "apply committed 3 promoted rule rows and deprecated 2 shadow rows",
+        "postcheck confirmed 3 promoted verified/auto rows with oracle_hash",
+        "PG -> Hermes/SQLite sync exported canonical snapshot",
+        "E2E package validation passed PostgreSQL, SQLite, canonical snapshot, and runtime_get_card_effect"
+    ],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Final Strike"
+      },
+      "card_name": "Final Strike",
+      "effect": "direct_damage",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:346223fcdea57c534e7b783dcff541b1",
+      "normalized_name": "final strike",
+      "required_effect_fields": {
+        "additional_cost": "sacrifice_creature",
+        "amount": 0,
+        "battle_model_scope": "xmage_sacrifice_creature_power_damage_spell_v1",
+        "damage": 0,
+        "damage_amount_source": "sacrificed_creature_power",
+        "damage_base_amount": 0,
+        "effect": "direct_damage",
+        "requires_sacrifice_creature": true,
+        "target": "opponent_or_planeswalker",
+        "target_constraints": {
+          "scope": "opponent_or_planeswalker"
+        },
+        "xmage_additional_cost_class": "SacrificeTargetCost",
+        "xmage_additional_cost_target": "creature",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Fling"
+      },
+      "card_name": "Fling",
+      "effect": "direct_damage",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:86b3e07368c2b2ef1190c6b2a5977e45",
+      "normalized_name": "fling",
+      "required_effect_fields": {
+        "additional_cost": "sacrifice_creature",
+        "amount": 0,
+        "battle_model_scope": "xmage_sacrifice_creature_power_damage_spell_v1",
+        "damage": 0,
+        "damage_amount_source": "sacrificed_creature_power",
+        "damage_base_amount": 0,
+        "effect": "direct_damage",
+        "requires_sacrifice_creature": true,
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_additional_cost_class": "SacrificeTargetCost",
+        "xmage_additional_cost_target": "creature",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Thud"
+      },
+      "card_name": "Thud",
+      "effect": "direct_damage",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6d05535b98987d48dddf63d3c6e08ad3",
+      "normalized_name": "thud",
+      "required_effect_fields": {
+        "additional_cost": "sacrifice_creature",
+        "amount": 0,
+        "battle_model_scope": "xmage_sacrifice_creature_power_damage_spell_v1",
+        "damage": 0,
+        "damage_amount_source": "sacrificed_creature_power",
+        "damage_base_amount": 0,
+        "effect": "direct_damage",
+        "requires_sacrifice_creature": true,
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_additional_cost_class": "SacrificeTargetCost",
+        "xmage_additional_cost_target": "creature",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Final Strike",
+    "Fling",
+    "Thud"
+  ],
+  "selected_count": 3,
+  "slug": "sacrifice_creature_power_damage_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Final Strike",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:346223fcdea57c534e7b783dcff541b1",
+      "min_rule_version": 2,
+      "normalized_name": "final strike",
+      "oracle_hash": "d9a916ef14b7d8bfe05d74858bf92c64",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_sacrifice_creature_power_damage_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Fling",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:86b3e07368c2b2ef1190c6b2a5977e45",
+      "min_rule_version": 2,
+      "normalized_name": "fling",
+      "oracle_hash": "4e8893193f72e0e545d986f00e6edd8e",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_sacrifice_creature_power_damage_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Thud",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6d05535b98987d48dddf63d3c6e08ad3",
+      "min_rule_version": 2,
+      "normalized_name": "thud",
+      "oracle_hash": "faee9a2d7c30b63149791b1e1d0b0891",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_sacrifice_creature_power_damage_spell_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+    "status": "applied_postchecked_synced_validated"
+}
