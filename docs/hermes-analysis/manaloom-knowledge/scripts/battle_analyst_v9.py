@@ -13516,6 +13516,41 @@ def create_controller_treasures_after_removal(effect_data, controller, source_ca
     return treasure_count
 
 
+def create_controller_treasures_after_damage(effect_data, controller, source_card, turn):
+    if not isinstance(effect_data, dict) or controller is None:
+        return 0
+    if str(effect_data.get("treasure_trigger") or "").strip().lower() != "on_resolution_after_damage":
+        return 0
+    try:
+        treasure_count = int(
+            effect_data.get("controller_treasure_tokens")
+            or effect_data.get("controller_treasure_count")
+            or effect_data.get("treasure_count")
+            or 0
+        )
+    except Exception:
+        treasure_count = 0
+    if treasure_count <= 0:
+        return 0
+    before = int(getattr(controller, "treasures", 0) or 0)
+    controller.treasures = before + treasure_count
+    emit_replay_event(
+        "treasure_created",
+        player=getattr(controller, "name", None),
+        card=source_card.get("name", "?") if isinstance(source_card, dict) else "?",
+        source=source_card.get("name", "?") if isinstance(source_card, dict) else "?",
+        trigger="on_resolution_after_damage",
+        treasures_created=treasure_count,
+        treasures_before=before,
+        treasures=controller.treasures,
+        treasures_after=controller.treasures,
+        treasure_recipient="controller",
+        turn=turn,
+        **replay_rule_fields(effect_data),
+    )
+    return treasure_count
+
+
 def cant_block_runtime_enabled(effect_data):
     if not isinstance(effect_data, dict):
         return False
@@ -47546,6 +47581,7 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng, *, fini
                 turn,
                 phase=phase,
             )
+            create_controller_treasures_after_damage(effect_data, player, card, turn)
             if finish_spell:
                 finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
             return
@@ -47610,6 +47646,7 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng, *, fini
             turn,
             phase=phase,
         )
+        create_controller_treasures_after_damage(effect_data, player, card, turn)
     if finish_spell:
         finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
 

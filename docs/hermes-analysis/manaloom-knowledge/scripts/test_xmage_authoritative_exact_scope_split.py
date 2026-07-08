@@ -4567,6 +4567,41 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["controller_treasure_tokens"], 2)
         self.assertEqual(effect["treasure_recipient"], "controller")
 
+    def test_damage_target_create_treasure_spell_maps_improvised_weaponry(self) -> None:
+        row = queue_row(
+            split.TREASURE_UNIT,
+            effect_classes=["CreateTokenEffect", "DamageTargetEffect"],
+            xmage_signals=["targeting", "token"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Improvised Weaponry",
+                type_line="Sorcery",
+                oracle_text=(
+                    "Improvised Weaponry deals 2 damage to any target. Create a Treasure token. "
+                    "(It's an artifact with \"{T}, Sacrifice this artifact: Add one mana of any color.\")"
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new DamageTargetEffect(2));
+                this.getSpellAbility().addTarget(new TargetAnyTarget());
+                this.getSpellAbility().addEffect(new CreateTokenEffect(new TreasureToken()).concatBy("."));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "direct_damage")
+        self.assertEqual(effect["battle_model_scope"], split.DAMAGE_CREATE_TREASURE_SCOPE)
+        self.assertEqual(effect["amount"], 2)
+        self.assertEqual(effect["damage"], 2)
+        self.assertEqual(effect["target"], "any_target")
+        self.assertEqual(effect["target_constraints"], {"scope": "any_target"})
+        self.assertEqual(effect["treasure_count"], 1)
+        self.assertEqual(effect["controller_treasure_tokens"], 1)
+        self.assertEqual(effect["treasure_trigger"], "on_resolution_after_damage")
+
     def test_creature_etb_create_treasure_maps_exact_scope(self) -> None:
         row = queue_row(
             split.ETB_TOKEN_CREATURE_UNIT,

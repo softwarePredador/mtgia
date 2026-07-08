@@ -153,6 +153,55 @@ def test_fixed_damage_target_spell_runner_executes_damage_and_cant_be_countered(
     assert result["cant_be_countered"] is True
 
 
+def test_damage_target_create_treasure_runner_executes_damage_and_treasure() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "direct_damage",
+        "battle_model_scope": "xmage_fixed_damage_target_create_treasure_spell_v1",
+        "amount": 2,
+        "damage": 2,
+        "target": "any_target",
+        "target_constraints": {"scope": "any_target"},
+        "treasure_count": 1,
+        "controller_treasure_tokens": 1,
+        "treasure_recipient": "controller",
+        "treasure_trigger": "on_resolution_after_damage",
+    }
+    try:
+        result = validator.run_damage_target_create_treasure(
+            battle,
+            {
+                "name": "Improvised Weaponry deals fixed target damage and creates Treasure",
+                "type": "damage_target_create_treasure",
+                "card": {"name": "Improvised Weaponry", "type_line": "Sorcery"},
+                "target": {
+                    "name": "E2E Damage Treasure Legal Target",
+                    "type_line": "Creature",
+                    "effect": "creature",
+                    "power": 2,
+                    "toughness": 2,
+                },
+                "expected_damage": 2,
+                "expected_life_gain": 0,
+                "expected_treasure_count": 1,
+                "expected_target_constraints": {"scope": "any_target"},
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["damage"] == 2
+    assert result["treasures_created"] == 1
+    assert result["controller_treasures"] == 1
+    assert result["target"] == "E2E Damage Treasure Legal Target"
+
+
 def test_simple_activated_damage_runner_executes_random_discard_cost() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

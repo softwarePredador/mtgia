@@ -230,6 +230,7 @@ X_DAMAGE_SCOPE = "xmage_x_damage_target_spell_v1"
 DAMAGE_EXILE_IF_DIES_SCOPE = "xmage_fixed_damage_target_exile_if_dies_spell_v1"
 SACRIFICE_CREATURE_POWER_DAMAGE_SCOPE = "xmage_sacrifice_creature_power_damage_spell_v1"
 DAMAGE_GAIN_LIFE_SCOPE = "xmage_fixed_damage_target_and_controller_gain_life_spell_v1"
+DAMAGE_CREATE_TREASURE_SCOPE = "xmage_fixed_damage_target_create_treasure_spell_v1"
 GRAVEYARD_COUNT_DAMAGE_SCOPE = "xmage_dynamic_graveyard_count_damage_spell_v1"
 DYNAMIC_COUNT_DAMAGE_SCOPE = "xmage_dynamic_count_damage_spell_v1"
 DESTROY_GAIN_LIFE_SCOPE = "xmage_destroy_target_and_controller_gain_life_spell_v1"
@@ -2469,6 +2470,65 @@ def destroy_target_create_treasure_from_source(source: str) -> int | str:
     if token_class != "TreasureToken":
         return "destroy_treasure_source_token_not_treasure"
     return int(token_count)
+
+
+def damage_target_create_treasure_from_oracle(
+    metadata: dict[str, Any],
+) -> tuple[int, str, int] | str:
+    text = normalized_token_oracle_phrase(oracle_text(metadata))
+    match = re.fullmatch(
+        r".+ deals (?P<amount>\d+) damage to "
+        r"(?P<target>any target|target opponent|target player|target creature or planeswalker|target creature)\. "
+        r"create (?P<count>a|an|one|two|three|four|five|\d+) treasure tokens?",
+        text,
+    )
+    if not match:
+        return "damage_treasure_oracle_not_exact"
+    amount = int(match.group("amount"))
+    if amount <= 0:
+        return "damage_treasure_oracle_damage_not_fixed_positive"
+    target_map = {
+        "any target": "any_target",
+        "target opponent": "opponent",
+        "target player": "player",
+        "target creature or planeswalker": "creature_or_planeswalker",
+        "target creature": "creature",
+    }
+    target = target_map.get(match.group("target").strip())
+    if target is None:
+        return "damage_treasure_oracle_target_not_supported"
+    count = fixed_treasure_count_word(match.group("count"))
+    if count is None or count <= 0:
+        return "damage_treasure_oracle_count_not_fixed_positive"
+    return amount, target, int(count)
+
+
+def damage_target_create_treasure_from_source(source: str) -> tuple[int, str, int] | str:
+    text = source or ""
+    if has_additional_cost(text):
+        return "damage_treasure_additional_cost_not_supported"
+    if "TargetPointer" in text or ".setTargetPointer" in text:
+        return "damage_treasure_target_pointer_not_supported"
+    if len(re.findall(r"new\s+DamageTargetEffect\s*\(", text, re.S)) != 1:
+        return "damage_treasure_source_damage_not_single"
+    amount = java_constructor_int(text, "DamageTargetEffect")
+    if amount is None or amount <= 0:
+        return "damage_treasure_source_damage_not_fixed_positive"
+    target = damage_target_from_source(text)
+    if target is None:
+        return "damage_treasure_source_target_not_supported"
+    parsed_token = fixed_create_token_effect_from_source(text)
+    if isinstance(parsed_token, dict):
+        return "damage_treasure_source_token_count_dynamic"
+    if isinstance(parsed_token, str):
+        return parsed_token
+    parsed_parts = fixed_literal_token_parts(parsed_token)
+    if isinstance(parsed_parts, str):
+        return parsed_parts
+    token_class, token_count, _parsed_token_fields = parsed_parts
+    if token_class != "TreasureToken":
+        return "damage_treasure_source_token_not_treasure"
+    return int(amount), target, int(token_count)
 
 
 def creature_etb_create_treasure_from_oracle(metadata: dict[str, Any]) -> int | dict[str, Any] | str:
@@ -28290,6 +28350,47 @@ def split_row(
                 effect_json,
                 family_id="xmage_creature_etb_create_treasure",
             ), "selected_exact_scope"
+        if classes == {"CreateTokenEffect", "DamageTargetEffect"}:
+            unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+            if unsupported_abilities:
+                return None, "damage_treasure_ability_class_not_simple"
+            oracle_match = damage_target_create_treasure_from_oracle(metadata)
+            if isinstance(oracle_match, str):
+                return None, oracle_match
+            source_match = damage_target_create_treasure_from_source(source_text)
+            if isinstance(source_match, str):
+                return None, source_match
+            oracle_amount, oracle_target, oracle_treasure_count = oracle_match
+            source_amount, source_target, source_treasure_count = source_match
+            if int(source_amount) != int(oracle_amount):
+                return None, "damage_treasure_source_oracle_damage_mismatch"
+            if source_target != oracle_target:
+                return None, "damage_treasure_source_oracle_target_mismatch"
+            if int(source_treasure_count) != int(oracle_treasure_count):
+                return None, "damage_treasure_source_oracle_count_mismatch"
+            if not source_matches_target_constraint(source_text, oracle_target):
+                return None, "damage_treasure_target_source_mismatch"
+            target_base = restricted_target_base(oracle_target)
+            effect_json = {
+                "effect": "direct_damage",
+                "battle_model_scope": DAMAGE_CREATE_TREASURE_SCOPE,
+                "amount": int(oracle_amount),
+                "damage": int(oracle_amount),
+                "target": target_base,
+                "target_constraints": target_constraints_for(oracle_target),
+                "treasure_count": int(oracle_treasure_count),
+                "controller_treasure_tokens": int(oracle_treasure_count),
+                "treasure_recipient": "controller",
+                "treasure_trigger": "on_resolution_after_damage",
+                "xmage_effect_classes": ["DamageTargetEffect", "CreateTokenEffect"],
+                **flags,
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_fixed_damage_target_create_treasure_spell",
+            ), "selected_exact_scope"
         if classes != {"CreateTokenEffect", "DestroyTargetEffect"}:
             return None, "destroy_treasure_effect_classes_not_exact"
         unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
@@ -32843,6 +32944,7 @@ def build_exact_split_report(
                 "direct_damage::targeted_damage_variant_v1 rows with one-shot DamageTargetEffect whose amount is an exact supported battlefield/hand/domain count, optional fixed base amount, and supported target constraints",
                 "removal_destroy::targeted_destroy_variant_v1 rows with DestroyTargetEffect, EntersBattlefieldTriggeredAbility, and exact ETB destroy Oracle/source target constraints",
                 "treasure_maker::single_treasure_creation_v1 rows with one-shot DestroyTargetEffect + CreateTokenEffect(new TreasureToken(), N), exact Oracle target/count agreement, and no auxiliary abilities",
+                "treasure_maker::single_treasure_creation_v1 rows with one-shot DamageTargetEffect + CreateTokenEffect(new TreasureToken(), N), exact Oracle target/damage/count agreement, and no auxiliary abilities",
                 "bounce::targeted_return_to_hand_variant_v1 rows with ReturnToHandTargetEffect, EntersBattlefieldTriggeredAbility, exact ETB return-target-to-hand Oracle text, no condition, and no multi-target adjuster",
                 "add_counters::targeted_add_counters_variant_v1 rows with AddCountersTargetEffect, EntersBattlefieldTriggeredAbility, exact one target creature Oracle text, and only static self keywords",
                 "add_counters::source_add_counters_variant_v1 rows with AddCountersSourceEffect, SimpleActivatedAbility, exact self-counter Oracle text, and mana/tap source costs only",

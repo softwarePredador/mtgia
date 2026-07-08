@@ -900,6 +900,7 @@ def run_damage_gain_life_spell(
     opponent.life = int(scenario.get("opponent_life") or 20)
     expected_damage = int(scenario.get("expected_damage") or 0)
     expected_life_gain = int(scenario.get("expected_life_gain") or 0)
+    expected_treasure_count = int(scenario.get("expected_treasure_count") or 0)
     constraints = dict(scenario.get("expected_target_constraints") or {})
     target = dict(scenario.get("target") or {})
     nonmatching_target = None
@@ -918,6 +919,7 @@ def run_damage_gain_life_spell(
 
     before_events = len(events)
     controller_life_before = active.life
+    controller_treasures_before = int(getattr(active, "treasures", 0) or 0)
     opponent_life_before = opponent.life
     battle.apply_effect_immediate(
         active,
@@ -950,6 +952,30 @@ def run_damage_gain_life_spell(
     expected_controller_life = controller_life_before + expected_life_gain
     if active.life != expected_controller_life:
         fail("battle_execution", f"{card['name']} controller life={active.life}, expected {expected_controller_life}")
+    treasure_delta = int(getattr(active, "treasures", 0) or 0) - controller_treasures_before
+    if treasure_delta != expected_treasure_count:
+        fail(
+            "battle_execution",
+            f"{card['name']} treasure delta={treasure_delta}, expected {expected_treasure_count}",
+        )
+    if expected_treasure_count:
+        treasure_event = next(
+            (
+                data
+                for event_name, data in events[before_events:]
+                if event_name == "treasure_created"
+                and data.get("card") == card.get("name")
+                and data.get("trigger") == "on_resolution_after_damage"
+            ),
+            None,
+        )
+        if treasure_event is None:
+            fail("battle_events", f"missing {card['name']} post-damage treasure_created event")
+        if int(treasure_event.get("treasures_created") or 0) != expected_treasure_count:
+            fail(
+                "battle_events",
+                f"{card['name']} event treasures_created={treasure_event.get('treasures_created')}",
+            )
 
     if target:
         target_name = str(target.get("name") or "")
@@ -980,6 +1006,8 @@ def run_damage_gain_life_spell(
         "target": damage_event.get("target") or damage_event.get("target_player"),
         "controller_life": active.life,
         "opponent_life": opponent.life,
+        "treasures_created": expected_treasure_count,
+        "controller_treasures": int(getattr(active, "treasures", 0) or 0),
     }
 
 
@@ -998,6 +1026,14 @@ def run_fixed_damage_target_spell(
             fail("battle_execution", f"{card['name']} was not visible as cant_be_countered")
         result["cant_be_countered"] = True
     return result
+
+
+def run_damage_target_create_treasure(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    return run_damage_gain_life_spell(battle, scenario, events)
 
 
 def run_creature_etb_dynamic_life_gain(
@@ -6938,6 +6974,7 @@ SCENARIO_RUNNERS = {
     "creature_enters_life_gain": run_creature_enters_life_gain,
     "creature_etb_scry": run_creature_etb_scry,
     "destroy_target_create_treasure": run_destroy_target_create_treasure,
+    "damage_target_create_treasure": run_damage_target_create_treasure,
     "damage_prevention": run_damage_prevention,
     "fixed_damage_target_spell": run_fixed_damage_target_spell,
     "dynamic_life_gain": run_dynamic_life_gain,
