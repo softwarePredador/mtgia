@@ -1,0 +1,381 @@
+{
+  "battle_execution": {
+    "event_count": 24,
+    "results": [
+      {
+        "assigned_total": 2,
+        "card_name": "Dual Shot",
+        "damage_markers": {
+          "E2E Illegal Damage Target": 0,
+          "E2E Legal Damage Target 1": 1,
+          "E2E Legal Damage Target 2": 1
+        },
+        "damaged_names": [
+          "E2E Legal Damage Target 1",
+          "E2E Legal Damage Target 2"
+        ],
+        "nonmatching_target": "E2E Illegal Damage Target",
+        "scenario": "Dual Shot deals 1 damage to each target",
+        "targets": [
+          "E2E Legal Damage Target 1",
+          "E2E Legal Damage Target 2"
+        ]
+      },
+      {
+        "assigned_total": 4,
+        "card_name": "Furious Reprisal",
+        "damage_markers": {
+          "E2E Illegal Damage Target": 0,
+          "E2E Legal Damage Target 1": 2,
+          "E2E Legal Damage Target 2": 2
+        },
+        "damaged_names": [
+          "E2E Legal Damage Target 1",
+          "E2E Legal Damage Target 2"
+        ],
+        "nonmatching_target": "E2E Illegal Damage Target",
+        "scenario": "Furious Reprisal deals 2 damage to each target",
+        "targets": [
+          "E2E Legal Damage Target 1",
+          "E2E Legal Damage Target 2"
+        ]
+      },
+      {
+        "assigned_total": 6,
+        "card_name": "Jagged Lightning",
+        "damage_markers": {
+          "E2E Illegal Damage Target": 0,
+          "E2E Legal Damage Target 1": 3,
+          "E2E Legal Damage Target 2": 3
+        },
+        "damaged_names": [
+          "E2E Legal Damage Target 1",
+          "E2E Legal Damage Target 2"
+        ],
+        "nonmatching_target": "E2E Illegal Damage Target",
+        "scenario": "Jagged Lightning deals 3 damage to each target",
+        "targets": [
+          "E2E Legal Damage Target 1",
+          "E2E Legal Damage Target 2"
+        ]
+      },
+      {
+        "assigned_total": 6,
+        "card_name": "Pinnacle of Rage",
+        "damage_markers": {
+          "E2E Illegal Damage Target": 0,
+          "E2E Legal Damage Target 1": 3,
+          "E2E Legal Damage Target 2": 3
+        },
+        "damaged_names": [
+          "E2E Legal Damage Target 1",
+          "E2E Legal Damage Target 2"
+        ],
+        "nonmatching_target": "E2E Illegal Damage Target",
+        "scenario": "Pinnacle of Rage deals 3 damage to each target",
+        "targets": [
+          "E2E Legal Damage Target 1",
+          "E2E Legal Damage Target 2"
+        ]
+      },
+      {
+        "assigned_total": 4,
+        "card_name": "Storm of Steel",
+        "damage_markers": {
+          "E2E Illegal Damage Target": 0,
+          "E2E Legal Damage Target 1": 2,
+          "E2E Legal Damage Target 2": 2
+        },
+        "damaged_names": [
+          "E2E Legal Damage Target 1",
+          "E2E Legal Damage Target 2"
+        ],
+        "nonmatching_target": "E2E Illegal Damage Target",
+        "scenario": "Storm of Steel deals 2 damage to each target",
+        "targets": [
+          "E2E Legal Damage Target 1",
+          "E2E Legal Damage Target 2"
+        ]
+      },
+      {
+        "assigned_total": 4,
+        "card_name": "Swelter",
+        "damage_markers": {
+          "E2E Illegal Damage Target": 0,
+          "E2E Legal Damage Target 1": 2,
+          "E2E Legal Damage Target 2": 2
+        },
+        "damaged_names": [
+          "E2E Legal Damage Target 1",
+          "E2E Legal Damage Target 2"
+        ],
+        "nonmatching_target": "E2E Illegal Damage Target",
+        "scenario": "Swelter deals 2 damage to each target",
+        "targets": [
+          "E2E Legal Damage Target 1",
+          "E2E Legal Damage Target 2"
+        ]
+      }
+    ],
+    "scenario_count": 6
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-08T19:19:47.754190+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg669_damage_each_target_package_manifest.json",
+  "package_id": "pg669_damage_each_target_package_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 6
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_each_target_spell_v1",
+          "card_name": "Dual Shot",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:842e945d5ea51e4543ecd8893d885a53",
+          "oracle_hash": "6daaff924d8b9f82f1cae620b46fd241",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_each_target_spell_v1",
+          "card_name": "Furious Reprisal",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c1ab7d2e2dd263844aed44f2f2d4957a",
+          "oracle_hash": "9bd9eb6b5582febd39fe4c14b869e597",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_each_target_spell_v1",
+          "card_name": "Jagged Lightning",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2938db8afb659c7365df1829893a8cbf",
+          "oracle_hash": "56235a14493124e5d85faebf8dcc245b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_each_target_spell_v1",
+          "card_name": "Pinnacle of Rage",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c8f0c970e5627709918c66013552a0a1",
+          "oracle_hash": "4ad4ecca3d73471d2abe17e9dabc39bc",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_each_target_spell_v1",
+          "card_name": "Storm of Steel",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7f0eaefa9d0a36848db1f9c2db74f696",
+          "oracle_hash": "65b87bdad31235af7321ab50fae324f7",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_each_target_spell_v1",
+          "card_name": "Swelter",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e0d02c8b56b4c56167ea3e2e6ade5866",
+          "oracle_hash": "2c133f34be23e41ed746a621695a9664",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 6
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_each_target_spell_v1",
+          "card_name": "Dual Shot",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:842e945d5ea51e4543ecd8893d885a53",
+          "oracle_hash": "6daaff924d8b9f82f1cae620b46fd241",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_each_target_spell_v1",
+          "card_name": "Furious Reprisal",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c1ab7d2e2dd263844aed44f2f2d4957a",
+          "oracle_hash": "9bd9eb6b5582febd39fe4c14b869e597",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_each_target_spell_v1",
+          "card_name": "Jagged Lightning",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2938db8afb659c7365df1829893a8cbf",
+          "oracle_hash": "56235a14493124e5d85faebf8dcc245b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_each_target_spell_v1",
+          "card_name": "Pinnacle of Rage",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c8f0c970e5627709918c66013552a0a1",
+          "oracle_hash": "4ad4ecca3d73471d2abe17e9dabc39bc",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_each_target_spell_v1",
+          "card_name": "Storm of Steel",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7f0eaefa9d0a36848db1f9c2db74f696",
+          "oracle_hash": "65b87bdad31235af7321ab50fae324f7",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_each_target_spell_v1",
+          "card_name": "Swelter",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e0d02c8b56b4c56167ea3e2e6ade5866",
+          "oracle_hash": "2c133f34be23e41ed746a621695a9664",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 6
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_each_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Dual Shot",
+          "logical_rule_key": "battle_rule_v1:842e945d5ea51e4543ecd8893d885a53"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_each_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Furious Reprisal",
+          "logical_rule_key": "battle_rule_v1:c1ab7d2e2dd263844aed44f2f2d4957a"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_each_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Jagged Lightning",
+          "logical_rule_key": "battle_rule_v1:2938db8afb659c7365df1829893a8cbf"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_each_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Pinnacle of Rage",
+          "logical_rule_key": "battle_rule_v1:c8f0c970e5627709918c66013552a0a1"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_each_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Storm of Steel",
+          "logical_rule_key": "battle_rule_v1:7f0eaefa9d0a36848db1f9c2db74f696"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_each_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Swelter",
+          "logical_rule_key": "battle_rule_v1:e0d02c8b56b4c56167ea3e2e6ade5866"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 6
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Dual Shot",
+          "component_keys": [],
+          "effect": "multi_target_damage",
+          "logical_rule_key": "battle_rule_v1:842e945d5ea51e4543ecd8893d885a53"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Furious Reprisal",
+          "component_keys": [],
+          "effect": "multi_target_damage",
+          "logical_rule_key": "battle_rule_v1:c1ab7d2e2dd263844aed44f2f2d4957a"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Jagged Lightning",
+          "component_keys": [],
+          "effect": "multi_target_damage",
+          "logical_rule_key": "battle_rule_v1:2938db8afb659c7365df1829893a8cbf"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Pinnacle of Rage",
+          "component_keys": [],
+          "effect": "multi_target_damage",
+          "logical_rule_key": "battle_rule_v1:c8f0c970e5627709918c66013552a0a1"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Storm of Steel",
+          "component_keys": [],
+          "effect": "multi_target_damage",
+          "logical_rule_key": "battle_rule_v1:7f0eaefa9d0a36848db1f9c2db74f696"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Swelter",
+          "component_keys": [],
+          "effect": "multi_target_damage",
+          "logical_rule_key": "battle_rule_v1:e0d02c8b56b4c56167ea3e2e6ade5866"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 24,
+        "scenarios": 6
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

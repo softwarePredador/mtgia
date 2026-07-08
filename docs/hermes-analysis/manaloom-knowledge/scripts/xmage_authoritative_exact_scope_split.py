@@ -224,6 +224,7 @@ DRAW_LOSE_LIFE_SPELL_SCOPE = "xmage_fixed_controller_draw_lose_life_spell_v1"
 TARGET_DRAW_LOSE_LIFE_SPELL_SCOPE = "xmage_fixed_target_player_draw_lose_life_spell_v1"
 DAMAGE_SCOPE = "xmage_fixed_damage_target_spell_v1"
 MULTI_TARGET_DAMAGE_SCOPE = "xmage_fixed_multi_target_damage_spell_v1"
+DAMAGE_EACH_TARGET_SCOPE = "xmage_fixed_damage_each_target_spell_v1"
 DAMAGE_EACH_OPPONENT_SCOPE = "spell_damage_each_opponent_v1"
 X_DAMAGE_SCOPE = "xmage_x_damage_target_spell_v1"
 DAMAGE_EXILE_IF_DIES_SCOPE = "xmage_fixed_damage_target_exile_if_dies_spell_v1"
@@ -11126,6 +11127,9 @@ def multi_target_damage_count_from_phrase(phrase: str, amount: int) -> tuple[int
         return 1, 2
     if normalized == "one, two, or three":
         return 1, 3
+    exact_count = word_count_value(normalized)
+    if exact_count is not None and exact_count > 0:
+        return int(exact_count), int(exact_count)
     up_to_match = re.fullmatch(r"up to (?P<count>one|two|three|four|five|six|seven|eight|nine|ten|\d+)", normalized)
     if up_to_match:
         count = word_count_value(up_to_match.group("count"))
@@ -11280,6 +11284,135 @@ def fixed_multi_target_damage_from_source(source: str) -> dict[str, Any] | str |
         "damage": amount,
         "target": target,
         "target_controller": target_controller,
+        "target_count_min": int(target_count_min),
+        "target_count_max": int(target_count_max),
+        "up_to_count": int(target_count_min) == 0,
+    }
+
+
+def fixed_damage_each_target_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str | None:
+    text = strip_parenthetical_reminders(oracle_text(metadata))
+    text = re.sub(r"\s+", " ", text.strip().lower())
+    if " each of x " in text or " x target" in text:
+        return "damage_each_target_oracle_x_not_supported"
+    match = re.fullmatch(
+        r".+ deals (?P<amount>\d+) damage to each of (?P<body>.+?)\.?",
+        text,
+    )
+    if not match:
+        return None
+    amount = int(match.group("amount"))
+    if amount <= 0:
+        return "damage_each_target_oracle_amount_not_fixed"
+    body = match.group("body").strip()
+    count_prefixes = [
+        "one, two, or three",
+        "one or two",
+        "up to ten",
+        "up to nine",
+        "up to eight",
+        "up to seven",
+        "up to six",
+        "up to five",
+        "up to four",
+        "up to three",
+        "up to two",
+        "up to one",
+        "ten",
+        "nine",
+        "eight",
+        "seven",
+        "six",
+        "five",
+        "four",
+        "three",
+        "two",
+        "one",
+    ]
+    count_phrase = None
+    target_phrase = None
+    for prefix in count_prefixes:
+        if body == prefix or body.startswith(prefix + " "):
+            count_phrase = prefix
+            target_phrase = body[len(prefix) :].strip()
+            break
+    if not count_phrase or not target_phrase:
+        return "damage_each_target_oracle_count_not_supported"
+    count_range = multi_target_damage_count_from_phrase(count_phrase, amount)
+    if count_range is None:
+        return "damage_each_target_oracle_count_not_supported"
+    target_spec = multi_target_damage_target_from_phrase(target_phrase)
+    if target_spec is None:
+        return "damage_each_target_oracle_target_not_supported"
+    target, target_controller = target_spec
+    target_count_min, target_count_max = count_range
+    if target_count_max <= 1:
+        return "damage_each_target_oracle_count_not_supported"
+    return {
+        "amount": amount,
+        "damage": amount,
+        "damage_per_target": amount,
+        "target": target,
+        "target_controller": target_controller,
+        "target_count_min": int(target_count_min),
+        "target_count_max": int(target_count_max),
+        "up_to_count": int(target_count_min) == 0,
+    }
+
+
+def fixed_damage_each_target_from_source(source: str) -> dict[str, Any] | str | None:
+    text = source or ""
+    if has_additional_cost(text) or "AlternativeCostSourceAbility" in text:
+        return "damage_each_target_additional_cost_not_supported"
+    if any(token in text for token in ("GetXValue", "ManacostVariableValue", "XValue", "xValue", "XTargetsCountAdjuster")):
+        return "damage_each_target_source_x_not_supported"
+    if "TargetPointer" in text or ".setTargetPointer" in text:
+        return "damage_each_target_source_target_pointer_not_supported"
+    if len(re.findall(r"new\s+DamageTargetEffect\s*\(", text)) != 1:
+        return "damage_each_target_source_not_single"
+    constructor_args = extract_constructor_args(text, "DamageTargetEffect")
+    if constructor_args is None:
+        return "damage_each_target_source_not_supported"
+    parts = split_top_level_args(constructor_args)
+    if not parts or not re.fullmatch(r"\d+", str(parts[0] or "").strip()):
+        return "damage_each_target_source_amount_not_fixed"
+    amount = int(str(parts[0]).strip())
+    if amount <= 0:
+        return "damage_each_target_source_amount_not_fixed"
+    target_matches = list(
+        re.finditer(
+            r"new\s+(?P<class>TargetAnyTarget|TargetCreaturePermanent|TargetCreatureOrPlaneswalker)\s*\(",
+            text,
+        )
+    )
+    if len(target_matches) != 1:
+        return "damage_each_target_source_target_constructor_not_single"
+    target_class = target_matches[0].group("class")
+    args = extract_constructor_args(text[target_matches[0].start() :], target_class)
+    if args is None:
+        return "damage_each_target_source_target_constructor_not_supported"
+    target_parts = split_top_level_args(args)
+    numeric_parts = [int(str(part).strip()) for part in target_parts if re.fullmatch(r"\d+", str(part or "").strip())]
+    if len(numeric_parts) >= 2:
+        target_count_min, target_count_max = numeric_parts[0], numeric_parts[1]
+    elif len(numeric_parts) == 1:
+        target_count_min = numeric_parts[0]
+        target_count_max = numeric_parts[0]
+    else:
+        return "damage_each_target_source_target_count_not_supported"
+    if target_count_max <= 1:
+        return "damage_each_target_source_target_count_not_supported"
+    target_map = {
+        "TargetAnyTarget": "any_target",
+        "TargetCreaturePermanent": "creature",
+        "TargetCreatureOrPlaneswalker": "creature_or_planeswalker",
+    }
+    return {
+        "amount": amount,
+        "damage": amount,
+        "damage_per_target": amount,
+        "target": target_map[target_class],
+        "target_controller": None,
         "target_count_min": int(target_count_min),
         "target_count_max": int(target_count_max),
         "up_to_count": int(target_count_min) == 0,
@@ -29609,6 +29742,58 @@ def split_row(
                 effect_json,
                 family_id="xmage_fixed_damage_exile_if_dies_spell",
             ), "selected_exact_scope"
+
+        if classes == {"DamageTargetEffect"}:
+            oracle_each_target_damage = fixed_damage_each_target_from_oracle(metadata)
+            if isinstance(oracle_each_target_damage, str):
+                return None, oracle_each_target_damage
+            if oracle_each_target_damage is not None:
+                source_each_target_damage = fixed_damage_each_target_from_source(source_text)
+                if isinstance(source_each_target_damage, str):
+                    return None, source_each_target_damage
+                if source_each_target_damage is None:
+                    return None, "damage_each_target_source_not_supported"
+                for key in (
+                    "amount",
+                    "target",
+                    "target_controller",
+                    "target_count_min",
+                    "target_count_max",
+                    "up_to_count",
+                ):
+                    if source_each_target_damage.get(key) != oracle_each_target_damage.get(key):
+                        return None, f"damage_each_target_source_oracle_{key}_mismatch"
+                target_type = str(oracle_each_target_damage["target"])
+                target_constraints = target_constraints_for(target_type)
+                if oracle_each_target_damage.get("target_controller"):
+                    target_constraints["controller_scope"] = oracle_each_target_damage["target_controller"]
+                effect_json = {
+                    "effect": "multi_target_damage",
+                    "battle_model_scope": DAMAGE_EACH_TARGET_SCOPE,
+                    "ability_kind": "one_shot",
+                    "amount": int(oracle_each_target_damage["amount"]),
+                    "damage": int(oracle_each_target_damage["damage"]),
+                    "damage_per_target": int(oracle_each_target_damage["damage_per_target"]),
+                    "damage_assignment_mode": "each_target",
+                    "target": target_type,
+                    "target_constraints": target_constraints,
+                    "target_count": int(oracle_each_target_damage["target_count_max"]),
+                    "target_count_min": int(oracle_each_target_damage["target_count_min"]),
+                    "target_count_max": int(oracle_each_target_damage["target_count_max"]),
+                    "max_targets": int(oracle_each_target_damage["target_count_max"]),
+                    "up_to_count": bool(oracle_each_target_damage["up_to_count"]),
+                    "divided_damage": False,
+                    "xmage_effect_class": "DamageTargetEffect",
+                    **flags,
+                }
+                if oracle_each_target_damage.get("target_controller"):
+                    effect_json["target_controller"] = oracle_each_target_damage["target_controller"]
+                return build_proposal(
+                    row,
+                    metadata,
+                    effect_json,
+                    family_id="xmage_fixed_damage_each_target_spell",
+                ), "selected_exact_scope"
 
         cant_be_countered_auxiliary = classes == {"CantBeCounteredSourceEffect", "DamageTargetEffect"}
         if classes != {"DamageTargetEffect"} and not cant_be_countered_auxiliary:

@@ -2205,6 +2205,73 @@ def test_multi_target_damage_scenario_exercises_divided_damage() -> None:
     assert len(scenario["targets"]) == 3
 
 
+def test_multi_target_damage_scenario_exercises_each_target_damage() -> None:
+    proposal = {
+        "normalized_name": "swelter",
+        "card_name": "Swelter",
+        "oracle_hash": "hash-swelter",
+        "logical_rule_key": "battle_rule_v1:hash-swelter",
+        "effect_json": {
+            "effect": "multi_target_damage",
+            "battle_model_scope": "xmage_fixed_damage_each_target_spell_v1",
+            "amount": 2,
+            "damage": 2,
+            "damage_per_target": 2,
+            "damage_assignment_mode": "each_target",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "target_count_min": 2,
+            "target_count_max": 2,
+            "max_targets": 2,
+            "divided_damage": False,
+        },
+    }
+
+    rule = builder.expected_rule_from_proposal(proposal)
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert rule["required_effect_fields"]["damage_assignment_mode"] == "each_target"
+    assert rule["required_effect_fields"]["damage_per_target"] == 2
+    assert scenario is not None
+    assert scenario["type"] == "multi_target_damage"
+    assert scenario["name"] == "Swelter deals 2 damage to each target"
+    assert scenario["expected_total_damage"] == 4
+    assert scenario["expected_target_count"] == 2
+    assert len(scenario["targets"]) == 2
+
+
+def test_multi_target_damage_scenario_keeps_one_damage_each_target() -> None:
+    proposal = {
+        "normalized_name": "dual shot",
+        "card_name": "Dual Shot",
+        "oracle_hash": "hash-dual-shot",
+        "logical_rule_key": "battle_rule_v1:hash-dual-shot",
+        "effect_json": {
+            "effect": "multi_target_damage",
+            "battle_model_scope": "xmage_fixed_damage_each_target_spell_v1",
+            "amount": 1,
+            "damage": 1,
+            "damage_per_target": 1,
+            "damage_assignment_mode": "each_target",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "target_count_min": 0,
+            "target_count_max": 2,
+            "max_targets": 2,
+            "up_to_count": True,
+            "divided_damage": False,
+        },
+    }
+
+    rule = builder.expected_rule_from_proposal(proposal)
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["name"] == "Dual Shot deals 1 damage to each target"
+    assert scenario["expected_total_damage"] == 2
+    assert scenario["expected_target_count"] == 2
+
+
 def test_single_target_removal_scenario_models_excluded_color_and_combat_state() -> None:
     rule = {
         "normalized_name": "assassins blade",

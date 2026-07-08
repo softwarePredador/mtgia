@@ -111,6 +111,9 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "target_count_max",
     "max_targets",
     "up_to_count",
+    "damage_per_target",
+    "damage_assignment_mode",
+    "divided_damage",
     "destination",
     "resolution_order",
     "rest_destination",
@@ -4284,15 +4287,20 @@ def multi_target_damage_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
     required = dict(rule.get("required_effect_fields") or {})
-    if required.get("battle_model_scope") != "xmage_fixed_multi_target_damage_spell_v1":
+    if required.get("battle_model_scope") not in {
+        "xmage_fixed_multi_target_damage_spell_v1",
+        "xmage_fixed_damage_each_target_spell_v1",
+    }:
         return None
     if required.get("effect") != "multi_target_damage":
         return None
     total_damage = int(required.get("amount") or required.get("damage") or 0)
+    per_target_damage = int(required.get("damage_per_target") or total_damage or 0)
+    each_target_mode = str(required.get("damage_assignment_mode") or "").strip().lower() == "each_target"
     target_count = int(required.get("target_count_max") or required.get("max_targets") or required.get("target_count") or 1)
-    if total_damage <= 1 or target_count <= 1:
+    if (not each_target_mode and total_damage <= 1) or (each_target_mode and per_target_damage <= 0) or target_count <= 1:
         return None
-    target_count = max(2, min(target_count, total_damage, 3))
+    target_count = max(2, min(target_count, 3 if each_target_mode else total_damage, 3))
     constraints = dict(required.get("target_constraints") or {})
     targets = []
     for index in range(1, target_count + 1):
@@ -4310,7 +4318,11 @@ def multi_target_damage_execution_scenario_from_expected_rule(
         matching=False,
     )
     return {
-        "name": f"{rule['card_name']} divides {total_damage} damage",
+        "name": (
+            f"{rule['card_name']} deals {per_target_damage} damage to each target"
+            if each_target_mode
+            else f"{rule['card_name']} divides {total_damage} damage"
+        ),
         "type": "multi_target_damage",
         "card": {
             "name": rule["card_name"],
@@ -4318,7 +4330,7 @@ def multi_target_damage_execution_scenario_from_expected_rule(
         },
         "targets": targets,
         "nonmatching_target": nonmatching,
-        "expected_total_damage": total_damage,
+        "expected_total_damage": per_target_damage * target_count if each_target_mode else total_damage,
         "expected_target_count": target_count,
         "expected_effect": required.get("effect"),
         "expected_target_constraints": constraints,

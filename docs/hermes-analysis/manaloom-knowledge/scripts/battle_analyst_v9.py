@@ -47130,7 +47130,17 @@ def apply_multi_target_damage(player, opponents, card, effect_data, turn, rng, *
     except Exception:
         max_targets = max(1, total_damage)
     candidates = _multi_target_damage_candidate_entries(player, opponents, card, effect_data)
-    assignments = _multi_target_damage_assignments(candidates, total_damage, max_targets)
+    if str(effect_data.get("damage_assignment_mode") or "").strip().lower() == "each_target":
+        try:
+            per_target_damage = int(effect_data.get("damage_per_target") or total_damage or 0)
+        except Exception:
+            per_target_damage = total_damage
+        per_target_damage = max(0, per_target_damage)
+        selected = candidates[: max(0, min(len(candidates), int(max_targets or 1)))]
+        assignments = [{"entry": entry, "amount": per_target_damage} for entry in selected]
+        total_damage = per_target_damage * len(assignments)
+    else:
+        assignments = _multi_target_damage_assignments(candidates, total_damage, max_targets)
     if not assignments:
         emit_replay_event(
             "multi_target_damage_resolved",

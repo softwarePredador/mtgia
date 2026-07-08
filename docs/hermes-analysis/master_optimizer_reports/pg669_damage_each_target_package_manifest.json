@@ -1,0 +1,727 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg669_damage_each_target_20260708_191811",
+  "deploy_id": "PG669",
+  "execution_scenarios": [
+    {
+      "card": {
+        "name": "Dual Shot",
+        "type_line": "Instant"
+      },
+      "expected_effect": "multi_target_damage",
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ]
+      },
+      "expected_target_count": 2,
+      "expected_total_damage": 2,
+      "logical_rule_key": "battle_rule_v1:842e945d5ea51e4543ecd8893d885a53",
+      "name": "Dual Shot deals 1 damage to each target",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Damage Target",
+        "type_line": "Land"
+      },
+      "targets": [
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Damage Target 1",
+          "power": 2,
+          "toughness": 6,
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Damage Target 2",
+          "power": 2,
+          "toughness": 6,
+          "type_line": "Creature - Soldier"
+        }
+      ],
+      "type": "multi_target_damage"
+    },
+    {
+      "card": {
+        "name": "Furious Reprisal",
+        "type_line": "Instant"
+      },
+      "expected_effect": "multi_target_damage",
+      "expected_target_constraints": {
+        "scope": "any_target"
+      },
+      "expected_target_count": 2,
+      "expected_total_damage": 4,
+      "logical_rule_key": "battle_rule_v1:c1ab7d2e2dd263844aed44f2f2d4957a",
+      "name": "Furious Reprisal deals 2 damage to each target",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Damage Target",
+        "type_line": "Land"
+      },
+      "targets": [
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Damage Target 1",
+          "power": 2,
+          "toughness": 6,
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Damage Target 2",
+          "power": 2,
+          "toughness": 6,
+          "type_line": "Creature - Soldier"
+        }
+      ],
+      "type": "multi_target_damage"
+    },
+    {
+      "card": {
+        "name": "Jagged Lightning",
+        "type_line": "Instant"
+      },
+      "expected_effect": "multi_target_damage",
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ]
+      },
+      "expected_target_count": 2,
+      "expected_total_damage": 6,
+      "logical_rule_key": "battle_rule_v1:2938db8afb659c7365df1829893a8cbf",
+      "name": "Jagged Lightning deals 3 damage to each target",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Damage Target",
+        "type_line": "Land"
+      },
+      "targets": [
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Damage Target 1",
+          "power": 2,
+          "toughness": 6,
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Damage Target 2",
+          "power": 2,
+          "toughness": 6,
+          "type_line": "Creature - Soldier"
+        }
+      ],
+      "type": "multi_target_damage"
+    },
+    {
+      "card": {
+        "name": "Pinnacle of Rage",
+        "type_line": "Instant"
+      },
+      "expected_effect": "multi_target_damage",
+      "expected_target_constraints": {
+        "scope": "any_target"
+      },
+      "expected_target_count": 2,
+      "expected_total_damage": 6,
+      "logical_rule_key": "battle_rule_v1:c8f0c970e5627709918c66013552a0a1",
+      "name": "Pinnacle of Rage deals 3 damage to each target",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Damage Target",
+        "type_line": "Land"
+      },
+      "targets": [
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Damage Target 1",
+          "power": 2,
+          "toughness": 6,
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Damage Target 2",
+          "power": 2,
+          "toughness": 6,
+          "type_line": "Creature - Soldier"
+        }
+      ],
+      "type": "multi_target_damage"
+    },
+    {
+      "card": {
+        "name": "Storm of Steel",
+        "type_line": "Instant"
+      },
+      "expected_effect": "multi_target_damage",
+      "expected_target_constraints": {
+        "scope": "any_target"
+      },
+      "expected_target_count": 2,
+      "expected_total_damage": 4,
+      "logical_rule_key": "battle_rule_v1:7f0eaefa9d0a36848db1f9c2db74f696",
+      "name": "Storm of Steel deals 2 damage to each target",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Damage Target",
+        "type_line": "Land"
+      },
+      "targets": [
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Damage Target 1",
+          "power": 2,
+          "toughness": 6,
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Damage Target 2",
+          "power": 2,
+          "toughness": 6,
+          "type_line": "Creature - Soldier"
+        }
+      ],
+      "type": "multi_target_damage"
+    },
+    {
+      "card": {
+        "name": "Swelter",
+        "type_line": "Instant"
+      },
+      "expected_effect": "multi_target_damage",
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ]
+      },
+      "expected_target_count": 2,
+      "expected_total_damage": 4,
+      "logical_rule_key": "battle_rule_v1:e0d02c8b56b4c56167ea3e2e6ade5866",
+      "name": "Swelter deals 2 damage to each target",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Damage Target",
+        "type_line": "Land"
+      },
+      "targets": [
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Damage Target 1",
+          "power": 2,
+          "toughness": 6,
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Damage Target 2",
+          "power": 2,
+          "toughness": 6,
+          "type_line": "Creature - Soldier"
+        }
+      ],
+      "type": "multi_target_damage"
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Dual Shot",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:842e945d5ea51e4543ecd8893d885a53",
+      "min_rule_version": 2,
+      "normalized_name": "dual shot",
+      "oracle_hash": "6daaff924d8b9f82f1cae620b46fd241",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "amount": 1,
+        "battle_model_scope": "xmage_fixed_damage_each_target_spell_v1",
+        "damage": 1,
+        "damage_assignment_mode": "each_target",
+        "damage_per_target": 1,
+        "divided_damage": false,
+        "effect": "multi_target_damage",
+        "max_targets": 2,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_count": 2,
+        "target_count_max": 2,
+        "target_count_min": 0,
+        "up_to_count": true,
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Furious Reprisal",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c1ab7d2e2dd263844aed44f2f2d4957a",
+      "min_rule_version": 2,
+      "normalized_name": "furious reprisal",
+      "oracle_hash": "9bd9eb6b5582febd39fe4c14b869e597",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "amount": 2,
+        "battle_model_scope": "xmage_fixed_damage_each_target_spell_v1",
+        "damage": 2,
+        "damage_assignment_mode": "each_target",
+        "damage_per_target": 2,
+        "divided_damage": false,
+        "effect": "multi_target_damage",
+        "max_targets": 2,
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "target_count": 2,
+        "target_count_max": 2,
+        "target_count_min": 2,
+        "up_to_count": false,
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Jagged Lightning",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2938db8afb659c7365df1829893a8cbf",
+      "min_rule_version": 2,
+      "normalized_name": "jagged lightning",
+      "oracle_hash": "56235a14493124e5d85faebf8dcc245b",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "amount": 3,
+        "battle_model_scope": "xmage_fixed_damage_each_target_spell_v1",
+        "damage": 3,
+        "damage_assignment_mode": "each_target",
+        "damage_per_target": 3,
+        "divided_damage": false,
+        "effect": "multi_target_damage",
+        "max_targets": 2,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_count": 2,
+        "target_count_max": 2,
+        "target_count_min": 2,
+        "up_to_count": false,
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Pinnacle of Rage",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c8f0c970e5627709918c66013552a0a1",
+      "min_rule_version": 2,
+      "normalized_name": "pinnacle of rage",
+      "oracle_hash": "4ad4ecca3d73471d2abe17e9dabc39bc",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "amount": 3,
+        "battle_model_scope": "xmage_fixed_damage_each_target_spell_v1",
+        "damage": 3,
+        "damage_assignment_mode": "each_target",
+        "damage_per_target": 3,
+        "divided_damage": false,
+        "effect": "multi_target_damage",
+        "max_targets": 2,
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "target_count": 2,
+        "target_count_max": 2,
+        "target_count_min": 2,
+        "up_to_count": false,
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Storm of Steel",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7f0eaefa9d0a36848db1f9c2db74f696",
+      "min_rule_version": 2,
+      "normalized_name": "storm of steel",
+      "oracle_hash": "65b87bdad31235af7321ab50fae324f7",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "amount": 2,
+        "battle_model_scope": "xmage_fixed_damage_each_target_spell_v1",
+        "damage": 2,
+        "damage_assignment_mode": "each_target",
+        "damage_per_target": 2,
+        "divided_damage": false,
+        "effect": "multi_target_damage",
+        "max_targets": 2,
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "target_count": 2,
+        "target_count_max": 2,
+        "target_count_min": 1,
+        "up_to_count": false,
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Swelter",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e0d02c8b56b4c56167ea3e2e6ade5866",
+      "min_rule_version": 2,
+      "normalized_name": "swelter",
+      "oracle_hash": "2c133f34be23e41ed746a621695a9664",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "amount": 2,
+        "battle_model_scope": "xmage_fixed_damage_each_target_spell_v1",
+        "damage": 2,
+        "damage_assignment_mode": "each_target",
+        "damage_per_target": 2,
+        "divided_damage": false,
+        "effect": "multi_target_damage",
+        "max_targets": 2,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_count": 2,
+        "target_count_max": 2,
+        "target_count_min": 2,
+        "up_to_count": false,
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_fixed_damage_each_target_spell": 6
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg669_damage_each_target_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg669_damage_each_target_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg669_damage_each_target_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg669_damage_each_target_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg669_damage_each_target_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg669_damage_each_target_package_rollback.sql"
+  },
+  "generated_at": "2026-07-08T19:19:07+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Dual Shot"
+      },
+      "card_name": "Dual Shot",
+      "effect": "multi_target_damage",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:842e945d5ea51e4543ecd8893d885a53",
+      "normalized_name": "dual shot",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "amount": 1,
+        "battle_model_scope": "xmage_fixed_damage_each_target_spell_v1",
+        "damage": 1,
+        "damage_assignment_mode": "each_target",
+        "damage_per_target": 1,
+        "divided_damage": false,
+        "effect": "multi_target_damage",
+        "max_targets": 2,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_count": 2,
+        "target_count_max": 2,
+        "target_count_min": 0,
+        "up_to_count": true,
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Furious Reprisal"
+      },
+      "card_name": "Furious Reprisal",
+      "effect": "multi_target_damage",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c1ab7d2e2dd263844aed44f2f2d4957a",
+      "normalized_name": "furious reprisal",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "amount": 2,
+        "battle_model_scope": "xmage_fixed_damage_each_target_spell_v1",
+        "damage": 2,
+        "damage_assignment_mode": "each_target",
+        "damage_per_target": 2,
+        "divided_damage": false,
+        "effect": "multi_target_damage",
+        "max_targets": 2,
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "target_count": 2,
+        "target_count_max": 2,
+        "target_count_min": 2,
+        "up_to_count": false,
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Jagged Lightning"
+      },
+      "card_name": "Jagged Lightning",
+      "effect": "multi_target_damage",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2938db8afb659c7365df1829893a8cbf",
+      "normalized_name": "jagged lightning",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "amount": 3,
+        "battle_model_scope": "xmage_fixed_damage_each_target_spell_v1",
+        "damage": 3,
+        "damage_assignment_mode": "each_target",
+        "damage_per_target": 3,
+        "divided_damage": false,
+        "effect": "multi_target_damage",
+        "max_targets": 2,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_count": 2,
+        "target_count_max": 2,
+        "target_count_min": 2,
+        "up_to_count": false,
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Pinnacle of Rage"
+      },
+      "card_name": "Pinnacle of Rage",
+      "effect": "multi_target_damage",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c8f0c970e5627709918c66013552a0a1",
+      "normalized_name": "pinnacle of rage",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "amount": 3,
+        "battle_model_scope": "xmage_fixed_damage_each_target_spell_v1",
+        "damage": 3,
+        "damage_assignment_mode": "each_target",
+        "damage_per_target": 3,
+        "divided_damage": false,
+        "effect": "multi_target_damage",
+        "max_targets": 2,
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "target_count": 2,
+        "target_count_max": 2,
+        "target_count_min": 2,
+        "up_to_count": false,
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Storm of Steel"
+      },
+      "card_name": "Storm of Steel",
+      "effect": "multi_target_damage",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7f0eaefa9d0a36848db1f9c2db74f696",
+      "normalized_name": "storm of steel",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "amount": 2,
+        "battle_model_scope": "xmage_fixed_damage_each_target_spell_v1",
+        "damage": 2,
+        "damage_assignment_mode": "each_target",
+        "damage_per_target": 2,
+        "divided_damage": false,
+        "effect": "multi_target_damage",
+        "max_targets": 2,
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "target_count": 2,
+        "target_count_max": 2,
+        "target_count_min": 1,
+        "up_to_count": false,
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Swelter"
+      },
+      "card_name": "Swelter",
+      "effect": "multi_target_damage",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e0d02c8b56b4c56167ea3e2e6ade5866",
+      "normalized_name": "swelter",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "amount": 2,
+        "battle_model_scope": "xmage_fixed_damage_each_target_spell_v1",
+        "damage": 2,
+        "damage_assignment_mode": "each_target",
+        "damage_per_target": 2,
+        "divided_damage": false,
+        "effect": "multi_target_damage",
+        "max_targets": 2,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_count": 2,
+        "target_count_max": 2,
+        "target_count_min": 2,
+        "up_to_count": false,
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Dual Shot",
+    "Furious Reprisal",
+    "Jagged Lightning",
+    "Pinnacle of Rage",
+    "Storm of Steel",
+    "Swelter"
+  ],
+  "selected_count": 6,
+  "slug": "damage_each_target",
+  "snapshot_checks": [
+    {
+      "card_name": "Dual Shot",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:842e945d5ea51e4543ecd8893d885a53",
+      "min_rule_version": 2,
+      "normalized_name": "dual shot",
+      "oracle_hash": "6daaff924d8b9f82f1cae620b46fd241",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_each_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Furious Reprisal",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c1ab7d2e2dd263844aed44f2f2d4957a",
+      "min_rule_version": 2,
+      "normalized_name": "furious reprisal",
+      "oracle_hash": "9bd9eb6b5582febd39fe4c14b869e597",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_each_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Jagged Lightning",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2938db8afb659c7365df1829893a8cbf",
+      "min_rule_version": 2,
+      "normalized_name": "jagged lightning",
+      "oracle_hash": "56235a14493124e5d85faebf8dcc245b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_each_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Pinnacle of Rage",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c8f0c970e5627709918c66013552a0a1",
+      "min_rule_version": 2,
+      "normalized_name": "pinnacle of rage",
+      "oracle_hash": "4ad4ecca3d73471d2abe17e9dabc39bc",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_each_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Storm of Steel",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7f0eaefa9d0a36848db1f9c2db74f696",
+      "min_rule_version": 2,
+      "normalized_name": "storm of steel",
+      "oracle_hash": "65b87bdad31235af7321ab50fae324f7",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_each_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Swelter",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e0d02c8b56b4c56167ea3e2e6ade5866",
+      "min_rule_version": 2,
+      "normalized_name": "swelter",
+      "oracle_hash": "2c133f34be23e41ed746a621695a9664",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_each_target_spell_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

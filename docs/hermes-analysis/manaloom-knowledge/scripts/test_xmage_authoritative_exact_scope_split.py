@@ -16381,6 +16381,79 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["max_targets"], 3)
         self.assertTrue(effect["divided_damage"])
 
+    def test_damage_target_effect_maps_each_of_up_to_two_target_creatures(self) -> None:
+        row = queue_row(split.DAMAGE_UNIT, effect_classes=["DamageTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Dual Shot",
+                oracle_text="Dual Shot deals 1 damage to each of up to two target creatures.",
+                type_line="Instant",
+            ),
+            source_text=(
+                "Effect effect = new DamageTargetEffect(1);"
+                "effect.setText(\"{this} deals 1 damage to each of up to two target creatures\");"
+                "this.getSpellAbility().addEffect(effect);"
+                "this.getSpellAbility().addTarget(new TargetCreaturePermanent(0, 2));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "multi_target_damage")
+        self.assertEqual(effect["battle_model_scope"], split.DAMAGE_EACH_TARGET_SCOPE)
+        self.assertEqual(effect["amount"], 1)
+        self.assertEqual(effect["damage_per_target"], 1)
+        self.assertEqual(effect["damage_assignment_mode"], "each_target")
+        self.assertEqual(effect["target"], "creature")
+        self.assertEqual(effect["target_count_min"], 0)
+        self.assertEqual(effect["target_count_max"], 2)
+        self.assertTrue(effect["up_to_count"])
+        self.assertFalse(effect["divided_damage"])
+
+    def test_damage_target_effect_maps_each_of_two_any_targets(self) -> None:
+        row = queue_row(split.DAMAGE_UNIT, effect_classes=["DamageTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Furious Reprisal",
+                oracle_text="Furious Reprisal deals 2 damage to each of two targets.",
+                type_line="Sorcery",
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new DamageTargetEffect(2).withTargetDescription(\"each of two targets\"));"
+                "this.getSpellAbility().addTarget(new TargetAnyTarget(2, 2));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DAMAGE_EACH_TARGET_SCOPE)
+        self.assertEqual(effect["target"], "any_target")
+        self.assertEqual(effect["target_constraints"], {"scope": "any_target"})
+        self.assertEqual(effect["target_count_min"], 2)
+        self.assertEqual(effect["target_count_max"], 2)
+        self.assertEqual(effect["damage_per_target"], 2)
+
+    def test_damage_target_effect_blocks_each_of_x_targets(self) -> None:
+        row = queue_row(split.DAMAGE_UNIT, effect_classes=["DamageTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Meteor Blast",
+                oracle_text="Meteor Blast deals 4 damage to each of X targets.",
+                type_line="Sorcery",
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new DamageTargetEffect(4));"
+                "this.getSpellAbility().addTarget(new TargetAnyTarget());"
+                "this.getSpellAbility().setTargetAdjuster(new XTargetsCountAdjuster());"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "damage_each_target_oracle_x_not_supported")
+
     def test_bounce_spell_with_compound_effect_stays_blocked(self) -> None:
         row = queue_row(
             split.BOUNCE_UNIT,
