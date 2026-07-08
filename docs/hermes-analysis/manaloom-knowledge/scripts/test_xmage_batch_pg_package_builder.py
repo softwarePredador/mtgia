@@ -102,6 +102,57 @@ def test_counter_unless_pays_dynamic_fields_and_execution_scenario_are_manifeste
     assert scenario["expected_counter_unless_pays_count"] == 2
 
 
+def test_counter_unless_pays_draw_execution_scenario_is_manifested() -> None:
+    proposal = {
+        "normalized_name": "runeboggle",
+        "card_name": "Runeboggle",
+        "oracle_hash": "hash-runeboggle",
+        "logical_rule_key": "battle_rule_v1:runeboggle",
+        "effect_json": {
+            "effect": "counter",
+            "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_draw_card_v1",
+            "target": "spell",
+            "counter_unless_pays_generic": 1,
+            "draw_on_counter": 1,
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    assert expected["required_effect_fields"]["draw_on_counter"] == 1
+    assert scenario["type"] == "counter_unless_pays_response"
+    assert scenario["expected_counter_unless_pays_generic"] == 1
+    assert scenario["expected_cards_drawn"] == 1
+
+
+def test_counter_unless_pays_draw_execution_scenario_uses_instant_fixture_for_instant_or_sorcery_target() -> None:
+    proposal = {
+        "normalized_name": "disrupt",
+        "card_name": "Disrupt",
+        "oracle_hash": "hash-disrupt",
+        "logical_rule_key": "battle_rule_v1:disrupt",
+        "effect_json": {
+            "effect": "counter",
+            "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_draw_card_v1",
+            "target": "instant_or_sorcery_spell",
+            "target_constraints": {
+                "zone": "stack",
+                "stack_object": "spell",
+                "spell_types": ["instant", "sorcery"],
+            },
+            "counter_unless_pays_generic": 1,
+            "draw_on_counter": 1,
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    assert scenario["type"] == "counter_unless_pays_response"
+    assert scenario["target_spell"]["type_line"] == "Instant"
+
+
 def test_counter_target_stack_object_execution_scenario_is_manifested() -> None:
     proposal = {
         "normalized_name": "disallow",

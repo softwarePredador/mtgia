@@ -6239,6 +6239,12 @@ def run_counter_unless_pays_response(
     responder.battlefield = [dict(item) for item in scenario.get("responder_battlefield") or []]
     add_manifest_mana(active, scenario.get("active_mana") or {})
     add_manifest_mana(responder, scenario.get("responder_mana") or {"blue": 1})
+    expected_cards_drawn = int(scenario.get("expected_cards_drawn") or response_card.get("draw_on_counter") or 0)
+    if expected_cards_drawn and not getattr(responder, "library", []):
+        responder.library = [
+            {"name": f"E2E Counter Unless Draw {index + 1}", "type_line": "Instant", "cmc": 1}
+            for index in range(expected_cards_drawn)
+        ]
     responder.hand = [response_card]
     target_spell = dict(scenario.get("target_spell") or {
         "name": "Counter Target Fixture",
@@ -6298,6 +6304,22 @@ def run_counter_unless_pays_response(
     expected_paid = bool(scenario.get("expected_counter_tax_paid", False))
     if bool(counter_event.get("counter_tax_paid")) != expected_paid:
         fail("battle_events", f"{response_card['name']} counter_tax_paid={counter_event.get('counter_tax_paid')}")
+    if expected_cards_drawn:
+        if int(counter_event.get("cards_drawn") or 0) != expected_cards_drawn:
+            fail(
+                "battle_events",
+                f"{response_card['name']} expected to draw {expected_cards_drawn}; event={counter_event.get('cards_drawn')}",
+            )
+        drawn_names = [card.get("name") for card in responder.hand if isinstance(card, dict)]
+        expected_drawn_names = [
+            f"E2E Counter Unless Draw {index + 1}"
+            for index in range(expected_cards_drawn)
+        ]
+        if drawn_names != expected_drawn_names:
+            fail(
+                "battle_execution",
+                f"{response_card['name']} drawn hand={drawn_names}, expected={expected_drawn_names}",
+            )
     expected_exile = bool(scenario.get("expected_countered_spell_to_exile"))
     if bool(counter_event.get("countered_spell_to_exile")) != expected_exile:
         fail("battle_events", f"{response_card['name']} countered_spell_to_exile={counter_event.get('countered_spell_to_exile')}")
@@ -6318,6 +6340,7 @@ def run_counter_unless_pays_response(
         "counter_unless_pays_count": counter_event.get("counter_unless_pays_count"),
         "counter_tax_paid": counter_event.get("counter_tax_paid"),
         "countered_spell_to_exile": counter_event.get("countered_spell_to_exile"),
+        "cards_drawn": int(counter_event.get("cards_drawn") or 0),
     }
 
 

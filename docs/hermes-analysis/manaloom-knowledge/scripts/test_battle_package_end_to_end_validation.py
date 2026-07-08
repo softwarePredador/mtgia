@@ -153,6 +153,59 @@ def test_fixed_damage_target_spell_runner_executes_damage_and_cant_be_countered(
     assert result["cant_be_countered"] is True
 
 
+def test_counter_unless_pays_draw_runner_draws_when_tax_unpaid() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "counter",
+        "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_draw_card_v1",
+        "target": "spell",
+        "target_constraints": {"zone": "stack", "stack_object": "spell"},
+        "counter_unless_pays_generic": 1,
+        "draw_on_counter": 1,
+        "instant": True,
+    }
+    try:
+        result = validator.run_counter_unless_pays_response(
+            battle,
+            {
+                "name": "Runeboggle counters unless tax is paid and draws",
+                "type": "counter_unless_pays_response",
+                "card": {
+                    "name": "Runeboggle",
+                    "type_line": "Instant",
+                    "mana_cost": "{U}",
+                    "cmc": 1,
+                    "instant": True,
+                },
+                "target_spell": {
+                    "name": "Counter Target Fixture",
+                    "cmc": 7,
+                    "mana_cost": "{5}{R}{R}",
+                    "type_line": "Creature - Dragon",
+                    "effect": "finisher",
+                },
+                "responder_mana": {"blue": 1},
+                "active_mana": {"generic": 0},
+                "expected_countered": True,
+                "expected_counter_tax_paid": False,
+                "expected_counter_unless_pays_generic": 1,
+                "expected_cards_drawn": 1,
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Runeboggle"
+    assert result["countered"] is True
+    assert result["cards_drawn"] == 1
+
+
 def test_global_stat_modifier_draw_spell_runner_executes_boost_and_draw() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

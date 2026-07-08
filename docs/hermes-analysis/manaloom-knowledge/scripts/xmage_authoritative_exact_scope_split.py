@@ -314,6 +314,9 @@ COUNTER_TARGET_CONTROLLER_LOSE_LIFE_SCOPE = (
     "xmage_counter_target_and_target_controller_loses_life_spell_v1"
 )
 COUNTER_UNLESS_PAYS_SCOPE = "xmage_counter_target_spell_unless_controller_pays_generic_v1"
+COUNTER_UNLESS_PAYS_DRAW_SCOPE = (
+    "xmage_counter_target_spell_unless_controller_pays_generic_draw_card_v1"
+)
 BOUNCE_SCOPE = "xmage_return_target_to_hand_spell_v1"
 RECURSION_SCOPE = "xmage_return_target_graveyard_card_to_hand_spell_v1"
 RECURSION_MILL_RETURN_SCOPE = "xmage_mill_then_return_graveyard_card_to_hand_spell_v1"
@@ -3858,6 +3861,29 @@ def fixed_counter_unless_pays_from_source(source_text: str) -> tuple[int, bool] 
     if "new TargetSpell" not in text:
         return None
     return int(match.group("cost")), match.group("exile") == "true"
+
+
+def fixed_counter_unless_pays_draw_from_oracle(
+    metadata: dict[str, Any],
+) -> tuple[str, int, int, bool] | None:
+    text = oracle_text(metadata)
+    match = re.match(
+        r"^(?P<counter>counter target .+? unless its controller pays \{(?P<cost>\d+)\})\. "
+        r"draw (?P<draw>[^.]+)\.?$",
+        text,
+    )
+    if not match:
+        return None
+    counter = fixed_counter_unless_pays_from_oracle(
+        {"oracle_text": f"{match.group('counter')}."}
+    )
+    if counter is None:
+        return None
+    draw_count = fixed_draw_count_from_oracle_sentence(f"draw {match.group('draw')}.")
+    if draw_count is None or draw_count <= 0:
+        return None
+    target, cost, exile_if_countered = counter
+    return target, cost, draw_count, exile_if_countered
 
 
 def dynamic_counter_unless_pays_from_oracle(
@@ -30367,6 +30393,72 @@ def split_row(
                 family_id="xmage_counter_target_draw_card_spell",
             ), "selected_exact_scope"
 
+        if classes == {"CounterUnlessPaysEffect", "DrawCardSourceControllerEffect"}:
+            unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+            if unsupported_abilities:
+                return None, "counter_unless_draw_ability_class_not_simple"
+            oracle_counter_draw = fixed_counter_unless_pays_draw_from_oracle(metadata)
+            if oracle_counter_draw is None:
+                return None, "counter_unless_draw_oracle_not_exact_fixed"
+            source_counter = fixed_counter_unless_pays_from_source(source_text)
+            if source_counter is None:
+                return None, "counter_unless_draw_source_not_fixed_counter"
+            target, pay_generic, draw_count, exile_if_countered = oracle_counter_draw
+            source_cost, source_exile_if_countered = source_counter
+            source_draw_count = java_constructor_int(
+                source_text,
+                "DrawCardSourceControllerEffect",
+                default=1,
+            )
+            if source_cost != pay_generic or source_exile_if_countered != exile_if_countered:
+                return None, "counter_unless_draw_source_oracle_counter_mismatch"
+            if source_draw_count != draw_count:
+                return None, "counter_unless_draw_source_oracle_draw_mismatch"
+            counter_component = {
+                "effect": "counter",
+                "battle_model_scope": COUNTER_UNLESS_PAYS_SCOPE,
+                "target": target,
+                "target_constraints": counter_target_constraints_for(target),
+                "counter_unless_pays_generic": pay_generic,
+                "xmage_effect_class": "CounterUnlessPaysEffect",
+            }
+            draw_component = {
+                "effect": "draw_cards",
+                "battle_model_scope": DRAW_SCOPE,
+                "count": draw_count,
+                "compose_on_resolution": True,
+                "xmage_effect_class": "DrawCardSourceControllerEffect",
+            }
+            effect_json = {
+                "effect": "counter",
+                "battle_model_scope": COUNTER_UNLESS_PAYS_DRAW_SCOPE,
+                "target": target,
+                "target_constraints": counter_target_constraints_for(target),
+                "counter_unless_pays_generic": pay_generic,
+                "draw_on_counter": draw_count,
+                "draw_count": draw_count,
+                "count": draw_count,
+                "_composite_rule_components": [counter_component, draw_component],
+                "xmage_effect_classes": [
+                    "CounterUnlessPaysEffect",
+                    "DrawCardSourceControllerEffect",
+                ],
+                **flags,
+            }
+            if exile_if_countered:
+                effect_json["countered_spell_to_exile"] = True
+                effect_json["countered_spell_to_exile_reason"] = (
+                    "counter_unless_pays_exile_replacement"
+                )
+            if target == "blue_spell":
+                effect_json["requires_blue_target"] = True
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_counter_unless_pays_draw_card_spell",
+            ), "selected_exact_scope"
+
         if classes == {"DrawCardSourceControllerEffect", "PutCardFromHandOntoBattlefieldEffect"}:
             unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
             if unsupported_abilities:
@@ -34047,6 +34139,7 @@ def build_exact_split_report(
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with ReturnFromGraveyardToHandTargetEffect, no extra ability class, exact choose-one-or-both Oracle text, and two fixed graveyard-to-hand components",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with ReturnFromGraveyardToHandTargetEffect, no extra ability class, exact choose-one Oracle text, and two fixed alternative graveyard-to-hand components",
                 "draw_cards::xmage_draw_card_variant_review_v1 rows with CounterTargetEffect + DrawCardSourceControllerEffect, exact supported counter-target spell Oracle text, and draw-on-counter runtime metadata",
+                "draw_cards::xmage_draw_card_variant_review_v1 rows with CounterUnlessPaysEffect + DrawCardSourceControllerEffect, exact fixed counter-unless-tax Oracle text plus fixed draw-on-counter runtime metadata",
                 "draw_cards::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect + PutCardFromHandOntoBattlefieldEffect, exact fixed draw count, exact land-card-from-hand target, optional tapped entry, and draw-then-put-land runtime metadata",
                 "draw_cards::xmage_draw_card_variant_review_v1 rows with GainAbilityTargetEffect + DrawCardSourceControllerEffect, exact target-creature keyword until EOT, and fixed draw-one Oracle/source agreement",
                 "draw_cards::xmage_draw_card_variant_review_v1 rows with DrawDiscardControllerEffect or fixed DrawCardSourceControllerEffect + DiscardControllerEffect, exact Oracle/source draw-discard order agreement, and optional random discard metadata",

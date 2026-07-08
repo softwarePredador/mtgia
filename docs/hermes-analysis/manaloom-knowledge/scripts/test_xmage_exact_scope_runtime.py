@@ -14298,6 +14298,73 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_counter_unless_pays_draw_scope_draws_when_tax_unpaid(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        responder = self.battle.Player(
+            "Responder",
+            None,
+            [{"name": "Runeboggle Draw", "type_line": "Instant", "cmc": 1}],
+        )
+        responder.mana_pool.add("blue", 1)
+        counter = {
+            "name": "Fixture Runeboggle",
+            "type_line": "Instant",
+            "mana_cost": "{U}",
+            "cmc": 1,
+            "effect": "counter",
+            "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_draw_card_v1",
+            "target": "spell",
+            "target_constraints": {"zone": "stack", "stack_object": "spell"},
+            "counter_unless_pays_generic": 1,
+            "draw_on_counter": 1,
+            "_composite_rule_components": [
+                {
+                    "effect": "counter",
+                    "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+                    "target": "spell",
+                    "counter_unless_pays_generic": 1,
+                },
+                {
+                    "effect": "draw_cards",
+                    "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+                    "count": 1,
+                    "compose_on_resolution": True,
+                },
+            ],
+            "instant": True,
+        }
+        responder.hand.append(counter)
+        target_spell = {
+            "name": "Target Finisher",
+            "type_line": "Creature - Dragon",
+            "cmc": 7,
+            "effect": "finisher",
+        }
+        stack = self.battle.Stack()
+        stack.push(target_spell, active, {"effect": "finisher"})
+
+        self.assertTrue(
+            self.battle.priority_round(
+                active,
+                [active, responder],
+                stack,
+                turn=8,
+                rng=random.Random(8),
+                phase="precombat_main",
+            )
+        )
+
+        self.assertTrue(stack.items[-1].countered)
+        self.assertEqual([card["name"] for card in responder.hand], ["Runeboggle Draw"])
+        counter_events = [
+            data
+            for event, data in self.events
+            if event == "spell_countered" and data.get("counter") == "Fixture Runeboggle"
+        ]
+        self.assertEqual(counter_events[-1]["counter_unless_pays_generic"], 1)
+        self.assertFalse(counter_events[-1]["counter_tax_paid"])
+        self.assertEqual(counter_events[-1]["cards_drawn"], 1)
+
     def test_counter_target_spell_targeting_creature_constraint(self) -> None:
         active = self.battle.Player("Active", None, [])
         responder = self.battle.Player("Responder", None, [])

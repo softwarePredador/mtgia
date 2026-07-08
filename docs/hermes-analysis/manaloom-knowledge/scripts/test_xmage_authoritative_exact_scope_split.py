@@ -16008,6 +16008,60 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             {"zone": "stack", "stack_object": "spell", "exclude_card_types": ["artifact"]},
         )
 
+    def test_counter_unless_pays_draw_spell_maps_to_draw_on_counter_runtime(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=["CounterUnlessPaysEffect", "DrawCardSourceControllerEffect"],
+            xmage_signals=["targeting", "counter", "draw"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Counter target instant or sorcery spell unless its controller pays {1}. Draw a card."),
+            source_text=(
+                "this.getSpellAbility().addEffect("
+                "new CounterUnlessPaysEffect(new GenericManaCost(1)));"
+                "this.getSpellAbility().addTarget(new TargetSpell(filter));"
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "counter")
+        self.assertEqual(effect["battle_model_scope"], split.COUNTER_UNLESS_PAYS_DRAW_SCOPE)
+        self.assertEqual(effect["target"], "instant_or_sorcery_spell")
+        self.assertEqual(effect["counter_unless_pays_generic"], 1)
+        self.assertEqual(effect["draw_on_counter"], 1)
+        self.assertEqual(
+            [component["effect"] for component in effect["_composite_rule_components"]],
+            ["counter", "draw_cards"],
+        )
+
+    def test_counter_unless_pays_draw_spell_blocks_modal_or_dynamic_draw(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=["CounterUnlessPaysEffect", "DrawCardSourceControllerEffect"],
+            xmage_signals=["targeting", "counter", "draw"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                oracle_text=(
+                    "Choose one — Counter target spell unless its controller pays {4}. "
+                    "Draw two cards."
+                ),
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect("
+                "new CounterUnlessPaysEffect(new GenericManaCost(4)));"
+                "this.getSpellAbility().addTarget(new TargetSpell());"
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(2));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "counter_unless_draw_oracle_not_exact_fixed")
+
     def test_counter_unless_pays_fixed_generic_exile_replacement_maps_to_runtime(self) -> None:
         row = queue_row(
             split.COUNTER_UNLESS_PAYS_UNIT,

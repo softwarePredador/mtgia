@@ -4817,7 +4817,11 @@ def counter_unless_pays_execution_scenario_from_expected_rule(
     required = dict(rule.get("required_effect_fields") or {})
     if (
         required.get("effect") != "counter"
-        or required.get("battle_model_scope") != "xmage_counter_target_spell_unless_controller_pays_generic_v1"
+        or required.get("battle_model_scope")
+        not in {
+            "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+            "xmage_counter_target_spell_unless_controller_pays_generic_draw_card_v1",
+        }
     ):
         return None
 
@@ -4892,6 +4896,10 @@ def counter_unless_pays_execution_scenario_from_expected_rule(
     }
     if required.get("target") == "noncreature_spell":
         target_spell.update({"type_line": "Sorcery"})
+    elif required.get("target") in {"instant_or_sorcery_spell", "instant_spell"}:
+        target_spell.update({"type_line": "Instant"})
+    elif required.get("target") == "sorcery_spell":
+        target_spell.update({"type_line": "Sorcery"})
 
     return {
         "name": f"{rule['card_name']} counters unless tax is paid",
@@ -4915,6 +4923,7 @@ def counter_unless_pays_execution_scenario_from_expected_rule(
         "expected_counter_unless_pays_amount_source": amount_source or None,
         "expected_counter_unless_pays_count": expected_count,
         "expected_countered_spell_to_exile": bool(required.get("countered_spell_to_exile")),
+        "expected_cards_drawn": max(0, safe_int(required.get("draw_on_counter"), 0)),
         "logical_rule_key": rule["logical_rule_key"],
     }
 
