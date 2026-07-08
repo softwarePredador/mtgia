@@ -98,6 +98,61 @@ def test_validate_runtime_lookup_derives_checks_from_expected_rules() -> None:
     assert results[0]["effect"] == "topdeck_play"
 
 
+def test_fixed_damage_target_spell_runner_executes_damage_and_cant_be_countered() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "direct_damage",
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+        "amount": 4,
+        "damage": 4,
+        "target": "creature",
+        "target_constraints": {"card_types": ["creature"], "target_colors": ["W", "U"]},
+        "cant_be_countered": True,
+    }
+    try:
+        result = validator.run_fixed_damage_target_spell(
+            battle,
+            {
+                "name": "Rending Volley deals fixed target damage",
+                "type": "fixed_damage_target_spell",
+                "card": {"name": "Rending Volley", "type_line": "Instant"},
+                "target": {
+                    "name": "E2E Fixed Damage Legal Target",
+                    "type_line": "Creature",
+                    "effect": "creature",
+                    "colors": ["W"],
+                    "power": 2,
+                    "toughness": 2,
+                },
+                "nonmatching_target": {
+                    "name": "E2E Fixed Damage Illegal Target",
+                    "type_line": "Creature",
+                    "effect": "creature",
+                    "colors": ["B"],
+                    "power": 2,
+                    "toughness": 2,
+                },
+                "expected_damage": 4,
+                "expected_life_gain": 0,
+                "expected_cant_be_countered": True,
+                "expected_target_constraints": {"card_types": ["creature"], "target_colors": ["W", "U"]},
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["damage"] == 4
+    assert result["life_gained"] == 0
+    assert result["target"] == "E2E Fixed Damage Legal Target"
+    assert result["cant_be_countered"] is True
+
+
 def test_simple_activated_damage_runner_executes_random_discard_cost() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

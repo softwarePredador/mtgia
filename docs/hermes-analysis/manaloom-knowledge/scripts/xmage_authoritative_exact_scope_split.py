@@ -11111,6 +11111,8 @@ def damage_target_from_oracle(metadata: dict[str, Any]) -> str | None:
         return "player"
     if re.search(r"target creature or planeswalker\b", text):
         return "creature_or_planeswalker"
+    if re.search(r"target (?:white (?:and/or|or) blue|blue (?:and/or|or) white) creatures?\b", text):
+        return "white_or_blue_creature"
     if re.search(r"target creature\b", text):
         return "creature"
     return None
@@ -12055,6 +12057,7 @@ def restricted_target_base(target: str) -> str:
         "white_creature",
         "blue_creature",
         "green_creature",
+        "white_or_blue_creature",
         "green_or_white_creature",
         "black_or_red_attacking_or_blocking_creature",
         "artifact_creature",
@@ -12379,6 +12382,16 @@ def restricted_battlefield_target_from_source(source: str) -> str | None:
         or ("ObjectColor.WHITE" in text and "Predicates.not" in text and "ColorPredicate" in text)
     ):
         return "nonwhite_creature"
+    if (
+        'FilterCreaturePermanent("white or blue creature")' in text
+        or "white or blue creature" in text
+        or (
+            "ObjectColor.WHITE" in text
+            and "ObjectColor.BLUE" in text
+            and "ColorPredicate" in text
+        )
+    ):
+        return "white_or_blue_creature"
     if 'FilterCreaturePermanent("black creature")' in text or "black creature" in text:
         return "black_creature"
     if 'FilterCreaturePermanent("green or white creature")' in text or "green or white creature" in text:
@@ -22518,6 +22531,12 @@ def split_row(
     if not str(metadata.get("oracle_text") or "").strip():
         return None, "oracle_text_missing"
 
+    damage_spell_stack_cant_be_countered_unit = (
+        unit == DAMAGE_UNIT
+        and effect_classes(row) == {"CantBeCounteredSourceEffect", "DamageTargetEffect"}
+        and ability_classes(row) == {"SimpleStaticAbility"}
+    )
+
     if (
         (unit in SPELL_UNITS or boost_keyword_spell_unit or target_keyword_spell_unit)
         and not etb_life_gain_creature_unit
@@ -22607,7 +22626,7 @@ def split_row(
     ):
         if not is_spell(metadata):
             return None, "not_instant_or_sorcery_spell"
-        if ability_kind(row) != "one_shot":
+        if ability_kind(row) != "one_shot" and not damage_spell_stack_cant_be_countered_unit:
             return None, "not_one_shot_spell_ability"
         if has_additional_cost(source_text) or "additional cost" in oracle_text(metadata):
             if unit == DAMAGE_UNIT and effect_classes(row) == {"DamageTargetEffect"}:
@@ -29591,8 +29610,16 @@ def split_row(
                 family_id="xmage_fixed_damage_exile_if_dies_spell",
             ), "selected_exact_scope"
 
-        if classes != {"DamageTargetEffect"}:
+        cant_be_countered_auxiliary = classes == {"CantBeCounteredSourceEffect", "DamageTargetEffect"}
+        if classes != {"DamageTargetEffect"} and not cant_be_countered_auxiliary:
             return None, "damage_effect_class_not_pure"
+        if cant_be_countered_auxiliary:
+            if ability_classes(row) != {"SimpleStaticAbility"}:
+                return None, "damage_cant_be_countered_ability_class_not_simple"
+            if "SimpleStaticAbility" not in source_text or "Zone.STACK" not in source_text:
+                return None, "damage_cant_be_countered_source_not_stack_static"
+            if "withCantBePrevented" in source_text:
+                return None, "damage_cant_be_prevented_not_supported"
         additional_cost_fields, additional_cost_reason = fixed_damage_spell_additional_cost_fields_from_source(
             source_text,
             metadata,
@@ -29724,6 +29751,9 @@ def split_row(
             **flags,
             **(additional_cost_fields or {}),
         }
+        if cant_be_countered_auxiliary:
+            effect_json["cant_be_countered"] = True
+            effect_json["xmage_effect_classes"] = ["CantBeCounteredSourceEffect", "DamageTargetEffect"]
         return build_proposal(row, metadata, effect_json, family_id="xmage_fixed_damage_spell"), "selected_exact_scope"
 
     if unit == DESTROY_UNIT:

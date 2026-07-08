@@ -7839,6 +7839,105 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                 self.assertEqual(effect["target"], "creature")
                 self.assertEqual(effect["target_constraints"], constraints)
 
+    def test_fixed_damage_spell_maps_cant_be_countered_creature_or_planeswalker_target(self) -> None:
+        row = queue_row(
+            split.DAMAGE_UNIT,
+            effect_classes=["CantBeCounteredSourceEffect", "DamageTargetEffect"],
+            ability_kind="static",
+            ability_classes=["SimpleStaticAbility"],
+            xmage_signals=["targeting"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Heated Debate",
+                type_line="Instant",
+                oracle_text=(
+                    "This spell can't be countered.\n"
+                    "Heated Debate deals 4 damage to target creature or planeswalker."
+                ),
+            ),
+            source_text=(
+                "this.addAbility(new SimpleStaticAbility(Zone.STACK, "
+                "new CantBeCounteredSourceEffect()));"
+                "this.getSpellAbility().addEffect(new DamageTargetEffect(4));"
+                "this.getSpellAbility().addTarget(new TargetCreatureOrPlaneswalker());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DAMAGE_SCOPE)
+        self.assertEqual(effect["amount"], 4)
+        self.assertEqual(effect["target"], "creature_or_planeswalker")
+        self.assertEqual(effect["target_constraints"], {"card_types": ["creature", "planeswalker"]})
+        self.assertTrue(effect["cant_be_countered"])
+        self.assertEqual(effect["xmage_effect_classes"], ["CantBeCounteredSourceEffect", "DamageTargetEffect"])
+
+    def test_fixed_damage_spell_maps_cant_be_countered_white_or_blue_creature_target(self) -> None:
+        row = queue_row(
+            split.DAMAGE_UNIT,
+            effect_classes=["CantBeCounteredSourceEffect", "DamageTargetEffect"],
+            ability_kind="static",
+            ability_classes=["SimpleStaticAbility"],
+            xmage_signals=["targeting"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Rending Volley",
+                type_line="Instant",
+                oracle_text=(
+                    "Rending Volley can't be countered.\n"
+                    "Rending Volley deals 4 damage to target white or blue creature."
+                ),
+            ),
+            source_text=(
+                "filter.add(Predicates.or(new ColorPredicate(ObjectColor.WHITE), "
+                "new ColorPredicate(ObjectColor.BLUE)));"
+                "Ability ability = new SimpleStaticAbility(Zone.STACK, new CantBeCounteredSourceEffect());"
+                "this.addAbility(ability);"
+                "this.getSpellAbility().addEffect(new DamageTargetEffect(4));"
+                "this.getSpellAbility().addTarget(new TargetPermanent(filter));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["target"], "creature")
+        self.assertEqual(effect["target_constraints"], {"card_types": ["creature"], "target_colors": ["W", "U"]})
+        self.assertTrue(effect["cant_be_countered"])
+
+    def test_fixed_damage_spell_blocks_unmodeled_cant_be_prevented_rider(self) -> None:
+        row = queue_row(
+            split.DAMAGE_UNIT,
+            effect_classes=["CantBeCounteredSourceEffect", "DamageTargetEffect"],
+            ability_kind="static",
+            ability_classes=["SimpleStaticAbility"],
+            xmage_signals=["targeting"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Combust",
+                type_line="Instant",
+                oracle_text=(
+                    "Combust can't be countered.\n"
+                    "Combust deals 5 damage to target white or blue creature. "
+                    "The damage can't be prevented."
+                ),
+            ),
+            source_text=(
+                "Ability ability = new SimpleStaticAbility(Zone.STACK, new CantBeCounteredSourceEffect());"
+                "this.addAbility(ability);"
+                "this.getSpellAbility().addEffect(new DamageTargetEffect(5).withCantBePrevented());"
+                "this.getSpellAbility().addTarget(new TargetPermanent(filter));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "damage_cant_be_prevented_not_supported")
+
     def test_fixed_damage_spell_maps_creature_sacrifice_additional_cost(self) -> None:
         row = queue_row(split.DAMAGE_UNIT, effect_classes=["DamageTargetEffect"])
         proposal, reason = split.split_row(

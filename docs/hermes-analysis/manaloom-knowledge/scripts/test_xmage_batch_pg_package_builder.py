@@ -1351,6 +1351,39 @@ def test_manifest_builds_damage_gain_life_spell_execution_scenario() -> None:
     assert scenario["expected_target_constraints"] == {"scope": "opponent_or_planeswalker"}
 
 
+def test_manifest_builds_fixed_damage_target_spell_execution_scenario() -> None:
+    proposal = {
+        "normalized_name": "rending volley",
+        "card_name": "Rending Volley",
+        "oracle_hash": "hash-rending-volley",
+        "logical_rule_key": "battle_rule_v1:hash-rending-volley",
+        "effect_json": {
+            "effect": "direct_damage",
+            "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+            "amount": 4,
+            "damage": 4,
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"], "target_colors": ["W", "U"]},
+            "cant_be_countered": True,
+        },
+    }
+
+    rule = builder.expected_rule_from_proposal(proposal)
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert rule["required_effect_fields"]["cant_be_countered"] is True
+    assert scenario is not None
+    assert scenario["type"] == "fixed_damage_target_spell"
+    assert scenario["card"]["name"] == "Rending Volley"
+    assert scenario["expected_damage"] == 4
+    assert scenario["expected_life_gain"] == 0
+    assert scenario["expected_cant_be_countered"] is True
+    assert scenario["target"]["type_line"].startswith("Creature")
+    assert scenario["target"]["colors"] == ["W"]
+    assert scenario["nonmatching_target"]["type_line"].startswith("Creature")
+    assert scenario["nonmatching_target"]["colors"] == ["B"]
+
+
 def test_manifest_builds_simple_activated_tap_target_execution_scenario() -> None:
     rule = {
         "normalized_name": "akroan jailer",

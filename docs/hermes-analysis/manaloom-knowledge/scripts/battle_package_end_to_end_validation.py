@@ -907,7 +907,10 @@ def run_damage_gain_life_spell(
         target.setdefault("power", 2)
         target["toughness"] = min(int(target.get("toughness") or 2), max(1, expected_damage))
         target.setdefault("effect", "creature")
-        nonmatching_target = _nonmatching_damage_gain_life_target(constraints)
+        nonmatching_target = dict(
+            scenario.get("nonmatching_target")
+            or _nonmatching_damage_gain_life_target(constraints)
+        )
         opponent.battlefield = [
             battle.enrich_card(dict(nonmatching_target)),
             battle.enrich_card(dict(target)),
@@ -978,6 +981,23 @@ def run_damage_gain_life_spell(
         "controller_life": active.life,
         "opponent_life": opponent.life,
     }
+
+
+def run_fixed_damage_target_spell(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    result = run_damage_gain_life_spell(battle, scenario, events)
+    if scenario.get("expected_cant_be_countered"):
+        card = dict(scenario["card"])
+        active = battle.Player(str(scenario.get("player") or "Damage Controller"), None, [])
+        effect_data = battle.get_card_effect(card) or {}
+        stack_item = battle.StackItem(card, active, effect_data)
+        if not battle.spell_cant_be_countered(card, stack_item=stack_item):
+            fail("battle_execution", f"{card['name']} was not visible as cant_be_countered")
+        result["cant_be_countered"] = True
+    return result
 
 
 def run_creature_etb_dynamic_life_gain(
@@ -6919,6 +6939,7 @@ SCENARIO_RUNNERS = {
     "creature_etb_scry": run_creature_etb_scry,
     "destroy_target_create_treasure": run_destroy_target_create_treasure,
     "damage_prevention": run_damage_prevention,
+    "fixed_damage_target_spell": run_fixed_damage_target_spell,
     "dynamic_life_gain": run_dynamic_life_gain,
     "each_player_sacrifice": run_each_player_sacrifice,
     "fixed_create_creature_tokens": run_fixed_create_creature_tokens,

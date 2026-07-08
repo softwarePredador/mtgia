@@ -6143,6 +6143,32 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_fixed_damage_target_spell_cant_be_countered_flag_is_runtime_visible(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        spell = {
+            "name": "Heated Debate",
+            "type_line": "Instant",
+            "oracle_text": (
+                "This spell can't be countered.\n"
+                "Heated Debate deals 4 damage to target creature or planeswalker."
+            ),
+        }
+        stack_item = self.battle.StackItem(
+            spell,
+            active,
+            {
+                "effect": "direct_damage",
+                "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+                "amount": 4,
+                "damage": 4,
+                "target": "creature_or_planeswalker",
+                "target_constraints": {"card_types": ["creature", "planeswalker"]},
+                "cant_be_countered": True,
+            },
+        )
+
+        self.assertTrue(self.battle.spell_cant_be_countered(spell, stack_item=stack_item))
+
     def test_fixed_damage_exile_if_dies_spell_exiles_lethal_creature(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])
