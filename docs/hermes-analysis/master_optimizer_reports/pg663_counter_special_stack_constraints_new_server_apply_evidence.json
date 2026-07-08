@@ -1,0 +1,77 @@
+{
+  "title": "PG663 Counter Special Stack Constraints Evidence",
+  "database_target": "127.0.0.1:15432/halder",
+  "package_id": "pg663_counter_special_stack_constraints_new_server",
+  "generated_at_utc": "2026-07-08T15:27:30Z",
+  "selected_cards": [
+    "Avoid Fate",
+    "Double Negative",
+    "Outwit",
+    "Second Guess"
+  ],
+  "families": {
+    "xmage_counter_target_spell": 4
+  },
+  "precheck": {
+    "target_card_rows": 4,
+    "expected_rule_rows_before": 0,
+    "would_deprecate_shadow_rows": 0
+  },
+  "apply": {
+    "upserted_rows": 4,
+    "deprecated_shadow_rows": 0,
+    "backup_table": "manaloom_deploy_audit.pg663_counter_special_stack_constraints_20260708_151831"
+  },
+  "postcheck": {
+    "promoted_rule_rows": 4,
+    "promoted_verified_auto_rows": 4,
+    "promoted_oracle_hash_rows": 4
+  },
+  "contract_repair": {
+    "reason": "post-PG663 PG/Hermes/SQLite audit found old trusted executable curated/manual rules without oracle_hash in the current new-server PostgreSQL",
+    "package": "pg661_trusted_rule_oracle_hash_backfill_new_server",
+    "precheck_target_rows": 44,
+    "precheck_safe_groups": 44,
+    "precheck_unsafe_groups": 0,
+    "updated_rows": 44,
+    "backup_rows": 44,
+    "postcheck_missing_oracle_hash": 0
+  },
+  "sync": {
+    "pg_rows_loaded": 5973,
+    "sqlite_inserted_or_updated": 5959,
+    "canonical_snapshot_rows_exported": 5936,
+    "metadata_postgres_cards_matched": 7096,
+    "metadata_sqlite_alias_rows": 7015,
+    "metadata_deck_cards_matched": "2699/2699",
+    "metadata_card_id_updates": 73,
+    "metadata_unresolved": 1
+  },
+  "e2e": {
+    "status": "pass",
+    "scenario_count": 4,
+    "cards_countered": [
+      "Avoid Fate",
+      "Double Negative",
+      "Outwit",
+      "Second Guess"
+    ]
+  },
+  "post_pg663": {
+    "battle_and_oracle_ready": 6033,
+    "snapshot_has_verified_rule": 6061,
+    "snapshot_has_any_rule": 7264,
+    "battle_family_mapper_required": 27843,
+    "xmage_authoritative_adapter_required_count": 24607,
+    "xmage_authoritative_parser_gap_count": 0,
+    "xmage_missing_source_exception_count": 313
+  },
+  "contract_audits": {
+    "xmage_strategy_consistency": "pass",
+    "xmage_strategy_consistency_checks": "26/26",
+    "operational_surface_alignment": "pass",
+    "legacy_contamination": "pass",
+    "pg_hermes_sqlite_contract": "pass",
+    "pg_hermes_sqlite_contract_checks": "51/51"
+  }
+}

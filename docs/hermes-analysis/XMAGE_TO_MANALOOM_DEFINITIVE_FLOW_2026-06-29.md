@@ -19509,6 +19509,83 @@ Evidence:
 - `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260708_post_pg662_counter_draw_special_targets_new_server_final.md`
 - `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260708_post_pg662_counter_draw_special_targets_new_server_final.md`
 
+## PG663 Counter Special Stack Constraint Wave
+
+PG663 added exact counter constraints for four remaining stack-target filters
+that were still blocked by `counter_target_not_supported`:
+
+- `Avoid Fate`: counter target instant or Aura spell that targets a permanent
+  you control;
+- `Double Negative`: counter up to two target spells;
+- `Outwit`: counter target spell that targets a player;
+- `Second Guess`: counter target spell that is the second spell cast this turn.
+
+Runtime/test changes:
+
+- `counter_target_from_oracle` and `counter_target_from_source` now recognize
+  `instant_or_aura_spell_targeting_permanent_you_control`,
+  `spell_targeting_player`, `spell_second_spell_this_turn`, and
+  `counter up to two target spells`;
+- `counter_target_constraints_for` emits `spell_targets=player`,
+  `spell_order_this_turn=2`, and the composed instant-or-Aura plus
+  permanent-you-control stack-target constraint;
+- `battle_analyst_v9.py` now validates stack spell player targets and spell
+  order this turn through the same `counter_can_target` path used by earlier
+  counter constraints;
+- `xmage_batch_pg_package_builder.py` now creates positive and negative stack
+  fixtures for player targets, spell order, and generic spell counters.
+
+PG663 apply/postcheck evidence:
+
+- split produced `4` safe package candidates in
+  `xmage_counter_target_spell`;
+- precheck found `4` target rows, `0` existing expected rows, and `0` stale
+  generated shadows to deprecate;
+- apply committed `4` promoted rows;
+- postcheck confirmed `4/4` promoted verified/auto rows with `oracle_hash`;
+- E2E package validation passed PostgreSQL, SQLite/Hermes, canonical snapshot,
+  `runtime_get_card_effect`, and `4` battle-execution scenarios.
+
+During the final PG/Hermes/SQLite audit, the current new-server PostgreSQL
+still had `44` old trusted executable curated/manual rules without
+`oracle_hash`. The narrow PG661 metadata-only backfill was reapplied against
+the current server: precheck found `44` safe groups and `0` unsafe groups,
+apply updated `44` rows, and postcheck reduced missing trusted executable
+hashes to `0`.
+
+Final post-PG663 state after hash repair:
+
+- global readiness:
+  `battle_and_oracle_ready=6033`, `battle_family_mapper_required=27843`,
+  `snapshot_has_verified_rule=6061`, `snapshot_has_any_rule=7264`;
+- authoritative queue:
+  `target_identity_count=24920`,
+  `xmage_authoritative_source_count=24607`,
+  `xmage_missing_source_exception_count=313`,
+  `xmage_authoritative_parser_gap_count=0`,
+  `xmage_authoritative_adapter_required_count=24607`;
+- validation gates:
+  `xmage_strategy_consistency_audit` passed `26/26`,
+  `pg_hermes_sqlite_contract_audit` passed `51/51`,
+  `operational_surface_alignment_audit` passed, and
+  `legacy_contamination_audit` passed.
+
+Evidence:
+
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260708_pg663_counter_special_stack_constraints_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg663_counter_special_stack_constraints_new_server_package_package.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg663_counter_special_stack_constraints_new_server_apply_evidence.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg663_counter_special_stack_constraints_new_server_pg_to_sqlite_sync_after_hash_backfill.json`
+- `docs/hermes-analysis/master_optimizer_reports/pg663_counter_special_stack_constraints_new_server_metadata_sync.json`
+- `docs/hermes-analysis/master_optimizer_reports/pg663_counter_special_stack_constraints_new_server_e2e_validation_after_hash_backfill.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260708_post_pg663_counter_special_stack_constraints_new_server_final_after_hash_backfill.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260708_post_pg663_counter_special_stack_constraints_new_server_final_after_hash_backfill_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260708_post_pg663_counter_special_stack_constraints_new_server_final_after_hash_backfill_recheck.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260708_post_pg663_counter_special_stack_constraints_new_server_final.md`
+- `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260708_post_pg663_counter_special_stack_constraints_new_server_final.md`
+- `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260708_post_pg663_counter_special_stack_constraints_new_server_final.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260708_post_pg663_counter_special_stack_constraints_new_server_final_after_hash_backfill.md`
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

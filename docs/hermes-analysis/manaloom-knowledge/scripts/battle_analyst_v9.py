@@ -9600,6 +9600,16 @@ def _counter_target_label_constraints(target_label):
         constraints["spell_targets"] = "permanent_you_control"
     elif target == "spell_targeting_you_or_permanent_you_control":
         constraints["spell_targets"] = "you_or_permanent_you_control"
+    elif target == "instant_or_aura_spell_targeting_permanent_you_control":
+        constraints["any_of"] = [
+            {"spell_types": ["instant"]},
+            {"spell_subtypes": ["aura"]},
+        ]
+        constraints["spell_targets"] = "permanent_you_control"
+    elif target == "spell_targeting_player":
+        constraints["spell_targets"] = "player"
+    elif target == "spell_second_spell_this_turn":
+        constraints["spell_order_this_turn"] = 2
     elif target == "spell_cast_from_graveyard":
         constraints["source_zone"] = "graveyard"
     elif target == "noncreature_spell":
@@ -9684,6 +9694,28 @@ def _stack_item_targets(stack_item):
     return list(targets or [])
 
 
+def _stack_item_spell_order_this_turn(stack_item, target_card=None):
+    effect_data = getattr(stack_item, "effect_data", None) or {}
+    cast_context = effect_data.get("_cast_context") or {}
+    for source in (effect_data, cast_context, target_card or {}):
+        if not isinstance(source, dict):
+            continue
+        for key in ("spell_order_this_turn", "cast_order_this_turn", "spell_cast_order"):
+            value = source.get(key)
+            if value is not None:
+                try:
+                    return int(value)
+                except Exception:
+                    return None
+    value = getattr(stack_item, "spell_order_this_turn", None)
+    if value is not None:
+        try:
+            return int(value)
+        except Exception:
+            return None
+    return None
+
+
 def _controller_name(controller):
     if controller is None:
         return None
@@ -9745,6 +9777,15 @@ def _stack_target_is_controller_player(target, counter_controller):
     return target_name == controller_name and target_type in {"", "player"}
 
 
+def _stack_target_is_player(target):
+    if not isinstance(target, dict):
+        return False
+    target_type = str(target.get("target_type") or target.get("type") or "").strip().lower()
+    if target_type == "player":
+        return True
+    return any(target.get(key) for key in ("target_player", "player"))
+
+
 def _stack_targets_match_spell_targets_constraint(spell_targets, stack_item, counter_controller=None):
     targets = _stack_item_targets(stack_item)
     if not targets:
@@ -9753,6 +9794,8 @@ def _stack_targets_match_spell_targets_constraint(spell_targets, stack_item, cou
     controller_name = _controller_name(counter_controller)
     if wanted == "creature":
         return any(_stack_target_is_creature(target) for target in targets)
+    if wanted == "player":
+        return any(_stack_target_is_player(target) for target in targets)
     if wanted == "permanent_you_control":
         if not controller_name:
             return False
@@ -9819,6 +9862,16 @@ def _counter_target_matches_constraints(counter_effect, target_card, stack_item=
     ).strip().lower()
     if required_source_zone and _stack_item_source_zone(stack_item, target_card) != required_source_zone:
         return False
+    required_spell_order = first_present_value(
+        constraints,
+        ("spell_order_this_turn", "cast_order_this_turn", "spell_cast_order"),
+    )
+    if required_spell_order is not None:
+        try:
+            if _stack_item_spell_order_this_turn(stack_item, target_card) != int(required_spell_order):
+                return False
+        except Exception:
+            return False
     spell_targets = constraints.get("spell_targets") or constraints.get("target_spell_targets")
     if spell_targets and not _stack_targets_match_spell_targets_constraint(
         spell_targets,

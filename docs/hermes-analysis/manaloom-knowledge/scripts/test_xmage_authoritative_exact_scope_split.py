@@ -15357,6 +15357,82 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                 for key, value in expected_constraints.items():
                     self.assertEqual(effect["target_constraints"][key], value)
 
+    def test_counter_target_additional_special_stack_constraints_map(self) -> None:
+        row = queue_row(split.COUNTER_UNIT, effect_classes=["CounterTargetEffect"])
+        cases = [
+            (
+                "Avoid Fate",
+                "Counter target instant or Aura spell that targets a permanent you control.",
+                (
+                    "filter.add(Predicates.or(CardType.INSTANT.getPredicate(), SubType.AURA.getPredicate()));"
+                    "filter.add(new TargetsPermanentPredicate(StaticFilters.FILTER_CONTROLLED_PERMANENT));"
+                    "this.getSpellAbility().addEffect(new CounterTargetEffect());"
+                    "this.getSpellAbility().addTarget(new TargetSpell(filter));"
+                ),
+                "instant_or_aura_spell_targeting_permanent_you_control",
+                {
+                    "any_of": [{"spell_types": ["instant"]}, {"spell_subtypes": ["aura"]}],
+                    "spell_targets": "permanent_you_control",
+                },
+            ),
+            (
+                "Outwit",
+                "Counter target spell that targets a player.",
+                (
+                    "filter.add(new TargetsPlayerPredicate(new FilterPlayer()));"
+                    "this.getSpellAbility().addEffect(new CounterTargetEffect());"
+                    "this.getSpellAbility().addTarget(new TargetSpell(filter));"
+                ),
+                "spell_targeting_player",
+                {"spell_targets": "player"},
+            ),
+            (
+                "Second Guess",
+                "Counter target spell that's the second spell cast this turn.",
+                (
+                    "filter.add(new SecondSpellPredicate());"
+                    'return "SecondSpellThisTurn";'
+                    "this.getSpellAbility().addEffect(new CounterTargetEffect());"
+                    "this.getSpellAbility().addTarget(new TargetSpell(filter));"
+                ),
+                "spell_second_spell_this_turn",
+                {"spell_order_this_turn": 2},
+            ),
+        ]
+
+        for card_name, oracle, source, target, expected_constraints in cases:
+            with self.subTest(card_name=card_name):
+                proposal, reason = split.split_row(
+                    row,
+                    metadata(name=card_name, oracle_text=oracle),
+                    source_text=source,
+                )
+                self.assertEqual(reason, "selected_exact_scope")
+                effect = proposal["effect_json"]
+                self.assertEqual(effect["battle_model_scope"], split.COUNTER_SCOPE)
+                self.assertEqual(effect["target"], target)
+                for key, value in expected_constraints.items():
+                    self.assertEqual(effect["target_constraints"][key], value)
+
+    def test_counter_up_to_two_target_spells_preserves_target_count(self) -> None:
+        row = queue_row(split.COUNTER_UNIT, effect_classes=["CounterTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(name="Double Negative", oracle_text="Counter up to two target spells."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new CounterTargetEffect());"
+                "this.getSpellAbility().addTarget(new TargetSpell(0, 2, StaticFilters.FILTER_SPELL));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["target"], "spell")
+        self.assertEqual(effect["target_count_min"], 0)
+        self.assertEqual(effect["target_count_max"], 2)
+        self.assertEqual(effect["max_targets"], 2)
+        self.assertTrue(effect["up_to_count"])
+
     def test_counter_scry_spell_maps_to_counter_runtime_with_scry_on_counter(self) -> None:
         row = queue_row(
             split.COUNTER_UNIT,

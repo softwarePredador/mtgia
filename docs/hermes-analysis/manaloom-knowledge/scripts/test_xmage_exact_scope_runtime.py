@@ -14049,6 +14049,160 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_counter_target_spell_targeting_player_constraint(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        responder = self.battle.Player("Responder", None, [])
+        counter_effect = {
+            "effect": "counter",
+            "battle_model_scope": "xmage_counter_target_spell_v1",
+            "target": "spell_targeting_player",
+            "target_constraints": {
+                "zone": "stack",
+                "stack_object": "spell",
+                "spell_targets": "player",
+            },
+            "instant": True,
+        }
+        target_spell = {"name": "Target Burn", "type_line": "Instant", "cmc": 2}
+        player_stack = self.battle.StackItem(
+            target_spell,
+            active,
+            {
+                "effect": "direct_damage",
+                "targets": [{"name": "Active", "target_player": "Active", "target_type": "player"}],
+            },
+        )
+        permanent_stack = self.battle.StackItem(
+            target_spell,
+            active,
+            {
+                "effect": "direct_damage",
+                "targets": [
+                    {
+                        "name": "Target Bear",
+                        "type_line": "Creature - Bear",
+                        "target_controller": "Active",
+                        "target_type": "permanent",
+                    }
+                ],
+            },
+        )
+
+        self.assertTrue(
+            self.battle.counter_can_target(
+                {},
+                counter_effect,
+                target_spell,
+                stack_item=player_stack,
+                counter_controller=responder,
+            )
+        )
+        self.assertFalse(
+            self.battle.counter_can_target(
+                {},
+                counter_effect,
+                target_spell,
+                stack_item=permanent_stack,
+                counter_controller=responder,
+            )
+        )
+
+    def test_counter_target_second_spell_this_turn_constraint(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        responder = self.battle.Player("Responder", None, [])
+        counter_effect = {
+            "effect": "counter",
+            "battle_model_scope": "xmage_counter_target_spell_v1",
+            "target": "spell_second_spell_this_turn",
+            "target_constraints": {
+                "zone": "stack",
+                "stack_object": "spell",
+                "spell_order_this_turn": 2,
+            },
+            "instant": True,
+        }
+        target_spell = {"name": "Target Spell", "type_line": "Sorcery", "cmc": 2}
+        second_stack = self.battle.StackItem(
+            target_spell,
+            active,
+            {"effect": "draw_cards", "spell_order_this_turn": 2},
+        )
+        first_stack = self.battle.StackItem(
+            target_spell,
+            active,
+            {"effect": "draw_cards", "spell_order_this_turn": 1},
+        )
+
+        self.assertTrue(
+            self.battle.counter_can_target(
+                {},
+                counter_effect,
+                target_spell,
+                stack_item=second_stack,
+                counter_controller=responder,
+            )
+        )
+        self.assertFalse(
+            self.battle.counter_can_target(
+                {},
+                counter_effect,
+                target_spell,
+                stack_item=first_stack,
+                counter_controller=responder,
+            )
+        )
+
+    def test_counter_target_instant_or_aura_targeting_controlled_permanent_constraint(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        responder = self.battle.Player("Responder", None, [])
+        counter_effect = {
+            "effect": "counter",
+            "battle_model_scope": "xmage_counter_target_spell_v1",
+            "target": "instant_or_aura_spell_targeting_permanent_you_control",
+            "target_constraints": {
+                "zone": "stack",
+                "stack_object": "spell",
+                "any_of": [{"spell_types": ["instant"]}, {"spell_subtypes": ["aura"]}],
+                "spell_targets": "permanent_you_control",
+            },
+            "instant": True,
+        }
+        legal_spell = {"name": "Target Trick", "type_line": "Instant", "cmc": 2}
+        illegal_spell = {"name": "Target Sorcery", "type_line": "Sorcery", "cmc": 2}
+        target_effect = {
+            "effect": "remove_permanent",
+            "targets": [
+                {
+                    "name": "Protected Permanent",
+                    "type_line": "Creature - Soldier",
+                    "target_controller": "Responder",
+                    "target_type": "permanent",
+                    "zone": "battlefield",
+                }
+            ],
+        }
+        legal_stack = self.battle.StackItem(legal_spell, active, target_effect)
+        illegal_stack = self.battle.StackItem(illegal_spell, active, target_effect)
+
+        self.assertTrue(
+            self.battle.counter_can_target(
+                {},
+                counter_effect,
+                legal_spell,
+                stack_item=legal_stack,
+                counter_controller=responder,
+            )
+        )
+        self.assertFalse(
+            self.battle.counter_can_target(
+                {},
+                counter_effect,
+                illegal_spell,
+                stack_item=illegal_stack,
+                counter_controller=responder,
+            )
+        )
+
     def test_counter_scry_scope_is_stack_response_and_scries_on_counter(self) -> None:
         active = self.battle.Player("Active", None, [])
         responder = self.battle.Player(

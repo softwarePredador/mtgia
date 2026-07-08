@@ -137,6 +137,58 @@ def test_counter_draw_special_target_execution_scenario_is_manifested() -> None:
     assert scenario["nonmatching_stack_effect"]["targets"][0]["target_controller"] == "Active"
 
 
+def test_counter_target_player_execution_scenario_is_manifested() -> None:
+    proposal = {
+        "normalized_name": "outwit",
+        "card_name": "Outwit",
+        "oracle_hash": "hash-outwit",
+        "logical_rule_key": "battle_rule_v1:outwit",
+        "effect_json": {
+            "effect": "counter",
+            "battle_model_scope": "xmage_counter_target_spell_v1",
+            "target": "spell_targeting_player",
+            "target_constraints": {
+                "zone": "stack",
+                "stack_object": "spell",
+                "spell_targets": "player",
+            },
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    assert scenario["type"] == "counter_target_response"
+    assert scenario["target_stack_effect"]["targets"][0]["target_type"] == "player"
+    assert scenario["nonmatching_stack_effect"]["targets"][0]["target_type"] == "permanent"
+
+
+def test_counter_second_spell_execution_scenario_is_manifested() -> None:
+    proposal = {
+        "normalized_name": "second guess",
+        "card_name": "Second Guess",
+        "oracle_hash": "hash-second-guess",
+        "logical_rule_key": "battle_rule_v1:second-guess",
+        "effect_json": {
+            "effect": "counter",
+            "battle_model_scope": "xmage_counter_target_spell_v1",
+            "target": "spell_second_spell_this_turn",
+            "target_constraints": {
+                "zone": "stack",
+                "stack_object": "spell",
+                "spell_order_this_turn": 2,
+            },
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    assert scenario["type"] == "counter_target_response"
+    assert scenario["target_stack_effect"]["spell_order_this_turn"] == 2
+    assert scenario["nonmatching_stack_effect"]["spell_order_this_turn"] == 1
+
+
 def test_counter_target_creature_power_or_toughness_fixture_is_manifested() -> None:
     proposal = {
         "normalized_name": "stern scolding",

@@ -3630,6 +3630,49 @@ def _stack_object_fixture_from_constraints(
     if not matching and active_constraints.get("require_legendary"):
         stack_object = "spell"
 
+    if (
+        not matching
+        and stack_object == "spell"
+        and not any(
+            active_constraints.get(key)
+            for key in (
+                "card_types",
+                "target_card_types",
+                "exclude_card_types",
+                "spell_types",
+                "target_spell_types",
+                "spell_subtypes",
+                "target_spell_subtypes",
+                "spell_colors",
+                "target_spell_colors",
+                "exclude_spell_colors",
+                "excluded_spell_colors",
+                "spell_color_count_exact",
+                "target_spell_color_count_exact",
+                "spell_color_count_min",
+                "target_spell_color_count_min",
+                "power_or_toughness_max",
+                "target_power_or_toughness_max",
+                "source_zone",
+                "spell_source_zone",
+                "spell_targets",
+                "target_spell_targets",
+                "spell_order_this_turn",
+                "cast_order_this_turn",
+                "spell_cast_order",
+            )
+        )
+    ):
+        return {
+            "card": {
+                "name": name,
+                "type_line": "Activated Ability",
+                "effect": "activated_ability",
+                "cmc": 0,
+            },
+            "effect": {"effect": "activated_ability"},
+        }
+
     if stack_object in {"activated_ability", "triggered_ability", "mana_ability"}:
         label = {
             "activated_ability": "Activated Ability",
@@ -3707,6 +3750,17 @@ def _stack_object_fixture_from_constraints(
                     "target_type": "creature" if matching else "planeswalker",
                 }
             ]
+        elif str(spell_targets) == "player":
+            effect["targets"] = [
+                {
+                    "name": "Target Player" if matching else "Target Permanent",
+                    "target_player": "Active" if matching else None,
+                    "target_controller": "Active",
+                    "target_type": "player" if matching else "permanent",
+                    "type_line": "Player" if matching else "Creature - Soldier",
+                    "zone": "player" if matching else "battlefield",
+                }
+            ]
         elif str(spell_targets) == "permanent_you_control":
             effect["targets"] = [
                 {
@@ -3727,6 +3781,18 @@ def _stack_object_fixture_from_constraints(
                     "zone": "battlefield",
                 }
             ]
+
+    spell_order = (
+        active_constraints.get("spell_order_this_turn")
+        or active_constraints.get("cast_order_this_turn")
+        or active_constraints.get("spell_cast_order")
+    )
+    if spell_order is not None:
+        try:
+            required_order = int(spell_order)
+            effect["spell_order_this_turn"] = required_order if matching else max(1, required_order - 1)
+        except Exception:
+            pass
 
     if matching and stack_object == "spell":
         card["effect"] = "finisher"

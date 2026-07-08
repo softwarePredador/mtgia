@@ -3405,7 +3405,14 @@ def counter_target_from_oracle(metadata: dict[str, Any]) -> str | None:
             r"^counter target spell that targets a permanent you control\.?$",
             "spell_targeting_permanent_you_control",
         ),
+        (
+            r"^counter target instant or aura spell that targets a permanent you control\.?$",
+            "instant_or_aura_spell_targeting_permanent_you_control",
+        ),
+        (r"^counter target spell that targets a player\.?$", "spell_targeting_player"),
+        (r"^counter target spell that's the second spell cast this turn\.?$", "spell_second_spell_this_turn"),
         (r"^counter target spell cast from a graveyard\.?$", "spell_cast_from_graveyard"),
+        (r"^counter up to two target spells\.?$", "spell"),
         (r"^counter target noncreature spell\.?$", "noncreature_spell"),
         (r"^counter target nonartifact spell\.?$", "nonartifact_spell"),
         (r"^counter target colorless spell\.?$", "colorless_spell"),
@@ -3434,6 +3441,50 @@ def counter_draw_target_from_oracle(metadata: dict[str, Any]) -> str | None:
     if not text.endswith(" draw a card."):
         return None
     return counter_target_from_oracle({"oracle_text": text.removesuffix(" draw a card.").strip()})
+
+
+def counter_target_count_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
+    text = re.sub(r"\s+", " ", strip_parenthetical_reminders(oracle_text(metadata))).strip().lower()
+    match = re.match(r"^counter up to (?P<count>\w+) target spells\.?$", text)
+    if not match:
+        return None
+    count = counter_count_from_text(match.group("count"))
+    if count is None or count <= 1:
+        return None
+    return {
+        "target_count_min": 0,
+        "target_count_max": int(count),
+        "up_to_count": True,
+    }
+
+
+def counter_target_count_from_source(source_text: str) -> dict[str, Any] | str | None:
+    text = str(source_text or "")
+    target_matches = list(re.finditer(r"new\s+TargetSpell\s*\(", text))
+    if len(target_matches) != 1:
+        return "counter_multi_target_source_target_constructor_not_single"
+    args = extract_constructor_args(text[target_matches[0].start() :], "TargetSpell")
+    if args is None:
+        return "counter_multi_target_source_target_constructor_not_supported"
+    parts = split_top_level_args(args)
+    numeric_parts = [
+        int(str(part).strip())
+        for part in parts[:2]
+        if re.fullmatch(r"\d+", str(part or "").strip())
+    ]
+    if not numeric_parts:
+        return None
+    if len(numeric_parts) >= 2:
+        target_min, target_max = numeric_parts[0], numeric_parts[1]
+    else:
+        target_min = target_max = numeric_parts[0]
+    if target_max <= 1:
+        return None
+    return {
+        "target_count_min": int(target_min),
+        "target_count_max": int(target_max),
+        "up_to_count": int(target_min) == 0,
+    }
 
 
 def fixed_counter_scry_from_oracle(metadata: dict[str, Any]) -> tuple[str, int] | None:
@@ -3506,7 +3557,11 @@ def counter_target_from_source(source_text: str) -> str | None:
         return "creature_spell_power_or_toughness_2_or_less"
     if "new TargetStackObject()" in text or re.search(r"new\s+TargetStackObject\s*\(\s*\)", text):
         return "spell_or_activated_or_triggered_ability"
-    if "new TargetSpell()" in text or "new TargetSpell(StaticFilters.FILTER_SPELL)" in text:
+    if (
+        "new TargetSpell()" in text
+        or "new TargetSpell(StaticFilters.FILTER_SPELL)" in text
+        or re.search(r"new\s+TargetSpell\s*\([^)]*StaticFilters\.FILTER_SPELL(?!_)", text)
+    ):
         return "spell"
     if (
         "FILTER_SPELL_NON_CREATURE" in text
@@ -3541,7 +3596,16 @@ def counter_target_from_source(source_text: str) -> str | None:
             or "spell that targets a permanent you control" in text
         )
     ):
+        if (
+            "CardType.INSTANT.getPredicate()" in text
+            and "SubType.AURA.getPredicate()" in text
+        ):
+            return "instant_or_aura_spell_targeting_permanent_you_control"
         return "spell_targeting_permanent_you_control"
+    if "TargetsPlayerPredicate" in text or "spell that targets a player" in text:
+        return "spell_targeting_player"
+    if "SecondSpellPredicate" in text or "SecondSpellThisTurn" in text:
+        return "spell_second_spell_this_turn"
     if (
         "TargetsPermanentPredicate" in text
         and (
@@ -3805,6 +3869,16 @@ def counter_target_constraints_for(target: str) -> dict[str, Any]:
         constraints["spell_targets"] = "permanent_you_control"
     elif target == "spell_targeting_you_or_permanent_you_control":
         constraints["spell_targets"] = "you_or_permanent_you_control"
+    elif target == "instant_or_aura_spell_targeting_permanent_you_control":
+        constraints["any_of"] = [
+            {"spell_types": ["instant"]},
+            {"spell_subtypes": ["aura"]},
+        ]
+        constraints["spell_targets"] = "permanent_you_control"
+    elif target == "spell_targeting_player":
+        constraints["spell_targets"] = "player"
+    elif target == "spell_second_spell_this_turn":
+        constraints["spell_order_this_turn"] = 2
     elif target == "spell_cast_from_graveyard":
         constraints["source_zone"] = "graveyard"
     elif target == "noncreature_spell":
@@ -30081,10 +30155,27 @@ def split_row(
             "spell_or_activated_or_triggered_ability",
             "activated_or_triggered_ability_or_legendary_spell",
             "creature_spell_power_or_toughness_2_or_less",
+            "instant_or_aura_spell_targeting_permanent_you_control",
+            "spell_targeting_player",
+            "spell_second_spell_this_turn",
+            "spell_targeting_creature",
+            "spell_targeting_permanent_you_control",
+            "spell_targeting_you_or_permanent_you_control",
+            "spell_cast_from_graveyard",
         }:
             source_target = counter_target_from_source(source_text)
             if source_target != target:
                 return None, "counter_source_target_not_supported"
+        target_count = counter_target_count_from_oracle(metadata)
+        if target_count is not None:
+            source_count = counter_target_count_from_source(source_text)
+            if isinstance(source_count, str):
+                return None, source_count
+            if source_count is None:
+                return None, "counter_multi_target_source_count_not_fixed"
+            for key in ("target_count_min", "target_count_max", "up_to_count"):
+                if source_count.get(key) != target_count.get(key):
+                    return None, f"counter_multi_target_source_oracle_{key}_mismatch"
         effect_json = {
             "effect": "counter",
             "battle_model_scope": COUNTER_SCOPE,
@@ -30093,6 +30184,16 @@ def split_row(
             "xmage_effect_class": "CounterTargetEffect",
             **flags,
         }
+        if target_count is not None:
+            effect_json.update(
+                {
+                    "target_count": int(target_count["target_count_max"]),
+                    "target_count_min": int(target_count["target_count_min"]),
+                    "target_count_max": int(target_count["target_count_max"]),
+                    "max_targets": int(target_count["target_count_max"]),
+                    "up_to_count": bool(target_count["up_to_count"]),
+                }
+            )
         if target == "blue_spell":
             effect_json["requires_blue_target"] = True
         return build_proposal(row, metadata, effect_json, family_id="xmage_counter_target_spell"), "selected_exact_scope"
