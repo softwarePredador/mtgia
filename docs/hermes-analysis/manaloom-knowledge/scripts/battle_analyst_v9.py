@@ -21540,6 +21540,19 @@ def additional_card_costs_are_payable(player, card, effect_data, cost_context=No
         )
         if permanent is None:
             return False
+    if effect_data.get("additional_cost") in {"sacrifice_artifact", "sacrifice_goblin"}:
+        sacrifice_target_type = (
+            "artifact"
+            if effect_data.get("additional_cost") == "sacrifice_artifact"
+            else "goblin"
+        )
+        permanent, _options = choose_activation_sacrifice_target(
+            player,
+            card,
+            sacrifice_target_type,
+        )
+        if permanent is None:
+            return False
     if effect_data.get("requires_sacrifice_land"):
         battlefield_lands = [
             candidate
@@ -21568,6 +21581,7 @@ def pay_additional_card_costs(player, card, effect_data, *, turn=None, cost_cont
         and not effect_data.get("requires_sacrifice_creature")
         and not effect_data.get("requires_sacrifice_green_creature")
         and not effect_data.get("requires_sacrifice_artifact_or_creature")
+        and effect_data.get("additional_cost") not in {"sacrifice_artifact", "sacrifice_goblin"}
         and not effect_data.get("requires_sacrifice_land")
         and not planned_sacrifices
         and not planned_blight
@@ -21745,6 +21759,48 @@ def pay_additional_card_costs(player, card, effect_data, *, turn=None, cost_cont
             land_options=land_options,
             selection_reason=selection_reason,
             strategic_risk_flags=strategic_risk_flags,
+        )
+    if effect_data.get("additional_cost") in {"sacrifice_artifact", "sacrifice_goblin"}:
+        sacrifice_target_type = (
+            "artifact"
+            if effect_data.get("additional_cost") == "sacrifice_artifact"
+            else "goblin"
+        )
+        sacrifice, permanent_options = choose_activation_sacrifice_target(
+            player,
+            card,
+            sacrifice_target_type,
+        )
+        if not sacrifice:
+            emit_replay_event(
+                "additional_cost_failed",
+                player=player.name,
+                card=card.get("name", "?"),
+                cost=effect_data.get("additional_cost"),
+                sacrifice_target_type=sacrifice_target_type,
+                turn=turn,
+            )
+            return False
+        destination = move_permanent_from_battlefield(
+            player,
+            sacrifice,
+            reason=effect_data.get("additional_cost"),
+            source=card,
+        )
+        emit_replay_event(
+            "additional_cost_paid",
+            player=player.name,
+            card=card.get("name", "?"),
+            cost=effect_data.get("additional_cost"),
+            sacrificed=sacrifice.get("name", "?"),
+            sacrifice_target_type=sacrifice_target_type,
+            destination=destination,
+            permanent_options=[
+                option.get("name", "?")
+                for option in permanent_options[:8]
+                if isinstance(option, dict)
+            ],
+            turn=turn,
         )
     required_color = "G" if effect_data.get("requires_sacrifice_green_creature") else None
     if effect_data.get("requires_sacrifice_creature") or required_color:

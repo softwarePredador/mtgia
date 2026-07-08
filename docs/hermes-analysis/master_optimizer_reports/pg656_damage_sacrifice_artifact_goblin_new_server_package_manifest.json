@@ -1,0 +1,160 @@
+{
+    "apply_gate": "Applied on 2026-07-08 against the new-server PostgreSQL target; do not rerun apply SQL unless a fresh precheck justifies it.",
+  "backup_table": "manaloom_deploy_audit.pg656_damage_sacrifice_artifact_goblin_n_20260708_124341",
+  "deploy_id": "PG656",
+  "execution_scenarios": [],
+  "expected_rules": [
+    {
+      "card_name": "Goblin Grenade",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d3ecba576287f7ee3ae09a6a90e10426",
+      "min_rule_version": 2,
+      "normalized_name": "goblin grenade",
+      "oracle_hash": "d3e3d2a19d131c2885a2c185184d3474",
+      "required_effect_fields": {
+        "additional_cost": "sacrifice_goblin",
+        "amount": 5,
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+        "damage": 5,
+        "effect": "direct_damage",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_additional_cost_class": "SacrificeTargetCost",
+        "xmage_additional_cost_target": "goblin",
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Shrapnel Blast",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d59036a7f269287fafc5c5e29e4eeb6d",
+      "min_rule_version": 2,
+      "normalized_name": "shrapnel blast",
+      "oracle_hash": "fb2957069cb0018ccd599ce259f55116",
+      "required_effect_fields": {
+        "additional_cost": "sacrifice_artifact",
+        "amount": 5,
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+        "damage": 5,
+        "effect": "direct_damage",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_additional_cost_class": "SacrificeTargetCost",
+        "xmage_additional_cost_target": "artifact",
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_fixed_damage_spell": 2
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg656_damage_sacrifice_artifact_goblin_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg656_damage_sacrifice_artifact_goblin_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg656_damage_sacrifice_artifact_goblin_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg656_damage_sacrifice_artifact_goblin_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg656_damage_sacrifice_artifact_goblin_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg656_damage_sacrifice_artifact_goblin_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-08T12:43:41+00:00",
+    "mutations_performed": [
+        "precheck completed against 127.0.0.1:15432/halder",
+        "apply committed 2 promoted rule rows and deprecated 0 shadow rows",
+        "postcheck confirmed 2 promoted verified/auto rows with oracle_hash",
+        "PG -> Hermes/SQLite sync exported canonical snapshot",
+        "E2E package validation passed PostgreSQL, SQLite, canonical snapshot, and runtime_get_card_effect"
+    ],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Goblin Grenade"
+      },
+      "card_name": "Goblin Grenade",
+      "effect": "direct_damage",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d3ecba576287f7ee3ae09a6a90e10426",
+      "normalized_name": "goblin grenade",
+      "required_effect_fields": {
+        "additional_cost": "sacrifice_goblin",
+        "amount": 5,
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+        "damage": 5,
+        "effect": "direct_damage",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_additional_cost_class": "SacrificeTargetCost",
+        "xmage_additional_cost_target": "goblin",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Shrapnel Blast"
+      },
+      "card_name": "Shrapnel Blast",
+      "effect": "direct_damage",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d59036a7f269287fafc5c5e29e4eeb6d",
+      "normalized_name": "shrapnel blast",
+      "required_effect_fields": {
+        "additional_cost": "sacrifice_artifact",
+        "amount": 5,
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+        "damage": 5,
+        "effect": "direct_damage",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_additional_cost_class": "SacrificeTargetCost",
+        "xmage_additional_cost_target": "artifact",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Goblin Grenade",
+    "Shrapnel Blast"
+  ],
+  "selected_count": 2,
+  "slug": "damage_sacrifice_artifact_goblin_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Goblin Grenade",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d3ecba576287f7ee3ae09a6a90e10426",
+      "min_rule_version": 2,
+      "normalized_name": "goblin grenade",
+      "oracle_hash": "d3e3d2a19d131c2885a2c185184d3474",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Shrapnel Blast",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d59036a7f269287fafc5c5e29e4eeb6d",
+      "min_rule_version": 2,
+      "normalized_name": "shrapnel blast",
+      "oracle_hash": "fb2957069cb0018ccd599ce259f55116",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+    "status": "applied_postchecked_synced_validated"
+}

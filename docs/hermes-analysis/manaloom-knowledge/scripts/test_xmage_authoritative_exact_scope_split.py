@@ -7949,6 +7949,63 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertTrue(effect["requires_sacrifice_artifact_or_creature"])
         self.assertEqual(effect["xmage_additional_cost_target"], "artifact_or_creature")
 
+    def test_fixed_damage_spell_maps_artifact_sacrifice_additional_cost(self) -> None:
+        row = queue_row(split.DAMAGE_UNIT, effect_classes=["DamageTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Shrapnel Blast",
+                oracle_text=(
+                    "As an additional cost to cast this spell, sacrifice an artifact. "
+                    "Shrapnel Blast deals 5 damage to any target."
+                ),
+            ),
+            source_text=(
+                "FilterControlledArtifactPermanent filter = "
+                "new FilterControlledArtifactPermanent(\"an artifact\");"
+                "filter.add(CardType.ARTIFACT.getPredicate());"
+                "this.getSpellAbility().addCost(new SacrificeTargetCost(filter));"
+                "this.getSpellAbility().addEffect(new DamageTargetEffect(5));"
+                "this.getSpellAbility().addTarget(new TargetAnyTarget());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DAMAGE_SCOPE)
+        self.assertEqual(effect["amount"], 5)
+        self.assertEqual(effect["additional_cost"], "sacrifice_artifact")
+        self.assertTrue(effect["requires_sacrifice_artifact"])
+        self.assertEqual(effect["xmage_additional_cost_target"], "artifact")
+
+    def test_fixed_damage_spell_maps_goblin_sacrifice_additional_cost(self) -> None:
+        row = queue_row(split.DAMAGE_UNIT, effect_classes=["DamageTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Goblin Grenade",
+                oracle_text=(
+                    "As an additional cost to cast this spell, sacrifice a Goblin. "
+                    "Goblin Grenade deals 5 damage to any target."
+                ),
+            ),
+            source_text=(
+                "FilterControlledPermanent filter = new FilterControlledPermanent(\"a Goblin\");"
+                "filter.add(SubType.GOBLIN.getPredicate());"
+                "this.getSpellAbility().addCost(new SacrificeTargetCost(filter));"
+                "this.getSpellAbility().addEffect(new DamageTargetEffect(5));"
+                "this.getSpellAbility().addTarget(new TargetAnyTarget());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DAMAGE_SCOPE)
+        self.assertEqual(effect["amount"], 5)
+        self.assertEqual(effect["additional_cost"], "sacrifice_goblin")
+        self.assertTrue(effect["requires_sacrifice_goblin"])
+        self.assertEqual(effect["xmage_additional_cost_target"], "goblin")
+
     def test_fixed_damage_spell_blocks_creature_or_enchantment_sacrifice_cost(self) -> None:
         row = queue_row(split.DAMAGE_UNIT, effect_classes=["DamageTargetEffect"])
         proposal, reason = split.split_row(

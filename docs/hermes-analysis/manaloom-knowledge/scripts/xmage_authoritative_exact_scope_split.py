@@ -16514,7 +16514,11 @@ def activation_sacrifice_target_from_source(source: str, window: str) -> str | N
         return "swamp"
     if "FILTER_PERMANENT_CREATURE" in relevant or "TargetControlledCreaturePermanent" in relevant:
         return "creature"
-    if "FILTER_PERMANENT_ARTIFACT" in relevant or "FILTER_CONTROLLED_PERMANENT_ARTIFACT" in relevant:
+    if (
+        "FILTER_PERMANENT_ARTIFACT" in relevant
+        or "FILTER_CONTROLLED_PERMANENT_ARTIFACT" in relevant
+        or "FilterControlledArtifactPermanent" in relevant
+    ):
         return "artifact"
     if (
         "FILTER_CONTROLLED_LAND" in relevant
@@ -16606,6 +16610,28 @@ def fixed_spell_additional_cost_fields_from_source(
                 "requires_sacrifice_artifact_or_creature": True,
                 "xmage_additional_cost_class": "SacrificeTargetCost",
                 "xmage_additional_cost_target": "artifact_or_creature",
+            }, None
+    if "SacrificeTargetCost" in text and re.search(
+        r"additional cost.*sacrifice (?:an?|one) artifact", lowered_oracle
+    ):
+        sacrifice_target = activation_sacrifice_target_from_source(text, text)
+        if sacrifice_target == "artifact":
+            return {
+                "additional_cost": "sacrifice_artifact",
+                "requires_sacrifice_artifact": True,
+                "xmage_additional_cost_class": "SacrificeTargetCost",
+                "xmage_additional_cost_target": "artifact",
+            }, None
+    if "SacrificeTargetCost" in text and re.search(
+        r"additional cost.*sacrifice (?:a|one) goblin", lowered_oracle
+    ):
+        sacrifice_target = activation_sacrifice_target_from_source(text, text)
+        if sacrifice_target == "goblin":
+            return {
+                "additional_cost": "sacrifice_goblin",
+                "requires_sacrifice_goblin": True,
+                "xmage_additional_cost_class": "SacrificeTargetCost",
+                "xmage_additional_cost_target": "goblin",
             }, None
     if "SacrificeTargetCost" in text and re.search(
         r"additional cost.*sacrifice (?:a|one) land", lowered_oracle

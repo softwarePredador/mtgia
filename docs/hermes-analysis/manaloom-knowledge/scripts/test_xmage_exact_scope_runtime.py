@@ -6805,6 +6805,129 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_fixed_damage_spell_pays_artifact_sacrifice_cost(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        artifact = {
+            "name": "Spare Artifact",
+            "type_line": "Artifact",
+            "effect": "artifact",
+            "cmc": 0,
+        }
+        creature = {
+            "name": "Unrelated Goblin",
+            "type_line": "Creature - Goblin",
+            "effect": "creature",
+            "power": 1,
+            "toughness": 1,
+        }
+        active.battlefield.extend([creature, artifact])
+        opponent.life = 8
+        effect = {
+            "effect": "direct_damage",
+            "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+            "amount": 5,
+            "damage": 5,
+            "target": "any_target",
+            "target_constraints": {"scope": "any_target"},
+            "requires_sacrifice_artifact": True,
+            "additional_cost": "sacrifice_artifact",
+            "instant": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Shrapnel Blast",
+                "type_line": "Instant",
+                "oracle_text": (
+                    "As an additional cost to cast this spell, sacrifice an artifact. "
+                    "Shrapnel Blast deals 5 damage to any target."
+                ),
+            },
+            turn=4,
+            rng=random.Random(34),
+            effect_data_override=effect,
+        )
+
+        self.assertNotIn(artifact, active.battlefield)
+        self.assertIn(artifact, active.graveyard)
+        self.assertIn(creature, active.battlefield)
+        self.assertEqual(opponent.life, 3)
+        self.assertTrue(
+            any(
+                event == "additional_cost_paid"
+                and data.get("card") == "Shrapnel Blast"
+                and data.get("cost") == "sacrifice_artifact"
+                and data.get("sacrificed") == "Spare Artifact"
+                and data.get("sacrifice_target_type") == "artifact"
+                for event, data in self.events
+            )
+        )
+
+    def test_fixed_damage_spell_pays_goblin_sacrifice_cost(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        goblin = {
+            "name": "Spare Goblin",
+            "type_line": "Creature - Goblin",
+            "effect": "creature",
+            "power": 1,
+            "toughness": 1,
+        }
+        beast = {
+            "name": "Non-Goblin Beast",
+            "type_line": "Creature - Beast",
+            "effect": "creature",
+            "power": 2,
+            "toughness": 2,
+        }
+        active.battlefield.extend([beast, goblin])
+        opponent.life = 8
+        effect = {
+            "effect": "direct_damage",
+            "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+            "amount": 5,
+            "damage": 5,
+            "target": "any_target",
+            "target_constraints": {"scope": "any_target"},
+            "requires_sacrifice_goblin": True,
+            "additional_cost": "sacrifice_goblin",
+            "instant": False,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Goblin Grenade",
+                "type_line": "Sorcery",
+                "oracle_text": (
+                    "As an additional cost to cast this spell, sacrifice a Goblin. "
+                    "Goblin Grenade deals 5 damage to any target."
+                ),
+            },
+            turn=4,
+            rng=random.Random(36),
+            effect_data_override=effect,
+        )
+
+        self.assertNotIn(goblin, active.battlefield)
+        self.assertIn(goblin, active.graveyard)
+        self.assertIn(beast, active.battlefield)
+        self.assertEqual(opponent.life, 3)
+        self.assertTrue(
+            any(
+                event == "additional_cost_paid"
+                and data.get("card") == "Goblin Grenade"
+                and data.get("cost") == "sacrifice_goblin"
+                and data.get("sacrificed") == "Spare Goblin"
+                and data.get("sacrifice_target_type") == "goblin"
+                for event, data in self.events
+            )
+        )
+
     def test_destroy_target_spell_pays_creature_sacrifice_cost_before_removal(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

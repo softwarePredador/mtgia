@@ -19034,6 +19034,74 @@ Evidence:
 - `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260708_post_pg655b_hash_backfill_new_server.md`
 - `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260708_post_pg655b_hash_backfill_new_server.md`
 
+## 2026-07-08 - PG656 Fixed Damage Artifact/Goblin Sacrifice Cost Checkpoint
+
+PG656 closed two exact fixed target-damage spell variants that were blocked by
+additional sacrifice costs already representable by ManaLoom's runtime target
+sacrifice selection:
+
+- `sacrifice_artifact` for `Shrapnel Blast`, where XMage uses
+  `SacrificeTargetCost` with `FilterControlledArtifactPermanent`;
+- `sacrifice_goblin` for `Goblin Grenade`, where XMage uses
+  `SacrificeTargetCost` with a `SubType.GOBLIN` controlled permanent filter;
+- both remain under the existing executable scope
+  `xmage_fixed_damage_target_spell_v1` with `amount=5`,
+  `target=any_target`, and exact Oracle/source target agreement;
+- runtime now pays spell additional costs for `sacrifice_artifact` and
+  `sacrifice_goblin`, moves the sacrificed permanent before damage resolution,
+  and records `sacrifice_target_type` in replay evidence;
+- residual boundary: mixed costs such as creature-or-enchantment,
+  creature-or-planeswalker, discard-or-pay, land bounce, or chosen/revealed
+  power damage remain blocked until their own exact subpattern is implemented.
+
+PG656 apply/postcheck evidence:
+
+- precheck found `2` target rows and no existing rules to deprecate;
+- apply committed `2` promoted rows and deprecated `0` shadow rows;
+- postcheck confirmed `2/2` promoted verified/auto rows with `oracle_hash`;
+- E2E package validation passed PostgreSQL, SQLite/Hermes, canonical snapshot,
+  and `runtime_get_card_effect` for both selected cards;
+- focused tests:
+  `python3 -m unittest test_xmage_authoritative_exact_scope_split.py test_xmage_exact_scope_runtime.py`
+  passed `1230` tests.
+
+Final post-PG656 state:
+
+- PG -> Hermes/SQLite sync:
+  `pg_rows_loaded=5932`, `sqlite_inserted_or_updated=5918`,
+  `canonical_snapshot_rows_exported=5895`;
+- global readiness:
+  `battle_and_oracle_ready=5992`, `battle_family_mapper_required=27884`,
+  `snapshot_has_verified_rule=6020`, `snapshot_has_any_rule=7224`;
+- authoritative queue:
+  `target_identity_count=24961`,
+  `xmage_authoritative_source_count=24648`,
+  `xmage_missing_source_exception_count=313`,
+  `xmage_authoritative_parser_gap_count=0`,
+  `xmage_authoritative_adapter_required_count=24648`,
+  `direct_damage::targeted_damage_variant_v1=765`;
+- final exact-scope recheck returned `proposal_count=0` and
+  `safe_for_batch_pg_package_count=0`;
+- validation gates:
+  `xmage_strategy_consistency_audit` passed `26/26`,
+  `pg_hermes_sqlite_contract_audit` passed `51/51` with the new-server wrapper,
+  `operational_surface_alignment_audit` passed, and
+  `legacy_contamination_audit` passed.
+
+Evidence:
+
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260708_pg656_damage_sacrifice_artifact_goblin_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg656_damage_sacrifice_artifact_goblin_new_server_package_package.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg656_damage_sacrifice_artifact_goblin_new_server_battle_rule_sync.json`
+- `docs/hermes-analysis/master_optimizer_reports/pg656_damage_sacrifice_artifact_goblin_new_server_e2e_validation.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260708_post_pg656_damage_sacrifice_artifact_goblin_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260708_post_pg656_damage_sacrifice_artifact_goblin_new_server_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260708_post_pg656_damage_sacrifice_artifact_goblin_new_server_recheck.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260708_post_pg656_damage_sacrifice_artifact_goblin_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260708_post_pg656_damage_sacrifice_artifact_goblin_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260708_post_pg656_damage_sacrifice_artifact_goblin_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260708_post_pg656_damage_sacrifice_artifact_goblin_new_server.md`
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:
