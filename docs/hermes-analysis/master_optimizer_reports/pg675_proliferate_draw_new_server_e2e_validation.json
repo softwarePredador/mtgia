@@ -1,0 +1,231 @@
+{
+  "battle_execution": {
+    "event_count": 20,
+    "results": [
+      {
+        "card_name": "Contentious Plan",
+        "controller_plus_one_counters": 2,
+        "draw_count": 1,
+        "opponent_charge_counters": 3,
+        "opponent_poison_counters": 2,
+        "scenario": "Contentious Plan proliferates and draws 1"
+      },
+      {
+        "card_name": "Steady Progress",
+        "controller_plus_one_counters": 2,
+        "draw_count": 1,
+        "opponent_charge_counters": 3,
+        "opponent_poison_counters": 2,
+        "scenario": "Steady Progress proliferates and draws 1"
+      },
+      {
+        "card_name": "Tezzeret's Gambit",
+        "controller_plus_one_counters": 2,
+        "draw_count": 2,
+        "opponent_charge_counters": 3,
+        "opponent_poison_counters": 2,
+        "scenario": "Tezzeret's Gambit proliferates and draws 2"
+      },
+      {
+        "card_name": "Vivisurgeon's Insight",
+        "controller_plus_one_counters": 2,
+        "draw_count": 3,
+        "opponent_charge_counters": 3,
+        "opponent_poison_counters": 2,
+        "scenario": "Vivisurgeon's Insight proliferates and draws 3"
+      }
+    ],
+    "scenario_count": 4
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-08T22:38:48.769401+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg675_proliferate_draw_new_server_manifest.json",
+  "package_id": "pg675_proliferate_draw_new_server_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 4
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_proliferate_and_draw_cards_spell_v1",
+          "card_name": "Contentious Plan",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:821bc3c6274082b25465b68c03d58653",
+          "oracle_hash": "4582abf74328130a7ac8ca45cbcd1d2d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_proliferate_and_draw_cards_spell_v1",
+          "card_name": "Steady Progress",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6f809a58fe795aff31937be7484e5915",
+          "oracle_hash": "4582abf74328130a7ac8ca45cbcd1d2d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_proliferate_and_draw_cards_spell_v1",
+          "card_name": "Tezzeret's Gambit",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a550b8881a1b501010aad2549aa54472",
+          "oracle_hash": "cd253b1acdf30fc75b8a62d7630b45cd",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_proliferate_and_draw_cards_spell_v1",
+          "card_name": "Vivisurgeon's Insight",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5f0f5e17992389750140c3f40957d89c",
+          "oracle_hash": "225971006721adf2999911730a636afc",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 4
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_proliferate_and_draw_cards_spell_v1",
+          "card_name": "Contentious Plan",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:821bc3c6274082b25465b68c03d58653",
+          "oracle_hash": "4582abf74328130a7ac8ca45cbcd1d2d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_proliferate_and_draw_cards_spell_v1",
+          "card_name": "Steady Progress",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6f809a58fe795aff31937be7484e5915",
+          "oracle_hash": "4582abf74328130a7ac8ca45cbcd1d2d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_proliferate_and_draw_cards_spell_v1",
+          "card_name": "Tezzeret's Gambit",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a550b8881a1b501010aad2549aa54472",
+          "oracle_hash": "cd253b1acdf30fc75b8a62d7630b45cd",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_proliferate_and_draw_cards_spell_v1",
+          "card_name": "Vivisurgeon's Insight",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5f0f5e17992389750140c3f40957d89c",
+          "oracle_hash": "225971006721adf2999911730a636afc",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 4
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_proliferate_and_draw_cards_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Contentious Plan",
+          "logical_rule_key": "battle_rule_v1:821bc3c6274082b25465b68c03d58653"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_proliferate_and_draw_cards_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Steady Progress",
+          "logical_rule_key": "battle_rule_v1:6f809a58fe795aff31937be7484e5915"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_proliferate_and_draw_cards_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Tezzeret's Gambit",
+          "logical_rule_key": "battle_rule_v1:a550b8881a1b501010aad2549aa54472"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_proliferate_and_draw_cards_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Vivisurgeon's Insight",
+          "logical_rule_key": "battle_rule_v1:5f0f5e17992389750140c3f40957d89c"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 4
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Contentious Plan",
+          "component_keys": [],
+          "effect": "composite_resolution",
+          "logical_rule_key": "battle_rule_v1:821bc3c6274082b25465b68c03d58653"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Steady Progress",
+          "component_keys": [],
+          "effect": "composite_resolution",
+          "logical_rule_key": "battle_rule_v1:6f809a58fe795aff31937be7484e5915"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Tezzeret's Gambit",
+          "component_keys": [],
+          "effect": "composite_resolution",
+          "logical_rule_key": "battle_rule_v1:a550b8881a1b501010aad2549aa54472"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Vivisurgeon's Insight",
+          "component_keys": [],
+          "effect": "composite_resolution",
+          "logical_rule_key": "battle_rule_v1:5f0f5e17992389750140c3f40957d89c"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 20,
+        "scenarios": 4
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

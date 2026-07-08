@@ -5235,6 +5235,108 @@ def run_global_stat_modifier_draw_spell(
     }
 
 
+def run_proliferate_draw_spell(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    effect = battle.get_card_effect(card)
+    active = battle.Player(str(scenario.get("player") or "Spell Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
+    active.battlefield = [
+        battle.enrich_card(dict(permanent))
+        for permanent in scenario.get("controller_battlefield") or []
+    ]
+    opponent.battlefield = [
+        battle.enrich_card(dict(permanent))
+        for permanent in scenario.get("opponent_battlefield") or []
+    ]
+    opponent.poison = int(scenario.get("opponent_poison_counters") or 0)
+    opponent.counters = {"poison": opponent.poison} if opponent.poison > 0 else {}
+    active.library = [dict(library_card) for library_card in scenario.get("library") or []]
+    before_events = len(events)
+
+    battle.apply_effect_immediate(
+        active,
+        [opponent],
+        battle.enrich_card({**card, **effect}),
+        turn=int(scenario.get("turn") or 7),
+        rng=random.Random(int(scenario.get("seed") or 6075)),
+        effect_data_override=effect,
+        phase=str(scenario.get("phase") or "precombat_main"),
+    )
+
+    expected_draw_count = int(scenario.get("expected_draw_count") or effect.get("draw_count") or effect.get("count") or 1)
+    if len(active.hand) != expected_draw_count:
+        fail("battle_execution", f"{card['name']} drew {len(active.hand)} cards, expected {expected_draw_count}")
+
+    controller_permanent = active.battlefield[0] if active.battlefield else {}
+    opponent_permanent = opponent.battlefield[0] if opponent.battlefield else {}
+    expected_plus_one = int(scenario.get("expected_controller_plus_one_counters") or 0)
+    if int(controller_permanent.get("plus_one_counters") or 0) != expected_plus_one:
+        fail(
+            "battle_execution",
+            f"{card['name']} +1/+1 counters={controller_permanent.get('plus_one_counters')!r}, expected {expected_plus_one}",
+        )
+    expected_power = int(scenario.get("expected_controller_power") or 0)
+    expected_toughness = int(scenario.get("expected_controller_toughness") or 0)
+    if int(controller_permanent.get("power") or 0) != expected_power:
+        fail("battle_execution", f"{card['name']} power={controller_permanent.get('power')!r}, expected {expected_power}")
+    if int(controller_permanent.get("toughness") or 0) != expected_toughness:
+        fail(
+            "battle_execution",
+            f"{card['name']} toughness={controller_permanent.get('toughness')!r}, expected {expected_toughness}",
+        )
+    expected_charge = int(scenario.get("expected_opponent_charge_counters") or 0)
+    if battle.get_named_counter_count(opponent_permanent, "charge") != expected_charge:
+        fail(
+            "battle_execution",
+            f"{card['name']} charge counters={battle.get_named_counter_count(opponent_permanent, 'charge')}, expected {expected_charge}",
+        )
+    expected_poison = int(scenario.get("expected_opponent_poison_counters") or 0)
+    if int(getattr(opponent, "poison", 0) or 0) != expected_poison:
+        fail("battle_execution", f"{card['name']} poison={getattr(opponent, 'poison', 0)}, expected {expected_poison}")
+
+    proliferate_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "proliferate_resolved"
+            and data.get("card") == card.get("name")
+        ),
+        None,
+    )
+    if proliferate_event is None:
+        fail("battle_events", f"missing {card['name']} proliferate_resolved event")
+    if int(proliferate_event.get("permanent_count") or 0) < 2:
+        fail("battle_events", f"{card['name']} permanent_count={proliferate_event.get('permanent_count')!r}")
+    if int(proliferate_event.get("player_count") or 0) < 1:
+        fail("battle_events", f"{card['name']} player_count={proliferate_event.get('player_count')!r}")
+    composite_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "composite_rule_resolved"
+            and data.get("card") == card.get("name")
+            and int(data.get("components_applied") or 0) == 2
+            and int(data.get("components_skipped") or 0) == 0
+        ),
+        None,
+    )
+    if composite_event is None:
+        fail("battle_events", f"missing {card['name']} composite_rule_resolved event")
+
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "draw_count": expected_draw_count,
+        "controller_plus_one_counters": expected_plus_one,
+        "opponent_charge_counters": expected_charge,
+        "opponent_poison_counters": expected_poison,
+    }
+
+
 def run_controlled_stat_modifier_until_eot(
     battle,
     scenario: dict[str, Any],
@@ -7428,6 +7530,7 @@ SCENARIO_RUNNERS = {
     "stat_modifier_until_eot": run_stat_modifier_until_eot,
     "boost_scry_spell": run_boost_scry_spell,
     "global_stat_modifier_draw_spell": run_global_stat_modifier_draw_spell,
+    "proliferate_draw_spell": run_proliferate_draw_spell,
     "static_controlled_power_toughness_boost": run_static_controlled_power_toughness_boost,
     "static_controlled_keyword": run_static_controlled_keyword,
     "static_graveyard_threshold_source_boost": run_static_graveyard_threshold_source_boost,

@@ -27429,6 +27429,83 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "boost_untap_source_target_filter_not_supported")
 
+    def test_proliferate_then_draw_maps_exact_composite_scope(self) -> None:
+        proposal, reason = split.split_row(
+            queue_row(
+                split.DRAW_UNIT,
+                effect_classes=["ProliferateEffect", "DrawCardSourceControllerEffect"],
+            ),
+            metadata(
+                name="Contentious Plan",
+                type_line="Sorcery",
+                oracle_text="Proliferate. Draw a card.",
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new ProliferateEffect());
+                this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(1).concatBy("<br>"));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "composite_resolution")
+        self.assertEqual(effect["battle_model_scope"], split.PROLIFERATE_DRAW_SCOPE)
+        self.assertEqual(effect["draw_count"], 1)
+        self.assertEqual(effect["proliferate_count"], 1)
+        self.assertEqual(effect["resolution_order"], "proliferate_then_draw")
+        self.assertEqual(
+            [component["effect"] for component in effect["_composite_rule_components"]],
+            ["proliferate", "draw_cards"],
+        )
+
+    def test_draw_then_proliferate_maps_exact_composite_scope(self) -> None:
+        proposal, reason = split.split_row(
+            queue_row(
+                split.DRAW_UNIT,
+                effect_classes=["DrawCardSourceControllerEffect", "ProliferateEffect"],
+            ),
+            metadata(
+                name="Tezzeret's Gambit",
+                type_line="Sorcery",
+                oracle_text="Draw two cards, then proliferate.",
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(2));
+                this.getSpellAbility().addEffect(new ProliferateEffect().concatBy(", then"));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["draw_count"], 2)
+        self.assertEqual(effect["resolution_order"], "draw_then_proliferate")
+        self.assertEqual(
+            [component["effect"] for component in effect["_composite_rule_components"]],
+            ["draw_cards", "proliferate"],
+        )
+
+    def test_proliferate_draw_triggered_creature_stays_blocked(self) -> None:
+        proposal, reason = split.split_row(
+            queue_row(
+                split.DRAW_UNIT,
+                effect_classes=["DrawCardSourceControllerEffect", "ProliferateEffect"],
+                ability_classes=["DealsCombatDamageToAPlayerTriggeredAbility"],
+            ),
+            metadata(
+                name="Fixture Proliferate Creature",
+                type_line="Creature - Elf Warrior",
+                oracle_text="Whenever Fixture Proliferate Creature deals combat damage to a player, draw a card, then proliferate.",
+            ),
+            source_text="""
+                this.addAbility(new DealsCombatDamageToAPlayerTriggeredAbility(
+                    new DrawCardSourceControllerEffect(1), false));
+                ability.addEffect(new ProliferateEffect().concatBy(", then"));
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "not_instant_or_sorcery_spell")
+
 
 if __name__ == "__main__":
     unittest.main()

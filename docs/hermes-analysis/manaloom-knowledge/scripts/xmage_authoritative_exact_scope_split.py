@@ -282,6 +282,7 @@ LIFE_GAIN_DRAW_SCOPE = "xmage_fixed_controller_gain_life_draw_card_spell_v1"
 SCRY_SCOPE = "xmage_fixed_scry_spell_v1"
 SURVEIL_SCOPE = "xmage_fixed_surveil_spell_v1"
 SCRY_DRAW_SCOPE = "xmage_fixed_scry_and_draw_cards_spell_v1"
+PROLIFERATE_DRAW_SCOPE = "xmage_fixed_proliferate_and_draw_cards_spell_v1"
 DAMAGE_SCRY_SCOPE = "xmage_fixed_damage_target_and_scry_spell_v1"
 DESTROY_SCRY_SCOPE = "xmage_destroy_target_and_scry_spell_v1"
 DESTROY_SURVEIL_SCOPE = "xmage_destroy_target_and_surveil_spell_v1"
@@ -9601,6 +9602,71 @@ def fixed_boost_all_draw_from_source(
         return None
     order = "draw_then_boost" if draw_match.start() < boost_match.start() else "boost_then_draw"
     return (*boost, draw_count, order)
+
+
+def fixed_proliferate_draw_from_oracle(metadata: dict[str, Any]) -> tuple[int, str] | None:
+    sentences = simple_oracle_sentences(oracle_text(metadata))
+    if len(sentences) == 1:
+        text = strip_parenthetical_reminders(sentences[0])
+        text = re.sub(r"\s+", " ", text).strip().lower()
+        match = re.fullmatch(
+            r"draw (?P<count>a|an|one|two|three|four|five|six|seven|eight|nine|ten|\d+) cards?, then proliferate\.?",
+            text,
+        )
+        if not match:
+            return None
+        token = match.group("count")
+        if token in {"a", "an"}:
+            return 1, "draw_then_proliferate"
+        count = COUNT_WORDS.get(token) or (int(token) if token.isdigit() else 0)
+        return (count, "draw_then_proliferate") if count > 0 else None
+    if len(sentences) != 2:
+        return None
+    draw_count: int | None = None
+    order: list[str] = []
+    for sentence in sentences:
+        text = strip_parenthetical_reminders(sentence)
+        text = re.sub(r"\s+", " ", text).strip().lower()
+        if re.fullmatch(r"proliferate\.?", text):
+            order.append("proliferate")
+            continue
+        draw = fixed_draw_count_from_oracle_sentence(sentence)
+        if draw is not None:
+            if draw_count is not None:
+                return None
+            draw_count = draw
+            order.append("draw")
+            continue
+        return None
+    if draw_count is None or len(order) != 2 or set(order) != {"draw", "proliferate"}:
+        return None
+    resolution_order = "draw_then_proliferate" if order == ["draw", "proliferate"] else "proliferate_then_draw"
+    return draw_count, resolution_order
+
+
+def fixed_proliferate_draw_from_source(source: str) -> tuple[int, str] | None:
+    text = source or ""
+    if len(re.findall(r"new\s+ProliferateEffect\s*\(", text)) != 1:
+        return None
+    if len(re.findall(r"new\s+DrawCardSourceControllerEffect\s*\(", text)) != 1:
+        return None
+    draw_count = java_constructor_int_or_noarg_default(
+        text,
+        "DrawCardSourceControllerEffect",
+        noarg_default=1,
+    )
+    if draw_count is None or draw_count <= 0:
+        return None
+    proliferate_match = re.search(r"new\s+ProliferateEffect\s*\(", text)
+    draw_match = re.search(r"new\s+DrawCardSourceControllerEffect\s*\(", text)
+    if not proliferate_match or not draw_match:
+        return None
+    order = (
+        "draw_then_proliferate"
+        if draw_match.start() < proliferate_match.start()
+        else "proliferate_then_draw"
+    )
+    return draw_count, order
 
 
 def fixed_boost_keyword_target_from_oracle(metadata: dict[str, Any]) -> tuple[int, int, str, str] | None:
@@ -29570,6 +29636,56 @@ def split_row(
         ), "selected_exact_scope"
 
     if unit == DRAW_UNIT:
+        if classes == {"DrawCardSourceControllerEffect", "ProliferateEffect"}:
+            unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+            if unsupported_abilities:
+                return None, "proliferate_draw_ability_class_not_simple"
+            oracle_proliferate_draw = fixed_proliferate_draw_from_oracle(metadata)
+            if oracle_proliferate_draw is None:
+                return None, "proliferate_draw_oracle_not_exact_fixed"
+            source_proliferate_draw = fixed_proliferate_draw_from_source(source_text)
+            if source_proliferate_draw is None:
+                return None, "proliferate_draw_source_not_fixed"
+            if source_proliferate_draw != oracle_proliferate_draw:
+                return None, "proliferate_draw_source_oracle_mismatch"
+            draw_count, order = oracle_proliferate_draw
+            proliferate_component = {
+                "effect": "proliferate",
+                "battle_model_scope": "xmage_fixed_proliferate_spell_v1",
+                "proliferate_count": 1,
+                "compose_on_resolution": True,
+                "xmage_effect_class": "ProliferateEffect",
+            }
+            draw_component = {
+                "effect": "draw_cards",
+                "battle_model_scope": DRAW_SCOPE,
+                "count": draw_count,
+                "compose_on_resolution": True,
+                "xmage_effect_class": "DrawCardSourceControllerEffect",
+            }
+            components = (
+                [draw_component, proliferate_component]
+                if order == "draw_then_proliferate"
+                else [proliferate_component, draw_component]
+            )
+            effect_json = {
+                "effect": "composite_resolution",
+                "battle_model_scope": PROLIFERATE_DRAW_SCOPE,
+                "draw_count": draw_count,
+                "count": draw_count,
+                "proliferate_count": 1,
+                "resolution_order": order,
+                "_composite_rule_components": components,
+                "xmage_effect_classes": ["DrawCardSourceControllerEffect", "ProliferateEffect"],
+                **flags,
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_fixed_proliferate_draw_card_spell",
+            ), "selected_exact_scope"
+
         if classes == {"ScryEffect", "DrawCardSourceControllerEffect"}:
             unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
             if unsupported_abilities:
@@ -33781,6 +33897,7 @@ def build_exact_split_report(
                 "draw_cards::xmage_draw_card_variant_review_v1 rows with GainAbilityTargetEffect + DrawCardSourceControllerEffect, exact target-creature keyword until EOT, and fixed draw-one Oracle/source agreement",
                 "draw_cards::xmage_draw_card_variant_review_v1 rows with DrawDiscardControllerEffect or fixed DrawCardSourceControllerEffect + DiscardControllerEffect, exact Oracle/source draw-discard order agreement, and optional random discard metadata",
                 "draw_cards::xmage_draw_card_variant_review_v1 rows with BoostAllEffect + DrawCardSourceControllerEffect, exact fixed all/opponents/filtered-creature boost until EOT plus fixed draw, and Oracle/source order agreement",
+                "draw_cards::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect + ProliferateEffect, exact fixed draw count, proliferate once, and Oracle/source order agreement",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with PutOnLibraryTargetEffect, no extra ability class, exact graveyard-to-library top/bottom Oracle text, and self-graveyard targets only",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with RevealLibraryPickControllerEffect, no extra ability class, exact reveal-top-library pick-to-hand Oracle/source agreement, and graveyard rest destination",
                 "life_gain::xmage_life_gain_variant_review_v1 rows with DamageTargetEffect + GainLifeEffect and exact fixed damage/life-gain Oracle text",

@@ -23182,6 +23182,85 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_composite_proliferate_draw_adds_existing_counters_and_draws(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        controller_creature = {
+            "name": "Counter Soldier",
+            "type_line": "Creature - Soldier",
+            "effect": "creature",
+            "power": 2,
+            "toughness": 2,
+            "plus_one_counters": 1,
+            "counters": {"+1/+1": 1},
+        }
+        opponent_artifact = {
+            "name": "Charge Relic",
+            "type_line": "Artifact",
+            "effect": "artifact",
+            "charge_counters": 2,
+            "counters": {"charge": 2},
+        }
+        active.battlefield = [controller_creature]
+        active.library = [{"name": "Drawn Card", "type_line": "Instant"}]
+        opponent.battlefield = [opponent_artifact]
+        opponent.poison = 1
+        opponent.counters = {"poison": 1}
+        effect = {
+            "effect": "composite_resolution",
+            "battle_model_scope": "xmage_fixed_proliferate_and_draw_cards_spell_v1",
+            "draw_count": 1,
+            "proliferate_count": 1,
+            "resolution_order": "proliferate_then_draw",
+            "_composite_rule_components": [
+                {
+                    "effect": "proliferate",
+                    "battle_model_scope": "xmage_fixed_proliferate_spell_v1",
+                    "proliferate_count": 1,
+                },
+                {
+                    "effect": "draw_cards",
+                    "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+                    "count": 1,
+                },
+            ],
+            "_rule_logical_key": "battle_rule_v1:proliferate-draw",
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Contentious Plan", "type_line": "Sorcery"},
+            turn=7,
+            rng=random.Random(7),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(len(active.hand), 1)
+        self.assertEqual(controller_creature["plus_one_counters"], 2)
+        self.assertEqual((controller_creature["power"], controller_creature["toughness"]), (3, 3))
+        self.assertEqual(self.battle.get_named_counter_count(opponent_artifact, "charge"), 3)
+        self.assertEqual(opponent.poison, 2)
+        self.assertTrue(
+            any(
+                event == "proliferate_resolved"
+                and data.get("card") == "Contentious Plan"
+                and data.get("permanent_count") == 2
+                and data.get("player_count") == 1
+                and data.get("rule_logical_key") == "battle_rule_v1:proliferate-draw"
+                for event, data in self.events
+            )
+        )
+        self.assertTrue(
+            any(
+                event == "composite_rule_resolved"
+                and data.get("card") == "Contentious Plan"
+                and data.get("components_applied") == 2
+                and data.get("components_skipped") == 0
+                for event, data in self.events
+            )
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

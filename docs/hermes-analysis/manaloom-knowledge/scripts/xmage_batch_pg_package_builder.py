@@ -95,6 +95,7 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "xmage_additional_cost_target",
     "count",
     "draw_count",
+    "proliferate_count",
     "discard_count",
     "draw_discard_order",
     "put_land_from_hand",
@@ -3603,6 +3604,66 @@ def global_stat_modifier_draw_spell_execution_scenario_from_expected_rule(
     }
 
 
+def proliferate_draw_spell_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_fixed_proliferate_and_draw_cards_spell_v1":
+        return None
+    if required.get("effect") != "composite_resolution":
+        return None
+    components = [
+        component
+        for component in required.get("_composite_rule_components") or []
+        if isinstance(component, dict)
+    ]
+    draw_component = next((component for component in components if component.get("effect") == "draw_cards"), None)
+    proliferate_component = next((component for component in components if component.get("effect") == "proliferate"), None)
+    if draw_component is None or proliferate_component is None:
+        return None
+    draw_count = int(required.get("draw_count") or draw_component.get("draw_count") or draw_component.get("count") or 1)
+    if draw_count <= 0:
+        return None
+    return {
+        "name": f"{rule['card_name']} proliferates and draws {draw_count}",
+        "type": "proliferate_draw_spell",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": "Sorcery" if required.get("sorcery") is True else "Instant",
+        },
+        "controller_battlefield": [
+            {
+                "name": "E2E Controller Counter Creature",
+                "type_line": "Creature - Soldier",
+                "power": 2,
+                "toughness": 2,
+                "plus_one_counters": 1,
+                "counters": {"+1/+1": 1},
+            }
+        ],
+        "opponent_battlefield": [
+            {
+                "name": "E2E Opponent Charge Artifact",
+                "type_line": "Artifact",
+                "charge_counters": 2,
+                "counters": {"charge": 2},
+            }
+        ],
+        "opponent_poison_counters": 1,
+        "expected_controller_plus_one_counters": 2,
+        "expected_controller_power": 3,
+        "expected_controller_toughness": 3,
+        "expected_opponent_charge_counters": 3,
+        "expected_opponent_poison_counters": 2,
+        "expected_draw_count": draw_count,
+        "library": [
+            {"name": f"E2E Draw Card {index + 1}", "type_line": "Instant", "effect": "draw_cards"}
+            for index in range(draw_count)
+        ],
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def controlled_stat_modifier_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
@@ -5000,6 +5061,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or target_keyword_spell_execution_scenario_from_expected_rule(rule)
         or boost_scry_spell_execution_scenario_from_expected_rule(rule)
         or global_stat_modifier_draw_spell_execution_scenario_from_expected_rule(rule)
+        or proliferate_draw_spell_execution_scenario_from_expected_rule(rule)
         or attack_self_boost_execution_scenario_from_expected_rule(rule)
         or becomes_blocked_self_boost_execution_scenario_from_expected_rule(rule)
         or each_player_sacrifice_execution_scenario_from_expected_rule(rule)

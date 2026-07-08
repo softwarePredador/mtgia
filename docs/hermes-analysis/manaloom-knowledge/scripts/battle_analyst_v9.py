@@ -4065,6 +4065,38 @@ def permanent_has_any_counter(permanent):
     return False
 
 
+def counter_names_on_permanent(permanent):
+    if not isinstance(permanent, dict):
+        return []
+    names = []
+    counters = permanent.get("counters")
+    if isinstance(counters, dict):
+        for name, value in counters.items():
+            try:
+                amount = int(value or 0)
+            except (TypeError, ValueError):
+                amount = 0
+            if amount > 0 and str(name) not in names:
+                names.append(str(name))
+    special_keys = {
+        "plus_one_counters": "+1/+1",
+        "minus_one_counters": "-1/-1",
+    }
+    for key, value in permanent.items():
+        if not str(key).endswith("_counters"):
+            continue
+        try:
+            amount = int(value or 0)
+        except (TypeError, ValueError):
+            amount = 0
+        if amount <= 0:
+            continue
+        name = special_keys.get(str(key), str(key)[: -len("_counters")])
+        if name and name not in names:
+            names.append(name)
+    return names
+
+
 def is_mana_source_permanent(source):
     if source == "land":
         return True
@@ -4700,6 +4732,63 @@ def add_named_counters(permanent, counter_name, count=1):
     if isinstance(counters, dict):
         counters[counter_name] = permanent[key]
     return added
+
+
+def add_one_counter_by_name(permanent, counter_name):
+    normalized = str(counter_name or "").strip()
+    if normalized == "+1/+1":
+        add_plus_one_counters(permanent, 1)
+        return 1
+    if normalized == "-1/-1":
+        return add_minus_one_counters(permanent, 1)
+    return add_named_counters(permanent, normalized, 1)
+
+
+def player_counter_names(player):
+    names = []
+    if player is None:
+        return names
+    counters = getattr(player, "counters", None)
+    if isinstance(counters, dict):
+        for name, value in counters.items():
+            try:
+                amount = int(value or 0)
+            except (TypeError, ValueError):
+                amount = 0
+            if amount > 0 and str(name) not in names:
+                names.append(str(name))
+    try:
+        poison = int(getattr(player, "poison", 0) or 0)
+    except (TypeError, ValueError):
+        poison = 0
+    if poison > 0 and "poison" not in names:
+        names.append("poison")
+    return names
+
+
+def add_one_player_counter_by_name(player, counter_name):
+    if player is None:
+        return 0
+    normalized = str(counter_name or "").strip()
+    if not normalized:
+        return 0
+    if normalized == "poison":
+        player.poison = int(getattr(player, "poison", 0) or 0) + 1
+        counters = getattr(player, "counters", None)
+        if counters is None:
+            counters = {}
+            player.counters = counters
+        if isinstance(counters, dict):
+            counters["poison"] = int(counters.get("poison") or 0) + 1
+        return 1
+    counters = getattr(player, "counters", None)
+    if counters is None:
+        counters = {}
+        player.counters = counters
+    if isinstance(counters, dict):
+        counters[normalized] = int(counters.get(normalized) or 0) + 1
+        return 1
+    return 0
 
 
 def remove_named_counters(permanent, counter_name, count=None):
@@ -60696,6 +60785,35 @@ def resolve_composite_resolution_effect(player, opponents, card, effect_data, tu
                 player.draw(max(0, count), rng)
                 outcome = "cards_drawn"
                 applied.append({"effect": component_effect, "count": count})
+        elif component_effect == "proliferate":
+            component_payload = dict(component)
+            component_payload["_composite_component_index"] = index
+            for key in (
+                "_rule_source",
+                "_rule_review_status",
+                "_rule_execution_status",
+                "_rule_confidence",
+                "_rule_version",
+                "_rule_logical_key",
+                "_rule_oracle_hash",
+                "card_id",
+                "semantic_hash",
+                "semantics_hash",
+            ):
+                if effect_data.get(key) is not None and component_payload.get(key) is None:
+                    component_payload[key] = effect_data.get(key)
+            summary = resolve_proliferate_effect(
+                player,
+                opponents,
+                card,
+                component_payload,
+                turn,
+                finish=False,
+                component_index=index,
+                phase=phase,
+            )
+            outcome = "proliferate_resolved"
+            applied.append(summary)
         elif component_effect == "put_land_from_hand_onto_battlefield":
             selected_land, land_options, selection_reason = choose_land_from_hand_to_put_onto_battlefield(player)
             if selected_land is None:
@@ -61795,6 +61913,91 @@ def resolve_target_player_discard_spell(
         all_players=all_players,
         event_name="target_player_discard_resolved",
     )
+
+
+def resolve_proliferate_effect(
+    player,
+    opponents,
+    card,
+    effect_data,
+    turn,
+    *,
+    finish=True,
+    component_index=None,
+    phase="resolution",
+):
+    participants = [player, *list(opponents or [])]
+    permanent_details = []
+    player_details = []
+    total_counters_added = 0
+    for participant in participants:
+        player_added = []
+        for counter_name in player_counter_names(participant):
+            if add_one_player_counter_by_name(participant, counter_name):
+                total_counters_added += 1
+                player_added.append(
+                    {
+                        "counter": counter_name,
+                        "new_count": int(
+                            getattr(participant, "poison", 0) or 0
+                        )
+                        if counter_name == "poison"
+                        else int((getattr(participant, "counters", {}) or {}).get(counter_name) or 0),
+                    }
+                )
+        if player_added:
+            player_details.append(
+                {
+                    "player": getattr(participant, "name", "?"),
+                    "counters_added": player_added,
+                }
+            )
+        for permanent in getattr(participant, "battlefield", []) or []:
+            if not isinstance(permanent, dict):
+                continue
+            permanent_added = []
+            for counter_name in counter_names_on_permanent(permanent):
+                if add_one_counter_by_name(permanent, counter_name):
+                    total_counters_added += 1
+                    permanent_added.append(
+                        {
+                            "counter": counter_name,
+                            "new_count": get_named_counter_count(permanent, counter_name),
+                        }
+                    )
+            if permanent_added:
+                permanent_details.append(
+                    {
+                        "controller": getattr(participant, "name", "?"),
+                        "permanent": permanent.get("name", "?"),
+                        "counters_added": permanent_added,
+                    }
+                )
+    summary = {
+        "effect": "proliferate",
+        "permanent_count": len(permanent_details),
+        "player_count": len(player_details),
+        "counters_added": total_counters_added,
+        "permanents": permanent_details,
+        "players": player_details,
+    }
+    emit_replay_event(
+        "proliferate_resolved",
+        player=player.name,
+        card=card.get("name", "?"),
+        permanent_count=len(permanent_details),
+        player_count=len(player_details),
+        counters_added=total_counters_added,
+        permanents=permanent_details,
+        players=player_details,
+        component_index=component_index,
+        turn=turn,
+        phase=phase,
+        **replay_rule_fields(effect_data),
+    )
+    if finish:
+        finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+    return summary
 
 
 def apply_effect_immediate(
@@ -62930,6 +63133,16 @@ def apply_effect_immediate(
                 **replay_rule_fields(effect_data),
             )
         finish_resolved_spell(player, card, turn=turn)
+    elif effect == "proliferate":
+        resolve_proliferate_effect(
+            player,
+            opponents,
+            card,
+            effect_data,
+            turn,
+            finish=True,
+            phase=phase or "resolution",
+        )
     elif effect == "hand_filter":
         if not pay_additional_card_costs(player, card, effect_data, turn=turn):
             finish_resolved_spell(player, card, turn=turn)

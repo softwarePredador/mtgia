@@ -2337,3 +2337,79 @@ def test_modal_damage_or_destroy_runner_executes_chosen_destroy_mode() -> None:
     assert result["card_name"] == "Fiery Intervention"
     assert result["selected_mode"] == "destroy_target"
     assert result["removed_target"] == "E2E Legal Modal Destroy Target"
+
+
+def test_proliferate_draw_runner_adds_counters_and_draws() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "composite_resolution",
+        "battle_model_scope": "xmage_fixed_proliferate_and_draw_cards_spell_v1",
+        "draw_count": 1,
+        "proliferate_count": 1,
+        "resolution_order": "proliferate_then_draw",
+        "_composite_rule_components": [
+            {
+                "effect": "proliferate",
+                "battle_model_scope": "xmage_fixed_proliferate_spell_v1",
+                "proliferate_count": 1,
+            },
+            {
+                "effect": "draw_cards",
+                "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+                "count": 1,
+            },
+        ],
+        "_rule_logical_key": "battle_rule_v1:contentious-plan",
+    }
+    try:
+        result = validator.run_proliferate_draw_spell(
+            battle,
+            {
+                "name": "Contentious Plan proliferates and draws 1",
+                "type": "proliferate_draw_spell",
+                "card": {"name": "Contentious Plan", "type_line": "Sorcery"},
+                "controller_battlefield": [
+                    {
+                        "name": "E2E Controller Counter Creature",
+                        "type_line": "Creature - Soldier",
+                        "effect": "creature",
+                        "power": 2,
+                        "toughness": 2,
+                        "plus_one_counters": 1,
+                        "counters": {"+1/+1": 1},
+                    }
+                ],
+                "opponent_battlefield": [
+                    {
+                        "name": "E2E Opponent Charge Artifact",
+                        "type_line": "Artifact",
+                        "effect": "artifact",
+                        "charge_counters": 2,
+                        "counters": {"charge": 2},
+                    }
+                ],
+                "opponent_poison_counters": 1,
+                "expected_controller_plus_one_counters": 2,
+                "expected_controller_power": 3,
+                "expected_controller_toughness": 3,
+                "expected_opponent_charge_counters": 3,
+                "expected_opponent_poison_counters": 2,
+                "expected_draw_count": 1,
+                "library": [{"name": "E2E Draw Card", "type_line": "Instant"}],
+                "logical_rule_key": "battle_rule_v1:contentious-plan",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Contentious Plan"
+    assert result["draw_count"] == 1
+    assert result["controller_plus_one_counters"] == 2
+    assert result["opponent_charge_counters"] == 3
+    assert result["opponent_poison_counters"] == 2

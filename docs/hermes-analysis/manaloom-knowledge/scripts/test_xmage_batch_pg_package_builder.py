@@ -3964,3 +3964,47 @@ def test_modal_damage_or_destroy_fields_and_execution_scenario_are_manifested() 
     assert scenario["expected_selected_mode"] == "destroy_target"
     assert scenario["destroy_target"]["name"] == "E2E Legal Modal Destroy Target"
     assert scenario["damage_target"]["name"] == "E2E Legal Modal Damage Target"
+
+
+def test_proliferate_draw_fields_and_execution_scenario_are_manifested() -> None:
+    proposal = {
+        "normalized_name": "contentious plan",
+        "card_name": "Contentious Plan",
+        "oracle_hash": "hash-contentious-plan",
+        "logical_rule_key": "battle_rule_v1:contentious-plan",
+        "effect_json": {
+            "effect": "composite_resolution",
+            "battle_model_scope": "xmage_fixed_proliferate_and_draw_cards_spell_v1",
+            "draw_count": 1,
+            "count": 1,
+            "proliferate_count": 1,
+            "resolution_order": "proliferate_then_draw",
+            "_composite_rule_components": [
+                {
+                    "effect": "proliferate",
+                    "battle_model_scope": "xmage_fixed_proliferate_spell_v1",
+                    "proliferate_count": 1,
+                },
+                {
+                    "effect": "draw_cards",
+                    "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+                    "count": 1,
+                },
+            ],
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    required = expected["required_effect_fields"]
+
+    assert required["battle_model_scope"] == "xmage_fixed_proliferate_and_draw_cards_spell_v1"
+    assert required["draw_count"] == 1
+    assert required["proliferate_count"] == 1
+
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    assert scenario["type"] == "proliferate_draw_spell"
+    assert scenario["expected_draw_count"] == 1
+    assert scenario["expected_controller_plus_one_counters"] == 2
+    assert scenario["expected_opponent_charge_counters"] == 3
+    assert scenario["expected_opponent_poison_counters"] == 2
