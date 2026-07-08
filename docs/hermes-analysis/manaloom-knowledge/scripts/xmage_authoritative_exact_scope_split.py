@@ -2254,6 +2254,22 @@ def has_oracle_complexity(metadata: dict[str, Any], tokens: set[str] = SPELL_COM
     return False
 
 
+def has_non_neutral_oracle_complexity(
+    metadata: dict[str, Any],
+    tokens: set[str] = SPELL_COMPLEXITY_TOKENS,
+) -> bool:
+    text = " ".join(oracle_effect_lines_without_neutral_auxiliary(metadata))
+    text = re.sub(r"\s+", " ", text).strip()
+    for token in tokens:
+        if re.fullmatch(r"[a-z]+", token):
+            if re.search(rf"\b{re.escape(token)}\b(?!['’]s\b)", text):
+                return True
+            continue
+        if token in text:
+            return True
+    return False
+
+
 def destroy_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, str] | None:
     text = primary_removal_action_text(metadata, "destroy")
     if "destroy target" not in text:
@@ -3364,6 +3380,14 @@ def counter_target_from_oracle(metadata: dict[str, Any]) -> str | None:
         " ",
         " ".join(oracle_effect_lines_without_neutral_auxiliary(metadata)),
     ).strip().lower()
+    change_equation_text = (
+        "choose one — • counter target spell with mana value 2 or less. "
+        "• counter target red or green spell with mana value 6 or less."
+    )
+    if text == change_equation_text:
+        return "spell_mana_value_2_or_less_or_red_green_spell_mana_value_6_or_less"
+    if text == "counter target spell with mana value x.":
+        return "spell_mana_value_x"
     mana_value_patterns: list[tuple[str, str]] = [
         (r"^counter target spell with mana value (?P<value>\d+) or greater\.?$", "spell_mana_value_{value}_or_greater"),
         (r"^counter target spell with mana value (?P<value>\d+) or less\.?$", "spell_mana_value_{value}_or_less"),
@@ -3562,7 +3586,16 @@ def counter_target_from_source(source_text: str) -> str | None:
         or "new TargetSpell(StaticFilters.FILTER_SPELL)" in text
         or re.search(r"new\s+TargetSpell\s*\([^)]*StaticFilters\.FILTER_SPELL(?!_)", text)
     ):
+        if "XManaValueTargetAdjuster" in text:
+            return "spell_mana_value_x"
         return "spell"
+    if (
+        "ManaValuePredicate(ComparisonType.FEWER_THAN, 3)" in text
+        and "ManaValuePredicate(ComparisonType.FEWER_THAN, 7)" in text
+        and "ColorPredicate(ObjectColor.RED)" in text
+        and "ColorPredicate(ObjectColor.GREEN)" in text
+    ):
+        return "spell_mana_value_2_or_less_or_red_green_spell_mana_value_6_or_less"
     if (
         "FILTER_SPELL_NON_CREATURE" in text
         or "FILTER_SPELL_A_NON_CREATURE" in text
@@ -3832,6 +3865,17 @@ def counter_target_constraints_for(target: str) -> dict[str, Any]:
             constraints["counter_target_mana_value_max"] = value
         else:
             constraints["counter_target_mana_value"] = value
+    elif target == "spell_mana_value_x":
+        constraints["counter_target_mana_value_source"] = "x_value"
+    elif target == "spell_mana_value_2_or_less_or_red_green_spell_mana_value_6_or_less":
+        constraints["any_of"] = [
+            {"stack_object": "spell", "counter_target_mana_value_max": 2},
+            {
+                "stack_object": "spell",
+                "spell_colors": ["R", "G"],
+                "counter_target_mana_value_max": 6,
+            },
+        ]
     elif (power_toughness_match := re.match(
         r"^creature_spell_power_or_toughness_(?P<value>\d+)_or_less$",
         target,
@@ -30146,11 +30190,15 @@ def split_row(
         unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
         if unsupported_abilities:
             return None, "counter_ability_class_not_simple"
-        if has_oracle_complexity(metadata):
-            return None, "counter_oracle_not_simple"
         target = counter_target_from_oracle(metadata)
         if target is None:
+            if has_non_neutral_oracle_complexity(metadata):
+                return None, "counter_oracle_not_simple"
             return None, "counter_target_not_supported"
+        if has_non_neutral_oracle_complexity(metadata) and target not in {
+            "spell_mana_value_2_or_less_or_red_green_spell_mana_value_6_or_less",
+        }:
+            return None, "counter_oracle_not_simple"
         if target in {
             "spell_or_activated_or_triggered_ability",
             "activated_or_triggered_ability_or_legendary_spell",
@@ -30162,6 +30210,8 @@ def split_row(
             "spell_targeting_permanent_you_control",
             "spell_targeting_you_or_permanent_you_control",
             "spell_cast_from_graveyard",
+            "spell_mana_value_x",
+            "spell_mana_value_2_or_less_or_red_green_spell_mana_value_6_or_less",
         }:
             source_target = counter_target_from_source(source_text)
             if source_target != target:
@@ -30196,6 +30246,9 @@ def split_row(
             )
         if target == "blue_spell":
             effect_json["requires_blue_target"] = True
+        if target == "spell_mana_value_x":
+            effect_json["counter_target_mana_value_source"] = "x_value"
+            effect_json["xmage_target_adjuster"] = "XManaValueTargetAdjuster"
         return build_proposal(row, metadata, effect_json, family_id="xmage_counter_target_spell"), "selected_exact_scope"
 
     if unit == BOUNCE_UNIT:

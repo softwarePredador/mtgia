@@ -15054,6 +15054,36 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(reason, "selected_exact_scope")
         self.assertEqual(proposal["effect_json"]["target_constraints"], {"zone": "stack", "stack_object": "spell"})
 
+    def test_counter_target_spell_ignores_neutral_alternate_casting_lines(self) -> None:
+        cases = [
+            ("Broken Concentration", "MadnessAbility", "Counter target spell.\nMadness {3}{U}"),
+            ("Fervent Denial", "FlashbackAbility", "Counter target spell.\nFlashback {5}{U}{U}"),
+            ("Neutralize", "CyclingAbility", "Counter target spell.\nCycling {2}"),
+            (
+                "Overwhelming Denial",
+                "SurgeAbility",
+                "Surge {U}{U}\nThis spell can't be countered.\nCounter target spell.",
+            ),
+        ]
+        for name, ability_class, oracle_text in cases:
+            with self.subTest(name=name):
+                row = queue_row(
+                    split.COUNTER_UNIT,
+                    effect_classes=["CounterTargetEffect"],
+                    ability_classes=[ability_class],
+                )
+                proposal, reason = split.split_row(
+                    row,
+                    metadata(name=name, oracle_text=oracle_text),
+                    source_text=(
+                        "this.getSpellAbility().addEffect(new CounterTargetEffect());"
+                        "this.getSpellAbility().addTarget(new TargetSpell());"
+                    ),
+                )
+
+                self.assertEqual(reason, "selected_exact_scope")
+                self.assertEqual(proposal["effect_json"]["target"], "spell")
+
     def test_counter_target_stack_ability_or_spell_maps_to_stack_object_constraints(self) -> None:
         row = queue_row(split.COUNTER_UNIT, effect_classes=["CounterTargetEffect"])
         proposal, reason = split.split_row(
@@ -15196,6 +15226,69 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(
             exact_value["effect_json"]["target_constraints"]["counter_target_mana_value"],
             2,
+        )
+
+    def test_counter_target_spell_mana_value_x_maps_to_x_context_constraint(self) -> None:
+        row = queue_row(split.COUNTER_UNIT, effect_classes=["CounterTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Spell Blast",
+                oracle_text="Counter target spell with mana value X. (For example, if that spell's mana cost is {3}{U}{U}, X is 5.)",
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new CounterTargetEffect().setText(\"counter target spell with mana value X\"));"
+                "this.getSpellAbility().addTarget(new TargetSpell());"
+                "this.getSpellAbility().setTargetAdjuster(new XManaValueTargetAdjuster());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["target"], "spell_mana_value_x")
+        self.assertEqual(effect["target_constraints"]["counter_target_mana_value_source"], "x_value")
+        self.assertEqual(effect["counter_target_mana_value_source"], "x_value")
+
+    def test_modal_counter_target_spell_mana_value_options_map_to_any_of_constraints(self) -> None:
+        row = queue_row(split.COUNTER_UNIT, effect_classes=["CounterTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Change the Equation",
+                oracle_text=(
+                    "Choose one —\n"
+                    "• Counter target spell with mana value 2 or less.\n"
+                    "• Counter target red or green spell with mana value 6 or less."
+                ),
+            ),
+            source_text=(
+                "private static final FilterSpell filter = new FilterSpell(\"spell with mana value 2 or less\");"
+                "filter.add(new ManaValuePredicate(ComparisonType.FEWER_THAN, 3));"
+                "private static final FilterSpell filter2 = new FilterSpell(\"red or green spell with mana value 6 or less\");"
+                "filter2.add(new ManaValuePredicate(ComparisonType.FEWER_THAN, 7));"
+                "filter2.add(Predicates.or(new ColorPredicate(ObjectColor.RED), new ColorPredicate(ObjectColor.GREEN)));"
+                "this.getSpellAbility().addEffect(new CounterTargetEffect());"
+                "this.getSpellAbility().addTarget(new TargetSpell(filter));"
+                "this.getSpellAbility().addMode(new Mode(new CounterTargetEffect()).addTarget(new TargetSpell(filter2)));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(
+            effect["target"],
+            "spell_mana_value_2_or_less_or_red_green_spell_mana_value_6_or_less",
+        )
+        self.assertEqual(
+            effect["target_constraints"]["any_of"],
+            [
+                {"stack_object": "spell", "counter_target_mana_value_max": 2},
+                {
+                    "stack_object": "spell",
+                    "spell_colors": ["R", "G"],
+                    "counter_target_mana_value_max": 6,
+                },
+            ],
         )
 
     def test_counter_target_extended_color_and_alternative_spell_filters(self) -> None:

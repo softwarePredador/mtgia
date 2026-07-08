@@ -1,0 +1,39 @@
+WITH proposed(normalized_name, card_name, oracle_hash, logical_rule_key, effect_json, deck_role_json, source, confidence, review_status, execution_status, notes, shadow_handling) AS (
+  VALUES
+    ('broken concentration', 'Broken Concentration', '8a5a6a79c2a2cbaf2347537beab3a531', 'battle_rule_v1:7e29c853e44945f99da7e36251341d47', '{"battle_model_scope":"xmage_counter_target_spell_v1","effect":"counter","instant":true,"sorcery":false,"target":"spell","target_constraints":{"stack_object":"spell","zone":"stack"},"xmage_effect_class":"CounterTargetEffect"}'::jsonb, '{"category":"protection","effect":"counter","target":"spell","timing":"instant"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class BrokenConcentration translated into ManaLoom runtime scope xmage_counter_target_spell_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('change the equation', 'Change the Equation', 'd0251f58ba453f942ca0b5ba15640b9d', 'battle_rule_v1:b8c72c51e85396ea7270876a3b0b2e43', '{"battle_model_scope":"xmage_counter_target_spell_v1","effect":"counter","instant":true,"sorcery":false,"target":"spell_mana_value_2_or_less_or_red_green_spell_mana_value_6_or_less","target_constraints":{"any_of":[{"counter_target_mana_value_max":2,"stack_object":"spell"},{"counter_target_mana_value_max":6,"spell_colors":["R","G"],"stack_object":"spell"}],"stack_object":"spell","zone":"stack"},"xmage_effect_class":"CounterTargetEffect"}'::jsonb, '{"category":"protection","effect":"counter","target":"spell_mana_value_2_or_less_or_red_green_spell_mana_value_6_or_less","timing":"instant"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class ChangeTheEquation translated into ManaLoom runtime scope xmage_counter_target_spell_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('fervent denial', 'Fervent Denial', 'c1031978dd245bea3fe05e15528745ba', 'battle_rule_v1:7e29c853e44945f99da7e36251341d47', '{"battle_model_scope":"xmage_counter_target_spell_v1","effect":"counter","instant":true,"sorcery":false,"target":"spell","target_constraints":{"stack_object":"spell","zone":"stack"},"xmage_effect_class":"CounterTargetEffect"}'::jsonb, '{"category":"protection","effect":"counter","target":"spell","timing":"instant"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class FerventDenial translated into ManaLoom runtime scope xmage_counter_target_spell_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('neutralize', 'Neutralize', '52bbdf8e145caf258602355543763c2e', 'battle_rule_v1:7e29c853e44945f99da7e36251341d47', '{"battle_model_scope":"xmage_counter_target_spell_v1","effect":"counter","instant":true,"sorcery":false,"target":"spell","target_constraints":{"stack_object":"spell","zone":"stack"},"xmage_effect_class":"CounterTargetEffect"}'::jsonb, '{"category":"protection","effect":"counter","target":"spell","timing":"instant"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class Neutralize translated into ManaLoom runtime scope xmage_counter_target_spell_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('overwhelming denial', 'Overwhelming Denial', 'c2768a233eecab00fb95ecf1d3044e84', 'battle_rule_v1:7e29c853e44945f99da7e36251341d47', '{"battle_model_scope":"xmage_counter_target_spell_v1","effect":"counter","instant":true,"sorcery":false,"target":"spell","target_constraints":{"stack_object":"spell","zone":"stack"},"xmage_effect_class":"CounterTargetEffect"}'::jsonb, '{"category":"protection","effect":"counter","target":"spell","timing":"instant"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class OverwhelmingDenial translated into ManaLoom runtime scope xmage_counter_target_spell_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('spell blast', 'Spell Blast', '5a5129a8df1b4635a8ce988179d53613', 'battle_rule_v1:31218ba1289c60ce24fbe95f1db0b962', '{"battle_model_scope":"xmage_counter_target_spell_v1","counter_target_mana_value_source":"x_value","effect":"counter","instant":true,"sorcery":false,"target":"spell_mana_value_x","target_constraints":{"counter_target_mana_value_source":"x_value","stack_object":"spell","zone":"stack"},"xmage_effect_class":"CounterTargetEffect","xmage_target_adjuster":"XManaValueTargetAdjuster"}'::jsonb, '{"category":"protection","effect":"counter","target":"spell_mana_value_x","timing":"instant"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class SpellBlast translated into ManaLoom runtime scope xmage_counter_target_spell_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.', 'deprecate_nonmatching_rows')
+),
+rule_rows AS (
+  SELECT
+    r.normalized_name,
+    r.logical_rule_key,
+    r.oracle_hash,
+    r.review_status,
+    r.execution_status
+  FROM proposed p
+  LEFT JOIN public.card_battle_rules r
+    ON (
+         r.normalized_name = p.normalized_name
+         OR r.normalized_name LIKE p.normalized_name || ' // %'
+       )
+   AND r.logical_rule_key = p.logical_rule_key
+)
+SELECT
+  p.card_name,
+  p.normalized_name,
+  p.logical_rule_key,
+  count(r.*) FILTER (WHERE r.logical_rule_key = p.logical_rule_key) AS promoted_rule_rows,
+  count(r.*) FILTER (WHERE r.review_status = 'verified' AND r.execution_status = 'auto') AS promoted_verified_auto_rows,
+  count(r.*) FILTER (WHERE r.oracle_hash = p.oracle_hash) AS promoted_oracle_hash_rows,
+  (SELECT count(*) FROM manaloom_deploy_audit.pg664_counter_oracle_auxiliary_x_modal_n_20260708_170208) AS backup_rows
+FROM proposed p
+LEFT JOIN rule_rows r
+  ON r.normalized_name = p.normalized_name
+ AND r.logical_rule_key = p.logical_rule_key
+ AND r.oracle_hash = p.oracle_hash
+GROUP BY p.card_name, p.normalized_name, p.logical_rule_key, p.oracle_hash
+ORDER BY p.card_name;

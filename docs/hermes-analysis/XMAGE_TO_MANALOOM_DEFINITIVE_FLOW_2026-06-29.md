@@ -19586,6 +19586,82 @@ Evidence:
 - `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260708_post_pg663_counter_special_stack_constraints_new_server_final.md`
 - `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260708_post_pg663_counter_special_stack_constraints_new_server_final_after_hash_backfill.md`
 
+## PG664 Counter Oracle Auxiliary/X/Modal Wave
+
+PG664 closed six counterspell cards still blocked after PG663 because their
+Oracle/XMage shape needed exact adapter handling rather than the plain
+`counter target spell` path:
+
+- `Broken Concentration`: neutral auxiliary Madness line around a simple
+  counter target spell;
+- `Fervent Denial`: neutral auxiliary Flashback line around a simple counter
+  target spell;
+- `Neutralize`: neutral auxiliary Cycling line around a simple counter target
+  spell;
+- `Overwhelming Denial`: neutral auxiliary Surge/can't-be-countered lines
+  around a simple counter target spell;
+- `Spell Blast`: `Counter target spell with mana value X`, translated through
+  `XManaValueTargetAdjuster` and runtime X payment;
+- `Change the Equation`: modal target constraint for mana value `2` or less,
+  or red/green spell with mana value `6` or less.
+
+Runtime/test changes:
+
+- `xmage_authoritative_exact_scope_split.py` distinguishes neutral auxiliary
+  Oracle lines from real additional effects for the counter family;
+- exact target extraction now recognizes `spell_mana_value_x` and
+  `spell_mana_value_2_or_less_or_red_green_spell_mana_value_6_or_less`;
+- `counter_target_constraints_for` emits dynamic X target constraints and
+  `any_of` modal target constraints;
+- `battle_analyst_v9.py` computes the target spell mana value as X for natural
+  counterspell selection/payment and validates dynamic X targets;
+- `xmage_batch_pg_package_builder.py` includes X/modal counter fields in E2E
+  fixtures so positive/negative stack-target validation remains executable.
+
+PG664 apply/postcheck evidence:
+
+- split produced `6` safe package candidates in
+  `xmage_counter_target_spell`;
+- precheck found `6` target rows, `0` existing expected rows, and `0` stale
+  generated shadows to deprecate;
+- apply committed `6` promoted rows;
+- postcheck confirmed `6/6` promoted verified/auto rows with `oracle_hash`;
+- package E2E passed PostgreSQL, SQLite/Hermes, canonical snapshot,
+  `runtime_get_card_effect`, and `6` battle-execution scenarios.
+
+Final post-PG664 state after hash repair:
+
+- global readiness:
+  `battle_and_oracle_ready=6039`, `battle_family_mapper_required=27837`,
+  `snapshot_has_verified_rule=6067`, `snapshot_has_any_rule=7270`;
+- authoritative queue:
+  `target_identity_count=24914`,
+  `xmage_authoritative_source_count=24601`,
+  `xmage_missing_source_exception_count=313`,
+  `xmage_authoritative_parser_gap_count=0`,
+  `xmage_authoritative_adapter_required_count=24601`;
+- validation gates:
+  `xmage_strategy_consistency_audit` passed `26/26`,
+  `pg_hermes_sqlite_contract_audit` passed `51/51`,
+  `operational_surface_alignment_audit` passed, and
+  `legacy_contamination_audit` passed.
+
+Evidence:
+
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260708_pg664_counter_oracle_auxiliary_x_modal_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg664_counter_oracle_auxiliary_x_modal_new_server_package_package.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg664_counter_oracle_auxiliary_x_modal_new_server_apply_evidence.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg664_counter_oracle_auxiliary_x_modal_new_server_sync_report.json`
+- `docs/hermes-analysis/master_optimizer_reports/pg664_counter_oracle_auxiliary_x_modal_new_server_post_hash_backfill_pg_to_sqlite_sync.json`
+- `docs/hermes-analysis/master_optimizer_reports/pg664_counter_oracle_auxiliary_x_modal_new_server_e2e.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260708_current_answer_post_pg664_hash_backfill.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260708_current_answer_post_pg664_hash_backfill_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260708_post_pg664_counter_oracle_auxiliary_x_modal_new_server_recheck.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260708_post_pg664_counter_oracle_auxiliary_x_modal_new_server_final_after_hash_backfill.md`
+- `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260708_post_pg664_counter_oracle_auxiliary_x_modal_new_server_final_after_hash_backfill.md`
+- `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260708_post_pg664_counter_oracle_auxiliary_x_modal_new_server_final_after_hash_backfill.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260708_post_pg664_counter_oracle_auxiliary_x_modal_new_server_final_after_hash_backfill.md`
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

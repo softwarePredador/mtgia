@@ -109,6 +109,68 @@ def test_counter_target_stack_object_execution_scenario_is_manifested() -> None:
     assert scenario["nonmatching_stack_effect"]["effect"] == "mana_ability"
 
 
+def test_counter_target_x_mana_value_execution_scenario_uses_cast_context() -> None:
+    proposal = {
+        "normalized_name": "spell blast",
+        "card_name": "Spell Blast",
+        "oracle_hash": "hash-spell-blast",
+        "logical_rule_key": "battle_rule_v1:spell-blast",
+        "effect_json": {
+            "effect": "counter",
+            "battle_model_scope": "xmage_counter_target_spell_v1",
+            "target": "spell_mana_value_x",
+            "target_constraints": {
+                "zone": "stack",
+                "stack_object": "spell",
+                "counter_target_mana_value_source": "x_value",
+            },
+            "counter_target_mana_value_source": "x_value",
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    assert scenario["type"] == "counter_target_response"
+    assert scenario["card"]["mana_cost"] == "{X}{U}"
+    assert scenario["card"]["_cast_context"] == {"x_value": 3}
+    assert scenario["target_stack_object"]["cmc"] == 3
+    assert scenario["nonmatching_stack_object"]["cmc"] == 4
+
+
+def test_modal_counter_target_mana_value_execution_scenario_uses_any_of_option() -> None:
+    proposal = {
+        "normalized_name": "change the equation",
+        "card_name": "Change the Equation",
+        "oracle_hash": "hash-change-equation",
+        "logical_rule_key": "battle_rule_v1:change-equation",
+        "effect_json": {
+            "effect": "counter",
+            "battle_model_scope": "xmage_counter_target_spell_v1",
+            "target": "spell_mana_value_2_or_less_or_red_green_spell_mana_value_6_or_less",
+            "target_constraints": {
+                "zone": "stack",
+                "stack_object": "spell",
+                "any_of": [
+                    {"stack_object": "spell", "counter_target_mana_value_max": 2},
+                    {
+                        "stack_object": "spell",
+                        "spell_colors": ["R", "G"],
+                        "counter_target_mana_value_max": 6,
+                    },
+                ],
+            },
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    assert scenario["type"] == "counter_target_response"
+    assert scenario["target_stack_object"]["cmc"] == 2
+    assert scenario["nonmatching_stack_object"]["type_line"] == "Mana Ability"
+
+
 def test_counter_draw_special_target_execution_scenario_is_manifested() -> None:
     proposal = {
         "normalized_name": "keep safe",

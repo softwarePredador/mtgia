@@ -14203,6 +14203,91 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_counter_target_mana_value_x_requires_matching_cast_context(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        responder = self.battle.Player("Responder", None, [])
+        counter_effect = {
+            "effect": "counter",
+            "battle_model_scope": "xmage_counter_target_spell_v1",
+            "target": "spell_mana_value_x",
+            "target_constraints": {
+                "zone": "stack",
+                "stack_object": "spell",
+                "counter_target_mana_value_source": "x_value",
+            },
+            "counter_target_mana_value_source": "x_value",
+            "_cast_context": {"x_value": 3},
+            "instant": True,
+        }
+        legal_spell = {"name": "Three Drop", "type_line": "Sorcery", "cmc": 3}
+        illegal_spell = {"name": "Four Drop", "type_line": "Sorcery", "cmc": 4}
+        legal_stack = self.battle.StackItem(legal_spell, active, {"effect": "finisher"})
+        illegal_stack = self.battle.StackItem(illegal_spell, active, {"effect": "finisher"})
+
+        self.assertTrue(
+            self.battle.counter_can_target(
+                {},
+                counter_effect,
+                legal_spell,
+                stack_item=legal_stack,
+                counter_controller=responder,
+            )
+        )
+        self.assertFalse(
+            self.battle.counter_can_target(
+                {},
+                counter_effect,
+                illegal_spell,
+                stack_item=illegal_stack,
+                counter_controller=responder,
+            )
+        )
+
+    def test_x_counterspell_pays_target_mana_value_and_counters_only_when_affordable(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        responder = self.battle.Player("Responder", None, [])
+        target_spell = {"name": "Three Drop", "type_line": "Sorcery", "cmc": 3}
+        stack_item = self.battle.StackItem(target_spell, active, {"effect": "finisher"})
+        spell_blast = {
+            "name": "Spell Blast",
+            "type_line": "Instant",
+            "mana_cost": "{X}{U}",
+            "cmc": 1,
+            "effect": "counter",
+            "battle_model_scope": "xmage_counter_target_spell_v1",
+            "target": "spell_mana_value_x",
+            "target_constraints": {
+                "zone": "stack",
+                "stack_object": "spell",
+                "counter_target_mana_value_source": "x_value",
+            },
+            "counter_target_mana_value_source": "x_value",
+            "instant": True,
+        }
+
+        responder.hand = [dict(spell_blast)]
+        responder.mana_pool.add("blue", 1)
+        responder.mana_pool.add_generic(2)
+        self.assertEqual(
+            responder.counterspell_cards(castable_only=True, target_card=target_spell, stack_item=stack_item),
+            [],
+        )
+
+        responder.hand = [dict(spell_blast)]
+        responder.mana_pool.add_generic(1)
+        counter = responder.use_counterspell(
+            turn=7,
+            target_card=target_spell,
+            stack_item=stack_item,
+            stack_depth=1,
+            phase="precombat_main",
+        )
+
+        self.assertIsNotNone(counter)
+        self.assertEqual(counter["name"], "Spell Blast")
+        self.assertEqual(counter["_cast_context"], {"x_value": 3})
+        self.assertEqual(responder.mana_pool.total(), 0)
+
     def test_counter_scry_scope_is_stack_response_and_scries_on_counter(self) -> None:
         active = self.battle.Player("Active", None, [])
         responder = self.battle.Player(

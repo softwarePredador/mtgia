@@ -9992,6 +9992,38 @@ def counter_can_target(counter_card, counter_effect, target_card, stack_item=Non
         return False
     constraints = _counter_effect_constraints(counter_effect)
     target_value = card_mana_value(target_card)
+    dynamic_exact_source = first_present_value(
+        counter_effect,
+        (
+            "counter_target_mana_value_source",
+            "target_mana_value_source",
+            "counter_target_cmc_source",
+            "target_cmc_source",
+        ),
+    )
+    if dynamic_exact_source is None:
+        dynamic_exact_source = first_present_value(
+            constraints,
+            (
+                "counter_target_mana_value_source",
+                "target_mana_value_source",
+                "counter_target_cmc_source",
+                "target_cmc_source",
+            ),
+        )
+    if str(dynamic_exact_source or "").strip().lower() == "x_value":
+        dynamic_context = (
+            (counter_effect or {}).get("_cast_context")
+            or (counter_effect or {}).get("_resolution_context")
+            or {}
+        )
+        if "x_value" in dynamic_context or (counter_effect or {}).get("x_value") is not None:
+            try:
+                x_value = int(float(dynamic_context.get("x_value", (counter_effect or {}).get("x_value") or 0)))
+                if target_value != x_value:
+                    return False
+            except Exception:
+                return False
     exact_value = first_present_value(
         counter_effect,
         (
@@ -10048,6 +10080,37 @@ def counter_can_target(counter_card, counter_effect, target_card, stack_item=Non
         except Exception:
             return False
     return True
+
+
+def counter_target_x_value_for_target(counter_effect, target_card):
+    if not isinstance(counter_effect, dict) or not isinstance(target_card, dict):
+        return None
+    constraints = _counter_effect_constraints(counter_effect)
+    dynamic_exact_source = first_present_value(
+        counter_effect,
+        (
+            "counter_target_mana_value_source",
+            "target_mana_value_source",
+            "counter_target_cmc_source",
+            "target_cmc_source",
+        ),
+    )
+    if dynamic_exact_source is None:
+        dynamic_exact_source = first_present_value(
+            constraints,
+            (
+                "counter_target_mana_value_source",
+                "target_mana_value_source",
+                "counter_target_cmc_source",
+                "target_cmc_source",
+            ),
+        )
+    if str(dynamic_exact_source or "").strip().lower() != "x_value":
+        return None
+    try:
+        return max(0, int(float(card_mana_value(target_card) or 0)))
+    except Exception:
+        return None
 
 
 def _counter_unless_pays_tax_amount(effect, counter_controller, target_controller=None, stack_item=None, all_players=None):
@@ -10916,10 +10979,17 @@ class Player:
             or card_has_functional_tag(card, "counter", "protection")
         ]
         if castable_only:
-            counters = [
-                card for card in counters
-                if self.can_pay_card(card)
-            ]
+            castable_counters = []
+            for card in counters:
+                effect = get_card_effect(card)
+                target_x_value = counter_target_x_value_for_target(effect, target_card)
+                if target_x_value is not None:
+                    if self.can_pay(card_cost_for_player_state(self, card, x_value=target_x_value)):
+                        castable_counters.append(card)
+                    continue
+                if self.can_pay_card(card):
+                    castable_counters.append(card)
+            counters = castable_counters
         if target_card is not None:
             counters = [
                 card for card in counters
@@ -10958,13 +11028,21 @@ class Player:
             counter = preferred_counter
         else:
             counter = min(counters, key=lambda card: card.get("cmc", 0))
-        cost = counter.get("cmc", 0)
-        if not self.spend_card_mana(counter):
-            return None
+        effect = get_card_effect(counter)
+        target_x_value = counter_target_x_value_for_target(effect, target_card)
+        if target_x_value is not None:
+            cost = card_cost_for_player_state(self, counter, x_value=target_x_value)
+            if not self.spend_mana(cost):
+                return None
+            store_cast_context_fields(effect, {"x_value": target_x_value})
+            counter["_cast_context"] = {"x_value": target_x_value}
+        else:
+            cost = card_cost_for_player_state(self, counter)
+            if not self.spend_mana(cost):
+                return None
         self.hand.remove(counter)
         self.graveyard.append(counter)
         self.counters_available = len(self.counterspell_cards())
-        effect = get_card_effect(counter)
         target_controller_obj = getattr(stack_item, "controller", None)
         counter_target_name = (target_card or {}).get("name", "?")
         counter_unless_pays_generic, counter_unless_pays_details, has_counter_unless_tax = (

@@ -69,6 +69,8 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "countered_spell_to_top_library",
     "countered_spell_to_exile",
     "countered_spell_to_exile_reason",
+    "counter_target_mana_value_source",
+    "xmage_target_adjuster",
     "draw_on_counter",
     "scry_on_counter",
     "life_gain_on_counter",
@@ -3651,6 +3653,20 @@ def _stack_object_fixture_from_constraints(
                 "target_spell_color_count_exact",
                 "spell_color_count_min",
                 "target_spell_color_count_min",
+                "counter_target_mana_value",
+                "target_mana_value",
+                "counter_target_cmc",
+                "target_cmc",
+                "counter_target_mana_value_min",
+                "target_mana_value_min",
+                "counter_target_cmc_min",
+                "target_cmc_min",
+                "counter_target_mana_value_max",
+                "target_mana_value_max",
+                "counter_target_cmc_max",
+                "target_cmc_max",
+                "counter_target_mana_value_source",
+                "target_mana_value_source",
                 "power_or_toughness_max",
                 "target_power_or_toughness_max",
                 "source_zone",
@@ -3731,6 +3747,56 @@ def _stack_object_fixture_from_constraints(
             colors = ["W"] if colors[0] != "W" else ["R"]
         card["colors"] = colors
         card["mana_cost"] = "".join(f"{{{color}}}" for color in colors)
+
+    dynamic_mana_value_source = None
+    for key in (
+        "counter_target_mana_value_source",
+        "target_mana_value_source",
+        "counter_target_cmc_source",
+        "target_cmc_source",
+    ):
+        if active_constraints.get(key) is not None:
+            dynamic_mana_value_source = str(active_constraints.get(key)).strip().lower()
+            break
+    if dynamic_mana_value_source == "x_value":
+        card["cmc"] = 3 if matching else 4
+    else:
+        exact_mana_value = None
+        for key in (
+            "counter_target_mana_value",
+            "target_mana_value",
+            "counter_target_cmc",
+            "target_cmc",
+        ):
+            if active_constraints.get(key) is not None:
+                exact_mana_value = int(active_constraints.get(key))
+                break
+        min_mana_value = None
+        for key in (
+            "counter_target_mana_value_min",
+            "target_mana_value_min",
+            "counter_target_cmc_min",
+            "target_cmc_min",
+        ):
+            if active_constraints.get(key) is not None:
+                min_mana_value = int(active_constraints.get(key))
+                break
+        max_mana_value = None
+        for key in (
+            "counter_target_mana_value_max",
+            "target_mana_value_max",
+            "counter_target_cmc_max",
+            "target_cmc_max",
+        ):
+            if active_constraints.get(key) is not None:
+                max_mana_value = int(active_constraints.get(key))
+                break
+        if exact_mana_value is not None:
+            card["cmc"] = exact_mana_value if matching else exact_mana_value + 1
+        elif max_mana_value is not None:
+            card["cmc"] = max_mana_value if matching else max_mana_value + 1
+        elif min_mana_value is not None:
+            card["cmc"] = min_mana_value if matching else max(0, min_mana_value - 1)
 
     effect = {"effect": card.get("effect") or "finisher"}
     source_zone = active_constraints.get("source_zone") or active_constraints.get("spell_source_zone")
@@ -3825,16 +3891,26 @@ def counter_target_execution_scenario_from_expected_rule(
         constraints,
         matching=False,
     )
+    counter_card = {
+        "name": rule["card_name"],
+        "type_line": "Instant",
+        "mana_cost": "{1}{U}",
+        "cmc": 2,
+        **required,
+    }
+    dynamic_mana_value_source = (
+        required.get("counter_target_mana_value_source")
+        or constraints.get("counter_target_mana_value_source")
+        or required.get("target_mana_value_source")
+        or constraints.get("target_mana_value_source")
+    )
+    if str(dynamic_mana_value_source or "").strip().lower() == "x_value":
+        counter_card["mana_cost"] = "{X}{U}"
+        counter_card["_cast_context"] = {"x_value": int(matching["card"].get("cmc") or 0)}
     return {
         "name": f"{rule['card_name']} counters a legal stack object",
         "type": "counter_target_response",
-        "card": {
-            "name": rule["card_name"],
-            "type_line": "Instant",
-            "mana_cost": "{1}{U}",
-            "cmc": 2,
-            **required,
-        },
+        "card": counter_card,
         "target_stack_object": matching["card"],
         "target_stack_effect": matching["effect"],
         "nonmatching_stack_object": nonmatching["card"],
