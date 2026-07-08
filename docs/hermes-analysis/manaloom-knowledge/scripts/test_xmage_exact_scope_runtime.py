@@ -15156,6 +15156,115 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_return_target_permanent_you_control_to_owner_hand_uses_self_controller_scope(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        own_target = {
+            "name": "Own Mana Rock",
+            "type_line": "Artifact",
+            "cmc": 2,
+        }
+        opponent_target = {
+            "name": "Opponent Trophy",
+            "type_line": "Artifact",
+            "cmc": 3,
+        }
+        active.battlefield.append(own_target)
+        opponent.battlefield.append(opponent_target)
+        effect = {
+            "effect": "remove_permanent",
+            "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+            "target": "permanent",
+            "target_constraints": {"card_types": ["permanent"], "controller_scope": "self"},
+            "target_controller": "self",
+            "destination": "hand",
+            "instant": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Rescue",
+                "type_line": "Instant",
+                "oracle_text": "Return target permanent you control to its owner's hand.",
+            },
+            turn=7,
+            rng=random.Random(71),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual([card["name"] for card in active.hand], ["Own Mana Rock"])
+        self.assertEqual(active.battlefield, [])
+        self.assertEqual([card["name"] for card in opponent.battlefield], ["Opponent Trophy"])
+        self.assertEqual(opponent.hand, [])
+        self.assertTrue(
+            any(
+                event == "removal_resolved"
+                and data.get("card") == "Rescue"
+                and data.get("target") == "Own Mana Rock"
+                and data.get("target_player") == "Active"
+                and data.get("destination") == "hand"
+                for event, data in self.events
+            )
+        )
+
+    def test_return_target_creature_or_enchantment_opponent_controls_respects_controller_scope(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active_candidate = {
+            "name": "Active Enchantment",
+            "type_line": "Enchantment",
+            "cmc": 4,
+        }
+        opponent_candidate = {
+            "name": "Opponent Enchantment",
+            "type_line": "Enchantment",
+            "cmc": 2,
+        }
+        active.battlefield.append(active_candidate)
+        opponent.battlefield.append(opponent_candidate)
+        effect = {
+            "effect": "remove_permanent",
+            "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+            "target": "creature_or_enchantment",
+            "target_constraints": {
+                "card_types": ["creature", "enchantment"],
+                "controller_scope": "opponent",
+            },
+            "target_controller": "opponent",
+            "destination": "hand",
+            "instant": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Stern Dismissal",
+                "type_line": "Instant",
+                "oracle_text": "Return target creature or enchantment an opponent controls to its owner's hand.",
+            },
+            turn=7,
+            rng=random.Random(72),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual([card["name"] for card in active.battlefield], ["Active Enchantment"])
+        self.assertEqual(active.hand, [])
+        self.assertEqual(opponent.battlefield, [])
+        self.assertEqual([card["name"] for card in opponent.hand], ["Opponent Enchantment"])
+        self.assertTrue(
+            any(
+                event == "removal_resolved"
+                and data.get("card") == "Stern Dismissal"
+                and data.get("target") == "Opponent Enchantment"
+                and data.get("target_player") == "Opponent"
+                and data.get("destination") == "hand"
+                for event, data in self.events
+            )
+        )
+
     def test_return_target_enchanted_permanent_to_owner_hand_respects_constraint(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

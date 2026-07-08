@@ -2701,7 +2701,7 @@ def fixed_destroy_draw_from_source(source: str) -> int | None:
     return draw_count
 
 
-def fixed_bounce_draw_from_oracle(metadata: dict[str, Any]) -> tuple[str, str, int] | None:
+def fixed_bounce_draw_from_oracle(metadata: dict[str, Any]) -> tuple[str, str, str, int] | None:
     text = oracle_text(metadata)
     match = re.match(
         r"^(return target .+? to its owner's hand)\. (?:then )?draw a card\.?$",
@@ -2714,8 +2714,8 @@ def fixed_bounce_draw_from_oracle(metadata: dict[str, Any]) -> tuple[str, str, i
     parsed = bounce_target_from_oracle(simple_metadata)
     if parsed is None:
         return None
-    effect, target = parsed
-    return effect, target, 1
+    effect, target, target_controller = parsed
+    return effect, target, target_controller, 1
 
 
 def fixed_bounce_draw_from_source(source: str) -> int | None:
@@ -2990,7 +2990,7 @@ def fixed_exile_scry_from_source(source: str) -> int | None:
     return scry_count
 
 
-def fixed_bounce_scry_from_oracle(metadata: dict[str, Any]) -> tuple[str, str, int] | None:
+def fixed_bounce_scry_from_oracle(metadata: dict[str, Any]) -> tuple[str, str, str, int] | None:
     text = strip_parenthetical_reminders(oracle_text(metadata))
     text = re.sub(r"\s+", " ", text).strip()
     match = re.match(r"^(return target .+? to its owner's hand)\. scry (?P<scry>\d+)\.?$", text)
@@ -3001,8 +3001,8 @@ def fixed_bounce_scry_from_oracle(metadata: dict[str, Any]) -> tuple[str, str, i
     parsed = bounce_target_from_oracle(simple_metadata)
     if parsed is None:
         return None
-    effect, target = parsed
-    return effect, target, int(match.group("scry"))
+    effect, target, target_controller = parsed
+    return effect, target, target_controller, int(match.group("scry"))
 
 
 def fixed_bounce_scry_from_source(source: str) -> int | None:
@@ -3104,9 +3104,38 @@ def source_matches_bounce_target(source: str, target: str) -> bool:
         return "TargetArtifactPermanent" in text or "FilterArtifactPermanent" in text or "artifact" in text
     if target == "enchantment":
         return "TargetEnchantmentPermanent" in text or "FilterEnchantmentPermanent" in text or "enchantment" in text
+    if target == "creature_or_enchantment":
+        return (
+            ("CardType.CREATURE" in text and "CardType.ENCHANTMENT" in text)
+            or "creature or enchantment" in text
+            or source_matches_target_constraint(source, target)
+        )
     if target == "land":
         return "TargetLandPermanent" in text or "FilterLandPermanent" in text or "land" in text
     return source_matches_target_constraint(source, target)
+
+
+def source_matches_bounce_target_controller(source: str, target_controller: str) -> bool:
+    text = source or ""
+    controller = str(target_controller or "any").lower()
+    if controller in {"", "any", "all"}:
+        return True
+    if controller in {"self", "you", "controller", "controlled"}:
+        return (
+            "TargetControlledPermanent" in text
+            or "TargetControlledCreaturePermanent" in text
+            or "FilterControlledPermanent" in text
+            or "FILTER_CONTROLLED" in text
+            or "you control" in text
+        )
+    if controller in {"opponent", "opponents"}:
+        return (
+            "TargetOpponentsCreaturePermanent" in text
+            or "FILTER_OPPONENTS" in text
+            or "TargetController.OPPONENT" in text
+            or "opponent controls" in text
+        )
+    return False
 
 
 def etb_bounce_target_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
@@ -3212,12 +3241,23 @@ def exile_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, str] | None
     return None
 
 
-def bounce_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, str] | None:
+def bounce_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, str, str] | None:
     text = re.sub(
         r"\s+",
         " ",
         " ".join(oracle_effect_lines_without_neutral_auxiliary(metadata)).strip().lower(),
     )
+    target_controller = "any"
+    controller_rewrites = [
+        (r"\s+you control to ", "self"),
+        (r"\s+an opponent controls to ", "opponent"),
+        (r"\s+opponents control to ", "opponent"),
+    ]
+    for pattern, controller in controller_rewrites:
+        if re.search(pattern, text):
+            text = re.sub(pattern, " to ", text)
+            target_controller = controller
+            break
     patterns: list[tuple[str, tuple[str, str]]] = [
         (r"^return target tapped creature to its owner's hand\.?$", ("remove_creature", "tapped_creature")),
         (r"^return target untapped creature to its owner's hand\.?$", ("remove_creature", "untapped_creature")),
@@ -3257,7 +3297,8 @@ def bounce_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, str] | Non
     ]
     for pattern, result in patterns:
         if re.match(pattern, text):
-            return result
+            effect, target = result
+            return effect, target, target_controller
     return None
 
 
@@ -21809,6 +21850,14 @@ def target_constraints_for(target: str) -> dict[str, Any]:
     return {"target": target}
 
 
+def target_constraints_with_controller(target: str, target_controller: str) -> dict[str, Any]:
+    constraints = dict(target_constraints_for(target))
+    controller = str(target_controller or "any").lower()
+    if controller not in {"", "any", "all"}:
+        constraints["controller_scope"] = controller
+    return constraints
+
+
 def prevent_damage_by_creature_sources_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
     lines = [
         re.sub(r"\s+", " ", line).strip().lower().rstrip(".")
@@ -28520,17 +28569,20 @@ def split_row(
         source_scry_count = fixed_bounce_scry_from_source(source_text)
         if source_scry_count is None:
             return None, "bounce_scry_source_not_fixed"
-        effect, target_type, scry_count = oracle_bounce_scry
+        effect, target_type, target_controller, scry_count = oracle_bounce_scry
         if source_scry_count != scry_count:
             return None, "bounce_scry_source_oracle_mismatch"
         if not source_matches_bounce_target(source_text, target_type):
             return None, "bounce_scry_target_source_mismatch"
+        if not source_matches_bounce_target_controller(source_text, target_controller):
+            return None, "bounce_scry_source_controller_mismatch"
         target_base = restricted_target_base(target_type)
         bounce_component = {
             "effect": effect,
             "battle_model_scope": BOUNCE_SCOPE,
             "target": target_base,
-            "target_constraints": target_constraints_for(target_type),
+            "target_constraints": target_constraints_with_controller(target_type, target_controller),
+            "target_controller": target_controller,
             "destination": "hand",
             "compose_on_resolution": True,
             "xmage_effect_class": "ReturnToHandTargetEffect",
@@ -28982,17 +29034,20 @@ def split_row(
             source_draw_count = fixed_bounce_draw_from_source(source_text)
             if source_draw_count is None:
                 return None, "bounce_draw_source_not_fixed"
-            effect, target_type, draw_count = oracle_bounce
+            effect, target_type, target_controller, draw_count = oracle_bounce
             if source_draw_count != draw_count:
                 return None, "bounce_draw_source_oracle_mismatch"
             if not source_matches_bounce_target(source_text, target_type):
                 return None, "bounce_draw_target_source_mismatch"
+            if not source_matches_bounce_target_controller(source_text, target_controller):
+                return None, "bounce_draw_source_controller_mismatch"
             target_base = restricted_target_base(target_type)
             bounce_component = {
                 "effect": effect,
                 "battle_model_scope": BOUNCE_SCOPE,
                 "target": target_base,
-                "target_constraints": target_constraints_for(target_type),
+                "target_constraints": target_constraints_with_controller(target_type, target_controller),
+                "target_controller": target_controller,
                 "destination": "hand",
                 "compose_on_resolution": True,
                 "xmage_effect_class": "ReturnToHandTargetEffect",
@@ -30324,12 +30379,17 @@ def split_row(
         target = bounce_target_from_oracle(metadata)
         if target is None:
             return None, "bounce_target_not_supported"
-        effect, target_type = target
+        effect, target_type, target_controller = target
+        if not source_matches_bounce_target(source_text, target_type):
+            return None, "bounce_target_source_mismatch"
+        if not source_matches_bounce_target_controller(source_text, target_controller):
+            return None, "bounce_target_source_controller_mismatch"
         effect_json = {
             "effect": effect,
             "battle_model_scope": BOUNCE_SCOPE,
             "target": target_type,
-            "target_constraints": target_constraints_for(target_type),
+            "target_constraints": target_constraints_with_controller(target_type, target_controller),
+            "target_controller": target_controller,
             "destination": "hand",
             "xmage_effect_class": "ReturnToHandTargetEffect",
             **flags,

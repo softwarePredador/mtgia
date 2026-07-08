@@ -2132,13 +2132,30 @@ def run_single_target_removal(
             "cmc": 0,
         }
     )
-    opponent.battlefield = [nonmatching, target]
     before_events = len(events)
 
     effect_data = battle.get_card_effect(card)
     expected_effect = scenario.get("expected_effect")
     if expected_effect and effect_data.get("effect") != expected_effect:
         fail("battle_execution", f"{card['name']} effect={effect_data.get('effect')!r}")
+    constraints = dict(
+        scenario.get("expected_target_constraints")
+        or effect_data.get("target_constraints")
+        or {}
+    )
+    target_controller_scope = str(
+        effect_data.get("target_controller")
+        or constraints.get("controller_scope")
+        or "opponent"
+    ).lower()
+    if target_controller_scope in {"self", "you", "controller", "controlled"}:
+        target_owner = active
+        other_owner = opponent
+    else:
+        target_owner = opponent
+        other_owner = active
+    target_owner.battlefield = [nonmatching, target]
+    other_owner.battlefield = []
 
     battle.apply_effect_immediate(
         active,
@@ -2152,9 +2169,9 @@ def run_single_target_removal(
     nonmatching_name = str(nonmatching.get("name") or "")
     destination = str(scenario.get("expected_destination") or "graveyard").lower()
     destination_zone_name = "exile" if destination == "exile" else "hand" if destination == "hand" else "graveyard"
-    destination_zone = getattr(opponent, destination_zone_name)
+    destination_zone = getattr(target_owner, destination_zone_name)
     moved_names = [str(item.get("name") or "") for item in destination_zone if isinstance(item, dict)]
-    battlefield_names = [str(item.get("name") or "") for item in opponent.battlefield if isinstance(item, dict)]
+    battlefield_names = [str(item.get("name") or "") for item in target_owner.battlefield if isinstance(item, dict)]
     if target_name not in moved_names:
         fail("battle_execution", f"{card['name']} did not move legal target {target_name} to {destination}")
     if nonmatching_name not in battlefield_names:
@@ -2174,6 +2191,8 @@ def run_single_target_removal(
         fail("battle_events", f"missing {card['name']} removal_resolved event for {target_name}")
     if removal_event.get("target_legal") is not True:
         fail("battle_events", f"{card['name']} target_legal={removal_event.get('target_legal')!r}")
+    if removal_event.get("target_player") != target_owner.name:
+        fail("battle_events", f"{card['name']} target_player={removal_event.get('target_player')!r}")
     if str(removal_event.get("destination") or "").lower() != destination:
         fail("battle_events", f"{card['name']} destination={removal_event.get('destination')!r}")
     if expected_controller_life_gain > 0:
@@ -2202,6 +2221,7 @@ def run_single_target_removal(
         "target": target_name,
         "nonmatching_target": nonmatching_name,
         "destination": destination,
+        "target_player": target_owner.name,
         "moved_names": moved_names,
         "battlefield_names": battlefield_names,
     }

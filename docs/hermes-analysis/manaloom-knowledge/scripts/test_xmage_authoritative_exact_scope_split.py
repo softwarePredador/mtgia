@@ -16022,7 +16022,10 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         proposal, reason = split.split_row(
             row,
             metadata(oracle_text="Return target creature to its owner's hand."),
-            source_text="this.getSpellAbility().addEffect(new ReturnToHandTargetEffect());",
+            source_text=(
+                "this.getSpellAbility().addEffect(new ReturnToHandTargetEffect());"
+                "this.getSpellAbility().addTarget(new TargetCreaturePermanent());"
+            ),
         )
 
         self.assertEqual(reason, "selected_exact_scope")
@@ -16038,13 +16041,65 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         proposal, reason = split.split_row(
             row,
             metadata(oracle_text="Return target nonland permanent to its owner's hand."),
-            source_text="this.getSpellAbility().addEffect(new ReturnToHandTargetEffect());",
+            source_text=(
+                "this.getSpellAbility().addEffect(new ReturnToHandTargetEffect());"
+                "this.getSpellAbility().addTarget(new TargetNonlandPermanent());"
+            ),
         )
 
         self.assertEqual(reason, "selected_exact_scope")
         effect = proposal["effect_json"]
         self.assertEqual(effect["effect"], "remove_permanent")
         self.assertEqual(effect["target"], "nonland_permanent")
+        self.assertEqual(effect["destination"], "hand")
+
+    def test_return_target_permanent_you_control_to_hand_maps_controller_scope(self) -> None:
+        row = queue_row(split.BOUNCE_UNIT, effect_classes=["ReturnToHandTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Return target permanent you control to its owner's hand."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new ReturnToHandTargetEffect());"
+                "this.getSpellAbility().addTarget(new TargetControlledPermanent());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "remove_permanent")
+        self.assertEqual(effect["target"], "permanent")
+        self.assertEqual(effect["target_controller"], "self")
+        self.assertEqual(
+            effect["target_constraints"],
+            {"card_types": ["permanent"], "controller_scope": "self"},
+        )
+        self.assertEqual(effect["destination"], "hand")
+
+    def test_return_target_creature_or_enchantment_opponent_controls_to_hand_maps_controller_scope(self) -> None:
+        row = queue_row(split.BOUNCE_UNIT, effect_classes=["ReturnToHandTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                oracle_text="Return target creature or enchantment an opponent controls to its owner's hand."
+            ),
+            source_text=(
+                "filter.add(Predicates.or(CardType.CREATURE.getPredicate(), "
+                "CardType.ENCHANTMENT.getPredicate()));"
+                "filter.add(TargetController.OPPONENT.getControllerPredicate());"
+                "this.getSpellAbility().addEffect(new ReturnToHandTargetEffect());"
+                "this.getSpellAbility().addTarget(new TargetPermanent(filter));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "remove_permanent")
+        self.assertEqual(effect["target"], "creature_or_enchantment")
+        self.assertEqual(effect["target_controller"], "opponent")
+        self.assertEqual(
+            effect["target_constraints"],
+            {"card_types": ["creature", "enchantment"], "controller_scope": "opponent"},
+        )
         self.assertEqual(effect["destination"], "hand")
 
     def test_return_target_creature_or_vehicle_to_hand_maps_to_bounce_runtime(self) -> None:

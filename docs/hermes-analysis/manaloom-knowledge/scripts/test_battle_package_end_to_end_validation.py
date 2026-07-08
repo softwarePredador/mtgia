@@ -578,6 +578,56 @@ def test_single_target_removal_runner_validates_controller_life_gain() -> None:
     assert result["controller_life_gained"] == 4
 
 
+def test_single_target_removal_runner_respects_self_controller_scope() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "remove_permanent",
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+        "target": "permanent",
+        "target_constraints": {"card_types": ["permanent"], "controller_scope": "self"},
+        "target_controller": "self",
+        "destination": "hand",
+        "_rule_logical_key": "battle_rule_v1:rescue-fixture",
+    }
+    try:
+        result = validator.run_single_target_removal(
+            battle,
+            {
+                "name": "Rescue Fixture returns one controlled permanent",
+                "type": "single_target_removal",
+                "card": {"name": "Rescue Fixture", "type_line": "Instant"},
+                "target": {
+                    "name": "E2E Legal Removal Target",
+                    "type_line": "Artifact",
+                    "effect": "artifact",
+                    "cmc": 2,
+                },
+                "nonmatching_target": {
+                    "name": "E2E Illegal Removal Target",
+                    "type_line": "Land",
+                    "effect": "land",
+                    "cmc": 0,
+                },
+                "expected_destination": "hand",
+                "expected_effect": "remove_permanent",
+                "logical_rule_key": "battle_rule_v1:rescue-fixture",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Rescue Fixture"
+    assert result["target_player"] == "Active"
+    assert result["moved_names"] == ["E2E Legal Removal Target"]
+    assert result["battlefield_names"] == ["E2E Illegal Removal Target"]
+
+
 def test_simple_activated_tap_target_runner_executes_tap_effect() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []
