@@ -1,0 +1,232 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-08T11:57:46.285329+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg654_dynamic_damage_wipe_new_server_package_manifest.json",
+  "package_id": "pg654_dynamic_damage_wipe_new_server_package_manifest",
+  "snapshot": "/tmp/pg654_dynamic_damage_wipe_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 5
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+          "card_name": "Calamitous Cave-In",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ff384c2972d27eae1173bbbb12bcd2e0",
+          "oracle_hash": "4069479e2214edce819d6a9edc3da97f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+          "card_name": "Chain Reaction",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b721248b835b2a566a36928f7de5f211",
+          "oracle_hash": "7133da1b111adf3a50a495277840c796",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+          "card_name": "Gates Ablaze",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:bce9b09587369ceddee79a4d87b2639d",
+          "oracle_hash": "93d9ca2d64d6702472f1beba1505cc00",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+          "card_name": "Immolating Gyre",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3a36e4c65fe5fbd1658a5dc91815619d",
+          "oracle_hash": "92e197d6b4ce1c5741779d0b5f327e0e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+          "card_name": "Skyreaping",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e00622e2a40dda1f82a2eb04c0b22f91",
+          "oracle_hash": "0c832362e9df1c38970d782accc8a1c3",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 5
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+          "card_name": "Calamitous Cave-In",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ff384c2972d27eae1173bbbb12bcd2e0",
+          "oracle_hash": "4069479e2214edce819d6a9edc3da97f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+          "card_name": "Chain Reaction",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b721248b835b2a566a36928f7de5f211",
+          "oracle_hash": "7133da1b111adf3a50a495277840c796",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+          "card_name": "Gates Ablaze",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:bce9b09587369ceddee79a4d87b2639d",
+          "oracle_hash": "93d9ca2d64d6702472f1beba1505cc00",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+          "card_name": "Immolating Gyre",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3a36e4c65fe5fbd1658a5dc91815619d",
+          "oracle_hash": "92e197d6b4ce1c5741779d0b5f327e0e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+          "card_name": "Skyreaping",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e00622e2a40dda1f82a2eb04c0b22f91",
+          "oracle_hash": "0c832362e9df1c38970d782accc8a1c3",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 5
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Calamitous Cave-In",
+          "logical_rule_key": "battle_rule_v1:ff384c2972d27eae1173bbbb12bcd2e0"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Chain Reaction",
+          "logical_rule_key": "battle_rule_v1:b721248b835b2a566a36928f7de5f211"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Gates Ablaze",
+          "logical_rule_key": "battle_rule_v1:bce9b09587369ceddee79a4d87b2639d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Immolating Gyre",
+          "logical_rule_key": "battle_rule_v1:3a36e4c65fe5fbd1658a5dc91815619d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Skyreaping",
+          "logical_rule_key": "battle_rule_v1:e00622e2a40dda1f82a2eb04c0b22f91"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 5
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Calamitous Cave-In",
+          "component_keys": [],
+          "effect": "damage_wipe",
+          "logical_rule_key": "battle_rule_v1:ff384c2972d27eae1173bbbb12bcd2e0"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Chain Reaction",
+          "component_keys": [],
+          "effect": "damage_wipe",
+          "logical_rule_key": "battle_rule_v1:b721248b835b2a566a36928f7de5f211"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Gates Ablaze",
+          "component_keys": [],
+          "effect": "damage_wipe",
+          "logical_rule_key": "battle_rule_v1:bce9b09587369ceddee79a4d87b2639d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Immolating Gyre",
+          "component_keys": [],
+          "effect": "damage_wipe",
+          "logical_rule_key": "battle_rule_v1:3a36e4c65fe5fbd1658a5dc91815619d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Skyreaping",
+          "component_keys": [],
+          "effect": "damage_wipe",
+          "logical_rule_key": "battle_rule_v1:e00622e2a40dda1f82a2eb04c0b22f91"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

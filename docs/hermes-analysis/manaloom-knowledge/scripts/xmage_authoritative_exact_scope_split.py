@@ -5966,6 +5966,19 @@ def damage_all_scope_from_oracle(metadata: dict[str, Any]) -> str | None:
     return str(spec["damage_scope"])
 
 
+def dynamic_damage_all_scope_from_phrase(phrase: str) -> dict[str, Any] | None:
+    token = re.sub(r"\s+", " ", str(phrase or "").strip().lower())
+    if token == "each creature":
+        return {"damage_scope": "each_creature"}
+    if token == "each creature and each planeswalker":
+        return {"damage_scope": "each_creature_and_planeswalker"}
+    if token == "each creature and planeswalker you don't control":
+        return {"damage_scope": "each_creature_and_planeswalker_opponents_control"}
+    if token == "each creature with flying":
+        return {"damage_scope": "each_flying_creature"}
+    return None
+
+
 def x_damage_all_spec_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
     text = strip_parenthetical_reminders(oracle_text(metadata))
     if re.match(r"^.+ deals? x damage to each creature\.?$", text):
@@ -6003,8 +6016,111 @@ def x_damage_all_source_blocker(source: str, spec: dict[str, Any]) -> str | None
     return None
 
 
+def dynamic_damage_all_spec_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str | None:
+    text = strip_parenthetical_reminders(oracle_text(metadata))
+    where_match = re.match(
+        r"^.+ deals? x damage to (?P<target>.+?), where x is (?P<filter>.+?)\.?$",
+        text,
+    )
+    if where_match:
+        damage_spec = dynamic_damage_all_scope_from_phrase(where_match.group("target"))
+        if damage_spec is None:
+            return "board_wipe_dynamic_damage_scope_not_supported"
+        filter_text = re.sub(r"^the number of\s+", "", where_match.group("filter").strip())
+        count_fields = _dynamic_damage_count_fields_from_filter(filter_text)
+        if isinstance(count_fields, str):
+            return count_fields
+        if count_fields is None:
+            return "dynamic_count_damage_oracle_filter_not_supported"
+        amount_source = str(count_fields.pop("damage_amount_source"))
+        return {
+            **damage_spec,
+            "damage_amount_source": amount_source,
+            "damage_base_amount": 0,
+            "damage_per_count": 1,
+            **count_fields,
+        }
+    equal_match = re.match(
+        r"^.+ deals? damage to (?P<target>.+?) equal to (?P<filter>.+?)\.?$",
+        text,
+    )
+    if equal_match:
+        damage_spec = dynamic_damage_all_scope_from_phrase(equal_match.group("target"))
+        if damage_spec is None:
+            return "board_wipe_dynamic_damage_scope_not_supported"
+        count_fields = _dynamic_damage_count_fields_from_filter(equal_match.group("filter"))
+        if isinstance(count_fields, str):
+            return count_fields
+        if count_fields is None:
+            return "dynamic_count_damage_oracle_filter_not_supported"
+        amount_source = str(count_fields.pop("damage_amount_source"))
+        return {
+            **damage_spec,
+            "damage_amount_source": amount_source,
+            "damage_base_amount": 0,
+            "damage_per_count": 1,
+            **count_fields,
+        }
+    return None
+
+
+def dynamic_damage_all_source_spec_from_source(source: str) -> dict[str, Any] | str | None:
+    text = source or ""
+    if has_additional_cost(text):
+        return "board_wipe_dynamic_damage_additional_cost_not_supported"
+    if len(re.findall(r"new\s+DamageAllEffect\s*\(", text)) != 1:
+        return "board_wipe_dynamic_damage_source_not_single"
+    constructor_args = extract_constructor_args(text, "DamageAllEffect")
+    if constructor_args is None:
+        return "board_wipe_dynamic_damage_source_not_supported"
+    parts = split_top_level_args(constructor_args)
+    if not parts:
+        return "board_wipe_dynamic_damage_source_not_supported"
+    spec = _dynamic_count_damage_source_spec_from_expr(text, parts[0])
+    if isinstance(spec, str) or spec is None:
+        return spec
+    return {
+        "damage_base_amount": int(spec.get("damage_base_amount") or 0),
+        "damage_per_count": int(spec.get("damage_per_count") or 1),
+        **{
+            key: value
+            for key, value in spec.items()
+            if key not in {"damage_base_amount", "damage_per_count"}
+        },
+    }
+
+
+def dynamic_damage_all_source_matches_spec(source: str, oracle_spec: dict[str, Any], source_spec: dict[str, Any]) -> bool:
+    if not damage_all_source_matches_spec(source, oracle_spec):
+        return False
+    comparable_keys = {
+        "damage_amount_source",
+        "damage_base_amount",
+        "damage_per_count",
+        "battlefield_count_scope",
+        "battlefield_count_card_types",
+        "battlefield_count_subtypes",
+        "graveyard_count_scope",
+        "graveyard_count_card_types",
+        "graveyard_count_subtypes",
+        "mana_symbol_count_color",
+    }
+    for key in comparable_keys:
+        if oracle_spec.get(key) != source_spec.get(key):
+            return False
+    return True
+
+
 def damage_all_source_matches_spec(source: str, spec: dict[str, Any]) -> bool:
     damage_scope = str(spec.get("damage_scope") or "")
+    if damage_scope == "each_creature_and_planeswalker_opponents_control":
+        text = source or ""
+        if "FilterCreatureOrPlaneswalkerPermanent" not in text or "TargetController.NOT_YOU" not in text:
+            return False
+    if damage_scope == "each_flying_creature" and "FILTER_CREATURE_FLYING" not in (source or ""):
+        return False
+    if damage_scope == "each_creature" and "FILTER_CREATURE_FLYING" in (source or ""):
+        return False
     if (
         damage_scope == "each_creature_dealt_damage_this_turn"
         and "WasDealtDamageThisTurnPredicate.instance" not in (source or "")
@@ -6070,9 +6186,7 @@ def board_wipe_source_blocker(source: str, classes: set[str]) -> str | None:
         if len(re.findall(r"new\s+DamageAllEffect\s*\(", text)) != 1:
             return "board_wipe_source_multiple_damage_all_effects"
         blockers = {
-            "PermanentsOnBattlefieldCount": "board_wipe_damage_amount_not_fixed",
             "ColorsOfManaSpentToCastCount": "board_wipe_damage_amount_not_fixed",
-            "DevotionCount": "board_wipe_damage_amount_not_fixed",
             "DealtDamageToCreatureBySourceDies": "board_wipe_damage_replacement_not_supported",
         }
         for needle, reason in blockers.items():
@@ -11210,6 +11324,8 @@ def _dynamic_damage_target_from_phrase(phrase: str) -> str | None:
 
 def _dynamic_damage_count_fields_from_filter(filter_text: str) -> dict[str, Any] | str | None:
     token = re.sub(r"\s+", " ", str(filter_text or "").strip().lower())
+    if token == "caves you control plus the number of cave cards in your graveyard":
+        return {"damage_amount_source": "caves_controlled_plus_cave_cards_in_graveyard"}
     if " plus " in token or " and/or " in token:
         return "dynamic_count_damage_oracle_composite_count_not_supported"
     if token == "basic land types among lands you control":
@@ -11218,6 +11334,23 @@ def _dynamic_damage_count_fields_from_filter(filter_text: str) -> dict[str, Any]
         return {"damage_amount_source": "controller_hand_count"}
     if token in {"cards in that player's hand", "cards in target player's hand"}:
         return {"damage_amount_source": "target_hand_count"}
+    if token == "creatures on the battlefield":
+        return {
+            "damage_amount_source": "battlefield_permanent_count",
+            "battlefield_count_scope": "all_battlefields",
+            "battlefield_count_card_types": ["creature"],
+        }
+    if token in {
+        "instant and sorcery cards in your graveyard",
+        "instant or sorcery cards in your graveyard",
+    }:
+        return {
+            "damage_amount_source": "graveyard_card_count",
+            "graveyard_count_scope": "controller_graveyard",
+            "graveyard_count_card_types": ["instant", "sorcery"],
+        }
+    if token == "your devotion to green":
+        return {"damage_amount_source": "devotion_to_green"}
     if token == "other spells you've cast this turn":
         return {"damage_amount_source": "other_spells_cast_this_turn"}
     if token == "colors of mana spent to cast this spell":
@@ -11378,6 +11511,29 @@ def _dynamic_count_damage_source_spec_from_expr(source: str, expr: str) -> dict[
         return {"damage_amount_source": "other_spells_cast_this_turn"}
     if "ElectrostaticBoltDamageValue" in token:
         return "dynamic_count_damage_conditional_target_state_not_supported"
+    if "ColorsOfManaSpentToCastCount" in token or (
+        token == "xValue" and "ColorsOfManaSpentToCastCount" in text
+    ):
+        return "dynamic_count_damage_mana_spent_colors_not_supported"
+    if "CavesControlledAndInGraveCount" in token or (
+        token == "xValue" and "CavesControlledAndInGraveCount" in text
+    ):
+        return {"damage_amount_source": "caves_controlled_plus_cave_cards_in_graveyard"}
+    if "DevotionCount.G" in token or (token == "xValue" and "DevotionCount.G" in text):
+        return {"damage_amount_source": "devotion_to_green"}
+    if (
+        "CardsInControllerGraveyardCount" in token
+        or (token == "xValue" and "CardsInControllerGraveyardCount" in text)
+    ) and (
+        "FILTER_CARD_INSTANT_AND_SORCERY" in text
+        or "FILTER_CARD_INSTANT_OR_SORCERY" in text
+        or "FilterInstantOrSorceryCard" in text
+    ):
+        return {
+            "damage_amount_source": "graveyard_card_count",
+            "graveyard_count_scope": "controller_graveyard",
+            "graveyard_count_card_types": ["instant", "sorcery"],
+        }
     if token == "xValue" and "AdditiveDynamicValue" in text:
         return "dynamic_count_damage_composite_count_not_supported"
     if "DomainValue.REGULAR" in token or (token == "xValue" and "DomainValue.REGULAR" in text):
@@ -11406,6 +11562,12 @@ def _dynamic_count_damage_source_spec_from_expr(source: str, expr: str) -> dict[
         return {
             "damage_amount_source": "battlefield_permanent_count",
             "battlefield_count_scope": "controller_battlefield",
+            "battlefield_count_card_types": ["creature"],
+        }
+    if "FilterCreaturePermanent" in token and "FilterControlledCreaturePermanent" not in token:
+        return {
+            "damage_amount_source": "battlefield_permanent_count",
+            "battlefield_count_scope": "all_battlefields",
             "battlefield_count_card_types": ["creature"],
         }
     if "FilterControlledArtifactPermanent" in token or "FilterControlledArtifactPermanent" in text:
@@ -11437,8 +11599,14 @@ def _dynamic_count_damage_source_spec_from_expr(source: str, expr: str) -> dict[
         r"FilterControlledPermanent\s*\(\s*SubType\.([A-Z_]+)",
         text if token == "xValue" else token,
     )
-    if subtype_match is None and "PermanentsOnBattlefieldCount" in token:
-        constructor_args = extract_constructor_args(token, "PermanentsOnBattlefieldCount") or ""
+    if subtype_match is None and (
+        "PermanentsOnBattlefieldCount" in token
+        or (token == "xValue" and "PermanentsOnBattlefieldCount" in text)
+    ):
+        constructor_args = extract_constructor_args(
+            text if token == "xValue" else token,
+            "PermanentsOnBattlefieldCount",
+        ) or ""
         constructor_parts = split_top_level_args(constructor_args)
         filter_ref = constructor_parts[0].strip() if constructor_parts else ""
         if re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", filter_ref):
@@ -30460,6 +30628,36 @@ def split_row(
                     **flags,
                 }
                 return build_proposal(row, metadata, effect_json, family_id="xmage_x_damage_all_spell"), "selected_exact_scope"
+            dynamic_damage_spec = dynamic_damage_all_spec_from_oracle(metadata)
+            if isinstance(dynamic_damage_spec, str):
+                return None, dynamic_damage_spec
+            if dynamic_damage_spec is not None:
+                source_dynamic_spec = dynamic_damage_all_source_spec_from_source(source_text)
+                if isinstance(source_dynamic_spec, str):
+                    return None, source_dynamic_spec
+                if source_dynamic_spec is None:
+                    return None, "board_wipe_dynamic_damage_source_not_supported"
+                if not dynamic_damage_all_source_matches_spec(
+                    source_text,
+                    dynamic_damage_spec,
+                    source_dynamic_spec,
+                ):
+                    return None, "board_wipe_dynamic_damage_source_oracle_mismatch"
+                effect_json = {
+                    "effect": "damage_wipe",
+                    "battle_model_scope": DAMAGE_WIPE_SCOPE,
+                    "amount": 0,
+                    "damage": 0,
+                    **dynamic_damage_spec,
+                    "xmage_effect_class": "DamageAllEffect",
+                    **flags,
+                }
+                return build_proposal(
+                    row,
+                    metadata,
+                    effect_json,
+                    family_id="xmage_dynamic_damage_all_spell",
+                ), "selected_exact_scope"
             amount = java_constructor_int(source_text, "DamageAllEffect")
             if amount is None or amount <= 0:
                 return None, "board_wipe_damage_amount_not_fixed"

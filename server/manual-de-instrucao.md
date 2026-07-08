@@ -18956,6 +18956,7 @@ na command zone, não para validação de deck no servidor.
   - `pg_hermes_sqlite_contract_audit` com wrapper do servidor novo -> `51/51`;
   - `operational_surface_alignment_audit` -> `pass`;
   - `legacy_contamination_audit` -> `pass`.
+  - `legacy_contamination_audit` -> `pass`.
 
 ## 2026-07-08 — PG652 X damage wipe + PG652b oracle_hash backfill
 
@@ -19000,6 +19001,55 @@ na command zone, não para validação de deck no servidor.
 - Gates finais:
   - `python3 -m unittest test_xmage_authoritative_exact_scope_split.py test_xmage_exact_scope_runtime.py`
     -> `Ran 1215 tests ... OK`;
+  - `xmage_strategy_consistency_audit` -> `26/26`;
+  - `pg_hermes_sqlite_contract_audit` com wrapper do servidor novo -> `51/51`;
+  - `operational_surface_alignment_audit` -> `pass`;
+
+## 2026-07-08 — PG653 hash repair + PG654 dynamic damage wipe
+
+- Alvo operacional: PostgreSQL novo via `server/bin/with_new_server_pg.sh`.
+- PG653:
+  - reparo metadata-only de `oracle_hash` em regras executáveis confiáveis;
+  - precheck: `backfillable_rule_rows=44`,
+    `affected_card_ids=43`, `affected_normalized_names=44`,
+    `unsafe_missing_hash_rows=0`;
+  - apply: `oracle_hash_rows_repaired=44`;
+  - postcheck: `remaining_trusted_executable_missing_hash_rows=0`,
+    `repaired_rows_with_expected_hash=44`.
+- PG654:
+  - fechou `DamageAllEffect` com dano dinamico computavel pelo runtime:
+    `caves_controlled_plus_cave_cards_in_graveyard`,
+    `battlefield_permanent_count`, `graveyard_card_count`,
+    `devotion_to_green`;
+  - adicionou escopo `each_creature_and_planeswalker_opponents_control`;
+  - promoveu `Calamitous Cave-In`, `Chain Reaction`, `Gates Ablaze`,
+    `Immolating Gyre`, `Skyreaping`;
+  - manteve `Radiant Flames` bloqueada por `ColorsOfManaSpentToCastCount`
+    ate existir contexto confiavel de cores de mana gastas no cast.
+- Resultado PG654:
+  - precheck: `target_card_rows=1` para cada carta;
+  - apply: `deprecated_shadow_rows=4`, `upserted_rows=5`;
+  - postcheck: cada carta com `promoted_rule_rows=1`,
+    `promoted_verified_auto_rows=1`, `promoted_oracle_hash_rows=1`;
+  - E2E: PostgreSQL, SQLite/Hermes, snapshot canonico e
+    `runtime_get_card_effect` passaram para as 5 cartas.
+- Sync final PG -> Hermes/SQLite:
+  - `pg_rows_loaded=5927`;
+  - `sqlite_inserted_or_updated=5913`;
+  - `canonical_snapshot_rows_exported=5890`.
+- Estado global pós-PG654:
+  - `battle_and_oracle_ready=5987`;
+  - `battle_family_mapper_required=27889`;
+  - `snapshot_has_verified_rule=6015`;
+  - `snapshot_has_any_rule=7220`;
+  - fila Commander-legal: `target_identity_count=24966`,
+    `xmage_authoritative_adapter_required_count=24653`,
+    `xmage_authoritative_parser_gap_count=0`,
+    `xmage_missing_source_exception_count=313`,
+    `board_wipe::xmage_mass_removal_or_sacrifice_variant_review_v1=386`.
+- Gates finais:
+  - `python3 -m unittest test_xmage_authoritative_exact_scope_split.py test_xmage_exact_scope_runtime.py`
+    -> `Ran 1223 tests ... OK`;
   - `xmage_strategy_consistency_audit` -> `26/26`;
   - `pg_hermes_sqlite_contract_audit` com wrapper do servidor novo -> `51/51`;
   - `operational_surface_alignment_audit` -> `pass`;

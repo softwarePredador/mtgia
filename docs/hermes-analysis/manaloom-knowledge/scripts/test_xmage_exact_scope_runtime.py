@@ -18458,6 +18458,223 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_dynamic_damage_wipe_counts_battlefield_creatures_and_controlled_gates(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.battlefield.append({"name": "Own Bear", "type_line": "Creature - Bear", "toughness": 3})
+        opponent.battlefield.extend(
+            [
+                {"name": "Opp Small", "type_line": "Creature - Goblin", "toughness": 3},
+                {"name": "Opp Large", "type_line": "Creature - Giant", "toughness": 4},
+            ]
+        )
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Fixture Chain Reaction", "type_line": "Sorcery"},
+            turn=15,
+            rng=random.Random(15),
+            effect_data_override={
+                "effect": "damage_wipe",
+                "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+                "amount": 0,
+                "damage": 0,
+                "damage_amount_source": "battlefield_permanent_count",
+                "battlefield_count_scope": "all_battlefields",
+                "battlefield_count_card_types": ["creature"],
+                "damage_scope": "each_creature",
+            },
+        )
+
+        self.assertEqual([card["name"] for card in active.graveyard if card.get("type_line", "").startswith("Creature")], ["Own Bear"])
+        self.assertEqual([card["name"] for card in opponent.battlefield], ["Opp Large"])
+        self.assertTrue(
+            any(
+                event == "damage_wipe_resolved"
+                and data.get("card") == "Fixture Chain Reaction"
+                and data.get("damage") == 3
+                and data.get("battlefield_damage_count") == 3
+                for event, data in self.events
+            )
+        )
+
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.battlefield.extend(
+            [
+                {"name": "Gate One", "type_line": "Land - Gate"},
+                {"name": "Gate Two", "type_line": "Land - Gate"},
+                {"name": "Mountain", "type_line": "Basic Land - Mountain"},
+            ]
+        )
+        opponent.battlefield.extend(
+            [
+                {"name": "Gate Victim", "type_line": "Creature - Goblin", "toughness": 2},
+                {"name": "Gate Survivor", "type_line": "Creature - Giant", "toughness": 3},
+            ]
+        )
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Fixture Gates Ablaze", "type_line": "Sorcery"},
+            turn=16,
+            rng=random.Random(16),
+            effect_data_override={
+                "effect": "damage_wipe",
+                "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+                "amount": 0,
+                "damage": 0,
+                "damage_amount_source": "battlefield_permanent_count",
+                "battlefield_count_scope": "controller_battlefield",
+                "battlefield_count_subtypes": ["gate"],
+                "damage_scope": "each_creature",
+            },
+        )
+
+        self.assertEqual([card["name"] for card in opponent.battlefield], ["Gate Survivor"])
+        self.assertTrue(
+            any(
+                event == "damage_wipe_resolved"
+                and data.get("card") == "Fixture Gates Ablaze"
+                and data.get("damage") == 2
+                and data.get("battlefield_damage_count") == 2
+                for event, data in self.events
+            )
+        )
+
+    def test_dynamic_damage_wipe_counts_graveyard_caves_and_green_devotion(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.graveyard.extend(
+            [
+                {"name": "Past Instant", "type_line": "Instant"},
+                {"name": "Past Sorcery", "type_line": "Sorcery"},
+                {"name": "Past Creature", "type_line": "Creature - Bear"},
+            ]
+        )
+        active.battlefield.append({"name": "Own Safe", "type_line": "Creature - Bear", "toughness": 2})
+        opponent.battlefield.extend(
+            [
+                {"name": "Opp Burned", "type_line": "Creature - Goblin", "toughness": 2},
+                {"name": "Opp Survives", "type_line": "Creature - Giant", "toughness": 3},
+                {"name": "Opp Walker", "type_line": "Planeswalker - Test", "loyalty": 2},
+            ]
+        )
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Fixture Immolating Gyre", "type_line": "Sorcery"},
+            turn=17,
+            rng=random.Random(17),
+            effect_data_override={
+                "effect": "damage_wipe",
+                "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+                "amount": 0,
+                "damage": 0,
+                "damage_amount_source": "graveyard_card_count",
+                "graveyard_count_scope": "controller_graveyard",
+                "graveyard_count_card_types": ["instant", "sorcery"],
+                "damage_scope": "each_creature_and_planeswalker_opponents_control",
+            },
+        )
+
+        self.assertEqual([card["name"] for card in active.battlefield], ["Own Safe"])
+        self.assertEqual([card["name"] for card in opponent.battlefield], ["Opp Survives"])
+        self.assertTrue(
+            any(
+                event == "damage_wipe_resolved"
+                and data.get("card") == "Fixture Immolating Gyre"
+                and data.get("damage") == 2
+                and data.get("graveyard_damage_count") == 2
+                and data.get("planeswalkers_destroyed") == 1
+                for event, data in self.events
+            )
+        )
+
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.battlefield.append({"name": "Controlled Cave", "type_line": "Land - Cave"})
+        active.graveyard.append({"name": "Buried Cave", "type_line": "Land - Cave"})
+        opponent.battlefield.extend(
+            [
+                {"name": "Cave Victim", "type_line": "Creature - Goblin", "toughness": 2},
+                {"name": "Cave Walker", "type_line": "Planeswalker - Test", "loyalty": 2},
+            ]
+        )
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Fixture Calamitous Cave-In", "type_line": "Sorcery"},
+            turn=18,
+            rng=random.Random(18),
+            effect_data_override={
+                "effect": "damage_wipe",
+                "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+                "amount": 0,
+                "damage": 0,
+                "damage_amount_source": "caves_controlled_plus_cave_cards_in_graveyard",
+                "damage_scope": "each_creature_and_planeswalker",
+            },
+        )
+
+        self.assertEqual([card["name"] for card in opponent.battlefield], [])
+        self.assertTrue(
+            any(
+                event == "damage_wipe_resolved"
+                and data.get("card") == "Fixture Calamitous Cave-In"
+                and data.get("damage") == 2
+                and data.get("controlled_caves_count") == 1
+                and data.get("graveyard_cave_cards_count") == 1
+                for event, data in self.events
+            )
+        )
+
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.battlefield.extend(
+            [
+                {"name": "Green Devotee", "type_line": "Creature - Elf", "mana_cost": "{G}{G}"},
+                {"name": "Hybrid Devotee", "type_line": "Enchantment", "mana_cost": "{2/G}"},
+            ]
+        )
+        opponent.battlefield.extend(
+            [
+                {"name": "Flying Victim", "type_line": "Creature - Bird", "keywords": ["flying"], "toughness": 3},
+                {"name": "Ground Safe", "type_line": "Creature - Bear", "toughness": 3},
+            ]
+        )
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Fixture Skyreaping", "type_line": "Sorcery"},
+            turn=19,
+            rng=random.Random(19),
+            effect_data_override={
+                "effect": "damage_wipe",
+                "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+                "amount": 0,
+                "damage": 0,
+                "damage_amount_source": "devotion_to_green",
+                "damage_scope": "each_flying_creature",
+            },
+        )
+
+        self.assertEqual([card["name"] for card in opponent.battlefield], ["Ground Safe"])
+        self.assertTrue(
+            any(
+                event == "damage_wipe_resolved"
+                and data.get("card") == "Fixture Skyreaping"
+                and data.get("damage") == 3
+                and data.get("devotion_to_green") == 3
+                for event, data in self.events
+            )
+        )
+
     def test_damage_wipe_respects_damaged_this_turn_scope(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

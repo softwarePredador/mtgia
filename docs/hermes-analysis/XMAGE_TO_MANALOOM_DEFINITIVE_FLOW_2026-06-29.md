@@ -18880,6 +18880,77 @@ Evidence:
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260708_post_pg652b_hash_backfill_new_server_recheck.md`
 - `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260708_post_pg652b_hash_backfill_new_server.md`
 
+## 2026-07-08 - PG653 Hash Repair and PG654 Dynamic Damage Wipe Checkpoint
+
+PG653 re-ran the trusted executable `oracle_hash` repair against the new-server
+target as an auditable metadata-only package. It did not change `effect_json`,
+`deck_role_json`, review status, execution status, or runtime behavior.
+Precheck found `44` backfillable rule rows across `43` card ids and
+`44` normalized names with `unsafe_missing_hash_rows=0`; apply repaired
+`44` rows; postcheck confirmed
+`remaining_trusted_executable_missing_hash_rows=0` and
+`repaired_rows_with_expected_hash=44`.
+
+PG654 closed the next exact `DamageAllEffect` subpattern where XMage provides a
+dynamic count that the ManaLoom runtime can compute without cast-payment color
+history:
+
+- runtime contract added:
+  `damage_amount_source=caves_controlled_plus_cave_cards_in_graveyard`,
+  `battlefield_permanent_count`, `graveyard_card_count`, and
+  `devotion_to_green` for `damage_wipe`;
+- replay evidence added: `battlefield_damage_count`,
+  `graveyard_damage_count`, `controlled_caves_count`,
+  `graveyard_cave_cards_count`, and `devotion_to_green`;
+- opponent-only creature/planeswalker wipe scope added:
+  `each_creature_and_planeswalker_opponents_control`;
+- promoted cards: `Calamitous Cave-In`, `Chain Reaction`, `Gates Ablaze`,
+  `Immolating Gyre`, and `Skyreaping`;
+- residual boundary: `Radiant Flames` remains blocked because
+  `ColorsOfManaSpentToCastCount` requires reliable colors-of-mana-spent
+  cast context before it can become executable ManaLoom truth.
+
+Final post-PG654 state:
+
+- PG -> Hermes/SQLite sync:
+  `pg_rows_loaded=5927`, `sqlite_inserted_or_updated=5913`,
+  `canonical_snapshot_rows_exported=5890`;
+- E2E package validation passed PostgreSQL, SQLite/Hermes, canonical snapshot,
+  and `runtime_get_card_effect` for all `5` selected cards;
+- focused tests:
+  `python3 -m unittest test_xmage_authoritative_exact_scope_split.py test_xmage_exact_scope_runtime.py`
+  passed `1223` tests;
+- global readiness:
+  `battle_and_oracle_ready=5987`, `battle_family_mapper_required=27889`,
+  `snapshot_has_verified_rule=6015`, `snapshot_has_any_rule=7220`;
+- authoritative queue:
+  `target_identity_count=24966`,
+  `xmage_authoritative_source_count=24653`,
+  `xmage_missing_source_exception_count=313`,
+  `xmage_authoritative_parser_gap_count=0`,
+  `xmage_authoritative_adapter_required_count=24653`,
+  `board_wipe::xmage_mass_removal_or_sacrifice_variant_review_v1=386`;
+- final exact-scope recheck returned `proposal_count=0` and
+  `safe_for_batch_pg_package_count=0`;
+- validation gates:
+  `xmage_strategy_consistency_audit` passed `26/26`,
+  `pg_hermes_sqlite_contract_audit` passed `51/51` with the new-server wrapper,
+  `operational_surface_alignment_audit` passed, and
+  `legacy_contamination_audit` passed.
+
+Evidence:
+
+- `docs/hermes-analysis/master_optimizer_reports/pg653_trusted_oracle_hash_repair_new_server_package.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg653_trusted_oracle_hash_repair_new_server_battle_rule_sync.json`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260708_pg654_dynamic_damage_wipe_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg654_dynamic_damage_wipe_new_server_package_package.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg654_dynamic_damage_wipe_new_server_battle_rule_sync.json`
+- `docs/hermes-analysis/master_optimizer_reports/pg654_dynamic_damage_wipe_new_server_e2e_validation.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260708_post_pg654_dynamic_damage_wipe_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260708_post_pg654_dynamic_damage_wipe_new_server_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260708_post_pg654_dynamic_damage_wipe_new_server_recheck.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260708_post_pg654_dynamic_damage_wipe_new_server.md`
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

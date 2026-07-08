@@ -51017,6 +51017,24 @@ def _controlled_permanents_mana_symbol_count(player, color):
     return total
 
 
+def devotion_to_color(player, color):
+    symbol = _color_symbol(color)
+    if symbol not in SYMBOL_TO_COLOR_NAME:
+        return 0
+    devotion = 0
+    for permanent in _controlled_permanents(player):
+        mana_cost = str(permanent.get("mana_cost") or "").upper()
+        for mana_symbol in re.findall(r"\{([^}]+)\}", mana_cost):
+            parts = {part.strip() for part in mana_symbol.split("/") if part.strip()}
+            if symbol in parts:
+                devotion += 1
+    return devotion
+
+
+def green_devotion(player):
+    return devotion_to_color(player, "G")
+
+
 def _stat_modifier_count_from_source(player, opponents, effect_data):
     amount_source = str(effect_data.get("stat_modifier_amount_source") or "").lower()
     if amount_source == "graveyard_card_count":
@@ -51170,6 +51188,30 @@ def _dynamic_damage_count_from_source(player, opponents, effect_data):
             "damage_amount_source": amount_source,
             "other_spells_cast_this_turn": count,
         }
+    if amount_source == "caves_controlled_plus_cave_cards_in_graveyard":
+        controlled_caves = sum(
+            1
+            for permanent in getattr(player, "battlefield", []) or []
+            if permanent_has_subtype(permanent, "cave")
+        )
+        graveyard_caves = sum(
+            1
+            for graveyard_card in getattr(player, "graveyard", []) or []
+            if permanent_has_subtype(graveyard_card, "cave")
+        )
+        count = controlled_caves + graveyard_caves
+        return count, {
+            "damage_amount_source": amount_source,
+            "controlled_caves_count": controlled_caves,
+            "graveyard_cave_cards_count": graveyard_caves,
+            "caves_controlled_plus_cave_cards_in_graveyard": count,
+        }
+    if amount_source == "devotion_to_green":
+        count = green_devotion(player)
+        return count, {
+            "damage_amount_source": amount_source,
+            "devotion_to_green": count,
+        }
     if amount_source == "colors_among_permanents_you_control":
         count = _controlled_permanent_color_count(player)
         return count, {
@@ -51213,6 +51255,8 @@ def dynamic_damage_amount(player, opponents, effect_data):
         "controller_hand_count",
         "target_hand_count",
         "other_spells_cast_this_turn",
+        "caves_controlled_plus_cave_cards_in_graveyard",
+        "devotion_to_green",
         "domain_basic_land_types",
         "colors_among_permanents_you_control",
         "party_count",
@@ -52088,6 +52132,7 @@ def apply_damage_wipe(player, opponents, card, effect_data, turn, *, finish_spel
         in {
             "opponent_creatures",
             "each_creature_opponents_control",
+            "each_creature_and_planeswalker_opponents_control",
             "creatures_opponents_control",
         }
         else [player] + list(opponents)
@@ -52217,7 +52262,10 @@ def apply_damage_wipe(player, opponents, card, effect_data, turn, *, finish_spel
                 continue
 
             if (
-                damage_scope == "each_creature_and_planeswalker"
+                damage_scope in {
+                    "each_creature_and_planeswalker",
+                    "each_creature_and_planeswalker_opponents_control",
+                }
                 and is_planeswalker_permanent(permanent)
             ):
                 planeswalkers_seen += 1
@@ -52275,6 +52323,14 @@ def apply_damage_wipe(player, opponents, card, effect_data, turn, *, finish_spel
         damage_exclude_tokens=damage_exclude_tokens,
         damage_amount_source=effect_data.get("damage_amount_source"),
         x_value=effect_data.get("x_value"),
+        graveyard_damage_count=effect_data.get("graveyard_damage_count"),
+        battlefield_damage_count=effect_data.get("battlefield_damage_count"),
+        controlled_caves_count=effect_data.get("controlled_caves_count"),
+        graveyard_cave_cards_count=effect_data.get("graveyard_cave_cards_count"),
+        devotion_to_green=effect_data.get("devotion_to_green"),
+        controlled_permanents_mana_symbol_count=effect_data.get(
+            "controlled_permanents_mana_symbol_count"
+        ),
         current_spell_mana_value=card_mana_value(card),
         spell_mana_value_cast_this_turn=getattr(
             player,

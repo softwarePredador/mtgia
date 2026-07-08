@@ -18298,6 +18298,138 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "board_wipe_damage_source_scope_mismatch")
 
+    def test_dynamic_damage_all_creatures_counts_all_creatures_on_battlefield(self) -> None:
+        row = queue_row(split.BOARD_WIPE_UNIT, effect_classes=["DamageAllEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Chain Reaction",
+                oracle_text="Chain Reaction deals X damage to each creature, where X is the number of creatures on the battlefield.",
+            ),
+            source_text=(
+                "Effect effect = new DamageAllEffect("
+                "new PermanentsOnBattlefieldCount(new FilterCreaturePermanent()), "
+                "new FilterCreaturePermanent());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["damage_amount_source"], "battlefield_permanent_count")
+        self.assertEqual(effect["battlefield_count_scope"], "all_battlefields")
+        self.assertEqual(effect["battlefield_count_card_types"], ["creature"])
+        self.assertEqual(effect["damage_scope"], "each_creature")
+
+    def test_dynamic_damage_all_creatures_counts_controlled_gates(self) -> None:
+        row = queue_row(split.BOARD_WIPE_UNIT, effect_classes=["DamageAllEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Gates Ablaze",
+                oracle_text="Gates Ablaze deals X damage to each creature, where X is the number of Gates you control.",
+            ),
+            source_text=(
+                "private static final FilterPermanent filter = new FilterControlledPermanent();"
+                "static { filter.add(SubType.GATE.getPredicate()); }"
+                "private static final DynamicValue xValue = new PermanentsOnBattlefieldCount(filter);"
+                "this.getSpellAbility().addEffect(new DamageAllEffect("
+                "xValue, StaticFilters.FILTER_PERMANENT_CREATURE));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["damage_amount_source"], "battlefield_permanent_count")
+        self.assertEqual(effect["battlefield_count_scope"], "controller_battlefield")
+        self.assertEqual(effect["battlefield_count_subtypes"], ["gate"])
+
+    def test_dynamic_damage_all_opponent_creatures_planeswalkers_counts_graveyard_spells(self) -> None:
+        row = queue_row(split.BOARD_WIPE_UNIT, effect_classes=["DamageAllEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Immolating Gyre",
+                oracle_text=(
+                    "Immolating Gyre deals X damage to each creature and planeswalker you don't control, "
+                    "where X is the number of instant and sorcery cards in your graveyard."
+                ),
+            ),
+            source_text=(
+                "DynamicValue xValue = new CardsInControllerGraveyardCount("
+                "StaticFilters.FILTER_CARD_INSTANT_AND_SORCERY);"
+                "FilterPermanent filter = new FilterCreatureOrPlaneswalkerPermanent();"
+                "filter.add(TargetController.NOT_YOU.getControllerPredicate());"
+                "this.getSpellAbility().addEffect(new DamageAllEffect(xValue, filter));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["damage_amount_source"], "graveyard_card_count")
+        self.assertEqual(effect["graveyard_count_card_types"], ["instant", "sorcery"])
+        self.assertEqual(effect["damage_scope"], "each_creature_and_planeswalker_opponents_control")
+
+    def test_dynamic_damage_all_creatures_planeswalkers_counts_caves(self) -> None:
+        row = queue_row(split.BOARD_WIPE_UNIT, effect_classes=["DamageAllEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Calamitous Cave-In",
+                oracle_text=(
+                    "Calamitous Cave-In deals X damage to each creature and each planeswalker, "
+                    "where X is the number of Caves you control plus the number of Cave cards in your graveyard."
+                ),
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new DamageAllEffect("
+                "CavesControlledAndInGraveCount.WHERE_X, "
+                "StaticFilters.FILTER_PERMANENT_CREATURE_OR_PLANESWALKER));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["damage_amount_source"], "caves_controlled_plus_cave_cards_in_graveyard")
+        self.assertEqual(effect["damage_scope"], "each_creature_and_planeswalker")
+
+    def test_dynamic_damage_all_flying_creatures_counts_green_devotion(self) -> None:
+        row = queue_row(split.BOARD_WIPE_UNIT, effect_classes=["DamageAllEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Skyreaping",
+                oracle_text="Skyreaping deals damage to each creature with flying equal to your devotion to green.",
+            ),
+            source_text=(
+                "Effect effect = new DamageAllEffect(DevotionCount.G, StaticFilters.FILTER_CREATURE_FLYING);"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["damage_amount_source"], "devotion_to_green")
+        self.assertEqual(effect["damage_scope"], "each_flying_creature")
+
+    def test_dynamic_damage_all_converge_stays_blocked_without_mana_spent_context(self) -> None:
+        row = queue_row(split.BOARD_WIPE_UNIT, effect_classes=["DamageAllEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Radiant Flames",
+                oracle_text=(
+                    "Converge — Radiant Flames deals X damage to each creature, "
+                    "where X is the number of colors of mana spent to cast this spell."
+                ),
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new DamageAllEffect("
+                "ColorsOfManaSpentToCastCount.getInstance(), new FilterCreaturePermanent()));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertIn(reason, {"board_wipe_oracle_not_simple", "board_wipe_damage_amount_not_fixed"})
+
     def test_storm_inside_card_name_does_not_count_as_complexity_keyword(self) -> None:
         row = queue_row(split.BOARD_WIPE_UNIT, effect_classes=["DamageAllEffect"])
         proposal, reason = split.split_row(
