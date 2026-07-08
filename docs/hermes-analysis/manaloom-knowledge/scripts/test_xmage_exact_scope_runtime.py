@@ -8831,6 +8831,95 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_composite_global_boost_draw_spell_resolves_both_components_once(self) -> None:
+        active = self.battle.Player("Active", None, [{"name": "Drawn Card"}])
+        opponent = self.battle.Player("Opponent", None, [])
+        attacking = {"name": "Active Attacker", "type_line": "Creature - Bear", "power": 2, "toughness": 2, "attacking": True}
+        idle = {"name": "Idle Bear", "type_line": "Creature - Bear", "power": 2, "toughness": 2}
+        enemy_attacking = {
+            "name": "Enemy Attacker",
+            "type_line": "Creature - Goblin",
+            "power": 1,
+            "toughness": 1,
+            "attacking": True,
+        }
+        active.battlefield = [attacking, idle]
+        opponent.battlefield = [enemy_attacking]
+        effect = {
+            "effect": "composite_resolution",
+            "battle_model_scope": "xmage_fixed_boost_all_or_opponents_creatures_until_eot_draw_card_spell_v1",
+            "target": "attacking_creatures",
+            "target_controller": "all",
+            "target_constraints": {
+                "card_types": ["creature"],
+                "creature_filter": {"combat_state": "attacking"},
+            },
+            "creature_filter": {"combat_state": "attacking"},
+            "power_delta": -2,
+            "toughness_delta": 0,
+            "draw_count": 1,
+            "_composite_rule_components": [
+                {
+                    "effect": "global_stat_modifier_until_eot",
+                    "battle_model_scope": "xmage_fixed_boost_filtered_creatures_until_eot_spell_v1",
+                    "target": "attacking_creatures",
+                    "target_controller": "all",
+                    "target_constraints": {
+                        "card_types": ["creature"],
+                        "creature_filter": {"combat_state": "attacking"},
+                    },
+                    "creature_filter": {"combat_state": "attacking"},
+                    "power_delta": -2,
+                    "toughness_delta": 0,
+                    "compose_on_resolution": True,
+                },
+                {
+                    "effect": "draw_cards",
+                    "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+                    "count": 1,
+                    "compose_on_resolution": True,
+                },
+            ],
+        }
+        card = {
+            "name": "Fixture Hydrolash",
+            "type_line": "Instant",
+            "oracle_text": "Attacking creatures get -2/-0 until end of turn. Draw a card.",
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            card,
+            turn=6,
+            rng=random.Random(49),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(attacking["power"], 0)
+        self.assertEqual(idle["power"], 2)
+        self.assertEqual(enemy_attacking["power"], -1)
+        self.assertEqual([card["name"] for card in active.hand], ["Drawn Card"])
+        self.assertEqual([card["name"] for card in active.graveyard], ["Fixture Hydrolash"])
+        self.assertTrue(
+            any(
+                event == "global_stat_modifier_until_eot_resolved"
+                and data.get("card") == "Fixture Hydrolash"
+                and data.get("affected_count") == 2
+                and data.get("creature_filter") == {"combat_state": "attacking"}
+                for event, data in self.events
+            )
+        )
+        self.assertTrue(
+            any(
+                event == "composite_rule_resolved"
+                and data.get("card") == "Fixture Hydrolash"
+                and data.get("components_applied") == 2
+                and data.get("components_skipped") == 0
+                for event, data in self.events
+            )
+        )
+
     def test_composite_keyword_draw_spell_grants_keyword_and_draws(self) -> None:
         active = self.battle.Player("Active", None, [{"name": "Fresh Card"}])
         opponent = self.battle.Player("Opponent", None, [])

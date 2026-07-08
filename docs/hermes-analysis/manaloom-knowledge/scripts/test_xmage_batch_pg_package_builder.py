@@ -2045,6 +2045,54 @@ def test_manifest_builds_boost_scry_spell_execution_scenario() -> None:
     assert scenario["expected_scry_count"] == 1
 
 
+def test_manifest_builds_global_boost_draw_spell_execution_scenario() -> None:
+    rule = {
+        "normalized_name": "hydrolash",
+        "card_name": "Hydrolash",
+        "oracle_hash": "hash-hydrolash",
+        "logical_rule_key": "battle_rule_v1:hash-hydrolash",
+        "required_effect_fields": {
+            "effect": "composite_resolution",
+            "battle_model_scope": "xmage_fixed_boost_all_or_opponents_creatures_until_eot_draw_card_spell_v1",
+            "target": "attacking_creatures",
+            "target_controller": "all",
+            "target_constraints": {
+                "card_types": ["creature"],
+                "creature_filter": {"combat_state": "attacking"},
+            },
+            "creature_filter": {"combat_state": "attacking"},
+            "power_delta": -2,
+            "toughness_delta": 0,
+            "draw_count": 1,
+            "_composite_rule_components": [
+                {
+                    "effect": "global_stat_modifier_until_eot",
+                    "battle_model_scope": "xmage_fixed_boost_filtered_creatures_until_eot_spell_v1",
+                    "target_controller": "all",
+                    "creature_filter": {"combat_state": "attacking"},
+                    "power_delta": -2,
+                    "toughness_delta": 0,
+                },
+                {
+                    "effect": "draw_cards",
+                    "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+                    "count": 1,
+                },
+            ],
+        },
+    }
+
+    scenario = builder.global_stat_modifier_draw_spell_execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "global_stat_modifier_draw_spell"
+    assert scenario["expected_power_delta"] == -2
+    assert scenario["expected_toughness_delta"] == 0
+    assert scenario["expected_draw_count"] == 1
+    assert scenario["expected_affected_count"] == 2
+    assert scenario["expected_creature_filter"] == {"combat_state": "attacking"}
+
+
 def test_manifest_builds_controlled_stat_modifier_filtered_execution_scenario() -> None:
     rule = {
         "normalized_name": "guardians' pledge",

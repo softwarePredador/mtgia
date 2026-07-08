@@ -289,6 +289,7 @@ EXILE_SCRY_SCOPE = "xmage_exile_target_and_scry_spell_v1"
 BOUNCE_SCRY_SCOPE = "xmage_return_target_to_hand_and_scry_spell_v1"
 DAMAGE_DRAW_SCOPE = "xmage_fixed_damage_target_and_draw_card_spell_v1"
 BOOST_DRAW_SCOPE = "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1"
+BOOST_ALL_DRAW_SCOPE = "xmage_fixed_boost_all_or_opponents_creatures_until_eot_draw_card_spell_v1"
 BOOST_SCRY_SCOPE = "xmage_fixed_boost_target_creature_until_eot_scry_spell_v1"
 KEYWORD_DRAW_SCOPE = "xmage_fixed_keyword_target_creature_until_eot_draw_card_spell_v1"
 BOOST_KEYWORD_DRAW_SCOPE = "xmage_fixed_boost_keyword_target_creature_until_eot_draw_card_spell_v1"
@@ -9522,6 +9523,84 @@ def fixed_boost_all_from_source(source: str) -> tuple[int, int, str, dict[str, A
         if isinstance(creature_filter, str):
             return creature_filter
     return int(power_raw), int(toughness_raw), controller_scope, creature_filter
+
+
+def fixed_draw_count_from_oracle_sentence(sentence: str) -> int | None:
+    text = strip_parenthetical_reminders(str(sentence or ""))
+    text = re.sub(r"\s+", " ", text).strip().lower()
+    match = re.fullmatch(r"draw (?P<count>a|an|one|two|three|four|five|six|seven|eight|nine|ten|\d+) cards?\.?", text)
+    if not match:
+        return None
+    count_token = match.group("count")
+    if count_token in {"a", "an"}:
+        return 1
+    count = COUNT_WORDS.get(count_token) or (int(count_token) if count_token.isdigit() else 0)
+    return count if count > 0 else None
+
+
+def simple_oracle_sentences(text: str) -> list[str]:
+    normalized = strip_parenthetical_reminders(str(text or ""))
+    sentences: list[str] = []
+    for paragraph in re.split(r"\n+", normalized):
+        paragraph = re.sub(r"\s+", " ", paragraph).strip()
+        if not paragraph:
+            continue
+        sentences.extend(part.strip() for part in re.split(r"(?<=\.)\s+", paragraph) if part.strip())
+    return sentences
+
+
+def fixed_boost_all_draw_from_oracle(
+    metadata: dict[str, Any],
+) -> tuple[int, int, str, dict[str, Any] | None, int, str] | None:
+    sentences = simple_oracle_sentences(oracle_text(metadata))
+    if len(sentences) != 2:
+        return None
+    boost: tuple[int, int, str, dict[str, Any] | None] | None = None
+    draw_count: int | None = None
+    order: list[str] = []
+    for sentence in sentences:
+        draw = fixed_draw_count_from_oracle_sentence(sentence)
+        if draw is not None:
+            if draw_count is not None:
+                return None
+            draw_count = draw
+            order.append("draw")
+            continue
+        boost_result = fixed_boost_all_from_oracle({**metadata, "oracle_text": sentence})
+        if isinstance(boost_result, str) or boost_result is None:
+            return None
+        if boost is not None:
+            return None
+        boost = boost_result
+        order.append("boost")
+    if boost is None or draw_count is None or len(order) != 2:
+        return None
+    resolution_order = "draw_then_boost" if order == ["draw", "boost"] else "boost_then_draw"
+    return (*boost, draw_count, resolution_order)
+
+
+def fixed_boost_all_draw_from_source(
+    source: str,
+) -> tuple[int, int, str, dict[str, Any] | None, int, str] | str | None:
+    text = source or ""
+    if len(re.findall(r"new\s+DrawCardSourceControllerEffect\s*\(", text)) != 1:
+        return None
+    boost = fixed_boost_all_from_source(text)
+    if isinstance(boost, str) or boost is None:
+        return boost
+    draw_count = java_constructor_int_or_noarg_default(
+        text,
+        "DrawCardSourceControllerEffect",
+        noarg_default=1,
+    )
+    if draw_count is None or draw_count <= 0:
+        return None
+    boost_match = re.search(r"new\s+BoostAllEffect\s*\(", text)
+    draw_match = re.search(r"new\s+DrawCardSourceControllerEffect\s*\(", text)
+    if not boost_match or not draw_match:
+        return None
+    order = "draw_then_boost" if draw_match.start() < boost_match.start() else "boost_then_draw"
+    return (*boost, draw_count, order)
 
 
 def fixed_boost_keyword_target_from_oracle(metadata: dict[str, Any]) -> tuple[int, int, str, str] | None:
@@ -22756,6 +22835,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "fixed counter-target spell with target-controller life loss"
     elif scope == BOOST_DRAW_SCOPE:
         scope_kind = "fixed target-creature boost plus draw-card spell"
+    elif scope == BOOST_ALL_DRAW_SCOPE:
+        scope_kind = "fixed all/opponents/filtered-creature boost plus draw-card spell"
     elif scope == KEYWORD_DRAW_SCOPE:
         scope_kind = "fixed target-creature keyword plus draw-card spell"
     elif scope == BOOST_KEYWORD_DRAW_SCOPE:
@@ -29593,6 +29674,87 @@ def split_row(
                 family_id="xmage_fixed_damage_draw_card_spell",
             ), "selected_exact_scope"
 
+        if classes == {"BoostAllEffect", "DrawCardSourceControllerEffect"}:
+            unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+            if unsupported_abilities:
+                return None, "boost_all_draw_ability_class_not_simple"
+            oracle_boost = fixed_boost_all_draw_from_oracle(metadata)
+            if oracle_boost is None:
+                return None, "boost_all_draw_oracle_not_exact_fixed"
+            source_boost = fixed_boost_all_draw_from_source(source_text)
+            if isinstance(source_boost, str):
+                return None, source_boost
+            if source_boost is None:
+                return None, "boost_all_draw_source_not_fixed"
+            if source_boost != oracle_boost:
+                return None, "boost_all_draw_source_oracle_mismatch"
+            power, toughness, controller_scope, creature_filter, draw_count, order = oracle_boost
+            component_scope = BOOST_ALL_FILTERED_SPELL_SCOPE if creature_filter else BOOST_ALL_SPELL_SCOPE
+            if controller_scope == "opponents":
+                target = "opponents_creatures"
+            elif creature_filter:
+                target = boost_all_filter_label(creature_filter)
+            else:
+                target = "all_creatures"
+            target_constraints = {"card_types": ["creature"]}
+            if controller_scope == "opponents":
+                target_constraints["controller"] = "opponents"
+            if creature_filter:
+                target_constraints["creature_filter"] = creature_filter
+            boost_component = {
+                "effect": "global_stat_modifier_until_eot",
+                "battle_model_scope": component_scope,
+                "target": target,
+                "target_controller": controller_scope,
+                "target_constraints": target_constraints,
+                "power_delta": power,
+                "toughness_delta": toughness,
+                "power_boost": power,
+                "toughness_boost": toughness,
+                "duration": "until_end_of_turn",
+                "compose_on_resolution": True,
+                "xmage_effect_class": "BoostAllEffect",
+            }
+            if creature_filter:
+                boost_component["creature_filter"] = creature_filter
+            draw_component = {
+                "effect": "draw_cards",
+                "battle_model_scope": DRAW_SCOPE,
+                "count": draw_count,
+                "compose_on_resolution": True,
+                "xmage_effect_class": "DrawCardSourceControllerEffect",
+            }
+            components = (
+                [draw_component, boost_component]
+                if order == "draw_then_boost"
+                else [boost_component, draw_component]
+            )
+            effect_json = {
+                "effect": "composite_resolution",
+                "battle_model_scope": BOOST_ALL_DRAW_SCOPE,
+                "target": target,
+                "target_controller": controller_scope,
+                "target_constraints": target_constraints,
+                "power_delta": power,
+                "toughness_delta": toughness,
+                "power_boost": power,
+                "toughness_boost": toughness,
+                "draw_count": draw_count,
+                "count": draw_count,
+                "resolution_order": order,
+                "_composite_rule_components": components,
+                "xmage_effect_classes": ["BoostAllEffect", "DrawCardSourceControllerEffect"],
+                **flags,
+            }
+            if creature_filter:
+                effect_json["creature_filter"] = creature_filter
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_fixed_boost_all_draw_card_spell",
+            ), "selected_exact_scope"
+
         if classes == {"BoostTargetEffect", "DrawCardSourceControllerEffect"}:
             unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
             if unsupported_abilities:
@@ -33618,6 +33780,7 @@ def build_exact_split_report(
                 "draw_cards::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect + PutCardFromHandOntoBattlefieldEffect, exact fixed draw count, exact land-card-from-hand target, optional tapped entry, and draw-then-put-land runtime metadata",
                 "draw_cards::xmage_draw_card_variant_review_v1 rows with GainAbilityTargetEffect + DrawCardSourceControllerEffect, exact target-creature keyword until EOT, and fixed draw-one Oracle/source agreement",
                 "draw_cards::xmage_draw_card_variant_review_v1 rows with DrawDiscardControllerEffect or fixed DrawCardSourceControllerEffect + DiscardControllerEffect, exact Oracle/source draw-discard order agreement, and optional random discard metadata",
+                "draw_cards::xmage_draw_card_variant_review_v1 rows with BoostAllEffect + DrawCardSourceControllerEffect, exact fixed all/opponents/filtered-creature boost until EOT plus fixed draw, and Oracle/source order agreement",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with PutOnLibraryTargetEffect, no extra ability class, exact graveyard-to-library top/bottom Oracle text, and self-graveyard targets only",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with RevealLibraryPickControllerEffect, no extra ability class, exact reveal-top-library pick-to-hand Oracle/source agreement, and graveyard rest destination",
                 "life_gain::xmage_life_gain_variant_review_v1 rows with DamageTargetEffect + GainLifeEffect and exact fixed damage/life-gain Oracle text",

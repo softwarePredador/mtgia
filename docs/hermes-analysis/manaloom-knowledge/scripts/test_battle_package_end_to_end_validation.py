@@ -153,6 +153,96 @@ def test_fixed_damage_target_spell_runner_executes_damage_and_cant_be_countered(
     assert result["cant_be_countered"] is True
 
 
+def test_global_stat_modifier_draw_spell_runner_executes_boost_and_draw() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "composite_resolution",
+        "battle_model_scope": "xmage_fixed_boost_all_or_opponents_creatures_until_eot_draw_card_spell_v1",
+        "target": "attacking_creatures",
+        "target_controller": "all",
+        "target_constraints": {
+            "card_types": ["creature"],
+            "creature_filter": {"combat_state": "attacking"},
+        },
+        "creature_filter": {"combat_state": "attacking"},
+        "power_delta": -2,
+        "toughness_delta": 0,
+        "draw_count": 1,
+        "_composite_rule_components": [
+            {
+                "effect": "global_stat_modifier_until_eot",
+                "battle_model_scope": "xmage_fixed_boost_filtered_creatures_until_eot_spell_v1",
+                "target": "attacking_creatures",
+                "target_controller": "all",
+                "target_constraints": {
+                    "card_types": ["creature"],
+                    "creature_filter": {"combat_state": "attacking"},
+                },
+                "creature_filter": {"combat_state": "attacking"},
+                "power_delta": -2,
+                "toughness_delta": 0,
+            },
+            {
+                "effect": "draw_cards",
+                "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+                "count": 1,
+            },
+        ],
+    }
+    try:
+        result = validator.run_global_stat_modifier_draw_spell(
+            battle,
+            {
+                "name": "Hydrolash globally modifies attacking creatures and draws 1",
+                "type": "global_stat_modifier_draw_spell",
+                "card": {"name": "Hydrolash", "type_line": "Instant"},
+                "controller_battlefield": [
+                    {
+                        "name": "E2E Controller Matching Creature",
+                        "type_line": "Creature - Soldier",
+                        "power": 2,
+                        "toughness": 2,
+                        "attacking": True,
+                    },
+                    {"name": "E2E Controller Nonmatching Permanent", "type_line": "Artifact", "power": 2, "toughness": 2},
+                ],
+                "opponent_battlefield": [
+                    {
+                        "name": "E2E Opponent Matching Creature",
+                        "type_line": "Creature - Soldier",
+                        "power": 2,
+                        "toughness": 2,
+                        "attacking": True,
+                    },
+                    {"name": "E2E Opponent Nonmatching Permanent", "type_line": "Artifact", "power": 2, "toughness": 2},
+                ],
+                "library": [{"name": "E2E Draw Card 1", "type_line": "Instant"}],
+                "expected_affected_names": [
+                    "E2E Controller Matching Creature",
+                    "E2E Opponent Matching Creature",
+                ],
+                "expected_affected_count": 2,
+                "expected_power_delta": -2,
+                "expected_toughness_delta": 0,
+                "expected_draw_count": 1,
+                "expected_target_controller": "all",
+                "expected_creature_filter": {"combat_state": "attacking"},
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["affected_count"] == 2
+    assert result["draw_count"] == 1
+    assert result["creature_filter"] == {"combat_state": "attacking"}
+
+
 def test_damage_target_create_treasure_runner_executes_damage_and_treasure() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

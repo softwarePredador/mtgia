@@ -5475,7 +5475,7 @@ def global_stat_modifier_creature_filter_matches(target, creature_filter):
     return True
 
 
-def resolve_global_stat_modifier_until_eot_spell(player, opponents, card, effect_data, turn):
+def resolve_global_stat_modifier_until_eot_spell(player, opponents, card, effect_data, turn, *, finish=True):
     power_delta = int(effect_data.get("power_delta") or effect_data.get("power_boost") or 0)
     toughness_delta = int(effect_data.get("toughness_delta") or effect_data.get("toughness_boost") or 0)
     creature_filter = effect_data.get("creature_filter") or {}
@@ -5535,7 +5535,8 @@ def resolve_global_stat_modifier_until_eot_spell(player, opponents, card, effect
         turn=turn,
         **replay_rule_fields(effect_data),
     )
-    finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+    if finish:
+        finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
     return affected
 
 
@@ -60818,6 +60819,32 @@ def resolve_composite_resolution_effect(player, opponents, card, effect_data, tu
                     {
                         "effect": component_effect,
                         "target": target.get("name", "?"),
+                        "power_delta": power_delta,
+                        "toughness_delta": toughness_delta,
+                    }
+                )
+        elif component_effect == "global_stat_modifier_until_eot":
+            component_payload = dict(component)
+            component_payload["_composite_component_index"] = index
+            affected = resolve_global_stat_modifier_until_eot_spell(
+                player,
+                opponents,
+                card,
+                component_payload,
+                turn,
+                finish=False,
+            )
+            power_delta = int(component.get("power_delta") or component.get("power_boost") or 0)
+            toughness_delta = int(component.get("toughness_delta") or component.get("toughness_boost") or 0)
+            if not affected:
+                outcome = "no_affected_creatures"
+                skipped.append({"effect": component_effect, "reason": outcome})
+            else:
+                outcome = "global_stat_modifier_until_eot_applied"
+                applied.append(
+                    {
+                        "effect": component_effect,
+                        "affected_count": len(affected),
                         "power_delta": power_delta,
                         "toughness_delta": toughness_delta,
                     }

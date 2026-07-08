@@ -8742,6 +8742,95 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "boost_draw_source_oracle_mismatch")
 
+    def test_fixed_boost_all_draw_spell_maps_hydrolash_pattern(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=["BoostAllEffect", "DrawCardSourceControllerEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Hydrolash",
+                oracle_text="Attacking creatures get -2/-0 until end of turn.\nDraw a card.",
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new BoostAllEffect("
+                "-2, 0, Duration.EndOfTurn, StaticFilters.FILTER_ATTACKING_CREATURES, false));"
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(1));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "composite_resolution")
+        self.assertEqual(effect["battle_model_scope"], split.BOOST_ALL_DRAW_SCOPE)
+        self.assertEqual(effect["target"], "attacking_creatures")
+        self.assertEqual(effect["target_controller"], "all")
+        self.assertEqual(effect["creature_filter"], {"combat_state": "attacking"})
+        self.assertEqual(effect["power_delta"], -2)
+        self.assertEqual(effect["toughness_delta"], 0)
+        self.assertEqual(effect["draw_count"], 1)
+        self.assertEqual(effect["resolution_order"], "boost_then_draw")
+        self.assertEqual(
+            [component["effect"] for component in effect["_composite_rule_components"]],
+            ["global_stat_modifier_until_eot", "draw_cards"],
+        )
+
+    def test_fixed_boost_all_draw_spell_maps_draw_first_opponents_pattern(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=["BoostAllEffect", "DrawCardSourceControllerEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Bewildering Blizzard",
+                oracle_text="Draw three cards. Creatures your opponents control get -3/-0 until end of turn.",
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(3));"
+                "this.getSpellAbility().addEffect(new BoostAllEffect("
+                "-3, 0, Duration.EndOfTurn, StaticFilters.FILTER_OPPONENTS_PERMANENT_CREATURES, false));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.BOOST_ALL_DRAW_SCOPE)
+        self.assertEqual(effect["target"], "opponents_creatures")
+        self.assertEqual(effect["target_controller"], "opponents")
+        self.assertEqual(effect["draw_count"], 3)
+        self.assertEqual(effect["resolution_order"], "draw_then_boost")
+        self.assertEqual(
+            [component["effect"] for component in effect["_composite_rule_components"]],
+            ["draw_cards", "global_stat_modifier_until_eot"],
+        )
+
+    def test_fixed_boost_all_draw_spell_blocks_dynamic_x(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=["BoostAllEffect", "DrawCardSourceControllerEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Pack Attack",
+                oracle_text=(
+                    "Attacking creatures get +X/+0 until end of turn, where X is the number of players being attacked. "
+                    "Draw a card."
+                ),
+            ),
+            source_text=(
+                "DynamicValue xValue = new AttackedPlayersCount();"
+                "this.getSpellAbility().addEffect(new BoostAllEffect("
+                "xValue, StaticValue.get(0), Duration.EndOfTurn, StaticFilters.FILTER_ATTACKING_CREATURES, false));"
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect());"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "boost_all_draw_oracle_not_exact_fixed")
+
     def test_fixed_boost_scry_spell_maps_battlewise_valor_pattern(self) -> None:
         row = queue_row(
             split.BOOST_SCRY_UNIT,

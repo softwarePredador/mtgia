@@ -5128,6 +5128,113 @@ def run_boost_scry_spell(
     }
 
 
+def run_global_stat_modifier_draw_spell(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    effect = battle.get_card_effect(card)
+    active = battle.Player(str(scenario.get("player") or "Spell Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
+    active.battlefield = [
+        battle.enrich_card(dict(permanent))
+        for permanent in scenario.get("controller_battlefield") or []
+    ]
+    opponent.battlefield = [
+        battle.enrich_card(dict(permanent))
+        for permanent in scenario.get("opponent_battlefield") or []
+    ]
+    active.library = [dict(library_card) for library_card in scenario.get("library") or []]
+    all_permanents = [*active.battlefield, *opponent.battlefield]
+    before_stats = {
+        permanent.get("name"): (
+            int(permanent.get("power") or 0),
+            int(permanent.get("toughness") or 0),
+        )
+        for permanent in all_permanents
+        if isinstance(permanent, dict)
+    }
+    expected_names = set(str(name) for name in scenario.get("expected_affected_names") or [])
+    before_events = len(events)
+    battle.apply_effect_immediate(
+        active,
+        [opponent],
+        battle.enrich_card({**card, **effect}),
+        turn=int(scenario.get("turn") or 7),
+        rng=random.Random(int(scenario.get("seed") or 6074)),
+        effect_data_override=effect,
+        phase=str(scenario.get("phase") or "precombat_main"),
+    )
+    power_delta = int(scenario.get("expected_power_delta") or effect.get("power_delta") or 0)
+    toughness_delta = int(scenario.get("expected_toughness_delta") or effect.get("toughness_delta") or 0)
+    for permanent in all_permanents:
+        name = str(permanent.get("name") or "")
+        before_power, before_toughness = before_stats.get(name, (0, 0))
+        expected_power = before_power + (power_delta if name in expected_names else 0)
+        expected_toughness = before_toughness + (toughness_delta if name in expected_names else 0)
+        if int(permanent.get("power") or 0) != expected_power:
+            fail("battle_execution", f"{card['name']} {name} power={permanent.get('power')!r}, expected {expected_power}")
+        if int(permanent.get("toughness") or 0) != expected_toughness:
+            fail(
+                "battle_execution",
+                f"{card['name']} {name} toughness={permanent.get('toughness')!r}, expected {expected_toughness}",
+            )
+    expected_draw_count = int(scenario.get("expected_draw_count") or effect.get("draw_count") or effect.get("count") or 1)
+    if len(active.hand) != expected_draw_count:
+        fail("battle_execution", f"{card['name']} drew {len(active.hand)} cards, expected {expected_draw_count}")
+    resolved_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "global_stat_modifier_until_eot_resolved"
+            and data.get("card") == card.get("name")
+        ),
+        None,
+    )
+    if resolved_event is None:
+        fail("battle_events", f"missing {card['name']} global stat modifier resolved event")
+    expected_affected_count = int(scenario.get("expected_affected_count") or len(expected_names))
+    if int(resolved_event.get("affected_count") or 0) != expected_affected_count:
+        fail(
+            "battle_events",
+            f"{card['name']} affected_count={resolved_event.get('affected_count')!r}, expected {expected_affected_count}",
+        )
+    expected_controller = str(scenario.get("expected_target_controller") or effect.get("target_controller") or "all")
+    if str(resolved_event.get("target_controller") or "") != expected_controller:
+        fail(
+            "battle_events",
+            f"{card['name']} target_controller={resolved_event.get('target_controller')!r}, expected {expected_controller!r}",
+        )
+    expected_filter = scenario.get("expected_creature_filter") or effect.get("creature_filter") or {}
+    if dict(resolved_event.get("creature_filter") or {}) != dict(expected_filter or {}):
+        fail(
+            "battle_events",
+            f"{card['name']} creature_filter={resolved_event.get('creature_filter')!r}, expected {expected_filter!r}",
+        )
+    composite_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "composite_rule_resolved"
+            and data.get("card") == card.get("name")
+            and int(data.get("components_applied") or 0) == 2
+            and int(data.get("components_skipped") or 0) == 0
+        ),
+        None,
+    )
+    if composite_event is None:
+        fail("battle_events", f"missing {card['name']} composite_rule_resolved event")
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "affected_count": expected_affected_count,
+        "draw_count": expected_draw_count,
+        "target_controller": expected_controller,
+        "creature_filter": dict(expected_filter or {}),
+    }
+
+
 def run_controlled_stat_modifier_until_eot(
     battle,
     scenario: dict[str, Any],
@@ -7320,6 +7427,7 @@ SCENARIO_RUNNERS = {
     "counter_target_response": run_counter_target_response,
     "stat_modifier_until_eot": run_stat_modifier_until_eot,
     "boost_scry_spell": run_boost_scry_spell,
+    "global_stat_modifier_draw_spell": run_global_stat_modifier_draw_spell,
     "static_controlled_power_toughness_boost": run_static_controlled_power_toughness_boost,
     "static_controlled_keyword": run_static_controlled_keyword,
     "static_graveyard_threshold_source_boost": run_static_graveyard_threshold_source_boost,

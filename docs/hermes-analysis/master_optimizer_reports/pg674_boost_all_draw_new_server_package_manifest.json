@@ -1,0 +1,647 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg674_boost_all_draw_new_server_boost_al_20260708_221124",
+  "deploy_id": "pg674_boost_all_draw_new_server",
+  "execution_scenarios": [
+    {
+      "card": {
+        "name": "Bewildering Blizzard",
+        "type_line": "Instant"
+      },
+      "controller_battlefield": [
+        {
+          "name": "E2E Controller Matching Creature",
+          "power": 2,
+          "toughness": 2,
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "name": "E2E Controller Nonmatching Permanent",
+          "power": 2,
+          "toughness": 2,
+          "type_line": "Artifact"
+        }
+      ],
+      "expected_affected_count": 1,
+      "expected_affected_names": [
+        "E2E Opponent Matching Creature"
+      ],
+      "expected_creature_filter": {},
+      "expected_draw_count": 3,
+      "expected_power_delta": -3,
+      "expected_target_controller": "opponents",
+      "expected_toughness_delta": 0,
+      "library": [
+        {
+          "effect": "draw_cards",
+          "name": "E2E Draw Card 1",
+          "type_line": "Instant"
+        },
+        {
+          "effect": "draw_cards",
+          "name": "E2E Draw Card 2",
+          "type_line": "Instant"
+        },
+        {
+          "effect": "draw_cards",
+          "name": "E2E Draw Card 3",
+          "type_line": "Instant"
+        }
+      ],
+      "logical_rule_key": "battle_rule_v1:20b9a31934f0273e2c7c04e71556d751",
+      "name": "Bewildering Blizzard globally modifies creatures and draws 3",
+      "opponent_battlefield": [
+        {
+          "name": "E2E Opponent Matching Creature",
+          "power": 2,
+          "toughness": 2,
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "name": "E2E Opponent Nonmatching Permanent",
+          "power": 2,
+          "toughness": 2,
+          "type_line": "Artifact"
+        }
+      ],
+      "type": "global_stat_modifier_draw_spell"
+    },
+    {
+      "card": {
+        "name": "Blinding Spray",
+        "type_line": "Instant"
+      },
+      "controller_battlefield": [
+        {
+          "name": "E2E Controller Matching Creature",
+          "power": 2,
+          "toughness": 2,
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "name": "E2E Controller Nonmatching Permanent",
+          "power": 2,
+          "toughness": 2,
+          "type_line": "Artifact"
+        }
+      ],
+      "expected_affected_count": 1,
+      "expected_affected_names": [
+        "E2E Opponent Matching Creature"
+      ],
+      "expected_creature_filter": {},
+      "expected_draw_count": 1,
+      "expected_power_delta": -4,
+      "expected_target_controller": "opponents",
+      "expected_toughness_delta": 0,
+      "library": [
+        {
+          "effect": "draw_cards",
+          "name": "E2E Draw Card 1",
+          "type_line": "Instant"
+        }
+      ],
+      "logical_rule_key": "battle_rule_v1:dc28e66e63622544aa582d3021171e9a",
+      "name": "Blinding Spray globally modifies creatures and draws 1",
+      "opponent_battlefield": [
+        {
+          "name": "E2E Opponent Matching Creature",
+          "power": 2,
+          "toughness": 2,
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "name": "E2E Opponent Nonmatching Permanent",
+          "power": 2,
+          "toughness": 2,
+          "type_line": "Artifact"
+        }
+      ],
+      "type": "global_stat_modifier_draw_spell"
+    },
+    {
+      "card": {
+        "name": "Hydrolash",
+        "type_line": "Instant"
+      },
+      "controller_battlefield": [
+        {
+          "attacking": true,
+          "name": "E2E Controller Matching Creature",
+          "power": 2,
+          "toughness": 2,
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "attacking": false,
+          "name": "E2E Controller Nonmatching Permanent",
+          "power": 2,
+          "toughness": 2,
+          "type_line": "Creature - Soldier"
+        }
+      ],
+      "expected_affected_count": 2,
+      "expected_affected_names": [
+        "E2E Controller Matching Creature",
+        "E2E Opponent Matching Creature"
+      ],
+      "expected_creature_filter": {
+        "combat_state": "attacking"
+      },
+      "expected_draw_count": 1,
+      "expected_power_delta": -2,
+      "expected_target_controller": "all",
+      "expected_toughness_delta": 0,
+      "library": [
+        {
+          "effect": "draw_cards",
+          "name": "E2E Draw Card 1",
+          "type_line": "Instant"
+        }
+      ],
+      "logical_rule_key": "battle_rule_v1:c31ef85a2a29d1a155ad6938c698a707",
+      "name": "Hydrolash globally modifies creatures and draws 1",
+      "opponent_battlefield": [
+        {
+          "attacking": true,
+          "name": "E2E Opponent Matching Creature",
+          "power": 2,
+          "toughness": 2,
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "attacking": false,
+          "name": "E2E Opponent Nonmatching Permanent",
+          "power": 2,
+          "toughness": 2,
+          "type_line": "Creature - Soldier"
+        }
+      ],
+      "type": "global_stat_modifier_draw_spell"
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Bewildering Blizzard",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:20b9a31934f0273e2c7c04e71556d751",
+      "min_rule_version": 2,
+      "normalized_name": "bewildering blizzard",
+      "oracle_hash": "e3919b8158fa4ca767ebc87280c1b444",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+            "compose_on_resolution": true,
+            "count": 3,
+            "effect": "draw_cards",
+            "xmage_effect_class": "DrawCardSourceControllerEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_boost_all_or_opponents_creatures_until_eot_spell_v1",
+            "compose_on_resolution": true,
+            "duration": "until_end_of_turn",
+            "effect": "global_stat_modifier_until_eot",
+            "power_boost": -3,
+            "power_delta": -3,
+            "target": "opponents_creatures",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "controller": "opponents"
+            },
+            "target_controller": "opponents",
+            "toughness_boost": 0,
+            "toughness_delta": 0,
+            "xmage_effect_class": "BoostAllEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_fixed_boost_all_or_opponents_creatures_until_eot_draw_card_spell_v1",
+        "count": 3,
+        "draw_count": 3,
+        "effect": "composite_resolution",
+        "instant": true,
+        "power_boost": -3,
+        "power_delta": -3,
+        "resolution_order": "draw_then_boost",
+        "sorcery": false,
+        "target": "opponents_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "opponents"
+        },
+        "target_controller": "opponents",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "xmage_effect_classes": [
+          "BoostAllEffect",
+          "DrawCardSourceControllerEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Blinding Spray",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:dc28e66e63622544aa582d3021171e9a",
+      "min_rule_version": 2,
+      "normalized_name": "blinding spray",
+      "oracle_hash": "6d5bb5f069b8abded312db6dce1fa30a",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_fixed_boost_all_or_opponents_creatures_until_eot_spell_v1",
+            "compose_on_resolution": true,
+            "duration": "until_end_of_turn",
+            "effect": "global_stat_modifier_until_eot",
+            "power_boost": -4,
+            "power_delta": -4,
+            "target": "opponents_creatures",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "controller": "opponents"
+            },
+            "target_controller": "opponents",
+            "toughness_boost": 0,
+            "toughness_delta": 0,
+            "xmage_effect_class": "BoostAllEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+            "compose_on_resolution": true,
+            "count": 1,
+            "effect": "draw_cards",
+            "xmage_effect_class": "DrawCardSourceControllerEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_fixed_boost_all_or_opponents_creatures_until_eot_draw_card_spell_v1",
+        "count": 1,
+        "draw_count": 1,
+        "effect": "composite_resolution",
+        "instant": true,
+        "power_boost": -4,
+        "power_delta": -4,
+        "resolution_order": "boost_then_draw",
+        "sorcery": false,
+        "target": "opponents_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "opponents"
+        },
+        "target_controller": "opponents",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "xmage_effect_classes": [
+          "BoostAllEffect",
+          "DrawCardSourceControllerEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Hydrolash",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c31ef85a2a29d1a155ad6938c698a707",
+      "min_rule_version": 2,
+      "normalized_name": "hydrolash",
+      "oracle_hash": "3a690e555ed48a9dc42db087954023f2",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_fixed_boost_filtered_creatures_until_eot_spell_v1",
+            "compose_on_resolution": true,
+            "creature_filter": {
+              "combat_state": "attacking"
+            },
+            "duration": "until_end_of_turn",
+            "effect": "global_stat_modifier_until_eot",
+            "power_boost": -2,
+            "power_delta": -2,
+            "target": "attacking_creatures",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "creature_filter": {
+                "combat_state": "attacking"
+              }
+            },
+            "target_controller": "all",
+            "toughness_boost": 0,
+            "toughness_delta": 0,
+            "xmage_effect_class": "BoostAllEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+            "compose_on_resolution": true,
+            "count": 1,
+            "effect": "draw_cards",
+            "xmage_effect_class": "DrawCardSourceControllerEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_fixed_boost_all_or_opponents_creatures_until_eot_draw_card_spell_v1",
+        "count": 1,
+        "creature_filter": {
+          "combat_state": "attacking"
+        },
+        "draw_count": 1,
+        "effect": "composite_resolution",
+        "instant": true,
+        "power_boost": -2,
+        "power_delta": -2,
+        "resolution_order": "boost_then_draw",
+        "sorcery": false,
+        "target": "attacking_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "creature_filter": {
+            "combat_state": "attacking"
+          }
+        },
+        "target_controller": "all",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "xmage_effect_classes": [
+          "BoostAllEffect",
+          "DrawCardSourceControllerEffect"
+        ]
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_fixed_boost_all_draw_card_spell": 3
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg674_boost_all_draw_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg674_boost_all_draw_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg674_boost_all_draw_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg674_boost_all_draw_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg674_boost_all_draw_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg674_boost_all_draw_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-08T22:11:24+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Bewildering Blizzard"
+      },
+      "card_name": "Bewildering Blizzard",
+      "effect": "composite_resolution",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:20b9a31934f0273e2c7c04e71556d751",
+      "normalized_name": "bewildering blizzard",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+            "compose_on_resolution": true,
+            "count": 3,
+            "effect": "draw_cards",
+            "xmage_effect_class": "DrawCardSourceControllerEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_boost_all_or_opponents_creatures_until_eot_spell_v1",
+            "compose_on_resolution": true,
+            "duration": "until_end_of_turn",
+            "effect": "global_stat_modifier_until_eot",
+            "power_boost": -3,
+            "power_delta": -3,
+            "target": "opponents_creatures",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "controller": "opponents"
+            },
+            "target_controller": "opponents",
+            "toughness_boost": 0,
+            "toughness_delta": 0,
+            "xmage_effect_class": "BoostAllEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_fixed_boost_all_or_opponents_creatures_until_eot_draw_card_spell_v1",
+        "count": 3,
+        "draw_count": 3,
+        "effect": "composite_resolution",
+        "instant": true,
+        "power_boost": -3,
+        "power_delta": -3,
+        "resolution_order": "draw_then_boost",
+        "sorcery": false,
+        "target": "opponents_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "opponents"
+        },
+        "target_controller": "opponents",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "xmage_effect_classes": [
+          "BoostAllEffect",
+          "DrawCardSourceControllerEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Blinding Spray"
+      },
+      "card_name": "Blinding Spray",
+      "effect": "composite_resolution",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:dc28e66e63622544aa582d3021171e9a",
+      "normalized_name": "blinding spray",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_fixed_boost_all_or_opponents_creatures_until_eot_spell_v1",
+            "compose_on_resolution": true,
+            "duration": "until_end_of_turn",
+            "effect": "global_stat_modifier_until_eot",
+            "power_boost": -4,
+            "power_delta": -4,
+            "target": "opponents_creatures",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "controller": "opponents"
+            },
+            "target_controller": "opponents",
+            "toughness_boost": 0,
+            "toughness_delta": 0,
+            "xmage_effect_class": "BoostAllEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+            "compose_on_resolution": true,
+            "count": 1,
+            "effect": "draw_cards",
+            "xmage_effect_class": "DrawCardSourceControllerEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_fixed_boost_all_or_opponents_creatures_until_eot_draw_card_spell_v1",
+        "count": 1,
+        "draw_count": 1,
+        "effect": "composite_resolution",
+        "instant": true,
+        "power_boost": -4,
+        "power_delta": -4,
+        "resolution_order": "boost_then_draw",
+        "sorcery": false,
+        "target": "opponents_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "opponents"
+        },
+        "target_controller": "opponents",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "xmage_effect_classes": [
+          "BoostAllEffect",
+          "DrawCardSourceControllerEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Hydrolash"
+      },
+      "card_name": "Hydrolash",
+      "effect": "composite_resolution",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c31ef85a2a29d1a155ad6938c698a707",
+      "normalized_name": "hydrolash",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_fixed_boost_filtered_creatures_until_eot_spell_v1",
+            "compose_on_resolution": true,
+            "creature_filter": {
+              "combat_state": "attacking"
+            },
+            "duration": "until_end_of_turn",
+            "effect": "global_stat_modifier_until_eot",
+            "power_boost": -2,
+            "power_delta": -2,
+            "target": "attacking_creatures",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "creature_filter": {
+                "combat_state": "attacking"
+              }
+            },
+            "target_controller": "all",
+            "toughness_boost": 0,
+            "toughness_delta": 0,
+            "xmage_effect_class": "BoostAllEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+            "compose_on_resolution": true,
+            "count": 1,
+            "effect": "draw_cards",
+            "xmage_effect_class": "DrawCardSourceControllerEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_fixed_boost_all_or_opponents_creatures_until_eot_draw_card_spell_v1",
+        "count": 1,
+        "creature_filter": {
+          "combat_state": "attacking"
+        },
+        "draw_count": 1,
+        "effect": "composite_resolution",
+        "instant": true,
+        "power_boost": -2,
+        "power_delta": -2,
+        "resolution_order": "boost_then_draw",
+        "sorcery": false,
+        "target": "attacking_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "creature_filter": {
+            "combat_state": "attacking"
+          }
+        },
+        "target_controller": "all",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "xmage_effect_classes": [
+          "BoostAllEffect",
+          "DrawCardSourceControllerEffect"
+        ]
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Bewildering Blizzard",
+    "Blinding Spray",
+    "Hydrolash"
+  ],
+  "selected_count": 3,
+  "slug": "boost_all_draw_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Bewildering Blizzard",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:20b9a31934f0273e2c7c04e71556d751",
+      "min_rule_version": 2,
+      "normalized_name": "bewildering blizzard",
+      "oracle_hash": "e3919b8158fa4ca767ebc87280c1b444",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_all_or_opponents_creatures_until_eot_draw_card_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Blinding Spray",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:dc28e66e63622544aa582d3021171e9a",
+      "min_rule_version": 2,
+      "normalized_name": "blinding spray",
+      "oracle_hash": "6d5bb5f069b8abded312db6dce1fa30a",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_all_or_opponents_creatures_until_eot_draw_card_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Hydrolash",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c31ef85a2a29d1a155ad6938c698a707",
+      "min_rule_version": 2,
+      "normalized_name": "hydrolash",
+      "oracle_hash": "3a690e555ed48a9dc42db087954023f2",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_all_or_opponents_creatures_until_eot_draw_card_spell_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

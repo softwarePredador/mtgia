@@ -3458,6 +3458,151 @@ def boost_scry_spell_execution_scenario_from_expected_rule(
     }
 
 
+def _global_stat_modifier_matching_creature(name: str, creature_filter: dict[str, Any]) -> dict[str, Any]:
+    card: dict[str, Any] = {
+        "name": name,
+        "type_line": "Creature - Soldier",
+        "power": 2,
+        "toughness": 2,
+    }
+    if creature_filter.get("combat_state") == "attacking":
+        card["attacking"] = True
+    if creature_filter.get("combat_state") == "blocking":
+        card["blocking"] = True
+    colors = [str(value).strip().upper() for value in creature_filter.get("colors", []) or [] if str(value).strip()]
+    if colors:
+        card["colors"] = colors
+        card["mana_cost"] = "".join(f"{{{color}}}" for color in colors)
+    excluded_colors = {
+        str(value).strip().upper()
+        for value in creature_filter.get("exclude_colors", []) or []
+        if str(value).strip()
+    }
+    if excluded_colors:
+        color = "W" if "W" not in excluded_colors else "U"
+        card["colors"] = [color]
+        card["mana_cost"] = f"{{{color}}}"
+    excluded_subtypes = {
+        str(value).strip().lower()
+        for value in creature_filter.get("exclude_subtypes", []) or []
+        if str(value).strip()
+    }
+    if excluded_subtypes:
+        card["type_line"] = "Creature - Soldier"
+    return card
+
+
+def _global_stat_modifier_nonmatching_permanent(name: str, creature_filter: dict[str, Any]) -> dict[str, Any]:
+    if not creature_filter:
+        return {"name": name, "type_line": "Artifact", "power": 2, "toughness": 2}
+    card: dict[str, Any] = {
+        "name": name,
+        "type_line": "Creature - Soldier",
+        "power": 2,
+        "toughness": 2,
+    }
+    if creature_filter.get("combat_state") == "attacking":
+        card["attacking"] = False
+    if creature_filter.get("combat_state") == "blocking":
+        card["blocking"] = False
+    colors = [str(value).strip().upper() for value in creature_filter.get("colors", []) or [] if str(value).strip()]
+    if colors:
+        color = "B" if "B" not in colors else "W"
+        card["colors"] = [color]
+        card["mana_cost"] = f"{{{color}}}"
+    excluded_colors = [
+        str(value).strip().upper()
+        for value in creature_filter.get("exclude_colors", []) or []
+        if str(value).strip()
+    ]
+    if excluded_colors:
+        color = excluded_colors[0]
+        card["colors"] = [color]
+        card["mana_cost"] = f"{{{color}}}"
+    excluded_subtypes = [
+        str(value).strip()
+        for value in creature_filter.get("exclude_subtypes", []) or []
+        if str(value).strip()
+    ]
+    if excluded_subtypes:
+        card["type_line"] = f"Creature - {excluded_subtypes[0]}"
+    excluded_card_types = {
+        str(value).strip().lower()
+        for value in creature_filter.get("exclude_card_types", []) or []
+        if str(value).strip()
+    }
+    if "artifact" in excluded_card_types:
+        card["type_line"] = "Artifact Creature - Golem"
+    if creature_filter.get("no_counters"):
+        card["counters"] = {"+1/+1": 1}
+    return card
+
+
+def global_stat_modifier_draw_spell_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_fixed_boost_all_or_opponents_creatures_until_eot_draw_card_spell_v1":
+        return None
+    if required.get("effect") != "composite_resolution":
+        return None
+    components = [
+        component
+        for component in required.get("_composite_rule_components") or []
+        if isinstance(component, dict)
+    ]
+    boost_component = next(
+        (component for component in components if component.get("effect") == "global_stat_modifier_until_eot"),
+        None,
+    )
+    draw_component = next((component for component in components if component.get("effect") == "draw_cards"), None)
+    if boost_component is None or draw_component is None:
+        return None
+    draw_count = int(required.get("draw_count") or draw_component.get("draw_count") or draw_component.get("count") or 1)
+    if draw_count <= 0:
+        return None
+    target_constraints = dict(required.get("target_constraints") or boost_component.get("target_constraints") or {})
+    creature_filter = required.get("creature_filter") or boost_component.get("creature_filter") or target_constraints.get("creature_filter") or {}
+    if not isinstance(creature_filter, dict):
+        creature_filter = {}
+    target_controller = str(required.get("target_controller") or boost_component.get("target_controller") or "all").lower()
+    controller_matching = _global_stat_modifier_matching_creature("E2E Controller Matching Creature", creature_filter)
+    opponent_matching = _global_stat_modifier_matching_creature("E2E Opponent Matching Creature", creature_filter)
+    controller_nonmatching = _global_stat_modifier_nonmatching_permanent("E2E Controller Nonmatching Permanent", creature_filter)
+    opponent_nonmatching = _global_stat_modifier_nonmatching_permanent("E2E Opponent Nonmatching Permanent", creature_filter)
+    expected_affected_names: list[str] = []
+    if target_controller in {"all", "any"}:
+        expected_affected_names.extend([controller_matching["name"], opponent_matching["name"]])
+    elif target_controller in {"opponent", "opponents"}:
+        expected_affected_names.append(opponent_matching["name"])
+    elif target_controller in {"self", "you", "controller", "controlled"}:
+        expected_affected_names.append(controller_matching["name"])
+    else:
+        return None
+    return {
+        "name": f"{rule['card_name']} globally modifies creatures and draws {draw_count}",
+        "type": "global_stat_modifier_draw_spell",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": "Sorcery" if required.get("sorcery") is True else "Instant",
+        },
+        "controller_battlefield": [controller_matching, controller_nonmatching],
+        "opponent_battlefield": [opponent_matching, opponent_nonmatching],
+        "expected_affected_names": expected_affected_names,
+        "expected_affected_count": len(expected_affected_names),
+        "expected_power_delta": int(required.get("power_delta") or boost_component.get("power_delta") or 0),
+        "expected_toughness_delta": int(required.get("toughness_delta") or boost_component.get("toughness_delta") or 0),
+        "expected_draw_count": draw_count,
+        "expected_target_controller": target_controller,
+        "expected_creature_filter": creature_filter,
+        "library": [
+            {"name": f"E2E Draw Card {index + 1}", "type_line": "Instant", "effect": "draw_cards"}
+            for index in range(draw_count)
+        ],
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def controlled_stat_modifier_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
@@ -4854,6 +4999,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or controlled_stat_modifier_execution_scenario_from_expected_rule(rule)
         or target_keyword_spell_execution_scenario_from_expected_rule(rule)
         or boost_scry_spell_execution_scenario_from_expected_rule(rule)
+        or global_stat_modifier_draw_spell_execution_scenario_from_expected_rule(rule)
         or attack_self_boost_execution_scenario_from_expected_rule(rule)
         or becomes_blocked_self_boost_execution_scenario_from_expected_rule(rule)
         or each_player_sacrifice_execution_scenario_from_expected_rule(rule)
