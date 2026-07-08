@@ -10141,11 +10141,12 @@ def is_creature_etb_tutor_to_hand_unit(row: dict[str, Any]) -> bool:
 
 
 def is_creature_etb_fixed_mana_unit(row: dict[str, Any]) -> bool:
+    signals = set(row.get("xmage_signals") or [])
     return (
         str(row.get("adapter_work_unit") or "") == RAMP_CREATURE_UNIT
         and effect_classes(row) == {"BasicManaEffect"}
         and ability_classes(row) == {"EntersBattlefieldTriggeredAbility"}
-        and set(row.get("xmage_signals") or []) == {"triggered_ability"}
+        and signals in ({"triggered_ability"}, {"condition", "triggered_ability"})
     )
 
 
@@ -20159,29 +20160,40 @@ def fixed_mana_symbols_from_braces(text: str) -> list[str]:
 def etb_fixed_mana_detail_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
     candidates: list[dict[str, Any]] = []
     for line in normalized_oracle_lines(metadata):
-        if " if " in line or "whenever " in line or "at the beginning " in line:
+        if "whenever " in line or "at the beginning " in line:
             if "enters" in line and "add " in line:
                 return None
             continue
         match = re.fullmatch(
             r"when (?:(?:this|that) creature|(?:this|that) permanent|[^,.]+) "
-            r"enters(?: the battlefield)?, add (?P<mana>(?:\{[wubrgc]\})+)\.?",
+            r"enters(?: the battlefield)?, "
+            r"(?:(?P<condition>if you cast it(?: from your hand)?), )?"
+            r"add (?P<mana>(?:\{[wubrgc]\})+)\.?",
             line,
         )
         if not match:
             if "enters" in line and "add " in line:
                 return None
             continue
+        condition_text = str(match.group("condition") or "").strip()
+        etb_mana_condition = None
+        if condition_text == "if you cast it from your hand":
+            etb_mana_condition = "cast_from_hand"
+        elif condition_text == "if you cast it":
+            etb_mana_condition = "cast"
+        elif condition_text:
+            return None
         produced_symbols = fixed_mana_symbols_from_braces(match.group("mana"))
         if not produced_symbols:
             return None
-        candidates.append(
-            {
-                "produces": _unique_mana_symbols(produced_symbols),
-                "mana_produced": len(produced_symbols),
-                "produced_mana_symbols": produced_symbols,
-            }
-        )
+        detail = {
+            "produces": _unique_mana_symbols(produced_symbols),
+            "mana_produced": len(produced_symbols),
+            "produced_mana_symbols": produced_symbols,
+        }
+        if etb_mana_condition:
+            detail["etb_mana_condition"] = etb_mana_condition
+        candidates.append(detail)
     if len(candidates) == 1:
         return candidates[0]
     return None
@@ -20568,9 +20580,28 @@ def etb_fixed_mana_source_blocker(source_text: str, detail: dict[str, Any]) -> s
         return "etb_mana_source_not_single_etb_trigger"
     if len(re.findall(r"new\s+BasicManaEffect\s*\(", text)) != 1:
         return "etb_mana_source_not_single_basic_mana_effect"
+    source_conditions = re.findall(
+        r"\.withInterveningIf\s*\(\s*([A-Za-z0-9_.]+)\.instance\s*\)",
+        text,
+    )
+    expected_condition = detail.get("etb_mana_condition")
+    source_condition = None
+    if len(source_conditions) > 1:
+        return "etb_mana_source_condition_not_supported"
+    if source_conditions:
+        condition_class = source_conditions[0].split(".")[-1]
+        if condition_class == "CastFromHandSourcePermanentCondition":
+            source_condition = "cast_from_hand"
+        elif condition_class == "CastFromEverywhereSourceCondition":
+            source_condition = "cast"
+        else:
+            return "etb_mana_source_condition_not_supported"
+    if expected_condition != source_condition:
+        return "etb_mana_source_condition_mismatch"
     unsupported_markers = {
-        ".withInterveningIf": "etb_mana_source_condition_not_supported",
-        "Conditional": "etb_mana_source_condition_not_supported",
+        "ConditionalManaEffect": "etb_mana_source_condition_not_supported",
+        "ConditionalOneShotEffect": "etb_mana_source_condition_not_supported",
+        "ConditionalContinuousEffect": "etb_mana_source_condition_not_supported",
         "DynamicManaEffect": "etb_mana_source_dynamic_not_supported",
         "AddConditionalManaEffect": "etb_mana_source_restricted_spend_not_supported",
         "Target": "etb_mana_source_target_not_supported",
@@ -22710,6 +22741,8 @@ def split_row(
             "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
             **flags,
         }
+        if mana_detail.get("etb_mana_condition"):
+            effect_json["etb_mana_condition"] = mana_detail["etb_mana_condition"]
         return build_proposal(
             row,
             metadata,

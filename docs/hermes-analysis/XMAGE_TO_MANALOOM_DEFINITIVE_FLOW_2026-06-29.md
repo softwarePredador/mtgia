@@ -19662,6 +19662,87 @@ Evidence:
 - `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260708_post_pg664_counter_oracle_auxiliary_x_modal_new_server_final_after_hash_backfill.md`
 - `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260708_post_pg664_counter_oracle_auxiliary_x_modal_new_server_final_after_hash_backfill.md`
 
+## PG665 ETB Conditional Cast Mana Wave
+
+PG665 closed the remaining exact creature ETB fixed-mana rows whose XMage
+source and Oracle text require a cast-condition gate instead of a plain ETB
+mana trigger:
+
+- `Coal Stoker`: `EntersBattlefieldTriggeredAbility` with
+  `CastFromHandSourcePermanentCondition.instance`; executable only when the
+  permanent was cast from hand, adding `{R}{R}{R}`;
+- `Iridescent Tiger`: `EntersBattlefieldTriggeredAbility` with
+  `CastFromEverywhereSourceCondition.instance`; executable when the permanent
+  was cast, including from a non-hand zone, adding `{W}{U}{B}{R}{G}`.
+
+Runtime/test changes:
+
+- `xmage_authoritative_exact_scope_split.py` now distinguishes fixed ETB mana
+  from cast-from-hand and cast-from-anywhere conditional ETB mana, while still
+  blocking Revolt/dynamic/unsupported conditional mana such as
+  `Hidden Herbalists`;
+- `battle_analyst_v9.py` preserves cast context on resolved permanents and
+  skips only the gated ETB mana trigger when the cast condition is false;
+- `xmage_batch_pg_package_builder.py` preserves ETB mana condition fields and
+  emits focused execution scenarios for package validation;
+- `battle_package_end_to_end_validation.py` executes creature ETB fixed-mana
+  scenarios and verifies the produced symbols and condition.
+
+PG665 apply/postcheck evidence:
+
+- split produced `2` safe package candidates in
+  `xmage_creature_etb_add_fixed_mana_v1`;
+- precheck found `2` target rows, `0` existing expected rows, and `0` stale
+  generated shadows to deprecate;
+- apply committed `2` promoted rows;
+- postcheck confirmed `2/2` promoted verified/auto rows with `oracle_hash`;
+- package E2E passed PostgreSQL, SQLite/Hermes, canonical snapshot,
+  `runtime_get_card_effect`, and `2` battle-execution scenarios.
+
+During final PG/Hermes/SQLite validation, PostgreSQL still had `44` older
+trusted executable curated/manual rows missing `oracle_hash`. PG665B reapplied
+the existing narrow trusted-rule metadata-only backfill against the current
+server: precheck found `44` safe groups and `0` unsafe groups, apply updated
+`44` rows, and postcheck reduced missing trusted executable hashes to `0`.
+
+Final post-PG665 state after hash repair:
+
+- global readiness:
+  `battle_and_oracle_ready=6041`, `battle_family_mapper_required=27835`,
+  `snapshot_has_verified_rule=6069`, `snapshot_has_any_rule=7272`;
+- authoritative queue:
+  `target_identity_count=24912`,
+  `xmage_authoritative_source_count=24599`,
+  `xmage_missing_source_exception_count=313`,
+  `xmage_authoritative_parser_gap_count=0`,
+  `xmage_authoritative_adapter_required_count=24599`;
+- final exact split recheck:
+  `proposal_count=0`, `safe_for_batch_pg_package_count=0`, with the remaining
+  conditional ETB mana neighbor deliberately blocked as
+  `etb_mana_oracle_not_simple_fixed`;
+- validation gates:
+  `xmage_strategy_consistency_audit` passed, `pg_hermes_sqlite_contract_audit`
+  passed `51/51` after PG665B, `operational_surface_alignment_audit` passed,
+  and `legacy_contamination_audit` passed.
+
+Evidence:
+
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260708_pg665_etb_conditional_cast_mana_new_server_candidate_v2.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg665_etb_conditional_cast_mana_new_server_package_package.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg665_etb_conditional_cast_mana_new_server_apply_evidence.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg665_etb_conditional_cast_mana_new_server_pg_to_sqlite_sync.json`
+- `docs/hermes-analysis/master_optimizer_reports/pg665_etb_conditional_cast_mana_new_server_metadata_sync.json`
+- `docs/hermes-analysis/master_optimizer_reports/pg665_etb_conditional_cast_mana_new_server_post_pg665b_e2e_validation.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg665b_trusted_rule_oracle_hash_backfill_new_server_apply_evidence.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg665b_trusted_rule_oracle_hash_backfill_new_server_pg_to_sqlite_sync.json`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260708_post_pg665b_trusted_rule_oracle_hash_backfill_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260708_post_pg665b_trusted_rule_oracle_hash_backfill_new_server_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260708_post_pg665b_trusted_rule_oracle_hash_backfill_new_server_recheck.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260708_post_pg665b_trusted_rule_oracle_hash_backfill_new_server_final.md`
+- `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260708_post_pg665b_trusted_rule_oracle_hash_backfill_new_server_final.md`
+- `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260708_post_pg665b_trusted_rule_oracle_hash_backfill_new_server_final.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260708_post_pg665b_trusted_rule_oracle_hash_backfill_new_server_final.md`
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

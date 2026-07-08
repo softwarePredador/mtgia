@@ -13346,7 +13346,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             effect_classes=["BasicManaEffect"],
             ability_kind="triggered",
             ability_classes=["EntersBattlefieldTriggeredAbility"],
-            xmage_signals=["triggered_ability"],
+            xmage_signals=["condition", "triggered_ability"],
         )
         proposal, reason = split.split_row(
             row,
@@ -13378,7 +13378,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             effect_classes=["BasicManaEffect"],
             ability_kind="triggered",
             ability_classes=["EntersBattlefieldTriggeredAbility"],
-            xmage_signals=["triggered_ability"],
+            xmage_signals=["condition", "triggered_ability"],
         )
         proposal, reason = split.split_row(
             row,
@@ -13399,13 +13399,13 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["etb_mana_produced"], 1)
         self.assertEqual(effect["etb_produced_mana_symbols"], ["R"])
 
-    def test_creature_etb_conditional_mana_stays_blocked(self) -> None:
+    def test_creature_etb_cast_from_hand_mana_maps_with_condition(self) -> None:
         row = queue_row(
             split.RAMP_CREATURE_UNIT,
             effect_classes=["BasicManaEffect"],
             ability_kind="triggered",
             ability_classes=["EntersBattlefieldTriggeredAbility"],
-            xmage_signals=["triggered_ability"],
+            xmage_signals=["condition", "triggered_ability"],
         )
         proposal, reason = split.split_row(
             row,
@@ -13421,6 +13421,69 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                 "this.addAbility(new EntersBattlefieldTriggeredAbility("
                 "new BasicManaEffect(Mana.RedMana(3)))"
                 ".withInterveningIf(CastFromHandSourcePermanentCondition.instance));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.ETB_FIXED_MANA_CREATURE_SCOPE)
+        self.assertEqual(effect["etb_mana_produced"], 3)
+        self.assertEqual(effect["etb_produces"], "R")
+        self.assertEqual(effect["etb_produced_mana_symbols"], ["R", "R", "R"])
+        self.assertEqual(effect["etb_mana_condition"], "cast_from_hand")
+
+    def test_creature_etb_cast_mana_maps_with_condition(self) -> None:
+        row = queue_row(
+            split.RAMP_CREATURE_UNIT,
+            effect_classes=["BasicManaEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Iridescent Tiger",
+                type_line="Creature - Cat",
+                oracle_text="When this creature enters, if you cast it, add {W}{U}{B}{R}{G}.",
+            ),
+            source_text=(
+                "this.addAbility(new EntersBattlefieldTriggeredAbility("
+                "new BasicManaEffect(new Mana(1, 1, 1, 1, 1, 0, 0, 0)))"
+                ".withInterveningIf(CastFromEverywhereSourceCondition.instance));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.ETB_FIXED_MANA_CREATURE_SCOPE)
+        self.assertEqual(effect["etb_mana_produced"], 5)
+        self.assertEqual(effect["etb_produces"], "WUBRG")
+        self.assertEqual(effect["etb_produced_mana_symbols"], ["W", "U", "B", "R", "G"])
+        self.assertEqual(effect["etb_mana_condition"], "cast")
+
+    def test_creature_etb_revolt_mana_stays_blocked(self) -> None:
+        row = queue_row(
+            split.RAMP_CREATURE_UNIT,
+            effect_classes=["BasicManaEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Hidden Herbalists",
+                type_line="Creature - Human Druid",
+                oracle_text=(
+                    "Revolt - When this creature enters, if a permanent you controlled "
+                    "left the battlefield this turn, add {G}{G}."
+                ),
+            ),
+            source_text=(
+                "this.addAbility(new EntersBattlefieldTriggeredAbility("
+                "new BasicManaEffect(Mana.GreenMana(2)))"
+                ".withInterveningIf(RevoltCondition.instance));"
             ),
         )
 

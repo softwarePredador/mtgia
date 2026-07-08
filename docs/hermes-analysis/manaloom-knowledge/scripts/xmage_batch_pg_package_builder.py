@@ -269,6 +269,10 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "dies_damage_amount",
     "dies_damage_target",
     "dies_damage_optional",
+    "etb_mana_produced",
+    "etb_produces",
+    "etb_produced_mana_symbols",
+    "etb_mana_condition",
     "dies_mana_produced",
     "dies_produces",
     "dies_produced_mana_symbols",
@@ -1511,6 +1515,38 @@ def destroy_target_create_treasure_execution_scenario_from_expected_rule(
             or required.get("treasure_count")
             or 1
         ),
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
+def creature_etb_fixed_mana_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_creature_etb_add_fixed_mana_v1":
+        return None
+    produced = int(required.get("etb_mana_produced") or required.get("mana_produced") or 0)
+    if produced <= 0:
+        return None
+    condition = str(required.get("etb_mana_condition") or "").strip()
+    cast_from_zone = "hand" if condition == "cast_from_hand" else "graveyard" if condition == "cast" else "hand"
+    return {
+        "name": f"{rule['card_name']} ETB adds fixed mana",
+        "type": "creature_etb_fixed_mana",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": "Creature - Elemental",
+            "effect": required.get("effect") or "creature",
+        },
+        "was_cast": True,
+        "cast_from_zone": cast_from_zone,
+        "expected_mana_added": produced,
+        "expected_produced_mana_symbols": list(
+            required.get("etb_produced_mana_symbols")
+            or required.get("produced_mana_symbols")
+            or []
+        ),
+        "expected_condition": condition,
         "logical_rule_key": rule["logical_rule_key"],
     }
 
@@ -4508,6 +4544,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or static_graveyard_threshold_boost_execution_scenario_from_expected_rule(rule)
         or static_count_pt_execution_scenario_from_expected_rule(rule)
         or destroy_target_create_treasure_execution_scenario_from_expected_rule(rule)
+        or creature_etb_fixed_mana_execution_scenario_from_expected_rule(rule)
         or creature_etb_create_treasure_execution_scenario_from_expected_rule(rule)
         or creature_dies_create_treasure_execution_scenario_from_expected_rule(rule)
         or creature_etb_create_tokens_execution_scenario_from_expected_rule(rule)

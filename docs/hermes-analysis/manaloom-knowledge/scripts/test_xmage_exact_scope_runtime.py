@@ -88,6 +88,202 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertEqual(active.mana_pool.total(), 0)
         self.assertFalse(any(event == "dies_mana_resolved" for event, _data in self.events))
 
+    def test_creature_etb_cast_from_hand_mana_adds_when_cast_from_hand(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        permanent = {
+            "name": "Coal Stoker",
+            "type_line": "Creature - Elemental",
+            "effect": "creature",
+            "was_cast": True,
+            "cast_from_zone": "hand",
+        }
+        effect_data = {
+            "effect": "ramp_permanent",
+            "battle_model_scope": "xmage_creature_etb_add_fixed_mana_v1",
+            "trigger": "enters_battlefield",
+            "trigger_effect": "add_mana",
+            "etb_mana_produced": 3,
+            "etb_produces": "R",
+            "etb_produced_mana_symbols": ["R", "R", "R"],
+            "etb_mana_condition": "cast_from_hand",
+        }
+
+        self.battle.resolve_generic_permanent_etb(
+            active,
+            [],
+            permanent,
+            effect_data,
+            turn=3,
+            rng=random.Random(3),
+        )
+
+        self.assertEqual(active.mana_pool.red, 3)
+        self.assertEqual(active.mana_pool.total(), 3)
+        self.assertTrue(
+            any(
+                event == "trigger_resolved"
+                and data.get("card") == "Coal Stoker"
+                and data.get("effect") == "add_mana"
+                and data.get("mana_added") == 3
+                for event, data in self.events
+            )
+        )
+
+    def test_creature_etb_cast_from_hand_mana_skips_when_not_cast(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        permanent = {
+            "name": "Coal Stoker",
+            "type_line": "Creature - Elemental",
+            "effect": "creature",
+            "was_cast": False,
+            "cast_from_zone": "graveyard",
+        }
+        effect_data = {
+            "effect": "ramp_permanent",
+            "battle_model_scope": "xmage_creature_etb_add_fixed_mana_v1",
+            "trigger": "enters_battlefield",
+            "trigger_effect": "add_mana",
+            "etb_mana_produced": 3,
+            "etb_produces": "R",
+            "etb_produced_mana_symbols": ["R", "R", "R"],
+            "etb_mana_condition": "cast_from_hand",
+        }
+
+        self.battle.resolve_generic_permanent_etb(
+            active,
+            [],
+            permanent,
+            effect_data,
+            turn=3,
+            rng=random.Random(4),
+        )
+
+        self.assertEqual(active.mana_pool.total(), 0)
+        self.assertTrue(
+            any(
+                event == "trigger_skipped"
+                and data.get("card") == "Coal Stoker"
+                and data.get("reason") == "etb_mana_condition_not_met"
+                for event, data in self.events
+            )
+        )
+
+    def test_creature_etb_cast_condition_allows_cast_from_non_hand_zone(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        permanent = {
+            "name": "Iridescent Tiger",
+            "type_line": "Creature - Cat",
+            "effect": "creature",
+            "was_cast": True,
+            "cast_from_zone": "graveyard",
+        }
+        effect_data = {
+            "effect": "ramp_permanent",
+            "battle_model_scope": "xmage_creature_etb_add_fixed_mana_v1",
+            "trigger": "enters_battlefield",
+            "trigger_effect": "add_mana",
+            "etb_mana_produced": 5,
+            "etb_produces": "WUBRG",
+            "etb_produced_mana_symbols": ["W", "U", "B", "R", "G"],
+            "etb_mana_condition": "cast",
+        }
+
+        self.battle.resolve_generic_permanent_etb(
+            active,
+            [],
+            permanent,
+            effect_data,
+            turn=4,
+            rng=random.Random(5),
+        )
+
+        self.assertEqual(active.mana_pool.white, 1)
+        self.assertEqual(active.mana_pool.blue, 1)
+        self.assertEqual(active.mana_pool.black, 1)
+        self.assertEqual(active.mana_pool.red, 1)
+        self.assertEqual(active.mana_pool.green, 1)
+        self.assertEqual(active.mana_pool.total(), 5)
+
+    def test_apply_effect_immediate_etb_cast_mana_requires_explicit_cast_context(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        card = {
+            "name": "Coal Stoker",
+            "type_line": "Creature - Elemental",
+            "cmc": 4,
+        }
+        effect_data = {
+            "effect": "ramp_permanent",
+            "battle_model_scope": "xmage_creature_etb_add_fixed_mana_v1",
+            "trigger": "enters_battlefield",
+            "trigger_effect": "add_mana",
+            "etb_mana_produced": 3,
+            "etb_produces": "R",
+            "etb_produced_mana_symbols": ["R", "R", "R"],
+            "etb_mana_condition": "cast_from_hand",
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [],
+            card,
+            turn=5,
+            rng=random.Random(5),
+            effect_data_override=effect_data,
+        )
+
+        self.assertEqual(active.mana_pool.total(), 0)
+        self.assertTrue(
+            any(
+                event == "trigger_skipped"
+                and data.get("card") == "Coal Stoker"
+                and data.get("reason") == "etb_mana_condition_not_met"
+                for event, data in self.events
+            )
+        )
+
+    def test_apply_effect_immediate_etb_cast_mana_uses_cast_context(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        card = {
+            "name": "Coal Stoker",
+            "type_line": "Creature - Elemental",
+            "cmc": 4,
+        }
+        effect_data = {
+            "effect": "ramp_permanent",
+            "battle_model_scope": "xmage_creature_etb_add_fixed_mana_v1",
+            "trigger": "enters_battlefield",
+            "trigger_effect": "add_mana",
+            "etb_mana_produced": 3,
+            "etb_produces": "R",
+            "etb_produced_mana_symbols": ["R", "R", "R"],
+            "etb_mana_condition": "cast_from_hand",
+            "_cast_context": {
+                "source_zone": "hand",
+                "cast_pipeline": "normal_spell_cast",
+            },
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [],
+            card,
+            turn=5,
+            rng=random.Random(6),
+            effect_data_override=effect_data,
+        )
+
+        self.assertEqual(active.mana_pool.red, 3)
+        self.assertEqual(active.mana_pool.total(), 3)
+        self.assertTrue(
+            any(
+                event == "trigger_resolved"
+                and data.get("card") == "Coal Stoker"
+                and data.get("effect") == "add_mana"
+                and data.get("mana_added") == 3
+                for event, data in self.events
+            )
+        )
+
     def test_simple_activated_regenerate_source_consumes_shield_on_destroy(self) -> None:
         active = self.battle.Player("Active", None, [])
         self.battle.CURRENT_REPLAY_TURN = 8

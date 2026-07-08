@@ -1,0 +1,251 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg665_etb_conditional_cast_mana_new_serv_20260708_173414",
+  "deploy_id": "pg665_etb_conditional_cast_mana_new_server",
+  "execution_scenarios": [
+    {
+      "card": {
+        "effect": "ramp_permanent",
+        "name": "Coal Stoker",
+        "type_line": "Creature - Elemental"
+      },
+      "cast_from_zone": "hand",
+      "expected_condition": "cast_from_hand",
+      "expected_mana_added": 3,
+      "expected_produced_mana_symbols": [
+        "R",
+        "R",
+        "R"
+      ],
+      "logical_rule_key": "battle_rule_v1:219016c5586f35bc0cfe9a4c7308703a",
+      "name": "Coal Stoker ETB adds fixed mana",
+      "type": "creature_etb_fixed_mana",
+      "was_cast": true
+    },
+    {
+      "card": {
+        "effect": "ramp_permanent",
+        "name": "Iridescent Tiger",
+        "type_line": "Creature - Elemental"
+      },
+      "cast_from_zone": "graveyard",
+      "expected_condition": "cast",
+      "expected_mana_added": 5,
+      "expected_produced_mana_symbols": [
+        "W",
+        "U",
+        "B",
+        "R",
+        "G"
+      ],
+      "logical_rule_key": "battle_rule_v1:40ddd485da3bf403787ae236f9fa35bb",
+      "name": "Iridescent Tiger ETB adds fixed mana",
+      "type": "creature_etb_fixed_mana",
+      "was_cast": true
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Coal Stoker",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:219016c5586f35bc0cfe9a4c7308703a",
+      "min_rule_version": 2,
+      "normalized_name": "coal stoker",
+      "oracle_hash": "30f3d291f75d0e6fccda1c89d8843189",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_add_fixed_mana_v1",
+        "effect": "ramp_permanent",
+        "etb_mana_condition": "cast_from_hand",
+        "etb_mana_produced": 3,
+        "etb_produced_mana_symbols": [
+          "R",
+          "R",
+          "R"
+        ],
+        "etb_produces": "R",
+        "is_mana_source": false,
+        "mana_produced": 3,
+        "permanent_type": "creature",
+        "produced_mana_symbols": [
+          "R",
+          "R",
+          "R"
+        ],
+        "produces": "R",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "add_mana",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "BasicManaEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Iridescent Tiger",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:40ddd485da3bf403787ae236f9fa35bb",
+      "min_rule_version": 2,
+      "normalized_name": "iridescent tiger",
+      "oracle_hash": "5320aef7894f806a2479d490088d1fa7",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_add_fixed_mana_v1",
+        "effect": "ramp_permanent",
+        "etb_mana_condition": "cast",
+        "etb_mana_produced": 5,
+        "etb_produced_mana_symbols": [
+          "W",
+          "U",
+          "B",
+          "R",
+          "G"
+        ],
+        "etb_produces": "WUBRG",
+        "is_mana_source": false,
+        "mana_produced": 5,
+        "permanent_type": "creature",
+        "produced_mana_symbols": [
+          "W",
+          "U",
+          "B",
+          "R",
+          "G"
+        ],
+        "produces": "WUBRG",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "add_mana",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "BasicManaEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_creature_etb_add_fixed_mana": 2
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg665_etb_conditional_cast_mana_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg665_etb_conditional_cast_mana_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg665_etb_conditional_cast_mana_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg665_etb_conditional_cast_mana_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg665_etb_conditional_cast_mana_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg665_etb_conditional_cast_mana_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-08T17:38:13+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Coal Stoker"
+      },
+      "card_name": "Coal Stoker",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:219016c5586f35bc0cfe9a4c7308703a",
+      "normalized_name": "coal stoker",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_add_fixed_mana_v1",
+        "effect": "ramp_permanent",
+        "etb_mana_condition": "cast_from_hand",
+        "etb_mana_produced": 3,
+        "etb_produced_mana_symbols": [
+          "R",
+          "R",
+          "R"
+        ],
+        "etb_produces": "R",
+        "is_mana_source": false,
+        "mana_produced": 3,
+        "permanent_type": "creature",
+        "produced_mana_symbols": [
+          "R",
+          "R",
+          "R"
+        ],
+        "produces": "R",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "add_mana",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "BasicManaEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Iridescent Tiger"
+      },
+      "card_name": "Iridescent Tiger",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:40ddd485da3bf403787ae236f9fa35bb",
+      "normalized_name": "iridescent tiger",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_add_fixed_mana_v1",
+        "effect": "ramp_permanent",
+        "etb_mana_condition": "cast",
+        "etb_mana_produced": 5,
+        "etb_produced_mana_symbols": [
+          "W",
+          "U",
+          "B",
+          "R",
+          "G"
+        ],
+        "etb_produces": "WUBRG",
+        "is_mana_source": false,
+        "mana_produced": 5,
+        "permanent_type": "creature",
+        "produced_mana_symbols": [
+          "W",
+          "U",
+          "B",
+          "R",
+          "G"
+        ],
+        "produces": "WUBRG",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "add_mana",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "BasicManaEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Coal Stoker",
+    "Iridescent Tiger"
+  ],
+  "selected_count": 2,
+  "slug": "etb_conditional_cast_mana",
+  "snapshot_checks": [
+    {
+      "card_name": "Coal Stoker",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:219016c5586f35bc0cfe9a4c7308703a",
+      "min_rule_version": 2,
+      "normalized_name": "coal stoker",
+      "oracle_hash": "30f3d291f75d0e6fccda1c89d8843189",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_add_fixed_mana_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Iridescent Tiger",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:40ddd485da3bf403787ae236f9fa35bb",
+      "min_rule_version": 2,
+      "normalized_name": "iridescent tiger",
+      "oracle_hash": "5320aef7894f806a2479d490088d1fa7",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_add_fixed_mana_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

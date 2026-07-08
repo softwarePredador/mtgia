@@ -2849,6 +2849,91 @@ def run_creature_etb_create_treasure(
     }
 
 
+def run_creature_etb_fixed_mana(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    active = battle.Player(str(scenario.get("player") or "ETB Mana Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
+    effect_data = battle.get_card_effect(card)
+    expected_condition = str(scenario.get("expected_condition") or "")
+    actual_condition = str(effect_data.get("etb_mana_condition") or "")
+    if expected_condition != actual_condition:
+        fail(
+            "battle_execution",
+            f"{card['name']} etb_mana_condition={actual_condition!r}, expected {expected_condition!r}",
+        )
+    expected_symbols = list(scenario.get("expected_produced_mana_symbols") or [])
+    actual_symbols = list(effect_data.get("etb_produced_mana_symbols") or [])
+    if expected_symbols and actual_symbols != expected_symbols:
+        fail(
+            "battle_execution",
+            f"{card['name']} etb_produced_mana_symbols={actual_symbols!r}, expected {expected_symbols!r}",
+        )
+    permanent = battle.prepare_entering_permanent(
+        battle.enrich_card(
+            {
+                **card,
+                **effect_data,
+                "was_cast": bool(scenario.get("was_cast", True)),
+                "cast_from_zone": str(scenario.get("cast_from_zone") or "hand"),
+            }
+        ),
+        controller=active,
+        all_players=[active, opponent],
+        turn=int(scenario.get("turn") or 6),
+    )
+    active.battlefield.append(permanent)
+    before_mana = active.mana_pool.total()
+    before_events = len(events)
+    expected_mana_added = int(scenario.get("expected_mana_added") or 0)
+
+    battle.resolve_generic_permanent_etb(
+        active,
+        [opponent],
+        permanent,
+        effect_data,
+        int(scenario.get("turn") or 6),
+        random.Random(int(scenario.get("seed") or 6065)),
+        all_players=[active, opponent],
+    )
+
+    mana_delta = active.mana_pool.total() - before_mana
+    if mana_delta != expected_mana_added:
+        fail(
+            "battle_execution",
+            f"{card['name']} ETB mana delta={mana_delta}, expected {expected_mana_added}",
+        )
+    mana_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "trigger_resolved"
+            and data.get("card") == card.get("name")
+            and data.get("trigger") == "enters_battlefield"
+            and data.get("effect") == "add_mana"
+        ),
+        None,
+    )
+    if mana_event is None:
+        fail("battle_events", f"missing {card['name']} ETB add_mana trigger_resolved event")
+    if int(mana_event.get("mana_added") or 0) != expected_mana_added:
+        fail(
+            "battle_events",
+            f"{card['name']} event mana_added={mana_event.get('mana_added')}",
+        )
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "mana_added": mana_delta,
+        "cast_from_zone": scenario.get("cast_from_zone"),
+        "validated_condition": expected_condition,
+        "produced_mana_symbols": expected_symbols,
+    }
+
+
 def run_conditional_land_play(
     battle,
     scenario: dict[str, Any],
@@ -6802,6 +6887,7 @@ SCENARIO_RUNNERS = {
     "change_single_target_response": run_change_single_target_response,
     "creature_dies_create_treasure": run_creature_dies_create_treasure,
     "creature_dies_create_tokens": run_creature_dies_create_tokens,
+    "creature_etb_fixed_mana": run_creature_etb_fixed_mana,
     "creature_etb_create_treasure": run_creature_etb_create_treasure,
     "creature_etb_create_tokens": run_creature_etb_create_tokens,
     "creature_etb_dynamic_life_gain": run_creature_etb_dynamic_life_gain,

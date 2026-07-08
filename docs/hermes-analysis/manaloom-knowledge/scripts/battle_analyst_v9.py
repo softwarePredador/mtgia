@@ -19282,6 +19282,28 @@ def resolve_etb_draw_discard(
     return drawn
 
 
+def etb_mana_condition_met(permanent, effect_data):
+    condition = str((effect_data or {}).get("etb_mana_condition") or "").strip().lower()
+    if not condition:
+        return True
+    was_cast = bool(
+        (permanent or {}).get("was_cast")
+        or (effect_data or {}).get("was_cast")
+    )
+    cast_from_zone = str(
+        (permanent or {}).get("cast_from_zone")
+        or (effect_data or {}).get("cast_from_zone")
+        or ((effect_data or {}).get("_cast_context") or {}).get("source_zone")
+        or ((effect_data or {}).get("_resolution_context") or {}).get("source_zone")
+        or ""
+    ).strip().lower()
+    if condition == "cast_from_hand":
+        return was_cast and cast_from_zone == "hand"
+    if condition in {"cast", "cast_from_anywhere"}:
+        return was_cast
+    return False
+
+
 def resolve_generic_permanent_etb(
     player,
     opponents,
@@ -19330,39 +19352,55 @@ def resolve_generic_permanent_etb(
             phase=phase,
         )
     if effect_data.get("etb_mana_produced"):
-        produced = max(0, int(effect_data.get("etb_mana_produced") or 0))
-        pool_before = player.mana_pool.total()
-        mana_payload = {
-            **effect_data,
-            "mana_produced": produced,
-            "produced_mana_symbols": (
-                effect_data.get("etb_produced_mana_symbols")
-                or effect_data.get("produced_mana_symbols")
-                or []
-            ),
-        }
-        if produced > 0 and not add_fixed_produced_mana_symbols_to_pool(player, mana_payload, produced):
-            mana_color = str(effect_data.get("etb_produces") or effect_data.get("produces") or "").lower()
-            player.mana_pool.add(
-                mana_color
-                if mana_color in {"white", "blue", "black", "red", "green", "colorless"}
-                else "generic",
-                produced,
+        if not etb_mana_condition_met(permanent, effect_data):
+            emit_replay_event(
+                "trigger_skipped",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                trigger="enters_battlefield",
+                effect="add_mana",
+                reason="etb_mana_condition_not_met",
+                etb_mana_condition=effect_data.get("etb_mana_condition"),
+                was_cast=bool(permanent.get("was_cast")),
+                cast_from_zone=permanent.get("cast_from_zone"),
+                turn=turn,
+                phase=phase,
+                **replay_rule_fields(effect_data),
             )
-        emit_replay_event(
-            "trigger_resolved",
-            player=player.name,
-            card=permanent.get("name", "?"),
-            trigger="enters_battlefield",
-            effect="add_mana",
-            mana_added=produced,
-            produced_mana_symbols=list(mana_payload.get("produced_mana_symbols") or []),
-            mana_pool_before=pool_before,
-            mana_pool_after=player.mana_pool.total(),
-            turn=turn,
-            phase=phase,
-            **replay_rule_fields(effect_data),
-        )
+        else:
+            produced = max(0, int(effect_data.get("etb_mana_produced") or 0))
+            pool_before = player.mana_pool.total()
+            mana_payload = {
+                **effect_data,
+                "mana_produced": produced,
+                "produced_mana_symbols": (
+                    effect_data.get("etb_produced_mana_symbols")
+                    or effect_data.get("produced_mana_symbols")
+                    or []
+                ),
+            }
+            if produced > 0 and not add_fixed_produced_mana_symbols_to_pool(player, mana_payload, produced):
+                mana_color = str(effect_data.get("etb_produces") or effect_data.get("produces") or "").lower()
+                player.mana_pool.add(
+                    mana_color
+                    if mana_color in {"white", "blue", "black", "red", "green", "colorless"}
+                    else "generic",
+                    produced,
+                )
+            emit_replay_event(
+                "trigger_resolved",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                trigger="enters_battlefield",
+                effect="add_mana",
+                mana_added=produced,
+                produced_mana_symbols=list(mana_payload.get("produced_mana_symbols") or []),
+                mana_pool_before=pool_before,
+                mana_pool_after=player.mana_pool.total(),
+                turn=turn,
+                phase=phase,
+                **replay_rule_fields(effect_data),
+            )
     if effect_data.get("etb_land_ramp_count"):
         if (
             effect_data.get("etb_land_ramp_condition") == "opponent_controls_more_lands"
@@ -61130,6 +61168,31 @@ def apply_effect_immediate(
     all_players_for_entry = bind_table_context([player] + list(opponents or []))
 
     def prepare_resolved_permanent(payload):
+        if isinstance(payload, dict):
+            cast_context = {}
+            if isinstance(effect_data, dict):
+                cast_context.update(copy.deepcopy(effect_data.get("_cast_context") or {}))
+                cast_context.update(copy.deepcopy(effect_data.get("_resolution_context") or {}))
+            if isinstance(card, dict):
+                cast_context.update(copy.deepcopy(card.get("_cast_context") or {}))
+            explicit_source_zone = (
+                cast_context.get("source_zone")
+                or payload.get("cast_from_zone")
+                or payload.get("source_zone")
+            )
+            has_explicit_cast_context = bool(
+                cast_context
+                or payload.get("was_cast") is not None
+                or explicit_source_zone
+            )
+            source_zone = str(explicit_source_zone or "").strip().lower()
+            is_stack_copy = source_zone == "stack_copy" or bool(payload.get("is_copy"))
+            if has_explicit_cast_context:
+                payload["was_cast"] = bool(payload.get("was_cast", not is_stack_copy)) and not is_stack_copy
+                payload["cast_from_zone"] = source_zone if not is_stack_copy else "stack_copy"
+            else:
+                payload.setdefault("was_cast", False)
+                payload.setdefault("cast_from_zone", "")
         return prepare_entering_permanent(
             payload,
             controller=player,

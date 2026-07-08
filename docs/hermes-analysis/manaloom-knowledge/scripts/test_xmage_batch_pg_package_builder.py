@@ -2636,6 +2636,82 @@ def test_manifest_expected_rule_preserves_dies_mana_fields() -> None:
     }
 
 
+def test_manifest_expected_rule_preserves_etb_mana_condition_fields() -> None:
+    proposal = {
+        "normalized_name": "coal stoker",
+        "card_name": "Coal Stoker",
+        "oracle_hash": "hash-coal-stoker",
+        "logical_rule_key": "battle_rule_v1:coal-stoker",
+        "effect_json": {
+            "effect": "ramp_permanent",
+            "battle_model_scope": "xmage_creature_etb_add_fixed_mana_v1",
+            "ability_kind": "triggered",
+            "trigger": "enters_battlefield",
+            "trigger_effect": "add_mana",
+            "permanent_type": "creature",
+            "etb_mana_produced": 3,
+            "etb_produces": "R",
+            "etb_produced_mana_symbols": ["R", "R", "R"],
+            "etb_mana_condition": "cast_from_hand",
+            "mana_produced": 3,
+            "produces": "R",
+            "produced_mana_symbols": ["R", "R", "R"],
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+
+    assert expected["required_effect_fields"] == {
+        "effect": "ramp_permanent",
+        "battle_model_scope": "xmage_creature_etb_add_fixed_mana_v1",
+        "ability_kind": "triggered",
+        "permanent_type": "creature",
+        "etb_mana_produced": 3,
+        "etb_produces": "R",
+        "etb_produced_mana_symbols": ["R", "R", "R"],
+        "etb_mana_condition": "cast_from_hand",
+        "mana_produced": 3,
+        "produces": "R",
+        "produced_mana_symbols": ["R", "R", "R"],
+        "trigger": "enters_battlefield",
+        "trigger_effect": "add_mana",
+    }
+
+
+def test_execution_scenario_includes_creature_etb_fixed_mana_condition() -> None:
+    rule = {
+        "normalized_name": "coal stoker",
+        "card_name": "Coal Stoker",
+        "logical_rule_key": "battle_rule_v1:coal-stoker",
+        "required_effect_fields": {
+            "effect": "ramp_permanent",
+            "battle_model_scope": "xmage_creature_etb_add_fixed_mana_v1",
+            "etb_mana_produced": 3,
+            "etb_produces": "R",
+            "etb_produced_mana_symbols": ["R", "R", "R"],
+            "etb_mana_condition": "cast_from_hand",
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario == {
+        "name": "Coal Stoker ETB adds fixed mana",
+        "type": "creature_etb_fixed_mana",
+        "card": {
+            "name": "Coal Stoker",
+            "type_line": "Creature - Elemental",
+            "effect": "ramp_permanent",
+        },
+        "was_cast": True,
+        "cast_from_zone": "hand",
+        "expected_mana_added": 3,
+        "expected_produced_mana_symbols": ["R", "R", "R"],
+        "expected_condition": "cast_from_hand",
+        "logical_rule_key": "battle_rule_v1:coal-stoker",
+    }
+
+
 def test_manifest_expected_rule_preserves_aura_static_power_toughness_fields() -> None:
     proposal = {
         "normalized_name": "dead weight",
