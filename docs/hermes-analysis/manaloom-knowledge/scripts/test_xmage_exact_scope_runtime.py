@@ -23030,6 +23030,69 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_boost_untap_target_spell_buffs_and_untaps_multiple_creatures(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        illegal_land = {
+            "name": "Illegal Tapped Land",
+            "type_line": "Land",
+            "effect": "land",
+            "tapped": True,
+        }
+        target_one = {
+            "name": "Tapped Soldier One",
+            "type_line": "Creature - Soldier",
+            "power": 2,
+            "toughness": 2,
+            "tapped": True,
+        }
+        target_two = {
+            "name": "Tapped Soldier Two",
+            "type_line": "Creature - Soldier",
+            "power": 3,
+            "toughness": 3,
+            "tapped": True,
+        }
+        active.battlefield = [illegal_land, target_one, target_two]
+        effect = {
+            "effect": "stat_modifier_until_eot_untap_target",
+            "battle_model_scope": "xmage_fixed_boost_and_untap_target_creature_until_eot_spell_v1",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "target_controller": "any",
+            "power_delta": 2,
+            "toughness_delta": 2,
+            "untap_target": True,
+            "target_count": 2,
+            "target_count_min": 0,
+            "target_count_max": 2,
+            "up_to_count": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Synchronized Strike", "type_line": "Instant"},
+            turn=7,
+            rng=random.Random(7),
+            effect_data_override=effect,
+        )
+
+        self.assertFalse(target_one["tapped"])
+        self.assertFalse(target_two["tapped"])
+        self.assertTrue(illegal_land["tapped"])
+        self.assertEqual((target_one["power"], target_one["toughness"]), (4, 4))
+        self.assertEqual((target_two["power"], target_two["toughness"]), (5, 5))
+        self.assertTrue(
+            any(
+                event == "stat_modifier_until_eot_untap_target_resolved"
+                and data.get("card") == "Synchronized Strike"
+                and data.get("target_count") == 2
+                and data.get("targets_untapped_count") == 2
+                for event, data in self.events
+            )
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

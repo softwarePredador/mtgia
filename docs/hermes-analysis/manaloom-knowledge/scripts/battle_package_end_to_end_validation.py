@@ -3989,6 +3989,107 @@ def run_tap_target_spell(
     }
 
 
+def run_stat_modifier_until_eot_untap_target(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    active = battle.Player(str(scenario.get("player") or "Boost Untap Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Boost Untap Opponent"), None, [])
+    targets = [
+        battle.enrich_card(dict(target))
+        for target in (scenario.get("targets") or [scenario.get("target") or {}])
+        if target
+    ]
+    if not targets:
+        fail("battle_execution", f"{card['name']} boost+untap scenario has no legal targets")
+    nonmatching = scenario.get("nonmatching_target")
+    active.battlefield = []
+    if nonmatching:
+        active.battlefield.append(battle.enrich_card(dict(nonmatching)))
+    active.battlefield.extend(targets)
+    expected_count = int(scenario.get("expected_target_count") or len(targets) or 1)
+    effect = battle.get_card_effect(card)
+    before_events = len(events)
+    before_stats = {
+        str(target.get("name") or ""): (
+            int(target.get("power") or 0),
+            int(target.get("toughness") or 0),
+        )
+        for target in targets
+    }
+    battle.apply_effect_immediate(
+        active,
+        [opponent],
+        battle.enrich_card({**card, **effect}),
+        turn=int(scenario.get("turn") or 7),
+        rng=random.Random(int(scenario.get("seed") or 6075)),
+        effect_data_override=effect,
+        phase=str(scenario.get("phase") or "precombat_main"),
+    )
+    power_delta = int(scenario.get("expected_power_delta") or effect.get("power_delta") or 0)
+    toughness_delta = int(scenario.get("expected_toughness_delta") or effect.get("toughness_delta") or 0)
+    affected_names = []
+    for target in targets:
+        name = str(target.get("name") or "")
+        before_power, before_toughness = before_stats[name]
+        if bool(target.get("tapped")):
+            fail("battle_execution", f"{card['name']} left target {name} tapped")
+        if int(target.get("power") or 0) != before_power + power_delta:
+            fail("battle_execution", f"{card['name']} target {name} power={target.get('power')!r}")
+        if int(target.get("toughness") or 0) != before_toughness + toughness_delta:
+            fail("battle_execution", f"{card['name']} target {name} toughness={target.get('toughness')!r}")
+        affected_names.append(name)
+    if len(affected_names) != expected_count:
+        fail(
+            "battle_execution",
+            f"{card['name']} affected {len(affected_names)} targets, expected {expected_count}",
+        )
+    if nonmatching:
+        nonmatching_name = str(nonmatching.get("name") or "")
+        illegal = next(
+            (
+                permanent
+                for permanent in active.battlefield
+                if str(permanent.get("name") or "") == nonmatching_name
+            ),
+            None,
+        )
+        if illegal is None:
+            fail("battle_execution", f"{card['name']} removed illegal target {nonmatching_name}")
+        if not illegal.get("tapped"):
+            fail("battle_execution", f"{card['name']} untapped illegal target {nonmatching_name}")
+    resolved_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "stat_modifier_until_eot_untap_target_resolved"
+            and data.get("card") == card.get("name")
+        ),
+        None,
+    )
+    if resolved_event is None:
+        fail("battle_events", f"missing {card['name']} boost+untap resolved event")
+    if int(resolved_event.get("target_count") or 0) != expected_count:
+        fail(
+            "battle_events",
+            f"{card['name']} event target_count={resolved_event.get('target_count')}, expected {expected_count}",
+        )
+    if int(resolved_event.get("targets_untapped_count") or 0) != expected_count:
+        fail(
+            "battle_events",
+            f"{card['name']} event targets_untapped_count={resolved_event.get('targets_untapped_count')}, expected {expected_count}",
+        )
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "targets": affected_names,
+        "target_count": len(affected_names),
+        "targets_untapped_count": int(resolved_event.get("targets_untapped_count") or 0),
+    }
+
+
 def run_simple_activated_tap_target(
     battle,
     scenario: dict[str, Any],
@@ -7069,6 +7170,7 @@ SCENARIO_RUNNERS = {
     "simple_activated_damage": run_simple_activated_damage,
     "simple_activated_tap_target": run_simple_activated_tap_target,
     "tap_target_spell": run_tap_target_spell,
+    "stat_modifier_until_eot_untap_target": run_stat_modifier_until_eot_untap_target,
     "simple_activated_add_counters_target": run_simple_activated_add_counters_target,
     "simple_activated_destroy": run_simple_activated_destroy,
     "simple_activated_target_keyword": run_simple_activated_target_keyword,

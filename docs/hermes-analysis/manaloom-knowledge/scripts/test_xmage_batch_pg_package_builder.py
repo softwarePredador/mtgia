@@ -1443,6 +1443,40 @@ def test_manifest_builds_tap_target_spell_execution_scenario() -> None:
     assert scenario["nonmatching_target"]["name"] == "E2E Illegal Tap Spell Target"
 
 
+def test_manifest_builds_boost_untap_target_spell_execution_scenario() -> None:
+    rule = {
+        "normalized_name": "synchronized strike",
+        "card_name": "Synchronized Strike",
+        "oracle_hash": "hash-synchronized-strike",
+        "logical_rule_key": "battle_rule_v1:hash-synchronized-strike",
+        "required_effect_fields": {
+            "effect": "stat_modifier_until_eot_untap_target",
+            "battle_model_scope": "xmage_fixed_boost_and_untap_target_creature_until_eot_spell_v1",
+            "target": "creature",
+            "target_controller": "any",
+            "target_constraints": {"card_types": ["creature"]},
+            "power_delta": 2,
+            "toughness_delta": 2,
+            "untap_target": True,
+            "target_count": 2,
+            "target_count_min": 0,
+            "target_count_max": 2,
+            "up_to_count": True,
+        },
+    }
+
+    scenario = builder.boost_untap_target_spell_execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "stat_modifier_until_eot_untap_target"
+    assert scenario["expected_power_delta"] == 2
+    assert scenario["expected_toughness_delta"] == 2
+    assert scenario["expected_target_count"] == 2
+    assert len(scenario["targets"]) == 2
+    assert all(target["tapped"] is True for target in scenario["targets"])
+    assert scenario["nonmatching_target"]["name"] == "E2E Illegal Boost Untap Target"
+
+
 def test_manifest_builds_simple_activated_tap_target_execution_scenario() -> None:
     rule = {
         "normalized_name": "akroan jailer",

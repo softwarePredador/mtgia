@@ -108,6 +108,7 @@ EFFECT_TO_DECK_CATEGORY = {
     "recursion": "engine",
     "add_counters": "support",
     "stat_modifier_until_eot": "support",
+    "stat_modifier_until_eot_untap_target": "support",
     "graveyard_flashback_grant": "engine",
     "redistribute_life_totals": "wincon",
     "land_recursion": "engine",
@@ -321,14 +322,14 @@ def deck_role_from_effect(effect_json: dict[str, Any]) -> dict[str, Any]:
             subtype = "negative_counters"
         elif counter_type == "+1/+1":
             subtype = "plus_one_counters"
-    elif effect == "stat_modifier_until_eot":
+    elif effect in {"stat_modifier_until_eot", "stat_modifier_until_eot_untap_target"}:
         power_delta = int(effect_json.get("power_delta") or effect_json.get("power_boost") or 0)
         toughness_delta = int(effect_json.get("toughness_delta") or effect_json.get("toughness_boost") or 0)
         if toughness_delta < 0 or (power_delta < 0 and toughness_delta <= 0):
             category = "removal"
             subtype = "temporary_debuff"
         else:
-            subtype = "temporary_pump"
+            subtype = "temporary_pump_untap" if effect == "stat_modifier_until_eot_untap_target" else "temporary_pump"
     elif effect == "aura_static_attachment":
         power_delta = int(effect_json.get("power_boost") or effect_json.get("static_power_bonus") or 0)
         toughness_delta = int(effect_json.get("toughness_boost") or effect_json.get("static_toughness_bonus") or 0)

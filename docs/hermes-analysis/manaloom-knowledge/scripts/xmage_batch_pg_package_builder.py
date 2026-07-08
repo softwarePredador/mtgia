@@ -83,6 +83,7 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "toughness_delta",
     "power_boost",
     "toughness_boost",
+    "untap_target",
     "blocker_count_mode",
     "duration",
     "granted_keywords_until_eot",
@@ -3046,6 +3047,56 @@ def tap_target_spell_execution_scenario_from_expected_rule(
     }
 
 
+def boost_untap_target_spell_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_fixed_boost_and_untap_target_creature_until_eot_spell_v1":
+        return None
+    if required.get("effect") != "stat_modifier_until_eot_untap_target":
+        return None
+    constraints = dict(required.get("target_constraints") or {"card_types": ["creature"]})
+    target_count = int(
+        required.get("target_count_max")
+        or required.get("max_targets")
+        or required.get("target_count")
+        or 1
+    )
+    target_count = max(1, min(target_count, 3))
+    targets = []
+    for index in range(1, target_count + 1):
+        fixture = _target_fixture_from_constraints(
+            f"E2E Legal Boost Untap Target {index}",
+            constraints,
+            matching=True,
+        )
+        fixture["tapped"] = True
+        fixture.setdefault("power", 2)
+        fixture.setdefault("toughness", 2)
+        targets.append(fixture)
+    nonmatching = _target_fixture_from_constraints(
+        "E2E Illegal Boost Untap Target",
+        constraints,
+        matching=False,
+    )
+    nonmatching["tapped"] = True
+    return {
+        "name": f"{rule['card_name']} boosts and untaps target creatures",
+        "type": "stat_modifier_until_eot_untap_target",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": "Sorcery" if required.get("sorcery") is True else "Instant",
+        },
+        "targets": targets,
+        "nonmatching_target": nonmatching,
+        "expected_power_delta": int(required.get("power_delta") or required.get("power_boost") or 0),
+        "expected_toughness_delta": int(required.get("toughness_delta") or required.get("toughness_boost") or 0),
+        "expected_target_count": target_count,
+        "expected_target_constraints": constraints,
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def simple_activated_add_counters_target_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
@@ -4714,6 +4765,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or fixed_damage_target_spell_execution_scenario_from_expected_rule(rule)
         or damage_target_create_treasure_execution_scenario_from_expected_rule(rule)
         or tap_target_spell_execution_scenario_from_expected_rule(rule)
+        or boost_untap_target_spell_execution_scenario_from_expected_rule(rule)
         or simple_activated_draw_execution_scenario_from_expected_rule(rule)
         or combat_damage_draw_execution_scenario_from_expected_rule(rule)
         or simple_activated_damage_execution_scenario_from_expected_rule(rule)

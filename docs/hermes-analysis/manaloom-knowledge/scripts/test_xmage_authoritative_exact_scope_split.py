@@ -27234,6 +27234,112 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "modal_damage_destroy_oracle_mode_not_supported")
 
+    def test_fixed_boost_untap_target_maps_single_target_exact_scope(self) -> None:
+        proposal, reason = split.split_row(
+            queue_row(
+                split.UNTAP_TARGET_UNIT,
+                effect_classes=["BoostTargetEffect", "UntapTargetEffect"],
+                xmage_signals=["targeting"],
+            ),
+            metadata(
+                name="Savage Surge",
+                type_line="Instant",
+                oracle_text="Target creature gets +2/+2 until end of turn. Untap that creature.",
+            ),
+            source_text="""
+                this.getSpellAbility().addTarget(new TargetCreaturePermanent());
+                Effect boostEffect = new BoostTargetEffect(2, 2, Duration.EndOfTurn);
+                Effect untapEffect = new UntapTargetEffect();
+                this.getSpellAbility().addEffect(boostEffect);
+                this.getSpellAbility().addEffect(untapEffect);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "stat_modifier_until_eot_untap_target")
+        self.assertEqual(effect["battle_model_scope"], split.BOOST_UNTAP_TARGET_SCOPE)
+        self.assertEqual(effect["power_delta"], 2)
+        self.assertEqual(effect["toughness_delta"], 2)
+        self.assertEqual(effect["target_count_min"], 1)
+        self.assertEqual(effect["target_count_max"], 1)
+        self.assertTrue(effect["untap_target"])
+
+    def test_fixed_boost_untap_target_maps_up_to_two_exact_scope(self) -> None:
+        proposal, reason = split.split_row(
+            queue_row(
+                split.UNTAP_TARGET_UNIT,
+                effect_classes=["BoostTargetEffect", "UntapTargetEffect"],
+                xmage_signals=["targeting"],
+            ),
+            metadata(
+                name="Synchronized Strike",
+                type_line="Instant",
+                oracle_text="Untap up to two target creatures. They each get +2/+2 until end of turn.",
+            ),
+            source_text="""
+                getSpellAbility().addTarget(new TargetCreaturePermanent(0, 2));
+                getSpellAbility().addEffect(new UntapTargetEffect());
+                Effect effect = new BoostTargetEffect(2, 2, Duration.EndOfTurn);
+                getSpellAbility().addEffect(effect);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["target_count_min"], 0)
+        self.assertEqual(effect["target_count_max"], 2)
+        self.assertTrue(effect["up_to_count"])
+
+    def test_fixed_boost_untap_blocks_dynamic_x_boost(self) -> None:
+        proposal, reason = split.split_row(
+            queue_row(
+                split.UNTAP_TARGET_UNIT,
+                effect_classes=["BoostTargetEffect", "UntapTargetEffect"],
+                xmage_signals=["targeting"],
+            ),
+            metadata(
+                name="Boon of Boseiju",
+                type_line="Instant",
+                oracle_text=(
+                    "Target creature gets +X/+X until end of turn, where X is the greatest mana value "
+                    "among permanents you control. Untap it."
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new BoostTargetEffect(
+                    BoonOfBoseijuValue.instance, BoonOfBoseijuValue.instance, Duration.EndOfTurn));
+                this.getSpellAbility().addEffect(new UntapTargetEffect().setText("Untap it"));
+                this.getSpellAbility().addTarget(new TargetCreaturePermanent());
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "boost_untap_source_boost_not_single_fixed")
+
+    def test_fixed_boost_untap_blocks_nonattacking_filter(self) -> None:
+        proposal, reason = split.split_row(
+            queue_row(
+                split.UNTAP_TARGET_UNIT,
+                effect_classes=["BoostTargetEffect", "UntapTargetEffect"],
+                xmage_signals=["targeting"],
+            ),
+            metadata(
+                name="Alarum",
+                type_line="Instant",
+                oracle_text="Untap target nonattacking creature. It gets +1/+3 until end of turn.",
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new UntapTargetEffect());
+                Effect effect = new BoostTargetEffect(1, 3, Duration.EndOfTurn);
+                this.getSpellAbility().addEffect(effect);
+                this.getSpellAbility().addTarget(new TargetPermanent(filter));
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "boost_untap_source_target_filter_not_supported")
+
 
 if __name__ == "__main__":
     unittest.main()

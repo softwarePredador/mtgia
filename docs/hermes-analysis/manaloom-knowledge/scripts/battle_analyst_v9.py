@@ -301,6 +301,7 @@ OPENING_HAND_REACTIVE_EFFECTS = {
     "silence_opponents",
     "silence_spell",
     "stat_modifier_until_eot",
+    "stat_modifier_until_eot_untap_target",
     "global_stat_modifier_until_eot",
 }
 OPENING_HAND_CARD_FLOW_EFFECTS = {
@@ -5129,6 +5130,142 @@ def choose_stat_modifier_target(player, opponents, card, effect_data):
         preferred = candidates
     owner, target = max(preferred, key=lambda item: target_priority(item[1]))
     return owner, target, [target for _owner, target in candidates]
+
+
+def stat_modifier_target_count(effect_data):
+    return max(
+        1,
+        int(
+            (effect_data or {}).get("target_count_max")
+            or (effect_data or {}).get("max_targets")
+            or (effect_data or {}).get("target_count")
+            or 1
+        ),
+    )
+
+
+def choose_stat_modifier_targets(player, opponents, card, effect_data):
+    candidates = stat_modifier_candidate_targets(player, opponents, card, effect_data)
+    if not candidates:
+        return []
+    requested_count = stat_modifier_target_count(effect_data)
+    up_to_count = bool((effect_data or {}).get("up_to_count"))
+    minimum_count = int((effect_data or {}).get("target_count_min") or (0 if up_to_count else requested_count))
+    minimum_count = max(0 if up_to_count else 1, minimum_count)
+    if len(candidates) < minimum_count:
+        return []
+    harmful = stat_modifier_is_harmful(effect_data)
+    preferred = [
+        (owner, target)
+        for owner, target in candidates
+        if (owner is not player if harmful else owner is player)
+    ]
+    if not preferred:
+        preferred = candidates
+    preferred.sort(
+        key=lambda item: (
+            target_priority(item[1]),
+            str(getattr(item[0], "name", "")),
+            str(item[1].get("name") or ""),
+        ),
+        reverse=True,
+    )
+    if not up_to_count and len(preferred) < requested_count and len(candidates) >= requested_count:
+        remaining = [item for item in candidates if item not in preferred]
+        remaining.sort(
+            key=lambda item: (
+                target_priority(item[1]),
+                str(getattr(item[0], "name", "")),
+                str(item[1].get("name") or ""),
+            ),
+            reverse=True,
+        )
+        preferred = [*preferred, *remaining]
+    if not up_to_count and len(preferred) < requested_count:
+        return []
+    return preferred[: min(requested_count, len(preferred))]
+
+
+def resolve_stat_modifier_until_eot_untap_target_spell(player, opponents, card, effect_data, turn):
+    power_delta = int(effect_data.get("power_delta") or effect_data.get("power_boost") or 0)
+    toughness_delta = int(effect_data.get("toughness_delta") or effect_data.get("toughness_boost") or 0)
+    target_type = str(effect_data.get("target") or "").lower() or _target_type_from_constraints(effect_data) or "creature"
+    candidates = stat_modifier_candidate_targets(player, opponents, card, effect_data)
+    selected = choose_stat_modifier_targets(player, opponents, card, effect_data)
+    requested_count = stat_modifier_target_count(effect_data)
+    if not selected:
+        emit_replay_event(
+            "stat_modifier_until_eot_untap_target_resolved",
+            player=player.name,
+            card=card.get("name", "?"),
+            power_delta=power_delta,
+            toughness_delta=toughness_delta,
+            target_type=target_type,
+            requested_target_count=requested_count,
+            available_targets=len(candidates),
+            target_count=0,
+            targets_untapped_count=0,
+            result="no_legal_target",
+            turn=turn,
+            **replay_rule_fields(effect_data),
+        )
+        finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+        return []
+
+    details = []
+    for target_owner, target in selected:
+        decision = targeting_decision(
+            card if isinstance(card, dict) else effect_data,
+            target,
+            player,
+            target_controller=target_owner,
+            target_type=target_type,
+        )
+        if not decision["target_legal"]:
+            continue
+        power_before = _numeric_card_stat(target, "power")
+        toughness_before = _numeric_card_stat(target, "toughness", "power")
+        tapped_before = bool(target.get("tapped"))
+        remember_until_eot(target, "power")
+        remember_until_eot(target, "toughness")
+        target["power"] = power_before + power_delta
+        target["toughness"] = toughness_before + toughness_delta
+        if effect_data.get("untap_target"):
+            target["tapped"] = False
+        details.append(
+            {
+                "target": target.get("name", "?"),
+                "target_player": target_owner.name,
+                "target_power_before": power_before,
+                "target_power_after": _numeric_card_stat(target, "power"),
+                "target_toughness_before": toughness_before,
+                "target_toughness_after": _numeric_card_stat(target, "toughness", "power"),
+                "target_tapped_before": tapped_before,
+                "target_tapped_after": bool(target.get("tapped")),
+                "target_untapped": tapped_before and not bool(target.get("tapped")),
+                **decision,
+            }
+        )
+
+    result = "stat_modifier_until_eot_untap_target_applied" if details else "no_legal_target"
+    emit_replay_event(
+        "stat_modifier_until_eot_untap_target_resolved",
+        player=player.name,
+        card=card.get("name", "?"),
+        target_type=target_type,
+        target_count=len(details),
+        requested_target_count=requested_count,
+        available_targets=len(candidates),
+        targets=details,
+        targets_untapped_count=sum(1 for detail in details if detail.get("target_untapped")),
+        power_delta=power_delta,
+        toughness_delta=toughness_delta,
+        result=result,
+        turn=turn,
+        **replay_rule_fields(effect_data),
+    )
+    finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+    return [target for _owner, target in selected]
 
 
 def resolve_stat_modifier_until_eot_spell(player, opponents, card, effect_data, turn, *, finish=True):
@@ -62738,6 +62875,8 @@ def apply_effect_immediate(
         resolve_add_counters_target_spell(player, opponents, card, effect_data, turn)
     elif effect == "tap_target":
         apply_tap_target_spell(player, opponents, card, effect_data, turn, rng)
+    elif effect == "stat_modifier_until_eot_untap_target":
+        resolve_stat_modifier_until_eot_untap_target_spell(player, opponents, card, effect_data, turn)
     elif effect == "stat_modifier_until_eot":
         resolve_stat_modifier_until_eot_spell(player, opponents, card, effect_data, turn)
     elif effect == "controlled_stat_modifier_until_eot":
