@@ -4186,6 +4186,140 @@ def run_simple_activated_tap_target(
     }
 
 
+def run_simple_activated_untap_target(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    effect = battle.get_card_effect(card)
+    permanent_type = str(effect.get("effect") or "permanent")
+    default_type_line = {
+        "creature": "Creature - Druid",
+        "artifact": "Artifact",
+        "enchantment": "Enchantment",
+    }.get(permanent_type, "Artifact")
+    source = battle.enrich_card(
+        {
+            **card,
+            "type_line": default_type_line,
+            "summoning_sick": False,
+            "tapped": False,
+            **effect,
+            **dict(scenario.get("source_overrides") or {}),
+        }
+    )
+    active = battle.Player(str(scenario.get("player") or "Untap Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Untap Opponent"), None, [])
+    target_fixtures = list(scenario.get("targets") or [])
+    if not target_fixtures:
+        target_fixtures = [
+            {
+                "name": str(scenario.get("target_name") or f"E2E Untap Target for {card['name']}"),
+                "type_line": "Creature - Druid",
+                "effect": "creature",
+                "power": 2,
+                "toughness": 2,
+                "tapped": True,
+            }
+        ]
+    targets = []
+    for index, fixture in enumerate(target_fixtures, start=1):
+        target = battle.enrich_card(
+            {
+                "name": fixture.get("name") or f"E2E Untap Target {index} for {card['name']}",
+                "type_line": "Creature - Druid",
+                "effect": "creature",
+                "power": 2,
+                "toughness": 2,
+                "cmc": 2,
+                "tapped": True,
+                **dict(fixture),
+            }
+        )
+        target["tapped"] = True
+        targets.append(target)
+    nonmatching_fixture = dict(scenario.get("nonmatching_target") or {})
+    nonmatching = battle.enrich_card(
+        {
+            "name": nonmatching_fixture.get("name") or f"E2E Illegal Untap Target for {card['name']}",
+            "type_line": "Creature - Rogue",
+            "effect": "creature",
+            "power": 1,
+            "toughness": 1,
+            "cmc": 1,
+            "tapped": True,
+            **nonmatching_fixture,
+        }
+    )
+    nonmatching["tapped"] = True
+    active.battlefield = [source, *targets]
+    opponent.battlefield = [nonmatching]
+    add_manifest_mana(active, scenario.get("controller_mana") or {})
+    expected_tapped_source = bool(scenario.get("expected_tapped_source", effect.get("activation_requires_tap", False)))
+    expected_count = int(scenario.get("expected_target_count") or effect.get("target_count") or len(targets) or 1)
+
+    if not battle.can_activate_generic_untap_target_permanent(active, source, [opponent]):
+        fail("battle_execution", f"{card['name']} simple activated untap target cannot activate")
+    activated = battle.activate_generic_untap_target_permanent(
+        active,
+        [opponent],
+        source,
+        turn=int(scenario.get("turn") or 6723),
+        rng=random.Random(int(scenario.get("seed") or 6723)),
+        phase=str(scenario.get("phase") or "precombat_main"),
+    )
+    if not activated:
+        fail("battle_execution", f"{card['name']} simple activated untap target activation failed")
+    untapped_count = sum(1 for target in targets if not bool(target.get("tapped")))
+    if untapped_count != expected_count:
+        fail(
+            "battle_execution",
+            f"{card['name']} untapped {untapped_count} targets, expected {expected_count}",
+        )
+    if not bool(nonmatching.get("tapped")):
+        fail("battle_execution", f"{card['name']} untapped illegal/nonpreferred target")
+    if bool(source.get("tapped")) != expected_tapped_source:
+        fail(
+            "battle_execution",
+            f"{card['name']} source tapped={bool(source.get('tapped'))}, expected {expected_tapped_source}",
+        )
+    activation_event = next(
+        (
+            data
+            for event, data in reversed(events)
+            if event == "activated_ability"
+            and data.get("card") == card.get("name")
+            and data.get("activation_kind") == "simple_activated_untap_target"
+        ),
+        None,
+    )
+    if activation_event is None:
+        fail("battle_events", f"missing {card['name']} simple activated untap target event")
+    resolved_event = next(
+        (
+            data
+            for event, data in reversed(events)
+            if event == "untap_target_resolved"
+            and data.get("card") == card.get("name")
+        ),
+        None,
+    )
+    if resolved_event is None:
+        fail("battle_events", f"missing {card['name']} untap target resolved event")
+    if int(resolved_event.get("target_untapped_count") or 0) != expected_count:
+        fail(
+            "battle_events",
+            f"{card['name']} event target_untapped_count={resolved_event.get('target_untapped_count')}, expected {expected_count}",
+        )
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "targets_untapped": untapped_count,
+        "source_tapped": bool(source.get("tapped")),
+    }
+
+
 def run_simple_activated_add_counters_target(
     battle,
     scenario: dict[str, Any],
@@ -7169,6 +7303,7 @@ SCENARIO_RUNNERS = {
     "simple_activated_draw": run_simple_activated_draw,
     "simple_activated_damage": run_simple_activated_damage,
     "simple_activated_tap_target": run_simple_activated_tap_target,
+    "simple_activated_untap_target": run_simple_activated_untap_target,
     "tap_target_spell": run_tap_target_spell,
     "stat_modifier_until_eot_untap_target": run_stat_modifier_until_eot_untap_target,
     "simple_activated_add_counters_target": run_simple_activated_add_counters_target,

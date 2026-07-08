@@ -412,6 +412,7 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "activated_remove_effect",
     "activated_remove_target",
     "activated_tap_target",
+    "activated_untap_target",
     "activated_add_counters",
     "activated_add_counters_target",
     "activated_add_counters_counter_type",
@@ -593,6 +594,7 @@ def package_deck_role(proposal: dict[str, Any]) -> dict[str, Any]:
     placeholder_role = (
         str(deck_role.get("effect") or "") == "external_reference_required_manual_model"
         or str(deck_role.get("category") or "") == "manual_review"
+        or str(deck_role.get("category") or "") == "unknown"
     )
     if effect and effect != "external_reference_required_manual_model" and placeholder_role:
         return battle_rule_registry.deck_role_from_effect(effect_json)
@@ -2995,6 +2997,60 @@ def simple_activated_tap_target_execution_scenario_from_expected_rule(
     }
 
 
+def simple_activated_untap_target_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_permanent_simple_activated_untap_target_v1":
+        return None
+    target = required.get("activated_untap_target") or required.get("target") or "permanent"
+    constraints = dict(required.get("target_constraints") or {})
+    if not constraints.get("card_types"):
+        if str(target) == "artifact_creature":
+            constraints["card_types"] = ["artifact", "creature"]
+            constraints["all_card_types_required"] = True
+        else:
+            constraints["card_types"] = ["creature"] if str(target) == "creature" else [str(target)]
+    target_count = max(
+        1,
+        min(
+            3,
+            int(
+                required.get("target_count_max")
+                or required.get("target_count")
+                or 1
+            ),
+        ),
+    )
+    targets = []
+    for index in range(1, target_count + 1):
+        fixture = _target_fixture_from_constraints(
+            f"E2E Legal Untap Target {index}",
+            constraints,
+            matching=True,
+        )
+        fixture["tapped"] = True
+        targets.append(fixture)
+    nonmatching = _target_fixture_from_constraints(
+        "E2E Illegal Untap Target",
+        constraints,
+        matching=False,
+    )
+    nonmatching["tapped"] = True
+    return {
+        "name": f"{rule['card_name']} activates untap target ability",
+        "type": "simple_activated_untap_target",
+        "card": {"name": rule["card_name"]},
+        "controller_mana": _manifest_mana_for_required_activation(required),
+        "expected_tapped_source": bool(required.get("activation_requires_tap")),
+        "expected_target": target,
+        "expected_target_count": target_count,
+        "targets": targets,
+        "nonmatching_target": nonmatching,
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def tap_target_spell_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
@@ -3720,6 +3776,14 @@ def _target_fixture_from_constraints(
 
     active_constraints = _merge_first_any_of_option(constraints) if matching else dict(constraints)
     card_type = _primary_fixture_card_type(active_constraints)
+    card_types = {
+        str(value or "").strip().lower()
+        for value in active_constraints.get("card_types") or []
+        if str(value or "").strip()
+    }
+    if matching and active_constraints.get("all_card_types_required"):
+        if {"artifact", "creature"}.issubset(card_types):
+            card_type = "artifact creature"
     if not matching and active_constraints.get("exclude_card_types"):
         excluded_type = str((active_constraints.get("exclude_card_types") or ["artifact"])[0]).strip().lower()
         if excluded_type:
@@ -3779,17 +3843,27 @@ def _target_fixture_from_constraints(
     if not matching and active_constraints.get("exclude_subtypes"):
         subtypes = [str((active_constraints.get("exclude_subtypes") or ["spirit"])[0]).strip().lower()]
     type_line = _type_line_for_fixture(card_type, subtypes)
+    if matching and active_constraints.get("required_supertypes"):
+        supertypes = [
+            str(value).strip().title()
+            for value in active_constraints.get("required_supertypes") or []
+            if str(value).strip()
+        ]
+        if supertypes:
+            type_line = f"{' '.join(supertypes)} {type_line}"
     if excluded_supertype:
         type_line = f"{excluded_supertype.title()} {type_line}"
     fixture = {
         "name": name,
         "type_line": type_line,
-        "effect": "creature" if card_type == "creature" else card_type,
+        "effect": "creature" if "creature" in card_type else card_type,
         "cmc": mana_value,
     }
     if "creature" in card_type:
         fixture["power"] = power
         fixture["toughness"] = toughness
+    if active_constraints.get("requires_activated_ability_with_tap_cost"):
+        fixture["has_activated_ability_with_tap_cost"] = bool(matching)
     if colors:
         fixture["colors"] = colors
     if active_constraints.get("token"):
@@ -4770,6 +4844,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or combat_damage_draw_execution_scenario_from_expected_rule(rule)
         or simple_activated_damage_execution_scenario_from_expected_rule(rule)
         or simple_activated_tap_target_execution_scenario_from_expected_rule(rule)
+        or simple_activated_untap_target_execution_scenario_from_expected_rule(rule)
         or simple_activated_add_counters_target_execution_scenario_from_expected_rule(rule)
         or simple_activated_destroy_execution_scenario_from_expected_rule(rule)
         or simple_activated_self_boost_execution_scenario_from_expected_rule(rule)

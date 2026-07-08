@@ -107,6 +107,7 @@ EFFECT_TO_DECK_CATEGORY = {
     "exile_top_nonland_free_cast": "engine",
     "recursion": "engine",
     "add_counters": "support",
+    "untap_target": "ramp",
     "stat_modifier_until_eot": "support",
     "stat_modifier_until_eot_untap_target": "support",
     "graveyard_flashback_grant": "engine",
@@ -289,7 +290,15 @@ def deck_role_from_effect(effect_json: dict[str, Any]) -> dict[str, Any]:
     effect = str(effect_json.get("effect") or "unknown")
     category = EFFECT_TO_DECK_CATEGORY.get(effect, "unknown")
     subtype = None
-    if effect == "creature" and effect_json.get("is_mana_source"):
+    if effect_json.get("activated_effect") == "untap_target":
+        target = str(effect_json.get("activated_untap_target") or effect_json.get("target") or "")
+        if target in {"land", "forest_land", "gate_land", "snow_land"}:
+            category = "ramp"
+            subtype = "land_untap"
+        else:
+            category = "support"
+            subtype = "permanent_untap"
+    elif effect == "creature" and effect_json.get("is_mana_source"):
         category = "ramp"
         subtype = "mana_dork"
     elif effect == "creature" and (
@@ -322,6 +331,14 @@ def deck_role_from_effect(effect_json: dict[str, Any]) -> dict[str, Any]:
             subtype = "negative_counters"
         elif counter_type == "+1/+1":
             subtype = "plus_one_counters"
+    elif effect == "untap_target":
+        target = str(effect_json.get("activated_untap_target") or effect_json.get("target") or "")
+        if target in {"land", "forest_land", "gate_land", "snow_land"}:
+            category = "ramp"
+            subtype = "land_untap"
+        else:
+            category = "support"
+            subtype = "permanent_untap"
     elif effect in {"stat_modifier_until_eot", "stat_modifier_until_eot_untap_target"}:
         power_delta = int(effect_json.get("power_delta") or effect_json.get("power_boost") or 0)
         toughness_delta = int(effect_json.get("toughness_delta") or effect_json.get("toughness_boost") or 0)

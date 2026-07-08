@@ -13070,6 +13070,11 @@ def is_legal_target(spell, target, controller, all_players=None, target_type=Non
     ]
     if required_keywords and not all(card_has_keyword(target, keyword) for keyword in required_keywords):
         return False
+    if constraints.get("requires_activated_ability_with_tap_cost") and not bool(
+        target.get("has_activated_ability_with_tap_cost")
+        or target.get("activated_ability_with_tap_cost")
+    ):
+        return False
     excluded_keywords = [
         str(value or "").strip().lower().replace(" ", "_")
         for value in _as_list(constraints.get("excluded_keywords") or constraints.get("exclude_keywords"))
@@ -15855,6 +15860,17 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
                 flush_triggers_in_apnap(active_player, all_players, stack)
                 return True
             if activate_best_generic_tap_target_permanent(
+                active_player,
+                opponents,
+                all_players,
+                turn,
+                rng,
+                phase=phase,
+            ):
+                check_sbas_until_stable(all_players)
+                flush_triggers_in_apnap(active_player, all_players, stack)
+                return True
+            if activate_best_generic_untap_target_permanent(
                 active_player,
                 opponents,
                 all_players,
@@ -47792,6 +47808,7 @@ GENERIC_TAP_DAMAGE_ACTIVATED_SCOPE = "xmage_tap_fixed_damage_target_activated_ab
 SIMPLE_ACTIVATED_DAMAGE_SCOPE = "xmage_permanent_simple_activated_damage_v1"
 SIMPLE_ACTIVATED_DESTROY_SCOPE = "xmage_permanent_simple_activated_destroy_target_v1"
 SIMPLE_ACTIVATED_TAP_TARGET_SCOPE = "xmage_permanent_simple_activated_tap_target_v1"
+SIMPLE_ACTIVATED_UNTAP_TARGET_SCOPE = "xmage_permanent_simple_activated_untap_target_v1"
 SIMPLE_ACTIVATED_TARGET_ADD_COUNTERS_SCOPE = (
     "xmage_permanent_simple_activated_add_counters_target_creature_v1"
 )
@@ -47946,6 +47963,38 @@ def _activated_rule_effects_for_permanent(permanent):
         ):
             tap_target_effect[key] = permanent.get(key)
         effects.append(tap_target_effect)
+    if (
+        permanent.get("activated_effect") == "untap_target"
+        and permanent.get("activated_battle_model_scope") == SIMPLE_ACTIVATED_UNTAP_TARGET_SCOPE
+    ):
+        untap_target_effect = {
+            "effect": "untap_target",
+            "battle_model_scope": permanent.get("activated_battle_model_scope"),
+            "ability_kind": "activated",
+            "activated_effect": "untap_target",
+            "activated_untap_target": permanent.get("activated_untap_target") or permanent.get("target") or "permanent",
+            "activation_requires_tap": bool(permanent.get("activation_requires_tap")),
+            "activation_requires_sacrifice": bool(permanent.get("activation_requires_sacrifice")),
+            "activation_cost_mana": permanent.get("activation_cost_mana"),
+            "activation_cost_generic": permanent.get("activation_cost_generic"),
+            "activation_cost_colors": permanent.get("activation_cost_colors"),
+            "target": permanent.get("target") or "permanent",
+            "target_constraints": permanent.get("target_constraints"),
+            "target_count": permanent.get("target_count") or 1,
+            "target_count_min": permanent.get("target_count_min") or permanent.get("target_count") or 1,
+            "target_count_max": permanent.get("target_count_max") or permanent.get("target_count") or 1,
+        }
+        for key in (
+            "_rule_source",
+            "_rule_review_status",
+            "_rule_execution_status",
+            "_rule_confidence",
+            "_rule_version",
+            "_rule_logical_key",
+            "_rule_oracle_hash",
+        ):
+            untap_target_effect[key] = permanent.get(key)
+        effects.append(untap_target_effect)
     if (
         permanent.get("activated_effect") == "add_counters"
         and permanent.get("activated_battle_model_scope") == SIMPLE_ACTIVATED_TARGET_ADD_COUNTERS_SCOPE
@@ -50099,6 +50148,277 @@ def activate_best_generic_tap_target_permanent(player, opponents, all_players, t
         return False
     options.sort(key=lambda item: (item[0], item[1], item[2]), reverse=True)
     return activate_generic_tap_target_permanent(
+        player,
+        opponents,
+        options[0][3],
+        turn,
+        rng,
+        phase=phase,
+    )
+
+
+def activated_untap_target_effect_for_permanent(permanent):
+    if not isinstance(permanent, dict):
+        return None
+    for effect_data in _activated_rule_effects_for_permanent(permanent):
+        if (
+            effect_data.get("battle_model_scope") == SIMPLE_ACTIVATED_UNTAP_TARGET_SCOPE
+            and effect_data.get("ability_kind") == "activated"
+            and effect_data.get("activated_effect") == "untap_target"
+        ):
+            return effect_data
+    return None
+
+
+def _activated_untap_target_count(effect_data):
+    return max(
+        1,
+        int(
+            (effect_data or {}).get("target_count_max")
+            or (effect_data or {}).get("target_count")
+            or 1
+        ),
+    )
+
+
+def _activated_untap_target_candidates(player, permanent, opponents, effect_data):
+    target_type = str(
+        (effect_data or {}).get("activated_untap_target")
+        or (effect_data or {}).get("target")
+        or "permanent"
+    ).lower()
+    candidates = []
+    participants = [player] + list(opponents or [])
+    for participant in participants:
+        if not getattr(participant, "is_alive", lambda: True)():
+            continue
+        for target in list(getattr(participant, "battlefield", []) or []):
+            if not isinstance(target, dict) or not bool(target.get("tapped")):
+                continue
+            if not is_legal_target(
+                permanent,
+                target,
+                player,
+                target_type=target_type,
+                target_controller=participant,
+            ):
+                continue
+            friendly_score = 1000 if participant is player else 0
+            candidates.append((friendly_score + sum(target_priority(target)), participant, target))
+    candidates.sort(
+        key=lambda item: (
+            item[0],
+            str(item[1].name),
+            str(item[2].get("name") or ""),
+        ),
+        reverse=True,
+    )
+    return candidates
+
+
+def can_activate_generic_untap_target_permanent(player, permanent, opponents, *, effect_data=None):
+    effect_data = effect_data or activated_untap_target_effect_for_permanent(permanent)
+    if effect_data is None:
+        return False
+    if permanent not in getattr(player, "battlefield", []):
+        return False
+    if effect_data.get("activation_requires_tap") and permanent.get("tapped"):
+        return False
+    if (
+        effect_data.get("activation_requires_tap")
+        and is_battlefield_creature(permanent)
+        and permanent.get("summoning_sick")
+        and not has_haste(permanent)
+    ):
+        return False
+    if effect_data.get("activation_requires_sacrifice"):
+        return False
+    activation_cost = effect_data.get("activation_cost_mana")
+    if not activation_cost:
+        activation_cost = _activation_cost_text(
+            int(effect_data.get("activation_cost_generic") or 0),
+            effect_data.get("activation_cost_colors") or [],
+        )
+    if not player.can_pay(activation_cost):
+        return False
+    candidates = _activated_untap_target_candidates(player, permanent, opponents, effect_data)
+    target_count = _activated_untap_target_count(effect_data)
+    minimum_count = int(effect_data.get("target_count_min") or target_count)
+    return len(candidates) >= max(1, minimum_count)
+
+
+def activate_generic_untap_target_permanent(player, opponents, permanent, turn, rng, *, phase=None):
+    effect_data = activated_untap_target_effect_for_permanent(permanent)
+    if not can_activate_generic_untap_target_permanent(
+        player,
+        permanent,
+        opponents,
+        effect_data=effect_data,
+    ):
+        return False
+    phase = phase or "precombat_main"
+    candidates = _activated_untap_target_candidates(player, permanent, opponents, effect_data)
+    target_count = _activated_untap_target_count(effect_data)
+    selected = candidates[:target_count]
+    if not selected:
+        return False
+    activation_cost = effect_data.get("activation_cost_mana")
+    if not activation_cost:
+        activation_cost = _activation_cost_text(
+            int(effect_data.get("activation_cost_generic") or 0),
+            effect_data.get("activation_cost_colors") or [],
+        )
+    if not player.spend_mana(activation_cost):
+        return False
+    if effect_data.get("activation_requires_tap"):
+        permanent["tapped"] = True
+    target_type = str(
+        effect_data.get("activated_untap_target")
+        or effect_data.get("target")
+        or "permanent"
+    ).lower()
+    activation_cost_generic = int(effect_data.get("activation_cost_generic") or 0)
+    activation_cost_colors = list(effect_data.get("activation_cost_colors") or [])
+    mana_paid = activation_cost_generic + len(activation_cost_colors)
+    fields = replay_rule_fields(effect_data)
+    available_options = [
+        decision_card_option(
+            candidate,
+            get_card_effect(candidate),
+            action="activate_untap_target",
+            score=score,
+            target_controller=controller.name,
+        )
+        for score, controller, candidate in candidates[:8]
+    ]
+    chosen_options = [
+        decision_card_option(
+            target,
+            get_card_effect(target),
+            action="activate_untap_target",
+            score=score,
+            target_controller=controller.name,
+        )
+        for score, controller, target in selected
+    ]
+    emit_decision_trace(
+        decision_type="activated_ability",
+        player=player,
+        turn=turn,
+        phase=phase,
+        available_options=available_options,
+        chosen_option=chosen_options[0] if chosen_options else None,
+        rejected_options=available_options[len(chosen_options):],
+        score_components={
+            "activation_cost": activation_cost,
+            "target_type": target_type,
+            "target_count": len(selected),
+            "requires_tap": 1 if effect_data.get("activation_requires_tap") else 0,
+        },
+        rule_source=fields.get("rule_source", "battle_rule"),
+        rule_status=fields.get("rule_review_status", "verified"),
+        confidence="medium",
+        expected_benefit_score=max(5, sum(score for score, _controller, _target in selected)),
+        actual_outcome="activated_untap_target_used",
+        reason="use_activated_untap_target_on_tapped_legal_permanents",
+        heuristic_version=DECISION_STRATEGY_VERSION,
+        resource_delta={
+            "mana": -mana_paid,
+            "tapped": 1 if effect_data.get("activation_requires_tap") else 0,
+            "permanents_untapped": len(selected),
+        },
+        risk_flags=[
+            flag
+            for flag, active in {
+                "tap_ability": bool(effect_data.get("activation_requires_tap")),
+                "activated_untap_target": True,
+                "simplified_target_choice": True,
+            }.items()
+            if active
+        ],
+    )
+    untapped_targets = []
+    for _score, target_player, target in selected:
+        decision = targeting_decision(
+            permanent,
+            target,
+            player,
+            target_controller=target_player,
+            target_type=target_type,
+        )
+        if not decision["target_legal"]:
+            continue
+        target["tapped"] = False
+        untapped_targets.append(
+            {
+                "target": target.get("name", "?"),
+                "target_player": target_player.name,
+                "target_type_line": target.get("type_line", ""),
+                **decision,
+            }
+        )
+    emit_replay_event(
+        "activated_ability",
+        player=player.name,
+        card=permanent.get("name", "?"),
+        effect="untap_target",
+        activation_kind="simple_activated_untap_target",
+        activation_cost=activation_cost,
+        tapped=bool(permanent.get("tapped")),
+        mana_paid=mana_paid,
+        target_type=target_type,
+        target_count=len(untapped_targets),
+        turn=turn,
+        phase=phase,
+        **fields,
+    )
+    emit_replay_event(
+        "untap_target_resolved",
+        player=player.name,
+        card=permanent.get("name", "?"),
+        target_type=target_type,
+        target_untapped=bool(untapped_targets),
+        target_untapped_count=len(untapped_targets),
+        requested_target_count=target_count,
+        available_targets=len(candidates),
+        untapped_targets=untapped_targets,
+        turn=turn,
+        phase=phase,
+        **fields,
+    )
+    return True
+
+
+def activate_best_generic_untap_target_permanent(player, opponents, all_players, turn, rng, *, phase=None):
+    options = []
+    for permanent in list(getattr(player, "battlefield", []) or []):
+        effect_data = activated_untap_target_effect_for_permanent(permanent)
+        if not can_activate_generic_untap_target_permanent(
+            player,
+            permanent,
+            opponents,
+            effect_data=effect_data,
+        ):
+            continue
+        candidates = _activated_untap_target_candidates(player, permanent, opponents, effect_data)
+        if not candidates:
+            continue
+        activation_cost = effect_data.get("activation_cost_mana")
+        if not activation_cost:
+            activation_cost = _activation_cost_text(
+                int(effect_data.get("activation_cost_generic") or 0),
+                effect_data.get("activation_cost_colors") or [],
+            )
+        options.append((
+            candidates[0][0],
+            -_mana_cost_text_value(activation_cost),
+            str(permanent.get("name") or ""),
+            permanent,
+        ))
+    if not options:
+        return False
+    options.sort(key=lambda item: (item[0], item[1], item[2]), reverse=True)
+    return activate_generic_untap_target_permanent(
         player,
         opponents,
         options[0][3],

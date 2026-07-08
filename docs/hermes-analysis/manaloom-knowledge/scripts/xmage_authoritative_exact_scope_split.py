@@ -264,6 +264,7 @@ TAP_DAMAGE_ACTIVATED_SCOPE = "xmage_tap_fixed_damage_target_activated_ability_v1
 PERMANENT_ACTIVATED_DAMAGE_SCOPE = "xmage_permanent_simple_activated_damage_v1"
 PERMANENT_ACTIVATED_DESTROY_SCOPE = "xmage_permanent_simple_activated_destroy_target_v1"
 PERMANENT_ACTIVATED_TAP_TARGET_SCOPE = "xmage_permanent_simple_activated_tap_target_v1"
+PERMANENT_ACTIVATED_UNTAP_TARGET_SCOPE = "xmage_permanent_simple_activated_untap_target_v1"
 TAP_TARGET_SPELL_SCOPE = "xmage_tap_target_spell_v1"
 PERMANENT_ACTIVATED_RECURSION_TO_HAND_SCOPE = "xmage_permanent_simple_activated_graveyard_to_hand_v1"
 PERMANENT_ACTIVATED_RECURSION_TO_BATTLEFIELD_SCOPE = "xmage_permanent_simple_activated_graveyard_to_battlefield_v1"
@@ -9878,6 +9879,15 @@ def is_permanent_activated_tap_target_unit(row: dict[str, Any]) -> bool:
     )
 
 
+def is_permanent_activated_untap_target_unit(row: dict[str, Any]) -> bool:
+    return (
+        str(row.get("adapter_work_unit") or "") == UNTAP_TARGET_UNIT
+        and effect_classes(row) == {"UntapTargetEffect"}
+        and ability_classes(row) == {"SimpleActivatedAbility"}
+        and {"targeting", "activated_ability"}.issubset(set(row.get("xmage_signals") or []))
+    )
+
+
 def is_tap_target_spell_unit(row: dict[str, Any]) -> bool:
     return (
         str(row.get("adapter_work_unit") or "")
@@ -16699,6 +16709,178 @@ def activated_tap_target_from_source(source: str) -> dict[str, Any] | str:
     }
 
 
+def untap_target_constraints_for(target: str, *, another: bool = False) -> dict[str, Any]:
+    constraints = dict(target_constraints_for(target))
+    if another:
+        constraints["exclude_source"] = True
+    return constraints
+
+
+def activated_untap_target_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    text = strip_parenthetical_reminders(oracle_text(metadata))
+    text = re.sub(r"\s+", " ", text).strip().lower()
+    if text.count(":") != 1:
+        return "activated_untap_target_oracle_not_simple"
+    cost_text, effect_text = [part.strip() for part in text.split(":", 1)]
+    target_patterns = [
+        (r"untap target forest\.?", "forest_land", 1, False),
+        (r"untap target gate\.?", "gate_land", 1, False),
+        (r"untap target land\.?", "land", 1, False),
+        (r"untap two target lands\.?", "land", 2, False),
+        (r"untap target snow land\.?", "snow_land", 1, False),
+        (r"untap target artifact\.?", "artifact", 1, False),
+        (r"untap target artifact creature\.?", "artifact_creature", 1, False),
+        (r"untap target creature\.?", "creature", 1, False),
+        (
+            r"untap target creature that has an activated ability with \{t\} in its cost\.?",
+            "creature_with_tap_ability",
+            1,
+            False,
+        ),
+        (r"untap another target permanent\.?", "permanent", 1, True),
+        (r"untap another target snow permanent\.?", "snow_permanent", 1, True),
+    ]
+    target = None
+    target_count = 1
+    another = False
+    for pattern, candidate, count, is_another in target_patterns:
+        if re.fullmatch(pattern, effect_text):
+            target = candidate
+            target_count = count
+            another = is_another
+            break
+    if target is None:
+        return "activated_untap_target_oracle_not_simple"
+    activation = activation_cost_from_oracle_prefix(cost_text)
+    if isinstance(activation, str):
+        return activation.replace("activated_self_boost", "activated_untap_target")
+    return {
+        "target": target,
+        "target_constraints": untap_target_constraints_for(target, another=another),
+        "target_count": int(target_count),
+        "target_count_min": int(target_count),
+        "target_count_max": int(target_count),
+        "activated_untap_another": bool(another),
+        **activation,
+    }
+
+
+def _activated_untap_target_from_source_target(text: str, window: str) -> tuple[str, dict[str, Any], int] | str:
+    target_count = 1
+    target = None
+    constraints: dict[str, Any] | None = None
+    land_count_match = re.search(r"new\s+TargetLandPermanent\s*\(\s*(\d+)?\s*\)", window, re.S)
+    if land_count_match:
+        target = "land"
+        target_count = int(land_count_match.group(1) or 1)
+        constraints = target_constraints_for("land")
+    elif re.search(r"new\s+TargetLandPermanent\s*\(\s*\)", window, re.S):
+        target = "land"
+        constraints = target_constraints_for("land")
+    elif re.search(r"new\s+TargetCreaturePermanent\s*\(\s*\)", window, re.S):
+        target = "creature"
+        constraints = target_constraints_for("creature")
+    elif "SubType.FOREST" in text:
+        target = "forest_land"
+        constraints = target_constraints_for(target)
+    elif "SubType.GATE" in text:
+        target = "gate_land"
+        constraints = target_constraints_for(target)
+    elif "FilterLandPermanent" in text and "SuperType.SNOW" in text:
+        target = "snow_land"
+        constraints = target_constraints_for(target)
+    elif "HasAbilityWithTapSymbolPredicate" in text:
+        target = "creature_with_tap_ability"
+        constraints = target_constraints_for(target)
+    elif "FilterCreaturePermanent" in text and "CardType.ARTIFACT" in text:
+        target = "artifact_creature"
+        constraints = target_constraints_for(target)
+    elif "FilterPermanent" in text and "CardType.ARTIFACT" in text:
+        target = "artifact"
+        constraints = target_constraints_for(target)
+    elif "SuperType.SNOW" in text and "AnotherPredicate" in text:
+        target = "snow_permanent"
+        constraints = untap_target_constraints_for(target, another=True)
+    elif "AnotherPredicate" in text:
+        target = "permanent"
+        constraints = untap_target_constraints_for(target, another=True)
+    elif re.search(r"new\s+TargetPermanent\s*\(\s*\)", window, re.S):
+        target = "permanent"
+        constraints = target_constraints_for("permanent")
+    if target is None or constraints is None:
+        return "activated_untap_target_source_target_not_supported"
+    return target, constraints, target_count
+
+
+def activated_untap_target_from_source(source: str) -> dict[str, Any] | str:
+    text = source or ""
+    risky_cost_classes = {
+        "CompositeCost",
+        "DiscardCardCost",
+        "DiscardTargetCost",
+        "ExileFrom",
+        "ExileFromGraveCost",
+        "ExileSourceFromGraveCost",
+        "MillCardsCost",
+        "OrCost",
+        "PayLifeCost",
+        "RemoveCounterCost",
+        "ReturnToHandSourceCost",
+        "RevealTargetFromHandCost",
+        "SacrificeSourceCost",
+        "SacrificeTargetCost",
+        "TapTargetCost",
+        "ExertSourceCost",
+    }
+    if "Zone.GRAVEYARD" in text:
+        return "activated_untap_target_source_not_battlefield"
+    present_risky = sorted(cost for cost in risky_cost_classes if cost in text)
+    if present_risky:
+        return "activated_untap_target_source_cost_not_supported"
+    if len(re.findall(r"new\s+UntapTargetEffect\s*\(\s*\)", text, re.S)) != 1:
+        return "activated_untap_target_source_not_single_untap_effect"
+    if len(re.findall(r"new\s+SimpleActivatedAbility\s*\(", text, re.S)) != 1:
+        return "activated_untap_target_source_not_single_simple_activated"
+    untap_index = text.find("UntapTargetEffect")
+    window = text[max(0, untap_index - 500) : untap_index + 2000]
+    if "SimpleActivatedAbility" not in window:
+        return "activated_untap_target_source_not_simple_activated"
+    parsed_target = _activated_untap_target_from_source_target(text, window)
+    if isinstance(parsed_target, str):
+        return parsed_target
+    target, constraints, target_count = parsed_target
+    cost_text = "{0}"
+    mana_match = re.search(r'ManaCostsImpl<[^>]*>\s*\(\s*"([^"]+)"\s*\)', window)
+    generic_match = re.search(r"GenericManaCost\s*\(\s*(\d+)\s*\)", window)
+    colored_match = re.search(r"ColoredManaCost\s*\(\s*ColoredManaSymbol\.([WUBRG])\s*\)", window)
+    cost_kinds = sum(1 for match in (mana_match, generic_match, colored_match) if match)
+    if cost_kinds > 1:
+        return "activated_untap_target_source_mana_cost_not_supported"
+    if mana_match:
+        cost_text = canonical_mana_cost_text(mana_match.group(1))
+    elif generic_match:
+        cost_text = "{" + generic_match.group(1) + "}"
+    elif colored_match:
+        cost_text = "{" + colored_match.group(1) + "}"
+    parsed_cost = parse_mana_cost_text(cost_text)
+    if parsed_cost is None:
+        return "activated_untap_target_source_mana_cost_not_supported"
+    activation_cost_generic, activation_cost_colors = parsed_cost
+    return {
+        "target": target,
+        "target_constraints": constraints,
+        "target_count": int(target_count),
+        "target_count_min": int(target_count),
+        "target_count_max": int(target_count),
+        "activated_untap_another": bool(constraints.get("exclude_source")),
+        "activation_cost_mana": cost_text,
+        "activation_cost_generic": activation_cost_generic,
+        "activation_cost_colors": activation_cost_colors,
+        "activation_requires_tap": "TapSourceCost" in window,
+        "activation_requires_sacrifice": False,
+    }
+
+
 def tap_target_count_value(raw: str) -> int | str | None:
     value = str(raw or "").strip().lower()
     if value == "x":
@@ -22113,6 +22295,16 @@ def target_constraints_for(target: str) -> dict[str, Any]:
         return {"card_types": ["creature"], "target_colors": ["G", "W"]}
     if target == "artifact_creature":
         return {"card_types": ["artifact", "creature"], "all_card_types_required": True}
+    if target == "forest_land":
+        return {"card_types": ["land"], "required_subtypes": ["forest"]}
+    if target == "gate_land":
+        return {"card_types": ["land"], "required_subtypes": ["gate"]}
+    if target == "snow_land":
+        return {"card_types": ["land"], "required_supertypes": ["snow"]}
+    if target == "snow_permanent":
+        return {"card_types": ["permanent"], "required_supertypes": ["snow"]}
+    if target == "creature_with_tap_ability":
+        return {"card_types": ["creature"], "requires_activated_ability_with_tap_cost": True}
     if target == "nonartifact_creature":
         return {"card_types": ["creature"], "exclude_card_types": ["artifact"]}
     if target == "nonartifact_nonblack_creature":
@@ -22830,6 +23022,7 @@ def split_row(
     permanent_activated_damage_unit = is_permanent_activated_damage_unit(row)
     permanent_activated_destroy_unit = is_permanent_activated_destroy_unit(row)
     permanent_activated_tap_target_unit = is_permanent_activated_tap_target_unit(row)
+    permanent_activated_untap_target_unit = is_permanent_activated_untap_target_unit(row)
     tap_target_spell_unit = is_tap_target_spell_unit(row)
     permanent_activated_life_gain_unit = is_permanent_activated_life_gain_unit(row)
     permanent_activated_self_boost_unit = is_permanent_activated_self_boost_unit(row)
@@ -22969,6 +23162,7 @@ def split_row(
         and not permanent_activated_draw_unit
         and not permanent_activated_damage_unit
         and not permanent_activated_destroy_unit
+        and not permanent_activated_untap_target_unit
         and not permanent_activated_life_gain_unit
         and not permanent_activated_self_boost_unit
         and not permanent_activated_target_boost_unit
@@ -23069,6 +23263,7 @@ def split_row(
         and not permanent_activated_draw_unit
         and not permanent_activated_damage_unit
         and not permanent_activated_destroy_unit
+        and not permanent_activated_untap_target_unit
         and not permanent_activated_life_gain_unit
         and not permanent_activated_self_boost_unit
         and not permanent_activated_target_keyword_unit
@@ -24242,6 +24437,83 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_permanent_simple_activated_tap_target",
+        ), "selected_exact_scope"
+
+    if permanent_activated_untap_target_unit:
+        if not is_permanent_metadata(metadata) or is_spell(metadata):
+            return None, "activated_untap_target_not_permanent"
+        oracle_activation = activated_untap_target_from_oracle(metadata)
+        if isinstance(oracle_activation, str):
+            return None, oracle_activation
+        parsed_activation = activated_untap_target_from_source(source_text)
+        if isinstance(parsed_activation, str):
+            return None, parsed_activation
+        for key in (
+            "target",
+            "target_count",
+            "target_count_min",
+            "target_count_max",
+            "target_constraints",
+            "activation_cost_mana",
+            "activation_cost_generic",
+            "activation_cost_colors",
+            "activation_requires_tap",
+            "activation_requires_sacrifice",
+        ):
+            if parsed_activation.get(key) != oracle_activation.get(key):
+                return None, "activated_untap_target_source_oracle_mismatch"
+        untap_target = str(parsed_activation.get("target") or "permanent")
+        untap_target_constraints = dict(
+            parsed_activation.get("target_constraints") or target_constraints_for(untap_target)
+        )
+        target_count = int(parsed_activation.get("target_count") or 1)
+        type_line = str(metadata.get("type_line") or "").lower()
+        permanent_effect = (
+            "creature"
+            if "creature" in type_line
+            else "artifact"
+            if "artifact" in type_line
+            else "enchantment"
+            if "enchantment" in type_line
+            else "permanent"
+        )
+        activated_effect = {
+            "effect": "untap_target",
+            "battle_model_scope": PERMANENT_ACTIVATED_UNTAP_TARGET_SCOPE,
+            "ability_kind": "activated",
+            "activated_effect": "untap_target",
+            "activated_untap_target": untap_target,
+            "target": untap_target,
+            "target_constraints": untap_target_constraints,
+            "target_count": target_count,
+            "target_count_min": int(parsed_activation.get("target_count_min") or target_count),
+            "target_count_max": int(parsed_activation.get("target_count_max") or target_count),
+            "xmage_effect_class": "UntapTargetEffect",
+            "xmage_ability_class": "SimpleActivatedAbility",
+            **parsed_activation,
+        }
+        effect_json = {
+            "effect": permanent_effect,
+            "battle_model_scope": PERMANENT_ACTIVATED_UNTAP_TARGET_SCOPE,
+            "ability_kind": "static_and_activated",
+            "activated_effect": "untap_target",
+            "activated_battle_model_scope": PERMANENT_ACTIVATED_UNTAP_TARGET_SCOPE,
+            "activated_untap_target": untap_target,
+            "target": untap_target,
+            "target_constraints": untap_target_constraints,
+            "target_count": target_count,
+            "target_count_min": int(parsed_activation.get("target_count_min") or target_count),
+            "target_count_max": int(parsed_activation.get("target_count_max") or target_count),
+            "_activated_rule_effects": [activated_effect],
+            "xmage_effect_class": "UntapTargetEffect",
+            "xmage_ability_class": "SimpleActivatedAbility",
+            **parsed_activation,
+        }
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_permanent_simple_activated_untap_target",
         ), "selected_exact_scope"
 
     if permanent_activated_life_gain_unit:

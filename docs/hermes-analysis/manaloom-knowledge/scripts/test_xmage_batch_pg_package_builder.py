@@ -38,6 +38,30 @@ def test_package_deck_role_derives_role_for_exact_effect_with_manual_placeholder
     }
 
 
+def test_package_deck_role_derives_role_for_unknown_activated_untap_target() -> None:
+    proposal = {
+        "effect_json": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_untap_target_v1",
+            "activated_effect": "untap_target",
+            "activated_untap_target": "land",
+            "target": "land",
+        },
+        "deck_role_json": {
+            "category": "unknown",
+            "effect": "creature",
+            "target": "land",
+        },
+    }
+
+    assert builder.package_deck_role(proposal) == {
+        "category": "ramp",
+        "effect": "creature",
+        "subtype": "land_untap",
+        "target": "land",
+    }
+
+
 def test_package_deck_role_preserves_true_external_reference_placeholder() -> None:
     proposal = {
         "effect_json": {"effect": "external_reference_required_manual_model"},
@@ -1506,6 +1530,42 @@ def test_manifest_builds_simple_activated_tap_target_execution_scenario() -> Non
     assert scenario["expected_tapped_source"] is True
     assert scenario["controller_mana"]["generic"] == 2
     assert scenario["controller_mana"]["white"] == 1
+
+
+def test_manifest_builds_simple_activated_untap_target_execution_scenario() -> None:
+    rule = {
+        "normalized_name": "argothian elder",
+        "card_name": "Argothian Elder",
+        "oracle_hash": "hash-argothian-elder",
+        "logical_rule_key": "battle_rule_v1:hash-argothian-elder",
+        "required_effect_fields": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_untap_target_v1",
+            "activated_effect": "untap_target",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_untap_target_v1",
+            "activated_untap_target": "land",
+            "target": "land",
+            "target_constraints": {"card_types": ["land"]},
+            "target_count": 2,
+            "target_count_min": 2,
+            "target_count_max": 2,
+            "activation_cost_mana": "{0}",
+            "activation_cost_generic": 0,
+            "activation_cost_colors": [],
+            "activation_requires_tap": True,
+        },
+    }
+
+    scenario = builder.simple_activated_untap_target_execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "simple_activated_untap_target"
+    assert scenario["expected_target"] == "land"
+    assert scenario["expected_target_count"] == 2
+    assert scenario["expected_tapped_source"] is True
+    assert len(scenario["targets"]) == 2
+    assert all(target["effect"] == "land" and target["tapped"] is True for target in scenario["targets"])
+    assert scenario["nonmatching_target"]["tapped"] is True
 
 
 def test_manifest_builds_simple_activated_tap_target_noncreature_fixture() -> None:

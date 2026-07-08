@@ -1011,6 +1011,81 @@ def test_simple_activated_tap_target_runner_executes_restricted_target() -> None
     assert result["source_tapped"] is True
 
 
+def test_simple_activated_untap_target_runner_executes_multi_land_target() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "creature",
+        "battle_model_scope": "xmage_permanent_simple_activated_untap_target_v1",
+        "activated_effect": "untap_target",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_untap_target_v1",
+        "activated_untap_target": "land",
+        "target": "land",
+        "target_constraints": {"card_types": ["land"]},
+        "target_count": 2,
+        "target_count_min": 2,
+        "target_count_max": 2,
+        "activation_cost_mana": "{0}",
+        "activation_cost_generic": 0,
+        "activation_cost_colors": [],
+        "activation_requires_tap": True,
+        "activation_requires_sacrifice": False,
+        "_rule_logical_key": "battle_rule_v1:argothian-elder",
+    }
+    try:
+        result = validator.run_simple_activated_untap_target(
+            battle,
+            {
+                "name": "Argothian Elder untaps two lands",
+                "type": "simple_activated_untap_target",
+                "card": {"name": "Argothian Elder"},
+                "targets": [
+                    {
+                        "name": "E2E First Tapped Land",
+                        "type_line": "Land",
+                        "effect": "land",
+                        "cmc": 0,
+                        "tapped": True,
+                    },
+                    {
+                        "name": "E2E Second Tapped Land",
+                        "type_line": "Land",
+                        "effect": "land",
+                        "cmc": 0,
+                        "tapped": True,
+                    },
+                ],
+                "nonmatching_target": {
+                    "name": "E2E Illegal Untap Creature",
+                    "type_line": "Creature - Rogue",
+                    "effect": "creature",
+                    "cmc": 1,
+                    "tapped": True,
+                },
+                "expected_target_count": 2,
+                "expected_tapped_source": True,
+                "logical_rule_key": "battle_rule_v1:argothian-elder",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Argothian Elder"
+    assert result["targets_untapped"] == 2
+    assert result["source_tapped"] is True
+    assert any(
+        event == "untap_target_resolved"
+        and data.get("card") == "Argothian Elder"
+        and data.get("target_untapped_count") == 2
+        for event, data in events
+    )
+
+
 def test_simple_activated_add_counters_target_runner_executes_minus_counter() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []
