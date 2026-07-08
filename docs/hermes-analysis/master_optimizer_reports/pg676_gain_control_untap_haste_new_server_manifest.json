@@ -1,0 +1,907 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg676_gain_control_untap_haste_20260708_230749",
+  "deploy_id": "PG676",
+  "execution_scenarios": [
+    {
+      "card": {
+        "name": "Act of Treason",
+        "type_line": "Sorcery"
+      },
+      "expected_control_duration": "until_end_of_turn",
+      "expected_granted_keywords": [
+        "haste"
+      ],
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ]
+      },
+      "logical_rule_key": "battle_rule_v1:199fac345843225e12ff24fe814702d7",
+      "name": "Act of Treason gains temporary control",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Temporary Control Target",
+        "tapped": true,
+        "type_line": "Land"
+      },
+      "target": {
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Legal Temporary Control Target",
+        "power": 2,
+        "tapped": true,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "type": "gain_control_untap_haste_until_eot"
+    },
+    {
+      "card": {
+        "name": "Blind with Anger",
+        "type_line": "Instant"
+      },
+      "expected_control_duration": "until_end_of_turn",
+      "expected_granted_keywords": [
+        "haste"
+      ],
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ],
+        "exclude_supertypes": [
+          "legendary"
+        ]
+      },
+      "logical_rule_key": "battle_rule_v1:1d33ee89a15a6b3fc2b5c63b1ba31d8c",
+      "name": "Blind with Anger gains temporary control",
+      "nonmatching_target": {
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Illegal Temporary Control Target",
+        "power": 2,
+        "tapped": true,
+        "toughness": 2,
+        "type_line": "Legendary Creature - Soldier"
+      },
+      "target": {
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Legal Temporary Control Target",
+        "power": 2,
+        "tapped": true,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "type": "gain_control_untap_haste_until_eot"
+    },
+    {
+      "card": {
+        "name": "Claim the Firstborn",
+        "type_line": "Sorcery"
+      },
+      "expected_control_duration": "until_end_of_turn",
+      "expected_granted_keywords": [
+        "haste"
+      ],
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ],
+        "mana_value_max": 3
+      },
+      "logical_rule_key": "battle_rule_v1:67e89d7ed196e92637743285bc65dace",
+      "name": "Claim the Firstborn gains temporary control",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Temporary Control Target",
+        "tapped": true,
+        "type_line": "Land"
+      },
+      "target": {
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Legal Temporary Control Target",
+        "power": 2,
+        "tapped": true,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "type": "gain_control_untap_haste_until_eot"
+    },
+    {
+      "card": {
+        "name": "Hijack",
+        "type_line": "Sorcery"
+      },
+      "expected_control_duration": "until_end_of_turn",
+      "expected_granted_keywords": [
+        "haste"
+      ],
+      "expected_target_constraints": {
+        "card_types": [
+          "artifact",
+          "creature"
+        ]
+      },
+      "logical_rule_key": "battle_rule_v1:8d3585724a53c93157963888594819c6",
+      "name": "Hijack gains temporary control",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Temporary Control Target",
+        "tapped": true,
+        "type_line": "Land"
+      },
+      "target": {
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Legal Temporary Control Target",
+        "power": 2,
+        "tapped": true,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "type": "gain_control_untap_haste_until_eot"
+    },
+    {
+      "card": {
+        "name": "Metallic Mastery",
+        "type_line": "Sorcery"
+      },
+      "expected_control_duration": "until_end_of_turn",
+      "expected_granted_keywords": [
+        "haste"
+      ],
+      "expected_target_constraints": {
+        "card_types": [
+          "artifact"
+        ]
+      },
+      "logical_rule_key": "battle_rule_v1:94992b67574bf9d7d4a187521ee18c6a",
+      "name": "Metallic Mastery gains temporary control",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Temporary Control Target",
+        "tapped": true,
+        "type_line": "Land"
+      },
+      "target": {
+        "cmc": 3,
+        "effect": "artifact",
+        "name": "E2E Legal Temporary Control Target",
+        "power": 3,
+        "tapped": true,
+        "toughness": 3,
+        "type_line": "Artifact"
+      },
+      "type": "gain_control_untap_haste_until_eot"
+    },
+    {
+      "card": {
+        "name": "Threaten",
+        "type_line": "Sorcery"
+      },
+      "expected_control_duration": "until_end_of_turn",
+      "expected_granted_keywords": [
+        "haste"
+      ],
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ]
+      },
+      "logical_rule_key": "battle_rule_v1:199fac345843225e12ff24fe814702d7",
+      "name": "Threaten gains temporary control",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Temporary Control Target",
+        "tapped": true,
+        "type_line": "Land"
+      },
+      "target": {
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Legal Temporary Control Target",
+        "power": 2,
+        "tapped": true,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "type": "gain_control_untap_haste_until_eot"
+    },
+    {
+      "card": {
+        "name": "Wrangle",
+        "type_line": "Sorcery"
+      },
+      "expected_control_duration": "until_end_of_turn",
+      "expected_granted_keywords": [
+        "haste"
+      ],
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ],
+        "power_max": 4
+      },
+      "logical_rule_key": "battle_rule_v1:5cfcbf2ede0226e481d4fbc7e825d78c",
+      "name": "Wrangle gains temporary control",
+      "nonmatching_target": {
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Illegal Temporary Control Target",
+        "power": 5,
+        "tapped": true,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "target": {
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Legal Temporary Control Target",
+        "power": 4,
+        "tapped": true,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "type": "gain_control_untap_haste_until_eot"
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Act of Treason",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:199fac345843225e12ff24fe814702d7",
+      "min_rule_version": 2,
+      "normalized_name": "act of treason",
+      "oracle_hash": "314d7d72d85e8d60855b79224faa18a0",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_gain_control_untap_haste_until_eot_spell_v1",
+        "control_duration": "until_end_of_turn",
+        "duration": "until_end_of_turn",
+        "effect": "gain_control_untap_haste_until_eot",
+        "granted_keywords_until_eot": [
+          "haste"
+        ],
+        "instant": false,
+        "sorcery": true,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "opponents",
+        "untap_target": true,
+        "xmage_ability_classes": [
+          "HasteAbility"
+        ],
+        "xmage_effect_classes": [
+          "GainAbilityTargetEffect",
+          "GainControlTargetEffect",
+          "UntapTargetEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Blind with Anger",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1d33ee89a15a6b3fc2b5c63b1ba31d8c",
+      "min_rule_version": 2,
+      "normalized_name": "blind with anger",
+      "oracle_hash": "162af0a71afdbc978f0e9530a2930b60",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_gain_control_untap_haste_until_eot_spell_v1",
+        "control_duration": "until_end_of_turn",
+        "duration": "until_end_of_turn",
+        "effect": "gain_control_untap_haste_until_eot",
+        "granted_keywords_until_eot": [
+          "haste"
+        ],
+        "instant": true,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "exclude_supertypes": [
+            "legendary"
+          ]
+        },
+        "target_controller": "opponents",
+        "untap_target": true,
+        "xmage_ability_classes": [
+          "HasteAbility"
+        ],
+        "xmage_effect_classes": [
+          "GainAbilityTargetEffect",
+          "GainControlTargetEffect",
+          "UntapTargetEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Claim the Firstborn",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:67e89d7ed196e92637743285bc65dace",
+      "min_rule_version": 2,
+      "normalized_name": "claim the firstborn",
+      "oracle_hash": "4844d46e00c8278d9b188b290aa88777",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_gain_control_untap_haste_until_eot_spell_v1",
+        "control_duration": "until_end_of_turn",
+        "duration": "until_end_of_turn",
+        "effect": "gain_control_untap_haste_until_eot",
+        "granted_keywords_until_eot": [
+          "haste"
+        ],
+        "instant": false,
+        "sorcery": true,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "mana_value_max": 3
+        },
+        "target_controller": "opponents",
+        "untap_target": true,
+        "xmage_ability_classes": [
+          "HasteAbility"
+        ],
+        "xmage_effect_classes": [
+          "GainAbilityTargetEffect",
+          "GainControlTargetEffect",
+          "UntapTargetEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Hijack",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8d3585724a53c93157963888594819c6",
+      "min_rule_version": 2,
+      "normalized_name": "hijack",
+      "oracle_hash": "3711f7d4278a254798ac98fbda59b936",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_gain_control_untap_haste_until_eot_spell_v1",
+        "control_duration": "until_end_of_turn",
+        "duration": "until_end_of_turn",
+        "effect": "gain_control_untap_haste_until_eot",
+        "granted_keywords_until_eot": [
+          "haste"
+        ],
+        "instant": false,
+        "sorcery": true,
+        "target": "artifact_or_creature",
+        "target_constraints": {
+          "card_types": [
+            "artifact",
+            "creature"
+          ]
+        },
+        "target_controller": "opponents",
+        "untap_target": true,
+        "xmage_ability_classes": [
+          "HasteAbility"
+        ],
+        "xmage_effect_classes": [
+          "GainAbilityTargetEffect",
+          "GainControlTargetEffect",
+          "UntapTargetEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Metallic Mastery",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:94992b67574bf9d7d4a187521ee18c6a",
+      "min_rule_version": 2,
+      "normalized_name": "metallic mastery",
+      "oracle_hash": "c26c2a0a7881cd27fe7d29931ad559b3",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_gain_control_untap_haste_until_eot_spell_v1",
+        "control_duration": "until_end_of_turn",
+        "duration": "until_end_of_turn",
+        "effect": "gain_control_untap_haste_until_eot",
+        "granted_keywords_until_eot": [
+          "haste"
+        ],
+        "instant": false,
+        "sorcery": true,
+        "target": "artifact",
+        "target_constraints": {
+          "card_types": [
+            "artifact"
+          ]
+        },
+        "target_controller": "opponents",
+        "untap_target": true,
+        "xmage_ability_classes": [
+          "HasteAbility"
+        ],
+        "xmage_effect_classes": [
+          "GainAbilityTargetEffect",
+          "GainControlTargetEffect",
+          "UntapTargetEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Threaten",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:199fac345843225e12ff24fe814702d7",
+      "min_rule_version": 2,
+      "normalized_name": "threaten",
+      "oracle_hash": "851f2791896c2e7d48ec022575763ce0",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_gain_control_untap_haste_until_eot_spell_v1",
+        "control_duration": "until_end_of_turn",
+        "duration": "until_end_of_turn",
+        "effect": "gain_control_untap_haste_until_eot",
+        "granted_keywords_until_eot": [
+          "haste"
+        ],
+        "instant": false,
+        "sorcery": true,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "opponents",
+        "untap_target": true,
+        "xmage_ability_classes": [
+          "HasteAbility"
+        ],
+        "xmage_effect_classes": [
+          "GainAbilityTargetEffect",
+          "GainControlTargetEffect",
+          "UntapTargetEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Wrangle",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5cfcbf2ede0226e481d4fbc7e825d78c",
+      "min_rule_version": 2,
+      "normalized_name": "wrangle",
+      "oracle_hash": "8be9095f8bcf4906391501cc2f94294f",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_gain_control_untap_haste_until_eot_spell_v1",
+        "control_duration": "until_end_of_turn",
+        "duration": "until_end_of_turn",
+        "effect": "gain_control_untap_haste_until_eot",
+        "granted_keywords_until_eot": [
+          "haste"
+        ],
+        "instant": false,
+        "sorcery": true,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "power_max": 4
+        },
+        "target_controller": "opponents",
+        "untap_target": true,
+        "xmage_ability_classes": [
+          "HasteAbility"
+        ],
+        "xmage_effect_classes": [
+          "GainAbilityTargetEffect",
+          "GainControlTargetEffect",
+          "UntapTargetEffect"
+        ]
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_gain_control_untap_haste_until_eot_spell": 7
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg676_gain_control_untap_haste_new_server_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg676_gain_control_untap_haste_new_server_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg676_gain_control_untap_haste_new_server_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg676_gain_control_untap_haste_new_server_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg676_gain_control_untap_haste_new_server_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg676_gain_control_untap_haste_new_server_rollback.sql"
+  },
+  "generated_at": "2026-07-08T23:07:49+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Act of Treason"
+      },
+      "card_name": "Act of Treason",
+      "effect": "gain_control_untap_haste_until_eot",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:199fac345843225e12ff24fe814702d7",
+      "normalized_name": "act of treason",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_gain_control_untap_haste_until_eot_spell_v1",
+        "control_duration": "until_end_of_turn",
+        "duration": "until_end_of_turn",
+        "effect": "gain_control_untap_haste_until_eot",
+        "granted_keywords_until_eot": [
+          "haste"
+        ],
+        "instant": false,
+        "sorcery": true,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "opponents",
+        "untap_target": true,
+        "xmage_ability_classes": [
+          "HasteAbility"
+        ],
+        "xmage_effect_classes": [
+          "GainAbilityTargetEffect",
+          "GainControlTargetEffect",
+          "UntapTargetEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Blind with Anger"
+      },
+      "card_name": "Blind with Anger",
+      "effect": "gain_control_untap_haste_until_eot",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1d33ee89a15a6b3fc2b5c63b1ba31d8c",
+      "normalized_name": "blind with anger",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_gain_control_untap_haste_until_eot_spell_v1",
+        "control_duration": "until_end_of_turn",
+        "duration": "until_end_of_turn",
+        "effect": "gain_control_untap_haste_until_eot",
+        "granted_keywords_until_eot": [
+          "haste"
+        ],
+        "instant": true,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "exclude_supertypes": [
+            "legendary"
+          ]
+        },
+        "target_controller": "opponents",
+        "untap_target": true,
+        "xmage_ability_classes": [
+          "HasteAbility"
+        ],
+        "xmage_effect_classes": [
+          "GainAbilityTargetEffect",
+          "GainControlTargetEffect",
+          "UntapTargetEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Claim the Firstborn"
+      },
+      "card_name": "Claim the Firstborn",
+      "effect": "gain_control_untap_haste_until_eot",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:67e89d7ed196e92637743285bc65dace",
+      "normalized_name": "claim the firstborn",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_gain_control_untap_haste_until_eot_spell_v1",
+        "control_duration": "until_end_of_turn",
+        "duration": "until_end_of_turn",
+        "effect": "gain_control_untap_haste_until_eot",
+        "granted_keywords_until_eot": [
+          "haste"
+        ],
+        "instant": false,
+        "sorcery": true,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "mana_value_max": 3
+        },
+        "target_controller": "opponents",
+        "untap_target": true,
+        "xmage_ability_classes": [
+          "HasteAbility"
+        ],
+        "xmage_effect_classes": [
+          "GainAbilityTargetEffect",
+          "GainControlTargetEffect",
+          "UntapTargetEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Hijack"
+      },
+      "card_name": "Hijack",
+      "effect": "gain_control_untap_haste_until_eot",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8d3585724a53c93157963888594819c6",
+      "normalized_name": "hijack",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_gain_control_untap_haste_until_eot_spell_v1",
+        "control_duration": "until_end_of_turn",
+        "duration": "until_end_of_turn",
+        "effect": "gain_control_untap_haste_until_eot",
+        "granted_keywords_until_eot": [
+          "haste"
+        ],
+        "instant": false,
+        "sorcery": true,
+        "target": "artifact_or_creature",
+        "target_constraints": {
+          "card_types": [
+            "artifact",
+            "creature"
+          ]
+        },
+        "target_controller": "opponents",
+        "untap_target": true,
+        "xmage_ability_classes": [
+          "HasteAbility"
+        ],
+        "xmage_effect_classes": [
+          "GainAbilityTargetEffect",
+          "GainControlTargetEffect",
+          "UntapTargetEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Metallic Mastery"
+      },
+      "card_name": "Metallic Mastery",
+      "effect": "gain_control_untap_haste_until_eot",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:94992b67574bf9d7d4a187521ee18c6a",
+      "normalized_name": "metallic mastery",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_gain_control_untap_haste_until_eot_spell_v1",
+        "control_duration": "until_end_of_turn",
+        "duration": "until_end_of_turn",
+        "effect": "gain_control_untap_haste_until_eot",
+        "granted_keywords_until_eot": [
+          "haste"
+        ],
+        "instant": false,
+        "sorcery": true,
+        "target": "artifact",
+        "target_constraints": {
+          "card_types": [
+            "artifact"
+          ]
+        },
+        "target_controller": "opponents",
+        "untap_target": true,
+        "xmage_ability_classes": [
+          "HasteAbility"
+        ],
+        "xmage_effect_classes": [
+          "GainAbilityTargetEffect",
+          "GainControlTargetEffect",
+          "UntapTargetEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Threaten"
+      },
+      "card_name": "Threaten",
+      "effect": "gain_control_untap_haste_until_eot",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:199fac345843225e12ff24fe814702d7",
+      "normalized_name": "threaten",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_gain_control_untap_haste_until_eot_spell_v1",
+        "control_duration": "until_end_of_turn",
+        "duration": "until_end_of_turn",
+        "effect": "gain_control_untap_haste_until_eot",
+        "granted_keywords_until_eot": [
+          "haste"
+        ],
+        "instant": false,
+        "sorcery": true,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "opponents",
+        "untap_target": true,
+        "xmage_ability_classes": [
+          "HasteAbility"
+        ],
+        "xmage_effect_classes": [
+          "GainAbilityTargetEffect",
+          "GainControlTargetEffect",
+          "UntapTargetEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Wrangle"
+      },
+      "card_name": "Wrangle",
+      "effect": "gain_control_untap_haste_until_eot",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5cfcbf2ede0226e481d4fbc7e825d78c",
+      "normalized_name": "wrangle",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_gain_control_untap_haste_until_eot_spell_v1",
+        "control_duration": "until_end_of_turn",
+        "duration": "until_end_of_turn",
+        "effect": "gain_control_untap_haste_until_eot",
+        "granted_keywords_until_eot": [
+          "haste"
+        ],
+        "instant": false,
+        "sorcery": true,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "power_max": 4
+        },
+        "target_controller": "opponents",
+        "untap_target": true,
+        "xmage_ability_classes": [
+          "HasteAbility"
+        ],
+        "xmage_effect_classes": [
+          "GainAbilityTargetEffect",
+          "GainControlTargetEffect",
+          "UntapTargetEffect"
+        ]
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Act of Treason",
+    "Blind with Anger",
+    "Claim the Firstborn",
+    "Hijack",
+    "Metallic Mastery",
+    "Threaten",
+    "Wrangle"
+  ],
+  "selected_count": 7,
+  "slug": "gain_control_untap_haste",
+  "snapshot_checks": [
+    {
+      "card_name": "Act of Treason",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:199fac345843225e12ff24fe814702d7",
+      "min_rule_version": 2,
+      "normalized_name": "act of treason",
+      "oracle_hash": "314d7d72d85e8d60855b79224faa18a0",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_gain_control_untap_haste_until_eot_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Blind with Anger",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1d33ee89a15a6b3fc2b5c63b1ba31d8c",
+      "min_rule_version": 2,
+      "normalized_name": "blind with anger",
+      "oracle_hash": "162af0a71afdbc978f0e9530a2930b60",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_gain_control_untap_haste_until_eot_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Claim the Firstborn",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:67e89d7ed196e92637743285bc65dace",
+      "min_rule_version": 2,
+      "normalized_name": "claim the firstborn",
+      "oracle_hash": "4844d46e00c8278d9b188b290aa88777",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_gain_control_untap_haste_until_eot_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Hijack",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8d3585724a53c93157963888594819c6",
+      "min_rule_version": 2,
+      "normalized_name": "hijack",
+      "oracle_hash": "3711f7d4278a254798ac98fbda59b936",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_gain_control_untap_haste_until_eot_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Metallic Mastery",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:94992b67574bf9d7d4a187521ee18c6a",
+      "min_rule_version": 2,
+      "normalized_name": "metallic mastery",
+      "oracle_hash": "c26c2a0a7881cd27fe7d29931ad559b3",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_gain_control_untap_haste_until_eot_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Threaten",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:199fac345843225e12ff24fe814702d7",
+      "min_rule_version": 2,
+      "normalized_name": "threaten",
+      "oracle_hash": "851f2791896c2e7d48ec022575763ce0",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_gain_control_untap_haste_until_eot_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Wrangle",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5cfcbf2ede0226e481d4fbc7e825d78c",
+      "min_rule_version": 2,
+      "normalized_name": "wrangle",
+      "oracle_hash": "8be9095f8bcf4906391501cc2f94294f",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_gain_control_untap_haste_until_eot_spell_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

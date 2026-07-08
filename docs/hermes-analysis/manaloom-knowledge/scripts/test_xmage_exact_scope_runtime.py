@@ -23182,6 +23182,78 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_gain_control_untap_haste_until_eot_returns_control_at_cleanup(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        target = {
+            "name": "Opponent Soldier",
+            "type_line": "Creature - Soldier",
+            "effect": "creature",
+            "power": 3,
+            "toughness": 3,
+            "controller": opponent.name,
+            "tapped": True,
+        }
+        illegal_land = {
+            "name": "Opponent Land",
+            "type_line": "Land",
+            "effect": "land",
+            "controller": opponent.name,
+            "tapped": True,
+        }
+        opponent.battlefield = [target, illegal_land]
+        effect = {
+            "effect": "gain_control_untap_haste_until_eot",
+            "battle_model_scope": "xmage_gain_control_untap_haste_until_eot_spell_v1",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "target_controller": "opponents",
+            "control_duration": "until_end_of_turn",
+            "untap_target": True,
+            "granted_keywords_until_eot": ["haste"],
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Act of Treason", "type_line": "Sorcery"},
+            turn=7,
+            rng=random.Random(7),
+            effect_data_override=effect,
+        )
+
+        self.assertIn(target, active.battlefield)
+        self.assertNotIn(target, opponent.battlefield)
+        self.assertFalse(target["tapped"])
+        self.assertEqual(target["controller"], active.name)
+        self.assertTrue(self.battle.card_has_keyword(target, "haste"))
+        self.assertIn(illegal_land, opponent.battlefield)
+        self.assertTrue(
+            any(
+                event == "gain_control_untap_haste_until_eot_resolved"
+                and data.get("card") == "Act of Treason"
+                and data.get("target") == "Opponent Soldier"
+                and data.get("result") == "control_gained_until_eot"
+                for event, data in self.events
+            )
+        )
+
+        self.battle.clear_until_eot(active)
+
+        self.assertNotIn(target, active.battlefield)
+        self.assertIn(target, opponent.battlefield)
+        self.assertFalse(target["tapped"])
+        self.assertEqual(target["controller"], opponent.name)
+        self.assertFalse(self.battle.card_has_keyword(target, "haste"))
+        self.assertTrue(
+            any(
+                event == "temporary_control_returned"
+                and data.get("card") == "Opponent Soldier"
+                and data.get("returned_to") == opponent.name
+                for event, data in self.events
+            )
+        )
+
     def test_composite_proliferate_draw_adds_existing_counters_and_draws(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

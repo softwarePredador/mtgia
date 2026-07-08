@@ -4090,6 +4090,82 @@ def run_stat_modifier_until_eot_untap_target(
     }
 
 
+def run_gain_control_untap_haste_until_eot(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    active = battle.Player(str(scenario.get("player") or "Temporary Control Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Temporary Control Opponent"), None, [])
+    target = battle.enrich_card(dict(scenario.get("target") or {}))
+    if not target:
+        fail("battle_execution", f"{card['name']} temporary-control scenario has no legal target")
+    target.setdefault("controller", opponent.name)
+    target["tapped"] = bool(target.get("tapped", True))
+    nonmatching = scenario.get("nonmatching_target")
+    active.battlefield = []
+    opponent.battlefield = [target]
+    if nonmatching:
+        illegal = battle.enrich_card(dict(nonmatching))
+        illegal.setdefault("controller", opponent.name)
+        opponent.battlefield.append(illegal)
+    effect = battle.get_card_effect(card)
+    before_events = len(events)
+    battle.apply_effect_immediate(
+        active,
+        [opponent],
+        battle.enrich_card({**card, **effect}),
+        turn=int(scenario.get("turn") or 7),
+        rng=random.Random(int(scenario.get("seed") or 6076)),
+        effect_data_override=effect,
+        phase=str(scenario.get("phase") or "precombat_main"),
+    )
+    if target in opponent.battlefield:
+        fail("battle_execution", f"{card['name']} left controlled target under opponent")
+    if target not in active.battlefield:
+        fail("battle_execution", f"{card['name']} did not move target to active battlefield")
+    if bool(target.get("tapped")):
+        fail("battle_execution", f"{card['name']} left stolen target tapped")
+    if not battle.card_has_keyword(target, "haste"):
+        fail("battle_execution", f"{card['name']} did not grant haste")
+    if target.get("controller") != active.name:
+        fail("battle_execution", f"{card['name']} controller={target.get('controller')!r}")
+    resolved_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "gain_control_untap_haste_until_eot_resolved"
+            and data.get("card") == card.get("name")
+        ),
+        None,
+    )
+    if resolved_event is None:
+        fail("battle_events", f"missing {card['name']} temporary-control resolved event")
+    if resolved_event.get("result") != "control_gained_until_eot":
+        fail("battle_events", f"{card['name']} result={resolved_event.get('result')!r}")
+    if resolved_event.get("target") != target.get("name"):
+        fail("battle_events", f"{card['name']} event target={resolved_event.get('target')!r}")
+
+    battle.clear_until_eot(active)
+    if target in active.battlefield:
+        fail("battle_execution", f"{card['name']} did not return target at cleanup")
+    if target not in opponent.battlefield:
+        fail("battle_execution", f"{card['name']} target missing from original battlefield after cleanup")
+    if battle.card_has_keyword(target, "haste"):
+        fail("battle_execution", f"{card['name']} haste persisted after cleanup")
+    if target.get("controller") != opponent.name:
+        fail("battle_execution", f"{card['name']} cleanup controller={target.get('controller')!r}")
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "target": target.get("name"),
+        "original_controller": opponent.name,
+        "new_controller": active.name,
+        "control_returned": True,
+    }
+
+
 def run_simple_activated_tap_target(
     battle,
     scenario: dict[str, Any],
@@ -7514,6 +7590,7 @@ SCENARIO_RUNNERS = {
     "simple_activated_tap_target": run_simple_activated_tap_target,
     "simple_activated_untap_target": run_simple_activated_untap_target,
     "tap_target_spell": run_tap_target_spell,
+    "gain_control_untap_haste_until_eot": run_gain_control_untap_haste_until_eot,
     "stat_modifier_until_eot_untap_target": run_stat_modifier_until_eot_untap_target,
     "simple_activated_add_counters_target": run_simple_activated_add_counters_target,
     "simple_activated_destroy": run_simple_activated_destroy,

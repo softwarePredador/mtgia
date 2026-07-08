@@ -300,6 +300,7 @@ OPENING_HAND_REACTIVE_EFFECTS = {
     "remove_permanent",
     "silence_opponents",
     "silence_spell",
+    "gain_control_untap_haste_until_eot",
     "stat_modifier_until_eot",
     "stat_modifier_until_eot_untap_target",
     "global_stat_modifier_until_eot",
@@ -5355,6 +5356,126 @@ def resolve_stat_modifier_until_eot_untap_target_spell(player, opponents, card, 
     )
     finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
     return [target for _owner, target in selected]
+
+
+def gain_control_untap_haste_candidate_targets(player, opponents, card, effect_data):
+    target_type = str(effect_data.get("target") or "").lower() or _target_type_from_constraints(effect_data) or "creature"
+    source = target_constraint_source(card, effect_data)
+    candidates = []
+    for owner in prioritize_evaluation_target_opponents(player, opponents or []):
+        for permanent in list(getattr(owner, "battlefield", []) or []):
+            if not isinstance(permanent, dict):
+                continue
+            permanent.setdefault("controller", getattr(owner, "name", None))
+            if is_legal_target(
+                source,
+                permanent,
+                player,
+                target_type=target_type,
+                target_controller=owner,
+            ):
+                candidates.append((owner, permanent))
+    candidates.sort(
+        key=lambda item: (
+            target_priority(item[1]),
+            str(getattr(item[0], "name", "")),
+            str(item[1].get("name") or ""),
+        ),
+        reverse=True,
+    )
+    return candidates
+
+
+def resolve_gain_control_untap_haste_until_eot_spell(player, opponents, card, effect_data, turn):
+    target_type = str(effect_data.get("target") or "").lower() or _target_type_from_constraints(effect_data) or "creature"
+    candidates = gain_control_untap_haste_candidate_targets(player, opponents, card, effect_data)
+    if not candidates:
+        emit_replay_event(
+            "gain_control_untap_haste_until_eot_resolved",
+            player=player.name,
+            card=card.get("name", "?"),
+            target_type=target_type,
+            available_targets=0,
+            target_count=0,
+            result="no_legal_target",
+            turn=turn,
+            **replay_rule_fields(effect_data),
+        )
+        finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+        return []
+
+    original_owner, target = candidates[0]
+    source = target_constraint_source(card, effect_data)
+    decision = targeting_decision(
+        source,
+        target,
+        player,
+        target_controller=original_owner,
+        target_type=target_type,
+    )
+    decision_fields = {
+        key: value
+        for key, value in decision.items()
+        if key not in {"target_type", "target_controller"}
+    }
+    if not decision["target_legal"]:
+        emit_replay_event(
+            "gain_control_untap_haste_until_eot_resolved",
+            player=player.name,
+            card=card.get("name", "?"),
+            target_type=target_type,
+            available_targets=len(candidates),
+            target_count=0,
+            result="target_became_illegal",
+            turn=turn,
+            **decision_fields,
+            **replay_rule_fields(effect_data),
+        )
+        finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+        return []
+
+    original_controller_name = target.get("controller") or getattr(original_owner, "name", None)
+    tapped_before = bool(target.get("tapped"))
+    remember_until_eot(target, "controller")
+    remember_until_eot(target, "keywords")
+    remember_until_eot(target, "haste")
+    remember_until_eot(target, "summoning_sick")
+    if target in getattr(original_owner, "battlefield", []):
+        original_owner.battlefield.remove(target)
+    target["_until_eot_control_return_player_ref"] = original_owner
+    target["_until_eot_control_return_player_name"] = original_controller_name
+    target["controller"] = player.name
+    if effect_data.get("untap_target", True):
+        target["tapped"] = False
+    keywords = sorted(_keyword_values(target) | {"haste"})
+    target["keywords"] = keywords
+    target["haste"] = True
+    target["summoning_sick"] = False
+    if target not in player.battlefield:
+        player.battlefield.append(target)
+
+    emit_replay_event(
+        "gain_control_untap_haste_until_eot_resolved",
+        player=player.name,
+        card=card.get("name", "?"),
+        target=target.get("name", "?"),
+        target_type=target_type,
+        original_controller=original_controller_name,
+        new_controller=player.name,
+        target_tapped_before=tapped_before,
+        target_tapped_after=bool(target.get("tapped")),
+        target_untapped=tapped_before and not bool(target.get("tapped")),
+        haste_granted=True,
+        control_duration=effect_data.get("control_duration") or "until_end_of_turn",
+        available_targets=len(candidates),
+        target_count=1,
+        result="control_gained_until_eot",
+        turn=turn,
+        **decision_fields,
+        **replay_rule_fields(effect_data),
+    )
+    finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+    return [target]
 
 
 def resolve_stat_modifier_until_eot_spell(player, opponents, card, effect_data, turn, *, finish=True):
@@ -17141,19 +17262,44 @@ def set_until_eot(card, key, value):
 
 def clear_until_eot(player):
     """Restore temporary card changes at cleanup."""
-    zones = (player.battlefield, player.phased_out, player.graveyard)
-    for zone in zones:
+    def restore_card(card):
+        originals = card.pop("_until_eot_originals", {})
+        for key, original in originals.items():
+            if original is None:
+                card.pop(key, None)
+            else:
+                card[key] = original
+        card.pop("_landfall_triggers_this_turn", None)
+        clear_permanent_damage_this_turn_flags(card)
+
+    for card in list(player.battlefield):
+        if not isinstance(card, dict):
+            continue
+        return_player = card.pop("_until_eot_control_return_player_ref", None)
+        return_controller_name = card.pop("_until_eot_control_return_player_name", None)
+        if return_player is not None and return_player is not player:
+            restore_card(card)
+            if return_controller_name and not card.get("controller"):
+                card["controller"] = return_controller_name
+            if card in player.battlefield:
+                player.battlefield.remove(card)
+            if card not in getattr(return_player, "battlefield", []):
+                return_player.battlefield.append(card)
+            emit_replay_event(
+                "temporary_control_returned",
+                player=player.name,
+                returned_to=getattr(return_player, "name", return_controller_name),
+                card=card.get("name", "?"),
+                result="returned_until_eot_controlled_permanent",
+            )
+            continue
+        restore_card(card)
+
+    for zone in (player.phased_out, player.graveyard):
         for card in zone:
             if not isinstance(card, dict):
                 continue
-            originals = card.pop("_until_eot_originals", {})
-            for key, original in originals.items():
-                if original is None:
-                    card.pop(key, None)
-                else:
-                    card[key] = original
-            card.pop("_landfall_triggers_this_turn", None)
-            clear_permanent_damage_this_turn_flags(card)
+            restore_card(card)
     player.indestructible = False
     player.hexproof = False
     player.hexproof_source = None
@@ -63435,6 +63581,8 @@ def apply_effect_immediate(
         resolve_add_counters_target_spell(player, opponents, card, effect_data, turn)
     elif effect == "tap_target":
         apply_tap_target_spell(player, opponents, card, effect_data, turn, rng)
+    elif effect == "gain_control_untap_haste_until_eot":
+        resolve_gain_control_untap_haste_until_eot_spell(player, opponents, card, effect_data, turn)
     elif effect == "stat_modifier_until_eot_untap_target":
         resolve_stat_modifier_until_eot_untap_target_spell(player, opponents, card, effect_data, turn)
     elif effect == "stat_modifier_until_eot":

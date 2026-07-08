@@ -1501,6 +1501,36 @@ def test_manifest_builds_boost_untap_target_spell_execution_scenario() -> None:
     assert scenario["nonmatching_target"]["name"] == "E2E Illegal Boost Untap Target"
 
 
+def test_manifest_builds_gain_control_untap_haste_execution_scenario() -> None:
+    rule = {
+        "normalized_name": "act of treason",
+        "card_name": "Act of Treason",
+        "oracle_hash": "hash-act-of-treason",
+        "logical_rule_key": "battle_rule_v1:hash-act-of-treason",
+        "required_effect_fields": {
+            "effect": "gain_control_untap_haste_until_eot",
+            "battle_model_scope": "xmage_gain_control_untap_haste_until_eot_spell_v1",
+            "target": "creature",
+            "target_controller": "opponents",
+            "target_constraints": {"card_types": ["creature"]},
+            "control_duration": "until_end_of_turn",
+            "untap_target": True,
+            "granted_keywords_until_eot": ["haste"],
+        },
+    }
+
+    scenario = builder.gain_control_untap_haste_execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "gain_control_untap_haste_until_eot"
+    assert scenario["card"]["name"] == "Act of Treason"
+    assert scenario["target"]["tapped"] is True
+    assert scenario["expected_target_constraints"] == {"card_types": ["creature"]}
+    assert scenario["expected_granted_keywords"] == ["haste"]
+    assert scenario["expected_control_duration"] == "until_end_of_turn"
+    assert scenario["nonmatching_target"]["name"] == "E2E Illegal Temporary Control Target"
+
+
 def test_manifest_builds_simple_activated_tap_target_execution_scenario() -> None:
     rule = {
         "normalized_name": "akroan jailer",

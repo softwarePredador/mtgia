@@ -356,6 +356,7 @@ PERMANENT_ACTIVATED_TARGET_ADD_COUNTERS_SCOPE = (
 )
 BOOST_TARGET_SCOPE = "xmage_fixed_boost_target_creature_until_eot_spell_v1"
 BOOST_UNTAP_TARGET_SCOPE = "xmage_fixed_boost_and_untap_target_creature_until_eot_spell_v1"
+GAIN_CONTROL_UNTAP_HASTE_SCOPE = "xmage_gain_control_untap_haste_until_eot_spell_v1"
 DYNAMIC_GRAVEYARD_COUNT_BOOST_TARGET_SCOPE = (
     "xmage_dynamic_graveyard_count_boost_target_creature_until_eot_spell_v1"
 )
@@ -7133,6 +7134,95 @@ def fixed_boost_untap_target_from_source(source: str) -> dict[str, Any] | str:
     }
 
 
+def gain_control_target_spec_from_phrase(phrase: str) -> dict[str, Any] | str:
+    text = re.sub(r"\s+", " ", str(phrase or "").strip().lower())
+    if text in {"artifact or creature", "artifact or target creature"}:
+        return {
+            "target": "artifact_or_creature",
+            "target_constraints": {"card_types": ["artifact", "creature"]},
+        }
+    if text == "artifact":
+        return {
+            "target": "artifact",
+            "target_constraints": {"card_types": ["artifact"]},
+        }
+    if text == "nonlegendary creature":
+        return {
+            "target": "creature",
+            "target_constraints": {
+                "card_types": ["creature"],
+                "exclude_supertypes": ["legendary"],
+            },
+        }
+    match = re.fullmatch(
+        r"creature with (?:mana value|converted mana cost) (?P<value>\d+) or less",
+        text,
+    )
+    if match:
+        return {
+            "target": "creature",
+            "target_constraints": {
+                "card_types": ["creature"],
+                "mana_value_max": int(match.group("value")),
+            },
+        }
+    match = re.fullmatch(r"creature with power (?P<value>\d+) or less", text)
+    if match:
+        return {
+            "target": "creature",
+            "target_constraints": {
+                "card_types": ["creature"],
+                "power_max": int(match.group("value")),
+            },
+        }
+    if text == "creature":
+        return {
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+        }
+    return "gain_control_untap_haste_target_phrase_not_supported"
+
+
+def gain_control_untap_haste_from_source(source: str) -> dict[str, Any] | str:
+    text = source or ""
+    if "TemporaryInsanityPredicate" in text or "number of cards in your graveyard" in text:
+        return "gain_control_untap_haste_source_dynamic_filter_not_supported"
+    if len(re.findall(r"new\s+GainControlTargetEffect\s*\(\s*Duration\.EndOfTurn\s*\)", text)) != 1:
+        return "gain_control_untap_haste_source_control_not_single_eot"
+    if len(re.findall(r"new\s+UntapTargetEffect\s*\(", text)) != 1:
+        return "gain_control_untap_haste_source_untap_not_single"
+    haste_effects = re.findall(
+        r"new\s+GainAbilityTargetEffect\s*\(\s*HasteAbility\.getInstance\(\)\s*,\s*Duration\.EndOfTurn",
+        text,
+        re.S,
+    )
+    if len(haste_effects) != 1:
+        return "gain_control_untap_haste_source_haste_not_single_eot"
+    all_gain_ability_effects = re.findall(r"new\s+GainAbilityTargetEffect\s*\(", text)
+    if len(all_gain_ability_effects) != 1:
+        return "gain_control_untap_haste_source_extra_granted_ability_not_supported"
+
+    if re.search(r"new\s+TargetArtifactPermanent\s*\(", text):
+        phrase = "artifact"
+    elif "FILTER_PERMANENT_ARTIFACT_OR_CREATURE" in text:
+        phrase = "artifact or creature"
+    elif "PowerPredicate(ComparisonType.FEWER_THAN, 5)" in text:
+        phrase = "creature with power 4 or less"
+    elif "ManaValuePredicate(ComparisonType.FEWER_THAN, 4)" in text:
+        phrase = "creature with mana value 3 or less"
+    elif "SuperType.LEGENDARY.getPredicate" in text or "nonlegendary creature" in text.lower():
+        phrase = "nonlegendary creature"
+    elif re.search(r"new\s+TargetCreaturePermanent\s*\(", text) or "FilterCreaturePermanent" in text:
+        phrase = "creature"
+    else:
+        return "gain_control_untap_haste_source_target_not_supported"
+
+    spec = gain_control_target_spec_from_phrase(phrase)
+    if isinstance(spec, str):
+        return spec
+    return spec
+
+
 def graveyard_count_boost_target_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str | None:
     text = strip_leading_parenthetical_reminders(oracle_text(metadata))
     match = re.match(
@@ -9268,6 +9358,35 @@ def fixed_boost_untap_target_from_oracle(metadata: dict[str, Any]) -> dict[str, 
             "up_to_count": up_to,
         }
     return "boost_untap_oracle_not_exact_fixed"
+
+
+def gain_control_untap_haste_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    text = strip_parenthetical_reminders(oracle_text(metadata))
+    text = re.sub(r"\s+", " ", text).strip().lower()
+    patterns = [
+        (
+            r"^gain control of target (?P<target>artifact or creature|artifact|nonlegendary creature|"
+            r"creature with (?:mana value|converted mana cost) \d+ or less|"
+            r"creature with power \d+ or less|creature) until end of turn\. "
+            r"untap (?:it|that creature|that artifact)\. "
+            r"(?:it|that creature|that artifact) gains haste until end of turn\.?$"
+        ),
+        (
+            r"^untap target (?P<target>artifact or creature|artifact|nonlegendary creature|"
+            r"creature with (?:mana value|converted mana cost) \d+ or less|"
+            r"creature with power \d+ or less|creature) and gain control of it until end of turn\. "
+            r"(?:it|that creature|that artifact) gains haste until end of turn\.?$"
+        ),
+    ]
+    for pattern in patterns:
+        match = re.fullmatch(pattern, text)
+        if not match:
+            continue
+        spec = gain_control_target_spec_from_phrase(match.group("target"))
+        if isinstance(spec, str):
+            return spec
+        return spec
+    return "gain_control_untap_haste_oracle_not_exact"
 
 
 def etb_fixed_boost_target_from_oracle(metadata: dict[str, Any]) -> tuple[int, int] | str:
@@ -32758,6 +32877,41 @@ def split_row(
         return build_proposal(row, metadata, effect_json, family_id="xmage_add_counters_target_creature_spell"), "selected_exact_scope"
 
     if unit == UNTAP_TARGET_UNIT:
+        if classes == {"GainAbilityTargetEffect", "GainControlTargetEffect", "UntapTargetEffect"}:
+            if ability_classes(row) != {"HasteAbility"}:
+                return None, "gain_control_untap_haste_ability_class_not_supported"
+            source_spec = gain_control_untap_haste_from_source(source_text)
+            if isinstance(source_spec, str):
+                return None, source_spec
+            oracle_spec = gain_control_untap_haste_from_oracle(metadata)
+            if isinstance(oracle_spec, str):
+                return None, oracle_spec
+            if source_spec != oracle_spec:
+                return None, "gain_control_untap_haste_source_oracle_mismatch"
+            effect_json = {
+                "effect": "gain_control_untap_haste_until_eot",
+                "battle_model_scope": GAIN_CONTROL_UNTAP_HASTE_SCOPE,
+                "target": oracle_spec["target"],
+                "target_constraints": oracle_spec["target_constraints"],
+                "target_controller": "opponents",
+                "control_duration": "until_end_of_turn",
+                "duration": "until_end_of_turn",
+                "untap_target": True,
+                "granted_keywords_until_eot": ["haste"],
+                "xmage_effect_classes": [
+                    "GainAbilityTargetEffect",
+                    "GainControlTargetEffect",
+                    "UntapTargetEffect",
+                ],
+                "xmage_ability_classes": ["HasteAbility"],
+                **flags,
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_gain_control_untap_haste_until_eot_spell",
+            ), "selected_exact_scope"
         if classes != {"BoostTargetEffect", "UntapTargetEffect"}:
             return None, "boost_untap_effect_class_not_exact"
         unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES

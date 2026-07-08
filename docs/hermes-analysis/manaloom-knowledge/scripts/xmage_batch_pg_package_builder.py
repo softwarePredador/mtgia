@@ -86,6 +86,7 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "untap_target",
     "blocker_count_mode",
     "duration",
+    "control_duration",
     "granted_keywords_until_eot",
     "additional_cost",
     "requires_sacrifice_creature",
@@ -3154,6 +3155,45 @@ def boost_untap_target_spell_execution_scenario_from_expected_rule(
     }
 
 
+def gain_control_untap_haste_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_gain_control_untap_haste_until_eot_spell_v1":
+        return None
+    if required.get("effect") != "gain_control_untap_haste_until_eot":
+        return None
+    constraints = dict(required.get("target_constraints") or {"card_types": ["creature"]})
+    target = _target_fixture_from_constraints(
+        "E2E Legal Temporary Control Target",
+        constraints,
+        matching=True,
+    )
+    target["tapped"] = True
+    target.setdefault("power", 3)
+    target.setdefault("toughness", 3)
+    nonmatching = _target_fixture_from_constraints(
+        "E2E Illegal Temporary Control Target",
+        constraints,
+        matching=False,
+    )
+    nonmatching["tapped"] = True
+    return {
+        "name": f"{rule['card_name']} gains temporary control",
+        "type": "gain_control_untap_haste_until_eot",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": "Sorcery" if required.get("sorcery") is True else "Instant",
+        },
+        "target": target,
+        "nonmatching_target": nonmatching,
+        "expected_target_constraints": constraints,
+        "expected_granted_keywords": list(required.get("granted_keywords_until_eot") or ["haste"]),
+        "expected_control_duration": required.get("control_duration") or "until_end_of_turn",
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def simple_activated_add_counters_target_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
@@ -5045,6 +5085,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or fixed_damage_target_spell_execution_scenario_from_expected_rule(rule)
         or damage_target_create_treasure_execution_scenario_from_expected_rule(rule)
         or tap_target_spell_execution_scenario_from_expected_rule(rule)
+        or gain_control_untap_haste_execution_scenario_from_expected_rule(rule)
         or boost_untap_target_spell_execution_scenario_from_expected_rule(rule)
         or simple_activated_draw_execution_scenario_from_expected_rule(rule)
         or combat_damage_draw_execution_scenario_from_expected_rule(rule)

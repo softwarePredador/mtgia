@@ -27354,6 +27354,215 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["target_count_max"], 1)
         self.assertTrue(effect["untap_target"])
 
+    def test_gain_control_untap_haste_maps_creature_exact_scope(self) -> None:
+        proposal, reason = split.split_row(
+            queue_row(
+                split.UNTAP_TARGET_UNIT,
+                effect_classes=[
+                    "GainControlTargetEffect",
+                    "UntapTargetEffect",
+                    "GainAbilityTargetEffect",
+                ],
+                ability_classes=["HasteAbility"],
+                xmage_signals=["targeting"],
+            ),
+            metadata(
+                name="Act of Treason",
+                type_line="Sorcery",
+                oracle_text=(
+                    "Gain control of target creature until end of turn. "
+                    "Untap that creature. It gains haste until end of turn."
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().addTarget(new TargetCreaturePermanent());
+                this.getSpellAbility().addEffect(new GainControlTargetEffect(Duration.EndOfTurn));
+                this.getSpellAbility().addEffect(new UntapTargetEffect().setText("Untap that creature"));
+                this.getSpellAbility().addEffect(new GainAbilityTargetEffect(
+                    HasteAbility.getInstance(), Duration.EndOfTurn));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "gain_control_untap_haste_until_eot")
+        self.assertEqual(effect["battle_model_scope"], split.GAIN_CONTROL_UNTAP_HASTE_SCOPE)
+        self.assertEqual(effect["target"], "creature")
+        self.assertEqual(effect["target_controller"], "opponents")
+        self.assertEqual(effect["target_constraints"], {"card_types": ["creature"]})
+        self.assertEqual(effect["granted_keywords_until_eot"], ["haste"])
+
+    def test_gain_control_untap_haste_maps_artifact_or_creature_exact_scope(self) -> None:
+        proposal, reason = split.split_row(
+            queue_row(
+                split.UNTAP_TARGET_UNIT,
+                effect_classes=[
+                    "GainControlTargetEffect",
+                    "UntapTargetEffect",
+                    "GainAbilityTargetEffect",
+                ],
+                ability_classes=["HasteAbility"],
+                xmage_signals=["targeting"],
+            ),
+            metadata(
+                name="Hijack",
+                type_line="Sorcery",
+                oracle_text=(
+                    "Gain control of target artifact or creature until end of turn. "
+                    "Untap it. It gains haste until end of turn."
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().addTarget(new TargetPermanent(
+                    StaticFilters.FILTER_PERMANENT_ARTIFACT_OR_CREATURE));
+                this.getSpellAbility().addEffect(new GainControlTargetEffect(Duration.EndOfTurn));
+                Effect effect = new UntapTargetEffect();
+                this.getSpellAbility().addEffect(effect);
+                effect = new GainAbilityTargetEffect(HasteAbility.getInstance(), Duration.EndOfTurn);
+                this.getSpellAbility().addEffect(effect);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        self.assertEqual(
+            proposal["effect_json"]["target_constraints"],
+            {"card_types": ["artifact", "creature"]},
+        )
+
+    def test_gain_control_untap_haste_maps_static_target_constraints(self) -> None:
+        constrained_cases = [
+            (
+                "Claim the Firstborn",
+                "Gain control of target creature with mana value 3 or less until end of turn. "
+                "Untap that creature. It gains haste until end of turn.",
+                """
+                    filter.add(new ManaValuePredicate(ComparisonType.FEWER_THAN, 4));
+                    this.getSpellAbility().addTarget(new TargetPermanent(filter));
+                    this.getSpellAbility().addEffect(new GainControlTargetEffect(Duration.EndOfTurn));
+                    this.getSpellAbility().addEffect(new UntapTargetEffect());
+                    this.getSpellAbility().addEffect(new GainAbilityTargetEffect(
+                        HasteAbility.getInstance(), Duration.EndOfTurn));
+                """,
+                {"card_types": ["creature"], "mana_value_max": 3},
+            ),
+            (
+                "Wrangle",
+                "Gain control of target creature with power 4 or less until end of turn. "
+                "Untap that creature. It gains haste until end of turn.",
+                """
+                    filter.add(new PowerPredicate(ComparisonType.FEWER_THAN, 5));
+                    this.getSpellAbility().addTarget(new TargetPermanent(filter));
+                    this.getSpellAbility().addEffect(new GainControlTargetEffect(Duration.EndOfTurn));
+                    this.getSpellAbility().addEffect(new UntapTargetEffect());
+                    this.getSpellAbility().addEffect(new GainAbilityTargetEffect(
+                        HasteAbility.getInstance(), Duration.EndOfTurn));
+                """,
+                {"card_types": ["creature"], "power_max": 4},
+            ),
+            (
+                "Blind with Anger",
+                "Untap target nonlegendary creature and gain control of it until end of turn. "
+                "It gains haste until end of turn.",
+                """
+                    filter.add(Predicates.not(SuperType.LEGENDARY.getPredicate()));
+                    this.getSpellAbility().addTarget(new TargetPermanent(filter));
+                    this.getSpellAbility().addEffect(new UntapTargetEffect());
+                    this.getSpellAbility().addEffect(new GainControlTargetEffect(Duration.EndOfTurn));
+                    this.getSpellAbility().addEffect(new GainAbilityTargetEffect(
+                        HasteAbility.getInstance(), Duration.EndOfTurn));
+                """,
+                {"card_types": ["creature"], "exclude_supertypes": ["legendary"]},
+            ),
+        ]
+        for name, oracle, source, expected_constraints in constrained_cases:
+            with self.subTest(name=name):
+                proposal, reason = split.split_row(
+                    queue_row(
+                        split.UNTAP_TARGET_UNIT,
+                        effect_classes=[
+                            "GainControlTargetEffect",
+                            "UntapTargetEffect",
+                            "GainAbilityTargetEffect",
+                        ],
+                        ability_classes=["HasteAbility"],
+                        xmage_signals=["targeting"],
+                    ),
+                    metadata(name=name, type_line="Sorcery", oracle_text=oracle),
+                    source_text=source,
+                )
+
+                self.assertEqual(reason, "selected_exact_scope")
+                self.assertEqual(proposal["effect_json"]["target_constraints"], expected_constraints)
+
+    def test_gain_control_untap_haste_blocks_extra_granted_ability(self) -> None:
+        proposal, reason = split.split_row(
+            queue_row(
+                split.UNTAP_TARGET_UNIT,
+                effect_classes=[
+                    "GainControlTargetEffect",
+                    "UntapTargetEffect",
+                    "GainAbilityTargetEffect",
+                ],
+                ability_classes=["HasteAbility", "TrampleAbility"],
+                xmage_signals=["targeting"],
+            ),
+            metadata(
+                name="Traitorous Blood",
+                type_line="Sorcery",
+                oracle_text=(
+                    "Gain control of target creature until end of turn. Untap it. "
+                    "It gains trample and haste until end of turn."
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().addTarget(new TargetCreaturePermanent());
+                this.getSpellAbility().addEffect(new GainControlTargetEffect(Duration.EndOfTurn));
+                this.getSpellAbility().addEffect(new UntapTargetEffect().setText("Untap it"));
+                this.getSpellAbility().addEffect(new GainAbilityTargetEffect(
+                    TrampleAbility.getInstance(), Duration.EndOfTurn));
+                this.getSpellAbility().addEffect(new GainAbilityTargetEffect(
+                    HasteAbility.getInstance(), Duration.EndOfTurn));
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "gain_control_untap_haste_ability_class_not_supported")
+
+    def test_gain_control_untap_haste_blocks_dynamic_graveyard_filter(self) -> None:
+        proposal, reason = split.split_row(
+            queue_row(
+                split.UNTAP_TARGET_UNIT,
+                effect_classes=[
+                    "GainControlTargetEffect",
+                    "UntapTargetEffect",
+                    "GainAbilityTargetEffect",
+                ],
+                ability_classes=["HasteAbility"],
+                xmage_signals=["targeting"],
+            ),
+            metadata(
+                name="Temporary Insanity",
+                type_line="Instant",
+                oracle_text=(
+                    "Untap target creature with power less than the number of cards in your graveyard "
+                    "and gain control of it until end of turn. That creature gains haste until end of turn."
+                ),
+            ),
+            source_text="""
+                private static final FilterPermanent filter = new FilterCreaturePermanent(
+                    "creature with power less than the number of cards in your graveyard");
+                enum TemporaryInsanityPredicate implements ObjectSourcePlayerPredicate<Permanent> {}
+                this.getSpellAbility().addTarget(new TargetPermanent(filter));
+                this.getSpellAbility().addEffect(new UntapTargetEffect());
+                this.getSpellAbility().addEffect(new GainControlTargetEffect(Duration.EndOfTurn));
+                this.getSpellAbility().addEffect(new GainAbilityTargetEffect(
+                    HasteAbility.getInstance(), Duration.EndOfTurn));
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "gain_control_untap_haste_source_dynamic_filter_not_supported")
+
     def test_fixed_boost_untap_target_maps_up_to_two_exact_scope(self) -> None:
         proposal, reason = split.split_row(
             queue_row(

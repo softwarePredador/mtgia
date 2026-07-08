@@ -994,6 +994,57 @@ def test_boost_untap_target_runner_executes_multi_target_spell() -> None:
     assert result["targets_untapped_count"] == 2
 
 
+def test_gain_control_untap_haste_runner_returns_control_at_cleanup() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "gain_control_untap_haste_until_eot",
+        "battle_model_scope": "xmage_gain_control_untap_haste_until_eot_spell_v1",
+        "target": "creature",
+        "target_controller": "opponents",
+        "target_constraints": {"card_types": ["creature"]},
+        "control_duration": "until_end_of_turn",
+        "untap_target": True,
+        "granted_keywords_until_eot": ["haste"],
+        "_rule_logical_key": "battle_rule_v1:act-of-treason",
+    }
+    try:
+        result = validator.run_gain_control_untap_haste_until_eot(
+            battle,
+            {
+                "name": "Act of Treason gains temporary control",
+                "type": "gain_control_untap_haste_until_eot",
+                "card": {"name": "Act of Treason", "type_line": "Sorcery"},
+                "target": {
+                    "name": "E2E Legal Temporary Control Target",
+                    "type_line": "Creature - Soldier",
+                    "effect": "creature",
+                    "power": 3,
+                    "toughness": 3,
+                    "tapped": True,
+                },
+                "nonmatching_target": {
+                    "name": "E2E Illegal Temporary Control Target",
+                    "type_line": "Land",
+                    "effect": "land",
+                    "tapped": True,
+                },
+                "logical_rule_key": "battle_rule_v1:act-of-treason",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Act of Treason"
+    assert result["target"] == "E2E Legal Temporary Control Target"
+    assert result["control_returned"] is True
+
+
 def test_simple_activated_tap_target_runner_executes_noncreature_target() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []
