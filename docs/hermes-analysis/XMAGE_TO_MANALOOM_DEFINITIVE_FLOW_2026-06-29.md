@@ -18811,6 +18811,75 @@ Evidence:
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260707_post_pg651_damage_combat_or_damaged_scope_new_server_recheck.md`
 - `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260707_post_pg651_damage_combat_or_damaged_scope_new_server_recheck_with_pg_env.md`
 
+## 2026-07-08 - PG652 X Damage Wipe and PG652b Hash Backfill Checkpoint
+
+PG652 closed the exact board-wipe damage subpattern where XMage and Oracle both
+state `X` damage to all creatures or all flying creatures:
+
+- runtime contract added: `damage_amount_source=x_value` for
+  `damage_wipe`;
+- replay event contract added: `damage_wipe_resolved.x_value`;
+- split contract added:
+  - Oracle must match `deals X damage to each creature` or
+    `deals X damage to each creature with flying`;
+  - XMage source must contain `DamageAllEffect(GetXValue.instance, ...)`;
+  - flying Oracle must have `FILTER_CREATURE_FLYING` in XMage source;
+  - mismatched source scope stays blocked as
+    `board_wipe_damage_source_scope_mismatch`;
+- promoted cards: `Corrosive Gale`, `Savage Twister`, and `Windstorm`;
+- postcheck: each card has `promoted_rule_rows=1`,
+  `promoted_verified_auto_rows=1`, and `promoted_oracle_hash_rows=1`;
+- E2E package validation passed PostgreSQL, SQLite, canonical snapshot, and
+  `runtime_get_card_effect`;
+- focused runtime coverage verifies that `damage_wipe` uses cast-context
+  `x_value` and destroys only creatures with toughness less than or equal to
+  the resolved X amount.
+
+During the same validation gate, readiness exposed `44` trusted executable
+rules missing `oracle_hash`. PG652b backfilled those hashes from
+`cards.oracle_text` through `card_id`, without changing `effect_json`,
+`deck_role_json`, review status, or execution status. Postcheck confirmed
+`remaining_trusted_executable_missing_hash_rows=0` and
+`backfilled_rows_with_expected_hash=44`.
+
+Final post-PG652b state:
+
+- PG -> Hermes/SQLite sync:
+  `pg_rows_loaded=5922`, `sqlite_inserted_or_updated=5908`,
+  `canonical_snapshot_rows_exported=5885`;
+- global readiness:
+  `battle_and_oracle_ready=5982`, `battle_family_mapper_required=27894`,
+  `snapshot_has_verified_rule=6010`, `snapshot_has_any_rule=7217`;
+- authoritative queue:
+  `target_identity_count=24971`,
+  `xmage_authoritative_source_count=24658`,
+  `xmage_missing_source_exception_count=313`,
+  `xmage_authoritative_parser_gap_count=0`,
+  `xmage_authoritative_adapter_required_count=24658`,
+  `board_wipe::xmage_mass_removal_or_sacrifice_variant_review_v1=391`;
+- final exact-scope recheck returned `proposal_count=0` and
+  `safe_for_batch_pg_package_count=0`;
+- validation gates:
+  `python3 -m unittest test_xmage_authoritative_exact_scope_split.py test_xmage_exact_scope_runtime.py`
+  passed `1215` tests,
+  `xmage_strategy_consistency_audit` passed `26/26`,
+  `pg_hermes_sqlite_contract_audit` passed `51/51` with the new-server wrapper,
+  `operational_surface_alignment_audit` passed, and
+  `legacy_contamination_audit` passed.
+
+Evidence:
+
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260708_pg652_x_damage_wipe_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg652_x_damage_wipe_new_server_package_package.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg652_x_damage_wipe_new_server_e2e_validation.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg652_x_damage_wipe_new_server_battle_rule_sync.json`
+- `docs/hermes-analysis/master_optimizer_reports/pg652b_trusted_oracle_hash_backfill_new_server_package.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg652b_trusted_oracle_hash_backfill_new_server_battle_rule_sync.json`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260708_post_pg652b_hash_backfill_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260708_post_pg652b_hash_backfill_new_server_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260708_post_pg652b_hash_backfill_new_server_recheck.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260708_post_pg652b_hash_backfill_new_server.md`
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

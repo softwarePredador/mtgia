@@ -18956,3 +18956,51 @@ na command zone, não para validação de deck no servidor.
   - `pg_hermes_sqlite_contract_audit` com wrapper do servidor novo -> `51/51`;
   - `operational_surface_alignment_audit` -> `pass`;
   - `legacy_contamination_audit` -> `pass`.
+
+## 2026-07-08 — PG652 X damage wipe + PG652b oracle_hash backfill
+
+- Alvo operacional: PostgreSQL novo via `server/bin/with_new_server_pg.sh`.
+- Subpadrão XMage -> ManaLoom fechado:
+  - `DamageAllEffect(GetXValue.instance, ...)`;
+  - Oracle aceito apenas para `deals X damage to each creature` ou
+    `deals X damage to each creature with flying`;
+  - fonte flying exige `FILTER_CREATURE_FLYING`;
+  - runtime `damage_wipe` passou a usar `damage_amount_source=x_value` e emitir
+    `damage_wipe_resolved.x_value`.
+- Cartas promovidas em PG652:
+  - `Corrosive Gale`;
+  - `Savage Twister`;
+  - `Windstorm`.
+- Resultado PG652:
+  - precheck: `existing_rule_rows=0` para as 3 cartas;
+  - apply: `upserted_rows=3`;
+  - postcheck: cada carta com `promoted_rule_rows=1`,
+    `promoted_verified_auto_rows=1` e `promoted_oracle_hash_rows=1`.
+- Correção complementar PG652b:
+  - readiness detectou `44` regras executáveis confiáveis sem `oracle_hash`;
+  - backfill via `card_id -> cards.oracle_text`;
+  - não alterou `effect_json`, `deck_role_json`, review status ou execution
+    status;
+  - postcheck: `remaining_trusted_executable_missing_hash_rows=0`,
+    `backfilled_rows_with_expected_hash=44`.
+- Sync final PG -> Hermes/SQLite:
+  - `pg_rows_loaded=5922`;
+  - `sqlite_inserted_or_updated=5908`;
+  - `canonical_snapshot_rows_exported=5885`.
+- Estado global pós-PG652b:
+  - `battle_and_oracle_ready=5982`;
+  - `battle_family_mapper_required=27894`;
+  - `snapshot_has_verified_rule=6010`;
+  - `snapshot_has_any_rule=7217`;
+  - fila Commander-legal: `target_identity_count=24971`,
+    `xmage_authoritative_adapter_required_count=24658`,
+    `xmage_authoritative_parser_gap_count=0`,
+    `xmage_missing_source_exception_count=313`,
+    `board_wipe::xmage_mass_removal_or_sacrifice_variant_review_v1=391`.
+- Gates finais:
+  - `python3 -m unittest test_xmage_authoritative_exact_scope_split.py test_xmage_exact_scope_runtime.py`
+    -> `Ran 1215 tests ... OK`;
+  - `xmage_strategy_consistency_audit` -> `26/26`;
+  - `pg_hermes_sqlite_contract_audit` com wrapper do servidor novo -> `51/51`;
+  - `operational_surface_alignment_audit` -> `pass`;
+  - `legacy_contamination_audit` -> `pass`.

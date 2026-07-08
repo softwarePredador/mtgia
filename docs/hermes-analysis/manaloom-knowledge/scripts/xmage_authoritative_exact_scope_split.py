@@ -5966,6 +5966,43 @@ def damage_all_scope_from_oracle(metadata: dict[str, Any]) -> str | None:
     return str(spec["damage_scope"])
 
 
+def x_damage_all_spec_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
+    text = strip_parenthetical_reminders(oracle_text(metadata))
+    if re.match(r"^.+ deals? x damage to each creature\.?$", text):
+        return {"damage_scope": "each_creature"}
+    if re.match(r"^.+ deals? x damage to each creature with flying\.?$", text):
+        return {"damage_scope": "each_flying_creature"}
+    return None
+
+
+def x_damage_all_source_blocker(source: str, spec: dict[str, Any]) -> str | None:
+    text = source or ""
+    if has_additional_cost(text):
+        return "board_wipe_x_damage_additional_cost_not_supported"
+    constructor_args = extract_constructor_args(text, "DamageAllEffect")
+    if constructor_args is None:
+        return "board_wipe_x_damage_source_not_supported"
+    parts = split_top_level_args(constructor_args)
+    if not parts:
+        return "board_wipe_x_damage_source_not_supported"
+    first_arg = re.sub(r"\s+", "", parts[0])
+    x_value = first_arg in {"GetXValue.instance", "ManacostVariableValue.instance"} or (
+        first_arg == "xValue"
+        and re.search(
+            r"(?:DynamicValue\s+)?xValue\s*=\s*(?:GetXValue|ManacostVariableValue)\.instance",
+            text,
+        )
+    )
+    if not x_value:
+        return "board_wipe_x_damage_source_not_supported"
+    damage_scope = str(spec.get("damage_scope") or "")
+    if damage_scope == "each_flying_creature" and "FILTER_CREATURE_FLYING" not in text:
+        return "board_wipe_damage_source_scope_mismatch"
+    if damage_scope == "each_creature" and "FILTER_CREATURE_FLYING" in text:
+        return "board_wipe_damage_source_scope_mismatch"
+    return None
+
+
 def damage_all_source_matches_spec(source: str, spec: dict[str, Any]) -> bool:
     damage_scope = str(spec.get("damage_scope") or "")
     if (
@@ -6033,7 +6070,6 @@ def board_wipe_source_blocker(source: str, classes: set[str]) -> str | None:
         if len(re.findall(r"new\s+DamageAllEffect\s*\(", text)) != 1:
             return "board_wipe_source_multiple_damage_all_effects"
         blockers = {
-            "GetXValue": "board_wipe_damage_amount_not_fixed",
             "PermanentsOnBattlefieldCount": "board_wipe_damage_amount_not_fixed",
             "ColorsOfManaSpentToCastCount": "board_wipe_damage_amount_not_fixed",
             "DevotionCount": "board_wipe_damage_amount_not_fixed",
@@ -30408,6 +30444,22 @@ def split_row(
             }
             return build_proposal(row, metadata, effect_json, family_id="xmage_destroy_all_spell"), "selected_exact_scope"
         if classes == {"DamageAllEffect"}:
+            x_damage_spec = x_damage_all_spec_from_oracle(metadata)
+            if x_damage_spec is not None:
+                x_source_blocker = x_damage_all_source_blocker(source_text, x_damage_spec)
+                if x_source_blocker is not None:
+                    return None, x_source_blocker
+                effect_json = {
+                    "effect": "damage_wipe",
+                    "battle_model_scope": DAMAGE_WIPE_SCOPE,
+                    "amount": 0,
+                    "damage": 0,
+                    "damage_amount_source": "x_value",
+                    **x_damage_spec,
+                    "xmage_effect_class": "DamageAllEffect",
+                    **flags,
+                }
+                return build_proposal(row, metadata, effect_json, family_id="xmage_x_damage_all_spell"), "selected_exact_scope"
             amount = java_constructor_int(source_text, "DamageAllEffect")
             if amount is None or amount <= 0:
                 return None, "board_wipe_damage_amount_not_fixed"

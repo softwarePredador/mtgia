@@ -18394,6 +18394,70 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_damage_wipe_uses_cast_context_x_value(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.battlefield.append(
+            {
+                "name": "Own Bear",
+                "type_line": "Creature - Bear",
+                "toughness": 4,
+            }
+        )
+        opponent.battlefield.extend(
+            [
+                {
+                    "name": "Opp Small",
+                    "type_line": "Creature - Goblin",
+                    "toughness": 3,
+                },
+                {
+                    "name": "Opp Large",
+                    "type_line": "Creature - Giant",
+                    "toughness": 5,
+                },
+            ]
+        )
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Savage Twister",
+                "type_line": "Sorcery",
+                "oracle_text": "Fixture Savage Twister deals X damage to each creature.",
+            },
+            turn=15,
+            rng=random.Random(15),
+            effect_data_override={
+                "effect": "damage_wipe",
+                "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+                "amount": 0,
+                "damage": 0,
+                "damage_amount_source": "x_value",
+                "damage_scope": "each_creature",
+                "_cast_context": {"x_value": 4},
+            },
+        )
+
+        self.assertEqual(active.battlefield, [])
+        self.assertIn("Own Bear", [card["name"] for card in active.graveyard])
+        self.assertIn("Fixture Savage Twister", [card["name"] for card in active.graveyard])
+        self.assertEqual([card["name"] for card in opponent.battlefield], ["Opp Large"])
+        self.assertEqual([card["name"] for card in opponent.graveyard], ["Opp Small"])
+        self.assertTrue(
+            any(
+                event == "damage_wipe_resolved"
+                and data.get("card") == "Fixture Savage Twister"
+                and data.get("damage") == 4
+                and data.get("damage_amount_source") == "x_value"
+                and data.get("x_value") == 4
+                and data.get("own_creatures_destroyed") == 1
+                and data.get("opponent_creatures_destroyed") == 1
+                for event, data in self.events
+            )
+        )
+
     def test_damage_wipe_respects_damaged_this_turn_scope(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

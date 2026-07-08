@@ -52013,8 +52013,13 @@ def apply_damage_wipe_treasure(player, opponents, card, effect_data, turn, rng):
     finish_resolved_spell(player, card, turn=turn)
 
 
-def damage_wipe_amount(player, card, effect_data):
+def damage_wipe_amount(player, card, effect_data, opponents=None):
     source = effect_data.get("damage_amount_source")
+    if source:
+        amount, dynamic_fields = dynamic_damage_amount(player, opponents or [], effect_data)
+        if amount is not None:
+            effect_data.update(dynamic_fields)
+            return amount
     if source in {
         "other_spells_cast_mana_value_this_turn",
         "other_spells_cast_mv_this_turn",
@@ -52057,7 +52062,7 @@ def apply_damage_wipe(player, opponents, card, effect_data, turn, *, finish_spel
         phase="damage_wipe",
         emit_events=True,
     )
-    amount = damage_wipe_amount(player, card, effect_data)
+    amount = damage_wipe_amount(player, card, effect_data, opponents)
     amount = apply_controller_noncombat_damage_modifiers(
         player,
         amount,
@@ -52269,6 +52274,7 @@ def apply_damage_wipe(player, opponents, card, effect_data, turn, *, finish_spel
         damage_required_colors=damage_required_colors,
         damage_exclude_tokens=damage_exclude_tokens,
         damage_amount_source=effect_data.get("damage_amount_source"),
+        x_value=effect_data.get("x_value"),
         current_spell_mana_value=card_mana_value(card),
         spell_mana_value_cast_this_turn=getattr(
             player,

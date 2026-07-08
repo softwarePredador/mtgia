@@ -18249,6 +18249,55 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["damage"], 2)
         self.assertEqual(effect["damage_scope"], "each_creature")
 
+    def test_x_damage_all_creatures_maps_to_dynamic_damage_wipe_scope(self) -> None:
+        row = queue_row(split.BOARD_WIPE_UNIT, effect_classes=["DamageAllEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Savage Twister deals X damage to each creature."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new DamageAllEffect("
+                "GetXValue.instance, new FilterCreaturePermanent()));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "damage_wipe")
+        self.assertEqual(effect["battle_model_scope"], split.DAMAGE_WIPE_SCOPE)
+        self.assertEqual(effect["damage_amount_source"], "x_value")
+        self.assertEqual(effect["amount"], 0)
+        self.assertEqual(effect["damage_scope"], "each_creature")
+
+    def test_x_damage_all_flying_creatures_maps_to_dynamic_damage_wipe_scope(self) -> None:
+        row = queue_row(split.BOARD_WIPE_UNIT, effect_classes=["DamageAllEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Windstorm deals X damage to each creature with flying."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new DamageAllEffect("
+                "GetXValue.instance, StaticFilters.FILTER_CREATURE_FLYING));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["damage_amount_source"], "x_value")
+        self.assertEqual(effect["damage_scope"], "each_flying_creature")
+
+    def test_x_damage_all_flying_creatures_requires_matching_source_scope(self) -> None:
+        row = queue_row(split.BOARD_WIPE_UNIT, effect_classes=["DamageAllEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Windstorm deals X damage to each creature with flying."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new DamageAllEffect("
+                "GetXValue.instance, new FilterCreaturePermanent()));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "board_wipe_damage_source_scope_mismatch")
+
     def test_storm_inside_card_name_does_not_count_as_complexity_keyword(self) -> None:
         row = queue_row(split.BOARD_WIPE_UNIT, effect_classes=["DamageAllEffect"])
         proposal, reason = split.split_row(
@@ -18349,7 +18398,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "board_wipe_source_multiple_destroy_all_effects")
 
-    def test_damage_wipe_flying_scope_maps_and_dynamic_source_blocks(self) -> None:
+    def test_damage_wipe_flying_scope_maps_and_x_source_maps(self) -> None:
         row = queue_row(split.BOARD_WIPE_UNIT, effect_classes=["DamageAllEffect"])
         proposal, reason = split.split_row(
             row,
@@ -18366,8 +18415,10 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             source_text="this.getSpellAbility().addEffect(new DamageAllEffect(GetXValue.instance, StaticFilters.FILTER_CREATURE_FLYING));",
         )
 
-        self.assertIsNone(proposal)
-        self.assertEqual(reason, "board_wipe_damage_amount_not_fixed")
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["damage_amount_source"], "x_value")
+        self.assertEqual(effect["damage_scope"], "each_flying_creature")
 
     def test_damage_wipe_damaged_this_turn_scope_maps_when_source_matches(self) -> None:
         row = queue_row(split.BOARD_WIPE_UNIT, effect_classes=["DamageAllEffect"])
