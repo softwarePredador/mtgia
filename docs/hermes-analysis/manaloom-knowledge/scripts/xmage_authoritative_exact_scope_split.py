@@ -629,11 +629,13 @@ STATIC_SELF_KEYWORD_ABILITY_CLASSES = {
     "DeathtouchAbility": "deathtouch",
     "DefenderAbility": "defender",
     "DoubleStrikeAbility": "double_strike",
+    "FearAbility": "fear",
     "FirstStrikeAbility": "first_strike",
     "FlashAbility": "flash",
     "FlyingAbility": "flying",
     "HasteAbility": "haste",
     "HexproofAbility": "hexproof",
+    "IntimidateAbility": "intimidate",
     "IndestructibleAbility": "indestructible",
     "LifelinkAbility": "lifelink",
     "MenaceAbility": "menace",
@@ -650,10 +652,12 @@ SAFE_MANA_AUXILIARY_ABILITY_CLASSES = {
 
 STATIC_SELF_KEYWORD_ORDER = [
     "flash",
+    "fear",
     "flying",
     "first_strike",
     "double_strike",
     "deathtouch",
+    "intimidate",
     "lifelink",
     "menace",
     "reach",
@@ -677,10 +681,12 @@ TARGET_GRANT_KEYWORD_ABILITY_CLASSES = {
     in {
         "deathtouch",
         "double_strike",
+        "fear",
         "first_strike",
         "flying",
         "haste",
         "hexproof",
+        "intimidate",
         "indestructible",
         "lifelink",
         "menace",
@@ -26128,6 +26134,8 @@ def split_row(
     if keyword_creature_unit:
         if not is_creature_metadata(metadata):
             return None, "static_keyword_not_creature"
+        if ".getSpellAbility().addCost" in source_text:
+            return None, "static_keyword_source_additional_cost_not_supported"
         keywords = keywords_from_ability_classes(row)
         oracle_keywords = static_keywords_from_oracle(metadata)
         if not keywords:

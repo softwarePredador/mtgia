@@ -415,6 +415,33 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertEqual(assignments, [(attacker, [])])
         self.assertNotIn("blocking", blocker)
 
+    def test_static_fear_and_intimidate_blocking_restrictions(self) -> None:
+        fear_attacker = {
+            "name": "Dross Prowler",
+            "type_line": "Creature - Zombie",
+            "mana_cost": "{2}{B}",
+            "fear": True,
+            "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        }
+        intimidate_attacker = {
+            "name": "Bladetusk Boar",
+            "type_line": "Creature - Boar",
+            "mana_cost": "{3}{R}",
+            "intimidate": True,
+            "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        }
+        green_blocker = {"name": "Grizzly Bears", "type_line": "Creature - Bear", "mana_cost": "{1}{G}"}
+        black_blocker = {"name": "Walking Corpse", "type_line": "Creature - Zombie", "mana_cost": "{1}{B}"}
+        artifact_blocker = {"name": "Silver Myr", "type_line": "Artifact Creature - Myr", "mana_cost": "{2}"}
+        red_blocker = {"name": "Goblin Piker", "type_line": "Creature - Goblin", "mana_cost": "{1}{R}"}
+
+        self.assertFalse(self.battle.blocker_can_block_attacker(green_blocker, fear_attacker))
+        self.assertTrue(self.battle.blocker_can_block_attacker(black_blocker, fear_attacker))
+        self.assertTrue(self.battle.blocker_can_block_attacker(artifact_blocker, fear_attacker))
+        self.assertFalse(self.battle.blocker_can_block_attacker(green_blocker, intimidate_attacker))
+        self.assertTrue(self.battle.blocker_can_block_attacker(red_blocker, intimidate_attacker))
+        self.assertTrue(self.battle.blocker_can_block_attacker(artifact_blocker, intimidate_attacker))
+
     def test_static_basic_landwalk_skips_blocker_when_defender_controls_matching_land(self) -> None:
         defender = self.battle.Player("Defender", None, [])
         attacker = {

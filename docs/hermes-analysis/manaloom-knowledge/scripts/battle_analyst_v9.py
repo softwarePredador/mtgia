@@ -64147,10 +64147,28 @@ def _blocker_matches_evasion_filter(blocker, filter_spec):
     return False
 
 
+def _blocker_can_block_fear_attacker(blocker):
+    return bool(is_artifact_permanent(blocker) or card_has_color(blocker, "black"))
+
+
+def _blocker_can_block_intimidate_attacker(blocker, attacker):
+    if is_artifact_permanent(blocker):
+        return True
+    attacker_colors = card_color_symbol_set(attacker)
+    if not attacker_colors:
+        return False
+    blocker_colors = card_color_symbol_set(blocker)
+    return bool(attacker_colors.intersection(blocker_colors))
+
+
 def blocker_can_block_attacker(blocker, attacker):
     if not isinstance(blocker, dict) or not isinstance(attacker, dict):
         return False
     if attacker.get("flying") and not (blocker.get("flying") or blocker.get("reach")):
+        return False
+    if attacker.get("fear") and not _blocker_can_block_fear_attacker(blocker):
+        return False
+    if attacker.get("intimidate") and not _blocker_can_block_intimidate_attacker(blocker, attacker):
         return False
     if card_has_keyword(attacker, "horsemanship") and not card_has_keyword(blocker, "horsemanship"):
         return False

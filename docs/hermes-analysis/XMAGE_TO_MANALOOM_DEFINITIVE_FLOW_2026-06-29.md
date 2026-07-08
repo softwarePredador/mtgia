@@ -19189,6 +19189,82 @@ Evidence:
 - `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260708_post_pg657_target_player_discard_triggers_new_server_final.md`
 - `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260708_post_pg657b_hash_backfill_new_server_final.md`
 
+## 2026-07-08 PG658 Static Fear/Intimidate Combat Keyword Checkpoint
+
+PG658 promoted the next exact XMage combat-keyword slice: static `fear` and
+`intimidate` creatures, plus safe mixed rows where `fear` is an auxiliary
+static keyword on an already supported exact scope.
+
+This wave closed `15` Commander-legal XMage-authoritative identities:
+`Accursed Spirit`, `Bladetusk Boar`, `Crowd of Cinders`, `Dross Prowler`,
+`Gluttonous Zombie`, `Highborn Ghoul`, `Krenko's Enforcer`,
+`Prickly Boggart`, `Razortooth Rats`, `Severed Legion`,
+`Shadowmage Infiltrator`, `Spectral Rider`, `Squirming Mass`,
+`Undercity Shade`, and `Woebearer`.
+
+Runtime/test changes:
+
+- `xmage_authoritative_exact_scope_split.py` now maps `FearAbility` and
+  `IntimidateAbility` into `xmage_static_self_combat_keyword_creature_v1`;
+- additional cast-cost sources are blocked from static keyword promotion;
+- `battle_analyst_v9.py` now applies MTG blocking restrictions for `fear` and
+  `intimidate`;
+- focused tests cover splitter mapping, additional-cost blocking, and battle
+  blocker legality for black, matching-color, artifact, and off-color blockers;
+- `python3 -m unittest test_xmage_authoritative_exact_scope_split.py
+  test_xmage_exact_scope_runtime.py` passed `1242` tests.
+
+PG658 apply/postcheck evidence:
+
+- split produced `15` safe package candidates: `11` static keyword rows, `1`
+  static source P/T count row, `1` combat-damage draw row, `1` activated self
+  boost row, and `1` combat-damage graveyard-to-hand recursion row;
+- precheck found `15` target rows, `0` existing rules, and `0` shadow rows to
+  deprecate;
+- apply committed `15` promoted rows;
+- postcheck confirmed `15/15` promoted verified/auto rows with `oracle_hash`;
+- PG -> Hermes/SQLite sync loaded `5957` PG rows, updated `5943` SQLite rows,
+  and exported a `5920` row canonical snapshot;
+- metadata sync matched `7081` PostgreSQL card rows, updated `96`
+  `deck_cards.card_id` cache rows, and left `1` unresolved alias
+  (`Surgical Suite/Hospital Room`);
+- E2E package validation passed PostgreSQL, SQLite/Hermes, canonical snapshot,
+  `runtime_get_card_effect`, and battle execution for the selected package;
+- exact-scope recheck on the rebuilt queue returned `proposal_count=0` and
+  `safe_for_batch_pg_package_count=0`.
+
+Final post-PG658 state:
+
+- global readiness:
+  `battle_and_oracle_ready=6017`, `battle_family_mapper_required=27859`,
+  `snapshot_has_verified_rule=6045`, `snapshot_has_any_rule=7249`;
+- authoritative queue:
+  `target_identity_count=24936`,
+  `xmage_authoritative_source_count=24623`,
+  `xmage_missing_source_exception_count=313`,
+  `xmage_authoritative_parser_gap_count=0`,
+  `xmage_authoritative_adapter_required_count=24623`;
+- validation gates:
+  `xmage_strategy_consistency_audit` passed `26/26`,
+  `pg_hermes_sqlite_contract_audit` passed `51/51`,
+  `operational_surface_alignment_audit` passed, and
+  `legacy_contamination_audit` passed.
+
+Evidence:
+
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260708_pg658_static_fear_intimidate_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg658_static_fear_intimidate_new_server_package_package.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg658_static_fear_intimidate_new_server_pg_to_sqlite_sync.json`
+- `docs/hermes-analysis/master_optimizer_reports/pg658_static_fear_intimidate_new_server_metadata_sync.json`
+- `docs/hermes-analysis/master_optimizer_reports/pg658_static_fear_intimidate_new_server_e2e_validation.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260708_post_pg658_static_fear_intimidate_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260708_post_pg658_static_fear_intimidate_new_server_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260708_post_pg658_static_fear_intimidate_new_server_recheck.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260708_post_pg658_static_fear_intimidate_new_server_final.md`
+- `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260708_post_pg658_static_fear_intimidate_new_server_final.md`
+- `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260708_post_pg658_static_fear_intimidate_new_server_final.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260708_post_pg658_static_fear_intimidate_new_server_final.md`
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

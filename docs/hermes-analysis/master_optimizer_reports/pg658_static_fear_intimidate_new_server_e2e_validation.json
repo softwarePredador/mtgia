@@ -1,0 +1,589 @@
+{
+  "battle_execution": {
+    "event_count": 3,
+    "results": [
+      {
+        "card_name": "Crowd of Cinders",
+        "count": 2,
+        "power": 2,
+        "scenario": "Crowd of Cinders static count P/T recalculates",
+        "toughness": 2
+      },
+      {
+        "activation_limit_per_turn": 0,
+        "card_name": "Undercity Shade",
+        "power_delta": 1,
+        "scenario": "Undercity Shade activates self boost ability",
+        "source_power": 3,
+        "source_toughness": 3,
+        "toughness_delta": 1
+      }
+    ],
+    "scenario_count": 2
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-08T13:53:13.216409+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg658_static_fear_intimidate_new_server_package_manifest.json",
+  "package_id": "pg658_static_fear_intimidate_new_server_package_manifest",
+  "snapshot": "/tmp/pg658_static_fear_intimidate_new_server_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 15
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Accursed Spirit",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8aae0cea4c421be2af1aecb5bc498c53",
+          "oracle_hash": "633a92d23666fcc688d202accc59ee81",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Bladetusk Boar",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8aae0cea4c421be2af1aecb5bc498c53",
+          "oracle_hash": "633a92d23666fcc688d202accc59ee81",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+          "card_name": "Crowd of Cinders",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b3b048bb0db50f65deaf08dd55ba8163",
+          "oracle_hash": "bbbf07724630e2d9eed139d281366503",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Dross Prowler",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:dcb1b5b7cadffa276560e4ed8ac4b96c",
+          "oracle_hash": "15faa2ca2927fe40f2021280ea0de932",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Gluttonous Zombie",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:dcb1b5b7cadffa276560e4ed8ac4b96c",
+          "oracle_hash": "15faa2ca2927fe40f2021280ea0de932",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Highborn Ghoul",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8aae0cea4c421be2af1aecb5bc498c53",
+          "oracle_hash": "633a92d23666fcc688d202accc59ee81",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Krenko's Enforcer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8aae0cea4c421be2af1aecb5bc498c53",
+          "oracle_hash": "633a92d23666fcc688d202accc59ee81",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Prickly Boggart",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:dcb1b5b7cadffa276560e4ed8ac4b96c",
+          "oracle_hash": "15faa2ca2927fe40f2021280ea0de932",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Razortooth Rats",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:dcb1b5b7cadffa276560e4ed8ac4b96c",
+          "oracle_hash": "15faa2ca2927fe40f2021280ea0de932",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Severed Legion",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:dcb1b5b7cadffa276560e4ed8ac4b96c",
+          "oracle_hash": "15faa2ca2927fe40f2021280ea0de932",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_combat_damage_draw_cards_v1",
+          "card_name": "Shadowmage Infiltrator",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:cdad8122d8a012a52adcc8634cac4f91",
+          "oracle_hash": "5b0b5f2bb475d519669519aa8ee38e55",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Spectral Rider",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8aae0cea4c421be2af1aecb5bc498c53",
+          "oracle_hash": "633a92d23666fcc688d202accc59ee81",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Squirming Mass",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:dcb1b5b7cadffa276560e4ed8ac4b96c",
+          "oracle_hash": "15faa2ca2927fe40f2021280ea0de932",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "card_name": "Undercity Shade",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a96ae8fcb8a3215364caf7b3665fedf9",
+          "oracle_hash": "b7429a8ccc4ddcd865bda66804825074",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_combat_damage_return_graveyard_card_to_hand_v1",
+          "card_name": "Woebearer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ae0219d282abfda7fb2d6ee13d3dda1d",
+          "oracle_hash": "77e677dd903722bd734c63841e23d9e3",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 15
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Accursed Spirit",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8aae0cea4c421be2af1aecb5bc498c53",
+          "oracle_hash": "633a92d23666fcc688d202accc59ee81",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Bladetusk Boar",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8aae0cea4c421be2af1aecb5bc498c53",
+          "oracle_hash": "633a92d23666fcc688d202accc59ee81",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+          "card_name": "Crowd of Cinders",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b3b048bb0db50f65deaf08dd55ba8163",
+          "oracle_hash": "bbbf07724630e2d9eed139d281366503",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Dross Prowler",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:dcb1b5b7cadffa276560e4ed8ac4b96c",
+          "oracle_hash": "15faa2ca2927fe40f2021280ea0de932",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Gluttonous Zombie",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:dcb1b5b7cadffa276560e4ed8ac4b96c",
+          "oracle_hash": "15faa2ca2927fe40f2021280ea0de932",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Highborn Ghoul",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8aae0cea4c421be2af1aecb5bc498c53",
+          "oracle_hash": "633a92d23666fcc688d202accc59ee81",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Krenko's Enforcer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8aae0cea4c421be2af1aecb5bc498c53",
+          "oracle_hash": "633a92d23666fcc688d202accc59ee81",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Prickly Boggart",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:dcb1b5b7cadffa276560e4ed8ac4b96c",
+          "oracle_hash": "15faa2ca2927fe40f2021280ea0de932",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Razortooth Rats",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:dcb1b5b7cadffa276560e4ed8ac4b96c",
+          "oracle_hash": "15faa2ca2927fe40f2021280ea0de932",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Severed Legion",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:dcb1b5b7cadffa276560e4ed8ac4b96c",
+          "oracle_hash": "15faa2ca2927fe40f2021280ea0de932",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_combat_damage_draw_cards_v1",
+          "card_name": "Shadowmage Infiltrator",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:cdad8122d8a012a52adcc8634cac4f91",
+          "oracle_hash": "5b0b5f2bb475d519669519aa8ee38e55",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Spectral Rider",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8aae0cea4c421be2af1aecb5bc498c53",
+          "oracle_hash": "633a92d23666fcc688d202accc59ee81",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Squirming Mass",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:dcb1b5b7cadffa276560e4ed8ac4b96c",
+          "oracle_hash": "15faa2ca2927fe40f2021280ea0de932",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "card_name": "Undercity Shade",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a96ae8fcb8a3215364caf7b3665fedf9",
+          "oracle_hash": "b7429a8ccc4ddcd865bda66804825074",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_combat_damage_return_graveyard_card_to_hand_v1",
+          "card_name": "Woebearer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ae0219d282abfda7fb2d6ee13d3dda1d",
+          "oracle_hash": "77e677dd903722bd734c63841e23d9e3",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 15
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Accursed Spirit",
+          "logical_rule_key": "battle_rule_v1:8aae0cea4c421be2af1aecb5bc498c53"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Bladetusk Boar",
+          "logical_rule_key": "battle_rule_v1:8aae0cea4c421be2af1aecb5bc498c53"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+          "battle_rule_version": 2,
+          "card_name": "Crowd of Cinders",
+          "logical_rule_key": "battle_rule_v1:b3b048bb0db50f65deaf08dd55ba8163"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Dross Prowler",
+          "logical_rule_key": "battle_rule_v1:dcb1b5b7cadffa276560e4ed8ac4b96c"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Gluttonous Zombie",
+          "logical_rule_key": "battle_rule_v1:dcb1b5b7cadffa276560e4ed8ac4b96c"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Highborn Ghoul",
+          "logical_rule_key": "battle_rule_v1:8aae0cea4c421be2af1aecb5bc498c53"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Krenko's Enforcer",
+          "logical_rule_key": "battle_rule_v1:8aae0cea4c421be2af1aecb5bc498c53"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Prickly Boggart",
+          "logical_rule_key": "battle_rule_v1:dcb1b5b7cadffa276560e4ed8ac4b96c"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Razortooth Rats",
+          "logical_rule_key": "battle_rule_v1:dcb1b5b7cadffa276560e4ed8ac4b96c"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Severed Legion",
+          "logical_rule_key": "battle_rule_v1:dcb1b5b7cadffa276560e4ed8ac4b96c"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_combat_damage_draw_cards_v1",
+          "battle_rule_version": 2,
+          "card_name": "Shadowmage Infiltrator",
+          "logical_rule_key": "battle_rule_v1:cdad8122d8a012a52adcc8634cac4f91"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Spectral Rider",
+          "logical_rule_key": "battle_rule_v1:8aae0cea4c421be2af1aecb5bc498c53"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Squirming Mass",
+          "logical_rule_key": "battle_rule_v1:dcb1b5b7cadffa276560e4ed8ac4b96c"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Undercity Shade",
+          "logical_rule_key": "battle_rule_v1:a96ae8fcb8a3215364caf7b3665fedf9"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_combat_damage_return_graveyard_card_to_hand_v1",
+          "battle_rule_version": 2,
+          "card_name": "Woebearer",
+          "logical_rule_key": "battle_rule_v1:ae0219d282abfda7fb2d6ee13d3dda1d"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 15
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Accursed Spirit",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:8aae0cea4c421be2af1aecb5bc498c53"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Bladetusk Boar",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:8aae0cea4c421be2af1aecb5bc498c53"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Crowd of Cinders",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:b3b048bb0db50f65deaf08dd55ba8163"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Dross Prowler",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:dcb1b5b7cadffa276560e4ed8ac4b96c"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Gluttonous Zombie",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:dcb1b5b7cadffa276560e4ed8ac4b96c"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Highborn Ghoul",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:8aae0cea4c421be2af1aecb5bc498c53"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Krenko's Enforcer",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:8aae0cea4c421be2af1aecb5bc498c53"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Prickly Boggart",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:dcb1b5b7cadffa276560e4ed8ac4b96c"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Razortooth Rats",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:dcb1b5b7cadffa276560e4ed8ac4b96c"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Severed Legion",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:dcb1b5b7cadffa276560e4ed8ac4b96c"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Shadowmage Infiltrator",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:cdad8122d8a012a52adcc8634cac4f91"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Spectral Rider",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:8aae0cea4c421be2af1aecb5bc498c53"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Squirming Mass",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:dcb1b5b7cadffa276560e4ed8ac4b96c"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Undercity Shade",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:a96ae8fcb8a3215364caf7b3665fedf9"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Woebearer",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:ae0219d282abfda7fb2d6ee13d3dda1d"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 3,
+        "scenarios": 2
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

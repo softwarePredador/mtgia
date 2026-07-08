@@ -20045,6 +20045,64 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertTrue(effect["flash"])
         self.assertTrue(effect["flying"])
 
+    def test_static_keyword_creature_maps_fear_and_intimidate(self) -> None:
+        cases = [
+            ("FearAbility", "Fear", "fear"),
+            ("IntimidateAbility", "Intimidate", "intimidate"),
+        ]
+        for ability_class, oracle_text, keyword in cases:
+            with self.subTest(keyword=keyword):
+                row = queue_row(
+                    f"xmage_signature::no_effect_class::{ability_class}::"
+                    "no_target_class::no_condition_class::no_signal",
+                    effect_classes=[],
+                    ability_kind="static",
+                    ability_classes=[ability_class],
+                )
+                proposal, reason = split.split_row(
+                    row,
+                    metadata(
+                        name="Fixture Rogue",
+                        type_line="Creature - Rogue",
+                        oracle_text=oracle_text,
+                    ),
+                    source_text=f"this.addAbility({ability_class}.getInstance());",
+                )
+
+                self.assertEqual(reason, "selected_exact_scope")
+                effect = proposal["effect_json"]
+                self.assertEqual(effect["battle_model_scope"], split.STATIC_KEYWORD_CREATURE_SCOPE)
+                self.assertEqual(effect["keywords"], [keyword])
+                self.assertTrue(effect[keyword])
+
+    def test_static_keyword_creature_blocks_source_additional_cast_cost(self) -> None:
+        row = queue_row(
+            "xmage_signature::no_effect_class::FearAbility::TargetCardInHand::no_condition_class::targeting",
+            effect_classes=[],
+            ability_kind="static",
+            ability_classes=["FearAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Squeaking Pie Sneak",
+                type_line="Creature - Goblin Rogue",
+                oracle_text=(
+                    "As an additional cost to cast this spell, reveal a Goblin card "
+                    "from your hand or pay {3}.\nFear"
+                ),
+            ),
+            source_text=(
+                "this.getSpellAbility().addCost(new OrCost("
+                "new RevealTargetFromHandCost(new TargetCardInHand(filter)), "
+                "new GenericManaCost(3)));"
+                "this.addAbility(FearAbility.getInstance());"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "static_keyword_source_additional_cost_not_supported")
+
     def test_activated_self_boost_creature_maps_to_self_stat_modifier(self) -> None:
         row = queue_row(
             split.SELF_BOOST_ACTIVATED_UNIT,

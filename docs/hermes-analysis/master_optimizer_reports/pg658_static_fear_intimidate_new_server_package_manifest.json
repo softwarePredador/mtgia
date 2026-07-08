@@ -1,0 +1,1102 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg658_static_fear_intimidate_new_server_20260708_135146",
+  "deploy_id": "PG658",
+  "execution_scenarios": [
+    {
+      "card": {
+        "colors": [
+          "B"
+        ],
+        "effect": "creature",
+        "mana_cost": "{B}",
+        "name": "Crowd of Cinders",
+        "power": 0,
+        "toughness": 0,
+        "type_line": "Creature - Avatar"
+      },
+      "controller_battlefield": [
+        {
+          "colors": [
+            "B"
+          ],
+          "mana_cost": "{B}",
+          "name": "E2E Matching B Permanent",
+          "type_line": "Artifact"
+        },
+        {
+          "colors": [
+            "U"
+          ],
+          "mana_cost": "{U}",
+          "name": "E2E Off Color Permanent",
+          "type_line": "Artifact"
+        }
+      ],
+      "controller_hand": [],
+      "expected_count": 2,
+      "expected_power": 2,
+      "expected_toughness": 2,
+      "logical_rule_key": "battle_rule_v1:b3b048bb0db50f65deaf08dd55ba8163",
+      "name": "Crowd of Cinders static count P/T recalculates",
+      "opponent_battlefield": [],
+      "opponent_hand": [],
+      "type": "static_count_power_toughness"
+    },
+    {
+      "card": {
+        "name": "Undercity Shade",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "controller_mana": {
+        "black": 1,
+        "blue": 0,
+        "generic": 0,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_activation_limit_per_turn": 0,
+      "expected_power_delta": 1,
+      "expected_tapped_source": false,
+      "expected_toughness_delta": 1,
+      "logical_rule_key": "battle_rule_v1:a96ae8fcb8a3215364caf7b3665fedf9",
+      "name": "Undercity Shade activates self boost ability",
+      "type": "simple_activated_self_boost"
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Accursed Spirit",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8aae0cea4c421be2af1aecb5bc498c53",
+      "min_rule_version": 2,
+      "normalized_name": "accursed spirit",
+      "oracle_hash": "633a92d23666fcc688d202accc59ee81",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "intimidate"
+        ],
+        "xmage_ability_classes": [
+          "IntimidateAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Bladetusk Boar",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8aae0cea4c421be2af1aecb5bc498c53",
+      "min_rule_version": 2,
+      "normalized_name": "bladetusk boar",
+      "oracle_hash": "633a92d23666fcc688d202accc59ee81",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "intimidate"
+        ],
+        "xmage_ability_classes": [
+          "IntimidateAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Crowd of Cinders",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b3b048bb0db50f65deaf08dd55ba8163",
+      "min_rule_version": 2,
+      "normalized_name": "crowd of cinders",
+      "oracle_hash": "bbbf07724630e2d9eed139d281366503",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+        "battlefield_count_card_types": [
+          "permanent"
+        ],
+        "battlefield_count_required_colors": [
+          "B"
+        ],
+        "battlefield_count_scope": "controller_battlefield",
+        "dynamic_power_equals_count": true,
+        "dynamic_toughness_equals_count": true,
+        "effect": "creature",
+        "keywords": [
+          "fear"
+        ],
+        "stat_modifier_amount_source": "battlefield_permanent_count",
+        "static_effect": "source_power_toughness_equal_count",
+        "static_power_toughness_base": 0,
+        "static_power_toughness_count_multiplier": 1,
+        "static_power_toughness_source": "battlefield_permanent_count",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SetBasePowerToughnessSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Dross Prowler",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:dcb1b5b7cadffa276560e4ed8ac4b96c",
+      "min_rule_version": 2,
+      "normalized_name": "dross prowler",
+      "oracle_hash": "15faa2ca2927fe40f2021280ea0de932",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "fear"
+        ],
+        "xmage_ability_classes": [
+          "FearAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Gluttonous Zombie",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:dcb1b5b7cadffa276560e4ed8ac4b96c",
+      "min_rule_version": 2,
+      "normalized_name": "gluttonous zombie",
+      "oracle_hash": "15faa2ca2927fe40f2021280ea0de932",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "fear"
+        ],
+        "xmage_ability_classes": [
+          "FearAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Highborn Ghoul",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8aae0cea4c421be2af1aecb5bc498c53",
+      "min_rule_version": 2,
+      "normalized_name": "highborn ghoul",
+      "oracle_hash": "633a92d23666fcc688d202accc59ee81",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "intimidate"
+        ],
+        "xmage_ability_classes": [
+          "IntimidateAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Krenko's Enforcer",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8aae0cea4c421be2af1aecb5bc498c53",
+      "min_rule_version": 2,
+      "normalized_name": "krenko's enforcer",
+      "oracle_hash": "633a92d23666fcc688d202accc59ee81",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "intimidate"
+        ],
+        "xmage_ability_classes": [
+          "IntimidateAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Prickly Boggart",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:dcb1b5b7cadffa276560e4ed8ac4b96c",
+      "min_rule_version": 2,
+      "normalized_name": "prickly boggart",
+      "oracle_hash": "15faa2ca2927fe40f2021280ea0de932",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "fear"
+        ],
+        "xmage_ability_classes": [
+          "FearAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Razortooth Rats",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:dcb1b5b7cadffa276560e4ed8ac4b96c",
+      "min_rule_version": 2,
+      "normalized_name": "razortooth rats",
+      "oracle_hash": "15faa2ca2927fe40f2021280ea0de932",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "fear"
+        ],
+        "xmage_ability_classes": [
+          "FearAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Severed Legion",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:dcb1b5b7cadffa276560e4ed8ac4b96c",
+      "min_rule_version": 2,
+      "normalized_name": "severed legion",
+      "oracle_hash": "15faa2ca2927fe40f2021280ea0de932",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "fear"
+        ],
+        "xmage_ability_classes": [
+          "FearAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Shadowmage Infiltrator",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cdad8122d8a012a52adcc8634cac4f91",
+      "min_rule_version": 2,
+      "normalized_name": "shadowmage infiltrator",
+      "oracle_hash": "5b0b5f2bb475d519669519aa8ee38e55",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_combat_damage_draw_cards_v1",
+        "combat_damage_draw_count": 1,
+        "combat_damage_draw_optional": true,
+        "combat_damage_player_draw": true,
+        "draw_count": 1,
+        "effect": "creature",
+        "keywords": [
+          "fear"
+        ],
+        "trigger": "combat_damage_to_player",
+        "trigger_effect": "draw_cards",
+        "xmage_ability_class": "DealsCombatDamageToAPlayerTriggeredAbility",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Spectral Rider",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8aae0cea4c421be2af1aecb5bc498c53",
+      "min_rule_version": 2,
+      "normalized_name": "spectral rider",
+      "oracle_hash": "633a92d23666fcc688d202accc59ee81",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "intimidate"
+        ],
+        "xmage_ability_classes": [
+          "IntimidateAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Squirming Mass",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:dcb1b5b7cadffa276560e4ed8ac4b96c",
+      "min_rule_version": 2,
+      "normalized_name": "squirming mass",
+      "oracle_hash": "15faa2ca2927fe40f2021280ea0de932",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "fear"
+        ],
+        "xmage_ability_classes": [
+          "FearAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Undercity Shade",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a96ae8fcb8a3215364caf7b3665fedf9",
+      "min_rule_version": 2,
+      "normalized_name": "undercity shade",
+      "oracle_hash": "b7429a8ccc4ddcd865bda66804825074",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "self_stat_modifier_until_eot",
+            "activation_cost_colors": [
+              "B"
+            ],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{B}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 1,
+            "power_delta": 1,
+            "target": "self",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "source": "self"
+            },
+            "target_controller": "self",
+            "toughness_boost": 1,
+            "toughness_delta": 1,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "BoostSourceEffect"
+          }
+        ],
+        "_keywords_are_self": true,
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "activated_effect": "self_stat_modifier_until_eot",
+        "activation_cost_colors": [
+          "B"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{B}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "keywords": [
+          "fear"
+        ],
+        "power_boost": 1,
+        "power_delta": 1,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 1,
+        "toughness_delta": 1,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Woebearer",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ae0219d282abfda7fb2d6ee13d3dda1d",
+      "min_rule_version": 2,
+      "normalized_name": "woebearer",
+      "oracle_hash": "77e677dd903722bd734c63841e23d9e3",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_combat_damage_return_graveyard_card_to_hand_v1",
+        "effect": "creature",
+        "keywords": [
+          "fear"
+        ],
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "trigger": "combat_damage_to_player",
+        "xmage_ability_class": "DealsCombatDamageToAPlayerTriggeredAbility",
+        "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_creature_combat_damage_draw_cards": 1,
+    "xmage_creature_combat_damage_graveyard_to_hand": 1,
+    "xmage_permanent_simple_activated_self_boost_until_eot": 1,
+    "xmage_static_self_combat_keyword_creature": 11,
+    "xmage_static_source_power_toughness_equal_count": 1
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg658_static_fear_intimidate_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg658_static_fear_intimidate_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg658_static_fear_intimidate_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg658_static_fear_intimidate_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg658_static_fear_intimidate_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg658_static_fear_intimidate_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-08T13:51:46+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Accursed Spirit"
+      },
+      "card_name": "Accursed Spirit",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8aae0cea4c421be2af1aecb5bc498c53",
+      "normalized_name": "accursed spirit",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "intimidate"
+        ],
+        "xmage_ability_classes": [
+          "IntimidateAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Bladetusk Boar"
+      },
+      "card_name": "Bladetusk Boar",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8aae0cea4c421be2af1aecb5bc498c53",
+      "normalized_name": "bladetusk boar",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "intimidate"
+        ],
+        "xmage_ability_classes": [
+          "IntimidateAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Crowd of Cinders"
+      },
+      "card_name": "Crowd of Cinders",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b3b048bb0db50f65deaf08dd55ba8163",
+      "normalized_name": "crowd of cinders",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1",
+        "battlefield_count_card_types": [
+          "permanent"
+        ],
+        "battlefield_count_required_colors": [
+          "B"
+        ],
+        "battlefield_count_scope": "controller_battlefield",
+        "dynamic_power_equals_count": true,
+        "dynamic_toughness_equals_count": true,
+        "effect": "creature",
+        "keywords": [
+          "fear"
+        ],
+        "stat_modifier_amount_source": "battlefield_permanent_count",
+        "static_effect": "source_power_toughness_equal_count",
+        "static_power_toughness_base": 0,
+        "static_power_toughness_count_multiplier": 1,
+        "static_power_toughness_source": "battlefield_permanent_count",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SetBasePowerToughnessSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Dross Prowler"
+      },
+      "card_name": "Dross Prowler",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:dcb1b5b7cadffa276560e4ed8ac4b96c",
+      "normalized_name": "dross prowler",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "fear"
+        ],
+        "xmage_ability_classes": [
+          "FearAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Gluttonous Zombie"
+      },
+      "card_name": "Gluttonous Zombie",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:dcb1b5b7cadffa276560e4ed8ac4b96c",
+      "normalized_name": "gluttonous zombie",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "fear"
+        ],
+        "xmage_ability_classes": [
+          "FearAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Highborn Ghoul"
+      },
+      "card_name": "Highborn Ghoul",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8aae0cea4c421be2af1aecb5bc498c53",
+      "normalized_name": "highborn ghoul",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "intimidate"
+        ],
+        "xmage_ability_classes": [
+          "IntimidateAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Krenko's Enforcer"
+      },
+      "card_name": "Krenko's Enforcer",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8aae0cea4c421be2af1aecb5bc498c53",
+      "normalized_name": "krenko's enforcer",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "intimidate"
+        ],
+        "xmage_ability_classes": [
+          "IntimidateAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Prickly Boggart"
+      },
+      "card_name": "Prickly Boggart",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:dcb1b5b7cadffa276560e4ed8ac4b96c",
+      "normalized_name": "prickly boggart",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "fear"
+        ],
+        "xmage_ability_classes": [
+          "FearAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Razortooth Rats"
+      },
+      "card_name": "Razortooth Rats",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:dcb1b5b7cadffa276560e4ed8ac4b96c",
+      "normalized_name": "razortooth rats",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "fear"
+        ],
+        "xmage_ability_classes": [
+          "FearAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Severed Legion"
+      },
+      "card_name": "Severed Legion",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:dcb1b5b7cadffa276560e4ed8ac4b96c",
+      "normalized_name": "severed legion",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "fear"
+        ],
+        "xmage_ability_classes": [
+          "FearAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Shadowmage Infiltrator"
+      },
+      "card_name": "Shadowmage Infiltrator",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cdad8122d8a012a52adcc8634cac4f91",
+      "normalized_name": "shadowmage infiltrator",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_combat_damage_draw_cards_v1",
+        "combat_damage_draw_count": 1,
+        "combat_damage_draw_optional": true,
+        "combat_damage_player_draw": true,
+        "draw_count": 1,
+        "effect": "creature",
+        "keywords": [
+          "fear"
+        ],
+        "trigger": "combat_damage_to_player",
+        "trigger_effect": "draw_cards",
+        "xmage_ability_class": "DealsCombatDamageToAPlayerTriggeredAbility",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Spectral Rider"
+      },
+      "card_name": "Spectral Rider",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8aae0cea4c421be2af1aecb5bc498c53",
+      "normalized_name": "spectral rider",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "intimidate"
+        ],
+        "xmage_ability_classes": [
+          "IntimidateAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Squirming Mass"
+      },
+      "card_name": "Squirming Mass",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:dcb1b5b7cadffa276560e4ed8ac4b96c",
+      "normalized_name": "squirming mass",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "fear"
+        ],
+        "xmage_ability_classes": [
+          "FearAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Undercity Shade"
+      },
+      "card_name": "Undercity Shade",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a96ae8fcb8a3215364caf7b3665fedf9",
+      "normalized_name": "undercity shade",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "self_stat_modifier_until_eot",
+            "activation_cost_colors": [
+              "B"
+            ],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{B}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 1,
+            "power_delta": 1,
+            "target": "self",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "source": "self"
+            },
+            "target_controller": "self",
+            "toughness_boost": 1,
+            "toughness_delta": 1,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "BoostSourceEffect"
+          }
+        ],
+        "_keywords_are_self": true,
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "activated_effect": "self_stat_modifier_until_eot",
+        "activation_cost_colors": [
+          "B"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{B}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "keywords": [
+          "fear"
+        ],
+        "power_boost": 1,
+        "power_delta": 1,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 1,
+        "toughness_delta": 1,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Woebearer"
+      },
+      "card_name": "Woebearer",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ae0219d282abfda7fb2d6ee13d3dda1d",
+      "normalized_name": "woebearer",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_combat_damage_return_graveyard_card_to_hand_v1",
+        "effect": "creature",
+        "keywords": [
+          "fear"
+        ],
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "trigger": "combat_damage_to_player",
+        "xmage_ability_class": "DealsCombatDamageToAPlayerTriggeredAbility",
+        "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Accursed Spirit",
+    "Bladetusk Boar",
+    "Crowd of Cinders",
+    "Dross Prowler",
+    "Gluttonous Zombie",
+    "Highborn Ghoul",
+    "Krenko's Enforcer",
+    "Prickly Boggart",
+    "Razortooth Rats",
+    "Severed Legion",
+    "Shadowmage Infiltrator",
+    "Spectral Rider",
+    "Squirming Mass",
+    "Undercity Shade",
+    "Woebearer"
+  ],
+  "selected_count": 15,
+  "slug": "static_fear_intimidate_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Accursed Spirit",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8aae0cea4c421be2af1aecb5bc498c53",
+      "min_rule_version": 2,
+      "normalized_name": "accursed spirit",
+      "oracle_hash": "633a92d23666fcc688d202accc59ee81",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Bladetusk Boar",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8aae0cea4c421be2af1aecb5bc498c53",
+      "min_rule_version": 2,
+      "normalized_name": "bladetusk boar",
+      "oracle_hash": "633a92d23666fcc688d202accc59ee81",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Crowd of Cinders",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b3b048bb0db50f65deaf08dd55ba8163",
+      "min_rule_version": 2,
+      "normalized_name": "crowd of cinders",
+      "oracle_hash": "bbbf07724630e2d9eed139d281366503",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_count_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Dross Prowler",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:dcb1b5b7cadffa276560e4ed8ac4b96c",
+      "min_rule_version": 2,
+      "normalized_name": "dross prowler",
+      "oracle_hash": "15faa2ca2927fe40f2021280ea0de932",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Gluttonous Zombie",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:dcb1b5b7cadffa276560e4ed8ac4b96c",
+      "min_rule_version": 2,
+      "normalized_name": "gluttonous zombie",
+      "oracle_hash": "15faa2ca2927fe40f2021280ea0de932",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Highborn Ghoul",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8aae0cea4c421be2af1aecb5bc498c53",
+      "min_rule_version": 2,
+      "normalized_name": "highborn ghoul",
+      "oracle_hash": "633a92d23666fcc688d202accc59ee81",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Krenko's Enforcer",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8aae0cea4c421be2af1aecb5bc498c53",
+      "min_rule_version": 2,
+      "normalized_name": "krenko's enforcer",
+      "oracle_hash": "633a92d23666fcc688d202accc59ee81",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Prickly Boggart",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:dcb1b5b7cadffa276560e4ed8ac4b96c",
+      "min_rule_version": 2,
+      "normalized_name": "prickly boggart",
+      "oracle_hash": "15faa2ca2927fe40f2021280ea0de932",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Razortooth Rats",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:dcb1b5b7cadffa276560e4ed8ac4b96c",
+      "min_rule_version": 2,
+      "normalized_name": "razortooth rats",
+      "oracle_hash": "15faa2ca2927fe40f2021280ea0de932",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Severed Legion",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:dcb1b5b7cadffa276560e4ed8ac4b96c",
+      "min_rule_version": 2,
+      "normalized_name": "severed legion",
+      "oracle_hash": "15faa2ca2927fe40f2021280ea0de932",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Shadowmage Infiltrator",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cdad8122d8a012a52adcc8634cac4f91",
+      "min_rule_version": 2,
+      "normalized_name": "shadowmage infiltrator",
+      "oracle_hash": "5b0b5f2bb475d519669519aa8ee38e55",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_combat_damage_draw_cards_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Spectral Rider",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8aae0cea4c421be2af1aecb5bc498c53",
+      "min_rule_version": 2,
+      "normalized_name": "spectral rider",
+      "oracle_hash": "633a92d23666fcc688d202accc59ee81",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Squirming Mass",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:dcb1b5b7cadffa276560e4ed8ac4b96c",
+      "min_rule_version": 2,
+      "normalized_name": "squirming mass",
+      "oracle_hash": "15faa2ca2927fe40f2021280ea0de932",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Undercity Shade",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a96ae8fcb8a3215364caf7b3665fedf9",
+      "min_rule_version": 2,
+      "normalized_name": "undercity shade",
+      "oracle_hash": "b7429a8ccc4ddcd865bda66804825074",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Woebearer",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ae0219d282abfda7fb2d6ee13d3dda1d",
+      "min_rule_version": 2,
+      "normalized_name": "woebearer",
+      "oracle_hash": "77e677dd903722bd734c63841e23d9e3",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_combat_damage_return_graveyard_card_to_hand_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}
