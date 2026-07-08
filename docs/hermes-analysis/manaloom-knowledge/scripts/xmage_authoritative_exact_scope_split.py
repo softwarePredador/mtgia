@@ -979,7 +979,7 @@ def fixed_equipment_static_attachment_from_oracle(
     ]
     static_lines: list[str] = []
     for line in lines:
-        if line.startswith("equip "):
+        if re.match(r"^equip(?:\s|[-:\u2013\u2014])", line):
             continue
         static_lines.append(line)
     if len(static_lines) != 1:

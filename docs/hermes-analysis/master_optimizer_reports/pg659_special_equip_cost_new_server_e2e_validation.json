@@ -1,0 +1,164 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-08T14:07:57.392384+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg659_special_equip_cost_new_server_package_manifest.json",
+  "package_id": "pg659_special_equip_cost_new_server_package_manifest",
+  "snapshot": "/tmp/pg659_special_equip_cost_new_server_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 3
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+          "card_name": "Bloodthorn Flail",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e1578e231f7cb23a2c4211fa2e08e51c",
+          "oracle_hash": "bb46b9b658a80f3d5eec51abf0dfb33a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+          "card_name": "Demonmail Hauberk",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a501e1c0f5726aaf4689af5eacd7774a",
+          "oracle_hash": "1f08deeab2c0475c0f80d8e4cc826355",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+          "card_name": "Murderer's Axe",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d207c85ffb0121236b7c49f49361f2aa",
+          "oracle_hash": "894f1d5c9adf8542002730887be9850d",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 3
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+          "card_name": "Bloodthorn Flail",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e1578e231f7cb23a2c4211fa2e08e51c",
+          "oracle_hash": "bb46b9b658a80f3d5eec51abf0dfb33a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+          "card_name": "Demonmail Hauberk",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a501e1c0f5726aaf4689af5eacd7774a",
+          "oracle_hash": "1f08deeab2c0475c0f80d8e4cc826355",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+          "card_name": "Murderer's Axe",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d207c85ffb0121236b7c49f49361f2aa",
+          "oracle_hash": "894f1d5c9adf8542002730887be9850d",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 3
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+          "battle_rule_version": 2,
+          "card_name": "Bloodthorn Flail",
+          "logical_rule_key": "battle_rule_v1:e1578e231f7cb23a2c4211fa2e08e51c"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+          "battle_rule_version": 2,
+          "card_name": "Demonmail Hauberk",
+          "logical_rule_key": "battle_rule_v1:a501e1c0f5726aaf4689af5eacd7774a"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+          "battle_rule_version": 2,
+          "card_name": "Murderer's Axe",
+          "logical_rule_key": "battle_rule_v1:d207c85ffb0121236b7c49f49361f2aa"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 3
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Bloodthorn Flail",
+          "component_keys": [],
+          "effect": "equipment_static_attachment",
+          "logical_rule_key": "battle_rule_v1:e1578e231f7cb23a2c4211fa2e08e51c"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Demonmail Hauberk",
+          "component_keys": [],
+          "effect": "equipment_static_attachment",
+          "logical_rule_key": "battle_rule_v1:a501e1c0f5726aaf4689af5eacd7774a"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Murderer's Axe",
+          "component_keys": [],
+          "effect": "equipment_static_attachment",
+          "logical_rule_key": "battle_rule_v1:d207c85ffb0121236b7c49f49361f2aa"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

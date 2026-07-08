@@ -116,6 +116,41 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "equipment_static_oracle_keyword_not_supported")
 
+    def test_fixed_equipment_static_attachment_allows_special_equip_cost_line(self) -> None:
+        row = queue_row(
+            "xmage_signature::BoostEquippedEffect::EquipAbility,SimpleStaticAbility::"
+            "no_target_class::no_condition_class::static_ability",
+            effect_classes=["BoostEquippedEffect"],
+            ability_kind="static",
+            ability_classes=["EquipAbility", "SimpleStaticAbility"],
+            xmage_signals=["static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Bloodthorn Flail",
+                type_line="Artifact - Equipment",
+                oracle_text="Equipped creature gets +2/+1.\nEquip—Pay {3} or discard a card.",
+            ),
+            source_text="""
+                this.subtype.add(SubType.EQUIPMENT);
+                this.addAbility(new SimpleStaticAbility(new BoostEquippedEffect(2, 1)));
+                this.addAbility(new EquipAbility(
+                    Outcome.BoostCreature,
+                    new OrCost(
+                        "Pay {3} or discard a card",
+                        new GenericManaCost(3), new DiscardCardCost()
+                    ), false));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.EQUIPMENT_STATIC_ATTACHMENT_SCOPE)
+        self.assertEqual(effect["power_boost"], 2)
+        self.assertEqual(effect["toughness_boost"], 1)
+        self.assertEqual(effect["attached_keywords"], [])
+
     def test_fixed_aura_static_power_toughness_attachment_maps_exact_scope(self) -> None:
         row = queue_row(
             "xmage_signature::AttachEffect,BoostEnchantedEffect::EnchantAbility,SimpleStaticAbility::"

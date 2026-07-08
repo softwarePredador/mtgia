@@ -1,0 +1,280 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg659_special_equip_cost_new_server_20260708_140658",
+  "deploy_id": "PG659",
+  "execution_scenarios": [],
+  "expected_rules": [
+    {
+      "card_name": "Bloodthorn Flail",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e1578e231f7cb23a2c4211fa2e08e51c",
+      "min_rule_version": 2,
+      "normalized_name": "bloodthorn flail",
+      "oracle_hash": "bb46b9b658a80f3d5eec51abf0dfb33a",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 2,
+        "static_power_bonus": 2,
+        "static_toughness_bonus": 1,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 1,
+        "xmage_ability_classes": [
+          "EquipAbility",
+          "SimpleStaticAbility"
+        ],
+        "xmage_effect_classes": [
+          "BoostEquippedEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Demonmail Hauberk",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a501e1c0f5726aaf4689af5eacd7774a",
+      "min_rule_version": 2,
+      "normalized_name": "demonmail hauberk",
+      "oracle_hash": "1f08deeab2c0475c0f80d8e4cc826355",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 4,
+        "static_power_bonus": 4,
+        "static_toughness_bonus": 2,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 2,
+        "xmage_ability_classes": [
+          "AddAbility",
+          "EquipAbility",
+          "SimpleStaticAbility"
+        ],
+        "xmage_effect_classes": [
+          "BoostEquippedEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Murderer's Axe",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d207c85ffb0121236b7c49f49361f2aa",
+      "min_rule_version": 2,
+      "normalized_name": "murderer's axe",
+      "oracle_hash": "894f1d5c9adf8542002730887be9850d",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 2,
+        "static_power_bonus": 2,
+        "static_toughness_bonus": 2,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 2,
+        "xmage_ability_classes": [
+          "AddAbility",
+          "EquipAbility",
+          "SimpleStaticAbility"
+        ],
+        "xmage_effect_classes": [
+          "BoostEquippedEffect"
+        ]
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_equipment_static_power_toughness_attachment": 3
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg659_special_equip_cost_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg659_special_equip_cost_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg659_special_equip_cost_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg659_special_equip_cost_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg659_special_equip_cost_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg659_special_equip_cost_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-08T14:06:58+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Bloodthorn Flail"
+      },
+      "card_name": "Bloodthorn Flail",
+      "effect": "equipment_static_attachment",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e1578e231f7cb23a2c4211fa2e08e51c",
+      "normalized_name": "bloodthorn flail",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 2,
+        "static_power_bonus": 2,
+        "static_toughness_bonus": 1,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 1,
+        "xmage_ability_classes": [
+          "EquipAbility",
+          "SimpleStaticAbility"
+        ],
+        "xmage_effect_classes": [
+          "BoostEquippedEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Demonmail Hauberk"
+      },
+      "card_name": "Demonmail Hauberk",
+      "effect": "equipment_static_attachment",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a501e1c0f5726aaf4689af5eacd7774a",
+      "normalized_name": "demonmail hauberk",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 4,
+        "static_power_bonus": 4,
+        "static_toughness_bonus": 2,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 2,
+        "xmage_ability_classes": [
+          "AddAbility",
+          "EquipAbility",
+          "SimpleStaticAbility"
+        ],
+        "xmage_effect_classes": [
+          "BoostEquippedEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Murderer's Axe"
+      },
+      "card_name": "Murderer's Axe",
+      "effect": "equipment_static_attachment",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d207c85ffb0121236b7c49f49361f2aa",
+      "normalized_name": "murderer's axe",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 2,
+        "static_power_bonus": 2,
+        "static_toughness_bonus": 2,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 2,
+        "xmage_ability_classes": [
+          "AddAbility",
+          "EquipAbility",
+          "SimpleStaticAbility"
+        ],
+        "xmage_effect_classes": [
+          "BoostEquippedEffect"
+        ]
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Bloodthorn Flail",
+    "Demonmail Hauberk",
+    "Murderer's Axe"
+  ],
+  "selected_count": 3,
+  "slug": "special_equip_cost_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Bloodthorn Flail",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e1578e231f7cb23a2c4211fa2e08e51c",
+      "min_rule_version": 2,
+      "normalized_name": "bloodthorn flail",
+      "oracle_hash": "bb46b9b658a80f3d5eec51abf0dfb33a",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Demonmail Hauberk",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a501e1c0f5726aaf4689af5eacd7774a",
+      "min_rule_version": 2,
+      "normalized_name": "demonmail hauberk",
+      "oracle_hash": "1f08deeab2c0475c0f80d8e4cc826355",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Murderer's Axe",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d207c85ffb0121236b7c49f49361f2aa",
+      "min_rule_version": 2,
+      "normalized_name": "murderer's axe",
+      "oracle_hash": "894f1d5c9adf8542002730887be9850d",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

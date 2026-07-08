@@ -19265,6 +19265,77 @@ Evidence:
 - `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260708_post_pg658_static_fear_intimidate_new_server_final.md`
 - `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260708_post_pg658_static_fear_intimidate_new_server_final.md`
 
+## 2026-07-08 PG659 Special Equip-Cost Equipment Checkpoint
+
+PG659 closed the fixed equipment attachment rows whose Oracle text uses
+nonstandard equip-cost syntax (`Equip--...` / `Equip—...`) while the XMage
+source is still a simple `BoostEquippedEffect`.
+
+This wave closed `3` Commander-legal XMage-authoritative identities:
+`Bloodthorn Flail`, `Demonmail Hauberk`, and `Murderer's Axe`.
+
+Runtime/test changes:
+
+- `xmage_authoritative_exact_scope_split.py` now treats `Equip—...`,
+  `Equip-...`, `Equip:...`, and `Equip ...` as equip-cost lines without
+  accidentally skipping `equipped creature ...` static text;
+- focused tests cover special equip-cost Oracle syntax and source-confirmed
+  fixed `BoostEquippedEffect` extraction;
+- existing runtime tests continue to cover static equipment attachment applying
+  power/toughness and attached keyword grants;
+- `python3 -m unittest test_xmage_authoritative_exact_scope_split.py
+  test_xmage_exact_scope_runtime.py` passed `1243` tests.
+
+PG659 apply/postcheck evidence:
+
+- split produced `3` safe package candidates in
+  `xmage_equipment_static_power_toughness_attachment_v1`;
+- precheck found `3` target rows, `0` existing rules, and `0` shadow rows to
+  deprecate;
+- apply committed `3` promoted rows;
+- postcheck confirmed `3/3` promoted verified/auto rows with `oracle_hash`;
+- PG -> Hermes/SQLite sync loaded `5960` PG rows, updated `5946` SQLite rows,
+  and exported a `5923` row canonical snapshot;
+- metadata sync matched `7084` PostgreSQL card rows, updated `95`
+  `deck_cards.card_id` cache rows, and left the known `1` unresolved alias;
+- E2E package validation passed PostgreSQL, SQLite/Hermes, canonical snapshot,
+  `runtime_get_card_effect`, and the expected no-override battle-execution
+  stage for static equipment rows;
+- exact-scope recheck on the rebuilt queue returned `proposal_count=0` and
+  `safe_for_batch_pg_package_count=0`.
+
+Final post-PG659 state:
+
+- global readiness:
+  `battle_and_oracle_ready=6020`, `battle_family_mapper_required=27856`,
+  `snapshot_has_verified_rule=6048`, `snapshot_has_any_rule=7252`;
+- authoritative queue:
+  `target_identity_count=24933`,
+  `xmage_authoritative_source_count=24620`,
+  `xmage_missing_source_exception_count=313`,
+  `xmage_authoritative_parser_gap_count=0`,
+  `xmage_authoritative_adapter_required_count=24620`;
+- validation gates:
+  `xmage_strategy_consistency_audit` passed `26/26`,
+  `pg_hermes_sqlite_contract_audit` passed `51/51`,
+  `operational_surface_alignment_audit` passed, and
+  `legacy_contamination_audit` passed.
+
+Evidence:
+
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260708_pg659_special_equip_cost_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg659_special_equip_cost_new_server_package_package.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg659_special_equip_cost_new_server_pg_to_sqlite_sync.json`
+- `docs/hermes-analysis/master_optimizer_reports/pg659_special_equip_cost_new_server_metadata_sync.json`
+- `docs/hermes-analysis/master_optimizer_reports/pg659_special_equip_cost_new_server_e2e_validation.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260708_post_pg659_special_equip_cost_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260708_post_pg659_special_equip_cost_new_server_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260708_post_pg659_special_equip_cost_new_server_recheck.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260708_post_pg659_special_equip_cost_new_server_final.md`
+- `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260708_post_pg659_special_equip_cost_new_server_final.md`
+- `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260708_post_pg659_special_equip_cost_new_server_final.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260708_post_pg659_special_equip_cost_new_server_final.md`
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:
