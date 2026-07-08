@@ -268,6 +268,8 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "combat_damage_player_draw",
     "combat_damage_draw_count",
     "combat_damage_draw_optional",
+    "combat_damage_draw_optional_cost",
+    "combat_damage_draw_optional_cost_count",
     "graveyard_exile_target",
     "graveyard_exile_target_count",
     "graveyard_exile_destination",
@@ -2733,6 +2735,43 @@ def simple_activated_draw_execution_scenario_from_expected_rule(
     return scenario
 
 
+def combat_damage_draw_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_creature_combat_damage_draw_cards_v1":
+        return None
+    draw_count = int(required.get("combat_damage_draw_count") or required.get("draw_count") or 1)
+    optional_cost = str(required.get("combat_damage_draw_optional_cost") or "").strip()
+    controller_hand = []
+    if optional_cost == "discard_card":
+        controller_hand = [
+            {"name": "E2E Combat Draw Cost Card", "type_line": "Sorcery", "effect": "draw_cards", "cmc": 4}
+        ]
+    card = {"name": rule["card_name"], "type_line": "Creature - E2E Fixture"}
+    card.update(required)
+    return {
+        "name": f"{rule['card_name']} combat damage draw trigger",
+        "type": "combat_damage_draw",
+        "card": card,
+        "controller_hand": controller_hand,
+        "controller_library": [
+            {
+                "name": f"E2E Combat Draw Card {index + 1}",
+                "type_line": "Instant",
+                "effect": "draw_cards",
+                "cmc": index + 1,
+            }
+            for index in range(max(draw_count, 1))
+        ],
+        "expected_draw_count": draw_count,
+        "expected_optional_cost": optional_cost or None,
+        "expected_discard_count": 1 if optional_cost == "discard_card" else 0,
+        "expected_source_sacrificed": optional_cost == "sacrifice_source",
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def damage_each_opponent_spell_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
@@ -4288,6 +4327,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or damage_each_opponent_spell_execution_scenario_from_expected_rule(rule)
         or damage_gain_life_spell_execution_scenario_from_expected_rule(rule)
         or simple_activated_draw_execution_scenario_from_expected_rule(rule)
+        or combat_damage_draw_execution_scenario_from_expected_rule(rule)
         or simple_activated_damage_execution_scenario_from_expected_rule(rule)
         or simple_activated_tap_target_execution_scenario_from_expected_rule(rule)
         or simple_activated_add_counters_target_execution_scenario_from_expected_rule(rule)

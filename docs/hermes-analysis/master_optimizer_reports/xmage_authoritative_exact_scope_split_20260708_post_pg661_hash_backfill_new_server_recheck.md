@@ -1,0 +1,269 @@
+# XMage Authoritative Exact Scope Split
+
+- Generated at: `2026-07-08T14:42:53+00:00`
+- Status: `ready`
+- Mutations performed: `[]`
+
+## Summary
+
+`{"adapter_work_unit_counts": {}, "blocked_reason_counts": {"activated_damage_oracle_not_simple": 32, "activated_damage_source_cost_not_supported": 3, "activated_destroy_oracle_not_simple": 11, "activated_destroy_source_cost_not_supported": 2, "activated_destroy_source_target_not_supported": 5, "activated_draw_discard_oracle_cost_not_supported": 1, "activated_draw_oracle_cost_not_supported": 7, "activated_draw_oracle_not_simple": 5, "activated_graveyard_exile_oracle_not_simple": 3, "activated_graveyard_to_library_oracle_not_simple": 1, "activated_library_tutor_oracle_cost_not_supported": 12, "activated_library_tutor_to_hand_oracle_cost_not_supported": 6, "activated_library_tutor_to_hand_oracle_not_simple": 1, "activated_life_gain_oracle_cost_not_supported": 5, "activated_life_gain_oracle_not_simple": 10, "activated_recursion_battlefield_oracle_cost_not_supported": 4, "activated_recursion_oracle_cost_not_supported": 3, "activated_recursion_oracle_not_simple": 3, "activated_regenerate_source_oracle_cost_not_supported": 8, "activated_regenerate_source_oracle_not_simple": 3, "activated_self_add_counters_oracle_not_simple": 1, "activated_self_add_counters_source_cost_not_supported": 5, "activated_self_boost_oracle_activation_limit_not_supported": 7, "activated_self_boost_oracle_cost_not_supported": 22, "activated_self_boost_oracle_not_simple": 15, "activated_self_boost_source_oracle_cost_mismatch": 1, "activated_self_keyword_oracle_cost_not_supported": 2, "activated_self_keyword_oracle_not_simple": 2, "activated_tap_target_oracle_cost_not_supported": 2, "activated_tap_target_oracle_not_simple": 2, "activated_target_add_counters_oracle_not_simple": 1, "activated_target_add_counters_source_cost_not_supported": 8, "activated_target_add_counters_source_counter_or_target_not_fixed": 4, "activated_target_boost_oracle_cost_not_supported": 4, "activated_target_boost_oracle_not_simple": 14, "activated_target_keyword_oracle_cost_not_supported": 5, "activated_target_keyword_source_target_not_supported": 1, "activated_token_oracle_not_simple": 1, "activated_token_source_cost_not_supported": 2, "activated_token_source_create_token_not_fixed": 2, "activated_token_source_not_simple_activated": 2, "add_counters_ability_class_not_simple": 2, "add_counters_counter_not_fixed": 8, "add_counters_effect_class_not_pure": 63, "add_counters_oracle_not_simple": 3, "add_counters_target_not_supported": 2, "additional_cost_detected": 101, "attack_self_boost_oracle_not_fixed": 9, "attack_target_keyword_oracle_static_keyword_not_exact": 1, "attack_target_keyword_source_keyword_not_supported": 5, "attack_target_keyword_source_oracle_mismatch": 1, "aura_static_pt_oracle_not_exact_fixed": 19, "board_wipe_ability_class_not_simple": 48, "board_wipe_damage_amount_not_fixed": 1, "board_wipe_destroy_scope_not_supported": 21, "board_wipe_effect_class_not_supported": 76, "board_wipe_oracle_not_simple": 49, "board_wipe_sacrifice_count_not_fixed": 1, "board_wipe_source_multiple_damage_all_effects": 1, "boost_all_source_not_single_fixed": 8, "boost_controlled_source_not_single_fixed": 4, "boost_draw_oracle_not_exact_fixed": 2, "boost_keyword_draw_source_not_exact_fixed": 2, "boost_keyword_oracle_not_exact_fixed": 1, "boost_keyword_oracle_not_simple": 2, "boost_keyword_source_not_single_fixed": 10, "boost_target_source_not_single_fixed": 20, "bounce_ability_class_not_simple": 14, "bounce_draw_ability_class_not_simple": 1, "bounce_draw_oracle_not_exact_fixed": 2, "bounce_draw_oracle_not_simple": 2, "bounce_effect_class_not_pure": 41, "bounce_oracle_not_simple": 11, "bounce_scry_oracle_not_exact_fixed": 1, "bounce_target_not_supported": 10, "combat_damage_draw_amount_damage_dealt_not_supported": 1, "counter_ability_class_not_simple": 12, "counter_draw_oracle_not_simple": 1, "counter_draw_target_not_supported": 4, "counter_effect_class_not_pure": 29, "counter_life_loss_oracle_not_exact_fixed": 1, "counter_oracle_not_simple": 6, "counter_target_not_supported": 7, "creature_enters_draw_oracle_not_simple": 4, "creature_enters_life_gain_oracle_not_exact_creature": 3, "damage_additional_cost_not_supported": 8, "damage_amount_not_fixed": 9, "damage_draw_oracle_not_exact_fixed": 6, "damage_each_opponent_effect_class_not_pure": 10, "damage_effect_class_not_pure": 103, "damage_life_gain_oracle_not_simple": 7, "damage_life_gain_source_not_fixed": 8, "damage_target_not_supported": 8, "destroy_additional_cost_not_supported": 14, "destroy_auxiliary_ability_class_not_supported": 8, "destroy_draw_oracle_not_exact_fixed": 2, "destroy_effect_class_not_pure": 97, "destroy_life_gain_ability_class_not_simple": 2, "destroy_life_gain_source_not_fixed": 4, "destroy_scry_ability_class_not_simple": 1, "destroy_target_controller_life_loss_ability_class_not_simple": 1, "destroy_target_not_supported": 9, "destroy_treasure_effect_classes_not_exact": 11, "dies_damage_amount_not_fixed": 1, "dies_damage_target_not_supported": 1, "dies_draw_count_not_fixed": 2, "dies_life_gain_amount_not_fixed": 3, "dies_recursion_optional_cost_not_supported": 1, "dies_target_player_discard_oracle_not_simple": 3, "dies_token_oracle_not_simple": 3, "dies_treasure_oracle_not_exact": 1, "draw_additional_cost_not_supported": 5, "draw_discard_spell_ability_class_not_simple": 2, "draw_discard_spell_oracle_not_exact_fixed": 5, "draw_discard_spell_oracle_not_simple": 7, "draw_effect_class_not_pure": 428, "draw_lose_life_spell_ability_class_not_simple": 3, "draw_lose_life_spell_oracle_not_exact_fixed": 3, "draw_put_land_oracle_not_exact_fixed": 1, "draw_self_cost_reduction_condition_not_supported": 1, "draw_self_cost_reduction_oracle_not_exact_fixed": 1, "dynamic_count_damage_composite_count_not_supported": 1, "dynamic_count_damage_oracle_composite_count_not_supported": 3, "dynamic_count_damage_oracle_filter_not_supported": 1, "dynamic_life_gain_damage_dealt_to_you_not_supported": 1, "dynamic_life_gain_mana_spent_colors_not_supported": 1, "dynamic_life_gain_oracle_filter_not_supported": 4, "dynamic_life_gain_target_opponent_count_not_supported": 2, "dynamic_life_gain_target_power_toughness_not_supported": 1, "dynamic_life_gain_x_value_not_supported": 1, "equipment_static_oracle_not_exact_fixed": 23, "equipment_static_source_oracle_mismatch": 2, "etb_add_counters_source_oracle_mismatch": 1, "etb_bounce_target_not_supported": 3, "etb_destroy_source_effect_count_not_supported": 1, "etb_destroy_target_not_supported": 1, "etb_draw_count_not_fixed": 2, "etb_draw_lose_life_oracle_not_exact_fixed": 1, "etb_library_pick_oracle_not_simple": 10, "etb_library_tutor_oracle_not_simple": 1, "etb_library_tutor_source_oracle_target_subtypes_mismatch": 2, "etb_library_tutor_to_hand_oracle_target_not_supported": 1, "etb_library_tutor_to_hand_source_oracle_count_mismatch": 3, "etb_library_tutor_to_hand_source_oracle_target_subtypes_mismatch": 2, "etb_library_tutor_to_hand_source_oracle_up_to_count_mismatch": 1, "etb_library_tutor_to_top_oracle_not_simple": 2, "etb_library_tutor_to_top_source_oracle_target_mismatch": 1, "etb_recursion_battlefield_target_not_supported": 1, "etb_recursion_target_not_supported": 3, "etb_scry_oracle_not_fixed": 1, "etb_scry_oracle_not_simple": 1, "etb_target_boost_oracle_not_exact_fixed": 1, "etb_target_boost_source_not_single_fixed": 2, "exile_auxiliary_ability_class_not_supported": 2, "exile_compensation_token_ability_class_not_simple": 1, "exile_compensation_token_oracle_not_simple": 1, "exile_compensation_token_target_not_supported": 1, "exile_effect_class_not_pure": 32, "exile_oracle_not_simple": 7, "exile_target_not_supported": 4, "graveyard_count_boost_source_not_single": 1, "graveyard_count_damage_adventure_filter_not_supported": 1, "graveyard_count_damage_exile_x_graveyard_cost_not_supported": 2, "graveyard_exile_ability_class_not_supported": 1, "graveyard_self_return_ability_class_not_simple": 4, "graveyard_self_return_oracle_not_simple": 4, "keyword_draw_source_not_exact_fixed": 2, "library_pick_ability_class_not_simple": 1, "library_tutor_oracle_not_simple": 6, "library_tutor_oracle_target_not_supported": 2, "library_tutor_source_distinct_names_not_supported": 2, "life_gain_amount_not_fixed": 1, "life_gain_draw_oracle_not_exact_fixed": 4, "life_gain_draw_oracle_not_simple": 3, "life_gain_effect_class_not_pure": 85, "life_gain_oracle_not_simple": 7, "limited_mana_source_cost_not_supported": 2, "look_library_pick_oracle_not_simple": 7, "look_library_pick_oracle_target_not_supported": 3, "look_library_pick_source_target_not_supported": 1, "mana_source_activated_draw_oracle_not_simple": 1, "mana_source_effect_class_not_simple": 16, "mana_source_oracle_not_simple": 100, "mana_source_sacrifice_oracle_not_simple": 10, "mana_source_safe_ability_missing": 125, "mana_source_source_conditional_mana_not_supported": 11, "mana_source_source_discard_cost_not_supported": 6, "mana_source_source_exile_cost_not_supported": 1, "mana_source_source_oracle_tap_mismatch": 1, "mana_source_source_pay_life_cost_not_supported": 1, "mana_source_spell_not_supported": 1, "mana_source_unsafe_ability_class": 119, "mill_return_ability_class_not_simple": 2, "modal_damage_destroy_oracle_mode_count_not_supported": 2, "modal_damage_destroy_oracle_mode_not_supported": 4, "modal_damage_destroy_oracle_not_exact": 3, "modal_damage_destroy_source_damage_target_mismatch": 3, "multi_target_damage_additional_cost_not_supported": 2, "multi_target_damage_effect_class_not_pure": 7, "multi_target_damage_oracle_count_not_supported": 1, "multi_target_damage_oracle_not_exact_fixed": 1, "multi_target_damage_oracle_target_not_supported": 2, "multi_target_damage_oracle_x_not_supported": 8, "not_instant_or_sorcery_spell": 3754, "not_one_shot_spell_ability": 255, "play_lands_from_graveyard_ability_class_not_simple_static": 1, "recursion_ability_class_not_simple": 6, "recursion_auxiliary_flashback_cost_not_supported": 1, "recursion_auxiliary_primary_oracle_not_simple": 1, "recursion_battlefield_ability_class_not_simple": 2, "recursion_battlefield_all_oracle_not_supported": 3, "recursion_battlefield_counter_ability_class_not_simple": 1, "recursion_battlefield_counter_oracle_not_simple": 1, "recursion_battlefield_oracle_not_simple": 4, "recursion_effect_class_not_pure": 370, "recursion_exile_self_target_not_supported": 2, "recursion_oracle_not_simple": 3, "scry_draw_oracle_not_exact_fixed": 1, "spell_cast_add_counters_oracle_filter_not_supported": 1, "spell_cast_draw_oracle_filter_not_supported": 3, "spell_cast_draw_source_oracle_mismatch": 1, "static_controlled_pt_oracle_filter_not_supported": 1, "static_controlled_pt_oracle_not_exact": 2, "static_controlled_pt_source_oracle_mismatch": 1, "static_global_pt_not_permanent": 1, "static_global_pt_oracle_dynamic_not_supported": 3, "static_global_pt_source_dynamic_or_phase_not_supported": 3, "static_graveyard_count_boost_oracle_not_exact": 1, "static_graveyard_count_pt_oracle_not_exact": 8, "static_graveyard_threshold_boost_oracle_not_exact": 5, "static_keyword_not_creature": 1, "static_protection_oracle_not_color_or_card_type_or_subtype_exact": 4, "target_keyword_spell_oracle_not_exact": 1, "target_keyword_spell_oracle_not_simple": 1, "target_keyword_spell_source_target_not_supported": 1, "target_player_discard_spell_oracle_not_exact_fixed": 5, "target_player_draw_spell_oracle_not_exact_fixed": 4, "target_sacrifice_mana_source_mana_output_mismatch": 2, "target_sacrifice_mana_source_oracle_not_simple": 1, "token_ability_not_supported": 2, "token_description_keyword_not_supported": 34, "token_description_not_creature_token": 24, "token_flashback_cost_not_supported": 2, "token_land_token_runtime_not_supported": 1, "token_source_base_create_token_not_fixed": 1, "token_source_create_token_not_fixed": 23, "token_source_not_single_create_token_effect": 1, "tutor_ability_class_not_simple": 27, "tutor_effect_class_not_supported": 158, "unsupported_adapter_work_unit": 3, "x_damage_alternative_timing_not_supported": 1, "x_damage_buyback_not_supported": 1}, "considered_supported_work_unit_rows": 7045, "family_counts": {}, "proposal_count": 0, "proposal_status_counts": {"batch_pg_candidate_after_precheck": 0}, "safe_for_batch_pg_package_count": 0, "scope_counts": {}}`
+
+## Selected Proposals
+
+| Card | Family | Scope | Effect | Logical rule key |
+| --- | --- | --- | --- | --- |
+
+## Blocked Samples
+
+- `activated_damage_oracle_not_simple`: `["Airdrop Condor", "Ballista Squad", "Ben-Ben, Akki Hermit", "Bloodshot Cyclops", "Bosh, Iron Golem", "Brion Stoutarm", "Cinder Elemental", "Coalborn Entity", "Crimson Hellkite", "Cuombajj Witches", "Fervent Paincaster", "Fire Shrine Keeper"]`
+- `activated_damage_source_cost_not_supported`: `["Arc-Slogger", "Bolrac-Clan Crusher", "Ion Storm"]`
+- `activated_destroy_oracle_not_simple`: `["Boom Box", "Devout Harpist", "Gorilla Shaman", "Miracle Worker", "Nosy Goblin", "Orcish Settlers", "Plaguebearer", "Ramses Overdark", "Savaen Elves", "Skirsdag Flayer", "Viscerid Drone"]`
+- `activated_destroy_source_cost_not_supported`: `["Murderous Betrayal", "Sinister Concoction"]`
+- `activated_destroy_source_target_not_supported`: `["Deepfire Elemental", "Despotic Scepter", "Hearth Kami", "Knight of Dusk", "Rats of Rath"]`
+- `activated_draw_discard_oracle_cost_not_supported`: `["Maestros Initiate"]`
+- `activated_draw_oracle_cost_not_supported`: `["Azami, Lady of Scrolls", "Cobbled Lancer", "Illuminated Folio", "Jandor's Ring", "O'aka, Traveling Merchant", "Selhoff Entomber", "Soul Diviner"]`
+- `activated_draw_oracle_not_simple`: `["Compulsion", "Gristle Glutton", "Riptide Director", "Sea Gate Loremaster", "Slate of Ancestry"]`
+- `activated_graveyard_exile_oracle_not_simple`: `["Martyr of Bones", "Mortiphobia", "Steamclaw"]`
+- `activated_graveyard_to_library_oracle_not_simple`: `["Keeper of the Cadence"]`
+- `activated_library_tutor_oracle_cost_not_supported`: `["Angel's Herald", "Behemoth's Herald", "Demon's Herald", "Dragon's Herald", "Dreamscape Artist", "Everbark Shaman", "Kuldotha Forgemaster", "Lifespinner", "Magus of the Order", "Perilous Forays", "Silverglade Pathfinder", "Sphinx's Herald"]`
+- `activated_library_tutor_to_hand_oracle_cost_not_supported`: `["Artificer's Intuition", "Corpse Harvester", "Fauna Shaman", "Greenseeker", "Steelshaper Apprentice", "Trustworthy Scout"]`
+- `activated_library_tutor_to_hand_oracle_not_simple`: `["World Map"]`
+- `activated_life_gain_oracle_cost_not_supported`: `["Ancestor's Prophet", "Dune Diviner", "Peace of Mind", "Royal Herbalist", "Soul Shepherd"]`
+- `activated_life_gain_oracle_not_simple`: `["Children of Korlis", "Elvish Eulogist", "Faith Healer", "Keeper of the Light", "Martyr of Sands", "Oracle of Nectars", "Skullmead Cauldron", "Sophic Centaur", "Tainted Sigil", "Wellwisher"]`
+- `activated_recursion_battlefield_oracle_cost_not_supported`: `["Gravespawn Sovereign", "Order of Whiteclay", "Sidisi, Regent of the Mire", "Whisper, Blood Liturgist"]`
+- `activated_recursion_oracle_cost_not_supported`: `["Bonebind Orator", "Cabal Surgeon", "Skeleton Shard"]`
+- `activated_recursion_oracle_not_simple`: `["Restoration Specialist", "Salvager of Ruin", "Soul of Innistrad"]`
+- `activated_regenerate_source_oracle_cost_not_supported`: `["Centaur Veteran", "Deepwood Ghoul", "Goblin Turncoat", "Marrow Bats", "Mischievous Poltergeist", "Rimebound Dead", "Sentry of the Underworld", "Tunneler Wurm"]`
+- `activated_regenerate_source_oracle_not_simple`: `["Eron the Relentless", "Jungle Troll", "Silvos, Rogue Elemental"]`
+- `activated_self_add_counters_oracle_not_simple`: `["Copper-Leaf Angel"]`
+- `activated_self_add_counters_source_cost_not_supported`: `["Hungry Ghoul", "Markov Dreadknight", "Mold Folk", "Souldrinker", "Unburied Earthcarver"]`
+- `activated_self_boost_oracle_activation_limit_not_supported`: `["Boreal Centaur", "Frostwalla", "Phyrexian Battleflies", "Pit Imp", "Roterothopter", "Sewer Rats", "Vampire Bats"]`
+- `activated_self_boost_oracle_cost_not_supported`: `["Aven Trooper", "Burning-Fist Minotaur", "Canyon Drake", "Carrion Howler", "Cutthroat Centurion", "Cutthroat Contender", "Dai Li Censor", "Fleshgrafter", "Frenetic Ogre", "Grimclaw Bats", "Krosan Archer", "Llanowar Behemoth"]`
+- `activated_self_boost_oracle_not_simple`: `["Chilling Shade", "Conifer Wurm", "Feral Animist", "Hailstorm Valkyrie", "Immolating Souleater", "Kitsune Loreweaver", "Reckless Amplimancer", "Safehold Sentry", "Stone Kavu", "Sunbathing Rootwalla", "Viashivan Dragon", "Volrath the Fallen"]`
+- `activated_self_boost_source_oracle_cost_mismatch`: `["Darklit Gargoyle"]`
+- `activated_self_keyword_oracle_cost_not_supported`: `["Merrow Wavebreakers", "Telethopter"]`
+- `activated_self_keyword_oracle_not_simple`: `["Face of Fear", "Hooded Kavu"]`
+- `activated_tap_target_oracle_cost_not_supported`: `["Icebind Pillar", "Sandsower"]`
+- `activated_tap_target_oracle_not_simple`: `["Floodwater Dam", "Mishra's Helix"]`
+- `activated_target_add_counters_oracle_not_simple`: `["Moxite Refinery"]`
+- `activated_target_add_counters_source_cost_not_supported`: `["Amok", "Armor Thrull", "Coretapper", "Deranged Outcast", "Fume Spitter", "Myr Scrapling", "Power Conduit", "Unspeakable Symbol"]`
+- `activated_target_add_counters_source_counter_or_target_not_fixed`: `["Daring Mechanic", "Fungal Bloom", "Herald of the Sun", "Tempered Veteran"]`
+- `activated_target_boost_oracle_cost_not_supported`: `["Coral Helm", "Deepwood Drummer", "Goblin Sledder", "Plague Witch"]`
+- `activated_target_boost_oracle_not_simple`: `["Armorer Guildmage", "Auriok Bladewarden", "Belbe's Armor", "Cackling Witch", "Dega Disciple", "Disciple of Tevesh Szat", "Elder of Laurels", "Lys Alana Scarblade", "Merrow Grimeblotter", "Narcissism", "Power Armor", "Silvergill Douser"]`
+- `activated_target_keyword_oracle_cost_not_supported`: `["Balloon Peddler", "Heartwood Shard", "Ohran Yeti", "Spurred Wolverine", "Stonerise Spirit"]`
+- `activated_target_keyword_source_target_not_supported`: `["Veteran Cathar"]`
+- `activated_token_oracle_not_simple`: `["Goldmeadow Lookout"]`
+- `activated_token_source_cost_not_supported`: `["Goblin Warrens", "Selesnya Evangel"]`
+- `activated_token_source_create_token_not_fixed`: `["Ant Queen", "Krenko, Mob Boss"]`
+- `activated_token_source_not_simple_activated`: `["Steward of Solidarity", "Vessel of Ephemera"]`
+- `add_counters_ability_class_not_simple`: `["Earthen Arms", "Nature's Panoply"]`
+- `add_counters_counter_not_fixed`: `["Common Bond", "Gird for Battle", "Incremental Blight", "Incremental Growth", "Reap What Is Sown", "River Heralds' Boon", "Stand Together", "Strength of Solidarity"]`
+- `add_counters_effect_class_not_pure`: `["Aggressive Negotiations", "Ajani's Influence", "Ancient Animus", "Awakening of Vitu-Ghazi", "Azula Always Lies", "Biogenic Upgrade", "Blur of Blades", "Boon of Safety", "Clash of the Eikons", "Clockspinning", "Courage in Crisis", "Domri's Ambush"]`
+- `add_counters_oracle_not_simple`: `["Protection Magic", "Stinging Shot", "Travel Preparations"]`
+- `add_counters_target_not_supported`: `["Thrive", "Unexpected Fangs"]`
+- `additional_cost_detected`: `["Abjure", "Aether Tide", "Anchor to Reality", "Angelic Purge", "Betrayer's Bargain", "Blood for Bones", "Bogslither's Embrace", "Caught in the Crossfire", "Caustic Exhale", "Chill Haunting", "Cinder Strike", "Cloud's Limit Break"]`
+- `attack_self_boost_oracle_not_fixed`: `["Bag End Porter", "Cenn's Heir", "Dire Fleet Captain", "Knotvine Paladin", "Lavakin Brawler", "Rampaging Classmate", "Terra Ravager", "Tuya Bearclaw", "Vile Deacon"]`
+- `attack_target_keyword_oracle_static_keyword_not_exact`: `["Ogre Errant"]`
+- `attack_target_keyword_source_keyword_not_supported`: `["Appa, Aang's Companion", "Flesh Burrower", "Malamet Brawler", "Phyrexian Pegasus", "Poison-Blade Mentor"]`
+- `attack_target_keyword_source_oracle_mismatch`: `["Mirkwood Spider"]`
+- `aura_static_pt_oracle_not_exact_fixed`: `["All That Glitters", "Alpha Status", "Ancestral Mask", "Aspect of Wolf", "Blanchwood Armor", "Blessing of the Nephilim", "Death's Approach", "Empyrial Armor", "Exoskeletal Armor", "Exotic Curse", "Granite Grip", "Kagemaro's Clutch"]`
+- `board_wipe_ability_class_not_simple`: `["Artistic Process", "Blasphemous Edict", "Boiling Earth", "Burn Down the House", "Cinderclasm", "Deafening Clarion", "Devastating Mastery", "Dusk // Dawn", "Exterminatus", "Firespout", "Flame Sweep", "Force of Despair"]`
+- `board_wipe_damage_amount_not_fixed`: `["Radiant Flames"]`
+- `board_wipe_destroy_scope_not_supported`: `["Consume the Meek", "Culling Sun", "Damning Verdict", "Doomskar", "Extinguish All Hope", "Fight to the Death", "Forced March", "Granulate", "In Garruk's Wake", "Iridian Maelstrom", "Jokulhaups", "Obliterate"]`
+- `board_wipe_effect_class_not_supported`: `["Balancing Act", "Bend or Break", "Blood Money", "Bontu's Last Reckoning", "Burning of Xinye", "By Invitation Only", "Call to the Void", "Cataclysm", "Catastrophe", "Ceaseless Conflict", "Celestial Judgment", "Cosmotronic Wave"]`
+- `board_wipe_oracle_not_simple`: `["Akroma's Vengeance", "Anger of the Gods", "Barrage of Boulders", "Blood on the Snow", "Breaking Point", "Brotherhood's End", "Calming Verse", "Claws of Wirewood", "Cleansing Meditation", "Cleansing Nova", "Crisis of Conscience", "Crush the Weak"]`
+- `board_wipe_sacrifice_count_not_fixed`: `["Tectonic Break"]`
+- `board_wipe_source_multiple_damage_all_effects`: `["Kaervek's Hex"]`
+- `boost_all_source_not_single_fixed`: `["Cloudkill", "Dead of Winter", "Drag to the Bottom", "Final Revels", "Flowstone Slide", "Glistening Deluge", "Olivia's Wrath", "Planar Despair"]`
+- `boost_controlled_source_not_single_fixed`: `["Battle Frenzy", "Fortify", "In Oketra's Name", "Klothys's Design"]`
+- `boost_draw_oracle_not_exact_fixed`: `["Aang's Defense", "Gallantry"]`
+- `boost_keyword_draw_source_not_exact_fixed`: `["Ancestral Anger", "Fists of Flame"]`
+- `boost_keyword_oracle_not_exact_fixed`: `["Breach"]`
+- `boost_keyword_oracle_not_simple`: `["Fight as One", "Invigorated Rampage"]`
+- `boost_keyword_source_not_single_fixed`: `["Arm the Cathars", "Chorus of Might", "Coordinated Assault", "Cutthroat Maneuver", "Get a Leg Up", "Pedal to the Metal", "Press the Advantage", "Run Amok", "Strength in Numbers", "Windborne Charge"]`
+- `boost_target_source_not_single_fixed`: `["Accelerated Mutation", "Agony Warp", "Allied Assault", "Bloodcurdling Scream", "Bounty of Might", "Dauntless Onslaught", "Death Wind", "Enrage", "Hearts on Fire", "Howl from Beyond", "Martial Glory", "Might of the Nephilim"]`
+- `bounce_ability_class_not_simple`: `["Alchemist's Retrieval", "Capsize", "Clutch of Currents", "Consuming Vortex", "Deny Reality", "Kiora's Dismissal", "Rite of Undoing", "Rushing River", "Surging Aether", "Temporal Fissure", "Ureni's Rebuff", "Vacuumelt"]`
+- `bounce_draw_ability_class_not_simple`: `["Lunar Rejection"]`
+- `bounce_draw_oracle_not_exact_fixed`: `["Eject", "Repeal"]`
+- `bounce_draw_oracle_not_simple`: `["Escape Detection", "Read the Tides"]`
+- `bounce_effect_class_not_pure`: `["Absorb Identity", "Alley Evasion", "Applied Biomancy", "Banishing Betrayal", "Baral's Expertise", "Barrin's Unmaking", "Boing!", "Brutal Expulsion", "Callous Dismissal", "Clutch of the Undercity", "Consign // Oblivion", "Dead // Gone"]`
+- `bounce_oracle_not_simple`: `["Champion's Victory", "Command of Unsummoning", "Dematerialize", "Essence Fracture", "Floodwaters", "Just the Wind", "Remove", "Rescind", "Runic Repetition", "Saving Grasp", "Silent Departure"]`
+- `bounce_scry_oracle_not_exact_fixed`: `["Sea God's Revenge"]`
+- `bounce_target_not_supported`: `["Aether Tradewinds", "Churning Eddy", "Counterintelligence", "Distorting Wake", "Peel from Reality", "Rescue", "Selective Snare", "Stern Dismissal", "Unsubstantiate", "Venser's Diffusion"]`
+- `combat_damage_draw_amount_damage_dealt_not_supported`: `["Fear of Failed Tests"]`
+- `counter_ability_class_not_simple`: `["Admiral's Order", "Consign to Memory", "Controvert", "Forbid", "Forceful Denial", "Long River's Pull", "Muddle the Mixture", "Scatter to the Winds", "Spell Burst", "Spider-Sense", "Thwart", "Traumatic Visions"]`
+- `counter_draw_oracle_not_simple`: `["School Daze"]`
+- `counter_draw_target_not_supported`: `["Confound", "Hindering Light", "Keep Safe", "Laquatus's Disdain"]`
+- `counter_effect_class_not_pure`: `["Amazing Acrobatics", "Bar the Gate", "Bring the Ending", "Confirm Suspicions", "Dawn Charm", "Didn't Say Please", "Discombobulate", "Ertai's Trickery", "Essence Capture", "Fuel for the Cause", "Ice Out", "Illumination"]`
+- `counter_life_loss_oracle_not_exact_fixed`: `["Deny the Witch"]`
+- `counter_oracle_not_simple`: `["Broken Concentration", "Change the Equation", "Fervent Denial", "Neutralize", "Overwhelming Denial", "Spell Blast"]`
+- `counter_target_not_supported`: `["Avoid Fate", "Double Negative", "Intervene", "Outwit", "Rebuff the Wicked", "Second Guess", "Turn Aside"]`
+- `creature_enters_draw_oracle_not_simple`: `["Irreverent Gremlin", "Mentor of the Meek", "Symmetry Matrix", "Welcoming Vampire"]`
+- `creature_enters_life_gain_oracle_not_exact_creature`: `["Leonin Elder", "Lifegift", "Totem Speaker"]`
+- `damage_additional_cost_not_supported`: `["Close Encounter", "Devour in Flames", "Final Flare", "Heartfire", "Lightning Axe", "Monstrous Emergence", "Nahiri's Wrath", "Pumpkin Bombardment"]`
+- `damage_amount_not_fixed`: `["Clan Defiance", "Devil's Play", "Electrostatic Bolt", "Fall of the Titans", "Jaya's Immolating Inferno", "Practiced Tactics", "Street Spasm", "Torrent of Fire", "Triumphant Chomp"]`
+- `damage_draw_oracle_not_exact_fixed`: `["Incinerating Blast", "Invoke the Firemind", "Master the Way", "Needle Drop", "Stensia Banquet", "Tweeze"]`
+- `damage_each_opponent_effect_class_not_pure`: `["Crackling Doom", "Culmination of Studies", "End the Festivities", "Farideh's Fireball", "Fiery Confluence", "Fiery Gambit", "Grab the Prize", "Ruinous Rampage", "Tectonic Hazard", "Vicious Rumors"]`
+- `damage_effect_class_not_pure`: `["Aggressive Sabotage", "Arc Blade", "Arrow Storm", "Barrel Down Sokenzan", "Beacon of Destruction", "Bedeck // Bedazzle", "Blastfire Bolt", "Blightning", "Blooming Blast", "Brimstone Volley", "Bring Low", "Burning Cloak"]`
+- `damage_life_gain_oracle_not_simple`: `["Covenant of Blood", "Lantern Flare", "Morbid Hunger", "Parasitic Grasp", "Sacred Fire", "Smiting Helix", "Zenith Flare"]`
+- `damage_life_gain_source_not_fixed`: `["Consuming Corruption", "Death Grasp", "Feast of Flesh", "Harsh Sustenance", "Profane Prayers", "Simulacrum", "Swallowing Plague", "Tendrils of Corruption"]`
+- `damage_target_not_supported`: `["Consuming Bonfire", "Dual Shot", "Furious Reprisal", "Jagged Lightning", "Meteor Blast", "Pinnacle of Rage", "Storm of Steel", "Swelter"]`
+- `destroy_additional_cost_not_supported`: `["Annihilating Glare", "Bitter Triumph", "Bone Shards", "Deadly Precision", "Eliminate the Competition", "Feed the Cycle", "Final Payment", "Fumarole", "Immoral Bargain", "Lash of the Balrog", "Lethal Sting", "Phyrexian Tribute"]`
+- `destroy_auxiliary_ability_class_not_supported`: `["Assassin's Blade", "Consign to Dust", "Eightfold Maze", "Fierce Retribution", "Flowstone Flood", "Just Fate", "Sheer Drop", "Slaughter"]`
+- `destroy_draw_oracle_not_exact_fixed`: `["Deadly Embrace", "Dregs of Sorrow"]`
+- `destroy_effect_class_not_pure`: `["Active Volcano", "Aftershock", "Agonizing Demise", "Airbender's Reversal", "Assassin's Strike", "Atomize", "Bant Charm", "Blight Grenade", "Blood Curdle", "Blue Elemental Blast", "Breathe Your Last", "Broken Bond"]`
+- `destroy_life_gain_ability_class_not_simple`: `["Aerial Assault", "Feast of Blood"]`
+- `destroy_life_gain_source_not_fixed`: `["Divine Offering", "Molder", "Serene Offering", "Tidy Conclusion"]`
+- `destroy_scry_ability_class_not_simple`: `["Shower of Arrows"]`
+- `destroy_target_controller_life_loss_ability_class_not_simple`: `["Exterminate!"]`
+- `destroy_target_not_supported`: `["Avalanche", "By Force", "Cradle to Grave", "Cut Short", "Plague Spores", "Premature Burial", "Reign of Chaos", "V.A.T.S.", "Venomous Vines"]`
+- `destroy_treasure_effect_classes_not_exact`: `["Cataclysmic Prospecting", "Covetous Elegy", "Heartless Pillage", "Improvised Weaponry", "Inspired Tinkering", "Involuntary Employment", "Megaton's Fate", "Petty Larceny", "Swarming of Moria", "You Find a Cursed Idol", "You've Been Caught Stealing"]`
+- `dies_damage_amount_not_fixed`: `["Blazing Effigy"]`
+- `dies_damage_target_not_supported`: `["Ember-Fist Zubera"]`
+- `dies_draw_count_not_fixed`: `["Floating-Dream Zubera", "Merfolk Seer"]`
+- `dies_life_gain_amount_not_fixed`: `["Bottle Golems", "Centaur Safeguard", "Silent-Chant Zubera"]`
+- `dies_recursion_optional_cost_not_supported`: `["Carrion Thrash"]`
+- `dies_target_player_discard_oracle_not_simple`: `["Ashen-Skin Zubera", "Drainpipe Vermin", "Insidious Bookworms"]`
+- `dies_token_oracle_not_simple`: `["Deathknell Berserker", "Deathpact Angel", "Tuktuk the Explorer"]`
+- `dies_treasure_oracle_not_exact`: `["Undercity Dire Rat"]`
+- `draw_additional_cost_not_supported`: `["Bankrupt in Blood", "Merciless Resolve", "Necrologia", "Scarscale Ritual", "Shared Discovery"]`
+- `draw_discard_spell_ability_class_not_simple`: `["Faithless Salvaging", "Winternight Stories"]`
+- `draw_discard_spell_oracle_not_exact_fixed`: `["Brilliant Spectrum", "Control of the Court", "Flow of Knowledge", "Goblin Lore", "Pull from Tomorrow"]`
+- `draw_discard_spell_oracle_not_simple`: `["Mystic Meditation", "Thirst for Discovery", "Thirst for Identity", "Thirst for Knowledge", "Thirst for Meaning", "Unexpected Assistance", "Waterbending Lesson"]`
+- `draw_effect_class_not_pure`: `["Abeyance", "Abzan Charm", "Adventure Awaits", "Afterlife Insurance", "Airbending Lesson", "Amass the Components", "Ambitious Assault", "Aphotic Wisps", "Archmage's Charm", "Argent Mutation", "Arrester's Admonition", "Artificer's Epiphany"]`
+- `draw_lose_life_spell_ability_class_not_simple`: `["Cut of the Profits", "Decorum Dissertation", "Ominous Harvest"]`
+- `draw_lose_life_spell_oracle_not_exact_fixed`: `["Monumental Corruption", "Painful Truths", "Sanguimancy"]`
+- `draw_put_land_oracle_not_exact_fixed`: `["Mind into Matter"]`
+- `draw_self_cost_reduction_condition_not_supported`: `["Seize the Secrets"]`
+- `draw_self_cost_reduction_oracle_not_exact_fixed`: `["Even the Score"]`
+- `dynamic_count_damage_composite_count_not_supported`: `["Road Rage"]`
+- `dynamic_count_damage_oracle_composite_count_not_supported`: `["Focus Fire", "Hobbit's Sting", "Slash of Light"]`
+- `dynamic_count_damage_oracle_filter_not_supported`: `["Kaleidoscorch"]`
+- `dynamic_life_gain_damage_dealt_to_you_not_supported`: `["Reverse Polarity"]`
+- `dynamic_life_gain_mana_spent_colors_not_supported`: `["Snarl Song"]`
+- `dynamic_life_gain_oracle_filter_not_supported`: `["Ancestral Tribute", "Benediction of Moons", "Folk Medicine", "Gnaw to the Bone"]`
+- `dynamic_life_gain_target_opponent_count_not_supported`: `["Renewing Dawn", "Starlight"]`
+- `dynamic_life_gain_target_power_toughness_not_supported`: `["Predator's Rapport"]`
+- `dynamic_life_gain_x_value_not_supported`: `["Vitalizing Cascade"]`
+- `equipment_static_oracle_not_exact_fixed`: `["Bearded Axe", "Blackblade Reforged", "Bramble Armor", "Civic Saber", "Darksteel Axe", "Empyrial Plate", "Glaive of the Guildpact", "Golem-Skin Gauntlets", "Helm of the Gods", "Manaforce Mace", "Maul of the Skyclaves", "Meltstrider's Gear"]`
+- `equipment_static_source_oracle_mismatch`: `["Boots of Speed", "Ranger's Longbow"]`
+- `etb_add_counters_source_oracle_mismatch`: `["Angelic Quartermaster"]`
+- `etb_bounce_target_not_supported`: `["Hoverguard Sweepers", "Sea Drake", "Venser, Shaper Savant"]`
+- `etb_destroy_source_effect_count_not_supported`: `["Disruptive Stormbrood // Petty Revenge"]`
+- `etb_destroy_target_not_supported`: `["Halo Hunter"]`
+- `etb_draw_count_not_fixed`: `["Liliana's Standard Bearer", "Treetop Sentries"]`
+- `etb_draw_lose_life_oracle_not_exact_fixed`: `["Champion of Dusk"]`
+- `etb_library_pick_oracle_not_simple`: `["Elvish Rejuvenator", "Frontier Seeker", "Gurmag Nightwatch", "Nessian Game Warden", "Overgrown Pest", "Sage of Days", "Silhana Wayfinder", "Sinuous Benthisaur", "Stirring Honormancer", "Voda Sea Scavenger"]`
+- `etb_library_tutor_oracle_not_simple`: `["Llanowar Sentinel"]`
+- `etb_library_tutor_source_oracle_target_subtypes_mismatch`: `["Silverglade Elemental", "Wood Elves"]`
+- `etb_library_tutor_to_hand_oracle_target_not_supported`: `["Micromancer"]`
+- `etb_library_tutor_to_hand_source_oracle_count_mismatch`: `["Battalion Foot Soldier", "Gathering Throng", "Legion Conquistador"]`
+- `etb_library_tutor_to_hand_source_oracle_target_subtypes_mismatch`: `["District Guide", "Skyshroud Sentinel"]`
+- `etb_library_tutor_to_hand_source_oracle_up_to_count_mismatch`: `["Thalia's Lancers"]`
+- `etb_library_tutor_to_top_oracle_not_simple`: `["Moon-Blessed Cleric", "Mwonvuli Beast Tracker"]`
+- `etb_library_tutor_to_top_source_oracle_target_mismatch`: `["Treefolk Harbinger"]`
+- `etb_recursion_battlefield_target_not_supported`: `["Rot Hulk"]`
+- `etb_recursion_target_not_supported`: `["Master Skald", "Mausoleum Turnkey", "Nucklavee"]`
+- `etb_scry_oracle_not_fixed`: `["Cascade Seer"]`
+- `etb_scry_oracle_not_simple`: `["Cryptic Annelid"]`
+- `etb_target_boost_oracle_not_exact_fixed`: `["Fourth Bridge Prowler"]`
+- `etb_target_boost_source_not_single_fixed`: `["Kabira Outrider", "Tormentor Exarch"]`
+- `exile_auxiliary_ability_class_not_supported`: `["Sylvan Reclamation", "Tear Asunder"]`
+- `exile_compensation_token_ability_class_not_simple`: `["Crib Swap"]`
+- `exile_compensation_token_oracle_not_simple`: `["Ravenform"]`
+- `exile_compensation_token_target_not_supported`: `["Resculpt"]`
+- `exile_effect_class_not_pure`: `["Agate Assault", "Aim for the Head", "Anguished Unmaking", "Ashes to Ashes", "Break Down the Door", "Cast into the Fire", "Consuming Sinkhole", "Dispatch", "Divine Gambit", "Early Winter", "Eat to Extinction", "Excise"]`
+- `exile_oracle_not_simple`: `["Barrier Breach", "Crush Contraband", "Devouring Light", "Forsake the Worldly", "Repel the Vile", "Topple", "Wipe Clean"]`
+- `exile_target_not_supported`: `["Blazing Hope", "Grip of Desolation", "Reciprocate", "Time to Reflect"]`
+- `graveyard_count_boost_source_not_single`: `["Growth Cycle"]`
+- `graveyard_count_damage_adventure_filter_not_supported`: `["Frantic Firebolt"]`
+- `graveyard_count_damage_exile_x_graveyard_cost_not_supported`: `["Harvest Pyre", "Haunting Misery"]`
+- `graveyard_exile_ability_class_not_supported`: `["Shred Memory"]`
+- `graveyard_self_return_ability_class_not_simple`: `["Deathless Pilot", "Eldrazi Ravager", "Gilded Assault Cart", "Salvage Titan"]`
+- `graveyard_self_return_oracle_not_simple`: `["Deathless Ancient", "Deathless Behemoth", "Dutiful Griffin", "Gangrenous Goliath"]`
+- `keyword_draw_source_not_exact_fixed`: `["Poison the Blade", "Psychotic Fury"]`
+- `library_pick_ability_class_not_simple`: `["Tracker's Instincts"]`
+- `library_tutor_oracle_not_simple`: `["Beneath the Sands", "Beseech the Queen", "Deep Reconnaissance", "Nissa's Expedition", "Profane Tutor", "Razaketh's Rite"]`
+- `library_tutor_oracle_target_not_supported`: `["Conflux", "Reach the Horizon"]`
+- `library_tutor_source_distinct_names_not_supported`: `["Shared Summons", "Three Dreams"]`
+- `life_gain_amount_not_fixed`: `["Nourishing Shoal"]`
+- `life_gain_draw_oracle_not_exact_fixed`: `["Shamanic Revelation", "Sphinx's Revelation", "Union of the Third Path", "Voyage Home"]`
+- `life_gain_draw_oracle_not_simple`: `["Lifestream's Blessing", "Pursue the Past", "Thrilling Discovery"]`
+- `life_gain_effect_class_not_pure`: `["Aang's Journey", "Abuna's Chant", "Archangel's Light", "Bargain", "Basic Conjuration", "Battle at the Bridge", "Battlefield Promotion", "Blossoming Calm", "Blunt the Assault", "Bond of Flourishing", "Commune with Evil", "Cosmic Rebirth"]`
+- `life_gain_oracle_not_simple`: `["Captured Sunlight", "Meditation Puzzle", "Reaping the Rewards", "Rejuvenate", "Sun's Bounty", "Vital Surge", "Weather the Storm"]`
+- `limited_mana_source_cost_not_supported`: `["Kozilek's Translator", "Ramos, Dragon Engine"]`
+- `look_library_pick_oracle_not_simple`: `["Cartographer's Survey", "Collected Company", "Deploy the Gatewatch", "Diabolic Vision", "Machinate", "Seismic Sense", "United Battlefront"]`
+- `look_library_pick_oracle_target_not_supported`: `["Board the Weatherlight", "Commune with Dinosaurs", "Cowabunga!"]`
+- `look_library_pick_source_target_not_supported`: `["Uncovered Clues"]`
+- `mana_source_activated_draw_oracle_not_simple`: `["Intelligence Bobblehead"]`
+- `mana_source_effect_class_not_simple`: `["Animal Attendant", "Avid Reclaimer", "Biophagus", "Carnelian Orb of Dragonkind", "Doubling Cube // Doubling Cube", "Heritage Druid", "Ilysian Caryatid", "Leafkin Druid", "Pristine Talisman", "Raucous Audience", "Sacellum Godspeaker", "Selvala, Explorer Returned"]`
+- `mana_source_oracle_not_simple`: `["Altar of the Pantheon", "Ashaya, Soul of the Wild", "Astral Cornucopia", "Baylen, the Haymaker", "Birchlore Rangers", "Brass Infiniscope", "Channeler Initiate", "Chromatic Lantern", "Citanul Hierophants", "Citanul Stalwart", "Coalition Relic", "Codie, Vociferous Codex"]`
+- `mana_source_sacrifice_oracle_not_simple`: `["Basal Sliver", "Cryptex", "Elsewhere Flask", "Exploding Barrel", "Five Hundred Year Diary", "Guild Globe", "Jack-o'-Lantern", "Lotus Ring", "Overeager Apprentice", "Vulshok Factory"]`
+- `mana_source_safe_ability_missing`: `["Abstract Paintmage", "Aetherflux Conduit", "Alluring Suitor // Deadly Dancer", "Ardent Electromancer", "Arvinox, the Mind Flail", "Azula, Cunning Usurper", "Barbflare Gremlin", "Benthic Explorers", "Berta, Wise Extrapolator", "Blazing Firesinger // Seething Song", "Boommobile", "Brazen Collector"]`
+- `mana_source_source_conditional_mana_not_supported`: `["Elementalist's Palette", "Helga, Skittish Seer", "Ice Cauldron", "Nardole, Resourceful Cyborg", "Redshift, Rocketeer Chief", "Rosheen, Roaring Prophet", "Sarevok's Tome", "S\u00e9ance Board", "Throne of Eldraine", "Undermountain Adventurer", "Vhal, Candlekeep Researcher"]`
+- `mana_source_source_discard_cost_not_supported`: `["Bog Witch", "Bramble Familiar // Fetch Quest", "Izzet Keyrune", "Network Terminal", "Skirge Familiar", "Starting Column"]`
+- `mana_source_source_exile_cost_not_supported`: `["Hourglass of the Lost"]`
+- `mana_source_source_oracle_tap_mismatch`: `["Urn of Godfire"]`
+- `mana_source_source_pay_life_cost_not_supported`: `["Haunted Screen"]`
+- `mana_source_spell_not_supported`: `["Esper Origins // Summon: Esper Maduin"]`
+- `mana_source_unsafe_ability_class`: `["Accomplished Alchemist", "Adarkar Unicorn", "Alena, Kessig Trapper", "Altar of the Lost", "Arbor Adherent", "Automated Artificer", "Axebane Guardian", "Battery Bearer", "Beastcaller Savant", "Bighorner Rancher", "Black Mana Battery", "Blue Mana Battery"]`
+- `mill_return_ability_class_not_simple`: `["Dig Up the Body", "Incarnation Technique"]`
+- `modal_damage_destroy_oracle_mode_count_not_supported`: `["Kill! Maim! Burn!", "Shredded Sails"]`
+- `modal_damage_destroy_oracle_mode_not_supported`: `["Bumi Bash", "Collision Course", "Coordinated Maneuver", "Crash and Burn"]`
+- `modal_damage_destroy_oracle_not_exact`: `["Molten Rebuke", "Overwhelming Surge", "Shatter the Source"]`
+- `modal_damage_destroy_source_damage_target_mismatch`: `["Keep Out", "Reckless Air Strike", "Tangletrap"]`
+- `multi_target_damage_additional_cost_not_supported`: `["Arrow Volley Trap", "Flameshot"]`
+- `multi_target_damage_effect_class_not_pure`: `["Aurelia's Fury", "Electrolyze", "Fiery Justice", "Fight with Fire", "Fire // Ice", "Mythos of Vadrok", "Sundering Stroke"]`
+- `multi_target_damage_oracle_count_not_supported`: `["Meteor Swarm"]`
+- `multi_target_damage_oracle_not_exact_fixed`: `["Meteor Shower"]`
+- `multi_target_damage_oracle_target_not_supported`: `["Violent Eruption", "Volley of Boulders"]`
+- `multi_target_damage_oracle_x_not_supported`: `["Avacyn's Judgment", "Hail of Arrows", "Impact Resonance", "Jaws of Stone", "Monstrous Onslaught", "Rock Slide", "Rolling Thunder", "Volcanic Wind"]`
+- `not_instant_or_sorcery_spell`: `["Aang, A Lot to Learn", "Abandoned Sarcophagus", "Aberrant", "Aberrant Mind Sorcerer", "Abhorrent Oculus", "Abiding Grace", "Abigale, Poet Laureate // Heroic Stanza", "Abomination", "Absolver Thrull", "Absolving Lammasu", "Abu Ja'far", "Abyssal Gatekeeper"]`
+- `not_one_shot_spell_ability`: `["Ajani's Response", "Aleatory", "All Hallow's Eve", "Anzrag's Rampage", "Arm with Aether", "Arwen's Gift", "Astral Confrontation", "Back for More", "Balduvian Rage", "Banish from Edoras", "Benefactor's Draught", "Bind"]`
+- `play_lands_from_graveyard_ability_class_not_simple_static`: `["Perennial Behemoth"]`
+- `recursion_ability_class_not_simple`: `["Blood Beckoning", "Disturbed Burial", "Grim Harvest", "Life from the Loam", "Peerless Recycling", "Soulless Revival"]`
+- `recursion_auxiliary_flashback_cost_not_supported`: `["Dread Return"]`
+- `recursion_auxiliary_primary_oracle_not_simple`: `["Sacred Excavation"]`
+- `recursion_battlefield_ability_class_not_simple`: `["Leonardo's Technique", "Proclamation of Rebirth"]`
+- `recursion_battlefield_all_oracle_not_supported`: `["Primevals' Glorious Rebirth", "Replenish", "Resurgent Belief"]`
+- `recursion_battlefield_counter_ability_class_not_simple`: `["Prison Break"]`
+- `recursion_battlefield_counter_oracle_not_simple`: `["Rite of the Moth"]`
+- `recursion_battlefield_oracle_not_simple`: `["Endless Obedience", "Entreat the Dead", "Restart Sequence", "Return to the Ranks"]`
+- `recursion_effect_class_not_pure`: `["Abuelo's Awakening", "Accumulate Wisdom", "Aether Burst", "Aether Helix", "Afterlife from the Loam", "Agonizing Remorse", "All Suns' Dawn", "Animal Magnetism", "Animist's Awakening", "Another Chance", "Anticognition", "Ascend from Avernus"]`
+- `recursion_exile_self_target_not_supported`: `["Seeds of Renewal", "Uncle's Musings"]`
+- `recursion_oracle_not_simple`: `["Call to the Netherworld", "Dead Revels", "Unmake the Graves"]`
+- `scry_draw_oracle_not_exact_fixed`: `["Ugin's Insight"]`
+- `spell_cast_add_counters_oracle_filter_not_supported`: `["Wandermare"]`
+- `spell_cast_draw_oracle_filter_not_supported`: `["Dreamcatcher", "Edgewall Innkeeper", "Lunar Mystic"]`
+- `spell_cast_draw_source_oracle_mismatch`: `["Emrakul's Influence"]`
+- `static_controlled_pt_oracle_filter_not_supported`: `["A Tale for the Ages"]`
+- `static_controlled_pt_oracle_not_exact`: `["Commander's Insignia", "Sporecrown Thallid"]`
+- `static_controlled_pt_source_oracle_mismatch`: `["Glass of the Guildpact"]`
+- `static_global_pt_not_permanent`: `["Piety"]`
+- `static_global_pt_oracle_dynamic_not_supported`: `["Knowledge Is Power", "Meishin, the Mind Cage", "Sliver Legion"]`
+- `static_global_pt_source_dynamic_or_phase_not_supported`: `["Mightstone", "Muraganda Petroglyphs", "Weakstone"]`
+- `static_graveyard_count_boost_oracle_not_exact`: `["Moon-Vigil Adherents"]`
+- `static_graveyard_count_pt_oracle_not_exact`: `["Abomination of Llanowar", "Ancient Ooze", "Awakened Amalgam", "Aysen Crusader", "Primalcrux", "Serpent of the Endless Sea", "Soulless One", "Umbra Stalker"]`
+- `static_graveyard_threshold_boost_oracle_not_exact`: `["First-Time Flyer", "Gorilla Titan", "Jace's Phantasm", "Murasa Behemoth", "Syndicate Infiltrator"]`
+- `static_keyword_not_creature`: `["Darksteel Relic"]`
+- `static_protection_oracle_not_color_or_card_type_or_subtype_exact`: `["Enemy of the Guildpact", "Guardian of the Guildpact", "Mistmeadow Skulk", "Warren-Scourge Elf"]`
+- `target_keyword_spell_oracle_not_exact`: `["Shriek of Dread"]`
+- `target_keyword_spell_oracle_not_simple`: `["Withstand Death"]`
+- `target_keyword_spell_source_target_not_supported`: `["Wind Sail"]`
+- `target_player_discard_spell_oracle_not_exact_fixed`: `["Arcane Omens", "Cabal Conditioning", "Mind Shatter", "Mind Twist", "Voices from the Void"]`
+- `target_player_draw_spell_oracle_not_exact_fixed`: `["Allied Strategies", "Braingeyser", "Huddle Up", "Stroke of Genius"]`
+- `target_sacrifice_mana_source_mana_output_mismatch`: `["Goblin Clearcutter", "Slobad, Iron Goblin"]`
+- `target_sacrifice_mana_source_oracle_not_simple`: `["The Golden Throne"]`
+- `token_ability_not_supported`: `["Llanowar Mentor", "Sparkspitter"]`
+- `token_description_keyword_not_supported`: `["Basilica Shepherd", "Birthing Boughs", "Carrion Call", "Dance with Devils", "Devils' Playground", "Dragon Egg", "Edgewall Pack", "Errand of Duty", "Falcon Abomination", "Falcon, Winged Wonder", "Fire Nation Attacks", "Form a Posse"]`
+- `token_description_not_creature_token`: `["Argothian Opportunist", "Beamsaw Prospector", "Blood Servitor", "Buy Your Silence", "Cartographer's Companion", "Crustacean Commando", "Emergency Eject", "Falkenrath Celebrants", "Fierce Witchstalker", "Forecasting Fortune Teller", "Galactic Wayfarer", "Glittermonger"]`
+- `token_flashback_cost_not_supported`: `["Acorn Harvest", "Group Project"]`
+- `token_land_token_runtime_not_supported`: `["Awaken the Woods"]`
+- `token_source_base_create_token_not_fixed`: `["Farmer Cotton"]`
+- `token_source_create_token_not_fixed`: `["Broodmate Dragon", "Caller of the Claw", "Dripping-Tongue Zubera", "Evangel of Heliod", "Fresh Meat", "Ghoulcaller's Harvest", "Great Desert Prospector", "Hallowed Spiritkeeper", "Militant Angel", "Nested Shambler", "Revenge of the Rats", "Reverent Hoplite"]`
+- `token_source_not_single_create_token_effect`: `["Exhibition Magician"]`
+- `tutor_ability_class_not_simple`: `["Bitter Ordeal", "Brave the Wilds", "Cosmium Confluence", "Dig Up", "Dragonstorm", "Flare of Cultivation", "Grow from the Ashes", "Journey of Discovery", "Land Grant", "Mystical Teachings", "New Generation's Technique", "Nylea's Intervention"]`
+- `tutor_effect_class_not_supported`: `["Acquire", "Ancient Vendetta", "Angrath's Fury", "Attune with Aether", "Avengers Disassembled", "Basri's Aegis", "Begin the Invasion", "Behold the Beyond", "Bifurcate", "Boundless Realms", "Bribery", "Bring to Light"]`
+- `unsupported_adapter_work_unit`: `["Changeling Wayfinder", "Tiamat", "Yasharn, Implacable Earth"]`
+- `x_damage_alternative_timing_not_supported`: `["Ghitu Fire"]`
+- `x_damage_buyback_not_supported`: `["Fanning the Flames"]`

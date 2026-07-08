@@ -6684,10 +6684,103 @@ def run_damage_prevention(
     }
 
 
+def run_combat_damage_draw(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    effect = battle.get_card_effect(card)
+    source = battle.enrich_card(
+        {
+            **card,
+            "type_line": card.get("type_line") or "Creature - E2E Fixture",
+            "summoning_sick": False,
+            **effect,
+        }
+    )
+    active = battle.Player(str(scenario.get("player") or "Combat Draw Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Combat Draw Opponent"), None, [])
+    active.hand = [
+        battle.enrich_card(dict(hand_card))
+        for hand_card in (scenario.get("controller_hand") or [])
+        if isinstance(hand_card, dict)
+    ]
+    active.library = [
+        battle.enrich_card(dict(library_card))
+        for library_card in (scenario.get("controller_library") or [])
+        if isinstance(library_card, dict)
+    ]
+    active.battlefield.append(source)
+    starting_hand_count = len(active.hand)
+    starting_library_count = len(active.library)
+    expected_draw_count = int(scenario.get("expected_draw_count") or effect.get("combat_damage_draw_count") or 1)
+    expected_discard_count = int(scenario.get("expected_discard_count") or 0)
+    expected_source_sacrificed = bool(scenario.get("expected_source_sacrificed"))
+    expected_optional_cost = scenario.get("expected_optional_cost")
+    before_events = len(events)
+
+    resolved = battle.resolve_combat_damage_draw_triggers(
+        active,
+        [source],
+        opponent,
+        turn=int(scenario.get("turn") or 6160),
+        phase=str(scenario.get("phase") or "combat_damage"),
+        rng=random.Random(int(scenario.get("seed") or 6160)),
+        all_players=[active, opponent],
+    )
+
+    if len(resolved) != 1:
+        fail("battle_execution", f"{card['name']} combat damage draw did not resolve")
+    if len(active.library) != starting_library_count - expected_draw_count:
+        fail(
+            "battle_execution",
+            f"{card['name']} library={len(active.library)}, expected {starting_library_count - expected_draw_count}",
+        )
+    expected_hand_count = starting_hand_count - expected_discard_count + expected_draw_count
+    if len(active.hand) != expected_hand_count:
+        fail("battle_execution", f"{card['name']} hand={len(active.hand)}, expected {expected_hand_count}")
+    if expected_discard_count:
+        discarded_names = [entry.get("name", "?") for entry in active.graveyard if isinstance(entry, dict)]
+        if len(discarded_names) < expected_discard_count:
+            fail("battle_execution", f"{card['name']} did not move discard cost to graveyard")
+    if expected_source_sacrificed:
+        if source in active.battlefield:
+            fail("battle_execution", f"{card['name']} source was not sacrificed")
+        if not any(entry is source for entry in active.graveyard):
+            fail("battle_execution", f"{card['name']} sacrificed source not in graveyard")
+
+    event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "combat_damage_draw_resolved"
+            and data.get("card") == card.get("name")
+        ),
+        None,
+    )
+    if event is None:
+        fail("battle_events", f"missing {card['name']} combat_damage_draw_resolved event")
+    if int(event.get("cards_drawn") or 0) != expected_draw_count:
+        fail("battle_events", f"{card['name']} cards_drawn={event.get('cards_drawn')}")
+    if expected_optional_cost and event.get("optional_cost") != expected_optional_cost:
+        fail("battle_events", f"{card['name']} optional_cost={event.get('optional_cost')!r}")
+    if expected_optional_cost and event.get("optional_cost_paid") is not True:
+        fail("battle_events", f"{card['name']} optional cost was not marked paid")
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "cards_drawn": expected_draw_count,
+        "optional_cost": expected_optional_cost,
+        "source_sacrificed": expected_source_sacrificed,
+    }
+
+
 SCENARIO_RUNNERS = {
     "attack_self_boost": run_attack_self_boost,
     "aura_static_power_toughness_attachment": run_aura_static_power_toughness_attachment,
     "becomes_blocked_self_boost": run_becomes_blocked_self_boost,
+    "combat_damage_draw": run_combat_damage_draw,
     "conditional_land_play": run_conditional_land_play,
     "counter_unless_pays_response": run_counter_unless_pays_response,
     "copy_stack_ability_response": run_copy_stack_ability_response,

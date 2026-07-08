@@ -927,6 +927,9 @@ def test_manifest_expected_rule_preserves_combat_damage_draw_fields() -> None:
             "trigger_effect": "draw_cards",
             "combat_damage_player_draw": True,
             "combat_damage_draw_count": 1,
+            "combat_damage_draw_optional": True,
+            "combat_damage_draw_optional_cost": "discard_card",
+            "combat_damage_draw_optional_cost_count": 1,
             "draw_count": 1,
             "xmage_effect_class": "DrawCardSourceControllerEffect",
             "xmage_ability_class": "DealsCombatDamageToAPlayerTriggeredAbility",
@@ -942,6 +945,9 @@ def test_manifest_expected_rule_preserves_combat_damage_draw_fields() -> None:
     assert required["trigger_effect"] == "draw_cards"
     assert required["combat_damage_player_draw"] is True
     assert required["combat_damage_draw_count"] == 1
+    assert required["combat_damage_draw_optional"] is True
+    assert required["combat_damage_draw_optional_cost"] == "discard_card"
+    assert required["combat_damage_draw_optional_cost_count"] == 1
     assert required["draw_count"] == 1
     assert required["xmage_effect_class"] == "DrawCardSourceControllerEffect"
     assert required["xmage_ability_class"] == "DealsCombatDamageToAPlayerTriggeredAbility"

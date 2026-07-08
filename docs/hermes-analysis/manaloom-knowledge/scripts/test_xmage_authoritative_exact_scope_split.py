@@ -22199,6 +22199,79 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertTrue(effect["combat_damage_draw_optional"])
         self.assertEqual(effect["combat_damage_draw_count"], 2)
 
+    def test_creature_combat_damage_draw_maps_optional_discard_cost(self) -> None:
+        row = queue_row(
+            split.DRAW_ENGINE_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect"],
+            ability_kind="triggered",
+            ability_classes=["DealsCombatDamageToAPlayerTriggeredAbility", "IntimidateAbility"],
+            xmage_signals=["draw", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Academy Raider",
+                type_line="Creature - Human Warrior",
+                oracle_text=(
+                    "Intimidate\n"
+                    "Whenever Academy Raider deals combat damage to a player, "
+                    "you may discard a card. If you do, draw a card."
+                ),
+            ),
+            source_text=(
+                "this.addAbility(IntimidateAbility.getInstance());"
+                "this.addAbility(new DealsCombatDamageToAPlayerTriggeredAbility("
+                "new DoIfCostPaid(new DrawCardSourceControllerEffect(1), "
+                "new DiscardCardCost()), false));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.COMBAT_DAMAGE_DRAW_CREATURE_SCOPE)
+        self.assertEqual(effect["keywords"], ["intimidate"])
+        self.assertTrue(effect["combat_damage_draw_optional"])
+        self.assertEqual(effect["combat_damage_draw_optional_cost"], "discard_card")
+        self.assertEqual(effect["combat_damage_draw_optional_cost_count"], 1)
+        self.assertEqual(effect["combat_damage_draw_count"], 1)
+
+    def test_creature_combat_damage_draw_maps_optional_sacrifice_source_cost(self) -> None:
+        row = queue_row(
+            split.DRAW_ENGINE_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect"],
+            ability_kind="triggered",
+            ability_classes=["DealsCombatDamageToAPlayerTriggeredAbility", "FlyingAbility"],
+            xmage_signals=["draw", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Impaler Shrike",
+                type_line="Creature - Phyrexian Bird",
+                oracle_text=(
+                    "Flying\n"
+                    "Whenever Impaler Shrike deals combat damage to a player, "
+                    "you may sacrifice it. If you do, draw three cards."
+                ),
+            ),
+            source_text=(
+                "this.addAbility(FlyingAbility.getInstance());"
+                "Ability ability = new DealsCombatDamageToAPlayerTriggeredAbility("
+                "new DoIfCostPaid(new DrawCardSourceControllerEffect(3), "
+                "new SacrificeSourceCost()), false);"
+                "this.addAbility(ability);"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.COMBAT_DAMAGE_DRAW_CREATURE_SCOPE)
+        self.assertEqual(effect["keywords"], ["flying"])
+        self.assertTrue(effect["combat_damage_draw_optional"])
+        self.assertEqual(effect["combat_damage_draw_optional_cost"], "sacrifice_source")
+        self.assertEqual(effect["combat_damage_draw_optional_cost_count"], 1)
+        self.assertEqual(effect["combat_damage_draw_count"], 3)
+
     def test_creature_combat_damage_draw_ignores_keyword_class_used_only_in_filter(self) -> None:
         row = queue_row(
             split.DRAW_ENGINE_UNIT,

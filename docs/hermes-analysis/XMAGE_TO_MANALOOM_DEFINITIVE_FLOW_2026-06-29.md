@@ -19336,6 +19336,93 @@ Evidence:
 - `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260708_post_pg659_special_equip_cost_new_server_final.md`
 - `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260708_post_pg659_special_equip_cost_new_server_final.md`
 
+## PG660/PG661 Combat-Damage Optional Draw And Hash Integrity Wave
+
+PG660 extended `xmage_creature_combat_damage_draw_cards_v1` from simple combat
+damage draw into optional-cost combat damage draw triggers backed by local
+XMage source:
+
+- `Academy Raider`: combat damage to a player, optional discard one card, then
+  draw one card;
+- `Impaler Shrike`: combat damage to a player, optional sacrifice source, then
+  draw three cards.
+
+Runtime/test changes:
+
+- `xmage_authoritative_exact_scope_split.py` now extracts
+  `combat_damage_draw_optional_cost` and
+  `combat_damage_draw_optional_cost_count` for the supported discard-card and
+  sacrifice-source forms;
+- `battle_analyst_v9.py` resolves those optional costs before drawing, emits
+  skipped events for unpaid costs, and records paid cost evidence in replay
+  events;
+- package E2E generation now creates combat-damage-draw execution scenarios;
+- focused tests cover the split, optional discard paid/unpaid behavior, optional
+  sacrifice-source behavior, package manifest preservation, and E2E execution.
+
+PG660 apply/postcheck evidence:
+
+- split produced `2` safe candidates in
+  `xmage_creature_combat_damage_draw_cards_v1`;
+- package manifest carried `2` `combat_damage_draw` scenarios;
+- precheck found `2` target card rows and `0` existing matching rules;
+- apply committed `2` promoted rows;
+- postcheck confirmed `2/2` promoted verified/auto rows with `oracle_hash`;
+- PG -> Hermes/SQLite sync loaded `5962` PG rows, updated `5948` SQLite rows,
+  and exported a `5925` row canonical snapshot;
+- E2E package validation passed PostgreSQL, SQLite/Hermes, canonical snapshot,
+  `runtime_get_card_effect`, and battle execution:
+  Academy Raider drew `1` after `discard_card`, and Impaler Shrike drew `3`
+  after `sacrifice_source`.
+
+PG661 integrity follow-up:
+
+- the post-PG660 PG/Hermes/SQLite contract audit exposed `44` old trusted
+  executable curated/manual rules with missing `oracle_hash`;
+- `pg661_trusted_rule_oracle_hash_backfill_new_server` performed a
+  metadata-only backfill from `cards.oracle_text`;
+- precheck found `44` safe groups and `0` unsafe groups;
+- apply updated `44` rows and backed them up in
+  `manaloom_deploy_audit.pg661_trusted_rule_oracle_hash_backfill_new_server_20260708`;
+- postcheck confirmed `trusted_executable_rules_missing_oracle_hash=0`;
+- final `pg_hermes_sqlite_contract_audit` passed `51/51`.
+
+Final post-PG661 state:
+
+- global readiness:
+  `battle_and_oracle_ready=6022`, `battle_family_mapper_required=27854`,
+  `snapshot_has_verified_rule=6050`, `snapshot_has_any_rule=7254`;
+- authoritative queue:
+  `target_identity_count=24931`,
+  `xmage_authoritative_source_count=24618`,
+  `xmage_missing_source_exception_count=313`,
+  `xmage_authoritative_parser_gap_count=0`,
+  `xmage_authoritative_adapter_required_count=24618`;
+- exact-scope recheck returned `proposal_count=0` and
+  `safe_for_batch_pg_package_count=0`;
+- validation gates:
+  `xmage_strategy_consistency_audit` passed `26/26`,
+  `pg_hermes_sqlite_contract_audit` passed `51/51`,
+  `operational_surface_alignment_audit` passed, and
+  `legacy_contamination_audit` passed.
+
+Evidence:
+
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260708_pg660_combat_damage_optional_draw_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg660_combat_damage_optional_draw_new_server_package_package.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg660_combat_damage_optional_draw_new_server_apply_evidence.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg660_combat_damage_optional_draw_new_server_pg_to_sqlite_sync.json`
+- `docs/hermes-analysis/master_optimizer_reports/pg660_combat_damage_optional_draw_new_server_metadata_sync.json`
+- `docs/hermes-analysis/master_optimizer_reports/pg660_combat_damage_optional_draw_new_server_post_pg661_e2e_validation.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg661_trusted_rule_oracle_hash_backfill_new_server_apply_evidence.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260708_post_pg661_hash_backfill_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260708_post_pg661_hash_backfill_new_server_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260708_post_pg661_hash_backfill_new_server_recheck.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260708_post_pg661_hash_backfill_new_server_final.md`
+- `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260708_post_pg661_hash_backfill_new_server_final.md`
+- `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260708_post_pg661_hash_backfill_new_server_final.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260708_post_pg661_hash_backfill_new_server_final.md`
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

@@ -1,0 +1,35 @@
+{
+  "title": "PG661 Trusted Rule Oracle Hash Backfill Evidence",
+  "database_target": "127.0.0.1:15432/halder",
+  "package_id": "pg661_trusted_rule_oracle_hash_backfill_new_server",
+  "generated_at_utc": "2026-07-08T14:40:04Z",
+  "mutations_performed": [
+    {
+      "operation": "metadata_only_oracle_hash_backfill",
+      "updated_rows": 44,
+      "backup_table": "manaloom_deploy_audit.pg661_trusted_rule_oracle_hash_backfill_new_server_20260708"
+    }
+  ],
+  "precheck": {
+    "target_missing_oracle_hash_rows": 44,
+    "safe_groups": 44,
+    "unsafe_groups": 0
+  },
+  "postcheck": {
+    "trusted_executable_rules_missing_oracle_hash": 0,
+    "backup_rows": 44,
+    "pg661_annotated_rows": 44
+  },
+  "sync": {
+    "report": "docs/hermes-analysis/master_optimizer_reports/pg661_trusted_rule_oracle_hash_backfill_new_server_pg_to_sqlite_sync.json",
+    "pg_rows_loaded": 5962,
+    "sqlite_inserted_or_updated": 5948,
+    "canonical_snapshot_rows_exported": 5925
+  },
+  "contract_audit": {
+    "report": "docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260708_post_pg661_hash_backfill_new_server_final.json",
+    "status": "pass",
+    "check_count": 51,
+    "pass_count": 51
+  }
+}

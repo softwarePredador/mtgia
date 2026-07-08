@@ -16544,6 +16544,134 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_combat_damage_draw_trigger_pays_optional_discard_cost(self) -> None:
+        active = self.battle.Player("Active", None, [{"name": "Fresh Card"}])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.hand.append({"name": "Discard Me", "type_line": "Sorcery", "cmc": 5})
+        permanent = {
+            "name": "Academy Raider",
+            "type_line": "Creature - Human Warrior",
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_combat_damage_draw_cards_v1",
+            "combat_damage_player_draw": True,
+            "combat_damage_draw_count": 1,
+            "combat_damage_draw_optional": True,
+            "combat_damage_draw_optional_cost": "discard_card",
+            "combat_damage_draw_optional_cost_count": 1,
+            "_rule_logical_key": "battle_rule_v1:fixture_academy_raider",
+        }
+        active.battlefield.append(permanent)
+
+        resolved = self.battle.resolve_combat_damage_draw_triggers(
+            active,
+            [permanent],
+            opponent,
+            turn=12,
+            phase="combat_damage",
+            rng=random.Random(12),
+            all_players=[active, opponent],
+        )
+
+        self.assertEqual(len(resolved), 1)
+        self.assertEqual([card["name"] for card in active.hand], ["Fresh Card"])
+        self.assertEqual([card["name"] for card in active.graveyard], ["Discard Me"])
+        self.assertTrue(
+            any(
+                event == "combat_damage_draw_resolved"
+                and data.get("card") == "Academy Raider"
+                and data.get("optional_cost") == "discard_card"
+                and data.get("optional_cost_paid") is True
+                and data.get("discarded") == ["Discard Me"]
+                and data.get("cards_drawn") == 1
+                for event, data in self.events
+            )
+        )
+
+    def test_combat_damage_draw_trigger_skips_when_optional_discard_cost_unpaid(self) -> None:
+        active = self.battle.Player("Active", None, [{"name": "Fresh Card"}])
+        opponent = self.battle.Player("Opponent", None, [])
+        permanent = {
+            "name": "Academy Raider",
+            "type_line": "Creature - Human Warrior",
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_combat_damage_draw_cards_v1",
+            "combat_damage_player_draw": True,
+            "combat_damage_draw_count": 1,
+            "combat_damage_draw_optional": True,
+            "combat_damage_draw_optional_cost": "discard_card",
+            "combat_damage_draw_optional_cost_count": 1,
+        }
+        active.battlefield.append(permanent)
+
+        resolved = self.battle.resolve_combat_damage_draw_triggers(
+            active,
+            [permanent],
+            opponent,
+            turn=12,
+            phase="combat_damage",
+            rng=random.Random(12),
+            all_players=[active, opponent],
+        )
+
+        self.assertEqual(resolved, [])
+        self.assertEqual(active.hand, [])
+        self.assertEqual([card["name"] for card in active.library], ["Fresh Card"])
+        self.assertTrue(
+            any(
+                event == "combat_damage_draw_skipped"
+                and data.get("card") == "Academy Raider"
+                and data.get("reason") == "optional_discard_cost_unpaid"
+                for event, data in self.events
+            )
+        )
+
+    def test_combat_damage_draw_trigger_pays_optional_sacrifice_source_cost(self) -> None:
+        active = self.battle.Player(
+            "Active",
+            None,
+            [{"name": "Draw A"}, {"name": "Draw B"}, {"name": "Draw C"}],
+        )
+        opponent = self.battle.Player("Opponent", None, [])
+        permanent = {
+            "name": "Impaler Shrike",
+            "type_line": "Creature - Phyrexian Bird",
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_combat_damage_draw_cards_v1",
+            "combat_damage_player_draw": True,
+            "combat_damage_draw_count": 3,
+            "combat_damage_draw_optional": True,
+            "combat_damage_draw_optional_cost": "sacrifice_source",
+            "combat_damage_draw_optional_cost_count": 1,
+            "_rule_logical_key": "battle_rule_v1:fixture_impaler_shrike",
+        }
+        active.battlefield.append(permanent)
+
+        resolved = self.battle.resolve_combat_damage_draw_triggers(
+            active,
+            [permanent],
+            opponent,
+            turn=12,
+            phase="combat_damage",
+            rng=random.Random(12),
+            all_players=[active, opponent],
+        )
+
+        self.assertEqual(len(resolved), 1)
+        self.assertNotIn(permanent, active.battlefield)
+        self.assertEqual([card["name"] for card in active.graveyard], ["Impaler Shrike"])
+        self.assertEqual([card["name"] for card in active.hand], ["Draw A", "Draw B", "Draw C"])
+        self.assertTrue(
+            any(
+                event == "combat_damage_draw_resolved"
+                and data.get("card") == "Impaler Shrike"
+                and data.get("optional_cost") == "sacrifice_source"
+                and data.get("optional_cost_paid") is True
+                and data.get("sacrificed") == "Impaler Shrike"
+                and data.get("cards_drawn") == 3
+                for event, data in self.events
+            )
+        )
+
     def test_attack_graveyard_recursion_pays_trigger_cost_before_returning_card(self) -> None:
         active = self.battle.Player("Active", None, [])
         non_target = {"name": "Target Bolt", "type_line": "Instant", "cmc": 1}

@@ -45568,6 +45568,64 @@ def resolve_combat_damage_draw_triggers(
         if permanent not in getattr(player, "battlefield", []):
             continue
         count = max(1, int(permanent.get("combat_damage_draw_count") or permanent.get("draw_count") or 1))
+        optional_cost = str(permanent.get("combat_damage_draw_optional_cost") or "").strip()
+        optional_cost_count = max(1, int(permanent.get("combat_damage_draw_optional_cost_count") or 1))
+        paid_cost = False
+        discarded_cards = []
+        sacrificed_name = None
+        if optional_cost == "discard_card":
+            discarded_cards = _draw_discard_spell_selected_discards(
+                player,
+                optional_cost_count,
+                rng=rng,
+            )
+            if len(discarded_cards) < optional_cost_count:
+                emit_replay_event(
+                    "combat_damage_draw_skipped",
+                    player=player.name,
+                    card=permanent.get("name", "?"),
+                    damaged_player=getattr(damaged_player, "name", None),
+                    trigger="combat_damage_to_player",
+                    reason="optional_discard_cost_unpaid",
+                    optional_cost=optional_cost,
+                    optional_cost_count=optional_cost_count,
+                    turn=turn,
+                    phase=phase,
+                    **replay_rule_fields(permanent),
+                )
+                continue
+            resolve_effect_discard_cards(
+                player,
+                discarded_cards,
+                opponents=[
+                    opponent
+                    for opponent in (all_players or [])
+                    if opponent is not player
+                ],
+                turn=turn,
+                phase=phase,
+                rng=rng,
+            )
+            paid_cost = True
+        elif optional_cost == "sacrifice_source":
+            if permanent not in getattr(player, "battlefield", []):
+                emit_replay_event(
+                    "combat_damage_draw_skipped",
+                    player=player.name,
+                    card=permanent.get("name", "?"),
+                    damaged_player=getattr(damaged_player, "name", None),
+                    trigger="combat_damage_to_player",
+                    reason="optional_sacrifice_source_cost_unpaid",
+                    optional_cost=optional_cost,
+                    optional_cost_count=optional_cost_count,
+                    turn=turn,
+                    phase=phase,
+                    **replay_rule_fields(permanent),
+                )
+                continue
+            sacrificed_name = permanent.get("name", "?")
+            sacrifice_permanent_for_activation(player, permanent, turn)
+            paid_cost = True
         hand_before = len(getattr(player, "hand", []) or [])
         library_before = len(getattr(player, "library", []) or [])
         drawn = player.draw(count, rng)
@@ -45600,6 +45658,15 @@ def resolve_combat_damage_draw_triggers(
             "library_before": library_before,
             "library_after": len(getattr(player, "library", []) or []),
             "optional": bool(permanent.get("combat_damage_draw_optional")),
+            "optional_cost": optional_cost or None,
+            "optional_cost_paid": paid_cost,
+            "optional_cost_count": optional_cost_count if optional_cost else 0,
+            "discarded": [
+                discarded_card.get("name", "?")
+                for discarded_card in discarded_cards
+                if isinstance(discarded_card, dict)
+            ],
+            "sacrificed": sacrificed_name,
             "turn": turn,
             "phase": phase,
             **replay_rule_fields(permanent),

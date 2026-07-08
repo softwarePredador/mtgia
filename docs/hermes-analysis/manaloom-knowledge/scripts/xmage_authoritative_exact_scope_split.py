@@ -18700,22 +18700,57 @@ def dies_draw_from_oracle(metadata: dict[str, Any]) -> tuple[int, bool] | None:
     return count, bool(match.group(1))
 
 
-def combat_damage_draw_from_oracle(metadata: dict[str, Any]) -> tuple[int, bool] | None:
+def combat_damage_draw_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
     text = re.sub(r"\s+", " ", oracle_text_after_leading_static_keywords(metadata)).strip()
     match = re.fullmatch(
         r"whenever (?:this creature|[^,.]+) deals combat damage to a player, "
         r"(?:you may )?(?:you )?draw (a|one|two|three|four|five|\d+) cards?\.?",
         text,
     )
-    if not match:
-        return None
-    count = number_word_to_int(match.group(1))
-    if count <= 0:
-        return None
-    return count, "you may" in text
+    if match:
+        count = number_word_to_int(match.group(1))
+        if count <= 0:
+            return None
+        return {
+            "draw_count": count,
+            "optional": "you may" in text,
+        }
+    discard_match = re.fullmatch(
+        r"whenever (?:this creature|[^,.]+) deals combat damage to a player, "
+        r"you may discard a card\. if you do, draw "
+        r"(a|one|two|three|four|five|\d+) cards?\.?",
+        text,
+    )
+    if discard_match:
+        count = number_word_to_int(discard_match.group(1))
+        if count <= 0:
+            return None
+        return {
+            "draw_count": count,
+            "optional": True,
+            "optional_cost": "discard_card",
+            "optional_cost_count": 1,
+        }
+    sacrifice_match = re.fullmatch(
+        r"whenever (?:this creature|[^,.]+) deals combat damage to a player, "
+        r"you may sacrifice (?:it|this creature|[^,.]+)\. if you do, draw "
+        r"(a|one|two|three|four|five|\d+) cards?\.?",
+        text,
+    )
+    if sacrifice_match:
+        count = number_word_to_int(sacrifice_match.group(1))
+        if count <= 0:
+            return None
+        return {
+            "draw_count": count,
+            "optional": True,
+            "optional_cost": "sacrifice_source",
+            "optional_cost_count": 1,
+        }
+    return None
 
 
-def combat_damage_draw_from_source(source_text: str) -> int | str:
+def combat_damage_draw_from_source(source_text: str) -> dict[str, Any] | str:
     text = str(source_text or "")
     if len(re.findall(r"new\s+DrawCardSourceControllerEffect\s*\(", text)) != 1:
         return "combat_damage_draw_source_effect_count_not_supported"
@@ -18728,7 +18763,21 @@ def combat_damage_draw_from_source(source_text: str) -> int | str:
     )
     if count is None or count <= 0:
         return "combat_damage_draw_count_source_not_fixed"
-    return count
+    optional_cost = None
+    if re.search(r"new\s+DoIfCostPaid\s*\(", text):
+        cost_flags = {
+            "discard_card": "new DiscardCardCost" in text,
+            "sacrifice_source": "new SacrificeSourceCost" in text,
+        }
+        enabled = [key for key, active in cost_flags.items() if active]
+        if len(enabled) != 1:
+            return "combat_damage_draw_optional_cost_not_supported"
+        optional_cost = enabled[0]
+    return {
+        "draw_count": count,
+        "optional_cost": optional_cost,
+        "optional_cost_count": 1 if optional_cost else 0,
+    }
 
 
 def etb_damage_target_from_oracle(metadata: dict[str, Any]) -> tuple[int, str] | None:
@@ -26678,8 +26727,15 @@ def split_row(
         source_draw = combat_damage_draw_from_source(source_text)
         if isinstance(source_draw, str):
             return None, source_draw
-        count, optional = parsed
-        if source_draw != count:
+        count = int(parsed["draw_count"])
+        optional = bool(parsed.get("optional"))
+        if int(source_draw["draw_count"]) != count:
+            return None, "combat_damage_draw_source_oracle_mismatch"
+        if parsed.get("optional_cost") != source_draw.get("optional_cost"):
+            return None, "combat_damage_draw_source_oracle_mismatch"
+        if parsed.get("optional_cost") and int(parsed.get("optional_cost_count") or 0) != int(
+            source_draw.get("optional_cost_count") or 0
+        ):
             return None, "combat_damage_draw_source_oracle_mismatch"
         keyword_list = ordered_keywords(keywords_from_source_added_ability_classes(source_text, row))
         effect_json = {
@@ -26696,6 +26752,11 @@ def split_row(
         }
         if optional:
             effect_json["combat_damage_draw_optional"] = True
+        if parsed.get("optional_cost"):
+            effect_json["combat_damage_draw_optional_cost"] = parsed["optional_cost"]
+            effect_json["combat_damage_draw_optional_cost_count"] = int(
+                parsed.get("optional_cost_count") or 1
+            )
         if keyword_list:
             effect_json["keywords"] = keyword_list
             effect_json["_keywords_are_self"] = True
