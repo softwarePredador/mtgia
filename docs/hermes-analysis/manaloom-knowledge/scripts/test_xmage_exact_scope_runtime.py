@@ -7540,6 +7540,67 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_tap_target_spell_taps_only_legal_targets(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        legal_one = {
+            "name": "Legal Soldier One",
+            "type_line": "Creature - Soldier",
+            "effect": "creature",
+            "power": 2,
+            "toughness": 2,
+            "tapped": False,
+        }
+        legal_two = {
+            "name": "Legal Soldier Two",
+            "type_line": "Creature - Soldier",
+            "effect": "creature",
+            "power": 3,
+            "toughness": 3,
+            "tapped": False,
+        }
+        illegal_land = {
+            "name": "Illegal Island",
+            "type_line": "Land",
+            "effect": "land",
+            "tapped": False,
+        }
+        opponent.battlefield = [illegal_land, legal_one, legal_two]
+        effect = {
+            "effect": "tap_target",
+            "battle_model_scope": "xmage_tap_target_spell_v1",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "target_count": 2,
+            "target_count_max": 2,
+            "up_to_count": True,
+            "_rule_logical_key": "battle_rule_v1:fixture_tap_target",
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Lead Astray", "type_line": "Instant"},
+            turn=4,
+            rng=random.Random(47),
+            effect_data_override=effect,
+        )
+
+        self.assertFalse(illegal_land.get("tapped"))
+        self.assertEqual(
+            sum(1 for target in (legal_one, legal_two) if target.get("tapped")),
+            2,
+        )
+        self.assertTrue(
+            any(
+                event == "tap_target_resolved"
+                and data.get("card") == "Lead Astray"
+                and data.get("target_tapped_count") == 2
+                and data.get("requested_target_count") == 2
+                for event, data in self.events
+            )
+        )
+
     def test_fixed_damage_spell_without_required_sacrifice_land_does_not_damage(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

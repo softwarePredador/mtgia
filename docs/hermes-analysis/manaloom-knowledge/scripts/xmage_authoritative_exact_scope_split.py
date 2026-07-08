@@ -52,6 +52,22 @@ TAP_TARGET_PERMANENT_UNIT = (
     "xmage_signature::TapTargetEffect::SimpleActivatedAbility::"
     "TargetPermanent::no_condition_class::targeting,activated_ability"
 )
+TAP_TARGET_CREATURE_SPELL_UNIT = (
+    "xmage_signature::TapTargetEffect::no_ability_class::"
+    "TargetCreaturePermanent::no_condition_class::targeting"
+)
+TAP_TARGET_LAND_SPELL_UNIT = (
+    "xmage_signature::TapTargetEffect::no_ability_class::"
+    "TargetLandPermanent::no_condition_class::targeting"
+)
+TAP_TARGET_NONLAND_PERMANENT_SPELL_UNIT = (
+    "xmage_signature::TapTargetEffect::no_ability_class::"
+    "TargetNonlandPermanent::no_condition_class::targeting"
+)
+TAP_TARGET_PERMANENT_SPELL_UNIT = (
+    "xmage_signature::TapTargetEffect::no_ability_class::"
+    "TargetPermanent::no_condition_class::targeting"
+)
 TREASURE_UNIT = "treasure_maker::single_treasure_creation_v1"
 LIFE_UNIT = "life_gain::xmage_life_gain_variant_review_v1"
 EXILE_UNIT = "removal_exile::targeted_exile_variant_v1"
@@ -185,6 +201,10 @@ SUPPORTED_UNITS = {
     RAMP_ANY_COLOR_MANA_ROCK_UNIT,
     COUNTER_UNIT,
     BOUNCE_UNIT,
+    TAP_TARGET_CREATURE_SPELL_UNIT,
+    TAP_TARGET_LAND_SPELL_UNIT,
+    TAP_TARGET_NONLAND_PERMANENT_SPELL_UNIT,
+    TAP_TARGET_PERMANENT_SPELL_UNIT,
     RECURSION_UNIT,
     TUTOR_UNIT,
     TUTOR_HAND_UNIT,
@@ -242,6 +262,7 @@ TAP_DAMAGE_ACTIVATED_SCOPE = "xmage_tap_fixed_damage_target_activated_ability_v1
 PERMANENT_ACTIVATED_DAMAGE_SCOPE = "xmage_permanent_simple_activated_damage_v1"
 PERMANENT_ACTIVATED_DESTROY_SCOPE = "xmage_permanent_simple_activated_destroy_target_v1"
 PERMANENT_ACTIVATED_TAP_TARGET_SCOPE = "xmage_permanent_simple_activated_tap_target_v1"
+TAP_TARGET_SPELL_SCOPE = "xmage_tap_target_spell_v1"
 PERMANENT_ACTIVATED_RECURSION_TO_HAND_SCOPE = "xmage_permanent_simple_activated_graveyard_to_hand_v1"
 PERMANENT_ACTIVATED_RECURSION_TO_BATTLEFIELD_SCOPE = "xmage_permanent_simple_activated_graveyard_to_battlefield_v1"
 PERMANENT_ACTIVATED_GRAVEYARD_EXILE_SCOPE = "xmage_permanent_simple_activated_exile_graveyard_card_v1"
@@ -441,6 +462,10 @@ SPELL_UNITS = {
     EXILE_UNIT,
     COUNTER_UNIT,
     BOUNCE_UNIT,
+    TAP_TARGET_CREATURE_SPELL_UNIT,
+    TAP_TARGET_LAND_SPELL_UNIT,
+    TAP_TARGET_NONLAND_PERMANENT_SPELL_UNIT,
+    TAP_TARGET_PERMANENT_SPELL_UNIT,
     RECURSION_UNIT,
     TUTOR_UNIT,
     TUTOR_HAND_UNIT,
@@ -9721,6 +9746,21 @@ def is_permanent_activated_tap_target_unit(row: dict[str, Any]) -> bool:
     )
 
 
+def is_tap_target_spell_unit(row: dict[str, Any]) -> bool:
+    return (
+        str(row.get("adapter_work_unit") or "")
+        in {
+            TAP_TARGET_CREATURE_SPELL_UNIT,
+            TAP_TARGET_LAND_SPELL_UNIT,
+            TAP_TARGET_NONLAND_PERMANENT_SPELL_UNIT,
+            TAP_TARGET_PERMANENT_SPELL_UNIT,
+        }
+        and effect_classes(row) == {"TapTargetEffect"}
+        and not ability_classes(row)
+        and set(row.get("xmage_signals") or []) == {"targeting"}
+    )
+
+
 def is_permanent_activated_tutor_battlefield_unit(row: dict[str, Any]) -> bool:
     if str(row.get("adapter_work_unit") or "") != TUTOR_UNIT:
         return False
@@ -16527,6 +16567,114 @@ def activated_tap_target_from_source(source: str) -> dict[str, Any] | str:
     }
 
 
+def tap_target_count_value(raw: str) -> int | str | None:
+    value = str(raw or "").strip().lower()
+    if value == "x":
+        return "x"
+    if value.isdigit():
+        return int(value)
+    return NUMBER_WORDS.get(value)
+
+
+def tap_target_spell_target_from_text(raw_target: str) -> str | None:
+    target = re.sub(r"\s+", " ", str(raw_target or "").strip().lower())
+    return {
+        "creature": "creature",
+        "creatures": "creature",
+        "land": "land",
+        "lands": "land",
+        "nonland permanent": "nonland_permanent",
+        "nonland permanents": "nonland_permanent",
+        "permanent": "permanent",
+        "permanents": "permanent",
+    }.get(target)
+
+
+def tap_target_spell_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    lines = [
+        re.sub(r"\s+", " ", line).strip().lower().rstrip(".")
+        for line in oracle_effect_lines_without_neutral_auxiliary(metadata)
+        if line.strip()
+    ]
+    if len(lines) != 1:
+        return "tap_target_spell_oracle_not_simple"
+    text = strip_parenthetical_reminders(lines[0])
+    match = re.fullmatch(
+        r"tap (?:(?P<up_to>up to) )?(?P<count>x|\d+|one|two|three|four|five|six|seven|eight|nine|ten) "
+        r"target (?P<target>creatures?|lands?|nonland permanents?|permanents?)",
+        text,
+    )
+    if not match:
+        return "tap_target_spell_oracle_not_simple"
+    target = tap_target_spell_target_from_text(match.group("target") or "")
+    if target is None:
+        return "tap_target_spell_oracle_target_not_supported"
+    count = tap_target_count_value(match.group("count") or "")
+    if count is None:
+        return "tap_target_spell_oracle_count_not_supported"
+    spec: dict[str, Any] = {
+        "target": target,
+        "target_constraints": target_constraints_for(target),
+        "up_to_count": bool(match.group("up_to")),
+    }
+    if count == "x":
+        spec["target_count_from_x"] = True
+        spec["target_count_source"] = "x_value"
+    else:
+        spec["target_count"] = int(count)
+        spec["target_count_max"] = int(count)
+    return spec
+
+
+def tap_target_spell_from_source(source: str) -> dict[str, Any] | str:
+    text = source or ""
+    if has_additional_cost(text):
+        return "tap_target_spell_additional_cost_not_supported"
+    if len(re.findall(r"new\s+TapTargetEffect\s*\(", text, re.S)) != 1:
+        return "tap_target_spell_source_not_simple_tap_effect"
+    target = None
+    if re.search(r"new\s+TargetCreaturePermanent\s*\(", text, re.S):
+        target = "creature"
+    elif re.search(r"new\s+TargetLandPermanent\s*\(", text, re.S):
+        target = "land"
+    elif re.search(r"new\s+TargetNonlandPermanent\s*\(", text, re.S):
+        target = "nonland_permanent"
+    elif re.search(r"new\s+TargetPermanent\s*\(", text, re.S):
+        target = "permanent"
+    if target is None:
+        return "tap_target_spell_source_target_not_supported"
+    spec: dict[str, Any] = {
+        "target": target,
+        "target_constraints": target_constraints_for(target),
+        "up_to_count": False,
+    }
+    if "XTargetsCountAdjuster" in text:
+        spec["target_count_from_x"] = True
+        spec["target_count_source"] = "x_value"
+        return spec
+    target_class = {
+        "creature": "TargetCreaturePermanent",
+        "land": "TargetLandPermanent",
+        "nonland_permanent": "TargetNonlandPermanent",
+        "permanent": "TargetPermanent",
+    }[target]
+    args = extract_constructor_args(text, target_class)
+    if args is None:
+        return "tap_target_spell_source_target_count_not_supported"
+    parts = split_java_args(args)
+    if len(parts) == 2 and parts[0].strip() == "0" and re.fullmatch(r"\d+", parts[1].strip()):
+        count = int(parts[1].strip())
+        spec["target_count"] = count
+        spec["target_count_max"] = count
+        spec["up_to_count"] = True
+        return spec
+    if len(parts) == 0 or args.strip() == "":
+        spec["target_count"] = 1
+        spec["target_count_max"] = 1
+        return spec
+    return "tap_target_spell_source_target_count_not_supported"
+
+
 def activated_draw_from_source(source: str) -> dict[str, Any] | str:
     text = source or ""
     if "Zone.GRAVEYARD" in text:
@@ -22413,6 +22561,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "permanent with a simple activated library-search-to-battlefield ability"
     elif scope == PERMANENT_ACTIVATED_TUTOR_HAND_SCOPE:
         scope_kind = "noncreature permanent with a simple self-sacrifice library-search-to-hand ability"
+    elif scope == TAP_TARGET_SPELL_SCOPE:
+        scope_kind = "instant or sorcery spell that taps exact target permanents"
     elif scope == LIBRARY_PICK_SPELL_SCOPE:
         scope_kind = "fixed reveal-top-library pick-to-hand spell"
     elif scope == LOOK_LIBRARY_PICK_SPELL_SCOPE:
@@ -22548,6 +22698,7 @@ def split_row(
     permanent_activated_damage_unit = is_permanent_activated_damage_unit(row)
     permanent_activated_destroy_unit = is_permanent_activated_destroy_unit(row)
     permanent_activated_tap_target_unit = is_permanent_activated_tap_target_unit(row)
+    tap_target_spell_unit = is_tap_target_spell_unit(row)
     permanent_activated_life_gain_unit = is_permanent_activated_life_gain_unit(row)
     permanent_activated_self_boost_unit = is_permanent_activated_self_boost_unit(row)
     permanent_activated_target_boost_unit = is_permanent_activated_target_boost_unit(row)
@@ -22833,6 +22984,34 @@ def split_row(
 
     flags = spell_flags(metadata)
     classes = effect_classes(row)
+
+    if tap_target_spell_unit:
+        if classes != {"TapTargetEffect"}:
+            return None, "tap_target_spell_effect_class_not_pure"
+        if ability_classes(row):
+            return None, "tap_target_spell_ability_class_not_simple"
+        oracle_tap = tap_target_spell_from_oracle(metadata)
+        if isinstance(oracle_tap, str):
+            return None, oracle_tap
+        source_tap = tap_target_spell_from_source(source_text)
+        if isinstance(source_tap, str):
+            return None, source_tap
+        for key in ("target", "target_count", "target_count_max", "target_count_from_x", "target_count_source", "up_to_count"):
+            if source_tap.get(key) != oracle_tap.get(key):
+                return None, "tap_target_spell_source_oracle_mismatch"
+        effect_json = {
+            "effect": "tap_target",
+            "battle_model_scope": TAP_TARGET_SPELL_SCOPE,
+            "xmage_effect_class": "TapTargetEffect",
+            **oracle_tap,
+            **flags,
+        }
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_tap_target_spell",
+        ), "selected_exact_scope"
 
     if prevent_all_combat_damage_spell_unit:
         abilities = ability_classes(row)

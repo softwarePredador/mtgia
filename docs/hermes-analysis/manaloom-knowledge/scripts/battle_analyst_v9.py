@@ -49561,6 +49561,176 @@ def activated_tap_target_effect_for_permanent(permanent):
     return None
 
 
+def tap_target_spell_count(effect_data):
+    if (
+        effect_data.get("target_count_from_x")
+        or str(effect_data.get("target_count_source") or "").lower() == "x_value"
+    ):
+        return max(
+            1,
+            int(
+                effect_data.get("x_value")
+                or effect_data.get("target_count")
+                or effect_data.get("target_count_max")
+                or effect_data.get("average_target_count")
+                or 1
+            ),
+        )
+    return max(
+        1,
+        int(
+            effect_data.get("target_count_max")
+            or effect_data.get("max_targets")
+            or effect_data.get("target_count")
+            or 1
+        ),
+    )
+
+
+def tap_target_spell_candidates(player, opponents, card, effect_data):
+    target_type = str(effect_data.get("target") or _target_type_from_constraints(effect_data) or "permanent").lower()
+    candidates = []
+    participants = list(opponents or [])
+    target_controller = str(
+        effect_data.get("target_controller")
+        or _target_constraints_dict(effect_data).get("controller_scope")
+        or "opponent"
+    ).lower()
+    if target_controller in {"self", "you", "controller", "controlled"}:
+        participants = [player]
+    elif target_controller in {"any", "all", "any_player"}:
+        participants = list(opponents or []) + [player]
+    for participant in participants:
+        if participant is not player and not participant.is_alive():
+            continue
+        for permanent in getattr(participant, "battlefield", []) or []:
+            if not isinstance(permanent, dict) or permanent.get("tapped"):
+                continue
+            targeting_source = target_constraint_source(card, effect_data)
+            if not is_legal_target(
+                targeting_source,
+                permanent,
+                player,
+                target_type=target_type,
+                target_controller=participant,
+            ):
+                continue
+            candidates.append((target_priority(permanent), participant, permanent))
+    candidates.sort(
+        key=lambda item: (
+            item[0],
+            str(item[1].name),
+            str(item[2].get("name") or ""),
+        ),
+        reverse=True,
+    )
+    return candidates
+
+
+def apply_tap_target_spell(player, opponents, card, effect_data, turn, rng):
+    count = tap_target_spell_count(effect_data)
+    candidates = tap_target_spell_candidates(player, opponents, card, effect_data)
+    selected = candidates[:count]
+    target_type = str(effect_data.get("target") or _target_type_from_constraints(effect_data) or "permanent").lower()
+    if not selected:
+        emit_replay_event(
+            "tap_target_resolved",
+            player=player.name,
+            card=card.get("name", "?"),
+            target_type=target_type,
+            target_tapped=False,
+            target_tapped_count=0,
+            available_targets=0,
+            result="no_legal_target",
+            turn=turn,
+            **replay_rule_fields(effect_data),
+        )
+        finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+        return
+    available_options = [
+        decision_card_option(
+            permanent,
+            get_card_effect(permanent),
+            action="tap_target",
+            score=sum(priority),
+            target_controller=controller.name,
+        )
+        for priority, controller, permanent in candidates[:8]
+    ]
+    chosen_options = [
+        decision_card_option(
+            permanent,
+            get_card_effect(permanent),
+            action="tap_target",
+            score=sum(priority),
+            target_controller=controller.name,
+        )
+        for priority, controller, permanent in selected
+    ]
+    emit_decision_trace(
+        decision_type="spell_resolution",
+        player=player,
+        turn=turn,
+        phase="resolution",
+        available_options=available_options,
+        chosen_option=chosen_options[0] if chosen_options else None,
+        rejected_options=available_options[len(chosen_options):],
+        score_components={
+            "target_type": target_type,
+            "requested_target_count": count,
+            "selected_target_count": len(selected),
+        },
+        rule_source=replay_rule_fields(effect_data).get("rule_source", "battle_rule"),
+        rule_status=replay_rule_fields(effect_data).get("rule_review_status", "verified"),
+        confidence="medium",
+        expected_benefit_score=max(10, len(selected) * 5),
+        actual_outcome="tap_target_spell_used",
+        reason="tap_highest_priority_untapped_legal_targets",
+        heuristic_version=DECISION_STRATEGY_VERSION,
+        resource_delta={"opponent_permanents_tapped": len(selected)},
+        risk_flags=["simplified_target_choice"],
+    )
+    tapped = []
+    illegal = []
+    for _priority, controller, permanent in selected:
+        decision = targeting_decision(
+            card,
+            permanent,
+            player,
+            target_controller=controller,
+            target_type=target_type,
+        )
+        if not decision["target_legal"]:
+            illegal.append(permanent.get("name", "?"))
+            continue
+        if check_ward(permanent, card, player, rng):
+            illegal.append(permanent.get("name", "?"))
+            continue
+        permanent["tapped"] = True
+        tapped.append(
+            {
+                "target": permanent.get("name", "?"),
+                "target_player": controller.name,
+                "target_type_line": permanent.get("type_line", ""),
+            }
+        )
+    emit_replay_event(
+        "tap_target_resolved",
+        player=player.name,
+        card=card.get("name", "?"),
+        target_type=target_type,
+        target_tapped=bool(tapped),
+        target_tapped_count=len(tapped),
+        requested_target_count=count,
+        available_targets=len(candidates),
+        tapped_targets=tapped,
+        illegal_targets=illegal,
+        turn=turn,
+        **replay_rule_fields(effect_data),
+    )
+    finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+
+
 def can_activate_generic_tap_target_permanent(player, permanent, opponents, *, effect_data=None):
     effect_data = effect_data or activated_tap_target_effect_for_permanent(permanent)
     if effect_data is None:
@@ -62566,6 +62736,8 @@ def apply_effect_immediate(
         apply_multi_target_damage(player, opponents, card, effect_data, turn, rng)
     elif effect == "add_counters":
         resolve_add_counters_target_spell(player, opponents, card, effect_data, turn)
+    elif effect == "tap_target":
+        apply_tap_target_spell(player, opponents, card, effect_data, turn, rng)
     elif effect == "stat_modifier_until_eot":
         resolve_stat_modifier_until_eot_spell(player, opponents, card, effect_data, turn)
     elif effect == "controlled_stat_modifier_until_eot":

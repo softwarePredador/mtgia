@@ -100,6 +100,7 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "put_land_tapped",
     "count_from_x",
     "target_count_from_x",
+    "target_count_source",
     "target_player_draw",
     "prevent_all_combat_damage_this_turn",
     "prevent_damage_from_creature_sources_this_turn",
@@ -2993,6 +2994,58 @@ def simple_activated_tap_target_execution_scenario_from_expected_rule(
     }
 
 
+def tap_target_spell_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_tap_target_spell_v1":
+        return None
+    target = required.get("target") or "permanent"
+    constraints = dict(required.get("target_constraints") or {})
+    if not constraints:
+        constraints = {"card_types": ["creature"] if target == "creature" else [target]}
+    if required.get("target_count_from_x") or required.get("target_count_source") == "x_value":
+        target_count = 2
+    else:
+        target_count = int(
+            required.get("target_count_max")
+            or required.get("max_targets")
+            or required.get("target_count")
+            or 1
+        )
+    target_count = max(1, min(target_count, 3))
+    targets = []
+    for index in range(1, target_count + 1):
+        fixture = _target_fixture_from_constraints(
+            f"E2E Legal Tap Spell Target {index}",
+            constraints,
+            matching=True,
+        )
+        fixture["tapped"] = False
+        targets.append(fixture)
+    nonmatching = _target_fixture_from_constraints(
+        "E2E Illegal Tap Spell Target",
+        constraints,
+        matching=False,
+    )
+    nonmatching["tapped"] = False
+    return {
+        "name": f"{rule['card_name']} taps target permanents",
+        "type": "tap_target_spell",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": "Sorcery" if required.get("sorcery") is True else "Instant",
+        },
+        "target": target,
+        "targets": targets,
+        "nonmatching_target": nonmatching,
+        "expected_target_count": target_count,
+        "expected_target_constraints": constraints,
+        "x_value": target_count if required.get("target_count_from_x") else None,
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def simple_activated_add_counters_target_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
@@ -4660,6 +4713,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or damage_gain_life_spell_execution_scenario_from_expected_rule(rule)
         or fixed_damage_target_spell_execution_scenario_from_expected_rule(rule)
         or damage_target_create_treasure_execution_scenario_from_expected_rule(rule)
+        or tap_target_spell_execution_scenario_from_expected_rule(rule)
         or simple_activated_draw_execution_scenario_from_expected_rule(rule)
         or combat_damage_draw_execution_scenario_from_expected_rule(rule)
         or simple_activated_damage_execution_scenario_from_expected_rule(rule)

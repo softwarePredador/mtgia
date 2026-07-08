@@ -18958,6 +18958,89 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "graveyard_self_return_oracle_not_simple")
 
+    def test_tap_up_to_three_target_creatures_spell_maps_to_tap_target_scope(self) -> None:
+        row = queue_row(
+            split.TAP_TARGET_CREATURE_SPELL_UNIT,
+            effect_classes=["TapTargetEffect"],
+            xmage_signals=["targeting"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Downpour",
+                type_line="Instant",
+                oracle_text="Tap up to three target creatures.",
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new TapTargetEffect());
+                this.getSpellAbility().addTarget(new TargetCreaturePermanent(0, 3));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "tap_target")
+        self.assertEqual(effect["battle_model_scope"], split.TAP_TARGET_SPELL_SCOPE)
+        self.assertEqual(effect["target"], "creature")
+        self.assertEqual(effect["target_count"], 3)
+        self.assertEqual(effect["target_count_max"], 3)
+        self.assertTrue(effect["up_to_count"])
+        self.assertEqual(effect["target_constraints"], {"card_types": ["creature"]})
+
+    def test_x_target_nonland_permanents_spell_maps_to_tap_target_scope(self) -> None:
+        row = queue_row(
+            split.TAP_TARGET_NONLAND_PERMANENT_SPELL_UNIT,
+            effect_classes=["TapTargetEffect"],
+            xmage_signals=["targeting"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Gridlock",
+                type_line="Instant",
+                oracle_text="Tap X target nonland permanents.",
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new TapTargetEffect("tap X target nonland permanents"));
+                this.getSpellAbility().addTarget(new TargetNonlandPermanent());
+                this.getSpellAbility().setTargetAdjuster(new XTargetsCountAdjuster());
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.TAP_TARGET_SPELL_SCOPE)
+        self.assertEqual(effect["target"], "nonland_permanent")
+        self.assertTrue(effect["target_count_from_x"])
+        self.assertEqual(effect["target_count_source"], "x_value")
+        self.assertFalse(effect["up_to_count"])
+        self.assertEqual(
+            effect["target_constraints"],
+            {"card_types": ["permanent"], "exclude_card_types": ["land"]},
+        )
+
+    def test_tap_target_spell_blocks_source_oracle_target_mismatch(self) -> None:
+        row = queue_row(
+            split.TAP_TARGET_LAND_SPELL_UNIT,
+            effect_classes=["TapTargetEffect"],
+            xmage_signals=["targeting"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Frost",
+                type_line="Instant",
+                oracle_text="Tap up to three target lands.",
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new TapTargetEffect());
+                this.getSpellAbility().addTarget(new TargetCreaturePermanent(0, 3));
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "tap_target_spell_source_oracle_mismatch")
+
     def test_destroy_all_creatures_maps_to_board_wipe_scope(self) -> None:
         row = queue_row(split.BOARD_WIPE_UNIT, effect_classes=["DestroyAllEffect"])
         proposal, reason = split.split_row(

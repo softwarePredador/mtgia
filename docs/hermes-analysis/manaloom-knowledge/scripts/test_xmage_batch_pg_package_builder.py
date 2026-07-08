@@ -1416,6 +1416,33 @@ def test_manifest_builds_damage_target_create_treasure_execution_scenario() -> N
     assert scenario["expected_target_constraints"] == {"scope": "any_target"}
 
 
+def test_manifest_builds_tap_target_spell_execution_scenario() -> None:
+    rule = {
+        "normalized_name": "gridlock",
+        "card_name": "Gridlock",
+        "oracle_hash": "hash-gridlock",
+        "logical_rule_key": "battle_rule_v1:hash-gridlock",
+        "required_effect_fields": {
+            "effect": "tap_target",
+            "battle_model_scope": "xmage_tap_target_spell_v1",
+            "target": "nonland_permanent",
+            "target_constraints": {"card_types": ["permanent"], "exclude_card_types": ["land"]},
+            "target_count_from_x": True,
+            "target_count_source": "x_value",
+        },
+    }
+
+    scenario = builder.tap_target_spell_execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "tap_target_spell"
+    assert scenario["card"]["name"] == "Gridlock"
+    assert scenario["expected_target_count"] == 2
+    assert scenario["x_value"] == 2
+    assert len(scenario["targets"]) == 2
+    assert scenario["nonmatching_target"]["name"] == "E2E Illegal Tap Spell Target"
+
+
 def test_manifest_builds_simple_activated_tap_target_execution_scenario() -> None:
     rule = {
         "normalized_name": "akroan jailer",

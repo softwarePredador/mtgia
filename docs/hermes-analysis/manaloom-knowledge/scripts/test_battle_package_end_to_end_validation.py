@@ -775,6 +775,67 @@ def test_simple_activated_tap_target_runner_executes_tap_effect() -> None:
     assert result["source_tapped"] is True
 
 
+def test_tap_target_spell_runner_executes_multi_target_spell() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "tap_target",
+        "battle_model_scope": "xmage_tap_target_spell_v1",
+        "target": "creature",
+        "target_constraints": {"card_types": ["creature"]},
+        "target_count": 2,
+        "target_count_max": 2,
+        "up_to_count": True,
+        "_rule_logical_key": "battle_rule_v1:lead-astray",
+    }
+    try:
+        result = validator.run_tap_target_spell(
+            battle,
+            {
+                "name": "Lead Astray taps two target creatures",
+                "type": "tap_target_spell",
+                "card": {"name": "Lead Astray", "type_line": "Instant"},
+                "targets": [
+                    {
+                        "name": "E2E Legal Tap Target One",
+                        "type_line": "Creature - Fixture",
+                        "effect": "creature",
+                        "power": 2,
+                        "toughness": 2,
+                    },
+                    {
+                        "name": "E2E Legal Tap Target Two",
+                        "type_line": "Creature - Fixture",
+                        "effect": "creature",
+                        "power": 3,
+                        "toughness": 3,
+                    },
+                ],
+                "nonmatching_target": {
+                    "name": "E2E Illegal Tap Target",
+                    "type_line": "Land",
+                    "effect": "land",
+                },
+                "expected_target_count": 2,
+                "logical_rule_key": "battle_rule_v1:lead-astray",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Lead Astray"
+    assert result["target_tapped_count"] == 2
+    assert result["targets_tapped"] == [
+        "E2E Legal Tap Target One",
+        "E2E Legal Tap Target Two",
+    ]
+
+
 def test_simple_activated_tap_target_runner_executes_noncreature_target() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

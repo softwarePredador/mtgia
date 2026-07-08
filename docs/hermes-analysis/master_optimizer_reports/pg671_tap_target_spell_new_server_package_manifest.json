@@ -1,0 +1,717 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg671_tap_target_spell_new_server_20260708_201937",
+  "deploy_id": "PG671",
+  "execution_scenarios": [
+    {
+      "card": {
+        "name": "Downpour",
+        "type_line": "Instant"
+      },
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ]
+      },
+      "expected_target_count": 3,
+      "logical_rule_key": "battle_rule_v1:97b5de80477f9460ef784533e6024927",
+      "name": "Downpour taps target permanents",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Tap Spell Target",
+        "tapped": false,
+        "type_line": "Land"
+      },
+      "target": "creature",
+      "targets": [
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Tap Spell Target 1",
+          "power": 2,
+          "tapped": false,
+          "toughness": 2,
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Tap Spell Target 2",
+          "power": 2,
+          "tapped": false,
+          "toughness": 2,
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Tap Spell Target 3",
+          "power": 2,
+          "tapped": false,
+          "toughness": 2,
+          "type_line": "Creature - Soldier"
+        }
+      ],
+      "type": "tap_target_spell",
+      "x_value": null
+    },
+    {
+      "card": {
+        "name": "Early Frost",
+        "type_line": "Instant"
+      },
+      "expected_target_constraints": {
+        "card_types": [
+          "land"
+        ]
+      },
+      "expected_target_count": 3,
+      "logical_rule_key": "battle_rule_v1:4fc24a112121a24561daf0f372287872",
+      "name": "Early Frost taps target permanents",
+      "nonmatching_target": {
+        "cmc": 1,
+        "effect": "draw_cards",
+        "name": "E2E Illegal Tap Spell Target",
+        "tapped": false,
+        "type_line": "Instant"
+      },
+      "target": "land",
+      "targets": [
+        {
+          "cmc": 3,
+          "effect": "land",
+          "name": "E2E Legal Tap Spell Target 1",
+          "tapped": false,
+          "type_line": "Land"
+        },
+        {
+          "cmc": 3,
+          "effect": "land",
+          "name": "E2E Legal Tap Spell Target 2",
+          "tapped": false,
+          "type_line": "Land"
+        },
+        {
+          "cmc": 3,
+          "effect": "land",
+          "name": "E2E Legal Tap Spell Target 3",
+          "tapped": false,
+          "type_line": "Land"
+        }
+      ],
+      "type": "tap_target_spell",
+      "x_value": null
+    },
+    {
+      "card": {
+        "name": "Gridlock",
+        "type_line": "Instant"
+      },
+      "expected_target_constraints": {
+        "card_types": [
+          "permanent"
+        ],
+        "exclude_card_types": [
+          "land"
+        ]
+      },
+      "expected_target_count": 2,
+      "logical_rule_key": "battle_rule_v1:5bebfc1427545887eb7efb9e503d4fe8",
+      "name": "Gridlock taps target permanents",
+      "nonmatching_target": {
+        "cmc": 3,
+        "effect": "land enchantment",
+        "name": "E2E Illegal Tap Spell Target",
+        "tapped": false,
+        "type_line": "Land Enchantment"
+      },
+      "target": "nonland_permanent",
+      "targets": [
+        {
+          "cmc": 3,
+          "effect": "enchantment",
+          "name": "E2E Legal Tap Spell Target 1",
+          "tapped": false,
+          "type_line": "Enchantment"
+        },
+        {
+          "cmc": 3,
+          "effect": "enchantment",
+          "name": "E2E Legal Tap Spell Target 2",
+          "tapped": false,
+          "type_line": "Enchantment"
+        }
+      ],
+      "type": "tap_target_spell",
+      "x_value": 2
+    },
+    {
+      "card": {
+        "name": "Lead Astray",
+        "type_line": "Instant"
+      },
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ]
+      },
+      "expected_target_count": 2,
+      "logical_rule_key": "battle_rule_v1:db6c12f90bdf648e5a86a83c2164ff64",
+      "name": "Lead Astray taps target permanents",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Tap Spell Target",
+        "tapped": false,
+        "type_line": "Land"
+      },
+      "target": "creature",
+      "targets": [
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Tap Spell Target 1",
+          "power": 2,
+          "tapped": false,
+          "toughness": 2,
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Tap Spell Target 2",
+          "power": 2,
+          "tapped": false,
+          "toughness": 2,
+          "type_line": "Creature - Soldier"
+        }
+      ],
+      "type": "tap_target_spell",
+      "x_value": null
+    },
+    {
+      "card": {
+        "name": "Terashi's Cry",
+        "type_line": "Sorcery"
+      },
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ]
+      },
+      "expected_target_count": 3,
+      "logical_rule_key": "battle_rule_v1:005cb5d615bbf9ed00e95157bdae79f4",
+      "name": "Terashi's Cry taps target permanents",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Tap Spell Target",
+        "tapped": false,
+        "type_line": "Land"
+      },
+      "target": "creature",
+      "targets": [
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Tap Spell Target 1",
+          "power": 2,
+          "tapped": false,
+          "toughness": 2,
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Tap Spell Target 2",
+          "power": 2,
+          "tapped": false,
+          "toughness": 2,
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Tap Spell Target 3",
+          "power": 2,
+          "tapped": false,
+          "toughness": 2,
+          "type_line": "Creature - Soldier"
+        }
+      ],
+      "type": "tap_target_spell",
+      "x_value": null
+    },
+    {
+      "card": {
+        "name": "Word of Binding",
+        "type_line": "Sorcery"
+      },
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ]
+      },
+      "expected_target_count": 2,
+      "logical_rule_key": "battle_rule_v1:a28fb929f055841a3fbe611c9dc7ca67",
+      "name": "Word of Binding taps target permanents",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Tap Spell Target",
+        "tapped": false,
+        "type_line": "Land"
+      },
+      "target": "creature",
+      "targets": [
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Tap Spell Target 1",
+          "power": 2,
+          "tapped": false,
+          "toughness": 2,
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Tap Spell Target 2",
+          "power": 2,
+          "tapped": false,
+          "toughness": 2,
+          "type_line": "Creature - Soldier"
+        }
+      ],
+      "type": "tap_target_spell",
+      "x_value": 2
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Downpour",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:97b5de80477f9460ef784533e6024927",
+      "min_rule_version": 2,
+      "normalized_name": "downpour",
+      "oracle_hash": "d68899a467f06f7eb5a4978ed3531b0f",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_tap_target_spell_v1",
+        "effect": "tap_target",
+        "instant": true,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_count": 3,
+        "target_count_max": 3,
+        "up_to_count": true,
+        "xmage_effect_class": "TapTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Early Frost",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4fc24a112121a24561daf0f372287872",
+      "min_rule_version": 2,
+      "normalized_name": "early frost",
+      "oracle_hash": "92375c3d37f9d764358fb389cadb5e48",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_tap_target_spell_v1",
+        "effect": "tap_target",
+        "instant": true,
+        "sorcery": false,
+        "target": "land",
+        "target_constraints": {
+          "card_types": [
+            "land"
+          ]
+        },
+        "target_count": 3,
+        "target_count_max": 3,
+        "up_to_count": true,
+        "xmage_effect_class": "TapTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Gridlock",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5bebfc1427545887eb7efb9e503d4fe8",
+      "min_rule_version": 2,
+      "normalized_name": "gridlock",
+      "oracle_hash": "f3799a0d79c5a1e04a784fdd1702acea",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_tap_target_spell_v1",
+        "effect": "tap_target",
+        "instant": true,
+        "sorcery": false,
+        "target": "nonland_permanent",
+        "target_constraints": {
+          "card_types": [
+            "permanent"
+          ],
+          "exclude_card_types": [
+            "land"
+          ]
+        },
+        "target_count_from_x": true,
+        "target_count_source": "x_value",
+        "up_to_count": false,
+        "xmage_effect_class": "TapTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Lead Astray",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:db6c12f90bdf648e5a86a83c2164ff64",
+      "min_rule_version": 2,
+      "normalized_name": "lead astray",
+      "oracle_hash": "c9ce98f65a5953a641363e2edeb41de7",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_tap_target_spell_v1",
+        "effect": "tap_target",
+        "instant": true,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_count": 2,
+        "target_count_max": 2,
+        "up_to_count": true,
+        "xmage_effect_class": "TapTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Terashi's Cry",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:005cb5d615bbf9ed00e95157bdae79f4",
+      "min_rule_version": 2,
+      "normalized_name": "terashi's cry",
+      "oracle_hash": "d68899a467f06f7eb5a4978ed3531b0f",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_tap_target_spell_v1",
+        "effect": "tap_target",
+        "instant": false,
+        "sorcery": true,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_count": 3,
+        "target_count_max": 3,
+        "up_to_count": true,
+        "xmage_effect_class": "TapTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Word of Binding",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a28fb929f055841a3fbe611c9dc7ca67",
+      "min_rule_version": 2,
+      "normalized_name": "word of binding",
+      "oracle_hash": "61e37e31093d1088e19be84db7c70d19",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_tap_target_spell_v1",
+        "effect": "tap_target",
+        "instant": false,
+        "sorcery": true,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_count_from_x": true,
+        "target_count_source": "x_value",
+        "up_to_count": false,
+        "xmage_effect_class": "TapTargetEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_tap_target_spell": 6
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg671_tap_target_spell_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg671_tap_target_spell_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg671_tap_target_spell_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg671_tap_target_spell_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg671_tap_target_spell_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg671_tap_target_spell_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-08T20:19:37+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Downpour"
+      },
+      "card_name": "Downpour",
+      "effect": "tap_target",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:97b5de80477f9460ef784533e6024927",
+      "normalized_name": "downpour",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_tap_target_spell_v1",
+        "effect": "tap_target",
+        "instant": true,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_count": 3,
+        "target_count_max": 3,
+        "up_to_count": true,
+        "xmage_effect_class": "TapTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Early Frost"
+      },
+      "card_name": "Early Frost",
+      "effect": "tap_target",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4fc24a112121a24561daf0f372287872",
+      "normalized_name": "early frost",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_tap_target_spell_v1",
+        "effect": "tap_target",
+        "instant": true,
+        "sorcery": false,
+        "target": "land",
+        "target_constraints": {
+          "card_types": [
+            "land"
+          ]
+        },
+        "target_count": 3,
+        "target_count_max": 3,
+        "up_to_count": true,
+        "xmage_effect_class": "TapTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Gridlock"
+      },
+      "card_name": "Gridlock",
+      "effect": "tap_target",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5bebfc1427545887eb7efb9e503d4fe8",
+      "normalized_name": "gridlock",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_tap_target_spell_v1",
+        "effect": "tap_target",
+        "instant": true,
+        "sorcery": false,
+        "target": "nonland_permanent",
+        "target_constraints": {
+          "card_types": [
+            "permanent"
+          ],
+          "exclude_card_types": [
+            "land"
+          ]
+        },
+        "target_count_from_x": true,
+        "target_count_source": "x_value",
+        "up_to_count": false,
+        "xmage_effect_class": "TapTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Lead Astray"
+      },
+      "card_name": "Lead Astray",
+      "effect": "tap_target",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:db6c12f90bdf648e5a86a83c2164ff64",
+      "normalized_name": "lead astray",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_tap_target_spell_v1",
+        "effect": "tap_target",
+        "instant": true,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_count": 2,
+        "target_count_max": 2,
+        "up_to_count": true,
+        "xmage_effect_class": "TapTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Terashi's Cry"
+      },
+      "card_name": "Terashi's Cry",
+      "effect": "tap_target",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:005cb5d615bbf9ed00e95157bdae79f4",
+      "normalized_name": "terashi's cry",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_tap_target_spell_v1",
+        "effect": "tap_target",
+        "instant": false,
+        "sorcery": true,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_count": 3,
+        "target_count_max": 3,
+        "up_to_count": true,
+        "xmage_effect_class": "TapTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Word of Binding"
+      },
+      "card_name": "Word of Binding",
+      "effect": "tap_target",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a28fb929f055841a3fbe611c9dc7ca67",
+      "normalized_name": "word of binding",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_tap_target_spell_v1",
+        "effect": "tap_target",
+        "instant": false,
+        "sorcery": true,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_count_from_x": true,
+        "target_count_source": "x_value",
+        "up_to_count": false,
+        "xmage_effect_class": "TapTargetEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Downpour",
+    "Early Frost",
+    "Gridlock",
+    "Lead Astray",
+    "Terashi's Cry",
+    "Word of Binding"
+  ],
+  "selected_count": 6,
+  "slug": "tap_target_spell_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Downpour",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:97b5de80477f9460ef784533e6024927",
+      "min_rule_version": 2,
+      "normalized_name": "downpour",
+      "oracle_hash": "d68899a467f06f7eb5a4978ed3531b0f",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_tap_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Early Frost",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4fc24a112121a24561daf0f372287872",
+      "min_rule_version": 2,
+      "normalized_name": "early frost",
+      "oracle_hash": "92375c3d37f9d764358fb389cadb5e48",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_tap_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Gridlock",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5bebfc1427545887eb7efb9e503d4fe8",
+      "min_rule_version": 2,
+      "normalized_name": "gridlock",
+      "oracle_hash": "f3799a0d79c5a1e04a784fdd1702acea",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_tap_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Lead Astray",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:db6c12f90bdf648e5a86a83c2164ff64",
+      "min_rule_version": 2,
+      "normalized_name": "lead astray",
+      "oracle_hash": "c9ce98f65a5953a641363e2edeb41de7",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_tap_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Terashi's Cry",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:005cb5d615bbf9ed00e95157bdae79f4",
+      "min_rule_version": 2,
+      "normalized_name": "terashi's cry",
+      "oracle_hash": "d68899a467f06f7eb5a4978ed3531b0f",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_tap_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Word of Binding",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a28fb929f055841a3fbe611c9dc7ca67",
+      "min_rule_version": 2,
+      "normalized_name": "word of binding",
+      "oracle_hash": "61e37e31093d1088e19be84db7c70d19",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_tap_target_spell_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

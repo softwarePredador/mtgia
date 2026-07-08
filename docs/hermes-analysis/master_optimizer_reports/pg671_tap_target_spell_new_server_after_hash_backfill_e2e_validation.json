@@ -1,0 +1,324 @@
+{
+  "battle_execution": {
+    "event_count": 12,
+    "results": [
+      {
+        "card_name": "Downpour",
+        "scenario": "Downpour taps target permanents",
+        "target_tapped_count": 3,
+        "targets_tapped": [
+          "E2E Legal Tap Spell Target 1",
+          "E2E Legal Tap Spell Target 2",
+          "E2E Legal Tap Spell Target 3"
+        ]
+      },
+      {
+        "card_name": "Early Frost",
+        "scenario": "Early Frost taps target permanents",
+        "target_tapped_count": 3,
+        "targets_tapped": [
+          "E2E Legal Tap Spell Target 1",
+          "E2E Legal Tap Spell Target 2",
+          "E2E Legal Tap Spell Target 3"
+        ]
+      },
+      {
+        "card_name": "Gridlock",
+        "scenario": "Gridlock taps target permanents",
+        "target_tapped_count": 2,
+        "targets_tapped": [
+          "E2E Legal Tap Spell Target 1",
+          "E2E Legal Tap Spell Target 2"
+        ]
+      },
+      {
+        "card_name": "Lead Astray",
+        "scenario": "Lead Astray taps target permanents",
+        "target_tapped_count": 2,
+        "targets_tapped": [
+          "E2E Legal Tap Spell Target 1",
+          "E2E Legal Tap Spell Target 2"
+        ]
+      },
+      {
+        "card_name": "Terashi's Cry",
+        "scenario": "Terashi's Cry taps target permanents",
+        "target_tapped_count": 3,
+        "targets_tapped": [
+          "E2E Legal Tap Spell Target 1",
+          "E2E Legal Tap Spell Target 2",
+          "E2E Legal Tap Spell Target 3"
+        ]
+      },
+      {
+        "card_name": "Word of Binding",
+        "scenario": "Word of Binding taps target permanents",
+        "target_tapped_count": 2,
+        "targets_tapped": [
+          "E2E Legal Tap Spell Target 1",
+          "E2E Legal Tap Spell Target 2"
+        ]
+      }
+    ],
+    "scenario_count": 6
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-08T20:34:11.449884+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg671_tap_target_spell_new_server_package_manifest.json",
+  "package_id": "pg671_tap_target_spell_new_server_package_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 6
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_tap_target_spell_v1",
+          "card_name": "Downpour",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:97b5de80477f9460ef784533e6024927",
+          "oracle_hash": "d68899a467f06f7eb5a4978ed3531b0f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_tap_target_spell_v1",
+          "card_name": "Early Frost",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4fc24a112121a24561daf0f372287872",
+          "oracle_hash": "92375c3d37f9d764358fb389cadb5e48",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_tap_target_spell_v1",
+          "card_name": "Gridlock",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5bebfc1427545887eb7efb9e503d4fe8",
+          "oracle_hash": "f3799a0d79c5a1e04a784fdd1702acea",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_tap_target_spell_v1",
+          "card_name": "Lead Astray",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:db6c12f90bdf648e5a86a83c2164ff64",
+          "oracle_hash": "c9ce98f65a5953a641363e2edeb41de7",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_tap_target_spell_v1",
+          "card_name": "Terashi's Cry",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:005cb5d615bbf9ed00e95157bdae79f4",
+          "oracle_hash": "d68899a467f06f7eb5a4978ed3531b0f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_tap_target_spell_v1",
+          "card_name": "Word of Binding",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a28fb929f055841a3fbe611c9dc7ca67",
+          "oracle_hash": "61e37e31093d1088e19be84db7c70d19",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 6
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_tap_target_spell_v1",
+          "card_name": "Downpour",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:97b5de80477f9460ef784533e6024927",
+          "oracle_hash": "d68899a467f06f7eb5a4978ed3531b0f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_tap_target_spell_v1",
+          "card_name": "Early Frost",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4fc24a112121a24561daf0f372287872",
+          "oracle_hash": "92375c3d37f9d764358fb389cadb5e48",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_tap_target_spell_v1",
+          "card_name": "Gridlock",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5bebfc1427545887eb7efb9e503d4fe8",
+          "oracle_hash": "f3799a0d79c5a1e04a784fdd1702acea",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_tap_target_spell_v1",
+          "card_name": "Lead Astray",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:db6c12f90bdf648e5a86a83c2164ff64",
+          "oracle_hash": "c9ce98f65a5953a641363e2edeb41de7",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_tap_target_spell_v1",
+          "card_name": "Terashi's Cry",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:005cb5d615bbf9ed00e95157bdae79f4",
+          "oracle_hash": "d68899a467f06f7eb5a4978ed3531b0f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_tap_target_spell_v1",
+          "card_name": "Word of Binding",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a28fb929f055841a3fbe611c9dc7ca67",
+          "oracle_hash": "61e37e31093d1088e19be84db7c70d19",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 6
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_tap_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Downpour",
+          "logical_rule_key": "battle_rule_v1:97b5de80477f9460ef784533e6024927"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_tap_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Early Frost",
+          "logical_rule_key": "battle_rule_v1:4fc24a112121a24561daf0f372287872"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_tap_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Gridlock",
+          "logical_rule_key": "battle_rule_v1:5bebfc1427545887eb7efb9e503d4fe8"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_tap_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Lead Astray",
+          "logical_rule_key": "battle_rule_v1:db6c12f90bdf648e5a86a83c2164ff64"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_tap_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Terashi's Cry",
+          "logical_rule_key": "battle_rule_v1:005cb5d615bbf9ed00e95157bdae79f4"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_tap_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Word of Binding",
+          "logical_rule_key": "battle_rule_v1:a28fb929f055841a3fbe611c9dc7ca67"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 6
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Downpour",
+          "component_keys": [],
+          "effect": "tap_target",
+          "logical_rule_key": "battle_rule_v1:97b5de80477f9460ef784533e6024927"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Early Frost",
+          "component_keys": [],
+          "effect": "tap_target",
+          "logical_rule_key": "battle_rule_v1:4fc24a112121a24561daf0f372287872"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Gridlock",
+          "component_keys": [],
+          "effect": "tap_target",
+          "logical_rule_key": "battle_rule_v1:5bebfc1427545887eb7efb9e503d4fe8"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Lead Astray",
+          "component_keys": [],
+          "effect": "tap_target",
+          "logical_rule_key": "battle_rule_v1:db6c12f90bdf648e5a86a83c2164ff64"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Terashi's Cry",
+          "component_keys": [],
+          "effect": "tap_target",
+          "logical_rule_key": "battle_rule_v1:005cb5d615bbf9ed00e95157bdae79f4"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Word of Binding",
+          "component_keys": [],
+          "effect": "tap_target",
+          "logical_rule_key": "battle_rule_v1:a28fb929f055841a3fbe611c9dc7ca67"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 12,
+        "scenarios": 6
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

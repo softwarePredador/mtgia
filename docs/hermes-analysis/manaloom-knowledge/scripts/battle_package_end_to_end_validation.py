@@ -3915,6 +3915,80 @@ def run_simple_activated_draw(
     }
 
 
+def run_tap_target_spell(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    active = battle.Player(str(scenario.get("player") or "Tap Spell Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Tap Spell Opponent"), None, [])
+    targets = [
+        battle.enrich_card(dict(target))
+        for target in (scenario.get("targets") or [scenario.get("target") or {}])
+        if target
+    ]
+    nonmatching = scenario.get("nonmatching_target")
+    opponent.battlefield = []
+    if nonmatching:
+        opponent.battlefield.append(battle.enrich_card(dict(nonmatching)))
+    opponent.battlefield.extend(targets)
+    expected_count = int(scenario.get("expected_target_count") or len(targets) or 1)
+    effect_data = dict(battle.get_card_effect(card) or {})
+    if scenario.get("x_value") is not None:
+        effect_data["x_value"] = int(scenario.get("x_value") or expected_count)
+    before_events = len(events)
+    battle.apply_effect_immediate(
+        active,
+        [opponent],
+        card,
+        turn=int(scenario.get("turn") or 7),
+        rng=random.Random(int(scenario.get("seed") or 6074)),
+        effect_data_override=effect_data,
+    )
+    tapped_names = [
+        str(target.get("name") or "")
+        for target in targets
+        if target.get("tapped")
+    ]
+    if len(tapped_names) != expected_count:
+        fail(
+            "battle_execution",
+            f"{card['name']} tapped {len(tapped_names)} targets, expected {expected_count}",
+        )
+    if nonmatching:
+        nonmatching_name = str(nonmatching.get("name") or "")
+        still_untapped = [
+            permanent
+            for permanent in opponent.battlefield
+            if str(permanent.get("name") or "") == nonmatching_name and not permanent.get("tapped")
+        ]
+        if not still_untapped:
+            fail("battle_execution", f"{card['name']} tapped illegal target {nonmatching_name}")
+    resolved_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "tap_target_resolved"
+            and data.get("card") == card.get("name")
+        ),
+        None,
+    )
+    if resolved_event is None:
+        fail("battle_events", f"missing {card['name']} tap target spell resolved event")
+    if int(resolved_event.get("target_tapped_count") or 0) != expected_count:
+        fail(
+            "battle_events",
+            f"{card['name']} event target_tapped_count={resolved_event.get('target_tapped_count')}, expected {expected_count}",
+        )
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "targets_tapped": tapped_names,
+        "target_tapped_count": len(tapped_names),
+    }
+
+
 def run_simple_activated_tap_target(
     battle,
     scenario: dict[str, Any],
@@ -6994,6 +7068,7 @@ SCENARIO_RUNNERS = {
     "simple_activated_draw": run_simple_activated_draw,
     "simple_activated_damage": run_simple_activated_damage,
     "simple_activated_tap_target": run_simple_activated_tap_target,
+    "tap_target_spell": run_tap_target_spell,
     "simple_activated_add_counters_target": run_simple_activated_add_counters_target,
     "simple_activated_destroy": run_simple_activated_destroy,
     "simple_activated_target_keyword": run_simple_activated_target_keyword,
