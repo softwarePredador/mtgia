@@ -5528,6 +5528,112 @@ def resolve_stat_modifier_until_eot_spell(player, opponents, card, effect_data, 
     if dynamic_deltas is not None:
         power_delta, toughness_delta = dynamic_deltas
         effect_data = {**effect_data, "power_delta": power_delta, "toughness_delta": toughness_delta}
+    requested_count = stat_modifier_target_count(effect_data)
+    if requested_count > 1 or effect_data.get("up_to_count"):
+        candidates = stat_modifier_candidate_targets(player, opponents, card, effect_data)
+        selected = choose_stat_modifier_targets(player, opponents, card, effect_data)
+        target_type = str(effect_data.get("target") or "").lower() or _target_type_from_constraints(effect_data) or "creature"
+        granted_keywords = [
+            str(keyword or "").strip()
+            for keyword in (effect_data.get("granted_keywords_until_eot") or [])
+            if str(keyword or "").strip()
+        ]
+        if not selected:
+            emit_replay_event(
+                "stat_modifier_until_eot_resolved",
+                player=player.name,
+                card=card.get("name", "?"),
+                power_delta=power_delta,
+                toughness_delta=toughness_delta,
+                target_type=target_type,
+                requested_target_count=requested_count,
+                available_targets=len(candidates),
+                target_count=0,
+                granted_keywords_until_eot=granted_keywords,
+                result="no_legal_target",
+                turn=turn,
+                **dynamic_replay_fields,
+                **replay_rule_fields(effect_data),
+            )
+            if finish:
+                finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+            return []
+
+        details = []
+        moved = []
+        for target_owner, target in selected:
+            decision = targeting_decision(
+                card if isinstance(card, dict) else effect_data,
+                target,
+                player,
+                target_controller=target_owner,
+                target_type=target_type,
+            )
+            if not decision["target_legal"]:
+                continue
+            power_before = _numeric_card_stat(target, "power")
+            toughness_before = _numeric_card_stat(target, "toughness", "power")
+            remember_until_eot(target, "power")
+            remember_until_eot(target, "toughness")
+            target["power"] = power_before + power_delta
+            target["toughness"] = toughness_before + toughness_delta
+            if granted_keywords:
+                current_keywords = list(target.get("keywords") or [])
+                merged_keywords = list(dict.fromkeys([*current_keywords, *granted_keywords]))
+                set_until_eot(target, "keywords", merged_keywords)
+                for keyword in granted_keywords:
+                    set_until_eot(target, keyword, True)
+            power_after = _numeric_card_stat(target, "power")
+            toughness_after = _numeric_card_stat(target, "toughness", "power")
+            destination = None
+            result = "stat_modifier_until_eot_applied"
+            if toughness_after <= 0 and is_battlefield_creature(target):
+                destination = move_creature_from_battlefield(
+                    target_owner,
+                    target,
+                    reason="zero_toughness",
+                    source=card,
+                )
+                moved.append(target.get("name", "?"))
+                result = "creature_put_into_graveyard_zero_toughness"
+            details.append(
+                {
+                    "target": target.get("name", "?"),
+                    "target_player": target_owner.name,
+                    "target_power_before": power_before,
+                    "target_power_after": power_after,
+                    "target_toughness_before": toughness_before,
+                    "target_toughness_after": toughness_after,
+                    "power_delta": power_delta,
+                    "toughness_delta": toughness_delta,
+                    "granted_keywords_until_eot": granted_keywords,
+                    "destination": destination,
+                    "result": result,
+                    **decision,
+                }
+            )
+        result = "stat_modifier_until_eot_applied" if details else "no_legal_target"
+        emit_replay_event(
+            "stat_modifier_until_eot_resolved",
+            player=player.name,
+            card=card.get("name", "?"),
+            target_type=target_type,
+            target_count=len(details),
+            requested_target_count=requested_count,
+            available_targets=len(candidates),
+            targets=details,
+            moved_to_graveyard=moved,
+            power_delta=power_delta,
+            toughness_delta=toughness_delta,
+            granted_keywords_until_eot=granted_keywords,
+            **dynamic_replay_fields,
+            result=result,
+            turn=turn,
+            **replay_rule_fields(effect_data),
+        )
+        if finish:
+            finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+        return [target for _owner, target in selected]
     target_owner, target, target_options = choose_stat_modifier_target(
         player,
         opponents,

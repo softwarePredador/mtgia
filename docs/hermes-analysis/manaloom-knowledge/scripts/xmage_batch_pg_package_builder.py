@@ -3774,7 +3774,11 @@ def target_keyword_spell_execution_scenario_from_expected_rule(
     }:
         return None
     type_line = "Sorcery" if required.get("sorcery") is True else "Instant"
-    return {
+    target_count = max(
+        1,
+        int(required.get("target_count_max") or required.get("target_count") or 1),
+    )
+    scenario = {
         "name": f"{rule['card_name']} grants target keyword until EOT",
         "type": "stat_modifier_until_eot",
         "card": {"name": rule["card_name"], "type_line": type_line},
@@ -3787,8 +3791,20 @@ def target_keyword_spell_execution_scenario_from_expected_rule(
         "expected_power_delta": int(required.get("power_delta") or 0),
         "expected_toughness_delta": int(required.get("toughness_delta") or 0),
         "expected_keywords": list(required.get("granted_keywords_until_eot") or []),
+        "expected_target_count": target_count,
         "logical_rule_key": rule["logical_rule_key"],
     }
+    if target_count > 1:
+        scenario["targets"] = [
+            {
+                "name": f"E2E Target Creature {index}",
+                "type_line": "Creature - Soldier",
+                "power": 2,
+                "toughness": 2,
+            }
+            for index in range(1, target_count + 1)
+        ]
+    return scenario
 
 
 def target_keyword_draw_spell_execution_scenario_from_expected_rule(

@@ -8427,7 +8427,7 @@ def fixed_boost_scry_from_source(source: str) -> tuple[int, int, int] | None:
 def fixed_boost_keyword_target_from_source(
     source: str,
     keyword_ability_classes: set[str],
-) -> tuple[int, int, list[str], str] | None:
+) -> tuple[int, int, list[str], str, int, int, bool] | None:
     text = source or ""
     boost_matches = re.findall(
         r"new\s+BoostTargetEffect\s*\(\s*([+-]?\d+)\s*,\s*([+-]?\d+)\s*"
@@ -8448,7 +8448,7 @@ def fixed_boost_keyword_target_from_source(
         )
         if not re.search(
             rf"new\s+GainAbilityTargetEffect\s*\(\s*{ability_expr}"
-            rf"\s*(?:,\s*Duration\.EndOfTurn\s*)?\)",
+            rf"\s*(?:,\s*Duration\.EndOfTurn\s*(?:,\s*\"[^\"]*\"\s*)?)?\)",
             text,
             re.S,
         ):
@@ -8457,7 +8457,8 @@ def fixed_boost_keyword_target_from_source(
         if not keyword:
             return None
         keywords.append(keyword)
-    any_target = re.findall(r"new\s+TargetCreaturePermanent\s*\(", text)
+    any_target_matches = list(re.finditer(r"new\s+TargetCreaturePermanent\s*\((?P<args>[^)]*)\)", text, re.S))
+    any_target = [match.group(0) for match in any_target_matches]
     controlled_target = re.findall(r"new\s+TargetControlledCreaturePermanent\s*\(", text)
     if len(any_target) + len(controlled_target) != 1:
         return None
@@ -8465,13 +8466,35 @@ def fixed_boost_keyword_target_from_source(
         if not re.search(r"new\s+TargetControlledCreaturePermanent\s*\(\s*\)", text):
             return None
         target_controller = "self"
+        target_count_min = 1
+        target_count_max = 1
     else:
-        if not re.search(r"new\s+TargetCreaturePermanent\s*\(\s*\)", text):
+        target_args = split_top_level_args(any_target_matches[0].group("args") or "")
+        if not target_args:
+            target_count_min = 1
+            target_count_max = 1
+        elif len(target_args) == 1 and re.fullmatch(r"\d+", target_args[0].strip()):
+            target_count_min = int(target_args[0].strip())
+            target_count_max = int(target_args[0].strip())
+        elif len(target_args) == 2 and all(re.fullmatch(r"\d+", arg.strip()) for arg in target_args):
+            target_count_min = int(target_args[0].strip())
+            target_count_max = int(target_args[1].strip())
+        else:
             return None
         target_controller = "any"
+        if target_count_max <= 0 or target_count_min < 0 or target_count_min > target_count_max:
+            return None
     if "TargetPointer" in text or ".setTargetPointer" in text:
         return None
-    return int(boost_matches[0][0]), int(boost_matches[0][1]), list(dict.fromkeys(keywords)), target_controller
+    return (
+        int(boost_matches[0][0]),
+        int(boost_matches[0][1]),
+        list(dict.fromkeys(keywords)),
+        target_controller,
+        target_count_min,
+        target_count_max,
+        target_count_min < target_count_max,
+    )
 
 
 def fixed_target_keyword_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
@@ -10624,10 +10647,41 @@ def fixed_proliferate_draw_from_source(source: str) -> tuple[int, str] | None:
     return draw_count, order
 
 
-def fixed_boost_keyword_target_from_oracle(metadata: dict[str, Any]) -> tuple[int, int, list[str], str] | None:
+def fixed_boost_keyword_target_from_oracle(metadata: dict[str, Any]) -> tuple[int, int, list[str], str, int, int, bool] | None:
     text = strip_parenthetical_reminders(oracle_text(metadata))
     keyword_words = "|".join(re.escape(word) for word in sorted(TARGET_GRANT_KEYWORD_ORACLE_WORDS, key=len, reverse=True))
     match = None
+    multi_match = re.match(
+        rf"^(up to )?(?P<count>one|two|three|\d+) target creatures each get "
+        rf"(?P<power>[+-]?\d+)/(?P<toughness>[+-]?\d+) and gain "
+        rf"(?P<keywords>(?:{keyword_words})(?:,? and (?:{keyword_words})|, (?:{keyword_words}))*) "
+        rf"until end of turn\.?$",
+        text,
+    )
+    if multi_match:
+        target_count_max = word_count_value(multi_match.group("count"))
+        power = signed_int_from_oracle(multi_match.group("power"))
+        toughness = signed_int_from_oracle(multi_match.group("toughness"))
+        if target_count_max is None or target_count_max <= 1 or power is None or toughness is None:
+            return None
+        keyword_parts = [
+            part.strip()
+            for part in re.split(r",?\s+and\s+|,\s*", multi_match.group("keywords"))
+            if part.strip()
+        ]
+        keywords = [TARGET_GRANT_KEYWORD_ORACLE_WORDS.get(part) for part in keyword_parts]
+        if not keywords or any(keyword is None for keyword in keywords):
+            return None
+        up_to_count = bool(multi_match.group(1))
+        return (
+            power,
+            toughness,
+            list(dict.fromkeys(str(keyword) for keyword in keywords if keyword)),
+            "any",
+            0 if up_to_count else int(target_count_max),
+            int(target_count_max),
+            up_to_count,
+        )
     for pattern in (
         rf"^target creature( you control)? gets ([+-]?\d+)/([+-]?\d+) "
         rf"and gains ((?:{keyword_words})(?:,? and (?:{keyword_words})|, (?:{keyword_words}))*) until end of turn\.?$",
@@ -10652,7 +10706,7 @@ def fixed_boost_keyword_target_from_oracle(metadata: dict[str, Any]) -> tuple[in
     keywords = [TARGET_GRANT_KEYWORD_ORACLE_WORDS.get(part) for part in keyword_parts]
     if not keywords or any(keyword is None for keyword in keywords):
         return None
-    return power, toughness, list(dict.fromkeys(str(keyword) for keyword in keywords if keyword)), target_controller
+    return power, toughness, list(dict.fromkeys(str(keyword) for keyword in keywords if keyword)), target_controller, 1, 1, False
 
 
 def fixed_keyword_draw_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, str, int, dict[str, Any]] | None:
@@ -34721,14 +34775,40 @@ def split_row(
         oracle_boost = fixed_boost_keyword_target_from_oracle(metadata)
         if oracle_boost is None:
             return None, "boost_keyword_oracle_not_exact_fixed"
-        source_power, source_toughness, source_keywords, source_target_controller = source_boost
-        oracle_power, oracle_toughness, oracle_keywords, oracle_target_controller = oracle_boost
+        (
+            source_power,
+            source_toughness,
+            source_keywords,
+            source_target_controller,
+            source_target_count_min,
+            source_target_count_max,
+            source_up_to_count,
+        ) = source_boost
+        (
+            oracle_power,
+            oracle_toughness,
+            oracle_keywords,
+            oracle_target_controller,
+            oracle_target_count_min,
+            oracle_target_count_max,
+            oracle_up_to_count,
+        ) = oracle_boost
         if (source_power, source_toughness) != (oracle_power, oracle_toughness):
             return None, "boost_keyword_source_oracle_boost_mismatch"
         if set(source_keywords) != set(oracle_keywords):
             return None, "boost_keyword_source_oracle_keyword_mismatch"
         if source_target_controller != oracle_target_controller:
             return None, "boost_keyword_source_oracle_target_mismatch"
+        if (
+            source_target_count_min,
+            source_target_count_max,
+            source_up_to_count,
+        ) != (
+            oracle_target_count_min,
+            oracle_target_count_max,
+            oracle_up_to_count,
+        ):
+            return None, "boost_keyword_source_oracle_target_count_mismatch"
         effect_json = {
             "effect": "stat_modifier_until_eot",
             "battle_model_scope": BOOST_KEYWORD_SCOPE,
@@ -34745,6 +34825,11 @@ def split_row(
             "xmage_ability_classes": sorted(abilities),
             **flags,
         }
+        if oracle_target_count_max > 1 or oracle_up_to_count:
+            effect_json["target_count"] = int(oracle_target_count_max)
+            effect_json["target_count_min"] = int(oracle_target_count_min)
+            effect_json["target_count_max"] = int(oracle_target_count_max)
+            effect_json["up_to_count"] = bool(oracle_up_to_count)
         return build_proposal(
             row,
             metadata,

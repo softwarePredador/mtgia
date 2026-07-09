@@ -1109,7 +1109,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["toughness_delta"], 0)
         self.assertEqual(effect["granted_keywords_until_eot"], ["indestructible"])
 
-    def test_fixed_boost_keyword_spell_blocks_multi_target_source(self) -> None:
+    def test_fixed_boost_keyword_spell_maps_multi_target_source(self) -> None:
         row = queue_row(
             split.BOOST_KEYWORD_UNIT,
             effect_classes=["BoostTargetEffect", "GainAbilityTargetEffect"],
@@ -1128,13 +1128,22 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             source_text="""
                 this.getSpellAbility().addEffect(new BoostTargetEffect(1, 0, Duration.EndOfTurn));
                 this.getSpellAbility().addEffect(new GainAbilityTargetEffect(
-                    FirstStrikeAbility.getInstance(), Duration.EndOfTurn));
+                    FirstStrikeAbility.getInstance(), Duration.EndOfTurn,
+                    "and gain first strike until end of turn"));
                 this.getSpellAbility().addTarget(new TargetCreaturePermanent(0, 2));
             """,
         )
 
-        self.assertIsNone(proposal)
-        self.assertEqual(reason, "boost_keyword_source_not_single_fixed")
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.BOOST_KEYWORD_SCOPE)
+        self.assertEqual(effect["power_delta"], 1)
+        self.assertEqual(effect["toughness_delta"], 0)
+        self.assertEqual(effect["granted_keywords_until_eot"], ["first_strike"])
+        self.assertEqual(effect["target_count"], 2)
+        self.assertEqual(effect["target_count_min"], 0)
+        self.assertEqual(effect["target_count_max"], 2)
+        self.assertIs(effect["up_to_count"], True)
 
     def test_attack_trigger_self_boost_maps_fixed_positive_boost(self) -> None:
         row = queue_row(
@@ -21952,6 +21961,40 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["toughness_delta"], 1)
         self.assertEqual(effect["granted_keywords_until_eot"], ["flying", "first_strike"])
         self.assertEqual(effect["xmage_ability_classes"], ["FirstStrikeAbility", "FlyingAbility"])
+
+    def test_fixed_boost_keyword_target_creature_maps_up_to_two_targets(self) -> None:
+        row = queue_row(
+            split.BOOST_KEYWORD_UNIT,
+            effect_classes=["BoostTargetEffect", "GainAbilityTargetEffect"],
+            ability_classes=["FirstStrikeAbility"],
+            xmage_signals=["targeting"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                oracle_text=(
+                    "Up to two target creatures each get +1/+0 and gain first strike until end of turn."
+                )
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new BoostTargetEffect(1, 0, Duration.EndOfTurn));"
+                "this.getSpellAbility().addEffect(new GainAbilityTargetEffect("
+                "FirstStrikeAbility.getInstance(), Duration.EndOfTurn, "
+                "\"and gain first strike until end of turn\"));"
+                "this.getSpellAbility().addTarget(new TargetCreaturePermanent(0, 2));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.BOOST_KEYWORD_SCOPE)
+        self.assertEqual(effect["power_delta"], 1)
+        self.assertEqual(effect["toughness_delta"], 0)
+        self.assertEqual(effect["granted_keywords_until_eot"], ["first_strike"])
+        self.assertEqual(effect["target_count"], 2)
+        self.assertEqual(effect["target_count_min"], 0)
+        self.assertEqual(effect["target_count_max"], 2)
+        self.assertIs(effect["up_to_count"], True)
 
     def test_fixed_boost_keyword_target_creature_blocks_oracle_source_keyword_mismatch(self) -> None:
         row = queue_row(

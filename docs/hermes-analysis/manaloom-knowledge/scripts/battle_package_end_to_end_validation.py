@@ -5955,24 +5955,32 @@ def run_stat_modifier_until_eot(
     effect = battle.get_card_effect(card)
     active = battle.Player(str(scenario.get("player") or "Spell Controller"), None, [])
     opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
-    target = battle.enrich_card(
-        {
-            "name": "E2E Target Creature",
-            "type_line": "Creature - Soldier",
-            "power": 2,
-            "toughness": 2,
-            **dict(scenario.get("target") or {}),
-        }
-    )
-    active.battlefield = [target]
+    raw_targets = list(scenario.get("targets") or [])
+    if not raw_targets:
+        raw_targets = [
+            {
+                "name": "E2E Target Creature",
+                "type_line": "Creature - Soldier",
+                "power": 2,
+                "toughness": 2,
+                **dict(scenario.get("target") or {}),
+            }
+        ]
+    targets = [battle.enrich_card(dict(target)) for target in raw_targets]
+    active.battlefield = targets
     expected_keywords = [
         str(keyword or "").strip().lower().replace(" ", "_")
         for keyword in (scenario.get("expected_keywords") or effect.get("granted_keywords_until_eot") or [])
         if str(keyword or "").strip()
     ]
     before_events = len(events)
-    before_power = int(target.get("power") or 0)
-    before_toughness = int(target.get("toughness") or 0)
+    before_stats = {
+        str(target.get("name") or index): (
+            int(target.get("power") or 0),
+            int(target.get("toughness") or 0),
+        )
+        for index, target in enumerate(targets)
+    }
     battle.apply_effect_immediate(
         active,
         [opponent],
@@ -5982,27 +5990,35 @@ def run_stat_modifier_until_eot(
         effect_data_override=effect,
         phase=str(scenario.get("phase") or "precombat_main"),
     )
-    expected_power = before_power + int(scenario.get("expected_power_delta") or effect.get("power_delta") or 0)
-    expected_toughness = before_toughness + int(
-        scenario.get("expected_toughness_delta") or effect.get("toughness_delta") or 0
-    )
-    if int(target.get("power") or 0) != expected_power:
-        fail("battle_execution", f"{card['name']} target power={target.get('power')!r}, expected {expected_power}")
-    if int(target.get("toughness") or 0) != expected_toughness:
+    expected_count = int(scenario.get("expected_target_count") or effect.get("target_count_max") or effect.get("target_count") or 1)
+    expected_power_delta = int(scenario.get("expected_power_delta") or effect.get("power_delta") or 0)
+    expected_toughness_delta = int(scenario.get("expected_toughness_delta") or effect.get("toughness_delta") or 0)
+    affected_targets = []
+    for target in targets:
+        target_name = str(target.get("name") or "")
+        before_power, before_toughness = before_stats[target_name]
+        expected_power = before_power + expected_power_delta
+        expected_toughness = before_toughness + expected_toughness_delta
+        if int(target.get("power") or 0) == expected_power and int(target.get("toughness") or 0) == expected_toughness:
+            affected_targets.append(target)
+            for keyword in expected_keywords:
+                if not battle.card_has_keyword(target, keyword):
+                    fail("battle_execution", f"{card['name']} target {target_name} missing keyword {keyword!r}")
+    if len(affected_targets) != expected_count:
         fail(
             "battle_execution",
-            f"{card['name']} target toughness={target.get('toughness')!r}, expected {expected_toughness}",
+            f"{card['name']} affected_targets={len(affected_targets)}, expected {expected_count}",
         )
-    for keyword in expected_keywords:
-        if not battle.card_has_keyword(target, keyword):
-            fail("battle_execution", f"{card['name']} target missing keyword {keyword!r}")
     resolved_event = next(
         (
             data
             for event, data in events[before_events:]
             if event == "stat_modifier_until_eot_resolved"
             and data.get("card") == card.get("name")
-            and data.get("target") == target.get("name")
+            and (
+                data.get("target") in {target.get("name") for target in affected_targets}
+                or int(data.get("target_count") or 0) == expected_count
+            )
         ),
         None,
     )
@@ -6016,9 +6032,10 @@ def run_stat_modifier_until_eot(
     return {
         "scenario": scenario.get("name"),
         "card_name": card["name"],
-        "target": target.get("name"),
-        "target_power": int(target.get("power") or 0),
-        "target_toughness": int(target.get("toughness") or 0),
+        "target": affected_targets[0].get("name") if affected_targets else None,
+        "target_power": int(affected_targets[0].get("power") or 0) if affected_targets else 0,
+        "target_toughness": int(affected_targets[0].get("toughness") or 0) if affected_targets else 0,
+        "target_count": len(affected_targets),
         "granted_keywords": expected_keywords,
     }
 

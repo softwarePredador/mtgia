@@ -1,0 +1,430 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg702_boost_keyword_multi_target_new_ser_20260709_081420",
+  "deploy_id": "PG702",
+  "execution_scenarios": [
+    {
+      "card": {
+        "name": "Coordinated Assault",
+        "type_line": "Instant"
+      },
+      "expected_keywords": [
+        "first_strike"
+      ],
+      "expected_power_delta": 1,
+      "expected_target_count": 2,
+      "expected_toughness_delta": 0,
+      "logical_rule_key": "battle_rule_v1:be978331d0c7514f1825e2b9308c0296",
+      "name": "Coordinated Assault grants target keyword until EOT",
+      "target": {
+        "name": "E2E Target Creature",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "targets": [
+        {
+          "name": "E2E Target Creature 1",
+          "power": 2,
+          "toughness": 2,
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "name": "E2E Target Creature 2",
+          "power": 2,
+          "toughness": 2,
+          "type_line": "Creature - Soldier"
+        }
+      ],
+      "type": "stat_modifier_until_eot"
+    },
+    {
+      "card": {
+        "name": "Cutthroat Maneuver",
+        "type_line": "Instant"
+      },
+      "expected_keywords": [
+        "lifelink"
+      ],
+      "expected_power_delta": 1,
+      "expected_target_count": 2,
+      "expected_toughness_delta": 1,
+      "logical_rule_key": "battle_rule_v1:2fdc264ddc771d31693afa3f35ed606d",
+      "name": "Cutthroat Maneuver grants target keyword until EOT",
+      "target": {
+        "name": "E2E Target Creature",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "targets": [
+        {
+          "name": "E2E Target Creature 1",
+          "power": 2,
+          "toughness": 2,
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "name": "E2E Target Creature 2",
+          "power": 2,
+          "toughness": 2,
+          "type_line": "Creature - Soldier"
+        }
+      ],
+      "type": "stat_modifier_until_eot"
+    },
+    {
+      "card": {
+        "name": "Press the Advantage",
+        "type_line": "Instant"
+      },
+      "expected_keywords": [
+        "trample"
+      ],
+      "expected_power_delta": 2,
+      "expected_target_count": 2,
+      "expected_toughness_delta": 2,
+      "logical_rule_key": "battle_rule_v1:6e167a383e79e3fc6914663b25c95ffa",
+      "name": "Press the Advantage grants target keyword until EOT",
+      "target": {
+        "name": "E2E Target Creature",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "targets": [
+        {
+          "name": "E2E Target Creature 1",
+          "power": 2,
+          "toughness": 2,
+          "type_line": "Creature - Soldier"
+        },
+        {
+          "name": "E2E Target Creature 2",
+          "power": 2,
+          "toughness": 2,
+          "type_line": "Creature - Soldier"
+        }
+      ],
+      "type": "stat_modifier_until_eot"
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Coordinated Assault",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:be978331d0c7514f1825e2b9308c0296",
+      "min_rule_version": 2,
+      "normalized_name": "coordinated assault",
+      "oracle_hash": "079eb6ec3422463809d13a8b1ccf71ff",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot",
+        "granted_keywords_until_eot": [
+          "first_strike"
+        ],
+        "instant": true,
+        "power_boost": 1,
+        "power_delta": 1,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "target_count": 2,
+        "target_count_max": 2,
+        "target_count_min": 0,
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "up_to_count": true,
+        "xmage_ability_classes": [
+          "FirstStrikeAbility"
+        ],
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "GainAbilityTargetEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Cutthroat Maneuver",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2fdc264ddc771d31693afa3f35ed606d",
+      "min_rule_version": 2,
+      "normalized_name": "cutthroat maneuver",
+      "oracle_hash": "f50e809f73b60b036aca3f6f531fa0e5",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot",
+        "granted_keywords_until_eot": [
+          "lifelink"
+        ],
+        "instant": true,
+        "power_boost": 1,
+        "power_delta": 1,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "target_count": 2,
+        "target_count_max": 2,
+        "target_count_min": 0,
+        "toughness_boost": 1,
+        "toughness_delta": 1,
+        "up_to_count": true,
+        "xmage_ability_classes": [
+          "LifelinkAbility"
+        ],
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "GainAbilityTargetEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Press the Advantage",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6e167a383e79e3fc6914663b25c95ffa",
+      "min_rule_version": 2,
+      "normalized_name": "press the advantage",
+      "oracle_hash": "0eae01c03661d9f3c379b0a4adad6382",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot",
+        "granted_keywords_until_eot": [
+          "trample"
+        ],
+        "instant": true,
+        "power_boost": 2,
+        "power_delta": 2,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "target_count": 2,
+        "target_count_max": 2,
+        "target_count_min": 0,
+        "toughness_boost": 2,
+        "toughness_delta": 2,
+        "up_to_count": true,
+        "xmage_ability_classes": [
+          "TrampleAbility"
+        ],
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "GainAbilityTargetEffect"
+        ]
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_boost_keyword_target_creature_until_eot_spell": 3
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg702_boost_keyword_multi_target_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg702_boost_keyword_multi_target_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg702_boost_keyword_multi_target_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg702_boost_keyword_multi_target_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg702_boost_keyword_multi_target_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg702_boost_keyword_multi_target_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-09T08:14:20+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Coordinated Assault"
+      },
+      "card_name": "Coordinated Assault",
+      "effect": "stat_modifier_until_eot",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:be978331d0c7514f1825e2b9308c0296",
+      "normalized_name": "coordinated assault",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot",
+        "granted_keywords_until_eot": [
+          "first_strike"
+        ],
+        "instant": true,
+        "power_boost": 1,
+        "power_delta": 1,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "target_count": 2,
+        "target_count_max": 2,
+        "target_count_min": 0,
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "up_to_count": true,
+        "xmage_ability_classes": [
+          "FirstStrikeAbility"
+        ],
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "GainAbilityTargetEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Cutthroat Maneuver"
+      },
+      "card_name": "Cutthroat Maneuver",
+      "effect": "stat_modifier_until_eot",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2fdc264ddc771d31693afa3f35ed606d",
+      "normalized_name": "cutthroat maneuver",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot",
+        "granted_keywords_until_eot": [
+          "lifelink"
+        ],
+        "instant": true,
+        "power_boost": 1,
+        "power_delta": 1,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "target_count": 2,
+        "target_count_max": 2,
+        "target_count_min": 0,
+        "toughness_boost": 1,
+        "toughness_delta": 1,
+        "up_to_count": true,
+        "xmage_ability_classes": [
+          "LifelinkAbility"
+        ],
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "GainAbilityTargetEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Press the Advantage"
+      },
+      "card_name": "Press the Advantage",
+      "effect": "stat_modifier_until_eot",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6e167a383e79e3fc6914663b25c95ffa",
+      "normalized_name": "press the advantage",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot",
+        "granted_keywords_until_eot": [
+          "trample"
+        ],
+        "instant": true,
+        "power_boost": 2,
+        "power_delta": 2,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "target_count": 2,
+        "target_count_max": 2,
+        "target_count_min": 0,
+        "toughness_boost": 2,
+        "toughness_delta": 2,
+        "up_to_count": true,
+        "xmage_ability_classes": [
+          "TrampleAbility"
+        ],
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "GainAbilityTargetEffect"
+        ]
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Coordinated Assault",
+    "Cutthroat Maneuver",
+    "Press the Advantage"
+  ],
+  "selected_count": 3,
+  "slug": "boost_keyword_multi_target_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Coordinated Assault",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:be978331d0c7514f1825e2b9308c0296",
+      "min_rule_version": 2,
+      "normalized_name": "coordinated assault",
+      "oracle_hash": "079eb6ec3422463809d13a8b1ccf71ff",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Cutthroat Maneuver",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2fdc264ddc771d31693afa3f35ed606d",
+      "min_rule_version": 2,
+      "normalized_name": "cutthroat maneuver",
+      "oracle_hash": "f50e809f73b60b036aca3f6f531fa0e5",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Press the Advantage",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6e167a383e79e3fc6914663b25c95ffa",
+      "min_rule_version": 2,
+      "normalized_name": "press the advantage",
+      "oracle_hash": "0eae01c03661d9f3c379b0a4adad6382",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}
