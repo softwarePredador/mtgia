@@ -16159,7 +16159,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["target"], "nonfaerie_spell")
         self.assertEqual(effect["target_constraints"]["exclude_spell_subtypes"], ["faerie"])
 
-    def test_counter_target_with_exile_replacement_blocks_top_library_replacement(self) -> None:
+    def test_counter_target_with_top_library_replacement_maps_to_runtime(self) -> None:
         row = queue_row(
             "xmage_signature::CounterTargetWithReplacementEffect::no_ability_class::"
             "TargetSpell::no_condition_class::targeting,counter",
@@ -16180,8 +16180,42 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             """,
         )
 
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "counter")
+        self.assertEqual(effect["battle_model_scope"], split.COUNTER_SCOPE)
+        self.assertEqual(effect["target"], "spell")
+        self.assertTrue(effect["countered_spell_to_top_library"])
+        self.assertEqual(
+            effect["countered_spell_to_top_library_reason"],
+            "counter_target_top_library_replacement",
+        )
+        self.assertNotIn("countered_spell_to_exile", effect)
+        self.assertEqual(proposal["family_id"], "xmage_counter_target_top_library_replacement_spell")
+
+    def test_counter_target_with_top_or_bottom_library_replacement_stays_blocked(self) -> None:
+        row = queue_row(
+            "xmage_signature::CounterTargetWithReplacementEffect::no_ability_class::"
+            "TargetSpell::no_condition_class::targeting,counter",
+            effect_classes=["CounterTargetWithReplacementEffect"],
+            xmage_signals=["targeting", "counter"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Hinder",
+                oracle_text=(
+                    "Counter target spell. If that spell is countered this way, put that card on the top or bottom of its owner's library instead of into that player's graveyard."
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new CounterTargetWithReplacementEffect(PutCards.TOP_OR_BOTTOM));
+                this.getSpellAbility().addTarget(new TargetSpell());
+            """,
+        )
+
         self.assertIsNone(proposal)
-        self.assertEqual(reason, "counter_replacement_oracle_not_exact_exile")
+        self.assertEqual(reason, "counter_replacement_oracle_not_exact_supported_destination")
 
     def test_counter_unless_pays_fixed_generic_exile_replacement_maps_to_runtime(self) -> None:
         row = queue_row(

@@ -6437,11 +6437,32 @@ def run_counter_target_response(
         scenario.get("expected_countered_spell_to_exile")
         or response_card.get("countered_spell_to_exile")
     )
+    expected_top_library = bool(
+        scenario.get("expected_countered_spell_to_top_library")
+        or response_card.get("countered_spell_to_top_library")
+    )
+    if bool(counter_event.get("countered_spell_to_top_library")) != expected_top_library:
+        fail(
+            "battle_events",
+            f"{response_card['name']} countered_spell_to_top_library={counter_event.get('countered_spell_to_top_library')}",
+        )
     if bool(counter_event.get("countered_spell_to_exile")) != expected_exile:
         fail(
             "battle_events",
             f"{response_card['name']} countered_spell_to_exile={counter_event.get('countered_spell_to_exile')}",
         )
+    if expected_top_library:
+        if not target_stack_object.get("_countered_to_top_library"):
+            fail(
+                "battle_execution",
+                f"{response_card['name']} did not mark countered stack object for library top",
+            )
+        stack.resolve_top()
+        if not active.library or active.library[0].get("name") != target_stack_object.get("name"):
+            fail(
+                "battle_execution",
+                f"{response_card['name']} did not move countered stack object to library top",
+            )
     if expected_exile:
         if not target_stack_object.get("_exile_on_resolution"):
             fail("battle_execution", f"{response_card['name']} did not mark countered stack object for exile")
@@ -6460,6 +6481,9 @@ def run_counter_target_response(
         "target_stack_effect": target_stack_effect.get("effect"),
         "countered": actual_countered,
         "cards_drawn": int(counter_event.get("cards_drawn") or 0),
+        "countered_spell_to_top_library": bool(
+            counter_event.get("countered_spell_to_top_library")
+        ),
         "countered_spell_to_exile": bool(counter_event.get("countered_spell_to_exile")),
         "nonmatching_target": (
             nonmatching_stack_object.get("name")

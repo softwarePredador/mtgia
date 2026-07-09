@@ -214,6 +214,31 @@ def test_counter_target_excluded_spell_subtype_execution_scenario_uses_illegal_s
     assert scenario["expected_countered_spell_to_exile"] is True
 
 
+def test_counter_target_top_library_execution_scenario_preserves_expected_destination() -> None:
+    proposal = {
+        "normalized_name": "memory lapse",
+        "card_name": "Memory Lapse",
+        "oracle_hash": "hash-memory-lapse",
+        "logical_rule_key": "battle_rule_v1:memory-lapse",
+        "effect_json": {
+            "effect": "counter",
+            "battle_model_scope": "xmage_counter_target_spell_v1",
+            "target": "spell",
+            "target_constraints": {"zone": "stack", "stack_object": "spell"},
+            "countered_spell_to_top_library": True,
+            "countered_spell_to_top_library_reason": "counter_target_top_library_replacement",
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    assert scenario["type"] == "counter_target_response"
+    assert scenario["card"]["countered_spell_to_top_library"] is True
+    assert scenario["expected_countered_spell_to_top_library"] is True
+    assert scenario["expected_countered_spell_to_exile"] is False
+
+
 def test_counter_target_x_mana_value_execution_scenario_uses_cast_context() -> None:
     proposal = {
         "normalized_name": "spell blast",

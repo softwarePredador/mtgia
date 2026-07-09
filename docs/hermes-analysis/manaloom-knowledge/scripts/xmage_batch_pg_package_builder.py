@@ -4489,6 +4489,9 @@ def counter_target_execution_scenario_from_expected_rule(
         "nonmatching_stack_effect": nonmatching["effect"],
         "expected_target_constraints": constraints,
         "expected_cards_drawn": int(required.get("draw_on_counter") or 0),
+        "expected_countered_spell_to_top_library": bool(
+            required.get("countered_spell_to_top_library")
+        ),
         "expected_countered_spell_to_exile": bool(required.get("countered_spell_to_exile")),
         "logical_rule_key": rule["logical_rule_key"],
     }

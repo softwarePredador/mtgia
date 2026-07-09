@@ -3844,6 +3844,36 @@ def counter_target_exile_replacement_from_source(source_text: str) -> str:
     return target
 
 
+def counter_target_top_library_replacement_from_oracle(metadata: dict[str, Any]) -> str | None:
+    text = re.sub(
+        r"\s+",
+        " ",
+        " ".join(oracle_effect_lines_without_neutral_auxiliary(metadata)),
+    ).strip().lower()
+    match = re.match(
+        r"^(?P<counter>counter target .+?)\. if that spell is countered this way, "
+        r"put (?:it|that spell|that card) on top of its owner's library "
+        r"instead of into that player's graveyard\.?$",
+        text,
+    )
+    if not match:
+        return None
+    return counter_target_from_oracle({"oracle_text": match.group("counter")})
+
+
+def counter_target_top_library_replacement_from_source(source_text: str) -> str:
+    text = str(source_text or "")
+    effect_matches = list(re.finditer(r"new\s+CounterTargetWithReplacementEffect\s*\(", text))
+    if len(effect_matches) != 1:
+        return "counter_replacement_source_effect_not_single"
+    if not re.search(r"CounterTargetWithReplacementEffect\s*\(\s*PutCards\.TOP_ANY\s*\)", text):
+        return "counter_replacement_source_not_top_library"
+    target = counter_target_from_source(text)
+    if target is None:
+        return "counter_replacement_source_target_not_supported"
+    return target
+
+
 def fixed_counter_target_controller_life_loss_from_oracle(
     metadata: dict[str, Any],
 ) -> tuple[str, int] | None:
@@ -31638,9 +31668,16 @@ def split_row(
         if unsupported_abilities:
             return None, "counter_replacement_ability_class_not_simple"
         target = counter_target_exile_replacement_from_oracle(metadata)
+        replacement_destination = "exile" if target is not None else ""
         if target is None:
-            return None, "counter_replacement_oracle_not_exact_exile"
-        source_target = counter_target_exile_replacement_from_source(source_text)
+            target = counter_target_top_library_replacement_from_oracle(metadata)
+            replacement_destination = "library_top" if target is not None else ""
+        if target is None:
+            return None, "counter_replacement_oracle_not_exact_supported_destination"
+        if replacement_destination == "exile":
+            source_target = counter_target_exile_replacement_from_source(source_text)
+        else:
+            source_target = counter_target_top_library_replacement_from_source(source_text)
         if source_target.startswith("counter_replacement_"):
             return None, source_target
         if source_target != target:
@@ -31650,11 +31687,19 @@ def split_row(
             "battle_model_scope": COUNTER_SCOPE,
             "target": target,
             "target_constraints": counter_target_constraints_for(target),
-            "countered_spell_to_exile": True,
-            "countered_spell_to_exile_reason": "counter_target_exile_replacement",
             "xmage_effect_class": "CounterTargetWithReplacementEffect",
             **flags,
         }
+        family_id = "xmage_counter_target_exile_replacement_spell"
+        if replacement_destination == "exile":
+            effect_json["countered_spell_to_exile"] = True
+            effect_json["countered_spell_to_exile_reason"] = "counter_target_exile_replacement"
+        elif replacement_destination == "library_top":
+            effect_json["countered_spell_to_top_library"] = True
+            effect_json["countered_spell_to_top_library_reason"] = (
+                "counter_target_top_library_replacement"
+            )
+            family_id = "xmage_counter_target_top_library_replacement_spell"
         if target == "blue_spell":
             effect_json["requires_blue_target"] = True
         if target == "spell_mana_value_x":
@@ -31664,7 +31709,7 @@ def split_row(
             row,
             metadata,
             effect_json,
-            family_id="xmage_counter_target_exile_replacement_spell",
+            family_id=family_id,
         ), "selected_exact_scope"
 
     if unit == COUNTER_UNIT:
