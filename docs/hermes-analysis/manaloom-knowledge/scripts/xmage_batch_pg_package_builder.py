@@ -2980,6 +2980,37 @@ def damage_each_opponent_spell_execution_scenario_from_expected_rule(
     }
 
 
+def damage_each_opponent_and_their_permanents_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if (
+        required.get("battle_model_scope")
+        != "xmage_damage_each_opponent_and_their_permanents_spell_v1"
+    ):
+        return None
+    damage_scope = str(required.get("damage_scope") or "")
+    if damage_scope not in {
+        "each_creature_opponents_control",
+        "each_creature_and_planeswalker_opponents_control",
+    }:
+        return None
+    return {
+        "name": f"{rule['card_name']} damages opponents and their permanents",
+        "type": "damage_each_opponent_and_their_permanents_spell",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": "Instant" if required.get("instant") else "Sorcery",
+        },
+        "opponent_life": 9,
+        "second_opponent_life": 11,
+        "expected_damage": int(required.get("damage") or required.get("amount") or 0),
+        "expected_damage_scope": damage_scope,
+        "expected_planeswalker_damage": damage_scope == "each_creature_and_planeswalker_opponents_control",
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def damage_gain_life_spell_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
@@ -5462,6 +5493,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or simple_mana_source_execution_scenario_from_expected_rule(rule)
         or sacrifice_mana_source_execution_scenario_from_expected_rule(rule)
         or damage_each_opponent_spell_execution_scenario_from_expected_rule(rule)
+        or damage_each_opponent_and_their_permanents_execution_scenario_from_expected_rule(rule)
         or damage_gain_life_spell_execution_scenario_from_expected_rule(rule)
         or fixed_damage_target_spell_execution_scenario_from_expected_rule(rule)
         or damage_target_create_treasure_execution_scenario_from_expected_rule(rule)

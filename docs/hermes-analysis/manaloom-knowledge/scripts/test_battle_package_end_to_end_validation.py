@@ -1032,6 +1032,72 @@ def test_simple_activated_damage_runner_executes_restricted_battlefield_target()
     ]
 
 
+def test_damage_each_opponent_and_their_permanents_runner_executes_composite_damage() -> None:
+    effect = {
+        "effect": "composite_resolution",
+        "battle_model_scope": "xmage_damage_each_opponent_and_their_permanents_spell_v1",
+        "ability_kind": "one_shot",
+        "amount": 1,
+        "damage": 1,
+        "damage_scope": "each_creature_and_planeswalker_opponents_control",
+        "target_controller": "opponents",
+        "resolution_order": "damage_opponents_then_their_permanents",
+        "_composite_rule_components": [
+            {
+                "effect": "damage_each_opponent",
+                "battle_model_scope": "spell_damage_each_opponent_v1",
+                "ability_kind": "one_shot",
+                "amount": 1,
+                "damage": 1,
+                "target_controller": "opponents",
+                "compose_on_resolution": True,
+            },
+            {
+                "effect": "damage_wipe",
+                "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+                "ability_kind": "one_shot",
+                "amount": 1,
+                "damage": 1,
+                "damage_scope": "each_creature_and_planeswalker_opponents_control",
+                "target_controller": "opponents",
+                "compose_on_resolution": True,
+            },
+        ],
+        "_rule_logical_key": "battle_rule_v1:end-the-festivities",
+    }
+    rule = {
+        "card_name": "End the Festivities",
+        "logical_rule_key": "battle_rule_v1:end-the-festivities",
+        "required_effect_fields": effect,
+    }
+    scenario = package_builder.damage_each_opponent_and_their_permanents_execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: dict(effect)
+    try:
+        result = validator.run_damage_each_opponent_and_their_permanents_spell(battle, scenario, events)
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "End the Festivities"
+    assert result["opponent_life"] == 8
+    assert result["second_opponent_life"] == 10
+    assert result["planeswalker_checked"] is True
+    assert any(
+        event == "composite_rule_resolved"
+        and data.get("card") == "End the Festivities"
+        and data.get("components_applied") == 2
+        and data.get("components_skipped") == 0
+        for event, data in events
+    )
+
+
 def test_simple_activated_draw_runner_executes_sacrifice_target_cost() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

@@ -8118,7 +8118,74 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["damage"], 3)
         self.assertEqual(effect["target_controller"], "opponents")
 
-    def test_fixed_damage_each_opponent_blocks_extra_damage_effects(self) -> None:
+    def test_damage_each_opponent_and_their_creatures_maps_composite_runtime(self) -> None:
+        row = queue_row(
+            split.DAMAGE_EACH_OPPONENT_UNIT,
+            effect_classes=["DamagePlayersEffect", "DamageAllEffect"],
+            xmage_signals=["targeting", "destroy_all"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Tectonic Hazard",
+                type_line="Sorcery",
+                oracle_text=(
+                    "Tectonic Hazard deals 1 damage to each opponent and each "
+                    "creature they control."
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new DamagePlayersEffect(1, TargetController.OPPONENT));
+                this.getSpellAbility().addEffect(new DamageAllEffect(
+                        1, StaticFilters.FILTER_OPPONENTS_PERMANENT_CREATURE
+                ).setText("and each creature they control"));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "composite_resolution")
+        self.assertEqual(effect["battle_model_scope"], split.DAMAGE_EACH_OPPONENT_AND_THEIR_PERMANENTS_SCOPE)
+        self.assertEqual(effect["amount"], 1)
+        self.assertEqual(effect["damage_scope"], "each_creature_opponents_control")
+        self.assertEqual(
+            [component["effect"] for component in effect["_composite_rule_components"]],
+            ["damage_each_opponent", "damage_wipe"],
+        )
+
+    def test_damage_each_opponent_and_their_planeswalkers_maps_composite_runtime(self) -> None:
+        row = queue_row(
+            split.DAMAGE_EACH_OPPONENT_UNIT,
+            effect_classes=["DamagePlayersEffect", "DamageAllEffect"],
+            xmage_signals=["targeting", "destroy_all"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="End the Festivities",
+                type_line="Sorcery",
+                oracle_text=(
+                    "End the Festivities deals 1 damage to each opponent and each "
+                    "creature and planeswalker they control."
+                ),
+            ),
+            source_text="""
+                private static final FilterPermanent filter = new FilterCreatureOrPlaneswalkerPermanent();
+                static {
+                    filter.add(TargetController.OPPONENT.getControllerPredicate());
+                }
+                this.getSpellAbility().addEffect(new DamagePlayersEffect(1, TargetController.OPPONENT));
+                this.getSpellAbility().addEffect(new DamageAllEffect(1, filter)
+                        .setText("and each creature and planeswalker they control"));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "composite_resolution")
+        self.assertEqual(effect["damage_scope"], "each_creature_and_planeswalker_opponents_control")
+
+    def test_fixed_damage_each_opponent_blocks_unsupported_extra_damage_effects(self) -> None:
         row = queue_row(
             split.DAMAGE_EACH_OPPONENT_UNIT,
             effect_classes=["DamagePlayersEffect", "DamageAllEffect"],
@@ -8142,7 +8209,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         )
 
         self.assertIsNone(proposal)
-        self.assertEqual(reason, "damage_each_opponent_effect_class_not_pure")
+        self.assertEqual(reason, "damage_each_opponent_permanents_source_filter_not_supported")
 
     def test_fixed_damage_spell_maps_nonred_and_nonwhite_creature_targets(self) -> None:
         cases = [

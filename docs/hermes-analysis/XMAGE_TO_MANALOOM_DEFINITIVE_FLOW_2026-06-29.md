@@ -19961,6 +19961,78 @@ Evidence:
 - `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260709_post_pg691_token_cant_block_new_server_final.md`
 - `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260709_post_pg691_token_cant_block_new_server_final.md`
 
+## PG692 Damage Each Opponent And Their Permanents Wave
+
+PG692 closed the exact composite spell subpattern where XMage resolves fixed
+`DamagePlayersEffect(..., TargetController.OPPONENT)` plus a matching
+`DamageAllEffect` over permanents those opponents control. This wave promotes
+only the safe Oracle/XMage matches for opponent creatures, or opponent
+creatures plus planeswalkers. Modal, conditional, sacrifice, discard, mill, d20,
+and variable-X neighbors remain blocked.
+
+Promoted cards:
+
+- `End the Festivities`
+- `Tectonic Hazard`
+
+Runtime/test changes:
+
+- `xmage_authoritative_exact_scope_split.py` emits `composite_resolution`
+  with `damage_each_opponent` and `damage_wipe` components for the exact
+  source/Oracle match;
+- `battle_analyst_v9.py` can resolve both components inside the same spell
+  without finishing the source card twice;
+- `xmage_batch_pg_package_builder.py` and
+  `battle_package_end_to_end_validation.py` create and validate focused
+  package scenarios for opponent life loss, affected opponent creatures, and
+  planeswalker damage when present.
+
+PG692 apply/postcheck evidence:
+
+- split produced `2` safe package candidates;
+- package manifest carries `2` battle execution scenarios;
+- precheck found `2/2` Oracle-hash-matched target rows and `4` shadow rows;
+- apply upserted `2` rows and deprecated `4` shadow rows;
+- postcheck confirmed `2/2` promoted verified/auto rows with `oracle_hash`;
+- final package E2E passed PostgreSQL, SQLite/Hermes, canonical snapshot,
+  `runtime_get_card_effect`, and `2` battle-execution scenarios with `18`
+  emitted events.
+
+Final post-PG692 state:
+
+- global readiness:
+  `battle_and_oracle_ready=6179`, `battle_family_mapper_required=27697`,
+  `snapshot_has_verified_rule=6207`, `snapshot_has_any_rule=7395`;
+- authoritative queue:
+  `target_identity_count=24774`,
+  `xmage_authoritative_source_count=24461`,
+  `xmage_missing_source_exception_count=313`,
+  `xmage_authoritative_parser_gap_count=0`,
+  `xmage_authoritative_adapter_required_count=24461`,
+  `adapter_work_unit_count=11305`;
+- exact split recheck:
+  `proposal_count=0` and `safe_for_batch_pg_package_count=0`;
+- validation gates:
+  `server-target` quality gate passed, `xmage_strategy_consistency_audit`
+  passed `26/26`, `pg_hermes_sqlite_contract_audit` passed `51/51`,
+  `operational_surface_alignment_audit` passed, and
+  `legacy_contamination_audit` passed.
+
+Evidence:
+
+- `docs/hermes-analysis/PG692_DAMAGE_EACH_OPPONENT_PERMANENTS_EVIDENCE_2026-07-09.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260709_pg692_damage_each_opponent_permanents_candidate.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg692_damage_each_opponent_permanents_new_server_package_manifest.json`
+- `docs/hermes-analysis/master_optimizer_reports/pg692_damage_each_opponent_permanents_new_server_pg_to_sqlite_sync_runtime_only.json`
+- `docs/hermes-analysis/master_optimizer_reports/pg692_damage_each_opponent_permanents_new_server_e2e_validation.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260709_post_pg692_damage_each_opponent_permanents_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260709_post_pg692_damage_each_opponent_permanents_new_server_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260709_post_pg692_damage_each_opponent_permanents_new_server_recheck.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260709_post_pg692_damage_each_opponent_permanents_new_server_final.md`
+- `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260709_post_pg692_damage_each_opponent_permanents_new_server_final.md`
+- `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260709_post_pg692_damage_each_opponent_permanents_new_server_final.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260709_post_pg692_damage_each_opponent_permanents_new_server_final.md`
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

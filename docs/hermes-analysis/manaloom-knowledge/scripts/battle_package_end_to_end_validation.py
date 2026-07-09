@@ -841,6 +841,162 @@ def run_damage_each_opponent_spell(
     }
 
 
+def run_damage_each_opponent_and_their_permanents_spell(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    active = battle.Player(str(scenario.get("player") or "Damage Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Opponent A"), None, [])
+    second_opponent = battle.Player(str(scenario.get("second_opponent") or "Opponent B"), None, [])
+    opponent.life = int(scenario.get("opponent_life") or 9)
+    second_opponent.life = int(scenario.get("second_opponent_life") or 11)
+    expected_damage = int(scenario.get("expected_damage") or 0)
+    expected_scope = str(scenario.get("expected_damage_scope") or "")
+    include_planeswalker = bool(scenario.get("expected_planeswalker_damage"))
+    opponent.battlefield.append(
+        {
+            "name": "E2E Opponent A Small Creature",
+            "type_line": "Creature - Fixture",
+            "effect": "creature",
+            "power": 1,
+            "toughness": max(1, expected_damage),
+        }
+    )
+    second_opponent.battlefield.append(
+        {
+            "name": "E2E Opponent B Small Creature",
+            "type_line": "Creature - Fixture",
+            "effect": "creature",
+            "power": 1,
+            "toughness": max(1, expected_damage),
+        }
+    )
+    if include_planeswalker:
+        opponent.battlefield.append(
+            {
+                "name": "E2E Opponent Planeswalker",
+                "type_line": "Legendary Planeswalker - Fixture",
+                "effect": "planeswalker",
+                "loyalty": max(1, expected_damage),
+                "starting_loyalty": max(1, expected_damage),
+            }
+        )
+    active.battlefield.append(
+        {
+            "name": "E2E Controller Creature Should Survive",
+            "type_line": "Creature - Fixture",
+            "effect": "creature",
+            "power": 1,
+            "toughness": max(1, expected_damage),
+        }
+    )
+    opponents = [opponent, second_opponent]
+    starting_life = {player.name: player.life for player in opponents}
+
+    before_events = len(events)
+    battle.apply_effect_immediate(
+        active,
+        opponents,
+        card,
+        turn=int(scenario.get("turn") or 5),
+        rng=random.Random(int(scenario.get("seed") or 6074)),
+    )
+
+    for target in opponents:
+        expected_life = starting_life[target.name] - expected_damage
+        if target.life != expected_life:
+            fail(
+                "battle_execution",
+                f"{card['name']} {target.name} life={target.life}, expected {expected_life}",
+            )
+    if any(
+        permanent.get("name") == "E2E Controller Creature Should Survive"
+        for permanent in active.battlefield
+    ) is False:
+        fail("battle_execution", f"{card['name']} damaged controller creature")
+    remaining_opponent_creatures = [
+        permanent
+        for target in opponents
+        for permanent in target.battlefield
+        if "Creature" in str(permanent.get("type_line") or "")
+    ]
+    if remaining_opponent_creatures:
+        fail(
+            "battle_execution",
+            f"{card['name']} left opponent creatures: {[p.get('name') for p in remaining_opponent_creatures]}",
+        )
+    if include_planeswalker and any(
+        "Planeswalker" in str(permanent.get("type_line") or "")
+        for permanent in opponent.battlefield
+    ):
+        fail("battle_execution", f"{card['name']} left opponent planeswalker")
+
+    player_event = next(
+        (
+            data
+            for event_name, data in events[before_events:]
+            if event_name == "damage_each_opponent_resolved"
+            and data.get("card") == card.get("name")
+        ),
+        None,
+    )
+    if player_event is None:
+        fail("battle_events", f"missing {card['name']} damage_each_opponent_resolved event")
+    wipe_event = next(
+        (
+            data
+            for event_name, data in events[before_events:]
+            if event_name == "damage_wipe_resolved"
+            and data.get("card") == card.get("name")
+        ),
+        None,
+    )
+    if wipe_event is None:
+        fail("battle_events", f"missing {card['name']} damage_wipe_resolved event")
+    if wipe_event.get("damage_scope") != expected_scope:
+        fail(
+            "battle_events",
+            f"{card['name']} damage_scope={wipe_event.get('damage_scope')}, expected {expected_scope}",
+        )
+    if int(wipe_event.get("live_opponent_creatures_destroyed") or 0) != 2:
+        fail(
+            "battle_events",
+            f"{card['name']} live_opponent_creatures_destroyed={wipe_event.get('live_opponent_creatures_destroyed')}",
+        )
+    expected_planeswalkers_destroyed = 1 if include_planeswalker else 0
+    if int(wipe_event.get("planeswalkers_destroyed") or 0) != expected_planeswalkers_destroyed:
+        fail(
+            "battle_events",
+            f"{card['name']} planeswalkers_destroyed={wipe_event.get('planeswalkers_destroyed')}",
+        )
+    composite_event = next(
+        (
+            data
+            for event_name, data in events[before_events:]
+            if event_name == "composite_rule_resolved"
+            and data.get("card") == card.get("name")
+        ),
+        None,
+    )
+    if composite_event is None:
+        fail("battle_events", f"missing {card['name']} composite_rule_resolved event")
+    if int(composite_event.get("components_applied") or 0) != 2:
+        fail("battle_events", f"{card['name']} components_applied={composite_event.get('components_applied')}")
+    if int(composite_event.get("components_skipped") or 0) != 0:
+        fail("battle_events", f"{card['name']} skipped composite components")
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "damage": expected_damage,
+        "damage_scope": expected_scope,
+        "opponent_life": opponent.life,
+        "second_opponent_life": second_opponent.life,
+        "planeswalker_checked": include_planeswalker,
+    }
+
+
 def _nonmatching_damage_gain_life_target(constraints: dict[str, Any]) -> dict[str, Any]:
     if str(constraints.get("tapped_state") or constraints.get("tap_state") or "").lower() == "tapped":
         return {
@@ -8381,6 +8537,7 @@ SCENARIO_RUNNERS = {
     "simple_activated_self_keyword": run_simple_activated_self_keyword,
     "simple_activated_regenerate_source": run_simple_activated_regenerate_source,
     "damage_each_opponent_spell": run_damage_each_opponent_spell,
+    "damage_each_opponent_and_their_permanents_spell": run_damage_each_opponent_and_their_permanents_spell,
     "damage_gain_life_spell": run_damage_gain_life_spell,
     "simple_activated_create_token": run_simple_activated_create_token,
     "spell_cast_gain_life": run_spell_cast_gain_life,

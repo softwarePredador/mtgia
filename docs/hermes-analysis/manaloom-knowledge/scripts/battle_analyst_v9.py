@@ -52673,7 +52673,7 @@ def activate_generic_regenerate_source_permanent(
     return True
 
 
-def apply_damage_each_opponent(player, opponents, card, effect_data, turn):
+def apply_damage_each_opponent(player, opponents, card, effect_data, turn, *, finish_spell=True):
     amount = int(effect_data.get("amount") or effect_data.get("damage") or 0)
     amount = apply_controller_noncombat_damage_modifiers(
         player,
@@ -52728,7 +52728,8 @@ def apply_damage_each_opponent(player, opponents, card, effect_data, turn):
             phase="resolution",
             damage_event="damage_each_opponent",
         )
-    finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+    if finish_spell:
+        finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
 
 
 def damage_amount_from_x_context(effect_data, default=0):
@@ -61687,6 +61688,46 @@ def resolve_composite_resolution_effect(player, opponents, card, effect_data, tu
                     "effect": component_effect,
                     "amount": amount,
                     "target": component.get("target"),
+                }
+            )
+        elif component_effect == "damage_each_opponent":
+            component_payload = dict(component)
+            component_payload["_composite_component_index"] = index
+            apply_damage_each_opponent(
+                player,
+                opponents,
+                card,
+                component_payload,
+                turn,
+                finish_spell=False,
+            )
+            amount = int(component.get("amount") or component.get("damage") or 0)
+            outcome = "damage_each_opponent_resolved"
+            applied.append(
+                {
+                    "effect": component_effect,
+                    "amount": amount,
+                    "target_controller": component.get("target_controller") or "opponents",
+                }
+            )
+        elif component_effect == "damage_wipe":
+            component_payload = dict(component)
+            component_payload["_composite_component_index"] = index
+            apply_damage_wipe(
+                player,
+                opponents,
+                card,
+                component_payload,
+                turn,
+                finish_spell=False,
+            )
+            amount = int(component.get("amount") or component.get("damage") or 0)
+            outcome = "damage_wipe_resolved"
+            applied.append(
+                {
+                    "effect": component_effect,
+                    "amount": amount,
+                    "damage_scope": component.get("damage_scope"),
                 }
             )
         elif component_effect in ("remove_creature", "remove_permanent", "remove_artifact_or_3dmg"):

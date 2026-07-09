@@ -1453,6 +1453,35 @@ def test_manifest_builds_damage_each_opponent_spell_execution_scenario() -> None
     assert scenario["second_opponent_life"] == 11
 
 
+def test_manifest_builds_damage_each_opponent_and_their_permanents_execution_scenario() -> None:
+    rule = {
+        "normalized_name": "end_the_festivities",
+        "card_name": "End the Festivities",
+        "oracle_hash": "hash-end",
+        "logical_rule_key": "battle_rule_v1:hash-end",
+        "required_effect_fields": {
+            "effect": "composite_resolution",
+            "battle_model_scope": "xmage_damage_each_opponent_and_their_permanents_spell_v1",
+            "ability_kind": "one_shot",
+            "amount": 1,
+            "damage": 1,
+            "damage_scope": "each_creature_and_planeswalker_opponents_control",
+            "target_controller": "opponents",
+            "sorcery": True,
+        },
+    }
+
+    scenario = builder.damage_each_opponent_and_their_permanents_execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "damage_each_opponent_and_their_permanents_spell"
+    assert scenario["card"]["name"] == "End the Festivities"
+    assert scenario["card"]["type_line"] == "Sorcery"
+    assert scenario["expected_damage"] == 1
+    assert scenario["expected_damage_scope"] == "each_creature_and_planeswalker_opponents_control"
+    assert scenario["expected_planeswalker_damage"] is True
+
+
 def test_manifest_builds_damage_gain_life_spell_execution_scenario() -> None:
     rule = {
         "normalized_name": "kiss_of_death",

@@ -248,6 +248,9 @@ DAMAGE_SCOPE = "xmage_fixed_damage_target_spell_v1"
 MULTI_TARGET_DAMAGE_SCOPE = "xmage_fixed_multi_target_damage_spell_v1"
 DAMAGE_EACH_TARGET_SCOPE = "xmage_fixed_damage_each_target_spell_v1"
 DAMAGE_EACH_OPPONENT_SCOPE = "spell_damage_each_opponent_v1"
+DAMAGE_EACH_OPPONENT_AND_THEIR_PERMANENTS_SCOPE = (
+    "xmage_damage_each_opponent_and_their_permanents_spell_v1"
+)
 X_DAMAGE_SCOPE = "xmage_x_damage_target_spell_v1"
 DAMAGE_EXILE_IF_DIES_SCOPE = "xmage_fixed_damage_target_exile_if_dies_spell_v1"
 SACRIFICE_CREATURE_POWER_DAMAGE_SCOPE = "xmage_sacrifice_creature_power_damage_spell_v1"
@@ -12547,6 +12550,71 @@ def fixed_damage_each_opponent_from_source(source: str) -> int | str:
     if amount <= 0:
         return "damage_each_opponent_source_amount_not_fixed"
     return amount
+
+
+def fixed_damage_each_opponent_and_their_permanents_from_oracle(
+    metadata: dict[str, Any],
+) -> dict[str, Any] | str:
+    text = strip_parenthetical_reminders(oracle_text(metadata))
+    match = re.fullmatch(
+        r".+ deals (?P<amount>\d+) damage to each opponent and each "
+        r"(?P<scope>creature|creature and planeswalker) they control\.?",
+        text,
+    )
+    if not match:
+        return "damage_each_opponent_permanents_oracle_not_exact_fixed"
+    amount = int(match.group("amount"))
+    if amount <= 0:
+        return "damage_each_opponent_permanents_oracle_amount_not_fixed"
+    scope_text = match.group("scope")
+    return {
+        "amount": amount,
+        "damage": amount,
+        "damage_scope": (
+            "each_creature_and_planeswalker_opponents_control"
+            if scope_text == "creature and planeswalker"
+            else "each_creature_opponents_control"
+        ),
+    }
+
+
+def fixed_damage_each_opponent_and_their_permanents_from_source(
+    source: str,
+) -> dict[str, Any] | str:
+    text = source or ""
+    if has_additional_cost(text):
+        return "damage_each_opponent_permanents_additional_cost_not_supported"
+    player_amount = fixed_damage_each_opponent_from_source(text)
+    if isinstance(player_amount, str):
+        return player_amount.replace("damage_each_opponent_", "damage_each_opponent_permanents_")
+    if len(re.findall(r"new\s+DamageAllEffect\s*\(", text)) != 1:
+        return "damage_each_opponent_permanents_damage_all_not_single"
+    constructor_args = extract_constructor_args(text, "DamageAllEffect")
+    if constructor_args is None:
+        return "damage_each_opponent_permanents_damage_all_not_supported"
+    parts = split_top_level_args(constructor_args)
+    if not parts or not re.fullmatch(r"\d+", parts[0].strip()):
+        return "damage_each_opponent_permanents_damage_all_amount_not_fixed"
+    permanent_amount = int(parts[0].strip())
+    if permanent_amount <= 0:
+        return "damage_each_opponent_permanents_damage_all_amount_not_fixed"
+    if permanent_amount != int(player_amount):
+        return "damage_each_opponent_permanents_source_amount_mismatch"
+    damage_scope: str | None = None
+    if "StaticFilters.FILTER_OPPONENTS_PERMANENT_CREATURE" in text:
+        damage_scope = "each_creature_opponents_control"
+    elif (
+        "FilterCreatureOrPlaneswalkerPermanent" in text
+        and "TargetController.OPPONENT.getControllerPredicate()" in text
+    ):
+        damage_scope = "each_creature_and_planeswalker_opponents_control"
+    else:
+        return "damage_each_opponent_permanents_source_filter_not_supported"
+    return {
+        "amount": int(player_amount),
+        "damage": int(player_amount),
+        "damage_scope": damage_scope,
+    }
 
 
 def graveyard_count_damage_target_from_oracle(metadata: dict[str, Any]) -> str | None:
@@ -31463,6 +31531,59 @@ def split_row(
             return None, "not_instant_or_sorcery_spell"
         if ability_classes(row):
             return None, "damage_each_opponent_ability_class_not_simple"
+        if classes == {"DamageAllEffect", "DamagePlayersEffect"}:
+            if "additional cost" in oracle_text(metadata):
+                return None, "damage_each_opponent_permanents_additional_cost_not_supported"
+            source_spec = fixed_damage_each_opponent_and_their_permanents_from_source(source_text)
+            if isinstance(source_spec, str):
+                return None, source_spec
+            oracle_spec = fixed_damage_each_opponent_and_their_permanents_from_oracle(metadata)
+            if isinstance(oracle_spec, str):
+                return None, oracle_spec
+            if source_spec != oracle_spec:
+                return None, "damage_each_opponent_permanents_source_oracle_mismatch"
+            amount = int(oracle_spec["amount"])
+            damage_scope = str(oracle_spec["damage_scope"])
+            damage_each_component = {
+                "effect": "damage_each_opponent",
+                "battle_model_scope": DAMAGE_EACH_OPPONENT_SCOPE,
+                "ability_kind": "one_shot",
+                "amount": amount,
+                "damage": amount,
+                "target_controller": "opponents",
+                "compose_on_resolution": True,
+                "xmage_effect_class": "DamagePlayersEffect",
+            }
+            damage_wipe_component = {
+                "effect": "damage_wipe",
+                "battle_model_scope": DAMAGE_WIPE_SCOPE,
+                "ability_kind": "one_shot",
+                "amount": amount,
+                "damage": amount,
+                "damage_scope": damage_scope,
+                "target_controller": "opponents",
+                "compose_on_resolution": True,
+                "xmage_effect_class": "DamageAllEffect",
+            }
+            effect_json = {
+                "effect": "composite_resolution",
+                "battle_model_scope": DAMAGE_EACH_OPPONENT_AND_THEIR_PERMANENTS_SCOPE,
+                "ability_kind": "one_shot",
+                "amount": amount,
+                "damage": amount,
+                "damage_scope": damage_scope,
+                "target_controller": "opponents",
+                "resolution_order": "damage_opponents_then_their_permanents",
+                "_composite_rule_components": [damage_each_component, damage_wipe_component],
+                "xmage_effect_classes": ["DamagePlayersEffect", "DamageAllEffect"],
+                **flags,
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_damage_each_opponent_and_their_permanents_spell",
+            ), "selected_exact_scope"
         if classes != {"DamagePlayersEffect"}:
             return None, "damage_each_opponent_effect_class_not_pure"
         if "additional cost" in oracle_text(metadata):
