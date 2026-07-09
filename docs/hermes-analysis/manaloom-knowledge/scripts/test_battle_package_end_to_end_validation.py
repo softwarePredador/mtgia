@@ -2225,6 +2225,85 @@ def test_target_keyword_draw_spell_runner_executes_keyword_and_draw() -> None:
     assert result["hand"] == ["E2E Draw Card"]
 
 
+def test_target_keyword_draw_spell_runner_respects_multicolored_target_constraint() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "composite_resolution",
+        "battle_model_scope": "xmage_fixed_keyword_target_creature_until_eot_draw_card_spell_v1",
+        "target": "creature",
+        "target_controller": "any",
+        "target_constraints": {"card_types": ["creature"], "color_count_min": 2},
+        "power_delta": 0,
+        "toughness_delta": 0,
+        "granted_keywords_until_eot": ["double_strike"],
+        "draw_count": 1,
+        "_composite_rule_components": [
+            {
+                "effect": "stat_modifier_until_eot",
+                "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+                "target": "creature",
+                "target_controller": "any",
+                "target_constraints": {"card_types": ["creature"], "color_count_min": 2},
+                "power_delta": 0,
+                "toughness_delta": 0,
+                "granted_keywords_until_eot": ["double_strike"],
+            },
+            {
+                "effect": "draw_cards",
+                "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+                "count": 1,
+            },
+        ],
+        "_rule_logical_key": "battle_rule_v1:psychotic-fury",
+    }
+    try:
+        result = validator.run_target_keyword_draw_spell(
+            battle,
+            {
+                "name": "Psychotic Fury grants double strike and draws 1",
+                "type": "target_keyword_draw_spell",
+                "card": {"name": "Psychotic Fury", "type_line": "Instant"},
+                "target": {
+                    "name": "E2E Multicolored Target Creature",
+                    "type_line": "Creature - Soldier",
+                    "power": 2,
+                    "toughness": 2,
+                    "colors": ["W", "U"],
+                },
+                "nonmatching_target": {
+                    "name": "E2E Monocolored Illegal Creature",
+                    "type_line": "Creature - Soldier",
+                    "power": 2,
+                    "toughness": 2,
+                    "colors": ["W"],
+                },
+                "expected_power_delta": 0,
+                "expected_toughness_delta": 0,
+                "expected_keywords": ["double_strike"],
+                "expected_draw_count": 1,
+                "library": [
+                    {"name": "E2E Draw Card", "type_line": "Instant", "effect": "draw_cards"},
+                    {"name": "E2E Remaining Card", "type_line": "Sorcery", "effect": "draw_cards"},
+                ],
+                "logical_rule_key": "battle_rule_v1:psychotic-fury",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Psychotic Fury"
+    assert result["target"] == "E2E Multicolored Target Creature"
+    assert result["nonmatching_target"] == "E2E Monocolored Illegal Creature"
+    assert result["granted_keywords"] == ["double_strike"]
+    assert result["cards_drawn"] == 1
+
+
 def test_simple_mana_source_refresh_runner_executes_partial_mana_rule() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

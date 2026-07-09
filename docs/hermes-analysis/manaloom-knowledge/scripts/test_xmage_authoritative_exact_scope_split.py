@@ -9130,6 +9130,41 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["granted_keywords_until_eot"], ["deathtouch"])
         self.assertEqual(effect["draw_count"], 1)
 
+    def test_fixed_keyword_draw_spell_maps_multicolored_creature_filter(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect", "GainAbilityTargetEffect"],
+            ability_classes=["DoubleStrikeAbility"],
+            xmage_signals=["targeting", "draw"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Psychotic Fury",
+                oracle_text="Target multicolored creature gains double strike until end of turn. Draw a card.",
+            ),
+            source_text=(
+                "private static final FilterCreaturePermanent filter = "
+                "new FilterCreaturePermanent(\"multicolored creature\");"
+                "static { filter.add(MulticoloredPredicate.instance); }"
+                "this.getSpellAbility().addTarget(new TargetPermanent(filter));"
+                "this.getSpellAbility().addEffect(new GainAbilityTargetEffect("
+                "DoubleStrikeAbility.getInstance(), Duration.EndOfTurn));"
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(1).concatBy(\"<br>\"));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.KEYWORD_DRAW_SCOPE)
+        self.assertEqual(effect["target_constraints"], {"card_types": ["creature"], "color_count_min": 2})
+        self.assertEqual(effect["granted_keywords_until_eot"], ["double_strike"])
+        self.assertEqual(effect["draw_count"], 1)
+        self.assertEqual(
+            effect["_composite_rule_components"][0]["target_constraints"],
+            {"card_types": ["creature"], "color_count_min": 2},
+        )
+
     def test_fixed_keyword_draw_spell_blocks_nonmatching_source_draw_count(self) -> None:
         row = queue_row(
             split.DRAW_UNIT,

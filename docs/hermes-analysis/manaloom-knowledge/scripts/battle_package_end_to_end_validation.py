@@ -5633,7 +5633,12 @@ def run_target_keyword_draw_spell(
             **dict(scenario.get("target") or {}),
         }
     )
-    active.battlefield = [target]
+    nonmatching_target = (
+        battle.enrich_card(dict(scenario["nonmatching_target"]))
+        if isinstance(scenario.get("nonmatching_target"), dict)
+        else None
+    )
+    active.battlefield = ([nonmatching_target] if nonmatching_target is not None else []) + [target]
     expected_keywords = [
         str(keyword or "").strip().lower().replace(" ", "_")
         for keyword in (scenario.get("expected_keywords") or effect.get("granted_keywords_until_eot") or [])
@@ -5643,6 +5648,10 @@ def run_target_keyword_draw_spell(
     before_events = len(events)
     before_power = int(target.get("power") or 0)
     before_toughness = int(target.get("toughness") or 0)
+    nonmatching_before = (
+        int(nonmatching_target.get("power") or 0),
+        int(nonmatching_target.get("toughness") or 0),
+    ) if nonmatching_target is not None else None
     library_before = len(active.library)
     battle.apply_effect_immediate(
         active,
@@ -5667,6 +5676,13 @@ def run_target_keyword_draw_spell(
     for keyword in expected_keywords:
         if not battle.card_has_keyword(target, keyword):
             fail("battle_execution", f"{card['name']} target missing keyword {keyword!r}")
+        if nonmatching_target is not None and battle.card_has_keyword(nonmatching_target, keyword):
+            fail("battle_execution", f"{card['name']} incorrectly granted {keyword!r} to illegal target")
+    if nonmatching_target is not None and (
+        int(nonmatching_target.get("power") or 0),
+        int(nonmatching_target.get("toughness") or 0),
+    ) != nonmatching_before:
+        fail("battle_execution", f"{card['name']} incorrectly modified illegal target")
     if len(active.hand) != expected_draw_count:
         fail("battle_execution", f"{card['name']} drew {len(active.hand)} cards, expected {expected_draw_count}")
     if len(active.library) != library_before - expected_draw_count:
@@ -5714,6 +5730,7 @@ def run_target_keyword_draw_spell(
         "target_toughness": int(target.get("toughness") or 0),
         "granted_keywords": expected_keywords,
         "cards_drawn": expected_draw_count,
+        "nonmatching_target": nonmatching_target.get("name") if nonmatching_target is not None else None,
         "hand": [item.get("name") for item in active.hand if isinstance(item, dict)],
     }
 

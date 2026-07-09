@@ -2161,6 +2161,51 @@ def test_manifest_builds_target_keyword_draw_spell_execution_scenario() -> None:
     assert len(scenario["library"]) == 2
 
 
+def test_manifest_builds_multicolored_target_keyword_draw_fixture() -> None:
+    rule = {
+        "normalized_name": "psychotic fury",
+        "card_name": "Psychotic Fury",
+        "oracle_hash": "hash-psychotic-fury",
+        "logical_rule_key": "battle_rule_v1:hash-psychotic-fury",
+        "required_effect_fields": {
+            "effect": "composite_resolution",
+            "battle_model_scope": "xmage_fixed_keyword_target_creature_until_eot_draw_card_spell_v1",
+            "target": "creature",
+            "target_controller": "any",
+            "target_constraints": {"card_types": ["creature"], "color_count_min": 2},
+            "power_delta": 0,
+            "toughness_delta": 0,
+            "granted_keywords_until_eot": ["double_strike"],
+            "draw_count": 1,
+            "_composite_rule_components": [
+                {
+                    "effect": "stat_modifier_until_eot",
+                    "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+                    "target": "creature",
+                    "target_constraints": {"card_types": ["creature"], "color_count_min": 2},
+                    "target_controller": "any",
+                    "power_delta": 0,
+                    "toughness_delta": 0,
+                    "granted_keywords_until_eot": ["double_strike"],
+                },
+                {
+                    "effect": "draw_cards",
+                    "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+                    "count": 1,
+                },
+            ],
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "target_keyword_draw_spell"
+    assert scenario["target"]["colors"] == ["W", "U"]
+    assert scenario["nonmatching_target"]["colors"] == ["W"]
+    assert scenario["expected_target_constraints"] == {"card_types": ["creature"], "color_count_min": 2}
+
+
 def test_manifest_builds_boost_keyword_spell_execution_scenario() -> None:
     rule = {
         "normalized_name": "massive might",

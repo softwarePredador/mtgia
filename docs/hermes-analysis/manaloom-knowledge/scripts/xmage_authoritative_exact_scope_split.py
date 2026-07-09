@@ -8235,7 +8235,7 @@ def fixed_target_keyword_from_source(
 def fixed_keyword_draw_target_from_source(
     source: str,
     keyword_ability_class: str,
-) -> tuple[str, int] | None:
+) -> tuple[str, int, dict[str, Any]] | None:
     text = source or ""
     gain_matches = re.findall(r"new\s+GainAbilityTargetEffect\s*\(", text)
     if len(gain_matches) != 1:
@@ -8260,19 +8260,33 @@ def fixed_keyword_draw_target_from_source(
         return None
     any_target = re.findall(r"new\s+TargetCreaturePermanent\s*\(", text)
     controlled_target = re.findall(r"new\s+TargetControlledCreaturePermanent\s*\(", text)
-    if len(any_target) + len(controlled_target) != 1:
+    target_permanent_filters = re.findall(r"new\s+TargetPermanent\s*\(\s*([A-Za-z_]\w*)\s*\)", text)
+    multicolored_creature_filter = None
+    for filter_name in target_permanent_filters:
+        if re.search(
+            rf"FilterCreaturePermanent\s+{re.escape(filter_name)}\s*=\s*"
+            rf"new\s+FilterCreaturePermanent\s*\(\s*\"multicolored creature\"\s*\)",
+            text,
+        ) and re.search(rf"{re.escape(filter_name)}\s*\.\s*add\s*\(\s*MulticoloredPredicate\.instance\s*\)", text):
+            multicolored_creature_filter = filter_name
+            break
+    if len(any_target) + len(controlled_target) + (1 if multicolored_creature_filter else 0) != 1:
         return None
+    target_constraints: dict[str, Any] = {"card_types": ["creature"]}
     if controlled_target:
         if not re.search(r"new\s+TargetControlledCreaturePermanent\s*\(\s*\)", text):
             return None
         target_controller = "self"
+    elif multicolored_creature_filter:
+        target_controller = "any"
+        target_constraints["color_count_min"] = 2
     else:
         if not re.search(r"new\s+TargetCreaturePermanent\s*\(\s*\)", text):
             return None
         target_controller = "any"
     if "TargetPointer" in text or ".setTargetPointer" in text:
         return None
-    return target_controller, int(draw_matches[0])
+    return target_controller, int(draw_matches[0]), target_constraints
 
 
 def fixed_boost_keyword_draw_target_from_source(
@@ -10258,21 +10272,24 @@ def fixed_boost_keyword_target_from_oracle(metadata: dict[str, Any]) -> tuple[in
     return power, toughness, keyword, target_controller
 
 
-def fixed_keyword_draw_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, str, int] | None:
+def fixed_keyword_draw_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, str, int, dict[str, Any]] | None:
     text = strip_parenthetical_reminders(oracle_text(metadata))
     keyword_words = "|".join(
         re.escape(word)
         for word in sorted(TARGET_GRANT_KEYWORD_ORACLE_WORDS, key=len, reverse=True)
     )
     match = re.match(
-        rf"^target creature( you control)? gains ({keyword_words}) until end of turn\. draw a card\.?$",
+        rf"^target (multicolored )?creature( you control)? gains ({keyword_words}) until end of turn\. draw a card\.?$",
         text,
     )
     if not match:
         return None
-    target_controller = "self" if match.group(1) else "any"
-    keyword = TARGET_GRANT_KEYWORD_ORACLE_WORDS[match.group(2)]
-    return keyword, target_controller, 1
+    target_controller = "self" if match.group(2) else "any"
+    keyword = TARGET_GRANT_KEYWORD_ORACLE_WORDS[match.group(3)]
+    target_constraints: dict[str, Any] = {"card_types": ["creature"]}
+    if match.group(1):
+        target_constraints["color_count_min"] = 2
+    return keyword, target_controller, 1, target_constraints
 
 
 def fixed_boost_keyword_draw_target_from_oracle(
@@ -30624,19 +30641,26 @@ def split_row(
             oracle_keyword = fixed_keyword_draw_target_from_oracle(metadata)
             if oracle_keyword is None:
                 return None, "keyword_draw_oracle_not_exact_fixed"
-            source_target_controller, source_draw_count = source_keyword
-            oracle_keyword_name, oracle_target_controller, oracle_draw_count = oracle_keyword
+            source_target_controller, source_draw_count, source_target_constraints = source_keyword
+            (
+                oracle_keyword_name,
+                oracle_target_controller,
+                oracle_draw_count,
+                oracle_target_constraints,
+            ) = oracle_keyword
             if keyword != oracle_keyword_name:
                 return None, "keyword_draw_source_oracle_keyword_mismatch"
             if source_target_controller != oracle_target_controller:
                 return None, "keyword_draw_source_oracle_target_mismatch"
             if source_draw_count != oracle_draw_count:
                 return None, "keyword_draw_source_oracle_draw_count_mismatch"
+            if source_target_constraints != oracle_target_constraints:
+                return None, "keyword_draw_source_oracle_target_constraints_mismatch"
             keyword_component = {
                 "effect": "stat_modifier_until_eot",
                 "battle_model_scope": BOOST_KEYWORD_SCOPE,
                 "target": "creature",
-                "target_constraints": {"card_types": ["creature"]},
+                "target_constraints": oracle_target_constraints,
                 "target_controller": oracle_target_controller,
                 "power_delta": 0,
                 "toughness_delta": 0,
@@ -30659,7 +30683,7 @@ def split_row(
                 "effect": "composite_resolution",
                 "battle_model_scope": KEYWORD_DRAW_SCOPE,
                 "target": "creature",
-                "target_constraints": {"card_types": ["creature"]},
+                "target_constraints": oracle_target_constraints,
                 "target_controller": oracle_target_controller,
                 "power_delta": 0,
                 "toughness_delta": 0,

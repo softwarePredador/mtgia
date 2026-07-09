@@ -3488,6 +3488,11 @@ def target_keyword_draw_spell_execution_scenario_from_expected_rule(
     draw_count = int(required.get("draw_count") or draw_component.get("draw_count") or draw_component.get("count") or 1)
     if draw_count <= 0:
         return None
+    target_constraints = dict(
+        required.get("target_constraints")
+        or keyword_component.get("target_constraints")
+        or {"card_types": ["creature"]}
+    )
     return {
         "name": f"{rule['card_name']} grants target keyword and draws {draw_count}",
         "type": "target_keyword_draw_spell",
@@ -3495,12 +3500,17 @@ def target_keyword_draw_spell_execution_scenario_from_expected_rule(
             "name": rule["card_name"],
             "type_line": "Sorcery" if required.get("sorcery") is True else "Instant",
         },
-        "target": {
-            "name": "E2E Target Creature",
-            "type_line": "Creature - Soldier",
-            "power": 2,
-            "toughness": 2,
-        },
+        "target": _target_fixture_from_constraints(
+            "E2E Target Creature",
+            target_constraints,
+            matching=True,
+        ),
+        "nonmatching_target": _target_fixture_from_constraints(
+            "E2E Illegal Target Creature",
+            target_constraints,
+            matching=False,
+        ),
+        "expected_target_constraints": target_constraints,
         "expected_power_delta": int(required.get("power_delta") or keyword_component.get("power_delta") or 0),
         "expected_toughness_delta": int(
             required.get("toughness_delta") or keyword_component.get("toughness_delta") or 0
