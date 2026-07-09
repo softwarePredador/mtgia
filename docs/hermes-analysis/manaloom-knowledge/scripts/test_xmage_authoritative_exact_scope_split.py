@@ -13548,6 +13548,84 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["destination"], "exile")
         self.assertEqual(effect["target_constraints"], {"card_types": ["creature", "enchantment"]})
 
+    def test_exile_target_spell_allows_resolution_neutral_cycling(self) -> None:
+        row = queue_row(
+            split.EXILE_UNIT,
+            effect_classes=["ExileTargetEffect"],
+            ability_classes=["CyclingAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Forsake the Worldly",
+                oracle_text="Exile target artifact or enchantment.\nCycling {2}",
+            ),
+            source_text=(
+                "getSpellAbility().addEffect(new ExileTargetEffect());"
+                "getSpellAbility().addTarget(new TargetPermanent("
+                "StaticFilters.FILTER_PERMANENT_ARTIFACT_OR_ENCHANTMENT));"
+                "this.addAbility(new CyclingAbility(new ManaCostsImpl<>(\"{2}\")));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "remove_permanent")
+        self.assertEqual(effect["battle_model_scope"], split.EXILE_SCOPE)
+        self.assertEqual(effect["target"], "artifact_or_enchantment")
+        self.assertEqual(effect["target_constraints"], {"card_types": ["artifact", "enchantment"]})
+        self.assertEqual(effect["destination"], "exile")
+
+    def test_exile_target_spell_allows_resolution_neutral_convoke(self) -> None:
+        row = queue_row(
+            split.EXILE_UNIT,
+            effect_classes=["ExileTargetEffect"],
+            ability_classes=["ConvokeAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Devouring Light",
+                oracle_text="Convoke\nExile target attacking or blocking creature.",
+            ),
+            source_text=(
+                "this.addAbility(new ConvokeAbility());"
+                "this.getSpellAbility().addEffect(new ExileTargetEffect());"
+                "this.getSpellAbility().addTarget(new TargetAttackingOrBlockingCreature());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "remove_creature")
+        self.assertEqual(effect["battle_model_scope"], split.EXILE_SCOPE)
+        self.assertEqual(effect["target"], "creature")
+        self.assertEqual(
+            effect["target_constraints"],
+            {"card_types": ["creature"], "combat_state": "attacking_or_blocking"},
+        )
+
+    def test_exile_target_spell_keeps_non_neutral_modal_text_blocked(self) -> None:
+        row = queue_row(split.EXILE_UNIT, effect_classes=["ExileTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Crush Contraband",
+                oracle_text=(
+                    "Choose one or both —\n"
+                    "• Exile target artifact.\n"
+                    "• Exile target enchantment."
+                ),
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new ExileTargetEffect());"
+                "this.getSpellAbility().addEffect(new ExileTargetEffect());"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "exile_oracle_not_simple")
+
     def test_exile_target_spell_maps_restricted_single_targets(self) -> None:
         cases = [
             (

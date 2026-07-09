@@ -31973,7 +31973,7 @@ def split_row(
         unsupported_abilities = unsupported_simple_removal_source_ability_classes(source_text)
         if unsupported_abilities:
             return None, "exile_auxiliary_ability_class_not_supported"
-        if has_oracle_complexity(metadata):
+        if has_non_neutral_oracle_complexity(metadata):
             return None, "exile_oracle_not_simple"
         multi_target = fixed_multi_target_removal_from_oracle(metadata, "exile")
         if multi_target is not None:
