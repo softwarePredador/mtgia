@@ -8735,6 +8735,82 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["source_controller_damage_on_resolve"], 3)
         self.assertEqual(effect["resolution_order"], "destroy_then_source_controller_damage")
 
+    def test_destroy_target_controller_damage_spell_maps_land(self) -> None:
+        row = queue_row(split.DESTROY_UNIT, effect_classes=["DamageTargetControllerEffect", "DestroyTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Melt Terrain",
+                type_line="Sorcery",
+                oracle_text="Destroy target land. Melt Terrain deals 2 damage to that land's controller.",
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new DestroyTargetEffect());"
+                "this.getSpellAbility().addEffect(new DamageTargetControllerEffect(2, \"land\"));"
+                "this.getSpellAbility().addTarget(new TargetLandPermanent());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "remove_permanent")
+        self.assertEqual(effect["battle_model_scope"], split.DESTROY_TARGET_CONTROLLER_DAMAGE_SCOPE)
+        self.assertEqual(effect["target"], "land")
+        self.assertEqual(effect["target_constraints"], {"card_types": ["land"]})
+        self.assertEqual(effect["target_controller_damage_on_resolve"], 2)
+        self.assertEqual(effect["resolution_order"], "destroy_then_target_controller_damage")
+
+    def test_destroy_target_controller_damage_spell_preserves_plains_or_island(self) -> None:
+        row = queue_row(split.DESTROY_UNIT, effect_classes=["DamageTargetControllerEffect", "DestroyTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Cryoclasm",
+                type_line="Sorcery",
+                oracle_text="Destroy target Plains or Island. Cryoclasm deals 3 damage to that land's controller.",
+            ),
+            source_text=(
+                'private static final FilterPermanent filter = new FilterPermanent("Plains or Island");'
+                "filter.add(Predicates.or(SubType.PLAINS.getPredicate(), SubType.ISLAND.getPredicate()));"
+                "this.getSpellAbility().addEffect(new DestroyTargetEffect());"
+                "this.getSpellAbility().addEffect(new DamageTargetControllerEffect(3, \"land\"));"
+                "this.getSpellAbility().addTarget(new TargetPermanent(filter));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["target"], "land")
+        self.assertEqual(
+            effect["target_constraints"],
+            {"card_types": ["land"], "required_subtypes": ["plains", "island"]},
+        )
+        self.assertEqual(effect["target_controller_damage_on_resolve"], 3)
+
+    def test_destroy_target_controller_damage_spell_blocks_x_target_adjuster(self) -> None:
+        row = queue_row(split.DESTROY_UNIT, effect_classes=["DamageTargetControllerEffect", "DestroyTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Detonate",
+                type_line="Sorcery",
+                oracle_text=(
+                    "Destroy target artifact with mana value X. It can't be regenerated. "
+                    "Detonate deals X damage to that artifact's controller."
+                ),
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new DestroyTargetEffect(true));"
+                "this.getSpellAbility().addTarget(new TargetPermanent(new FilterArtifactPermanent(\"artifact with mana value X\")));"
+                "this.getSpellAbility().addEffect(new DamageTargetControllerEffect(GetXValue.instance, \"artifact\"));"
+                "this.getSpellAbility().addTarget(new TargetArtifactPermanent());"
+                "this.getSpellAbility().setTargetAdjuster(new XManaValueTargetAdjuster());"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "destroy_target_controller_damage_source_not_fixed")
+
     def test_destroy_gain_life_spell_blocks_opaque_target_filter(self) -> None:
         row = queue_row(split.LIFE_UNIT, effect_classes=["DestroyTargetEffect", "GainLifeEffect"])
         proposal, reason = split.split_row(

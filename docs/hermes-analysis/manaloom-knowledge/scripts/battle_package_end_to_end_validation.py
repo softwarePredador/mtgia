@@ -2176,9 +2176,13 @@ def run_single_target_removal(
     active = battle.Player(str(scenario.get("player") or "Active"), None, [])
     opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
     controller_starting_life = int(scenario.get("controller_life") or getattr(active, "life", 20) or 20)
+    target_controller_starting_life = int(
+        scenario.get("target_controller_life") or getattr(opponent, "life", 20) or 20
+    )
     expected_controller_life_gain = int(scenario.get("expected_controller_life_gain") or 0)
     expected_source_controller_life_loss = int(scenario.get("expected_source_controller_life_loss") or 0)
     expected_source_controller_damage = int(scenario.get("expected_source_controller_damage") or 0)
+    expected_target_controller_damage = int(scenario.get("expected_target_controller_damage") or 0)
     active.life = controller_starting_life
     target = dict(scenario["target"])
     nonmatching = dict(
@@ -2212,6 +2216,8 @@ def run_single_target_removal(
     else:
         target_owner = opponent
         other_owner = active
+    if expected_target_controller_damage > 0:
+        target_owner.life = target_controller_starting_life
     target_owner.battlefield = [nonmatching, target]
     other_owner.battlefield = []
 
@@ -2318,6 +2324,35 @@ def run_single_target_removal(
                 "battle_events",
                 f"{card['name']} actual_damage_dealt={damage_event.get('actual_damage_dealt')!r}",
             )
+    if expected_target_controller_damage > 0:
+        expected_life = target_controller_starting_life - expected_target_controller_damage
+        if target_owner.life != expected_life:
+            fail(
+                "battle_execution",
+                f"{card['name']} target_controller_life={target_owner.life}, expected={expected_life}",
+            )
+        target_damage_event = next(
+            (
+                data
+                for event, data in events[before_events:]
+                if event == "target_controller_damage_on_resolve"
+                and data.get("card") == card.get("name")
+                and data.get("target") == target_name
+            ),
+            None,
+        )
+        if target_damage_event is None:
+            fail("battle_events", f"missing {card['name']} target_controller_damage_on_resolve event")
+        if target_damage_event.get("target_controller") != target_owner.name:
+            fail(
+                "battle_events",
+                f"{card['name']} target_controller={target_damage_event.get('target_controller')!r}",
+            )
+        if int(target_damage_event.get("actual_damage_dealt") or 0) != expected_target_controller_damage:
+            fail(
+                "battle_events",
+                f"{card['name']} target actual_damage_dealt={target_damage_event.get('actual_damage_dealt')!r}",
+            )
 
     result = {
         "scenario": scenario.get("name"),
@@ -2341,6 +2376,10 @@ def run_single_target_removal(
         result["controller_life_before"] = controller_starting_life
         result["controller_life_after"] = active.life
         result["source_controller_damage_dealt"] = expected_source_controller_damage
+    if expected_target_controller_damage > 0:
+        result["target_controller_life_before"] = target_controller_starting_life
+        result["target_controller_life_after"] = target_owner.life
+        result["target_controller_damage_dealt"] = expected_target_controller_damage
     return result
 
 

@@ -79,6 +79,7 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "life_gain_on_counter",
     "life_loss_on_counter",
     "target_controller_life_loss_on_counter",
+    "target_controller_damage_on_resolve",
     "source_controller_life_loss_on_resolve",
     "source_controller_damage_on_resolve",
     "power_delta",
@@ -4010,6 +4011,18 @@ def _fixture_color_not_in(excluded_colors: set[str]) -> str:
     return "W"
 
 
+def _fixture_subtype_not_in(required_subtypes: set[str], card_type: str) -> str:
+    candidates = (
+        ("plains", "island", "swamp", "mountain", "forest")
+        if "land" in card_type
+        else ("goblin", "elf", "spirit", "soldier", "wizard")
+    )
+    for subtype in candidates:
+        if subtype not in required_subtypes:
+            return subtype
+    return "fixture_subtype"
+
+
 def _merge_first_any_of_option(constraints: dict[str, Any]) -> dict[str, Any]:
     merged = dict(constraints)
     options = merged.pop("any_of", None)
@@ -4140,7 +4153,17 @@ def _target_fixture_from_constraints(
         maximum = int(active_constraints["mana_value_max"])
         mana_value = maximum if matching else maximum + 1
 
-    subtypes = [str(value).lower() for value in active_constraints.get("required_subtypes") or [] if value]
+    required_subtypes = {
+        str(value).strip().lower()
+        for value in active_constraints.get("required_subtypes") or []
+        if str(value).strip()
+    }
+    if matching:
+        subtypes = sorted(required_subtypes)
+    elif required_subtypes:
+        subtypes = [_fixture_subtype_not_in(required_subtypes, card_type)]
+    else:
+        subtypes = []
     if not matching and active_constraints.get("exclude_subtypes"):
         subtypes = [str((active_constraints.get("exclude_subtypes") or ["spirit"])[0]).strip().lower()]
     type_line = _type_line_for_fixture(card_type, subtypes)
@@ -4642,6 +4665,7 @@ def single_target_removal_execution_scenario_from_expected_rule(
         "xmage_destroy_target_and_controller_gain_life_spell_v1",
         "xmage_destroy_target_and_source_controller_loses_life_spell_v1",
         "xmage_destroy_target_and_source_controller_damage_spell_v1",
+        "xmage_destroy_target_and_target_controller_damage_spell_v1",
         "xmage_return_target_to_hand_spell_v1",
     }:
         return None
@@ -4676,12 +4700,16 @@ def single_target_removal_execution_scenario_from_expected_rule(
         scenario["expected_controller_life_gain"] = controller_life_gain
     source_controller_life_loss = int(required.get("source_controller_life_loss_on_resolve") or 0)
     source_controller_damage = int(required.get("source_controller_damage_on_resolve") or 0)
+    target_controller_damage = int(required.get("target_controller_damage_on_resolve") or 0)
     if source_controller_life_loss > 0:
         scenario["controller_life"] = 20
         scenario["expected_source_controller_life_loss"] = source_controller_life_loss
     if source_controller_damage > 0:
         scenario["controller_life"] = 20
         scenario["expected_source_controller_damage"] = source_controller_damage
+    if target_controller_damage > 0:
+        scenario["target_controller_life"] = 20
+        scenario["expected_target_controller_damage"] = target_controller_damage
     return scenario
 
 

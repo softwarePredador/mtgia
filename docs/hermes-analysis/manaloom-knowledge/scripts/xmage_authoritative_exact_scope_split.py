@@ -265,6 +265,9 @@ DESTROY_SOURCE_CONTROLLER_LOSE_LIFE_SCOPE = (
 DESTROY_SOURCE_CONTROLLER_DAMAGE_SCOPE = (
     "xmage_destroy_target_and_source_controller_damage_spell_v1"
 )
+DESTROY_TARGET_CONTROLLER_DAMAGE_SCOPE = (
+    "xmage_destroy_target_and_target_controller_damage_spell_v1"
+)
 CREATURE_TAP_DAMAGE_SCOPE = "xmage_creature_tap_fixed_damage_target_activated_v1"
 TAP_DAMAGE_ACTIVATED_SCOPE = "xmage_tap_fixed_damage_target_activated_ability_v1"
 PERMANENT_ACTIVATED_DAMAGE_SCOPE = "xmage_permanent_simple_activated_damage_v1"
@@ -2819,6 +2822,24 @@ def simple_destroy_source_controller_damage_from_oracle(
     return {**parsed, "source_controller_damage_on_resolve": int(match.group("damage"))}
 
 
+def simple_destroy_target_controller_damage_from_oracle(
+    metadata: dict[str, Any],
+) -> dict[str, Any] | None:
+    text = oracle_text(metadata)
+    name = re.escape(str(metadata.get("name") or "").strip().lower())
+    match = re.match(
+        rf"^(?P<destroy>destroy .+?)\. {name} deals (?P<damage>\d+) damage to "
+        r"that [a-z0-9 ,'-]+?'s controller\.?$",
+        text,
+    )
+    if not match:
+        return None
+    parsed = _destroy_source_controller_penalty_target_from_oracle(match.group("destroy"))
+    if parsed is None:
+        return None
+    return {**parsed, "target_controller_damage_on_resolve": int(match.group("damage"))}
+
+
 def simple_destroy_source_controller_life_loss_from_source(source: str) -> int | None:
     text = source or ""
     if has_additional_cost(text):
@@ -2845,6 +2866,28 @@ def simple_destroy_source_controller_damage_from_source(source: str) -> int | No
         return None
     damage_matches = list(
         re.finditer(r"new\s+DamageControllerEffect\s*\(\s*(\d+)\s*\)", text, re.S)
+    )
+    if len(damage_matches) != 1:
+        return None
+    return int(damage_matches[0].group(1))
+
+
+def simple_destroy_target_controller_damage_from_source(source: str) -> int | None:
+    text = source or ""
+    if has_additional_cost(text):
+        return None
+    if "TargetPointer" in text or ".setTargetPointer" in text:
+        return None
+    if "TargetAdjuster" in text or ".setTargetAdjuster" in text:
+        return None
+    if len(re.findall(r"new\s+DestroyTargetEffect\s*\(\s*(?:true|false)?\s*\)", text, re.S)) != 1:
+        return None
+    damage_matches = list(
+        re.finditer(
+            r"new\s+DamageTargetControllerEffect\s*\(\s*(\d+)\s*(?:,\s*\"[^\"]+\")?\s*\)",
+            text,
+            re.S,
+        )
     )
     if len(damage_matches) != 1:
         return None
@@ -13127,7 +13170,7 @@ def restricted_target_base(target: str) -> str:
         return "artifact"
     if target == "aura":
         return "enchantment"
-    if target in {"island_or_swamp_opponent_controls", "nonbasic_land"}:
+    if target in {"island_or_swamp_opponent_controls", "nonbasic_land", "plains_or_island", "mountain"}:
         return "land"
     if target == "creature_or_planeswalker_damaged_this_turn_opponent_controls":
         return "creature_or_planeswalker"
@@ -13225,6 +13268,8 @@ def restricted_battlefield_target_from_oracle(metadata: dict[str, Any], action: 
         (r"target monocolored creature", "monocolored_creature"),
         (r"target noncreature permanent", "noncreature_permanent"),
         (r"target noncreature artifact", "noncreature_artifact"),
+        (r"target plains or island", "plains_or_island"),
+        (r"target mountain", "mountain"),
         (r"target nonbasic land", "nonbasic_land"),
         (r"target blue or black creature with flying", "blue_or_black_flying_creature"),
         (r"target creature or planeswalker that's green or white", "green_or_white_creature_or_planeswalker"),
@@ -13344,6 +13389,18 @@ def restricted_battlefield_target_from_source(source: str) -> str | None:
         return "tapped_creature"
     if 'FilterCreaturePermanent("untapped creature")' in text or "untapped creature" in text or "TappedPredicate.UNTAPPED" in text:
         return "untapped_creature"
+    if (
+        "SubType.PLAINS" in text
+        and "SubType.ISLAND" in text
+        and "FilterPermanent" in text
+    ):
+        return "plains_or_island"
+    if (
+        "SubType.MOUNTAIN" in text
+        and "FilterPermanent" in text
+        and "TargetPermanent" in text
+    ):
+        return "mountain"
     if (
         'FilterCreaturePermanent("nonblack attacking creature")' in text
         or (
@@ -22928,6 +22985,10 @@ def target_constraints_for(target: str) -> dict[str, Any]:
         return {"card_types": ["artifact", "creature"], "all_card_types_required": True}
     if target == "forest_land":
         return {"card_types": ["land"], "required_subtypes": ["forest"]}
+    if target == "mountain":
+        return {"card_types": ["land"], "required_subtypes": ["mountain"]}
+    if target == "plains_or_island":
+        return {"card_types": ["land"], "required_subtypes": ["plains", "island"]}
     if target == "gate_land":
         return {"card_types": ["land"], "required_subtypes": ["gate"]}
     if target == "snow_land":
@@ -23369,6 +23430,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "fixed destroy-target plus controller life-gain spell"
     elif scope == DESTROY_TARGET_CONTROLLER_LOSE_LIFE_SCOPE:
         scope_kind = "fixed destroy-target spell with target-controller life loss"
+    elif scope == DESTROY_TARGET_CONTROLLER_DAMAGE_SCOPE:
+        scope_kind = "fixed destroy-target spell with target-controller damage"
     elif scope == DESTROY_CREATE_TREASURE_SCOPE:
         scope_kind = "fixed destroy-target plus controller Treasure creation spell"
     elif scope == LIFE_GAIN_DRAW_SCOPE:
@@ -31585,6 +31648,41 @@ def split_row(
                 metadata,
                 effect_json,
                 family_id="xmage_destroy_target_source_controller_damage_spell",
+            ), "selected_exact_scope"
+        if classes == {"DamageTargetControllerEffect", "DestroyTargetEffect"}:
+            unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+            if unsupported_abilities:
+                return None, "destroy_target_controller_damage_ability_class_not_simple"
+            source_damage = simple_destroy_target_controller_damage_from_source(source_text)
+            if source_damage is None:
+                return None, "destroy_target_controller_damage_source_not_fixed"
+            oracle_destroy = simple_destroy_target_controller_damage_from_oracle(metadata)
+            if oracle_destroy is None:
+                return None, "destroy_target_controller_damage_oracle_not_exact_fixed"
+            oracle_damage = int(oracle_destroy["target_controller_damage_on_resolve"])
+            if source_damage != oracle_damage:
+                return None, "destroy_target_controller_damage_source_oracle_mismatch"
+            target_type = str(oracle_destroy["target"])
+            if not source_matches_target_constraint(source_text, target_type):
+                return None, "destroy_target_controller_damage_target_source_mismatch"
+            target_base = restricted_target_base(target_type)
+            effect_json = {
+                "effect": oracle_destroy["effect"],
+                "battle_model_scope": DESTROY_TARGET_CONTROLLER_DAMAGE_SCOPE,
+                "target": target_base,
+                "target_constraints": target_constraints_for(target_type),
+                "destination": "graveyard",
+                "target_controller_damage_on_resolve": oracle_damage,
+                "damage_amount": oracle_damage,
+                "resolution_order": "destroy_then_target_controller_damage",
+                "xmage_effect_classes": ["DestroyTargetEffect", "DamageTargetControllerEffect"],
+                **flags,
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_destroy_target_controller_damage_spell",
             ), "selected_exact_scope"
         if classes != {"DestroyTargetEffect"}:
             return None, "destroy_effect_class_not_pure"

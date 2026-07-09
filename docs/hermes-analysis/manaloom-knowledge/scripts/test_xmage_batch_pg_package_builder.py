@@ -2590,6 +2590,33 @@ def test_destroy_source_controller_damage_scenario_carries_damage() -> None:
     assert scenario["controller_life"] == 20
 
 
+def test_destroy_target_controller_damage_scenario_carries_damage() -> None:
+    rule = {
+        "normalized_name": "peak eruption fixture",
+        "card_name": "Peak Eruption Fixture",
+        "oracle_hash": "hash-peak-eruption-fixture",
+        "logical_rule_key": "battle_rule_v1:hash-peak-eruption-fixture",
+        "required_effect_fields": {
+            "effect": "remove_permanent",
+            "battle_model_scope": "xmage_destroy_target_and_target_controller_damage_spell_v1",
+            "target": "land",
+            "target_constraints": {"card_types": ["land"], "required_subtypes": ["mountain"]},
+            "destination": "graveyard",
+            "target_controller_damage_on_resolve": 3,
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "single_target_removal"
+    assert scenario["expected_target_controller_damage"] == 3
+    assert scenario["target_controller_life"] == 20
+    assert scenario["target"]["subtypes"] == ["mountain"]
+    assert "mountain" not in scenario["nonmatching_target"].get("subtypes", [])
+    assert scenario["nonmatching_target"]["type_line"].startswith("Land")
+
+
 def test_multi_target_damage_scenario_exercises_divided_damage() -> None:
     rule = {
         "normalized_name": "arc lightning",

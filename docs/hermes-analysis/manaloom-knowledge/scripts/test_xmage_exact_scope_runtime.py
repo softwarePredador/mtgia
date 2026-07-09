@@ -614,6 +614,50 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_destroy_target_controller_damage_applies_after_removal(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.life = 20
+        opponent.life = 20
+        target = {
+            "name": "Target Mountain",
+            "type_line": "Land - Mountain",
+            "subtypes": ["Mountain"],
+        }
+        opponent.battlefield = [target]
+        effect = {
+            "effect": "remove_permanent",
+            "battle_model_scope": "xmage_destroy_target_and_target_controller_damage_spell_v1",
+            "target": "land",
+            "target_constraints": {"card_types": ["land"], "required_subtypes": ["mountain"]},
+            "destination": "graveyard",
+            "target_controller_damage_on_resolve": 3,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Fixture Peak Eruption", "type_line": "Sorcery"},
+            turn=12,
+            rng=random.Random(15),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(active.life, 20)
+        self.assertEqual(opponent.life, 17)
+        self.assertEqual(opponent.battlefield, [])
+        self.assertIn(target, opponent.graveyard)
+        self.assertTrue(
+            any(
+                event == "target_controller_damage_on_resolve"
+                and data.get("card") == "Fixture Peak Eruption"
+                and data.get("target") == "Target Mountain"
+                and data.get("target_controller") == "Opponent"
+                and data.get("actual_damage_dealt") == 3
+                for event, data in self.events
+            )
+        )
+
     def test_static_flash_permission_artifact_filter_only_allows_artifacts(self) -> None:
         active = self.battle.Player("Active", None, [])
         artifact = {"name": "Mind Stone", "type_line": "Artifact", "mana_cost": "{2}"}

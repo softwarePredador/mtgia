@@ -9486,6 +9486,7 @@ CARD_EFFECT_FIELD_RULE_KEYS = (
     "target_controller_life_loss_on_counter",
     "life_loss_on_destroy",
     "target_controller_life_loss_on_destroy",
+    "target_controller_damage_on_resolve",
     "source_controller_life_loss_on_resolve",
     "source_controller_damage_on_resolve",
     "life_loss_amount",
@@ -13716,6 +13717,64 @@ def apply_removal_target_controller_life_loss(
     return requested, lost
 
 
+def removal_target_controller_damage_requested(effect_data):
+    if not isinstance(effect_data, dict):
+        return 0
+    try:
+        return max(0, int(effect_data.get("target_controller_damage_on_resolve") or 0))
+    except Exception:
+        return 0
+
+
+def apply_removal_target_controller_damage(
+    effect_data,
+    target_controller,
+    source_controller,
+    source_card,
+    target,
+    turn,
+    *,
+    phase="resolution",
+):
+    requested = removal_target_controller_damage_requested(effect_data)
+    if requested <= 0 or target_controller is None or source_controller is None:
+        return {}
+    before = int(getattr(target_controller, "life", 0) or 0)
+    actual_damage, final_damage, dealt = deal_damage_to_player_with_static_replacements(
+        source_controller,
+        target_controller,
+        source_card,
+        requested,
+        turn=turn,
+        phase=phase,
+        damage_event_type="player",
+    )
+    after = int(getattr(target_controller, "life", 0) or 0)
+    emit_replay_event(
+        "target_controller_damage_on_resolve",
+        player=getattr(source_controller, "name", None),
+        card=source_card.get("name", "?") if isinstance(source_card, dict) else "?",
+        source_controller=getattr(source_controller, "name", None),
+        target=target.get("name", "?") if isinstance(target, dict) else "?",
+        target_controller=getattr(target_controller, "name", None),
+        damage_on_resolve=requested,
+        target_controller_damage_on_resolve=requested,
+        amount=final_damage,
+        actual_damage_dealt=actual_damage,
+        dealt=dealt,
+        target_controller_life_before=before,
+        target_controller_life_after=after,
+        turn=turn,
+        phase=phase,
+        **replay_rule_fields(effect_data),
+    )
+    return {
+        "target_controller_life_before": before,
+        "target_controller_life_after": after,
+        "target_controller_damage_dealt": actual_damage,
+    }
+
+
 def apply_removal_source_controller_penalty(
     effect_data,
     source_controller,
@@ -14701,6 +14760,15 @@ def resolve_multi_target_removal(player, opponents, card, effect_data, turn, rng
             destination,
             turn,
         )
+        apply_removal_target_controller_damage(
+            effect_data,
+            target_controller,
+            player,
+            card,
+            target,
+            turn,
+            phase="resolution",
+        )
         create_removal_compensation_tokens(effect_data, target_controller, card, turn)
         create_controller_treasures_after_removal(effect_data, player, card, turn)
         resolved.append(decision["target_name"])
@@ -14900,6 +14968,15 @@ def resolve_declared_single_removal(player, opponents, card, effect_data, turn, 
         target,
         destination,
         turn,
+    )
+    apply_removal_target_controller_damage(
+        effect_data,
+        target_controller,
+        player,
+        card,
+        target,
+        turn,
+        phase="resolution",
     )
     apply_removal_source_controller_penalty(
         effect_data,
@@ -63728,6 +63805,15 @@ def apply_effect_immediate(
                     t,
                     destination,
                     turn,
+                )
+                apply_removal_target_controller_damage(
+                    effect_data,
+                    opp,
+                    player,
+                    card,
+                    t,
+                    turn,
+                    phase="resolution",
                 )
                 create_removal_compensation_tokens(effect_data, opp, card, turn)
                 create_controller_treasures_after_removal(effect_data, player, card, turn)
