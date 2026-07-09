@@ -2114,6 +2114,53 @@ def test_manifest_builds_target_keyword_spell_execution_scenario() -> None:
     assert scenario["expected_keywords"] == ["double_strike"]
 
 
+def test_manifest_builds_target_keyword_draw_spell_execution_scenario() -> None:
+    rule = {
+        "normalized_name": "poison the blade",
+        "card_name": "Poison the Blade",
+        "oracle_hash": "hash-poison-the-blade",
+        "logical_rule_key": "battle_rule_v1:hash-poison-the-blade",
+        "required_effect_fields": {
+            "effect": "composite_resolution",
+            "battle_model_scope": "xmage_fixed_keyword_target_creature_until_eot_draw_card_spell_v1",
+            "target": "creature",
+            "target_controller": "any",
+            "target_constraints": {"card_types": ["creature"]},
+            "power_delta": 0,
+            "toughness_delta": 0,
+            "granted_keywords_until_eot": ["deathtouch"],
+            "draw_count": 1,
+            "_composite_rule_components": [
+                {
+                    "effect": "stat_modifier_until_eot",
+                    "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+                    "target": "creature",
+                    "target_constraints": {"card_types": ["creature"]},
+                    "target_controller": "any",
+                    "power_delta": 0,
+                    "toughness_delta": 0,
+                    "granted_keywords_until_eot": ["deathtouch"],
+                },
+                {
+                    "effect": "draw_cards",
+                    "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+                    "count": 1,
+                },
+            ],
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "target_keyword_draw_spell"
+    assert scenario["expected_power_delta"] == 0
+    assert scenario["expected_toughness_delta"] == 0
+    assert scenario["expected_keywords"] == ["deathtouch"]
+    assert scenario["expected_draw_count"] == 1
+    assert len(scenario["library"]) == 2
+
+
 def test_manifest_builds_boost_keyword_spell_execution_scenario() -> None:
     rule = {
         "normalized_name": "massive might",

@@ -3462,6 +3462,59 @@ def target_keyword_spell_execution_scenario_from_expected_rule(
     }
 
 
+def target_keyword_draw_spell_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") not in {
+        "xmage_fixed_keyword_target_creature_until_eot_draw_card_spell_v1",
+        "xmage_fixed_boost_keyword_target_creature_until_eot_draw_card_spell_v1",
+    }:
+        return None
+    if required.get("effect") != "composite_resolution":
+        return None
+    components = [
+        component
+        for component in required.get("_composite_rule_components") or []
+        if isinstance(component, dict)
+    ]
+    keyword_component = next(
+        (component for component in components if component.get("effect") == "stat_modifier_until_eot"),
+        None,
+    )
+    draw_component = next((component for component in components if component.get("effect") == "draw_cards"), None)
+    if keyword_component is None or draw_component is None:
+        return None
+    draw_count = int(required.get("draw_count") or draw_component.get("draw_count") or draw_component.get("count") or 1)
+    if draw_count <= 0:
+        return None
+    return {
+        "name": f"{rule['card_name']} grants target keyword and draws {draw_count}",
+        "type": "target_keyword_draw_spell",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": "Sorcery" if required.get("sorcery") is True else "Instant",
+        },
+        "target": {
+            "name": "E2E Target Creature",
+            "type_line": "Creature - Soldier",
+            "power": 2,
+            "toughness": 2,
+        },
+        "expected_power_delta": int(required.get("power_delta") or keyword_component.get("power_delta") or 0),
+        "expected_toughness_delta": int(
+            required.get("toughness_delta") or keyword_component.get("toughness_delta") or 0
+        ),
+        "expected_keywords": list(required.get("granted_keywords_until_eot") or []),
+        "expected_draw_count": draw_count,
+        "library": [
+            {"name": f"E2E Draw Card {index + 1}", "type_line": "Instant", "effect": "draw_cards"}
+            for index in range(draw_count + 1)
+        ],
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def boost_scry_spell_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
@@ -5296,6 +5349,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or simple_activated_target_keyword_execution_scenario_from_expected_rule(rule)
         or controlled_stat_modifier_execution_scenario_from_expected_rule(rule)
         or target_keyword_spell_execution_scenario_from_expected_rule(rule)
+        or target_keyword_draw_spell_execution_scenario_from_expected_rule(rule)
         or boost_scry_spell_execution_scenario_from_expected_rule(rule)
         or global_stat_modifier_draw_spell_execution_scenario_from_expected_rule(rule)
         or proliferate_draw_spell_execution_scenario_from_expected_rule(rule)

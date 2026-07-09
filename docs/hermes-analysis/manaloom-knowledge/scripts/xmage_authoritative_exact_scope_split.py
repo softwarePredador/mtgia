@@ -8245,7 +8245,8 @@ def fixed_keyword_draw_target_from_source(
         rf"|new\s+{re.escape(keyword_ability_class)}\s*\([^)]*\))"
     )
     gain_match = re.search(
-        rf"new\s+GainAbilityTargetEffect\s*\(\s*{ability_expr}\s*,\s*Duration\.EndOfTurn",
+        rf"new\s+GainAbilityTargetEffect\s*\(\s*{ability_expr}"
+        rf"\s*(?:,\s*Duration\.EndOfTurn\s*)?\)",
         text,
         re.S,
     )
