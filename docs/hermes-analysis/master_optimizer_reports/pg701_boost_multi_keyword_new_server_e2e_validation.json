@@ -1,0 +1,424 @@
+{
+  "battle_execution": {
+    "event_count": 16,
+    "results": [
+      {
+        "card_name": "Aerial Maneuver",
+        "granted_keywords": [
+          "flying",
+          "first_strike"
+        ],
+        "scenario": "Aerial Maneuver grants target keyword until EOT",
+        "target": "E2E Target Creature",
+        "target_power": 3,
+        "target_toughness": 3
+      },
+      {
+        "card_name": "Daring Leap",
+        "granted_keywords": [
+          "flying",
+          "first_strike"
+        ],
+        "scenario": "Daring Leap grants target keyword until EOT",
+        "target": "E2E Target Creature",
+        "target_power": 3,
+        "target_toughness": 3
+      },
+      {
+        "card_name": "Fervent Strike",
+        "granted_keywords": [
+          "first_strike",
+          "haste"
+        ],
+        "scenario": "Fervent Strike grants target keyword until EOT",
+        "target": "E2E Target Creature",
+        "target_power": 3,
+        "target_toughness": 2
+      },
+      {
+        "card_name": "Overprotect",
+        "granted_keywords": [
+          "trample",
+          "hexproof",
+          "indestructible"
+        ],
+        "scenario": "Overprotect grants target keyword until EOT",
+        "target": "E2E Target Creature",
+        "target_power": 5,
+        "target_toughness": 5
+      },
+      {
+        "card_name": "Rig for War",
+        "granted_keywords": [
+          "first_strike",
+          "reach"
+        ],
+        "scenario": "Rig for War grants target keyword until EOT",
+        "target": "E2E Target Creature",
+        "target_power": 5,
+        "target_toughness": 2
+      },
+      {
+        "card_name": "Rush of Vitality",
+        "granted_keywords": [
+          "lifelink",
+          "indestructible"
+        ],
+        "scenario": "Rush of Vitality grants target keyword until EOT",
+        "target": "E2E Target Creature",
+        "target_power": 3,
+        "target_toughness": 2
+      },
+      {
+        "card_name": "Swift Justice",
+        "granted_keywords": [
+          "first_strike",
+          "lifelink"
+        ],
+        "scenario": "Swift Justice grants target keyword until EOT",
+        "target": "E2E Target Creature",
+        "target_power": 3,
+        "target_toughness": 2
+      },
+      {
+        "card_name": "Whirling Strike",
+        "granted_keywords": [
+          "first_strike",
+          "trample"
+        ],
+        "scenario": "Whirling Strike grants target keyword until EOT",
+        "target": "E2E Target Creature",
+        "target_power": 4,
+        "target_toughness": 2
+      }
+    ],
+    "scenario_count": 8
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-09T07:48:40.308818+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg701_boost_multi_keyword_new_server_package_manifest.json",
+  "package_id": "pg701_boost_multi_keyword_new_server_package_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 8
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Aerial Maneuver",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:56b71a4b25ae0b51c78fc93f659958bb",
+          "oracle_hash": "221188eea4eb64a9e2984a9b2377c9d0",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Daring Leap",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:56b71a4b25ae0b51c78fc93f659958bb",
+          "oracle_hash": "221188eea4eb64a9e2984a9b2377c9d0",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Fervent Strike",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3af1ff0cf902c4d7131169ce195d2108",
+          "oracle_hash": "f2aa1195e8d5b8d41743d91f98f9e26a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Overprotect",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:30b1e1c152d1848f17c5295ff0b4e05e",
+          "oracle_hash": "4753ce470c0bbcc0f2adcaed1988afff",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Rig for War",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:67b31a40bda8783bb93f9d93f1758518",
+          "oracle_hash": "9de49f95911c9fd2dca3d5ea9b17ced0",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Rush of Vitality",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b07fa8005b5622c941b96d27cd1046ba",
+          "oracle_hash": "ac77a1a9c3217cfb386007244f47e9c6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Swift Justice",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6732b4c925bc1b1b1ff57114778f55cf",
+          "oracle_hash": "721ece12befbf328b7835646a378e9cc",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Whirling Strike",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6013fde232dfe15aea065b44428a448b",
+          "oracle_hash": "54efde62150c83ccabecb99dd436534e",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 8
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Aerial Maneuver",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:56b71a4b25ae0b51c78fc93f659958bb",
+          "oracle_hash": "221188eea4eb64a9e2984a9b2377c9d0",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Daring Leap",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:56b71a4b25ae0b51c78fc93f659958bb",
+          "oracle_hash": "221188eea4eb64a9e2984a9b2377c9d0",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Fervent Strike",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3af1ff0cf902c4d7131169ce195d2108",
+          "oracle_hash": "f2aa1195e8d5b8d41743d91f98f9e26a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Overprotect",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:30b1e1c152d1848f17c5295ff0b4e05e",
+          "oracle_hash": "4753ce470c0bbcc0f2adcaed1988afff",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Rig for War",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:67b31a40bda8783bb93f9d93f1758518",
+          "oracle_hash": "9de49f95911c9fd2dca3d5ea9b17ced0",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Rush of Vitality",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b07fa8005b5622c941b96d27cd1046ba",
+          "oracle_hash": "ac77a1a9c3217cfb386007244f47e9c6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Swift Justice",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6732b4c925bc1b1b1ff57114778f55cf",
+          "oracle_hash": "721ece12befbf328b7835646a378e9cc",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Whirling Strike",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6013fde232dfe15aea065b44428a448b",
+          "oracle_hash": "54efde62150c83ccabecb99dd436534e",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 8
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Aerial Maneuver",
+          "logical_rule_key": "battle_rule_v1:56b71a4b25ae0b51c78fc93f659958bb"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Daring Leap",
+          "logical_rule_key": "battle_rule_v1:56b71a4b25ae0b51c78fc93f659958bb"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Fervent Strike",
+          "logical_rule_key": "battle_rule_v1:3af1ff0cf902c4d7131169ce195d2108"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Overprotect",
+          "logical_rule_key": "battle_rule_v1:30b1e1c152d1848f17c5295ff0b4e05e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Rig for War",
+          "logical_rule_key": "battle_rule_v1:67b31a40bda8783bb93f9d93f1758518"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Rush of Vitality",
+          "logical_rule_key": "battle_rule_v1:b07fa8005b5622c941b96d27cd1046ba"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Swift Justice",
+          "logical_rule_key": "battle_rule_v1:6732b4c925bc1b1b1ff57114778f55cf"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Whirling Strike",
+          "logical_rule_key": "battle_rule_v1:6013fde232dfe15aea065b44428a448b"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 8
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Aerial Maneuver",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:56b71a4b25ae0b51c78fc93f659958bb"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Daring Leap",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:56b71a4b25ae0b51c78fc93f659958bb"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Fervent Strike",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:3af1ff0cf902c4d7131169ce195d2108"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Overprotect",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:30b1e1c152d1848f17c5295ff0b4e05e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Rig for War",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:67b31a40bda8783bb93f9d93f1758518"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Rush of Vitality",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:b07fa8005b5622c941b96d27cd1046ba"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Swift Justice",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:6732b4c925bc1b1b1ff57114778f55cf"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Whirling Strike",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:6013fde232dfe15aea065b44428a448b"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 16,
+        "scenarios": 8
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

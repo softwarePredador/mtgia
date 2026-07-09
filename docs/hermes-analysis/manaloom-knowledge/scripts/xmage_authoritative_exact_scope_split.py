@@ -8426,8 +8426,8 @@ def fixed_boost_scry_from_source(source: str) -> tuple[int, int, int] | None:
 
 def fixed_boost_keyword_target_from_source(
     source: str,
-    keyword_ability_class: str,
-) -> tuple[int, int, str] | None:
+    keyword_ability_classes: set[str],
+) -> tuple[int, int, list[str], str] | None:
     text = source or ""
     boost_matches = re.findall(
         r"new\s+BoostTargetEffect\s*\(\s*([+-]?\d+)\s*,\s*([+-]?\d+)\s*"
@@ -8438,19 +8438,25 @@ def fixed_boost_keyword_target_from_source(
     if len(boost_matches) != 1:
         return None
     gain_matches = re.findall(r"new\s+GainAbilityTargetEffect\s*\(", text)
-    if len(gain_matches) != 1:
+    if len(gain_matches) != len(keyword_ability_classes):
         return None
-    ability_expr = (
-        rf"(?:{re.escape(keyword_ability_class)}\.getInstance\s*\(\s*\)"
-        rf"|new\s+{re.escape(keyword_ability_class)}\s*\([^)]*\))"
-    )
-    if not re.search(
-        rf"new\s+GainAbilityTargetEffect\s*\(\s*{ability_expr}"
-        rf"\s*(?:,\s*Duration\.EndOfTurn\s*)?\)",
-        text,
-        re.S,
-    ):
-        return None
+    keywords: list[str] = []
+    for ability_class in sorted(keyword_ability_classes):
+        ability_expr = (
+            rf"(?:{re.escape(ability_class)}\.getInstance\s*\(\s*\)"
+            rf"|new\s+{re.escape(ability_class)}\s*\([^)]*\))"
+        )
+        if not re.search(
+            rf"new\s+GainAbilityTargetEffect\s*\(\s*{ability_expr}"
+            rf"\s*(?:,\s*Duration\.EndOfTurn\s*)?\)",
+            text,
+            re.S,
+        ):
+            return None
+        keyword = TARGET_GRANT_KEYWORD_ABILITY_CLASSES.get(ability_class)
+        if not keyword:
+            return None
+        keywords.append(keyword)
     any_target = re.findall(r"new\s+TargetCreaturePermanent\s*\(", text)
     controlled_target = re.findall(r"new\s+TargetControlledCreaturePermanent\s*\(", text)
     if len(any_target) + len(controlled_target) != 1:
@@ -8465,7 +8471,7 @@ def fixed_boost_keyword_target_from_source(
         target_controller = "any"
     if "TargetPointer" in text or ".setTargetPointer" in text:
         return None
-    return int(boost_matches[0][0]), int(boost_matches[0][1]), target_controller
+    return int(boost_matches[0][0]), int(boost_matches[0][1]), list(dict.fromkeys(keywords)), target_controller
 
 
 def fixed_target_keyword_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
@@ -10618,15 +10624,15 @@ def fixed_proliferate_draw_from_source(source: str) -> tuple[int, str] | None:
     return draw_count, order
 
 
-def fixed_boost_keyword_target_from_oracle(metadata: dict[str, Any]) -> tuple[int, int, str, str] | None:
+def fixed_boost_keyword_target_from_oracle(metadata: dict[str, Any]) -> tuple[int, int, list[str], str] | None:
     text = strip_parenthetical_reminders(oracle_text(metadata))
     keyword_words = "|".join(re.escape(word) for word in sorted(TARGET_GRANT_KEYWORD_ORACLE_WORDS, key=len, reverse=True))
     match = None
     for pattern in (
         rf"^target creature( you control)? gets ([+-]?\d+)/([+-]?\d+) "
-        rf"and gains ({keyword_words}) until end of turn\.?$",
+        rf"and gains ((?:{keyword_words})(?:,? and (?:{keyword_words})|, (?:{keyword_words}))*) until end of turn\.?$",
         rf"^until end of turn, target creature( you control)? gets ([+-]?\d+)/([+-]?\d+) "
-        rf"and gains ({keyword_words})\.?$",
+        rf"and gains ((?:{keyword_words})(?:,? and (?:{keyword_words})|, (?:{keyword_words}))*)\.?$",
     ):
         match = re.match(pattern, text)
         if match:
@@ -10638,8 +10644,15 @@ def fixed_boost_keyword_target_from_oracle(metadata: dict[str, Any]) -> tuple[in
     if power is None or toughness is None:
         return None
     target_controller = "self" if match.group(1) else "any"
-    keyword = TARGET_GRANT_KEYWORD_ORACLE_WORDS[match.group(4)]
-    return power, toughness, keyword, target_controller
+    keyword_parts = [
+        part.strip()
+        for part in re.split(r",?\s+and\s+|,\s*", match.group(4))
+        if part.strip()
+    ]
+    keywords = [TARGET_GRANT_KEYWORD_ORACLE_WORDS.get(part) for part in keyword_parts]
+    if not keywords or any(keyword is None for keyword in keywords):
+        return None
+    return power, toughness, list(dict.fromkeys(str(keyword) for keyword in keywords if keyword)), target_controller
 
 
 def fixed_keyword_draw_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, str, int, dict[str, Any]] | None:
@@ -11630,8 +11643,8 @@ def is_boost_keyword_spell_unit(row: dict[str, Any]) -> bool:
         str(row.get("adapter_work_unit") or "") == BOOST_KEYWORD_UNIT
         and effect_classes(row) == {"BoostTargetEffect", "GainAbilityTargetEffect"}
         and set(row.get("xmage_signals") or []) == {"targeting"}
-        and len(abilities) == 1
-        and next(iter(abilities)) in TARGET_GRANT_KEYWORD_ABILITY_CLASSES
+        and bool(abilities)
+        and abilities.issubset(TARGET_GRANT_KEYWORD_ABILITY_CLASSES)
     )
 
 
@@ -34698,25 +34711,21 @@ def split_row(
         if classes != {"BoostTargetEffect", "GainAbilityTargetEffect"}:
             return None, "boost_keyword_effect_class_not_pure"
         abilities = ability_classes(row)
-        if len(abilities) != 1:
-            return None, "boost_keyword_ability_not_single"
-        ability_class = next(iter(abilities))
-        keyword = TARGET_GRANT_KEYWORD_ABILITY_CLASSES.get(ability_class)
-        if not keyword:
+        if not abilities or not abilities.issubset(TARGET_GRANT_KEYWORD_ABILITY_CLASSES):
             return None, "boost_keyword_ability_not_supported"
         if has_oracle_complexity(metadata):
             return None, "boost_keyword_oracle_not_simple"
-        source_boost = fixed_boost_keyword_target_from_source(source_text, ability_class)
+        source_boost = fixed_boost_keyword_target_from_source(source_text, abilities)
         if source_boost is None:
             return None, "boost_keyword_source_not_single_fixed"
         oracle_boost = fixed_boost_keyword_target_from_oracle(metadata)
         if oracle_boost is None:
             return None, "boost_keyword_oracle_not_exact_fixed"
-        source_power, source_toughness, source_target_controller = source_boost
-        oracle_power, oracle_toughness, oracle_keyword, oracle_target_controller = oracle_boost
+        source_power, source_toughness, source_keywords, source_target_controller = source_boost
+        oracle_power, oracle_toughness, oracle_keywords, oracle_target_controller = oracle_boost
         if (source_power, source_toughness) != (oracle_power, oracle_toughness):
             return None, "boost_keyword_source_oracle_boost_mismatch"
-        if keyword != oracle_keyword:
+        if set(source_keywords) != set(oracle_keywords):
             return None, "boost_keyword_source_oracle_keyword_mismatch"
         if source_target_controller != oracle_target_controller:
             return None, "boost_keyword_source_oracle_target_mismatch"
@@ -34731,9 +34740,9 @@ def split_row(
             "power_boost": oracle_power,
             "toughness_boost": oracle_toughness,
             "duration": "until_end_of_turn",
-            "granted_keywords_until_eot": [keyword],
+            "granted_keywords_until_eot": oracle_keywords,
             "xmage_effect_classes": ["BoostTargetEffect", "GainAbilityTargetEffect"],
-            "xmage_ability_class": ability_class,
+            "xmage_ability_classes": sorted(abilities),
             **flags,
         }
         return build_proposal(

@@ -21923,6 +21923,61 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["toughness_delta"], 1)
         self.assertEqual(effect["granted_keywords_until_eot"], ["trample"])
 
+    def test_fixed_boost_keyword_target_creature_maps_multiple_keywords(self) -> None:
+        row = queue_row(
+            split.BOOST_KEYWORD_UNIT,
+            effect_classes=["BoostTargetEffect", "GainAbilityTargetEffect"],
+            ability_classes=["FlyingAbility", "FirstStrikeAbility"],
+            xmage_signals=["targeting"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                oracle_text="Target creature gets +1/+1 and gains flying and first strike until end of turn."
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new BoostTargetEffect(1, 1, Duration.EndOfTurn));"
+                "this.getSpellAbility().addEffect(new GainAbilityTargetEffect("
+                "FlyingAbility.getInstance(), Duration.EndOfTurn));"
+                "this.getSpellAbility().addEffect(new GainAbilityTargetEffect("
+                "FirstStrikeAbility.getInstance(), Duration.EndOfTurn));"
+                "this.getSpellAbility().addTarget(new TargetCreaturePermanent());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.BOOST_KEYWORD_SCOPE)
+        self.assertEqual(effect["power_delta"], 1)
+        self.assertEqual(effect["toughness_delta"], 1)
+        self.assertEqual(effect["granted_keywords_until_eot"], ["flying", "first_strike"])
+        self.assertEqual(effect["xmage_ability_classes"], ["FirstStrikeAbility", "FlyingAbility"])
+
+    def test_fixed_boost_keyword_target_creature_blocks_oracle_source_keyword_mismatch(self) -> None:
+        row = queue_row(
+            split.BOOST_KEYWORD_UNIT,
+            effect_classes=["BoostTargetEffect", "GainAbilityTargetEffect"],
+            ability_classes=["FlyingAbility", "FirstStrikeAbility"],
+            xmage_signals=["targeting"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                oracle_text="Target creature gets +1/+1 and gains flying and vigilance until end of turn."
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new BoostTargetEffect(1, 1, Duration.EndOfTurn));"
+                "this.getSpellAbility().addEffect(new GainAbilityTargetEffect("
+                "FlyingAbility.getInstance(), Duration.EndOfTurn));"
+                "this.getSpellAbility().addEffect(new GainAbilityTargetEffect("
+                "FirstStrikeAbility.getInstance(), Duration.EndOfTurn));"
+                "this.getSpellAbility().addTarget(new TargetCreaturePermanent());"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "boost_keyword_source_oracle_keyword_mismatch")
+
     def test_fixed_target_keyword_spell_maps_keyword_only_pattern(self) -> None:
         row = queue_row(
             split.BOOST_KEYWORD_UNIT,

@@ -2673,6 +2673,47 @@ def test_stat_modifier_until_eot_runner_executes_keyword_only_spell() -> None:
     assert result["granted_keywords"] == ["double_strike"]
 
 
+def test_stat_modifier_until_eot_runner_executes_boost_with_multiple_keywords() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "stat_modifier_until_eot",
+        "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+        "target": "creature",
+        "target_controller": "any",
+        "target_constraints": {"card_types": ["creature"]},
+        "power_delta": 1,
+        "toughness_delta": 1,
+        "granted_keywords_until_eot": ["flying", "first_strike"],
+        "_rule_logical_key": "battle_rule_v1:aerial-maneuver",
+    }
+    try:
+        result = validator.run_stat_modifier_until_eot(
+            battle,
+            {
+                "name": "Aerial Maneuver boosts and grants keywords",
+                "type": "stat_modifier_until_eot",
+                "card": {"name": "Aerial Maneuver", "type_line": "Instant"},
+                "expected_power_delta": 1,
+                "expected_toughness_delta": 1,
+                "expected_keywords": ["flying", "first_strike"],
+                "logical_rule_key": "battle_rule_v1:aerial-maneuver",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Aerial Maneuver"
+    assert result["target_power"] == 3
+    assert result["target_toughness"] == 3
+    assert result["granted_keywords"] == ["flying", "first_strike"]
+
+
 def test_target_keyword_draw_spell_runner_executes_keyword_and_draw() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

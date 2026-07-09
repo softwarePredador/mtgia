@@ -1,0 +1,187 @@
+{
+  "audit_name": "legacy_contamination_audit",
+  "checks": [
+    {
+      "detail": "count=28",
+      "name": "active_files.exist",
+      "status": "pass"
+    },
+    {
+      "detail": "no hits",
+      "name": "active_files.no_stale_absolute_or_pg_fallbacks",
+      "status": "pass"
+    },
+    {
+      "detail": "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+      "name": "path_contract.battle_analyst_v9.py",
+      "status": "pass"
+    },
+    {
+      "detail": "docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_card_metadata_to_hermes.py",
+      "name": "path_contract.sync_pg_card_metadata_to_hermes.py",
+      "status": "pass"
+    },
+    {
+      "detail": "docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_legalities.py",
+      "name": "path_contract.sync_pg_legalities.py",
+      "status": "pass"
+    },
+    {
+      "detail": "docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_target_deck_to_hermes.py",
+      "name": "path_contract.sync_pg_target_deck_to_hermes.py",
+      "status": "pass"
+    },
+    {
+      "detail": "docs/hermes-analysis/manaloom-knowledge/scripts/sync_pg_meta_decks_to_hermes.py",
+      "name": "path_contract.sync_pg_meta_decks_to_hermes.py",
+      "status": "pass"
+    },
+    {
+      "detail": "docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules_pg.py",
+      "name": "path_contract.sync_battle_card_rules_pg.py",
+      "status": "pass"
+    },
+    {
+      "detail": "docs/hermes-analysis/manaloom-knowledge/scripts/generate_known_cards.py",
+      "name": "path_contract.generate_known_cards.py",
+      "status": "pass"
+    },
+    {
+      "detail": "docs/hermes-analysis/manaloom-knowledge/scripts/kc_validator.py",
+      "name": "path_contract.kc_validator.py",
+      "status": "pass"
+    },
+    {
+      "detail": "docs/hermes-analysis/manaloom-knowledge/scripts/_mana_validator.py",
+      "name": "path_contract._mana_validator.py",
+      "status": "pass"
+    },
+    {
+      "detail": "docs/hermes-analysis/manaloom-knowledge/scripts/_update_cron_status.py",
+      "name": "path_contract._update_cron_status.py",
+      "status": "pass"
+    },
+    {
+      "detail": "docs/hermes-analysis/manaloom-knowledge/scripts/wincon_pipeline.py",
+      "name": "path_contract.wincon_pipeline.py",
+      "status": "pass"
+    },
+    {
+      "detail": "docs/hermes-analysis/manaloom-knowledge/scripts/import_lorehold_decks.py",
+      "name": "path_contract.import_lorehold_decks.py",
+      "status": "pass"
+    },
+    {
+      "detail": "docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_canonical_deck_snapshot.py",
+      "name": "path_contract.lorehold_canonical_deck_snapshot.py",
+      "status": "pass"
+    },
+    {
+      "detail": "docs/hermes-analysis/manaloom-knowledge/scripts/validate_deck_legalities.py",
+      "name": "path_contract.validate_deck_legalities.py",
+      "status": "pass"
+    },
+    {
+      "detail": "server/bin/sync_hermes_learned_deck.sh",
+      "name": "path_contract.sync_hermes_learned_deck.sh",
+      "status": "pass"
+    },
+    {
+      "detail": "server/bin/pull_learning_events.py",
+      "name": "path_contract.pull_learning_events.py",
+      "status": "pass"
+    },
+    {
+      "detail": "server/bin/register_commanders.py",
+      "name": "path_contract.register_commanders.py",
+      "status": "pass"
+    },
+    {
+      "detail": "docs/hermes-analysis/manaloom-knowledge/scripts/xmage_current_replay_batch_pipeline.py",
+      "name": "path_contract.xmage_current_replay_batch_pipeline.py",
+      "status": "pass"
+    },
+    {
+      "detail": "docs/hermes-analysis/manaloom-knowledge/scripts/battle_package_end_to_end_validation.py",
+      "name": "path_contract.battle_package_end_to_end_validation.py",
+      "status": "pass"
+    },
+    {
+      "detail": "docs/hermes-analysis/manaloom-knowledge/scripts/pgc060_end_to_end_validation.py",
+      "name": "path_contract.pgc060_end_to_end_validation.py",
+      "status": "pass"
+    },
+    {
+      "detail": "docs/hermes-analysis/manaloom-knowledge/scripts/master_optimizer_loop.py",
+      "name": "path_contract.master_optimizer_loop.py",
+      "status": "pass"
+    },
+    {
+      "detail": "ordered",
+      "name": "cron_sequence.known_cards_generator_cron.sh",
+      "status": "pass"
+    },
+    {
+      "detail": "ordered",
+      "name": "cron_sequence.known_cards_validator_cron.sh",
+      "status": "pass"
+    },
+    {
+      "detail": "ordered",
+      "name": "cron_sequence.master_optimizer_preflight_cron.sh",
+      "status": "pass"
+    },
+    {
+      "detail": "ordered",
+      "name": "cron_sequence.master_optimizer_end_to_end.sh",
+      "status": "pass"
+    },
+    {
+      "detail": "ordered",
+      "name": "cron_sequence.master_optimizer_auto_cycle_cron.sh",
+      "status": "pass"
+    },
+    {
+      "detail": "ordered",
+      "name": "cron_sequence.master_optimizer_slot_scan_cron.sh",
+      "status": "pass"
+    },
+    {
+      "detail": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db size=25186304",
+      "name": "sqlite.active_knowledge_db_exists",
+      "status": "pass"
+    },
+    {
+      "detail": "absent",
+      "name": "sqlite.no_stale_sibling_knowledge_db",
+      "status": "pass"
+    },
+    {
+      "detail": "no unsafe joins",
+      "name": "query_consumers.no_unsafe_direct_1n_card_joins",
+      "status": "pass"
+    }
+  ],
+  "delegates_to": "workspace_contract_drift_audit.py",
+  "generated_at": "2026-07-09T07:51:03.124878+00:00",
+  "guardrail_scope": [
+    "stale SQLite path contamination",
+    "hardcoded PostgreSQL fallback contamination",
+    "PG -> Hermes -> SQLite sync sequence drift",
+    "unsafe one-to-many card table joins",
+    "active operational file existence"
+  ],
+  "mutations_performed": [],
+  "sqlite_paths": {
+    "active": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+    "stale_sibling": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/knowledge.db"
+  },
+  "status": "pass",
+  "summary": {
+    "active_file_count": 28,
+    "check_count": 32,
+    "status_counts": {
+      "pass": 32
+    }
+  }
+}
