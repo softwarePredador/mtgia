@@ -426,6 +426,37 @@ def load_card_id_lookup(cur: Any, card_names: list[str]) -> dict[str, str]:
     return lookup
 
 
+def load_card_oracle_hash_lookup(cur: Any, card_names: list[str]) -> dict[str, str]:
+    normalized_exact = sorted({normalize_card_name(name) for name in card_names})
+    normalized_fronts = sorted(
+        {normalize_card_name(name.split(" // ", 1)[0]) for name in card_names}
+    )
+    cur.execute(
+        """
+        SELECT name, md5(coalesce(oracle_text, '')) AS oracle_hash
+        FROM cards
+        WHERE (lower(name) = ANY(%s)
+           OR lower(split_part(name, ' // ', 1)) = ANY(%s))
+          AND btrim(coalesce(oracle_text, '')) <> ''
+        """,
+        (normalized_exact, normalized_fronts),
+    )
+    exact: dict[str, str] = {}
+    front: dict[str, str] = {}
+    for name, oracle_hash in cur.fetchall():
+        exact[normalize_card_name(name)] = str(oracle_hash)
+        front.setdefault(normalize_card_name(str(name).split(" // ", 1)[0]), str(oracle_hash))
+
+    lookup: dict[str, str] = {}
+    for card_name in card_names:
+        normalized = normalize_card_name(card_name)
+        front_name = normalize_card_name(card_name.split(" // ", 1)[0])
+        oracle_hash = exact.get(normalized) or front.get(front_name)
+        if oracle_hash:
+            lookup[normalized] = oracle_hash
+    return lookup
+
+
 def upsert_pg_rule(cur: Any, row: dict[str, Any]) -> bool:
     card_name = str(row["card_name"])
     normalized_name = normalize_card_name(card_name)
@@ -533,12 +564,12 @@ def upsert_pg_rules(cur: Any, rows: list[dict[str, Any]]) -> tuple[int, int]:
     from psycopg2.extras import execute_values
 
     current_sources = load_current_sources(cur)
-    card_lookup = load_card_id_lookup(
-        cur,
-        [str(row["card_name"]) for row in rows if row.get("card_name")],
-    )
+    card_names = [str(row["card_name"]) for row in rows if row.get("card_name")]
+    card_lookup = load_card_id_lookup(cur, card_names)
+    oracle_hash_lookup = load_card_oracle_hash_lookup(cur, card_names)
     values: list[tuple[Any, ...]] = []
     skipped_keys: list[tuple[str, str]] = []
+    trusted_without_oracle_hash: list[str] = []
     for row in rows:
         card_name = str(row["card_name"])
         normalized_name = normalize_card_name(card_name)
@@ -562,7 +593,16 @@ def upsert_pg_rules(cur: Any, rows: list[dict[str, Any]]) -> tuple[int, int]:
                 continue
 
         review_status = str(row.get("review_status") or "verified")
+        execution_status = str(row.get("execution_status") or "auto")
         reviewed_at = datetime.now(timezone.utc) if review_status in ("verified", "active") else None
+        oracle_hash = row.get("oracle_hash") or oracle_hash_lookup.get(normalized_name)
+        if (
+            not oracle_hash
+            and not current_source
+            and review_status in {"verified", "active"}
+            and execution_status in {"auto", "executable"}
+        ):
+            trusted_without_oracle_hash.append(card_name)
         values.append(
             (
                 normalized_name,
@@ -574,11 +614,19 @@ def upsert_pg_rules(cur: Any, rows: list[dict[str, Any]]) -> tuple[int, int]:
                 source,
                 float(row.get("confidence", 1.0)),
                 review_status,
-                str(row.get("execution_status") or "auto"),
-                row.get("oracle_hash"),
+                execution_status,
+                oracle_hash,
                 str(row.get("notes") or ""),
                 reviewed_at,
             )
+        )
+
+    if trusted_without_oracle_hash:
+        sample = ", ".join(sorted(trusted_without_oracle_hash)[:10])
+        raise RuntimeError(
+            "Refusing to insert trusted executable battle rules without oracle_hash "
+            f"or PostgreSQL oracle_text fallback. Count={len(trusted_without_oracle_hash)}; "
+            f"sample={sample}"
         )
 
     if skipped_keys:

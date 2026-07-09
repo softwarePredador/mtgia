@@ -767,6 +767,7 @@ class SyncBattleCardRulesPgSelectionTests(unittest.TestCase):
         with (
             mock.patch.object(sync_pg, "load_current_sources", return_value={}),
             mock.patch.object(sync_pg, "load_card_id_lookup", return_value={}),
+            mock.patch.object(sync_pg, "load_card_oracle_hash_lookup", return_value={}),
             mock.patch("psycopg2.extras.execute_values", side_effect=fake_execute_values),
         ):
             changed, skipped = sync_pg.upsert_pg_rules(mock.Mock(), [row])
@@ -811,6 +812,7 @@ class SyncBattleCardRulesPgSelectionTests(unittest.TestCase):
                 return_value={("seething song", "battle_rule_v1:ritual"): "curated"},
             ),
             mock.patch.object(sync_pg, "load_card_id_lookup", return_value={}),
+            mock.patch.object(sync_pg, "load_card_oracle_hash_lookup", return_value={}),
             mock.patch("psycopg2.extras.execute_values", side_effect=fake_execute_values),
         ):
             changed, skipped = sync_pg.upsert_pg_rules(mock.Mock(), [row])
@@ -826,6 +828,80 @@ class SyncBattleCardRulesPgSelectionTests(unittest.TestCase):
             str(captured["sql"]),
         )
         self.assertIsNone(captured["values"][0][10])
+
+    def test_upsert_pg_rules_fills_missing_oracle_hash_from_pg_oracle_text(self) -> None:
+        captured: dict[str, object] = {}
+
+        def fake_execute_values(cur, sql, values, template, page_size):
+            captured["values"] = values
+
+        row = {
+            "card_name": "Mana Vault",
+            "logical_rule_key": "battle_rule_v1:fast-mana",
+            "effect_json": {
+                "effect": "ramp_permanent",
+                "mana_produced": 3,
+                "produces": "C",
+                "battle_model_scope": "fast_mana_artifact_partial_v1",
+            },
+            "deck_role_json": {
+                "category": "ramp",
+                "effect": "ramp_permanent",
+            },
+            "source": "curated",
+            "confidence": 0.91,
+            "review_status": "active",
+            "execution_status": "auto",
+            "notes": "reviewed runtime row without hash in source JSON",
+        }
+
+        with (
+            mock.patch.object(sync_pg, "load_current_sources", return_value={}),
+            mock.patch.object(sync_pg, "load_card_id_lookup", return_value={"mana vault": "card-id"}),
+            mock.patch.object(
+                sync_pg,
+                "load_card_oracle_hash_lookup",
+                return_value={"mana vault": "md5-from-postgres-oracle-text"},
+            ),
+            mock.patch("psycopg2.extras.execute_values", side_effect=fake_execute_values),
+        ):
+            changed, skipped = sync_pg.upsert_pg_rules(mock.Mock(), [row])
+
+        self.assertEqual(changed, 1)
+        self.assertEqual(skipped, 0)
+        self.assertEqual(captured["values"][0][10], "md5-from-postgres-oracle-text")
+
+    def test_upsert_pg_rules_rejects_new_trusted_executable_without_oracle_hash(self) -> None:
+        row = {
+            "card_name": "Mana Vault",
+            "logical_rule_key": "battle_rule_v1:fast-mana",
+            "effect_json": {
+                "effect": "ramp_permanent",
+                "mana_produced": 3,
+                "produces": "C",
+                "battle_model_scope": "fast_mana_artifact_partial_v1",
+            },
+            "deck_role_json": {
+                "category": "ramp",
+                "effect": "ramp_permanent",
+            },
+            "source": "curated",
+            "confidence": 0.91,
+            "review_status": "active",
+            "execution_status": "auto",
+            "notes": "reviewed runtime row without hash in source JSON",
+        }
+
+        with (
+            mock.patch.object(sync_pg, "load_current_sources", return_value={}),
+            mock.patch.object(sync_pg, "load_card_id_lookup", return_value={"mana vault": "card-id"}),
+            mock.patch.object(sync_pg, "load_card_oracle_hash_lookup", return_value={}),
+            mock.patch("psycopg2.extras.execute_values") as execute_values,
+        ):
+            with self.assertRaisesRegex(RuntimeError, "without oracle_hash"):
+                sync_pg.upsert_pg_rules(mock.Mock(), [row])
+
+        execute_values.assert_not_called()
 
     def test_pg_mirror_preserves_pg_logical_key_and_removes_shadow_rows(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:

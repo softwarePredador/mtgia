@@ -1,0 +1,5 @@
+     card_name     |  normalized_name  |           oracle_hash            |                logical_rule_key                 |      shadow_handling       | target_card_rows |          canonical_card_id           | existing_rule_rows | expected_rule_rows_before | would_deprecate_shadow_rows
+-------------------+-------------------+----------------------------------+-------------------------------------------------+----------------------------+------------------+--------------------------------------+--------------------+---------------------------+-----------------------------
+ Burst of Strength | burst of strength | cfdf1d006ec4a004b932482218590cee | battle_rule_v1:085839334ad80f440ae0a12b576361d2 | deprecate_nonmatching_rows |                1 | e0885e96-934d-4fee-90d8-a6087656da70 |                  0 |                         0 |                           0
+ Dragonscale Boon  | dragonscale boon  | 75254a881f708d93984214d32480bb31 | battle_rule_v1:8cb1a93aad935ca2838cbc890bdd2343 | deprecate_nonmatching_rows |                1 | 53981401-6d05-404f-94f2-3584eee4abf9 |                  0 |                         0 |                           0
+(2 rows)

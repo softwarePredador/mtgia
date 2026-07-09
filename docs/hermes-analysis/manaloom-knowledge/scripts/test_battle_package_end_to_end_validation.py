@@ -1639,6 +1639,135 @@ def test_boost_untap_target_runner_executes_multi_target_spell() -> None:
     assert result["targets_untapped_count"] == 2
 
 
+def test_boost_keyword_untap_target_runner_applies_keyword() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "stat_modifier_until_eot_untap_target",
+        "battle_model_scope": "xmage_fixed_boost_keyword_and_untap_target_creature_until_eot_spell_v1",
+        "target": "creature",
+        "target_controller": "any",
+        "target_constraints": {"card_types": ["creature"]},
+        "power_delta": 2,
+        "toughness_delta": 2,
+        "untap_target": True,
+        "granted_keywords_until_eot": ["reach"],
+        "target_count": 1,
+        "target_count_min": 1,
+        "target_count_max": 1,
+        "up_to_count": False,
+        "_rule_logical_key": "battle_rule_v1:aim-high",
+    }
+    try:
+        result = validator.run_stat_modifier_until_eot_untap_target(
+            battle,
+            {
+                "name": "Aim High boosts, grants reach, and untaps target creature",
+                "type": "stat_modifier_until_eot_untap_target",
+                "card": {"name": "Aim High", "type_line": "Instant"},
+                "targets": [
+                    {
+                        "name": "E2E Legal Boost Keyword Untap Target",
+                        "type_line": "Creature - Fixture",
+                        "effect": "creature",
+                        "power": 2,
+                        "toughness": 2,
+                        "tapped": True,
+                    },
+                ],
+                "nonmatching_target": {
+                    "name": "E2E Illegal Boost Keyword Untap Target",
+                    "type_line": "Land",
+                    "effect": "land",
+                    "tapped": True,
+                },
+                "expected_power_delta": 2,
+                "expected_toughness_delta": 2,
+                "expected_keywords": ["reach"],
+                "expected_target_count": 1,
+                "logical_rule_key": "battle_rule_v1:aim-high",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Aim High"
+    assert result["target_count"] == 1
+    assert result["targets_untapped_count"] == 1
+    assert result["granted_keywords"] == ["reach"]
+
+
+def test_add_counters_untap_target_runner_executes_spell() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "add_counters",
+        "battle_model_scope": "xmage_fixed_add_counters_and_untap_target_creature_spell_v1",
+        "target": "creature",
+        "target_controller": "any",
+        "target_constraints": {"card_types": ["creature"]},
+        "counter_type": "+1/+1",
+        "counter_count": 2,
+        "count": 2,
+        "untap_target": True,
+        "target_count": 1,
+        "target_count_min": 1,
+        "target_count_max": 1,
+        "up_to_count": False,
+        "_rule_logical_key": "battle_rule_v1:dragonscale-boon",
+    }
+    try:
+        result = validator.run_add_counters_untap_target_spell(
+            battle,
+            {
+                "name": "Dragonscale Boon adds counters and untaps target creature",
+                "type": "add_counters_untap_target_spell",
+                "card": {"name": "Dragonscale Boon", "type_line": "Instant"},
+                "target": {
+                    "name": "E2E Counter Untap Target",
+                    "type_line": "Creature - Fixture",
+                    "effect": "creature",
+                    "power": 3,
+                    "toughness": 3,
+                    "tapped": True,
+                },
+                "nonmatching_target": {
+                    "name": "E2E Illegal Counter Untap Target",
+                    "type_line": "Land",
+                    "effect": "land",
+                    "tapped": True,
+                },
+                "expected_counter_type": "+1/+1",
+                "expected_counter_count": 2,
+                "logical_rule_key": "battle_rule_v1:dragonscale-boon",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Dragonscale Boon"
+    assert result["target"] == "E2E Counter Untap Target"
+    assert result["counters_added"] == 2
+    assert result["target_untapped"] is True
+    assert any(
+        event == "add_counters_resolved"
+        and data.get("card") == "Dragonscale Boon"
+        and data.get("target_untapped") is True
+        and data.get("counters_added") == 2
+        for event, data in events
+    )
+
+
 def test_gain_control_untap_haste_runner_returns_control_at_cleanup() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

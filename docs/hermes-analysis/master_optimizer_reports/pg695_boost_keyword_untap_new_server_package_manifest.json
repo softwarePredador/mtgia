@@ -1,0 +1,2271 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg695_boost_keyword_untap_new_server_20260709_062716",
+  "deploy_id": "PG695",
+  "execution_scenarios": [
+    {
+      "card": {
+        "name": "Acrobatic Leap",
+        "type_line": "Instant"
+      },
+      "expected_keywords": [
+        "flying"
+      ],
+      "expected_power_delta": 1,
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ]
+      },
+      "expected_target_count": 1,
+      "expected_toughness_delta": 3,
+      "logical_rule_key": "battle_rule_v1:aca02e2fdb45482d920c38c5e91a284c",
+      "name": "Acrobatic Leap boosts and untaps target creatures",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Boost Untap Target",
+        "tapped": true,
+        "type_line": "Land"
+      },
+      "targets": [
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Boost Untap Target 1",
+          "power": 2,
+          "tapped": true,
+          "toughness": 2,
+          "type_line": "Creature - Soldier"
+        }
+      ],
+      "type": "stat_modifier_until_eot_untap_target"
+    },
+    {
+      "card": {
+        "name": "Aim High",
+        "type_line": "Instant"
+      },
+      "expected_keywords": [
+        "reach"
+      ],
+      "expected_power_delta": 2,
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ]
+      },
+      "expected_target_count": 1,
+      "expected_toughness_delta": 2,
+      "logical_rule_key": "battle_rule_v1:989523d8326c9b20c2d8a48527278c2b",
+      "name": "Aim High boosts and untaps target creatures",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Boost Untap Target",
+        "tapped": true,
+        "type_line": "Land"
+      },
+      "targets": [
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Boost Untap Target 1",
+          "power": 2,
+          "tapped": true,
+          "toughness": 2,
+          "type_line": "Creature - Soldier"
+        }
+      ],
+      "type": "stat_modifier_until_eot_untap_target"
+    },
+    {
+      "card": {
+        "name": "Arachnoid Adaptation",
+        "type_line": "Instant"
+      },
+      "expected_keywords": [
+        "reach"
+      ],
+      "expected_power_delta": 2,
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ]
+      },
+      "expected_target_count": 1,
+      "expected_toughness_delta": 2,
+      "logical_rule_key": "battle_rule_v1:989523d8326c9b20c2d8a48527278c2b",
+      "name": "Arachnoid Adaptation boosts and untaps target creatures",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Boost Untap Target",
+        "tapped": true,
+        "type_line": "Land"
+      },
+      "targets": [
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Boost Untap Target 1",
+          "power": 2,
+          "tapped": true,
+          "toughness": 2,
+          "type_line": "Creature - Soldier"
+        }
+      ],
+      "type": "stat_modifier_until_eot_untap_target"
+    },
+    {
+      "card": {
+        "name": "Bull's Strength",
+        "type_line": "Instant"
+      },
+      "expected_keywords": [
+        "trample"
+      ],
+      "expected_power_delta": 2,
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ]
+      },
+      "expected_target_count": 1,
+      "expected_toughness_delta": 2,
+      "logical_rule_key": "battle_rule_v1:8f9c8394a80ff7636a2e3f26c50c7079",
+      "name": "Bull's Strength boosts and untaps target creatures",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Boost Untap Target",
+        "tapped": true,
+        "type_line": "Land"
+      },
+      "targets": [
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Boost Untap Target 1",
+          "power": 2,
+          "tapped": true,
+          "toughness": 2,
+          "type_line": "Creature - Soldier"
+        }
+      ],
+      "type": "stat_modifier_until_eot_untap_target"
+    },
+    {
+      "card": {
+        "name": "Escape from Orthanc",
+        "type_line": "Instant"
+      },
+      "expected_keywords": [
+        "flying"
+      ],
+      "expected_power_delta": 1,
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ]
+      },
+      "expected_target_count": 1,
+      "expected_toughness_delta": 3,
+      "logical_rule_key": "battle_rule_v1:aca02e2fdb45482d920c38c5e91a284c",
+      "name": "Escape from Orthanc boosts and untaps target creatures",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Boost Untap Target",
+        "tapped": true,
+        "type_line": "Land"
+      },
+      "targets": [
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Boost Untap Target 1",
+          "power": 2,
+          "tapped": true,
+          "toughness": 2,
+          "type_line": "Creature - Soldier"
+        }
+      ],
+      "type": "stat_modifier_until_eot_untap_target"
+    },
+    {
+      "card": {
+        "name": "High Stride",
+        "type_line": "Instant"
+      },
+      "expected_keywords": [
+        "reach"
+      ],
+      "expected_power_delta": 1,
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ]
+      },
+      "expected_target_count": 1,
+      "expected_toughness_delta": 3,
+      "logical_rule_key": "battle_rule_v1:089fe41e5843c1dde8b5b159a34d6852",
+      "name": "High Stride boosts and untaps target creatures",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Boost Untap Target",
+        "tapped": true,
+        "type_line": "Land"
+      },
+      "targets": [
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Boost Untap Target 1",
+          "power": 2,
+          "tapped": true,
+          "toughness": 2,
+          "type_line": "Creature - Soldier"
+        }
+      ],
+      "type": "stat_modifier_until_eot_untap_target"
+    },
+    {
+      "card": {
+        "name": "Leaping Ambush",
+        "type_line": "Instant"
+      },
+      "expected_keywords": [
+        "reach"
+      ],
+      "expected_power_delta": 1,
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ]
+      },
+      "expected_target_count": 1,
+      "expected_toughness_delta": 3,
+      "logical_rule_key": "battle_rule_v1:089fe41e5843c1dde8b5b159a34d6852",
+      "name": "Leaping Ambush boosts and untaps target creatures",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Boost Untap Target",
+        "tapped": true,
+        "type_line": "Land"
+      },
+      "targets": [
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Boost Untap Target 1",
+          "power": 2,
+          "tapped": true,
+          "toughness": 2,
+          "type_line": "Creature - Soldier"
+        }
+      ],
+      "type": "stat_modifier_until_eot_untap_target"
+    },
+    {
+      "card": {
+        "name": "Magic Damper",
+        "type_line": "Instant"
+      },
+      "expected_keywords": [
+        "hexproof"
+      ],
+      "expected_power_delta": 1,
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ]
+      },
+      "expected_target_count": 1,
+      "expected_toughness_delta": 1,
+      "logical_rule_key": "battle_rule_v1:9d49082cb5e16358f7904907739d3d81",
+      "name": "Magic Damper boosts and untaps target creatures",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Boost Untap Target",
+        "tapped": true,
+        "type_line": "Land"
+      },
+      "targets": [
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Boost Untap Target 1",
+          "power": 2,
+          "tapped": true,
+          "toughness": 2,
+          "type_line": "Creature - Soldier"
+        }
+      ],
+      "type": "stat_modifier_until_eot_untap_target"
+    },
+    {
+      "card": {
+        "name": "Octopus Form",
+        "type_line": "Instant"
+      },
+      "expected_keywords": [
+        "hexproof"
+      ],
+      "expected_power_delta": 1,
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ]
+      },
+      "expected_target_count": 1,
+      "expected_toughness_delta": 1,
+      "logical_rule_key": "battle_rule_v1:9d49082cb5e16358f7904907739d3d81",
+      "name": "Octopus Form boosts and untaps target creatures",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Boost Untap Target",
+        "tapped": true,
+        "type_line": "Land"
+      },
+      "targets": [
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Boost Untap Target 1",
+          "power": 2,
+          "tapped": true,
+          "toughness": 2,
+          "type_line": "Creature - Soldier"
+        }
+      ],
+      "type": "stat_modifier_until_eot_untap_target"
+    },
+    {
+      "card": {
+        "name": "Pillar Launch",
+        "type_line": "Instant"
+      },
+      "expected_keywords": [
+        "reach"
+      ],
+      "expected_power_delta": 2,
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ]
+      },
+      "expected_target_count": 1,
+      "expected_toughness_delta": 2,
+      "logical_rule_key": "battle_rule_v1:989523d8326c9b20c2d8a48527278c2b",
+      "name": "Pillar Launch boosts and untaps target creatures",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Boost Untap Target",
+        "tapped": true,
+        "type_line": "Land"
+      },
+      "targets": [
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Boost Untap Target 1",
+          "power": 2,
+          "tapped": true,
+          "toughness": 2,
+          "type_line": "Creature - Soldier"
+        }
+      ],
+      "type": "stat_modifier_until_eot_untap_target"
+    },
+    {
+      "card": {
+        "name": "Riverguard's Reflexes",
+        "type_line": "Instant"
+      },
+      "expected_keywords": [
+        "first_strike"
+      ],
+      "expected_power_delta": 2,
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ]
+      },
+      "expected_target_count": 1,
+      "expected_toughness_delta": 2,
+      "logical_rule_key": "battle_rule_v1:9948851bec07ebf5ac68653993924e2c",
+      "name": "Riverguard's Reflexes boosts and untaps target creatures",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Boost Untap Target",
+        "tapped": true,
+        "type_line": "Land"
+      },
+      "targets": [
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Boost Untap Target 1",
+          "power": 2,
+          "tapped": true,
+          "toughness": 2,
+          "type_line": "Creature - Soldier"
+        }
+      ],
+      "type": "stat_modifier_until_eot_untap_target"
+    },
+    {
+      "card": {
+        "name": "Spidery Grasp",
+        "type_line": "Instant"
+      },
+      "expected_keywords": [
+        "reach"
+      ],
+      "expected_power_delta": 2,
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ]
+      },
+      "expected_target_count": 1,
+      "expected_toughness_delta": 4,
+      "logical_rule_key": "battle_rule_v1:a9f4609fbd91c1199957d7ec148bc8f8",
+      "name": "Spidery Grasp boosts and untaps target creatures",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Boost Untap Target",
+        "tapped": true,
+        "type_line": "Land"
+      },
+      "targets": [
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Boost Untap Target 1",
+          "power": 2,
+          "tapped": true,
+          "toughness": 2,
+          "type_line": "Creature - Soldier"
+        }
+      ],
+      "type": "stat_modifier_until_eot_untap_target"
+    },
+    {
+      "card": {
+        "name": "Steady Aim",
+        "type_line": "Instant"
+      },
+      "expected_keywords": [
+        "reach"
+      ],
+      "expected_power_delta": 1,
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ]
+      },
+      "expected_target_count": 1,
+      "expected_toughness_delta": 4,
+      "logical_rule_key": "battle_rule_v1:514cb595ec9f550e6ed224b1c9180072",
+      "name": "Steady Aim boosts and untaps target creatures",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Boost Untap Target",
+        "tapped": true,
+        "type_line": "Land"
+      },
+      "targets": [
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Boost Untap Target 1",
+          "power": 2,
+          "tapped": true,
+          "toughness": 2,
+          "type_line": "Creature - Soldier"
+        }
+      ],
+      "type": "stat_modifier_until_eot_untap_target"
+    },
+    {
+      "card": {
+        "name": "Vines of the Recluse",
+        "type_line": "Instant"
+      },
+      "expected_keywords": [
+        "reach"
+      ],
+      "expected_power_delta": 1,
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ]
+      },
+      "expected_target_count": 1,
+      "expected_toughness_delta": 2,
+      "logical_rule_key": "battle_rule_v1:45481d88981896c847d880a6c58e016f",
+      "name": "Vines of the Recluse boosts and untaps target creatures",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Boost Untap Target",
+        "tapped": true,
+        "type_line": "Land"
+      },
+      "targets": [
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Boost Untap Target 1",
+          "power": 2,
+          "tapped": true,
+          "toughness": 2,
+          "type_line": "Creature - Soldier"
+        }
+      ],
+      "type": "stat_modifier_until_eot_untap_target"
+    },
+    {
+      "card": {
+        "name": "Wings of the Cosmos",
+        "type_line": "Instant"
+      },
+      "expected_keywords": [
+        "flying"
+      ],
+      "expected_power_delta": 1,
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ]
+      },
+      "expected_target_count": 1,
+      "expected_toughness_delta": 3,
+      "logical_rule_key": "battle_rule_v1:aca02e2fdb45482d920c38c5e91a284c",
+      "name": "Wings of the Cosmos boosts and untaps target creatures",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Boost Untap Target",
+        "tapped": true,
+        "type_line": "Land"
+      },
+      "targets": [
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Boost Untap Target 1",
+          "power": 2,
+          "tapped": true,
+          "toughness": 2,
+          "type_line": "Creature - Soldier"
+        }
+      ],
+      "type": "stat_modifier_until_eot_untap_target"
+    },
+    {
+      "card": {
+        "name": "Witch's Web",
+        "type_line": "Instant"
+      },
+      "expected_keywords": [
+        "reach"
+      ],
+      "expected_power_delta": 3,
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ]
+      },
+      "expected_target_count": 1,
+      "expected_toughness_delta": 3,
+      "logical_rule_key": "battle_rule_v1:56319c01d8ab7bc65c235d983e781572",
+      "name": "Witch's Web boosts and untaps target creatures",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Boost Untap Target",
+        "tapped": true,
+        "type_line": "Land"
+      },
+      "targets": [
+        {
+          "cmc": 3,
+          "effect": "creature",
+          "name": "E2E Legal Boost Untap Target 1",
+          "power": 2,
+          "tapped": true,
+          "toughness": 2,
+          "type_line": "Creature - Soldier"
+        }
+      ],
+      "type": "stat_modifier_until_eot_untap_target"
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Acrobatic Leap",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:aca02e2fdb45482d920c38c5e91a284c",
+      "min_rule_version": 2,
+      "normalized_name": "acrobatic leap",
+      "oracle_hash": "bc5bb4bb57487b1831424b81deed8f14",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_keyword_and_untap_target_creature_until_eot_spell_v1",
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot_untap_target",
+        "granted_keywords_until_eot": [
+          "flying"
+        ],
+        "instant": true,
+        "power_boost": 1,
+        "power_delta": 1,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "target_count": 1,
+        "target_count_max": 1,
+        "target_count_min": 1,
+        "toughness_boost": 3,
+        "toughness_delta": 3,
+        "untap_target": true,
+        "up_to_count": false,
+        "xmage_ability_classes": [
+          "FlyingAbility"
+        ],
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "GainAbilityTargetEffect",
+          "UntapTargetEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Aim High",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:989523d8326c9b20c2d8a48527278c2b",
+      "min_rule_version": 2,
+      "normalized_name": "aim high",
+      "oracle_hash": "aca6bd8fa27a4948f6791609ffa1e514",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_keyword_and_untap_target_creature_until_eot_spell_v1",
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot_untap_target",
+        "granted_keywords_until_eot": [
+          "reach"
+        ],
+        "instant": true,
+        "power_boost": 2,
+        "power_delta": 2,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "target_count": 1,
+        "target_count_max": 1,
+        "target_count_min": 1,
+        "toughness_boost": 2,
+        "toughness_delta": 2,
+        "untap_target": true,
+        "up_to_count": false,
+        "xmage_ability_classes": [
+          "ReachAbility"
+        ],
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "GainAbilityTargetEffect",
+          "UntapTargetEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Arachnoid Adaptation",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:989523d8326c9b20c2d8a48527278c2b",
+      "min_rule_version": 2,
+      "normalized_name": "arachnoid adaptation",
+      "oracle_hash": "240a488d5aa0f08f3984abcafd3102e6",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_keyword_and_untap_target_creature_until_eot_spell_v1",
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot_untap_target",
+        "granted_keywords_until_eot": [
+          "reach"
+        ],
+        "instant": true,
+        "power_boost": 2,
+        "power_delta": 2,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "target_count": 1,
+        "target_count_max": 1,
+        "target_count_min": 1,
+        "toughness_boost": 2,
+        "toughness_delta": 2,
+        "untap_target": true,
+        "up_to_count": false,
+        "xmage_ability_classes": [
+          "ReachAbility"
+        ],
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "GainAbilityTargetEffect",
+          "UntapTargetEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Bull's Strength",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8f9c8394a80ff7636a2e3f26c50c7079",
+      "min_rule_version": 2,
+      "normalized_name": "bull's strength",
+      "oracle_hash": "1e1d5afafe89aeffde26d31d88ad75f4",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_keyword_and_untap_target_creature_until_eot_spell_v1",
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot_untap_target",
+        "granted_keywords_until_eot": [
+          "trample"
+        ],
+        "instant": true,
+        "power_boost": 2,
+        "power_delta": 2,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "target_count": 1,
+        "target_count_max": 1,
+        "target_count_min": 1,
+        "toughness_boost": 2,
+        "toughness_delta": 2,
+        "untap_target": true,
+        "up_to_count": false,
+        "xmage_ability_classes": [
+          "TrampleAbility"
+        ],
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "GainAbilityTargetEffect",
+          "UntapTargetEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Escape from Orthanc",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:aca02e2fdb45482d920c38c5e91a284c",
+      "min_rule_version": 2,
+      "normalized_name": "escape from orthanc",
+      "oracle_hash": "bc5bb4bb57487b1831424b81deed8f14",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_keyword_and_untap_target_creature_until_eot_spell_v1",
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot_untap_target",
+        "granted_keywords_until_eot": [
+          "flying"
+        ],
+        "instant": true,
+        "power_boost": 1,
+        "power_delta": 1,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "target_count": 1,
+        "target_count_max": 1,
+        "target_count_min": 1,
+        "toughness_boost": 3,
+        "toughness_delta": 3,
+        "untap_target": true,
+        "up_to_count": false,
+        "xmage_ability_classes": [
+          "FlyingAbility"
+        ],
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "GainAbilityTargetEffect",
+          "UntapTargetEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "High Stride",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:089fe41e5843c1dde8b5b159a34d6852",
+      "min_rule_version": 2,
+      "normalized_name": "high stride",
+      "oracle_hash": "6852257746aab1ee2fe94cfce172bf1f",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_keyword_and_untap_target_creature_until_eot_spell_v1",
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot_untap_target",
+        "granted_keywords_until_eot": [
+          "reach"
+        ],
+        "instant": true,
+        "power_boost": 1,
+        "power_delta": 1,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "target_count": 1,
+        "target_count_max": 1,
+        "target_count_min": 1,
+        "toughness_boost": 3,
+        "toughness_delta": 3,
+        "untap_target": true,
+        "up_to_count": false,
+        "xmage_ability_classes": [
+          "ReachAbility"
+        ],
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "GainAbilityTargetEffect",
+          "UntapTargetEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Leaping Ambush",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:089fe41e5843c1dde8b5b159a34d6852",
+      "min_rule_version": 2,
+      "normalized_name": "leaping ambush",
+      "oracle_hash": "6852257746aab1ee2fe94cfce172bf1f",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_keyword_and_untap_target_creature_until_eot_spell_v1",
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot_untap_target",
+        "granted_keywords_until_eot": [
+          "reach"
+        ],
+        "instant": true,
+        "power_boost": 1,
+        "power_delta": 1,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "target_count": 1,
+        "target_count_max": 1,
+        "target_count_min": 1,
+        "toughness_boost": 3,
+        "toughness_delta": 3,
+        "untap_target": true,
+        "up_to_count": false,
+        "xmage_ability_classes": [
+          "ReachAbility"
+        ],
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "GainAbilityTargetEffect",
+          "UntapTargetEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Magic Damper",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9d49082cb5e16358f7904907739d3d81",
+      "min_rule_version": 2,
+      "normalized_name": "magic damper",
+      "oracle_hash": "21120dca77fc95e65c721d064d93f14f",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_keyword_and_untap_target_creature_until_eot_spell_v1",
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot_untap_target",
+        "granted_keywords_until_eot": [
+          "hexproof"
+        ],
+        "instant": true,
+        "power_boost": 1,
+        "power_delta": 1,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "self",
+        "target_count": 1,
+        "target_count_max": 1,
+        "target_count_min": 1,
+        "toughness_boost": 1,
+        "toughness_delta": 1,
+        "untap_target": true,
+        "up_to_count": false,
+        "xmage_ability_classes": [
+          "HexproofAbility"
+        ],
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "GainAbilityTargetEffect",
+          "UntapTargetEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Octopus Form",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9d49082cb5e16358f7904907739d3d81",
+      "min_rule_version": 2,
+      "normalized_name": "octopus form",
+      "oracle_hash": "42e4ab731b832c50a234d13f77d3bddb",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_keyword_and_untap_target_creature_until_eot_spell_v1",
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot_untap_target",
+        "granted_keywords_until_eot": [
+          "hexproof"
+        ],
+        "instant": true,
+        "power_boost": 1,
+        "power_delta": 1,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "self",
+        "target_count": 1,
+        "target_count_max": 1,
+        "target_count_min": 1,
+        "toughness_boost": 1,
+        "toughness_delta": 1,
+        "untap_target": true,
+        "up_to_count": false,
+        "xmage_ability_classes": [
+          "HexproofAbility"
+        ],
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "GainAbilityTargetEffect",
+          "UntapTargetEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Pillar Launch",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:989523d8326c9b20c2d8a48527278c2b",
+      "min_rule_version": 2,
+      "normalized_name": "pillar launch",
+      "oracle_hash": "240a488d5aa0f08f3984abcafd3102e6",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_keyword_and_untap_target_creature_until_eot_spell_v1",
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot_untap_target",
+        "granted_keywords_until_eot": [
+          "reach"
+        ],
+        "instant": true,
+        "power_boost": 2,
+        "power_delta": 2,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "target_count": 1,
+        "target_count_max": 1,
+        "target_count_min": 1,
+        "toughness_boost": 2,
+        "toughness_delta": 2,
+        "untap_target": true,
+        "up_to_count": false,
+        "xmage_ability_classes": [
+          "ReachAbility"
+        ],
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "GainAbilityTargetEffect",
+          "UntapTargetEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Riverguard's Reflexes",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9948851bec07ebf5ac68653993924e2c",
+      "min_rule_version": 2,
+      "normalized_name": "riverguard's reflexes",
+      "oracle_hash": "83697d7105a34039b785f419e6508069",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_keyword_and_untap_target_creature_until_eot_spell_v1",
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot_untap_target",
+        "granted_keywords_until_eot": [
+          "first_strike"
+        ],
+        "instant": true,
+        "power_boost": 2,
+        "power_delta": 2,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "target_count": 1,
+        "target_count_max": 1,
+        "target_count_min": 1,
+        "toughness_boost": 2,
+        "toughness_delta": 2,
+        "untap_target": true,
+        "up_to_count": false,
+        "xmage_ability_classes": [
+          "FirstStrikeAbility"
+        ],
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "GainAbilityTargetEffect",
+          "UntapTargetEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Spidery Grasp",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a9f4609fbd91c1199957d7ec148bc8f8",
+      "min_rule_version": 2,
+      "normalized_name": "spidery grasp",
+      "oracle_hash": "7f9c04ffce44cddc1af640310ed3c8a8",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_keyword_and_untap_target_creature_until_eot_spell_v1",
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot_untap_target",
+        "granted_keywords_until_eot": [
+          "reach"
+        ],
+        "instant": true,
+        "power_boost": 2,
+        "power_delta": 2,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "target_count": 1,
+        "target_count_max": 1,
+        "target_count_min": 1,
+        "toughness_boost": 4,
+        "toughness_delta": 4,
+        "untap_target": true,
+        "up_to_count": false,
+        "xmage_ability_classes": [
+          "ReachAbility"
+        ],
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "GainAbilityTargetEffect",
+          "UntapTargetEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Steady Aim",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:514cb595ec9f550e6ed224b1c9180072",
+      "min_rule_version": 2,
+      "normalized_name": "steady aim",
+      "oracle_hash": "1dcd21c8aa533804ecf6875e798a1b21",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_keyword_and_untap_target_creature_until_eot_spell_v1",
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot_untap_target",
+        "granted_keywords_until_eot": [
+          "reach"
+        ],
+        "instant": true,
+        "power_boost": 1,
+        "power_delta": 1,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "target_count": 1,
+        "target_count_max": 1,
+        "target_count_min": 1,
+        "toughness_boost": 4,
+        "toughness_delta": 4,
+        "untap_target": true,
+        "up_to_count": false,
+        "xmage_ability_classes": [
+          "ReachAbility"
+        ],
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "GainAbilityTargetEffect",
+          "UntapTargetEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Vines of the Recluse",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:45481d88981896c847d880a6c58e016f",
+      "min_rule_version": 2,
+      "normalized_name": "vines of the recluse",
+      "oracle_hash": "b32f274db44e12460e001cc287c2bcb8",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_keyword_and_untap_target_creature_until_eot_spell_v1",
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot_untap_target",
+        "granted_keywords_until_eot": [
+          "reach"
+        ],
+        "instant": true,
+        "power_boost": 1,
+        "power_delta": 1,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "target_count": 1,
+        "target_count_max": 1,
+        "target_count_min": 1,
+        "toughness_boost": 2,
+        "toughness_delta": 2,
+        "untap_target": true,
+        "up_to_count": false,
+        "xmage_ability_classes": [
+          "ReachAbility"
+        ],
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "GainAbilityTargetEffect",
+          "UntapTargetEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Wings of the Cosmos",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:aca02e2fdb45482d920c38c5e91a284c",
+      "min_rule_version": 2,
+      "normalized_name": "wings of the cosmos",
+      "oracle_hash": "bc5bb4bb57487b1831424b81deed8f14",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_keyword_and_untap_target_creature_until_eot_spell_v1",
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot_untap_target",
+        "granted_keywords_until_eot": [
+          "flying"
+        ],
+        "instant": true,
+        "power_boost": 1,
+        "power_delta": 1,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "target_count": 1,
+        "target_count_max": 1,
+        "target_count_min": 1,
+        "toughness_boost": 3,
+        "toughness_delta": 3,
+        "untap_target": true,
+        "up_to_count": false,
+        "xmage_ability_classes": [
+          "FlyingAbility"
+        ],
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "GainAbilityTargetEffect",
+          "UntapTargetEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Witch's Web",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:56319c01d8ab7bc65c235d983e781572",
+      "min_rule_version": 2,
+      "normalized_name": "witch's web",
+      "oracle_hash": "04f672439c56af21568383064e997672",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_keyword_and_untap_target_creature_until_eot_spell_v1",
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot_untap_target",
+        "granted_keywords_until_eot": [
+          "reach"
+        ],
+        "instant": true,
+        "power_boost": 3,
+        "power_delta": 3,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "target_count": 1,
+        "target_count_max": 1,
+        "target_count_min": 1,
+        "toughness_boost": 3,
+        "toughness_delta": 3,
+        "untap_target": true,
+        "up_to_count": false,
+        "xmage_ability_classes": [
+          "ReachAbility"
+        ],
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "GainAbilityTargetEffect",
+          "UntapTargetEffect"
+        ]
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_boost_keyword_untap_target_creature_until_eot_spell": 16
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg695_boost_keyword_untap_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg695_boost_keyword_untap_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg695_boost_keyword_untap_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg695_boost_keyword_untap_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg695_boost_keyword_untap_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg695_boost_keyword_untap_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-09T06:27:16+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Acrobatic Leap"
+      },
+      "card_name": "Acrobatic Leap",
+      "effect": "stat_modifier_until_eot_untap_target",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:aca02e2fdb45482d920c38c5e91a284c",
+      "normalized_name": "acrobatic leap",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_keyword_and_untap_target_creature_until_eot_spell_v1",
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot_untap_target",
+        "granted_keywords_until_eot": [
+          "flying"
+        ],
+        "instant": true,
+        "power_boost": 1,
+        "power_delta": 1,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "target_count": 1,
+        "target_count_max": 1,
+        "target_count_min": 1,
+        "toughness_boost": 3,
+        "toughness_delta": 3,
+        "untap_target": true,
+        "up_to_count": false,
+        "xmage_ability_classes": [
+          "FlyingAbility"
+        ],
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "GainAbilityTargetEffect",
+          "UntapTargetEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Aim High"
+      },
+      "card_name": "Aim High",
+      "effect": "stat_modifier_until_eot_untap_target",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:989523d8326c9b20c2d8a48527278c2b",
+      "normalized_name": "aim high",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_keyword_and_untap_target_creature_until_eot_spell_v1",
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot_untap_target",
+        "granted_keywords_until_eot": [
+          "reach"
+        ],
+        "instant": true,
+        "power_boost": 2,
+        "power_delta": 2,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "target_count": 1,
+        "target_count_max": 1,
+        "target_count_min": 1,
+        "toughness_boost": 2,
+        "toughness_delta": 2,
+        "untap_target": true,
+        "up_to_count": false,
+        "xmage_ability_classes": [
+          "ReachAbility"
+        ],
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "GainAbilityTargetEffect",
+          "UntapTargetEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Arachnoid Adaptation"
+      },
+      "card_name": "Arachnoid Adaptation",
+      "effect": "stat_modifier_until_eot_untap_target",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:989523d8326c9b20c2d8a48527278c2b",
+      "normalized_name": "arachnoid adaptation",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_keyword_and_untap_target_creature_until_eot_spell_v1",
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot_untap_target",
+        "granted_keywords_until_eot": [
+          "reach"
+        ],
+        "instant": true,
+        "power_boost": 2,
+        "power_delta": 2,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "target_count": 1,
+        "target_count_max": 1,
+        "target_count_min": 1,
+        "toughness_boost": 2,
+        "toughness_delta": 2,
+        "untap_target": true,
+        "up_to_count": false,
+        "xmage_ability_classes": [
+          "ReachAbility"
+        ],
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "GainAbilityTargetEffect",
+          "UntapTargetEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Bull's Strength"
+      },
+      "card_name": "Bull's Strength",
+      "effect": "stat_modifier_until_eot_untap_target",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8f9c8394a80ff7636a2e3f26c50c7079",
+      "normalized_name": "bull's strength",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_keyword_and_untap_target_creature_until_eot_spell_v1",
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot_untap_target",
+        "granted_keywords_until_eot": [
+          "trample"
+        ],
+        "instant": true,
+        "power_boost": 2,
+        "power_delta": 2,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "target_count": 1,
+        "target_count_max": 1,
+        "target_count_min": 1,
+        "toughness_boost": 2,
+        "toughness_delta": 2,
+        "untap_target": true,
+        "up_to_count": false,
+        "xmage_ability_classes": [
+          "TrampleAbility"
+        ],
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "GainAbilityTargetEffect",
+          "UntapTargetEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Escape from Orthanc"
+      },
+      "card_name": "Escape from Orthanc",
+      "effect": "stat_modifier_until_eot_untap_target",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:aca02e2fdb45482d920c38c5e91a284c",
+      "normalized_name": "escape from orthanc",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_keyword_and_untap_target_creature_until_eot_spell_v1",
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot_untap_target",
+        "granted_keywords_until_eot": [
+          "flying"
+        ],
+        "instant": true,
+        "power_boost": 1,
+        "power_delta": 1,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "target_count": 1,
+        "target_count_max": 1,
+        "target_count_min": 1,
+        "toughness_boost": 3,
+        "toughness_delta": 3,
+        "untap_target": true,
+        "up_to_count": false,
+        "xmage_ability_classes": [
+          "FlyingAbility"
+        ],
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "GainAbilityTargetEffect",
+          "UntapTargetEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "High Stride"
+      },
+      "card_name": "High Stride",
+      "effect": "stat_modifier_until_eot_untap_target",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:089fe41e5843c1dde8b5b159a34d6852",
+      "normalized_name": "high stride",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_keyword_and_untap_target_creature_until_eot_spell_v1",
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot_untap_target",
+        "granted_keywords_until_eot": [
+          "reach"
+        ],
+        "instant": true,
+        "power_boost": 1,
+        "power_delta": 1,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "target_count": 1,
+        "target_count_max": 1,
+        "target_count_min": 1,
+        "toughness_boost": 3,
+        "toughness_delta": 3,
+        "untap_target": true,
+        "up_to_count": false,
+        "xmage_ability_classes": [
+          "ReachAbility"
+        ],
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "GainAbilityTargetEffect",
+          "UntapTargetEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Leaping Ambush"
+      },
+      "card_name": "Leaping Ambush",
+      "effect": "stat_modifier_until_eot_untap_target",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:089fe41e5843c1dde8b5b159a34d6852",
+      "normalized_name": "leaping ambush",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_keyword_and_untap_target_creature_until_eot_spell_v1",
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot_untap_target",
+        "granted_keywords_until_eot": [
+          "reach"
+        ],
+        "instant": true,
+        "power_boost": 1,
+        "power_delta": 1,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "target_count": 1,
+        "target_count_max": 1,
+        "target_count_min": 1,
+        "toughness_boost": 3,
+        "toughness_delta": 3,
+        "untap_target": true,
+        "up_to_count": false,
+        "xmage_ability_classes": [
+          "ReachAbility"
+        ],
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "GainAbilityTargetEffect",
+          "UntapTargetEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Magic Damper"
+      },
+      "card_name": "Magic Damper",
+      "effect": "stat_modifier_until_eot_untap_target",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9d49082cb5e16358f7904907739d3d81",
+      "normalized_name": "magic damper",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_keyword_and_untap_target_creature_until_eot_spell_v1",
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot_untap_target",
+        "granted_keywords_until_eot": [
+          "hexproof"
+        ],
+        "instant": true,
+        "power_boost": 1,
+        "power_delta": 1,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "self",
+        "target_count": 1,
+        "target_count_max": 1,
+        "target_count_min": 1,
+        "toughness_boost": 1,
+        "toughness_delta": 1,
+        "untap_target": true,
+        "up_to_count": false,
+        "xmage_ability_classes": [
+          "HexproofAbility"
+        ],
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "GainAbilityTargetEffect",
+          "UntapTargetEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Octopus Form"
+      },
+      "card_name": "Octopus Form",
+      "effect": "stat_modifier_until_eot_untap_target",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9d49082cb5e16358f7904907739d3d81",
+      "normalized_name": "octopus form",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_keyword_and_untap_target_creature_until_eot_spell_v1",
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot_untap_target",
+        "granted_keywords_until_eot": [
+          "hexproof"
+        ],
+        "instant": true,
+        "power_boost": 1,
+        "power_delta": 1,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "self",
+        "target_count": 1,
+        "target_count_max": 1,
+        "target_count_min": 1,
+        "toughness_boost": 1,
+        "toughness_delta": 1,
+        "untap_target": true,
+        "up_to_count": false,
+        "xmage_ability_classes": [
+          "HexproofAbility"
+        ],
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "GainAbilityTargetEffect",
+          "UntapTargetEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Pillar Launch"
+      },
+      "card_name": "Pillar Launch",
+      "effect": "stat_modifier_until_eot_untap_target",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:989523d8326c9b20c2d8a48527278c2b",
+      "normalized_name": "pillar launch",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_keyword_and_untap_target_creature_until_eot_spell_v1",
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot_untap_target",
+        "granted_keywords_until_eot": [
+          "reach"
+        ],
+        "instant": true,
+        "power_boost": 2,
+        "power_delta": 2,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "target_count": 1,
+        "target_count_max": 1,
+        "target_count_min": 1,
+        "toughness_boost": 2,
+        "toughness_delta": 2,
+        "untap_target": true,
+        "up_to_count": false,
+        "xmage_ability_classes": [
+          "ReachAbility"
+        ],
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "GainAbilityTargetEffect",
+          "UntapTargetEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Riverguard's Reflexes"
+      },
+      "card_name": "Riverguard's Reflexes",
+      "effect": "stat_modifier_until_eot_untap_target",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9948851bec07ebf5ac68653993924e2c",
+      "normalized_name": "riverguard's reflexes",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_keyword_and_untap_target_creature_until_eot_spell_v1",
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot_untap_target",
+        "granted_keywords_until_eot": [
+          "first_strike"
+        ],
+        "instant": true,
+        "power_boost": 2,
+        "power_delta": 2,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "target_count": 1,
+        "target_count_max": 1,
+        "target_count_min": 1,
+        "toughness_boost": 2,
+        "toughness_delta": 2,
+        "untap_target": true,
+        "up_to_count": false,
+        "xmage_ability_classes": [
+          "FirstStrikeAbility"
+        ],
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "GainAbilityTargetEffect",
+          "UntapTargetEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Spidery Grasp"
+      },
+      "card_name": "Spidery Grasp",
+      "effect": "stat_modifier_until_eot_untap_target",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a9f4609fbd91c1199957d7ec148bc8f8",
+      "normalized_name": "spidery grasp",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_keyword_and_untap_target_creature_until_eot_spell_v1",
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot_untap_target",
+        "granted_keywords_until_eot": [
+          "reach"
+        ],
+        "instant": true,
+        "power_boost": 2,
+        "power_delta": 2,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "target_count": 1,
+        "target_count_max": 1,
+        "target_count_min": 1,
+        "toughness_boost": 4,
+        "toughness_delta": 4,
+        "untap_target": true,
+        "up_to_count": false,
+        "xmage_ability_classes": [
+          "ReachAbility"
+        ],
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "GainAbilityTargetEffect",
+          "UntapTargetEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Steady Aim"
+      },
+      "card_name": "Steady Aim",
+      "effect": "stat_modifier_until_eot_untap_target",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:514cb595ec9f550e6ed224b1c9180072",
+      "normalized_name": "steady aim",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_keyword_and_untap_target_creature_until_eot_spell_v1",
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot_untap_target",
+        "granted_keywords_until_eot": [
+          "reach"
+        ],
+        "instant": true,
+        "power_boost": 1,
+        "power_delta": 1,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "target_count": 1,
+        "target_count_max": 1,
+        "target_count_min": 1,
+        "toughness_boost": 4,
+        "toughness_delta": 4,
+        "untap_target": true,
+        "up_to_count": false,
+        "xmage_ability_classes": [
+          "ReachAbility"
+        ],
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "GainAbilityTargetEffect",
+          "UntapTargetEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Vines of the Recluse"
+      },
+      "card_name": "Vines of the Recluse",
+      "effect": "stat_modifier_until_eot_untap_target",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:45481d88981896c847d880a6c58e016f",
+      "normalized_name": "vines of the recluse",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_keyword_and_untap_target_creature_until_eot_spell_v1",
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot_untap_target",
+        "granted_keywords_until_eot": [
+          "reach"
+        ],
+        "instant": true,
+        "power_boost": 1,
+        "power_delta": 1,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "target_count": 1,
+        "target_count_max": 1,
+        "target_count_min": 1,
+        "toughness_boost": 2,
+        "toughness_delta": 2,
+        "untap_target": true,
+        "up_to_count": false,
+        "xmage_ability_classes": [
+          "ReachAbility"
+        ],
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "GainAbilityTargetEffect",
+          "UntapTargetEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Wings of the Cosmos"
+      },
+      "card_name": "Wings of the Cosmos",
+      "effect": "stat_modifier_until_eot_untap_target",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:aca02e2fdb45482d920c38c5e91a284c",
+      "normalized_name": "wings of the cosmos",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_keyword_and_untap_target_creature_until_eot_spell_v1",
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot_untap_target",
+        "granted_keywords_until_eot": [
+          "flying"
+        ],
+        "instant": true,
+        "power_boost": 1,
+        "power_delta": 1,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "target_count": 1,
+        "target_count_max": 1,
+        "target_count_min": 1,
+        "toughness_boost": 3,
+        "toughness_delta": 3,
+        "untap_target": true,
+        "up_to_count": false,
+        "xmage_ability_classes": [
+          "FlyingAbility"
+        ],
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "GainAbilityTargetEffect",
+          "UntapTargetEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Witch's Web"
+      },
+      "card_name": "Witch's Web",
+      "effect": "stat_modifier_until_eot_untap_target",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:56319c01d8ab7bc65c235d983e781572",
+      "normalized_name": "witch's web",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_keyword_and_untap_target_creature_until_eot_spell_v1",
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot_untap_target",
+        "granted_keywords_until_eot": [
+          "reach"
+        ],
+        "instant": true,
+        "power_boost": 3,
+        "power_delta": 3,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "target_count": 1,
+        "target_count_max": 1,
+        "target_count_min": 1,
+        "toughness_boost": 3,
+        "toughness_delta": 3,
+        "untap_target": true,
+        "up_to_count": false,
+        "xmage_ability_classes": [
+          "ReachAbility"
+        ],
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "GainAbilityTargetEffect",
+          "UntapTargetEffect"
+        ]
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Acrobatic Leap",
+    "Aim High",
+    "Arachnoid Adaptation",
+    "Bull's Strength",
+    "Escape from Orthanc",
+    "High Stride",
+    "Leaping Ambush",
+    "Magic Damper",
+    "Octopus Form",
+    "Pillar Launch",
+    "Riverguard's Reflexes",
+    "Spidery Grasp",
+    "Steady Aim",
+    "Vines of the Recluse",
+    "Wings of the Cosmos",
+    "Witch's Web"
+  ],
+  "selected_count": 16,
+  "slug": "boost_keyword_untap_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Acrobatic Leap",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:aca02e2fdb45482d920c38c5e91a284c",
+      "min_rule_version": 2,
+      "normalized_name": "acrobatic leap",
+      "oracle_hash": "bc5bb4bb57487b1831424b81deed8f14",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_keyword_and_untap_target_creature_until_eot_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Aim High",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:989523d8326c9b20c2d8a48527278c2b",
+      "min_rule_version": 2,
+      "normalized_name": "aim high",
+      "oracle_hash": "aca6bd8fa27a4948f6791609ffa1e514",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_keyword_and_untap_target_creature_until_eot_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Arachnoid Adaptation",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:989523d8326c9b20c2d8a48527278c2b",
+      "min_rule_version": 2,
+      "normalized_name": "arachnoid adaptation",
+      "oracle_hash": "240a488d5aa0f08f3984abcafd3102e6",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_keyword_and_untap_target_creature_until_eot_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Bull's Strength",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8f9c8394a80ff7636a2e3f26c50c7079",
+      "min_rule_version": 2,
+      "normalized_name": "bull's strength",
+      "oracle_hash": "1e1d5afafe89aeffde26d31d88ad75f4",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_keyword_and_untap_target_creature_until_eot_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Escape from Orthanc",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:aca02e2fdb45482d920c38c5e91a284c",
+      "min_rule_version": 2,
+      "normalized_name": "escape from orthanc",
+      "oracle_hash": "bc5bb4bb57487b1831424b81deed8f14",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_keyword_and_untap_target_creature_until_eot_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "High Stride",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:089fe41e5843c1dde8b5b159a34d6852",
+      "min_rule_version": 2,
+      "normalized_name": "high stride",
+      "oracle_hash": "6852257746aab1ee2fe94cfce172bf1f",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_keyword_and_untap_target_creature_until_eot_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Leaping Ambush",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:089fe41e5843c1dde8b5b159a34d6852",
+      "min_rule_version": 2,
+      "normalized_name": "leaping ambush",
+      "oracle_hash": "6852257746aab1ee2fe94cfce172bf1f",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_keyword_and_untap_target_creature_until_eot_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Magic Damper",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9d49082cb5e16358f7904907739d3d81",
+      "min_rule_version": 2,
+      "normalized_name": "magic damper",
+      "oracle_hash": "21120dca77fc95e65c721d064d93f14f",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_keyword_and_untap_target_creature_until_eot_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Octopus Form",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9d49082cb5e16358f7904907739d3d81",
+      "min_rule_version": 2,
+      "normalized_name": "octopus form",
+      "oracle_hash": "42e4ab731b832c50a234d13f77d3bddb",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_keyword_and_untap_target_creature_until_eot_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Pillar Launch",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:989523d8326c9b20c2d8a48527278c2b",
+      "min_rule_version": 2,
+      "normalized_name": "pillar launch",
+      "oracle_hash": "240a488d5aa0f08f3984abcafd3102e6",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_keyword_and_untap_target_creature_until_eot_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Riverguard's Reflexes",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9948851bec07ebf5ac68653993924e2c",
+      "min_rule_version": 2,
+      "normalized_name": "riverguard's reflexes",
+      "oracle_hash": "83697d7105a34039b785f419e6508069",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_keyword_and_untap_target_creature_until_eot_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Spidery Grasp",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a9f4609fbd91c1199957d7ec148bc8f8",
+      "min_rule_version": 2,
+      "normalized_name": "spidery grasp",
+      "oracle_hash": "7f9c04ffce44cddc1af640310ed3c8a8",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_keyword_and_untap_target_creature_until_eot_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Steady Aim",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:514cb595ec9f550e6ed224b1c9180072",
+      "min_rule_version": 2,
+      "normalized_name": "steady aim",
+      "oracle_hash": "1dcd21c8aa533804ecf6875e798a1b21",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_keyword_and_untap_target_creature_until_eot_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Vines of the Recluse",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:45481d88981896c847d880a6c58e016f",
+      "min_rule_version": 2,
+      "normalized_name": "vines of the recluse",
+      "oracle_hash": "b32f274db44e12460e001cc287c2bcb8",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_keyword_and_untap_target_creature_until_eot_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Wings of the Cosmos",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:aca02e2fdb45482d920c38c5e91a284c",
+      "min_rule_version": 2,
+      "normalized_name": "wings of the cosmos",
+      "oracle_hash": "bc5bb4bb57487b1831424b81deed8f14",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_keyword_and_untap_target_creature_until_eot_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Witch's Web",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:56319c01d8ab7bc65c235d983e781572",
+      "min_rule_version": 2,
+      "normalized_name": "witch's web",
+      "oracle_hash": "04f672439c56af21568383064e997672",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_keyword_and_untap_target_creature_until_eot_spell_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

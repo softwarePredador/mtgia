@@ -4959,6 +4959,7 @@ def resolve_add_counters_target_effect(
 
     resolved_targets = []
     for target_owner, target in selected_targets:
+        tapped_before = bool(target.get("tapped"))
         power_before = _numeric_card_stat(target, "power")
         toughness_before = _numeric_card_stat(target, "toughness", "power")
         counters_before = (
@@ -4986,6 +4987,10 @@ def resolve_add_counters_target_effect(
                 source=card,
             )
             result = "creature_put_into_graveyard_zero_toughness"
+        target_untapped = False
+        if effect_data.get("untap_target") and destination is None:
+            target["tapped"] = False
+            target_untapped = tapped_before and not bool(target.get("tapped"))
         decision = targeting_decision(
             card if isinstance(card, dict) else effect_data,
             target,
@@ -5006,6 +5011,9 @@ def resolve_add_counters_target_effect(
             counters_before=counters_before,
             counters_added=added,
             counters_after=counters_before + added,
+            target_tapped_before=tapped_before,
+            target_tapped_after=bool(target.get("tapped")),
+            target_untapped=target_untapped,
             result=result,
             destination=destination,
             selected_target_count=len(selected_targets),
@@ -5337,6 +5345,17 @@ def resolve_stat_modifier_until_eot_untap_target_spell(player, opponents, card, 
         remember_until_eot(target, "toughness")
         target["power"] = power_before + power_delta
         target["toughness"] = toughness_before + toughness_delta
+        granted_keywords = [
+            str(keyword or "").strip()
+            for keyword in (effect_data.get("granted_keywords_until_eot") or [])
+            if str(keyword or "").strip()
+        ]
+        if granted_keywords:
+            current_keywords = list(target.get("keywords") or [])
+            merged_keywords = list(dict.fromkeys([*current_keywords, *granted_keywords]))
+            set_until_eot(target, "keywords", merged_keywords)
+            for keyword in granted_keywords:
+                set_until_eot(target, keyword, True)
         if effect_data.get("untap_target"):
             target["tapped"] = False
         details.append(
@@ -5350,11 +5369,17 @@ def resolve_stat_modifier_until_eot_untap_target_spell(player, opponents, card, 
                 "target_tapped_before": tapped_before,
                 "target_tapped_after": bool(target.get("tapped")),
                 "target_untapped": tapped_before and not bool(target.get("tapped")),
+                "granted_keywords_until_eot": granted_keywords,
                 **decision,
             }
         )
 
     result = "stat_modifier_until_eot_untap_target_applied" if details else "no_legal_target"
+    granted_keywords = [
+        str(keyword or "").strip()
+        for keyword in (effect_data.get("granted_keywords_until_eot") or [])
+        if str(keyword or "").strip()
+    ]
     emit_replay_event(
         "stat_modifier_until_eot_untap_target_resolved",
         player=player.name,
@@ -5367,6 +5392,7 @@ def resolve_stat_modifier_until_eot_untap_target_spell(player, opponents, card, 
         targets_untapped_count=sum(1 for detail in details if detail.get("target_untapped")),
         power_delta=power_delta,
         toughness_delta=toughness_delta,
+        granted_keywords_until_eot=granted_keywords,
         result=result,
         turn=turn,
         **replay_rule_fields(effect_data),

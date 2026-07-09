@@ -1,0 +1,265 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg697_add_counters_untap_target_new_serv_20260709_065617",
+  "deploy_id": "pg697",
+  "execution_scenarios": [
+    {
+      "card": {
+        "name": "Burst of Strength",
+        "type_line": "Instant"
+      },
+      "expected_counter_count": 1,
+      "expected_counter_type": "+1/+1",
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ]
+      },
+      "expected_untap_target": true,
+      "logical_rule_key": "battle_rule_v1:085839334ad80f440ae0a12b576361d2",
+      "name": "Burst of Strength adds counters and untaps target creature",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Counter Untap Target",
+        "tapped": true,
+        "type_line": "Land"
+      },
+      "target": {
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Legal Counter Untap Target",
+        "power": 2,
+        "tapped": true,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "type": "add_counters_untap_target_spell"
+    },
+    {
+      "card": {
+        "name": "Dragonscale Boon",
+        "type_line": "Instant"
+      },
+      "expected_counter_count": 2,
+      "expected_counter_type": "+1/+1",
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ]
+      },
+      "expected_untap_target": true,
+      "logical_rule_key": "battle_rule_v1:8cb1a93aad935ca2838cbc890bdd2343",
+      "name": "Dragonscale Boon adds counters and untaps target creature",
+      "nonmatching_target": {
+        "cmc": 0,
+        "effect": "land",
+        "name": "E2E Illegal Counter Untap Target",
+        "tapped": true,
+        "type_line": "Land"
+      },
+      "target": {
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Legal Counter Untap Target",
+        "power": 2,
+        "tapped": true,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "type": "add_counters_untap_target_spell"
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Burst of Strength",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:085839334ad80f440ae0a12b576361d2",
+      "min_rule_version": 2,
+      "normalized_name": "burst of strength",
+      "oracle_hash": "cfdf1d006ec4a004b932482218590cee",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_add_counters_and_untap_target_creature_spell_v1",
+        "count": 1,
+        "counter_count": 1,
+        "counter_type": "+1/+1",
+        "effect": "add_counters",
+        "instant": true,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "target_count": 1,
+        "target_count_max": 1,
+        "target_count_min": 1,
+        "untap_target": true,
+        "up_to_count": false,
+        "xmage_effect_classes": [
+          "AddCountersTargetEffect",
+          "UntapTargetEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Dragonscale Boon",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8cb1a93aad935ca2838cbc890bdd2343",
+      "min_rule_version": 2,
+      "normalized_name": "dragonscale boon",
+      "oracle_hash": "75254a881f708d93984214d32480bb31",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_add_counters_and_untap_target_creature_spell_v1",
+        "count": 2,
+        "counter_count": 2,
+        "counter_type": "+1/+1",
+        "effect": "add_counters",
+        "instant": true,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "target_count": 1,
+        "target_count_max": 1,
+        "target_count_min": 1,
+        "untap_target": true,
+        "up_to_count": false,
+        "xmage_effect_classes": [
+          "AddCountersTargetEffect",
+          "UntapTargetEffect"
+        ]
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_add_counters_untap_target_creature_spell": 2
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg697_add_counters_untap_target_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg697_add_counters_untap_target_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg697_add_counters_untap_target_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg697_add_counters_untap_target_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg697_add_counters_untap_target_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg697_add_counters_untap_target_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-09T06:56:17+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Burst of Strength"
+      },
+      "card_name": "Burst of Strength",
+      "effect": "add_counters",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:085839334ad80f440ae0a12b576361d2",
+      "normalized_name": "burst of strength",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_add_counters_and_untap_target_creature_spell_v1",
+        "count": 1,
+        "counter_count": 1,
+        "counter_type": "+1/+1",
+        "effect": "add_counters",
+        "instant": true,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "target_count": 1,
+        "target_count_max": 1,
+        "target_count_min": 1,
+        "untap_target": true,
+        "up_to_count": false,
+        "xmage_effect_classes": [
+          "AddCountersTargetEffect",
+          "UntapTargetEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Dragonscale Boon"
+      },
+      "card_name": "Dragonscale Boon",
+      "effect": "add_counters",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8cb1a93aad935ca2838cbc890bdd2343",
+      "normalized_name": "dragonscale boon",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_add_counters_and_untap_target_creature_spell_v1",
+        "count": 2,
+        "counter_count": 2,
+        "counter_type": "+1/+1",
+        "effect": "add_counters",
+        "instant": true,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "target_count": 1,
+        "target_count_max": 1,
+        "target_count_min": 1,
+        "untap_target": true,
+        "up_to_count": false,
+        "xmage_effect_classes": [
+          "AddCountersTargetEffect",
+          "UntapTargetEffect"
+        ]
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Burst of Strength",
+    "Dragonscale Boon"
+  ],
+  "selected_count": 2,
+  "slug": "add_counters_untap_target_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Burst of Strength",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:085839334ad80f440ae0a12b576361d2",
+      "min_rule_version": 2,
+      "normalized_name": "burst of strength",
+      "oracle_hash": "cfdf1d006ec4a004b932482218590cee",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_add_counters_and_untap_target_creature_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Dragonscale Boon",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8cb1a93aad935ca2838cbc890bdd2343",
+      "min_rule_version": 2,
+      "normalized_name": "dragonscale boon",
+      "oracle_hash": "75254a881f708d93984214d32480bb31",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_add_counters_and_untap_target_creature_spell_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

@@ -28583,6 +28583,229 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["target_count_max"], 1)
         self.assertTrue(effect["untap_target"])
 
+    def test_add_counters_untap_target_maps_burst_of_strength_scope(self) -> None:
+        proposal, reason = split.split_row(
+            queue_row(
+                split.UNTAP_TARGET_UNIT,
+                effect_classes=["AddCountersTargetEffect", "UntapTargetEffect"],
+                xmage_signals=["targeting", "counter"],
+            ),
+            metadata(
+                name="Burst of Strength",
+                type_line="Instant",
+                oracle_text="Put a +1/+1 counter on target creature and untap it.",
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new AddCountersTargetEffect(CounterType.P1P1.createInstance(1)));
+                this.getSpellAbility().addEffect(new UntapTargetEffect().setText("and untap it"));
+                this.getSpellAbility().addTarget(new TargetCreaturePermanent());
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "add_counters")
+        self.assertEqual(effect["battle_model_scope"], split.ADD_COUNTERS_UNTAP_TARGET_SCOPE)
+        self.assertEqual(effect["counter_type"], "+1/+1")
+        self.assertEqual(effect["counter_count"], 1)
+        self.assertEqual(effect["target_count_min"], 1)
+        self.assertEqual(effect["target_count_max"], 1)
+        self.assertTrue(effect["untap_target"])
+
+    def test_add_counters_untap_target_maps_dragonscale_boon_count(self) -> None:
+        proposal, reason = split.split_row(
+            queue_row(
+                split.UNTAP_TARGET_UNIT,
+                effect_classes=["AddCountersTargetEffect", "UntapTargetEffect"],
+                xmage_signals=["targeting", "counter"],
+            ),
+            metadata(
+                name="Dragonscale Boon",
+                type_line="Instant",
+                oracle_text="Put two +1/+1 counters on target creature and untap it.",
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new AddCountersTargetEffect(CounterType.P1P1.createInstance(2)));
+                Effect effect = new UntapTargetEffect();
+                effect.setText("and untap it");
+                this.getSpellAbility().addEffect(effect);
+                this.getSpellAbility().addTarget(new TargetCreaturePermanent());
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.ADD_COUNTERS_UNTAP_TARGET_SCOPE)
+        self.assertEqual(effect["counter_count"], 2)
+
+    def test_add_counters_untap_target_blocks_keyword_counters_until_supported(self) -> None:
+        proposal, reason = split.split_row(
+            queue_row(
+                split.UNTAP_TARGET_UNIT,
+                effect_classes=["AddCountersTargetEffect", "UntapTargetEffect"],
+                xmage_signals=["targeting", "counter"],
+            ),
+            metadata(
+                name="Gift of the Viper",
+                type_line="Instant",
+                oracle_text=(
+                    "Put a +1/+1 counter, a reach counter, and a deathtouch counter on target creature. "
+                    "Untap it."
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new AddCountersTargetEffect(CounterType.P1P1.createInstance()));
+                this.getSpellAbility().addEffect(new AddCountersTargetEffect(CounterType.REACH.createInstance()));
+                this.getSpellAbility().addEffect(new AddCountersTargetEffect(CounterType.DEATHTOUCH.createInstance()));
+                this.getSpellAbility().addEffect(new UntapTargetEffect("untap it"));
+                this.getSpellAbility().addTarget(new TargetCreaturePermanent());
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "add_counters_untap_source_counter_not_single_fixed")
+
+    def test_add_counters_untap_target_blocks_multi_target_until_supported(self) -> None:
+        proposal, reason = split.split_row(
+            queue_row(
+                split.UNTAP_TARGET_UNIT,
+                effect_classes=["AddCountersTargetEffect", "UntapTargetEffect"],
+                xmage_signals=["targeting", "counter"],
+            ),
+            metadata(
+                name="Leo's Guidance",
+                type_line="Instant",
+                oracle_text="Put a +1/+1 counter on each of up to three target creatures. Untap them.",
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new AddCountersTargetEffect(CounterType.P1P1.createInstance()));
+                this.getSpellAbility().addEffect(new UntapTargetEffect().setText("Untap them"));
+                this.getSpellAbility().addTarget(new TargetCreaturePermanent(0, 3));
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "add_counters_untap_source_target_count_not_single")
+
+    def test_fixed_boost_keyword_untap_target_maps_exact_scope(self) -> None:
+        proposal, reason = split.split_row(
+            queue_row(
+                split.UNTAP_TARGET_UNIT,
+                effect_classes=["BoostTargetEffect", "GainAbilityTargetEffect", "UntapTargetEffect"],
+                ability_classes=["ReachAbility"],
+                xmage_signals=["targeting"],
+            ),
+            metadata(
+                name="Aim High",
+                type_line="Instant",
+                oracle_text="Untap target creature. It gets +2/+2 and gains reach until end of turn.",
+            ),
+            source_text="""
+                this.getSpellAbility().addTarget(new TargetCreaturePermanent());
+                Effect effect = new UntapTargetEffect();
+                this.getSpellAbility().addEffect(effect);
+                effect = new BoostTargetEffect(2, 2, Duration.EndOfTurn);
+                this.getSpellAbility().addEffect(effect);
+                effect = new GainAbilityTargetEffect(ReachAbility.getInstance(), Duration.EndOfTurn);
+                this.getSpellAbility().addEffect(effect);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "stat_modifier_until_eot_untap_target")
+        self.assertEqual(effect["battle_model_scope"], split.BOOST_KEYWORD_UNTAP_TARGET_SCOPE)
+        self.assertEqual(effect["power_delta"], 2)
+        self.assertEqual(effect["toughness_delta"], 2)
+        self.assertEqual(effect["target_controller"], "any")
+        self.assertEqual(effect["granted_keywords_until_eot"], ["reach"])
+        self.assertTrue(effect["untap_target"])
+
+    def test_fixed_boost_keyword_untap_target_maps_controlled_target(self) -> None:
+        proposal, reason = split.split_row(
+            queue_row(
+                split.UNTAP_TARGET_UNIT,
+                effect_classes=["BoostTargetEffect", "GainAbilityTargetEffect", "UntapTargetEffect"],
+                ability_classes=["HexproofAbility"],
+                xmage_signals=["targeting"],
+            ),
+            metadata(
+                name="Magic Damper",
+                type_line="Instant",
+                oracle_text=(
+                    "Target creature you control gets +1/+1 and gains hexproof until end of turn. "
+                    "Untap it."
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new BoostTargetEffect(1, 1, Duration.EndOfTurn));
+                this.getSpellAbility().addEffect(new GainAbilityTargetEffect(
+                    HexproofAbility.getInstance(), Duration.EndOfTurn));
+                this.getSpellAbility().addEffect(new UntapTargetEffect());
+                this.getSpellAbility().addTarget(new TargetControlledCreaturePermanent());
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.BOOST_KEYWORD_UNTAP_TARGET_SCOPE)
+        self.assertEqual(effect["target_controller"], "self")
+        self.assertEqual(effect["granted_keywords_until_eot"], ["hexproof"])
+
+    def test_fixed_boost_keyword_untap_accepts_source_reminder_text(self) -> None:
+        proposal, reason = split.split_row(
+            queue_row(
+                split.UNTAP_TARGET_UNIT,
+                effect_classes=["BoostTargetEffect", "GainAbilityTargetEffect", "UntapTargetEffect"],
+                ability_classes=["TrampleAbility"],
+                xmage_signals=["targeting"],
+            ),
+            metadata(
+                name="Bull's Strength",
+                type_line="Instant",
+                oracle_text="Target creature gets +2/+2 and gains trample until end of turn. Untap it.",
+            ),
+            source_text="""
+                this.getSpellAbility().addTarget(new TargetCreaturePermanent());
+                this.getSpellAbility().addEffect(new BoostTargetEffect(2, 2).setText("Target creature gets +2/+2"));
+                this.getSpellAbility().addEffect(new GainAbilityTargetEffect(
+                    TrampleAbility.getInstance(), Duration.EndOfTurn, "and gains trample until end of turn"));
+                this.getSpellAbility().addEffect(new UntapTargetEffect().setText("Untap it"));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        self.assertEqual(proposal["effect_json"]["granted_keywords_until_eot"], ["trample"])
+
+    def test_fixed_boost_keyword_untap_blocks_modal_oracle(self) -> None:
+        proposal, reason = split.split_row(
+            queue_row(
+                split.UNTAP_TARGET_UNIT,
+                effect_classes=["BoostTargetEffect", "GainAbilityTargetEffect", "UntapTargetEffect"],
+                ability_classes=["TrampleAbility"],
+                xmage_signals=["targeting"],
+            ),
+            metadata(
+                name="Ruthless Instincts",
+                type_line="Instant",
+                oracle_text=(
+                    "Choose one —\n"
+                    "• Target nonattacking creature gains reach and deathtouch until end of turn. Untap it.\n"
+                    "• Target attacking creature gets +2/+2 and gains trample until end of turn."
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new BoostTargetEffect(2, 2, Duration.EndOfTurn));
+                this.getSpellAbility().addEffect(new GainAbilityTargetEffect(
+                    TrampleAbility.getInstance(), Duration.EndOfTurn));
+                this.getSpellAbility().addEffect(new UntapTargetEffect());
+                this.getSpellAbility().addTarget(new TargetCreaturePermanent());
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "boost_keyword_untap_oracle_not_simple")
+
     def test_gain_control_untap_haste_maps_creature_exact_scope(self) -> None:
         proposal, reason = split.split_row(
             queue_row(

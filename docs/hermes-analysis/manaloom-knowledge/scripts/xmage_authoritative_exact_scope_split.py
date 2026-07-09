@@ -364,6 +364,7 @@ BOARD_WIPE_SCOPE = "xmage_destroy_all_matching_permanents_spell_v1"
 DAMAGE_WIPE_SCOPE = "xmage_fixed_damage_all_matching_permanents_spell_v1"
 EACH_PLAYER_SACRIFICE_SCOPE = "xmage_each_player_sacrifice_fixed_permanents_spell_v1"
 ADD_COUNTERS_TARGET_SCOPE = "xmage_fixed_add_counters_target_creature_spell_v1"
+ADD_COUNTERS_UNTAP_TARGET_SCOPE = "xmage_fixed_add_counters_and_untap_target_creature_spell_v1"
 PERMANENT_ACTIVATED_SELF_ADD_COUNTERS_SCOPE = (
     "xmage_permanent_simple_activated_self_add_counters_v1"
 )
@@ -372,6 +373,9 @@ PERMANENT_ACTIVATED_TARGET_ADD_COUNTERS_SCOPE = (
 )
 BOOST_TARGET_SCOPE = "xmage_fixed_boost_target_creature_until_eot_spell_v1"
 BOOST_UNTAP_TARGET_SCOPE = "xmage_fixed_boost_and_untap_target_creature_until_eot_spell_v1"
+BOOST_KEYWORD_UNTAP_TARGET_SCOPE = (
+    "xmage_fixed_boost_keyword_and_untap_target_creature_until_eot_spell_v1"
+)
 GAIN_CONTROL_UNTAP_HASTE_SCOPE = "xmage_gain_control_untap_haste_until_eot_spell_v1"
 DYNAMIC_GRAVEYARD_COUNT_BOOST_TARGET_SCOPE = (
     "xmage_dynamic_graveyard_count_boost_target_creature_until_eot_spell_v1"
@@ -7240,6 +7244,67 @@ def fixed_counter_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, int
     return match.group(2), count
 
 
+def fixed_counter_untap_target_from_source(source: str) -> dict[str, Any] | str:
+    text = source or ""
+    if len(re.findall(r"new\s+UntapTargetEffect\s*\(", text)) != 1:
+        return "add_counters_untap_source_untap_not_single"
+    if len(re.findall(r"AddCountersTargetEffect\s*\(", text)) != 1:
+        return "add_counters_untap_source_counter_not_single_fixed"
+    counter_matches = re.findall(
+        r"AddCountersTargetEffect\s*\(\s*CounterType\.(P1P1|M1M1)\.createInstance\s*\(\s*(\d*)\s*\)",
+        text,
+    )
+    if len(counter_matches) != 1:
+        return "add_counters_untap_source_counter_not_single_fixed"
+    if len(re.findall(r"\.addTarget\s*\(", text)) != 1:
+        return "add_counters_untap_source_target_not_single"
+    target_count = target_creature_permanent_count_from_source(text)
+    if isinstance(target_count, str):
+        return target_count.replace("target_creature", "add_counters_untap_target_creature")
+    if (
+        int(target_count.get("target_count_min") or 0) != 1
+        or int(target_count.get("target_count_max") or 0) != 1
+        or bool(target_count.get("up_to_count"))
+    ):
+        return "add_counters_untap_source_target_count_not_single"
+    counter_class, raw_count = counter_matches[0]
+    counter_type = "+1/+1" if counter_class == "P1P1" else "-1/-1"
+    count = int(raw_count or "1")
+    return {
+        "counter_type": counter_type,
+        "counter_count": count,
+        **target_count,
+    }
+
+
+def fixed_counter_untap_target_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    text = strip_leading_parenthetical_reminders(oracle_text(metadata))
+    text = re.sub(r"\s+", " ", text).strip().lower()
+    patterns = [
+        r"^put (?P<count>a|an|one|two|three|four|five|six|seven|eight|nine|ten|\d+) "
+        r"(?P<counter>\+1/\+1|-1/-1) counters? on target creature and untap it\.?$",
+        r"^put (?P<count>a|an|one|two|three|four|five|six|seven|eight|nine|ten|\d+) "
+        r"(?P<counter>\+1/\+1|-1/-1) counters? on target creature\. untap (?:it|that creature)\.?$",
+    ]
+    for pattern in patterns:
+        match = re.fullmatch(pattern, text)
+        if not match:
+            continue
+        count = counter_count_from_text(match.group("count"))
+        if count is None or count <= 0:
+            return "add_counters_untap_oracle_count_not_supported"
+        return {
+            "counter_type": match.group("counter"),
+            "counter_count": count,
+            "target_count": 1,
+            "target_count_min": 1,
+            "target_count_max": 1,
+            "up_to_count": False,
+            "target_controller": "any",
+        }
+    return "add_counters_untap_oracle_not_exact"
+
+
 def activated_self_counter_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
     text = re.sub(
         r"\s+",
@@ -7639,9 +7704,16 @@ def fixed_boost_target_from_source(source: str) -> tuple[int, int] | None:
 
 
 def target_creature_permanent_count_from_source(source: str) -> dict[str, Any] | str:
-    matches = re.findall(r"new\s+TargetCreaturePermanent\s*\(\s*([^()]*)\)", source or "", re.S)
-    if len(matches) != 1:
+    any_matches = re.findall(r"new\s+TargetCreaturePermanent\s*\(\s*([^()]*)\)", source or "", re.S)
+    controlled_matches = re.findall(
+        r"new\s+TargetControlledCreaturePermanent\s*\(\s*([^()]*)\)",
+        source or "",
+        re.S,
+    )
+    if len(any_matches) + len(controlled_matches) != 1:
         return "target_creature_permanent_count_not_single"
+    target_controller = "self" if controlled_matches else "any"
+    matches = controlled_matches or any_matches
     args = [arg.strip() for arg in matches[0].split(",") if arg.strip()]
     if not args:
         return {
@@ -7649,6 +7721,7 @@ def target_creature_permanent_count_from_source(source: str) -> dict[str, Any] |
             "target_count_min": 1,
             "target_count_max": 1,
             "up_to_count": False,
+            "target_controller": target_controller,
         }
     if len(args) == 1 and re.fullmatch(r"\d+", args[0]):
         count = int(args[0])
@@ -7659,6 +7732,7 @@ def target_creature_permanent_count_from_source(source: str) -> dict[str, Any] |
             "target_count_min": count,
             "target_count_max": count,
             "up_to_count": False,
+            "target_controller": target_controller,
         }
     if len(args) == 2 and all(re.fullmatch(r"\d+", arg) for arg in args):
         minimum = int(args[0])
@@ -7670,6 +7744,7 @@ def target_creature_permanent_count_from_source(source: str) -> dict[str, Any] |
             "target_count_min": minimum,
             "target_count_max": maximum,
             "up_to_count": minimum < maximum,
+            "target_controller": target_controller,
         }
     return "target_creature_permanent_count_dynamic_or_unsupported"
 
@@ -7701,6 +7776,34 @@ def fixed_boost_untap_target_from_source(source: str) -> dict[str, Any] | str:
         "toughness_delta": int(matches[0][1]),
         **target_count,
     }
+
+
+def fixed_boost_keyword_untap_target_from_source(
+    source: str,
+    keyword_ability_class: str,
+) -> dict[str, Any] | str:
+    text = source or ""
+    base = fixed_boost_untap_target_from_source(text)
+    if isinstance(base, str):
+        return base
+    gain_matches = re.findall(r"new\s+GainAbilityTargetEffect\s*\(", text)
+    if len(gain_matches) != 1:
+        return "boost_keyword_untap_source_keyword_not_single"
+    ability_expr = (
+        rf"(?:{re.escape(keyword_ability_class)}\.getInstance\s*\(\s*\)"
+        rf"|new\s+{re.escape(keyword_ability_class)}\s*\([^)]*\))"
+    )
+    if not re.search(
+        rf"new\s+GainAbilityTargetEffect\s*\(\s*{ability_expr}"
+        rf"\s*(?:,\s*Duration\.EndOfTurn\s*(?:,\s*\"[^\"]*\"\s*)?)?\)",
+        text,
+        re.S,
+    ):
+        return "boost_keyword_untap_source_keyword_not_supported"
+    keyword = TARGET_GRANT_KEYWORD_ABILITY_CLASSES.get(keyword_ability_class)
+    if not keyword:
+        return "boost_keyword_untap_source_keyword_not_supported"
+    return {**base, "keywords": [keyword]}
 
 
 def gain_control_target_spec_from_phrase(phrase: str) -> dict[str, Any] | str:
@@ -9942,6 +10045,53 @@ def fixed_boost_untap_target_from_oracle(metadata: dict[str, Any]) -> dict[str, 
             "up_to_count": up_to,
         }
     return "boost_untap_oracle_not_exact_fixed"
+
+
+def fixed_boost_keyword_untap_target_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    text = strip_parenthetical_reminders(oracle_text(metadata))
+    text = re.sub(r"\s+", " ", text).strip().lower()
+    if "choose one" in text or "whenever " in text or "when " in text:
+        return "boost_keyword_untap_oracle_not_simple"
+    keyword_words = "|".join(
+        re.escape(word)
+        for word in sorted(TARGET_GRANT_KEYWORD_ORACLE_WORDS, key=len, reverse=True)
+    )
+    patterns = [
+        (
+            rf"^target creature(?P<controller> you control)? gets (?P<power>[+-]?\d+)/(?P<toughness>[+-]?\d+) "
+            rf"and gains (?P<keyword>{keyword_words}) until end of turn\. untap (?:it|that creature)\.?$",
+            1,
+            1,
+            False,
+        ),
+        (
+            rf"^untap target creature(?P<controller> you control)?\. it gets (?P<power>[+-]?\d+)/(?P<toughness>[+-]?\d+) "
+            rf"and gains (?P<keyword>{keyword_words}) until end of turn\.?$",
+            1,
+            1,
+            False,
+        ),
+    ]
+    for pattern, minimum, maximum, up_to in patterns:
+        match = re.fullmatch(pattern, text)
+        if not match:
+            continue
+        power = signed_int_from_oracle(match.group("power"))
+        toughness = signed_int_from_oracle(match.group("toughness"))
+        keyword = TARGET_GRANT_KEYWORD_ORACLE_WORDS.get(match.group("keyword"))
+        if power is None or toughness is None or not keyword:
+            return "boost_keyword_untap_oracle_not_exact_fixed"
+        return {
+            "power_delta": power,
+            "toughness_delta": toughness,
+            "target_controller": "self" if match.group("controller") else "any",
+            "target_count": maximum,
+            "target_count_min": minimum,
+            "target_count_max": maximum,
+            "up_to_count": up_to,
+            "keywords": [keyword],
+        }
+    return "boost_keyword_untap_oracle_not_exact_fixed"
 
 
 def gain_control_untap_haste_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
@@ -23862,6 +24012,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "noncreature permanent with a simple self-sacrifice library-search-to-hand ability"
     elif scope == TAP_TARGET_SPELL_SCOPE:
         scope_kind = "instant or sorcery spell that taps exact target permanents"
+    elif scope == ADD_COUNTERS_UNTAP_TARGET_SCOPE:
+        scope_kind = "instant or sorcery spell that adds fixed counters to one target creature and untaps it"
     elif scope == LIBRARY_PICK_SPELL_SCOPE:
         scope_kind = "fixed reveal-top-library pick-to-hand spell"
     elif scope == LOOK_LIBRARY_PICK_SPELL_SCOPE:
@@ -34021,6 +34173,50 @@ def split_row(
         return build_proposal(row, metadata, effect_json, family_id="xmage_add_counters_target_creature_spell"), "selected_exact_scope"
 
     if unit == UNTAP_TARGET_UNIT:
+        if classes == {"AddCountersTargetEffect", "UntapTargetEffect"}:
+            unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+            if unsupported_abilities:
+                return None, "add_counters_untap_ability_class_not_simple"
+            source_counter = fixed_counter_untap_target_from_source(source_text)
+            if isinstance(source_counter, str):
+                return None, source_counter
+            oracle_counter = fixed_counter_untap_target_from_oracle(metadata)
+            if isinstance(oracle_counter, str):
+                return None, oracle_counter
+            comparable_keys = (
+                "counter_type",
+                "counter_count",
+                "target_count_min",
+                "target_count_max",
+                "up_to_count",
+            )
+            if any(source_counter.get(key) != oracle_counter.get(key) for key in comparable_keys):
+                return None, "add_counters_untap_source_oracle_mismatch"
+            counter_type = str(oracle_counter["counter_type"])
+            count = int(oracle_counter["counter_count"])
+            effect_json = {
+                "effect": "add_counters",
+                "battle_model_scope": ADD_COUNTERS_UNTAP_TARGET_SCOPE,
+                "target": "creature",
+                "target_constraints": {"card_types": ["creature"]},
+                "target_controller": "any",
+                "counter_type": counter_type,
+                "counter_count": count,
+                "count": count,
+                "untap_target": True,
+                "target_count": 1,
+                "target_count_min": 1,
+                "target_count_max": 1,
+                "up_to_count": False,
+                "xmage_effect_classes": ["AddCountersTargetEffect", "UntapTargetEffect"],
+                **flags,
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_add_counters_untap_target_creature_spell",
+            ), "selected_exact_scope"
         if classes == {"GainAbilityTargetEffect", "GainControlTargetEffect", "UntapTargetEffect"}:
             if ability_classes(row) != {"HasteAbility"}:
                 return None, "gain_control_untap_haste_ability_class_not_supported"
@@ -34055,6 +34251,66 @@ def split_row(
                 metadata,
                 effect_json,
                 family_id="xmage_gain_control_untap_haste_until_eot_spell",
+            ), "selected_exact_scope"
+        if classes == {"BoostTargetEffect", "GainAbilityTargetEffect", "UntapTargetEffect"}:
+            abilities = ability_classes(row)
+            if len(abilities) != 1:
+                return None, "boost_keyword_untap_ability_not_single"
+            ability_class = next(iter(abilities))
+            keyword = TARGET_GRANT_KEYWORD_ABILITY_CLASSES.get(ability_class)
+            if not keyword:
+                return None, "boost_keyword_untap_ability_not_supported"
+            source_boost = fixed_boost_keyword_untap_target_from_source(source_text, ability_class)
+            if isinstance(source_boost, str):
+                return None, source_boost
+            oracle_boost = fixed_boost_keyword_untap_target_from_oracle(metadata)
+            if isinstance(oracle_boost, str):
+                return None, oracle_boost
+            comparable_keys = (
+                "power_delta",
+                "toughness_delta",
+                "target_controller",
+                "target_count_min",
+                "target_count_max",
+                "up_to_count",
+            )
+            if any(source_boost.get(key) != oracle_boost.get(key) for key in comparable_keys):
+                return None, "boost_keyword_untap_source_oracle_mismatch"
+            if set(source_boost.get("keywords") or []) != set(oracle_boost.get("keywords") or []):
+                return None, "boost_keyword_untap_source_oracle_mismatch"
+            power_delta = int(oracle_boost["power_delta"])
+            toughness_delta = int(oracle_boost["toughness_delta"])
+            target_count = int(oracle_boost["target_count"])
+            effect_json = {
+                "effect": "stat_modifier_until_eot_untap_target",
+                "battle_model_scope": BOOST_KEYWORD_UNTAP_TARGET_SCOPE,
+                "target": "creature",
+                "target_constraints": {"card_types": ["creature"]},
+                "target_controller": oracle_boost["target_controller"],
+                "power_delta": power_delta,
+                "toughness_delta": toughness_delta,
+                "power_boost": power_delta,
+                "toughness_boost": toughness_delta,
+                "duration": "until_end_of_turn",
+                "untap_target": True,
+                "granted_keywords_until_eot": oracle_boost["keywords"],
+                "target_count": target_count,
+                "target_count_min": int(oracle_boost["target_count_min"]),
+                "target_count_max": int(oracle_boost["target_count_max"]),
+                "up_to_count": bool(oracle_boost["up_to_count"]),
+                "xmage_effect_classes": [
+                    "BoostTargetEffect",
+                    "GainAbilityTargetEffect",
+                    "UntapTargetEffect",
+                ],
+                "xmage_ability_classes": [ability_class],
+                **flags,
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_boost_keyword_untap_target_creature_until_eot_spell",
             ), "selected_exact_scope"
         if classes != {"BoostTargetEffect", "UntapTargetEffect"}:
             return None, "boost_untap_effect_class_not_exact"

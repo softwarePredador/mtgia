@@ -1731,6 +1731,73 @@ def test_manifest_builds_boost_untap_target_spell_execution_scenario() -> None:
     assert scenario["nonmatching_target"]["name"] == "E2E Illegal Boost Untap Target"
 
 
+def test_manifest_builds_boost_keyword_untap_target_spell_execution_scenario() -> None:
+    rule = {
+        "normalized_name": "aim high",
+        "card_name": "Aim High",
+        "oracle_hash": "hash-aim-high",
+        "logical_rule_key": "battle_rule_v1:hash-aim-high",
+        "required_effect_fields": {
+            "effect": "stat_modifier_until_eot_untap_target",
+            "battle_model_scope": "xmage_fixed_boost_keyword_and_untap_target_creature_until_eot_spell_v1",
+            "target": "creature",
+            "target_controller": "any",
+            "target_constraints": {"card_types": ["creature"]},
+            "power_delta": 2,
+            "toughness_delta": 2,
+            "untap_target": True,
+            "granted_keywords_until_eot": ["reach"],
+            "target_count": 1,
+            "target_count_min": 1,
+            "target_count_max": 1,
+            "up_to_count": False,
+        },
+    }
+
+    scenario = builder.boost_untap_target_spell_execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "stat_modifier_until_eot_untap_target"
+    assert scenario["expected_power_delta"] == 2
+    assert scenario["expected_toughness_delta"] == 2
+    assert scenario["expected_keywords"] == ["reach"]
+    assert scenario["expected_target_count"] == 1
+    assert scenario["targets"][0]["tapped"] is True
+
+
+def test_manifest_builds_add_counters_untap_target_spell_execution_scenario() -> None:
+    rule = {
+        "normalized_name": "dragonscale boon",
+        "card_name": "Dragonscale Boon",
+        "oracle_hash": "hash-dragonscale-boon",
+        "logical_rule_key": "battle_rule_v1:hash-dragonscale-boon",
+        "required_effect_fields": {
+            "effect": "add_counters",
+            "battle_model_scope": "xmage_fixed_add_counters_and_untap_target_creature_spell_v1",
+            "target": "creature",
+            "target_controller": "any",
+            "target_constraints": {"card_types": ["creature"]},
+            "counter_type": "+1/+1",
+            "counter_count": 2,
+            "count": 2,
+            "untap_target": True,
+            "target_count": 1,
+            "target_count_min": 1,
+            "target_count_max": 1,
+            "up_to_count": False,
+        },
+    }
+
+    scenario = builder.add_counters_untap_target_spell_execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "add_counters_untap_target_spell"
+    assert scenario["expected_counter_type"] == "+1/+1"
+    assert scenario["expected_counter_count"] == 2
+    assert scenario["target"]["tapped"] is True
+    assert scenario["nonmatching_target"]["name"] == "E2E Illegal Counter Untap Target"
+
+
 def test_manifest_builds_gain_control_untap_haste_execution_scenario() -> None:
     rule = {
         "normalized_name": "act of treason",
