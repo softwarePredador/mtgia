@@ -1,0 +1,40 @@
+ rows_to_backfill | distinct_cards | rows_with_computed_hash
+------------------+----------------+-------------------------
+               32 |             31 |                      32
+(1 row)
+
+                card_name                |             normalized_name             |                logical_rule_key                 |                 battle_model_scope                  |       computed_oracle_hash
+-----------------------------------------+-----------------------------------------+-------------------------------------------------+-----------------------------------------------------+----------------------------------
+ Akroma's Will                           | akroma's will                           | battle_rule_v1:1134718ef1509d04fbc1291dbdbdf23e | combat_keyword_grant_until_eot_v1                   | 006e2b72eae264e2aaba82d99d07f593
+ Ancient Den                             | ancient den                             | battle_rule_v1:ea7e00f2d90b2ceead4036ab10cd0200 | artifact_land_colored_source_v1                     | c7264c311c98ff99b293a96ad9ab2daf
+ Ancient Tomb                            | ancient tomb                            | battle_rule_v1:c364544e9bd651211acf851db2313ccd | ancient_tomb_bonus_mana_on_tap_v1                   | 5f61966c5bfc67508502d929ca891af3
+ Angel's Grace                           | angel's grace                           | battle_rule_v1:2833836fd4d943d3e02d1cfa2d284227 |                                                     | 627c4ce7adf5be44b93e2b850159e5d9
+ Birgi, God of Storytelling              | birgi, god of storytelling              | battle_rule_v1:a7af0fd25d7c196baa8ff58d193b2695 | spell_cast_red_mana_trigger_v1                      | 5f1ed696a63cd668fd46a2fe9971a54e
+ Chrome Mox                              | chrome mox                              | battle_rule_v1:baf0ceea81b709c31104e0fcb4fc4e95 | imprint_fast_mana_v1                                | 44481be7f5347792ede1a9b679a424b3
+ Crop Rotation                           | crop rotation                           | battle_rule_v1:0cae4a7bd1e862a0063b9c606ff96e6c | sacrifice_land_for_high_value_land_v1               | 67869230ccb8b4499893e14915ca8b14
+ Dismember                               | dismember                               | battle_rule_v1:2f513570333d9f48be476602a7ce1593 | stat_modifier_removal_until_eot_v1                  | e3824a160f31571d21bccb7be33474cf
+ Electroduplicate                        | electroduplicate                        | battle_rule_v1:908888276dcbc8c3db1126707691ae2c | temporary_hasty_copy_token_v1                       | 336afa048144f8fb9a88dfc3b6588f4b
+ Entomb                                  | entomb                                  | battle_rule_v1:eb8223965ca43b8748902c1f16770332 | graveyard_tutor_single_card_v1                      | ff9463f33167f2489bb78394a914d43c
+ Everflowing Chalice                     | everflowing chalice                     | battle_rule_v1:67f848a7a9f40c7337ec0c13e0c1de7c | multikicker_charge_mana_artifact_v1                 | 2916ac287962232283ac7b1dbe684b7d
+ Great Furnace                           | great furnace                           | battle_rule_v1:9a28465081dd2ac48819f94e919646a6 | artifact_land_colored_source_v1                     | ed6887f502cae452812d5f5d0a0c5792
+ Lumra, Bellow of the Woods              | lumra, bellow of the woods              | battle_rule_v1:847f9ee3ec1da14f043c8a52a4dbfb52 | mill_four_then_return_all_graveyard_lands_tapped_v1 | 6d55531f06ba4e627600f3962ad9f95f
+ Miscast                                 | miscast                                 | battle_rule_v1:6b480fbda0d69779cde9b6a366089c4a | soft_noncreature_counter_v1                         | dff145f1eaaa76d6f9e44e688bb29726
+ Mox Amber                               | mox amber                               | battle_rule_v1:972703914ee50acd7a4e6f529fea1adf | legend_gated_fast_mana_v1                           | e47b40cf2afc4c9ceac6bf91815da706
+ Mox Diamond                             | mox diamond                             | battle_rule_v1:80a4b5beca8834e0c642dc8c0663106c | discard_land_fast_mana_v1                           | 517f664e6c81ce9c204c09a20e14be2d
+ Natural Order                           | natural order                           | battle_rule_v1:8a9cf49fe56ad1fabdb48aead5531bd1 | green_creature_pod_tutor_v1                         | 313e25b11a10c99127eca70b7fefbb75
+ Nature's Claim                          | nature's claim                          | battle_rule_v1:b68a368de3add71ee716cda718b9bcb9 | artifact_or_enchantment_removal_lifegain_v1         | c88d03f66daf06b46fd567dca8e34c50
+ Rampant Growth                          | rampant growth                          | battle_rule_v1:439f162ed0ffa2321dd21b0692f07af4 | basic_land_ramp_tapped_v1                           | 4ce07a0d5e5a33a68517b988b63dbe42
+ Runaway Steam-Kin                       | runaway steam-kin                       | battle_rule_v1:955e0141660dfdc8b31aaf15056693aa | creature_counter_engine_unexecuted_v1               | abe8e79d26d363a82e68a55e6c19c0b3
+ Sami's Curiosity                        | sami's curiosity                        | battle_rule_v1:b25c35d72e00a057dc20945c38059d0e | gain_life_make_lander_token_v1                      | d88d3c9d7319f3ce78f286614392ffbf
+ Seething Song                           | seething song                           | battle_rule_v1:3eb15dc581c6b913158f9b63c023f3d7 | single_shot_red_ritual_v1                           | ccd492289c6f1c14c8fb7a248d7bbf32
+ Silence                                 | silence                                 | battle_rule_v1:74b210b77b004a677906e0216d44e445 | silence_until_eot_v1                                | a0ca3c09a7db091c435ab31adb9c1780
+ Soul-Guide Lantern                      | soul-guide lantern                      | battle_rule_v1:3454aa122d10a4abd906132eb7745339 | graveyard_hate_cantrip_artifact_v1                  | 6a9e4cf9a4397715ccd0737e1b8cf270
+ Splendid Reclamation                    | splendid reclamation                    | battle_rule_v1:323e4e2c6e95da761c1614e4dff44778 | graveyard_lands_to_battlefield_tapped_v1            | 81249444bdb32006d5e687858df04b9a
+ Unexpected Windfall                     | unexpected windfall                     | battle_rule_v1:f9f98ea1925518eea7a7c94c21ef2dc4 | discard_draw_create_treasures_v1                    | 9c4fbe06104051a2e8b1d295d307b26a
+ Valakut Awakening                       | valakut awakening                       | battle_rule_v1:245b8d2627720fadfd7a30464d07605a | bottom_then_draw_plus_one_v1                        | 22b42fcc181b7aed71f78b2e1e51e887
+ Valakut Awakening // Valakut Stoneforge | valakut awakening // valakut stoneforge | battle_rule_v1:6e1f3b876822abafe1de47610f46858d | bottom_then_draw_plus_one_mdfc_land_v1              | 22b42fcc181b7aed71f78b2e1e51e887
+ Vexing Bauble                           | vexing bauble                           | battle_rule_v1:6a85170698c85498bf618c0c0283a770 | free_spell_hate_artifact_v1                         | 020e696ec9560830bb82bf0244595d69
+ Wall of Omens                           | wall of omens                           | battle_rule_v1:ee84dfe5a22708bf0b0ef435699ed7a4 | etb_cantrip_creature_v1                             | 755be179e545f27507f78b6a79a34485
+ Worldfire                               | worldfire                               | battle_rule_v1:1b9bb9bfd6774cc55d21e50009efa9f3 | worldfire_total_reset_v1                            | dfb75aa49416e7e281ad8e5cdcf721fa
+ Zuran Orb                               | zuran orb                               | battle_rule_v1:d977323f1ef9834d148ef87dc519ba37 | sacrifice_land_gain_life_artifact_v1                | 5fef1974ee8b02952ac5612ea66c5c33
+(32 rows)

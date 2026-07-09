@@ -1756,9 +1756,10 @@ def test_add_counters_untap_target_runner_executes_spell() -> None:
         battle.get_card_effect = previous_get_card_effect
 
     assert result["card_name"] == "Dragonscale Boon"
-    assert result["target"] == "E2E Counter Untap Target"
-    assert result["counters_added"] == 2
-    assert result["target_untapped"] is True
+    assert result["target_count"] == 1
+    assert result["targets"] == ["E2E Counter Untap Target"]
+    assert result["counters_added_each"] == 2
+    assert result["targets_untapped_count"] == 1
     assert any(
         event == "add_counters_resolved"
         and data.get("card") == "Dragonscale Boon"
@@ -1766,6 +1767,80 @@ def test_add_counters_untap_target_runner_executes_spell() -> None:
         and data.get("counters_added") == 2
         for event, data in events
     )
+
+
+def test_add_counters_multi_target_runner_executes_spell() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "add_counters",
+        "battle_model_scope": "xmage_fixed_add_counters_target_creatures_spell_v1",
+        "target": "creature",
+        "target_controller": "any",
+        "target_constraints": {"card_types": ["creature"]},
+        "counter_type": "+1/+1",
+        "counter_count": 1,
+        "count": 1,
+        "target_count": 2,
+        "target_count_min": 0,
+        "target_count_max": 2,
+        "up_to_count": True,
+        "_rule_logical_key": "battle_rule_v1:test-counters",
+    }
+    try:
+        result = validator.run_add_counters_target_spell(
+            battle,
+            {
+                "name": "Test Counters adds counters to targets",
+                "type": "add_counters_target_spell",
+                "card": {"name": "Test Counters", "type_line": "Instant"},
+                "targets": [
+                    {
+                        "name": "E2E Counter Target A",
+                        "type_line": "Creature - Fixture",
+                        "effect": "creature",
+                        "power": 3,
+                        "toughness": 3,
+                    },
+                    {
+                        "name": "E2E Counter Target B",
+                        "type_line": "Creature - Fixture",
+                        "effect": "creature",
+                        "power": 2,
+                        "toughness": 2,
+                    },
+                ],
+                "nonmatching_target": {
+                    "name": "E2E Illegal Counter Target",
+                    "type_line": "Land",
+                    "effect": "land",
+                },
+                "expected_target_count": 2,
+                "expected_counter_type": "+1/+1",
+                "expected_counter_count": 1,
+                "logical_rule_key": "battle_rule_v1:test-counters",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Test Counters"
+    assert result["target_count"] == 2
+    assert result["counters_added_each"] == 1
+    assert len(
+        [
+            data
+            for event, data in events
+            if event == "add_counters_resolved"
+            and data.get("card") == "Test Counters"
+            and data.get("counters_added") == 1
+        ]
+    ) == 2
 
 
 def test_gain_control_untap_haste_runner_returns_control_at_cleanup() -> None:

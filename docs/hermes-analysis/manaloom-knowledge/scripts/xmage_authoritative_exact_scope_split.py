@@ -364,7 +364,11 @@ BOARD_WIPE_SCOPE = "xmage_destroy_all_matching_permanents_spell_v1"
 DAMAGE_WIPE_SCOPE = "xmage_fixed_damage_all_matching_permanents_spell_v1"
 EACH_PLAYER_SACRIFICE_SCOPE = "xmage_each_player_sacrifice_fixed_permanents_spell_v1"
 ADD_COUNTERS_TARGET_SCOPE = "xmage_fixed_add_counters_target_creature_spell_v1"
+ADD_COUNTERS_TARGET_CREATURES_SCOPE = "xmage_fixed_add_counters_target_creatures_spell_v1"
 ADD_COUNTERS_UNTAP_TARGET_SCOPE = "xmage_fixed_add_counters_and_untap_target_creature_spell_v1"
+ADD_COUNTERS_UNTAP_TARGET_CREATURES_SCOPE = (
+    "xmage_fixed_add_counters_and_untap_target_creatures_spell_v1"
+)
 PERMANENT_ACTIVATED_SELF_ADD_COUNTERS_SCOPE = (
     "xmage_permanent_simple_activated_self_add_counters_v1"
 )
@@ -7201,20 +7205,47 @@ def counter_count_from_text(value: str) -> int | None:
     return COUNTER_WORD_NUMBERS.get(token)
 
 
-def fixed_counter_target_from_source(source: str) -> tuple[str, int] | None:
+def fixed_counter_target_spec_from_source(source: str) -> dict[str, Any] | str | None:
     matches = re.findall(
         r"AddCountersTargetEffect\s*\(\s*CounterType\.(P1P1|M1M1)\.createInstance\s*\(\s*(\d*)\s*\)",
         source or "",
     )
     if len(matches) != 1:
         return None
-    if len(re.findall(r"\.addTarget\s*\(\s*new\s+TargetCreaturePermanent\s*\(", source or "")) != 1:
+    if (
+        len(
+            re.findall(
+                r"\.addTarget\s*\(\s*new\s+Target(?:Controlled)?CreaturePermanent\s*\(",
+                source or "",
+            )
+        )
+        != 1
+    ):
         return None
-    if not re.search(r"\.addTarget\s*\(\s*new\s+TargetCreaturePermanent\s*\(\s*\)\s*\)", source or ""):
-        return None
+    target_count = target_creature_permanent_count_from_source(source or "")
+    if isinstance(target_count, str):
+        return target_count.replace("target_creature", "add_counters_target_creature")
     counter_class, raw_count = matches[0]
     counter_type = "+1/+1" if counter_class == "P1P1" else "-1/-1"
-    return counter_type, int(raw_count or "1")
+    return {
+        "counter_type": counter_type,
+        "counter_count": int(raw_count or "1"),
+        **target_count,
+    }
+
+
+def fixed_counter_target_from_source(source: str) -> tuple[str, int] | None:
+    spec = fixed_counter_target_spec_from_source(source)
+    if not isinstance(spec, dict):
+        return None
+    if (
+        int(spec.get("target_count_min") or 0) != 1
+        or int(spec.get("target_count_max") or 0) != 1
+        or bool(spec.get("up_to_count"))
+        or str(spec.get("target_controller") or "any") != "any"
+    ):
+        return None
+    return str(spec["counter_type"]), int(spec["counter_count"])
 
 
 def fixed_counter_source_from_source(source: str) -> tuple[str, int] | None:
@@ -7230,18 +7261,62 @@ def fixed_counter_source_from_source(source: str) -> tuple[str, int] | None:
 
 
 def fixed_counter_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, int] | None:
+    spec = fixed_counter_target_spec_from_oracle(metadata)
+    if not isinstance(spec, dict):
+        return None
+    if (
+        int(spec.get("target_count_min") or 0) != 1
+        or int(spec.get("target_count_max") or 0) != 1
+        or bool(spec.get("up_to_count"))
+        or str(spec.get("target_controller") or "any") != "any"
+    ):
+        return None
+    return str(spec["counter_type"]), int(spec["counter_count"])
+
+
+def fixed_counter_target_spec_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
     text = oracle_text(metadata)
-    match = re.match(
+    match = re.fullmatch(
         r"^put (a|an|one|two|three|four|five|six|seven|eight|nine|ten|\d+) "
-        r"(\+1/\+1|-1/-1) counters? on target creature\.?$",
+        r"(\+1/\+1|-1/-1) counters? on target creature(?P<controlled> you control)?\.?$",
         text,
     )
-    if not match:
+    if match:
+        count = counter_count_from_text(match.group(1))
+        if count is None or count <= 0:
+            return None
+        return {
+            "counter_type": match.group(2),
+            "counter_count": count,
+            "target_count": 1,
+            "target_count_min": 1,
+            "target_count_max": 1,
+            "up_to_count": False,
+            "target_controller": "self" if match.group("controlled") else "any",
+        }
+    multi = re.fullmatch(
+        r"^put (?P<count>a|an|one|two|three|four|five|six|seven|eight|nine|ten|\d+) "
+        r"(?P<counter>\+1/\+1|-1/-1) counters? on each of (?P<upto>up to )?"
+        r"(?P<targets>two|three|four|five|six|seven|eight|nine|ten|\d+) "
+        r"target creatures(?P<controlled> you control)?\.?$",
+        text,
+    )
+    if not multi:
         return None
-    count = counter_count_from_text(match.group(1))
-    if count is None or count <= 0:
+    count = counter_count_from_text(multi.group("count"))
+    target_count = counter_count_from_text(multi.group("targets"))
+    if count is None or count <= 0 or target_count is None or target_count <= 1:
         return None
-    return match.group(2), count
+    up_to = bool(multi.group("upto"))
+    return {
+        "counter_type": multi.group("counter"),
+        "counter_count": count,
+        "target_count": target_count,
+        "target_count_min": 0 if up_to else target_count,
+        "target_count_max": target_count,
+        "up_to_count": up_to,
+        "target_controller": "self" if multi.group("controlled") else "any",
+    }
 
 
 def fixed_counter_untap_target_from_source(source: str) -> dict[str, Any] | str:
@@ -7261,12 +7336,6 @@ def fixed_counter_untap_target_from_source(source: str) -> dict[str, Any] | str:
     target_count = target_creature_permanent_count_from_source(text)
     if isinstance(target_count, str):
         return target_count.replace("target_creature", "add_counters_untap_target_creature")
-    if (
-        int(target_count.get("target_count_min") or 0) != 1
-        or int(target_count.get("target_count_max") or 0) != 1
-        or bool(target_count.get("up_to_count"))
-    ):
-        return "add_counters_untap_source_target_count_not_single"
     counter_class, raw_count = counter_matches[0]
     counter_type = "+1/+1" if counter_class == "P1P1" else "-1/-1"
     count = int(raw_count or "1")
@@ -7300,6 +7369,33 @@ def fixed_counter_untap_target_from_oracle(metadata: dict[str, Any]) -> dict[str
             "target_count_min": 1,
             "target_count_max": 1,
             "up_to_count": False,
+            "target_controller": "any",
+        }
+    multi_patterns = [
+        r"^put (?P<count>a|an|one|two|three|four|five|six|seven|eight|nine|ten|\d+) "
+        r"(?P<counter>\+1/\+1|-1/-1) counters? on each of (?P<upto>up to )?"
+        r"(?P<targets>two|three|four|five|six|seven|eight|nine|ten|\d+) target creatures\. "
+        r"untap them\.?$",
+        r"^put (?P<count>a|an|one|two|three|four|five|six|seven|eight|nine|ten|\d+) "
+        r"(?P<counter>\+1/\+1|-1/-1) counters? on each of (?P<upto>up to )?"
+        r"(?P<targets>two|three|four|five|six|seven|eight|nine|ten|\d+) target creatures and untap them\.?$",
+    ]
+    for pattern in multi_patterns:
+        match = re.fullmatch(pattern, text)
+        if not match:
+            continue
+        count = counter_count_from_text(match.group("count"))
+        target_count = counter_count_from_text(match.group("targets"))
+        if count is None or count <= 0 or target_count is None or target_count <= 1:
+            return "add_counters_untap_oracle_count_not_supported"
+        up_to = bool(match.group("upto"))
+        return {
+            "counter_type": match.group("counter"),
+            "counter_count": count,
+            "target_count": target_count,
+            "target_count_min": 0 if up_to else target_count,
+            "target_count_max": target_count,
+            "up_to_count": up_to,
             "target_controller": "any",
         }
     return "add_counters_untap_oracle_not_exact"
@@ -24012,8 +24108,14 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "noncreature permanent with a simple self-sacrifice library-search-to-hand ability"
     elif scope == TAP_TARGET_SPELL_SCOPE:
         scope_kind = "instant or sorcery spell that taps exact target permanents"
+    elif scope == ADD_COUNTERS_TARGET_SCOPE:
+        scope_kind = "instant or sorcery spell that adds fixed counters to one target creature"
+    elif scope == ADD_COUNTERS_TARGET_CREATURES_SCOPE:
+        scope_kind = "instant or sorcery spell that adds fixed counters to exact target creatures"
     elif scope == ADD_COUNTERS_UNTAP_TARGET_SCOPE:
         scope_kind = "instant or sorcery spell that adds fixed counters to one target creature and untaps it"
+    elif scope == ADD_COUNTERS_UNTAP_TARGET_CREATURES_SCOPE:
+        scope_kind = "instant or sorcery spell that adds fixed counters to exact target creatures and untaps them"
     elif scope == LIBRARY_PICK_SPELL_SCOPE:
         scope_kind = "fixed reveal-top-library pick-to-hand spell"
     elif scope == LOOK_LIBRARY_PICK_SPELL_SCOPE:
@@ -34149,28 +34251,50 @@ def split_row(
             return None, "add_counters_ability_class_not_simple"
         if has_oracle_complexity(metadata):
             return None, "add_counters_oracle_not_simple"
-        source_counter = fixed_counter_target_from_source(source_text)
+        source_counter = fixed_counter_target_spec_from_source(source_text)
+        if isinstance(source_counter, str):
+            return None, source_counter
         if source_counter is None:
             return None, "add_counters_counter_not_fixed"
-        oracle_counter = fixed_counter_target_from_oracle(metadata)
+        oracle_counter = fixed_counter_target_spec_from_oracle(metadata)
         if oracle_counter is None:
             return None, "add_counters_target_not_supported"
-        if source_counter != oracle_counter:
+        comparable_keys = (
+            "counter_type",
+            "counter_count",
+            "target_count_min",
+            "target_count_max",
+            "up_to_count",
+            "target_controller",
+        )
+        if any(source_counter.get(key) != oracle_counter.get(key) for key in comparable_keys):
             return None, "add_counters_source_oracle_mismatch"
-        counter_type, count = oracle_counter
+        counter_type = str(oracle_counter["counter_type"])
+        count = int(oracle_counter["counter_count"])
+        target_count_max = int(oracle_counter["target_count_max"])
+        scope = ADD_COUNTERS_TARGET_CREATURES_SCOPE if target_count_max > 1 else ADD_COUNTERS_TARGET_SCOPE
         effect_json = {
             "effect": "add_counters",
-            "battle_model_scope": ADD_COUNTERS_TARGET_SCOPE,
+            "battle_model_scope": scope,
             "target": "creature",
             "target_constraints": {"card_types": ["creature"]},
-            "target_controller": "any",
+            "target_controller": oracle_counter["target_controller"],
             "counter_type": counter_type,
             "counter_count": count,
             "count": count,
+            "target_count": target_count_max,
+            "target_count_min": int(oracle_counter["target_count_min"]),
+            "target_count_max": target_count_max,
+            "up_to_count": bool(oracle_counter["up_to_count"]),
             "xmage_effect_class": "AddCountersTargetEffect",
             **flags,
         }
-        return build_proposal(row, metadata, effect_json, family_id="xmage_add_counters_target_creature_spell"), "selected_exact_scope"
+        family_id = (
+            "xmage_add_counters_target_creatures_spell"
+            if target_count_max > 1
+            else "xmage_add_counters_target_creature_spell"
+        )
+        return build_proposal(row, metadata, effect_json, family_id=family_id), "selected_exact_scope"
 
     if unit == UNTAP_TARGET_UNIT:
         if classes == {"AddCountersTargetEffect", "UntapTargetEffect"}:
@@ -34189,33 +34313,45 @@ def split_row(
                 "target_count_min",
                 "target_count_max",
                 "up_to_count",
+                "target_controller",
             )
             if any(source_counter.get(key) != oracle_counter.get(key) for key in comparable_keys):
                 return None, "add_counters_untap_source_oracle_mismatch"
             counter_type = str(oracle_counter["counter_type"])
             count = int(oracle_counter["counter_count"])
+            target_count_max = int(oracle_counter["target_count_max"])
+            scope = (
+                ADD_COUNTERS_UNTAP_TARGET_CREATURES_SCOPE
+                if target_count_max > 1
+                else ADD_COUNTERS_UNTAP_TARGET_SCOPE
+            )
             effect_json = {
                 "effect": "add_counters",
-                "battle_model_scope": ADD_COUNTERS_UNTAP_TARGET_SCOPE,
+                "battle_model_scope": scope,
                 "target": "creature",
                 "target_constraints": {"card_types": ["creature"]},
-                "target_controller": "any",
+                "target_controller": oracle_counter["target_controller"],
                 "counter_type": counter_type,
                 "counter_count": count,
                 "count": count,
                 "untap_target": True,
-                "target_count": 1,
-                "target_count_min": 1,
-                "target_count_max": 1,
-                "up_to_count": False,
+                "target_count": target_count_max,
+                "target_count_min": int(oracle_counter["target_count_min"]),
+                "target_count_max": target_count_max,
+                "up_to_count": bool(oracle_counter["up_to_count"]),
                 "xmage_effect_classes": ["AddCountersTargetEffect", "UntapTargetEffect"],
                 **flags,
             }
+            family_id = (
+                "xmage_add_counters_untap_target_creatures_spell"
+                if target_count_max > 1
+                else "xmage_add_counters_untap_target_creature_spell"
+            )
             return build_proposal(
                 row,
                 metadata,
                 effect_json,
-                family_id="xmage_add_counters_untap_target_creature_spell",
+                family_id=family_id,
             ), "selected_exact_scope"
         if classes == {"GainAbilityTargetEffect", "GainControlTargetEffect", "UntapTargetEffect"}:
             if ability_classes(row) != {"HasteAbility"}:

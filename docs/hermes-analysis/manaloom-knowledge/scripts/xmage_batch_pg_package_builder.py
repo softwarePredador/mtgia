@@ -3387,23 +3387,86 @@ def boost_untap_target_spell_execution_scenario_from_expected_rule(
     }
 
 
+def add_counters_target_spell_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") not in {
+        "xmage_fixed_add_counters_target_creature_spell_v1",
+        "xmage_fixed_add_counters_target_creatures_spell_v1",
+    }:
+        return None
+    if required.get("effect") != "add_counters" or required.get("untap_target"):
+        return None
+    constraints = dict(required.get("target_constraints") or {"card_types": ["creature"]})
+    target_count = max(
+        1,
+        int(required.get("target_count_max") or required.get("target_count") or 1),
+    )
+    targets = []
+    for index in range(target_count):
+        target = _target_fixture_from_constraints(
+            f"E2E Legal Counter Target {index + 1}",
+            constraints,
+            matching=True,
+        )
+        target.setdefault("power", 2 + index)
+        target.setdefault("toughness", 2 + index)
+        targets.append(target)
+    nonmatching = _target_fixture_from_constraints(
+        "E2E Illegal Counter Target",
+        constraints,
+        matching=False,
+    )
+    return {
+        "name": f"{rule['card_name']} adds counters to target creature spell",
+        "type": "add_counters_target_spell",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": "Sorcery" if required.get("sorcery") is True else "Instant",
+        },
+        "target": targets[0],
+        "targets": targets,
+        "nonmatching_target": nonmatching,
+        "expected_target_constraints": constraints,
+        "expected_target_count": target_count,
+        "expected_counter_type": required.get("counter_type"),
+        "expected_counter_count": int(
+            required.get("counter_count")
+            or required.get("count")
+            or 1
+        ),
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def add_counters_untap_target_spell_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
     required = dict(rule.get("required_effect_fields") or {})
-    if required.get("battle_model_scope") != "xmage_fixed_add_counters_and_untap_target_creature_spell_v1":
+    if required.get("battle_model_scope") not in {
+        "xmage_fixed_add_counters_and_untap_target_creature_spell_v1",
+        "xmage_fixed_add_counters_and_untap_target_creatures_spell_v1",
+    }:
         return None
     if required.get("effect") != "add_counters" or not required.get("untap_target"):
         return None
     constraints = dict(required.get("target_constraints") or {"card_types": ["creature"]})
-    target = _target_fixture_from_constraints(
-        "E2E Legal Counter Untap Target",
-        constraints,
-        matching=True,
+    target_count = max(
+        1,
+        int(required.get("target_count_max") or required.get("target_count") or 1),
     )
-    target["tapped"] = True
-    target.setdefault("power", 2)
-    target.setdefault("toughness", 2)
+    targets = []
+    for index in range(target_count):
+        target = _target_fixture_from_constraints(
+            f"E2E Legal Counter Untap Target {index + 1}",
+            constraints,
+            matching=True,
+        )
+        target["tapped"] = True
+        target.setdefault("power", 2 + index)
+        target.setdefault("toughness", 2 + index)
+        targets.append(target)
     nonmatching = _target_fixture_from_constraints(
         "E2E Illegal Counter Untap Target",
         constraints,
@@ -3417,9 +3480,11 @@ def add_counters_untap_target_spell_execution_scenario_from_expected_rule(
             "name": rule["card_name"],
             "type_line": "Sorcery" if required.get("sorcery") is True else "Instant",
         },
-        "target": target,
+        "target": targets[0],
+        "targets": targets,
         "nonmatching_target": nonmatching,
         "expected_target_constraints": constraints,
+        "expected_target_count": target_count,
         "expected_counter_type": required.get("counter_type"),
         "expected_counter_count": int(
             required.get("counter_count")
@@ -5611,6 +5676,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or damage_target_create_treasure_execution_scenario_from_expected_rule(rule)
         or tap_target_spell_execution_scenario_from_expected_rule(rule)
         or gain_control_untap_haste_execution_scenario_from_expected_rule(rule)
+        or add_counters_target_spell_execution_scenario_from_expected_rule(rule)
         or add_counters_untap_target_spell_execution_scenario_from_expected_rule(rule)
         or boost_untap_target_spell_execution_scenario_from_expected_rule(rule)
         or simple_activated_draw_execution_scenario_from_expected_rule(rule)

@@ -1798,6 +1798,69 @@ def test_manifest_builds_add_counters_untap_target_spell_execution_scenario() ->
     assert scenario["nonmatching_target"]["name"] == "E2E Illegal Counter Untap Target"
 
 
+def test_manifest_builds_add_counters_multi_target_spell_execution_scenario() -> None:
+    rule = {
+        "normalized_name": "test counters",
+        "card_name": "Test Counters",
+        "oracle_hash": "hash-test-counters",
+        "logical_rule_key": "battle_rule_v1:hash-test-counters",
+        "required_effect_fields": {
+            "effect": "add_counters",
+            "battle_model_scope": "xmage_fixed_add_counters_target_creatures_spell_v1",
+            "target": "creature",
+            "target_controller": "any",
+            "target_constraints": {"card_types": ["creature"]},
+            "counter_type": "+1/+1",
+            "counter_count": 1,
+            "count": 1,
+            "target_count": 2,
+            "target_count_min": 0,
+            "target_count_max": 2,
+            "up_to_count": True,
+        },
+    }
+
+    scenario = builder.add_counters_target_spell_execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "add_counters_target_spell"
+    assert scenario["expected_target_count"] == 2
+    assert len(scenario["targets"]) == 2
+    assert scenario["expected_counter_type"] == "+1/+1"
+
+
+def test_manifest_builds_add_counters_untap_multi_target_spell_execution_scenario() -> None:
+    rule = {
+        "normalized_name": "leos guidance",
+        "card_name": "Leo's Guidance",
+        "oracle_hash": "hash-leos-guidance",
+        "logical_rule_key": "battle_rule_v1:hash-leos-guidance",
+        "required_effect_fields": {
+            "effect": "add_counters",
+            "battle_model_scope": "xmage_fixed_add_counters_and_untap_target_creatures_spell_v1",
+            "target": "creature",
+            "target_controller": "any",
+            "target_constraints": {"card_types": ["creature"]},
+            "counter_type": "+1/+1",
+            "counter_count": 1,
+            "count": 1,
+            "untap_target": True,
+            "target_count": 3,
+            "target_count_min": 0,
+            "target_count_max": 3,
+            "up_to_count": True,
+        },
+    }
+
+    scenario = builder.add_counters_untap_target_spell_execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "add_counters_untap_target_spell"
+    assert scenario["expected_target_count"] == 3
+    assert len(scenario["targets"]) == 3
+    assert all(target["tapped"] is True for target in scenario["targets"])
+
+
 def test_manifest_builds_gain_control_untap_haste_execution_scenario() -> None:
     rule = {
         "normalized_name": "act of treason",

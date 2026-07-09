@@ -4989,23 +4989,39 @@ def run_simple_activated_tap_target(
     }
 
 
-def run_add_counters_untap_target_spell(
+def _counter_value(battle, target: dict[str, Any], counter_type: str) -> int:
+    if counter_type == "+1/+1":
+        return int(target.get("plus_one_counters") or 0)
+    if counter_type == "-1/-1":
+        return int(target.get("minus_one_counters") or 0)
+    return int(battle.get_named_counter_count(target, counter_type) or 0)
+
+
+def run_add_counters_target_spell(
     battle,
     scenario: dict[str, Any],
     events: list[tuple[str, dict[str, Any]]],
 ) -> dict[str, Any]:
     card = dict(scenario["card"])
-    active = battle.Player(str(scenario.get("player") or "Counter Untap Controller"), None, [])
-    opponent = battle.Player(str(scenario.get("opponent") or "Counter Untap Opponent"), None, [])
-    target = battle.enrich_card(dict(scenario.get("target") or {}))
-    if not target:
-        fail("battle_execution", f"{card['name']} counter+untap scenario has no legal target")
-    target["tapped"] = bool(target.get("tapped", True))
+    active = battle.Player(str(scenario.get("player") or "Counter Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Counter Opponent"), None, [])
+    raw_targets = list(scenario.get("targets") or [])
+    if not raw_targets and scenario.get("target"):
+        raw_targets = [scenario["target"]]
+    targets = [battle.enrich_card(dict(target)) for target in raw_targets]
+    if not targets:
+        fail("battle_execution", f"{card['name']} add-counters scenario has no legal target")
     nonmatching = scenario.get("nonmatching_target")
-    active.battlefield = [target]
+    active.battlefield = list(targets)
     if nonmatching:
         active.battlefield.append(battle.enrich_card(dict(nonmatching)))
     effect = battle.get_card_effect(card)
+    expected_target_count = int(
+        scenario.get("expected_target_count")
+        or effect.get("target_count_max")
+        or effect.get("target_count")
+        or 1
+    )
     expected_counter_type = str(
         scenario.get("expected_counter_type")
         or effect.get("counter_type")
@@ -5017,13 +5033,8 @@ def run_add_counters_untap_target_spell(
         or effect.get("count")
         or 1
     )
-    before = (
-        int(target.get("plus_one_counters") or 0)
-        if expected_counter_type == "+1/+1"
-        else int(target.get("minus_one_counters") or 0)
-        if expected_counter_type == "-1/-1"
-        else battle.get_named_counter_count(target, expected_counter_type)
-    )
+    selected_targets = targets[:expected_target_count]
+    before = {target.get("name"): _counter_value(battle, target, expected_counter_type) for target in selected_targets}
     before_events = len(events)
     battle.apply_effect_immediate(
         active,
@@ -5034,46 +5045,131 @@ def run_add_counters_untap_target_spell(
         effect_data_override=effect,
         phase=str(scenario.get("phase") or "precombat_main"),
     )
-    after = (
-        int(target.get("plus_one_counters") or 0)
-        if expected_counter_type == "+1/+1"
-        else int(target.get("minus_one_counters") or 0)
-        if expected_counter_type == "-1/-1"
-        else battle.get_named_counter_count(target, expected_counter_type)
-    )
-    if after - before != expected_counter_count:
-        fail(
-            "battle_execution",
-            f"{card['name']} expected {expected_counter_count} {expected_counter_type} counters, got {after - before}",
-        )
-    if bool(target.get("tapped")):
-        fail("battle_execution", f"{card['name']} left target {target.get('name')} tapped")
-    resolved_event = next(
-        (
-            data
-            for event, data in events[before_events:]
-            if event == "add_counters_resolved"
-            and data.get("card") == card.get("name")
-            and data.get("target") == target.get("name")
-        ),
-        None,
-    )
-    if resolved_event is None:
-        fail("battle_events", f"missing {card['name']} counter+untap resolved event")
-    if not resolved_event.get("target_untapped"):
-        fail("battle_events", f"{card['name']} event did not mark target untapped")
-    if int(resolved_event.get("counters_added") or 0) != expected_counter_count:
+    for target in selected_targets:
+        target_name = target.get("name")
+        after = _counter_value(battle, target, expected_counter_type)
+        if after - before[target_name] != expected_counter_count:
+            fail(
+                "battle_execution",
+                f"{card['name']} expected {expected_counter_count} {expected_counter_type} counters on {target_name}, got {after - before[target_name]}",
+            )
+    resolved_events = [
+        data
+        for event, data in events[before_events:]
+        if event == "add_counters_resolved" and data.get("card") == card.get("name")
+    ]
+    if len(resolved_events) != expected_target_count:
         fail(
             "battle_events",
-            f"{card['name']} event counters_added={resolved_event.get('counters_added')}, expected {expected_counter_count}",
+            f"{card['name']} expected {expected_target_count} add-counters events, got {len(resolved_events)}",
         )
+    for data in resolved_events:
+        if int(data.get("counters_added") or 0) != expected_counter_count:
+            fail(
+                "battle_events",
+                f"{card['name']} event counters_added={data.get('counters_added')}, expected {expected_counter_count}",
+            )
+        if int(data.get("selected_target_count") or 0) != expected_target_count:
+            fail(
+                "battle_events",
+                f"{card['name']} selected_target_count={data.get('selected_target_count')}, expected {expected_target_count}",
+            )
     return {
         "scenario": scenario.get("name"),
         "card_name": card["name"],
-        "target": target.get("name"),
+        "target_count": expected_target_count,
+        "targets": [target.get("name") for target in selected_targets],
         "counter_type": expected_counter_type,
-        "counters_added": after - before,
-        "target_untapped": not bool(target.get("tapped")),
+        "counters_added_each": expected_counter_count,
+    }
+
+
+def run_add_counters_untap_target_spell(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    active = battle.Player(str(scenario.get("player") or "Counter Untap Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Counter Untap Opponent"), None, [])
+    raw_targets = list(scenario.get("targets") or [])
+    if not raw_targets and scenario.get("target"):
+        raw_targets = [scenario["target"]]
+    targets = [battle.enrich_card(dict(target)) for target in raw_targets]
+    if not targets:
+        fail("battle_execution", f"{card['name']} counter+untap scenario has no legal target")
+    for target in targets:
+        target["tapped"] = bool(target.get("tapped", True))
+    nonmatching = scenario.get("nonmatching_target")
+    active.battlefield = list(targets)
+    if nonmatching:
+        active.battlefield.append(battle.enrich_card(dict(nonmatching)))
+    effect = battle.get_card_effect(card)
+    expected_target_count = int(
+        scenario.get("expected_target_count")
+        or effect.get("target_count_max")
+        or effect.get("target_count")
+        or 1
+    )
+    expected_counter_type = str(
+        scenario.get("expected_counter_type")
+        or effect.get("counter_type")
+        or "+1/+1"
+    )
+    expected_counter_count = int(
+        scenario.get("expected_counter_count")
+        or effect.get("counter_count")
+        or effect.get("count")
+        or 1
+    )
+    selected_targets = targets[:expected_target_count]
+    before = {target.get("name"): _counter_value(battle, target, expected_counter_type) for target in selected_targets}
+    before_events = len(events)
+    battle.apply_effect_immediate(
+        active,
+        [opponent],
+        battle.enrich_card({**card, **effect}),
+        turn=int(scenario.get("turn") or 7),
+        rng=random.Random(int(scenario.get("seed") or 6077)),
+        effect_data_override=effect,
+        phase=str(scenario.get("phase") or "precombat_main"),
+    )
+    for target in selected_targets:
+        target_name = target.get("name")
+        after = _counter_value(battle, target, expected_counter_type)
+        if after - before[target_name] != expected_counter_count:
+            fail(
+                "battle_execution",
+                f"{card['name']} expected {expected_counter_count} {expected_counter_type} counters on {target_name}, got {after - before[target_name]}",
+            )
+        if bool(target.get("tapped")):
+            fail("battle_execution", f"{card['name']} left target {target_name} tapped")
+    resolved_events = [
+        data
+        for event, data in events[before_events:]
+        if event == "add_counters_resolved" and data.get("card") == card.get("name")
+    ]
+    if len(resolved_events) != expected_target_count:
+        fail(
+            "battle_events",
+            f"{card['name']} expected {expected_target_count} counter+untap events, got {len(resolved_events)}",
+        )
+    for data in resolved_events:
+        if not data.get("target_untapped"):
+            fail("battle_events", f"{card['name']} event did not mark target untapped")
+        if int(data.get("counters_added") or 0) != expected_counter_count:
+            fail(
+                "battle_events",
+                f"{card['name']} event counters_added={data.get('counters_added')}, expected {expected_counter_count}",
+            )
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "target_count": expected_target_count,
+        "targets": [target.get("name") for target in selected_targets],
+        "counter_type": expected_counter_type,
+        "counters_added_each": expected_counter_count,
+        "targets_untapped_count": len(selected_targets),
     }
 
 
@@ -8763,6 +8859,7 @@ SCENARIO_RUNNERS = {
     "tap_target_spell": run_tap_target_spell,
     "gain_control_untap_haste_until_eot": run_gain_control_untap_haste_until_eot,
     "stat_modifier_until_eot_untap_target": run_stat_modifier_until_eot_untap_target,
+    "add_counters_target_spell": run_add_counters_target_spell,
     "add_counters_untap_target_spell": run_add_counters_untap_target_spell,
     "target_player_draw_spell": run_target_player_draw_spell,
     "target_keyword_draw_spell": run_target_keyword_draw_spell,

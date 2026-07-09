@@ -20888,7 +20888,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["counter_type"], "-1/-1")
         self.assertEqual(effect["counter_count"], 4)
 
-    def test_add_counters_multi_target_spell_stays_blocked(self) -> None:
+    def test_add_counters_multi_target_spell_maps_target_count(self) -> None:
         row = queue_row(split.ADD_COUNTERS_TARGET_UNIT, effect_classes=["AddCountersTargetEffect"])
         proposal, reason = split.split_row(
             row,
@@ -20900,8 +20900,14 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             ),
         )
 
-        self.assertIsNone(proposal)
-        self.assertEqual(reason, "add_counters_counter_not_fixed")
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.ADD_COUNTERS_TARGET_CREATURES_SCOPE)
+        self.assertEqual(effect["counter_type"], "+1/+1")
+        self.assertEqual(effect["counter_count"], 1)
+        self.assertEqual(effect["target_count_min"], 0)
+        self.assertEqual(effect["target_count_max"], 2)
+        self.assertTrue(effect["up_to_count"])
 
     def test_activated_self_add_counter_maps_to_source_counter_runtime(self) -> None:
         row = queue_row(
@@ -28665,7 +28671,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "add_counters_untap_source_counter_not_single_fixed")
 
-    def test_add_counters_untap_target_blocks_multi_target_until_supported(self) -> None:
+    def test_add_counters_untap_target_maps_multi_target_scope(self) -> None:
         proposal, reason = split.split_row(
             queue_row(
                 split.UNTAP_TARGET_UNIT,
@@ -28684,8 +28690,15 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             """,
         )
 
-        self.assertIsNone(proposal)
-        self.assertEqual(reason, "add_counters_untap_source_target_count_not_single")
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.ADD_COUNTERS_UNTAP_TARGET_CREATURES_SCOPE)
+        self.assertEqual(effect["counter_type"], "+1/+1")
+        self.assertEqual(effect["counter_count"], 1)
+        self.assertEqual(effect["target_count_min"], 0)
+        self.assertEqual(effect["target_count_max"], 3)
+        self.assertTrue(effect["up_to_count"])
+        self.assertTrue(effect["untap_target"])
 
     def test_fixed_boost_keyword_untap_target_maps_exact_scope(self) -> None:
         proposal, reason = split.split_row(

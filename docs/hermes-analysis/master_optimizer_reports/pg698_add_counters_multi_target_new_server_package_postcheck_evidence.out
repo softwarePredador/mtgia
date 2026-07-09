@@ -1,0 +1,6 @@
+     card_name     |  normalized_name  |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
+-------------------+-------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
+ Gird for Battle   | gird for battle   | battle_rule_v1:370f47a81ed9d92f11b41968a8cbe6cf |                  1 |                           1 |                         1 |           0
+ Leo's Guidance    | leo's guidance    | battle_rule_v1:1a72396e764ce4abd22f1d1d569031f8 |                  1 |                           1 |                         1 |           0
+ Reap What Is Sown | reap what is sown | battle_rule_v1:34ad232119cc27683aabda01ee0aaecf |                  1 |                           1 |                         1 |           0
+(3 rows)
