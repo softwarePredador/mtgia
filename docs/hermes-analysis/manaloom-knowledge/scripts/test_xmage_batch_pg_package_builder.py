@@ -1395,6 +1395,39 @@ def test_manifest_builds_target_player_x_draw_execution_scenario() -> None:
     assert scenario["expected_target_player"] == "Spell Controller"
 
 
+def test_manifest_builds_target_player_x_draw_shuffle_self_execution_scenario() -> None:
+    rule = {
+        "normalized_name": "blue sun's zenith",
+        "card_name": "Blue Sun's Zenith",
+        "oracle_hash": "hash-blue-sun",
+        "logical_rule_key": "battle_rule_v1:hash-blue-sun",
+        "required_effect_fields": {
+            "effect": "draw_cards",
+            "battle_model_scope": "xmage_fixed_target_player_draw_spell_v1",
+            "target": "player",
+            "target_controller": "target_player",
+            "target_preference": "self",
+            "count": 0,
+            "draw_count": 0,
+            "draw_count_source": "x_value",
+            "target_player_draw": True,
+            "instant": True,
+            "shuffle_self_into_library_on_resolution": True,
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "target_player_draw_spell"
+    assert scenario["card"]["name"] == "Blue Sun's Zenith"
+    assert scenario["card"]["type_line"] == "Instant"
+    assert scenario["x_value"] == 3
+    assert scenario["expected_draw_count"] == 3
+    assert scenario["expect_shuffle_self"] is True
+    assert scenario["expected_spell_destination"] == "library"
+
+
 def test_manifest_builds_simple_activated_damage_execution_scenario() -> None:
     rule = {
         "normalized_name": "stormbind",
@@ -1573,6 +1606,36 @@ def test_manifest_builds_fixed_damage_target_spell_execution_scenario() -> None:
     assert scenario["target"]["colors"] == ["W"]
     assert scenario["nonmatching_target"]["type_line"].startswith("Creature")
     assert scenario["nonmatching_target"]["colors"] == ["B"]
+
+
+def test_manifest_builds_fixed_damage_target_shuffle_self_execution_scenario() -> None:
+    proposal = {
+        "normalized_name": "beacon of destruction",
+        "card_name": "Beacon of Destruction",
+        "oracle_hash": "hash-beacon-destruction",
+        "logical_rule_key": "battle_rule_v1:hash-beacon-destruction",
+        "effect_json": {
+            "effect": "direct_damage",
+            "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+            "amount": 5,
+            "damage": 5,
+            "target": "any_target",
+            "target_constraints": {"scope": "any_target"},
+            "instant": True,
+            "shuffle_self_into_library_on_resolution": True,
+        },
+    }
+
+    rule = builder.expected_rule_from_proposal(proposal)
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert rule["required_effect_fields"]["shuffle_self_into_library_on_resolution"] is True
+    assert scenario is not None
+    assert scenario["type"] == "fixed_damage_target_spell"
+    assert scenario["card"]["name"] == "Beacon of Destruction"
+    assert scenario["expected_damage"] == 5
+    assert scenario["expect_shuffle_self"] is True
+    assert scenario["expected_spell_destination"] == "library"
 
 
 def test_manifest_builds_damage_target_create_treasure_execution_scenario() -> None:

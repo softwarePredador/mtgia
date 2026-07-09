@@ -959,6 +959,8 @@ def resolved_spell_destination(card, effect_data, effect, player=None):
         return "library"
     if buyback_was_paid(effect_data):
         return "hand"
+    if effect_data.get("shuffle_self_into_library_on_resolution"):
+        return "library"
     if is_instant_or_sorcery_spell(card):
         return "graveyard"
     if effect == "land":
@@ -3777,6 +3779,21 @@ def finish_resolved_spell(player, card, turn=None, effect_data=None):
             player=player.name,
             card=card.get("name", "?") if isinstance(card, dict) else str(card),
             available_turn=(turn or 0) + 1,
+            turn=turn,
+            **replay_rule_fields(effect_data or {}),
+        )
+        return
+    if (effect_data or {}).get("shuffle_self_into_library_on_resolution"):
+        player.library.append(card)
+        player.shuffle(random)
+        emit_replay_event(
+            "spell_shuffled_into_library_on_resolution",
+            player=player.name,
+            card=card.get("name", "?") if isinstance(card, dict) else str(card),
+            from_zone="stack",
+            to_zone="library",
+            destination="library",
+            zone_after="library",
             turn=turn,
             **replay_rule_fields(effect_data or {}),
         )
@@ -47673,7 +47690,7 @@ def resolve_copy_creature_token(player, card, effect_data, turn, opponents=None,
             **replay_rule_fields(effect_data),
         )
         if finish_spell:
-            finish_resolved_spell(player, card, turn=turn)
+            finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
         return None
     selected_targets = _selected_copy_targets(candidates, effect_data)
     token_count = _copy_token_count(effect_data, player)
@@ -63604,7 +63621,7 @@ def apply_effect_immediate(
                 all_players=all_players_for_entry,
                 stack=stack,
             )
-            finish_resolved_spell(player, card, turn=turn)
+            finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
             return
         if is_wheel_like_card(card, effect_data):
             wheel_draw_count = wheel_like_draw_count(

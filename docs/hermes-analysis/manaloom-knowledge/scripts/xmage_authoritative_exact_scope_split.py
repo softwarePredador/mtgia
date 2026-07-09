@@ -14335,6 +14335,11 @@ def fixed_target_player_draw_spell_from_oracle(metadata: dict[str, Any]) -> dict
         " ",
         " ".join(oracle_effect_lines_without_neutral_auxiliary(metadata)),
     ).strip().lower()
+    text = re.sub(
+        r"\s*shuffle [^.]+ into (?:its|their|his or her) owner['’]s library\.?\s*",
+        " ",
+        text,
+    ).strip()
     if not text:
         return "target_player_draw_spell_oracle_not_simple"
     if re.fullmatch(r"target player draws x cards?\.?", text):
@@ -21437,6 +21442,7 @@ def is_resolution_neutral_auxiliary_oracle_line(line: str) -> bool:
             r"^(?:"
             r"affinity for artifacts|assist|(?:this spell )?can['’]t be countered|convoke|cycling|devoid|"
             r"flashback|foretell|freerunning|legendary|madness|miracle|retrace|"
+            r"shuffle .+ into (?:its|their|his or her) owner['’]s library|"
             r"spectacle|split second|surge|suspend|undaunted"
             r")\b",
             normalized,
@@ -21450,6 +21456,17 @@ def oracle_effect_lines_without_neutral_auxiliary(metadata: dict[str, Any]) -> l
         for line in normalized_oracle_lines(metadata)
         if not is_resolution_neutral_auxiliary_oracle_line(line)
     ]
+
+
+def has_exact_shuffle_spell_effect(source: str) -> bool:
+    text = source or ""
+    return bool(re.search(r"\bShuffleSpellEffect\.getInstance\s*\(\s*\)", text))
+
+
+def add_shuffle_spell_auxiliary_fields(effect_json: dict[str, Any], primary_effect_class: str) -> dict[str, Any]:
+    effect_json["shuffle_self_into_library_on_resolution"] = True
+    effect_json["xmage_effect_classes"] = [primary_effect_class, "ShuffleSpellEffect"]
+    return effect_json
 
 
 def _unique_mana_symbols(symbols: list[str]) -> str:
@@ -31334,7 +31351,17 @@ def split_row(
                 family_id="xmage_fixed_draw_lose_life_spell",
             ), "selected_exact_scope"
 
-        if classes == {"DrawCardTargetEffect"}:
+        target_player_draw_classes = {"DrawCardTargetEffect"}
+        target_player_draw_shuffle_auxiliary = False
+        if classes == {"DrawCardTargetEffect", "ShuffleSpellEffect"}:
+            if not has_exact_shuffle_spell_effect(source_text):
+                return None, "target_player_draw_shuffle_spell_source_not_exact"
+            target_player_draw_classes = {"DrawCardTargetEffect"}
+            target_player_draw_shuffle_auxiliary = True
+        if target_player_draw_classes == {"DrawCardTargetEffect"} and classes in (
+            {"DrawCardTargetEffect"},
+            {"DrawCardTargetEffect", "ShuffleSpellEffect"},
+        ):
             unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
             if unsupported_abilities:
                 return None, "target_player_draw_spell_ability_class_not_simple"
@@ -31366,6 +31393,8 @@ def split_row(
                 effect_json["draw_count_source"] = oracle_target_draw["draw_count_source"]
                 effect_json["count"] = 0
                 effect_json["draw_count"] = 0
+            if target_player_draw_shuffle_auxiliary:
+                add_shuffle_spell_auxiliary_fields(effect_json, "DrawCardTargetEffect")
             return build_proposal(
                 row,
                 metadata,
@@ -31713,6 +31742,15 @@ def split_row(
         ), "selected_exact_scope"
 
     if unit == DAMAGE_UNIT:
+        damage_classes = set(classes)
+        damage_shuffle_auxiliary = False
+        if classes == {"DamageTargetEffect", "ShuffleSpellEffect"}:
+            if not has_exact_shuffle_spell_effect(source_text):
+                return None, "damage_shuffle_spell_source_not_exact"
+            if "DealtDamageToCreatureBySourceDies" in source_text:
+                return None, "damage_shuffle_exile_if_dies_not_supported"
+            damage_classes = {"DamageTargetEffect"}
+            damage_shuffle_auxiliary = True
         if classes == {"DamageTargetEffect", "ExileTargetIfDiesEffect"}:
             if has_additional_cost(source_text) or "additional cost" in oracle_text(metadata):
                 return None, "damage_exile_if_dies_additional_cost_not_supported"
@@ -31747,7 +31785,7 @@ def split_row(
                 family_id="xmage_fixed_damage_exile_if_dies_spell",
             ), "selected_exact_scope"
 
-        if classes == {"DamageTargetEffect"}:
+        if damage_classes == {"DamageTargetEffect"}:
             oracle_each_target_damage = fixed_damage_each_target_from_oracle(metadata)
             if isinstance(oracle_each_target_damage, str):
                 return None, oracle_each_target_damage
@@ -31799,8 +31837,8 @@ def split_row(
                     family_id="xmage_fixed_damage_each_target_spell",
                 ), "selected_exact_scope"
 
-        cant_be_countered_auxiliary = classes == {"CantBeCounteredSourceEffect", "DamageTargetEffect"}
-        if classes != {"DamageTargetEffect"} and not cant_be_countered_auxiliary:
+        cant_be_countered_auxiliary = damage_classes == {"CantBeCounteredSourceEffect", "DamageTargetEffect"}
+        if damage_classes != {"DamageTargetEffect"} and not cant_be_countered_auxiliary:
             return None, "damage_effect_class_not_pure"
         if cant_be_countered_auxiliary:
             if ability_classes(row) != {"SimpleStaticAbility"}:
@@ -31894,6 +31932,8 @@ def split_row(
                 **dynamic_damage_fields,
                 **flags,
             }
+            if damage_shuffle_auxiliary:
+                add_shuffle_spell_auxiliary_fields(effect_json, "DamageTargetEffect")
             return build_proposal(
                 row,
                 metadata,
@@ -31919,6 +31959,8 @@ def split_row(
                 "xmage_effect_class": "DamageTargetEffect",
                 **flags,
             }
+            if damage_shuffle_auxiliary:
+                add_shuffle_spell_auxiliary_fields(effect_json, "DamageTargetEffect")
             return build_proposal(row, metadata, effect_json, family_id="xmage_x_damage_spell"), "selected_exact_scope"
         amount = java_constructor_int(source_text, "DamageTargetEffect")
         if amount is None or amount <= 0:
@@ -31943,6 +31985,8 @@ def split_row(
         if cant_be_countered_auxiliary:
             effect_json["cant_be_countered"] = True
             effect_json["xmage_effect_classes"] = ["CantBeCounteredSourceEffect", "DamageTargetEffect"]
+        if damage_shuffle_auxiliary:
+            add_shuffle_spell_auxiliary_fields(effect_json, "DamageTargetEffect")
         return build_proposal(row, metadata, effect_json, family_id="xmage_fixed_damage_spell"), "selected_exact_scope"
 
     if unit == DESTROY_UNIT:

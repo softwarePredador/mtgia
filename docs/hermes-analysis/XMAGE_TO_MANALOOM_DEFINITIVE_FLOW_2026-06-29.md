@@ -20116,6 +20116,93 @@ Evidence:
 - `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260709_post_pg693_target_player_x_draw_hash_backfill_new_server.md`
 - `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260709_post_pg693_target_player_x_draw_hash_backfill_new_server.md`
 
+## PG694 Shuffle Self Auxiliary - 2026-07-09
+
+PG694 extends already runtime-backed one-shot spell scopes with the exact XMage
+auxiliary `ShuffleSpellEffect.getInstance()`, so those spells resolve their
+primary effect and then shuffle themselves into owner library instead of moving
+to graveyard.
+
+Promoted cards:
+
+- `Beacon of Destruction`
+- `Blue Sun's Zenith`
+
+Safety boundary:
+
+- `Red Sun's Zenith` remains blocked by
+  `damage_shuffle_exile_if_dies_not_supported` because XMage also models
+  `DealtDamageToCreatureBySourceDies`; that exile-if-dies replacement is a
+  separate adapter requirement.
+
+Implementation/runtime evidence:
+
+- `battle_analyst_v9.py` recognizes
+  `shuffle_self_into_library_on_resolution` as a library destination and emits
+  `spell_shuffled_into_library_on_resolution`;
+- target-player draw finalization now passes `effect_data`, allowing
+  `Blue Sun's Zenith` to draw from X and still shuffle itself into library;
+- `xmage_authoritative_exact_scope_split.py` maps exact
+  `DamageTargetEffect + ShuffleSpellEffect` and
+  `DrawCardTargetEffect + ShuffleSpellEffect` signatures;
+- `xmage_batch_pg_package_builder.py` and
+  `battle_package_end_to_end_validation.py` now carry and validate the
+  shuffle-self field in package scenarios.
+
+Validation evidence:
+
+- focused script suite: `1093 passed`;
+- package E2E passed PostgreSQL, SQLite/Hermes, canonical snapshot,
+  `runtime_get_card_effect`, and `2` battle-execution scenarios;
+- battle evidence confirmed `shuffled_self_into_library=true` for both
+  promoted cards.
+
+PG694 apply/postcheck evidence:
+
+- precheck found `2/2` Oracle-hash-matched target rows and `4` stale shadow
+  rows to deprecate;
+- apply backed up `4` rows, deprecated `4` stale shadow rows, and upserted `2`
+  verified executable rows;
+- postcheck confirmed `2/2` promoted verified/auto rows with matching
+  `oracle_hash`;
+- PG -> SQLite sync exported `6085` canonical snapshot rows and loaded `6123`
+  PostgreSQL rule rows.
+
+Final post-PG694 state:
+
+- global readiness:
+  `battle_and_oracle_ready=6183`, `battle_family_mapper_required=27693`,
+  `snapshot_has_verified_rule=6211`, `snapshot_has_any_rule=7397`;
+- authoritative queue:
+  `target_identity_count=24770`,
+  `xmage_authoritative_source_count=24457`,
+  `xmage_missing_source_exception_count=313`,
+  `xmage_authoritative_parser_gap_count=0`,
+  `xmage_authoritative_adapter_required_count=24457`,
+  `adapter_work_unit_count=11305`;
+- exact split recheck:
+  `proposal_count=0` and `safe_for_batch_pg_package_count=0`;
+- validation gates:
+  `server-target` quality gate passed, `xmage_strategy_consistency_audit`
+  passed `26/26`, `pg_hermes_sqlite_contract_audit` passed `51/51`,
+  `operational_surface_alignment_audit` passed, and
+  `legacy_contamination_audit` passed.
+
+Evidence:
+
+- `docs/hermes-analysis/PG694_SHUFFLE_SELF_AUXILIARY_EVIDENCE_2026-07-09.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260709_pg694_shuffle_probe_v2.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg694_shuffle_self_auxiliary_new_server_package_manifest.json`
+- `docs/hermes-analysis/master_optimizer_reports/pg694_shuffle_self_auxiliary_new_server_pg_to_sqlite_sync_runtime_only.json`
+- `docs/hermes-analysis/master_optimizer_reports/pg694_shuffle_self_auxiliary_new_server_e2e_validation.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260709_post_pg694_shuffle_self_auxiliary_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260709_post_pg694_shuffle_self_auxiliary_new_server_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260709_post_pg694_shuffle_self_auxiliary_new_server_recheck.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260709_post_pg694_shuffle_self_auxiliary_new_server_final.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260709_post_pg694_shuffle_self_auxiliary_new_server_final.md`
+- `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260709_post_pg694_shuffle_self_auxiliary_new_server_final.md`
+- `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260709_post_pg694_shuffle_self_auxiliary_new_server_final.md`
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

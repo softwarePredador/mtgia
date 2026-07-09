@@ -6286,6 +6286,40 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["count"], 0)
         self.assertEqual(effect["draw_count_source"], "x_value")
 
+    def test_fixed_target_player_draw_spell_maps_x_value_with_shuffle_self(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=["DrawCardTargetEffect", "ShuffleSpellEffect"],
+            xmage_signals=["targeting", "draw"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Blue Sun's Zenith",
+                oracle_text=(
+                    "Target player draws X cards. "
+                    "Shuffle Blue Sun's Zenith into its owner's library."
+                ),
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new DrawCardTargetEffect(GetXValue.instance));"
+                "this.getSpellAbility().addEffect(ShuffleSpellEffect.getInstance());"
+                "this.getSpellAbility().addTarget(new TargetPlayer());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.TARGET_DRAW_SCOPE)
+        self.assertEqual(effect["draw_count_source"], "x_value")
+        self.assertEqual(effect["draw_count"], 0)
+        self.assertTrue(effect["target_player_draw"])
+        self.assertTrue(effect["shuffle_self_into_library_on_resolution"])
+        self.assertEqual(
+            effect["xmage_effect_classes"],
+            ["DrawCardTargetEffect", "ShuffleSpellEffect"],
+        )
+
     def test_fixed_target_player_discard_spell_maps(self) -> None:
         row = queue_row(
             split.TARGET_PLAYER_DISCARD_UNIT,

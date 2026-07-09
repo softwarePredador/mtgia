@@ -400,6 +400,39 @@ def event_payloads(events: list[tuple[str, dict[str, Any]]], event_name: str, ca
     ]
 
 
+def validate_shuffle_self_into_library_if_expected(
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+    before_events: int,
+    player,
+    card: dict[str, Any],
+) -> bool:
+    if not scenario.get("expect_shuffle_self"):
+        return False
+    card_name = str(card.get("name") or "")
+    shuffle_event = next(
+        (
+            data
+            for event_name, data in events[before_events:]
+            if event_name == "spell_shuffled_into_library_on_resolution"
+            and data.get("card") == card_name
+        ),
+        None,
+    )
+    if shuffle_event is None:
+        fail("battle_events", f"missing {card_name} spell_shuffled_into_library_on_resolution event")
+    expected_destination = str(scenario.get("expected_spell_destination") or "library")
+    for field in ("to_zone", "destination", "zone_after"):
+        if shuffle_event.get(field) != expected_destination:
+            fail("battle_events", f"{card_name} {field}={shuffle_event.get(field)!r}")
+    if not any(
+        isinstance(library_card, dict) and library_card.get("name") == card_name
+        for library_card in getattr(player, "library", [])
+    ):
+        fail("battle_execution", f"{card_name} was not shuffled into controller library")
+    return True
+
+
 def run_token_maker_attack_each_opponent(battle, scenario: dict[str, Any], events: list[tuple[str, dict[str, Any]]]) -> dict[str, Any]:
     card = scenario["card"]
     turn = int(scenario.get("turn") or 7)
@@ -1164,6 +1197,14 @@ def run_damage_gain_life_spell(
         if damage_event.get("target_player") != opponent.name:
             fail("battle_events", f"{card['name']} target_player={damage_event.get('target_player')!r}")
 
+    shuffled_self = validate_shuffle_self_into_library_if_expected(
+        scenario,
+        events,
+        before_events,
+        active,
+        card,
+    )
+
     return {
         "scenario": scenario.get("name"),
         "card_name": card["name"],
@@ -1174,6 +1215,7 @@ def run_damage_gain_life_spell(
         "opponent_life": opponent.life,
         "treasures_created": expected_treasure_count,
         "controller_treasures": int(getattr(active, "treasures", 0) or 0),
+        "shuffled_self_into_library": shuffled_self,
     }
 
 
@@ -8525,10 +8567,18 @@ def run_target_player_draw_spell(
         phase=str(scenario.get("phase") or "precombat_main"),
     )
 
-    if len(active.library) != starting_library_count - expected_draw_count:
+    shuffled_self = validate_shuffle_self_into_library_if_expected(
+        scenario,
+        events,
+        before_events,
+        active,
+        card,
+    )
+    expected_library_count = starting_library_count - expected_draw_count + (1 if shuffled_self else 0)
+    if len(active.library) != expected_library_count:
         fail(
             "battle_execution",
-            f"{card['name']} library={len(active.library)}, expected {starting_library_count - expected_draw_count}",
+            f"{card['name']} library={len(active.library)}, expected {expected_library_count}",
         )
     expected_hand_count = starting_hand_count + expected_draw_count
     if len(active.hand) != expected_hand_count:
@@ -8557,6 +8607,7 @@ def run_target_player_draw_spell(
         "target_player": expected_target_player,
         "cards_drawn": expected_draw_count,
         "x_value": x_value,
+        "shuffled_self_into_library": shuffled_self,
     }
 
 

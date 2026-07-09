@@ -204,6 +204,50 @@ def test_fixed_damage_target_spell_runner_executes_damage_and_cant_be_countered(
     assert result["cant_be_countered"] is True
 
 
+def test_fixed_damage_target_spell_runner_validates_shuffle_self() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "direct_damage",
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+        "amount": 5,
+        "damage": 5,
+        "target": "any_target",
+        "target_constraints": {"scope": "any_target"},
+        "shuffle_self_into_library_on_resolution": True,
+    }
+    try:
+        result = validator.run_fixed_damage_target_spell(
+            battle,
+            {
+                "name": "Beacon of Destruction deals fixed target damage",
+                "type": "fixed_damage_target_spell",
+                "card": {"name": "Beacon of Destruction", "type_line": "Instant"},
+                "expected_damage": 5,
+                "expected_life_gain": 0,
+                "expected_target_constraints": {"scope": "any_target"},
+                "expect_shuffle_self": True,
+                "expected_spell_destination": "library",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["damage"] == 5
+    assert result["shuffled_self_into_library"] is True
+    assert any(
+        event == "spell_shuffled_into_library_on_resolution"
+        and data.get("card") == "Beacon of Destruction"
+        and data.get("to_zone") == "library"
+        for event, data in events
+    )
+
+
 def test_creature_etb_create_tokens_runner_preserves_noncreature_artifact_token() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []
@@ -1141,6 +1185,52 @@ def test_target_player_x_draw_runner_uses_cast_x_value() -> None:
         and data.get("target_player_draw") is True
         and data.get("requested_draw_count") == 3
         and data.get("cards_drawn") == 3
+        for event, data in events
+    )
+
+
+def test_target_player_x_draw_runner_validates_shuffle_self() -> None:
+    effect = {
+        "effect": "draw_cards",
+        "battle_model_scope": "xmage_fixed_target_player_draw_spell_v1",
+        "target": "player",
+        "target_controller": "target_player",
+        "target_preference": "self",
+        "count": 0,
+        "draw_count": 0,
+        "draw_count_source": "x_value",
+        "target_player_draw": True,
+        "shuffle_self_into_library_on_resolution": True,
+        "_rule_logical_key": "battle_rule_v1:blue-sun",
+    }
+    rule = {
+        "card_name": "Blue Sun's Zenith",
+        "logical_rule_key": "battle_rule_v1:blue-sun",
+        "required_effect_fields": effect,
+    }
+    scenario = package_builder.target_player_draw_execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["expect_shuffle_self"] is True
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: dict(effect)
+    try:
+        result = validator.run_target_player_draw_spell(battle, scenario, events)
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Blue Sun's Zenith"
+    assert result["cards_drawn"] == 3
+    assert result["shuffled_self_into_library"] is True
+    assert any(
+        event == "spell_shuffled_into_library_on_resolution"
+        and data.get("card") == "Blue Sun's Zenith"
+        and data.get("to_zone") == "library"
         for event, data in events
     )
 

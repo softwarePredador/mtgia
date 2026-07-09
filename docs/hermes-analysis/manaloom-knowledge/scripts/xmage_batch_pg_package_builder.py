@@ -151,6 +151,7 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "reveal",
     "enters_tapped",
     "exiles_self",
+    "shuffle_self_into_library_on_resolution",
     "mode_selection",
     "mode_selection_model",
     "mode_min",
@@ -2957,6 +2958,14 @@ def target_player_draw_execution_scenario_from_expected_rule(
         "expected_draw_count": expected_draw_count,
         "expected_target_player": "Spell Controller",
         "target_preference": str(required.get("target_preference") or "self"),
+        **(
+            {
+                "expect_shuffle_self": True,
+                "expected_spell_destination": "library",
+            }
+            if required.get("shuffle_self_into_library_on_resolution")
+            else {}
+        ),
         **({"x_value": x_value} if draw_count_source == "x_value" else {}),
         "logical_rule_key": rule["logical_rule_key"],
     }
@@ -3080,6 +3089,14 @@ def damage_gain_life_spell_execution_scenario_from_expected_rule(
         "expected_target_constraints": target_constraints,
         "controller_life": 10,
         "opponent_life": max(20, damage + 5),
+        **(
+            {
+                "expect_shuffle_self": True,
+                "expected_spell_destination": "library",
+            }
+            if required.get("shuffle_self_into_library_on_resolution")
+            else {}
+        ),
         "logical_rule_key": rule["logical_rule_key"],
     }
 
@@ -3121,6 +3138,14 @@ def fixed_damage_target_spell_execution_scenario_from_expected_rule(
         "expected_target_constraints": target_constraints,
         "controller_life": 10,
         "opponent_life": max(20, damage + 5),
+        **(
+            {
+                "expect_shuffle_self": True,
+                "expected_spell_destination": "library",
+            }
+            if required.get("shuffle_self_into_library_on_resolution")
+            else {}
+        ),
         "logical_rule_key": rule["logical_rule_key"],
     }
 
