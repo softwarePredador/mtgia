@@ -306,6 +306,7 @@ BOOST_KEYWORD_DRAW_SCOPE = "xmage_fixed_boost_keyword_target_creature_until_eot_
 DESTROY_DRAW_SCOPE = "xmage_destroy_target_and_draw_card_spell_v1"
 BOUNCE_DRAW_SCOPE = "xmage_return_target_to_hand_and_draw_card_spell_v1"
 EXILE_SCOPE = "xmage_exile_target_spell_v1"
+EXILE_DRAW_SCOPE = "xmage_exile_target_and_draw_card_spell_v1"
 DESTROY_COMPENSATION_TOKEN_SCOPE = "xmage_destroy_target_with_controller_creature_token_compensation_spell_v1"
 EXILE_COMPENSATION_TOKEN_SCOPE = "xmage_exile_target_with_controller_creature_token_compensation_spell_v1"
 MANA_SCOPE = "xmage_simple_tap_mana_source_permanent_v1"
@@ -2949,6 +2950,49 @@ def fixed_destroy_draw_from_source(source: str) -> int | None:
     if draw_count != 1:
         return None
     if destroy_matches[0].start() > draw_matches[0].start():
+        return None
+    return draw_count
+
+
+def fixed_exile_draw_from_oracle(metadata: dict[str, Any]) -> tuple[str, str, int] | None:
+    text = oracle_text(metadata)
+    match = re.match(
+        r"^(exile target .+?)\. (?:then )?draw a card\.?$",
+        text,
+    )
+    if not match:
+        return None
+    simple_metadata = dict(metadata)
+    simple_metadata["oracle_text"] = f"{match.group(1)}."
+    parsed = exile_target_from_oracle(simple_metadata)
+    if parsed is None:
+        return None
+    effect, target = parsed
+    return effect, target, 1
+
+
+def fixed_exile_draw_from_source(source: str) -> int | None:
+    text = source or ""
+    if has_additional_cost(text):
+        return None
+    if "TargetPointer" in text or ".setTargetPointer" in text:
+        return None
+    if "TargetAdjuster" in text or ".setTargetAdjuster" in text:
+        return None
+    exile_matches = list(re.finditer(r"new\s+ExileTargetEffect\s*\(\s*\)", text, re.S))
+    if len(exile_matches) != 1:
+        return None
+    draw_matches = list(re.finditer(r"new\s+DrawCardSourceControllerEffect\s*\(", text))
+    if len(draw_matches) != 1:
+        return None
+    draw_count = java_constructor_int_or_noarg_default(
+        text,
+        "DrawCardSourceControllerEffect",
+        noarg_default=1,
+    )
+    if draw_count != 1:
+        return None
+    if exile_matches[0].start() > draw_matches[0].start():
         return None
     return draw_count
 
@@ -30689,6 +30733,59 @@ def split_row(
                 family_id="xmage_destroy_target_draw_card_spell",
             ), "selected_exact_scope"
 
+        if classes == {"ExileTargetEffect", "DrawCardSourceControllerEffect"}:
+            unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+            if unsupported_abilities:
+                return None, "exile_draw_ability_class_not_simple"
+            if has_oracle_complexity(metadata):
+                return None, "exile_draw_oracle_not_simple"
+            oracle_exile = fixed_exile_draw_from_oracle(metadata)
+            if oracle_exile is None:
+                return None, "exile_draw_oracle_not_exact_fixed"
+            source_draw_count = fixed_exile_draw_from_source(source_text)
+            if source_draw_count is None:
+                return None, "exile_draw_source_not_fixed"
+            effect, target_type, draw_count = oracle_exile
+            if source_draw_count != draw_count:
+                return None, "exile_draw_source_oracle_mismatch"
+            if not source_matches_target_constraint(source_text, target_type):
+                return None, "exile_draw_target_source_mismatch"
+            target_base = restricted_target_base(target_type)
+            exile_component = {
+                "effect": effect,
+                "battle_model_scope": EXILE_SCOPE,
+                "target": target_base,
+                "target_constraints": target_constraints_for(target_type),
+                "destination": "exile",
+                "compose_on_resolution": True,
+                "xmage_effect_class": "ExileTargetEffect",
+            }
+            draw_component = {
+                "effect": "draw_cards",
+                "battle_model_scope": DRAW_SCOPE,
+                "count": draw_count,
+                "compose_on_resolution": True,
+                "xmage_effect_class": "DrawCardSourceControllerEffect",
+            }
+            effect_json = {
+                "effect": "composite_resolution",
+                "battle_model_scope": EXILE_DRAW_SCOPE,
+                "target": target_base,
+                "target_constraints": target_constraints_for(target_type),
+                "destination": "exile",
+                "draw_count": draw_count,
+                "count": draw_count,
+                "_composite_rule_components": [exile_component, draw_component],
+                "xmage_effect_classes": ["ExileTargetEffect", "DrawCardSourceControllerEffect"],
+                **flags,
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_exile_target_draw_card_spell",
+            ), "selected_exact_scope"
+
         if classes == {"ReturnToHandTargetEffect", "DrawCardSourceControllerEffect"}:
             unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
             if unsupported_abilities:
@@ -34732,6 +34829,7 @@ def build_exact_split_report(
                 "draw_cards::xmage_draw_card_variant_review_v1 rows with DrawDiscardControllerEffect or fixed DrawCardSourceControllerEffect + DiscardControllerEffect, exact Oracle/source draw-discard order agreement, and optional random discard metadata",
                 "draw_cards::xmage_draw_card_variant_review_v1 rows with BoostAllEffect + DrawCardSourceControllerEffect, exact fixed all/opponents/filtered-creature boost until EOT plus fixed draw, and Oracle/source order agreement",
                 "draw_cards::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect + ProliferateEffect, exact fixed draw count, proliferate once, and Oracle/source order agreement",
+                "draw_cards::xmage_draw_card_variant_review_v1 rows with ExileTargetEffect + DrawCardSourceControllerEffect, exact battlefield target exile plus draw-one Oracle/source agreement",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with PutOnLibraryTargetEffect, no extra ability class, exact graveyard-to-library top/bottom Oracle text, and self-graveyard targets only",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with RevealLibraryPickControllerEffect, no extra ability class, exact reveal-top-library pick-to-hand Oracle/source agreement, and graveyard rest destination",
                 "life_gain::xmage_life_gain_variant_review_v1 rows with DamageTargetEffect + GainLifeEffect and exact fixed damage/life-gain Oracle text",

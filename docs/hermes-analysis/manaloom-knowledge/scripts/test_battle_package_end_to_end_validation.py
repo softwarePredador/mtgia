@@ -1036,6 +1036,79 @@ def test_single_target_removal_runner_validates_controller_life_gain() -> None:
     assert result["controller_life_gained"] == 4
 
 
+def test_single_target_removal_and_draw_runner_exiles_and_draws() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "composite_resolution",
+        "battle_model_scope": "xmage_exile_target_and_draw_card_spell_v1",
+        "target": "creature",
+        "target_constraints": {"card_types": ["creature"], "combat_state": "attacking"},
+        "destination": "exile",
+        "draw_count": 1,
+        "_composite_rule_components": [
+            {
+                "effect": "remove_creature",
+                "battle_model_scope": "xmage_exile_target_spell_v1",
+                "target": "creature",
+                "target_constraints": {"card_types": ["creature"], "combat_state": "attacking"},
+                "destination": "exile",
+            },
+            {
+                "effect": "draw_cards",
+                "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+                "count": 1,
+            },
+        ],
+        "_rule_logical_key": "battle_rule_v1:second-thoughts-fixture",
+    }
+    try:
+        result = validator.run_single_target_removal_and_draw(
+            battle,
+            {
+                "name": "Second Thoughts removes one legal target and draws 1",
+                "type": "single_target_removal_and_draw",
+                "card": {"name": "Second Thoughts", "type_line": "Instant"},
+                "target": {
+                    "name": "E2E Legal Removal Target",
+                    "type_line": "Creature - Soldier",
+                    "effect": "creature",
+                    "attacking": True,
+                    "power": 2,
+                    "toughness": 2,
+                },
+                "nonmatching_target": {
+                    "name": "E2E Illegal Removal Target",
+                    "type_line": "Creature - Soldier",
+                    "effect": "creature",
+                    "attacking": False,
+                    "power": 2,
+                    "toughness": 2,
+                },
+                "expected_destination": "exile",
+                "expected_draw_count": 1,
+                "controller_library": [
+                    {"name": "E2E Draw Card", "type_line": "Instant", "effect": "draw_cards"},
+                    {"name": "E2E Remaining Card", "type_line": "Sorcery", "effect": "draw_cards"},
+                ],
+                "logical_rule_key": "battle_rule_v1:second-thoughts-fixture",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Second Thoughts"
+    assert result["destination"] == "exile"
+    assert result["cards_drawn"] == 1
+    assert result["target"] == "E2E Legal Removal Target"
+    assert result["nonmatching_target"] == "E2E Illegal Removal Target"
+
+
 def test_single_target_removal_runner_respects_self_controller_scope() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

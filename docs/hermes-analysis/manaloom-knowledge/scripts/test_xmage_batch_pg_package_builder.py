@@ -2363,6 +2363,46 @@ def test_single_target_removal_scenario_uses_illegal_fixture_for_simple_creature
     assert scenario["nonmatching_target"]["type_line"] == "Land"
 
 
+def test_manifest_builds_single_target_exile_draw_execution_scenario() -> None:
+    rule = {
+        "normalized_name": "second thoughts",
+        "card_name": "Second Thoughts",
+        "oracle_hash": "hash-second-thoughts",
+        "logical_rule_key": "battle_rule_v1:hash-second-thoughts",
+        "required_effect_fields": {
+            "effect": "composite_resolution",
+            "battle_model_scope": "xmage_exile_target_and_draw_card_spell_v1",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"], "combat_state": "attacking"},
+            "destination": "exile",
+            "draw_count": 1,
+            "_composite_rule_components": [
+                {
+                    "effect": "remove_creature",
+                    "battle_model_scope": "xmage_exile_target_spell_v1",
+                    "target": "creature",
+                    "target_constraints": {"card_types": ["creature"], "combat_state": "attacking"},
+                    "destination": "exile",
+                },
+                {
+                    "effect": "draw_cards",
+                    "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+                    "count": 1,
+                },
+            ],
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "single_target_removal_and_draw"
+    assert scenario["expected_destination"] == "exile"
+    assert scenario["expected_draw_count"] == 1
+    assert scenario["target"]["attacking"] is True
+    assert scenario["nonmatching_target"].get("attacking") is not True
+
+
 def test_single_target_bounce_scenario_moves_target_to_hand() -> None:
     rule = {
         "normalized_name": "cut the earthly bond",

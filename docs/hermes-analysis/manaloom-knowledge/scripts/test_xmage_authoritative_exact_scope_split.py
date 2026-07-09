@@ -13626,6 +13626,58 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "exile_oracle_not_simple")
 
+    def test_exile_target_draw_spell_maps_battlefield_target_and_draw(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=["ExileTargetEffect", "DrawCardSourceControllerEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Second Thoughts",
+                oracle_text="Exile target attacking creature.\nDraw a card.",
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new ExileTargetEffect());"
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect());"
+                "this.getSpellAbility().addTarget(new TargetAttackingCreature());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "composite_resolution")
+        self.assertEqual(effect["battle_model_scope"], split.EXILE_DRAW_SCOPE)
+        self.assertEqual(effect["target"], "creature")
+        self.assertEqual(effect["destination"], "exile")
+        self.assertEqual(effect["draw_count"], 1)
+        self.assertEqual(effect["target_constraints"], {"card_types": ["creature"], "combat_state": "attacking"})
+        self.assertEqual(
+            [component["effect"] for component in effect["_composite_rule_components"]],
+            ["remove_creature", "draw_cards"],
+        )
+
+    def test_exile_target_draw_spell_keeps_graveyard_target_blocked(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=["ExileTargetEffect", "DrawCardSourceControllerEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Cremate",
+                oracle_text="Exile target card from a graveyard.\nDraw a card.",
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new ExileTargetEffect());"
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect());"
+                "this.getSpellAbility().addTarget(new TargetCardInGraveyard());"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "exile_draw_oracle_not_exact_fixed")
+
     def test_exile_target_spell_maps_restricted_single_targets(self) -> None:
         cases = [
             (

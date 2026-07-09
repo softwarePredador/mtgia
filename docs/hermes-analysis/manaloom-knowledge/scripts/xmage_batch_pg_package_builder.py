@@ -4825,6 +4825,72 @@ def single_target_removal_and_surveil_execution_scenario_from_expected_rule(
     }
 
 
+def single_target_removal_and_draw_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") not in {
+        "xmage_exile_target_and_draw_card_spell_v1",
+        "xmage_destroy_target_and_draw_card_spell_v1",
+        "xmage_return_target_to_hand_and_draw_card_spell_v1",
+    }:
+        return None
+    if required.get("effect") != "composite_resolution":
+        return None
+    components = [
+        component
+        for component in required.get("_composite_rule_components") or []
+        if isinstance(component, dict)
+    ]
+    removal_component = next(
+        (
+            component
+            for component in components
+            if component.get("effect") in {"remove_creature", "remove_permanent"}
+        ),
+        None,
+    )
+    draw_component = next(
+        (component for component in components if component.get("effect") == "draw_cards"),
+        None,
+    )
+    if removal_component is None or draw_component is None:
+        return None
+    constraints = dict(required.get("target_constraints") or removal_component.get("target_constraints") or {})
+    destination = str(required.get("destination") or removal_component.get("destination") or "graveyard").lower()
+    draw_count = int(
+        required.get("draw_count")
+        or draw_component.get("draw_count")
+        or draw_component.get("count")
+        or 1
+    )
+    if draw_count <= 0:
+        return None
+    return {
+        "name": f"{rule['card_name']} removes one legal target and draws {draw_count}",
+        "type": "single_target_removal_and_draw",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": "Sorcery" if required.get("sorcery") is True else "Instant",
+        },
+        "target": _target_fixture_from_constraints("E2E Legal Removal Target", constraints, matching=True),
+        "nonmatching_target": _target_fixture_from_constraints(
+            "E2E Illegal Removal Target",
+            constraints,
+            matching=False,
+        ),
+        "expected_destination": destination,
+        "expected_effect": removal_component.get("effect"),
+        "expected_target_constraints": constraints,
+        "expected_draw_count": draw_count,
+        "controller_library": [
+            {"name": f"E2E Draw Card {index}", "type_line": "Instant", "effect": "draw_cards"}
+            for index in range(1, draw_count + 3)
+        ],
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def multi_target_removal_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
@@ -5239,6 +5305,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or each_player_sacrifice_execution_scenario_from_expected_rule(rule)
         or multi_target_damage_execution_scenario_from_expected_rule(rule)
         or multi_target_removal_execution_scenario_from_expected_rule(rule)
+        or single_target_removal_and_draw_execution_scenario_from_expected_rule(rule)
         or single_target_removal_and_surveil_execution_scenario_from_expected_rule(rule)
         or modal_damage_or_destroy_execution_scenario_from_expected_rule(rule)
         or single_target_removal_execution_scenario_from_expected_rule(rule)
