@@ -62287,7 +62287,10 @@ def resolve_target_player_draw_spell(
     all_players=None,
     stack=None,
 ):
-    draw_count = max(0, int(effect_data.get("draw_count") or effect_data.get("count") or 0))
+    if str(effect_data.get("draw_count_source") or "").strip().lower() == "x_value":
+        draw_count = x_value_from_effect_context(effect_data)
+    else:
+        draw_count = max(0, int(effect_data.get("draw_count") or effect_data.get("count") or 0))
     target_player, target_reason = _target_player_draw_target_player(player, opponents, effect_data)
     drawn_cards = target_player.draw(draw_count, rng)
     process_player_draw_triggers(

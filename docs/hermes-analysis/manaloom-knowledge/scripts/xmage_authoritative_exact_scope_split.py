@@ -14337,6 +14337,8 @@ def fixed_target_player_draw_spell_from_oracle(metadata: dict[str, Any]) -> dict
     ).strip().lower()
     if not text:
         return "target_player_draw_spell_oracle_not_simple"
+    if re.fullmatch(r"target player draws x cards?\.?", text):
+        return {"draw_count": 0, "draw_count_source": "x_value"}
     number_pattern = r"(a|one|two|three|four|five|six|seven|\d+)"
     match = re.fullmatch(rf"target player draws {number_pattern} cards?\.?", text)
     if not match:
@@ -18196,6 +18198,13 @@ def fixed_target_player_draw_spell_from_source(source: str) -> dict[str, Any] | 
         return "target_player_draw_spell_source_target_not_supported"
     if len(re.findall(r"\bDrawCardTargetEffect\s*\(", text)) != 1:
         return "target_player_draw_spell_source_not_simple"
+    constructor_args = extract_constructor_args(text, "DrawCardTargetEffect")
+    if constructor_args and constructor_args.strip() in {"GetXValue.instance", "ManacostVariableValue.instance"}:
+        return {
+            "draw_count": 0,
+            "draw_count_source": "x_value",
+            "xmage_effect_class": "DrawCardTargetEffect",
+        }
     draw_count = java_constructor_int_or_noarg_default(
         text,
         "DrawCardTargetEffect",
@@ -31337,6 +31346,8 @@ def split_row(
                 return None, source_target_draw
             if oracle_target_draw["draw_count"] != source_target_draw["draw_count"]:
                 return None, "target_player_draw_spell_source_oracle_mismatch"
+            if oracle_target_draw.get("draw_count_source") != source_target_draw.get("draw_count_source"):
+                return None, "target_player_draw_spell_source_oracle_mismatch"
             draw_count = int(oracle_target_draw["draw_count"])
             effect_json = {
                 "effect": "draw_cards",
@@ -31351,6 +31362,10 @@ def split_row(
                 "xmage_effect_class": "DrawCardTargetEffect",
                 **flags,
             }
+            if oracle_target_draw.get("draw_count_source"):
+                effect_json["draw_count_source"] = oracle_target_draw["draw_count_source"]
+                effect_json["count"] = 0
+                effect_json["draw_count"] = 0
             return build_proposal(
                 row,
                 metadata,

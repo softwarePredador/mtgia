@@ -1363,6 +1363,38 @@ def test_manifest_builds_simple_activated_draw_execution_scenario_with_sacrifice
     assert scenario["sacrifice_target"]["type_line"] == "Artifact"
 
 
+def test_manifest_builds_target_player_x_draw_execution_scenario() -> None:
+    rule = {
+        "normalized_name": "braingeyser",
+        "card_name": "Braingeyser",
+        "oracle_hash": "hash-braingeyser",
+        "logical_rule_key": "battle_rule_v1:hash-braingeyser",
+        "required_effect_fields": {
+            "effect": "draw_cards",
+            "battle_model_scope": "xmage_fixed_target_player_draw_spell_v1",
+            "target": "player",
+            "target_controller": "target_player",
+            "target_preference": "self",
+            "count": 0,
+            "draw_count": 0,
+            "draw_count_source": "x_value",
+            "target_player_draw": True,
+            "sorcery": True,
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "target_player_draw_spell"
+    assert scenario["card"]["name"] == "Braingeyser"
+    assert scenario["card"]["type_line"] == "Sorcery"
+    assert scenario["x_value"] == 3
+    assert scenario["expected_draw_count"] == 3
+    assert len(scenario["controller_library"]) == 3
+    assert scenario["expected_target_player"] == "Spell Controller"
+
+
 def test_manifest_builds_simple_activated_damage_execution_scenario() -> None:
     rule = {
         "normalized_name": "stormbind",

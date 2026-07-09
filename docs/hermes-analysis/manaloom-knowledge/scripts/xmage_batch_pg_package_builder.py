@@ -2923,6 +2923,45 @@ def simple_activated_draw_execution_scenario_from_expected_rule(
     return scenario
 
 
+def target_player_draw_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_fixed_target_player_draw_spell_v1":
+        return None
+    draw_count_source = str(required.get("draw_count_source") or "").strip().lower()
+    x_value = 0
+    if draw_count_source == "x_value":
+        x_value = int(required.get("x_value") or 3)
+        expected_draw_count = x_value
+    elif draw_count_source:
+        return None
+    else:
+        expected_draw_count = int(required.get("draw_count") or required.get("count") or 1)
+    return {
+        "name": f"{rule['card_name']} target player draws cards",
+        "type": "target_player_draw_spell",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": "Instant" if required.get("instant") else "Sorcery",
+        },
+        "controller_library": [
+            {
+                "name": f"E2E Target Player Draw Card {index + 1}",
+                "type_line": "Instant" if index % 2 == 0 else "Sorcery",
+                "effect": "draw_cards",
+                "cmc": index + 1,
+            }
+            for index in range(max(expected_draw_count, 1))
+        ],
+        "expected_draw_count": expected_draw_count,
+        "expected_target_player": "Spell Controller",
+        "target_preference": str(required.get("target_preference") or "self"),
+        **({"x_value": x_value} if draw_count_source == "x_value" else {}),
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def combat_damage_draw_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
@@ -5501,6 +5540,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or gain_control_untap_haste_execution_scenario_from_expected_rule(rule)
         or boost_untap_target_spell_execution_scenario_from_expected_rule(rule)
         or simple_activated_draw_execution_scenario_from_expected_rule(rule)
+        or target_player_draw_execution_scenario_from_expected_rule(rule)
         or combat_damage_draw_execution_scenario_from_expected_rule(rule)
         or simple_activated_damage_execution_scenario_from_expected_rule(rule)
         or simple_activated_tap_target_execution_scenario_from_expected_rule(rule)

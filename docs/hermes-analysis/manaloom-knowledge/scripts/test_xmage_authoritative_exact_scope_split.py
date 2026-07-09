@@ -6260,7 +6260,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "target_player_draw_spell_oracle_not_exact_fixed")
 
-    def test_fixed_target_player_draw_spell_blocks_dynamic_source_count(self) -> None:
+    def test_fixed_target_player_draw_spell_maps_x_value(self) -> None:
         row = queue_row(
             split.DRAW_UNIT,
             effect_classes=["DrawCardTargetEffect"],
@@ -6275,8 +6275,16 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             ),
         )
 
-        self.assertIsNone(proposal)
-        self.assertEqual(reason, "target_player_draw_spell_oracle_not_exact_fixed")
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.TARGET_DRAW_SCOPE)
+        self.assertTrue(effect["target_player_draw"])
+        self.assertEqual(effect["target_controller"], "target_player")
+        self.assertEqual(effect["target"], "player")
+        self.assertEqual(effect["target_preference"], "self")
+        self.assertEqual(effect["draw_count"], 0)
+        self.assertEqual(effect["count"], 0)
+        self.assertEqual(effect["draw_count_source"], "x_value")
 
     def test_fixed_target_player_discard_spell_maps(self) -> None:
         row = queue_row(

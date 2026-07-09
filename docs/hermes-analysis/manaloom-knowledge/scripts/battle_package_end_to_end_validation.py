@@ -8479,6 +8479,87 @@ def run_combat_damage_draw(
     }
 
 
+def run_target_player_draw_spell(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    effect = dict(battle.get_card_effect(card))
+    if effect.get("effect") != "draw_cards":
+        fail("battle_execution", f"{card['name']} effect={effect.get('effect')!r}")
+    if effect.get("target_player_draw") is not True:
+        fail("battle_execution", f"{card['name']} is not marked target_player_draw")
+    x_value = scenario.get("x_value")
+    if x_value is not None:
+        x_value = int(x_value)
+        effect["x_value"] = x_value
+        effect["_cast_context"] = {"x_value": x_value}
+        card["x_value"] = x_value
+        card["_cast_context"] = {"x_value": x_value}
+    active = battle.Player(str(scenario.get("player") or "Spell Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
+    active.library = [
+        battle.enrich_card(dict(library_card))
+        for library_card in (scenario.get("controller_library") or scenario.get("library") or [])
+        if isinstance(library_card, dict)
+    ]
+    active.hand = [
+        battle.enrich_card(dict(hand_card))
+        for hand_card in (scenario.get("controller_hand") or [])
+        if isinstance(hand_card, dict)
+    ]
+    starting_hand_count = len(active.hand)
+    starting_library_count = len(active.library)
+    expected_draw_count = int(scenario.get("expected_draw_count") or effect.get("draw_count") or effect.get("count") or 1)
+    expected_target_player = str(scenario.get("expected_target_player") or active.name)
+    before_events = len(events)
+
+    battle.apply_effect_immediate(
+        active,
+        [opponent],
+        battle.enrich_card(card),
+        turn=int(scenario.get("turn") or 6170),
+        rng=random.Random(int(scenario.get("seed") or 6170)),
+        effect_data_override=effect,
+        phase=str(scenario.get("phase") or "precombat_main"),
+    )
+
+    if len(active.library) != starting_library_count - expected_draw_count:
+        fail(
+            "battle_execution",
+            f"{card['name']} library={len(active.library)}, expected {starting_library_count - expected_draw_count}",
+        )
+    expected_hand_count = starting_hand_count + expected_draw_count
+    if len(active.hand) != expected_hand_count:
+        fail("battle_execution", f"{card['name']} hand={len(active.hand)}, expected {expected_hand_count}")
+    event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "draw_cards_resolved"
+            and data.get("card") == card.get("name")
+            and data.get("target_player_draw") is True
+        ),
+        None,
+    )
+    if event is None:
+        fail("battle_events", f"missing {card['name']} draw_cards_resolved event")
+    if event.get("target_player") != expected_target_player:
+        fail("battle_events", f"{card['name']} target_player={event.get('target_player')!r}")
+    if int(event.get("cards_drawn") or 0) != expected_draw_count:
+        fail("battle_events", f"{card['name']} cards_drawn={event.get('cards_drawn')}")
+    if int(event.get("requested_draw_count") or 0) != expected_draw_count:
+        fail("battle_events", f"{card['name']} requested_draw_count={event.get('requested_draw_count')}")
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "target_player": expected_target_player,
+        "cards_drawn": expected_draw_count,
+        "x_value": x_value,
+    }
+
+
 SCENARIO_RUNNERS = {
     "attack_self_boost": run_attack_self_boost,
     "aura_static_power_toughness_attachment": run_aura_static_power_toughness_attachment,
@@ -8529,6 +8610,7 @@ SCENARIO_RUNNERS = {
     "tap_target_spell": run_tap_target_spell,
     "gain_control_untap_haste_until_eot": run_gain_control_untap_haste_until_eot,
     "stat_modifier_until_eot_untap_target": run_stat_modifier_until_eot_untap_target,
+    "target_player_draw_spell": run_target_player_draw_spell,
     "target_keyword_draw_spell": run_target_keyword_draw_spell,
     "simple_activated_add_counters_target": run_simple_activated_add_counters_target,
     "simple_activated_destroy": run_simple_activated_destroy,

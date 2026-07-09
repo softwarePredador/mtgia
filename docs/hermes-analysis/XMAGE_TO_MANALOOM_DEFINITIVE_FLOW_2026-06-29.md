@@ -20033,6 +20033,89 @@ Evidence:
 - `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260709_post_pg692_damage_each_opponent_permanents_new_server_final.md`
 - `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260709_post_pg692_damage_each_opponent_permanents_new_server_final.md`
 
+## PG693 Target Player X Draw - 2026-07-09
+
+PG693 extends the exact target-player draw adapter to the safe variable-X
+subpattern:
+
+- Oracle exact match: `Target player draws X cards.`;
+- XMage exact source match:
+  `DrawCardTargetEffect(GetXValue.instance)` plus `TargetPlayer`;
+- ManaLoom scope:
+  `xmage_fixed_target_player_draw_spell_v1` with
+  `draw_count_source=x_value`.
+
+Promoted cards:
+
+- `Braingeyser`
+- `Stroke of Genius`
+
+Implementation/runtime evidence:
+
+- `xmage_authoritative_exact_scope_split.py` now maps exact target-player X
+  draw source/Oracle pairs and keeps non-exact neighbors blocked.
+- `battle_analyst_v9.py` resolves target-player draw counts from cast context
+  when `draw_count_source=x_value`.
+- `xmage_batch_pg_package_builder.py` and
+  `battle_package_end_to_end_validation.py` generate and run focused scenarios
+  proving both cards draw `3` cards when cast with `x_value=3`.
+
+PG693 apply/postcheck evidence:
+
+- split produced `2` safe package candidates;
+- package manifest carries `2` battle execution scenarios;
+- precheck found `2/2` Oracle-hash-matched target rows and `0` shadow rows;
+- apply upserted `2` rows;
+- postcheck confirmed `2/2` promoted verified/auto rows with `oracle_hash`;
+- final package E2E passed PostgreSQL, SQLite/Hermes, canonical snapshot,
+  `runtime_get_card_effect`, and `2` battle-execution scenarios with `4`
+  emitted events.
+
+PG693 also repaired an audit-blocking legacy metadata gap:
+
+- backfilled `oracle_hash` for `44` trusted executable PostgreSQL rules using
+  `md5(coalesce(cards.oracle_text, ''))`;
+- backup table:
+  `manaloom_deploy_audit.pg693_trusted_rule_oracle_hash_backfill_backup`;
+- postcheck confirmed `trusted_executable_rules_missing_oracle_hash=0`.
+
+Final post-PG693 state:
+
+- global readiness:
+  `battle_and_oracle_ready=6181`, `battle_family_mapper_required=27695`,
+  `snapshot_has_verified_rule=6209`, `snapshot_has_any_rule=7397`;
+- authoritative queue:
+  `target_identity_count=24772`,
+  `xmage_authoritative_source_count=24459`,
+  `xmage_missing_source_exception_count=313`,
+  `xmage_authoritative_parser_gap_count=0`,
+  `xmage_authoritative_adapter_required_count=24459`,
+  `adapter_work_unit_count=11305`;
+- exact split recheck:
+  `proposal_count=0` and `safe_for_batch_pg_package_count=0`;
+- validation gates:
+  `server-target` quality gate passed, `xmage_strategy_consistency_audit`
+  passed `26/26`, `pg_hermes_sqlite_contract_audit` passed `51/51`,
+  `operational_surface_alignment_audit` passed, and
+  `legacy_contamination_audit` passed.
+
+Evidence:
+
+- `docs/hermes-analysis/PG693_TARGET_PLAYER_X_DRAW_EVIDENCE_2026-07-09.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260709_pg693_target_player_x_draw_candidate.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg693_target_player_x_draw_new_server_package_manifest.json`
+- `docs/hermes-analysis/master_optimizer_reports/pg693_target_player_x_draw_new_server_pg_to_sqlite_sync_runtime_only.json`
+- `docs/hermes-analysis/master_optimizer_reports/pg693_target_player_x_draw_new_server_e2e_validation.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg693_target_player_x_draw_new_server_post_hash_backfill_pg_to_sqlite_sync_runtime_only.json`
+- `docs/hermes-analysis/master_optimizer_reports/pg693_target_player_x_draw_new_server_post_hash_backfill_e2e_validation.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260709_post_pg693_target_player_x_draw_hash_backfill_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260709_post_pg693_target_player_x_draw_hash_backfill_new_server_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260709_post_pg693_target_player_x_draw_hash_backfill_new_server_recheck.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260709_post_pg693_target_player_x_draw_hash_backfill_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260709_post_pg693_target_player_x_draw_hash_backfill_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260709_post_pg693_target_player_x_draw_hash_backfill_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260709_post_pg693_target_player_x_draw_hash_backfill_new_server.md`
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:
