@@ -16062,6 +16062,127 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "counter_unless_draw_oracle_not_exact_fixed")
 
+    def test_counter_target_with_exile_replacement_maps_to_runtime(self) -> None:
+        row = queue_row(
+            "xmage_signature::CounterTargetWithReplacementEffect::DevoidAbility::"
+            "TargetSpell::no_condition_class::targeting,counter",
+            effect_classes=["CounterTargetWithReplacementEffect"],
+            ability_classes=["DevoidAbility"],
+            xmage_signals=["targeting", "counter"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Void Shatter",
+                oracle_text=(
+                    "Devoid (This card has no color.)\n"
+                    "Counter target spell. If that spell is countered this way, exile it instead of putting it into its owner's graveyard."
+                ),
+            ),
+            source_text="""
+                this.addAbility(new DevoidAbility(this.color));
+                this.getSpellAbility().addEffect(new CounterTargetWithReplacementEffect(PutCards.EXILED));
+                this.getSpellAbility().addTarget(new TargetSpell());
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "counter")
+        self.assertEqual(effect["battle_model_scope"], split.COUNTER_SCOPE)
+        self.assertEqual(effect["target"], "spell")
+        self.assertTrue(effect["countered_spell_to_exile"])
+        self.assertEqual(effect["countered_spell_to_exile_reason"], "counter_target_exile_replacement")
+        self.assertEqual(effect["xmage_effect_class"], "CounterTargetWithReplacementEffect")
+
+    def test_counter_target_with_exile_replacement_preserves_creature_mana_value_constraint(self) -> None:
+        row = queue_row(
+            "xmage_signature::CounterTargetWithReplacementEffect::DevoidAbility::"
+            "TargetSpell::no_condition_class::targeting,counter",
+            effect_classes=["CounterTargetWithReplacementEffect"],
+            ability_classes=["DevoidAbility"],
+            xmage_signals=["targeting", "counter"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Horribly Awry",
+                oracle_text=(
+                    "Devoid (This card has no color.)\n"
+                    "Counter target creature spell with mana value 4 or less. If that spell is countered this way, exile it instead of putting it into its owner's graveyard."
+                ),
+            ),
+            source_text="""
+                private static final FilterCreatureSpell filter = new FilterCreatureSpell("creature spell with mana value 4 or less");
+                static {
+                    filter.add(new ManaValuePredicate(ComparisonType.FEWER_THAN, 5));
+                }
+                this.addAbility(new DevoidAbility(this.color));
+                this.getSpellAbility().addEffect(new CounterTargetWithReplacementEffect(PutCards.EXILED));
+                this.getSpellAbility().addTarget(new TargetSpell(filter));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["target"], "creature_spell_mana_value_4_or_less")
+        self.assertEqual(effect["target_constraints"]["card_types"], ["creature"])
+        self.assertEqual(effect["target_constraints"]["counter_target_mana_value_max"], 4)
+
+    def test_counter_target_with_exile_replacement_preserves_excluded_spell_subtype(self) -> None:
+        row = queue_row(
+            "xmage_signature::CounterTargetWithReplacementEffect::no_ability_class::"
+            "TargetSpell::no_condition_class::targeting,counter",
+            effect_classes=["CounterTargetWithReplacementEffect"],
+            xmage_signals=["targeting", "counter"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Faerie Trickery",
+                oracle_text=(
+                    "Counter target non-Faerie spell. If that spell is countered this way, exile it instead of putting it into its owner's graveyard."
+                ),
+            ),
+            source_text="""
+                private static final FilterSpell filter = new FilterSpell("non-Faerie spell");
+                static {
+                    filter.add(Predicates.not(SubType.FAERIE.getPredicate()));
+                }
+                this.getSpellAbility().addEffect(new CounterTargetWithReplacementEffect(PutCards.EXILED));
+                this.getSpellAbility().addTarget(new TargetSpell(filter));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["target"], "nonfaerie_spell")
+        self.assertEqual(effect["target_constraints"]["exclude_spell_subtypes"], ["faerie"])
+
+    def test_counter_target_with_exile_replacement_blocks_top_library_replacement(self) -> None:
+        row = queue_row(
+            "xmage_signature::CounterTargetWithReplacementEffect::no_ability_class::"
+            "TargetSpell::no_condition_class::targeting,counter",
+            effect_classes=["CounterTargetWithReplacementEffect"],
+            xmage_signals=["targeting", "counter"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Memory Lapse",
+                oracle_text=(
+                    "Counter target spell. If that spell is countered this way, put it on top of its owner's library instead of into that player's graveyard."
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new CounterTargetWithReplacementEffect(PutCards.TOP_ANY));
+                this.getSpellAbility().addTarget(new TargetSpell());
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "counter_replacement_oracle_not_exact_exile")
+
     def test_counter_unless_pays_fixed_generic_exile_replacement_maps_to_runtime(self) -> None:
         row = queue_row(
             split.COUNTER_UNLESS_PAYS_UNIT,

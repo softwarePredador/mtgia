@@ -4199,6 +4199,8 @@ def _stack_object_fixture_from_constraints(
                 "target_spell_types",
                 "spell_subtypes",
                 "target_spell_subtypes",
+                "exclude_spell_subtypes",
+                "excluded_spell_subtypes",
                 "spell_colors",
                 "target_spell_colors",
                 "exclude_spell_colors",
@@ -4275,6 +4277,22 @@ def _stack_object_fixture_from_constraints(
             "cmc": 3,
             "mana_cost": "{2}{U}",
         }
+    spell_subtypes = [
+        str(value).strip().title()
+        for value in active_constraints.get("spell_subtypes") or active_constraints.get("target_spell_subtypes") or []
+        if str(value).strip()
+    ]
+    excluded_spell_subtypes = [
+        str(value).strip().title()
+        for value in active_constraints.get("exclude_spell_subtypes")
+        or active_constraints.get("excluded_spell_subtypes")
+        or []
+        if str(value).strip()
+    ]
+    if matching and spell_subtypes and " - " not in str(card.get("type_line") or ""):
+        card["type_line"] = f"{card.get('type_line') or 'Instant'} - {spell_subtypes[0]}"
+    if not matching and excluded_spell_subtypes and " - " not in str(card.get("type_line") or ""):
+        card["type_line"] = f"{card.get('type_line') or 'Instant'} - {excluded_spell_subtypes[0]}"
 
     if active_constraints.get("require_legendary"):
         if matching:
@@ -4471,6 +4489,7 @@ def counter_target_execution_scenario_from_expected_rule(
         "nonmatching_stack_effect": nonmatching["effect"],
         "expected_target_constraints": constraints,
         "expected_cards_drawn": int(required.get("draw_on_counter") or 0),
+        "expected_countered_spell_to_exile": bool(required.get("countered_spell_to_exile")),
         "logical_rule_key": rule["logical_rule_key"],
     }
 

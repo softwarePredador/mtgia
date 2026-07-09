@@ -206,6 +206,67 @@ def test_counter_unless_pays_draw_runner_draws_when_tax_unpaid() -> None:
     assert result["cards_drawn"] == 1
 
 
+def test_counter_target_runner_validates_exile_replacement() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "counter",
+        "battle_model_scope": "xmage_counter_target_spell_v1",
+        "target": "spell",
+        "target_constraints": {"zone": "stack", "stack_object": "spell"},
+        "countered_spell_to_exile": True,
+        "countered_spell_to_exile_reason": "counter_target_exile_replacement",
+        "instant": True,
+    }
+    try:
+        result = validator.run_counter_target_response(
+            battle,
+            {
+                "name": "Dissipate counters and exiles",
+                "type": "counter_target_response",
+                "card": {
+                    "name": "Dissipate",
+                    "type_line": "Instant",
+                    "mana_cost": "{1}{U}{U}",
+                    "cmc": 3,
+                    "instant": True,
+                    "effect": "counter",
+                    "battle_model_scope": "xmage_counter_target_spell_v1",
+                    "target": "spell",
+                    "target_constraints": {"zone": "stack", "stack_object": "spell"},
+                    "countered_spell_to_exile": True,
+                    "countered_spell_to_exile_reason": "counter_target_exile_replacement",
+                },
+                "target_stack_object": {
+                    "name": "E2E Legal Counter Target",
+                    "type_line": "Creature - Dragon",
+                    "cmc": 7,
+                    "effect": "finisher",
+                },
+                "target_stack_effect": {"effect": "finisher"},
+                "nonmatching_stack_object": {
+                    "name": "E2E Illegal Counter Target",
+                    "type_line": "Activated Ability",
+                    "effect": "activated_ability",
+                    "cmc": 0,
+                },
+                "nonmatching_stack_effect": {"effect": "activated_ability"},
+                "expected_countered_spell_to_exile": True,
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Dissipate"
+    assert result["countered"] is True
+    assert result["countered_spell_to_exile"] is True
+
+
 def test_global_stat_modifier_draw_spell_runner_executes_boost_and_draw() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

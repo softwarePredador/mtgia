@@ -6433,6 +6433,25 @@ def run_counter_target_response(
             "battle_events",
             f"{response_card['name']} expected to draw {expected_cards_drawn} on counter; event={counter_event.get('cards_drawn')}",
         )
+    expected_exile = bool(
+        scenario.get("expected_countered_spell_to_exile")
+        or response_card.get("countered_spell_to_exile")
+    )
+    if bool(counter_event.get("countered_spell_to_exile")) != expected_exile:
+        fail(
+            "battle_events",
+            f"{response_card['name']} countered_spell_to_exile={counter_event.get('countered_spell_to_exile')}",
+        )
+    if expected_exile:
+        if not target_stack_object.get("_exile_on_resolution"):
+            fail("battle_execution", f"{response_card['name']} did not mark countered stack object for exile")
+        stack.resolve_top()
+        if not any(
+            card.get("name") == target_stack_object.get("name")
+            for card in active.exile
+            if isinstance(card, dict)
+        ):
+            fail("battle_execution", f"{response_card['name']} did not move countered stack object to exile")
 
     return {
         "scenario": scenario.get("name"),
@@ -6441,6 +6460,7 @@ def run_counter_target_response(
         "target_stack_effect": target_stack_effect.get("effect"),
         "countered": actual_countered,
         "cards_drawn": int(counter_event.get("cards_drawn") or 0),
+        "countered_spell_to_exile": bool(counter_event.get("countered_spell_to_exile")),
         "nonmatching_target": (
             nonmatching_stack_object.get("name")
             if isinstance(nonmatching_stack_object, dict)

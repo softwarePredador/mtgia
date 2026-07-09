@@ -3527,6 +3527,10 @@ def counter_target_from_oracle(metadata: dict[str, Any]) -> str | None:
     if text == "counter target spell with mana value x.":
         return "spell_mana_value_x"
     mana_value_patterns: list[tuple[str, str]] = [
+        (
+            r"^counter target creature spell with mana value (?P<value>\d+) or less\.?$",
+            "creature_spell_mana_value_{value}_or_less",
+        ),
         (r"^counter target spell with mana value (?P<value>\d+) or greater\.?$", "spell_mana_value_{value}_or_greater"),
         (r"^counter target spell with mana value (?P<value>\d+) or less\.?$", "spell_mana_value_{value}_or_less"),
         (r"^counter target spell with mana value (?P<value>\d+)\.?$", "spell_mana_value_{value}"),
@@ -3555,6 +3559,7 @@ def counter_target_from_oracle(metadata: dict[str, Any]) -> str | None:
         (r"^counter target spirit or arcane spell\.?$", "spirit_or_arcane_spell"),
         (r"^counter target artifact or creature spell\.?$", "artifact_or_creature_spell"),
         (r"^counter target creature or planeswalker spell\.?$", "creature_or_planeswalker_spell"),
+        (r"^counter target creature or enchantment spell\.?$", "creature_or_enchantment_spell"),
         (r"^counter target artifact or enchantment spell\.?$", "artifact_or_enchantment_spell"),
         (r"^counter target instant or sorcery spell\.?$", "instant_or_sorcery_spell"),
         (r"^counter target spell that targets one or more creatures\.?$", "spell_targeting_creature"),
@@ -3577,6 +3582,7 @@ def counter_target_from_oracle(metadata: dict[str, Any]) -> str | None:
         (r"^counter up to two target spells\.?$", "spell"),
         (r"^counter target noncreature spell\.?$", "noncreature_spell"),
         (r"^counter target nonartifact spell\.?$", "nonartifact_spell"),
+        (r"^counter target non-faerie spell\.?$", "nonfaerie_spell"),
         (r"^counter target colorless spell\.?$", "colorless_spell"),
         (r"^counter target nonblue spell\.?$", "nonblue_spell"),
         (r"^counter target multicolored spell\.?$", "multicolored_spell"),
@@ -3734,6 +3740,19 @@ def counter_target_from_source(source_text: str) -> str | None:
         and "ColorPredicate(ObjectColor.GREEN)" in text
     ):
         return "spell_mana_value_2_or_less_or_red_green_spell_mana_value_6_or_less"
+    mana_value_less_match = re.search(
+        r"ManaValuePredicate\s*\(\s*ComparisonType\.FEWER_THAN\s*,\s*(?P<limit>\d+)\s*\)",
+        text,
+    )
+    if mana_value_less_match:
+        max_value = max(0, int(mana_value_less_match.group("limit")) - 1)
+        if "FilterCreatureSpell" in text:
+            return f"creature_spell_mana_value_{max_value}_or_less"
+        return f"spell_mana_value_{max_value}_or_less"
+    if "Predicates.not(SubType.FAERIE.getPredicate())" in text or "non-Faerie spell" in text:
+        return "nonfaerie_spell"
+    if "CardType.CREATURE.getPredicate()" in text and "CardType.ENCHANTMENT.getPredicate()" in text:
+        return "creature_or_enchantment_spell"
     if (
         "FILTER_SPELL_NON_CREATURE" in text
         or "FILTER_SPELL_A_NON_CREATURE" in text
@@ -3794,6 +3813,35 @@ def counter_target_from_source(source_text: str) -> str | None:
     ):
         return "spell_cast_from_graveyard"
     return None
+
+
+def counter_target_exile_replacement_from_oracle(metadata: dict[str, Any]) -> str | None:
+    text = re.sub(
+        r"\s+",
+        " ",
+        " ".join(oracle_effect_lines_without_neutral_auxiliary(metadata)),
+    ).strip().lower()
+    match = re.match(
+        r"^(?P<counter>counter target .+?)\. if that spell is countered this way, "
+        r"exile (?:it|that spell) instead of putting (?:it )?into its owner's graveyard\.?$",
+        text,
+    )
+    if not match:
+        return None
+    return counter_target_from_oracle({"oracle_text": match.group("counter")})
+
+
+def counter_target_exile_replacement_from_source(source_text: str) -> str:
+    text = str(source_text or "")
+    effect_matches = list(re.finditer(r"new\s+CounterTargetWithReplacementEffect\s*\(", text))
+    if len(effect_matches) != 1:
+        return "counter_replacement_source_effect_not_single"
+    if not re.search(r"CounterTargetWithReplacementEffect\s*\(\s*PutCards\.EXILED\s*\)", text):
+        return "counter_replacement_source_not_exile"
+    target = counter_target_from_source(text)
+    if target is None:
+        return "counter_replacement_source_target_not_supported"
+    return target
 
 
 def fixed_counter_target_controller_life_loss_from_oracle(
@@ -4043,6 +4091,12 @@ def counter_target_constraints_for(target: str) -> dict[str, Any]:
     )):
         constraints["card_types"] = ["creature"]
         constraints["power_or_toughness_max"] = int(power_toughness_match.group("value"))
+    elif (creature_mana_value_match := re.match(
+        r"^creature_spell_mana_value_(?P<value>\d+)_or_less$",
+        target,
+    )):
+        constraints["card_types"] = ["creature"]
+        constraints["counter_target_mana_value_max"] = int(creature_mana_value_match.group("value"))
     elif target == "red_or_green_spell":
         constraints["spell_colors"] = ["R", "G"]
     elif target == "blue_instant_spell":
@@ -4064,6 +4118,8 @@ def counter_target_constraints_for(target: str) -> dict[str, Any]:
         constraints["card_types"] = ["artifact", "creature"]
     elif target == "creature_or_planeswalker_spell":
         constraints["card_types"] = ["creature", "planeswalker"]
+    elif target == "creature_or_enchantment_spell":
+        constraints["card_types"] = ["creature", "enchantment"]
     elif target == "artifact_or_enchantment_spell":
         constraints["card_types"] = ["artifact", "enchantment"]
     elif target == "instant_or_sorcery_spell":
@@ -4090,6 +4146,8 @@ def counter_target_constraints_for(target: str) -> dict[str, Any]:
         constraints["exclude_card_types"] = ["creature"]
     elif target == "nonartifact_spell":
         constraints["exclude_card_types"] = ["artifact"]
+    elif target == "nonfaerie_spell":
+        constraints["exclude_spell_subtypes"] = ["faerie"]
     elif target == "colorless_spell":
         constraints["spell_color_count_exact"] = 0
     elif target == "nonblue_spell":
@@ -10505,6 +10563,15 @@ def is_counter_unless_pays_spell_unit(row: dict[str, Any]) -> bool:
         and effect_classes(row) == {"CounterUnlessPaysEffect"}
         and not ability_classes(row)
         and set(row.get("xmage_signals") or []) == {"targeting", "counter"}
+    )
+
+
+def is_counter_target_with_replacement_spell_unit(row: dict[str, Any]) -> bool:
+    return (
+        effect_classes(row) == {"CounterTargetWithReplacementEffect"}
+        and ability_classes(row).issubset(ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES)
+        and set(row.get("xmage_signals") or []) == {"targeting", "counter"}
+        and "TargetSpell" in str(row.get("adapter_work_unit") or "")
     )
 
 
@@ -23365,6 +23432,7 @@ def split_row(
         and not ability_classes(row)
     )
     counter_unless_pays_spell_unit = is_counter_unless_pays_spell_unit(row)
+    counter_target_with_replacement_spell_unit = is_counter_target_with_replacement_spell_unit(row)
     target_keyword_spell_unit = is_target_keyword_spell_unit(row)
     boost_keyword_spell_unit = is_boost_keyword_spell_unit(row)
     prevent_all_combat_damage_spell_unit = unit in {
@@ -23486,6 +23554,7 @@ def split_row(
         and not fixed_token_spell_unit
         and not graveyard_count_damage_unit
         and not counter_unless_pays_spell_unit
+        and not counter_target_with_replacement_spell_unit
     ):
         return None, "unsupported_adapter_work_unit"
     if not metadata:
@@ -31562,6 +31631,42 @@ def split_row(
             family_id="xmage_counter_unless_pays_dynamic_spell",
         ), "selected_exact_scope"
 
+    if counter_target_with_replacement_spell_unit:
+        if not is_spell(metadata):
+            return None, "counter_replacement_not_instant_or_sorcery_spell"
+        unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+        if unsupported_abilities:
+            return None, "counter_replacement_ability_class_not_simple"
+        target = counter_target_exile_replacement_from_oracle(metadata)
+        if target is None:
+            return None, "counter_replacement_oracle_not_exact_exile"
+        source_target = counter_target_exile_replacement_from_source(source_text)
+        if source_target.startswith("counter_replacement_"):
+            return None, source_target
+        if source_target != target:
+            return None, "counter_replacement_source_oracle_target_mismatch"
+        effect_json = {
+            "effect": "counter",
+            "battle_model_scope": COUNTER_SCOPE,
+            "target": target,
+            "target_constraints": counter_target_constraints_for(target),
+            "countered_spell_to_exile": True,
+            "countered_spell_to_exile_reason": "counter_target_exile_replacement",
+            "xmage_effect_class": "CounterTargetWithReplacementEffect",
+            **flags,
+        }
+        if target == "blue_spell":
+            effect_json["requires_blue_target"] = True
+        if target == "spell_mana_value_x":
+            effect_json["counter_target_mana_value_source"] = "x_value"
+            effect_json["xmage_target_adjuster"] = "XManaValueTargetAdjuster"
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_counter_target_exile_replacement_spell",
+        ), "selected_exact_scope"
+
     if unit == COUNTER_UNIT:
         if classes == {"CounterTargetEffect", "ScryEffect"}:
             unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
@@ -34029,6 +34134,7 @@ def build_exact_split_report(
             and not is_target_keyword_spell_unit(row)
             and not is_boost_keyword_spell_unit(row)
             and not is_counter_unless_pays_spell_unit(row)
+            and not is_counter_target_with_replacement_spell_unit(row)
             and not (
                 str(row.get("adapter_work_unit") or "") == RECURSION_UNIT
                 and effect_classes(row) == {"PutOnLibraryTargetEffect"}
@@ -34100,6 +34206,7 @@ def build_exact_split_report(
                 "add_counters::targeted_add_counters_variant_v1 rows with AddCountersTargetEffect, EntersBattlefieldTriggeredAbility, exact one target creature Oracle text, and only static self keywords",
                 "add_counters::source_add_counters_variant_v1 rows with AddCountersSourceEffect, SimpleActivatedAbility, exact self-counter Oracle text, and mana/tap source costs only",
                 "xmage_signature CounterUnlessPaysEffect one-shot spell rows with exact GenericManaCost(N), exact Oracle 'unless its controller pays {N}', and supported stack target constraints",
+                "xmage_signature CounterTargetWithReplacementEffect one-shot spell rows with exact PutCards.EXILED source replacement, exact Oracle exile-instead counter text, and supported stack target constraints",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with PutOnLibraryTargetEffect, EntersBattlefieldTriggeredAbility, exact self-graveyard top/bottom library Oracle text, and only static self keywords",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with LookLibraryAndPickControllerEffect, EntersBattlefieldTriggeredAbility, exact ETB look-library pick-one-to-hand Oracle/source agreement, and only static self keywords",
                 "tutor::xmage_library_search_variant_review_v1 rows with SearchLibraryPutInPlayEffect, EntersBattlefieldTriggeredAbility, exact ETB land tutor-to-battlefield Oracle/source agreement, and only static self keywords",

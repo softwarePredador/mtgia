@@ -14732,6 +14732,46 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_counter_target_excluded_spell_subtype_constraint(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        responder = self.battle.Player("Responder", None, [])
+        counter_effect = {
+            "effect": "counter",
+            "battle_model_scope": "xmage_counter_target_spell_v1",
+            "target": "nonfaerie_spell",
+            "target_constraints": {
+                "zone": "stack",
+                "stack_object": "spell",
+                "exclude_spell_subtypes": ["faerie"],
+            },
+            "countered_spell_to_exile": True,
+            "countered_spell_to_exile_reason": "counter_target_exile_replacement",
+            "instant": True,
+        }
+        legal_spell = {"name": "Target Draw", "type_line": "Instant", "cmc": 2}
+        illegal_spell = {"name": "Target Faerie", "type_line": "Kindred Instant - Faerie", "cmc": 2}
+        legal_stack = self.battle.StackItem(legal_spell, active, {"effect": "draw_cards"})
+        illegal_stack = self.battle.StackItem(illegal_spell, active, {"effect": "draw_cards"})
+
+        self.assertTrue(
+            self.battle.counter_can_target(
+                {},
+                counter_effect,
+                legal_spell,
+                stack_item=legal_stack,
+                counter_controller=responder,
+            )
+        )
+        self.assertFalse(
+            self.battle.counter_can_target(
+                {},
+                counter_effect,
+                illegal_spell,
+                stack_item=illegal_stack,
+                counter_controller=responder,
+            )
+        )
+
     def test_x_counterspell_pays_target_mana_value_and_counters_only_when_affordable(self) -> None:
         active = self.battle.Player("Active", None, [])
         responder = self.battle.Player("Responder", None, [])

@@ -184,6 +184,36 @@ def test_counter_target_stack_object_execution_scenario_is_manifested() -> None:
     assert scenario["nonmatching_stack_effect"]["effect"] == "mana_ability"
 
 
+def test_counter_target_excluded_spell_subtype_execution_scenario_uses_illegal_subtype_fixture() -> None:
+    proposal = {
+        "normalized_name": "faerie trickery",
+        "card_name": "Faerie Trickery",
+        "oracle_hash": "hash-faerie-trickery",
+        "logical_rule_key": "battle_rule_v1:faerie trickery",
+        "effect_json": {
+            "effect": "counter",
+            "battle_model_scope": "xmage_counter_target_spell_v1",
+            "target": "nonfaerie_spell",
+            "target_constraints": {
+                "zone": "stack",
+                "stack_object": "spell",
+                "exclude_spell_subtypes": ["faerie"],
+            },
+            "countered_spell_to_exile": True,
+            "countered_spell_to_exile_reason": "counter_target_exile_replacement",
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    assert scenario["type"] == "counter_target_response"
+    assert "Faerie" not in scenario["target_stack_object"]["type_line"]
+    assert "Faerie" in scenario["nonmatching_stack_object"]["type_line"]
+    assert scenario["card"]["countered_spell_to_exile"] is True
+    assert scenario["expected_countered_spell_to_exile"] is True
+
+
 def test_counter_target_x_mana_value_execution_scenario_uses_cast_context() -> None:
     proposal = {
         "normalized_name": "spell blast",

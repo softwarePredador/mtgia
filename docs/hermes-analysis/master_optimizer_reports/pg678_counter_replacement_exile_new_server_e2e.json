@@ -1,0 +1,415 @@
+{
+  "battle_execution": {
+    "event_count": 16,
+    "results": [
+      {
+        "card_name": "Assert Authority",
+        "cards_drawn": 0,
+        "countered": true,
+        "countered_spell_to_exile": true,
+        "nonmatching_target": "E2E Illegal Counter Target",
+        "scenario": "Assert Authority counters a legal stack object",
+        "target": "E2E Legal Counter Target",
+        "target_stack_effect": "finisher"
+      },
+      {
+        "card_name": "Deny Existence",
+        "cards_drawn": 0,
+        "countered": true,
+        "countered_spell_to_exile": true,
+        "nonmatching_target": "E2E Illegal Counter Target",
+        "scenario": "Deny Existence counters a legal stack object",
+        "target": "E2E Legal Counter Target",
+        "target_stack_effect": "finisher"
+      },
+      {
+        "card_name": "Deny the Divine",
+        "cards_drawn": 0,
+        "countered": true,
+        "countered_spell_to_exile": true,
+        "nonmatching_target": "E2E Illegal Counter Target",
+        "scenario": "Deny the Divine counters a legal stack object",
+        "target": "E2E Legal Counter Target",
+        "target_stack_effect": "finisher"
+      },
+      {
+        "card_name": "Dissipate",
+        "cards_drawn": 0,
+        "countered": true,
+        "countered_spell_to_exile": true,
+        "nonmatching_target": "E2E Illegal Counter Target",
+        "scenario": "Dissipate counters a legal stack object",
+        "target": "E2E Legal Counter Target",
+        "target_stack_effect": "finisher"
+      },
+      {
+        "card_name": "Faerie Trickery",
+        "cards_drawn": 0,
+        "countered": true,
+        "countered_spell_to_exile": true,
+        "nonmatching_target": "E2E Illegal Counter Target",
+        "scenario": "Faerie Trickery counters a legal stack object",
+        "target": "E2E Legal Counter Target",
+        "target_stack_effect": "finisher"
+      },
+      {
+        "card_name": "Horribly Awry",
+        "cards_drawn": 0,
+        "countered": true,
+        "countered_spell_to_exile": true,
+        "nonmatching_target": "E2E Illegal Counter Target",
+        "scenario": "Horribly Awry counters a legal stack object",
+        "target": "E2E Legal Counter Target",
+        "target_stack_effect": "finisher"
+      },
+      {
+        "card_name": "Liquify",
+        "cards_drawn": 0,
+        "countered": true,
+        "countered_spell_to_exile": true,
+        "nonmatching_target": "E2E Illegal Counter Target",
+        "scenario": "Liquify counters a legal stack object",
+        "target": "E2E Legal Counter Target",
+        "target_stack_effect": "finisher"
+      },
+      {
+        "card_name": "Void Shatter",
+        "cards_drawn": 0,
+        "countered": true,
+        "countered_spell_to_exile": true,
+        "nonmatching_target": "E2E Illegal Counter Target",
+        "scenario": "Void Shatter counters a legal stack object",
+        "target": "E2E Legal Counter Target",
+        "target_stack_effect": "finisher"
+      }
+    ],
+    "scenario_count": 8
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-09T00:05:11.850510+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg678_counter_replacement_exile_new_server_manifest.json",
+  "package_id": "pg678_counter_replacement_exile_new_server_manifest",
+  "snapshot": "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 8
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "card_name": "Assert Authority",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b93da3b7d54ae3de7cb4445ca5d21f27",
+          "oracle_hash": "e7e55ff661b00c18b06a0440ae09f5c3",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "card_name": "Deny Existence",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9a8fc3452aadc7a476e2a80a40933258",
+          "oracle_hash": "9ef9d5e5c3a197765e7ed3fc010d4694",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "card_name": "Deny the Divine",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a93f6af5442ff3883dd9f67b59aabc33",
+          "oracle_hash": "0b49f6a07dfab50146e385e07f91d0cd",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "card_name": "Dissipate",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b93da3b7d54ae3de7cb4445ca5d21f27",
+          "oracle_hash": "307fb6896c67fa1a3661968432a66241",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "card_name": "Faerie Trickery",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:02debaf82ed6175dfb4cd42134317ce8",
+          "oracle_hash": "191228b05399a640b3409b2bce5a32e5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "card_name": "Horribly Awry",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7f961c618cf035b3060297e5be43e3a4",
+          "oracle_hash": "769649f9202fe62cde39074275097cb4",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "card_name": "Liquify",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2069ef74d49c4461854d1fca3258cbcc",
+          "oracle_hash": "4c9c8c008370e7284d2f03bc4e614c96",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "card_name": "Void Shatter",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b93da3b7d54ae3de7cb4445ca5d21f27",
+          "oracle_hash": "591fc6fc6eae405e727724e6255ae015",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 8
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "card_name": "Assert Authority",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b93da3b7d54ae3de7cb4445ca5d21f27",
+          "oracle_hash": "e7e55ff661b00c18b06a0440ae09f5c3",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "card_name": "Deny Existence",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9a8fc3452aadc7a476e2a80a40933258",
+          "oracle_hash": "9ef9d5e5c3a197765e7ed3fc010d4694",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "card_name": "Deny the Divine",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a93f6af5442ff3883dd9f67b59aabc33",
+          "oracle_hash": "0b49f6a07dfab50146e385e07f91d0cd",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "card_name": "Dissipate",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b93da3b7d54ae3de7cb4445ca5d21f27",
+          "oracle_hash": "307fb6896c67fa1a3661968432a66241",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "card_name": "Faerie Trickery",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:02debaf82ed6175dfb4cd42134317ce8",
+          "oracle_hash": "191228b05399a640b3409b2bce5a32e5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "card_name": "Horribly Awry",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7f961c618cf035b3060297e5be43e3a4",
+          "oracle_hash": "769649f9202fe62cde39074275097cb4",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "card_name": "Liquify",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2069ef74d49c4461854d1fca3258cbcc",
+          "oracle_hash": "4c9c8c008370e7284d2f03bc4e614c96",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "card_name": "Void Shatter",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b93da3b7d54ae3de7cb4445ca5d21f27",
+          "oracle_hash": "591fc6fc6eae405e727724e6255ae015",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 8
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Assert Authority",
+          "logical_rule_key": "battle_rule_v1:b93da3b7d54ae3de7cb4445ca5d21f27"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Deny Existence",
+          "logical_rule_key": "battle_rule_v1:9a8fc3452aadc7a476e2a80a40933258"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Deny the Divine",
+          "logical_rule_key": "battle_rule_v1:a93f6af5442ff3883dd9f67b59aabc33"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Dissipate",
+          "logical_rule_key": "battle_rule_v1:b93da3b7d54ae3de7cb4445ca5d21f27"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Faerie Trickery",
+          "logical_rule_key": "battle_rule_v1:02debaf82ed6175dfb4cd42134317ce8"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Horribly Awry",
+          "logical_rule_key": "battle_rule_v1:7f961c618cf035b3060297e5be43e3a4"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Liquify",
+          "logical_rule_key": "battle_rule_v1:2069ef74d49c4461854d1fca3258cbcc"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Void Shatter",
+          "logical_rule_key": "battle_rule_v1:b93da3b7d54ae3de7cb4445ca5d21f27"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 8
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Assert Authority",
+          "component_keys": [],
+          "effect": "counter",
+          "logical_rule_key": "battle_rule_v1:b93da3b7d54ae3de7cb4445ca5d21f27"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Deny Existence",
+          "component_keys": [],
+          "effect": "counter",
+          "logical_rule_key": "battle_rule_v1:9a8fc3452aadc7a476e2a80a40933258"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Deny the Divine",
+          "component_keys": [],
+          "effect": "counter",
+          "logical_rule_key": "battle_rule_v1:a93f6af5442ff3883dd9f67b59aabc33"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Dissipate",
+          "component_keys": [],
+          "effect": "counter",
+          "logical_rule_key": "battle_rule_v1:b93da3b7d54ae3de7cb4445ca5d21f27"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Faerie Trickery",
+          "component_keys": [],
+          "effect": "counter",
+          "logical_rule_key": "battle_rule_v1:02debaf82ed6175dfb4cd42134317ce8"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Horribly Awry",
+          "component_keys": [],
+          "effect": "counter",
+          "logical_rule_key": "battle_rule_v1:7f961c618cf035b3060297e5be43e3a4"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Liquify",
+          "component_keys": [],
+          "effect": "counter",
+          "logical_rule_key": "battle_rule_v1:2069ef74d49c4461854d1fca3258cbcc"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Void Shatter",
+          "component_keys": [],
+          "effect": "counter",
+          "logical_rule_key": "battle_rule_v1:b93da3b7d54ae3de7cb4445ca5d21f27"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 16,
+        "scenarios": 8
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

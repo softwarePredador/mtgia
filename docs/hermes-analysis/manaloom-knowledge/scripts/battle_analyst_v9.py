@@ -10284,6 +10284,20 @@ def _counter_target_matches_constraints(counter_effect, target_card, stack_item=
     ]
     if spell_subtypes and not any(re.search(rf"\b{re.escape(subtype)}\b", type_line) for subtype in spell_subtypes):
         return False
+    excluded_spell_subtypes = [
+        str(value or "").strip().lower()
+        for value in _as_list(
+            constraints.get("exclude_spell_subtypes")
+            or constraints.get("excluded_spell_subtypes")
+            or constraints.get("exclude_subtypes")
+        )
+        if str(value or "").strip()
+    ]
+    if excluded_spell_subtypes and any(
+        re.search(rf"\b{re.escape(subtype)}\b", type_line)
+        for subtype in excluded_spell_subtypes
+    ):
+        return False
     spell_color_count_exact = first_present_value(
         constraints,
         ("spell_color_count_exact", "target_spell_color_count_exact"),
