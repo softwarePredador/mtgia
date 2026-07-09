@@ -98,6 +98,57 @@ def test_validate_runtime_lookup_derives_checks_from_expected_rules() -> None:
     assert results[0]["effect"] == "topdeck_play"
 
 
+def test_equipment_static_attachment_runner_executes_boost_and_keywords() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    effect = {
+        "effect": "equipment_static_attachment",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "power_boost": 2,
+        "toughness_boost": 2,
+        "static_power_bonus": 2,
+        "static_toughness_bonus": 2,
+        "attached_keywords": ["first_strike", "flying"],
+        "_rule_logical_key": "battle_rule_v1:maul-of-the-skyclaves",
+    }
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: dict(effect)
+    try:
+        result = validator.run_equipment_static_power_toughness_attachment(
+            battle,
+            {
+                "name": "Maul of the Skyclaves equipment static P/T attaches",
+                "type": "equipment_static_power_toughness_attachment",
+                "card": {"name": "Maul of the Skyclaves", "type_line": "Artifact - Equipment"},
+                "target": {
+                    "name": "E2E Equipment Target",
+                    "type_line": "Creature - Soldier",
+                    "base_power": 2,
+                    "base_toughness": 2,
+                    "power": 2,
+                    "toughness": 2,
+                },
+                "expected_power": 4,
+                "expected_toughness": 4,
+                "expected_keywords": ["first_strike", "flying"],
+                "expected_source": "Maul of the Skyclaves",
+                "logical_rule_key": "battle_rule_v1:maul-of-the-skyclaves",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Maul of the Skyclaves"
+    assert result["target_power"] == 4
+    assert result["target_toughness"] == 4
+    assert result["validated_keywords"] == ["first_strike", "flying"]
+    assert result["attached_event"]["grants"] == ["flying", "first_strike"]
+
+
 def test_fixed_damage_target_spell_runner_executes_damage_and_cant_be_countered() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

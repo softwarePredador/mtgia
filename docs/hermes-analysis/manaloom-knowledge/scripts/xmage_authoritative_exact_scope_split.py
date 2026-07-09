@@ -1046,6 +1046,21 @@ EQUIPMENT_ATTACHED_KEYWORD_WORDS = {
 }
 
 
+def _is_safe_equipment_auxiliary_oracle_line(line: str) -> bool:
+    if re.match(r"^equip(?:\s|[-:\u2013\u2014])", line):
+        return True
+    if line in EQUIPMENT_ATTACHED_KEYWORD_WORDS:
+        return True
+    if (
+        line.startswith("when ")
+        and " equipment enters" in line
+        and " attach it to target creature you control" in line
+        and "create" not in line
+    ):
+        return True
+    return False
+
+
 def _equipment_oracle_keyword_list(value: str) -> list[str] | None:
     if not value:
         return []
@@ -1077,7 +1092,7 @@ def fixed_equipment_static_attachment_from_oracle(
     ]
     static_lines: list[str] = []
     for line in lines:
-        if re.match(r"^equip(?:\s|[-:\u2013\u2014])", line):
+        if _is_safe_equipment_auxiliary_oracle_line(line):
             continue
         static_lines.append(line)
     if len(static_lines) != 1:

@@ -86,6 +86,22 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "toughness_delta",
     "power_boost",
     "toughness_boost",
+    "attached_keywords",
+    "grants_flying",
+    "grants_reach",
+    "grants_trample",
+    "grants_deathtouch",
+    "grants_first_strike",
+    "grants_double_strike",
+    "grants_lifelink",
+    "grants_indestructible",
+    "grants_haste",
+    "grants_vigilance",
+    "grants_hexproof",
+    "grants_shroud",
+    "grants_menace",
+    "grants_unblockable",
+    "attached_creature_cant_be_blocked",
     "untap_target",
     "blocker_count_mode",
     "duration",
@@ -1291,6 +1307,38 @@ def aura_static_pt_execution_scenario_from_expected_rule(rule: dict[str, Any]) -
         "expected_power": target["base_power"] + power_bonus,
         "expected_toughness": expected_toughness,
         "expected_moved_to_graveyard": expected_toughness <= 0,
+        "expected_source": rule["card_name"],
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
+def equipment_static_pt_execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("effect") != "equipment_static_attachment":
+        return None
+    power_bonus = int(required.get("power_boost") or required.get("static_power_bonus") or 0)
+    toughness_bonus = int(required.get("toughness_boost") or required.get("static_toughness_bonus") or 0)
+    attached_keywords = [
+        str(value).strip().lower().replace(" ", "_")
+        for value in required.get("attached_keywords", []) or []
+        if str(value).strip()
+    ]
+    target = {
+        "name": f"E2E Equipment Target for {rule['card_name']}",
+        "type_line": "Creature - Soldier",
+        "base_power": 2,
+        "base_toughness": 2,
+        "power": 2,
+        "toughness": 2,
+    }
+    return {
+        "name": f"{rule['card_name']} equipment static P/T attaches",
+        "type": "equipment_static_power_toughness_attachment",
+        "card": {"name": rule["card_name"], "type_line": "Artifact - Equipment"},
+        "target": target,
+        "expected_power": target["base_power"] + power_bonus,
+        "expected_toughness": target["base_toughness"] + toughness_bonus,
+        "expected_keywords": attached_keywords,
         "expected_source": rule["card_name"],
         "logical_rule_key": rule["logical_rule_key"],
     }
@@ -5378,6 +5426,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or static_controlled_keyword_execution_scenario_from_expected_rule(rule)
         or static_global_pt_execution_scenario_from_expected_rule(rule)
         or aura_static_pt_execution_scenario_from_expected_rule(rule)
+        or equipment_static_pt_execution_scenario_from_expected_rule(rule)
         or static_graveyard_threshold_boost_execution_scenario_from_expected_rule(rule)
         or static_count_pt_execution_scenario_from_expected_rule(rule)
         or destroy_target_create_treasure_execution_scenario_from_expected_rule(rule)

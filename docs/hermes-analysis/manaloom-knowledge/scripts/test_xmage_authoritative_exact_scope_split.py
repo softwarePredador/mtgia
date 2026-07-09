@@ -151,6 +151,110 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["toughness_boost"], 1)
         self.assertEqual(effect["attached_keywords"], [])
 
+    def test_fixed_equipment_static_attachment_ignores_auto_attach_etb_line(self) -> None:
+        row = queue_row(
+            "xmage_signature::BoostEquippedEffect,GainAbilityAttachedEffect::"
+            "EquipAbility,FirstStrikeAbility,FlyingAbility,SimpleStaticAbility::"
+            "no_target_class::no_condition_class::static_ability",
+            effect_classes=["BoostEquippedEffect", "GainAbilityAttachedEffect"],
+            ability_kind="static",
+            ability_classes=[
+                "EquipAbility",
+                "FirstStrikeAbility",
+                "FlyingAbility",
+                "SimpleStaticAbility",
+            ],
+            xmage_signals=["static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Maul of the Skyclaves",
+                type_line="Artifact - Equipment",
+                oracle_text=(
+                    "When this Equipment enters, attach it to target creature you control.\n"
+                    "Equipped creature gets +2/+2 and has flying and first strike.\n"
+                    "Equip {2}{W}{W}"
+                ),
+            ),
+            source_text="""
+                Ability ability = new SimpleStaticAbility(new BoostEquippedEffect(2, 2));
+                ability.addEffect(new GainAbilityAttachedEffect(
+                    FlyingAbility.getInstance(), AttachmentType.EQUIPMENT));
+                ability.addEffect(new GainAbilityAttachedEffect(
+                    FirstStrikeAbility.getInstance(), AttachmentType.EQUIPMENT));
+                this.addAbility(ability);
+                this.addAbility(new EquipAbility(Outcome.BoostCreature, new ManaCostsImpl<>("{2}{W}{W}"), false));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["power_boost"], 2)
+        self.assertEqual(effect["toughness_boost"], 2)
+        self.assertEqual(effect["attached_keywords"], ["first_strike", "flying"])
+        self.assertTrue(effect["grants_first_strike"])
+        self.assertTrue(effect["grants_flying"])
+
+    def test_fixed_equipment_static_attachment_ignores_equipment_self_keyword_line(self) -> None:
+        row = queue_row(
+            "xmage_signature::BoostEquippedEffect::AddAbility,EquipAbility,IndestructibleAbility,SimpleStaticAbility::"
+            "no_target_class::no_condition_class::static_ability",
+            effect_classes=["BoostEquippedEffect"],
+            ability_kind="static",
+            ability_classes=[
+                "AddAbility",
+                "EquipAbility",
+                "IndestructibleAbility",
+                "SimpleStaticAbility",
+            ],
+            xmage_signals=["static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Darksteel Axe",
+                type_line="Artifact - Equipment",
+                oracle_text="Indestructible\nEquipped creature gets +2/+0.\nEquip {2}",
+            ),
+            source_text="""
+                this.addAbility(IndestructibleAbility.getInstance());
+                this.addAbility(new SimpleStaticAbility(new BoostEquippedEffect(2, 0)));
+                this.addAbility(new EquipAbility(Outcome.AddAbility, new GenericManaCost(2), false));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["power_boost"], 2)
+        self.assertEqual(effect["toughness_boost"], 0)
+        self.assertEqual(effect["attached_keywords"], [])
+
+    def test_fixed_equipment_static_attachment_still_blocks_for_mirrodin_token_line(self) -> None:
+        row = queue_row(
+            "xmage_signature::BoostEquippedEffect::EquipAbility,SimpleStaticAbility::"
+            "no_target_class::no_condition_class::static_ability",
+            effect_classes=["BoostEquippedEffect"],
+            ability_kind="static",
+            ability_classes=["EquipAbility", "SimpleStaticAbility"],
+            xmage_signals=["static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Equipment",
+                type_line="Artifact - Equipment",
+                oracle_text="For Mirrodin!\nEquipped creature gets +2/+1.\nEquip {4}",
+            ),
+            source_text="""
+                this.addAbility(new SimpleStaticAbility(new BoostEquippedEffect(2, 1)));
+                this.addAbility(new EquipAbility(4));
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "equipment_static_oracle_not_exact_fixed")
+
     def test_fixed_aura_static_power_toughness_attachment_maps_exact_scope(self) -> None:
         row = queue_row(
             "xmage_signature::AttachEffect,BoostEnchantedEffect::EnchantAbility,SimpleStaticAbility::"

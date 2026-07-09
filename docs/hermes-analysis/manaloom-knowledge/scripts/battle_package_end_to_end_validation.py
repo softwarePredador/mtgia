@@ -7737,6 +7737,75 @@ def run_aura_static_power_toughness_attachment(
     }
 
 
+def run_equipment_static_power_toughness_attachment(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    source = battle.enrich_card({**card, **battle.get_card_effect(card)})
+    active = battle.Player(str(scenario.get("player") or "Equipment Controller"), None, [])
+    target = dict(scenario["target"])
+    active.battlefield.append(target)
+    before_events = len(events)
+    battle.apply_equipment_static_attachment(
+        active,
+        source,
+        battle.get_card_effect(card),
+        turn=int(scenario.get("turn") or 3),
+    )
+    expected_power = int(scenario["expected_power"])
+    expected_toughness = int(scenario["expected_toughness"])
+    if int(target.get("power") or 0) != expected_power:
+        fail("battle_execution", f"{card['name']} target power={target.get('power')}, expected {expected_power}")
+    if int(target.get("toughness") or 0) != expected_toughness:
+        fail("battle_execution", f"{card['name']} target toughness={target.get('toughness')}, expected {expected_toughness}")
+    expected_keywords = [
+        str(keyword).strip().lower().replace(" ", "_")
+        for keyword in scenario.get("expected_keywords", []) or []
+        if str(keyword).strip()
+    ]
+    missing_keywords = [
+        keyword
+        for keyword in expected_keywords
+        if not battle.card_has_keyword(target, keyword)
+    ]
+    if missing_keywords:
+        fail("battle_execution", f"{card['name']} target missing keywords {missing_keywords}")
+    attached_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "equipment_attached"
+            and data.get("card") == card.get("name")
+            and data.get("target") == target.get("name")
+        ),
+        None,
+    )
+    if attached_event is None:
+        fail("battle_events", f"missing {card['name']} equipment_attached event")
+    source_name = str(scenario.get("expected_source") or card.get("name"))
+    if attached_event.get("card") != source_name:
+        fail("battle_events", f"{card['name']} attached event source={attached_event.get('card')!r}")
+    grants = [str(value) for value in attached_event.get("grants", []) or []]
+    for keyword in expected_keywords:
+        if keyword not in grants:
+            fail("battle_events", f"{card['name']} event missing grant {keyword!r}: {grants}")
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "target": target.get("name"),
+        "target_power": target.get("power"),
+        "target_toughness": target.get("toughness"),
+        "validated_keywords": expected_keywords,
+        "attached_event": {
+            "power_boost": attached_event.get("power_boost"),
+            "toughness_boost": attached_event.get("toughness_boost"),
+            "grants": grants,
+        },
+    }
+
+
 def run_static_count_power_toughness(
     battle,
     scenario: dict[str, Any],
@@ -8240,6 +8309,7 @@ def run_combat_damage_draw(
 SCENARIO_RUNNERS = {
     "attack_self_boost": run_attack_self_boost,
     "aura_static_power_toughness_attachment": run_aura_static_power_toughness_attachment,
+    "equipment_static_power_toughness_attachment": run_equipment_static_power_toughness_attachment,
     "becomes_blocked_self_boost": run_becomes_blocked_self_boost,
     "board_wipe": run_board_wipe,
     "combat_damage_draw": run_combat_damage_draw,

@@ -3465,6 +3465,53 @@ def test_manifest_expected_rule_preserves_aura_static_power_toughness_fields() -
     }
 
 
+def test_equipment_static_attachment_execution_scenario_preserves_keywords() -> None:
+    proposal = {
+        "normalized_name": "maul of the skyclaves",
+        "card_name": "Maul of the Skyclaves",
+        "oracle_hash": "hash-maul",
+        "logical_rule_key": "battle_rule_v1:maul-of-the-skyclaves",
+        "effect_json": {
+            "effect": "equipment_static_attachment",
+            "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+            "target": "creature_you_control",
+            "target_constraints": {"card_types": ["creature"], "controller": "self", "zone": "battlefield"},
+            "power_boost": 2,
+            "toughness_boost": 2,
+            "static_power_bonus": 2,
+            "static_toughness_bonus": 2,
+            "attached_keywords": ["first_strike", "flying"],
+            "grants_first_strike": True,
+            "grants_flying": True,
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    assert expected["required_effect_fields"]["attached_keywords"] == ["first_strike", "flying"]
+    assert expected["required_effect_fields"]["grants_first_strike"] is True
+    assert expected["required_effect_fields"]["grants_flying"] is True
+    assert scenario == {
+        "name": "Maul of the Skyclaves equipment static P/T attaches",
+        "type": "equipment_static_power_toughness_attachment",
+        "card": {"name": "Maul of the Skyclaves", "type_line": "Artifact - Equipment"},
+        "target": {
+            "name": "E2E Equipment Target for Maul of the Skyclaves",
+            "type_line": "Creature - Soldier",
+            "base_power": 2,
+            "base_toughness": 2,
+            "power": 2,
+            "toughness": 2,
+        },
+        "expected_power": 4,
+        "expected_toughness": 4,
+        "expected_keywords": ["first_strike", "flying"],
+        "expected_source": "Maul of the Skyclaves",
+        "logical_rule_key": "battle_rule_v1:maul-of-the-skyclaves",
+    }
+
+
 def test_manifest_expected_rule_preserves_static_controlled_keyword_fields() -> None:
     proposal = {
         "normalized_name": "groundshaker sliver",
