@@ -19818,6 +19818,78 @@ Evidence:
 - `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260709_post_pg689_equipment_aux_lines_new_server_final.md`
 - `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260709_post_pg689_equipment_aux_lines_new_server_final.md`
 
+## PG690 Equipment Attachment Marker Wave
+
+PG690 closed two equipment static P/T rows whose XMage source grants the
+equipment keyword through `GainAbilityAttachedEffect(..., AttachmentType.AURA)`
+inside an Equipment class. This is accepted only inside the equipment static
+attachment parser after Oracle/source matching proves the row is an equipment
+attachment, not a generic Aura rule.
+
+Runtime/test changes:
+
+- `xmage_authoritative_exact_scope_split.py` accepts
+  `AttachmentType.EQUIPMENT` and `AttachmentType.AURA` markers for equipment
+  static keyword grants;
+- `test_xmage_authoritative_exact_scope_split.py` covers the Boots of Speed
+  source shape and asserts `attached_keywords=["haste"]`, P/T, and exact scope;
+- PG689's equipment execution path remains the runtime executor for these
+  rows.
+
+PG690 apply/postcheck evidence:
+
+- split produced `2` safe package candidates:
+  `Boots of Speed` and `Ranger's Longbow`;
+- package manifest carries `2` battle execution scenarios;
+- postcheck confirmed `2/2` promoted verified/auto rows with `oracle_hash`;
+- final package E2E passed PostgreSQL, SQLite/Hermes, canonical snapshot,
+  `runtime_get_card_effect`, and `2` battle-execution scenarios/events.
+
+PG690b hash-integrity cleanup:
+
+- post-PG690 contract audit exposed trusted executable rules missing
+  `oracle_hash`;
+- metadata-only package PG690b backfilled `44` safe rows from
+  `md5(cards.oracle_text)`;
+- postcheck left `0` trusted executable rows missing hash;
+- final PG/Hermes/SQLite contract audit passed `51/51`.
+
+Final post-PG690b state:
+
+- global readiness:
+  `battle_and_oracle_ready=6174`, `battle_family_mapper_required=27702`,
+  `snapshot_has_verified_rule=6202`, `snapshot_has_any_rule=7392`;
+- authoritative queue:
+  `target_identity_count=24779`,
+  `xmage_authoritative_source_count=24466`,
+  `xmage_missing_source_exception_count=313`,
+  `xmage_authoritative_parser_gap_count=0`,
+  `xmage_authoritative_adapter_required_count=24466`,
+  `adapter_work_unit_count=11306`;
+- exact split recheck:
+  `proposal_count=0` and `safe_for_batch_pg_package_count=0`;
+- validation gates:
+  `server-target` quality gate passed, `xmage_strategy_consistency_audit`
+  passed `26/26`, `pg_hermes_sqlite_contract_audit` passed `51/51`,
+  `operational_surface_alignment_audit` passed `48/48`, and
+  `legacy_contamination_audit` passed `32/32`.
+
+Evidence:
+
+- `docs/hermes-analysis/PG690_EQUIPMENT_ATTACHMENT_MARKER_EVIDENCE_2026-07-09.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260709_pg690_equipment_attachment_marker_candidate.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg690_equipment_attachment_marker_new_server_package_manifest.json`
+- `docs/hermes-analysis/master_optimizer_reports/pg690_equipment_attachment_marker_new_server_pg_to_sqlite_sync_runtime_only.json`
+- `docs/hermes-analysis/master_optimizer_reports/pg690_equipment_attachment_marker_new_server_e2e_validation_post_pg690b_hash_backfill.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg690b_trusted_rule_oracle_hash_backfill_new_server_pg_to_sqlite_sync_runtime_only.json`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260709_post_pg690b_hash_backfill_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260709_post_pg690_equipment_attachment_marker_new_server_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260709_post_pg690_equipment_attachment_marker_new_server_recheck.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260709_post_pg690b_hash_backfill_new_server_final.md`
+- `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260709_post_pg690b_hash_backfill_new_server_final.md`
+- `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260709_post_pg690b_hash_backfill_new_server_final.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260709_post_pg690b_hash_backfill_new_server_final.md`
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

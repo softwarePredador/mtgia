@@ -1135,7 +1135,7 @@ def fixed_equipment_static_attachment_from_source(source: str) -> dict[str, Any]
     if len(boost_matches) != 1:
         return "equipment_static_source_boost_not_single_fixed"
     attached_effect_blocks = re.findall(
-        r"GainAbilityAttachedEffect\s*\(\s*(.*?)AttachmentType\.EQUIPMENT",
+        r"GainAbilityAttachedEffect\s*\(\s*(.*?)AttachmentType\.(?:EQUIPMENT|AURA)",
         text,
         re.S,
     )

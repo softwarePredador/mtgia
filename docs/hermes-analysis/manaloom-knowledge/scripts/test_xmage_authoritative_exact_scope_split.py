@@ -255,6 +255,40 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "equipment_static_oracle_not_exact_fixed")
 
+    def test_fixed_equipment_static_attachment_accepts_xmage_aura_attachment_keyword_marker(self) -> None:
+        row = queue_row(
+            "xmage_signature::BoostEquippedEffect,GainAbilityAttachedEffect::"
+            "EquipAbility,HasteAbility,SimpleStaticAbility::no_target_class::"
+            "no_condition_class::static_ability",
+            effect_classes=["BoostEquippedEffect", "GainAbilityAttachedEffect"],
+            ability_kind="static",
+            ability_classes=["EquipAbility", "HasteAbility", "SimpleStaticAbility"],
+            xmage_signals=["static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Boots of Speed",
+                type_line="Artifact - Equipment",
+                oracle_text="Equipped creature gets +1/+0 and has haste.\nEquip {1}",
+            ),
+            source_text="""
+                Ability ability = new SimpleStaticAbility(new BoostEquippedEffect(1, 0));
+                ability.addEffect(new GainAbilityAttachedEffect(
+                    HasteAbility.getInstance(), AttachmentType.AURA
+                ).setText("and has haste"));
+                this.addAbility(ability);
+                this.addAbility(new EquipAbility(1));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["power_boost"], 1)
+        self.assertEqual(effect["toughness_boost"], 0)
+        self.assertEqual(effect["attached_keywords"], ["haste"])
+        self.assertTrue(effect["grants_haste"])
+
     def test_fixed_aura_static_power_toughness_attachment_maps_exact_scope(self) -> None:
         row = queue_row(
             "xmage_signature::AttachEffect,BoostEnchantedEffect::EnchantAbility,SimpleStaticAbility::"
