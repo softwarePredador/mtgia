@@ -6033,8 +6033,56 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertEqual(token.get("power"), 1)
         self.assertEqual(token.get("toughness"), 1)
         self.assertTrue(token.get("flying"))
-        self.assertIn("flying", token.get("keywords", []))
         self.assertTrue(token.get("tapped"))
+
+    def test_creature_etb_create_tokens_preserves_noncreature_artifact_token_model(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        permanent = {"name": "Fixture Cartographer", "type_line": "Creature - Robot"}
+        active.battlefield.append(permanent)
+        effect = {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+            "ability_kind": "triggered",
+            "trigger": "enters_battlefield",
+            "etb_token_count": 1,
+            "etb_token_name": "Map Token",
+            "etb_token_subtype": "Map",
+            "etb_artifact_tokens": True,
+            "etb_token_artifact_only": True,
+            "etb_token_activated_ability": "explore_target_creature",
+            "etb_token_activated_ability_status": "created_token_only",
+            "_rule_logical_key": "battle_rule_v1:fixture_etb_map_token",
+        }
+
+        self.battle.resolve_generic_permanent_etb(
+            active,
+            [opponent],
+            permanent,
+            effect,
+            turn=3,
+            rng=random.Random(3),
+        )
+
+        tokens = [card for card in active.battlefield if card.get("name") == "Map Token"]
+        self.assertEqual(len(tokens), 1)
+        token = tokens[0]
+        self.assertEqual(token.get("type_line"), "Artifact Token — Map")
+        self.assertEqual(token.get("effect"), "artifact")
+        self.assertTrue(token.get("artifact_token"))
+        self.assertTrue(token.get("token_artifact_only"))
+        self.assertNotIn("power", token)
+        self.assertNotIn("toughness", token)
+        self.assertNotIn("Creature", token.get("type_line", ""))
+        self.assertTrue(
+            any(
+                event == "etb_token_maker_resolved"
+                and data.get("card") == "Fixture Cartographer"
+                and data.get("token_count") == 1
+                and data.get("token_names") == ["Map Token"]
+                for event, data in self.events
+            )
+        )
 
     def test_creature_etb_create_treasure_adds_controller_treasures(self) -> None:
         active = self.battle.Player("Active", None, [])

@@ -4635,7 +4635,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["treasure_trigger"], "enters_battlefield")
         self.assertEqual(effect["xmage_token_class"], "TreasureToken")
 
-    def test_creature_etb_create_treasure_blocks_non_treasure_artifact_token(self) -> None:
+    def test_creature_etb_create_tokens_maps_noncreature_map_artifact_token(self) -> None:
         row = queue_row(
             split.ETB_TOKEN_CREATURE_UNIT,
             effect_classes=["CreateTokenEffect"],
@@ -4656,13 +4656,24 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                 class MapToken extends TokenImpl {
                     public MapToken() {
                         super("Map Token", "Map token");
+                        cardType.add(CardType.ARTIFACT);
+                        subtype.add(SubType.MAP);
                     }
                 }
             """,
         )
 
-        self.assertIsNone(proposal)
-        self.assertEqual(reason, "token_description_not_creature_token")
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.ETB_TOKEN_CREATURE_SCOPE)
+        self.assertEqual(effect["etb_token_name"], "Map Token")
+        self.assertEqual(effect["etb_token_subtype"], "Map")
+        self.assertTrue(effect["etb_artifact_tokens"])
+        self.assertTrue(effect["etb_token_artifact_only"])
+        self.assertEqual(effect["etb_token_activated_ability"], "explore_target_creature")
+        self.assertEqual(effect["etb_token_activated_ability_status"], "created_token_only")
+        self.assertNotIn("etb_token_power", effect)
+        self.assertNotIn("etb_token_toughness", effect)
 
     def test_destroy_target_create_treasure_spell_maps_artifact_or_enchantment(self) -> None:
         row = queue_row(
@@ -5555,7 +5566,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["keywords"], ["defender"])
         self.assertTrue(effect["defender"])
 
-    def test_creature_dies_create_tokens_blocks_non_treasure_artifact_token(self) -> None:
+    def test_creature_dies_create_tokens_maps_noncreature_blood_artifact_token(self) -> None:
         row = queue_row(
             split.DIES_TOKEN_CREATURE_UNIT,
             effect_classes=["CreateTokenEffect"],
@@ -5575,15 +5586,25 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                     new CreateTokenEffect(new BloodToken())));
                 class BloodToken extends TokenImpl {
                     public BloodToken() {
-                        super("Blood Token", "colorless Blood artifact token");
+                        super("Blood Token", "Blood token");
                         cardType.add(CardType.ARTIFACT);
+                        subtype.add(SubType.BLOOD);
                     }
                 }
             """,
         )
 
-        self.assertIsNone(proposal)
-        self.assertEqual(reason, "token_description_not_creature_token")
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DIES_TOKEN_CREATURE_SCOPE)
+        self.assertEqual(effect["dies_token_name"], "Blood Token")
+        self.assertEqual(effect["dies_token_subtype"], "Blood")
+        self.assertTrue(effect["dies_artifact_tokens"])
+        self.assertTrue(effect["dies_token_artifact_only"])
+        self.assertEqual(effect["dies_token_activated_ability"], "draw_discard_self_sacrifice")
+        self.assertEqual(effect["dies_token_activated_ability_status"], "created_token_only")
+        self.assertNotIn("dies_token_power", effect)
+        self.assertNotIn("dies_token_toughness", effect)
 
     def test_creature_dies_create_tokens_blocks_conditional_oracle(self) -> None:
         row = queue_row(

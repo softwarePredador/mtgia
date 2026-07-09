@@ -467,6 +467,8 @@ def token_matches_expected(battle, token: dict[str, Any], expected: dict[str, An
             return False, f"missing keyword {keyword!r}"
     if bool(expected.get("artifact")) and "artifact" not in str(token.get("type_line") or "").lower():
         return False, "artifact token type missing"
+    if bool(expected.get("artifact_only")) and "creature" in str(token.get("type_line") or "").lower():
+        return False, f"artifact_only token is creature type_line={token.get('type_line')!r}"
     if bool(token.get("tapped")) != bool(expected.get("tapped")):
         return False, f"tapped={token.get('tapped')}"
     if bool(expected.get("sacrifice_for_colorless_mana")):

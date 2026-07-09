@@ -153,6 +153,60 @@ def test_fixed_damage_target_spell_runner_executes_damage_and_cant_be_countered(
     assert result["cant_be_countered"] is True
 
 
+def test_creature_etb_create_tokens_runner_preserves_noncreature_artifact_token() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "creature",
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+        "ability_kind": "triggered",
+        "trigger": "enters_battlefield",
+        "etb_trigger_effect": "token_maker",
+        "etb_token_count": 1,
+        "etb_token_name": "Map Token",
+        "etb_token_subtype": "Map",
+        "etb_artifact_tokens": True,
+        "etb_token_artifact_only": True,
+        "etb_token_activated_ability": "explore_target_creature",
+        "etb_token_activated_ability_status": "created_token_only",
+    }
+    try:
+        result = validator.run_creature_etb_create_tokens(
+            battle,
+            {
+                "name": "Cartographer's Companion enters and creates a Map token",
+                "type": "creature_etb_create_tokens",
+                "card": {
+                    "name": "Cartographer's Companion",
+                    "type_line": "Creature",
+                    "effect": "creature",
+                },
+                "expected_token": {
+                    "name": "Map Token",
+                    "count": 1,
+                    "power": None,
+                    "toughness": None,
+                    "subtype": "Map",
+                    "colors": [],
+                    "keywords": [],
+                    "artifact": True,
+                    "artifact_only": True,
+                    "tapped": False,
+                },
+                "expected_total_tokens": 1,
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["tokens_created"] == 1
+
+
 def test_counter_unless_pays_draw_runner_draws_when_tax_unpaid() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

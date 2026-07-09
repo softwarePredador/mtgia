@@ -3794,6 +3794,7 @@ def test_creature_dies_create_tokens_execution_scenario() -> None:
             "colors": [],
             "keywords": [],
             "artifact": False,
+            "artifact_only": False,
             "tapped": False,
             "sacrifice_for_colorless_mana": True,
             "mana_produced": 1,
@@ -3832,6 +3833,37 @@ def test_creature_dies_create_tokens_execution_scenario_preserves_artifact_tappe
     assert scenario["expected_token"]["artifact"] is True
     assert scenario["expected_token"]["tapped"] is True
     assert scenario["expected_keywords"] == ["flying"]
+
+
+def test_creature_etb_create_tokens_execution_scenario_preserves_noncreature_artifact_token() -> None:
+    rule = {
+        "normalized_name": "cartographers companion",
+        "card_name": "Cartographer's Companion",
+        "logical_rule_key": "battle_rule_v1:cartographers-companion",
+        "required_effect_fields": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+            "trigger": "enters_battlefield",
+            "etb_trigger_effect": "token_maker",
+            "etb_token_count": 1,
+            "etb_token_name": "Map Token",
+            "etb_token_subtype": "Map",
+            "etb_artifact_tokens": True,
+            "etb_token_artifact_only": True,
+            "etb_token_activated_ability": "explore_target_creature",
+            "etb_token_activated_ability_status": "created_token_only",
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario["type"] == "creature_etb_create_tokens"
+    assert scenario["expected_token"]["name"] == "Map Token"
+    assert scenario["expected_token"]["subtype"] == "Map"
+    assert scenario["expected_token"]["artifact"] is True
+    assert scenario["expected_token"]["artifact_only"] is True
+    assert scenario["expected_token"]["power"] is None
+    assert scenario["expected_token"]["toughness"] is None
 
 
 def test_creature_etb_create_multi_tokens_execution_scenario() -> None:

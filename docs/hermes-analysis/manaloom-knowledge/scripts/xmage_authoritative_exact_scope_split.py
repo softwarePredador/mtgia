@@ -665,6 +665,56 @@ UNSUPPORTED_TOKEN_DESCRIPTION_MARKERS = {
     "banding",
 }
 
+ARTIFACT_ONLY_TOKEN_RUNTIME_FIELDS = {
+    "FoodToken": {
+        "token_activated_ability": "life_gain_self_sacrifice",
+        "token_activated_ability_status": "runtime_supported",
+        "token_activated_battle_model_scope": PERMANENT_ACTIVATED_LIFE_GAIN_SCOPE,
+        "token_activated_life_gain_amount": 3,
+        "token_activation_cost_mana": "{2}",
+        "token_activation_cost_generic": 2,
+        "token_activation_requires_tap": False,
+        "token_activation_requires_sacrifice": True,
+    },
+    "ClueArtifactToken": {
+        "token_activated_ability": "draw_self_sacrifice",
+        "token_activated_ability_status": "runtime_supported",
+        "token_activated_battle_model_scope": PERMANENT_ACTIVATED_DRAW_SCOPE,
+        "token_activated_draw_on_self_sacrifice": True,
+        "token_activated_self_sacrifice_draw": True,
+        "token_draw_on_self_sacrifice": 1,
+        "token_draw_count": 1,
+        "token_activation_cost_mana": "{2}",
+        "token_activation_cost_generic": 2,
+        "token_activation_requires_tap": False,
+        "token_activation_requires_sacrifice": True,
+    },
+    "PowerstoneToken": {
+        "token_activated_ability": "conditional_colorless_mana",
+        "token_activated_ability_status": "runtime_supported",
+        "token_is_mana_source": True,
+        "token_mana_source_contextual_only": True,
+        "token_mana_activation_requires_tap": True,
+        "token_activation_requires_tap": True,
+        "token_mana_produced": 1,
+        "token_produces": "C",
+        "token_produced_mana_symbols": ["C"],
+        "token_mana_spend_restriction": "artifact_spell_or_activated_ability",
+    },
+    "BloodToken": {
+        "token_activated_ability": "draw_discard_self_sacrifice",
+        "token_activated_ability_status": "created_token_only",
+    },
+    "MapToken": {
+        "token_activated_ability": "explore_target_creature",
+        "token_activated_ability_status": "created_token_only",
+    },
+    "LanderToken": {
+        "token_activated_ability": "search_basic_land_to_battlefield_tapped",
+        "token_activated_ability_status": "created_token_only",
+    },
+}
+
 UNSAFE_MANA_ABILITY_CLASSES = {
     "ConditionalAnyColorManaAbility",
     "ConditionalColoredManaAbility",
@@ -1730,7 +1780,13 @@ def parse_simple_token_class(token_source: str, token_class: str) -> tuple[dict[
         return {}, "token_literal_description_missing"
     token_name, description = token_descriptor
     lower_description = description.lower()
-    if "creature token" not in lower_description:
+    artifact_only = (
+        "creature token" not in lower_description
+        and re.search(r"cardType\.add\s*\(\s*CardType\.ARTIFACT\s*\)", constructor_source)
+        and not re.search(r"cardType\.add\s*\(\s*CardType\.CREATURE\s*\)", constructor_source)
+        and lower_description.endswith("token")
+    )
+    if "creature token" not in lower_description and not artifact_only:
         return {}, "token_description_not_creature_token"
     has_colorless_sacrifice_mana = bool(
         "SimpleManaAbility" in constructor_source
@@ -1776,7 +1832,7 @@ def parse_simple_token_class(token_source: str, token_class: str) -> tuple[dict[
             description_keywords.append(normalized_keyword)
     power_match = re.search(r"power\s*=\s*new\s+MageInt\s*\(\s*(\d+)\s*\)", constructor_source)
     toughness_match = re.search(r"toughness\s*=\s*new\s+MageInt\s*\(\s*(\d+)\s*\)", constructor_source)
-    if not power_match or not toughness_match:
+    if (not power_match or not toughness_match) and not artifact_only:
         return {}, "token_power_toughness_not_fixed"
     if re.search(r"cardType\.add\s*\(\s*CardType\.LAND\s*\)", constructor_source):
         return {}, "token_land_token_runtime_not_supported"
@@ -1787,6 +1843,16 @@ def parse_simple_token_class(token_source: str, token_class: str) -> tuple[dict[
     allowed_ability_classes = set(ALLOWED_TOKEN_ABILITY_KEYWORDS)
     if has_colorless_sacrifice_mana:
         allowed_ability_classes.add("SimpleManaAbility")
+    if artifact_only:
+        allowed_ability_classes.update(
+            {
+                "ActivateAsSorceryActivatedAbility",
+                "ClueAbility",
+                "ConditionalColorlessManaAbility",
+                "FoodAbility",
+                "SimpleActivatedAbility",
+            }
+        )
     unsupported_abilities = ability_classes - allowed_ability_classes
     if unsupported_abilities:
         return {}, "token_ability_not_supported"
@@ -1825,10 +1891,17 @@ def parse_simple_token_class(token_source: str, token_class: str) -> tuple[dict[
     token_data: dict[str, Any] = {
         "xmage_token_class": token_class,
         "token_name": token_name,
-        "token_power": int(power_match.group(1)),
-        "token_toughness": int(toughness_match.group(1)),
         "token_description": description,
     }
+    if artifact_only:
+        token_data["token_artifact_only"] = True
+        token_data["artifact_tokens"] = True
+        token_data.update(ARTIFACT_ONLY_TOKEN_RUNTIME_FIELDS.get(token_class, {
+            "token_activated_ability_status": "created_token_only",
+        }))
+    else:
+        token_data["token_power"] = int(power_match.group(1))
+        token_data["token_toughness"] = int(toughness_match.group(1))
     if subtypes:
         token_data["token_subtype"] = " ".join(subtypes)
     if colors:
@@ -27039,6 +27112,7 @@ def split_row(
         )
         if token_reason:
             return None, token_reason
+        token_data = {**parsed_token_fields, **token_data}
         effect_json = {
             "effect": "creature",
             "battle_model_scope": ETB_TOKEN_CREATURE_SCOPE,
@@ -27050,9 +27124,11 @@ def split_row(
             "xmage_token_class": token_data["xmage_token_class"],
             "token_description": token_data["token_description"],
             "etb_token_name": token_data["token_name"],
-            "etb_token_power": token_data["token_power"],
-            "etb_token_toughness": token_data["token_toughness"],
         }
+        if "token_power" in token_data:
+            effect_json["etb_token_power"] = token_data["token_power"]
+        if "token_toughness" in token_data:
+            effect_json["etb_token_toughness"] = token_data["token_toughness"]
         optional_token_fields = {
             "token_subtype": "etb_token_subtype",
             "token_colors": "etb_token_colors",
@@ -27070,8 +27146,23 @@ def split_row(
             "token_produced_mana_symbols": "etb_token_produced_mana_symbols",
             "token_tapped": "etb_token_tapped",
             "artifact_tokens": "etb_artifact_tokens",
+            "token_artifact_only": "etb_token_artifact_only",
+            "token_activated_ability": "etb_token_activated_ability",
+            "token_activated_ability_status": "etb_token_activated_ability_status",
+            "token_activated_battle_model_scope": "etb_token_activated_battle_model_scope",
+            "token_activated_life_gain_amount": "etb_token_activated_life_gain_amount",
+            "token_activation_cost_mana": "etb_token_activation_cost_mana",
+            "token_activation_cost_generic": "etb_token_activation_cost_generic",
+            "token_activation_requires_tap": "etb_token_activation_requires_tap",
+            "token_activation_requires_sacrifice": "etb_token_activation_requires_sacrifice",
+            "token_activated_draw_on_self_sacrifice": "etb_token_activated_draw_on_self_sacrifice",
+            "token_activated_self_sacrifice_draw": "etb_token_activated_self_sacrifice_draw",
+            "token_draw_on_self_sacrifice": "etb_token_draw_on_self_sacrifice",
+            "token_draw_count": "etb_token_draw_count",
+            "token_is_mana_source": "etb_token_is_mana_source",
+            "token_mana_source_contextual_only": "etb_token_mana_source_contextual_only",
+            "token_mana_spend_restriction": "etb_token_mana_spend_restriction",
         }
-        token_data = {**parsed_token_fields, **token_data}
         for source_key, target_key in optional_token_fields.items():
             if source_key in token_data:
                 effect_json[target_key] = token_data[source_key]
@@ -27200,9 +27291,11 @@ def split_row(
             "xmage_token_class": token_data["xmage_token_class"],
             "token_description": token_data["token_description"],
             "dies_token_name": token_data["token_name"],
-            "dies_token_power": token_data["token_power"],
-            "dies_token_toughness": token_data["token_toughness"],
         }
+        if "token_power" in token_data:
+            effect_json["dies_token_power"] = token_data["token_power"]
+        if "token_toughness" in token_data:
+            effect_json["dies_token_toughness"] = token_data["token_toughness"]
         optional_token_fields = {
             "token_subtype": "dies_token_subtype",
             "token_colors": "dies_token_colors",
@@ -27220,6 +27313,22 @@ def split_row(
             "token_produced_mana_symbols": "dies_token_produced_mana_symbols",
             "token_tapped": "dies_token_tapped",
             "artifact_tokens": "dies_artifact_tokens",
+            "token_artifact_only": "dies_token_artifact_only",
+            "token_activated_ability": "dies_token_activated_ability",
+            "token_activated_ability_status": "dies_token_activated_ability_status",
+            "token_activated_battle_model_scope": "dies_token_activated_battle_model_scope",
+            "token_activated_life_gain_amount": "dies_token_activated_life_gain_amount",
+            "token_activation_cost_mana": "dies_token_activation_cost_mana",
+            "token_activation_cost_generic": "dies_token_activation_cost_generic",
+            "token_activation_requires_tap": "dies_token_activation_requires_tap",
+            "token_activation_requires_sacrifice": "dies_token_activation_requires_sacrifice",
+            "token_activated_draw_on_self_sacrifice": "dies_token_activated_draw_on_self_sacrifice",
+            "token_activated_self_sacrifice_draw": "dies_token_activated_self_sacrifice_draw",
+            "token_draw_on_self_sacrifice": "dies_token_draw_on_self_sacrifice",
+            "token_draw_count": "dies_token_draw_count",
+            "token_is_mana_source": "dies_token_is_mana_source",
+            "token_mana_source_contextual_only": "dies_token_mana_source_contextual_only",
+            "token_mana_spend_restriction": "dies_token_mana_spend_restriction",
         }
         for source_key, target_key in optional_token_fields.items():
             if source_key in token_data:
@@ -29791,6 +29900,8 @@ def split_row(
         )
         if token_reason is not None:
             return None, token_reason
+        if token_data.get("token_artifact_only"):
+            return None, "compensation_artifact_token_not_supported"
         oracle_blocker = removal_compensation_token_oracle_blocker(
             metadata,
             action="destroy",
@@ -29847,6 +29958,8 @@ def split_row(
         )
         if token_reason is not None:
             return None, token_reason
+        if token_data.get("token_artifact_only"):
+            return None, "compensation_artifact_token_not_supported"
         oracle_blocker = removal_compensation_token_oracle_blocker(
             metadata,
             action="exile",

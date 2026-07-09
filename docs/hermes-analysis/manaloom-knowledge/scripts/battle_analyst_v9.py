@@ -20378,41 +20378,57 @@ def resolve_generic_permanent_etb(
             **replay_rule_fields(effect_data),
         )
     elif effect_data.get("etb_token_count"):
-        for _ in range(min(int(effect_data.get("etb_token_count") or 1), 20)):
-            create_creature_token(
-                player,
-                name=effect_data.get("etb_token_name", "Token"),
-                power=int(effect_data.get("etb_token_power") or 1),
-                toughness=int(
-                    effect_data.get("etb_token_toughness")
-                    or effect_data.get("etb_token_power")
-                    or 1
-                ),
-                haste=bool(effect_data.get("etb_token_haste")),
-                flying=bool(effect_data.get("etb_token_flying")),
-                keywords=list(effect_data.get("etb_token_keywords") or []),
-                landwalk_land_types=(
-                    effect_data.get("etb_token_landwalk_land_types")
-                    or effect_data.get("etb_token_landwalk_land_type")
-                    or []
-                ),
-                artifact=bool(effect_data.get("etb_artifact_tokens")),
-                subtype=effect_data.get("etb_token_subtype"),
-                colors=list(effect_data.get("etb_token_colors") or []),
-                sacrifice_for_colorless_mana=bool(effect_data.get("etb_token_sacrifice_for_colorless_mana")),
-                mana_activation_requires_sacrifice=bool(
-                    effect_data.get("etb_token_mana_activation_requires_sacrifice")
-                    or effect_data.get("etb_token_sacrifice_for_colorless_mana")
-                ),
-                mana_activation_requires_tap=bool(effect_data.get("etb_token_mana_activation_requires_tap")),
-                mana_produced=effect_data.get("etb_token_mana_produced"),
-                produces=effect_data.get("etb_token_produces"),
-                produced_mana_symbols=effect_data.get("etb_token_produced_mana_symbols"),
-                tapped=bool(effect_data.get("etb_token_tapped")),
-                opponents=opponents,
-                turn=turn,
-                source_event="etb_token_created",
-            )
+        token_effect_data = dict(effect_data)
+        etb_field_map = {
+            "etb_token_name": "token_name",
+            "etb_token_power": "token_power",
+            "etb_token_toughness": "token_toughness",
+            "etb_token_subtype": "token_subtype",
+            "etb_token_colors": "token_colors",
+            "etb_token_keywords": "token_keywords",
+            "etb_token_flying": "token_flying",
+            "etb_token_haste": "token_haste",
+            "etb_token_landwalk": "token_landwalk",
+            "etb_token_landwalk_land_type": "token_landwalk_land_type",
+            "etb_token_landwalk_land_types": "token_landwalk_land_types",
+            "etb_token_sacrifice_for_colorless_mana": "token_sacrifice_for_colorless_mana",
+            "etb_token_mana_activation_requires_sacrifice": "token_mana_activation_requires_sacrifice",
+            "etb_token_mana_activation_requires_tap": "token_mana_activation_requires_tap",
+            "etb_token_mana_produced": "token_mana_produced",
+            "etb_token_produces": "token_produces",
+            "etb_token_produced_mana_symbols": "token_produced_mana_symbols",
+            "etb_token_tapped": "token_tapped",
+            "etb_artifact_tokens": "artifact_tokens",
+            "etb_token_artifact_only": "token_artifact_only",
+            "etb_token_activated_ability": "token_activated_ability",
+            "etb_token_activated_ability_status": "token_activated_ability_status",
+            "etb_token_activated_battle_model_scope": "token_activated_battle_model_scope",
+            "etb_token_activated_life_gain_amount": "token_activated_life_gain_amount",
+            "etb_token_activation_cost_mana": "token_activation_cost_mana",
+            "etb_token_activation_cost_generic": "token_activation_cost_generic",
+            "etb_token_activation_requires_tap": "token_activation_requires_tap",
+            "etb_token_activation_requires_sacrifice": "token_activation_requires_sacrifice",
+            "etb_token_activated_draw_on_self_sacrifice": "token_activated_draw_on_self_sacrifice",
+            "etb_token_activated_self_sacrifice_draw": "token_activated_self_sacrifice_draw",
+            "etb_token_draw_on_self_sacrifice": "token_draw_on_self_sacrifice",
+            "etb_token_draw_count": "token_draw_count",
+            "etb_token_is_mana_source": "token_is_mana_source",
+            "etb_token_mana_source_contextual_only": "token_mana_source_contextual_only",
+            "etb_token_mana_spend_restriction": "token_mana_spend_restriction",
+        }
+        for etb_key, token_key in etb_field_map.items():
+            if etb_key in effect_data:
+                token_effect_data[token_key] = effect_data[etb_key]
+        create_creature_tokens_from_effect(
+            player,
+            token_effect_data,
+            count=int(effect_data.get("etb_token_count") or 1),
+            opponents=opponents,
+            turn=turn,
+            source_event="etb_token_created",
+            active_player=player,
+            all_players=list(all_players or [player, *list(opponents or [])]),
+        )
         emit_replay_event(
             "etb_token_maker_resolved",
             player=player.name,
@@ -21370,6 +21386,22 @@ def resolve_permanent_dies_token_maker(
         "dies_token_produced_mana_symbols": "token_produced_mana_symbols",
         "dies_token_tapped": "token_tapped",
         "dies_artifact_tokens": "artifact_tokens",
+        "dies_token_artifact_only": "token_artifact_only",
+        "dies_token_activated_ability": "token_activated_ability",
+        "dies_token_activated_ability_status": "token_activated_ability_status",
+        "dies_token_activated_battle_model_scope": "token_activated_battle_model_scope",
+        "dies_token_activated_life_gain_amount": "token_activated_life_gain_amount",
+        "dies_token_activation_cost_mana": "token_activation_cost_mana",
+        "dies_token_activation_cost_generic": "token_activation_cost_generic",
+        "dies_token_activation_requires_tap": "token_activation_requires_tap",
+        "dies_token_activation_requires_sacrifice": "token_activation_requires_sacrifice",
+        "dies_token_activated_draw_on_self_sacrifice": "token_activated_draw_on_self_sacrifice",
+        "dies_token_activated_self_sacrifice_draw": "token_activated_self_sacrifice_draw",
+        "dies_token_draw_on_self_sacrifice": "token_draw_on_self_sacrifice",
+        "dies_token_draw_count": "token_draw_count",
+        "dies_token_is_mana_source": "token_is_mana_source",
+        "dies_token_mana_source_contextual_only": "token_mana_source_contextual_only",
+        "dies_token_mana_spend_restriction": "token_mana_spend_restriction",
     }
     for dies_key, token_key in dies_field_map.items():
         if dies_key in permanent:
@@ -42327,6 +42359,94 @@ def create_creature_token(
     return token
 
 
+def create_artifact_token(
+    player,
+    *,
+    name="Artifact Token",
+    subtype=None,
+    token_class=None,
+    tapped=False,
+    effect_data=None,
+    source_event="artifact_token_created",
+    turn=None,
+    all_players=None,
+):
+    type_line = "Artifact Token"
+    if subtype:
+        type_line = f"{type_line} — {subtype}"
+    token = {
+        "name": name,
+        "cmc": 0,
+        "tag": "token",
+        "token": True,
+        "effect": "artifact",
+        "type_line": type_line,
+        "artifact": True,
+        "artifact_token": True,
+        "token_artifact_only": True,
+        "tapped": bool(tapped),
+    }
+    if subtype:
+        token["subtype"] = subtype
+    if token_class:
+        token["xmage_token_class"] = token_class
+    data = dict(effect_data or {})
+    token["token_activated_ability_status"] = data.get(
+        "token_activated_ability_status",
+        "created_token_only",
+    )
+    if data.get("token_activated_ability"):
+        token["token_activated_ability"] = data.get("token_activated_ability")
+    activated_scope = data.get("token_activated_battle_model_scope")
+    if activated_scope:
+        token["activated_battle_model_scope"] = activated_scope
+    if activated_scope == PERMANENT_ACTIVATED_LIFE_GAIN_SCOPE:
+        token["battle_model_scope"] = activated_scope
+        token["activated_life_gain_amount"] = int(data.get("token_activated_life_gain_amount") or 0)
+        token["life_gain_amount"] = int(data.get("token_activated_life_gain_amount") or 0)
+        token["activation_cost_mana"] = data.get("token_activation_cost_mana") or "{2}"
+        token["activation_cost_generic"] = int(data.get("token_activation_cost_generic") or 2)
+        token["activation_requires_tap"] = bool(data.get("token_activation_requires_tap"))
+        token["activation_requires_sacrifice"] = bool(data.get("token_activation_requires_sacrifice"))
+    if data.get("token_activated_draw_on_self_sacrifice") or data.get("token_activated_self_sacrifice_draw"):
+        token["activated_draw_on_self_sacrifice"] = True
+        token["activated_self_sacrifice_draw"] = True
+        token["draw_on_self_sacrifice"] = int(data.get("token_draw_on_self_sacrifice") or 1)
+        token["draw_count"] = int(data.get("token_draw_count") or 1)
+        token["activation_cost_mana"] = data.get("token_activation_cost_mana") or "{2}"
+        token["activation_cost_generic"] = int(data.get("token_activation_cost_generic") or 2)
+        token["activation_requires_tap"] = bool(data.get("token_activation_requires_tap"))
+        token["activation_requires_sacrifice"] = bool(data.get("token_activation_requires_sacrifice"))
+    if data.get("token_is_mana_source"):
+        token["is_mana_source"] = True
+        token["mana_source_contextual_only"] = bool(data.get("token_mana_source_contextual_only", True))
+        token["mana_activation_requires_tap"] = bool(data.get("token_mana_activation_requires_tap", True))
+        token["activation_requires_tap"] = bool(data.get("token_activation_requires_tap", True))
+        token["mana_produced"] = int(data.get("token_mana_produced") or 1)
+        token["produces"] = data.get("token_produces") or "C"
+        token["produced_mana_symbols"] = list(data.get("token_produced_mana_symbols") or ["C"])
+        if data.get("token_mana_spend_restriction"):
+            token["mana_spend_restriction"] = data.get("token_mana_spend_restriction")
+    token = prepare_entering_permanent(
+        token,
+        controller=player,
+        all_players=all_players,
+        turn=turn,
+    )
+    player.battlefield.append(token)
+    emit_replay_event(
+        source_event,
+        player=player.name,
+        token=token.get("name"),
+        token_subtype=subtype,
+        token_class=token_class,
+        token_artifact_only=True,
+        turn=turn,
+        **replay_rule_fields(data),
+    )
+    return token
+
+
 def create_food_token(
     player,
     *,
@@ -42633,6 +42753,8 @@ def create_creature_tokens_from_effect(
     token_produces = (effect_data or {}).get("token_produces")
     token_produced_mana_symbols = (effect_data or {}).get("token_produced_mana_symbols")
     token_tapped = bool((effect_data or {}).get("token_tapped"))
+    token_artifact_only = bool((effect_data or {}).get("token_artifact_only"))
+    token_class = (effect_data or {}).get("xmage_token_class")
     if (effect_data or {}).get("token_prowess") and "prowess" not in token_keywords:
         token_keywords.append("prowess")
     artifact_tokens = bool((effect_data or {}).get("artifact_tokens"))
@@ -42654,38 +42776,51 @@ def create_creature_tokens_from_effect(
             for _ in range(max(0, int(per_opponent))):
                 if created >= capped_token_count:
                     break
-                token = create_creature_token(
-                    player,
-                    name=token_name,
-                    power=token_power,
-                    toughness=token_toughness,
-                    haste=token_haste,
-                    flying=token_flying,
-                    keywords=token_keywords,
-                    landwalk_land_types=token_landwalk_land_types,
-                    artifact=artifact_tokens,
-                    subtype=token_subtype,
-                    colors=token_colors,
-                    sacrifice_for_colorless_mana=token_sacrifice_for_colorless_mana,
-                    mana_activation_requires_sacrifice=token_mana_activation_requires_sacrifice,
-                    mana_activation_requires_tap=token_mana_activation_requires_tap,
-                    mana_produced=token_mana_produced,
-                    produces=token_produces,
-                    produced_mana_symbols=token_produced_mana_symbols,
-                    tapped=token_tapped,
-                    opponents=opponents,
-                    turn=turn,
-                    source_event=source_event,
-                    stack=stack,
-                    active_player=active_player,
-                    all_players=all_players,
-                )
-                _mark_token_must_attack_defender_until_eot(
-                    token,
-                    opponent,
-                    source_card_name,
-                    turn,
-                )
+                if token_artifact_only:
+                    token = create_artifact_token(
+                        player,
+                        name=token_name,
+                        subtype=token_subtype,
+                        token_class=token_class,
+                        tapped=token_tapped,
+                        effect_data=effect_data,
+                        source_event=source_event,
+                        turn=turn,
+                        all_players=all_players,
+                    )
+                else:
+                    token = create_creature_token(
+                        player,
+                        name=token_name,
+                        power=token_power,
+                        toughness=token_toughness,
+                        haste=token_haste,
+                        flying=token_flying,
+                        keywords=token_keywords,
+                        landwalk_land_types=token_landwalk_land_types,
+                        artifact=artifact_tokens,
+                        subtype=token_subtype,
+                        colors=token_colors,
+                        sacrifice_for_colorless_mana=token_sacrifice_for_colorless_mana,
+                        mana_activation_requires_sacrifice=token_mana_activation_requires_sacrifice,
+                        mana_activation_requires_tap=token_mana_activation_requires_tap,
+                        mana_produced=token_mana_produced,
+                        produces=token_produces,
+                        produced_mana_symbols=token_produced_mana_symbols,
+                        tapped=token_tapped,
+                        opponents=opponents,
+                        turn=turn,
+                        source_event=source_event,
+                        stack=stack,
+                        active_player=active_player,
+                        all_players=all_players,
+                    )
+                    _mark_token_must_attack_defender_until_eot(
+                        token,
+                        opponent,
+                        source_card_name,
+                        turn,
+                    )
                 defender_tokens += 1
                 created += 1
             if defender_tokens:
@@ -42698,32 +42833,45 @@ def create_creature_tokens_from_effect(
         return token_count
 
     for _ in range(capped_token_count):
-        create_creature_token(
-            player,
-            name=token_name,
-            power=token_power,
-            toughness=token_toughness,
-            haste=token_haste,
-            flying=token_flying,
-            keywords=token_keywords,
-            landwalk_land_types=token_landwalk_land_types,
-            artifact=artifact_tokens,
-            subtype=token_subtype,
-            colors=token_colors,
-            sacrifice_for_colorless_mana=token_sacrifice_for_colorless_mana,
-            mana_activation_requires_sacrifice=token_mana_activation_requires_sacrifice,
-            mana_activation_requires_tap=token_mana_activation_requires_tap,
-            mana_produced=token_mana_produced,
-            produces=token_produces,
-            produced_mana_symbols=token_produced_mana_symbols,
-            tapped=token_tapped,
-            opponents=opponents,
-            turn=turn,
-            source_event=source_event,
-            stack=stack,
-            active_player=active_player,
-            all_players=all_players,
-        )
+        if token_artifact_only:
+            create_artifact_token(
+                player,
+                name=token_name,
+                subtype=token_subtype,
+                token_class=token_class,
+                tapped=token_tapped,
+                effect_data=effect_data,
+                source_event=source_event,
+                turn=turn,
+                all_players=all_players,
+            )
+        else:
+            create_creature_token(
+                player,
+                name=token_name,
+                power=token_power,
+                toughness=token_toughness,
+                haste=token_haste,
+                flying=token_flying,
+                keywords=token_keywords,
+                landwalk_land_types=token_landwalk_land_types,
+                artifact=artifact_tokens,
+                subtype=token_subtype,
+                colors=token_colors,
+                sacrifice_for_colorless_mana=token_sacrifice_for_colorless_mana,
+                mana_activation_requires_sacrifice=token_mana_activation_requires_sacrifice,
+                mana_activation_requires_tap=token_mana_activation_requires_tap,
+                mana_produced=token_mana_produced,
+                produces=token_produces,
+                produced_mana_symbols=token_produced_mana_symbols,
+                tapped=token_tapped,
+                opponents=opponents,
+                turn=turn,
+                source_event=source_event,
+                stack=stack,
+                active_player=active_player,
+                all_players=all_players,
+            )
     return token_count
 
 
