@@ -2177,6 +2177,8 @@ def run_single_target_removal(
     opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
     controller_starting_life = int(scenario.get("controller_life") or getattr(active, "life", 20) or 20)
     expected_controller_life_gain = int(scenario.get("expected_controller_life_gain") or 0)
+    expected_source_controller_life_loss = int(scenario.get("expected_source_controller_life_loss") or 0)
+    expected_source_controller_damage = int(scenario.get("expected_source_controller_damage") or 0)
     active.life = controller_starting_life
     target = dict(scenario["target"])
     nonmatching = dict(
@@ -2270,6 +2272,52 @@ def run_single_target_removal(
                 "battle_events",
                 f"{card['name']} life_gain_recipient={removal_event.get('life_gain_recipient')!r}",
             )
+    if expected_source_controller_life_loss > 0:
+        expected_life = controller_starting_life - expected_source_controller_life_loss
+        if active.life != expected_life:
+            fail(
+                "battle_execution",
+                f"{card['name']} controller_life={active.life}, expected={expected_life}",
+            )
+        penalty_event = next(
+            (
+                data
+                for event, data in events[before_events:]
+                if event == "source_controller_life_loss_on_resolve"
+                and data.get("card") == card.get("name")
+            ),
+            None,
+        )
+        if penalty_event is None:
+            fail("battle_events", f"missing {card['name']} source_controller_life_loss_on_resolve event")
+        if int(penalty_event.get("source_controller_life_lost") or 0) != expected_source_controller_life_loss:
+            fail(
+                "battle_events",
+                f"{card['name']} source_controller_life_lost={penalty_event.get('source_controller_life_lost')!r}",
+            )
+    if expected_source_controller_damage > 0:
+        expected_life = controller_starting_life - expected_source_controller_damage
+        if active.life != expected_life:
+            fail(
+                "battle_execution",
+                f"{card['name']} controller_life={active.life}, expected={expected_life}",
+            )
+        damage_event = next(
+            (
+                data
+                for event, data in events[before_events:]
+                if event == "source_controller_damage_on_resolve"
+                and data.get("card") == card.get("name")
+            ),
+            None,
+        )
+        if damage_event is None:
+            fail("battle_events", f"missing {card['name']} source_controller_damage_on_resolve event")
+        if int(damage_event.get("actual_damage_dealt") or 0) != expected_source_controller_damage:
+            fail(
+                "battle_events",
+                f"{card['name']} actual_damage_dealt={damage_event.get('actual_damage_dealt')!r}",
+            )
 
     result = {
         "scenario": scenario.get("name"),
@@ -2285,6 +2333,14 @@ def run_single_target_removal(
         result["controller_life_before"] = controller_starting_life
         result["controller_life_after"] = active.life
         result["controller_life_gained"] = expected_controller_life_gain
+    if expected_source_controller_life_loss > 0:
+        result["controller_life_before"] = controller_starting_life
+        result["controller_life_after"] = active.life
+        result["source_controller_life_lost"] = expected_source_controller_life_loss
+    if expected_source_controller_damage > 0:
+        result["controller_life_before"] = controller_starting_life
+        result["controller_life_after"] = active.life
+        result["source_controller_damage_dealt"] = expected_source_controller_damage
     return result
 
 
@@ -2506,6 +2562,9 @@ def run_multi_target_removal(
         }
     )
     opponent.battlefield = [nonmatching, *targets]
+    controller_starting_life = int(scenario.get("controller_life") or getattr(active, "life", 20) or 20)
+    expected_source_controller_life_loss = int(scenario.get("expected_source_controller_life_loss") or 0)
+    active.life = controller_starting_life
     before_events = len(events)
 
     effect_data = battle.get_card_effect(card)
@@ -2551,8 +2610,31 @@ def run_multi_target_removal(
             fail("battle_events", f"{card['name']} missing resolved target {target_name}")
     if int(resolution_event.get("declared") or 0) < len(target_names):
         fail("battle_events", f"{card['name']} declared={resolution_event.get('declared')!r}")
+    if expected_source_controller_life_loss > 0:
+        expected_life = controller_starting_life - expected_source_controller_life_loss
+        if active.life != expected_life:
+            fail(
+                "battle_execution",
+                f"{card['name']} controller_life={active.life}, expected={expected_life}",
+            )
+        penalty_event = next(
+            (
+                data
+                for event, data in events[before_events:]
+                if event == "source_controller_life_loss_on_resolve"
+                and data.get("card") == card.get("name")
+            ),
+            None,
+        )
+        if penalty_event is None:
+            fail("battle_events", f"missing {card['name']} source_controller_life_loss_on_resolve event")
+        if int(penalty_event.get("source_controller_life_lost") or 0) != expected_source_controller_life_loss:
+            fail(
+                "battle_events",
+                f"{card['name']} source_controller_life_lost={penalty_event.get('source_controller_life_lost')!r}",
+            )
 
-    return {
+    result = {
         "scenario": scenario.get("name"),
         "card_name": card["name"],
         "targets": target_names,
@@ -2562,6 +2644,11 @@ def run_multi_target_removal(
         "battlefield_names": battlefield_names,
         "resolved_names": resolved_names,
     }
+    if expected_source_controller_life_loss > 0:
+        result["controller_life_before"] = controller_starting_life
+        result["controller_life_after"] = active.life
+        result["source_controller_life_lost"] = expected_source_controller_life_loss
+    return result
 
 
 def run_multi_target_damage(

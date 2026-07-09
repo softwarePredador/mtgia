@@ -499,6 +499,121 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertNotIn(troll, opponent.graveyard)
         self.assertFalse(any(event == "life_loss_on_destroy_resolved" for event, _data in self.events))
 
+    def test_destroy_source_controller_life_loss_applies_once_after_single_removal(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.life = 20
+        target = {"name": "Target Bear", "type_line": "Creature - Bear", "power": 2, "toughness": 2}
+        opponent.battlefield = [target]
+        effect = {
+            "effect": "remove_creature",
+            "battle_model_scope": "xmage_destroy_target_and_source_controller_loses_life_spell_v1",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "destination": "graveyard",
+            "source_controller_life_loss_on_resolve": 2,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Fixture Infernal Grasp", "type_line": "Instant"},
+            turn=12,
+            rng=random.Random(12),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(active.life, 18)
+        self.assertEqual(opponent.battlefield, [])
+        self.assertIn(target, opponent.graveyard)
+        self.assertTrue(
+            any(
+                event == "source_controller_life_loss_on_resolve"
+                and data.get("card") == "Fixture Infernal Grasp"
+                and data.get("source_controller_life_lost") == 2
+                for event, data in self.events
+            )
+        )
+
+    def test_destroy_source_controller_life_loss_applies_once_after_multi_removal(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.life = 20
+        legal_one = {"name": "Legal Bear One", "type_line": "Creature - Bear", "colors": ["G"], "power": 2, "toughness": 2}
+        legal_two = {"name": "Legal Bear Two", "type_line": "Creature - Bear", "colors": ["W"], "power": 2, "toughness": 2}
+        black_creature = {"name": "Black Decoy", "type_line": "Creature - Shade", "colors": ["B"], "power": 2, "toughness": 2}
+        opponent.battlefield = [legal_one, legal_two, black_creature]
+        effect = {
+            "effect": "remove_creature",
+            "battle_model_scope": "xmage_destroy_target_and_source_controller_loses_life_spell_v1",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"], "exclude_colors": ["B"]},
+            "destination": "graveyard",
+            "target_count": 2,
+            "target_count_min": 2,
+            "target_count_max": 2,
+            "source_controller_life_loss_on_resolve": 5,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Fixture Reckless Spite", "type_line": "Instant"},
+            turn=12,
+            rng=random.Random(13),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(active.life, 15)
+        self.assertEqual([card["name"] for card in opponent.battlefield], ["Black Decoy"])
+        self.assertCountEqual([card["name"] for card in opponent.graveyard], ["Legal Bear One", "Legal Bear Two"])
+        self.assertEqual(
+            sum(
+                1
+                for event, data in self.events
+                if event == "source_controller_life_loss_on_resolve"
+                and data.get("card") == "Fixture Reckless Spite"
+                and data.get("source_controller_life_lost") == 5
+            ),
+            1,
+        )
+
+    def test_destroy_source_controller_damage_applies_after_removal(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.life = 20
+        target = {"name": "Target Relic", "type_line": "Artifact", "cmc": 2}
+        opponent.battlefield = [target]
+        effect = {
+            "effect": "remove_permanent",
+            "battle_model_scope": "xmage_destroy_target_and_source_controller_damage_spell_v1",
+            "target": "artifact_creature_or_land",
+            "target_constraints": {"card_types": ["artifact", "creature", "land"]},
+            "destination": "graveyard",
+            "source_controller_damage_on_resolve": 3,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Fixture Aftershock", "type_line": "Sorcery"},
+            turn=12,
+            rng=random.Random(14),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(active.life, 17)
+        self.assertEqual(opponent.battlefield, [])
+        self.assertIn(target, opponent.graveyard)
+        self.assertTrue(
+            any(
+                event == "source_controller_damage_on_resolve"
+                and data.get("card") == "Fixture Aftershock"
+                and data.get("actual_damage_dealt") == 3
+                for event, data in self.events
+            )
+        )
+
     def test_static_flash_permission_artifact_filter_only_allows_artifacts(self) -> None:
         active = self.battle.Player("Active", None, [])
         artifact = {"name": "Mind Stone", "type_line": "Artifact", "mana_cost": "{2}"}

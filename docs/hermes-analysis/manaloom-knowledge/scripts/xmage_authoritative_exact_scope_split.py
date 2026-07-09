@@ -259,6 +259,12 @@ DESTROY_GAIN_LIFE_SCOPE = "xmage_destroy_target_and_controller_gain_life_spell_v
 DESTROY_TARGET_CONTROLLER_LOSE_LIFE_SCOPE = (
     "xmage_destroy_target_and_target_controller_loses_life_spell_v1"
 )
+DESTROY_SOURCE_CONTROLLER_LOSE_LIFE_SCOPE = (
+    "xmage_destroy_target_and_source_controller_loses_life_spell_v1"
+)
+DESTROY_SOURCE_CONTROLLER_DAMAGE_SCOPE = (
+    "xmage_destroy_target_and_source_controller_damage_spell_v1"
+)
 CREATURE_TAP_DAMAGE_SCOPE = "xmage_creature_tap_fixed_damage_target_activated_v1"
 TAP_DAMAGE_ACTIVATED_SCOPE = "xmage_tap_fixed_damage_target_activated_ability_v1"
 PERMANENT_ACTIVATED_DAMAGE_SCOPE = "xmage_permanent_simple_activated_damage_v1"
@@ -2325,6 +2331,8 @@ def destroy_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, str] | No
         return "remove_permanent", "nonland_permanent"
     if re.search(r"destroy target creature, enchantment, or planeswalker\b", text):
         return "remove_permanent", "creature_enchantment_or_planeswalker"
+    if re.search(r"destroy target creature or enchantment\b", text):
+        return "remove_permanent", "creature_or_enchantment"
     if re.search(r"destroy target creature or planeswalker\b", text):
         return "remove_permanent", "creature_or_planeswalker"
     if re.search(r"destroy target creature\b", text):
@@ -2755,6 +2763,110 @@ def simple_destroy_target_controller_life_loss_from_oracle(
         return None
     effect, target = parsed
     return effect, target, int(match.group("life"))
+
+
+def _destroy_source_controller_penalty_target_from_oracle(
+    destroy_text: str,
+) -> dict[str, Any] | None:
+    simple_metadata = {"oracle_text": f"{destroy_text}."}
+    multi_target = fixed_multi_target_removal_from_oracle(simple_metadata, "destroy")
+    if multi_target is not None:
+        return dict(multi_target)
+    if re.fullmatch(r"destroy target artifact, creature, or land", destroy_text):
+        return {
+            "effect": "remove_permanent",
+            "target": "artifact_creature_or_land",
+            "destination": "graveyard",
+        }
+    parsed = destroy_target_from_oracle(simple_metadata)
+    if parsed is None:
+        return None
+    effect, target = parsed
+    return {
+        "effect": effect,
+        "target": target,
+        "destination": "graveyard",
+    }
+
+
+def simple_destroy_source_controller_life_loss_from_oracle(
+    metadata: dict[str, Any],
+) -> dict[str, Any] | None:
+    text = oracle_text(metadata)
+    match = re.match(r"^(?P<destroy>destroy .+?)\. you lose (?P<life>\d+) life\.?$", text)
+    if not match:
+        return None
+    parsed = _destroy_source_controller_penalty_target_from_oracle(match.group("destroy"))
+    if parsed is None:
+        return None
+    return {**parsed, "source_controller_life_loss_on_resolve": int(match.group("life"))}
+
+
+def simple_destroy_source_controller_damage_from_oracle(
+    metadata: dict[str, Any],
+) -> dict[str, Any] | None:
+    text = oracle_text(metadata)
+    name = re.escape(str(metadata.get("name") or "").strip().lower())
+    match = re.match(
+        rf"^(?P<destroy>destroy .+?)\. {name} deals (?P<damage>\d+) damage to you\.?$",
+        text,
+    )
+    if not match:
+        return None
+    parsed = _destroy_source_controller_penalty_target_from_oracle(match.group("destroy"))
+    if parsed is None:
+        return None
+    return {**parsed, "source_controller_damage_on_resolve": int(match.group("damage"))}
+
+
+def simple_destroy_source_controller_life_loss_from_source(source: str) -> int | None:
+    text = source or ""
+    if has_additional_cost(text):
+        return None
+    if "TargetPointer" in text or ".setTargetPointer" in text:
+        return None
+    if len(re.findall(r"new\s+DestroyTargetEffect\s*\(", text, re.S)) != 1:
+        return None
+    life_matches = list(
+        re.finditer(r"new\s+LoseLifeSourceControllerEffect\s*\(\s*(\d+)\s*\)", text, re.S)
+    )
+    if len(life_matches) != 1:
+        return None
+    return int(life_matches[0].group(1))
+
+
+def simple_destroy_source_controller_damage_from_source(source: str) -> int | None:
+    text = source or ""
+    if has_additional_cost(text):
+        return None
+    if "TargetPointer" in text or ".setTargetPointer" in text:
+        return None
+    if len(re.findall(r"new\s+DestroyTargetEffect\s*\(", text, re.S)) != 1:
+        return None
+    damage_matches = list(
+        re.finditer(r"new\s+DamageControllerEffect\s*\(\s*(\d+)\s*\)", text, re.S)
+    )
+    if len(damage_matches) != 1:
+        return None
+    return int(damage_matches[0].group(1))
+
+
+def source_supports_destroy_source_controller_penalty_target(source: str, target: str) -> bool:
+    if target == "artifact_creature_or_land":
+        text = source or ""
+        return (
+            "CardType.ARTIFACT" in text
+            and "CardType.CREATURE" in text
+            and "CardType.LAND" in text
+            and "TargetPermanent" in text
+        )
+    if target == "nonblack_creature":
+        text = source or ""
+        return (
+            "FILTER_PERMANENT_CREATURES_NON_BLACK" in text
+            and "TargetPermanent" in text
+        )
+    return source_matches_target_constraint(source, target)
 
 
 def fixed_destroy_draw_from_oracle(metadata: dict[str, Any]) -> tuple[str, str, int] | None:
@@ -3417,6 +3529,8 @@ def removal_multi_target_from_phrase(phrase: str) -> tuple[str, str] | None:
     mapping = {
         "creature": ("remove_creature", "creature"),
         "creatures": ("remove_creature", "creature"),
+        "nonblack creature": ("remove_creature", "nonblack_creature"),
+        "nonblack creatures": ("remove_creature", "nonblack_creature"),
         "artifact": ("remove_permanent", "artifact"),
         "artifacts": ("remove_permanent", "artifact"),
         "enchantment": ("remove_permanent", "enchantment"),
@@ -23038,6 +23152,8 @@ def target_constraints_for(target: str) -> dict[str, Any]:
         return {"card_types": ["artifact", "enchantment", "land"]}
     if target == "artifact_or_creature":
         return {"card_types": ["artifact", "creature"]}
+    if target == "artifact_creature_or_land":
+        return {"card_types": ["artifact", "creature", "land"]}
     if target == "creature_or_enchantment":
         return {"card_types": ["creature", "enchantment"]}
     if target == "creature_enchantment_or_planeswalker":
@@ -31380,6 +31496,95 @@ def split_row(
                 metadata,
                 effect_json,
                 family_id="xmage_destroy_target_controller_life_loss_spell",
+            ), "selected_exact_scope"
+        if classes == {"DestroyTargetEffect", "LoseLifeSourceControllerEffect"}:
+            unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+            if unsupported_abilities:
+                return None, "destroy_source_controller_life_loss_ability_class_not_simple"
+            source_life_loss = simple_destroy_source_controller_life_loss_from_source(source_text)
+            if source_life_loss is None:
+                return None, "destroy_source_controller_life_loss_source_not_fixed"
+            oracle_destroy = simple_destroy_source_controller_life_loss_from_oracle(metadata)
+            if oracle_destroy is None:
+                return None, "destroy_source_controller_life_loss_oracle_not_exact_fixed"
+            oracle_life_loss = int(oracle_destroy["source_controller_life_loss_on_resolve"])
+            if source_life_loss != oracle_life_loss:
+                return None, "destroy_source_controller_life_loss_source_oracle_mismatch"
+            target_type = str(oracle_destroy["target"])
+            if not source_supports_destroy_source_controller_penalty_target(source_text, target_type):
+                return None, "destroy_source_controller_life_loss_target_source_mismatch"
+            target_base = restricted_target_base(target_type)
+            target_count_max = int(oracle_destroy.get("target_count_max") or oracle_destroy.get("count") or 1)
+            effect_json = {
+                "effect": oracle_destroy["effect"],
+                "battle_model_scope": DESTROY_SOURCE_CONTROLLER_LOSE_LIFE_SCOPE,
+                "target": target_base,
+                "target_constraints": target_constraints_for(target_type),
+                "destination": "graveyard",
+                "source_controller_life_loss_on_resolve": oracle_life_loss,
+                "life_loss_amount": oracle_life_loss,
+                "resolution_order": "destroy_then_source_controller_life_loss",
+                "xmage_effect_classes": ["DestroyTargetEffect", "LoseLifeSourceControllerEffect"],
+                **flags,
+            }
+            if target_count_max > 1:
+                source_count = fixed_multi_target_count_from_source(source_text)
+                if isinstance(source_count, str):
+                    return None, source_count
+                if source_count is None:
+                    return None, "destroy_source_controller_life_loss_multi_target_source_count_not_fixed"
+                for key in ("target_count_min", "target_count_max", "up_to_count"):
+                    if source_count.get(key) != oracle_destroy.get(key):
+                        return None, f"destroy_source_controller_life_loss_source_oracle_{key}_mismatch"
+                effect_json.update(
+                    {
+                        "target_count": target_count_max,
+                        "target_count_min": int(oracle_destroy["target_count_min"]),
+                        "target_count_max": target_count_max,
+                        "max_targets": target_count_max,
+                        "up_to_count": bool(oracle_destroy.get("up_to_count")),
+                    }
+                )
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_destroy_target_source_controller_life_loss_spell",
+            ), "selected_exact_scope"
+        if classes == {"DamageControllerEffect", "DestroyTargetEffect"}:
+            unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+            if unsupported_abilities:
+                return None, "destroy_source_controller_damage_ability_class_not_simple"
+            source_damage = simple_destroy_source_controller_damage_from_source(source_text)
+            if source_damage is None:
+                return None, "destroy_source_controller_damage_source_not_fixed"
+            oracle_destroy = simple_destroy_source_controller_damage_from_oracle(metadata)
+            if oracle_destroy is None:
+                return None, "destroy_source_controller_damage_oracle_not_exact_fixed"
+            oracle_damage = int(oracle_destroy["source_controller_damage_on_resolve"])
+            if source_damage != oracle_damage:
+                return None, "destroy_source_controller_damage_source_oracle_mismatch"
+            target_type = str(oracle_destroy["target"])
+            if not source_supports_destroy_source_controller_penalty_target(source_text, target_type):
+                return None, "destroy_source_controller_damage_target_source_mismatch"
+            target_base = restricted_target_base(target_type)
+            effect_json = {
+                "effect": oracle_destroy["effect"],
+                "battle_model_scope": DESTROY_SOURCE_CONTROLLER_DAMAGE_SCOPE,
+                "target": target_base,
+                "target_constraints": target_constraints_for(target_type),
+                "destination": "graveyard",
+                "source_controller_damage_on_resolve": oracle_damage,
+                "damage_amount": oracle_damage,
+                "resolution_order": "destroy_then_source_controller_damage",
+                "xmage_effect_classes": ["DestroyTargetEffect", "DamageControllerEffect"],
+                **flags,
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_destroy_target_source_controller_damage_spell",
             ), "selected_exact_scope"
         if classes != {"DestroyTargetEffect"}:
             return None, "destroy_effect_class_not_pure"

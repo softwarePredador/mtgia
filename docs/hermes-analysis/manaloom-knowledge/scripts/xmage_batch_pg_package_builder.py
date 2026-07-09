@@ -79,6 +79,8 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "life_gain_on_counter",
     "life_loss_on_counter",
     "target_controller_life_loss_on_counter",
+    "source_controller_life_loss_on_resolve",
+    "source_controller_damage_on_resolve",
     "power_delta",
     "toughness_delta",
     "power_boost",
@@ -163,6 +165,8 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "draw_count_exclude_source",
     "etb_draw_count_exclude_source",
     "etb_life_loss",
+    "life_loss_amount",
+    "damage_amount",
     "etb_life_gain_amount",
     "etb_dynamic_life_gain",
     "etb_scry_count",
@@ -4636,6 +4640,8 @@ def single_target_removal_execution_scenario_from_expected_rule(
         "xmage_exile_target_spell_v1",
         "xmage_destroy_target_spell_v1",
         "xmage_destroy_target_and_controller_gain_life_spell_v1",
+        "xmage_destroy_target_and_source_controller_loses_life_spell_v1",
+        "xmage_destroy_target_and_source_controller_damage_spell_v1",
         "xmage_return_target_to_hand_spell_v1",
     }:
         return None
@@ -4668,6 +4674,14 @@ def single_target_removal_execution_scenario_from_expected_rule(
     if controller_life_gain > 0:
         scenario["controller_life"] = 10
         scenario["expected_controller_life_gain"] = controller_life_gain
+    source_controller_life_loss = int(required.get("source_controller_life_loss_on_resolve") or 0)
+    source_controller_damage = int(required.get("source_controller_damage_on_resolve") or 0)
+    if source_controller_life_loss > 0:
+        scenario["controller_life"] = 20
+        scenario["expected_source_controller_life_loss"] = source_controller_life_loss
+    if source_controller_damage > 0:
+        scenario["controller_life"] = 20
+        scenario["expected_source_controller_damage"] = source_controller_damage
     return scenario
 
 
@@ -4790,6 +4804,7 @@ def multi_target_removal_execution_scenario_from_expected_rule(
     if required.get("battle_model_scope") not in {
         "xmage_exile_target_spell_v1",
         "xmage_destroy_target_spell_v1",
+        "xmage_destroy_target_and_source_controller_loses_life_spell_v1",
         "xmage_return_target_to_hand_spell_v1",
     }:
         return None
@@ -4801,7 +4816,7 @@ def multi_target_removal_execution_scenario_from_expected_rule(
     target_count = max(2, min(target_count, 10))
     constraints = dict(required.get("target_constraints") or {})
     destination = str(required.get("destination") or "graveyard").lower()
-    return {
+    scenario = {
         "name": f"{rule['card_name']} removes {target_count} legal targets",
         "type": "multi_target_removal",
         "card": {
@@ -4827,6 +4842,11 @@ def multi_target_removal_execution_scenario_from_expected_rule(
         "expected_target_count": target_count,
         "logical_rule_key": rule["logical_rule_key"],
     }
+    source_controller_life_loss = int(required.get("source_controller_life_loss_on_resolve") or 0)
+    if source_controller_life_loss > 0:
+        scenario["controller_life"] = 20
+        scenario["expected_source_controller_life_loss"] = source_controller_life_loss
+    return scenario
 
 
 def multi_target_damage_execution_scenario_from_expected_rule(

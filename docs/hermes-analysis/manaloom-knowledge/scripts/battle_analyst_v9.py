@@ -9486,6 +9486,8 @@ CARD_EFFECT_FIELD_RULE_KEYS = (
     "target_controller_life_loss_on_counter",
     "life_loss_on_destroy",
     "target_controller_life_loss_on_destroy",
+    "source_controller_life_loss_on_resolve",
+    "source_controller_damage_on_resolve",
     "life_loss_amount",
     "scry_on_counter",
     "scry_count",
@@ -13509,6 +13511,8 @@ def _target_type_from_constraints(effect_data):
     card_types = _constraint_card_types(effect_data)
     if {"creature", "enchantment", "planeswalker"}.issubset(card_types):
         return "creature_enchantment_or_planeswalker"
+    if {"artifact", "creature", "land"}.issubset(card_types):
+        return "artifact_creature_or_land"
     if {"artifact", "enchantment"}.issubset(card_types):
         return "artifact_or_enchantment"
     if "artifact" in card_types and "creature" in card_types:
@@ -13710,6 +13714,75 @@ def apply_removal_target_controller_life_loss(
         **replay_rule_fields(effect_data),
     )
     return requested, lost
+
+
+def apply_removal_source_controller_penalty(
+    effect_data,
+    source_controller,
+    source_card,
+    turn,
+    *,
+    phase="resolution",
+):
+    if not isinstance(effect_data, dict) or source_controller is None:
+        return {}
+    life_loss = max(0, int(effect_data.get("source_controller_life_loss_on_resolve") or 0))
+    damage = max(0, int(effect_data.get("source_controller_damage_on_resolve") or 0))
+    if life_loss <= 0 and damage <= 0:
+        return {}
+    before = int(getattr(source_controller, "life", 0) or 0)
+    if life_loss > 0:
+        change_life(source_controller, -life_loss)
+        after = int(getattr(source_controller, "life", 0) or 0)
+        lost = max(0, before - after)
+        emit_replay_event(
+            "source_controller_life_loss_on_resolve",
+            player=getattr(source_controller, "name", None),
+            card=source_card.get("name", "?") if isinstance(source_card, dict) else "?",
+            source_controller=getattr(source_controller, "name", None),
+            life_loss_on_resolve=life_loss,
+            source_controller_life_before=before,
+            source_controller_life_after=after,
+            source_controller_life_lost=lost,
+            turn=turn,
+            phase=phase,
+            **replay_rule_fields(effect_data),
+        )
+        return {
+            "source_controller_life_before": before,
+            "source_controller_life_after": after,
+            "source_controller_life_lost": lost,
+        }
+    actual_damage, final_damage, dealt = deal_damage_to_player_with_static_replacements(
+        source_controller,
+        source_controller,
+        source_card,
+        damage,
+        turn=turn,
+        phase=phase,
+        damage_event_type="player",
+    )
+    after = int(getattr(source_controller, "life", 0) or 0)
+    emit_replay_event(
+        "source_controller_damage_on_resolve",
+        player=getattr(source_controller, "name", None),
+        card=source_card.get("name", "?") if isinstance(source_card, dict) else "?",
+        source_controller=getattr(source_controller, "name", None),
+        damage_on_resolve=damage,
+        amount=final_damage,
+        actual_damage_dealt=actual_damage,
+        dealt=dealt,
+        source_controller_life_before=before,
+        source_controller_life_after=after,
+        turn=turn,
+        phase=phase,
+        **replay_rule_fields(effect_data),
+    )
+    return {
+        "source_controller_life_before": before,
+        "source_controller_life_after": after,
+        "source_controller_damage_dealt": actual_damage,
+    }
 
 
 def removal_life_gain_replay_fields(effect_data, requested, gained):
@@ -14632,6 +14705,15 @@ def resolve_multi_target_removal(player, opponents, card, effect_data, turn, rng
         create_controller_treasures_after_removal(effect_data, player, card, turn)
         resolved.append(decision["target_name"])
 
+    if resolved:
+        apply_removal_source_controller_penalty(
+            effect_data,
+            player,
+            card,
+            turn,
+            phase="resolution",
+        )
+
     emit_replay_event(
         "multi_target_resolution",
         player=player.name,
@@ -14818,6 +14900,13 @@ def resolve_declared_single_removal(player, opponents, card, effect_data, turn, 
         target,
         destination,
         turn,
+    )
+    apply_removal_source_controller_penalty(
+        effect_data,
+        player,
+        card,
+        turn,
+        phase="resolution",
     )
     apply_cant_block_until_eot_runtime(
         player,

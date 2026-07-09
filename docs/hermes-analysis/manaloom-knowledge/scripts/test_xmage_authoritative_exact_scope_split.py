@@ -8646,6 +8646,95 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "additional_cost_detected")
 
+    def test_destroy_source_controller_life_loss_spell_maps_fixed_loss(self) -> None:
+        row = queue_row(split.DESTROY_UNIT, effect_classes=["DestroyTargetEffect", "LoseLifeSourceControllerEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Destroy target creature. You lose 2 life."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new DestroyTargetEffect());"
+                "this.getSpellAbility().addTarget(new TargetCreaturePermanent());"
+                "this.getSpellAbility().addEffect(new LoseLifeSourceControllerEffect(2));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "remove_creature")
+        self.assertEqual(effect["battle_model_scope"], split.DESTROY_SOURCE_CONTROLLER_LOSE_LIFE_SCOPE)
+        self.assertEqual(effect["target"], "creature")
+        self.assertEqual(effect["target_constraints"], {"card_types": ["creature"]})
+        self.assertEqual(effect["source_controller_life_loss_on_resolve"], 2)
+        self.assertEqual(effect["resolution_order"], "destroy_then_source_controller_life_loss")
+
+    def test_destroy_source_controller_life_loss_spell_preserves_creature_or_enchantment_target(self) -> None:
+        row = queue_row(split.DESTROY_UNIT, effect_classes=["DestroyTargetEffect", "LoseLifeSourceControllerEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Destroy target creature or enchantment. You lose 2 life."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new DestroyTargetEffect());"
+                "this.getSpellAbility().addEffect(new LoseLifeSourceControllerEffect(2));"
+                "this.getSpellAbility().addTarget(new TargetPermanent(StaticFilters.FILTER_PERMANENT_CREATURE_OR_ENCHANTMENT));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "remove_permanent")
+        self.assertEqual(effect["target"], "creature_or_enchantment")
+        self.assertEqual(effect["target_constraints"], {"card_types": ["creature", "enchantment"]})
+        self.assertEqual(effect["source_controller_life_loss_on_resolve"], 2)
+
+    def test_destroy_source_controller_life_loss_spell_maps_multi_target_loss_once(self) -> None:
+        row = queue_row(split.DESTROY_UNIT, effect_classes=["DestroyTargetEffect", "LoseLifeSourceControllerEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Destroy two target nonblack creatures. You lose 5 life."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new DestroyTargetEffect());"
+                "this.getSpellAbility().addTarget(new TargetPermanent(2, StaticFilters.FILTER_PERMANENT_CREATURES_NON_BLACK));"
+                "this.getSpellAbility().addEffect(new LoseLifeSourceControllerEffect(5));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "remove_creature")
+        self.assertEqual(effect["battle_model_scope"], split.DESTROY_SOURCE_CONTROLLER_LOSE_LIFE_SCOPE)
+        self.assertEqual(effect["target"], "creature")
+        self.assertEqual(effect["target_constraints"], {"card_types": ["creature"], "exclude_colors": ["B"]})
+        self.assertEqual(effect["target_count"], 2)
+        self.assertEqual(effect["target_count_min"], 2)
+        self.assertEqual(effect["target_count_max"], 2)
+        self.assertEqual(effect["source_controller_life_loss_on_resolve"], 5)
+
+    def test_destroy_source_controller_damage_spell_maps_artifact_creature_or_land(self) -> None:
+        row = queue_row(split.DESTROY_UNIT, effect_classes=["DamageControllerEffect", "DestroyTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Aftershock",
+                oracle_text="Destroy target artifact, creature, or land. Aftershock deals 3 damage to you.",
+            ),
+            source_text=(
+                'private static final FilterPermanent filter = new FilterPermanent("artifact, creature, or land");'
+                "filter.add(Predicates.or(CardType.ARTIFACT.getPredicate(), CardType.CREATURE.getPredicate(), CardType.LAND.getPredicate()));"
+                "this.getSpellAbility().addEffect(new DestroyTargetEffect());"
+                "this.getSpellAbility().addTarget(new TargetPermanent(filter));"
+                "this.getSpellAbility().addEffect(new DamageControllerEffect(3));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "remove_permanent")
+        self.assertEqual(effect["battle_model_scope"], split.DESTROY_SOURCE_CONTROLLER_DAMAGE_SCOPE)
+        self.assertEqual(effect["target"], "artifact_creature_or_land")
+        self.assertEqual(effect["target_constraints"], {"card_types": ["artifact", "creature", "land"]})
+        self.assertEqual(effect["source_controller_damage_on_resolve"], 3)
+        self.assertEqual(effect["resolution_order"], "destroy_then_source_controller_damage")
+
     def test_destroy_gain_life_spell_blocks_opaque_target_filter(self) -> None:
         row = queue_row(split.LIFE_UNIT, effect_classes=["DestroyTargetEffect", "GainLifeEffect"])
         proposal, reason = split.split_row(
