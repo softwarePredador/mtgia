@@ -2829,6 +2829,232 @@ def run_each_player_sacrifice(
     }
 
 
+def _board_wipe_type_line(card_type: str, scenario: dict[str, Any], *, matching: bool) -> str:
+    normalized = str(card_type or "creature").strip().lower()
+    mapping = {
+        "artifact": "Artifact",
+        "battle": "Battle - Siege",
+        "creature": "Creature - Soldier",
+        "enchantment": "Enchantment",
+        "land": "Land",
+        "permanent": "Creature - Soldier",
+        "planeswalker": "Planeswalker - Jace",
+    }
+    type_line = mapping.get(normalized, "Creature - Soldier")
+    if matching:
+        required_subtypes = [
+            str(value or "").replace("_", " ").strip().title()
+            for value in scenario.get("destroy_required_subtypes") or []
+            if str(value or "").strip()
+        ]
+        if required_subtypes:
+            if " - " in type_line:
+                base, subtypes = type_line.split(" - ", 1)
+                type_line = f"{base} - {subtypes} {' '.join(required_subtypes)}"
+            else:
+                type_line = f"{type_line} - {' '.join(required_subtypes)}"
+    excluded_types = [
+        str(value or "").strip().title()
+        for value in scenario.get("destroy_exclude_card_types") or []
+        if str(value or "").strip()
+    ]
+    if not matching and excluded_types:
+        type_line = f"{type_line} {' '.join(excluded_types)}"
+    return type_line
+
+
+def _board_wipe_fixture_permanent(
+    name: str,
+    card_type: str,
+    scenario: dict[str, Any],
+    *,
+    matching: bool,
+) -> dict[str, Any]:
+    type_line = _board_wipe_type_line(card_type, scenario, matching=matching)
+    cmc = int(scenario.get("destroy_mana_value_lte") or 3)
+    if not matching and scenario.get("destroy_mana_value_lte") not in (None, ""):
+        cmc = int(scenario.get("destroy_mana_value_lte")) + 1
+    if matching and scenario.get("destroy_mana_value_gte") not in (None, ""):
+        cmc = int(scenario.get("destroy_mana_value_gte"))
+    if not matching and scenario.get("destroy_mana_value_gte") not in (None, ""):
+        cmc = max(0, int(scenario.get("destroy_mana_value_gte")) - 1)
+    power = int(scenario.get("destroy_power_gte") or scenario.get("destroy_power_lte") or 2)
+    toughness = int(scenario.get("destroy_toughness_gte") or scenario.get("destroy_toughness_lte") or 2)
+    if not matching and scenario.get("destroy_power_gte") not in (None, ""):
+        power = max(0, int(scenario.get("destroy_power_gte")) - 1)
+    if not matching and scenario.get("destroy_power_lte") not in (None, ""):
+        power = int(scenario.get("destroy_power_lte")) + 1
+    if not matching and scenario.get("destroy_toughness_gte") not in (None, ""):
+        toughness = max(0, int(scenario.get("destroy_toughness_gte")) - 1)
+    if not matching and scenario.get("destroy_toughness_lte") not in (None, ""):
+        toughness = int(scenario.get("destroy_toughness_lte")) + 1
+    colors = list(scenario.get("destroy_required_colors") or [])
+    if not matching and colors:
+        colors = []
+    excluded_colors = list(scenario.get("destroy_excluded_colors") or [])
+    if not matching and excluded_colors:
+        colors = excluded_colors[:1]
+    tapped_state = str(scenario.get("destroy_tapped_state") or "").strip().lower()
+    tapped = tapped_state == "tapped"
+    if not matching and tapped_state:
+        tapped = not tapped
+    permanent = {
+        "name": name,
+        "type_line": type_line,
+        "effect": "creature" if "Creature" in type_line else "land" if "Land" in type_line else "permanent",
+        "cmc": cmc,
+        "power": power,
+        "toughness": toughness,
+        "colors": colors,
+        "tapped": tapped,
+    }
+    if "Land" in type_line:
+        permanent["basic"] = not bool(matching and scenario.get("destroy_nonbasic_lands"))
+    return permanent
+
+
+def _board_wipe_nonmatching_type(requested_types: list[str]) -> str | None:
+    requested = {str(value or "").strip().lower() for value in requested_types}
+    for candidate in ("enchantment", "artifact", "land", "planeswalker", "creature"):
+        if candidate not in requested and "permanent" not in requested:
+            return candidate
+    return None
+
+
+def run_board_wipe(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    active = battle.Player(str(scenario.get("player") or "Active"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
+    before_events = len(events)
+    effect_data = battle.get_card_effect(card)
+    if effect_data.get("effect") != "board_wipe":
+        fail("battle_execution", f"{card['name']} effect={effect_data.get('effect')!r}")
+    destroy_card_types = list(
+        scenario.get("destroy_card_types")
+        or effect_data.get("destroy_card_types")
+        or ["creature"]
+    )
+    destroy_controller = str(
+        scenario.get("destroy_controller")
+        or effect_data.get("destroy_controller")
+        or "any"
+    ).strip().lower()
+    scenario_with_effect = {**effect_data, **scenario}
+    target_active = destroy_controller not in {"opponent", "opponents", "opponents_control"}
+    target_opponent = destroy_controller not in {"self", "you", "controller"}
+    expected_destroyed_names: set[str] = set()
+    expected_survivor_names: set[str] = set()
+
+    def add_fixture(owner, owner_label: str, targeted: bool) -> None:
+        for card_type in destroy_card_types:
+            permanent = _board_wipe_fixture_permanent(
+                f"{owner_label} Matching {card_type.title()}",
+                card_type,
+                scenario_with_effect,
+                matching=True,
+            )
+            owner.battlefield.append(permanent)
+            if targeted:
+                expected_destroyed_names.add(permanent["name"])
+            else:
+                expected_survivor_names.add(permanent["name"])
+        decoy_type = _board_wipe_nonmatching_type(destroy_card_types)
+        if decoy_type:
+            decoy = _board_wipe_fixture_permanent(
+                f"{owner_label} Nonmatching {decoy_type.title()}",
+                decoy_type,
+                scenario_with_effect,
+                matching=True,
+            )
+            owner.battlefield.append(decoy)
+            expected_survivor_names.add(decoy["name"])
+        has_extra_filter = any(
+            scenario_with_effect.get(field) not in (None, "", [], False)
+            for field in (
+                "destroy_required_colors",
+                "destroy_excluded_colors",
+                "destroy_required_subtypes",
+                "destroy_excluded_subtypes",
+                "destroy_exclude_card_types",
+                "destroy_tapped_state",
+                "destroy_nonbasic_lands",
+                "destroy_mana_value_lte",
+                "destroy_mana_value_gte",
+                "destroy_power_lte",
+                "destroy_power_gte",
+                "destroy_toughness_lte",
+                "destroy_toughness_gte",
+            )
+        )
+        if has_extra_filter:
+            filtered_decoy = _board_wipe_fixture_permanent(
+                f"{owner_label} Filtered Decoy",
+                destroy_card_types[0],
+                scenario_with_effect,
+                matching=False,
+            )
+            owner.battlefield.append(filtered_decoy)
+            expected_survivor_names.add(filtered_decoy["name"])
+
+    add_fixture(active, "Active", target_active)
+    add_fixture(opponent, "Opponent", target_opponent)
+
+    battle.apply_effect_immediate(
+        active,
+        [opponent],
+        card,
+        turn=int(scenario.get("turn") or 6),
+        rng=random.Random(int(scenario.get("seed") or 6066)),
+    )
+
+    graveyard_names = {
+        str(item.get("name") or "")
+        for owner in (active, opponent)
+        for item in owner.graveyard
+        if isinstance(item, dict)
+    }
+    battlefield_names = {
+        str(item.get("name") or "")
+        for owner in (active, opponent)
+        for item in owner.battlefield
+        if isinstance(item, dict)
+    }
+    missing_destroyed = expected_destroyed_names - graveyard_names
+    wrongly_destroyed = expected_survivor_names & graveyard_names
+    if missing_destroyed:
+        fail("battle_execution", f"{card['name']} did not destroy {sorted(missing_destroyed)}")
+    if wrongly_destroyed:
+        fail("battle_execution", f"{card['name']} wrongly destroyed {sorted(wrongly_destroyed)}")
+    if not expected_survivor_names.issubset(battlefield_names):
+        fail("battle_execution", f"{card['name']} survivor state mismatch")
+    wipe_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "board_wipe_resolved" and data.get("card") == card.get("name")
+        ),
+        None,
+    )
+    if wipe_event is None:
+        fail("battle_events", f"missing {card['name']} board_wipe_resolved event")
+    if int(wipe_event.get("destroyed") or 0) != len(expected_destroyed_names):
+        fail(
+            "battle_events",
+            f"{card['name']} destroyed={wipe_event.get('destroyed')}, expected {len(expected_destroyed_names)}",
+        )
+    return {
+        "card_name": card["name"],
+        "destroyed": int(wipe_event.get("destroyed") or 0),
+        "expected_destroyed": len(expected_destroyed_names),
+        "destroy_card_types": wipe_event.get("destroy_card_types") or destroy_card_types,
+        "destroy_controller": wipe_event.get("destroy_controller") or destroy_controller,
+    }
+
+
 def run_creature_etb_create_treasure(
     battle,
     scenario: dict[str, Any],
@@ -7616,6 +7842,7 @@ SCENARIO_RUNNERS = {
     "attack_self_boost": run_attack_self_boost,
     "aura_static_power_toughness_attachment": run_aura_static_power_toughness_attachment,
     "becomes_blocked_self_boost": run_becomes_blocked_self_boost,
+    "board_wipe": run_board_wipe,
     "combat_damage_draw": run_combat_damage_draw,
     "conditional_land_play": run_conditional_land_play,
     "counter_unless_pays_response": run_counter_unless_pays_response,

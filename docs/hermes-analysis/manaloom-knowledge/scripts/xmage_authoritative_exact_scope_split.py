@@ -6233,15 +6233,20 @@ def etb_graveyard_to_library_from_source(source: str) -> dict[str, Any] | str:
 
 
 def destroy_all_spec_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
-    text = oracle_text(metadata)
+    effect_lines = oracle_effect_lines_without_neutral_auxiliary(metadata)
+    text = re.sub(r"\s+", " ", " ".join(effect_lines)).strip()
     patterns: list[tuple[str, dict[str, Any]]] = [
-        (r"^destroy all creatures(?:\. they can't be regenerated\.)?\.?$", ["creature"]),
-        (r"^destroy all artifacts(?:\. they can't be regenerated\.)?\.?$", ["artifact"]),
-        (r"^destroy all enchantments(?:\. they can't be regenerated\.)?\.?$", ["enchantment"]),
-        (r"^destroy all artifacts and enchantments(?:\. they can't be regenerated\.)?\.?$", ["artifact", "enchantment"]),
-        (r"^destroy all creatures and lands(?:\. they can't be regenerated\.)?\.?$", ["creature", "land"]),
+        (r"^destroy (?:all|each) creatures(?:\. they can't be regenerated\.)?\.?$", ["creature"]),
+        (r"^destroy (?:all|each) artifacts(?:\. they can't be regenerated\.)?\.?$", ["artifact"]),
+        (r"^destroy (?:all|each) enchantments(?:\. they can't be regenerated\.)?\.?$", ["enchantment"]),
+        (r"^destroy (?:all|each) artifacts and enchantments(?:\. they can't be regenerated\.)?\.?$", ["artifact", "enchantment"]),
+        (r"^destroy (?:all|each) creatures and lands(?:\. they can't be regenerated\.)?\.?$", ["creature", "land"]),
         (
-            r"^destroy all artifacts, creatures, and enchantments(?:\. they can't be regenerated\.)?\.?$",
+            r"^destroy (?:all|each) artifacts, creatures, and lands(?:\. they can't be regenerated\.)?\.?$",
+            ["artifact", "creature", "land"],
+        ),
+        (
+            r"^destroy (?:all|each) artifacts, creatures, and enchantments(?:\. they can't be regenerated\.)?\.?$",
             ["artifact", "creature", "enchantment"],
         ),
     ]
@@ -6249,7 +6254,7 @@ def destroy_all_spec_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | N
         if re.match(pattern, text):
             return {"destroy_card_types": card_types}
     match = re.match(
-        r"^destroy all (?P<subtype>plains|islands|swamps|mountains|forests)(?:\. they can't be regenerated\.)?\.?$",
+        r"^destroy (?:all|each) (?P<subtype>plains|islands|swamps|mountains|forests)(?:\. they can't be regenerated\.)?\.?$",
         text,
     )
     if match:
@@ -6265,7 +6270,7 @@ def destroy_all_spec_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | N
             "destroy_required_subtypes": [subtype],
         }
     match = re.match(
-        r"^destroy all (?P<color>white|blue|black|red|green) (?P<kind>creatures|permanents)(?:\. they can't be regenerated\.)?\.?$",
+        r"^destroy (?:all|each) (?P<color>white|blue|black|red|green) (?P<kind>creatures|permanents)(?:\. they can't be regenerated\.)?\.?$",
         text,
     )
     if match:
@@ -6274,7 +6279,7 @@ def destroy_all_spec_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | N
             "destroy_required_colors": [TOKEN_COLOR_WORDS[match.group("color")]],
         }
     match = re.match(
-        r"^destroy all non(?P<color>white|blue|black|red|green) creatures(?:\. they can't be regenerated\.)?\.?$",
+        r"^destroy (?:all|each) non(?P<color>white|blue|black|red|green) creatures(?:\. they can't be regenerated\.)?\.?$",
         text,
     )
     if match:
@@ -6282,32 +6287,52 @@ def destroy_all_spec_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | N
             "destroy_card_types": ["creature"],
             "destroy_excluded_colors": [TOKEN_COLOR_WORDS[match.group("color")]],
         }
-    if re.match(r"^destroy all creatures you don't control(?:\. they can't be regenerated\.)?\.?$", text):
+    if re.match(r"^destroy (?:all|each) creatures you don't control(?:\. they can't be regenerated\.)?\.?$", text):
         return {"destroy_card_types": ["creature"], "destroy_controller": "opponents_control"}
-    if re.match(r"^destroy all nonland permanents(?:\. they can't be regenerated\.)?\.?$", text):
+    if re.match(
+        r"^destroy (?:all|each) creatures you don't control and all planeswalkers you don't control(?:\. they can't be regenerated\.)?\.?$",
+        text,
+    ):
+        return {
+            "destroy_card_types": ["creature", "planeswalker"],
+            "destroy_controller": "opponents_control",
+        }
+    if re.match(r"^destroy (?:all|each) nonland permanents(?:\. they can't be regenerated\.)?\.?$", text):
         return {"destroy_card_types": ["permanent"], "destroy_exclude_card_types": ["land"]}
-    if re.match(r"^destroy all nonartifact creatures(?:\. they can't be regenerated\.)?\.?$", text):
+    if re.match(r"^destroy (?:all|each) nonartifact creatures(?:\. they can't be regenerated\.)?\.?$", text):
         return {"destroy_card_types": ["creature"], "destroy_exclude_card_types": ["artifact"]}
-    if re.match(r"^destroy all nonartifact permanents(?:\. they can't be regenerated\.)?\.?$", text):
+    if re.match(r"^destroy (?:all|each) nonartifact permanents(?:\. they can't be regenerated\.)?\.?$", text):
         return {"destroy_card_types": ["permanent"], "destroy_exclude_card_types": ["artifact"]}
-    if re.match(r"^destroy all tapped creatures(?:\. they can't be regenerated\.)?\.?$", text):
+    if re.match(r"^destroy (?:all|each) nonenchantment creatures(?:\. they can't be regenerated\.)?\.?$", text):
+        return {"destroy_card_types": ["creature"], "destroy_exclude_card_types": ["enchantment"]}
+    if re.match(r"^destroy (?:all|each) tapped creatures(?:\. they can't be regenerated\.)?\.?$", text):
         return {"destroy_card_types": ["creature"], "destroy_tapped_state": "tapped"}
-    if re.match(r"^destroy all nonbasic lands(?:\. they can't be regenerated\.)?\.?$", text):
+    if re.match(r"^destroy (?:all|each) nonbasic lands(?:\. they can't be regenerated\.)?\.?$", text):
         return {"destroy_card_types": ["land"], "destroy_nonbasic_lands": True}
     match = re.match(
-        r"^destroy all creatures with mana value (?P<value>\d+) or less(?:\. they can't be regenerated\.)?\.?$",
+        r"^destroy (?:all|each) creatures? with (?:mana value|converted mana cost) (?P<value>\d+) or less(?:\. they can't be regenerated\.)?\.?$",
         text,
     )
     if match:
         return {"destroy_card_types": ["creature"], "destroy_mana_value_lte": int(match.group("value"))}
     match = re.match(
-        r"^destroy all creatures with power (?P<value>\d+) or greater(?:\. they can't be regenerated\.)?\.?$",
+        r"^destroy (?:all|each) nonland artifacts? with (?:mana value|converted mana cost) (?P<value>\d+) or less(?:\. they can't be regenerated\.)?\.?$",
+        text,
+    )
+    if match:
+        return {
+            "destroy_card_types": ["artifact"],
+            "destroy_exclude_card_types": ["land"],
+            "destroy_mana_value_lte": int(match.group("value")),
+        }
+    match = re.match(
+        r"^destroy (?:all|each) creatures? with power (?P<value>\d+) or greater(?:\. they can't be regenerated\.)?\.?$",
         text,
     )
     if match:
         return {"destroy_card_types": ["creature"], "destroy_power_gte": int(match.group("value"))}
     match = re.match(
-        r"^destroy all creatures with toughness (?P<value>\d+) or greater(?:\. they can't be regenerated\.)?\.?$",
+        r"^destroy (?:all|each) creatures? with toughness (?P<value>\d+) or greater(?:\. they can't be regenerated\.)?\.?$",
         text,
     )
     if match:
@@ -6628,6 +6653,46 @@ def board_wipe_source_blocker(source: str, classes: set[str]) -> str | None:
             return "board_wipe_sacrifice_count_not_fixed"
         return None
     return None
+
+
+def destroy_all_source_matches_spec(source: str, spec: dict[str, Any]) -> bool:
+    text = source or ""
+    card_types = {
+        str(value or "").strip().lower()
+        for value in as_list(spec.get("destroy_card_types"))
+        if str(value or "").strip()
+    }
+    if spec.get("destroy_controller") == "opponents_control" and "TargetController.NOT_YOU" not in text:
+        return False
+    if {"creature", "planeswalker"}.issubset(card_types) and "FilterCreatureOrPlaneswalkerPermanent" not in text:
+        return False
+    if {"artifact", "creature", "land"}.issubset(card_types):
+        for card_type in ("ARTIFACT", "CREATURE", "LAND"):
+            if f"CardType.{card_type}.getPredicate()" not in text:
+                return False
+    if spec.get("destroy_mana_value_lte") not in (None, ""):
+        threshold = int(spec.get("destroy_mana_value_lte")) + 1
+        if not re.search(
+            rf"ManaValuePredicate\s*\(\s*ComparisonType\.FEWER_THAN\s*,\s*{threshold}\s*\)",
+            text,
+        ):
+            return False
+    excluded_types = {
+        str(value or "").strip().lower()
+        for value in as_list(spec.get("destroy_exclude_card_types"))
+        if str(value or "").strip()
+    }
+    if "land" in excluded_types and "FilterNonlandPermanent" not in text and "Predicates.not(CardType.LAND" not in text:
+        return False
+    if "enchantment" in excluded_types and "Predicates.not(CardType.ENCHANTMENT" not in text:
+        return False
+    if spec.get("destroy_nonbasic_lands") and "NonBasicLandPredicate" not in text:
+        return False
+    for subtype in as_list(spec.get("destroy_required_subtypes")):
+        subtype_constant = re.sub(r"[^A-Z0-9]+", "_", str(subtype or "").upper()).strip("_")
+        if subtype_constant and f"SubType.{subtype_constant}" not in text:
+            return False
+    return True
 
 
 def fixed_sacrifice_count_word(value: str) -> int | None:
@@ -32987,6 +33052,8 @@ def split_row(
             destroy_spec = destroy_all_spec_from_oracle(metadata)
             if destroy_spec is None:
                 return None, "board_wipe_destroy_scope_not_supported"
+            if not destroy_all_source_matches_spec(source_text, destroy_spec):
+                return None, "board_wipe_destroy_source_oracle_mismatch"
             effect_json = {
                 "effect": "board_wipe",
                 "battle_model_scope": BOARD_WIPE_SCOPE,

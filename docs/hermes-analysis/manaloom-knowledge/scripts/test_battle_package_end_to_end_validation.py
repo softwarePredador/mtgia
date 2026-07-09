@@ -335,6 +335,45 @@ def test_counter_target_runner_validates_top_library_replacement() -> None:
     )
 
 
+def test_board_wipe_runner_validates_destroy_filters() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "board_wipe",
+        "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+        "destroy_card_types": ["creature"],
+        "destroy_mana_value_lte": 3,
+        "destination": "graveyard",
+    }
+    try:
+        result = validator.run_board_wipe(
+            battle,
+            {
+                "name": "Consume the Meek destroys only low-value creatures",
+                "type": "board_wipe",
+                "card": {
+                    "name": "Consume the Meek",
+                    "type_line": "Instant",
+                    "effect": "board_wipe",
+                },
+                "destroy_card_types": ["creature"],
+                "destroy_mana_value_lte": 3,
+                "logical_rule_key": "battle_rule_v1:consume-the-meek",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Consume the Meek"
+    assert result["destroyed"] == 2
+    assert result["expected_destroyed"] == 2
+
+
 def test_global_stat_modifier_draw_spell_runner_executes_boost_and_draw() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

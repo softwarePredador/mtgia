@@ -2794,6 +2794,29 @@ def test_manifest_expected_rule_preserves_extended_board_wipe_fields() -> None:
     assert expected["required_effect_fields"]["damage_scope"] == "each_nonartifact_creature"
 
 
+def test_board_wipe_execution_scenario_preserves_destroy_filters() -> None:
+    proposal = {
+        "normalized_name": "consume the meek",
+        "card_name": "Consume the Meek",
+        "oracle_hash": "hash-consume-the-meek",
+        "logical_rule_key": "battle_rule_v1:consume-the-meek",
+        "effect_json": {
+            "effect": "board_wipe",
+            "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+            "destroy_card_types": ["creature"],
+            "destroy_mana_value_lte": 3,
+            "destination": "graveyard",
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    assert scenario["type"] == "board_wipe"
+    assert scenario["destroy_card_types"] == ["creature"]
+    assert scenario["destroy_mana_value_lte"] == 3
+
+
 def test_manifest_expected_rule_preserves_dynamic_graveyard_damage_fields() -> None:
     proposal = {
         "normalized_name": "kindle",

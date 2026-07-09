@@ -3835,6 +3835,41 @@ def each_player_sacrifice_execution_scenario_from_expected_rule(
     }
 
 
+def board_wipe_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_destroy_all_matching_permanents_spell_v1":
+        return None
+    destroy_card_types = list(required.get("destroy_card_types") or ["creature"])
+    scenario = {
+        "name": f"{rule['card_name']} destroys matching permanents",
+        "type": "board_wipe",
+        "card": {"name": rule["card_name"], "type_line": "Sorcery"},
+        "destroy_card_types": destroy_card_types,
+        "destroy_controller": required.get("destroy_controller", "any"),
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+    for field in (
+        "destroy_required_colors",
+        "destroy_excluded_colors",
+        "destroy_required_subtypes",
+        "destroy_excluded_subtypes",
+        "destroy_exclude_card_types",
+        "destroy_tapped_state",
+        "destroy_nonbasic_lands",
+        "destroy_mana_value_lte",
+        "destroy_mana_value_gte",
+        "destroy_power_lte",
+        "destroy_power_gte",
+        "destroy_toughness_lte",
+        "destroy_toughness_gte",
+    ):
+        if required.get(field) not in (None, "", []):
+            scenario[field] = required[field]
+    return scenario
+
+
 def _library_pick_matching_card(target: str, *, name: str, cmc: int = 5) -> dict[str, Any]:
     normalized = str(target or "any_card").strip().lower()
     mapping = {
@@ -5136,6 +5171,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or proliferate_draw_spell_execution_scenario_from_expected_rule(rule)
         or attack_self_boost_execution_scenario_from_expected_rule(rule)
         or becomes_blocked_self_boost_execution_scenario_from_expected_rule(rule)
+        or board_wipe_execution_scenario_from_expected_rule(rule)
         or each_player_sacrifice_execution_scenario_from_expected_rule(rule)
         or multi_target_damage_execution_scenario_from_expected_rule(rule)
         or multi_target_removal_execution_scenario_from_expected_rule(rule)

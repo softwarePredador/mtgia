@@ -19594,12 +19594,137 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["destroy_card_types"], ["creature"])
         self.assertEqual(effect["destroy_toughness_gte"], 4)
 
+    def test_board_wipe_each_creature_mana_value_scope_maps_to_constraints(self) -> None:
+        row = queue_row(split.BOARD_WIPE_UNIT, effect_classes=["DestroyAllEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                oracle_text=(
+                    "Destroy each creature with mana value 3 or less. "
+                    "They can't be regenerated."
+                )
+            ),
+            source_text=(
+                "private static final FilterCreaturePermanent filter = new FilterCreaturePermanent();"
+                "filter.add(new ManaValuePredicate(ComparisonType.FEWER_THAN, 4));"
+                "this.getSpellAbility().addEffect(new DestroyAllEffect(filter, true));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "board_wipe")
+        self.assertEqual(effect["destroy_card_types"], ["creature"])
+        self.assertEqual(effect["destroy_mana_value_lte"], 3)
+
+    def test_board_wipe_nonland_artifact_mana_value_scope_maps_to_constraints(self) -> None:
+        row = queue_row(split.BOARD_WIPE_UNIT, effect_classes=["DestroyAllEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Destroy each nonland artifact with mana value 4 or less."),
+            source_text=(
+                "private static final FilterNonlandPermanent filter = new FilterNonlandPermanent();"
+                "filter.add(CardType.ARTIFACT.getPredicate());"
+                "filter.add(new ManaValuePredicate(ComparisonType.FEWER_THAN, 5));"
+                "this.getSpellAbility().addEffect(new DestroyAllEffect(filter));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["destroy_card_types"], ["artifact"])
+        self.assertEqual(effect["destroy_exclude_card_types"], ["land"])
+        self.assertEqual(effect["destroy_mana_value_lte"], 4)
+
+    def test_board_wipe_artifact_creature_land_scope_maps_to_constraints(self) -> None:
+        row = queue_row(split.BOARD_WIPE_UNIT, effect_classes=["DestroyAllEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                oracle_text=(
+                    "Destroy all artifacts, creatures, and lands. "
+                    "They can't be regenerated."
+                )
+            ),
+            source_text=(
+                "FilterPermanent filter = new FilterPermanent();"
+                "filter.add(Predicates.or("
+                "CardType.ARTIFACT.getPredicate(),"
+                "CardType.CREATURE.getPredicate(),"
+                "CardType.LAND.getPredicate()));"
+                "this.getSpellAbility().addEffect(new DestroyAllEffect(filter, true));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        self.assertEqual(
+            proposal["effect_json"]["destroy_card_types"],
+            ["artifact", "creature", "land"],
+        )
+
+    def test_board_wipe_opponents_creatures_and_planeswalkers_maps_to_constraints(self) -> None:
+        row = queue_row(split.BOARD_WIPE_UNIT, effect_classes=["DestroyAllEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                oracle_text=(
+                    "Destroy all creatures you don't control and all planeswalkers you don't control."
+                )
+            ),
+            source_text=(
+                "FilterPermanent filter = new FilterCreatureOrPlaneswalkerPermanent();"
+                "filter.add(TargetController.NOT_YOU.getControllerPredicate());"
+                "this.getSpellAbility().addEffect(new DestroyAllEffect(filter));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["destroy_card_types"], ["creature", "planeswalker"])
+        self.assertEqual(effect["destroy_controller"], "opponents_control")
+
+    def test_board_wipe_non_enchantment_creatures_maps_to_constraints(self) -> None:
+        row = queue_row(split.BOARD_WIPE_UNIT, effect_classes=["DestroyAllEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Destroy all nonenchantment creatures."),
+            source_text=(
+                "private static final FilterPermanent filter = new FilterCreaturePermanent();"
+                "filter.add(Predicates.not(CardType.ENCHANTMENT.getPredicate()));"
+                "this.getSpellAbility().addEffect(new DestroyAllEffect(filter));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["destroy_card_types"], ["creature"])
+        self.assertEqual(effect["destroy_exclude_card_types"], ["enchantment"])
+
+    def test_board_wipe_source_mana_value_mismatch_stays_blocked(self) -> None:
+        row = queue_row(split.BOARD_WIPE_UNIT, effect_classes=["DestroyAllEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Destroy each creature with mana value 3 or less."),
+            source_text=(
+                "private static final FilterCreaturePermanent filter = new FilterCreaturePermanent();"
+                "filter.add(new ManaValuePredicate(ComparisonType.FEWER_THAN, 5));"
+                "this.getSpellAbility().addEffect(new DestroyAllEffect(filter));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "board_wipe_destroy_source_oracle_mismatch")
+
     def test_board_wipe_land_subtype_scope_maps_to_constraints(self) -> None:
         row = queue_row(split.BOARD_WIPE_UNIT, effect_classes=["DestroyAllEffect"])
         proposal, reason = split.split_row(
             row,
             metadata(oracle_text="Destroy all Islands."),
-            source_text="this.getSpellAbility().addEffect(new DestroyAllEffect(filter));",
+            source_text=(
+                "FilterPermanent filter = new FilterLandPermanent();"
+                "filter.add(SubType.ISLAND.getPredicate());"
+                "this.getSpellAbility().addEffect(new DestroyAllEffect(filter));"
+            ),
         )
 
         self.assertEqual(reason, "selected_exact_scope")
@@ -19610,7 +19735,11 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         proposal, reason = split.split_row(
             row,
             metadata(oracle_text="Destroy all Plains."),
-            source_text="this.getSpellAbility().addEffect(new DestroyAllEffect(filter));",
+            source_text=(
+                "FilterPermanent filter = new FilterLandPermanent();"
+                "filter.add(SubType.PLAINS.getPredicate());"
+                "this.getSpellAbility().addEffect(new DestroyAllEffect(filter));"
+            ),
         )
 
         self.assertEqual(reason, "selected_exact_scope")
@@ -19630,7 +19759,11 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         proposal, reason = split.split_row(
             row,
             metadata(oracle_text="Destroy all creatures you don't control."),
-            source_text="this.getSpellAbility().addEffect(new DestroyAllEffect(filter, true));",
+            source_text=(
+                "FilterPermanent filter = new FilterCreaturePermanent();"
+                "filter.add(TargetController.NOT_YOU.getControllerPredicate());"
+                "this.getSpellAbility().addEffect(new DestroyAllEffect(filter, true));"
+            ),
         )
 
         self.assertEqual(reason, "selected_exact_scope")
