@@ -332,11 +332,18 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "destroy_tapped_state",
     "destroy_nonbasic_lands",
     "destroy_mana_value_lte",
+    "destroy_mana_value_lte_source",
     "destroy_mana_value_gte",
     "destroy_power_lte",
     "destroy_power_gte",
     "destroy_toughness_lte",
     "destroy_toughness_gte",
+    "destroy_counter_state",
+    "destroy_combat_state",
+    "destroy_color_count_lt",
+    "destroy_dealt_damage_to_you_this_turn",
+    "destroy_exclude_commanders",
+    "destroy_enchanted_state",
     "sacrifice_count",
     "sacrifice_card_types",
     "sacrifice_scope",
@@ -3859,14 +3866,23 @@ def board_wipe_execution_scenario_from_expected_rule(
         "destroy_tapped_state",
         "destroy_nonbasic_lands",
         "destroy_mana_value_lte",
+        "destroy_mana_value_lte_source",
         "destroy_mana_value_gte",
         "destroy_power_lte",
         "destroy_power_gte",
         "destroy_toughness_lte",
         "destroy_toughness_gte",
+        "destroy_counter_state",
+        "destroy_combat_state",
+        "destroy_color_count_lt",
+        "destroy_dealt_damage_to_you_this_turn",
+        "destroy_exclude_commanders",
+        "destroy_enchanted_state",
     ):
         if required.get(field) not in (None, "", []):
             scenario[field] = required[field]
+    if scenario.get("destroy_mana_value_lte_source") == "x_value":
+        scenario["x_value"] = int(required.get("x_value") or required.get("destroy_mana_value_lte") or 3 or 0)
     return scenario
 
 

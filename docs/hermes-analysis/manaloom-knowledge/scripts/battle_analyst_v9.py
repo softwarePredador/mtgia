@@ -25857,6 +25857,42 @@ def _permanent_has_any_subtype(permanent, subtypes):
     )
 
 
+def _permanent_has_any_counter(permanent):
+    if not isinstance(permanent, dict):
+        return False
+    counters = permanent.get("counters")
+    if isinstance(counters, dict) and any(int(value or 0) > 0 for value in counters.values()):
+        return True
+    if isinstance(counters, (list, tuple, set)) and bool(counters):
+        return True
+    for key, value in permanent.items():
+        if str(key).endswith("_counters") and int(value or 0) > 0:
+            return True
+    return False
+
+
+def _permanent_color_count(permanent):
+    if not isinstance(permanent, dict):
+        return 0
+    raw_colors = permanent.get("colors")
+    if raw_colors in (None, ""):
+        raw_colors = permanent.get("color_identity")
+    if isinstance(raw_colors, str):
+        values = re.findall(r"[WUBRG]", raw_colors.upper())
+    elif isinstance(raw_colors, (list, tuple, set)):
+        values = [str(value or "").upper() for value in raw_colors]
+    else:
+        values = []
+    return len({value for value in values if value in {"W", "U", "B", "R", "G"}})
+
+
+def _destroy_threshold_from_effect(effect_data, field):
+    if effect_data.get(f"{field}_source") == "x_value":
+        context = effect_data.get("_cast_context") if isinstance(effect_data.get("_cast_context"), dict) else {}
+        return int(float(context.get("x_value") or effect_data.get("x_value") or effect_data.get(field) or 0))
+    return int(float(effect_data.get(field) or 0))
+
+
 def _permanent_matches_destroy_card_types(permanent, destroy_card_types, effect_data=None):
     requested = {str(card_type or "").lower() for card_type in (destroy_card_types or ["creature"])}
     type_line = _permanent_type_line(permanent)
@@ -25923,6 +25959,29 @@ def _permanent_matches_destroy_card_types(permanent, destroy_card_types, effect_
         return False
     if tapped_state == "untapped" and bool(isinstance(permanent, dict) and permanent.get("tapped")):
         return False
+    if effect_data.get("destroy_counter_state") == "none" and _permanent_has_any_counter(permanent):
+        return False
+    combat_state = str(effect_data.get("destroy_combat_state") or "").strip().lower()
+    if combat_state == "blocking_or_blocked" and not (
+        isinstance(permanent, dict) and (permanent.get("blocking") or permanent.get("blocked"))
+    ):
+        return False
+    if effect_data.get("destroy_color_count_lt") not in (None, ""):
+        if _permanent_color_count(permanent) >= int(effect_data.get("destroy_color_count_lt") or 0):
+            return False
+    if effect_data.get("destroy_dealt_damage_to_you_this_turn") and not (
+        isinstance(permanent, dict) and permanent.get("dealt_damage_to_you_this_turn")
+    ):
+        return False
+    if effect_data.get("destroy_exclude_commanders") and isinstance(permanent, dict) and (
+        permanent.get("commander") or permanent.get("is_commander")
+    ):
+        return False
+    enchanted_state = str(effect_data.get("destroy_enchanted_state") or "").strip().lower()
+    if enchanted_state == "not_enchanted" and isinstance(permanent, dict) and (
+        permanent.get("enchanted") or permanent.get("is_enchanted") or permanent.get("enchanted_by")
+    ):
+        return False
     for field, stat in (
         ("destroy_mana_value_lte", "cmc"),
         ("destroy_mana_value_gte", "cmc"),
@@ -25934,7 +25993,7 @@ def _permanent_matches_destroy_card_types(permanent, destroy_card_types, effect_
         if effect_data.get(field) in (None, ""):
             continue
         value = card_mana_value(permanent) if stat == "cmc" else _numeric_card_stat(permanent, stat)
-        threshold = int(float(effect_data.get(field) or 0))
+        threshold = _destroy_threshold_from_effect(effect_data, field)
         if field.endswith("_lte") and value > threshold:
             return False
         if field.endswith("_gte") and value < threshold:
@@ -62174,6 +62233,10 @@ def apply_effect_immediate(
     """v8: Apply card effect (called when spell resolves from stack)."""
     effect_data = copy.deepcopy(effect_data_override) if effect_data_override else get_card_effect(card)
     effect_data = normalize_runtime_effect_aliases(card, effect_data)
+    if isinstance(card, dict) and isinstance(card.get("_cast_context"), dict) and not isinstance(effect_data.get("_cast_context"), dict):
+        effect_data["_cast_context"] = copy.deepcopy(card["_cast_context"])
+    if isinstance(card, dict) and card.get("x_value") is not None and effect_data.get("x_value") is None:
+        effect_data["x_value"] = card.get("x_value")
     if isinstance(card, dict) and isinstance(effect_data.get("_cast_context"), dict):
         card["_cast_context"] = copy.deepcopy(effect_data["_cast_context"])
     effect = effect_data.get("effect", "unknown")

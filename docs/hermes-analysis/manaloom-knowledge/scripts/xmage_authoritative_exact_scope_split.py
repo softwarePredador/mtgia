@@ -6297,6 +6297,15 @@ def destroy_all_spec_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | N
             "destroy_card_types": ["creature", "planeswalker"],
             "destroy_controller": "opponents_control",
         }
+    if re.match(
+        r"^destroy (?:all|each) nonland permanents your opponents control(?:\. they can't be regenerated\.)?\.?$",
+        text,
+    ):
+        return {
+            "destroy_card_types": ["permanent"],
+            "destroy_exclude_card_types": ["land"],
+            "destroy_controller": "opponents_control",
+        }
     if re.match(r"^destroy (?:all|each) nonland permanents(?:\. they can't be regenerated\.)?\.?$", text):
         return {"destroy_card_types": ["permanent"], "destroy_exclude_card_types": ["land"]}
     if re.match(r"^destroy (?:all|each) nonartifact creatures(?:\. they can't be regenerated\.)?\.?$", text):
@@ -6309,12 +6318,42 @@ def destroy_all_spec_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | N
         return {"destroy_card_types": ["creature"], "destroy_tapped_state": "tapped"}
     if re.match(r"^destroy (?:all|each) nonbasic lands(?:\. they can't be regenerated\.)?\.?$", text):
         return {"destroy_card_types": ["land"], "destroy_nonbasic_lands": True}
+    if re.match(r"^destroy (?:all|each) creatures with no counters on them(?:\. they can't be regenerated\.)?\.?$", text):
+        return {"destroy_card_types": ["creature"], "destroy_counter_state": "none"}
+    if re.match(r"^destroy (?:all|each) blocking creatures and all blocked creatures(?:\. they can't be regenerated\.)?\.?$", text):
+        return {"destroy_card_types": ["creature"], "destroy_combat_state": "blocking_or_blocked"}
+    if re.match(r"^destroy (?:all|each) creatures? that isn't all colors(?:\. they can't be regenerated\.)?\.?$", text):
+        return {"destroy_card_types": ["creature"], "destroy_color_count_lt": 5}
+    if re.match(r"^destroy (?:all|each) creatures? that dealt damage to you this turn(?:\. they can't be regenerated\.)?\.?$", text):
+        return {"destroy_card_types": ["creature"], "destroy_dealt_damage_to_you_this_turn": True}
+    if re.match(r"^destroy (?:all|each) auras(?:\. they can't be regenerated\.)?\.?$", text):
+        return {"destroy_card_types": ["enchantment"], "destroy_required_subtypes": ["aura"]}
+    if re.match(r"^destroy (?:all|each) creatures and planeswalkers except for commanders(?:\. they can't be regenerated\.)?\.?$", text):
+        return {
+            "destroy_card_types": ["creature", "planeswalker"],
+            "destroy_exclude_commanders": True,
+        }
+    if re.match(r"^destroy (?:all|each) goblins(?:\. they can't be regenerated\.)?\.?$", text):
+        return {"destroy_card_types": ["permanent"], "destroy_required_subtypes": ["goblin"]}
+    if re.match(r"^destroy (?:all|each) non-aura enchantments(?:\. they can't be regenerated\.)?\.?$", text):
+        return {"destroy_card_types": ["enchantment"], "destroy_excluded_subtypes": ["aura"]}
+    if re.match(r"^destroy (?:all|each) creatures? that aren't enchanted(?:\. they can't be regenerated\.)?\.?$", text):
+        return {"destroy_card_types": ["creature"], "destroy_enchanted_state": "not_enchanted"}
     match = re.match(
         r"^destroy (?:all|each) creatures? with (?:mana value|converted mana cost) (?P<value>\d+) or less(?:\. they can't be regenerated\.)?\.?$",
         text,
     )
     if match:
         return {"destroy_card_types": ["creature"], "destroy_mana_value_lte": int(match.group("value"))}
+    if re.match(
+        r"^destroy (?:all|each) creatures? with (?:mana value|converted mana cost) x or less(?:\. they can't be regenerated\.)?\.?$",
+        text,
+    ):
+        return {
+            "destroy_card_types": ["creature"],
+            "destroy_mana_value_lte": 0,
+            "destroy_mana_value_lte_source": "x_value",
+        }
     match = re.match(
         r"^destroy (?:all|each) nonland artifacts? with (?:mana value|converted mana cost) (?P<value>\d+) or less(?:\. they can't be regenerated\.)?\.?$",
         text,
@@ -6662,7 +6701,11 @@ def destroy_all_source_matches_spec(source: str, spec: dict[str, Any]) -> bool:
         for value in as_list(spec.get("destroy_card_types"))
         if str(value or "").strip()
     }
-    if spec.get("destroy_controller") == "opponents_control" and "TargetController.NOT_YOU" not in text:
+    if (
+        spec.get("destroy_controller") == "opponents_control"
+        and "TargetController.NOT_YOU" not in text
+        and "TargetController.OPPONENT" not in text
+    ):
         return False
     if {"creature", "planeswalker"}.issubset(card_types) and "FilterCreatureOrPlaneswalkerPermanent" not in text:
         return False
@@ -6671,12 +6714,16 @@ def destroy_all_source_matches_spec(source: str, spec: dict[str, Any]) -> bool:
             if f"CardType.{card_type}.getPredicate()" not in text:
                 return False
     if spec.get("destroy_mana_value_lte") not in (None, ""):
-        threshold = int(spec.get("destroy_mana_value_lte")) + 1
-        if not re.search(
-            rf"ManaValuePredicate\s*\(\s*ComparisonType\.FEWER_THAN\s*,\s*{threshold}\s*\)",
-            text,
-        ):
-            return False
+        if spec.get("destroy_mana_value_lte_source") == "x_value":
+            if "GetXValue.instance" not in text or "getManaValue()" not in text:
+                return False
+        else:
+            threshold = int(spec.get("destroy_mana_value_lte")) + 1
+            if not re.search(
+                rf"ManaValuePredicate\s*\(\s*ComparisonType\.FEWER_THAN\s*,\s*{threshold}\s*\)",
+                text,
+            ):
+                return False
     excluded_types = {
         str(value or "").strip().lower()
         for value in as_list(spec.get("destroy_exclude_card_types"))
@@ -6688,7 +6735,25 @@ def destroy_all_source_matches_spec(source: str, spec: dict[str, Any]) -> bool:
         return False
     if spec.get("destroy_nonbasic_lands") and "NonBasicLandPredicate" not in text:
         return False
+    if spec.get("destroy_counter_state") == "none" and "CounterAnyPredicate" not in text:
+        return False
+    if spec.get("destroy_combat_state") == "blocking_or_blocked" and (
+        "BlockingPredicate" not in text or "BlockedPredicate" not in text
+    ):
+        return False
+    if spec.get("destroy_color_count_lt") not in (None, "") and "getColorCount()" not in text:
+        return False
+    if spec.get("destroy_dealt_damage_to_you_this_turn") and "DamagedPlayerThisTurnPredicate" not in text:
+        return False
+    if spec.get("destroy_exclude_commanders") and "CommanderPredicate" not in text:
+        return False
+    if spec.get("destroy_enchanted_state") == "not_enchanted" and "EnchantedPredicate" not in text:
+        return False
     for subtype in as_list(spec.get("destroy_required_subtypes")):
+        subtype_constant = re.sub(r"[^A-Z0-9]+", "_", str(subtype or "").upper()).strip("_")
+        if subtype_constant and f"SubType.{subtype_constant}" not in text:
+            return False
+    for subtype in as_list(spec.get("destroy_excluded_subtypes")):
         subtype_constant = re.sub(r"[^A-Z0-9]+", "_", str(subtype or "").upper()).strip("_")
         if subtype_constant and f"SubType.{subtype_constant}" not in text:
             return False

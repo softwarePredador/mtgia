@@ -2860,6 +2860,17 @@ def _board_wipe_type_line(card_type: str, scenario: dict[str, Any], *, matching:
     ]
     if not matching and excluded_types:
         type_line = f"{type_line} {' '.join(excluded_types)}"
+    excluded_subtypes = [
+        str(value or "").replace("_", " ").strip().title()
+        for value in scenario.get("destroy_excluded_subtypes") or []
+        if str(value or "").strip()
+    ]
+    if not matching and excluded_subtypes:
+        if " - " in type_line:
+            base, subtypes = type_line.split(" - ", 1)
+            type_line = f"{base} - {subtypes} {' '.join(excluded_subtypes)}"
+        else:
+            type_line = f"{type_line} - {' '.join(excluded_subtypes)}"
     return type_line
 
 
@@ -2871,9 +2882,12 @@ def _board_wipe_fixture_permanent(
     matching: bool,
 ) -> dict[str, Any]:
     type_line = _board_wipe_type_line(card_type, scenario, matching=matching)
-    cmc = int(scenario.get("destroy_mana_value_lte") or 3)
-    if not matching and scenario.get("destroy_mana_value_lte") not in (None, ""):
-        cmc = int(scenario.get("destroy_mana_value_lte")) + 1
+    mana_value_lte = scenario.get("destroy_mana_value_lte")
+    if scenario.get("destroy_mana_value_lte_source") == "x_value":
+        mana_value_lte = int(scenario.get("x_value") or mana_value_lte or 3)
+    cmc = int(mana_value_lte or 3)
+    if not matching and mana_value_lte not in (None, ""):
+        cmc = int(mana_value_lte) + 1
     if matching and scenario.get("destroy_mana_value_gte") not in (None, ""):
         cmc = int(scenario.get("destroy_mana_value_gte"))
     if not matching and scenario.get("destroy_mana_value_gte") not in (None, ""):
@@ -2894,6 +2908,9 @@ def _board_wipe_fixture_permanent(
     excluded_colors = list(scenario.get("destroy_excluded_colors") or [])
     if not matching and excluded_colors:
         colors = excluded_colors[:1]
+    color_count_lt = scenario.get("destroy_color_count_lt")
+    if color_count_lt not in (None, ""):
+        colors = ["W"] if matching else ["W", "U", "B", "R", "G"]
     tapped_state = str(scenario.get("destroy_tapped_state") or "").strip().lower()
     tapped = tapped_state == "tapped"
     if not matching and tapped_state:
@@ -2910,6 +2927,22 @@ def _board_wipe_fixture_permanent(
     }
     if "Land" in type_line:
         permanent["basic"] = not bool(matching and scenario.get("destroy_nonbasic_lands"))
+    if scenario.get("destroy_counter_state") == "none":
+        permanent["counters"] = {} if matching else {"+1/+1": 1}
+        permanent["plus_one_counters"] = 0 if matching else 1
+    combat_state = str(scenario.get("destroy_combat_state") or "").strip().lower()
+    if combat_state == "blocking_or_blocked":
+        permanent["blocking"] = bool(matching)
+        permanent["blocked"] = False
+    if scenario.get("destroy_dealt_damage_to_you_this_turn"):
+        permanent["dealt_damage_to_you_this_turn"] = bool(matching)
+    if scenario.get("destroy_exclude_commanders"):
+        permanent["commander"] = not bool(matching)
+    enchanted_state = str(scenario.get("destroy_enchanted_state") or "").strip().lower()
+    if enchanted_state == "not_enchanted":
+        permanent["enchanted"] = not bool(matching)
+        if not matching:
+            permanent["enchanted_by"] = "E2E Aura"
     return permanent
 
 
@@ -2927,6 +2960,9 @@ def run_board_wipe(
     events: list[tuple[str, dict[str, Any]]],
 ) -> dict[str, Any]:
     card = dict(scenario["card"])
+    if scenario.get("x_value") is not None:
+        card["x_value"] = int(scenario.get("x_value") or 0)
+        card["_cast_context"] = {"x_value": int(scenario.get("x_value") or 0)}
     active = battle.Player(str(scenario.get("player") or "Active"), None, [])
     opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
     before_events = len(events)
@@ -2983,11 +3019,18 @@ def run_board_wipe(
                 "destroy_tapped_state",
                 "destroy_nonbasic_lands",
                 "destroy_mana_value_lte",
+                "destroy_mana_value_lte_source",
                 "destroy_mana_value_gte",
                 "destroy_power_lte",
                 "destroy_power_gte",
                 "destroy_toughness_lte",
                 "destroy_toughness_gte",
+                "destroy_counter_state",
+                "destroy_combat_state",
+                "destroy_color_count_lt",
+                "destroy_dealt_damage_to_you_this_turn",
+                "destroy_exclude_commanders",
+                "destroy_enchanted_state",
             )
         )
         if has_extra_filter:

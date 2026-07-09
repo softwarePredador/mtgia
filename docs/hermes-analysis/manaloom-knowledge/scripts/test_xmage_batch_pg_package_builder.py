@@ -2762,8 +2762,15 @@ def test_manifest_expected_rule_preserves_extended_board_wipe_fields() -> None:
             "destroy_tapped_state": "tapped",
             "destroy_nonbasic_lands": True,
             "destroy_mana_value_lte": 3,
+            "destroy_mana_value_lte_source": "x_value",
             "destroy_power_gte": 4,
             "destroy_toughness_gte": 4,
+            "destroy_counter_state": "none",
+            "destroy_combat_state": "blocking_or_blocked",
+            "destroy_color_count_lt": 5,
+            "destroy_dealt_damage_to_you_this_turn": True,
+            "destroy_exclude_commanders": True,
+            "destroy_enchanted_state": "not_enchanted",
         },
     }
 
@@ -2780,8 +2787,15 @@ def test_manifest_expected_rule_preserves_extended_board_wipe_fields() -> None:
     assert required["destroy_tapped_state"] == "tapped"
     assert required["destroy_nonbasic_lands"] is True
     assert required["destroy_mana_value_lte"] == 3
+    assert required["destroy_mana_value_lte_source"] == "x_value"
     assert required["destroy_power_gte"] == 4
     assert required["destroy_toughness_gte"] == 4
+    assert required["destroy_counter_state"] == "none"
+    assert required["destroy_combat_state"] == "blocking_or_blocked"
+    assert required["destroy_color_count_lt"] == 5
+    assert required["destroy_dealt_damage_to_you_this_turn"] is True
+    assert required["destroy_exclude_commanders"] is True
+    assert required["destroy_enchanted_state"] == "not_enchanted"
 
     proposal["effect_json"] = {
         "effect": "damage_wipe",
@@ -2805,6 +2819,9 @@ def test_board_wipe_execution_scenario_preserves_destroy_filters() -> None:
             "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
             "destroy_card_types": ["creature"],
             "destroy_mana_value_lte": 3,
+            "destroy_mana_value_lte_source": "x_value",
+            "destroy_counter_state": "none",
+            "destroy_exclude_commanders": True,
             "destination": "graveyard",
         },
     }
@@ -2815,6 +2832,10 @@ def test_board_wipe_execution_scenario_preserves_destroy_filters() -> None:
     assert scenario["type"] == "board_wipe"
     assert scenario["destroy_card_types"] == ["creature"]
     assert scenario["destroy_mana_value_lte"] == 3
+    assert scenario["destroy_mana_value_lte_source"] == "x_value"
+    assert scenario["x_value"] == 3
+    assert scenario["destroy_counter_state"] == "none"
+    assert scenario["destroy_exclude_commanders"] is True
 
 
 def test_manifest_expected_rule_preserves_dynamic_graveyard_damage_fields() -> None:

@@ -374,6 +374,49 @@ def test_board_wipe_runner_validates_destroy_filters() -> None:
     assert result["expected_destroyed"] == 2
 
 
+def test_board_wipe_runner_validates_extended_destroy_predicates() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    effect = {
+        "effect": "board_wipe",
+        "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+        "destroy_card_types": ["creature"],
+        "destroy_mana_value_lte": 0,
+        "destroy_mana_value_lte_source": "x_value",
+        "destroy_counter_state": "none",
+        "destroy_combat_state": "blocking_or_blocked",
+        "destroy_color_count_lt": 5,
+        "destroy_dealt_damage_to_you_this_turn": True,
+        "destroy_exclude_commanders": True,
+        "destroy_enchanted_state": "not_enchanted",
+        "destination": "graveyard",
+    }
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: effect
+    try:
+        result = validator.run_board_wipe(
+            battle,
+            {
+                "name": "Fixture selective wipe destroys only matching extended predicates",
+                "type": "board_wipe",
+                "card": {"name": "Fixture Selective Verdict", "type_line": "Sorcery"},
+                **effect,
+                "x_value": 3,
+                "logical_rule_key": "battle_rule_v1:fixture-selective-verdict",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Fixture Selective Verdict"
+    assert result["destroyed"] == 2
+    assert result["expected_destroyed"] == 2
+
+
 def test_global_stat_modifier_draw_spell_runner_executes_boost_and_draw() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

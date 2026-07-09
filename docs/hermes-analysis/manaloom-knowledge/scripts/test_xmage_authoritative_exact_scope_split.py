@@ -19769,6 +19769,124 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(reason, "selected_exact_scope")
         self.assertEqual(proposal["effect_json"]["destroy_controller"], "opponents_control")
 
+    def test_board_wipe_residual_destroy_scopes_map_to_explicit_constraints(self) -> None:
+        row = queue_row(split.BOARD_WIPE_UNIT, effect_classes=["DestroyAllEffect"])
+        cases = [
+            (
+                "Destroy all creatures with no counters on them.",
+                (
+                    "FilterCreaturePermanent filter = new FilterCreaturePermanent();"
+                    "filter.add(Predicates.not(CounterAnyPredicate.instance));"
+                    "this.getSpellAbility().addEffect(new DestroyAllEffect(filter));"
+                ),
+                {"destroy_counter_state": "none"},
+            ),
+            (
+                "Destroy all blocking creatures and all blocked creatures.",
+                (
+                    "FilterCreaturePermanent filter = new FilterCreaturePermanent();"
+                    "filter.add(Predicates.or(BlockingPredicate.instance, BlockedPredicate.instance));"
+                    "this.getSpellAbility().addEffect(new DestroyAllEffect(filter));"
+                ),
+                {"destroy_combat_state": "blocking_or_blocked"},
+            ),
+            (
+                "Destroy all creatures with mana value X or less.",
+                (
+                    "filter.add(ForcedMarchPredicate.instance);"
+                    "return input.getObject().getManaValue() <= GetXValue.instance.calculate(game, input.getSource(), null);"
+                    "this.getSpellAbility().addEffect(new DestroyAllEffect(filter));"
+                ),
+                {"destroy_mana_value_lte": 0, "destroy_mana_value_lte_source": "x_value"},
+            ),
+            (
+                "Destroy each creature that isn't all colors.",
+                (
+                    "filter.add(IridianMaelstromPredicate.instance);"
+                    "return input.getColor(game).getColorCount() < 5;"
+                    "this.getSpellAbility().addEffect(new DestroyAllEffect(filter));"
+                ),
+                {"destroy_color_count_lt": 5},
+            ),
+            (
+                "Destroy all creatures that dealt damage to you this turn.",
+                (
+                    "filter.add(new DamagedPlayerThisTurnPredicate(TargetController.YOU));"
+                    "this.getSpellAbility().addEffect(new DestroyAllEffect(filter));"
+                ),
+                {"destroy_dealt_damage_to_you_this_turn": True},
+            ),
+            (
+                "Destroy all nonland permanents your opponents control.",
+                (
+                    "FilterNonlandPermanent filter = new FilterNonlandPermanent();"
+                    "filter.add(TargetController.OPPONENT.getControllerPredicate());"
+                    "this.getSpellAbility().addEffect(new DestroyAllEffect(filter));"
+                ),
+                {
+                    "destroy_card_types": ["permanent"],
+                    "destroy_exclude_card_types": ["land"],
+                    "destroy_controller": "opponents_control",
+                },
+            ),
+            (
+                "Destroy all Auras.",
+                (
+                    "FilterPermanent filter = new FilterPermanent(\"Auras\");"
+                    "filter.add(SubType.AURA.getPredicate());"
+                    "this.getSpellAbility().addEffect(new DestroyAllEffect(filter));"
+                ),
+                {"destroy_card_types": ["enchantment"], "destroy_required_subtypes": ["aura"]},
+            ),
+            (
+                "Destroy all creatures and planeswalkers except for commanders.",
+                (
+                    "FilterPermanent filter = new FilterCreatureOrPlaneswalkerPermanent();"
+                    "filter.add(Predicates.not(CommanderPredicate.instance));"
+                    "this.getSpellAbility().addEffect(new DestroyAllEffect(filter));"
+                ),
+                {"destroy_card_types": ["creature", "planeswalker"], "destroy_exclude_commanders": True},
+            ),
+            (
+                "Destroy all Goblins.",
+                (
+                    "FilterPermanent filter = new FilterPermanent(SubType.GOBLIN, \"Goblins\");"
+                    "this.getSpellAbility().addEffect(new DestroyAllEffect(filter));"
+                ),
+                {"destroy_card_types": ["permanent"], "destroy_required_subtypes": ["goblin"]},
+            ),
+            (
+                "Destroy all non-Aura enchantments.",
+                (
+                    "FilterEnchantmentPermanent filter = new FilterEnchantmentPermanent();"
+                    "filter.add(Predicates.not(SubType.AURA.getPredicate()));"
+                    "this.getSpellAbility().addEffect(new DestroyAllEffect(filter));"
+                ),
+                {"destroy_card_types": ["enchantment"], "destroy_excluded_subtypes": ["aura"]},
+            ),
+            (
+                "Destroy all creatures that aren't enchanted. They can't be regenerated.",
+                (
+                    "FilterCreaturePermanent filter = new FilterCreaturePermanent();"
+                    "filter.add(Predicates.not(EnchantedPredicate.instance));"
+                    "this.getSpellAbility().addEffect(new DestroyAllEffect(filter, true));"
+                ),
+                {"destroy_card_types": ["creature"], "destroy_enchanted_state": "not_enchanted"},
+            ),
+        ]
+        for oracle, source, expected in cases:
+            with self.subTest(oracle=oracle):
+                proposal, reason = split.split_row(
+                    row,
+                    metadata(oracle_text=oracle),
+                    source_text=source,
+                )
+                self.assertEqual(reason, "selected_exact_scope")
+                effect = proposal["effect_json"]
+                self.assertEqual(effect["effect"], "board_wipe")
+                for key, value in expected.items():
+                    self.assertEqual(effect[key], value)
+
     def test_board_wipe_source_modal_stays_blocked(self) -> None:
         row = queue_row(split.BOARD_WIPE_UNIT, effect_classes=["DestroyAllEffect"])
         proposal, reason = split.split_row(
