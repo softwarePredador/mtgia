@@ -4494,6 +4494,60 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["token_toughness"], 5)
         self.assertEqual(effect["token_keywords"], ["trample"])
 
+    def test_token_class_parser_accepts_static_cant_block_token(self) -> None:
+        token_data, reason = split.parse_simple_token_class(
+            """
+            public final class RatCantBlockToken extends TokenImpl {
+                public RatCantBlockToken() {
+                    super("Rat Token", "1/1 black Rat creature token with \\"This token can't block.\\"");
+                    cardType.add(CardType.CREATURE);
+                    color.setBlack(true);
+                    subtype.add(SubType.RAT);
+                    power = new MageInt(1);
+                    toughness = new MageInt(1);
+                    this.addAbility(new SimpleStaticAbility(
+                        new CantBlockSourceEffect(Duration.WhileOnBattlefield)
+                            .setText("this token can't block")
+                    ));
+                }
+            }
+            """,
+            "RatCantBlockToken",
+        )
+
+        self.assertIsNone(reason)
+        self.assertEqual(token_data["token_name"], "Rat Token")
+        self.assertEqual(token_data["token_power"], 1)
+        self.assertEqual(token_data["token_toughness"], 1)
+        self.assertEqual(token_data["token_subtype"], "Rat")
+        self.assertEqual(token_data["token_colors"], ["B"])
+        self.assertTrue(token_data["token_cant_block"])
+        self.assertEqual(token_data["token_static_restrictions"], ["cant_block"])
+
+    def test_token_class_parser_blocks_cant_block_token_with_extra_static_effect(self) -> None:
+        token_data, reason = split.parse_simple_token_class(
+            """
+            public final class PursuedWhaleToken extends TokenImpl {
+                public PursuedWhaleToken() {
+                    super("Pirate Token", "1/1 red Pirate creature token with \\"This creature can't block\\" and \\"Creatures you control attack each combat if able.\\"");
+                    cardType.add(CardType.CREATURE);
+                    color.setRed(true);
+                    subtype.add(SubType.PIRATE);
+                    power = new MageInt(1);
+                    toughness = new MageInt(1);
+                    this.addAbility(new SimpleStaticAbility(
+                        new CantBlockSourceEffect(Duration.WhileOnBattlefield)
+                            .setText("this creature can't block")));
+                    this.addAbility(new SimpleStaticAbility(new AttacksIfAbleAllEffect()));
+                }
+            }
+            """,
+            "PursuedWhaleToken",
+        )
+
+        self.assertEqual(token_data, {})
+        self.assertEqual(reason, "token_ability_not_supported")
+
     def test_token_class_parser_follows_delegating_noarg_constructor(self) -> None:
         token_data, reason = split.parse_simple_token_class(
             """
@@ -5407,6 +5461,54 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["etb_token_name"], "Merfolk Token")
         self.assertEqual(effect["etb_token_keywords"], ["hexproof"])
 
+    def test_creature_etb_create_tokens_maps_static_cant_block_token(self) -> None:
+        row = queue_row(
+            split.ETB_TOKEN_CREATURE_UNIT,
+            effect_classes=["CreateTokenEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility", "MenaceAbility"],
+            xmage_signals=["token", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Edgewall Pack",
+                type_line="Creature - Dog",
+                oracle_text=(
+                    "Menace\n"
+                    "When Edgewall Pack enters the battlefield, create a 1/1 black Rat "
+                    "creature token with \"This creature can't block.\""
+                ),
+            ),
+            source_text="""
+                this.addAbility(new MenaceAbility());
+                this.addAbility(new EntersBattlefieldTriggeredAbility(
+                    new CreateTokenEffect(new RatCantBlockToken())));
+                class RatCantBlockToken extends TokenImpl {
+                    public RatCantBlockToken() {
+                        super("Rat Token", "1/1 black Rat creature token with \\"This token can't block.\\"");
+                        cardType.add(CardType.CREATURE);
+                        color.setBlack(true);
+                        subtype.add(SubType.RAT);
+                        power = new MageInt(1);
+                        toughness = new MageInt(1);
+                        this.addAbility(new SimpleStaticAbility(
+                            new CantBlockSourceEffect(Duration.WhileOnBattlefield)
+                                .setText("this token can't block")
+                        ));
+                    }
+                }
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.ETB_TOKEN_CREATURE_SCOPE)
+        self.assertEqual(effect["etb_token_name"], "Rat Token")
+        self.assertTrue(effect["etb_token_cant_block"])
+        self.assertEqual(effect["etb_token_static_restrictions"], ["cant_block"])
+        self.assertEqual(effect["keywords"], ["menace"])
+
     def test_creature_etb_create_tokens_preserves_source_static_keyword(self) -> None:
         row = queue_row(
             "token_maker::xmage_signature::CreateTokenEffect::"
@@ -5781,6 +5883,52 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
 
         self.assertIsNone(proposal)
         self.assertEqual(reason, "dies_token_oracle_not_simple")
+
+    def test_creature_dies_create_tokens_maps_static_cant_block_token(self) -> None:
+        row = queue_row(
+            split.DIES_TOKEN_CREATURE_UNIT,
+            effect_classes=["CreateTokenEffect"],
+            ability_kind="triggered",
+            ability_classes=["DiesSourceTriggeredAbility"],
+            xmage_signals=["token", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Synapse Necromage",
+                type_line="Creature - Fungus Wizard",
+                oracle_text=(
+                    "When Synapse Necromage dies, create two 1/1 black Fungus "
+                    "creature tokens with \"This creature can't block.\""
+                ),
+            ),
+            source_text="""
+                this.addAbility(new DiesSourceTriggeredAbility(
+                    new CreateTokenEffect(new FungusCantBlockToken(), 2)));
+                class FungusCantBlockToken extends TokenImpl {
+                    public FungusCantBlockToken() {
+                        super("Fungus Token", "1/1 black Fungus creature token with \\"This creature can't block.\\"");
+                        cardType.add(CardType.CREATURE);
+                        color.setBlack(true);
+                        subtype.add(SubType.FUNGUS);
+                        power = new MageInt(1);
+                        toughness = new MageInt(1);
+                        this.addAbility(new SimpleStaticAbility(
+                            new CantBlockSourceEffect(Duration.WhileOnBattlefield)
+                                .setText("this creature can't block")
+                        ));
+                    }
+                }
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DIES_TOKEN_CREATURE_SCOPE)
+        self.assertEqual(effect["dies_token_count"], 2)
+        self.assertEqual(effect["dies_token_name"], "Fungus Token")
+        self.assertTrue(effect["dies_token_cant_block"])
+        self.assertEqual(effect["dies_token_static_restrictions"], ["cant_block"])
 
     def test_creature_dies_create_tokens_blocks_dynamic_count(self) -> None:
         row = queue_row(

@@ -657,6 +657,7 @@ TOKEN_COLOR_WORDS = {
 UNSUPPORTED_TOKEN_DESCRIPTION_MARKERS = {
     "when ",
     "whenever ",
+    "at the beginning",
     "gets ",
     "get +",
     "for each ",
@@ -1824,6 +1825,26 @@ def parse_simple_token_class(token_source: str, token_class: str) -> tuple[dict[
             "",
             keyword_description,
         )
+    token_cant_block = bool(
+        re.search(r"\bnew\s+CantBlockSourceEffect\s*\(\s*Duration\.WhileOnBattlefield\s*\)", constructor_source)
+        and re.search(r'this (?:creature|token) can\'t block\.?', lower_description)
+    )
+    if token_cant_block:
+        keyword_description = re.sub(
+            r'\s+with\s+"this (?:creature|token) can\'t block\.?"\.?',
+            "",
+            keyword_description,
+        )
+        keyword_description = re.sub(
+            r'\s+and\s+"this (?:creature|token) can\'t block\.?"\.?',
+            "",
+            keyword_description,
+        )
+        keyword_description = re.sub(
+            r'\s+"this (?:creature|token) can\'t block\.?"\.?',
+            "",
+            keyword_description,
+        )
     unsupported_markers = [
         marker
         for marker in sorted(UNSUPPORTED_TOKEN_DESCRIPTION_MARKERS)
@@ -1868,8 +1889,13 @@ def parse_simple_token_class(token_source: str, token_class: str) -> tuple[dict[
                 "SimpleActivatedAbility",
             }
         )
+    if token_cant_block:
+        allowed_ability_classes.add("SimpleStaticAbility")
     unsupported_abilities = ability_classes - allowed_ability_classes
     if unsupported_abilities:
+        return {}, "token_ability_not_supported"
+    token_effect_classes = set(re.findall(r"new\s+([A-Za-z]+Effect)\s*\(", constructor_source))
+    if token_cant_block and (token_effect_classes - {"CantBlockSourceEffect"}):
         return {}, "token_ability_not_supported"
     colors = [
         symbol
@@ -1927,6 +1953,9 @@ def parse_simple_token_class(token_source: str, token_class: str) -> tuple[dict[
         token_data["token_flying"] = True
     if "haste" in token_keywords:
         token_data["token_haste"] = True
+    if token_cant_block:
+        token_data["token_cant_block"] = True
+        token_data["token_static_restrictions"] = ["cant_block"]
     landwalk_types = [
         land_type
         for keyword, land_type in TOKEN_BASIC_LANDWALK_KEYWORDS.items()
@@ -1969,6 +1998,10 @@ def plural_token_description(description: str) -> str:
 def token_oracle_description_variants(token_data: dict[str, Any]) -> set[str]:
     description = normalized_token_oracle_phrase(token_data.get("token_description"))
     variants = {description}
+    if token_data.get("token_cant_block"):
+        for phrase in list(variants):
+            variants.add(phrase.replace("this token can't block", "this creature can't block"))
+            variants.add(phrase.replace("this creature can't block", "this token can't block"))
     if token_data.get("token_tapped") and not description.startswith("tapped "):
         variants.add(f"tapped {description}")
     if token_data.get("token_sacrifice_for_colorless_mana"):
@@ -27177,6 +27210,8 @@ def split_row(
             "token_is_mana_source": "etb_token_is_mana_source",
             "token_mana_source_contextual_only": "etb_token_mana_source_contextual_only",
             "token_mana_spend_restriction": "etb_token_mana_spend_restriction",
+            "token_cant_block": "etb_token_cant_block",
+            "token_static_restrictions": "etb_token_static_restrictions",
         }
         for source_key, target_key in optional_token_fields.items():
             if source_key in token_data:
@@ -27344,6 +27379,8 @@ def split_row(
             "token_is_mana_source": "dies_token_is_mana_source",
             "token_mana_source_contextual_only": "dies_token_mana_source_contextual_only",
             "token_mana_spend_restriction": "dies_token_mana_spend_restriction",
+            "token_cant_block": "dies_token_cant_block",
+            "token_static_restrictions": "dies_token_static_restrictions",
         }
         for source_key, target_key in optional_token_fields.items():
             if source_key in token_data:

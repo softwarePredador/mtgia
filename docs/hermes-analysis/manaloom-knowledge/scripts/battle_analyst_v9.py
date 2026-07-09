@@ -20415,6 +20415,8 @@ def resolve_generic_permanent_etb(
             "etb_token_is_mana_source": "token_is_mana_source",
             "etb_token_mana_source_contextual_only": "token_mana_source_contextual_only",
             "etb_token_mana_spend_restriction": "token_mana_spend_restriction",
+            "etb_token_cant_block": "token_cant_block",
+            "etb_token_static_restrictions": "token_static_restrictions",
         }
         for etb_key, token_key in etb_field_map.items():
             if etb_key in effect_data:
@@ -20436,6 +20438,7 @@ def resolve_generic_permanent_etb(
             token_count=int(effect_data.get("etb_token_count") or 1),
             token_component_count=1,
             token_names=[effect_data.get("etb_token_name", "Token")],
+            token_cant_block=bool(effect_data.get("etb_token_cant_block")),
             trigger="enters_battlefield",
             turn=turn,
             phase=phase,
@@ -21400,9 +21403,11 @@ def resolve_permanent_dies_token_maker(
         "dies_token_draw_on_self_sacrifice": "token_draw_on_self_sacrifice",
         "dies_token_draw_count": "token_draw_count",
         "dies_token_is_mana_source": "token_is_mana_source",
-        "dies_token_mana_source_contextual_only": "token_mana_source_contextual_only",
-        "dies_token_mana_spend_restriction": "token_mana_spend_restriction",
-    }
+            "dies_token_mana_source_contextual_only": "token_mana_source_contextual_only",
+            "dies_token_mana_spend_restriction": "token_mana_spend_restriction",
+            "dies_token_cant_block": "token_cant_block",
+            "dies_token_static_restrictions": "token_static_restrictions",
+        }
     for dies_key, token_key in dies_field_map.items():
         if dies_key in permanent:
             effect_data[token_key] = permanent[dies_key]
@@ -21426,6 +21431,7 @@ def resolve_permanent_dies_token_maker(
         token_toughness=effect_data.get("token_toughness"),
         token_subtype=effect_data.get("token_subtype"),
         token_tapped=bool(effect_data.get("token_tapped")),
+        token_cant_block=bool(effect_data.get("token_cant_block") or effect_data.get("cant_block")),
         reason=reason,
         source=source.get("name", "?") if isinstance(source, dict) else source,
         turn=CURRENT_REPLAY_TURN,
@@ -42215,6 +42221,7 @@ def create_creature_token(
     produces=None,
     produced_mana_symbols=None,
     tapped=False,
+    cant_block=False,
     opponents=None,
     turn=None,
     source_event="token_created",
@@ -42237,6 +42244,9 @@ def create_creature_token(
         "summoning_sick": not bool(haste),
         "tapped": bool(tapped),
     }
+    if cant_block:
+        token["cant_block"] = True
+        token["cant_block_source"] = source_event
     if sacrifice_for_colorless_mana or mana_activation_requires_sacrifice:
         produced_amount = max(1, int(mana_produced or 1))
         token["sacrifice_for_colorless_mana"] = bool(sacrifice_for_colorless_mana)
@@ -42753,6 +42763,7 @@ def create_creature_tokens_from_effect(
     token_produces = (effect_data or {}).get("token_produces")
     token_produced_mana_symbols = (effect_data or {}).get("token_produced_mana_symbols")
     token_tapped = bool((effect_data or {}).get("token_tapped"))
+    token_cant_block = bool((effect_data or {}).get("token_cant_block") or (effect_data or {}).get("cant_block"))
     token_artifact_only = bool((effect_data or {}).get("token_artifact_only"))
     token_class = (effect_data or {}).get("xmage_token_class")
     if (effect_data or {}).get("token_prowess") and "prowess" not in token_keywords:
@@ -42808,6 +42819,7 @@ def create_creature_tokens_from_effect(
                         produces=token_produces,
                         produced_mana_symbols=token_produced_mana_symbols,
                         tapped=token_tapped,
+                        cant_block=token_cant_block,
                         opponents=opponents,
                         turn=turn,
                         source_event=source_event,
@@ -42865,6 +42877,7 @@ def create_creature_tokens_from_effect(
                 produces=token_produces,
                 produced_mana_symbols=token_produced_mana_symbols,
                 tapped=token_tapped,
+                cant_block=token_cant_block,
                 opponents=opponents,
                 turn=turn,
                 source_event=source_event,
@@ -49917,6 +49930,7 @@ def activate_generic_token_maker_permanent(player, opponents, all_players, perma
         token_toughness=effect_data.get("token_toughness"),
         token_subtype=effect_data.get("token_subtype"),
         token_colors=effect_data.get("token_colors") or [],
+        token_cant_block=bool(effect_data.get("token_cant_block") or effect_data.get("cant_block")),
         turn=turn,
         phase=phase,
         **fields,
@@ -64762,6 +64776,7 @@ def apply_effect_immediate(
                 token_flying=bool(effect_data.get("token_flying") or effect_data.get("flying")),
                 token_haste=bool(effect_data.get("token_haste") or effect_data.get("haste")),
                 token_tapped=bool(effect_data.get("token_tapped")),
+                token_cant_block=bool(effect_data.get("token_cant_block") or effect_data.get("cant_block")),
                 attack_each_opponent_this_turn_status=effect_data.get("attack_each_opponent_this_turn_status"),
                 attack_assignment_by_opponent=effect_data.get("_last_token_attack_assignments") or [],
                 token_cap_applied=requested_tokens > 20,

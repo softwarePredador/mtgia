@@ -2696,6 +2696,54 @@ def test_fixed_create_tokens_runner_counts_controlled_subtype_support() -> None:
     assert result["token_name"] == "Elf Warrior Token"
 
 
+def test_fixed_create_tokens_runner_validates_static_cant_block() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "token_maker",
+        "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+        "ability_kind": "one_shot",
+        "token_count": 1,
+        "token_name": "Rat Token",
+        "token_power": 1,
+        "token_toughness": 1,
+        "token_subtype": "Rat",
+        "token_colors": ["B"],
+        "token_cant_block": True,
+        "_rule_logical_key": "battle_rule_v1:fixture-rat-call",
+    }
+    try:
+        result = validator.run_fixed_create_creature_tokens(
+            battle,
+            {
+                "name": "Fixture Rat Call creates modeled creature tokens",
+                "type": "fixed_create_creature_tokens",
+                "card": {"name": "Fixture Rat Call"},
+                "expected_token": {
+                    "name": "Rat Token",
+                    "count": 1,
+                    "power": 1,
+                    "toughness": 1,
+                    "subtype": "Rat",
+                    "colors": ["B"],
+                    "cant_block": True,
+                },
+                "logical_rule_key": "battle_rule_v1:fixture-rat-call",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Fixture Rat Call"
+    assert result["tokens_created"] == 1
+    assert result["token_cant_block"] is True
+
+
 def test_fixed_create_tokens_runner_counts_dynamic_support_state() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     cases = [

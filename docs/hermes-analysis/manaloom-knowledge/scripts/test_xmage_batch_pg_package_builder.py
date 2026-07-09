@@ -3971,6 +3971,33 @@ def test_creature_etb_create_multi_tokens_execution_scenario() -> None:
     ]
 
 
+def test_creature_etb_create_tokens_execution_scenario_preserves_static_cant_block() -> None:
+    rule = {
+        "normalized_name": "edgewall pack",
+        "card_name": "Edgewall Pack",
+        "logical_rule_key": "battle_rule_v1:edgewall-pack",
+        "required_effect_fields": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+            "trigger": "enters_battlefield",
+            "etb_trigger_effect": "token_maker",
+            "etb_token_count": 1,
+            "etb_token_name": "Rat Token",
+            "etb_token_power": 1,
+            "etb_token_toughness": 1,
+            "etb_token_subtype": "Rat",
+            "etb_token_colors": ["B"],
+            "etb_token_cant_block": True,
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario["type"] == "creature_etb_create_tokens"
+    assert scenario["expected_token"]["name"] == "Rat Token"
+    assert scenario["expected_token"]["cant_block"] is True
+
+
 def test_creature_dies_create_multi_tokens_execution_scenario() -> None:
     rule = {
         "normalized_name": "wurmcoil engine",
@@ -4143,6 +4170,31 @@ def test_controlled_subtype_token_spell_execution_scenario_seeds_support_permane
     assert scenario["controlled_permanent_subtype_count"] == 3
     assert scenario["expected_token"]["count"] == 3
     assert scenario["expected_token"]["name"] == "Elf Warrior Token"
+
+
+def test_fixed_create_tokens_execution_scenario_preserves_static_cant_block() -> None:
+    rule = {
+        "normalized_name": "fixture rat call",
+        "card_name": "Fixture Rat Call",
+        "logical_rule_key": "battle_rule_v1:fixture-rat-call",
+        "required_effect_fields": {
+            "effect": "token_maker",
+            "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+            "token_count": 1,
+            "token_name": "Rat Token",
+            "token_power": 1,
+            "token_toughness": 1,
+            "token_subtype": "Rat",
+            "token_colors": ["B"],
+            "token_cant_block": True,
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario["type"] == "fixed_create_creature_tokens"
+    assert scenario["expected_token"]["name"] == "Rat Token"
+    assert scenario["expected_token"]["cant_block"] is True
 
 
 def test_dynamic_count_token_spell_execution_scenarios_seed_support_state() -> None:

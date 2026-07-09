@@ -216,6 +216,8 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "token_flying",
     "token_haste",
     "token_tapped",
+    "token_cant_block",
+    "token_static_restrictions",
     "token_landwalk",
     "token_landwalk_land_type",
     "token_landwalk_land_types",
@@ -257,6 +259,8 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "etb_token_flying",
     "etb_token_haste",
     "etb_token_tapped",
+    "etb_token_cant_block",
+    "etb_token_static_restrictions",
     "etb_token_landwalk",
     "etb_token_landwalk_land_type",
     "etb_token_landwalk_land_types",
@@ -293,6 +297,8 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "dies_token_flying",
     "dies_token_haste",
     "dies_token_tapped",
+    "dies_token_cant_block",
+    "dies_token_static_restrictions",
     "dies_token_landwalk",
     "dies_token_landwalk_land_type",
     "dies_token_landwalk_land_types",
@@ -1703,7 +1709,7 @@ def creature_etb_create_treasure_execution_scenario_from_expected_rule(
 
 
 def expected_token_from_component(component: dict[str, Any]) -> dict[str, Any]:
-    return {
+    expected = {
         "name": component.get("token_name"),
         "count": int(component.get("token_count") or 1),
         "power": component.get("token_power"),
@@ -1721,6 +1727,9 @@ def expected_token_from_component(component: dict[str, Any]) -> dict[str, Any]:
         "produced_mana_symbols": component.get("token_produced_mana_symbols") or [],
         "artifact_only": bool(component.get("token_artifact_only")),
     }
+    if component.get("token_cant_block"):
+        expected["cant_block"] = True
+    return expected
 
 
 def creature_etb_create_tokens_execution_scenario_from_expected_rule(
@@ -1776,6 +1785,8 @@ def creature_etb_create_tokens_execution_scenario_from_expected_rule(
         "produced_mana_symbols": required.get("etb_token_produced_mana_symbols") or [],
         "artifact_only": bool(required.get("etb_token_artifact_only")),
     }
+    if required.get("etb_token_cant_block"):
+        scenario["expected_token"]["cant_block"] = True
     return scenario
 
 
@@ -1865,6 +1876,8 @@ def fixed_create_creature_tokens_execution_scenario_from_expected_rule(
         },
         "logical_rule_key": rule["logical_rule_key"],
     }
+    if required.get("token_cant_block"):
+        scenario["expected_token"]["cant_block"] = True
     if required.get("token_count_source") == "controlled_permanents_with_subtype":
         expected_count = 3
         scenario["expected_token"]["count"] = expected_count
@@ -1924,18 +1937,19 @@ def multi_create_creature_tokens_execution_scenario_from_expected_rule(
     for component in components:
         if not isinstance(component, dict) or component.get("effect") != "token_maker":
             return None
-        expected_tokens.append(
-            {
-                "name": component.get("token_name"),
-                "count": int(component.get("token_count") or 1),
-                "power": component.get("token_power"),
-                "toughness": component.get("token_toughness"),
-                "subtype": component.get("token_subtype"),
-                "colors": component.get("token_colors") or [],
-                "keywords": component.get("token_keywords") or [],
-                "artifact": bool(component.get("artifact_tokens")),
-            }
-        )
+        expected_token = {
+            "name": component.get("token_name"),
+            "count": int(component.get("token_count") or 1),
+            "power": component.get("token_power"),
+            "toughness": component.get("token_toughness"),
+            "subtype": component.get("token_subtype"),
+            "colors": component.get("token_colors") or [],
+            "keywords": component.get("token_keywords") or [],
+            "artifact": bool(component.get("artifact_tokens")),
+        }
+        if component.get("token_cant_block"):
+            expected_token["cant_block"] = True
+        expected_tokens.append(expected_token)
     return {
         "name": f"{rule['card_name']} creates multiple modeled creature tokens",
         "type": "multi_create_creature_tokens",
@@ -2448,6 +2462,8 @@ def creature_dies_create_tokens_execution_scenario_from_expected_rule(
         "produced_mana_symbols": required.get("dies_token_produced_mana_symbols") or [],
         "artifact_only": bool(required.get("dies_token_artifact_only")),
     }
+    if required.get("dies_token_cant_block"):
+        scenario["expected_token"]["cant_block"] = True
     return scenario
 
 
@@ -2473,7 +2489,7 @@ def simple_activated_create_token_execution_scenario_from_expected_rule(
                 {"name": "E2E Spare Card A", "type_line": "Sorcery", "effect": "draw_cards", "cmc": 2},
                 {"name": "E2E Spare Card B", "type_line": "Instant", "effect": "direct_damage", "cmc": 1},
             ]
-    return {
+    scenario = {
         "name": f"{rule['card_name']} activates token ability",
         "type": "simple_activated_create_token",
         "card": {"name": rule["card_name"]},
@@ -2500,6 +2516,12 @@ def simple_activated_create_token_execution_scenario_from_expected_rule(
         ),
         "logical_rule_key": rule["logical_rule_key"],
     }
+    if required.get("token_cant_block"):
+        scenario["expected_token"]["cant_block"] = True
+    return scenario
+    if required.get("token_cant_block"):
+        result["expected_token"]["cant_block"] = True
+    return result
 
 
 def _manifest_mana_for_activation_cost(cost: str | None) -> dict[str, int]:

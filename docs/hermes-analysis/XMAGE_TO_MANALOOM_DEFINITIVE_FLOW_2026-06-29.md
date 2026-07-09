@@ -19890,6 +19890,77 @@ Evidence:
 - `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260709_post_pg690b_hash_backfill_new_server_final.md`
 - `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260709_post_pg690b_hash_backfill_new_server_final.md`
 
+## PG691 Token Cant-Block Static Restriction Wave
+
+PG691 closed three creature-token rows where XMage creates a token with only a
+static `CantBlockSourceEffect(Duration.WhileOnBattlefield)` restriction. This
+wave deliberately does not promote toxic, infect, decayed, banding, triggered
+token text, or token classes with additional static effects.
+
+Promoted cards:
+
+- `Edgewall Pack`
+- `Harried Spearguard`
+- `Synapse Necromage`
+
+Runtime/test changes:
+
+- `xmage_authoritative_exact_scope_split.py` emits structured
+  `token_cant_block`, `etb_token_cant_block`, and `dies_token_cant_block`
+  fields only for the safe XMage static restriction;
+- `battle_analyst_v9.py` carries the field through shared token creation and
+  combat already respects it through `creature_cannot_block`;
+- `xmage_batch_pg_package_builder.py` and
+  `battle_package_end_to_end_validation.py` preserve and validate
+  `cant_block=true` in package execution scenarios.
+
+PG691 apply/postcheck evidence:
+
+- split produced `3` safe package candidates in
+  `xmage_creature_etb_create_tokens` / `xmage_creature_dies_create_tokens`;
+- package manifest carries `3` battle execution scenarios;
+- precheck found `3/3` Oracle-hash-matched target rows and `0` shadow rows;
+- apply upserted `3` rows;
+- postcheck confirmed `3/3` promoted verified/auto rows with `oracle_hash`;
+- final package E2E passed PostgreSQL, SQLite/Hermes, canonical snapshot,
+  `runtime_get_card_effect`, and `3` battle-execution scenarios/events with
+  `token_cant_block=true`.
+
+Final post-PG691 state:
+
+- global readiness:
+  `battle_and_oracle_ready=6177`, `battle_family_mapper_required=27699`,
+  `snapshot_has_verified_rule=6205`, `snapshot_has_any_rule=7395`;
+- authoritative queue:
+  `target_identity_count=24776`,
+  `xmage_authoritative_source_count=24463`,
+  `xmage_missing_source_exception_count=313`,
+  `xmage_authoritative_parser_gap_count=0`,
+  `xmage_authoritative_adapter_required_count=24463`,
+  `adapter_work_unit_count=11305`;
+- exact split recheck:
+  `proposal_count=0` and `safe_for_batch_pg_package_count=0`;
+- validation gates:
+  `server-target` quality gate passed, `xmage_strategy_consistency_audit`
+  passed `26/26`, `pg_hermes_sqlite_contract_audit` passed `51/51`,
+  `operational_surface_alignment_audit` passed, and
+  `legacy_contamination_audit` passed.
+
+Evidence:
+
+- `docs/hermes-analysis/PG691_TOKEN_CANT_BLOCK_EVIDENCE_2026-07-09.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260709_pg691_token_cant_block_candidate.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg691_token_cant_block_new_server_package_manifest.json`
+- `docs/hermes-analysis/master_optimizer_reports/pg691_token_cant_block_new_server_pg_to_sqlite_sync_runtime_only.json`
+- `docs/hermes-analysis/master_optimizer_reports/pg691_token_cant_block_new_server_e2e_validation.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260709_post_pg691_token_cant_block_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260709_post_pg691_token_cant_block_new_server_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260709_post_pg691_token_cant_block_new_server_recheck.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260709_post_pg691_token_cant_block_new_server_final.md`
+- `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260709_post_pg691_token_cant_block_new_server_final.md`
+- `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260709_post_pg691_token_cant_block_new_server_final.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260709_post_pg691_token_cant_block_new_server_final.md`
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

@@ -471,6 +471,9 @@ def token_matches_expected(battle, token: dict[str, Any], expected: dict[str, An
         return False, f"artifact_only token is creature type_line={token.get('type_line')!r}"
     if bool(token.get("tapped")) != bool(expected.get("tapped")):
         return False, f"tapped={token.get('tapped')}"
+    if "cant_block" in expected:
+        if bool(battle.creature_cannot_block(token)) != bool(expected.get("cant_block")):
+            return False, f"cant_block={token.get('cant_block')}"
     if bool(expected.get("sacrifice_for_colorless_mana")):
         if token.get("sacrifice_for_colorless_mana") is not True:
             return False, "missing sacrifice mana ability"
@@ -617,6 +620,8 @@ def run_fixed_create_creature_tokens(
             fail("battle_execution", f"{card['name']} {expected_name} artifact token type missing")
         if bool(token.get("tapped")) != bool(expected.get("tapped")):
             fail("battle_execution", f"{card['name']} {expected_name} tapped={token.get('tapped')}")
+        if "cant_block" in expected and bool(battle.creature_cannot_block(token)) != bool(expected.get("cant_block")):
+            fail("battle_execution", f"{card['name']} {expected_name} cant_block={token.get('cant_block')}")
 
     token_event = next(
         (
@@ -633,12 +638,15 @@ def run_fixed_create_creature_tokens(
         fail("battle_events", f"{card['name']} event tokens_created={token_event.get('tokens_created')}")
     if bool(token_event.get("token_tapped")) != bool(expected.get("tapped")):
         fail("battle_events", f"{card['name']} event token_tapped={token_event.get('token_tapped')}")
+    if "cant_block" in expected and bool(token_event.get("token_cant_block")) != bool(expected.get("cant_block")):
+        fail("battle_events", f"{card['name']} event token_cant_block={token_event.get('token_cant_block')}")
     return {
         "scenario": scenario.get("name"),
         "card_name": card["name"],
         "tokens_created": len(matches),
         "token_name": expected_name,
         "token_tapped": bool(expected.get("tapped")),
+        "token_cant_block": bool(expected.get("cant_block")),
     }
 
 
@@ -1469,7 +1477,8 @@ def run_creature_etb_create_tokens(
         all_players=[active, opponent],
     )
 
-    expected_tokens = scenario.get("expected_tokens") or [scenario.get("expected_token") or {}]
+    expected = dict(scenario.get("expected_token") or {})
+    expected_tokens = scenario.get("expected_tokens") or [expected]
     expected_total = int(
         scenario.get("expected_total_tokens")
         or sum(int(token.get("count") or 0) for token in expected_tokens)
@@ -1500,12 +1509,16 @@ def run_creature_etb_create_tokens(
         scenario.get("expected_component_count") or 0
     ):
         fail("battle_events", f"{card['name']} event token_component_count={token_event.get('token_component_count')}")
+    if not scenario.get("expected_tokens") and "cant_block" in expected:
+        if bool(token_event.get("token_cant_block")) != bool(expected.get("cant_block")):
+            fail("battle_events", f"{card['name']} event token_cant_block={token_event.get('token_cant_block')}")
 
     return {
         "scenario": scenario.get("name"),
         "card_name": card["name"],
         "tokens_created": len(actual_tokens),
         "token_names": sorted(token.get("name") for token in actual_tokens),
+        "token_cant_block": any(bool(token.get("cant_block")) for token in actual_tokens),
         "validated_keywords": expected_keywords,
     }
 
@@ -1949,6 +1962,9 @@ def run_creature_dies_create_tokens(
         scenario.get("expected_component_count") or 0
     ):
         fail("battle_events", f"{card['name']} event token_component_count={token_event.get('token_component_count')}")
+    if not scenario.get("expected_tokens") and "cant_block" in expected:
+        if bool(token_event.get("token_cant_block")) != bool(expected.get("cant_block")):
+            fail("battle_events", f"{card['name']} event token_cant_block={token_event.get('token_cant_block')}")
 
     return {
         "scenario": scenario.get("name"),
@@ -1957,6 +1973,7 @@ def run_creature_dies_create_tokens(
         "token_name": expected_name or None,
         "token_names": sorted(token.get("name") for token in matches),
         "token_tapped": bool(expected.get("tapped")) if expected else False,
+        "token_cant_block": bool(expected.get("cant_block")) if expected else False,
         "validated_keywords": expected_keywords,
         "sacrifice_for_colorless_mana": bool(expected.get("sacrifice_for_colorless_mana")),
     }
