@@ -1,0 +1,321 @@
+{
+  "battle_execution": {
+    "event_count": 12,
+    "results": [
+      {
+        "card_name": "Centaur Veteran",
+        "destination": "battlefield",
+        "discarded_count": 1,
+        "life_paid": 0,
+        "regeneration_shields_after": 0,
+        "scenario": "Centaur Veteran activates regenerate source ability",
+        "source_tapped": true
+      },
+      {
+        "card_name": "Deepwood Ghoul",
+        "destination": "battlefield",
+        "discarded_count": 0,
+        "life_paid": 2,
+        "regeneration_shields_after": 0,
+        "scenario": "Deepwood Ghoul activates regenerate source ability",
+        "source_tapped": true
+      },
+      {
+        "card_name": "Marrow Bats",
+        "destination": "battlefield",
+        "discarded_count": 0,
+        "life_paid": 4,
+        "regeneration_shields_after": 0,
+        "scenario": "Marrow Bats activates regenerate source ability",
+        "source_tapped": true
+      },
+      {
+        "card_name": "Mischievous Poltergeist",
+        "destination": "battlefield",
+        "discarded_count": 0,
+        "life_paid": 1,
+        "regeneration_shields_after": 0,
+        "scenario": "Mischievous Poltergeist activates regenerate source ability",
+        "source_tapped": true
+      },
+      {
+        "card_name": "Sentry of the Underworld",
+        "destination": "battlefield",
+        "discarded_count": 0,
+        "life_paid": 3,
+        "regeneration_shields_after": 0,
+        "scenario": "Sentry of the Underworld activates regenerate source ability",
+        "source_tapped": true
+      },
+      {
+        "card_name": "Tunneler Wurm",
+        "destination": "battlefield",
+        "discarded_count": 1,
+        "life_paid": 0,
+        "regeneration_shields_after": 0,
+        "scenario": "Tunneler Wurm activates regenerate source ability",
+        "source_tapped": true
+      }
+    ],
+    "scenario_count": 6
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-10T21:33:01.477270+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg722_regenerate_costs_new_server_package_manifest.json",
+  "package_id": "pg722_regenerate_costs_new_server_package_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 6
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_regenerate_source_v1",
+          "card_name": "Centaur Veteran",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e35f3ce9a67c2de7b719f5ea094632a7",
+          "oracle_hash": "a7c2878030bdc99b3d0aa9d6194122da",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_regenerate_source_v1",
+          "card_name": "Deepwood Ghoul",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:29b27ad949f2a0feccff92ec8a36370f",
+          "oracle_hash": "b0b618643b86c0988608c4bd63abb49e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_regenerate_source_v1",
+          "card_name": "Marrow Bats",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:627a532a5466d2e059212b0f09f07d2e",
+          "oracle_hash": "13915d0190c111ada0a320e33aa8255d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_regenerate_source_v1",
+          "card_name": "Mischievous Poltergeist",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:16334bd23c8bf65025cc0e18abb544f8",
+          "oracle_hash": "1d4c28511b92b358353a30f5ed2ea864",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_regenerate_source_v1",
+          "card_name": "Sentry of the Underworld",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9de50b65fd645a62bc46d4c369b84c4d",
+          "oracle_hash": "73a705cab53339dede31c0ca712cfeb2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_regenerate_source_v1",
+          "card_name": "Tunneler Wurm",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6eff9f19b181732abd0a6c4d6d1d0069",
+          "oracle_hash": "bf60dc8ee6f3fc31a5d4a40b014a65fa",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 6
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_regenerate_source_v1",
+          "card_name": "Centaur Veteran",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e35f3ce9a67c2de7b719f5ea094632a7",
+          "oracle_hash": "a7c2878030bdc99b3d0aa9d6194122da",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_regenerate_source_v1",
+          "card_name": "Deepwood Ghoul",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:29b27ad949f2a0feccff92ec8a36370f",
+          "oracle_hash": "b0b618643b86c0988608c4bd63abb49e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_regenerate_source_v1",
+          "card_name": "Marrow Bats",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:627a532a5466d2e059212b0f09f07d2e",
+          "oracle_hash": "13915d0190c111ada0a320e33aa8255d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_regenerate_source_v1",
+          "card_name": "Mischievous Poltergeist",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:16334bd23c8bf65025cc0e18abb544f8",
+          "oracle_hash": "1d4c28511b92b358353a30f5ed2ea864",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_regenerate_source_v1",
+          "card_name": "Sentry of the Underworld",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9de50b65fd645a62bc46d4c369b84c4d",
+          "oracle_hash": "73a705cab53339dede31c0ca712cfeb2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_regenerate_source_v1",
+          "card_name": "Tunneler Wurm",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6eff9f19b181732abd0a6c4d6d1d0069",
+          "oracle_hash": "bf60dc8ee6f3fc31a5d4a40b014a65fa",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 6
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_regenerate_source_v1",
+          "battle_rule_version": 2,
+          "card_name": "Centaur Veteran",
+          "logical_rule_key": "battle_rule_v1:e35f3ce9a67c2de7b719f5ea094632a7"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_regenerate_source_v1",
+          "battle_rule_version": 2,
+          "card_name": "Deepwood Ghoul",
+          "logical_rule_key": "battle_rule_v1:29b27ad949f2a0feccff92ec8a36370f"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_regenerate_source_v1",
+          "battle_rule_version": 2,
+          "card_name": "Marrow Bats",
+          "logical_rule_key": "battle_rule_v1:627a532a5466d2e059212b0f09f07d2e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_regenerate_source_v1",
+          "battle_rule_version": 2,
+          "card_name": "Mischievous Poltergeist",
+          "logical_rule_key": "battle_rule_v1:16334bd23c8bf65025cc0e18abb544f8"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_regenerate_source_v1",
+          "battle_rule_version": 2,
+          "card_name": "Sentry of the Underworld",
+          "logical_rule_key": "battle_rule_v1:9de50b65fd645a62bc46d4c369b84c4d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_regenerate_source_v1",
+          "battle_rule_version": 2,
+          "card_name": "Tunneler Wurm",
+          "logical_rule_key": "battle_rule_v1:6eff9f19b181732abd0a6c4d6d1d0069"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 6
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Centaur Veteran",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:e35f3ce9a67c2de7b719f5ea094632a7"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Deepwood Ghoul",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:29b27ad949f2a0feccff92ec8a36370f"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Marrow Bats",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:627a532a5466d2e059212b0f09f07d2e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Mischievous Poltergeist",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:16334bd23c8bf65025cc0e18abb544f8"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Sentry of the Underworld",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:9de50b65fd645a62bc46d4c369b84c4d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Tunneler Wurm",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:6eff9f19b181732abd0a6c4d6d1d0069"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 12,
+        "scenarios": 6
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

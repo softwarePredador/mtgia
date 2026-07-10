@@ -3132,6 +3132,60 @@ def test_simple_activated_regenerate_source_runner_consumes_shield_on_destroy() 
     assert result["regeneration_shields_after"] == 0
 
 
+def test_simple_activated_regenerate_source_runner_executes_extra_costs() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "creature",
+        "battle_model_scope": "xmage_permanent_simple_activated_regenerate_source_v1",
+        "activated_effect": "regenerate_source",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_regenerate_source_v1",
+        "target": "self",
+        "target_controller": "self",
+        "target_constraints": {"source": "self", "card_types": ["creature"]},
+        "regenerate_source": True,
+        "activation_cost_mana": "{0}",
+        "activation_cost_generic": 0,
+        "activation_cost_colors": [],
+        "activation_requires_tap": False,
+        "activation_discard_count": 1,
+        "activation_discard_target": "any_card",
+        "activation_life_cost": 2,
+        "_rule_logical_key": "battle_rule_v1:centaur-veteran",
+    }
+    try:
+        result = validator.run_simple_activated_regenerate_source(
+            battle,
+            {
+                "name": "Centaur Veteran regenerates with extra costs",
+                "type": "simple_activated_regenerate_source",
+                "card": {"name": "Centaur Veteran"},
+                "controller_hand": [
+                    {"name": "E2E Spare Card", "type_line": "Sorcery", "effect": "draw_cards"}
+                ],
+                "starting_life": 10,
+                "expected_tapped_source": False,
+                "expected_regeneration_shields": 1,
+                "expected_discard_count": 1,
+                "expected_discard_target": "any_card",
+                "expected_life_paid": 2,
+                "logical_rule_key": "battle_rule_v1:centaur-veteran",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Centaur Veteran"
+    assert result["destination"] == "battlefield"
+    assert result["discarded_count"] == 1
+    assert result["life_paid"] == 2
+
+
 def test_stat_modifier_until_eot_runner_executes_keyword_only_spell() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

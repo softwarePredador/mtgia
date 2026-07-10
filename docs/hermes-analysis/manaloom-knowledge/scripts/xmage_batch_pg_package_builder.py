@@ -4150,13 +4150,36 @@ def simple_activated_regenerate_source_execution_scenario_from_expected_rule(
     required = dict(rule.get("required_effect_fields") or {})
     if required.get("battle_model_scope") != "xmage_permanent_simple_activated_regenerate_source_v1":
         return None
+    discard_target = str(required.get("activation_discard_target") or "any_card")
+    discard_hand = []
+    if int(required.get("activation_discard_count") or 0):
+        if discard_target == "land_card":
+            discard_hand = [
+                {"name": "E2E Spare Forest", "type_line": "Basic Land - Forest", "effect": "land"},
+                {"name": "E2E Nonland Spell", "type_line": "Sorcery", "effect": "draw_cards", "cmc": 2},
+            ]
+        elif discard_target == "artifact_card":
+            discard_hand = [
+                {"name": "E2E Spare Relic", "type_line": "Artifact", "effect": "mana_source", "cmc": 1},
+                {"name": "E2E Nonartifact Spell", "type_line": "Sorcery", "effect": "draw_cards", "cmc": 2},
+            ]
+        else:
+            discard_hand = [
+                {"name": "E2E Spare Card A", "type_line": "Sorcery", "effect": "draw_cards", "cmc": 2},
+                {"name": "E2E Spare Card B", "type_line": "Instant", "effect": "direct_damage", "cmc": 1},
+            ]
     return {
         "name": f"{rule['card_name']} activates regenerate source ability",
         "type": "simple_activated_regenerate_source",
         "card": {"name": rule["card_name"]},
         "controller_mana": _manifest_mana_for_required_activation(required),
+        "controller_hand": discard_hand,
+        "starting_life": 40,
         "expected_tapped_source": bool(required.get("activation_requires_tap")),
         "expected_regeneration_shields": 1,
+        "expected_discard_count": int(required.get("activation_discard_count") or 0),
+        "expected_discard_target": discard_target,
+        "expected_life_paid": int(required.get("activation_life_cost") or 0),
         "logical_rule_key": rule["logical_rule_key"],
     }
 

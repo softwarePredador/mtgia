@@ -5289,6 +5289,35 @@ def test_simple_activated_regenerate_source_execution_scenario_uses_activation_m
     assert scenario["expected_regeneration_shields"] == 1
 
 
+def test_simple_activated_regenerate_source_execution_scenario_supplies_extra_costs() -> None:
+    rule = {
+        "normalized_name": "centaur veteran",
+        "card_name": "Centaur Veteran",
+        "logical_rule_key": "battle_rule_v1:centaur-veteran",
+        "required_effect_fields": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_regenerate_source_v1",
+            "activated_effect": "regenerate_source",
+            "activation_cost_mana": "{G}",
+            "activation_cost_generic": 0,
+            "activation_cost_colors": ["G"],
+            "activation_requires_tap": False,
+            "activation_discard_count": 1,
+            "activation_discard_target": "any_card",
+            "activation_life_cost": 2,
+            "regenerate_source": True,
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario["type"] == "simple_activated_regenerate_source"
+    assert scenario["expected_discard_count"] == 1
+    assert scenario["expected_discard_target"] == "any_card"
+    assert scenario["expected_life_paid"] == 2
+    assert len(scenario["controller_hand"]) >= 1
+
+
 def test_modal_damage_or_destroy_fields_and_execution_scenario_are_manifested() -> None:
     proposal = {
         "normalized_name": "fiery intervention",

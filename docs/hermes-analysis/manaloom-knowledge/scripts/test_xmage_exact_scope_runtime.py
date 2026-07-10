@@ -23755,6 +23755,64 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_simple_activated_regenerate_source_pays_discard_and_life_costs(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        permanent = {
+            "name": "Fixture Regenerator",
+            "type_line": "Creature - Troll",
+            "effect": "creature",
+            "power": 2,
+            "toughness": 2,
+            "summoning_sick": False,
+            "_activated_rule_effects": [
+                {
+                    "effect": "regenerate_source",
+                    "battle_model_scope": "xmage_permanent_simple_activated_regenerate_source_v1",
+                    "ability_kind": "activated",
+                    "activated_effect": "regenerate_source",
+                    "target": "self",
+                    "activation_cost_mana": "{0}",
+                    "activation_cost_generic": 0,
+                    "activation_cost_colors": [],
+                    "activation_requires_tap": False,
+                    "activation_requires_sacrifice": False,
+                    "activation_discard_count": 1,
+                    "activation_discard_target": "any_card",
+                    "activation_life_cost": 2,
+                }
+            ],
+        }
+        discard_card = {"name": "Discard Fixture", "type_line": "Sorcery", "effect": "draw_cards"}
+        active.battlefield = [permanent]
+        active.hand = [discard_card]
+        active.life = 10
+
+        activated = self.battle.activate_generic_regenerate_source_permanent(
+            active,
+            [active],
+            permanent,
+            turn=9,
+            rng=random.Random(9),
+            phase="precombat_main",
+        )
+
+        self.assertTrue(activated)
+        self.assertEqual(active.life, 8)
+        self.assertEqual(active.hand, [])
+        self.assertIn(discard_card, active.graveyard)
+        self.assertEqual(permanent.get("regeneration_shields"), 1)
+        self.assertTrue(
+            any(
+                event == "activated_ability"
+                and data.get("card") == "Fixture Regenerator"
+                and data.get("activation_kind") == "simple_activated_regenerate_source"
+                and data.get("activation_life_cost") == 2
+                and data.get("activation_discard_count") == 1
+                and data.get("discarded") == ["Discard Fixture"]
+                for event, data in self.events
+            )
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

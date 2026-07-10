@@ -16661,7 +16661,11 @@ def activated_regenerate_source_from_oracle(metadata: dict[str, Any]) -> dict[st
     source_pattern += r")"
     if not re.fullmatch(rf"regenerate {source_pattern}\.?", effect_text):
         return "activated_regenerate_source_oracle_not_simple"
-    activation = activation_cost_from_oracle_prefix(cost_text)
+    activation = activation_cost_from_oracle_prefix(
+        cost_text,
+        allow_discard=True,
+        allow_life=True,
+    )
     if isinstance(activation, str):
         return str(activation).replace("activated_self_boost", "activated_regenerate_source")
     return activation
@@ -16673,13 +16677,10 @@ def activated_regenerate_source_from_source(source: str) -> dict[str, Any] | str
         return "activated_regenerate_source_not_battlefield"
     risky_cost_classes = {
         "CompositeCost",
-        "DiscardCardCost",
-        "DiscardTargetCost",
         "ExileFrom",
         "ExileFromGraveCost",
         "ExileSourceFromGraveCost",
         "OrCost",
-        "PayLifeCost",
         "RemoveCounterCost",
         "ReturnToHandSourceCost",
         "ReturnToHandTargetCost",
@@ -16697,6 +16698,15 @@ def activated_regenerate_source_from_source(source: str) -> dict[str, Any] | str
     window = text[max(0, regenerate_index - 500) : regenerate_index + 2000]
     if "SimpleActivatedAbility" not in window:
         return "activated_regenerate_source_not_simple_activated"
+    discard_cost = activation_discard_cost_from_source(window)
+    if isinstance(discard_cost, str):
+        return discard_cost.replace("activated_damage", "activated_regenerate_source")
+    life_matches = re.findall(r"PayLifeCost\s*\(\s*(\d+)\s*\)", window)
+    if "PayLifeCost" in window and len(life_matches) != 1:
+        return "activated_regenerate_source_cost_not_supported"
+    life_cost = int(life_matches[0]) if life_matches else 0
+    if life_cost < 0:
+        return "activated_regenerate_source_cost_not_supported"
     mana_matches = re.findall(r'ManaCostsImpl<[^>]*>\s*\(\s*"([^"]+)"\s*\)', window, re.S)
     generic_matches = re.findall(r"GenericManaCost\s*\(\s*(\d+)\s*\)", window, re.S)
     colored_matches = re.findall(r"ColoredManaCost\s*\(\s*ColoredManaSymbol\.([WUBRG])\s*\)", window, re.S)
@@ -16723,6 +16733,8 @@ def activated_regenerate_source_from_source(source: str) -> dict[str, Any] | str
         "activation_cost_colors": colors,
         "activation_requires_tap": "TapSourceCost" in window,
         "activation_requires_sacrifice": False,
+        **({"activation_life_cost": life_cost} if life_cost else {}),
+        **(discard_cost or {}),
     }
 
 
@@ -27588,11 +27600,19 @@ def split_row(
             int(parsed_activation["activation_cost_generic"]),
             list(parsed_activation["activation_cost_colors"]),
             bool(parsed_activation["activation_requires_tap"]),
+            int(parsed_activation.get("activation_discard_count") or 0),
+            str(parsed_activation.get("activation_discard_target") or ""),
+            bool(parsed_activation.get("activation_discard_random")),
+            int(parsed_activation.get("activation_life_cost") or 0),
         )
         oracle_cost = (
             int(oracle_activation["activation_cost_generic"]),
             list(oracle_activation["activation_cost_colors"]),
             bool(oracle_activation["activation_requires_tap"]),
+            int(oracle_activation.get("activation_discard_count") or 0),
+            str(oracle_activation.get("activation_discard_target") or ""),
+            bool(oracle_activation.get("activation_discard_random")),
+            int(oracle_activation.get("activation_life_cost") or 0),
         )
         if source_cost != oracle_cost:
             return None, "activated_regenerate_source_source_oracle_cost_mismatch"
@@ -27614,6 +27634,25 @@ def split_row(
             "activation_cost_colors": parsed_activation["activation_cost_colors"],
             "activation_requires_tap": parsed_activation["activation_requires_tap"],
             "activation_requires_sacrifice": False,
+            **(
+                {
+                    "activation_discard_count": int(parsed_activation.get("activation_discard_count") or 0),
+                    "activation_discard_target": parsed_activation.get("activation_discard_target") or "any_card",
+                    "activation_requires_discard_card": True,
+                }
+                if int(parsed_activation.get("activation_discard_count") or 0)
+                else {}
+            ),
+            **(
+                {"activation_discard_random": True}
+                if parsed_activation.get("activation_discard_random")
+                else {}
+            ),
+            **(
+                {"activation_life_cost": int(parsed_activation.get("activation_life_cost") or 0)}
+                if int(parsed_activation.get("activation_life_cost") or 0)
+                else {}
+            ),
         }
         if keyword_list:
             activated_effect["keywords"] = keyword_list
@@ -27637,6 +27676,25 @@ def split_row(
             "activation_cost_colors": parsed_activation["activation_cost_colors"],
             "activation_requires_tap": parsed_activation["activation_requires_tap"],
             "activation_requires_sacrifice": False,
+            **(
+                {
+                    "activation_discard_count": int(parsed_activation.get("activation_discard_count") or 0),
+                    "activation_discard_target": parsed_activation.get("activation_discard_target") or "any_card",
+                    "activation_requires_discard_card": True,
+                }
+                if int(parsed_activation.get("activation_discard_count") or 0)
+                else {}
+            ),
+            **(
+                {"activation_discard_random": True}
+                if parsed_activation.get("activation_discard_random")
+                else {}
+            ),
+            **(
+                {"activation_life_cost": int(parsed_activation.get("activation_life_cost") or 0)}
+                if int(parsed_activation.get("activation_life_cost") or 0)
+                else {}
+            ),
         }
         if keyword_list:
             effect_json["keywords"] = keyword_list

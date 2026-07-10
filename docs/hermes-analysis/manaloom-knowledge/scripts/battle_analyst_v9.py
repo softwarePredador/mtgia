@@ -49670,6 +49670,11 @@ def _activated_rule_effects_for_permanent(permanent):
             "activation_cost_mana": permanent.get("activation_cost_mana"),
             "activation_cost_generic": permanent.get("activation_cost_generic"),
             "activation_cost_colors": permanent.get("activation_cost_colors"),
+            "activation_discard_count": permanent.get("activation_discard_count"),
+            "activation_discard_target": permanent.get("activation_discard_target"),
+            "activation_requires_discard_card": permanent.get("activation_requires_discard_card"),
+            "activation_discard_random": permanent.get("activation_discard_random"),
+            "activation_life_cost": permanent.get("activation_life_cost"),
             "target": "self",
             "target_controller": "self",
             "target_constraints": permanent.get("target_constraints")
@@ -53461,7 +53466,17 @@ def can_activate_generic_regenerate_source_permanent(player, permanent, *, effec
     ):
         return False
     activation_cost = _regenerate_source_activation_cost(effect_data)
-    return player.can_pay(activation_cost)
+    if not player.can_pay(activation_cost):
+        return False
+    discard_count = max(0, int(effect_data.get("activation_discard_count") or 0))
+    if discard_count:
+        discard_target = effect_data.get("activation_discard_target") or "any_card"
+        if len(_activation_discard_cost_candidates(player, discard_count, discard_target)) < discard_count:
+            return False
+    life_cost = max(0, int(effect_data.get("activation_life_cost") or 0))
+    if life_cost and (getattr(player, "life_cant_change", False) or player.life <= life_cost + 1):
+        return False
+    return True
 
 
 def activate_generic_regenerate_source_permanent(
@@ -53484,8 +53499,44 @@ def activate_generic_regenerate_source_permanent(
         return False
     phase = phase or "precombat_main"
     activation_cost = _regenerate_source_activation_cost(effect_data)
+    discard_count = max(0, int(effect_data.get("activation_discard_count") or 0))
+    discard_target = effect_data.get("activation_discard_target") or "any_card"
+    discard_cards = []
+    if discard_count:
+        discard_cards = _choose_activation_discard_cost_cards(
+            player,
+            discard_count,
+            discard_target,
+            random_discard=bool(effect_data.get("activation_discard_random")),
+            rng=rng,
+        )
+        if len(discard_cards) != discard_count:
+            return False
     if not player.spend_mana(activation_cost):
         return False
+    life_before = player.life
+    life_cost = max(0, int(effect_data.get("activation_life_cost") or 0))
+    if life_cost:
+        change_life(player, -life_cost)
+    discarded = []
+    if discard_cards:
+        removed_cards = _remove_exact_cards_from_hand(player, discard_cards)
+        if len(removed_cards) != len(discard_cards):
+            return False
+        discard_resolution = resolve_effect_discard_cards(
+            player,
+            removed_cards,
+            top_limit=0,
+            opponents=[opponent for opponent in all_players if opponent is not player],
+            turn=turn,
+            phase=phase,
+            rng=rng,
+        )
+        discarded = [
+            card.get("name", "?")
+            for card in discard_resolution.get("to_graveyard", removed_cards)
+            if isinstance(card, dict)
+        ]
     if effect_data.get("activation_requires_tap"):
         permanent["tapped"] = True
     shields_before = max(0, int(permanent.get("regeneration_shields") or 0))
@@ -53516,6 +53567,10 @@ def activate_generic_regenerate_source_permanent(
         score_components={
             "activation_cost": activation_cost,
             "requires_tap": 1 if effect_data.get("activation_requires_tap") else 0,
+            "discard_cost": discard_count,
+            "life_cost": life_cost,
+            "life_before": life_before,
+            "life_after": player.life,
             "regeneration_shields_before": shields_before,
         },
         rule_source=fields.get("rule_source", "battle_rule"),
@@ -53528,12 +53583,16 @@ def activate_generic_regenerate_source_permanent(
         resource_delta={
             "mana": -mana_paid,
             "tapped": 1 if effect_data.get("activation_requires_tap") else 0,
+            "life": -life_cost,
+            "cards_discarded": len(discarded),
             "regeneration_shields": 1,
         },
         risk_flags=[
             flag
             for flag, active in {
                 "tap_ability": bool(effect_data.get("activation_requires_tap")),
+                "discard_cost": bool(discarded),
+                "life_payment": bool(life_cost),
                 "temporary_replacement_shield": True,
             }.items()
             if active
@@ -53548,6 +53607,13 @@ def activate_generic_regenerate_source_permanent(
         activation_cost=activation_cost,
         tapped=bool(permanent.get("tapped")),
         mana_paid=mana_paid,
+        activation_life_cost=life_cost,
+        life_paid=life_cost,
+        life_before=life_before,
+        life_after=player.life,
+        activation_discard_count=len(discarded),
+        activation_discard_target=discard_target if discard_count else None,
+        discarded=discarded,
         target=permanent.get("name", "?"),
         target_player=player.name,
         regeneration_shields_before=shields_before,

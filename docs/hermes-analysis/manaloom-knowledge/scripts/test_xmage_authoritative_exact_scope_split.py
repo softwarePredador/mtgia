@@ -23544,7 +23544,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["_activated_rule_effects"][0]["keywords"], ["flying", "vigilance"])
         self.assertTrue(effect["_activated_rule_effects"][0]["_keywords_are_self"])
 
-    def test_activated_regenerate_source_blocks_non_mana_source_cost(self) -> None:
+    def test_activated_regenerate_source_maps_life_cost(self) -> None:
         row = queue_row(
             "xmage_signature::RegenerateSourceEffect::SimpleActivatedAbility::"
             "no_target_class::no_condition_class::activated_ability",
@@ -23558,7 +23558,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             metadata(
                 name="Fixture Ghoul",
                 type_line="Creature - Zombie",
-                oracle_text="{B}: Regenerate this creature.",
+                oracle_text="Pay 2 life: Regenerate this creature.",
             ),
             source_text=(
                 "this.addAbility(new SimpleActivatedAbility("
@@ -23567,8 +23567,42 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             ),
         )
 
-        self.assertIsNone(proposal)
-        self.assertEqual(reason, "activated_regenerate_source_cost_not_supported")
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.REGENERATE_SOURCE_ACTIVATED_SCOPE)
+        self.assertEqual(effect["activation_life_cost"], 2)
+        self.assertEqual(effect["_activated_rule_effects"][0]["activation_life_cost"], 2)
+
+    def test_activated_regenerate_source_maps_discard_cost(self) -> None:
+        row = queue_row(
+            "xmage_signature::RegenerateSourceEffect::SimpleActivatedAbility::"
+            "no_target_class::no_condition_class::activated_ability",
+            effect_classes=["RegenerateSourceEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Centaur Veteran",
+                type_line="Creature - Centaur",
+                oracle_text="{G}, Discard a card: Regenerate Centaur Veteran.",
+            ),
+            source_text=(
+                "Ability ability = new SimpleActivatedAbility("
+                "new RegenerateSourceEffect(), "
+                'new ManaCostsImpl<>("{G}"));'
+                "ability.addCost(new DiscardCardCost());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.REGENERATE_SOURCE_ACTIVATED_SCOPE)
+        self.assertEqual(effect["activation_discard_count"], 1)
+        self.assertEqual(effect["activation_discard_target"], "any_card")
+        self.assertEqual(effect["_activated_rule_effects"][0]["activation_discard_count"], 1)
 
     def test_activated_self_boost_accepts_colored_mana_cost_source(self) -> None:
         row = queue_row(
