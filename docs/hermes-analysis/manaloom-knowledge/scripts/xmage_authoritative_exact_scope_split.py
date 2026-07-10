@@ -74,6 +74,7 @@ EXILE_UNIT = "removal_exile::targeted_exile_variant_v1"
 RAMP_ARTIFACT_UNIT = "ramp_permanent::xmage_artifact_mana_source_variant_review_v1"
 RAMP_CREATURE_UNIT = "ramp_permanent::xmage_creature_mana_source_variant_review_v1"
 RAMP_ANY_COLOR_MANA_ROCK_UNIT = "ramp_permanent::one_any_color_mana_rock_v1"
+PAIN_TALISMAN_UNIT = "ramp_permanent::pain_talisman_color_pair_partial_v1"
 COUNTER_UNIT = "counter_spell::counter_target_stack_object_variant_v1"
 COUNTER_UNLESS_PAYS_UNIT = (
     "xmage_signature::CounterUnlessPaysEffect::no_ability_class::"
@@ -208,6 +209,7 @@ SUPPORTED_UNITS = {
     RAMP_ARTIFACT_UNIT,
     RAMP_CREATURE_UNIT,
     RAMP_ANY_COLOR_MANA_ROCK_UNIT,
+    PAIN_TALISMAN_UNIT,
     COUNTER_UNIT,
     BOUNCE_UNIT,
     TAP_TARGET_CREATURE_SPELL_UNIT,
@@ -322,6 +324,7 @@ EXILE_DRAW_SCOPE = "xmage_exile_target_and_draw_card_spell_v1"
 DESTROY_COMPENSATION_TOKEN_SCOPE = "xmage_destroy_target_with_controller_creature_token_compensation_spell_v1"
 EXILE_COMPENSATION_TOKEN_SCOPE = "xmage_exile_target_with_controller_creature_token_compensation_spell_v1"
 MANA_SCOPE = "xmage_simple_tap_mana_source_permanent_v1"
+PAIN_TALISMAN_SCOPE = "pain_talisman_color_pair_partial_v1"
 MANA_WITH_ACTIVATED_DRAW_SCOPE = "xmage_simple_tap_mana_source_with_activated_draw_v1"
 MANA_WITH_ETB_DRAW_SCOPE = "xmage_simple_mana_source_with_etb_draw_v1"
 ETB_FIXED_MANA_CREATURE_SCOPE = "xmage_creature_etb_add_fixed_mana_v1"
@@ -528,7 +531,12 @@ SPELL_UNITS = {
     TOKEN_SPELL_UNIT,
     LOOK_LIBRARY_PICK_SPELL_UNIT,
 }
-RAMP_UNITS = {RAMP_ARTIFACT_UNIT, RAMP_CREATURE_UNIT, RAMP_ANY_COLOR_MANA_ROCK_UNIT}
+RAMP_UNITS = {
+    RAMP_ARTIFACT_UNIT,
+    RAMP_CREATURE_UNIT,
+    RAMP_ANY_COLOR_MANA_ROCK_UNIT,
+    PAIN_TALISMAN_UNIT,
+}
 
 SPELL_COMPLEXITY_TOKENS = {
     "additional cost",
@@ -23261,6 +23269,52 @@ def fixed_mana_symbols_from_ability_classes(ability_class_values: set[str]) -> l
     ]
 
 
+def pain_talisman_detail_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
+    lines = normalized_oracle_lines(metadata)
+    if len(lines) != 2 or lines[0] != "{t}: add {c}.":
+        return None
+    match = re.fullmatch(
+        r"\{t\}: add \{(?P<first>[wubrg])\} or \{(?P<second>[wubrg])\}\. "
+        r"(?:this artifact|[^.]+) deals (?P<damage>\d+) damage to you\.?",
+        lines[1],
+    )
+    if not match:
+        return None
+    first = match.group("first").upper()
+    second = match.group("second").upper()
+    if first == second:
+        return None
+    return {
+        "produces": f"C{first}{second}",
+        "mana_produced": 1,
+        "mana_activation_requires_tap": True,
+        "colored_mana_symbols": [first, second],
+        "life_for_colored_mana": int(match.group("damage")),
+    }
+
+
+def pain_talisman_detail_from_source(
+    source_text: str,
+    ability_class_values: set[str],
+) -> dict[str, Any] | str:
+    symbols = fixed_mana_symbols_from_ability_classes(ability_class_values)
+    colored_symbols = [symbol for symbol in symbols if symbol != "C"]
+    if symbols.count("C") != 1 or len(colored_symbols) != 2:
+        return "pain_talisman_source_mana_abilities_not_exact"
+    damage_amounts = [
+        int(value)
+        for value in re.findall(r"new\s+DamageControllerEffect\s*\(\s*(\d+)\s*\)", source_text or "")
+    ]
+    if len(damage_amounts) != len(colored_symbols):
+        return "pain_talisman_source_damage_count_mismatch"
+    if len(set(damage_amounts)) != 1:
+        return "pain_talisman_source_damage_amount_not_single"
+    return {
+        "colored_mana_symbols": colored_symbols,
+        "life_for_colored_mana": int(damage_amounts[0]),
+    }
+
+
 def tap_and_self_sacrifice_mana_source_source_blocker(
     source_text: str,
     ability_class_values: set[str],
@@ -35978,6 +36032,44 @@ def split_row(
             return None, "mana_source_unsafe_ability_class"
         if not mana_ability_classes.intersection(SAFE_MANA_ABILITY_CLASSES) and not limited_choice_mana_supported:
             return None, "mana_source_safe_ability_missing"
+        if unit == PAIN_TALISMAN_UNIT:
+            if classes != {"DamageControllerEffect"}:
+                return None, "pain_talisman_effect_class_not_exact"
+            oracle_mana = pain_talisman_detail_from_oracle(metadata)
+            if oracle_mana is None:
+                return None, "pain_talisman_oracle_not_exact"
+            source_mana = pain_talisman_detail_from_source(source_text, mana_ability_classes)
+            if isinstance(source_mana, str):
+                return None, source_mana
+            if Counter(source_mana["colored_mana_symbols"]) != Counter(
+                oracle_mana["colored_mana_symbols"]
+            ):
+                return None, "pain_talisman_source_oracle_color_mismatch"
+            if int(source_mana["life_for_colored_mana"]) != int(
+                oracle_mana["life_for_colored_mana"]
+            ):
+                return None, "pain_talisman_source_oracle_damage_mismatch"
+            effect_json = {
+                "effect": "ramp_permanent",
+                "battle_model_scope": PAIN_TALISMAN_SCOPE,
+                "is_mana_source": True,
+                "mana_produced": 1,
+                "produces": oracle_mana["produces"],
+                "life_for_colored_mana": int(oracle_mana["life_for_colored_mana"]),
+                "activation_requires_tap": True,
+                "mana_activation_requires_tap": True,
+                "permanent_type": "artifact",
+                "ability_kind": "activated",
+                "xmage_mana_ability_classes": sorted(mana_ability_classes),
+                "xmage_effect_classes": sorted(classes),
+                "xmage_ability_classes": sorted(mana_ability_classes),
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_pain_talisman_color_pair_mana_source",
+            ), "selected_exact_scope"
         mana_source_with_activated_draw = (
             classes == {"DrawCardSourceControllerEffect"}
             and "SimpleActivatedAbility" in mana_ability_classes
@@ -36794,6 +36886,7 @@ def build_exact_split_report(
                 "xmage_signature BoostSourceEffect + AttacksTriggeredAbility rows with exact fixed self boost until EOT and Oracle/source agreement",
                 "grant_protection_from_chosen_color rows with pure GainAbilityTargetEffect one-shot spells, exact target-creature keyword until EOT, and no auxiliary ability classes",
                 "PreventAllDamageByAllPermanentsEffect one-shot spells with exact Oracle 'Prevent all combat damage that would be dealt this turn', exact XMage Duration.EndOfTurn onlyCombat=true source, and optional CyclingAbility as auxiliary resolution-neutral ability",
+                "ramp_permanent::pain_talisman_color_pair_partial_v1 rows with ColorlessManaAbility plus two fixed colored mana abilities, DamageControllerEffect(N) on each colored mode, and exact Oracle color-pair pain mana text",
                 "ramp_permanent::xmage_creature_mana_source_variant_review_v1 rows with EntersBattlefieldTriggeredAbility + BasicManaEffect, exact unconditional fixed ETB mana Oracle/source agreement, and no auxiliary ability class",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with ReturnFromGraveyardToHandTargetEffect, SimpleActivatedAbility, exact activated graveyard-to-hand Oracle text, and mana/tap/self-sacrifice/discard-a-card source costs only",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with ReturnFromGraveyardToBattlefieldTargetEffect, SimpleActivatedAbility, exact activated graveyard-to-battlefield Oracle text, and mana/tap/source self-sacrifice costs only",

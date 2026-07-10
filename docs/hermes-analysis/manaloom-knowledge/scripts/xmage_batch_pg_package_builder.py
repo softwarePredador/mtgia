@@ -487,6 +487,7 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "mana_produced",
     "produces",
     "produced_mana_symbols",
+    "life_for_colored_mana",
     "mana_activation_requires_tap",
     "mana_activation_requires_sacrifice_target",
     "sacrifice_mana_source_contextual_only",
@@ -2834,6 +2835,38 @@ def _manifest_has_multiple_mana_choices(value: Any) -> bool:
     return len(set(symbols)) > 1
 
 
+def _manifest_conditional_life_loss_by_color(
+    produces: Any,
+    life_for_colored_mana: int,
+) -> dict[str, int]:
+    if not life_for_colored_mana:
+        return {}
+    color_names = {
+        "W": "white",
+        "U": "blue",
+        "B": "black",
+        "R": "red",
+        "G": "green",
+        "C": "colorless",
+    }
+    symbols = []
+    if isinstance(produces, str):
+        symbols = re.findall(r"[WUBRGC]", produces.upper())
+    elif isinstance(produces, list):
+        symbols = [
+            str(symbol or "").strip().upper()
+            for symbol in produces
+            if str(symbol or "").strip().upper() in color_names
+        ]
+    result: dict[str, int] = {}
+    for symbol in symbols:
+        color = color_names.get(symbol)
+        if not color:
+            continue
+        result[color] = 0 if symbol == "C" else int(life_for_colored_mana)
+    return result
+
+
 def _manifest_support_sources_for_controller_mana(mana: dict[str, int]) -> list[dict[str, Any]]:
     sources: list[dict[str, Any]] = []
     color_symbols = {
@@ -2870,6 +2903,7 @@ def simple_mana_source_execution_scenario_from_expected_rule(rule: dict[str, Any
         "xmage_simple_tap_mana_source_permanent_v1",
         "xmage_simple_tap_mana_source_with_activated_draw_v1",
         "xmage_simple_mana_source_with_etb_draw_v1",
+        "pain_talisman_color_pair_partial_v1",
     }:
         return None
     mana_produced = int(required.get("mana_produced") or 0)
@@ -2909,6 +2943,12 @@ def simple_mana_source_execution_scenario_from_expected_rule(rule: dict[str, Any
         scenario["starting_life"] = 40
         scenario["expected_life_paid"] = activation_life_cost
         scenario["expected_life_after_refresh"] = 40 - activation_life_cost
+    conditional_life_loss_by_color = _manifest_conditional_life_loss_by_color(
+        required.get("produces"),
+        int(required.get("life_for_colored_mana") or 0),
+    )
+    if conditional_life_loss_by_color:
+        scenario["expected_conditional_life_loss_by_color"] = conditional_life_loss_by_color
     return scenario
 
 

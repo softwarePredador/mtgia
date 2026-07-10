@@ -5254,3 +5254,39 @@ def test_proliferate_draw_fields_and_execution_scenario_are_manifested() -> None
     assert scenario["expected_controller_plus_one_counters"] == 2
     assert scenario["expected_opponent_charge_counters"] == 3
     assert scenario["expected_opponent_poison_counters"] == 2
+
+
+def test_pain_talisman_manifest_preserves_colored_mana_life_loss_modes() -> None:
+    proposal = {
+        "normalized_name": "talisman of hierarchy",
+        "card_name": "Talisman of Hierarchy",
+        "oracle_hash": "hash-talisman-hierarchy",
+        "logical_rule_key": "battle_rule_v1:talisman-hierarchy",
+        "effect_json": {
+            "effect": "ramp_permanent",
+            "battle_model_scope": "pain_talisman_color_pair_partial_v1",
+            "is_mana_source": True,
+            "mana_produced": 1,
+            "produces": "CWB",
+            "life_for_colored_mana": 1,
+            "mana_activation_requires_tap": True,
+            "activation_requires_tap": True,
+            "permanent_type": "artifact",
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    required = expected["required_effect_fields"]
+
+    assert required["life_for_colored_mana"] == 1
+
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    assert scenario["type"] == "simple_mana_source_refresh"
+    assert scenario["expected_available_mana_after_refresh"] == 1
+    assert scenario["expected_conditional_mana"] == 1
+    assert scenario["expected_conditional_life_loss_by_color"] == {
+        "colorless": 0,
+        "white": 1,
+        "black": 1,
+    }

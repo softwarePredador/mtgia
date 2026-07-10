@@ -3399,6 +3399,55 @@ def test_simple_mana_source_refresh_runner_executes_partial_mana_rule() -> None:
     assert result["tapped"] is True
 
 
+def test_simple_mana_source_refresh_runner_validates_pain_talisman_modes() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "ramp_permanent",
+        "battle_model_scope": "pain_talisman_color_pair_partial_v1",
+        "is_mana_source": True,
+        "mana_produced": 1,
+        "produces": "CWB",
+        "life_for_colored_mana": 1,
+        "mana_activation_requires_tap": True,
+        "_rule_logical_key": "battle_rule_v1:talisman-hierarchy",
+    }
+    try:
+        result = validator.run_simple_mana_source_refresh(
+            battle,
+            {
+                "name": "Talisman of Hierarchy refreshes pain mana",
+                "type": "simple_mana_source_refresh",
+                "card": {"name": "Talisman of Hierarchy"},
+                "expected_available_mana_after_refresh": 1,
+                "expected_tapped": True,
+                "expected_sources": 1,
+                "expected_conditional_mana": 1,
+                "expected_conditional_life_loss_by_color": {
+                    "colorless": 0,
+                    "white": 1,
+                    "black": 1,
+                },
+                "logical_rule_key": "battle_rule_v1:talisman-hierarchy",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Talisman of Hierarchy"
+    assert result["conditional_mana"] == 1
+    assert result["conditional_life_loss_by_color"] == {
+        "colorless": 0,
+        "white": 1,
+        "black": 1,
+    }
+
+
 def test_creature_dies_create_treasure_runner_executes_trigger() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

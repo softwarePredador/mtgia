@@ -4704,6 +4704,30 @@ def run_simple_mana_source_refresh(
             "battle_execution",
             f"{card['name']} conditional mana={conditional_total}, expected {expected_conditional}",
         )
+    expected_life_loss_by_color = {
+        str(color): int(value)
+        for color, value in dict(
+            scenario.get("expected_conditional_life_loss_by_color") or {}
+        ).items()
+    }
+    if expected_life_loss_by_color:
+        actual_life_loss_by_color: dict[str, int] = {}
+        for conditional_source in getattr(active, "conditional_mana_sources", []) or []:
+            if not isinstance(conditional_source, dict):
+                continue
+            for mode in conditional_source.get("modes") or []:
+                if not isinstance(mode, dict):
+                    continue
+                color = str(mode.get("color") or "")
+                if not color:
+                    continue
+                actual_life_loss_by_color[color] = int(mode.get("life_loss_on_spend") or 0)
+        if actual_life_loss_by_color != expected_life_loss_by_color:
+            fail(
+                "battle_execution",
+                f"{card['name']} conditional life-loss modes="
+                f"{actual_life_loss_by_color}, expected {expected_life_loss_by_color}",
+            )
     expected_life_after = scenario.get("expected_life_after_refresh")
     if expected_life_after is not None and active.life != int(expected_life_after):
         fail(
@@ -4783,6 +4807,7 @@ def run_simple_mana_source_refresh(
         "activation_limit_per_turn": expected_activation_limit,
         "life_paid": expected_life_paid,
         "life_after_refresh": active.life,
+        "conditional_life_loss_by_color": expected_life_loss_by_color,
     }
 
 

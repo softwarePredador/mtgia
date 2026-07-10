@@ -30126,6 +30126,81 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "not_instant_or_sorcery_spell")
 
+    def test_pain_talisman_maps_exact_color_pair_mana_modes(self) -> None:
+        proposal, reason = split.split_row(
+            queue_row(
+                split.PAIN_TALISMAN_UNIT,
+                effect_classes=["DamageControllerEffect"],
+                ability_classes=[
+                    "BlackManaAbility",
+                    "ColorlessManaAbility",
+                    "WhiteManaAbility",
+                ],
+                xmage_signals=["mana"],
+            ),
+            metadata(
+                name="Talisman of Hierarchy",
+                type_line="Artifact",
+                oracle_text=(
+                    "{T}: Add {C}.\n"
+                    "{T}: Add {W} or {B}. This artifact deals 1 damage to you."
+                ),
+            ),
+            source_text="""
+                this.addAbility(new ColorlessManaAbility());
+                Ability ability = new WhiteManaAbility();
+                ability.addEffect(new DamageControllerEffect(1));
+                this.addAbility(ability);
+                ability = new BlackManaAbility();
+                ability.addEffect(new DamageControllerEffect(1));
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.PAIN_TALISMAN_SCOPE)
+        self.assertEqual(effect["effect"], "ramp_permanent")
+        self.assertEqual(effect["produces"], "CWB")
+        self.assertEqual(effect["mana_produced"], 1)
+        self.assertEqual(effect["life_for_colored_mana"], 1)
+        self.assertTrue(effect["mana_activation_requires_tap"])
+        self.assertEqual(effect["xmage_effect_classes"], ["DamageControllerEffect"])
+
+    def test_pain_talisman_blocks_source_oracle_damage_mismatch(self) -> None:
+        proposal, reason = split.split_row(
+            queue_row(
+                split.PAIN_TALISMAN_UNIT,
+                effect_classes=["DamageControllerEffect"],
+                ability_classes=[
+                    "ColorlessManaAbility",
+                    "GreenManaAbility",
+                    "WhiteManaAbility",
+                ],
+                xmage_signals=["mana"],
+            ),
+            metadata(
+                name="Talisman of Unity",
+                type_line="Artifact",
+                oracle_text=(
+                    "{T}: Add {C}.\n"
+                    "{T}: Add {G} or {W}. This artifact deals 1 damage to you."
+                ),
+            ),
+            source_text="""
+                this.addAbility(new ColorlessManaAbility());
+                Ability ability = new GreenManaAbility();
+                ability.addEffect(new DamageControllerEffect(2));
+                this.addAbility(ability);
+                ability = new WhiteManaAbility();
+                ability.addEffect(new DamageControllerEffect(2));
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "pain_talisman_source_oracle_damage_mismatch")
+
 
 if __name__ == "__main__":
     unittest.main()
