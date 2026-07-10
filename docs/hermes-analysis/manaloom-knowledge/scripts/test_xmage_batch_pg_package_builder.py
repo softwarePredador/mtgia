@@ -1669,6 +1669,39 @@ def test_manifest_builds_fixed_damage_target_additional_cost_scenario() -> None:
     assert scenario["controller_battlefield"][0]["type_line"] == "Basic Land - Mountain"
 
 
+def test_manifest_builds_single_target_removal_or_additional_cost_scenario() -> None:
+    proposal = {
+        "normalized_name": "bitter triumph",
+        "card_name": "Bitter Triumph",
+        "oracle_hash": "hash-bitter-triumph",
+        "logical_rule_key": "battle_rule_v1:hash-bitter-triumph",
+        "effect_json": {
+            "effect": "remove_creature",
+            "battle_model_scope": "xmage_destroy_target_spell_v1",
+            "target": "creature_or_planeswalker",
+            "target_constraints": {"scope": "creature_or_planeswalker"},
+            "destination": "graveyard",
+            "additional_cost": "choose_discard_card_or_pay_life",
+            "requires_one_additional_cost_option": True,
+            "additional_cost_options": [
+                {"cost": "discard_card", "requires_discard_card": True},
+                {"cost": "pay_life", "requires_pay_life": True, "pay_life_amount": 3},
+            ],
+            "xmage_additional_cost_class": "OrCost",
+        },
+    }
+
+    rule = builder.expected_rule_from_proposal(proposal)
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert rule["required_effect_fields"]["requires_one_additional_cost_option"] is True
+    assert scenario is not None
+    assert scenario["type"] == "single_target_removal"
+    assert scenario["expected_additional_cost"] == "discard_card"
+    assert scenario["expected_discarded_name"] == "E2E Discard Cost Card"
+    assert scenario["controller_hand"][0]["name"] == "E2E Discard Cost Card"
+
+
 def test_manifest_builds_damage_target_create_treasure_execution_scenario() -> None:
     proposal = {
         "normalized_name": "improvised weaponry",

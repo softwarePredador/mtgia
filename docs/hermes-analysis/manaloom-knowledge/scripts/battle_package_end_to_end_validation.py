@@ -2454,6 +2454,14 @@ def run_single_target_removal(
     expected_source_controller_damage = int(scenario.get("expected_source_controller_damage") or 0)
     expected_target_controller_damage = int(scenario.get("expected_target_controller_damage") or 0)
     active.life = controller_starting_life
+    for card_fixture in scenario.get("controller_hand") or []:
+        if isinstance(card_fixture, dict):
+            active.hand.append(dict(card_fixture))
+    controller_battlefield = [
+        dict(card_fixture)
+        for card_fixture in scenario.get("controller_battlefield") or []
+        if isinstance(card_fixture, dict)
+    ]
     target = dict(scenario["target"])
     nonmatching = dict(
         scenario.get("nonmatching_target")
@@ -2488,8 +2496,12 @@ def run_single_target_removal(
         other_owner = active
     if expected_target_controller_damage > 0:
         target_owner.life = target_controller_starting_life
-    target_owner.battlefield = [nonmatching, target]
-    other_owner.battlefield = []
+    if target_owner is active:
+        target_owner.battlefield = [*controller_battlefield, nonmatching, target]
+        other_owner.battlefield = []
+    else:
+        target_owner.battlefield = [nonmatching, target]
+        other_owner.battlefield = controller_battlefield
 
     battle.apply_effect_immediate(
         active,
@@ -2529,6 +2541,55 @@ def run_single_target_removal(
         fail("battle_events", f"{card['name']} target_player={removal_event.get('target_player')!r}")
     if str(removal_event.get("destination") or "").lower() != destination:
         fail("battle_events", f"{card['name']} destination={removal_event.get('destination')!r}")
+    expected_additional_cost = str(scenario.get("expected_additional_cost") or "").strip()
+    additional_cost_event = None
+    if expected_additional_cost:
+        additional_cost_event = next(
+            (
+                data
+                for event, data in events[before_events:]
+                if event == "additional_cost_paid"
+                and data.get("card") == card.get("name")
+                and data.get("cost") == expected_additional_cost
+            ),
+            None,
+        )
+        if additional_cost_event is None:
+            fail(
+                "battle_events",
+                f"missing {card['name']} additional_cost_paid {expected_additional_cost}",
+            )
+    expected_pay_life_amount = int(scenario.get("expected_pay_life_amount") or 0)
+    if expected_pay_life_amount > 0 and additional_cost_event is not None:
+        if int(additional_cost_event.get("pay_life_amount") or 0) != expected_pay_life_amount:
+            fail(
+                "battle_events",
+                f"{card['name']} pay_life_amount={additional_cost_event.get('pay_life_amount')!r}",
+            )
+    expected_discarded_name = str(scenario.get("expected_discarded_name") or "").strip()
+    if expected_discarded_name:
+        graveyard_names = [
+            str(item.get("name") or "")
+            for item in active.graveyard
+            if isinstance(item, dict)
+        ]
+        if expected_discarded_name not in graveyard_names:
+            fail(
+                "battle_execution",
+                f"{card['name']} did not discard {expected_discarded_name}",
+            )
+    expected_sacrificed_name = str(scenario.get("expected_sacrificed_name") or "").strip()
+    if expected_sacrificed_name:
+        active_battlefield_names = [
+            str(item.get("name") or "")
+            for item in active.battlefield
+            if isinstance(item, dict)
+        ]
+        if expected_sacrificed_name in active_battlefield_names:
+            fail(
+                "battle_execution",
+                f"{card['name']} did not sacrifice {expected_sacrificed_name}",
+            )
     if expected_controller_life_gain > 0:
         expected_life = controller_starting_life + expected_controller_life_gain
         if active.life != expected_life:
@@ -2650,6 +2711,10 @@ def run_single_target_removal(
         result["target_controller_life_before"] = target_controller_starting_life
         result["target_controller_life_after"] = target_owner.life
         result["target_controller_damage_dealt"] = expected_target_controller_damage
+    if expected_additional_cost:
+        result["additional_cost"] = expected_additional_cost
+    if expected_pay_life_amount > 0:
+        result["pay_life_amount"] = expected_pay_life_amount
     return result
 
 

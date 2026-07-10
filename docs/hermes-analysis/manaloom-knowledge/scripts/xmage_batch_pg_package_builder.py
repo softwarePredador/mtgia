@@ -108,8 +108,12 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "control_duration",
     "granted_keywords_until_eot",
     "additional_cost",
+    "requires_one_additional_cost_option",
+    "additional_cost_options",
     "requires_discard_card",
     "requires_discard_land",
+    "requires_pay_life",
+    "pay_life_amount",
     "requires_sacrifice_creature",
     "requires_sacrifice_creature_or_enchantment",
     "requires_sacrifice_creature_or_planeswalker",
@@ -5161,6 +5165,72 @@ def single_target_removal_execution_scenario_from_expected_rule(
     if target_controller_damage > 0:
         scenario["target_controller_life"] = 20
         scenario["expected_target_controller_damage"] = target_controller_damage
+    additional_cost_options = [
+        option
+        for option in required.get("additional_cost_options") or []
+        if isinstance(option, dict)
+    ]
+    selected_additional_cost = str(required.get("additional_cost") or "").strip()
+    selected_option = additional_cost_options[0] if additional_cost_options else {}
+    if selected_option:
+        selected_additional_cost = str(selected_option.get("cost") or "").strip()
+    if selected_additional_cost == "discard_card":
+        scenario["controller_hand"] = [
+            {
+                "name": "E2E Discard Cost Card",
+                "type_line": "Sorcery",
+                "effect": "draw_cards",
+            }
+        ]
+        scenario["expected_additional_cost"] = "discard_card"
+        scenario["expected_discarded_name"] = "E2E Discard Cost Card"
+    elif selected_additional_cost == "pay_life":
+        pay_life_amount = int(
+            selected_option.get("pay_life_amount")
+            or required.get("pay_life_amount")
+            or 0
+        )
+        if pay_life_amount > 0:
+            scenario["controller_life"] = max(20, pay_life_amount + 5)
+            scenario["expected_additional_cost"] = "pay_life"
+            scenario["expected_pay_life_amount"] = pay_life_amount
+    elif selected_additional_cost in {
+        "sacrifice_creature",
+        "sacrifice_creature_or_enchantment",
+        "sacrifice_creature_or_planeswalker",
+        "sacrifice_artifact_or_creature",
+    }:
+        fixture_by_cost = {
+            "sacrifice_creature": {
+                "name": "E2E Sacrifice Cost Creature",
+                "type_line": "Creature - Soldier",
+                "effect": "creature",
+                "power": 1,
+                "toughness": 1,
+            },
+            "sacrifice_creature_or_enchantment": {
+                "name": "E2E Sacrifice Cost Enchantment",
+                "type_line": "Enchantment",
+                "effect": "enchantment",
+            },
+            "sacrifice_creature_or_planeswalker": {
+                "name": "E2E Sacrifice Cost Planeswalker",
+                "type_line": "Planeswalker",
+                "effect": "planeswalker",
+                "loyalty": 3,
+            },
+            "sacrifice_artifact_or_creature": {
+                "name": "E2E Sacrifice Cost Artifact",
+                "type_line": "Artifact",
+                "effect": "artifact",
+            },
+        }
+        scenario["controller_battlefield"] = [
+            *scenario.get("controller_battlefield", []),
+            fixture_by_cost[selected_additional_cost],
+        ]
+        scenario["expected_additional_cost"] = selected_additional_cost
+        scenario["expected_sacrificed_name"] = fixture_by_cost[selected_additional_cost]["name"]
     return scenario
 
 

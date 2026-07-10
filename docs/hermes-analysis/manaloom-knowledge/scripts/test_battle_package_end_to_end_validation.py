@@ -311,6 +311,115 @@ def test_fixed_damage_target_spell_runner_pays_mixed_sacrifice_cost() -> None:
     assert result["additional_cost"] == "sacrifice_creature_or_enchantment"
 
 
+def test_single_target_removal_runner_pays_or_discard_cost() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "remove_creature",
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "target": "creature_or_planeswalker",
+        "target_constraints": {"scope": "creature_or_planeswalker"},
+        "destination": "graveyard",
+        "additional_cost": "choose_discard_card_or_pay_life",
+        "requires_one_additional_cost_option": True,
+        "additional_cost_options": [
+            {"cost": "discard_card", "requires_discard_card": True},
+            {"cost": "pay_life", "requires_pay_life": True, "pay_life_amount": 3},
+        ],
+    }
+    try:
+        result = validator.run_single_target_removal(
+            battle,
+            {
+                "name": "Bitter Triumph pays discard option",
+                "type": "single_target_removal",
+                "card": {"name": "Bitter Triumph", "type_line": "Instant"},
+                "target": {
+                    "name": "E2E Legal Removal Target",
+                    "type_line": "Creature",
+                    "effect": "creature",
+                    "power": 2,
+                    "toughness": 2,
+                },
+                "nonmatching_target": {
+                    "name": "E2E Illegal Removal Target",
+                    "type_line": "Land",
+                    "effect": "land",
+                },
+                "controller_hand": [
+                    {
+                        "name": "E2E Discard Cost Card",
+                        "type_line": "Sorcery",
+                        "effect": "draw_cards",
+                    }
+                ],
+                "expected_destination": "graveyard",
+                "expected_effect": "remove_creature",
+                "expected_target_constraints": {"scope": "creature_or_planeswalker"},
+                "expected_additional_cost": "discard_card",
+                "expected_discarded_name": "E2E Discard Cost Card",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["target"] == "E2E Legal Removal Target"
+    assert result["additional_cost"] == "discard_card"
+
+
+def test_single_target_removal_runner_pays_life_cost() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "remove_creature",
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "target": "creature",
+        "target_constraints": {"card_types": ["creature"]},
+        "destination": "graveyard",
+        "additional_cost": "pay_life",
+        "requires_pay_life": True,
+        "pay_life_amount": 3,
+    }
+    try:
+        result = validator.run_single_target_removal(
+            battle,
+            {
+                "name": "Fumarole pays life cost",
+                "type": "single_target_removal",
+                "card": {"name": "Fumarole", "type_line": "Sorcery"},
+                "target": {
+                    "name": "E2E Legal Removal Target",
+                    "type_line": "Creature",
+                    "effect": "creature",
+                    "power": 2,
+                    "toughness": 2,
+                },
+                "controller_life": 20,
+                "expected_destination": "graveyard",
+                "expected_effect": "remove_creature",
+                "expected_target_constraints": {"card_types": ["creature"]},
+                "expected_additional_cost": "pay_life",
+                "expected_pay_life_amount": 3,
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["target"] == "E2E Legal Removal Target"
+    assert result["additional_cost"] == "pay_life"
+    assert result["pay_life_amount"] == 3
+
+
 def test_fixed_damage_target_spell_runner_validates_shuffle_self() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

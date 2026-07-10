@@ -13816,7 +13816,41 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["xmage_additional_cost_class"], "SacrificeTargetCost")
         self.assertEqual(effect["xmage_additional_cost_target"], "creature")
 
-    def test_destroy_target_spell_blocks_or_additional_cost(self) -> None:
+    def test_destroy_target_spell_accepts_or_discard_or_pay_life_additional_cost(self) -> None:
+        row = queue_row(split.DESTROY_UNIT, effect_classes=["DestroyTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                oracle_text=(
+                    "As an additional cost to cast this spell, discard a card or pay 3 life. "
+                    "Destroy target creature or planeswalker."
+                )
+            ),
+            source_text=(
+                "this.getSpellAbility().addCost(new OrCost("
+                "\"discard a card or pay 3 life\", "
+                "new DiscardCardCost(), "
+                "new PayLifeCost(3)));"
+                "this.getSpellAbility().addTarget(new TargetCreatureOrPlaneswalker());"
+                "this.getSpellAbility().addEffect(new DestroyTargetEffect());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DESTROY_SCOPE)
+        self.assertEqual(effect["additional_cost"], "choose_discard_card_or_pay_life")
+        self.assertTrue(effect["requires_one_additional_cost_option"])
+        self.assertEqual(
+            effect["additional_cost_options"],
+            [
+                {"cost": "discard_card", "requires_discard_card": True},
+                {"cost": "pay_life", "requires_pay_life": True, "pay_life_amount": 3},
+            ],
+        )
+        self.assertEqual(effect["xmage_additional_cost_class"], "OrCost")
+
+    def test_destroy_target_spell_accepts_or_sacrifice_or_discard_additional_cost(self) -> None:
         row = queue_row(split.DESTROY_UNIT, effect_classes=["DestroyTargetEffect"])
         proposal, reason = split.split_row(
             row,
@@ -13832,6 +13866,41 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                 "new SacrificeTargetCost(StaticFilters.FILTER_PERMANENT_CREATURE), "
                 "new DiscardCardCost()));"
                 "this.getSpellAbility().addTarget(new TargetCreaturePermanent());"
+                "this.getSpellAbility().addEffect(new DestroyTargetEffect());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["additional_cost"], "choose_sacrifice_creature_or_discard_card")
+        self.assertEqual(
+            effect["additional_cost_options"],
+            [
+                {
+                    "cost": "sacrifice_creature",
+                    "requires_sacrifice_creature": True,
+                    "xmage_additional_cost_target": "creature",
+                },
+                {"cost": "discard_card", "requires_discard_card": True},
+            ],
+        )
+
+    def test_destroy_target_spell_keeps_generic_mana_or_additional_cost_blocked(self) -> None:
+        row = queue_row(split.DESTROY_UNIT, effect_classes=["DestroyTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                oracle_text=(
+                    "As an additional cost to cast this spell, pay {4} or sacrifice an artifact or creature. "
+                    "Destroy target creature or planeswalker."
+                )
+            ),
+            source_text=(
+                "this.getSpellAbility().addCost(new OrCost("
+                "\"pay {4} or sacrifice an artifact or creature\", "
+                "new GenericManaCost(4), "
+                "new SacrificeTargetCost(StaticFilters.FILTER_CONTROLLED_PERMANENT_ARTIFACT_OR_CREATURE)));"
+                "this.getSpellAbility().addTarget(new TargetCreatureOrPlaneswalker());"
                 "this.getSpellAbility().addEffect(new DestroyTargetEffect());"
             ),
         )

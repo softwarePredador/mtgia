@@ -9087,12 +9087,16 @@ COMPOSITE_BLOCKING_EFFECT_KEYS = {
 SAFE_RUNTIME_SECONDARY_ANNOTATION_KEYS = {
     "requires_discard_card",
     "requires_discard_land",
+    "requires_pay_life",
+    "pay_life_amount",
     "requires_sacrifice_creature",
     "requires_sacrifice_creature_or_enchantment",
     "requires_sacrifice_creature_or_planeswalker",
     "requires_sacrifice_green_creature",
     "requires_sacrifice_land",
     "requires_return_land_to_hand",
+    "requires_one_additional_cost_option",
+    "additional_cost_options",
 }
 
 SAFE_RUNTIME_SECONDARY_DESCRIPTOR_KEYS = {
@@ -22699,6 +22703,21 @@ def choose_untapped_creature_for_resource_cost(player, *, required_color=None):
 
 
 def additional_card_costs_are_payable(player, card, effect_data, cost_context=None):
+    cost_options = [
+        option
+        for option in effect_data.get("additional_cost_options") or []
+        if isinstance(option, dict)
+    ]
+    if cost_options:
+        return any(
+            additional_card_costs_are_payable(
+                player,
+                card,
+                additional_cost_option_effect_fields(option),
+                cost_context=cost_context,
+            )
+            for option in cost_options
+        )
     planned_sacrifices = list((cost_context or {}).get("sacrifice_artifact_or_creature") or [])
     if planned_sacrifices:
         return True
@@ -22723,6 +22742,10 @@ def additional_card_costs_are_payable(player, card, effect_data, cost_context=No
             and is_land(candidate)
         ]
         if not discardable_lands:
+            return False
+    if effect_data.get("requires_pay_life"):
+        amount = int(effect_data.get("pay_life_amount") or 0)
+        if amount <= 0 or int(getattr(player, "life", 0) or 0) < amount:
             return False
     if effect_data.get("requires_sacrifice_green_creature"):
         creature, _options, _reason = choose_creature_for_resource_cost(
@@ -22799,16 +22822,91 @@ def additional_card_costs_are_payable(player, card, effect_data, cost_context=No
     return True
 
 
+def additional_cost_option_effect_fields(option):
+    cost = str((option or {}).get("cost") or "").strip()
+    effect_data = {"additional_cost": cost}
+    if cost == "discard_card":
+        effect_data["requires_discard_card"] = True
+    elif cost == "discard_land":
+        effect_data["requires_discard_land"] = True
+    elif cost == "pay_life":
+        effect_data["requires_pay_life"] = True
+        effect_data["pay_life_amount"] = int((option or {}).get("pay_life_amount") or 0)
+    elif cost == "sacrifice_creature":
+        effect_data["requires_sacrifice_creature"] = True
+    elif cost == "sacrifice_green_creature":
+        effect_data["requires_sacrifice_green_creature"] = True
+    elif cost == "sacrifice_creature_or_enchantment":
+        effect_data["requires_sacrifice_creature_or_enchantment"] = True
+    elif cost == "sacrifice_creature_or_planeswalker":
+        effect_data["requires_sacrifice_creature_or_planeswalker"] = True
+    elif cost == "sacrifice_artifact_or_creature":
+        effect_data["requires_sacrifice_artifact_or_creature"] = True
+    elif cost == "sacrifice_land":
+        effect_data["requires_sacrifice_land"] = True
+    elif cost == "return_land_to_hand":
+        effect_data["requires_return_land_to_hand"] = True
+    return effect_data
+
+
 def pay_additional_card_costs(player, card, effect_data, *, turn=None, cost_context=None):
     """Pay non-mana costs that materially affect battlefield validity."""
     if effect_data.get("_additional_card_costs_paid"):
         return True
     cost_context = dict(cost_context or {})
+    cost_options = [
+        option
+        for option in effect_data.get("additional_cost_options") or []
+        if isinstance(option, dict)
+    ]
+    if cost_options:
+        for option in cost_options:
+            option_effect_data = additional_cost_option_effect_fields(option)
+            if not additional_card_costs_are_payable(
+                player,
+                card,
+                option_effect_data,
+                cost_context=cost_context,
+            ):
+                continue
+            if pay_additional_card_costs(
+                player,
+                card,
+                option_effect_data,
+                turn=turn,
+                cost_context=cost_context,
+            ):
+                emit_replay_event(
+                    "additional_cost_option_selected",
+                    player=player.name,
+                    card=card.get("name", "?"),
+                    selected_cost=option_effect_data.get("additional_cost"),
+                    available_cost_options=[
+                        str(candidate.get("cost") or "")
+                        for candidate in cost_options
+                    ],
+                    turn=turn,
+                )
+                effect_data["_additional_card_costs_paid"] = True
+                return True
+        emit_replay_event(
+            "additional_cost_failed",
+            player=player.name,
+            card=card.get("name", "?"),
+            cost="choose_one_additional_cost_option",
+            available_cost_options=[
+                str(candidate.get("cost") or "")
+                for candidate in cost_options
+            ],
+            turn=turn,
+        )
+        return False
     planned_sacrifices = list(cost_context.get("sacrifice_artifact_or_creature") or [])
     planned_blight = dict(cost_context.get("blight") or {})
     if (
         not effect_data.get("requires_discard_card")
         and not effect_data.get("requires_discard_land")
+        and not effect_data.get("requires_pay_life")
         and not effect_data.get("requires_sacrifice_creature")
         and not effect_data.get("requires_sacrifice_green_creature")
         and not effect_data.get("requires_sacrifice_creature_or_enchantment")
@@ -22859,6 +22957,31 @@ def pay_additional_card_costs(player, card, effect_data, *, turn=None, cost_cont
             destination=destination,
             selection_reason=planned_blight.get("selection_reason"),
             runtime_cost_model=planned_blight.get("runtime_cost_model"),
+            turn=turn,
+        )
+    if effect_data.get("requires_pay_life"):
+        amount = int(effect_data.get("pay_life_amount") or 0)
+        life_before = int(getattr(player, "life", 0) or 0)
+        if amount <= 0 or life_before < amount:
+            emit_replay_event(
+                "additional_cost_failed",
+                player=player.name,
+                card=card.get("name", "?"),
+                cost="pay_life",
+                pay_life_amount=amount,
+                life_before=life_before,
+                turn=turn,
+            )
+            return False
+        player.life = life_before - amount
+        emit_replay_event(
+            "additional_cost_paid",
+            player=player.name,
+            card=card.get("name", "?"),
+            cost="pay_life",
+            pay_life_amount=amount,
+            life_before=life_before,
+            life_after=player.life,
             turn=turn,
         )
     if effect_data.get("requires_discard_card"):

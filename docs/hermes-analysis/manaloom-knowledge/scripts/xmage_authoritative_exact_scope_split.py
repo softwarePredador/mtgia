@@ -18967,9 +18967,75 @@ def fixed_spell_additional_cost_fields_from_source(
     cost_count = len(re.findall(r"\.addCost\s*\(", text))
     if cost_count != 1:
         return None, unsupported_reason
-    if "OrCost" in text or "GenericManaCost" in text or "PayLifeCost" in text:
-        return None, unsupported_reason
     lowered_oracle = oracle_text(metadata).lower()
+    if "OrCost" in text:
+        if "GenericManaCost" in text or "ManaCostsImpl" in text or "ForageCost" in text:
+            return None, unsupported_reason
+        options: list[dict[str, Any]] = []
+        if "DiscardCardCost" in text and re.search(r"additional cost.*discard a card", lowered_oracle):
+            options.append({"cost": "discard_card", "requires_discard_card": True})
+        pay_life_match = re.search(r"PayLifeCost\s*\(\s*(\d+)\s*\)", text)
+        if pay_life_match and re.search(r"additional cost.*pay \d+ life", lowered_oracle):
+            options.append(
+                {
+                    "cost": "pay_life",
+                    "requires_pay_life": True,
+                    "pay_life_amount": int(pay_life_match.group(1)),
+                }
+            )
+        sacrifice_target = activation_sacrifice_target_from_source(text, text)
+        if "SacrificeTargetCost" in text and sacrifice_target:
+            sacrifice_patterns = {
+                "creature": r"additional cost.*sacrifice (?:a|one) creature",
+                "artifact_or_creature": r"additional cost.*sacrifice (?:an?|one) artifact or creature",
+                "creature_or_enchantment": r"additional cost.*sacrifice (?:a|one) creature or enchantment",
+                "creature_or_planeswalker": r"additional cost.*sacrifice (?:a|one) creature or planeswalker",
+                "artifact": r"additional cost.*sacrifice (?:an?|one) artifact",
+                "land": r"additional cost.*sacrifice (?:a|one) land",
+            }
+            pattern = sacrifice_patterns.get(sacrifice_target)
+            if pattern and re.search(pattern, lowered_oracle):
+                options.append(
+                    {
+                        "cost": f"sacrifice_{sacrifice_target}",
+                        f"requires_sacrifice_{sacrifice_target}": True,
+                        "xmage_additional_cost_target": sacrifice_target,
+                    }
+                )
+        cost_source_start = text.find(".addCost")
+        cost_source_text = text[cost_source_start:] if cost_source_start >= 0 else text
+
+        def option_source_index(option: dict[str, Any]) -> int:
+            cost = str(option.get("cost") or "")
+            if cost.startswith("sacrifice_"):
+                return cost_source_text.find("SacrificeTargetCost")
+            if cost == "discard_card":
+                return cost_source_text.find("DiscardCardCost")
+            if cost == "pay_life":
+                return cost_source_text.find("PayLifeCost")
+            return len(cost_source_text)
+
+        options.sort(key=option_source_index)
+        if len(options) >= 2:
+            return {
+                "additional_cost": "choose_" + "_or_".join(str(option["cost"]) for option in options),
+                "requires_one_additional_cost_option": True,
+                "additional_cost_options": options,
+                "xmage_additional_cost_class": "OrCost",
+            }, None
+        return None, unsupported_reason
+    if "GenericManaCost" in text:
+        return None, unsupported_reason
+    if "PayLifeCost" in text:
+        pay_life_match = re.search(r"PayLifeCost\s*\(\s*(\d+)\s*\)", text)
+        if pay_life_match and re.search(r"additional cost.*pay \d+ life", lowered_oracle):
+            return {
+                "additional_cost": "pay_life",
+                "requires_pay_life": True,
+                "pay_life_amount": int(pay_life_match.group(1)),
+                "xmage_additional_cost_class": "PayLifeCost",
+            }, None
+        return None, unsupported_reason
     if (
         "ReturnToHandChosenControlledPermanentCost" in text
         and re.search(

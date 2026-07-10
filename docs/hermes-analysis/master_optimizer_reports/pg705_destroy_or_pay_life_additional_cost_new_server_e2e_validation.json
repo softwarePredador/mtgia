@@ -1,0 +1,261 @@
+{
+  "battle_execution": {
+    "event_count": 20,
+    "results": [
+      {
+        "additional_cost": "discard_card",
+        "battlefield_names": [
+          "E2E Illegal Removal Target"
+        ],
+        "card_name": "Bitter Triumph",
+        "destination": "graveyard",
+        "moved_names": [
+          "E2E Legal Removal Target"
+        ],
+        "nonmatching_target": "E2E Illegal Removal Target",
+        "scenario": "Bitter Triumph removes one legal target",
+        "target": "E2E Legal Removal Target",
+        "target_player": "Opponent"
+      },
+      {
+        "additional_cost": "sacrifice_creature",
+        "battlefield_names": [
+          "E2E Illegal Removal Target"
+        ],
+        "card_name": "Bone Shards",
+        "destination": "graveyard",
+        "moved_names": [
+          "E2E Legal Removal Target"
+        ],
+        "nonmatching_target": "E2E Illegal Removal Target",
+        "scenario": "Bone Shards removes one legal target",
+        "target": "E2E Legal Removal Target",
+        "target_player": "Opponent"
+      },
+      {
+        "additional_cost": "pay_life",
+        "battlefield_names": [
+          "E2E Illegal Removal Target"
+        ],
+        "card_name": "Final Payment",
+        "destination": "graveyard",
+        "moved_names": [
+          "E2E Legal Removal Target"
+        ],
+        "nonmatching_target": "E2E Illegal Removal Target",
+        "pay_life_amount": 5,
+        "scenario": "Final Payment removes one legal target",
+        "target": "E2E Legal Removal Target",
+        "target_player": "Opponent"
+      },
+      {
+        "additional_cost": "pay_life",
+        "battlefield_names": [
+          "E2E Illegal Removal Target"
+        ],
+        "card_name": "Fumarole",
+        "destination": "graveyard",
+        "moved_names": [
+          "E2E Legal Removal Target"
+        ],
+        "nonmatching_target": "E2E Illegal Removal Target",
+        "pay_life_amount": 3,
+        "scenario": "Fumarole removes one legal target",
+        "target": "E2E Legal Removal Target",
+        "target_player": "Opponent"
+      }
+    ],
+    "scenario_count": 4
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-10T15:03:16.377926+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg705_destroy_or_pay_life_additional_cost_new_server_package_manifest.json",
+  "package_id": "pg705_destroy_or_pay_life_additional_cost_new_server_package_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 4
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Bitter Triumph",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c7de8f5e0f2505279a40bbaf2e61833d",
+          "oracle_hash": "5dde73aa35c4313affb424c96291d82e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Bone Shards",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:891f9f844a0a1eeecf75ab101d862213",
+          "oracle_hash": "b363168a99a08d80861b1ef4c06f5cd2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Final Payment",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:88aedd014ee74ec75c59d7b3e816336f",
+          "oracle_hash": "bc569926e43ff7832d9949b8da1245f7",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Fumarole",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f19f673e79ed6be70af42520fd54cf05",
+          "oracle_hash": "3503e0474089775318620b7b48f5e89f",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 4
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Bitter Triumph",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c7de8f5e0f2505279a40bbaf2e61833d",
+          "oracle_hash": "5dde73aa35c4313affb424c96291d82e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Bone Shards",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:891f9f844a0a1eeecf75ab101d862213",
+          "oracle_hash": "b363168a99a08d80861b1ef4c06f5cd2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Final Payment",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:88aedd014ee74ec75c59d7b3e816336f",
+          "oracle_hash": "bc569926e43ff7832d9949b8da1245f7",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Fumarole",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f19f673e79ed6be70af42520fd54cf05",
+          "oracle_hash": "3503e0474089775318620b7b48f5e89f",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 4
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Bitter Triumph",
+          "logical_rule_key": "battle_rule_v1:c7de8f5e0f2505279a40bbaf2e61833d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Bone Shards",
+          "logical_rule_key": "battle_rule_v1:891f9f844a0a1eeecf75ab101d862213"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Final Payment",
+          "logical_rule_key": "battle_rule_v1:88aedd014ee74ec75c59d7b3e816336f"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Fumarole",
+          "logical_rule_key": "battle_rule_v1:f19f673e79ed6be70af42520fd54cf05"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 4
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Bitter Triumph",
+          "component_keys": [],
+          "effect": "remove_permanent",
+          "logical_rule_key": "battle_rule_v1:c7de8f5e0f2505279a40bbaf2e61833d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Bone Shards",
+          "component_keys": [],
+          "effect": "remove_permanent",
+          "logical_rule_key": "battle_rule_v1:891f9f844a0a1eeecf75ab101d862213"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Final Payment",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:88aedd014ee74ec75c59d7b3e816336f"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Fumarole",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:f19f673e79ed6be70af42520fd54cf05"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 20,
+        "scenarios": 4
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}
