@@ -587,6 +587,9 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "spell_cast_gain_life_source_zone",
     "spell_cast_gain_life_optional",
     "spell_cast_gain_life_any_player",
+    "land_enter_gain_life",
+    "land_enter_gain_life_amount",
+    "land_enter_gain_life_subtypes",
     "spell_cast_token_maker",
     "spell_cast_token_card_types",
     "spell_cast_token_required_subtypes",
@@ -2511,6 +2514,35 @@ def spell_cast_gain_life_execution_scenario_from_expected_rule(
         scenario["matching_spell_controller"] = "opponent"
         if nonmatching_spell is not None:
             scenario["nonmatching_spell_controller"] = "opponent"
+    if required.get("land_enter_gain_life"):
+        subtypes = [
+            str(value).strip()
+            for value in (required.get("land_enter_gain_life_subtypes") or [])
+            if str(value).strip()
+        ]
+        matching_subtype = subtypes[0] if subtypes else "Plains"
+        nonmatching_subtype = next(
+            (
+                subtype
+                for subtype in ["Plains", "Island", "Swamp", "Mountain", "Forest"]
+                if subtype.lower() != matching_subtype.lower()
+            ),
+            "Island",
+        )
+        scenario["matching_land"] = {
+            "name": matching_subtype,
+            "type_line": f"Basic Land - {matching_subtype}",
+            "effect": "land",
+        }
+        scenario["nonmatching_land"] = {
+            "name": nonmatching_subtype,
+            "type_line": f"Basic Land - {nonmatching_subtype}",
+            "effect": "land",
+        }
+        scenario["expected_land_life_after"] = (
+            20 + amount + int(required.get("land_enter_gain_life_amount") or amount)
+        )
+        scenario["expected_land_subtypes"] = subtypes
     return scenario
 
 

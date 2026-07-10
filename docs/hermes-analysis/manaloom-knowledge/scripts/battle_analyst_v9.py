@@ -26160,6 +26160,15 @@ def play_land_candidate(player, opponents, all_players, turn, stack, candidate):
         active_player=player,
         all_players=all_players,
     )
+    trigger_land_enter_gain_life_engines(
+        player,
+        land_permanent,
+        turn,
+        "land_played",
+        stack=stack,
+        active_player=player,
+        all_players=all_players,
+    )
     trigger_opponent_land_play_engines(
         player,
         opponents,
@@ -45617,6 +45626,93 @@ def trigger_landfall(
     return True
 
 
+def _land_matches_any_subtype(land_permanent, subtypes):
+    if not isinstance(land_permanent, dict):
+        return False
+    wanted = {
+        str(subtype).strip().lower()
+        for subtype in _as_list(subtypes)
+        if str(subtype).strip()
+    }
+    if not wanted:
+        return True
+    text_parts = [
+        str(land_permanent.get("name") or ""),
+        str(land_permanent.get("type_line") or ""),
+    ]
+    text_parts.extend(str(value) for value in _as_list(land_permanent.get("subtypes")))
+    haystack = " ".join(text_parts).lower()
+    return any(re.search(rf"\b{re.escape(subtype)}\b", haystack) for subtype in wanted)
+
+
+def trigger_land_enter_gain_life_engines(
+    player,
+    land_permanent,
+    turn,
+    source_event,
+    *,
+    stack=None,
+    active_player=None,
+    all_players=None,
+):
+    if not isinstance(land_permanent, dict):
+        return False
+    engines = [
+        permanent
+        for permanent in getattr(player, "battlefield", []) or []
+        if isinstance(permanent, dict)
+        and permanent.get("land_enter_gain_life")
+        and int(permanent.get("land_enter_gain_life_amount") or 0) > 0
+        and _land_matches_any_subtype(
+            land_permanent,
+            permanent.get("land_enter_gain_life_subtypes"),
+        )
+    ]
+    if not engines:
+        return False
+
+    def resolve_land_enter_gain_life():
+        for permanent in list(engines):
+            if permanent not in getattr(player, "battlefield", []) or []:
+                continue
+            amount = int(permanent.get("land_enter_gain_life_amount") or 0)
+            if amount <= 0:
+                continue
+            life_before = player.life
+            gain_life(player, amount, cap=999)
+            emit_replay_event(
+                "trigger_resolved",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                trigger="land_enter",
+                trigger_land=land_permanent.get("name", "?"),
+                source_event=source_event,
+                effect="gain_life",
+                life_gain_requested=amount,
+                life_gained=max(0, player.life - life_before),
+                life_before=life_before,
+                life_after=player.life,
+                land_enter_gain_life_subtypes=permanent.get("land_enter_gain_life_subtypes") or [],
+                turn=turn,
+                **replay_rule_fields(permanent),
+            )
+
+    resolve_or_enqueue_trigger(
+        player,
+        engines[0],
+        "land_enter",
+        resolve_land_enter_gain_life,
+        stack=stack,
+        active_player=active_player,
+        all_players=all_players,
+        data={
+            "trigger_land": land_permanent.get("name", "?"),
+            "source_event": source_event,
+        },
+    )
+    return True
+
+
 def sacrifice_land_for_effect(player, card, turn, *, required=True, effect_data=None):
     effect_data = effect_data or {}
     battlefield_lands = [
@@ -45711,6 +45807,7 @@ def put_lands_from_library(player, card, effect_data, turn, *, opponents=None, s
         })
         player.battlefield.append(land)
         trigger_landfall(player, land, turn, source_event, opponents=opponents)
+        trigger_land_enter_gain_life_engines(player, land, turn, source_event)
         found.append(land)
     emit_replay_event(
         "land_ramp_resolved",
@@ -45738,6 +45835,7 @@ def return_graveyard_lands_to_battlefield(player, card, turn, *, opponents=None,
             land = enrich_card({**grave_card, "effect": "land", "tapped": True})
             player.battlefield.append(land)
             trigger_landfall(player, land, turn, source_event, opponents=opponents)
+            trigger_land_enter_gain_life_engines(player, land, turn, source_event)
             returned.append(land)
     emit_replay_event(
         "land_recursion_resolved",
@@ -46105,6 +46203,7 @@ def trigger_opponent_land_play_engines(
             extra_land = enrich_card({**land_from_hand, "effect": "land"})
             opponent.battlefield.append(extra_land)
             trigger_landfall(opponent, extra_land, turn, "opponent_land_play")
+            trigger_land_enter_gain_life_engines(opponent, extra_land, turn, "opponent_land_play")
             emit_replay_event(
                 "trigger_resolved",
                 player=opponent.name,

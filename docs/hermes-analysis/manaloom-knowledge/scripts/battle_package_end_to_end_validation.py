@@ -1688,6 +1688,80 @@ def run_spell_cast_gain_life(
             "battle_events",
             f"{card['name']} trigger={event.get('trigger')!r}, expected {expected_trigger!r}",
         )
+    land_event = None
+    matching_land = scenario.get("matching_land")
+    if isinstance(matching_land, dict):
+        nonmatching_land = scenario.get("nonmatching_land")
+        if isinstance(nonmatching_land, dict):
+            before_life = active.life
+            before_events = len(events)
+            active.hand.append(dict(nonmatching_land))
+            battle.play_land_candidate(
+                active,
+                [opponent],
+                all_players,
+                turn,
+                None,
+                {"card": active.hand[-1], "source_zone": "hand"},
+            )
+            if active.life != before_life:
+                fail(
+                    "battle_execution",
+                    f"{card['name']} gained life from nonmatching land {nonmatching_land.get('name')}",
+                )
+            unexpected_land = next(
+                (
+                    data
+                    for event_name, data in events[before_events:]
+                    if event_name == "trigger_resolved"
+                    and data.get("card") == card.get("name")
+                    and data.get("effect") == "gain_life"
+                    and data.get("trigger") == "land_enter"
+                ),
+                None,
+            )
+            if unexpected_land is not None:
+                fail("battle_events", f"{card['name']} triggered from nonmatching land")
+
+        before_events = len(events)
+        active.hand.append(dict(matching_land))
+        played = battle.play_land_candidate(
+            active,
+            [opponent],
+            all_players,
+            turn,
+            None,
+            {"card": active.hand[-1], "source_zone": "hand"},
+        )
+        if not played:
+            fail("battle_execution", f"{card['name']} matching land was not played")
+        expected_land_life_after = int(
+            scenario.get("expected_land_life_after")
+            or (expected_life_after + expected_life_gain)
+        )
+        if active.life != expected_land_life_after:
+            fail(
+                "battle_execution",
+                f"{card['name']} life after land-enter gain-life trigger={active.life}, expected {expected_land_life_after}",
+            )
+        land_event = next(
+            (
+                data
+                for event_name, data in events[before_events:]
+                if event_name == "trigger_resolved"
+                and data.get("card") == card.get("name")
+                and data.get("effect") == "gain_life"
+                and data.get("trigger") == "land_enter"
+            ),
+            None,
+        )
+        if land_event is None:
+            fail("battle_events", f"missing {card['name']} land-enter gain_life trigger_resolved event")
+        if int(land_event.get("life_gain_requested") or 0) != expected_life_gain:
+            fail(
+                "battle_events",
+                f"{card['name']} land life_gain_requested={land_event.get('life_gain_requested')}, expected {expected_life_gain}",
+            )
     return {
         "scenario": scenario.get("name"),
         "card_name": card["name"],
@@ -1696,6 +1770,8 @@ def run_spell_cast_gain_life(
         "trigger": event.get("trigger"),
         "trigger_spell": event.get("trigger_spell"),
         "trigger_spell_controller": event.get("trigger_spell_controller"),
+        "land_trigger": land_event.get("trigger") if land_event else None,
+        "trigger_land": land_event.get("trigger_land") if land_event else None,
     }
 
 

@@ -4077,6 +4077,77 @@ def test_spell_cast_gain_life_runner_resolves_any_player_opponent_spell() -> Non
     assert result["trigger_spell_controller"] == "Opponent"
 
 
+def test_spell_cast_gain_life_runner_resolves_matching_land_enter_trigger() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "life_gain_engine",
+        "battle_model_scope": "xmage_spell_cast_gain_life_v1",
+        "trigger": "spell_cast",
+        "trigger_effect": "gain_life",
+        "spell_cast_gain_life": True,
+        "spell_cast_gain_life_amount": 1,
+        "spell_cast_gain_life_required_colors": ["B"],
+        "land_enter_gain_life": True,
+        "land_enter_gain_life_amount": 1,
+        "land_enter_gain_life_subtypes": ["Swamp"],
+        "_rule_logical_key": "battle_rule_v1:staff-of-the-death-magus",
+    }
+    try:
+        result = validator.run_spell_cast_gain_life(
+            battle,
+            {
+                "name": "Staff of the Death Magus gains life from spell and Swamp",
+                "type": "spell_cast_gain_life",
+                "card": {
+                    "name": "Staff of the Death Magus",
+                    "type_line": "Artifact",
+                    "effect": "life_gain_engine",
+                },
+                "starting_life": 20,
+                "matching_spell": {
+                    "name": "Black Sorcery",
+                    "type_line": "Sorcery",
+                    "colors": ["B"],
+                    "cmc": 2,
+                },
+                "nonmatching_spell": {
+                    "name": "White Sorcery",
+                    "type_line": "Sorcery",
+                    "colors": ["W"],
+                    "cmc": 2,
+                },
+                "matching_land": {
+                    "name": "Swamp",
+                    "type_line": "Basic Land - Swamp",
+                    "effect": "land",
+                },
+                "nonmatching_land": {
+                    "name": "Plains",
+                    "type_line": "Basic Land - Plains",
+                    "effect": "land",
+                },
+                "expected_trigger": "spell_cast",
+                "expected_life_gain": 1,
+                "expected_life_after": 21,
+                "expected_land_life_after": 22,
+                "logical_rule_key": "battle_rule_v1:staff-of-the-death-magus",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Staff of the Death Magus"
+    assert result["life_after"] == 22
+    assert result["land_trigger"] == "land_enter"
+    assert result["trigger_land"] == "Swamp"
+
+
 def test_spell_cast_token_maker_runner_blocks_nonmatching_and_resolves_matching_spell() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

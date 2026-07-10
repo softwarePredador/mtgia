@@ -8046,6 +8046,50 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertTrue(effect["spell_cast_gain_life_any_player"])
         self.assertTrue(effect["spell_cast_gain_life_optional"])
 
+    def test_spell_cast_gain_life_maps_staff_spell_or_land_trigger(self) -> None:
+        row = queue_row(
+            split.LIFE_UNIT,
+            effect_classes=["GainLifeEffect"],
+            ability_kind="triggered",
+            ability_classes=[
+                "EntersBattlefieldControlledTriggeredAbility",
+                "OrTriggeredAbility",
+                "SpellCastControllerTriggeredAbility",
+            ],
+            xmage_signals=["triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Staff of the Death Magus",
+                type_line="Artifact",
+                oracle_text=(
+                    "Whenever you cast a black spell or a Swamp you control enters, "
+                    "you gain 1 life."
+                ),
+            ),
+            source_text="""
+                private static final FilterSpell filterSpell = new FilterSpell("a black spell");
+                private static final FilterLandPermanent filterLand = new FilterLandPermanent("a Swamp");
+                static {
+                    filterSpell.add(new ColorPredicate(ObjectColor.BLACK));
+                    filterLand.add(SubType.SWAMP.getPredicate());
+                }
+                this.addAbility(new OrTriggeredAbility(Zone.BATTLEFIELD, new GainLifeEffect(1), false,
+                    "Whenever you cast a black spell or a Swamp you control enters, ",
+                    new SpellCastControllerTriggeredAbility(null, filterSpell, false),
+                    new EntersBattlefieldControlledTriggeredAbility(null, filterLand)));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.SPELL_CAST_GAIN_LIFE_SCOPE)
+        self.assertEqual(effect["spell_cast_gain_life_required_colors"], ["B"])
+        self.assertTrue(effect["land_enter_gain_life"])
+        self.assertEqual(effect["land_enter_gain_life_amount"], 1)
+        self.assertEqual(effect["land_enter_gain_life_subtypes"], ["Swamp"])
+
     def test_spell_cast_gain_life_maps_static_value_amount(self) -> None:
         row = queue_row(
             split.LIFE_UNIT,

@@ -4976,6 +4976,34 @@ def test_spell_cast_gain_life_execution_scenario_picks_true_nonmatching_color() 
     assert scenario["nonmatching_spell"]["colors"] != ["G"]
 
 
+def test_spell_cast_gain_life_execution_scenario_includes_matching_land_trigger() -> None:
+    rule = {
+        "normalized_name": "staff of the death magus",
+        "card_name": "Staff of the Death Magus",
+        "logical_rule_key": "battle_rule_v1:staff-of-the-death-magus",
+        "required_effect_fields": {
+            "effect": "life_gain_engine",
+            "battle_model_scope": "xmage_spell_cast_gain_life_v1",
+            "trigger": "spell_cast",
+            "trigger_effect": "gain_life",
+            "spell_cast_gain_life": True,
+            "spell_cast_gain_life_amount": 1,
+            "spell_cast_gain_life_required_colors": ["B"],
+            "land_enter_gain_life": True,
+            "land_enter_gain_life_amount": 1,
+            "land_enter_gain_life_subtypes": ["Swamp"],
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario["type"] == "spell_cast_gain_life"
+    assert scenario["matching_spell"]["colors"] == ["B"]
+    assert scenario["matching_land"]["type_line"] == "Basic Land - Swamp"
+    assert scenario["nonmatching_land"]["type_line"] != "Basic Land - Swamp"
+    assert scenario["expected_land_life_after"] == 22
+
+
 def test_spell_cast_token_maker_execution_scenario_uses_matching_and_nonmatching_spells() -> None:
     rule = {
         "normalized_name": "third path iconoclast",

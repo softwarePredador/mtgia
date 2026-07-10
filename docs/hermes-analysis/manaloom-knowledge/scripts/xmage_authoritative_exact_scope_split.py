@@ -11744,10 +11744,20 @@ def is_spell_cast_gain_life_unit(row: dict[str, Any]) -> bool:
     custom_trigger_ability = bool(
         trigger_abilities.intersection({"KrakensEyeAbility", "WurmsToothAbility"})
     )
+    spell_or_land_or_trigger = abilities == {
+        "EntersBattlefieldControlledTriggeredAbility",
+        "OrTriggeredAbility",
+        "SpellCastControllerTriggeredAbility",
+    }
     return (
         effect_classes(row) == {"GainLifeEffect"}
-        and len(trigger_abilities) == 1
-        and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
+        and (
+            (
+                len(trigger_abilities) == 1
+                and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
+            )
+            or spell_or_land_or_trigger
+        )
         and (signals == {"triggered_ability"} or (custom_trigger_ability and not signals))
     )
 
@@ -19852,6 +19862,41 @@ def spell_cast_gain_life_filter_from_oracle(metadata: dict[str, Any]) -> dict[st
     text = re.sub(r"\s+", " ", oracle_text_after_leading_static_keywords(metadata)).strip().lower()
     if "may pay" in text:
         return "spell_cast_gain_life_oracle_optional_cost_not_supported"
+    spell_or_land_match = re.search(
+        r"whenever you cast (?P<filter>.+?) or (?:a|an) "
+        r"(?P<land>plains|island|swamp|mountain|forest) you control enters, "
+        r"you (?P<may>may )?gain "
+        r"(?P<count>a|an|one|two|three|four|five|six|seven|eight|nine|ten|\d+) life\.?",
+        text,
+    )
+    if spell_or_land_match:
+        amount = counter_count_from_text(spell_or_land_match.group("count"))
+        if amount is None or amount <= 0:
+            return "spell_cast_gain_life_oracle_amount_not_supported"
+        filter_text = re.sub(
+            r"\s+spell$",
+            "",
+            re.sub(r"\s+", " ", spell_or_land_match.group("filter").strip()),
+        )
+        color_filter_text = re.sub(
+            r"^(?:a|an)\s+spell\s+that(?:'s| is)\s+",
+            "",
+            filter_text,
+        )
+        color_filter_text = re.sub(r"^(?:a|an)\s+", "", color_filter_text)
+        color_symbol = TOKEN_COLOR_WORDS.get(color_filter_text)
+        if not color_symbol:
+            return "spell_cast_gain_life_oracle_filter_not_supported"
+        land_subtype = spell_or_land_match.group("land").capitalize()
+        return {
+            "spell_cast_gain_life_amount": amount,
+            "spell_cast_gain_life_optional": bool(spell_or_land_match.group("may")),
+            "spell_cast_gain_life_required_colors": [color_symbol],
+            "land_enter_gain_life": True,
+            "land_enter_gain_life_amount": amount,
+            "land_enter_gain_life_subtypes": [land_subtype],
+            "trigger": "spell_cast",
+        }
     match = re.search(
         r"whenever (?:(?P<you>you) cast|(?P<player>a player) casts|(?P<opponent>an opponent) casts) "
         r"(?P<filter>.+?), you (?P<may>may )?gain "
@@ -19919,11 +19964,39 @@ def spell_cast_gain_life_filter_from_source(source: str) -> dict[str, Any] | str
         return "spell_cast_gain_life_source_not_single_trigger"
     if "DoIfCostPaid" in text or "SacrificeSourceCost" in text or "PayLifeCost" in text:
         return "spell_cast_gain_life_source_optional_cost_not_supported"
-    if "OrTriggeredAbility" in text:
-        return "spell_cast_gain_life_source_trigger_not_supported"
     amount = java_gain_life_effect_amount(text)
     if amount is None or amount <= 0:
         return "spell_cast_gain_life_source_amount_not_fixed"
+    if "OrTriggeredAbility" in text:
+        if (
+            controller_trigger_count != 1
+            or all_trigger_count
+            or custom_spell_cast_trigger
+            or "EntersBattlefieldControlledTriggeredAbility" not in text
+            or "FilterLandPermanent" not in text
+        ):
+            return "spell_cast_gain_life_source_trigger_not_supported"
+        color_symbols = [
+            TOKEN_COLOR_WORDS.get(match.lower())
+            for match in re.findall(r"ObjectColor\.(WHITE|BLUE|BLACK|RED|GREEN)\b", text)
+        ]
+        land_subtypes = [
+            match.capitalize()
+            for match in re.findall(
+                r"SubType\.(PLAINS|ISLAND|SWAMP|MOUNTAIN|FOREST)\.getPredicate\s*\(",
+                text,
+            )
+        ]
+        if len(color_symbols) != 1 or len(land_subtypes) != 1:
+            return "spell_cast_gain_life_source_filter_not_supported"
+        return {
+            "spell_cast_gain_life_amount": amount,
+            "trigger": "spell_cast",
+            "spell_cast_gain_life_required_colors": color_symbols,
+            "land_enter_gain_life": True,
+            "land_enter_gain_life_amount": amount,
+            "land_enter_gain_life_subtypes": land_subtypes,
+        }
     result: dict[str, Any] = {
         "spell_cast_gain_life_amount": amount,
         "trigger": "spell_cast",
@@ -19967,6 +20040,9 @@ def spell_cast_gain_life_specs_match(
         "spell_cast_gain_life_card_types",
         "spell_cast_gain_life_required_colors",
         "spell_cast_gain_life_any_player",
+        "land_enter_gain_life",
+        "land_enter_gain_life_amount",
+        "land_enter_gain_life_subtypes",
     }
     for key in comparable_keys:
         oracle_value = oracle_spec.get(key)
@@ -26356,7 +26432,12 @@ def split_row(
             "trigger_effect": "gain_life",
             "spell_cast_gain_life": True,
             "xmage_effect_class": "GainLifeEffect",
-            "xmage_ability_class": sorted(ability_classes(row))[0],
+            "xmage_ability_class": (
+                "OrTriggeredAbility"
+                if "OrTriggeredAbility" in ability_classes(row)
+                else sorted(ability_classes(row))[0]
+            ),
+            "xmage_ability_classes": sorted(ability_classes(row)),
             **oracle_spec,
         }
         if permanent_effect == "creature":
