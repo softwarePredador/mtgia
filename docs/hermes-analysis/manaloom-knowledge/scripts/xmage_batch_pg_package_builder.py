@@ -551,6 +551,8 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "activation_requires_sacrifice",
     "activation_limit_per_turn",
     "activation_life_cost",
+    "activation_exile_top_library_count",
+    "activation_remove_counter_cost",
     "activation_discard_count",
     "activation_discard_target",
     "activation_requires_discard_card",
@@ -3030,6 +3032,47 @@ def _manifest_tap_cost_fixtures(
     return fixtures
 
 
+def _manifest_remove_counter_cost_fixture(
+    base_name: str,
+    remove_counter_cost: dict[str, Any] | None,
+) -> tuple[dict[str, Any] | None, str | None, int]:
+    if not isinstance(remove_counter_cost, dict):
+        return None, None, 0
+    count = max(1, int(remove_counter_cost.get("count") or 1))
+    constraints = dict(remove_counter_cost.get("constraints") or {})
+    counter_types = [
+        str(value or "").strip().lower()
+        for value in (remove_counter_cost.get("counter_types") or [])
+        if str(value or "").strip()
+    ]
+    if not counter_types:
+        return None, None, 0
+    counter_type = "+1/+1" if "+1/+1" in counter_types else counter_types[0]
+    if constraints.get("target_subtypes") and not constraints.get("required_subtypes"):
+        constraints["required_subtypes"] = list(constraints.get("target_subtypes") or [])
+    if constraints.get("required_subtypes") and not constraints.get("card_types"):
+        constraints["card_types"] = ["creature"]
+    if counter_type in {"+1/+1", "-1/-1"} and constraints.get("card_types") == ["permanent"]:
+        constraints["card_types"] = ["creature"]
+    fixture = _target_fixture_from_constraints(
+        base_name,
+        constraints,
+        matching=True,
+    )
+    counters = dict(fixture.get("counters") or {})
+    if counter_type == "+1/+1":
+        fixture["plus_one_counters"] = count
+        counters["+1/+1"] = count
+    elif counter_type == "-1/-1":
+        fixture["minus_one_counters"] = count
+        counters["-1/-1"] = count
+    else:
+        fixture[f"{counter_type}_counters"] = count
+        counters[counter_type] = count
+    fixture["counters"] = counters
+    return fixture, counter_type, count
+
+
 def sacrifice_mana_source_execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any] | None:
     required = dict(rule.get("required_effect_fields") or {})
     if required.get("effect") != "ramp_permanent" or not required.get("is_mana_source"):
@@ -3141,6 +3184,28 @@ def simple_activated_damage_execution_scenario_from_expected_rule(
     if tap_cost_targets:
         scenario["tap_cost_targets"] = tap_cost_targets
         scenario["expected_tap_cost_count"] = len(tap_cost_targets)
+    exile_top_library_count = int(required.get("activation_exile_top_library_count") or 0)
+    if exile_top_library_count:
+        scenario["controller_library"] = [
+            {
+                "name": f"E2E Activated Damage Exile Cost Card {index + 1}",
+                "type_line": "Sorcery",
+                "effect": "draw_cards",
+                "cmc": 2,
+            }
+            for index in range(exile_top_library_count)
+        ]
+        scenario["expected_exiled_top_library_count"] = exile_top_library_count
+    counter_cost_target, counter_type, counter_count = _manifest_remove_counter_cost_fixture(
+        "E2E Activated Damage Counter Cost Target",
+        required.get("activation_remove_counter_cost")
+        if isinstance(required.get("activation_remove_counter_cost"), dict)
+        else None,
+    )
+    if counter_cost_target:
+        scenario["counter_cost_targets"] = [counter_cost_target]
+        scenario["expected_remove_counter_cost_count"] = counter_count
+        scenario["expected_remove_counter_type"] = counter_type
     target = str(required.get("target") or "").strip().lower()
     constraints = dict(required.get("target_constraints") or {})
     player_targets = {

@@ -5167,19 +5167,39 @@ def run_simple_activated_damage(
     ]
     if tap_cost_targets:
         active.battlefield.extend(tap_cost_targets)
+    counter_cost_targets = [
+        battle.enrich_card(dict(item))
+        for item in (scenario.get("counter_cost_targets") or [])
+        if isinstance(item, dict)
+    ]
+    if counter_cost_targets:
+        active.battlefield.extend(counter_cost_targets)
     target = None
     if isinstance(scenario.get("target"), dict):
         target = battle.enrich_card(dict(scenario["target"]))
         opponent.battlefield = [target]
     active.hand = [dict(card) for card in scenario.get("controller_hand", [])]
+    active.library = [
+        battle.enrich_card(dict(library_card))
+        for library_card in (scenario.get("controller_library") or [])
+        if isinstance(library_card, dict)
+    ]
     add_manifest_mana(active, scenario.get("controller_mana") or {})
     starting_life = opponent.life
     starting_active_life = active.life
     starting_hand_names = [card.get("name", "?") for card in active.hand if isinstance(card, dict)]
+    starting_library_count = len(active.library)
     expected_damage = int(scenario.get("expected_damage") or effect.get("activated_damage_amount") or 0)
     expected_discard_count = int(scenario.get("expected_discard_count") or 0)
     expected_discard_target = str(scenario.get("expected_discard_target") or "any_card")
     expected_life_paid = int(scenario.get("expected_life_paid") or 0)
+    expected_exiled_top_library_count = int(scenario.get("expected_exiled_top_library_count") or 0)
+    expected_remove_counter_cost_count = int(scenario.get("expected_remove_counter_cost_count") or 0)
+    expected_remove_counter_type = str(scenario.get("expected_remove_counter_type") or "+1/+1")
+    counter_cost_before = {
+        item.get("name"): _counter_value(battle, item, expected_remove_counter_type)
+        for item in counter_cost_targets
+    }
 
     if not battle.can_activate_generic_tap_damage_permanent(active, source, [opponent]):
         fail("battle_execution", f"{card['name']} simple activated damage cannot activate")
@@ -5267,6 +5287,51 @@ def run_simple_activated_damage(
             "battle_events",
             f"{card['name']} life_paid={activation_event.get('life_paid')}, expected {expected_life_paid}",
         )
+    if int(activation_event.get("exiled_top_library_count") or 0) != expected_exiled_top_library_count:
+        fail(
+            "battle_events",
+            f"{card['name']} exiled_top_library_count={activation_event.get('exiled_top_library_count')}, expected {expected_exiled_top_library_count}",
+        )
+    if expected_exiled_top_library_count and len(active.library) != starting_library_count - expected_exiled_top_library_count:
+        fail(
+            "battle_execution",
+            f"{card['name']} library size={len(active.library)}, expected {starting_library_count - expected_exiled_top_library_count}",
+        )
+    if expected_remove_counter_cost_count:
+        if not counter_cost_targets:
+            fail("battle_execution", f"{card['name']} expected counter cost target was not configured")
+        expected_counter_names = [item.get("name") for item in counter_cost_targets]
+        event_counter_names = list(activation_event.get("removed_counter_cost_targets") or [])
+        if not set(expected_counter_names).intersection(set(event_counter_names)):
+            fail(
+                "battle_events",
+                f"{card['name']} removed_counter_cost_targets={event_counter_names!r}, expected one of {expected_counter_names!r}",
+            )
+        if str(activation_event.get("removed_counter_cost_type") or "") != expected_remove_counter_type:
+            fail(
+                "battle_events",
+                f"{card['name']} removed_counter_cost_type={activation_event.get('removed_counter_cost_type')!r}, expected {expected_remove_counter_type!r}",
+            )
+        if int(activation_event.get("removed_counter_cost_count") or 0) != expected_remove_counter_cost_count:
+            fail(
+                "battle_events",
+                f"{card['name']} removed_counter_cost_count={activation_event.get('removed_counter_cost_count')}, expected {expected_remove_counter_cost_count}",
+            )
+        removed_targets = [
+            item
+            for item in counter_cost_targets
+            if item.get("name") in set(event_counter_names)
+        ]
+        if not removed_targets:
+            fail("battle_execution", f"{card['name']} counter cost target not found after activation")
+        removed_target = removed_targets[0]
+        before = counter_cost_before.get(removed_target.get("name"), 0)
+        after = _counter_value(battle, removed_target, expected_remove_counter_type)
+        if before - after != expected_remove_counter_cost_count:
+            fail(
+                "battle_execution",
+                f"{card['name']} removed {before - after} {expected_remove_counter_type} counters, expected {expected_remove_counter_cost_count}",
+            )
     if expected_discard_count:
         discarded = list(activation_event.get("discarded") or [])
         if len(discarded) != expected_discard_count:
@@ -5295,10 +5360,14 @@ def run_simple_activated_damage(
         "controller_life": active.life,
         "discarded_count": expected_discard_count,
         "discard_target": expected_discard_target if expected_discard_count else None,
+        "exiled_top_library_count": expected_exiled_top_library_count,
+        "removed_counter_cost_count": expected_remove_counter_cost_count,
+        "removed_counter_cost_type": expected_remove_counter_type if expected_remove_counter_cost_count else None,
         "target": target.get("name") if target else damage_event.get("target_player"),
         "target_result": damage_event.get("result"),
         "target_destination": damage_event.get("destination"),
         "tapped_cost_targets": [item.get("name") for item in tap_cost_targets if bool(item.get("tapped"))],
+        "counter_cost_targets": [item.get("name") for item in counter_cost_targets],
     }
 
 

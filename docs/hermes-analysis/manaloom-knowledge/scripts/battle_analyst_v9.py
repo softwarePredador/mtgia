@@ -4726,6 +4726,25 @@ def add_minus_one_counters(permanent, count=1):
     return added
 
 
+def remove_minus_one_counters(permanent, count=1):
+    if not isinstance(permanent, dict):
+        return 0
+    current = max(0, int(permanent.get("minus_one_counters") or 0))
+    if current <= 0:
+        return 0
+    removed = max(0, min(current, int(count or 0)))
+    if removed <= 0:
+        return 0
+    permanent["minus_one_counters"] = current - removed
+    counters = permanent.get("counters")
+    if isinstance(counters, dict):
+        counters["-1/-1"] = permanent["minus_one_counters"]
+    if is_battlefield_creature(permanent):
+        permanent["power"] = int(float(permanent.get("power") or 0)) + removed
+        permanent["toughness"] = int(float(permanent.get("toughness") or 0)) + removed
+    return removed
+
+
 def get_named_counter_count(permanent, counter_name):
     if not isinstance(permanent, dict):
         return 0
@@ -49308,6 +49327,8 @@ def _activated_rule_effects_for_permanent(permanent):
             "activation_requires_discard_card": permanent.get("activation_requires_discard_card"),
             "activation_discard_random": permanent.get("activation_discard_random"),
             "activation_life_cost": permanent.get("activation_life_cost"),
+            "activation_exile_top_library_count": permanent.get("activation_exile_top_library_count"),
+            "activation_remove_counter_cost": permanent.get("activation_remove_counter_cost"),
             "activation_cost_mana": permanent.get("activation_cost_mana"),
             "activation_cost_generic": permanent.get("activation_cost_generic"),
             "activation_cost_colors": permanent.get("activation_cost_colors"),
@@ -50046,6 +50067,31 @@ def _activation_tap_cost(effect_data):
     }
 
 
+def _activation_remove_counter_cost(effect_data):
+    cost = (effect_data or {}).get("activation_remove_counter_cost")
+    if not isinstance(cost, dict):
+        return None
+    constraints = dict(cost.get("constraints") or {})
+    counter_types = [
+        str(value or "").strip().lower()
+        for value in _as_list(cost.get("counter_types") or cost.get("counter_type"))
+        if str(value or "").strip()
+    ]
+    return {
+        "count": int(cost.get("count") or 1),
+        "target_controller": str(cost.get("target_controller") or "self"),
+        "counter_types": counter_types,
+        "constraints": constraints,
+    }
+
+
+def _activation_exile_top_library_count(effect_data):
+    try:
+        return max(0, int((effect_data or {}).get("activation_exile_top_library_count") or 0))
+    except (TypeError, ValueError):
+        return 0
+
+
 def _sacrifice_cost_candidate_matches(candidate, source, constraints):
     if not isinstance(candidate, dict):
         return False
@@ -50211,6 +50257,75 @@ def _tap_cost_label(effect_data):
     }
 
 
+def _counter_cost_label(effect_data):
+    cost = _activation_remove_counter_cost(effect_data)
+    if not cost:
+        return None
+    return {
+        "count": int(cost.get("count") or 1),
+        "counter_types": list(cost.get("counter_types") or []),
+        "constraints": dict(cost.get("constraints") or {}),
+    }
+
+
+def _activation_counter_count(candidate, counter_type):
+    normalized = str(counter_type or "").strip().lower()
+    if normalized == "+1/+1":
+        return max(0, int((candidate or {}).get("plus_one_counters") or 0))
+    if normalized == "-1/-1":
+        return max(0, int((candidate or {}).get("minus_one_counters") or 0))
+    return max(0, int(get_named_counter_count(candidate, normalized) or 0))
+
+
+def _remove_activation_counter_cost(candidate, counter_type, count):
+    normalized = str(counter_type or "").strip().lower()
+    if normalized == "+1/+1":
+        return remove_plus_one_counters(candidate, count)
+    if normalized == "-1/-1":
+        return remove_minus_one_counters(candidate, count)
+    return remove_named_counters(candidate, normalized, count)
+
+
+def _activation_remove_counter_cost_options(player, source, effect_data):
+    cost = _activation_remove_counter_cost(effect_data)
+    if not cost:
+        return []
+    if str(cost.get("target_controller") or "self") not in {"self", "you", "controller"}:
+        return []
+    count = max(1, int(cost.get("count") or 1))
+    constraints = dict(cost.get("constraints") or {})
+    counter_types = list(cost.get("counter_types") or [])
+    options = []
+    for candidate in list(getattr(player, "battlefield", []) or []):
+        if not _sacrifice_cost_candidate_matches(candidate, source, constraints):
+            continue
+        for counter_type in counter_types:
+            if _activation_counter_count(candidate, counter_type) >= count:
+                options.append((candidate, counter_type))
+    return options
+
+
+def _choose_activation_remove_counter_cost_option(player, source, effect_data):
+    options = _activation_remove_counter_cost_options(player, source, effect_data)
+    if not options:
+        return None, None, []
+    options = sorted(
+        options,
+        key=lambda option: (
+            1 if option[0] is source else 0,
+            target_priority(option[0]),
+            str(option[0].get("name") or ""),
+            str(option[1] or ""),
+        ),
+    )
+    chosen = options[0]
+    return chosen[0], chosen[1], options
+
+
+def _counter_cost_target_names(options):
+    return [option[0].get("name", "?") for option in options or []]
+
+
 def _sacrifice_cost_constraints(effect_data):
     cost = _activation_sacrifice_cost(effect_data)
     return dict(cost.get("constraints") or {}) if cost else {}
@@ -50313,6 +50428,17 @@ def can_activate_generic_tap_damage_permanent(player, permanent, opponents, *, e
     life_cost = max(0, int(effect_data.get("activation_life_cost") or 0))
     if life_cost and (getattr(player, "life_cant_change", False) or player.life <= life_cost + 1):
         return False
+    exile_top_library_count = _activation_exile_top_library_count(effect_data)
+    if exile_top_library_count and len(getattr(player, "library", []) or []) < exile_top_library_count:
+        return False
+    if _activation_remove_counter_cost(effect_data):
+        counter_target, counter_type, _counter_options = _choose_activation_remove_counter_cost_option(
+            player,
+            permanent,
+            effect_data,
+        )
+        if counter_target is None or not counter_type:
+            return False
     if direct_damage_targets_player(effect_data):
         if any(opponent.is_alive() for opponent in opponents or []):
             return True
@@ -50373,6 +50499,15 @@ def activate_generic_tap_damage_permanent(player, opponents, permanent, turn, rn
     life_before = player.life
     if life_cost:
         change_life(player, -life_cost)
+    exile_top_library_count = _activation_exile_top_library_count(effect_data)
+    exiled_top_library_cards = []
+    if exile_top_library_count:
+        if len(getattr(player, "library", []) or []) < exile_top_library_count:
+            return False
+        for _index in range(exile_top_library_count):
+            exiled_card = player.library.pop(0)
+            player.exile.append(exiled_card)
+            exiled_top_library_cards.append(exiled_card)
     tapped_cost_targets = []
     tap_cost_options = []
     tap_candidates = []
@@ -50408,6 +50543,24 @@ def activate_generic_tap_damage_permanent(player, opponents, permanent, turn, rn
         sacrificed_cost_target = _first_sacrificed_cost_target(sacrificed_cost_targets)
     if _activation_tap_cost(effect_data):
         tapped_cost_targets = _tap_activation_cost_candidates(player, tap_candidates, turn)
+    removed_counter_cost_target = None
+    removed_counter_cost_type = None
+    removed_counter_cost_count = 0
+    remove_counter_cost_options = []
+    if _activation_remove_counter_cost(effect_data):
+        removed_counter_cost_target, removed_counter_cost_type, remove_counter_cost_options = (
+            _choose_activation_remove_counter_cost_option(player, permanent, effect_data)
+        )
+        if removed_counter_cost_target is None or not removed_counter_cost_type:
+            return False
+        required_counter_count = int(_activation_remove_counter_cost(effect_data).get("count") or 1)
+        removed_counter_cost_count = _remove_activation_counter_cost(
+            removed_counter_cost_target,
+            removed_counter_cost_type,
+            required_counter_count,
+        )
+        if removed_counter_cost_count != required_counter_count:
+            return False
     fields = replay_rule_fields(effect_data)
     damage = int(effect_data.get("amount") or effect_data.get("damage") or 0)
     requires_tap = bool(effect_data.get("activation_requires_tap"))
@@ -50448,6 +50601,11 @@ def activate_generic_tap_damage_permanent(player, opponents, permanent, turn, rn
             "life_cost": life_cost,
             "life_before": life_before,
             "life_after": player.life,
+            "exiled_top_library_count": exile_top_library_count,
+            "removed_counter_cost_target": (removed_counter_cost_target or {}).get("name"),
+            "removed_counter_cost_type": removed_counter_cost_type,
+            "removed_counter_cost_count": removed_counter_cost_count,
+            "remove_counter_cost": _counter_cost_label(effect_data),
         },
         rule_source=fields.get("rule_source", "battle_rule"),
         rule_status=fields.get("rule_review_status", "verified"),
@@ -50467,6 +50625,9 @@ def activate_generic_tap_damage_permanent(player, opponents, permanent, turn, rn
             "graveyard": len(discard_resolution.get("to_graveyard") or []),
             "cards_discarded": activation_discard_count,
             "life": -life_cost,
+            "library": -exile_top_library_count,
+            "exile": exile_top_library_count,
+            "removed_counters": -removed_counter_cost_count,
         },
         risk_flags=[
             flag
@@ -50477,6 +50638,8 @@ def activate_generic_tap_damage_permanent(player, opponents, permanent, turn, rn
                 "tap_cost_target": bool(tapped_cost_targets),
                 "discard_cost": activation_discard_count > 0,
                 "life_payment": life_cost > 0,
+                "exile_top_library_cost": exile_top_library_count > 0,
+                "remove_counter_cost": removed_counter_cost_count > 0,
                 "simplified_target_choice": True,
             }.items()
             if active
@@ -50507,6 +50670,17 @@ def activate_generic_tap_damage_permanent(player, opponents, permanent, turn, rn
         life_paid=life_cost,
         life_before=life_before,
         life_after=player.life,
+        exiled_top_library_count=exile_top_library_count,
+        exiled_top_library_cards=[card.get("name", "?") for card in exiled_top_library_cards],
+        removed_counter_cost_target=(removed_counter_cost_target or {}).get("name"),
+        removed_counter_cost_targets=(
+            [(removed_counter_cost_target or {}).get("name")]
+            if removed_counter_cost_target is not None
+            else []
+        ),
+        remove_counter_cost_available_targets=len(remove_counter_cost_options),
+        removed_counter_cost_type=removed_counter_cost_type,
+        removed_counter_cost_count=removed_counter_cost_count,
         turn=turn,
         phase=phase,
         **fields,

@@ -1204,6 +1204,123 @@ def test_simple_activated_damage_runner_executes_life_cost() -> None:
     assert result["opponent_life"] == 6
 
 
+def test_simple_activated_damage_runner_executes_exile_top_library_cost() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "creature",
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_effect": "direct_damage",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_damage_amount": 2,
+        "target": "any_target",
+        "target_constraints": {"scope": "any_target"},
+        "activation_cost_mana": "{R}",
+        "activation_cost_generic": 0,
+        "activation_cost_colors": ["R"],
+        "activation_requires_tap": False,
+        "activation_requires_sacrifice": False,
+        "activation_exile_top_library_count": 3,
+        "_rule_logical_key": "battle_rule_v1:arc-slogger",
+    }
+    try:
+        result = validator.run_simple_activated_damage(
+            battle,
+            {
+                "name": "Arc-Slogger activates damage ability",
+                "type": "simple_activated_damage",
+                "card": {"name": "Arc-Slogger"},
+                "opponent_life": 7,
+                "controller_mana": {"red": 1},
+                "controller_library": [
+                    {"name": "E2E Library Card 1", "type_line": "Sorcery", "effect": "draw_cards"},
+                    {"name": "E2E Library Card 2", "type_line": "Instant", "effect": "direct_damage"},
+                    {"name": "E2E Library Card 3", "type_line": "Creature", "effect": "creature"},
+                ],
+                "expected_damage": 2,
+                "expected_exiled_top_library_count": 3,
+                "logical_rule_key": "battle_rule_v1:arc-slogger",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Arc-Slogger"
+    assert result["damage"] == 2
+    assert result["exiled_top_library_count"] == 3
+    assert result["opponent_life"] == 5
+
+
+def test_simple_activated_damage_runner_executes_remove_counter_cost() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "enchantment",
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_effect": "direct_damage",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_damage_amount": 2,
+        "target": "any_target",
+        "target_constraints": {"scope": "any_target"},
+        "activation_cost_mana": "{1}{R}",
+        "activation_cost_generic": 1,
+        "activation_cost_colors": ["R"],
+        "activation_requires_tap": False,
+        "activation_requires_sacrifice": False,
+        "activation_remove_counter_cost": {
+            "count": 1,
+            "target_controller": "self",
+            "counter_types": ["+1/+1", "charge"],
+            "constraints": {"card_types": ["permanent"]},
+        },
+        "_rule_logical_key": "battle_rule_v1:ion-storm",
+    }
+    try:
+        result = validator.run_simple_activated_damage(
+            battle,
+            {
+                "name": "Ion Storm activates damage ability",
+                "type": "simple_activated_damage",
+                "card": {"name": "Ion Storm"},
+                "opponent_life": 7,
+                "controller_mana": {"generic": 1, "red": 1},
+                "counter_cost_targets": [
+                    {
+                        "name": "E2E Counter Permanent",
+                        "type_line": "Creature - Fixture",
+                        "effect": "creature",
+                        "power": 2,
+                        "toughness": 2,
+                        "plus_one_counters": 1,
+                        "counters": {"+1/+1": 1},
+                    }
+                ],
+                "expected_damage": 2,
+                "expected_remove_counter_cost_count": 1,
+                "expected_remove_counter_type": "+1/+1",
+                "logical_rule_key": "battle_rule_v1:ion-storm",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Ion Storm"
+    assert result["damage"] == 2
+    assert result["removed_counter_cost_count"] == 1
+    assert result["removed_counter_cost_type"] == "+1/+1"
+    assert result["opponent_life"] == 5
+
+
 def test_simple_activated_damage_runner_executes_tap_cost_targets() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

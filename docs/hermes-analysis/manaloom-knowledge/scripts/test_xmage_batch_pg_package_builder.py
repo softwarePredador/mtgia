@@ -1641,6 +1641,68 @@ def test_manifest_builds_simple_activated_damage_life_cost_execution_scenario() 
     assert scenario["controller_mana"]["generic"] == 1
 
 
+def test_manifest_builds_simple_activated_damage_exile_top_library_cost_scenario() -> None:
+    rule = {
+        "normalized_name": "arc-slogger",
+        "card_name": "Arc-Slogger",
+        "oracle_hash": "hash-arc-slogger",
+        "logical_rule_key": "battle_rule_v1:hash-arc-slogger",
+        "required_effect_fields": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "activated_damage_amount": 2,
+            "target": "any_target",
+            "activation_cost_mana": "{R}",
+            "activation_cost_generic": 0,
+            "activation_cost_colors": ["R"],
+            "activation_exile_top_library_count": 10,
+        },
+    }
+
+    scenario = builder.simple_activated_damage_execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "simple_activated_damage"
+    assert scenario["expected_exiled_top_library_count"] == 10
+    assert len(scenario["controller_library"]) == 10
+    assert scenario["controller_mana"]["red"] == 1
+
+
+def test_manifest_builds_simple_activated_damage_remove_counter_cost_scenario() -> None:
+    rule = {
+        "normalized_name": "ion-storm",
+        "card_name": "Ion Storm",
+        "oracle_hash": "hash-ion-storm",
+        "logical_rule_key": "battle_rule_v1:hash-ion-storm",
+        "required_effect_fields": {
+            "effect": "enchantment",
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "activated_damage_amount": 2,
+            "target": "any_target",
+            "activation_cost_mana": "{1}{R}",
+            "activation_cost_generic": 1,
+            "activation_cost_colors": ["R"],
+            "activation_remove_counter_cost": {
+                "count": 1,
+                "target_controller": "self",
+                "counter_types": ["+1/+1", "charge"],
+                "constraints": {"card_types": ["permanent"]},
+            },
+        },
+    }
+
+    scenario = builder.simple_activated_damage_execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "simple_activated_damage"
+    assert scenario["expected_remove_counter_cost_count"] == 1
+    assert scenario["expected_remove_counter_type"] == "+1/+1"
+    assert len(scenario["counter_cost_targets"]) == 1
+    assert scenario["counter_cost_targets"][0]["plus_one_counters"] == 1
+    assert scenario["controller_mana"]["generic"] == 1
+    assert scenario["controller_mana"]["red"] == 1
+
+
 def test_manifest_builds_damage_each_opponent_spell_execution_scenario() -> None:
     rule = {
         "normalized_name": "sizzle",

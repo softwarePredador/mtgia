@@ -12504,6 +12504,117 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         )
         self.assertEqual(effect["_activated_rule_effects"][0]["activation_tap_cost"], effect["activation_tap_cost"])
 
+    def test_permanent_activated_damage_maps_exile_top_library_cost(self) -> None:
+        row = queue_row(
+            split.DAMAGE_UNIT,
+            effect_classes=["DamageTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Arc-Slogger",
+                type_line="Creature - Beast",
+                oracle_text="{R}, Exile the top ten cards of your library: Arc-Slogger deals 2 damage to any target.",
+            ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(new DamageTargetEffect(2), new ManaCostsImpl<>("{R}"));
+                ability.addCost(new ExileFromTopOfLibraryCost(10));
+                ability.addTarget(new TargetAnyTarget());
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_DAMAGE_SCOPE)
+        self.assertEqual(effect["activated_damage_amount"], 2)
+        self.assertEqual(effect["activation_cost_mana"], "{R}")
+        self.assertEqual(effect["activation_exile_top_library_count"], 10)
+        self.assertEqual(effect["_activated_rule_effects"][0]["activation_exile_top_library_count"], 10)
+
+    def test_permanent_activated_damage_maps_remove_plus_one_counter_cost(self) -> None:
+        row = queue_row(
+            split.DAMAGE_UNIT,
+            effect_classes=["DamageTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Bolrac-Clan Crusher",
+                type_line="Creature - Ogre Warrior",
+                oracle_text="{T}, Remove a +1/+1 counter from a creature you control: Bolrac-Clan Crusher deals 2 damage to any target.",
+            ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(new DamageTargetEffect(2), new TapSourceCost());
+                ability.addCost(new RemoveCounterCost(new TargetControlledCreaturePermanent(), CounterType.P1P1));
+                ability.addTarget(new TargetAnyTarget());
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertTrue(effect["activation_requires_tap"])
+        self.assertEqual(
+            effect["activation_remove_counter_cost"],
+            {
+                "count": 1,
+                "target_controller": "self",
+                "counter_types": ["+1/+1"],
+                "constraints": {"card_types": ["creature"]},
+            },
+        )
+        self.assertEqual(
+            effect["_activated_rule_effects"][0]["activation_remove_counter_cost"],
+            effect["activation_remove_counter_cost"],
+        )
+
+    def test_permanent_activated_damage_maps_remove_counter_or_cost(self) -> None:
+        row = queue_row(
+            split.DAMAGE_UNIT,
+            effect_classes=["DamageTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Ion Storm",
+                type_line="Enchantment",
+                oracle_text="{1}{R}, Remove a +1/+1 counter or a charge counter from a permanent you control: Ion Storm deals 2 damage to any target.",
+            ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(new DamageTargetEffect(2), new ManaCostsImpl<>("{1}{R}"));
+                ability.addCost(new OrCost(
+                    "Remove a +1/+1 counter or a charge counter from a permanent you control",
+                    new RemoveCounterCost(new TargetControlledPermanent(), CounterType.P1P1),
+                    new RemoveCounterCost(new TargetControlledPermanent(), CounterType.CHARGE)
+                ));
+                ability.addTarget(new TargetAnyTarget());
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["activation_cost_mana"], "{1}{R}")
+        self.assertEqual(
+            effect["activation_remove_counter_cost"],
+            {
+                "count": 1,
+                "target_controller": "self",
+                "counter_types": ["+1/+1", "charge"],
+                "constraints": {"card_types": ["permanent"]},
+            },
+        )
+
     def test_permanent_activated_damage_blocks_dynamic_amount(self) -> None:
         row = queue_row(
             split.DAMAGE_UNIT,
