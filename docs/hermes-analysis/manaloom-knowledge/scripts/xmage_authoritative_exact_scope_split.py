@@ -18970,6 +18970,21 @@ def fixed_spell_additional_cost_fields_from_source(
     if "OrCost" in text or "GenericManaCost" in text or "PayLifeCost" in text:
         return None, unsupported_reason
     lowered_oracle = oracle_text(metadata).lower()
+    if (
+        "ReturnToHandChosenControlledPermanentCost" in text
+        and re.search(
+            r"additional cost.*return a land you control to (?:its|their) owner's hand",
+            lowered_oracle,
+        )
+    ):
+        return_target = activation_sacrifice_target_from_source(text, text)
+        if return_target == "land":
+            return {
+                "additional_cost": "return_land_to_hand",
+                "requires_return_land_to_hand": True,
+                "xmage_additional_cost_class": "ReturnToHandChosenControlledPermanentCost",
+                "xmage_additional_cost_target": "land",
+            }, None
     if "DiscardCardCost" in text and re.search(r"additional cost.*discard a card", lowered_oracle):
         return {
             "additional_cost": "discard_card",
@@ -19011,6 +19026,28 @@ def fixed_spell_additional_cost_fields_from_source(
                 "requires_sacrifice_artifact_or_creature": True,
                 "xmage_additional_cost_class": "SacrificeTargetCost",
                 "xmage_additional_cost_target": "artifact_or_creature",
+            }, None
+    if "SacrificeTargetCost" in text and re.search(
+        r"additional cost.*sacrifice (?:a|one) creature or enchantment", lowered_oracle
+    ):
+        sacrifice_target = activation_sacrifice_target_from_source(text, text)
+        if sacrifice_target == "creature_or_enchantment":
+            return {
+                "additional_cost": "sacrifice_creature_or_enchantment",
+                "requires_sacrifice_creature_or_enchantment": True,
+                "xmage_additional_cost_class": "SacrificeTargetCost",
+                "xmage_additional_cost_target": "creature_or_enchantment",
+            }, None
+    if "SacrificeTargetCost" in text and re.search(
+        r"additional cost.*sacrifice (?:a|one) creature or planeswalker", lowered_oracle
+    ):
+        sacrifice_target = activation_sacrifice_target_from_source(text, text)
+        if sacrifice_target == "creature_or_planeswalker":
+            return {
+                "additional_cost": "sacrifice_creature_or_planeswalker",
+                "requires_sacrifice_creature_or_planeswalker": True,
+                "xmage_additional_cost_class": "SacrificeTargetCost",
+                "xmage_additional_cost_target": "creature_or_planeswalker",
             }, None
     if "SacrificeTargetCost" in text and re.search(
         r"additional cost.*sacrifice (?:an?|one) artifact", lowered_oracle

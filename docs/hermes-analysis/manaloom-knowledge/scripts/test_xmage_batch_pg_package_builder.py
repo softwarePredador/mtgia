@@ -1638,6 +1638,37 @@ def test_manifest_builds_fixed_damage_target_shuffle_self_execution_scenario() -
     assert scenario["expected_spell_destination"] == "library"
 
 
+def test_manifest_builds_fixed_damage_target_additional_cost_scenario() -> None:
+    proposal = {
+        "normalized_name": "devour in flames",
+        "card_name": "Devour in Flames",
+        "oracle_hash": "hash-devour-in-flames",
+        "logical_rule_key": "battle_rule_v1:hash-devour-in-flames",
+        "effect_json": {
+            "effect": "direct_damage",
+            "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+            "amount": 5,
+            "damage": 5,
+            "target": "creature_or_planeswalker",
+            "target_constraints": {"scope": "creature_or_planeswalker"},
+            "requires_return_land_to_hand": True,
+            "additional_cost": "return_land_to_hand",
+            "xmage_additional_cost_class": "ReturnToHandChosenControlledPermanentCost",
+            "xmage_additional_cost_target": "land",
+        },
+    }
+
+    rule = builder.expected_rule_from_proposal(proposal)
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert rule["required_effect_fields"]["requires_return_land_to_hand"] is True
+    assert scenario is not None
+    assert scenario["type"] == "fixed_damage_target_spell"
+    assert scenario["expected_additional_cost"] == "return_land_to_hand"
+    assert scenario["expected_returned_land_name"] == "E2E Return Cost Land"
+    assert scenario["controller_battlefield"][0]["type_line"] == "Basic Land - Mountain"
+
+
 def test_manifest_builds_damage_target_create_treasure_execution_scenario() -> None:
     proposal = {
         "normalized_name": "improvised weaponry",

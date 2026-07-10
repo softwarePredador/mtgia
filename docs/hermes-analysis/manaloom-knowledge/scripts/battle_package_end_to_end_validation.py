@@ -1101,6 +1101,11 @@ def run_damage_gain_life_spell(
     expected_life_gain = int(scenario.get("expected_life_gain") or 0)
     expected_treasure_count = int(scenario.get("expected_treasure_count") or 0)
     constraints = dict(scenario.get("expected_target_constraints") or {})
+    active.hand = [battle.enrich_card(dict(card)) for card in (scenario.get("controller_hand") or [])]
+    active.battlefield = [
+        battle.enrich_card(dict(card))
+        for card in (scenario.get("controller_battlefield") or [])
+    ]
     target = dict(scenario.get("target") or {})
     nonmatching_target = None
     if target:
@@ -1127,6 +1132,53 @@ def run_damage_gain_life_spell(
         turn=int(scenario.get("turn") or 5),
         rng=random.Random(int(scenario.get("seed") or 6075)),
     )
+    expected_additional_cost = str(scenario.get("expected_additional_cost") or "").strip()
+    additional_cost_event = None
+    if expected_additional_cost:
+        additional_cost_event = next(
+            (
+                data
+                for event_name, data in events[before_events:]
+                if event_name == "additional_cost_paid"
+                and data.get("card") == card.get("name")
+                and data.get("cost") == expected_additional_cost
+            ),
+            None,
+        )
+        if additional_cost_event is None:
+            fail(
+                "battle_events",
+                f"missing {card['name']} additional_cost_paid {expected_additional_cost}",
+            )
+        expected_sacrificed = str(scenario.get("expected_sacrificed_name") or "").strip()
+        if expected_sacrificed:
+            if additional_cost_event.get("sacrificed") != expected_sacrificed:
+                fail(
+                    "battle_events",
+                    f"{card['name']} sacrificed={additional_cost_event.get('sacrificed')!r}, expected {expected_sacrificed!r}",
+                )
+            if any(
+                isinstance(permanent, dict) and permanent.get("name") == expected_sacrificed
+                for permanent in active.battlefield
+            ):
+                fail("battle_execution", f"{card['name']} did not sacrifice {expected_sacrificed}")
+        expected_returned = str(scenario.get("expected_returned_land_name") or "").strip()
+        if expected_returned:
+            if additional_cost_event.get("returned") != expected_returned:
+                fail(
+                    "battle_events",
+                    f"{card['name']} returned={additional_cost_event.get('returned')!r}, expected {expected_returned!r}",
+                )
+            if not any(
+                isinstance(card, dict) and card.get("name") == expected_returned
+                for card in active.hand
+            ):
+                fail("battle_execution", f"{card['name']} did not return {expected_returned} to hand")
+            if any(
+                isinstance(permanent, dict) and permanent.get("name") == expected_returned
+                for permanent in active.battlefield
+            ):
+                fail("battle_execution", f"{card['name']} left returned land {expected_returned} on battlefield")
 
     damage_event = next(
         (
@@ -1216,6 +1268,7 @@ def run_damage_gain_life_spell(
         "treasures_created": expected_treasure_count,
         "controller_treasures": int(getattr(active, "treasures", 0) or 0),
         "shuffled_self_into_library": shuffled_self,
+        "additional_cost": additional_cost_event.get("cost") if additional_cost_event else None,
     }
 
 

@@ -108,9 +108,16 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "control_duration",
     "granted_keywords_until_eot",
     "additional_cost",
+    "requires_discard_card",
+    "requires_discard_land",
     "requires_sacrifice_creature",
+    "requires_sacrifice_creature_or_enchantment",
+    "requires_sacrifice_creature_or_planeswalker",
     "requires_sacrifice_artifact_or_creature",
+    "requires_sacrifice_artifact",
+    "requires_sacrifice_goblin",
     "requires_sacrifice_land",
+    "requires_return_land_to_hand",
     "xmage_additional_cost_class",
     "xmage_additional_cost_target",
     "count",
@@ -3125,7 +3132,7 @@ def fixed_damage_target_spell_execution_scenario_from_expected_rule(
     if target_constraints.get("scope") in {"player", "player_or_planeswalker", "opponent", "opponent_or_planeswalker"}:
         target = None
         nonmatching_target = None
-    return {
+    scenario = {
         "name": f"{rule['card_name']} deals fixed target damage",
         "type": "fixed_damage_target_spell",
         "card": {"name": rule["card_name"], "type_line": type_line},
@@ -3148,6 +3155,41 @@ def fixed_damage_target_spell_execution_scenario_from_expected_rule(
         ),
         "logical_rule_key": rule["logical_rule_key"],
     }
+    if required.get("requires_return_land_to_hand"):
+        scenario["controller_battlefield"] = [
+            {
+                "name": "E2E Return Cost Land",
+                "type_line": "Basic Land - Mountain",
+                "effect": "land",
+                "tapped": True,
+            }
+        ]
+        scenario["expected_additional_cost"] = "return_land_to_hand"
+        scenario["expected_returned_land_name"] = "E2E Return Cost Land"
+    if required.get("requires_sacrifice_creature_or_enchantment"):
+        scenario["controller_battlefield"] = [
+            *scenario.get("controller_battlefield", []),
+            {
+                "name": "E2E Sacrifice Cost Enchantment",
+                "type_line": "Enchantment",
+                "effect": "enchantment",
+            },
+        ]
+        scenario["expected_additional_cost"] = "sacrifice_creature_or_enchantment"
+        scenario["expected_sacrificed_name"] = "E2E Sacrifice Cost Enchantment"
+    if required.get("requires_sacrifice_creature_or_planeswalker"):
+        scenario["controller_battlefield"] = [
+            *scenario.get("controller_battlefield", []),
+            {
+                "name": "E2E Sacrifice Cost Planeswalker",
+                "type_line": "Planeswalker",
+                "effect": "planeswalker",
+                "loyalty": 3,
+            },
+        ]
+        scenario["expected_additional_cost"] = "sacrifice_creature_or_planeswalker"
+        scenario["expected_sacrificed_name"] = "E2E Sacrifice Cost Planeswalker"
+    return scenario
 
 
 def damage_target_create_treasure_execution_scenario_from_expected_rule(

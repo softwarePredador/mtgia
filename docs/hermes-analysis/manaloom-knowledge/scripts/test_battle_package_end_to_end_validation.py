@@ -204,6 +204,113 @@ def test_fixed_damage_target_spell_runner_executes_damage_and_cant_be_countered(
     assert result["cant_be_countered"] is True
 
 
+def test_fixed_damage_target_spell_runner_pays_return_land_cost() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "direct_damage",
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+        "amount": 5,
+        "damage": 5,
+        "target": "creature_or_planeswalker",
+        "target_constraints": {"scope": "creature_or_planeswalker"},
+        "additional_cost": "return_land_to_hand",
+        "requires_return_land_to_hand": True,
+    }
+    try:
+        result = validator.run_fixed_damage_target_spell(
+            battle,
+            {
+                "name": "Devour in Flames pays return-land cost",
+                "type": "fixed_damage_target_spell",
+                "card": {"name": "Devour in Flames", "type_line": "Sorcery"},
+                "target": {
+                    "name": "E2E Fixed Damage Legal Target",
+                    "type_line": "Creature",
+                    "effect": "creature",
+                    "power": 2,
+                    "toughness": 2,
+                },
+                "expected_damage": 5,
+                "expected_life_gain": 0,
+                "expected_target_constraints": {"scope": "creature_or_planeswalker"},
+                "controller_battlefield": [
+                    {
+                        "name": "E2E Return Cost Land",
+                        "type_line": "Basic Land - Mountain",
+                        "effect": "land",
+                        "tapped": True,
+                    }
+                ],
+                "expected_additional_cost": "return_land_to_hand",
+                "expected_returned_land_name": "E2E Return Cost Land",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["damage"] == 5
+    assert result["additional_cost"] == "return_land_to_hand"
+
+
+def test_fixed_damage_target_spell_runner_pays_mixed_sacrifice_cost() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "direct_damage",
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+        "amount": 5,
+        "damage": 5,
+        "target": "creature",
+        "target_constraints": {"card_types": ["creature"]},
+        "additional_cost": "sacrifice_creature_or_enchantment",
+        "requires_sacrifice_creature_or_enchantment": True,
+    }
+    try:
+        result = validator.run_fixed_damage_target_spell(
+            battle,
+            {
+                "name": "Final Flare pays mixed sacrifice cost",
+                "type": "fixed_damage_target_spell",
+                "card": {"name": "Final Flare", "type_line": "Instant"},
+                "target": {
+                    "name": "E2E Fixed Damage Legal Target",
+                    "type_line": "Creature",
+                    "effect": "creature",
+                    "power": 2,
+                    "toughness": 2,
+                },
+                "expected_damage": 5,
+                "expected_life_gain": 0,
+                "expected_target_constraints": {"card_types": ["creature"]},
+                "controller_battlefield": [
+                    {
+                        "name": "E2E Sacrifice Cost Enchantment",
+                        "type_line": "Enchantment",
+                        "effect": "enchantment",
+                    }
+                ],
+                "expected_additional_cost": "sacrifice_creature_or_enchantment",
+                "expected_sacrificed_name": "E2E Sacrifice Cost Enchantment",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["damage"] == 5
+    assert result["additional_cost"] == "sacrifice_creature_or_enchantment"
+
+
 def test_fixed_damage_target_spell_runner_validates_shuffle_self() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

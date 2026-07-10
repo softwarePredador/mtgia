@@ -8600,7 +8600,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertTrue(effect["requires_sacrifice_goblin"])
         self.assertEqual(effect["xmage_additional_cost_target"], "goblin")
 
-    def test_fixed_damage_spell_blocks_creature_or_enchantment_sacrifice_cost(self) -> None:
+    def test_fixed_damage_spell_maps_creature_or_enchantment_sacrifice_cost(self) -> None:
         row = queue_row(split.DAMAGE_UNIT, effect_classes=["DamageTargetEffect"])
         proposal, reason = split.split_row(
             row,
@@ -8612,8 +8612,63 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             ),
         )
 
-        self.assertIsNone(proposal)
-        self.assertEqual(reason, "damage_additional_cost_not_supported")
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DAMAGE_SCOPE)
+        self.assertEqual(effect["amount"], 5)
+        self.assertEqual(effect["additional_cost"], "sacrifice_creature_or_enchantment")
+        self.assertTrue(effect["requires_sacrifice_creature_or_enchantment"])
+        self.assertEqual(effect["xmage_additional_cost_target"], "creature_or_enchantment")
+
+    def test_fixed_damage_spell_maps_creature_or_planeswalker_sacrifice_cost(self) -> None:
+        row = queue_row(split.DAMAGE_UNIT, effect_classes=["DamageTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="As an additional cost to cast this spell, sacrifice a creature or planeswalker. Fixture Fire deals 4 damage to any target."),
+            source_text=(
+                "FilterControlledPermanent filter = new FilterControlledPermanent(\"creature or planeswalker\");"
+                "filter.add(CardType.CREATURE.getPredicate());"
+                "filter.add(CardType.PLANESWALKER.getPredicate());"
+                "this.getSpellAbility().addCost(new SacrificeTargetCost(filter));"
+                "this.getSpellAbility().addEffect(new DamageTargetEffect(4));"
+                "this.getSpellAbility().addTarget(new TargetAnyTarget());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DAMAGE_SCOPE)
+        self.assertEqual(effect["amount"], 4)
+        self.assertEqual(effect["additional_cost"], "sacrifice_creature_or_planeswalker")
+        self.assertTrue(effect["requires_sacrifice_creature_or_planeswalker"])
+        self.assertEqual(effect["xmage_additional_cost_target"], "creature_or_planeswalker")
+
+    def test_fixed_damage_spell_maps_return_land_to_hand_additional_cost(self) -> None:
+        row = queue_row(split.DAMAGE_UNIT, effect_classes=["DamageTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                oracle_text=(
+                    "As an additional cost to cast this spell, return a land you control to its owner's hand. "
+                    "Fixture Flames deals 5 damage to target creature or planeswalker."
+                )
+            ),
+            source_text=(
+                "this.getSpellAbility().addCost(new ReturnToHandChosenControlledPermanentCost("
+                "new TargetControlledPermanent(new FilterControlledLandPermanent(\"land\"))));"
+                "this.getSpellAbility().addTarget(new TargetCreatureOrPlaneswalker());"
+                "this.getSpellAbility().addEffect(new DamageTargetEffect(5));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DAMAGE_SCOPE)
+        self.assertEqual(effect["amount"], 5)
+        self.assertEqual(effect["additional_cost"], "return_land_to_hand")
+        self.assertTrue(effect["requires_return_land_to_hand"])
+        self.assertEqual(effect["xmage_additional_cost_class"], "ReturnToHandChosenControlledPermanentCost")
+        self.assertEqual(effect["xmage_additional_cost_target"], "land")
 
     def test_fixed_damage_exile_if_dies_spell_maps_to_runtime(self) -> None:
         row = queue_row(split.DAMAGE_UNIT, effect_classes=["DamageTargetEffect", "ExileTargetIfDiesEffect"])

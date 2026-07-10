@@ -9088,8 +9088,11 @@ SAFE_RUNTIME_SECONDARY_ANNOTATION_KEYS = {
     "requires_discard_card",
     "requires_discard_land",
     "requires_sacrifice_creature",
+    "requires_sacrifice_creature_or_enchantment",
+    "requires_sacrifice_creature_or_planeswalker",
     "requires_sacrifice_green_creature",
     "requires_sacrifice_land",
+    "requires_return_land_to_hand",
 }
 
 SAFE_RUNTIME_SECONDARY_DESCRIPTOR_KEYS = {
@@ -21981,6 +21984,12 @@ def activation_sacrifice_target_matches(permanent, target_type):
         return is_enchantment_permanent(permanent)
     if target == "land":
         return is_effective_land(permanent)
+    if target == "creature_or_enchantment":
+        return is_battlefield_creature(permanent) or is_enchantment_permanent(permanent)
+    if target == "creature_or_planeswalker":
+        return is_battlefield_creature(permanent) or "planeswalker" in str(
+            permanent.get("type_line") or ""
+        ).lower()
     if target == "forest":
         return is_effective_land(permanent) and _permanent_has_subtype(permanent, "forest")
     if target == "goblin":
@@ -22726,6 +22735,22 @@ def additional_card_costs_are_payable(player, card, effect_data, cost_context=No
         creature, _options, _reason = choose_creature_for_resource_cost(player)
         if creature is None:
             return False
+    if effect_data.get("requires_sacrifice_creature_or_enchantment"):
+        permanent, _options = choose_activation_sacrifice_target(
+            player,
+            card,
+            "creature_or_enchantment",
+        )
+        if permanent is None:
+            return False
+    if effect_data.get("requires_sacrifice_creature_or_planeswalker"):
+        permanent, _options = choose_activation_sacrifice_target(
+            player,
+            card,
+            "creature_or_planeswalker",
+        )
+        if permanent is None:
+            return False
     if effect_data.get("requires_sacrifice_artifact_or_creature"):
         permanent, _options = choose_activation_sacrifice_target(
             player,
@@ -22759,6 +22784,18 @@ def additional_card_costs_are_payable(player, card, effect_data, cost_context=No
         )
         if land is None:
             return False
+    if effect_data.get("requires_return_land_to_hand"):
+        battlefield_lands = [
+            candidate
+            for candidate in player.battlefield
+            if isinstance(candidate, dict) and is_effective_land(candidate)
+        ]
+        land, _options, _risk_flags, _selection_reason = choose_land_for_resource_cost(
+            battlefield_lands,
+            zone="battlefield",
+        )
+        if land is None:
+            return False
     return True
 
 
@@ -22774,9 +22811,12 @@ def pay_additional_card_costs(player, card, effect_data, *, turn=None, cost_cont
         and not effect_data.get("requires_discard_land")
         and not effect_data.get("requires_sacrifice_creature")
         and not effect_data.get("requires_sacrifice_green_creature")
+        and not effect_data.get("requires_sacrifice_creature_or_enchantment")
+        and not effect_data.get("requires_sacrifice_creature_or_planeswalker")
         and not effect_data.get("requires_sacrifice_artifact_or_creature")
         and effect_data.get("additional_cost") not in {"sacrifice_artifact", "sacrifice_goblin"}
         and not effect_data.get("requires_sacrifice_land")
+        and not effect_data.get("requires_return_land_to_hand")
         and not planned_sacrifices
         and not planned_blight
     ):
@@ -22954,6 +22994,42 @@ def pay_additional_card_costs(player, card, effect_data, *, turn=None, cost_cont
             selection_reason=selection_reason,
             strategic_risk_flags=strategic_risk_flags,
         )
+    if effect_data.get("requires_return_land_to_hand"):
+        battlefield_lands = [
+            candidate
+            for candidate in player.battlefield
+            if isinstance(candidate, dict) and is_effective_land(candidate)
+        ]
+        returned_land, land_options, strategic_risk_flags, selection_reason = choose_land_for_resource_cost(
+            battlefield_lands,
+            zone="battlefield",
+        )
+        if not returned_land:
+            emit_replay_event(
+                "additional_cost_failed",
+                player=player.name,
+                card=card.get("name", "?"),
+                cost="return_land_to_hand",
+                turn=turn,
+                land_options=land_options,
+                strategic_risk_flags=strategic_risk_flags,
+            )
+            return False
+        if returned_land in player.battlefield:
+            player.battlefield.remove(returned_land)
+        player.hand.append(returned_land)
+        emit_replay_event(
+            "additional_cost_paid",
+            player=player.name,
+            card=card.get("name", "?"),
+            cost="return_land_to_hand",
+            returned=returned_land.get("name", "?"),
+            returned_to="hand",
+            turn=turn,
+            land_options=land_options,
+            selection_reason=selection_reason,
+            strategic_risk_flags=strategic_risk_flags,
+        )
     if effect_data.get("additional_cost") in {"sacrifice_artifact", "sacrifice_goblin"}:
         sacrifice_target_type = (
             "artifact"
@@ -23042,6 +23118,56 @@ def pay_additional_card_costs(player, card, effect_data, *, turn=None, cost_cont
             creature_options=creature_options,
             selection_reason=selection_reason,
             required_color=required_color,
+            turn=turn,
+        )
+    for cost_flag, cost_name, sacrifice_target_type in (
+        (
+            "requires_sacrifice_creature_or_enchantment",
+            "sacrifice_creature_or_enchantment",
+            "creature_or_enchantment",
+        ),
+        (
+            "requires_sacrifice_creature_or_planeswalker",
+            "sacrifice_creature_or_planeswalker",
+            "creature_or_planeswalker",
+        ),
+    ):
+        if not effect_data.get(cost_flag):
+            continue
+        sacrifice, permanent_options = choose_activation_sacrifice_target(
+            player,
+            card,
+            sacrifice_target_type,
+        )
+        if not sacrifice:
+            emit_replay_event(
+                "additional_cost_failed",
+                player=player.name,
+                card=card.get("name", "?"),
+                cost=cost_name,
+                sacrifice_target_type=sacrifice_target_type,
+                turn=turn,
+            )
+            return False
+        destination = move_permanent_from_battlefield(
+            player,
+            sacrifice,
+            reason=cost_name,
+            source=card,
+        )
+        emit_replay_event(
+            "additional_cost_paid",
+            player=player.name,
+            card=card.get("name", "?"),
+            cost=cost_name,
+            sacrificed=sacrifice.get("name", "?"),
+            sacrifice_target_type=sacrifice_target_type,
+            destination=destination,
+            permanent_options=[
+                option.get("name", "?")
+                for option in permanent_options[:8]
+                if isinstance(option, dict)
+            ],
             turn=turn,
         )
     if effect_data.get("requires_sacrifice_artifact_or_creature"):
