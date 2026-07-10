@@ -578,6 +578,36 @@ def test_creature_etb_each_player_sacrifice_execution_scenario_is_manifested() -
     assert scenario["sacrifice_card_types"] == ["creature"]
 
 
+def test_creature_dies_each_player_sacrifice_execution_scenario_is_manifested() -> None:
+    proposal = {
+        "normalized_name": "akki blizzard-herder",
+        "card_name": "Akki Blizzard-Herder",
+        "oracle_hash": "hash-akki-blizzard-herder",
+        "logical_rule_key": "battle_rule_v1:akki-blizzard-herder",
+        "effect_json": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_dies_each_player_sacrifice_fixed_permanents_v1",
+            "ability_kind": "triggered",
+            "trigger": "dies",
+            "trigger_effect": "each_player_sacrifice",
+            "dies_each_player_sacrifice": True,
+            "sacrifice_count": 1,
+            "sacrifice_card_types": ["land"],
+            "sacrifice_scope": "each_player",
+            "sacrifice_choice": "controller_choice_lowest_value",
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    assert expected["required_effect_fields"]["dies_each_player_sacrifice"] is True
+    assert scenario["type"] == "creature_dies_each_player_sacrifice"
+    assert scenario["card"]["type_line"] == "Creature"
+    assert scenario["sacrifice_count"] == 1
+    assert scenario["sacrifice_card_types"] == ["land"]
+
+
 def test_creature_etb_target_stat_modifier_execution_scenario_is_manifested() -> None:
     proposal = {
         "normalized_name": "blister beetle",

@@ -364,6 +364,7 @@ BOARD_WIPE_SCOPE = "xmage_destroy_all_matching_permanents_spell_v1"
 DAMAGE_WIPE_SCOPE = "xmage_fixed_damage_all_matching_permanents_spell_v1"
 EACH_PLAYER_SACRIFICE_SCOPE = "xmage_each_player_sacrifice_fixed_permanents_spell_v1"
 ETB_EACH_PLAYER_SACRIFICE_SCOPE = "xmage_creature_etb_each_player_sacrifice_fixed_permanents_v1"
+DIES_EACH_PLAYER_SACRIFICE_SCOPE = "xmage_creature_dies_each_player_sacrifice_fixed_permanents_v1"
 ADD_COUNTERS_TARGET_SCOPE = "xmage_fixed_add_counters_target_creature_spell_v1"
 ADD_COUNTERS_TARGET_CREATURES_SCOPE = "xmage_fixed_add_counters_target_creatures_spell_v1"
 ADD_COUNTERS_UNTAP_TARGET_SCOPE = "xmage_fixed_add_counters_and_untap_target_creature_spell_v1"
@@ -7162,6 +7163,23 @@ def etb_each_player_sacrifice_spec_from_oracle(metadata: dict[str, Any]) -> dict
     effect = match.group("effect").strip()
     if re.search(r"\b(?:nontoken|token|planeswalker|choose one|or)\b", effect, re.I):
         return "etb_each_player_sacrifice_target_not_supported"
+    return each_player_sacrifice_spec_from_oracle({**metadata, "oracle_text": effect})
+
+
+def dies_each_player_sacrifice_spec_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str | None:
+    text = oracle_text(metadata)
+    text = re.sub(r"\s*\([^)]*\)\s*", " ", text)
+    text = re.sub(r"\s+", " ", text).strip()
+    match = re.match(
+        r"^when (?:this creature|[^,.]+) dies, (?P<effect>each player sacrifices .+)$",
+        text,
+        re.I,
+    )
+    if not match:
+        return "dies_each_player_sacrifice_oracle_not_exact"
+    effect = match.group("effect").strip()
+    if re.search(r"\b(?:nontoken|token|planeswalker|choose one|or)\b", effect, re.I):
+        return "dies_each_player_sacrifice_target_not_supported"
     return each_player_sacrifice_spec_from_oracle({**metadata, "oracle_text": effect})
 
 
@@ -24630,6 +24648,11 @@ def split_row(
         and effect_classes(row) == {"SacrificeAllEffect"}
         and ability_classes(row) == {"EntersBattlefieldTriggeredAbility"}
     )
+    dies_each_player_sacrifice_creature_unit = (
+        unit == BOARD_WIPE_UNIT
+        and effect_classes(row) == {"SacrificeAllEffect"}
+        and ability_classes(row) == {"DiesSourceTriggeredAbility"}
+    )
     draw_self_cost_reduction_spell_unit = (
         unit == DRAW_UNIT
         and effect_classes(row) == {"DrawCardSourceControllerEffect", "SpellCostReductionSourceEffect"}
@@ -24724,6 +24747,7 @@ def split_row(
         and not fixed_token_spell_unit
         and not graveyard_count_damage_unit
         and not etb_each_player_sacrifice_creature_unit
+        and not dies_each_player_sacrifice_creature_unit
         and not counter_unless_pays_spell_unit
         and not counter_target_with_replacement_spell_unit
     ):
@@ -24826,6 +24850,7 @@ def split_row(
         and not boost_keyword_draw_spell_unit
         and not treasure_etb_creature_unit
         and not etb_each_player_sacrifice_creature_unit
+        and not dies_each_player_sacrifice_creature_unit
         and not counter_unless_pays_spell_unit
     ):
         if not is_spell(metadata):
@@ -34464,6 +34489,40 @@ def split_row(
                 metadata,
                 effect_json,
                 family_id="xmage_creature_etb_each_player_sacrifice_fixed_permanents",
+            ), "selected_exact_scope"
+        if classes == {"SacrificeAllEffect"} and ability_classes(row) == {"DiesSourceTriggeredAbility"}:
+            if "creature" not in str(metadata.get("type_line") or "").lower():
+                return None, "dies_each_player_sacrifice_not_creature"
+            source_blocker = board_wipe_source_blocker(source_text, classes)
+            if source_blocker:
+                return None, source_blocker.replace("board_wipe", "dies_each_player_sacrifice")
+            oracle_sacrifice = dies_each_player_sacrifice_spec_from_oracle(metadata)
+            if isinstance(oracle_sacrifice, str):
+                return None, oracle_sacrifice
+            if oracle_sacrifice is None:
+                return None, "dies_each_player_sacrifice_oracle_not_exact"
+            source_sacrifice = each_player_sacrifice_spec_from_source(source_text)
+            if isinstance(source_sacrifice, str):
+                return None, source_sacrifice.replace("board_wipe", "dies_each_player_sacrifice")
+            if source_sacrifice != oracle_sacrifice:
+                return None, "dies_each_player_sacrifice_source_oracle_mismatch"
+            effect_json = {
+                "effect": "creature",
+                "battle_model_scope": DIES_EACH_PLAYER_SACRIFICE_SCOPE,
+                "ability_kind": "triggered",
+                "trigger": "dies",
+                "trigger_effect": "each_player_sacrifice",
+                "dies_each_player_sacrifice": True,
+                "xmage_effect_class": "SacrificeAllEffect",
+                "xmage_ability_class": "DiesSourceTriggeredAbility",
+                **oracle_sacrifice,
+                **flags,
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_creature_dies_each_player_sacrifice_fixed_permanents",
             ), "selected_exact_scope"
         unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
         if unsupported_abilities:

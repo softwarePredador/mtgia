@@ -28612,6 +28612,34 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["sacrifice_count"], 1)
         self.assertEqual(effect["sacrifice_card_types"], ["creature"])
 
+    def test_creature_dies_each_player_sacrifice_maps_fixed_land_count(self) -> None:
+        proposal, reason = split.split_row(
+            queue_row(
+                split.BOARD_WIPE_UNIT,
+                effect_classes=["SacrificeAllEffect"],
+                ability_classes=["DiesSourceTriggeredAbility"],
+            ),
+            metadata(
+                name="Akki Blizzard-Herder",
+                type_line="Creature - Goblin Shaman",
+                oracle_text="When Akki Blizzard-Herder dies, each player sacrifices a land.",
+            ),
+            source_text="""
+                private static final FilterControlledPermanent filter = new FilterControlledLandPermanent("land");
+                this.addAbility(new DiesSourceTriggeredAbility(new SacrificeAllEffect(filter)));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "creature")
+        self.assertEqual(effect["battle_model_scope"], split.DIES_EACH_PLAYER_SACRIFICE_SCOPE)
+        self.assertEqual(effect["trigger"], "dies")
+        self.assertEqual(effect["trigger_effect"], "each_player_sacrifice")
+        self.assertTrue(effect["dies_each_player_sacrifice"])
+        self.assertEqual(effect["sacrifice_count"], 1)
+        self.assertEqual(effect["sacrifice_card_types"], ["land"])
+
     def test_each_player_sacrifice_maps_fixed_land_count(self) -> None:
         proposal, reason = split.split_row(
             queue_row(split.BOARD_WIPE_UNIT, effect_classes=["SacrificeAllEffect"]),

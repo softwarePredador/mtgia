@@ -439,6 +439,7 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "sacrifice_choice",
     "sacrifice_requires_multicolored",
     "etb_each_player_sacrifice",
+    "dies_each_player_sacrifice",
     "controller_gains_life",
     "life_gain",
     "life_gain_amount",
@@ -4355,14 +4356,23 @@ def each_player_sacrifice_execution_scenario_from_expected_rule(
     if scope not in {
         "xmage_each_player_sacrifice_fixed_permanents_spell_v1",
         "xmage_creature_etb_each_player_sacrifice_fixed_permanents_v1",
+        "xmage_creature_dies_each_player_sacrifice_fixed_permanents_v1",
     }:
         return None
     card_types = list(required.get("sacrifice_card_types") or ["creature"])
     sacrifice_count = max(1, int(required.get("sacrifice_count") or 1))
-    type_line = "Creature" if scope == "xmage_creature_etb_each_player_sacrifice_fixed_permanents_v1" else "Sorcery"
+    if scope == "xmage_creature_dies_each_player_sacrifice_fixed_permanents_v1":
+        scenario_type = "creature_dies_each_player_sacrifice"
+        type_line = "Creature"
+    elif scope == "xmage_creature_etb_each_player_sacrifice_fixed_permanents_v1":
+        scenario_type = "each_player_sacrifice"
+        type_line = "Creature"
+    else:
+        scenario_type = "each_player_sacrifice"
+        type_line = "Sorcery"
     return {
         "name": f"{rule['card_name']} each player sacrifices matching permanents",
-        "type": "each_player_sacrifice",
+        "type": scenario_type,
         "card": {"name": rule["card_name"], "type_line": type_line},
         "sacrifice_count": sacrifice_count,
         "sacrifice_card_types": card_types,

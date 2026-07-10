@@ -21438,6 +21438,48 @@ def resolve_permanent_dies_target_player_discard(
     return payload
 
 
+def resolve_permanent_dies_each_player_sacrifice(
+    owner,
+    permanent,
+    *,
+    destination=None,
+    reason=None,
+    source=None,
+    opponents=None,
+    all_players=None,
+):
+    if destination != "graveyard" or not isinstance(permanent, dict):
+        return 0
+    if not permanent.get("dies_each_player_sacrifice"):
+        return 0
+    participants = list(all_players or [])
+    if not participants:
+        participants = [owner] + list(opponents or [])
+    resolved_opponents = [
+        player
+        for player in (opponents or [participant for participant in participants if participant is not owner])
+        if player is not None
+    ]
+    effect_data = {
+        **permanent,
+        "effect": "each_player_sacrifice",
+        "ability_kind": "triggered",
+        "trigger": "dies",
+        "trigger_effect": "each_player_sacrifice",
+        "reason": reason,
+        "source": source.get("name", "?") if isinstance(source, dict) else source,
+    }
+    resolve_each_player_sacrifice(
+        owner,
+        resolved_opponents,
+        permanent,
+        effect_data,
+        CURRENT_REPLAY_TURN,
+        finish_spell=False,
+    )
+    return 1
+
+
 def resolve_permanent_dies_recursion(owner, permanent, *, destination=None, reason=None, source=None):
     if destination != "graveyard" or not isinstance(permanent, dict):
         return []
@@ -21720,6 +21762,14 @@ def move_creature_from_battlefield(owner, creature, reason=None, source=None, al
         source=source,
         all_players=all_players,
     )
+    resolve_permanent_dies_each_player_sacrifice(
+        owner,
+        creature,
+        destination=destination,
+        reason=reason,
+        source=source,
+        all_players=all_players,
+    )
     resolve_permanent_dies_recursion(
         owner,
         creature,
@@ -21827,6 +21877,14 @@ def move_permanent_from_battlefield(owner, permanent, reason=None, source=None, 
         all_players=all_players,
     )
     resolve_permanent_dies_target_player_discard(
+        owner,
+        permanent,
+        destination=destination,
+        reason=reason,
+        source=source,
+        all_players=all_players,
+    )
+    resolve_permanent_dies_each_player_sacrifice(
         owner,
         permanent,
         destination=destination,
@@ -27831,6 +27889,8 @@ def resolve_each_player_sacrifice(player, opponents, card, effect_data, turn, *,
         sacrificed=len(sacrificed_cards),
         sacrificed_cards=sacrificed_cards[:24],
         choices=choices[:24],
+        trigger=effect_data.get("trigger"),
+        trigger_effect=effect_data.get("trigger_effect"),
         permanents_seen=permanents_seen,
         creatures_seen=creatures_seen,
         own_permanents_sacrificed=own_permanents_sacrificed,

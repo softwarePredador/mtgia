@@ -1,0 +1,286 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg708_dies_each_player_sacrifice_new_ser_20260710_155036",
+  "deploy_id": "pg708",
+  "execution_scenarios": [
+    {
+      "card": {
+        "name": "Abyssal Gatekeeper",
+        "type_line": "Creature"
+      },
+      "expected_sacrificed_per_player": 1,
+      "logical_rule_key": "battle_rule_v1:38dc27ef7f3aaaa64d69ca3af90e8948",
+      "name": "Abyssal Gatekeeper each player sacrifices matching permanents",
+      "sacrifice_card_types": [
+        "creature"
+      ],
+      "sacrifice_count": 1,
+      "sacrifice_requires_multicolored": false,
+      "type": "creature_dies_each_player_sacrifice"
+    },
+    {
+      "card": {
+        "name": "Akki Blizzard-Herder",
+        "type_line": "Creature"
+      },
+      "expected_sacrificed_per_player": 1,
+      "logical_rule_key": "battle_rule_v1:fcbd2830364aa99be41a8cedcbbf6eb7",
+      "name": "Akki Blizzard-Herder each player sacrifices matching permanents",
+      "sacrifice_card_types": [
+        "land"
+      ],
+      "sacrifice_count": 1,
+      "sacrifice_requires_multicolored": false,
+      "type": "creature_dies_each_player_sacrifice"
+    },
+    {
+      "card": {
+        "name": "Hurloon Shaman",
+        "type_line": "Creature"
+      },
+      "expected_sacrificed_per_player": 1,
+      "logical_rule_key": "battle_rule_v1:fcbd2830364aa99be41a8cedcbbf6eb7",
+      "name": "Hurloon Shaman each player sacrifices matching permanents",
+      "sacrifice_card_types": [
+        "land"
+      ],
+      "sacrifice_count": 1,
+      "sacrifice_requires_multicolored": false,
+      "type": "creature_dies_each_player_sacrifice"
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Abyssal Gatekeeper",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:38dc27ef7f3aaaa64d69ca3af90e8948",
+      "min_rule_version": 2,
+      "normalized_name": "abyssal gatekeeper",
+      "oracle_hash": "882b690c3b89b0b0a3de931b3e6e3cc1",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_dies_each_player_sacrifice_fixed_permanents_v1",
+        "dies_each_player_sacrifice": true,
+        "effect": "creature",
+        "instant": false,
+        "sacrifice_card_types": [
+          "creature"
+        ],
+        "sacrifice_choice": "controller_choice_lowest_value",
+        "sacrifice_count": 1,
+        "sacrifice_scope": "each_player",
+        "sorcery": false,
+        "trigger": "dies",
+        "trigger_effect": "each_player_sacrifice",
+        "xmage_ability_class": "DiesSourceTriggeredAbility",
+        "xmage_effect_class": "SacrificeAllEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Akki Blizzard-Herder",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:fcbd2830364aa99be41a8cedcbbf6eb7",
+      "min_rule_version": 2,
+      "normalized_name": "akki blizzard-herder",
+      "oracle_hash": "76e5249dc8fad55956f9aeeec989f1ea",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_dies_each_player_sacrifice_fixed_permanents_v1",
+        "dies_each_player_sacrifice": true,
+        "effect": "creature",
+        "instant": false,
+        "sacrifice_card_types": [
+          "land"
+        ],
+        "sacrifice_choice": "controller_choice_lowest_value",
+        "sacrifice_count": 1,
+        "sacrifice_scope": "each_player",
+        "sorcery": false,
+        "trigger": "dies",
+        "trigger_effect": "each_player_sacrifice",
+        "xmage_ability_class": "DiesSourceTriggeredAbility",
+        "xmage_effect_class": "SacrificeAllEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Hurloon Shaman",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:fcbd2830364aa99be41a8cedcbbf6eb7",
+      "min_rule_version": 2,
+      "normalized_name": "hurloon shaman",
+      "oracle_hash": "76e5249dc8fad55956f9aeeec989f1ea",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_dies_each_player_sacrifice_fixed_permanents_v1",
+        "dies_each_player_sacrifice": true,
+        "effect": "creature",
+        "instant": false,
+        "sacrifice_card_types": [
+          "land"
+        ],
+        "sacrifice_choice": "controller_choice_lowest_value",
+        "sacrifice_count": 1,
+        "sacrifice_scope": "each_player",
+        "sorcery": false,
+        "trigger": "dies",
+        "trigger_effect": "each_player_sacrifice",
+        "xmage_ability_class": "DiesSourceTriggeredAbility",
+        "xmage_effect_class": "SacrificeAllEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_creature_dies_each_player_sacrifice_fixed_permanents": 3
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg708_dies_each_player_sacrifice_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg708_dies_each_player_sacrifice_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg708_dies_each_player_sacrifice_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg708_dies_each_player_sacrifice_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg708_dies_each_player_sacrifice_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg708_dies_each_player_sacrifice_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-10T15:50:36+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Abyssal Gatekeeper"
+      },
+      "card_name": "Abyssal Gatekeeper",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:38dc27ef7f3aaaa64d69ca3af90e8948",
+      "normalized_name": "abyssal gatekeeper",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_dies_each_player_sacrifice_fixed_permanents_v1",
+        "dies_each_player_sacrifice": true,
+        "effect": "creature",
+        "instant": false,
+        "sacrifice_card_types": [
+          "creature"
+        ],
+        "sacrifice_choice": "controller_choice_lowest_value",
+        "sacrifice_count": 1,
+        "sacrifice_scope": "each_player",
+        "sorcery": false,
+        "trigger": "dies",
+        "trigger_effect": "each_player_sacrifice",
+        "xmage_ability_class": "DiesSourceTriggeredAbility",
+        "xmage_effect_class": "SacrificeAllEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Akki Blizzard-Herder"
+      },
+      "card_name": "Akki Blizzard-Herder",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:fcbd2830364aa99be41a8cedcbbf6eb7",
+      "normalized_name": "akki blizzard-herder",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_dies_each_player_sacrifice_fixed_permanents_v1",
+        "dies_each_player_sacrifice": true,
+        "effect": "creature",
+        "instant": false,
+        "sacrifice_card_types": [
+          "land"
+        ],
+        "sacrifice_choice": "controller_choice_lowest_value",
+        "sacrifice_count": 1,
+        "sacrifice_scope": "each_player",
+        "sorcery": false,
+        "trigger": "dies",
+        "trigger_effect": "each_player_sacrifice",
+        "xmage_ability_class": "DiesSourceTriggeredAbility",
+        "xmage_effect_class": "SacrificeAllEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Hurloon Shaman"
+      },
+      "card_name": "Hurloon Shaman",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:fcbd2830364aa99be41a8cedcbbf6eb7",
+      "normalized_name": "hurloon shaman",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_dies_each_player_sacrifice_fixed_permanents_v1",
+        "dies_each_player_sacrifice": true,
+        "effect": "creature",
+        "instant": false,
+        "sacrifice_card_types": [
+          "land"
+        ],
+        "sacrifice_choice": "controller_choice_lowest_value",
+        "sacrifice_count": 1,
+        "sacrifice_scope": "each_player",
+        "sorcery": false,
+        "trigger": "dies",
+        "trigger_effect": "each_player_sacrifice",
+        "xmage_ability_class": "DiesSourceTriggeredAbility",
+        "xmage_effect_class": "SacrificeAllEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Abyssal Gatekeeper",
+    "Akki Blizzard-Herder",
+    "Hurloon Shaman"
+  ],
+  "selected_count": 3,
+  "slug": "dies_each_player_sacrifice_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Abyssal Gatekeeper",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:38dc27ef7f3aaaa64d69ca3af90e8948",
+      "min_rule_version": 2,
+      "normalized_name": "abyssal gatekeeper",
+      "oracle_hash": "882b690c3b89b0b0a3de931b3e6e3cc1",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_dies_each_player_sacrifice_fixed_permanents_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Akki Blizzard-Herder",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:fcbd2830364aa99be41a8cedcbbf6eb7",
+      "min_rule_version": 2,
+      "normalized_name": "akki blizzard-herder",
+      "oracle_hash": "76e5249dc8fad55956f9aeeec989f1ea",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_dies_each_player_sacrifice_fixed_permanents_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Hurloon Shaman",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:fcbd2830364aa99be41a8cedcbbf6eb7",
+      "min_rule_version": 2,
+      "normalized_name": "hurloon shaman",
+      "oracle_hash": "76e5249dc8fad55956f9aeeec989f1ea",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_dies_each_player_sacrifice_fixed_permanents_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}
