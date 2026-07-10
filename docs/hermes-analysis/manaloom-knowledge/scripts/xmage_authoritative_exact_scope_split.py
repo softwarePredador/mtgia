@@ -325,6 +325,7 @@ DESTROY_COMPENSATION_TOKEN_SCOPE = "xmage_destroy_target_with_controller_creatur
 EXILE_COMPENSATION_TOKEN_SCOPE = "xmage_exile_target_with_controller_creature_token_compensation_spell_v1"
 MANA_SCOPE = "xmage_simple_tap_mana_source_permanent_v1"
 PAIN_TALISMAN_SCOPE = "pain_talisman_color_pair_partial_v1"
+MANA_WITH_ACTIVATION_LIFE_GAIN_SCOPE = "xmage_simple_tap_mana_source_with_gain_life_v1"
 MANA_WITH_ACTIVATED_DRAW_SCOPE = "xmage_simple_tap_mana_source_with_activated_draw_v1"
 MANA_WITH_ETB_DRAW_SCOPE = "xmage_simple_mana_source_with_etb_draw_v1"
 ETB_FIXED_MANA_CREATURE_SCOPE = "xmage_creature_etb_add_fixed_mana_v1"
@@ -23315,6 +23316,45 @@ def pain_talisman_detail_from_source(
     }
 
 
+def mana_activation_life_gain_detail_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
+    lines = normalized_oracle_lines(metadata)
+    if len(lines) != 1:
+        return None
+    match = re.fullmatch(
+        r"\{t\}: add \{(?P<symbol>[wubrgc])\}\. you gain (?P<life>\d+) life\.?",
+        lines[0],
+    )
+    if not match:
+        return None
+    symbol = match.group("symbol").upper()
+    return {
+        "produces": symbol,
+        "mana_produced": 1,
+        "produced_mana_symbols": [symbol],
+        "mana_activation_requires_tap": True,
+        "mana_activation_life_gain": int(match.group("life")),
+    }
+
+
+def mana_activation_life_gain_detail_from_source(
+    source_text: str,
+    ability_class_values: set[str],
+) -> dict[str, Any] | str:
+    symbols = fixed_mana_symbols_from_ability_classes(ability_class_values)
+    if len(symbols) != 1:
+        return "mana_activation_life_gain_source_mana_ability_not_single"
+    gain_amounts = [
+        int(value)
+        for value in re.findall(r"new\s+GainLifeEffect\s*\(\s*(\d+)\s*\)", source_text or "")
+    ]
+    if len(gain_amounts) != 1:
+        return "mana_activation_life_gain_source_gain_life_not_single"
+    return {
+        "produces": symbols[0],
+        "mana_activation_life_gain": int(gain_amounts[0]),
+    }
+
+
 def tap_and_self_sacrifice_mana_source_source_blocker(
     source_text: str,
     ability_class_values: set[str],
@@ -24889,6 +24929,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
     scope_kind = "runtime-backed exact-scope adapter"
     if scope == MANA_WITH_ACTIVATED_DRAW_SCOPE:
         scope_kind = "activated mana-source permanent with separate activated draw ability"
+    elif scope == MANA_WITH_ACTIVATION_LIFE_GAIN_SCOPE:
+        scope_kind = "mana-source permanent with fixed life gain on mana activation"
     elif scope == MANA_WITH_ETB_DRAW_SCOPE:
         scope_kind = "mana-source permanent with fixed enter-the-battlefield draw trigger"
     elif scope == ETB_FIXED_MANA_CREATURE_SCOPE:
@@ -36069,6 +36111,61 @@ def split_row(
                 metadata,
                 effect_json,
                 family_id="xmage_pain_talisman_color_pair_mana_source",
+            ), "selected_exact_scope"
+        mana_source_with_activation_life_gain = (
+            classes == {"GainLifeEffect"}
+            and len(mana_ability_classes & set(MANA_ABILITY_CLASS_SYMBOLS)) == 1
+            and not (
+                mana_ability_classes
+                - set(MANA_ABILITY_CLASS_SYMBOLS)
+                - SAFE_MANA_AUXILIARY_ABILITY_CLASSES
+            )
+        )
+        if mana_source_with_activation_life_gain:
+            oracle_mana = mana_activation_life_gain_detail_from_oracle(metadata)
+            if oracle_mana is None:
+                return None, "mana_activation_life_gain_oracle_not_exact"
+            source_mana = mana_activation_life_gain_detail_from_source(
+                source_text,
+                mana_ability_classes,
+            )
+            if isinstance(source_mana, str):
+                return None, source_mana
+            if source_mana["produces"] != oracle_mana["produces"]:
+                return None, "mana_activation_life_gain_source_oracle_mana_mismatch"
+            if int(source_mana["mana_activation_life_gain"]) != int(
+                oracle_mana["mana_activation_life_gain"]
+            ):
+                return None, "mana_activation_life_gain_source_oracle_amount_mismatch"
+            type_line = str(metadata.get("type_line") or "").lower()
+            permanent_type = (
+                "creature"
+                if "creature" in type_line
+                else "artifact"
+                if "artifact" in type_line
+                else "permanent"
+            )
+            effect_json = {
+                "effect": "ramp_permanent",
+                "battle_model_scope": MANA_WITH_ACTIVATION_LIFE_GAIN_SCOPE,
+                "is_mana_source": True,
+                "mana_produced": int(oracle_mana["mana_produced"]),
+                "produces": str(oracle_mana["produces"]),
+                "produced_mana_symbols": list(oracle_mana["produced_mana_symbols"]),
+                "activation_requires_tap": True,
+                "mana_activation_requires_tap": True,
+                "mana_activation_life_gain": int(oracle_mana["mana_activation_life_gain"]),
+                "permanent_type": permanent_type,
+                "ability_kind": "activated_mana",
+                "xmage_mana_ability_classes": sorted(mana_ability_classes),
+                "xmage_effect_classes": sorted(classes),
+                "xmage_ability_classes": sorted(mana_ability_classes),
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_mana_source_activation_gain_life",
             ), "selected_exact_scope"
         mana_source_with_activated_draw = (
             classes == {"DrawCardSourceControllerEffect"}

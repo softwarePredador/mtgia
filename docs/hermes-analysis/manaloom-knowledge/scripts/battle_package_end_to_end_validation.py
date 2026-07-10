@@ -4797,6 +4797,25 @@ def run_simple_mana_source_refresh(
                 "battle_events",
                 f"{card['name']} life_paid={life_event.get('life_paid')}, expected {expected_life_paid}",
             )
+    expected_activation_life_gain = int(scenario.get("expected_mana_activation_life_gain") or 0)
+    if expected_activation_life_gain:
+        gain_event = next(
+            (
+                data
+                for replay_event, data in events[before_events:]
+                if replay_event == "mana_source_activation_life_gain_resolved"
+                and data.get("card") == card.get("name")
+            ),
+            None,
+        )
+        if gain_event is None:
+            fail("battle_events", f"missing {card['name']} mana-source life gain event")
+        if int(gain_event.get("life_gained") or 0) != expected_activation_life_gain:
+            fail(
+                "battle_events",
+                f"{card['name']} life_gained={gain_event.get('life_gained')}, "
+                f"expected {expected_activation_life_gain}",
+            )
     return {
         "scenario": scenario.get("name"),
         "card_name": card["name"],
@@ -4806,6 +4825,7 @@ def run_simple_mana_source_refresh(
         "sources": int(event.get("sources") or 0),
         "activation_limit_per_turn": expected_activation_limit,
         "life_paid": expected_life_paid,
+        "mana_activation_life_gain": expected_activation_life_gain,
         "life_after_refresh": active.life,
         "conditional_life_loss_by_color": expected_life_loss_by_color,
     }

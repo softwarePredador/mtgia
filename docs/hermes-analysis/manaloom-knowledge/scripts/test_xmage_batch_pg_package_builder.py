@@ -5290,3 +5290,37 @@ def test_pain_talisman_manifest_preserves_colored_mana_life_loss_modes() -> None
         "white": 1,
         "black": 1,
     }
+
+
+def test_mana_source_activation_life_gain_manifest_expects_life_gain() -> None:
+    proposal = {
+        "normalized_name": "pristine talisman",
+        "card_name": "Pristine Talisman",
+        "oracle_hash": "hash-pristine-talisman",
+        "logical_rule_key": "battle_rule_v1:pristine-talisman",
+        "effect_json": {
+            "effect": "ramp_permanent",
+            "battle_model_scope": "xmage_simple_tap_mana_source_with_gain_life_v1",
+            "is_mana_source": True,
+            "mana_produced": 1,
+            "produces": "C",
+            "produced_mana_symbols": ["C"],
+            "mana_activation_life_gain": 1,
+            "mana_activation_requires_tap": True,
+            "activation_requires_tap": True,
+            "permanent_type": "artifact",
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    required = expected["required_effect_fields"]
+
+    assert required["mana_activation_life_gain"] == 1
+
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    assert scenario["type"] == "simple_mana_source_refresh"
+    assert scenario["expected_available_mana_after_refresh"] == 1
+    assert scenario["starting_life"] == 40
+    assert scenario["expected_mana_activation_life_gain"] == 1
+    assert scenario["expected_life_after_refresh"] == 41

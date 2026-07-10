@@ -3448,6 +3448,50 @@ def test_simple_mana_source_refresh_runner_validates_pain_talisman_modes() -> No
     }
 
 
+def test_simple_mana_source_refresh_runner_executes_activation_life_gain() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "ramp_permanent",
+        "battle_model_scope": "xmage_simple_tap_mana_source_with_gain_life_v1",
+        "is_mana_source": True,
+        "mana_produced": 1,
+        "produces": "C",
+        "produced_mana_symbols": ["C"],
+        "mana_activation_life_gain": 1,
+        "mana_activation_requires_tap": True,
+        "_rule_logical_key": "battle_rule_v1:pristine-talisman",
+    }
+    try:
+        result = validator.run_simple_mana_source_refresh(
+            battle,
+            {
+                "name": "Pristine Talisman refreshes mana and gains life",
+                "type": "simple_mana_source_refresh",
+                "card": {"name": "Pristine Talisman"},
+                "starting_life": 40,
+                "expected_available_mana_after_refresh": 1,
+                "expected_tapped": True,
+                "expected_sources": 1,
+                "expected_mana_activation_life_gain": 1,
+                "expected_life_after_refresh": 41,
+                "logical_rule_key": "battle_rule_v1:pristine-talisman",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Pristine Talisman"
+    assert result["available_mana"] == 1
+    assert result["mana_activation_life_gain"] == 1
+    assert result["life_after_refresh"] == 41
+
+
 def test_creature_dies_create_treasure_runner_executes_trigger() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

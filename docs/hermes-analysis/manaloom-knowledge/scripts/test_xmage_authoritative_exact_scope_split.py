@@ -30201,6 +30201,58 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "pain_talisman_source_oracle_damage_mismatch")
 
+    def test_mana_source_activation_life_gain_maps_pristine_talisman(self) -> None:
+        proposal, reason = split.split_row(
+            queue_row(
+                split.RAMP_ARTIFACT_UNIT,
+                effect_classes=["GainLifeEffect"],
+                ability_classes=["ColorlessManaAbility"],
+                xmage_signals=["mana"],
+            ),
+            metadata(
+                name="Pristine Talisman",
+                type_line="Artifact",
+                oracle_text="{T}: Add {C}. You gain 1 life.",
+            ),
+            source_text="""
+                ColorlessManaAbility ability = new ColorlessManaAbility();
+                ability.addEffect(new GainLifeEffect(1));
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.MANA_WITH_ACTIVATION_LIFE_GAIN_SCOPE)
+        self.assertEqual(effect["effect"], "ramp_permanent")
+        self.assertEqual(effect["produces"], "C")
+        self.assertEqual(effect["produced_mana_symbols"], ["C"])
+        self.assertEqual(effect["mana_activation_life_gain"], 1)
+        self.assertTrue(effect["mana_activation_requires_tap"])
+
+    def test_mana_source_activation_life_gain_blocks_source_oracle_amount_mismatch(self) -> None:
+        proposal, reason = split.split_row(
+            queue_row(
+                split.RAMP_ARTIFACT_UNIT,
+                effect_classes=["GainLifeEffect"],
+                ability_classes=["ColorlessManaAbility"],
+                xmage_signals=["mana"],
+            ),
+            metadata(
+                name="Fixture Talisman",
+                type_line="Artifact",
+                oracle_text="{T}: Add {C}. You gain 1 life.",
+            ),
+            source_text="""
+                ColorlessManaAbility ability = new ColorlessManaAbility();
+                ability.addEffect(new GainLifeEffect(2));
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "mana_activation_life_gain_source_oracle_amount_mismatch")
+
 
 if __name__ == "__main__":
     unittest.main()

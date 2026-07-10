@@ -488,6 +488,7 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "produces",
     "produced_mana_symbols",
     "life_for_colored_mana",
+    "mana_activation_life_gain",
     "mana_activation_requires_tap",
     "mana_activation_requires_sacrifice_target",
     "sacrifice_mana_source_contextual_only",
@@ -2901,6 +2902,7 @@ def simple_mana_source_execution_scenario_from_expected_rule(rule: dict[str, Any
         return None
     if required.get("battle_model_scope") not in {
         "xmage_simple_tap_mana_source_permanent_v1",
+        "xmage_simple_tap_mana_source_with_gain_life_v1",
         "xmage_simple_tap_mana_source_with_activated_draw_v1",
         "xmage_simple_mana_source_with_etb_draw_v1",
         "pain_talisman_color_pair_partial_v1",
@@ -2914,6 +2916,7 @@ def simple_mana_source_execution_scenario_from_expected_rule(rule: dict[str, Any
     support_sources = _manifest_support_sources_for_controller_mana(controller_mana)
     enters_tapped = bool(required.get("enters_tapped"))
     activation_life_cost = int(required.get("activation_life_cost") or 0)
+    activation_life_gain = int(required.get("mana_activation_life_gain") or 0)
     scenario = {
         "name": f"{rule['card_name']} refreshes modeled mana source",
         "type": "simple_mana_source_refresh",
@@ -2939,10 +2942,13 @@ def simple_mana_source_execution_scenario_from_expected_rule(rule: dict[str, Any
         "source_overrides": {"tapped": True} if enters_tapped else {},
         "logical_rule_key": rule["logical_rule_key"],
     }
-    if activation_life_cost:
+    if activation_life_cost or activation_life_gain:
         scenario["starting_life"] = 40
+        scenario["expected_life_after_refresh"] = 40 - activation_life_cost + activation_life_gain
+    if activation_life_cost:
         scenario["expected_life_paid"] = activation_life_cost
-        scenario["expected_life_after_refresh"] = 40 - activation_life_cost
+    if activation_life_gain:
+        scenario["expected_mana_activation_life_gain"] = activation_life_gain
     conditional_life_loss_by_color = _manifest_conditional_life_loss_by_color(
         required.get("produces"),
         int(required.get("life_for_colored_mana") or 0),

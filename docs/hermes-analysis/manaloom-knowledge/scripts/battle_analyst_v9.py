@@ -6195,16 +6195,20 @@ def add_player_mana_source_to_pool(player, source, turn=None):
     if produced <= 0:
         return False
     if add_fixed_produced_mana_symbols_to_pool(player, source, produced):
+        resolve_mana_source_activation_life_gain(player, source, turn=turn)
         return True
     if add_distributed_controlled_color_mana_to_pool(player, source, produced):
+        resolve_mana_source_activation_life_gain(player, source, turn=turn)
         return True
     conditional_source = conditional_mana_source_for_state(player, source, produced)
     if conditional_source:
         player.conditional_mana_sources.append(conditional_source)
+        resolve_mana_source_activation_life_gain(player, source, turn=turn)
         return True
     colors = mana_source_colors_for_state(player, source)
     color = colors[0] if len(colors) == 1 else "generic"
     player.mana_pool.add(color, produced)
+    resolve_mana_source_activation_life_gain(player, source, turn=turn)
     return True
 
 
@@ -6501,6 +6505,37 @@ def pay_mana_source_activation_costs(player, source, turn=None):
     if source.get("mana_activation_requires_tap"):
         source["tapped"] = True
     return True
+
+
+def resolve_mana_source_activation_life_gain(player, source, turn=None):
+    if not isinstance(source, dict):
+        return 0
+    amount = max(
+        0,
+        int(
+            source.get("mana_activation_life_gain")
+            or source.get("mana_source_activation_life_gain")
+            or 0
+        ),
+    )
+    if amount <= 0:
+        return 0
+    life_before = int(getattr(player, "life", 0))
+    gain_life(player, amount, cap=999)
+    life_after = int(getattr(player, "life", life_before))
+    life_gained = max(0, life_after - life_before)
+    emit_replay_event(
+        "mana_source_activation_life_gain_resolved",
+        player=getattr(player, "name", "?"),
+        card=source.get("name", "?"),
+        life_gain_requested=amount,
+        life_gained=life_gained,
+        life_before=life_before,
+        life_after=life_after,
+        turn=turn,
+        **replay_rule_fields(source),
+    )
+    return life_gained
 
 
 def numeric_stat(value):
@@ -10992,11 +11027,13 @@ class Player:
             if not pay_mana_source_activation_costs(self, source, turn=turn):
                 continue
             if add_fixed_produced_mana_symbols_to_pool(self, source, produced):
+                resolve_mana_source_activation_life_gain(self, source, turn=turn)
                 mark_mana_source_used_if_nonstandard_untap(source)
                 record_mana_source_activation(source, turn)
                 active_sources += 1
                 continue
             if add_distributed_controlled_color_mana_to_pool(self, source, produced):
+                resolve_mana_source_activation_life_gain(self, source, turn=turn)
                 mark_mana_source_used_if_nonstandard_untap(source)
                 record_mana_source_activation(source, turn)
                 active_sources += 1
@@ -11004,6 +11041,7 @@ class Player:
             conditional_source = conditional_mana_source_for_state(self, source, produced)
             if conditional_source:
                 self.conditional_mana_sources.append(conditional_source)
+                resolve_mana_source_activation_life_gain(self, source, turn=turn)
                 mark_mana_source_used_if_nonstandard_untap(source)
                 record_mana_source_activation(source, turn)
                 active_sources += 1
@@ -11013,6 +11051,7 @@ class Player:
             # the imported data specifies one concrete produced color.
             color = colors[0] if len(colors) == 1 else "generic"
             self.mana_pool.add(color, produced)
+            resolve_mana_source_activation_life_gain(self, source, turn=turn)
             mark_mana_source_used_if_nonstandard_untap(source)
             record_mana_source_activation(source, turn)
             active_sources += 1
