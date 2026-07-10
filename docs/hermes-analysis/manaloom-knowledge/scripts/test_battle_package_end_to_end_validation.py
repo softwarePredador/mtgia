@@ -3029,6 +3029,64 @@ def test_simple_activated_self_keyword_runner_executes_keyword_effect() -> None:
     assert result["life_paid"] == 2
 
 
+def test_simple_activated_self_boost_runner_executes_extra_costs() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "creature",
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "activated_effect": "self_stat_modifier_until_eot",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "target": "self",
+        "target_controller": "self",
+        "target_constraints": {"source": "self", "card_types": ["creature"]},
+        "power_delta": 2,
+        "toughness_delta": 2,
+        "power_boost": 2,
+        "toughness_boost": 2,
+        "activation_cost_mana": "{0}",
+        "activation_cost_generic": 0,
+        "activation_cost_colors": [],
+        "activation_requires_tap": False,
+        "activation_discard_count": 1,
+        "activation_discard_target": "artifact_card",
+        "activation_requires_discard_card": True,
+        "activation_life_cost": 1,
+        "_rule_logical_key": "battle_rule_v1:fleshgrafter",
+    }
+    try:
+        result = validator.run_simple_activated_self_boost(
+            battle,
+            {
+                "name": "Fleshgrafter pumps itself",
+                "type": "simple_activated_self_boost",
+                "card": {"name": "Fleshgrafter", "type_line": "Creature - Human Warrior"},
+                "controller_hand": [
+                    {"name": "E2E Spare Bauble", "type_line": "Artifact", "effect": "mana_source", "cmc": 1},
+                    {"name": "E2E Nonartifact Spell", "type_line": "Sorcery", "effect": "draw_cards", "cmc": 2},
+                ],
+                "expected_power_delta": 2,
+                "expected_toughness_delta": 2,
+                "expected_discard_count": 1,
+                "expected_life_paid": 1,
+                "logical_rule_key": "battle_rule_v1:fleshgrafter",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Fleshgrafter"
+    assert result["source_power"] == 4
+    assert result["source_toughness"] == 4
+    assert result["discarded_count"] == 1
+    assert result["life_paid"] == 1
+
+
 def test_simple_activated_regenerate_source_runner_consumes_shield_on_destroy() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

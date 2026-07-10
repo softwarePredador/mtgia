@@ -7382,6 +7382,7 @@ def run_simple_activated_self_boost(
     )
     active = battle.Player(str(scenario.get("player") or "Activated Controller"), None, [])
     active.battlefield = [source]
+    active.hand = [dict(card) for card in (scenario.get("controller_hand") or []) if isinstance(card, dict)]
     add_manifest_mana(active, scenario.get("controller_mana") or {})
     expected_power_delta = int(
         scenario.get("expected_power_delta") or effect.get("power_delta") or effect.get("power_boost") or 0
@@ -7398,10 +7399,21 @@ def run_simple_activated_self_boost(
         or effect.get("activation_limit_per_turn")
         or 0
     )
+    expected_discard_count = int(
+        scenario.get("expected_discard_count")
+        or effect.get("activation_discard_count")
+        or 0
+    )
+    expected_life_paid = int(
+        scenario.get("expected_life_paid")
+        or effect.get("activation_life_cost")
+        or 0
+    )
     turn = int(scenario.get("turn") or 7)
     before_events = len(events)
     before_power = int(source.get("power") or 0)
     before_toughness = int(source.get("toughness") or 0)
+    life_before = active.life
     if not battle.can_activate_generic_self_boost_permanent(active, source):
         fail("battle_execution", f"{card['name']} simple activated self boost cannot activate")
     activated = battle.activate_generic_self_boost_permanent(
@@ -7461,6 +7473,23 @@ def run_simple_activated_self_boost(
             "battle_events",
             f"{card['name']} activation_limit_per_turn={activation_event.get('activation_limit_per_turn')!r}",
         )
+    discarded = list(activation_event.get("discarded") or [])
+    if len(discarded) != expected_discard_count:
+        fail(
+            "battle_events",
+            f"{card['name']} discarded_count={len(discarded)}, expected {expected_discard_count}",
+        )
+    life_paid = int(activation_event.get("activation_life_cost") or 0)
+    if life_paid != expected_life_paid:
+        fail(
+            "battle_events",
+            f"{card['name']} activation_life_cost={life_paid}, expected {expected_life_paid}",
+        )
+    if active.life != life_before - expected_life_paid:
+        fail(
+            "battle_execution",
+            f"{card['name']} life_after={active.life}, expected {life_before - expected_life_paid}",
+        )
     resolved_event = next(
         (
             data
@@ -7481,6 +7510,8 @@ def run_simple_activated_self_boost(
         "power_delta": expected_power_delta,
         "toughness_delta": expected_toughness_delta,
         "activation_limit_per_turn": expected_limit,
+        "discarded_count": len(discarded),
+        "life_paid": expected_life_paid,
     }
 
 

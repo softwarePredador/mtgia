@@ -52151,6 +52151,18 @@ def _self_boost_activation_cost(effect_data):
     return activation_cost
 
 
+def _can_pay_self_boost_extra_costs(player, effect_data):
+    life_cost = max(0, int(effect_data.get("activation_life_cost") or 0))
+    if life_cost and (getattr(player, "life_cant_change", False) or player.life <= life_cost + 1):
+        return False
+    discard_count = max(0, int(effect_data.get("activation_discard_count") or 0))
+    if discard_count:
+        discard_target = effect_data.get("activation_discard_target") or "any_card"
+        if len(_activation_discard_cost_candidates(player, discard_count, discard_target)) < discard_count:
+            return False
+    return True
+
+
 def can_activate_generic_self_boost_permanent(player, permanent, *, effect_data=None, auto_only=False):
     effect_data = effect_data or activated_self_boost_effect_for_permanent(permanent)
     if effect_data is None:
@@ -52170,6 +52182,8 @@ def can_activate_generic_self_boost_permanent(player, permanent, *, effect_data=
     activation_cost = _self_boost_activation_cost(effect_data)
     if not player.can_pay(activation_cost):
         return False
+    if not _can_pay_self_boost_extra_costs(player, effect_data):
+        return False
     power_delta = int(effect_data.get("power_delta") or effect_data.get("power_boost") or 0)
     toughness_delta = int(effect_data.get("toughness_delta") or effect_data.get("toughness_boost") or 0)
     current_toughness = int(float(permanent.get("toughness") or permanent.get("power") or 0))
@@ -52177,6 +52191,10 @@ def can_activate_generic_self_boost_permanent(player, permanent, *, effect_data=
         return False
     if auto_only:
         if effect_data.get("activation_requires_tap"):
+            return False
+        if int(effect_data.get("activation_discard_count") or 0) > 0:
+            return False
+        if int(effect_data.get("activation_life_cost") or 0) > 0:
             return False
         if power_delta <= 0:
             return False
@@ -52209,8 +52227,44 @@ def activate_generic_self_boost_permanent(
     activation_count_before = int(activation_usage.get(activation_turn_key) or 0)
     if activation_limit > 0 and activation_count_before >= activation_limit:
         return False
+    discard_count = max(0, int(effect_data.get("activation_discard_count") or 0))
+    discard_target = effect_data.get("activation_discard_target") or "any_card"
+    discard_cards = []
+    if discard_count:
+        discard_cards = _choose_activation_discard_cost_cards(
+            player,
+            discard_count,
+            discard_target,
+            random_discard=bool(effect_data.get("activation_discard_random")),
+            rng=rng,
+        )
+        if len(discard_cards) != discard_count:
+            return False
     if not player.spend_mana(activation_cost):
         return False
+    life_before = player.life
+    life_cost = max(0, int(effect_data.get("activation_life_cost") or 0))
+    if life_cost:
+        change_life(player, -life_cost)
+    discarded = []
+    if discard_cards:
+        removed_cards = _remove_exact_cards_from_hand(player, discard_cards)
+        if len(removed_cards) != len(discard_cards):
+            return False
+        discard_resolution = resolve_effect_discard_cards(
+            player,
+            removed_cards,
+            top_limit=0,
+            opponents=[opponent for opponent in all_players if opponent is not player],
+            turn=turn,
+            phase=phase,
+            rng=rng,
+        )
+        discarded = [
+            card.get("name", "?")
+            for card in discard_resolution.get("to_graveyard", removed_cards)
+            if isinstance(card, dict)
+        ]
     if effect_data.get("activation_requires_tap"):
         permanent["tapped"] = True
     power_delta = int(effect_data.get("power_delta") or effect_data.get("power_boost") or 0)
@@ -52251,6 +52305,8 @@ def activate_generic_self_boost_permanent(
             "power_delta": power_delta,
             "toughness_delta": toughness_delta,
             "requires_tap": 1 if effect_data.get("activation_requires_tap") else 0,
+            "life_cost": life_cost,
+            "discard_cost": discard_count,
         },
         rule_source=fields.get("rule_source", "battle_rule"),
         rule_status=fields.get("rule_review_status", "verified"),
@@ -52261,6 +52317,8 @@ def activate_generic_self_boost_permanent(
         heuristic_version=DECISION_STRATEGY_VERSION,
         resource_delta={
             "mana": -mana_paid,
+            "life": -life_cost,
+            "cards_discarded": len(discarded),
             "power": power_delta,
             "toughness": toughness_delta,
             "tapped": 1 if effect_data.get("activation_requires_tap") else 0,
@@ -52269,6 +52327,8 @@ def activate_generic_self_boost_permanent(
             flag
             for flag, active in {
                 "tap_ability": bool(effect_data.get("activation_requires_tap")),
+                "discard_cost": bool(discarded),
+                "life_payment": bool(life_cost),
                 "temporary_boost": True,
             }.items()
             if active
@@ -52281,6 +52341,12 @@ def activate_generic_self_boost_permanent(
         effect="stat_modifier_until_eot",
         activation_kind="simple_activated_self_boost",
         activation_cost=activation_cost,
+        activation_life_cost=life_cost,
+        life_before=life_before,
+        life_after=player.life,
+        activation_discard_count=len(discarded),
+        activation_discard_target=discard_target if discard_count else None,
+        discarded=discarded,
         activation_limit_per_turn=activation_limit or None,
         activation_count_this_turn=activation_count_before + 1,
         tapped=bool(permanent.get("tapped")),

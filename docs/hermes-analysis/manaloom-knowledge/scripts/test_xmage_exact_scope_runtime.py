@@ -12119,6 +12119,114 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertEqual(permanent["power"], 2)
         self.assertEqual(permanent["toughness"], 2)
 
+    def test_simple_activated_self_boost_pays_discard_cost(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        discard_card = {"name": "Spare Spell", "type_line": "Sorcery", "effect": "draw_cards", "cmc": 2}
+        active.hand = [discard_card]
+        permanent = {
+            "name": "Noose Constrictor",
+            "type_line": "Creature - Snake",
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+            "activated_effect": "self_stat_modifier_until_eot",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+            "target": "self",
+            "target_controller": "self",
+            "power": 2,
+            "toughness": 2,
+            "power_delta": 1,
+            "toughness_delta": 1,
+            "power_boost": 1,
+            "toughness_boost": 1,
+            "activation_cost_mana": "{0}",
+            "activation_cost_generic": 0,
+            "activation_cost_colors": [],
+            "activation_requires_tap": False,
+            "activation_discard_count": 1,
+            "activation_discard_target": "any_card",
+            "activation_requires_discard_card": True,
+            "_rule_logical_key": "battle_rule_v1:noose-constrictor-test",
+        }
+        active.battlefield.append(permanent)
+
+        activated = self.battle.activate_generic_self_boost_permanent(
+            active,
+            [active, opponent],
+            permanent,
+            turn=18,
+            rng=random.Random(181),
+            phase="precombat_main",
+        )
+
+        self.assertTrue(activated)
+        self.assertEqual(active.hand, [])
+        self.assertEqual([card.get("name") for card in active.graveyard], ["Spare Spell"])
+        self.assertEqual(permanent["power"], 3)
+        self.assertEqual(permanent["toughness"], 3)
+        self.assertTrue(
+            any(
+                event == "activated_ability"
+                and data.get("card") == "Noose Constrictor"
+                and data.get("activation_kind") == "simple_activated_self_boost"
+                and data.get("activation_discard_count") == 1
+                and data.get("discarded") == ["Spare Spell"]
+                for event, data in self.events
+            )
+        )
+
+    def test_simple_activated_self_boost_pays_life_cost(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.mana_pool.add("black", 1)
+        permanent = {
+            "name": "Grimclaw Bats",
+            "type_line": "Creature - Bat",
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+            "activated_effect": "self_stat_modifier_until_eot",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+            "target": "self",
+            "target_controller": "self",
+            "power": 1,
+            "toughness": 1,
+            "power_delta": 1,
+            "toughness_delta": 1,
+            "power_boost": 1,
+            "toughness_boost": 1,
+            "activation_cost_mana": "{B}",
+            "activation_cost_generic": 0,
+            "activation_cost_colors": ["B"],
+            "activation_requires_tap": False,
+            "activation_life_cost": 1,
+            "_rule_logical_key": "battle_rule_v1:grimclaw-bats-test",
+        }
+        active.battlefield.append(permanent)
+
+        activated = self.battle.activate_generic_self_boost_permanent(
+            active,
+            [active, opponent],
+            permanent,
+            turn=18,
+            rng=random.Random(182),
+            phase="precombat_main",
+        )
+
+        self.assertTrue(activated)
+        self.assertEqual(active.life, 39)
+        self.assertEqual(permanent["power"], 2)
+        self.assertEqual(permanent["toughness"], 2)
+        self.assertTrue(
+            any(
+                event == "activated_ability"
+                and data.get("card") == "Grimclaw Bats"
+                and data.get("activation_life_cost") == 1
+                and data.get("life_before") == 40
+                and data.get("life_after") == 39
+                for event, data in self.events
+            )
+        )
+
     def test_limited_activated_self_boost_only_once_per_turn(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

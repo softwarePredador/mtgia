@@ -16327,9 +16327,12 @@ def activation_cost_from_oracle_prefix(
     cost_text: str,
     *,
     allow_source_sacrifice: bool = False,
+    allow_discard: bool = False,
+    allow_life: bool = False,
 ) -> dict[str, Any] | str:
     text = re.sub(r"\s+", " ", str(cost_text or "").strip().lower())
     requires_sacrifice = False
+    extra_costs: dict[str, Any] = {}
     if allow_source_sacrifice and "sacrifice" in text:
         sacrifice_pattern = r"(?:^|,\s*)sacrifice this (?:artifact|creature|enchantment|permanent)(?:\s*,?|$)"
         sacrifice_matches = re.findall(sacrifice_pattern, text)
@@ -16337,10 +16340,34 @@ def activation_cost_from_oracle_prefix(
             return "activated_self_boost_oracle_cost_not_supported"
         text = re.sub(sacrifice_pattern, ",", text).strip(" ,")
         requires_sacrifice = True
+    if allow_discard and "discard" in text:
+        discard_cost = activation_discard_cost_from_oracle(text)
+        if discard_cost is None:
+            return "activated_self_boost_oracle_cost_not_supported"
+        extra_costs.update(discard_cost)
+        discard_pattern = (
+            r"(?:^|,\s*)discard (?:(?:two|three|\d+) cards|an? (?:artifact|land|card) card|a card)"
+            r"(?: at random)?\s*$"
+        )
+        normalized = re.sub(discard_pattern, "", text).strip(" ,")
+        if normalized == text:
+            return "activated_self_boost_oracle_cost_not_supported"
+        text = normalized
+    if allow_life and "life" in text:
+        life_cost = activation_life_cost_from_oracle(text)
+        if life_cost is None:
+            return "activated_self_boost_oracle_cost_not_supported"
+        if life_cost:
+            extra_costs["activation_life_cost"] = life_cost
+        life_pattern = r"(?:^|,\s*)pay \d+ life(?:\s*,?|$)"
+        normalized = re.sub(life_pattern, "", text).strip(" ,")
+        if normalized == text:
+            return "activated_self_boost_oracle_cost_not_supported"
+        text = normalized
     risky_tokens = [
         "{q}",
-        "discard",
-        "pay ",
+        *([] if allow_discard else ["discard"]),
+        *([] if allow_life else ["pay "]),
         "tap an untapped",
         "remove ",
         "exile ",
@@ -16371,6 +16398,7 @@ def activation_cost_from_oracle_prefix(
         "activation_cost_colors": colors,
         "activation_requires_tap": requires_tap,
         "activation_requires_sacrifice": requires_sacrifice,
+        **extra_costs,
     }
 
 
@@ -16508,7 +16536,11 @@ def activated_self_boost_from_oracle(metadata: dict[str, Any]) -> dict[str, Any]
     )
     if not match:
         return "activated_self_boost_oracle_not_simple"
-    activation = activation_cost_from_oracle_prefix(cost_text)
+    activation = activation_cost_from_oracle_prefix(
+        cost_text,
+        allow_discard=True,
+        allow_life=True,
+    )
     if isinstance(activation, str):
         return activation
     return {
@@ -16540,12 +16572,23 @@ def activated_self_boost_cost_from_source(window: str) -> dict[str, Any] | str:
     if parsed is None:
         return "activated_self_boost_source_mana_cost_not_supported"
     generic, colors = parsed
+    discard_cost = activation_discard_cost_from_source(window)
+    if isinstance(discard_cost, str):
+        return discard_cost.replace("activated_damage", "activated_self_boost")
+    life_matches = re.findall(r"new\s+PayLifeCost\s*\(\s*(\d+)\s*\)", window, re.S)
+    if len(life_matches) > 1:
+        return "activated_self_boost_source_cost_not_supported"
+    life_cost = int(life_matches[0]) if life_matches else 0
+    if life_cost < 0:
+        return "activated_self_boost_source_cost_not_supported"
     return {
         "activation_cost_mana": cost_text,
         "activation_cost_generic": generic,
         "activation_cost_colors": colors,
         "activation_requires_tap": "TapSourceCost" in window,
         "activation_requires_sacrifice": False,
+        **(discard_cost or {}),
+        **({"activation_life_cost": life_cost} if life_cost else {}),
     }
 
 
@@ -16553,13 +16596,10 @@ def activated_self_boost_from_source(source: str) -> dict[str, Any] | str:
     text = source or ""
     risky_cost_classes = {
         "CompositeCost",
-        "DiscardCardCost",
-        "DiscardTargetCost",
         "ExileFrom",
         "ExileFromGraveCost",
         "ExileSourceFromGraveCost",
         "OrCost",
-        "PayLifeCost",
         "RemoveCounterCost",
         "ReturnToHandSourceCost",
         "SacrificeSourceCost",
@@ -17933,6 +17973,12 @@ def activation_discard_cost_from_oracle(text: str) -> dict[str, Any] | None:
             "activation_discard_target": "land_card",
             "activation_requires_discard_card": True,
         }
+    if re.search(r"(?:^|,)\s*discard an artifact card\s*$", cost_text):
+        return {
+            "activation_discard_count": 1,
+            "activation_discard_target": "artifact_card",
+            "activation_requires_discard_card": True,
+        }
     if re.search(r"(?:^|,)\s*discard a card\s*$", cost_text):
         return {
             "activation_discard_count": 1,
@@ -17952,11 +17998,21 @@ def activation_discard_cost_from_source(window: str) -> dict[str, Any] | str | N
     )
     random_matches = re.findall(r"new\s+DiscardCardCost\s*\(\s*true\s*\)", window or "")
     plain_matches = re.findall(r"new\s+DiscardCardCost\s*\(\s*\)", window or "")
+    artifact_matches = re.findall(
+        r"new\s+DiscardCardCost\s*\(\s*StaticFilters\.FILTER_CARD_ARTIFACT_[A-Z]+\s*\)",
+        window or "",
+    )
     land_matches = re.findall(
         r"new\s+DiscardTargetCost\s*\(\s*new\s+TargetCardInHand\s*\(\s*StaticFilters\.FILTER_CARD_LAND_A\s*\)\s*\)",
         window or "",
     )
-    supported_count = len(random_target_matches) + len(random_matches) + len(plain_matches) + len(land_matches)
+    supported_count = (
+        len(random_target_matches)
+        + len(random_matches)
+        + len(plain_matches)
+        + len(artifact_matches)
+        + len(land_matches)
+    )
     if supported_count != 1:
         return "activated_damage_source_discard_cost_not_supported"
     if random_target_matches:
@@ -17980,6 +18036,12 @@ def activation_discard_cost_from_source(window: str) -> dict[str, Any] | str | N
         return {
             "activation_discard_count": 1,
             "activation_discard_target": "land_card",
+            "activation_requires_discard_card": True,
+        }
+    if artifact_matches:
+        return {
+            "activation_discard_count": 1,
+            "activation_discard_target": "artifact_card",
             "activation_requires_discard_card": True,
         }
     return {
@@ -27100,12 +27162,20 @@ def split_row(
             list(parsed_activation["activation_cost_colors"]),
             bool(parsed_activation["activation_requires_tap"]),
             int(parsed_activation.get("activation_limit_per_turn") or 0),
+            int(parsed_activation.get("activation_discard_count") or 0),
+            str(parsed_activation.get("activation_discard_target") or ""),
+            bool(parsed_activation.get("activation_discard_random")),
+            int(parsed_activation.get("activation_life_cost") or 0),
         )
         oracle_cost = (
             int(oracle_boost["activation_cost_generic"]),
             list(oracle_boost["activation_cost_colors"]),
             bool(oracle_boost["activation_requires_tap"]),
             int(oracle_boost.get("activation_limit_per_turn") or 0),
+            int(oracle_boost.get("activation_discard_count") or 0),
+            str(oracle_boost.get("activation_discard_target") or ""),
+            bool(oracle_boost.get("activation_discard_random")),
+            int(oracle_boost.get("activation_life_cost") or 0),
         )
         if source_cost != oracle_cost:
             return None, "activated_self_boost_source_oracle_cost_mismatch"
@@ -27154,6 +27224,16 @@ def split_row(
             "activation_requires_tap": parsed_activation["activation_requires_tap"],
             "activation_requires_sacrifice": False,
         }
+        for key in (
+            "activation_discard_count",
+            "activation_discard_target",
+            "activation_requires_discard_card",
+            "activation_discard_random",
+            "activation_life_cost",
+        ):
+            if parsed_activation.get(key) not in (None, "", [], {}):
+                activated_effect[key] = parsed_activation[key]
+                effect_json[key] = parsed_activation[key]
         if parsed_activation.get("activation_limit_per_turn"):
             activated_effect["activation_limit_per_turn"] = int(parsed_activation["activation_limit_per_turn"])
             effect_json["activation_limit_per_turn"] = int(parsed_activation["activation_limit_per_turn"])

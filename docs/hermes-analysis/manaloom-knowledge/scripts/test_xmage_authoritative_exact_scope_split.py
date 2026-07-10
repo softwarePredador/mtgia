@@ -23598,6 +23598,124 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["activation_cost_colors"], ["R"])
         self.assertFalse(effect["activation_requires_tap"])
 
+    def test_activated_self_boost_maps_discard_cost(self) -> None:
+        row = queue_row(
+            split.SELF_BOOST_ACTIVATED_UNIT,
+            effect_classes=["BoostSourceEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Burning-Fist Minotaur",
+                type_line="Creature - Minotaur Wizard",
+                oracle_text="{1}{R}, Discard a card: This creature gets +2/+0 until end of turn.",
+            ),
+            source_text=(
+                "Ability ability = new SimpleActivatedAbility("
+                "new BoostSourceEffect(2, 0, Duration.EndOfTurn), "
+                'new ManaCostsImpl<>("{1}{R}"));'
+                "ability.addCost(new DiscardCardCost());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.SELF_BOOST_ACTIVATED_SCOPE)
+        self.assertEqual(effect["activation_cost_mana"], "{1}{R}")
+        self.assertEqual(effect["activation_discard_count"], 1)
+        self.assertEqual(effect["activation_discard_target"], "any_card")
+        self.assertTrue(effect["activation_requires_discard_card"])
+        self.assertEqual(effect["_activated_rule_effects"][0]["activation_discard_count"], 1)
+
+    def test_activated_self_boost_maps_random_discard_cost(self) -> None:
+        row = queue_row(
+            split.SELF_BOOST_ACTIVATED_UNIT,
+            effect_classes=["BoostSourceEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Canyon Drake",
+                type_line="Creature - Drake",
+                oracle_text="{1}, Discard a card at random: This creature gets +2/+0 until end of turn.",
+            ),
+            source_text=(
+                "Ability ability = new SimpleActivatedAbility("
+                "new BoostSourceEffect(2, 0, Duration.EndOfTurn), "
+                'new ManaCostsImpl<>("{1}"));'
+                "ability.addCost(new DiscardCardCost(true));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["activation_discard_count"], 1)
+        self.assertEqual(effect["activation_discard_target"], "any_card")
+        self.assertTrue(effect["activation_discard_random"])
+
+    def test_activated_self_boost_maps_artifact_discard_cost(self) -> None:
+        row = queue_row(
+            split.SELF_BOOST_ACTIVATED_UNIT,
+            effect_classes=["BoostSourceEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fleshgrafter",
+                type_line="Creature - Human Warrior",
+                oracle_text="Discard an artifact card: Fleshgrafter gets +2/+2 until end of turn.",
+            ),
+            source_text=(
+                "this.addAbility(new SimpleActivatedAbility("
+                "new BoostSourceEffect(2, 2, Duration.EndOfTurn), "
+                "new DiscardCardCost(StaticFilters.FILTER_CARD_ARTIFACT_AN)));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["activation_cost_mana"], "{0}")
+        self.assertEqual(effect["activation_discard_target"], "artifact_card")
+        self.assertTrue(effect["activation_requires_discard_card"])
+
+    def test_activated_self_boost_maps_pay_life_cost(self) -> None:
+        row = queue_row(
+            split.SELF_BOOST_ACTIVATED_UNIT,
+            effect_classes=["BoostSourceEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Grimclaw Bats",
+                type_line="Creature - Bat",
+                oracle_text="{B}, Pay 1 life: This creature gets +1/+1 until end of turn.",
+            ),
+            source_text=(
+                "Ability ability = new SimpleActivatedAbility("
+                "new BoostSourceEffect(1, 1, Duration.EndOfTurn), "
+                'new ManaCostsImpl<>("{B}"));'
+                "ability.addCost(new PayLifeCost(1));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["activation_cost_mana"], "{B}")
+        self.assertEqual(effect["activation_life_cost"], 1)
+        self.assertEqual(effect["_activated_rule_effects"][0]["activation_life_cost"], 1)
+
     def test_activated_self_boost_blocks_tapping_another_creature_cost(self) -> None:
         row = queue_row(
             split.SELF_BOOST_ACTIVATED_UNIT,

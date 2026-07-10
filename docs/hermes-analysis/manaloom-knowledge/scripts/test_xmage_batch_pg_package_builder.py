@@ -2458,6 +2458,40 @@ def test_manifest_builds_simple_activated_self_boost_execution_scenario() -> Non
     assert scenario["expected_activation_limit_per_turn"] == 1
 
 
+def test_manifest_builds_simple_activated_self_boost_extra_cost_scenario() -> None:
+    rule = {
+        "normalized_name": "fleshgrafter",
+        "card_name": "Fleshgrafter",
+        "oracle_hash": "hash-fleshgrafter",
+        "logical_rule_key": "battle_rule_v1:hash-fleshgrafter",
+        "required_effect_fields": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+            "activated_effect": "self_stat_modifier_until_eot",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+            "target": "self",
+            "target_controller": "self",
+            "power_delta": 2,
+            "toughness_delta": 2,
+            "activation_cost_mana": "{0}",
+            "activation_cost_generic": 0,
+            "activation_cost_colors": [],
+            "activation_discard_count": 1,
+            "activation_discard_target": "artifact_card",
+            "activation_requires_discard_card": True,
+            "activation_life_cost": 1,
+        },
+    }
+
+    scenario = builder.simple_activated_self_boost_execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "simple_activated_self_boost"
+    assert scenario["expected_discard_count"] == 1
+    assert scenario["expected_life_paid"] == 1
+    assert scenario["controller_hand"][0]["type_line"] == "Artifact"
+
+
 def test_manifest_builds_simple_activated_target_keyword_execution_scenario() -> None:
     rule = {
         "normalized_name": "selfless savior",

@@ -1,0 +1,738 @@
+{
+  "battle_execution": {
+    "event_count": 30,
+    "results": [
+      {
+        "activation_limit_per_turn": 0,
+        "card_name": "Aven Trooper",
+        "discarded_count": 1,
+        "life_paid": 0,
+        "power_delta": 1,
+        "scenario": "Aven Trooper activates self boost ability",
+        "source_power": 3,
+        "source_toughness": 4,
+        "toughness_delta": 2
+      },
+      {
+        "activation_limit_per_turn": 0,
+        "card_name": "Burning-Fist Minotaur",
+        "discarded_count": 1,
+        "life_paid": 0,
+        "power_delta": 2,
+        "scenario": "Burning-Fist Minotaur activates self boost ability",
+        "source_power": 4,
+        "source_toughness": 2,
+        "toughness_delta": 0
+      },
+      {
+        "activation_limit_per_turn": 0,
+        "card_name": "Canyon Drake",
+        "discarded_count": 1,
+        "life_paid": 0,
+        "power_delta": 2,
+        "scenario": "Canyon Drake activates self boost ability",
+        "source_power": 4,
+        "source_toughness": 2,
+        "toughness_delta": 0
+      },
+      {
+        "activation_limit_per_turn": 0,
+        "card_name": "Carrion Howler",
+        "discarded_count": 0,
+        "life_paid": 1,
+        "power_delta": 2,
+        "scenario": "Carrion Howler activates self boost ability",
+        "source_power": 4,
+        "source_toughness": 1,
+        "toughness_delta": -1
+      },
+      {
+        "activation_limit_per_turn": 1,
+        "card_name": "Cutthroat Contender",
+        "discarded_count": 0,
+        "life_paid": 1,
+        "power_delta": 1,
+        "scenario": "Cutthroat Contender activates self boost ability",
+        "source_power": 3,
+        "source_toughness": 2,
+        "toughness_delta": 0
+      },
+      {
+        "activation_limit_per_turn": 0,
+        "card_name": "Fleshgrafter",
+        "discarded_count": 1,
+        "life_paid": 0,
+        "power_delta": 2,
+        "scenario": "Fleshgrafter activates self boost ability",
+        "source_power": 4,
+        "source_toughness": 4,
+        "toughness_delta": 2
+      },
+      {
+        "activation_limit_per_turn": 0,
+        "card_name": "Frenetic Ogre",
+        "discarded_count": 1,
+        "life_paid": 0,
+        "power_delta": 3,
+        "scenario": "Frenetic Ogre activates self boost ability",
+        "source_power": 5,
+        "source_toughness": 2,
+        "toughness_delta": 0
+      },
+      {
+        "activation_limit_per_turn": 0,
+        "card_name": "Grimclaw Bats",
+        "discarded_count": 0,
+        "life_paid": 1,
+        "power_delta": 1,
+        "scenario": "Grimclaw Bats activates self boost ability",
+        "source_power": 3,
+        "source_toughness": 3,
+        "toughness_delta": 1
+      },
+      {
+        "activation_limit_per_turn": 0,
+        "card_name": "Krosan Archer",
+        "discarded_count": 1,
+        "life_paid": 0,
+        "power_delta": 0,
+        "scenario": "Krosan Archer activates self boost ability",
+        "source_power": 2,
+        "source_toughness": 4,
+        "toughness_delta": 2
+      },
+      {
+        "activation_limit_per_turn": 0,
+        "card_name": "Noose Constrictor",
+        "discarded_count": 1,
+        "life_paid": 0,
+        "power_delta": 1,
+        "scenario": "Noose Constrictor activates self boost ability",
+        "source_power": 3,
+        "source_toughness": 3,
+        "toughness_delta": 1
+      },
+      {
+        "activation_limit_per_turn": 0,
+        "card_name": "Pardic Swordsmith",
+        "discarded_count": 1,
+        "life_paid": 0,
+        "power_delta": 2,
+        "scenario": "Pardic Swordsmith activates self boost ability",
+        "source_power": 4,
+        "source_toughness": 2,
+        "toughness_delta": 0
+      },
+      {
+        "activation_limit_per_turn": 1,
+        "card_name": "Putrid Leech",
+        "discarded_count": 0,
+        "life_paid": 2,
+        "power_delta": 2,
+        "scenario": "Putrid Leech activates self boost ability",
+        "source_power": 4,
+        "source_toughness": 4,
+        "toughness_delta": 2
+      },
+      {
+        "activation_limit_per_turn": 0,
+        "card_name": "Ravenous Bloodseeker",
+        "discarded_count": 1,
+        "life_paid": 0,
+        "power_delta": 2,
+        "scenario": "Ravenous Bloodseeker activates self boost ability",
+        "source_power": 4,
+        "source_toughness": 1,
+        "toughness_delta": -2
+      },
+      {
+        "activation_limit_per_turn": 0,
+        "card_name": "Stalking Bloodsucker",
+        "discarded_count": 1,
+        "life_paid": 0,
+        "power_delta": 2,
+        "scenario": "Stalking Bloodsucker activates self boost ability",
+        "source_power": 4,
+        "source_toughness": 4,
+        "toughness_delta": 2
+      },
+      {
+        "activation_limit_per_turn": 0,
+        "card_name": "Wall of Blood",
+        "discarded_count": 0,
+        "life_paid": 1,
+        "power_delta": 1,
+        "scenario": "Wall of Blood activates self boost ability",
+        "source_power": 3,
+        "source_toughness": 3,
+        "toughness_delta": 1
+      }
+    ],
+    "scenario_count": 15
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-10T21:07:38.469542+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg721_activated_self_boost_costs_new_server_package_manifest.json",
+  "package_id": "pg721_activated_self_boost_costs_new_server_package_manifest",
+  "snapshot": "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 15
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "card_name": "Aven Trooper",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1a030ea083ef693fe47f55c1e259541b",
+          "oracle_hash": "0f0c83e5c2801f5196dfc47256df4e8c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "card_name": "Burning-Fist Minotaur",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:36d4ef487a2a35dc0328dfcc474ffa71",
+          "oracle_hash": "69ef774af1118cae0b5ac946e88a0d96",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "card_name": "Canyon Drake",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c0b71a11d86bc31d5547201042e18897",
+          "oracle_hash": "2b7519cfaf37f55cc65b25cf2ccd93e9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "card_name": "Carrion Howler",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c2b89f414d066fb2d6b38a1adff59b00",
+          "oracle_hash": "0838cdb685b18c654d30004f6ec97d0a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "card_name": "Cutthroat Contender",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:86d543fa932afb695a0c1ae0db8034af",
+          "oracle_hash": "333c4206636814e68ee98bb5057d8475",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "card_name": "Fleshgrafter",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9090483dfb9584d0b786cafbb9fb9623",
+          "oracle_hash": "34ce74b417b410b5cabbe0a2c3c84cfb",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "card_name": "Frenetic Ogre",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3433d7a8291ec66f54f21b1c8c84a653",
+          "oracle_hash": "3303c9b62e006edeed79c8ef0167698c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "card_name": "Grimclaw Bats",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d0e6717885e012dabcd365e01c44a87c",
+          "oracle_hash": "e7231683950a58a6abcd19964a95c694",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "card_name": "Krosan Archer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3db753bffa3813945279db0e6376cf53",
+          "oracle_hash": "7272074c7717b5683af7a840061bce4a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "card_name": "Noose Constrictor",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f4b9fbac8048c35da4bde9da7ae9c3f4",
+          "oracle_hash": "1dd922028c8671daabea387ac116caa7",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "card_name": "Pardic Swordsmith",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5b8e9f97fa2ed081118e8f4be64e4e1d",
+          "oracle_hash": "f283a39e08945c7568c92ff3326dd40f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "card_name": "Putrid Leech",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:79fda462d57b713c5e5623be871a8a0d",
+          "oracle_hash": "6989dfd180617881830b2c52daf017a4",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "card_name": "Ravenous Bloodseeker",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1c77c20310161d821d74dc3d5c6cc2f6",
+          "oracle_hash": "1ec30f407b930a2fb0b74f9ca032f28f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "card_name": "Stalking Bloodsucker",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ca07ff2ddfde83de2a352f981f3b7e21",
+          "oracle_hash": "f8234f8a19dbe5b5ca396aab11930635",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "card_name": "Wall of Blood",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e6fdf411eef16ead9861f49b4d11b4c3",
+          "oracle_hash": "a1ae3ea1ca235e596af587df93696b99",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 15
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "card_name": "Aven Trooper",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1a030ea083ef693fe47f55c1e259541b",
+          "oracle_hash": "0f0c83e5c2801f5196dfc47256df4e8c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "card_name": "Burning-Fist Minotaur",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:36d4ef487a2a35dc0328dfcc474ffa71",
+          "oracle_hash": "69ef774af1118cae0b5ac946e88a0d96",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "card_name": "Canyon Drake",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c0b71a11d86bc31d5547201042e18897",
+          "oracle_hash": "2b7519cfaf37f55cc65b25cf2ccd93e9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "card_name": "Carrion Howler",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c2b89f414d066fb2d6b38a1adff59b00",
+          "oracle_hash": "0838cdb685b18c654d30004f6ec97d0a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "card_name": "Cutthroat Contender",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:86d543fa932afb695a0c1ae0db8034af",
+          "oracle_hash": "333c4206636814e68ee98bb5057d8475",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "card_name": "Fleshgrafter",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9090483dfb9584d0b786cafbb9fb9623",
+          "oracle_hash": "34ce74b417b410b5cabbe0a2c3c84cfb",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "card_name": "Frenetic Ogre",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3433d7a8291ec66f54f21b1c8c84a653",
+          "oracle_hash": "3303c9b62e006edeed79c8ef0167698c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "card_name": "Grimclaw Bats",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d0e6717885e012dabcd365e01c44a87c",
+          "oracle_hash": "e7231683950a58a6abcd19964a95c694",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "card_name": "Krosan Archer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3db753bffa3813945279db0e6376cf53",
+          "oracle_hash": "7272074c7717b5683af7a840061bce4a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "card_name": "Noose Constrictor",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f4b9fbac8048c35da4bde9da7ae9c3f4",
+          "oracle_hash": "1dd922028c8671daabea387ac116caa7",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "card_name": "Pardic Swordsmith",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5b8e9f97fa2ed081118e8f4be64e4e1d",
+          "oracle_hash": "f283a39e08945c7568c92ff3326dd40f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "card_name": "Putrid Leech",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:79fda462d57b713c5e5623be871a8a0d",
+          "oracle_hash": "6989dfd180617881830b2c52daf017a4",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "card_name": "Ravenous Bloodseeker",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1c77c20310161d821d74dc3d5c6cc2f6",
+          "oracle_hash": "1ec30f407b930a2fb0b74f9ca032f28f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "card_name": "Stalking Bloodsucker",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ca07ff2ddfde83de2a352f981f3b7e21",
+          "oracle_hash": "f8234f8a19dbe5b5ca396aab11930635",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "card_name": "Wall of Blood",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e6fdf411eef16ead9861f49b4d11b4c3",
+          "oracle_hash": "a1ae3ea1ca235e596af587df93696b99",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 15
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Aven Trooper",
+          "logical_rule_key": "battle_rule_v1:1a030ea083ef693fe47f55c1e259541b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Burning-Fist Minotaur",
+          "logical_rule_key": "battle_rule_v1:36d4ef487a2a35dc0328dfcc474ffa71"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Canyon Drake",
+          "logical_rule_key": "battle_rule_v1:c0b71a11d86bc31d5547201042e18897"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Carrion Howler",
+          "logical_rule_key": "battle_rule_v1:c2b89f414d066fb2d6b38a1adff59b00"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Cutthroat Contender",
+          "logical_rule_key": "battle_rule_v1:86d543fa932afb695a0c1ae0db8034af"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Fleshgrafter",
+          "logical_rule_key": "battle_rule_v1:9090483dfb9584d0b786cafbb9fb9623"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Frenetic Ogre",
+          "logical_rule_key": "battle_rule_v1:3433d7a8291ec66f54f21b1c8c84a653"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Grimclaw Bats",
+          "logical_rule_key": "battle_rule_v1:d0e6717885e012dabcd365e01c44a87c"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Krosan Archer",
+          "logical_rule_key": "battle_rule_v1:3db753bffa3813945279db0e6376cf53"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Noose Constrictor",
+          "logical_rule_key": "battle_rule_v1:f4b9fbac8048c35da4bde9da7ae9c3f4"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Pardic Swordsmith",
+          "logical_rule_key": "battle_rule_v1:5b8e9f97fa2ed081118e8f4be64e4e1d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Putrid Leech",
+          "logical_rule_key": "battle_rule_v1:79fda462d57b713c5e5623be871a8a0d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Ravenous Bloodseeker",
+          "logical_rule_key": "battle_rule_v1:1c77c20310161d821d74dc3d5c6cc2f6"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Stalking Bloodsucker",
+          "logical_rule_key": "battle_rule_v1:ca07ff2ddfde83de2a352f981f3b7e21"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Wall of Blood",
+          "logical_rule_key": "battle_rule_v1:e6fdf411eef16ead9861f49b4d11b4c3"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 15
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Aven Trooper",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:1a030ea083ef693fe47f55c1e259541b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Burning-Fist Minotaur",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:36d4ef487a2a35dc0328dfcc474ffa71"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Canyon Drake",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:c0b71a11d86bc31d5547201042e18897"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Carrion Howler",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:c2b89f414d066fb2d6b38a1adff59b00"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Cutthroat Contender",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:86d543fa932afb695a0c1ae0db8034af"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Fleshgrafter",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:9090483dfb9584d0b786cafbb9fb9623"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Frenetic Ogre",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:3433d7a8291ec66f54f21b1c8c84a653"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Grimclaw Bats",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:d0e6717885e012dabcd365e01c44a87c"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Krosan Archer",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:3db753bffa3813945279db0e6376cf53"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Noose Constrictor",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:f4b9fbac8048c35da4bde9da7ae9c3f4"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Pardic Swordsmith",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:5b8e9f97fa2ed081118e8f4be64e4e1d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Putrid Leech",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:79fda462d57b713c5e5623be871a8a0d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Ravenous Bloodseeker",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:1c77c20310161d821d74dc3d5c6cc2f6"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Stalking Bloodsucker",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:ca07ff2ddfde83de2a352f981f3b7e21"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Wall of Blood",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:e6fdf411eef16ead9861f49b4d11b4c3"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 30,
+        "scenarios": 15
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}
