@@ -6171,15 +6171,45 @@ def run_simple_activated_add_counters_target(
         }
     )
     expected_counter_type = str(scenario.get("expected_counter_type") or effect.get("counter_type") or "+1/+1")
+    sacrifice_targets = [
+        battle.enrich_card(dict(card))
+        for card in (scenario.get("sacrifice_targets") or [])
+        if isinstance(card, dict)
+    ]
     if expected_counter_type == "-1/-1":
-        active.battlefield = [source]
+        active.battlefield = [source, *sacrifice_targets]
         opponent.battlefield = [target]
     else:
-        active.battlefield = [source, target]
+        active.battlefield = [source, target, *sacrifice_targets]
         opponent.battlefield = []
+    active.hand = [
+        battle.enrich_card(dict(card))
+        for card in (scenario.get("controller_hand") or [])
+        if isinstance(card, dict)
+    ]
+    active.life = int(scenario.get("starting_life") or active.life)
     add_manifest_mana(active, scenario.get("controller_mana") or {})
     expected_tapped_source = bool(scenario.get("expected_tapped_source", effect.get("activation_requires_tap", False)))
+    expected_sacrificed_source = bool(
+        scenario.get("expected_sacrificed_source", effect.get("activation_requires_sacrifice", False))
+    )
     expected_counter_count = int(scenario.get("expected_counter_count") or effect.get("counter_count") or 1)
+    expected_discard_count = int(
+        scenario.get("expected_discard_count", effect.get("activation_discard_count") or 0) or 0
+    )
+    expected_life_paid = int(
+        scenario.get("expected_life_paid", effect.get("activation_life_cost") or 0) or 0
+    )
+    expected_sacrifice_count = int(
+        scenario.get(
+            "expected_sacrifice_count",
+            (effect.get("activation_sacrifice_cost") or {}).get("count")
+            if isinstance(effect.get("activation_sacrifice_cost"), dict)
+            else 0,
+        )
+        or 0
+    )
+    life_before = active.life
     before = (
         int(target.get("plus_one_counters") or 0)
         if expected_counter_type == "+1/+1"
@@ -6225,6 +6255,31 @@ def run_simple_activated_add_counters_target(
     )
     if activation_event is None:
         fail("battle_events", f"missing {card['name']} simple activated add counters event")
+    if bool(activation_event.get("sacrificed_source")) != expected_sacrificed_source:
+        fail(
+            "battle_events",
+            f"{card['name']} sacrificed_source={activation_event.get('sacrificed_source')} expected {expected_sacrificed_source}",
+        )
+    if expected_sacrificed_source and source in active.battlefield:
+        fail("battle_execution", f"{card['name']} expected source to leave battlefield")
+    if int(activation_event.get("discarded_count") or 0) != expected_discard_count:
+        fail(
+            "battle_events",
+            f"{card['name']} discarded_count={activation_event.get('discarded_count')} expected {expected_discard_count}",
+        )
+    if int(activation_event.get("life_paid") or activation_event.get("activation_life_cost") or 0) != expected_life_paid:
+        fail(
+            "battle_events",
+            f"{card['name']} life_paid={activation_event.get('life_paid')} expected {expected_life_paid}",
+        )
+    sacrificed_cost_targets = activation_event.get("sacrificed_cost_targets") or []
+    if len(sacrificed_cost_targets) != expected_sacrifice_count:
+        fail(
+            "battle_events",
+            f"{card['name']} sacrificed_cost_targets={sacrificed_cost_targets} expected {expected_sacrifice_count}",
+        )
+    if active.life != life_before - expected_life_paid:
+        fail("battle_execution", f"{card['name']} life={active.life} expected {life_before - expected_life_paid}")
     return {
         "scenario": scenario.get("name"),
         "card_name": card["name"],
@@ -6232,6 +6287,142 @@ def run_simple_activated_add_counters_target(
         "counter_type": expected_counter_type,
         "counters_added": after - before,
         "source_tapped": bool(source.get("tapped")),
+        "source_sacrificed": expected_sacrificed_source,
+        "discarded_count": expected_discard_count,
+        "life_paid": expected_life_paid,
+        "sacrifice_cost_count": expected_sacrifice_count,
+    }
+
+
+def run_simple_activated_add_counters_self(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    effect = battle.get_card_effect(card)
+    source = battle.enrich_card(
+        {
+            **card,
+            "type_line": str(card.get("type_line") or "Creature - Vampire"),
+            "effect": str(effect.get("effect") or "creature"),
+            "power": int(card.get("power") or 2),
+            "toughness": int(card.get("toughness") or 2),
+            "summoning_sick": False,
+            **effect,
+            **dict(scenario.get("source_overrides") or {}),
+        }
+    )
+    active = battle.Player(str(scenario.get("player") or "Activated Controller"), None, [])
+    sacrifice_targets = [
+        battle.enrich_card(dict(card))
+        for card in (scenario.get("sacrifice_targets") or [])
+        if isinstance(card, dict)
+    ]
+    active.battlefield = [source, *sacrifice_targets]
+    active.hand = [
+        battle.enrich_card(dict(card))
+        for card in (scenario.get("controller_hand") or [])
+        if isinstance(card, dict)
+    ]
+    active.life = int(scenario.get("starting_life") or active.life)
+    add_manifest_mana(active, scenario.get("controller_mana") or {})
+    expected_tapped_source = bool(scenario.get("expected_tapped_source", effect.get("activation_requires_tap", False)))
+    expected_counter_type = str(scenario.get("expected_counter_type") or effect.get("counter_type") or "+1/+1")
+    expected_counter_count = int(scenario.get("expected_counter_count") or effect.get("counter_count") or 1)
+    expected_discard_count = int(
+        scenario.get("expected_discard_count", effect.get("activation_discard_count") or 0) or 0
+    )
+    expected_life_paid = int(
+        scenario.get("expected_life_paid", effect.get("activation_life_cost") or 0) or 0
+    )
+    expected_sacrifice_count = int(
+        scenario.get(
+            "expected_sacrifice_count",
+            (effect.get("activation_sacrifice_cost") or {}).get("count")
+            if isinstance(effect.get("activation_sacrifice_cost"), dict)
+            else 0,
+        )
+        or 0
+    )
+    life_before = active.life
+    before = (
+        int(source.get("plus_one_counters") or 0)
+        if expected_counter_type == "+1/+1"
+        else int(source.get("minus_one_counters") or 0)
+        if expected_counter_type == "-1/-1"
+        else battle.get_named_counter_count(source, expected_counter_type)
+    )
+
+    if not battle.can_activate_generic_add_counters_self_permanent(active, source):
+        fail("battle_execution", f"{card['name']} simple activated self add counters cannot activate")
+    activated = battle.activate_generic_add_counters_self_permanent(
+        active,
+        source,
+        turn=int(scenario.get("turn") or 6134),
+        rng=random.Random(int(scenario.get("seed") or 6134)),
+        phase=str(scenario.get("phase") or "postcombat_main"),
+    )
+    if not activated:
+        fail("battle_execution", f"{card['name']} simple activated self add counters activation failed")
+    after = (
+        int(source.get("plus_one_counters") or 0)
+        if expected_counter_type == "+1/+1"
+        else int(source.get("minus_one_counters") or 0)
+        if expected_counter_type == "-1/-1"
+        else battle.get_named_counter_count(source, expected_counter_type)
+    )
+    if after - before != expected_counter_count:
+        fail(
+            "battle_execution",
+            f"{card['name']} expected {expected_counter_count} {expected_counter_type} counters, got {after - before}",
+        )
+    if source not in active.battlefield:
+        fail("battle_execution", f"{card['name']} source unexpectedly left battlefield")
+    if bool(source.get("tapped")) != expected_tapped_source:
+        fail(
+            "battle_execution",
+            f"{card['name']} source tapped={source.get('tapped')} expected {expected_tapped_source}",
+        )
+    activation_event = next(
+        (
+            data
+            for event, data in reversed(events)
+            if event == "activated_ability"
+            and data.get("card") == card.get("name")
+            and data.get("activation_kind") == "simple_activated_add_counters_self"
+        ),
+        None,
+    )
+    if activation_event is None:
+        fail("battle_events", f"missing {card['name']} simple activated self add counters event")
+    if int(activation_event.get("discarded_count") or 0) != expected_discard_count:
+        fail(
+            "battle_events",
+            f"{card['name']} discarded_count={activation_event.get('discarded_count')} expected {expected_discard_count}",
+        )
+    if int(activation_event.get("life_paid") or activation_event.get("activation_life_cost") or 0) != expected_life_paid:
+        fail(
+            "battle_events",
+            f"{card['name']} life_paid={activation_event.get('life_paid')} expected {expected_life_paid}",
+        )
+    sacrificed_cost_targets = activation_event.get("sacrificed_cost_targets") or []
+    if len(sacrificed_cost_targets) != expected_sacrifice_count:
+        fail(
+            "battle_events",
+            f"{card['name']} sacrificed_cost_targets={sacrificed_cost_targets} expected {expected_sacrifice_count}",
+        )
+    if active.life != life_before - expected_life_paid:
+        fail("battle_execution", f"{card['name']} life={active.life} expected {life_before - expected_life_paid}")
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "counter_type": expected_counter_type,
+        "counters_added": after - before,
+        "source_tapped": bool(source.get("tapped")),
+        "discarded_count": expected_discard_count,
+        "life_paid": expected_life_paid,
+        "sacrifice_cost_count": expected_sacrifice_count,
     }
 
 
@@ -9982,6 +10173,7 @@ SCENARIO_RUNNERS = {
     "target_player_draw_spell": run_target_player_draw_spell,
     "target_keyword_draw_spell": run_target_keyword_draw_spell,
     "simple_activated_add_counters_target": run_simple_activated_add_counters_target,
+    "simple_activated_add_counters_self": run_simple_activated_add_counters_self,
     "simple_activated_destroy": run_simple_activated_destroy,
     "simple_activated_target_keyword": run_simple_activated_target_keyword,
     "simple_activated_self_boost": run_simple_activated_self_boost,

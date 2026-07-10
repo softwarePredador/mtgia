@@ -21838,7 +21838,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertTrue(effect["_keywords_are_self"])
         self.assertEqual(effect["activation_cost_mana"], "{1}{W}")
 
-    def test_activated_self_add_counter_with_sacrifice_cost_stays_blocked(self) -> None:
+    def test_activated_self_add_counter_maps_sacrifice_cost(self) -> None:
         row = queue_row(
             split.ADD_COUNTERS_SOURCE_UNIT,
             effect_classes=["AddCountersSourceEffect"],
@@ -21860,8 +21860,11 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             ),
         )
 
-        self.assertIsNone(proposal)
-        self.assertEqual(reason, "activated_self_add_counters_source_cost_not_supported")
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_SELF_ADD_COUNTERS_SCOPE)
+        self.assertEqual(effect["activation_sacrifice_target"], "creature")
+        self.assertEqual(effect["activation_sacrifice_cost"]["constraints"], {"card_types": ["creature"]})
 
     def test_activated_target_add_counters_maps_fixed_creature_targets(self) -> None:
         cases = [
@@ -21938,7 +21941,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                 self.assertEqual(effect["activation_cost_colors"], colors)
                 self.assertEqual(effect["activation_requires_tap"], requires_tap)
 
-    def test_activated_target_add_counters_extra_cost_stays_blocked(self) -> None:
+    def test_activated_target_add_counters_maps_source_sacrifice_cost(self) -> None:
         row = queue_row(
             split.ADD_COUNTERS_TARGET_UNIT,
             effect_classes=["AddCountersTargetEffect"],
@@ -21961,8 +21964,106 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             ),
         )
 
-        self.assertIsNone(proposal)
-        self.assertEqual(reason, "activated_target_add_counters_source_cost_not_supported")
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_TARGET_ADD_COUNTERS_SCOPE)
+        self.assertEqual(effect["activated_add_counters_counter_type"], "-1/-1")
+        self.assertTrue(effect["activation_requires_sacrifice"])
+        self.assertEqual(effect["_activated_rule_effects"][0]["activation_requires_sacrifice"], True)
+
+    def test_activated_target_add_counters_maps_random_discard_cost(self) -> None:
+        row = queue_row(
+            split.ADD_COUNTERS_TARGET_UNIT,
+            effect_classes=["AddCountersTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "counter", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Amok",
+                type_line="Enchantment",
+                oracle_text="{1}, Discard a card at random: Put a +1/+1 counter on target creature.",
+            ),
+            source_text=(
+                "Ability ability = new SimpleActivatedAbility("
+                "new AddCountersTargetEffect(CounterType.P1P1.createInstance()), "
+                "new ManaCostsImpl<>(\"{1}\"));"
+                "ability.addCost(new DiscardCardCost(true));"
+                "ability.addTarget(new TargetCreaturePermanent());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["activation_cost_mana"], "{1}")
+        self.assertEqual(effect["activation_discard_count"], 1)
+        self.assertEqual(effect["activation_discard_target"], "any_card")
+        self.assertTrue(effect["activation_discard_random"])
+
+    def test_activated_target_add_counters_maps_life_cost(self) -> None:
+        row = queue_row(
+            split.ADD_COUNTERS_TARGET_UNIT,
+            effect_classes=["AddCountersTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "counter", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Unspeakable Symbol",
+                type_line="Enchantment",
+                oracle_text="Pay 3 life: Put a +1/+1 counter on target creature.",
+            ),
+            source_text=(
+                "Ability ability = new SimpleActivatedAbility("
+                "new AddCountersTargetEffect(CounterType.P1P1.createInstance()), "
+                "new PayLifeCost(3));"
+                "ability.addTarget(new TargetCreaturePermanent());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["activation_cost_mana"], "{0}")
+        self.assertEqual(effect["activation_life_cost"], 3)
+
+    def test_activated_target_add_counters_maps_sacrifice_human_cost(self) -> None:
+        row = queue_row(
+            split.ADD_COUNTERS_TARGET_UNIT,
+            effect_classes=["AddCountersTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "counter", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Deranged Outcast",
+                type_line="Creature - Human Rogue",
+                oracle_text="{1}{G}, Sacrifice a Human: Put two +1/+1 counters on target creature.",
+            ),
+            source_text=(
+                "private static final FilterControlledPermanent filter = new FilterControlledPermanent(\"a Human\");"
+                "filter.add(SubType.HUMAN.getPredicate());"
+                "Ability ability = new SimpleActivatedAbility("
+                "new AddCountersTargetEffect(CounterType.P1P1.createInstance(2)), "
+                "new ManaCostsImpl<>(\"{1}{G}\"));"
+                "ability.addCost(new SacrificeTargetCost(filter));"
+                "ability.addTarget(new TargetCreaturePermanent());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["activation_cost_mana"], "{1}{G}")
+        self.assertEqual(effect["activation_sacrifice_target"], "human")
+        self.assertEqual(
+            effect["activation_sacrifice_cost"]["constraints"],
+            {"card_types": ["creature"], "target_subtypes": ["human"]},
+        )
 
     def test_creature_etb_plus_one_counter_target_creature_maps_to_etb_scope(self) -> None:
         row = queue_row(

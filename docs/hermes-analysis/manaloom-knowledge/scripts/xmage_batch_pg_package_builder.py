@@ -3983,12 +3983,37 @@ def simple_activated_add_counters_target_execution_scenario_from_expected_rule(
         constraints,
         matching=True,
     )
-    return {
+    discard_count = max(0, int(required.get("activation_discard_count") or 0))
+    discard_target = str(required.get("activation_discard_target") or "any_card")
+    controller_hand = []
+    if discard_count:
+        if discard_target == "land_card":
+            controller_hand = [
+                {"name": "E2E Counter Cost Mountain", "type_line": "Basic Land - Mountain", "effect": "land"},
+                {"name": "E2E Counter Cost Nonland", "type_line": "Sorcery", "effect": "draw_cards", "cmc": 2},
+            ]
+        elif discard_target == "artifact_card":
+            controller_hand = [
+                {"name": "E2E Counter Cost Bauble", "type_line": "Artifact", "effect": "mana_source", "cmc": 1},
+                {"name": "E2E Counter Cost Nonartifact", "type_line": "Sorcery", "effect": "draw_cards", "cmc": 2},
+            ]
+        else:
+            controller_hand = [
+                {
+                    "name": f"E2E Counter Cost Discard {index + 1}",
+                    "type_line": "Instant",
+                    "effect": "draw_cards",
+                    "cmc": 2,
+                }
+                for index in range(discard_count)
+            ]
+    scenario = {
         "name": f"{rule['card_name']} activates add counters ability",
         "type": "simple_activated_add_counters_target",
         "card": {"name": rule["card_name"]},
         "controller_mana": _manifest_mana_for_required_activation(required),
         "expected_tapped_source": bool(required.get("activation_requires_tap")),
+        "expected_sacrificed_source": bool(required.get("activation_requires_sacrifice")),
         "expected_target": target,
         "expected_counter_type": required.get("activated_add_counters_counter_type") or required.get("counter_type"),
         "expected_counter_count": int(
@@ -3998,8 +4023,83 @@ def simple_activated_add_counters_target_execution_scenario_from_expected_rule(
             or 1
         ),
         "target": target_fixture,
+        "starting_life": 40,
+        "expected_discard_count": discard_count,
+        "expected_discard_target": discard_target,
+        "expected_life_paid": int(required.get("activation_life_cost") or 0),
         "logical_rule_key": rule["logical_rule_key"],
     }
+    if controller_hand:
+        scenario["controller_hand"] = controller_hand
+    sacrifice_targets = _manifest_sacrifice_cost_fixtures(
+        "E2E Counter Sacrifice Target",
+        required.get("activation_sacrifice_cost") if isinstance(required.get("activation_sacrifice_cost"), dict) else None,
+    )
+    if sacrifice_targets:
+        scenario["sacrifice_targets"] = sacrifice_targets
+        scenario["expected_sacrifice_count"] = len(sacrifice_targets)
+    return scenario
+
+
+def simple_activated_add_counters_self_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_permanent_simple_activated_self_add_counters_v1":
+        return None
+    discard_count = max(0, int(required.get("activation_discard_count") or 0))
+    discard_target = str(required.get("activation_discard_target") or "any_card")
+    controller_hand = []
+    if discard_count:
+        if discard_target == "land_card":
+            controller_hand = [
+                {"name": "E2E Self Counter Cost Mountain", "type_line": "Basic Land - Mountain", "effect": "land"},
+                {"name": "E2E Self Counter Cost Nonland", "type_line": "Sorcery", "effect": "draw_cards", "cmc": 2},
+            ]
+        elif discard_target == "artifact_card":
+            controller_hand = [
+                {"name": "E2E Self Counter Cost Bauble", "type_line": "Artifact", "effect": "mana_source", "cmc": 1},
+                {"name": "E2E Self Counter Cost Nonartifact", "type_line": "Sorcery", "effect": "draw_cards", "cmc": 2},
+            ]
+        else:
+            controller_hand = [
+                {
+                    "name": f"E2E Self Counter Cost Discard {index + 1}",
+                    "type_line": "Instant",
+                    "effect": "draw_cards",
+                    "cmc": 2,
+                }
+                for index in range(discard_count)
+            ]
+    scenario = {
+        "name": f"{rule['card_name']} activates self add counters ability",
+        "type": "simple_activated_add_counters_self",
+        "card": {"name": rule["card_name"]},
+        "controller_mana": _manifest_mana_for_required_activation(required),
+        "expected_tapped_source": bool(required.get("activation_requires_tap")),
+        "expected_counter_type": required.get("activated_add_counters_counter_type") or required.get("counter_type"),
+        "expected_counter_count": int(
+            required.get("activated_add_counters_count")
+            or required.get("counter_count")
+            or required.get("count")
+            or 1
+        ),
+        "starting_life": 40,
+        "expected_discard_count": discard_count,
+        "expected_discard_target": discard_target,
+        "expected_life_paid": int(required.get("activation_life_cost") or 0),
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+    if controller_hand:
+        scenario["controller_hand"] = controller_hand
+    sacrifice_targets = _manifest_sacrifice_cost_fixtures(
+        "E2E Self Counter Sacrifice Target",
+        required.get("activation_sacrifice_cost") if isinstance(required.get("activation_sacrifice_cost"), dict) else None,
+    )
+    if sacrifice_targets:
+        scenario["sacrifice_targets"] = sacrifice_targets
+        scenario["expected_sacrifice_count"] = len(sacrifice_targets)
+    return scenario
 
 
 def simple_activated_destroy_execution_scenario_from_expected_rule(
@@ -6326,6 +6426,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or simple_activated_tap_target_execution_scenario_from_expected_rule(rule)
         or simple_activated_untap_target_execution_scenario_from_expected_rule(rule)
         or simple_activated_add_counters_target_execution_scenario_from_expected_rule(rule)
+        or simple_activated_add_counters_self_execution_scenario_from_expected_rule(rule)
         or simple_activated_destroy_execution_scenario_from_expected_rule(rule)
         or simple_activated_self_boost_execution_scenario_from_expected_rule(rule)
         or simple_activated_self_keyword_execution_scenario_from_expected_rule(rule)

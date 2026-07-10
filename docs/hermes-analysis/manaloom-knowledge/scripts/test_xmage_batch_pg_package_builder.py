@@ -2255,6 +2255,15 @@ def test_manifest_builds_simple_activated_add_counters_target_scenario() -> None
             "activation_cost_generic": 4,
             "activation_cost_colors": [],
             "activation_requires_tap": True,
+            "activation_requires_sacrifice": True,
+            "activation_discard_count": 1,
+            "activation_discard_target": "any_card",
+            "activation_life_cost": 3,
+            "activation_sacrifice_cost": {
+                "count": 1,
+                "target_controller": "self",
+                "constraints": {"card_types": ["creature"], "target_subtypes": ["human"]},
+            },
         },
     }
 
@@ -2266,8 +2275,64 @@ def test_manifest_builds_simple_activated_add_counters_target_scenario() -> None
     assert scenario["expected_counter_type"] == "-1/-1"
     assert scenario["expected_counter_count"] == 1
     assert scenario["expected_tapped_source"] is True
+    assert scenario["expected_sacrificed_source"] is True
+    assert scenario["expected_discard_count"] == 1
+    assert scenario["expected_life_paid"] == 3
+    assert scenario["expected_sacrifice_count"] == 1
     assert scenario["target"]["type_line"] == "Creature - Soldier"
     assert scenario["controller_mana"]["generic"] == 4
+    assert scenario["controller_hand"][0]["name"] == "E2E Counter Cost Discard 1"
+    assert scenario["sacrifice_targets"][0]["type_line"] == "Creature - Human"
+
+
+def test_manifest_builds_simple_activated_add_counters_self_scenario() -> None:
+    rule = {
+        "normalized_name": "markov dreadknight",
+        "card_name": "Markov Dreadknight",
+        "oracle_hash": "hash-markov-dreadknight",
+        "logical_rule_key": "battle_rule_v1:hash-markov-dreadknight",
+        "required_effect_fields": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_self_add_counters_v1",
+            "activated_effect": "add_counters",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_self_add_counters_v1",
+            "activated_add_counters": True,
+            "activated_add_counters_target": "self",
+            "activated_add_counters_counter_type": "+1/+1",
+            "activated_add_counters_count": 2,
+            "target": "self",
+            "counter_type": "+1/+1",
+            "counter_count": 2,
+            "activation_cost_mana": "{2}{B}",
+            "activation_cost_generic": 2,
+            "activation_cost_colors": ["B"],
+            "activation_requires_tap": False,
+            "activation_requires_sacrifice": False,
+            "activation_discard_count": 1,
+            "activation_discard_target": "any_card",
+            "activation_life_cost": 3,
+            "activation_sacrifice_cost": {
+                "count": 1,
+                "target_controller": "self",
+                "constraints": {"card_types": ["creature"], "exclude_source": True},
+            },
+        },
+    }
+
+    scenario = builder.simple_activated_add_counters_self_execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "simple_activated_add_counters_self"
+    assert scenario["expected_counter_type"] == "+1/+1"
+    assert scenario["expected_counter_count"] == 2
+    assert scenario["expected_tapped_source"] is False
+    assert scenario["expected_discard_count"] == 1
+    assert scenario["expected_life_paid"] == 3
+    assert scenario["expected_sacrifice_count"] == 1
+    assert scenario["controller_mana"]["generic"] == 2
+    assert scenario["controller_mana"]["black"] == 1
+    assert scenario["controller_hand"][0]["name"] == "E2E Self Counter Cost Discard 1"
+    assert scenario["sacrifice_targets"][0]["type_line"] == "Creature - Soldier"
 
 
 def test_manifest_builds_simple_activated_destroy_execution_scenario() -> None:

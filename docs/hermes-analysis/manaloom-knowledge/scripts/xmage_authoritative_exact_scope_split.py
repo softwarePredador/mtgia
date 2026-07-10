@@ -7687,10 +7687,14 @@ def activated_self_counter_from_oracle(metadata: dict[str, Any]) -> dict[str, An
     count = counter_count_from_text(match.group("count"))
     if count is None or count <= 0:
         return "activated_self_add_counters_oracle_count_not_supported"
-    activation = activation_cost_from_oracle_prefix(cost_text)
+    activation = activated_counter_cost_from_oracle_prefix(
+        text,
+        cost_text,
+        allow_source_sacrifice=False,
+    )
     if isinstance(activation, str):
         return str(activation).replace(
-            "activated_self_boost", "activated_self_add_counters"
+            "activated_add_counters", "activated_self_add_counters"
         )
     return {
         "counter_type": match.group("counter"),
@@ -7703,17 +7707,13 @@ def activated_self_counter_from_source(source: str) -> dict[str, Any] | str:
     text = source or ""
     risky_cost_classes = {
         "CompositeCost",
-        "DiscardCardCost",
-        "DiscardTargetCost",
         "ExileFrom",
         "ExileFromGraveCost",
         "ExileSourceFromGraveCost",
         "OrCost",
-        "PayLifeCost",
         "RemoveCounterCost",
         "ReturnToHandSourceCost",
         "SacrificeSourceCost",
-        "SacrificeTargetCost",
         "TapTargetCost",
         "UntapSourceCost",
     }
@@ -7727,10 +7727,14 @@ def activated_self_counter_from_source(source: str) -> dict[str, Any] | str:
     present_risky = sorted(cost for cost in risky_cost_classes if cost in window)
     if present_risky:
         return "activated_self_add_counters_source_cost_not_supported"
-    activation = activated_self_boost_cost_from_source(window)
+    activation = activated_counter_cost_from_source(
+        text,
+        window,
+        allow_source_sacrifice=False,
+    )
     if isinstance(activation, str):
         return str(activation).replace(
-            "activated_self_boost", "activated_self_add_counters"
+            "activated_add_counters", "activated_self_add_counters"
         )
     counter_type, count = counter
     return {
@@ -7755,9 +7759,13 @@ def activated_target_counter_from_oracle(metadata: dict[str, Any]) -> dict[str, 
     count = counter_count_from_text(match.group("count"))
     if count is None or count <= 0:
         return "activated_target_add_counters_oracle_count_not_supported"
-    activation = activation_cost_from_oracle_prefix(cost_text)
+    activation = activated_counter_cost_from_oracle_prefix(
+        text,
+        cost_text,
+        allow_source_sacrifice=True,
+    )
     if isinstance(activation, str):
-        return str(activation).replace("activated_self_boost", "activated_target_add_counters")
+        return str(activation).replace("activated_add_counters", "activated_target_add_counters")
     return {
         "counter_type": match.group("counter"),
         "counter_count": count,
@@ -7771,23 +7779,15 @@ def activated_target_counter_from_source(source: str) -> dict[str, Any] | str:
     text = source or ""
     risky_cost_classes = {
         "CompositeCost",
-        "DiscardCardCost",
-        "DiscardTargetCost",
         "ExileFrom",
         "ExileFromGraveCost",
         "ExileSourceFromGraveCost",
         "OrCost",
-        "PayLifeCost",
         "RemoveCounterCost",
         "ReturnToHandSourceCost",
-        "SacrificeSourceCost",
-        "SacrificeTargetCost",
         "TapTargetCost",
         "UntapSourceCost",
     }
-    present_risky = sorted(cost for cost in risky_cost_classes if cost in text)
-    if present_risky:
-        return "activated_target_add_counters_source_cost_not_supported"
     counter = fixed_counter_target_from_source(text)
     if counter is None:
         return "activated_target_add_counters_source_counter_or_target_not_fixed"
@@ -7795,9 +7795,16 @@ def activated_target_counter_from_source(source: str) -> dict[str, Any] | str:
     window = text[max(0, effect_index - 500) : effect_index + 2000]
     if "SimpleActivatedAbility" not in window:
         return "activated_target_add_counters_source_not_simple_activated"
-    activation = activated_self_boost_cost_from_source(window)
+    present_risky = sorted(cost for cost in risky_cost_classes if cost in window)
+    if present_risky:
+        return "activated_target_add_counters_source_cost_not_supported"
+    activation = activated_counter_cost_from_source(
+        text,
+        window,
+        allow_source_sacrifice=True,
+    )
     if isinstance(activation, str):
-        return str(activation).replace("activated_self_boost", "activated_target_add_counters")
+        return str(activation).replace("activated_add_counters", "activated_target_add_counters")
     counter_type, count = counter
     return {
         "counter_type": counter_type,
@@ -14894,6 +14901,7 @@ def activation_sacrifice_target_from_phrase(phrase: str) -> str | None:
         "land": "land",
         "forest": "forest",
         "goblin": "goblin",
+        "human": "human",
         "mountain": "mountain",
         "beast": "beast",
         "swamp": "swamp",
@@ -16402,6 +16410,70 @@ def activation_cost_from_oracle_prefix(
     }
 
 
+def activated_counter_cost_from_oracle_prefix(
+    full_text: str,
+    cost_text: str,
+    *,
+    allow_source_sacrifice: bool,
+) -> dict[str, Any] | str:
+    normalized_cost = str(cost_text or "").strip().lower()
+    sacrifice_cost = activation_sacrifice_cost_from_oracle(full_text)
+    if isinstance(sacrifice_cost, str):
+        return sacrifice_cost.replace("activated_damage", "activated_add_counters")
+    if sacrifice_cost is not None:
+        sacrifice_pattern = (
+            r"(?:^|,\s*)sacrifice\s+"
+            r"(?:another|an?|one|two|three|four|five|six|seven|eight|nine|ten|\d+)\s+[^,]+?"
+            r"(?:,|$)"
+        )
+        stripped_cost = re.sub(sacrifice_pattern, ",", normalized_cost).strip(" ,")
+        if stripped_cost == normalized_cost:
+            return "activated_add_counters_oracle_cost_not_supported"
+        normalized_cost = stripped_cost
+    activation = activation_cost_from_oracle_prefix(
+        normalized_cost,
+        allow_source_sacrifice=allow_source_sacrifice,
+        allow_discard=True,
+        allow_life=True,
+    )
+    if isinstance(activation, str):
+        return activation.replace("activated_self_boost", "activated_add_counters")
+    if sacrifice_cost is not None:
+        if activation.get("activation_requires_sacrifice"):
+            return "activated_add_counters_oracle_cost_not_supported"
+        activation["activation_sacrifice_cost"] = sacrifice_cost
+        activation["activation_requires_sacrifice_target"] = True
+        sacrifice_target = activation_sacrifice_target_from_cost(sacrifice_cost)
+        if sacrifice_target:
+            activation["activation_sacrifice_target"] = sacrifice_target
+    return activation
+
+
+def activated_counter_cost_from_source(
+    source: str,
+    window: str,
+    *,
+    allow_source_sacrifice: bool,
+) -> dict[str, Any] | str:
+    activation = activated_self_boost_cost_from_source(window)
+    if isinstance(activation, str):
+        return activation.replace("activated_self_boost", "activated_add_counters")
+    if "SacrificeSourceCost" in (window or ""):
+        if not allow_source_sacrifice:
+            return "activated_add_counters_source_cost_not_supported"
+        activation["activation_requires_sacrifice"] = True
+    sacrifice_cost = activation_sacrifice_cost_from_source(source, window)
+    if isinstance(sacrifice_cost, str):
+        return sacrifice_cost.replace("activated_damage", "activated_add_counters")
+    if sacrifice_cost is not None:
+        activation["activation_sacrifice_cost"] = sacrifice_cost
+        activation["activation_requires_sacrifice_target"] = True
+        sacrifice_target = activation_sacrifice_target_from_cost(sacrifice_cost)
+        if sacrifice_target:
+            activation["activation_sacrifice_target"] = sacrifice_target
+    return activation
+
+
 def activated_life_gain_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
     text = re.sub(r"\s+", " ", oracle_text(metadata)).strip().lower()
     if text.count(":") != 1:
@@ -17671,6 +17743,9 @@ def activation_sacrifice_cost_from_phrase(phrase: str) -> dict[str, Any] | str:
     elif text in {"goblin creature", "goblin creatures"}:
         constraints["card_types"] = ["creature"]
         constraints["target_subtypes"] = ["goblin"]
+    elif text in {"human", "humans"}:
+        constraints["card_types"] = ["creature"]
+        constraints["target_subtypes"] = ["human"]
     elif text in {"forest", "forests"}:
         constraints["target_subtypes"] = ["forest"]
     elif text in {"creature or enchantment", "creature or an enchantment"}:
@@ -17742,6 +17817,9 @@ def activation_sacrifice_cost_from_source(text: str, window: str) -> dict[str, A
             filter_window = (text or "")[filter_match.start() : filter_match.start() + 700]
         if "SubType.GOBLIN" in filter_body or "SubType.GOBLIN" in filter_window:
             constraints["target_subtypes"] = ["goblin"]
+        elif "SubType.HUMAN" in filter_body or "SubType.HUMAN" in filter_window:
+            constraints["card_types"] = ["creature"]
+            constraints["target_subtypes"] = ["human"]
         elif "SubType.FOREST" in filter_body or "SubType.FOREST" in filter_window:
             constraints["target_subtypes"] = ["forest"]
         elif "CardType.ARTIFACT" in filter_window:

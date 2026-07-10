@@ -37280,113 +37280,14 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
     ]
     if phase == "postcombat_main":
         for permanent in self_counter_permanents:
-            activation_cost = adjusted_activated_ability_generic_cost(
+            if activate_generic_add_counters_self_permanent(
                 player,
-                permanent,
-                int(permanent.get("activation_cost_generic") or 0),
-            )
-            activation_cost_text = permanent.get("activation_cost_mana") or _activation_cost_text(
-                activation_cost,
-                permanent.get("activation_cost_colors") or [],
-            )
-            activation_mana_paid = _mana_cost_text_value(activation_cost_text)
-            if permanent.get("activation_requires_tap") and permanent.get("tapped"):
-                _utility_artifact_skip_event(
-                    player,
-                    permanent,
-                    turn,
-                    "permanent_already_tapped_for_activated_add_counters",
-                    phase=phase,
-                )
-                continue
-            if (
-                permanent.get("activation_requires_tap")
-                and is_battlefield_creature(permanent)
-                and permanent.get("summoning_sick")
-            ):
-                _utility_artifact_skip_event(
-                    player,
-                    permanent,
-                    turn,
-                    "creature_summoning_sick_for_activated_add_counters",
-                    phase=phase,
-                )
-                continue
-            if not player.can_pay(activation_cost_text) or not player.spend_mana(activation_cost_text):
-                _utility_artifact_skip_event(
-                    player,
-                    permanent,
-                    turn,
-                    "failed_to_pay_activated_add_counters_cost",
-                    phase=phase,
-                )
-                continue
-            if permanent.get("activation_requires_tap"):
-                permanent["tapped"] = True
-            permanent["activated_add_counters_used_this_turn"] = True
-            counter_type = str(
-                permanent.get("activated_add_counters_counter_type")
-                or permanent.get("counter_type")
-                or "+1/+1"
-            )
-            counter_count = max(
-                1,
-                int(
-                    permanent.get("activated_add_counters_count")
-                    or permanent.get("counter_count")
-                    or permanent.get("count")
-                    or 1
-                ),
-            )
-            resolve_add_counters_source_effect(
-                player,
-                permanent,
                 permanent,
                 turn,
-                event_name="utility_permanent_activated",
+                rng,
                 phase=phase,
-            )
-            emit_decision_trace(
-                decision_type="utility_permanent_activation",
-                player=player,
-                turn=turn,
-                phase=phase,
-                available_options=[
-                    decision_card_option(
-                        permanent,
-                        action="add_counters_to_self",
-                        effect=permanent.get("effect", "creature"),
-                        score=14 + counter_count * 4,
-                    )
-                ],
-                chosen_option=decision_card_option(
-                    permanent,
-                    action="add_counters_to_self",
-                    effect=permanent.get("effect", "creature"),
-                    score=14 + counter_count * 4,
-                ),
-                score_components={
-                    "activation_cost": activation_cost_text,
-                    "counter_type": counter_type,
-                    "counter_count": counter_count,
-                    "tapped": bool(permanent.get("activation_requires_tap")),
-                    "mana_paid": activation_mana_paid,
-                },
-                rule_source="permanent_simple_activated_self_add_counters_v1",
-                rule_status=permanent.get("_rule_review_status", "active"),
-                confidence="medium",
-                expected_benefit_score=14 + counter_count * 4,
-                reason="convert_available_postcombat_mana_into_persistent_creature_size",
-                strategic_principle="use safe permanent self-counter activation when mana is available",
-                heuristic_version=DECISION_STRATEGY_VERSION,
-                resource_delta={
-                    "mana": -activation_mana_paid,
-                    "tapped": 1 if permanent.get("activation_requires_tap") else 0,
-                    "counters": counter_count,
-                },
-                risk_flags=["activated_add_counters"],
-            )
-            return 1
+            ):
+                return 1
 
     simple_activated_draw_permanents = [
         permanent
@@ -49342,6 +49243,7 @@ SIMPLE_ACTIVATED_UNTAP_TARGET_SCOPE = "xmage_permanent_simple_activated_untap_ta
 SIMPLE_ACTIVATED_TARGET_ADD_COUNTERS_SCOPE = (
     "xmage_permanent_simple_activated_add_counters_target_creature_v1"
 )
+SIMPLE_ACTIVATED_SELF_ADD_COUNTERS_SCOPE = "xmage_permanent_simple_activated_self_add_counters_v1"
 SIMPLE_ACTIVATED_SELF_BOOST_SCOPE = "xmage_permanent_simple_activated_self_boost_until_eot_v1"
 SIMPLE_ACTIVATED_SELF_KEYWORD_SCOPE = "xmage_permanent_simple_activated_self_keyword_until_eot_v1"
 SIMPLE_ACTIVATED_REGENERATE_SOURCE_SCOPE = "xmage_permanent_simple_activated_regenerate_source_v1"
@@ -49476,6 +49378,14 @@ def _activated_rule_effects_for_permanent(permanent):
             "activated_tap_target": permanent.get("activated_tap_target") or permanent.get("target") or "creature",
             "activation_requires_tap": bool(permanent.get("activation_requires_tap")),
             "activation_requires_sacrifice": bool(permanent.get("activation_requires_sacrifice")),
+            "activation_requires_sacrifice_target": bool(permanent.get("activation_requires_sacrifice_target")),
+            "activation_sacrifice_target": permanent.get("activation_sacrifice_target"),
+            "activation_sacrifice_cost": permanent.get("activation_sacrifice_cost"),
+            "activation_discard_count": permanent.get("activation_discard_count"),
+            "activation_discard_target": permanent.get("activation_discard_target"),
+            "activation_requires_discard_card": permanent.get("activation_requires_discard_card"),
+            "activation_discard_random": permanent.get("activation_discard_random"),
+            "activation_life_cost": permanent.get("activation_life_cost"),
             "activation_cost_mana": permanent.get("activation_cost_mana"),
             "activation_cost_generic": permanent.get("activation_cost_generic"),
             "activation_cost_colors": permanent.get("activation_cost_colors"),
@@ -49505,6 +49415,14 @@ def _activated_rule_effects_for_permanent(permanent):
             "activated_untap_target": permanent.get("activated_untap_target") or permanent.get("target") or "permanent",
             "activation_requires_tap": bool(permanent.get("activation_requires_tap")),
             "activation_requires_sacrifice": bool(permanent.get("activation_requires_sacrifice")),
+            "activation_requires_sacrifice_target": bool(permanent.get("activation_requires_sacrifice_target")),
+            "activation_sacrifice_target": permanent.get("activation_sacrifice_target"),
+            "activation_sacrifice_cost": permanent.get("activation_sacrifice_cost"),
+            "activation_discard_count": permanent.get("activation_discard_count"),
+            "activation_discard_target": permanent.get("activation_discard_target"),
+            "activation_requires_discard_card": permanent.get("activation_requires_discard_card"),
+            "activation_discard_random": permanent.get("activation_discard_random"),
+            "activation_life_cost": permanent.get("activation_life_cost"),
             "activation_cost_mana": permanent.get("activation_cost_mana"),
             "activation_cost_generic": permanent.get("activation_cost_generic"),
             "activation_cost_colors": permanent.get("activation_cost_colors"),
@@ -49546,6 +49464,14 @@ def _activated_rule_effects_for_permanent(permanent):
             or permanent.get("count"),
             "activation_requires_tap": bool(permanent.get("activation_requires_tap")),
             "activation_requires_sacrifice": bool(permanent.get("activation_requires_sacrifice")),
+            "activation_requires_sacrifice_target": bool(permanent.get("activation_requires_sacrifice_target")),
+            "activation_sacrifice_target": permanent.get("activation_sacrifice_target"),
+            "activation_sacrifice_cost": permanent.get("activation_sacrifice_cost"),
+            "activation_discard_count": permanent.get("activation_discard_count"),
+            "activation_discard_target": permanent.get("activation_discard_target"),
+            "activation_requires_discard_card": permanent.get("activation_requires_discard_card"),
+            "activation_discard_random": permanent.get("activation_discard_random"),
+            "activation_life_cost": permanent.get("activation_life_cost"),
             "activation_cost_mana": permanent.get("activation_cost_mana"),
             "activation_cost_generic": permanent.get("activation_cost_generic"),
             "activation_cost_colors": permanent.get("activation_cost_colors"),
@@ -49569,6 +49495,54 @@ def _activated_rule_effects_for_permanent(permanent):
         ):
             add_counters_effect[key] = permanent.get(key)
         effects.append(add_counters_effect)
+    if (
+        permanent.get("activated_effect") == "add_counters"
+        and permanent.get("activated_battle_model_scope") == SIMPLE_ACTIVATED_SELF_ADD_COUNTERS_SCOPE
+        and str(permanent.get("activated_add_counters_target") or permanent.get("target") or "self").lower() == "self"
+    ):
+        self_add_counters_effect = {
+            "effect": permanent.get("effect") or "creature",
+            "battle_model_scope": permanent.get("activated_battle_model_scope"),
+            "ability_kind": "activated",
+            "activated_effect": "add_counters",
+            "activated_add_counters": bool(permanent.get("activated_add_counters")),
+            "activated_add_counters_target": "self",
+            "activated_add_counters_counter_type": permanent.get("activated_add_counters_counter_type")
+            or permanent.get("counter_type"),
+            "activated_add_counters_count": permanent.get("activated_add_counters_count")
+            or permanent.get("counter_count")
+            or permanent.get("count"),
+            "activation_requires_tap": bool(permanent.get("activation_requires_tap")),
+            "activation_requires_sacrifice": bool(permanent.get("activation_requires_sacrifice")),
+            "activation_requires_sacrifice_target": bool(permanent.get("activation_requires_sacrifice_target")),
+            "activation_sacrifice_target": permanent.get("activation_sacrifice_target"),
+            "activation_sacrifice_cost": permanent.get("activation_sacrifice_cost"),
+            "activation_discard_count": permanent.get("activation_discard_count"),
+            "activation_discard_target": permanent.get("activation_discard_target"),
+            "activation_requires_discard_card": permanent.get("activation_requires_discard_card"),
+            "activation_discard_random": permanent.get("activation_discard_random"),
+            "activation_life_cost": permanent.get("activation_life_cost"),
+            "activation_cost_mana": permanent.get("activation_cost_mana"),
+            "activation_cost_generic": permanent.get("activation_cost_generic"),
+            "activation_cost_colors": permanent.get("activation_cost_colors"),
+            "target": "self",
+            "counter_type": permanent.get("counter_type") or permanent.get("activated_add_counters_counter_type"),
+            "counter_count": permanent.get("counter_count")
+            or permanent.get("activated_add_counters_count")
+            or permanent.get("count"),
+            "count": permanent.get("count") or permanent.get("activated_add_counters_count"),
+        }
+        for key in (
+            "_rule_source",
+            "_rule_review_status",
+            "_rule_execution_status",
+            "_rule_confidence",
+            "_rule_version",
+            "_rule_logical_key",
+            "_rule_oracle_hash",
+        ):
+            self_add_counters_effect[key] = permanent.get(key)
+        effects.append(self_add_counters_effect)
     if (
         not any(effect.get("battle_model_scope") in SIMPLE_ACTIVATED_TOKEN_SCOPES for effect in effects)
         and permanent.get("activated_effect") == "token_maker"
@@ -52017,8 +51991,6 @@ def can_activate_generic_add_counters_target_permanent(player, permanent, oppone
         and not has_haste(permanent)
     ):
         return False
-    if effect_data.get("activation_requires_sacrifice"):
-        return False
     activation_cost = effect_data.get("activation_cost_mana")
     if not activation_cost:
         activation_cost = _activation_cost_text(
@@ -52026,6 +51998,22 @@ def can_activate_generic_add_counters_target_permanent(player, permanent, oppone
             effect_data.get("activation_cost_colors") or [],
         )
     if not player.can_pay(activation_cost):
+        return False
+    if _activation_sacrifice_cost(effect_data):
+        sacrifice_candidates, _sacrifice_options = _choose_activation_sacrifice_cost_candidates(
+            player,
+            permanent,
+            effect_data,
+        )
+        if len(sacrifice_candidates) != _sacrifice_cost_count(effect_data):
+            return False
+    discard_count = max(0, int(effect_data.get("activation_discard_count") or 0))
+    if discard_count:
+        discard_target = effect_data.get("activation_discard_target") or "any_card"
+        if len(_activation_discard_cost_candidates(player, discard_count, discard_target)) < discard_count:
+            return False
+    life_cost = max(0, int(effect_data.get("activation_life_cost") or 0))
+    if life_cost and (getattr(player, "life_cant_change", False) or player.life <= life_cost + 1):
         return False
     selected_targets, _target_options = choose_add_counters_targets(
         player,
@@ -52061,10 +52049,64 @@ def activate_generic_add_counters_target_permanent(player, opponents, permanent,
     )
     if not selected_targets:
         return False
+    discard_count = max(0, int(effect_data.get("activation_discard_count") or 0))
+    discard_target = effect_data.get("activation_discard_target") or "any_card"
+    discard_cards = []
+    if discard_count:
+        discard_cards = _choose_activation_discard_cost_cards(
+            player,
+            discard_count,
+            discard_target,
+            random_discard=bool(effect_data.get("activation_discard_random")),
+            rng=rng,
+        )
+        if len(discard_cards) != discard_count:
+            return False
+    sacrifice_candidates = []
+    sacrifice_cost_options = []
+    if _activation_sacrifice_cost(effect_data):
+        sacrifice_candidates, sacrifice_cost_options = _choose_activation_sacrifice_cost_candidates(
+            player,
+            permanent,
+            effect_data,
+        )
+        if len(sacrifice_candidates) != _sacrifice_cost_count(effect_data):
+            return False
     if not player.spend_mana(activation_cost):
         return False
+    life_before = player.life
+    life_cost = max(0, int(effect_data.get("activation_life_cost") or 0))
+    if life_cost:
+        change_life(player, -life_cost)
+    discarded = []
+    discard_resolution = {"to_graveyard": [], "to_top": [], "used_replacement": False}
+    if discard_cards:
+        removed_cards = _remove_exact_cards_from_hand(player, discard_cards)
+        if len(removed_cards) != len(discard_cards):
+            return False
+        discard_resolution = resolve_effect_discard_cards(
+            player,
+            removed_cards,
+            top_limit=0,
+            opponents=opponents,
+            turn=turn,
+            phase=phase,
+            rng=rng,
+        )
+        discarded = [
+            card.get("name", "?")
+            for card in discard_resolution.get("to_graveyard", removed_cards)
+            if isinstance(card, dict)
+        ]
     if effect_data.get("activation_requires_tap"):
         permanent["tapped"] = True
+    sacrificed_source = False
+    if effect_data.get("activation_requires_sacrifice"):
+        sacrifice_permanent_for_activation(player, permanent, turn)
+        sacrificed_source = True
+    sacrificed_cost_targets = []
+    if sacrifice_candidates:
+        sacrificed_cost_targets = _sacrifice_activation_cost_candidates(player, sacrifice_candidates, turn)
     target_owner, target = selected_targets[0]
     activation_cost_generic = int(effect_data.get("activation_cost_generic") or 0)
     activation_cost_colors = list(effect_data.get("activation_cost_colors") or [])
@@ -52104,6 +52146,14 @@ def activate_generic_add_counters_target_permanent(player, opponents, permanent,
             "counter_type": resolution_effect.get("counter_type"),
             "counter_count": resolution_effect.get("counter_count"),
             "requires_tap": 1 if effect_data.get("activation_requires_tap") else 0,
+            "requires_sacrifice": 1 if sacrificed_source else 0,
+            "sacrifice_cost": _sacrifice_cost_label(effect_data),
+            "sacrifice_cost_targets": _sacrificed_cost_target_names(sacrificed_cost_targets),
+            "discarded": discarded,
+            "discard_cost": discard_count,
+            "life_cost": life_cost,
+            "life_before": life_before,
+            "life_after": player.life,
         },
         rule_source=fields.get("rule_source", "battle_rule"),
         rule_status=fields.get("rule_review_status", "verified"),
@@ -52114,13 +52164,21 @@ def activate_generic_add_counters_target_permanent(player, opponents, permanent,
         heuristic_version=DECISION_STRATEGY_VERSION,
         resource_delta={
             "mana": -mana_paid,
+            "life": -life_cost,
             "tapped": 1 if effect_data.get("activation_requires_tap") else 0,
+            "permanents": -((1 if sacrificed_source else 0) + len(sacrificed_cost_targets)),
+            "cards_discarded": discard_count,
+            "graveyard": len(discard_resolution.get("to_graveyard") or []),
             "counters": int(resolution_effect.get("counter_count") or 1),
         },
         risk_flags=[
             flag
             for flag, active in {
                 "tap_ability": bool(effect_data.get("activation_requires_tap")),
+                "sacrifice_source": sacrificed_source,
+                "sacrifice_cost_target": bool(sacrificed_cost_targets),
+                "discard_cost": bool(discarded),
+                "life_payment": bool(life_cost),
                 "activated_add_counters_target": True,
                 "simplified_target_choice": True,
             }.items()
@@ -52135,6 +52193,19 @@ def activate_generic_add_counters_target_permanent(player, opponents, permanent,
         activation_kind="simple_activated_add_counters_target",
         activation_cost=activation_cost,
         tapped=bool(permanent.get("tapped")),
+        sacrificed_source=sacrificed_source,
+        sacrificed_cost_targets=_sacrificed_cost_target_names(sacrificed_cost_targets),
+        sacrifice_cost_available_targets=len(sacrifice_cost_options),
+        discarded=discarded,
+        discarded_count=discard_count,
+        discard_target=discard_target if discard_count else None,
+        discard_to_graveyard=[card.get("name", "?") for card in discard_resolution.get("to_graveyard") or []],
+        discard_to_library_top=[card.get("name", "?") for card in discard_resolution.get("to_top") or []],
+        discard_replacement_used=bool(discard_resolution.get("used_replacement")),
+        activation_life_cost=life_cost,
+        life_paid=life_cost,
+        life_before=life_before,
+        life_after=player.life,
         mana_paid=mana_paid,
         target=target.get("name", "?"),
         target_player=target_owner.name,
@@ -52204,6 +52275,265 @@ def activate_best_generic_add_counters_target_permanent(player, opponents, all_p
         rng,
         phase=phase,
     )
+
+
+def activated_self_add_counters_effect_for_permanent(permanent):
+    if not isinstance(permanent, dict):
+        return None
+    for effect_data in _activated_rule_effects_for_permanent(permanent):
+        if (
+            effect_data.get("battle_model_scope") == SIMPLE_ACTIVATED_SELF_ADD_COUNTERS_SCOPE
+            and effect_data.get("ability_kind") == "activated"
+            and effect_data.get("activated_effect") == "add_counters"
+            and effect_data.get("activated_add_counters")
+            and str(effect_data.get("activated_add_counters_target") or effect_data.get("target") or "self").lower()
+            == "self"
+        ):
+            return effect_data
+    return None
+
+
+def _activated_self_add_counters_resolution_effect(effect_data):
+    return {
+        **effect_data,
+        "target": "self",
+        "counter_type": (
+            effect_data.get("activated_add_counters_counter_type")
+            or effect_data.get("counter_type")
+            or "+1/+1"
+        ),
+        "counter_count": int(
+            effect_data.get("activated_add_counters_count")
+            or effect_data.get("counter_count")
+            or effect_data.get("count")
+            or 1
+        ),
+    }
+
+
+def can_activate_generic_add_counters_self_permanent(player, permanent, *, effect_data=None):
+    effect_data = effect_data or activated_self_add_counters_effect_for_permanent(permanent)
+    if effect_data is None:
+        return False
+    if permanent not in getattr(player, "battlefield", []):
+        return False
+    if permanent.get("activated_add_counters_used_this_turn"):
+        return False
+    if effect_data.get("activation_requires_sacrifice"):
+        return False
+    if effect_data.get("activation_requires_tap") and permanent.get("tapped"):
+        return False
+    if (
+        effect_data.get("activation_requires_tap")
+        and is_battlefield_creature(permanent)
+        and permanent.get("summoning_sick")
+        and not has_haste(permanent)
+    ):
+        return False
+    activation_cost = effect_data.get("activation_cost_mana")
+    if not activation_cost:
+        activation_cost = _activation_cost_text(
+            int(effect_data.get("activation_cost_generic") or 0),
+            effect_data.get("activation_cost_colors") or [],
+        )
+    if not player.can_pay(activation_cost):
+        return False
+    if _activation_sacrifice_cost(effect_data):
+        sacrifice_candidates, _sacrifice_options = _choose_activation_sacrifice_cost_candidates(
+            player,
+            permanent,
+            effect_data,
+        )
+        if len(sacrifice_candidates) != _sacrifice_cost_count(effect_data):
+            return False
+    discard_count = max(0, int(effect_data.get("activation_discard_count") or 0))
+    if discard_count:
+        discard_target = effect_data.get("activation_discard_target") or "any_card"
+        if len(_activation_discard_cost_candidates(player, discard_count, discard_target)) < discard_count:
+            return False
+    life_cost = max(0, int(effect_data.get("activation_life_cost") or 0))
+    if life_cost and (getattr(player, "life_cant_change", False) or player.life <= life_cost + 1):
+        return False
+    return True
+
+
+def activate_generic_add_counters_self_permanent(player, permanent, turn, rng, *, phase=None):
+    effect_data = activated_self_add_counters_effect_for_permanent(permanent)
+    if not can_activate_generic_add_counters_self_permanent(
+        player,
+        permanent,
+        effect_data=effect_data,
+    ):
+        return False
+    phase = phase or "postcombat_main"
+    activation_cost = effect_data.get("activation_cost_mana")
+    if not activation_cost:
+        activation_cost = _activation_cost_text(
+            int(effect_data.get("activation_cost_generic") or 0),
+            effect_data.get("activation_cost_colors") or [],
+        )
+    resolution_effect = _activated_self_add_counters_resolution_effect(effect_data)
+    discard_count = max(0, int(effect_data.get("activation_discard_count") or 0))
+    discard_target = effect_data.get("activation_discard_target") or "any_card"
+    discard_cards = []
+    if discard_count:
+        discard_cards = _choose_activation_discard_cost_cards(
+            player,
+            discard_count,
+            discard_target,
+            random_discard=bool(effect_data.get("activation_discard_random")),
+            rng=rng,
+        )
+        if len(discard_cards) != discard_count:
+            return False
+    sacrifice_candidates = []
+    sacrifice_cost_options = []
+    if _activation_sacrifice_cost(effect_data):
+        sacrifice_candidates, sacrifice_cost_options = _choose_activation_sacrifice_cost_candidates(
+            player,
+            permanent,
+            effect_data,
+        )
+        if len(sacrifice_candidates) != _sacrifice_cost_count(effect_data):
+            return False
+    if not player.spend_mana(activation_cost):
+        return False
+    life_before = player.life
+    life_cost = max(0, int(effect_data.get("activation_life_cost") or 0))
+    if life_cost:
+        change_life(player, -life_cost)
+    discarded = []
+    discard_resolution = {"to_graveyard": [], "to_top": [], "used_replacement": False}
+    if discard_cards:
+        removed_cards = _remove_exact_cards_from_hand(player, discard_cards)
+        if len(removed_cards) != len(discard_cards):
+            return False
+        discard_resolution = resolve_effect_discard_cards(
+            player,
+            removed_cards,
+            top_limit=0,
+            opponents=[],
+            turn=turn,
+            phase=phase,
+            rng=rng,
+        )
+        discarded = [
+            card.get("name", "?")
+            for card in discard_resolution.get("to_graveyard", removed_cards)
+            if isinstance(card, dict)
+        ]
+    if effect_data.get("activation_requires_tap"):
+        permanent["tapped"] = True
+    sacrificed_cost_targets = []
+    if sacrifice_candidates:
+        sacrificed_cost_targets = _sacrifice_activation_cost_candidates(player, sacrifice_candidates, turn)
+    activation_cost_generic = int(effect_data.get("activation_cost_generic") or 0)
+    activation_cost_colors = list(effect_data.get("activation_cost_colors") or [])
+    mana_paid = activation_cost_generic + len(activation_cost_colors)
+    counter_type = resolution_effect.get("counter_type")
+    counter_count = int(resolution_effect.get("counter_count") or 1)
+    fields = replay_rule_fields(effect_data)
+    emit_decision_trace(
+        decision_type="utility_permanent_activation",
+        player=player,
+        turn=turn,
+        phase=phase,
+        available_options=[
+            decision_card_option(
+                permanent,
+                action="add_counters_to_self",
+                effect=permanent.get("effect", "creature"),
+                score=14 + counter_count * 4,
+            )
+        ],
+        chosen_option=decision_card_option(
+            permanent,
+            action="add_counters_to_self",
+            effect=permanent.get("effect", "creature"),
+            score=14 + counter_count * 4,
+        ),
+        score_components={
+            "activation_cost": activation_cost,
+            "counter_type": counter_type,
+            "counter_count": counter_count,
+            "requires_tap": 1 if effect_data.get("activation_requires_tap") else 0,
+            "sacrifice_cost": _sacrifice_cost_label(effect_data),
+            "sacrifice_cost_targets": _sacrificed_cost_target_names(sacrificed_cost_targets),
+            "discarded": discarded,
+            "discard_cost": discard_count,
+            "life_cost": life_cost,
+            "life_before": life_before,
+            "life_after": player.life,
+        },
+        rule_source=fields.get("rule_source", "permanent_simple_activated_self_add_counters_v1"),
+        rule_status=fields.get("rule_review_status", "verified"),
+        confidence="medium",
+        expected_benefit_score=14 + counter_count * 4,
+        actual_outcome="activated_add_counters_self_used",
+        reason="convert_available_postcombat_resources_into_persistent_creature_size",
+        strategic_principle="use safe permanent self-counter activation when payment is legal",
+        heuristic_version=DECISION_STRATEGY_VERSION,
+        resource_delta={
+            "mana": -mana_paid,
+            "life": -life_cost,
+            "tapped": 1 if effect_data.get("activation_requires_tap") else 0,
+            "permanents": -len(sacrificed_cost_targets),
+            "cards_discarded": discard_count,
+            "graveyard": len(discard_resolution.get("to_graveyard") or []) + len(sacrificed_cost_targets),
+            "counters": counter_count,
+        },
+        risk_flags=[
+            flag
+            for flag, active in {
+                "tap_ability": bool(effect_data.get("activation_requires_tap")),
+                "sacrifice_cost_target": bool(sacrificed_cost_targets),
+                "discard_cost": bool(discarded),
+                "life_payment": bool(life_cost),
+                "activated_add_counters": True,
+            }.items()
+            if active
+        ],
+    )
+    emit_replay_event(
+        "activated_ability",
+        player=player.name,
+        card=permanent.get("name", "?"),
+        effect="add_counters",
+        activation_kind="simple_activated_add_counters_self",
+        activation_cost=activation_cost,
+        tapped=bool(permanent.get("tapped")),
+        sacrificed_source=False,
+        sacrificed_cost_targets=_sacrificed_cost_target_names(sacrificed_cost_targets),
+        sacrifice_cost_available_targets=len(sacrifice_cost_options),
+        discarded=discarded,
+        discarded_count=discard_count,
+        discard_target=discard_target if discard_count else None,
+        discard_to_graveyard=[card.get("name", "?") for card in discard_resolution.get("to_graveyard") or []],
+        discard_to_library_top=[card.get("name", "?") for card in discard_resolution.get("to_top") or []],
+        discard_replacement_used=bool(discard_resolution.get("used_replacement")),
+        activation_life_cost=life_cost,
+        life_paid=life_cost,
+        life_before=life_before,
+        life_after=player.life,
+        mana_paid=mana_paid,
+        target=permanent.get("name", "?"),
+        target_player=player.name,
+        counter_type=counter_type,
+        counter_count=counter_count,
+        turn=turn,
+        phase=phase,
+        **fields,
+    )
+    resolved = resolve_add_counters_source_effect(
+        player,
+        permanent,
+        resolution_effect,
+        turn,
+        event_name="self_add_counters_resolved",
+        phase=phase,
+        extra_event_fields={"activation_kind": "simple_activated_add_counters_self"},
+    )
+    return bool(resolved)
 
 
 def activated_self_boost_effect_for_permanent(permanent):

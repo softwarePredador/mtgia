@@ -2586,6 +2586,187 @@ def test_simple_activated_add_counters_target_runner_executes_minus_counter() ->
     )
 
 
+def test_simple_activated_add_counters_target_runner_pays_extra_costs() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "creature",
+        "battle_model_scope": "xmage_permanent_simple_activated_add_counters_target_creature_v1",
+        "activated_effect": "add_counters",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_add_counters_target_creature_v1",
+        "activated_add_counters": True,
+        "activated_add_counters_target": "creature",
+        "activated_add_counters_counter_type": "+1/+1",
+        "activated_add_counters_count": 1,
+        "target": "creature",
+        "target_constraints": {"card_types": ["creature"]},
+        "target_controller": "any",
+        "counter_type": "+1/+1",
+        "counter_count": 1,
+        "count": 1,
+        "activation_cost_mana": "{1}",
+        "activation_cost_generic": 1,
+        "activation_cost_colors": [],
+        "activation_requires_tap": False,
+        "activation_requires_sacrifice": True,
+        "activation_discard_count": 1,
+        "activation_discard_target": "any_card",
+        "activation_life_cost": 3,
+        "activation_sacrifice_cost": {
+            "count": 1,
+            "target_controller": "self",
+            "constraints": {"card_types": ["creature"], "exclude_source": True},
+        },
+        "_rule_logical_key": "battle_rule_v1:fixture-counter-costs",
+    }
+    try:
+        result = validator.run_simple_activated_add_counters_target(
+            battle,
+            {
+                "name": "Fixture Counter Costs pays extras",
+                "type": "simple_activated_add_counters_target",
+                "card": {
+                    "name": "Fixture Counter Costs",
+                    "type_line": "Creature - Human",
+                    "power": 1,
+                    "toughness": 1,
+                },
+                "target": {
+                    "name": "E2E Counter Target",
+                    "type_line": "Creature - Soldier",
+                    "effect": "creature",
+                    "power": 3,
+                    "toughness": 3,
+                },
+                "controller_mana": {"generic": 1},
+                "controller_hand": [
+                    {"name": "E2E Discard Cost Card", "type_line": "Instant", "effect": "draw_cards", "cmc": 2}
+                ],
+                "sacrifice_targets": [
+                    {"name": "E2E Sacrifice Cost Creature", "type_line": "Creature - Citizen", "effect": "creature"}
+                ],
+                "starting_life": 40,
+                "expected_sacrificed_source": True,
+                "expected_discard_count": 1,
+                "expected_life_paid": 3,
+                "expected_sacrifice_count": 1,
+                "expected_counter_type": "+1/+1",
+                "expected_counter_count": 1,
+                "logical_rule_key": "battle_rule_v1:fixture-counter-costs",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["source_sacrificed"] is True
+    assert result["discarded_count"] == 1
+    assert result["life_paid"] == 3
+    assert result["sacrifice_cost_count"] == 1
+    assert any(
+        event == "activated_ability"
+        and data.get("card") == "Fixture Counter Costs"
+        and data.get("sacrificed_source") is True
+        and data.get("discarded_count") == 1
+        and data.get("life_paid") == 3
+        and data.get("sacrificed_cost_targets") == ["E2E Sacrifice Cost Creature"]
+        for event, data in events
+    )
+
+
+def test_simple_activated_add_counters_self_runner_pays_extra_costs() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "creature",
+        "battle_model_scope": "xmage_permanent_simple_activated_self_add_counters_v1",
+        "activated_effect": "add_counters",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_add_counters_v1",
+        "activated_add_counters": True,
+        "activated_add_counters_target": "self",
+        "activated_add_counters_counter_type": "+1/+1",
+        "activated_add_counters_count": 2,
+        "target": "self",
+        "counter_type": "+1/+1",
+        "counter_count": 2,
+        "count": 2,
+        "activation_cost_mana": "{2}{B}",
+        "activation_cost_generic": 2,
+        "activation_cost_colors": ["B"],
+        "activation_requires_tap": False,
+        "activation_requires_sacrifice": False,
+        "activation_discard_count": 1,
+        "activation_discard_target": "any_card",
+        "activation_life_cost": 3,
+        "activation_sacrifice_cost": {
+            "count": 1,
+            "target_controller": "self",
+            "constraints": {"card_types": ["creature"], "exclude_source": True},
+        },
+        "_rule_logical_key": "battle_rule_v1:fixture-self-counter-costs",
+    }
+    try:
+        result = validator.run_simple_activated_add_counters_self(
+            battle,
+            {
+                "name": "Fixture Self Counter Costs pays extras",
+                "type": "simple_activated_add_counters_self",
+                "card": {
+                    "name": "Fixture Self Counter Costs",
+                    "type_line": "Creature - Vampire",
+                    "power": 2,
+                    "toughness": 2,
+                },
+                "controller_mana": {"generic": 2, "black": 1},
+                "controller_hand": [
+                    {"name": "E2E Self Discard Cost Card", "type_line": "Instant", "effect": "draw_cards", "cmc": 2}
+                ],
+                "sacrifice_targets": [
+                    {"name": "E2E Self Sacrifice Cost Creature", "type_line": "Creature - Citizen", "effect": "creature"}
+                ],
+                "starting_life": 40,
+                "expected_discard_count": 1,
+                "expected_life_paid": 3,
+                "expected_sacrifice_count": 1,
+                "expected_counter_type": "+1/+1",
+                "expected_counter_count": 2,
+                "logical_rule_key": "battle_rule_v1:fixture-self-counter-costs",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Fixture Self Counter Costs"
+    assert result["counters_added"] == 2
+    assert result["discarded_count"] == 1
+    assert result["life_paid"] == 3
+    assert result["sacrifice_cost_count"] == 1
+    assert any(
+        event == "activated_ability"
+        and data.get("card") == "Fixture Self Counter Costs"
+        and data.get("activation_kind") == "simple_activated_add_counters_self"
+        and data.get("discarded_count") == 1
+        and data.get("life_paid") == 3
+        and data.get("sacrificed_cost_targets") == ["E2E Self Sacrifice Cost Creature"]
+        for event, data in events
+    )
+    assert any(
+        event == "self_add_counters_resolved"
+        and data.get("card") == "Fixture Self Counter Costs"
+        and data.get("counters_added") == 2
+        for event, data in events
+    )
+
+
 def test_simple_activated_destroy_runner_executes_token_target_constraint() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []
