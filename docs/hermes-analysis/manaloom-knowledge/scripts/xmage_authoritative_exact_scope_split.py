@@ -19083,6 +19083,30 @@ def fixed_spell_additional_cost_fields_from_source(
                 "xmage_additional_cost_target": "creature",
             }, None
     if "SacrificeTargetCost" in text and re.search(
+        r"additional cost.*sacrifice two creatures", lowered_oracle
+    ):
+        if re.search(r"SacrificeTargetCost\s*\(\s*2\s*,", text):
+            sacrifice_target = activation_sacrifice_target_from_source(text, text)
+            if sacrifice_target == "creature":
+                return {
+                    "additional_cost": "sacrifice_two_creatures",
+                    "requires_sacrifice_creature_count": 2,
+                    "xmage_additional_cost_class": "SacrificeTargetCost",
+                    "xmage_additional_cost_target": "creature",
+                }, None
+        return None, unsupported_reason
+    if "SacrificeTargetCost" in text and re.search(
+        r"additional cost.*sacrifice (?:a|one) creature or land", lowered_oracle
+    ):
+        sacrifice_target = activation_sacrifice_target_from_source(text, text)
+        if sacrifice_target == "creature_or_land":
+            return {
+                "additional_cost": "sacrifice_creature_or_land",
+                "requires_sacrifice_creature_or_land": True,
+                "xmage_additional_cost_class": "SacrificeTargetCost",
+                "xmage_additional_cost_target": "creature_or_land",
+            }, None
+    if "SacrificeTargetCost" in text and re.search(
         r"additional cost.*sacrifice (?:an?|one) artifact or creature", lowered_oracle
     ):
         sacrifice_target = activation_sacrifice_target_from_source(text, text)

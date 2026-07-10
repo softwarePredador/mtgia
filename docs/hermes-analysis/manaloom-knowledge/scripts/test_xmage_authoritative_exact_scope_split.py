@@ -6217,6 +6217,55 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["draw_count"], 4)
         self.assertEqual(effect["count"], 4)
 
+    def test_fixed_draw_spell_maps_sacrifice_two_creatures_cost(self) -> None:
+        row = queue_row(split.DRAW_UNIT, effect_classes=["DrawCardSourceControllerEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                oracle_text=(
+                    "As an additional cost to cast this spell, sacrifice two creatures. "
+                    "Draw three cards."
+                )
+            ),
+            source_text=(
+                "this.getSpellAbility().addCost(new SacrificeTargetCost(2, "
+                "StaticFilters.FILTER_PERMANENT_CREATURES));"
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(3));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DRAW_SCOPE)
+        self.assertEqual(effect["count"], 3)
+        self.assertEqual(effect["additional_cost"], "sacrifice_two_creatures")
+        self.assertEqual(effect["requires_sacrifice_creature_count"], 2)
+
+    def test_fixed_draw_spell_maps_sacrifice_creature_or_land_cost(self) -> None:
+        row = queue_row(split.DRAW_UNIT, effect_classes=["DrawCardSourceControllerEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                oracle_text=(
+                    "As an additional cost to cast this spell, sacrifice a creature or land. "
+                    "Draw two cards."
+                )
+            ),
+            source_text=(
+                "FilterControlledPermanent filter = new FilterControlledPermanent(\"a creature or land\");"
+                "filter.add(Predicates.or(CardType.CREATURE.getPredicate(), CardType.LAND.getPredicate()));"
+                "this.getSpellAbility().addCost(new SacrificeTargetCost(filter));"
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(2));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DRAW_SCOPE)
+        self.assertEqual(effect["count"], 2)
+        self.assertEqual(effect["additional_cost"], "sacrifice_creature_or_land")
+        self.assertTrue(effect["requires_sacrifice_creature_or_land"])
+
     def test_fixed_target_player_draw_spell_ignores_neutral_auxiliary_oracle_lines(self) -> None:
         row = queue_row(
             split.DRAW_UNIT,
@@ -6562,7 +6611,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["xmage_additional_cost_class"], "SacrificeTargetCost")
         self.assertEqual(effect["xmage_additional_cost_target"], "artifact_or_creature")
 
-    def test_fixed_source_controller_draw_spell_blocks_unsupported_additional_cost(self) -> None:
+    def test_fixed_source_controller_draw_spell_accepts_sacrifice_two_creatures_cost(self) -> None:
         row = queue_row(split.DRAW_UNIT, effect_classes=["DrawCardSourceControllerEffect"])
         proposal, reason = split.split_row(
             row,
@@ -6576,8 +6625,10 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             ),
         )
 
-        self.assertIsNone(proposal)
-        self.assertEqual(reason, "draw_additional_cost_not_supported")
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["additional_cost"], "sacrifice_two_creatures")
+        self.assertEqual(effect["requires_sacrifice_creature_count"], 2)
 
     def test_reveal_library_pick_spell_creature_or_land_is_package_safe(self) -> None:
         row = queue_row(split.RECURSION_UNIT, effect_classes=["RevealLibraryPickControllerEffect"])

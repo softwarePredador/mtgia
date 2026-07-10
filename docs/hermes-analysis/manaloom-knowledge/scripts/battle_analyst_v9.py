@@ -9090,6 +9090,8 @@ SAFE_RUNTIME_SECONDARY_ANNOTATION_KEYS = {
     "requires_pay_life",
     "pay_life_amount",
     "requires_sacrifice_creature",
+    "requires_sacrifice_creature_count",
+    "requires_sacrifice_creature_or_land",
     "requires_sacrifice_creature_or_enchantment",
     "requires_sacrifice_creature_or_planeswalker",
     "requires_sacrifice_green_creature",
@@ -22754,9 +22756,26 @@ def additional_card_costs_are_payable(player, card, effect_data, cost_context=No
         )
         if creature is None:
             return False
+    elif int(effect_data.get("requires_sacrifice_creature_count") or 0) > 0:
+        required_count = int(effect_data.get("requires_sacrifice_creature_count") or 0)
+        creatures = [
+            permanent
+            for permanent in getattr(player, "battlefield", []) or []
+            if permanent is not card and is_battlefield_creature(permanent)
+        ]
+        if len(creatures) < required_count:
+            return False
     elif effect_data.get("requires_sacrifice_creature"):
         creature, _options, _reason = choose_creature_for_resource_cost(player)
         if creature is None:
+            return False
+    if effect_data.get("requires_sacrifice_creature_or_land"):
+        permanent, _options = choose_activation_sacrifice_target(
+            player,
+            card,
+            "creature_or_land",
+        )
+        if permanent is None:
             return False
     if effect_data.get("requires_sacrifice_creature_or_enchantment"):
         permanent, _options = choose_activation_sacrifice_target(
@@ -22834,8 +22853,12 @@ def additional_cost_option_effect_fields(option):
         effect_data["pay_life_amount"] = int((option or {}).get("pay_life_amount") or 0)
     elif cost == "sacrifice_creature":
         effect_data["requires_sacrifice_creature"] = True
+    elif cost == "sacrifice_two_creatures":
+        effect_data["requires_sacrifice_creature_count"] = 2
     elif cost == "sacrifice_green_creature":
         effect_data["requires_sacrifice_green_creature"] = True
+    elif cost == "sacrifice_creature_or_land":
+        effect_data["requires_sacrifice_creature_or_land"] = True
     elif cost == "sacrifice_creature_or_enchantment":
         effect_data["requires_sacrifice_creature_or_enchantment"] = True
     elif cost == "sacrifice_creature_or_planeswalker":
@@ -22908,6 +22931,8 @@ def pay_additional_card_costs(player, card, effect_data, *, turn=None, cost_cont
         and not effect_data.get("requires_discard_land")
         and not effect_data.get("requires_pay_life")
         and not effect_data.get("requires_sacrifice_creature")
+        and not effect_data.get("requires_sacrifice_creature_count")
+        and not effect_data.get("requires_sacrifice_creature_or_land")
         and not effect_data.get("requires_sacrifice_green_creature")
         and not effect_data.get("requires_sacrifice_creature_or_enchantment")
         and not effect_data.get("requires_sacrifice_creature_or_planeswalker")
@@ -23196,6 +23221,49 @@ def pay_additional_card_costs(player, card, effect_data, *, turn=None, cost_cont
             turn=turn,
         )
     required_color = "G" if effect_data.get("requires_sacrifice_green_creature") else None
+    required_creature_count = int(effect_data.get("requires_sacrifice_creature_count") or 0)
+    if required_creature_count > 0:
+        candidates = [
+            permanent
+            for permanent in getattr(player, "battlefield", []) or []
+            if permanent is not card and is_battlefield_creature(permanent)
+        ]
+        candidates.sort(
+            key=lambda permanent: (
+                activation_sacrifice_candidate_score(player, permanent),
+                str(permanent.get("name") or ""),
+            )
+        )
+        selected = candidates[:required_creature_count]
+        if len(selected) < required_creature_count:
+            emit_replay_event(
+                "additional_cost_failed",
+                player=player.name,
+                card=card.get("name", "?"),
+                cost="sacrifice_two_creatures" if required_creature_count == 2 else "sacrifice_creatures",
+                required_count=required_creature_count,
+                available_count=len(candidates),
+                turn=turn,
+            )
+            return False
+        sacrificed = []
+        for sacrifice in selected:
+            destination = move_creature_from_battlefield(
+                player,
+                sacrifice,
+                reason="sacrifice_creatures",
+                source=card,
+            )
+            sacrificed.append({"name": sacrifice.get("name", "?"), "destination": destination})
+        emit_replay_event(
+            "additional_cost_paid",
+            player=player.name,
+            card=card.get("name", "?"),
+            cost="sacrifice_two_creatures" if required_creature_count == 2 else "sacrifice_creatures",
+            sacrificed=[entry["name"] for entry in sacrificed],
+            sacrificed_count=len(sacrificed),
+            turn=turn,
+        )
     if effect_data.get("requires_sacrifice_creature") or required_color:
         if (
             not required_color
@@ -23241,6 +23309,43 @@ def pay_additional_card_costs(player, card, effect_data, *, turn=None, cost_cont
             creature_options=creature_options,
             selection_reason=selection_reason,
             required_color=required_color,
+            turn=turn,
+        )
+    if effect_data.get("requires_sacrifice_creature_or_land"):
+        sacrifice, permanent_options = choose_activation_sacrifice_target(
+            player,
+            card,
+            "creature_or_land",
+        )
+        if not sacrifice:
+            emit_replay_event(
+                "additional_cost_failed",
+                player=player.name,
+                card=card.get("name", "?"),
+                cost="sacrifice_creature_or_land",
+                sacrifice_target_type="creature_or_land",
+                turn=turn,
+            )
+            return False
+        destination = move_permanent_from_battlefield(
+            player,
+            sacrifice,
+            reason="sacrifice_creature_or_land",
+            source=card,
+        )
+        emit_replay_event(
+            "additional_cost_paid",
+            player=player.name,
+            card=card.get("name", "?"),
+            cost="sacrifice_creature_or_land",
+            sacrificed=sacrifice.get("name", "?"),
+            sacrifice_target_type="creature_or_land",
+            destination=destination,
+            permanent_options=[
+                option.get("name", "?")
+                for option in permanent_options[:8]
+                if isinstance(option, dict)
+            ],
             turn=turn,
         )
     for cost_flag, cost_name, sacrifice_target_type in (

@@ -865,6 +865,33 @@ def test_manifest_expected_rule_preserves_target_player_draw_fields() -> None:
     }
 
 
+def test_manifest_builds_fixed_draw_additional_cost_scenario() -> None:
+    rule = {
+        "normalized_name": "merciless resolve",
+        "card_name": "Merciless Resolve",
+        "oracle_hash": "hash-merciless-resolve",
+        "logical_rule_key": "battle_rule_v1:hash-merciless-resolve",
+        "required_effect_fields": {
+            "effect": "draw_cards",
+            "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+            "count": 2,
+            "draw_count": 2,
+            "instant": True,
+            "additional_cost": "sacrifice_creature_or_land",
+            "requires_sacrifice_creature_or_land": True,
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "fixed_draw_spell"
+    assert scenario["expected_draw_count"] == 2
+    assert scenario["expected_additional_cost"] == "sacrifice_creature_or_land"
+    assert scenario["expected_sacrificed_names"] == ["E2E Sacrifice Cost Creature"]
+    assert scenario["controller_battlefield"][0]["type_line"] == "Creature - Soldier"
+
+
 def test_manifest_expected_rule_preserves_damage_prevention_fields() -> None:
     proposal = {
         "normalized_name": "vine snare",

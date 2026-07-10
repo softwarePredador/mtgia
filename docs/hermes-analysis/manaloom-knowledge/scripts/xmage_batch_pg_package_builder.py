@@ -115,6 +115,8 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "requires_pay_life",
     "pay_life_amount",
     "requires_sacrifice_creature",
+    "requires_sacrifice_creature_count",
+    "requires_sacrifice_creature_or_land",
     "requires_sacrifice_creature_or_enchantment",
     "requires_sacrifice_creature_or_planeswalker",
     "requires_sacrifice_artifact_or_creature",
@@ -2982,6 +2984,68 @@ def target_player_draw_execution_scenario_from_expected_rule(
     }
 
 
+def fixed_draw_spell_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_fixed_source_controller_draw_spell_v1":
+        return None
+    expected_draw_count = int(required.get("draw_count") or required.get("count") or 0)
+    if expected_draw_count <= 0:
+        return None
+    scenario: dict[str, Any] = {
+        "name": f"{rule['card_name']} draws cards",
+        "type": "fixed_draw_spell",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": "Instant" if required.get("instant") else "Sorcery",
+        },
+        "controller_library": [
+            {
+                "name": f"E2E Draw Card {index + 1}",
+                "type_line": "Instant" if index % 2 == 0 else "Sorcery",
+                "effect": "draw_cards",
+                "cmc": index + 1,
+            }
+            for index in range(expected_draw_count)
+        ],
+        "expected_draw_count": expected_draw_count,
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+    if required.get("requires_sacrifice_creature_or_land"):
+        scenario["controller_battlefield"] = [
+            {
+                "name": "E2E Sacrifice Cost Creature",
+                "type_line": "Creature - Soldier",
+                "effect": "creature",
+                "power": 1,
+                "toughness": 1,
+            }
+        ]
+        scenario["expected_additional_cost"] = "sacrifice_creature_or_land"
+        scenario["expected_sacrificed_names"] = ["E2E Sacrifice Cost Creature"]
+    creature_count = int(required.get("requires_sacrifice_creature_count") or 0)
+    if creature_count > 0:
+        scenario["controller_battlefield"] = [
+            {
+                "name": f"E2E Sacrifice Cost Creature {index + 1}",
+                "type_line": "Creature - Soldier",
+                "effect": "creature",
+                "power": 1,
+                "toughness": 1,
+            }
+            for index in range(creature_count)
+        ]
+        scenario["expected_additional_cost"] = (
+            "sacrifice_two_creatures" if creature_count == 2 else "sacrifice_creatures"
+        )
+        scenario["expected_sacrificed_names"] = [
+            f"E2E Sacrifice Cost Creature {index + 1}"
+            for index in range(creature_count)
+        ]
+    return scenario
+
+
 def combat_damage_draw_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
@@ -5809,6 +5873,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or add_counters_untap_target_spell_execution_scenario_from_expected_rule(rule)
         or boost_untap_target_spell_execution_scenario_from_expected_rule(rule)
         or simple_activated_draw_execution_scenario_from_expected_rule(rule)
+        or fixed_draw_spell_execution_scenario_from_expected_rule(rule)
         or target_player_draw_execution_scenario_from_expected_rule(rule)
         or combat_damage_draw_execution_scenario_from_expected_rule(rule)
         or simple_activated_damage_execution_scenario_from_expected_rule(rule)

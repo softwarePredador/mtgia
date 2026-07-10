@@ -1508,6 +1508,69 @@ def test_simple_activated_draw_runner_executes_sacrifice_target_cost() -> None:
     assert result["target_sacrificed"] is True
 
 
+def test_fixed_draw_spell_runner_pays_sacrifice_two_creatures_cost() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "draw_cards",
+        "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+        "count": 3,
+        "draw_count": 3,
+        "additional_cost": "sacrifice_two_creatures",
+        "requires_sacrifice_creature_count": 2,
+    }
+    try:
+        result = validator.run_fixed_draw_spell(
+            battle,
+            {
+                "name": "Bankrupt in Blood draws cards",
+                "type": "fixed_draw_spell",
+                "card": {"name": "Bankrupt in Blood", "type_line": "Sorcery"},
+                "controller_library": [
+                    {"name": f"E2E Draw Card {index + 1}", "type_line": "Sorcery", "effect": "draw_cards"}
+                    for index in range(3)
+                ],
+                "controller_battlefield": [
+                    {
+                        "name": "E2E Sacrifice Cost Creature 1",
+                        "type_line": "Creature - Soldier",
+                        "effect": "creature",
+                        "power": 1,
+                        "toughness": 1,
+                    },
+                    {
+                        "name": "E2E Sacrifice Cost Creature 2",
+                        "type_line": "Creature - Soldier",
+                        "effect": "creature",
+                        "power": 1,
+                        "toughness": 1,
+                    },
+                ],
+                "expected_draw_count": 3,
+                "expected_additional_cost": "sacrifice_two_creatures",
+                "expected_sacrificed_names": [
+                    "E2E Sacrifice Cost Creature 1",
+                    "E2E Sacrifice Cost Creature 2",
+                ],
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Bankrupt in Blood"
+    assert result["cards_drawn"] == 3
+    assert result["additional_cost"] == "sacrifice_two_creatures"
+    assert result["sacrificed"] == [
+        "E2E Sacrifice Cost Creature 1",
+        "E2E Sacrifice Cost Creature 2",
+    ]
+
+
 def test_single_target_removal_runner_validates_controller_life_gain() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []
