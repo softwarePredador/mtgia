@@ -21445,6 +21445,49 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(proposal["effect_json"]["power_delta"], 2)
         self.assertEqual(proposal["effect_json"]["toughness_delta"], 2)
 
+    def test_fixed_boost_target_spell_maps_up_to_two_targets(self) -> None:
+        row = queue_row(split.BOOST_TARGET_UNIT, effect_classes=["BoostTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Up to two target creatures each get +2/+2 until end of turn."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new BoostTargetEffect(2, 2, Duration.EndOfTurn));"
+                "this.getSpellAbility().addTarget(new TargetCreaturePermanent(0, 2));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.BOOST_TARGET_SCOPE)
+        self.assertEqual(effect["power_delta"], 2)
+        self.assertEqual(effect["toughness_delta"], 2)
+        self.assertEqual(effect["target_controller"], "any")
+        self.assertEqual(effect["target_count"], 2)
+        self.assertEqual(effect["target_count_min"], 0)
+        self.assertEqual(effect["target_count_max"], 2)
+        self.assertIs(effect["up_to_count"], True)
+
+    def test_fixed_boost_target_spell_maps_one_or_two_targets(self) -> None:
+        row = queue_row(split.BOOST_TARGET_UNIT, effect_classes=["BoostTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="One or two target creatures each get +2/+1 until end of turn."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new BoostTargetEffect(2, 1));"
+                "this.getSpellAbility().addTarget(new TargetCreaturePermanent(1, 2));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.BOOST_TARGET_SCOPE)
+        self.assertEqual(effect["power_delta"], 2)
+        self.assertEqual(effect["toughness_delta"], 1)
+        self.assertEqual(effect["target_count"], 2)
+        self.assertEqual(effect["target_count_min"], 1)
+        self.assertEqual(effect["target_count_max"], 2)
+        self.assertIs(effect["up_to_count"], True)
+
     def test_boost_multi_target_spell_stays_blocked(self) -> None:
         row = queue_row(split.BOOST_TARGET_UNIT, effect_classes=["BoostTargetEffect"])
         proposal, reason = split.split_row(
@@ -21995,6 +22038,40 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["target_count_min"], 0)
         self.assertEqual(effect["target_count_max"], 2)
         self.assertIs(effect["up_to_count"], True)
+
+    def test_fixed_boost_keyword_target_creature_maps_two_controlled_targets(self) -> None:
+        row = queue_row(
+            split.BOOST_KEYWORD_UNIT,
+            effect_classes=["BoostTargetEffect", "GainAbilityTargetEffect"],
+            ability_classes=["FlyingAbility"],
+            xmage_signals=["targeting"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                oracle_text=(
+                    "Two target creatures you control each get +2/+2 and gain flying until end of turn."
+                )
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new BoostTargetEffect(2, 2, Duration.EndOfTurn));"
+                "this.getSpellAbility().addEffect(new GainAbilityTargetEffect("
+                "FlyingAbility.getInstance(), Duration.EndOfTurn));"
+                "this.getSpellAbility().addTarget(new TargetControlledCreaturePermanent(2));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.BOOST_KEYWORD_SCOPE)
+        self.assertEqual(effect["power_delta"], 2)
+        self.assertEqual(effect["toughness_delta"], 2)
+        self.assertEqual(effect["target_controller"], "self")
+        self.assertEqual(effect["granted_keywords_until_eot"], ["flying"])
+        self.assertEqual(effect["target_count"], 2)
+        self.assertEqual(effect["target_count_min"], 2)
+        self.assertEqual(effect["target_count_max"], 2)
+        self.assertIs(effect["up_to_count"], False)
 
     def test_fixed_boost_keyword_target_creature_blocks_oracle_source_keyword_mismatch(self) -> None:
         row = queue_row(

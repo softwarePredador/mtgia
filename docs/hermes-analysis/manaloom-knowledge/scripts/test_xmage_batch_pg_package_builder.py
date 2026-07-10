@@ -2428,6 +2428,38 @@ def test_manifest_builds_multi_target_boost_keyword_spell_execution_scenario() -
     assert scenario["expected_keywords"] == ["first_strike"]
 
 
+def test_manifest_builds_multi_target_boost_spell_execution_scenario() -> None:
+    rule = {
+        "normalized_name": "dauntless onslaught",
+        "card_name": "Dauntless Onslaught",
+        "oracle_hash": "hash-dauntless-onslaught",
+        "logical_rule_key": "battle_rule_v1:hash-dauntless-onslaught",
+        "required_effect_fields": {
+            "effect": "stat_modifier_until_eot",
+            "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+            "target": "creature",
+            "target_controller": "any",
+            "target_constraints": {"card_types": ["creature"]},
+            "power_delta": 2,
+            "toughness_delta": 2,
+            "target_count": 2,
+            "target_count_min": 0,
+            "target_count_max": 2,
+            "up_to_count": True,
+        },
+    }
+
+    scenario = builder.target_keyword_spell_execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "stat_modifier_until_eot"
+    assert scenario["expected_target_count"] == 2
+    assert len(scenario["targets"]) == 2
+    assert scenario["expected_power_delta"] == 2
+    assert scenario["expected_toughness_delta"] == 2
+    assert scenario["expected_keywords"] == []
+
+
 def test_manifest_builds_target_keyword_draw_spell_execution_scenario() -> None:
     rule = {
         "normalized_name": "poison the blade",

@@ -3771,6 +3771,7 @@ def target_keyword_spell_execution_scenario_from_expected_rule(
     if required.get("battle_model_scope") not in {
         "xmage_fixed_keyword_target_creature_until_eot_spell_v1",
         "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+        "xmage_fixed_boost_target_creature_until_eot_spell_v1",
     }:
         return None
     type_line = "Sorcery" if required.get("sorcery") is True else "Instant"

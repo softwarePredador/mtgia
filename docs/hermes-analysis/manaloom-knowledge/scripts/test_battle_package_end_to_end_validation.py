@@ -2782,6 +2782,74 @@ def test_stat_modifier_until_eot_runner_executes_multi_target_boost_keyword_spel
     )
 
 
+def test_stat_modifier_until_eot_runner_executes_multi_target_boost_spell() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "stat_modifier_until_eot",
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+        "target": "creature",
+        "target_controller": "any",
+        "target_constraints": {"card_types": ["creature"]},
+        "power_delta": 2,
+        "toughness_delta": 2,
+        "target_count": 2,
+        "target_count_min": 0,
+        "target_count_max": 2,
+        "up_to_count": True,
+        "_rule_logical_key": "battle_rule_v1:dauntless-onslaught",
+    }
+    try:
+        result = validator.run_stat_modifier_until_eot(
+            battle,
+            {
+                "name": "Dauntless Onslaught boosts two targets",
+                "type": "stat_modifier_until_eot",
+                "card": {"name": "Dauntless Onslaught", "type_line": "Instant"},
+                "targets": [
+                    {
+                        "name": "E2E Target Creature 1",
+                        "type_line": "Creature - Soldier",
+                        "power": 2,
+                        "toughness": 2,
+                    },
+                    {
+                        "name": "E2E Target Creature 2",
+                        "type_line": "Creature - Soldier",
+                        "power": 2,
+                        "toughness": 2,
+                    },
+                ],
+                "expected_power_delta": 2,
+                "expected_toughness_delta": 2,
+                "expected_keywords": [],
+                "expected_target_count": 2,
+                "logical_rule_key": "battle_rule_v1:dauntless-onslaught",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Dauntless Onslaught"
+    assert result["target_count"] == 2
+    assert result["target_power"] == 4
+    assert result["target_toughness"] == 4
+    assert result["granted_keywords"] == []
+    assert any(
+        event == "stat_modifier_until_eot_resolved"
+        and data.get("card") == "Dauntless Onslaught"
+        and data.get("target_count") == 2
+        and data.get("power_delta") == 2
+        and data.get("toughness_delta") == 2
+        for event, data in events
+    )
+
+
 def test_target_keyword_draw_spell_runner_executes_keyword_and_draw() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []
