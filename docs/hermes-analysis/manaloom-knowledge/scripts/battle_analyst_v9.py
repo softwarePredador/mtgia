@@ -62787,6 +62787,20 @@ def resolve_composite_resolution_effect(player, opponents, card, effect_data, tu
                     break
             outcome = "removal_resolved" if removed else "no_legal_target"
             applied.append({"effect": component_effect, "removed": removed})
+        elif component_effect == "graveyard_exile":
+            component_payload = dict(component)
+            component_payload["_composite_component_index"] = index
+            exiled = resolve_graveyard_exile_spell(
+                player,
+                opponents,
+                participants,
+                card,
+                component_payload,
+                turn,
+                phase=phase,
+            )
+            outcome = "graveyard_exile_resolved" if exiled else "no_legal_graveyard_target"
+            applied.append({"effect": component_effect, "exiled": len(exiled)})
         else:
             skipped.append({"effect": component_effect, "reason": "unsupported_component"})
 

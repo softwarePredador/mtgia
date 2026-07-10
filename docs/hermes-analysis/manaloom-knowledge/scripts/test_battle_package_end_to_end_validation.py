@@ -1781,6 +1781,84 @@ def test_single_target_removal_and_draw_runner_exiles_and_draws() -> None:
     assert result["nonmatching_target"] == "E2E Illegal Removal Target"
 
 
+def test_single_target_removal_and_draw_runner_exiles_graveyard_card_and_draws() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "composite_resolution",
+        "battle_model_scope": "xmage_exile_target_and_draw_card_spell_v1",
+        "target": "any_card",
+        "target_constraints": {"zone": "graveyard", "controller": "any", "card_types": ["card"]},
+        "destination": "exile",
+        "draw_count": 1,
+        "_composite_rule_components": [
+            {
+                "effect": "graveyard_exile",
+                "battle_model_scope": "xmage_exile_target_graveyard_card_spell_v1",
+                "target": "any_card",
+                "target_constraints": {"zone": "graveyard", "controller": "any", "card_types": ["card"]},
+                "count": 1,
+                "destination": "exile",
+                "target_controller": "any",
+                "graveyard_exile_target": "any_card",
+                "graveyard_exile_target_count": 1,
+                "graveyard_exile_destination": "exile",
+                "graveyard_exile_single_graveyard": False,
+            },
+            {
+                "effect": "draw_cards",
+                "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+                "count": 1,
+            },
+        ],
+        "_rule_logical_key": "battle_rule_v1:cremate-fixture",
+    }
+    try:
+        result = validator.run_single_target_removal_and_draw(
+            battle,
+            {
+                "name": "Cremate exiles one graveyard card and draws 1",
+                "type": "single_target_removal_and_draw",
+                "card": {"name": "Cremate", "type_line": "Instant"},
+                "target_zone": "graveyard",
+                "target": {
+                    "name": "E2E Legal Graveyard Target",
+                    "type_line": "Instant",
+                    "effect": "draw_cards",
+                    "cmc": 2,
+                },
+                "nonmatching_target": {
+                    "name": "E2E Battlefield Non-Target",
+                    "type_line": "Creature - Soldier",
+                    "effect": "creature",
+                    "cmc": 2,
+                    "power": 2,
+                    "toughness": 2,
+                },
+                "expected_destination": "exile",
+                "expected_draw_count": 1,
+                "controller_library": [
+                    {"name": "E2E Draw Card", "type_line": "Instant", "effect": "draw_cards"},
+                    {"name": "E2E Remaining Card", "type_line": "Sorcery", "effect": "draw_cards"},
+                ],
+                "logical_rule_key": "battle_rule_v1:cremate-fixture",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Cremate"
+    assert result["destination"] == "exile"
+    assert result["cards_drawn"] == 1
+    assert result["target"] == "E2E Legal Graveyard Target"
+    assert result["nonmatching_target"] == "E2E Battlefield Non-Target"
+
+
 def test_single_target_removal_runner_respects_self_controller_scope() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

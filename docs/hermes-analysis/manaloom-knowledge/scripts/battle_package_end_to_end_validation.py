@@ -3276,7 +3276,12 @@ def run_single_target_removal_and_draw(
             "cmc": 0,
         }
     )
-    opponent.battlefield = [nonmatching, target]
+    target_zone = str(scenario.get("target_zone") or "battlefield").lower()
+    if target_zone == "graveyard":
+        opponent.battlefield = [nonmatching]
+        opponent.graveyard = [target]
+    else:
+        opponent.battlefield = [nonmatching, target]
     before_events = len(events)
     library_before = len(active.library)
 
@@ -3299,8 +3304,11 @@ def run_single_target_removal_and_draw(
     destination_zone = getattr(opponent, destination_zone_name)
     moved_names = [str(item.get("name") or "") for item in destination_zone if isinstance(item, dict)]
     battlefield_names = [str(item.get("name") or "") for item in opponent.battlefield if isinstance(item, dict)]
+    graveyard_names = [str(item.get("name") or "") for item in opponent.graveyard if isinstance(item, dict)]
     if target_name not in moved_names:
         fail("battle_execution", f"{card['name']} did not move legal target {target_name} to {destination}")
+    if target_zone == "graveyard" and target_name in graveyard_names:
+        fail("battle_execution", f"{card['name']} left graveyard target {target_name} in graveyard")
     if nonmatching_name not in battlefield_names:
         fail("battle_execution", f"{card['name']} removed illegal target {nonmatching_name}")
 
@@ -3313,20 +3321,36 @@ def run_single_target_removal_and_draw(
             f"{card['name']} library={len(active.library)}, expected {library_before - expected_draw_count}",
         )
 
-    removal_event = next(
-        (
-            data
-            for event, data in events[before_events:]
-            if event == "removal_resolved"
-            and data.get("card") == card.get("name")
-            and data.get("target") == target_name
-        ),
-        None,
-    )
-    if removal_event is None:
-        fail("battle_events", f"missing {card['name']} removal_resolved event for {target_name}")
-    if str(removal_event.get("destination") or "").lower() != destination:
-        fail("battle_events", f"{card['name']} destination={removal_event.get('destination')!r}")
+    if target_zone == "graveyard":
+        graveyard_exile_event = next(
+            (
+                data
+                for event, data in events[before_events:]
+                if event == "graveyard_exile_resolved"
+                and data.get("card") == card.get("name")
+                and target_name in [str(name or "") for name in data.get("exiled") or []]
+            ),
+            None,
+        )
+        if graveyard_exile_event is None:
+            fail("battle_events", f"missing {card['name']} graveyard_exile_resolved event for {target_name}")
+        if str(graveyard_exile_event.get("destination") or "").lower() != destination:
+            fail("battle_events", f"{card['name']} destination={graveyard_exile_event.get('destination')!r}")
+    else:
+        removal_event = next(
+            (
+                data
+                for event, data in events[before_events:]
+                if event == "removal_resolved"
+                and data.get("card") == card.get("name")
+                and data.get("target") == target_name
+            ),
+            None,
+        )
+        if removal_event is None:
+            fail("battle_events", f"missing {card['name']} removal_resolved event for {target_name}")
+        if str(removal_event.get("destination") or "").lower() != destination:
+            fail("battle_events", f"{card['name']} destination={removal_event.get('destination')!r}")
 
     draw_component_event = next(
         (

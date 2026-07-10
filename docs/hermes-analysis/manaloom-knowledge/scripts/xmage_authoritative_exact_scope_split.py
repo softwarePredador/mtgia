@@ -3135,7 +3135,10 @@ def fixed_exile_draw_from_oracle(metadata: dict[str, Any]) -> tuple[str, str, in
     simple_metadata["oracle_text"] = f"{match.group(1)}."
     parsed = exile_target_from_oracle(simple_metadata)
     if parsed is None:
-        return None
+        graveyard_parsed = graveyard_exile_from_oracle(simple_metadata)
+        if isinstance(graveyard_parsed, str):
+            return None
+        return "graveyard_exile", str(graveyard_parsed["target"]), 1
     effect, target = parsed
     return effect, target, 1
 
@@ -32487,18 +32490,69 @@ def split_row(
             effect, target_type, draw_count = oracle_exile
             if source_draw_count != draw_count:
                 return None, "exile_draw_source_oracle_mismatch"
-            if not source_matches_target_constraint(source_text, target_type):
-                return None, "exile_draw_target_source_mismatch"
-            target_base = restricted_target_base(target_type)
-            exile_component = {
-                "effect": effect,
-                "battle_model_scope": EXILE_SCOPE,
-                "target": target_base,
-                "target_constraints": target_constraints_for(target_type),
-                "destination": "exile",
-                "compose_on_resolution": True,
-                "xmage_effect_class": "ExileTargetEffect",
-            }
+            if effect == "graveyard_exile":
+                simple_metadata = dict(metadata)
+                simple_metadata["oracle_text"] = re.sub(
+                    r"\.\s*(?:then\s+)?draw a card\.?$",
+                    ".",
+                    oracle_text(metadata),
+                )
+                oracle_target = graveyard_exile_from_oracle(simple_metadata)
+                if isinstance(oracle_target, str):
+                    return None, oracle_target
+                source_target = graveyard_exile_from_source(source_text)
+                if isinstance(source_target, str):
+                    return None, source_target
+                for key in (
+                    "target",
+                    "count",
+                    "target_controller",
+                    "single_graveyard",
+                    "up_to_count",
+                    "target_count_from_x",
+                ):
+                    if source_target.get(key) != oracle_target.get(key):
+                        return None, f"exile_draw_source_oracle_{key}_mismatch"
+                target_base = str(oracle_target["target"])
+                target_constraints = graveyard_exile_target_constraints_for(
+                    target_base,
+                    controller=str(oracle_target["target_controller"]),
+                )
+                exile_component = {
+                    "effect": "graveyard_exile",
+                    "battle_model_scope": GRAVEYARD_EXILE_SPELL_SCOPE,
+                    "target": target_base,
+                    "target_constraints": target_constraints,
+                    "count": int(oracle_target["count"]),
+                    "destination": "exile",
+                    "target_controller": str(oracle_target["target_controller"]),
+                    "graveyard_exile_target": target_base,
+                    "graveyard_exile_target_count": int(oracle_target["count"]),
+                    "graveyard_exile_destination": "exile",
+                    "graveyard_exile_single_graveyard": bool(oracle_target["single_graveyard"]),
+                    "compose_on_resolution": True,
+                    "xmage_effect_class": "ExileTargetEffect",
+                }
+                if oracle_target["up_to_count"]:
+                    exile_component["up_to_count"] = True
+                    exile_component["graveyard_exile_up_to_count"] = True
+                if oracle_target["target_count_from_x"]:
+                    exile_component["target_count_from_x"] = True
+                    exile_component["graveyard_exile_target_count_from_x"] = True
+            else:
+                if not source_matches_target_constraint(source_text, target_type):
+                    return None, "exile_draw_target_source_mismatch"
+                target_base = restricted_target_base(target_type)
+                target_constraints = target_constraints_for(target_type)
+                exile_component = {
+                    "effect": effect,
+                    "battle_model_scope": EXILE_SCOPE,
+                    "target": target_base,
+                    "target_constraints": target_constraints,
+                    "destination": "exile",
+                    "compose_on_resolution": True,
+                    "xmage_effect_class": "ExileTargetEffect",
+                }
             draw_component = {
                 "effect": "draw_cards",
                 "battle_model_scope": DRAW_SCOPE,
@@ -32510,7 +32564,7 @@ def split_row(
                 "effect": "composite_resolution",
                 "battle_model_scope": EXILE_DRAW_SCOPE,
                 "target": target_base,
-                "target_constraints": target_constraints_for(target_type),
+                "target_constraints": target_constraints,
                 "destination": "exile",
                 "draw_count": draw_count,
                 "count": draw_count,

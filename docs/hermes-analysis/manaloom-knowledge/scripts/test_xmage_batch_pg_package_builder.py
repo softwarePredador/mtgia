@@ -3022,6 +3022,53 @@ def test_manifest_builds_single_target_exile_draw_execution_scenario() -> None:
     assert scenario["nonmatching_target"].get("attacking") is not True
 
 
+def test_manifest_builds_graveyard_exile_draw_execution_scenario() -> None:
+    rule = {
+        "normalized_name": "cremate",
+        "card_name": "Cremate",
+        "oracle_hash": "hash-cremate",
+        "logical_rule_key": "battle_rule_v1:hash-cremate",
+        "required_effect_fields": {
+            "effect": "composite_resolution",
+            "battle_model_scope": "xmage_exile_target_and_draw_card_spell_v1",
+            "target": "any_card",
+            "target_constraints": {"zone": "graveyard", "controller": "any", "card_types": ["card"]},
+            "destination": "exile",
+            "draw_count": 1,
+            "_composite_rule_components": [
+                {
+                    "effect": "graveyard_exile",
+                    "battle_model_scope": "xmage_exile_target_graveyard_card_spell_v1",
+                    "target": "any_card",
+                    "target_constraints": {"zone": "graveyard", "controller": "any", "card_types": ["card"]},
+                    "count": 1,
+                    "destination": "exile",
+                    "target_controller": "any",
+                    "graveyard_exile_target": "any_card",
+                    "graveyard_exile_target_count": 1,
+                    "graveyard_exile_destination": "exile",
+                    "graveyard_exile_single_graveyard": False,
+                },
+                {
+                    "effect": "draw_cards",
+                    "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+                    "count": 1,
+                },
+            ],
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "single_target_removal_and_draw"
+    assert scenario["target_zone"] == "graveyard"
+    assert scenario["expected_effect"] == "graveyard_exile"
+    assert scenario["expected_destination"] == "exile"
+    assert scenario["expected_draw_count"] == 1
+    assert scenario["target"]["type_line"] == "Instant"
+
+
 def test_single_target_bounce_scenario_moves_target_to_hand() -> None:
     rule = {
         "normalized_name": "cut the earthly bond",

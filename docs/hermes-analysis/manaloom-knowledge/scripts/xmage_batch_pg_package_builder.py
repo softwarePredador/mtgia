@@ -5793,14 +5793,23 @@ def single_target_removal_and_draw_execution_scenario_from_expected_rule(
         ),
         None,
     )
+    graveyard_exile_component = next(
+        (
+            component
+            for component in components
+            if component.get("effect") == "graveyard_exile"
+        ),
+        None,
+    )
     draw_component = next(
         (component for component in components if component.get("effect") == "draw_cards"),
         None,
     )
-    if removal_component is None or draw_component is None:
+    target_component = removal_component or graveyard_exile_component
+    if target_component is None or draw_component is None:
         return None
-    constraints = dict(required.get("target_constraints") or removal_component.get("target_constraints") or {})
-    destination = str(required.get("destination") or removal_component.get("destination") or "graveyard").lower()
+    constraints = dict(required.get("target_constraints") or target_component.get("target_constraints") or {})
+    destination = str(required.get("destination") or target_component.get("destination") or "graveyard").lower()
     draw_count = int(
         required.get("draw_count")
         or draw_component.get("draw_count")
@@ -5809,6 +5818,29 @@ def single_target_removal_and_draw_execution_scenario_from_expected_rule(
     )
     if draw_count <= 0:
         return None
+    target_zone = "graveyard" if graveyard_exile_component is not None else "battlefield"
+    if target_zone == "graveyard":
+        target = {
+            "name": "E2E Legal Graveyard Target",
+            "type_line": "Instant",
+            "effect": "draw_cards",
+            "cmc": 2,
+        }
+        nonmatching = {
+            "name": "E2E Battlefield Non-Target",
+            "type_line": "Creature - Soldier",
+            "effect": "creature",
+            "cmc": 2,
+            "power": 2,
+            "toughness": 2,
+        }
+    else:
+        target = _target_fixture_from_constraints("E2E Legal Removal Target", constraints, matching=True)
+        nonmatching = _target_fixture_from_constraints(
+            "E2E Illegal Removal Target",
+            constraints,
+            matching=False,
+        )
     return {
         "name": f"{rule['card_name']} removes one legal target and draws {draw_count}",
         "type": "single_target_removal_and_draw",
@@ -5816,14 +5848,12 @@ def single_target_removal_and_draw_execution_scenario_from_expected_rule(
             "name": rule["card_name"],
             "type_line": "Sorcery" if required.get("sorcery") is True else "Instant",
         },
-        "target": _target_fixture_from_constraints("E2E Legal Removal Target", constraints, matching=True),
-        "nonmatching_target": _target_fixture_from_constraints(
-            "E2E Illegal Removal Target",
-            constraints,
-            matching=False,
-        ),
+        "target": target,
+        "nonmatching_target": nonmatching,
+        "target_zone": target_zone,
+        "target_owner": "opponent",
         "expected_destination": destination,
-        "expected_effect": removal_component.get("effect"),
+        "expected_effect": target_component.get("effect"),
         "expected_target_constraints": constraints,
         "expected_draw_count": draw_count,
         "controller_library": [

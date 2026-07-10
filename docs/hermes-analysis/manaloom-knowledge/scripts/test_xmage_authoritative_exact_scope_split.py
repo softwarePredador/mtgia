@@ -14651,7 +14651,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             ["remove_creature", "draw_cards"],
         )
 
-    def test_exile_target_draw_spell_keeps_graveyard_target_blocked(self) -> None:
+    def test_exile_target_draw_spell_maps_graveyard_target(self) -> None:
         row = queue_row(
             split.DRAW_UNIT,
             effect_classes=["ExileTargetEffect", "DrawCardSourceControllerEffect"],
@@ -14669,8 +14669,20 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             ),
         )
 
-        self.assertIsNone(proposal)
-        self.assertEqual(reason, "exile_draw_oracle_not_exact_fixed")
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "composite_resolution")
+        self.assertEqual(effect["battle_model_scope"], split.EXILE_DRAW_SCOPE)
+        self.assertEqual(effect["target"], "any_card")
+        self.assertEqual(effect["target_constraints"], {"zone": "graveyard", "controller": "any", "card_types": ["card"]})
+        self.assertEqual(effect["destination"], "exile")
+        self.assertEqual(effect["draw_count"], 1)
+        self.assertEqual(
+            [component["effect"] for component in effect["_composite_rule_components"]],
+            ["graveyard_exile", "draw_cards"],
+        )
+        self.assertEqual(effect["_composite_rule_components"][0]["battle_model_scope"], split.GRAVEYARD_EXILE_SPELL_SCOPE)
+        self.assertEqual(effect["_composite_rule_components"][0]["graveyard_exile_target"], "any_card")
 
     def test_exile_target_spell_maps_restricted_single_targets(self) -> None:
         cases = [
