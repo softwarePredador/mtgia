@@ -4903,6 +4903,8 @@ def choose_add_counters_targets(player, opponents, card, effect_data):
             ordered = sorted(candidates, key=lambda item: target_priority(item[1]))
             return ordered[:max_targets], [target for _owner, target in candidates]
         preferred = [(owner, target) for owner, target in candidates if owner is not player]
+        if not preferred and (up_to_count or (effect_data or {}).get("optional")):
+            return [], [target for _owner, target in candidates]
     else:
         if forced_opponent:
             preferred = candidates
@@ -21309,6 +21311,65 @@ def resolve_permanent_dies_add_mana(owner, permanent, *, destination=None, reaso
     return produced
 
 
+def resolve_permanent_dies_add_counters(
+    owner,
+    permanent,
+    *,
+    destination=None,
+    reason=None,
+    source=None,
+    opponents=None,
+    all_players=None,
+):
+    if destination != "graveyard" or not isinstance(permanent, dict):
+        return None
+    if not permanent.get("dies_add_counters"):
+        return None
+    participants = list(all_players or [])
+    if not participants:
+        participants = [owner] + list(opponents or [])
+    resolved_opponents = [
+        player
+        for player in (opponents or [participant for participant in participants if participant is not owner])
+        if player is not None
+    ]
+    effect_data = {
+        **permanent,
+        "effect": "add_counters",
+        "ability_kind": "triggered",
+        "trigger": "dies",
+        "trigger_effect": "add_counters",
+        "target": permanent.get("dies_add_counters_target") or permanent.get("target") or "creature",
+        "target_constraints": permanent.get("target_constraints") or {"card_types": ["creature"]},
+        "target_controller": permanent.get("target_controller") or "any",
+        "counter_type": (
+            permanent.get("dies_add_counters_counter_type")
+            or permanent.get("counter_type")
+            or "+1/+1"
+        ),
+        "counter_count": int(
+            permanent.get("dies_add_counters_count")
+            or permanent.get("counter_count")
+            or permanent.get("count")
+            or 1
+        ),
+        "optional": bool(permanent.get("optional") or permanent.get("dies_add_counters_optional")),
+        "reason": reason,
+        "source": source.get("name", "?") if isinstance(source, dict) else source,
+    }
+    return resolve_add_counters_target_effect(
+        owner,
+        resolved_opponents,
+        permanent,
+        effect_data,
+        CURRENT_REPLAY_TURN,
+        finish_spell=False,
+        event_name="dies_add_counters_resolved",
+        trigger="dies",
+        phase="dies_trigger",
+    )
+
+
 def resolve_permanent_dies_damage(
     owner,
     permanent,
@@ -21746,6 +21807,14 @@ def move_creature_from_battlefield(owner, creature, reason=None, source=None, al
         reason=reason,
         source=source,
     )
+    resolve_permanent_dies_add_counters(
+        owner,
+        creature,
+        destination=destination,
+        reason=reason,
+        source=source,
+        all_players=all_players,
+    )
     resolve_permanent_dies_damage(
         owner,
         creature,
@@ -21867,6 +21936,14 @@ def move_permanent_from_battlefield(owner, permanent, reason=None, source=None, 
         destination=destination,
         reason=reason,
         source=source,
+    )
+    resolve_permanent_dies_add_counters(
+        owner,
+        permanent,
+        destination=destination,
+        reason=reason,
+        source=source,
+        all_players=all_players,
     )
     resolve_permanent_dies_damage(
         owner,

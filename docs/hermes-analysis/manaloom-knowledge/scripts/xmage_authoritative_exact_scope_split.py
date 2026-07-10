@@ -381,6 +381,7 @@ ADD_COUNTERS_UNTAP_TARGET_SCOPE = "xmage_fixed_add_counters_and_untap_target_cre
 ADD_COUNTERS_UNTAP_TARGET_CREATURES_SCOPE = (
     "xmage_fixed_add_counters_and_untap_target_creatures_spell_v1"
 )
+DIES_ADD_COUNTERS_CREATURE_SCOPE = "xmage_creature_dies_add_counters_target_creature_v1"
 PERMANENT_ACTIVATED_SELF_ADD_COUNTERS_SCOPE = (
     "xmage_permanent_simple_activated_self_add_counters_v1"
 )
@@ -7810,7 +7811,7 @@ def etb_counter_target_spec(
         "target_controller": target_controller,
         "target_constraints": constraints,
     }
-    if target_count_max > 1:
+    if target_count_max > 1 or up_to_count:
         spec["target_count_min"] = 0 if up_to_count else target_count_max
         spec["target_count_max"] = int(target_count_max)
     if up_to_count:
@@ -7985,6 +7986,69 @@ def etb_counter_target_spec_from_oracle(metadata: dict[str, Any]) -> dict[str, A
         required_subtypes=required_subtypes,
         excluded_keywords=excluded_keywords,
     )
+
+
+def dies_counter_target_spec_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
+    text = strip_leading_parenthetical_reminders(
+        re.sub(r"\s+", " ", oracle_text_after_leading_static_keywords(metadata)).strip()
+    )
+    match = re.match(
+        r"^(?:when|whenever) (?:this creature|.+?) dies, (?P<may>you may )?put "
+        r"(?P<count>a|an|one|two|three|four|five|six|seven|eight|nine|ten|\d+) "
+        r"(?P<counter>\+1/\+1|-1/-1) counters? on (?P<phrase>.+?)\.?$",
+        text,
+    )
+    if not match:
+        return None
+    count = counter_count_from_text(match.group("count"))
+    if count is None or count <= 0:
+        return None
+    phrase = str(match.group("phrase") or "").strip().lower()
+    up_to = phrase.startswith("up to one target ")
+    if up_to:
+        phrase = phrase.removeprefix("up to one target ").strip()
+    else:
+        for prefix in ("target ",):
+            if phrase.startswith(prefix):
+                phrase = phrase[len(prefix) :].strip()
+                break
+    target_controller = "self" if phrase.endswith(" you control") else "any"
+    if target_controller == "self":
+        phrase = phrase.removesuffix(" you control").strip()
+    if phrase in {"creature", "creatures"}:
+        required_subtypes: list[str] = []
+    else:
+        subtype_match = re.fullmatch(r"([a-z][a-z '\\-]+?)s?", phrase)
+        if not subtype_match:
+            return None
+        required_subtypes = [subtype_match.group(1).strip()]
+    spec = etb_counter_target_spec(
+        counter_type=match.group("counter"),
+        counter_count=count,
+        target_controller=target_controller,
+        target_count_max=1,
+        up_to_count=up_to,
+        required_subtypes=required_subtypes,
+    )
+    if match.group("may"):
+        spec["optional"] = True
+        spec["dies_add_counters_optional"] = True
+    return spec
+
+
+def dies_counter_target_spec_from_source(source: str) -> dict[str, Any] | str:
+    spec = etb_counter_target_spec_from_source(source)
+    if spec is None:
+        return "dies_add_counters_source_counter_or_target_not_fixed"
+    trigger_args = extract_java_call_args(source or "", "DiesSourceTriggeredAbility")
+    optional = False
+    if trigger_args:
+        trigger_parts = split_java_args(trigger_args)
+        optional = bool(trigger_parts and trigger_parts[-1].strip() == "true")
+    if optional:
+        spec["optional"] = True
+        spec["dies_add_counters_optional"] = True
+    return spec
 
 
 def fixed_boost_target_spec_from_source(source: str) -> dict[str, Any] | None:
@@ -11947,6 +12011,19 @@ def is_creature_etb_add_counters_unit(row: dict[str, Any]) -> bool:
     return (
         effect_classes(row) == {"AddCountersTargetEffect"}
         and "EntersBattlefieldTriggeredAbility" in abilities
+        and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
+        and set(row.get("xmage_signals") or []) == {"targeting", "counter", "triggered_ability"}
+    )
+
+
+def is_creature_dies_add_counters_unit(row: dict[str, Any]) -> bool:
+    if str(row.get("adapter_work_unit") or "") != ADD_COUNTERS_TARGET_UNIT:
+        return False
+    abilities = ability_classes(row)
+    remaining = abilities - {"DiesSourceTriggeredAbility"}
+    return (
+        effect_classes(row) == {"AddCountersTargetEffect"}
+        and "DiesSourceTriggeredAbility" in abilities
         and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
         and set(row.get("xmage_signals") or []) == {"targeting", "counter", "triggered_ability"}
     )
@@ -24950,6 +25027,7 @@ def split_row(
     dies_token_creature_unit = is_creature_dies_token_unit(row)
     permanent_activated_token_unit = is_permanent_activated_token_unit(row)
     etb_add_counters_creature_unit = is_creature_etb_add_counters_unit(row)
+    dies_add_counters_creature_unit = is_creature_dies_add_counters_unit(row)
     permanent_activated_self_add_counters_unit = (
         is_permanent_activated_self_add_counters_unit(row)
     )
@@ -25107,6 +25185,7 @@ def split_row(
         and not dies_token_creature_unit
         and not permanent_activated_token_unit
         and not etb_add_counters_creature_unit
+        and not dies_add_counters_creature_unit
         and not permanent_activated_self_add_counters_unit
         and not permanent_activated_target_add_counters_unit
         and not creature_tap_damage_unit
@@ -25212,6 +25291,7 @@ def split_row(
         and not dies_token_creature_unit
         and not permanent_activated_token_unit
         and not etb_add_counters_creature_unit
+        and not dies_add_counters_creature_unit
         and not permanent_activated_self_add_counters_unit
         and not permanent_activated_target_add_counters_unit
         and not creature_tap_damage_unit
@@ -28612,6 +28692,59 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_creature_etb_add_counters_target_creature",
+        ), "selected_exact_scope"
+
+    if dies_add_counters_creature_unit:
+        if not is_creature_metadata(metadata):
+            return None, "dies_add_counters_not_creature"
+        source_counter = dies_counter_target_spec_from_source(source_text)
+        if isinstance(source_counter, str):
+            return None, source_counter
+        oracle_counter = dies_counter_target_spec_from_oracle(metadata)
+        if oracle_counter is None:
+            return None, "dies_add_counters_target_not_supported"
+        if source_counter != oracle_counter:
+            return None, "dies_add_counters_source_oracle_mismatch"
+        counter_type = str(oracle_counter["counter_type"])
+        count = int(oracle_counter["counter_count"])
+        keyword_list = ordered_keywords(keywords_from_ability_classes(row))
+        effect_json = {
+            "effect": "creature",
+            "battle_model_scope": DIES_ADD_COUNTERS_CREATURE_SCOPE,
+            "ability_kind": "triggered",
+            "trigger": "dies",
+            "trigger_effect": "add_counters",
+            "dies_add_counters": True,
+            "dies_add_counters_target": oracle_counter["target"],
+            "dies_add_counters_counter_type": counter_type,
+            "dies_add_counters_count": count,
+            "target": oracle_counter["target"],
+            "target_constraints": oracle_counter["target_constraints"],
+            "target_controller": oracle_counter["target_controller"],
+            "counter_type": counter_type,
+            "counter_count": count,
+            "count": count,
+            "xmage_effect_class": "AddCountersTargetEffect",
+            "xmage_ability_class": "DiesSourceTriggeredAbility",
+            **flags,
+        }
+        if oracle_counter.get("target_count_min") is not None:
+            effect_json["target_count_min"] = int(oracle_counter["target_count_min"])
+        if oracle_counter.get("target_count_max") is not None:
+            effect_json["target_count_max"] = int(oracle_counter["target_count_max"])
+        if oracle_counter.get("up_to_count"):
+            effect_json["up_to_count"] = True
+        if oracle_counter.get("optional"):
+            effect_json["optional"] = True
+            effect_json["dies_add_counters_optional"] = True
+        if keyword_list:
+            effect_json["keywords"] = keyword_list
+            effect_json["_keywords_are_self"] = True
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_creature_dies_add_counters_target_creature",
         ), "selected_exact_scope"
 
     if permanent_activated_self_add_counters_unit:

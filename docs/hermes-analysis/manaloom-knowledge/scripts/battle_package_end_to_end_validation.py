@@ -2436,6 +2436,124 @@ def run_creature_dies_create_treasure(
     }
 
 
+def run_creature_dies_add_counters(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    active = battle.Player(str(scenario.get("player") or "Dies Counter Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Dies Counter Opponent"), None, [])
+    effect_data = battle.get_card_effect(card)
+    permanent = battle.enrich_card({**card, "type_line": "Creature", **effect_data})
+    active.battlefield.append(permanent)
+
+    expected_keywords = [str(value) for value in (scenario.get("expected_keywords") or [])]
+    missing_keywords = [
+        keyword
+        for keyword in expected_keywords
+        if not battle.card_has_keyword(permanent, keyword)
+    ]
+    if missing_keywords:
+        fail(
+            "battle_execution",
+            f"{card['name']} missing expected permanent keywords: {missing_keywords}",
+        )
+
+    target_fixture = dict(scenario.get("target") or {})
+    target = battle.enrich_card(
+        {
+            "name": str(target_fixture.get("name") or f"E2E Dies Counter Target for {card['name']}"),
+            "type_line": "Creature - Soldier",
+            "effect": "creature",
+            "power": int(scenario.get("target_power") or 3),
+            "toughness": int(scenario.get("target_toughness") or 3),
+            "cmc": int(scenario.get("target_cmc") or 3),
+            "tapped": False,
+            **target_fixture,
+        }
+    )
+    nonmatching_fixture = scenario.get("nonmatching_target")
+    if nonmatching_fixture:
+        active.battlefield.append(battle.enrich_card(dict(nonmatching_fixture)))
+
+    expected_counter_type = str(
+        scenario.get("expected_counter_type")
+        or effect_data.get("dies_add_counters_counter_type")
+        or effect_data.get("counter_type")
+        or "+1/+1"
+    )
+    expected_counter_count = int(
+        scenario.get("expected_counter_count")
+        or effect_data.get("dies_add_counters_count")
+        or effect_data.get("counter_count")
+        or 1
+    )
+    target_owner_label = str(scenario.get("target_owner") or "").lower()
+    if target_owner_label == "opponent":
+        opponent.battlefield.append(target)
+        target_owner = opponent
+    else:
+        active.battlefield.append(target)
+        target_owner = active
+
+    before = _counter_value(battle, target, expected_counter_type)
+    before_events = len(events)
+    destination = battle.move_creature_from_battlefield(
+        active,
+        permanent,
+        reason=str(scenario.get("reason") or "package_e2e_destroy"),
+        source=dict(scenario.get("source") or {"name": "Package E2E Removal"}),
+        all_players=[active, opponent],
+    )
+    if destination != "graveyard":
+        fail("battle_execution", f"{card['name']} destination={destination!r}")
+    if permanent not in active.graveyard:
+        fail("battle_execution", f"{card['name']} not moved to controller graveyard")
+
+    after = _counter_value(battle, target, expected_counter_type)
+    if after - before != expected_counter_count:
+        fail(
+            "battle_execution",
+            f"{card['name']} expected {expected_counter_count} {expected_counter_type} counters on {target.get('name')}, got {after - before}",
+        )
+
+    resolved_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "dies_add_counters_resolved"
+            and data.get("card") == card.get("name")
+            and data.get("target") == target.get("name")
+        ),
+        None,
+    )
+    if resolved_event is None:
+        fail("battle_events", f"missing {card['name']} dies_add_counters_resolved event")
+    if int(resolved_event.get("counters_added") or 0) != expected_counter_count:
+        fail(
+            "battle_events",
+            f"{card['name']} event counters_added={resolved_event.get('counters_added')}, expected {expected_counter_count}",
+        )
+    if str(resolved_event.get("counter_type") or "") != expected_counter_type:
+        fail(
+            "battle_events",
+            f"{card['name']} event counter_type={resolved_event.get('counter_type')!r}, expected {expected_counter_type!r}",
+        )
+    if resolved_event.get("trigger") != "dies" or resolved_event.get("effect") != "add_counters":
+        fail("battle_events", f"{card['name']} event trigger/effect mismatch")
+
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "target": target.get("name"),
+        "target_owner": target_owner.name,
+        "counter_type": expected_counter_type,
+        "counters_added": after - before,
+        "validated_keywords": expected_keywords,
+    }
+
+
 def run_tempting_offer_decline(battle, scenario: dict[str, Any], events: list[tuple[str, dict[str, Any]]]) -> dict[str, Any]:
     card = scenario["card"]
     active = battle.Player(
@@ -9469,6 +9587,7 @@ SCENARIO_RUNNERS = {
     "copy_spell_choose_new_targets": run_copy_spell_choose_new_targets,
     "change_single_target_response": run_change_single_target_response,
     "creature_dies_create_treasure": run_creature_dies_create_treasure,
+    "creature_dies_add_counters": run_creature_dies_add_counters,
     "creature_dies_create_tokens": run_creature_dies_create_tokens,
     "creature_dies_each_player_sacrifice": run_creature_dies_each_player_sacrifice,
     "creature_etb_fixed_mana": run_creature_etb_fixed_mana,

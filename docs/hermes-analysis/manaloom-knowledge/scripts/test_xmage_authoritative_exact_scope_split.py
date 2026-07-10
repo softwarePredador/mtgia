@@ -21830,6 +21830,109 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "etb_add_counters_source_oracle_mismatch")
 
+    def test_creature_dies_minus_one_counter_up_to_target_maps_to_dies_scope(self) -> None:
+        row = queue_row(
+            split.ADD_COUNTERS_TARGET_UNIT,
+            effect_classes=["AddCountersTargetEffect"],
+            ability_kind="triggered",
+            ability_classes=["DiesSourceTriggeredAbility"],
+            xmage_signals=["targeting", "counter", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Bile-Vial Boggart",
+                type_line="Creature - Goblin",
+                oracle_text="When this creature dies, put a -1/-1 counter on up to one target creature.",
+            ),
+            source_text=(
+                "Ability ability = new DiesSourceTriggeredAbility("
+                "new AddCountersTargetEffect(CounterType.M1M1.createInstance()), false);"
+                "ability.addTarget(new TargetCreaturePermanent(0, 1));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DIES_ADD_COUNTERS_CREATURE_SCOPE)
+        self.assertTrue(effect["dies_add_counters"])
+        self.assertEqual(effect["dies_add_counters_target"], "creature")
+        self.assertEqual(effect["dies_add_counters_counter_type"], "-1/-1")
+        self.assertEqual(effect["dies_add_counters_count"], 1)
+        self.assertEqual(effect["target_controller"], "any")
+        self.assertEqual(effect["target_count_min"], 0)
+        self.assertEqual(effect["target_count_max"], 1)
+        self.assertTrue(effect["up_to_count"])
+
+    def test_creature_dies_counter_target_controlled_subtype_maps_constraints(self) -> None:
+        row = queue_row(
+            split.ADD_COUNTERS_TARGET_UNIT,
+            effect_classes=["AddCountersTargetEffect"],
+            ability_kind="triggered",
+            ability_classes=["DiesSourceTriggeredAbility", "FirstStrikeAbility"],
+            xmage_signals=["targeting", "counter", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Venerable Knight",
+                type_line="Creature - Human Knight",
+                oracle_text=(
+                    "First strike\n"
+                    "When Venerable Knight dies, put a +1/+1 counter on target Knight you control."
+                ),
+            ),
+            source_text=(
+                "this.addAbility(FirstStrikeAbility.getInstance());"
+                "private static final FilterPermanent filter = "
+                "new FilterControlledPermanent(SubType.KNIGHT, \"target Knight you control\");"
+                "Ability ability = new DiesSourceTriggeredAbility("
+                "new AddCountersTargetEffect(CounterType.P1P1.createInstance()), false);"
+                "ability.addTarget(new TargetPermanent(filter));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DIES_ADD_COUNTERS_CREATURE_SCOPE)
+        self.assertEqual(effect["target_controller"], "self")
+        self.assertEqual(
+            effect["target_constraints"],
+            {
+                "card_types": ["creature"],
+                "controller_scope": "self",
+                "required_subtypes": ["knight"],
+            },
+        )
+        self.assertEqual(effect["keywords"], ["first_strike"])
+
+    def test_creature_dies_shield_counter_target_stays_blocked(self) -> None:
+        row = queue_row(
+            split.ADD_COUNTERS_TARGET_UNIT,
+            effect_classes=["AddCountersTargetEffect"],
+            ability_kind="triggered",
+            ability_classes=["DiesSourceTriggeredAbility"],
+            xmage_signals=["targeting", "counter", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Brokers Veteran",
+                type_line="Creature - Human Soldier",
+                oracle_text=(
+                    "When Brokers Veteran dies, put a shield counter on target creature you control."
+                ),
+            ),
+            source_text=(
+                "Ability ability = new DiesSourceTriggeredAbility("
+                "new AddCountersTargetEffect(CounterType.SHIELD.createInstance()), false);"
+                "ability.addTarget(new TargetControlledCreaturePermanent());"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "dies_add_counters_source_counter_or_target_not_fixed")
+
     def test_fixed_boost_target_creature_maps_to_stat_modifier_until_eot(self) -> None:
         row = queue_row(split.BOOST_TARGET_UNIT, effect_classes=["BoostTargetEffect"])
         proposal, reason = split.split_row(

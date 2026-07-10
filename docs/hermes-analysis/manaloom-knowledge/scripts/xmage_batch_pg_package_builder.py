@@ -375,6 +375,11 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "dies_mana_produced",
     "dies_produces",
     "dies_produced_mana_symbols",
+    "dies_add_counters",
+    "dies_add_counters_target",
+    "dies_add_counters_counter_type",
+    "dies_add_counters_count",
+    "dies_add_counters_optional",
     "combat_damage_player_draw",
     "combat_damage_draw_count",
     "combat_damage_draw_optional",
@@ -514,6 +519,7 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "trigger_entering_subtypes",
     "trigger_optional",
     "trigger_limit_each_turn",
+    "optional",
     "ability_kind",
     "activated_effect",
     "activated_battle_model_scope",
@@ -1878,6 +1884,56 @@ def creature_dies_create_treasure_execution_scenario_from_expected_rule(
             or required.get("treasure_count")
             or 1
         ),
+        "expected_keywords": list(required.get("keywords") or []),
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
+def creature_dies_add_counters_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_creature_dies_add_counters_target_creature_v1":
+        return None
+    constraints = dict(required.get("target_constraints") or {"card_types": ["creature"]})
+    counter_type = str(required.get("dies_add_counters_counter_type") or required.get("counter_type") or "+1/+1")
+    target_controller = str(required.get("target_controller") or "any")
+    target_owner = "opponent" if counter_type == "-1/-1" and target_controller == "any" else "controller"
+    if target_controller == "opponent":
+        target_owner = "opponent"
+    target = _target_fixture_from_constraints(
+        "E2E Dies Counter Target",
+        constraints,
+        matching=True,
+    )
+    target.setdefault("power", 3)
+    target.setdefault("toughness", 3)
+    nonmatching = _target_fixture_from_constraints(
+        "E2E Illegal Dies Counter Target",
+        constraints,
+        matching=False,
+    )
+    return {
+        "name": f"{rule['card_name']} dies and adds counters to target creature",
+        "type": "creature_dies_add_counters",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": "Creature",
+            "effect": "creature",
+        },
+        "target": target,
+        "target_owner": target_owner,
+        "nonmatching_target": nonmatching,
+        "expected_counter_type": counter_type,
+        "expected_counter_count": int(
+            required.get("dies_add_counters_count")
+            or required.get("counter_count")
+            or required.get("count")
+            or 1
+        ),
+        "expected_target_controller": target_controller,
+        "expected_target_constraints": constraints,
+        "expected_optional": bool(required.get("dies_add_counters_optional") or required.get("optional")),
         "expected_keywords": list(required.get("keywords") or []),
         "logical_rule_key": rule["logical_rule_key"],
     }
@@ -6022,6 +6078,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or creature_etb_fixed_mana_execution_scenario_from_expected_rule(rule)
         or creature_etb_create_treasure_execution_scenario_from_expected_rule(rule)
         or creature_dies_create_treasure_execution_scenario_from_expected_rule(rule)
+        or creature_dies_add_counters_execution_scenario_from_expected_rule(rule)
         or creature_etb_create_tokens_execution_scenario_from_expected_rule(rule)
         or creature_etb_scry_execution_scenario_from_expected_rule(rule)
         or creature_etb_library_pick_execution_scenario_from_expected_rule(rule)

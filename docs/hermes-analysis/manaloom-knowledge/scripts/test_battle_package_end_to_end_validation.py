@@ -3392,6 +3392,69 @@ def test_creature_dies_create_treasure_runner_executes_trigger() -> None:
     assert result["validated_keywords"] == ["defender"]
 
 
+def test_creature_dies_add_counters_runner_executes_minus_counter_trigger() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "creature",
+        "battle_model_scope": "xmage_creature_dies_add_counters_target_creature_v1",
+        "ability_kind": "triggered",
+        "trigger": "dies",
+        "trigger_effect": "add_counters",
+        "dies_add_counters": True,
+        "dies_add_counters_target": "creature",
+        "dies_add_counters_counter_type": "-1/-1",
+        "dies_add_counters_count": 1,
+        "target": "creature",
+        "target_constraints": {"card_types": ["creature"]},
+        "target_controller": "any",
+        "counter_type": "-1/-1",
+        "counter_count": 1,
+        "count": 1,
+        "_rule_logical_key": "battle_rule_v1:bile-vial-boggart",
+    }
+    try:
+        result = validator.run_creature_dies_add_counters(
+            battle,
+            {
+                "name": "Bile-Vial Boggart dies and adds a -1/-1 counter",
+                "type": "creature_dies_add_counters",
+                "card": {"name": "Bile-Vial Boggart", "type_line": "Creature", "effect": "creature"},
+                "target": {
+                    "name": "E2E Dies Counter Target",
+                    "type_line": "Creature - Soldier",
+                    "effect": "creature",
+                    "power": 3,
+                    "toughness": 3,
+                },
+                "target_owner": "opponent",
+                "expected_counter_type": "-1/-1",
+                "expected_counter_count": 1,
+                "logical_rule_key": "battle_rule_v1:bile-vial-boggart",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Bile-Vial Boggart"
+    assert result["target"] == "E2E Dies Counter Target"
+    assert result["counter_type"] == "-1/-1"
+    assert result["counters_added"] == 1
+    assert any(
+        event == "dies_add_counters_resolved"
+        and data.get("card") == "Bile-Vial Boggart"
+        and data.get("target") == "E2E Dies Counter Target"
+        and data.get("counters_added") == 1
+        and data.get("trigger") == "dies"
+        for event, data in events
+    )
+
+
 def test_creature_etb_scry_runner_executes_trigger() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

@@ -4603,6 +4603,43 @@ def test_creature_dies_create_treasure_execution_scenario() -> None:
     }
 
 
+def test_creature_dies_add_counters_execution_scenario() -> None:
+    rule = {
+        "normalized_name": "venerable knight",
+        "card_name": "Venerable Knight",
+        "logical_rule_key": "battle_rule_v1:venerable-knight",
+        "required_effect_fields": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_dies_add_counters_target_creature_v1",
+            "dies_add_counters": True,
+            "dies_add_counters_target": "creature",
+            "dies_add_counters_counter_type": "+1/+1",
+            "dies_add_counters_count": 1,
+            "target": "creature",
+            "target_controller": "self",
+            "target_constraints": {
+                "card_types": ["creature"],
+                "controller_scope": "self",
+                "required_subtypes": ["knight"],
+            },
+            "counter_type": "+1/+1",
+            "counter_count": 1,
+            "keywords": ["first_strike"],
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario["type"] == "creature_dies_add_counters"
+    assert scenario["target_owner"] == "controller"
+    assert scenario["expected_counter_type"] == "+1/+1"
+    assert scenario["expected_counter_count"] == 1
+    assert scenario["expected_target_controller"] == "self"
+    assert scenario["expected_target_constraints"]["required_subtypes"] == ["knight"]
+    assert "Knight" in scenario["target"]["type_line"]
+    assert scenario["expected_keywords"] == ["first_strike"]
+
+
 def test_manifest_checks_from_expected_rule_split_snapshot_and_runtime_fields() -> None:
     rule = {
         "normalized_name": "verge rangers",
