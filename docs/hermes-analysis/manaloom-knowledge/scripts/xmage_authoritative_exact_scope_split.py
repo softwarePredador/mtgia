@@ -832,10 +832,12 @@ TARGET_GRANT_KEYWORD_ABILITY_CLASSES = {
 TARGET_GRANT_KEYWORD_ORACLE_WORDS = {
     "deathtouch": "deathtouch",
     "double strike": "double_strike",
+    "fear": "fear",
     "first strike": "first_strike",
     "flying": "flying",
     "haste": "haste",
     "hexproof": "hexproof",
+    "intimidate": "intimidate",
     "indestructible": "indestructible",
     "lifelink": "lifelink",
     "menace": "menace",
@@ -2469,6 +2471,12 @@ def has_oracle_complexity(metadata: dict[str, Any], tokens: set[str] = SPELL_COM
         if token in text:
             return True
     return False
+
+
+def metadata_without_parenthetical_reminders(metadata: dict[str, Any]) -> dict[str, Any]:
+    updated = dict(metadata)
+    updated["oracle_text"] = strip_parenthetical_reminders(oracle_text(metadata))
+    return updated
 
 
 def has_non_neutral_oracle_complexity(
@@ -8850,6 +8858,22 @@ def fixed_target_keyword_from_oracle(metadata: dict[str, Any]) -> dict[str, Any]
         rf"(?P<target>target .+?) gains (?P<keywords>(?:{keyword_words})(?:,? (?:and |or )?(?:{keyword_words}))*) until end of turn\.?",
         text,
     )
+    if not match:
+        indestructible_match = re.fullmatch(
+            r"(?P<target>target .+?) is indestructible this turn\.?",
+            text,
+        )
+        if indestructible_match:
+            target_phrase = indestructible_match.group("target")
+            if target_phrase.startswith("target "):
+                target_phrase = target_phrase[len("target ") :].strip()
+            target_data = activated_target_keyword_target_phrase_data(target_phrase)
+            if isinstance(target_data, str):
+                return target_data.replace("activated_target_keyword", "target_keyword_spell")
+            return {
+                "keywords": ["indestructible"],
+                **target_data,
+            }
     if not match:
         return "target_keyword_spell_oracle_not_exact"
     if " or " in match.group("keywords"):
@@ -32329,7 +32353,7 @@ def split_row(
             keyword = TARGET_GRANT_KEYWORD_ABILITY_CLASSES.get(ability_class)
             if not keyword:
                 return None, "boost_keyword_draw_ability_not_supported"
-            if has_oracle_complexity(metadata):
+            if has_oracle_complexity(metadata_without_parenthetical_reminders(metadata)):
                 return None, "boost_keyword_draw_oracle_not_simple"
             source_boost = fixed_boost_keyword_draw_target_from_source(source_text, ability_class)
             if source_boost is None:
@@ -36062,7 +36086,7 @@ def split_row(
         abilities = ability_classes(row)
         if not abilities or not abilities.issubset(TARGET_GRANT_KEYWORD_ABILITY_CLASSES):
             return None, "target_keyword_spell_ability_not_supported"
-        if has_oracle_complexity(metadata):
+        if has_oracle_complexity(metadata_without_parenthetical_reminders(metadata)):
             return None, "target_keyword_spell_oracle_not_simple"
         source_keyword = fixed_target_keyword_from_source(source_text, abilities)
         if isinstance(source_keyword, str):
@@ -36104,7 +36128,7 @@ def split_row(
         abilities = ability_classes(row)
         if not abilities or not abilities.issubset(TARGET_GRANT_KEYWORD_ABILITY_CLASSES):
             return None, "boost_keyword_ability_not_supported"
-        if has_oracle_complexity(metadata):
+        if has_oracle_complexity(metadata_without_parenthetical_reminders(metadata)):
             return None, "boost_keyword_oracle_not_simple"
         source_boost = fixed_boost_keyword_target_from_source(source_text, abilities)
         if source_boost is None:

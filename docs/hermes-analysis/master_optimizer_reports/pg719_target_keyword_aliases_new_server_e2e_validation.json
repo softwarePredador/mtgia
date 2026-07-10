@@ -1,0 +1,245 @@
+{
+  "battle_execution": {
+    "event_count": 8,
+    "results": [
+      {
+        "card_name": "Breach",
+        "granted_keywords": [
+          "fear"
+        ],
+        "scenario": "Breach grants target keyword until EOT",
+        "target": "E2E Target Creature",
+        "target_count": 1,
+        "target_power": 4,
+        "target_toughness": 2
+      },
+      {
+        "card_name": "Hooded Kavu",
+        "discarded_count": 0,
+        "granted_keywords": [
+          "fear"
+        ],
+        "life_paid": 0,
+        "scenario": "Hooded Kavu activates self keyword ability",
+        "source_keywords": [
+          "fear"
+        ],
+        "source_tapped": false
+      },
+      {
+        "card_name": "Shriek of Dread",
+        "granted_keywords": [
+          "fear"
+        ],
+        "scenario": "Shriek of Dread grants target keyword until EOT",
+        "target": "E2E Target Creature",
+        "target_count": 1,
+        "target_power": 2,
+        "target_toughness": 2
+      },
+      {
+        "card_name": "Withstand Death",
+        "granted_keywords": [
+          "indestructible"
+        ],
+        "scenario": "Withstand Death grants target keyword until EOT",
+        "target": "E2E Target Creature",
+        "target_count": 1,
+        "target_power": 2,
+        "target_toughness": 2
+      }
+    ],
+    "scenario_count": 4
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-10T20:13:38.809682+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg719_target_keyword_aliases_new_server_package_manifest.json",
+  "package_id": "pg719_target_keyword_aliases_new_server_package_manifest",
+  "snapshot": "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 4
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Breach",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1a80a59bfe60d19ce999c58d8ac0625d",
+          "oracle_hash": "224c0d53fa8be85465b652ca0159f3d3",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_keyword_until_eot_v1",
+          "card_name": "Hooded Kavu",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5f8dd5e86f63f36f1155e92d6949b87b",
+          "oracle_hash": "50d94303fbeddf742c7ad88d483140dd",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Shriek of Dread",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8d46159e8ae2f9b5ee8b04b9f0b2db80",
+          "oracle_hash": "9b96055cb88f677761b150c4b7d5a167",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Withstand Death",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:64b2eb6d72830a72e6188d12589b5e97",
+          "oracle_hash": "7cf7b1aef30648b3a79cba54d4c8f659",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 4
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Breach",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1a80a59bfe60d19ce999c58d8ac0625d",
+          "oracle_hash": "224c0d53fa8be85465b652ca0159f3d3",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_keyword_until_eot_v1",
+          "card_name": "Hooded Kavu",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5f8dd5e86f63f36f1155e92d6949b87b",
+          "oracle_hash": "50d94303fbeddf742c7ad88d483140dd",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Shriek of Dread",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8d46159e8ae2f9b5ee8b04b9f0b2db80",
+          "oracle_hash": "9b96055cb88f677761b150c4b7d5a167",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Withstand Death",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:64b2eb6d72830a72e6188d12589b5e97",
+          "oracle_hash": "7cf7b1aef30648b3a79cba54d4c8f659",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 4
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Breach",
+          "logical_rule_key": "battle_rule_v1:1a80a59bfe60d19ce999c58d8ac0625d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_keyword_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Hooded Kavu",
+          "logical_rule_key": "battle_rule_v1:5f8dd5e86f63f36f1155e92d6949b87b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_keyword_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Shriek of Dread",
+          "logical_rule_key": "battle_rule_v1:8d46159e8ae2f9b5ee8b04b9f0b2db80"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_keyword_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Withstand Death",
+          "logical_rule_key": "battle_rule_v1:64b2eb6d72830a72e6188d12589b5e97"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 4
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Breach",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:1a80a59bfe60d19ce999c58d8ac0625d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Hooded Kavu",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:5f8dd5e86f63f36f1155e92d6949b87b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Shriek of Dread",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:8d46159e8ae2f9b5ee8b04b9f0b2db80"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Withstand Death",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:64b2eb6d72830a72e6188d12589b5e97"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 8,
+        "scenarios": 4
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

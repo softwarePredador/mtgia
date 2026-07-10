@@ -1,0 +1,535 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg719_target_keyword_aliases_new_server_20260710_201249",
+  "deploy_id": "pg719_target_keyword_aliases_new_server",
+  "execution_scenarios": [
+    {
+      "card": {
+        "name": "Breach",
+        "type_line": "Instant"
+      },
+      "expected_keywords": [
+        "fear"
+      ],
+      "expected_power_delta": 2,
+      "expected_target_count": 1,
+      "expected_toughness_delta": 0,
+      "logical_rule_key": "battle_rule_v1:1a80a59bfe60d19ce999c58d8ac0625d",
+      "name": "Breach grants target keyword until EOT",
+      "target": {
+        "name": "E2E Target Creature",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "type": "stat_modifier_until_eot"
+    },
+    {
+      "card": {
+        "name": "Hooded Kavu"
+      },
+      "controller_hand": [],
+      "controller_mana": {
+        "black": 1,
+        "blue": 0,
+        "generic": 0,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_discard_count": 0,
+      "expected_keywords": [
+        "fear"
+      ],
+      "expected_life_paid": 0,
+      "expected_tapped_source": false,
+      "logical_rule_key": "battle_rule_v1:5f8dd5e86f63f36f1155e92d6949b87b",
+      "name": "Hooded Kavu activates self keyword ability",
+      "type": "simple_activated_self_keyword"
+    },
+    {
+      "card": {
+        "name": "Shriek of Dread",
+        "type_line": "Instant"
+      },
+      "expected_keywords": [
+        "fear"
+      ],
+      "expected_power_delta": 0,
+      "expected_target_count": 1,
+      "expected_toughness_delta": 0,
+      "logical_rule_key": "battle_rule_v1:8d46159e8ae2f9b5ee8b04b9f0b2db80",
+      "name": "Shriek of Dread grants target keyword until EOT",
+      "target": {
+        "name": "E2E Target Creature",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "type": "stat_modifier_until_eot"
+    },
+    {
+      "card": {
+        "name": "Withstand Death",
+        "type_line": "Instant"
+      },
+      "expected_keywords": [
+        "indestructible"
+      ],
+      "expected_power_delta": 0,
+      "expected_target_count": 1,
+      "expected_toughness_delta": 0,
+      "logical_rule_key": "battle_rule_v1:64b2eb6d72830a72e6188d12589b5e97",
+      "name": "Withstand Death grants target keyword until EOT",
+      "target": {
+        "name": "E2E Target Creature",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "type": "stat_modifier_until_eot"
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Breach",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1a80a59bfe60d19ce999c58d8ac0625d",
+      "min_rule_version": 2,
+      "normalized_name": "breach",
+      "oracle_hash": "224c0d53fa8be85465b652ca0159f3d3",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot",
+        "granted_keywords_until_eot": [
+          "fear"
+        ],
+        "instant": true,
+        "power_boost": 2,
+        "power_delta": 2,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "xmage_ability_classes": [
+          "FearAbility"
+        ],
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "GainAbilityTargetEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Hooded Kavu",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5f8dd5e86f63f36f1155e92d6949b87b",
+      "min_rule_version": 2,
+      "normalized_name": "hooded kavu",
+      "oracle_hash": "50d94303fbeddf742c7ad88d483140dd",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "self_keyword_until_eot",
+            "activation_cost_colors": [
+              "B"
+            ],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{B}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_self_keyword_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "granted_keywords_until_eot": [
+              "fear"
+            ],
+            "power_delta": 0,
+            "target": "self",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "source": "self"
+            },
+            "target_controller": "self",
+            "toughness_delta": 0,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "GainAbilitySourceEffect",
+            "xmage_keyword_ability_class": "FearAbility"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_keyword_until_eot_v1",
+        "activated_effect": "self_keyword_until_eot",
+        "activation_cost_colors": [
+          "B"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{B}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_keyword_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "granted_keywords_until_eot": [
+          "fear"
+        ],
+        "power_delta": 0,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_delta": 0,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "GainAbilitySourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Shriek of Dread",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8d46159e8ae2f9b5ee8b04b9f0b2db80",
+      "min_rule_version": 2,
+      "normalized_name": "shriek of dread",
+      "oracle_hash": "9b96055cb88f677761b150c4b7d5a167",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_keyword_target_creature_until_eot_spell_v1",
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot",
+        "granted_keywords_until_eot": [
+          "fear"
+        ],
+        "instant": true,
+        "power_boost": 0,
+        "power_delta": 0,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "xmage_ability_classes": [
+          "FearAbility"
+        ],
+        "xmage_effect_class": "GainAbilityTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Withstand Death",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:64b2eb6d72830a72e6188d12589b5e97",
+      "min_rule_version": 2,
+      "normalized_name": "withstand death",
+      "oracle_hash": "7cf7b1aef30648b3a79cba54d4c8f659",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_keyword_target_creature_until_eot_spell_v1",
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot",
+        "granted_keywords_until_eot": [
+          "indestructible"
+        ],
+        "instant": true,
+        "power_boost": 0,
+        "power_delta": 0,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "xmage_ability_classes": [
+          "IndestructibleAbility"
+        ],
+        "xmage_effect_class": "GainAbilityTargetEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_boost_keyword_target_creature_until_eot_spell": 1,
+    "xmage_permanent_simple_activated_self_keyword_until_eot": 1,
+    "xmage_target_keyword_creature_until_eot_spell": 2
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg719_target_keyword_aliases_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg719_target_keyword_aliases_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg719_target_keyword_aliases_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg719_target_keyword_aliases_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg719_target_keyword_aliases_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg719_target_keyword_aliases_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-10T20:12:49+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Breach"
+      },
+      "card_name": "Breach",
+      "effect": "stat_modifier_until_eot",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1a80a59bfe60d19ce999c58d8ac0625d",
+      "normalized_name": "breach",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot",
+        "granted_keywords_until_eot": [
+          "fear"
+        ],
+        "instant": true,
+        "power_boost": 2,
+        "power_delta": 2,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "xmage_ability_classes": [
+          "FearAbility"
+        ],
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "GainAbilityTargetEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Hooded Kavu"
+      },
+      "card_name": "Hooded Kavu",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5f8dd5e86f63f36f1155e92d6949b87b",
+      "normalized_name": "hooded kavu",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "self_keyword_until_eot",
+            "activation_cost_colors": [
+              "B"
+            ],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{B}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_self_keyword_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "granted_keywords_until_eot": [
+              "fear"
+            ],
+            "power_delta": 0,
+            "target": "self",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "source": "self"
+            },
+            "target_controller": "self",
+            "toughness_delta": 0,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "GainAbilitySourceEffect",
+            "xmage_keyword_ability_class": "FearAbility"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_keyword_until_eot_v1",
+        "activated_effect": "self_keyword_until_eot",
+        "activation_cost_colors": [
+          "B"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{B}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_keyword_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "granted_keywords_until_eot": [
+          "fear"
+        ],
+        "power_delta": 0,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_delta": 0,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "GainAbilitySourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Shriek of Dread"
+      },
+      "card_name": "Shriek of Dread",
+      "effect": "stat_modifier_until_eot",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8d46159e8ae2f9b5ee8b04b9f0b2db80",
+      "normalized_name": "shriek of dread",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_keyword_target_creature_until_eot_spell_v1",
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot",
+        "granted_keywords_until_eot": [
+          "fear"
+        ],
+        "instant": true,
+        "power_boost": 0,
+        "power_delta": 0,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "xmage_ability_classes": [
+          "FearAbility"
+        ],
+        "xmage_effect_class": "GainAbilityTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Withstand Death"
+      },
+      "card_name": "Withstand Death",
+      "effect": "stat_modifier_until_eot",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:64b2eb6d72830a72e6188d12589b5e97",
+      "normalized_name": "withstand death",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_keyword_target_creature_until_eot_spell_v1",
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot",
+        "granted_keywords_until_eot": [
+          "indestructible"
+        ],
+        "instant": true,
+        "power_boost": 0,
+        "power_delta": 0,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "xmage_ability_classes": [
+          "IndestructibleAbility"
+        ],
+        "xmage_effect_class": "GainAbilityTargetEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Breach",
+    "Hooded Kavu",
+    "Shriek of Dread",
+    "Withstand Death"
+  ],
+  "selected_count": 4,
+  "slug": "target_keyword_aliases_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Breach",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1a80a59bfe60d19ce999c58d8ac0625d",
+      "min_rule_version": 2,
+      "normalized_name": "breach",
+      "oracle_hash": "224c0d53fa8be85465b652ca0159f3d3",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Hooded Kavu",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5f8dd5e86f63f36f1155e92d6949b87b",
+      "min_rule_version": 2,
+      "normalized_name": "hooded kavu",
+      "oracle_hash": "50d94303fbeddf742c7ad88d483140dd",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_self_keyword_until_eot_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Shriek of Dread",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8d46159e8ae2f9b5ee8b04b9f0b2db80",
+      "min_rule_version": 2,
+      "normalized_name": "shriek of dread",
+      "oracle_hash": "9b96055cb88f677761b150c4b7d5a167",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_keyword_target_creature_until_eot_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Withstand Death",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:64b2eb6d72830a72e6188d12589b5e97",
+      "min_rule_version": 2,
+      "normalized_name": "withstand death",
+      "oracle_hash": "7cf7b1aef30648b3a79cba54d4c8f659",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_keyword_target_creature_until_eot_spell_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

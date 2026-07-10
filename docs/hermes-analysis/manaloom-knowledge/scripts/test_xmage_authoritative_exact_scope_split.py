@@ -22881,6 +22881,77 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["granted_keywords_until_eot"], ["double_strike"])
         self.assertEqual(effect["target_controller"], "any")
 
+    def test_fixed_target_keyword_spell_maps_fear_keyword(self) -> None:
+        row = queue_row(
+            split.BOOST_KEYWORD_UNIT,
+            effect_classes=["GainAbilityTargetEffect"],
+            ability_classes=["FearAbility"],
+            xmage_signals=["targeting"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                oracle_text=(
+                    "Target creature gains fear until end of turn. "
+                    "(It can't be blocked except by artifact creatures and/or black creatures.)"
+                )
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new GainAbilityTargetEffect("
+                "FearAbility.getInstance(), Duration.EndOfTurn));"
+                "this.getSpellAbility().addTarget(new TargetCreaturePermanent());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        self.assertEqual(proposal["effect_json"]["granted_keywords_until_eot"], ["fear"])
+
+    def test_fixed_target_keyword_spell_maps_indestructible_this_turn_wording(self) -> None:
+        row = queue_row(
+            split.BOOST_KEYWORD_UNIT,
+            effect_classes=["GainAbilityTargetEffect"],
+            ability_classes=["IndestructibleAbility"],
+            xmage_signals=["targeting"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Target creature is indestructible this turn."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new GainAbilityTargetEffect("
+                "IndestructibleAbility.getInstance(), Duration.EndOfTurn));"
+                "this.getSpellAbility().addTarget(new TargetCreaturePermanent());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        self.assertEqual(proposal["effect_json"]["granted_keywords_until_eot"], ["indestructible"])
+
+    def test_fixed_target_keyword_spell_ignores_indestructible_reminder_text(self) -> None:
+        row = queue_row(
+            split.BOOST_KEYWORD_UNIT,
+            effect_classes=["GainAbilityTargetEffect"],
+            ability_classes=["IndestructibleAbility"],
+            xmage_signals=["targeting"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                oracle_text=(
+                    "Target creature gains indestructible until end of turn. "
+                    "(Damage and effects that say \"destroy\" don't destroy it. "
+                    "If its toughness is 0 or less, it still dies.)"
+                )
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new GainAbilityTargetEffect("
+                "IndestructibleAbility.getInstance(), Duration.EndOfTurn));"
+                "this.getSpellAbility().addTarget(new TargetCreaturePermanent());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        self.assertEqual(proposal["effect_json"]["granted_keywords_until_eot"], ["indestructible"])
+
     def test_fixed_target_keyword_spell_maps_multiple_keywords(self) -> None:
         row = queue_row(
             split.BOOST_KEYWORD_UNIT,
