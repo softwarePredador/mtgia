@@ -1661,6 +1661,139 @@ def test_simple_activated_draw_runner_executes_sacrifice_target_cost() -> None:
     assert result["target_sacrificed"] is True
 
 
+def test_simple_activated_draw_runner_executes_tap_cost_target() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "draw_engine",
+        "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+        "permanent_type": "creature",
+        "activated_draw": True,
+        "activated_draw_count": 1,
+        "activation_cost_mana": "{0}",
+        "activation_cost_generic": 0,
+        "activation_cost_colors": [],
+        "activation_requires_tap": False,
+        "activation_requires_sacrifice": False,
+        "activation_requires_tap_target": True,
+        "activation_tap_cost": {
+            "count": 1,
+            "target_controller": "self",
+            "constraints": {
+                "card_types": ["creature"],
+                "required_subtypes": ["wizard"],
+                "tapped_state": "untapped",
+            },
+        },
+        "_rule_logical_key": "battle_rule_v1:azami",
+    }
+    try:
+        result = validator.run_simple_activated_draw(
+            battle,
+            {
+                "name": "Azami activates draw ability",
+                "type": "simple_activated_draw",
+                "card": {"name": "Azami, Lady of Scrolls"},
+                "controller_mana": {},
+                "controller_library": [
+                    {"name": "E2E Activated Draw Card", "type_line": "Sorcery", "effect": "draw_cards"}
+                ],
+                "tap_cost_targets": [
+                    {
+                        "name": "E2E Untapped Wizard",
+                        "type_line": "Creature - Human Wizard",
+                        "effect": "creature",
+                        "power": 1,
+                        "toughness": 1,
+                        "tapped": False,
+                    }
+                ],
+                "expected_draw_count": 1,
+                "expected_tapped_source": False,
+                "expected_tap_cost_count": 1,
+                "logical_rule_key": "battle_rule_v1:azami",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Azami, Lady of Scrolls"
+    assert result["cards_drawn"] == 1
+    assert result["source_tapped"] is False
+    assert result["tapped_cost_targets"] == ["E2E Untapped Wizard"]
+
+
+def test_simple_activated_draw_runner_executes_remove_counter_cost() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "draw_engine",
+        "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+        "permanent_type": "creature",
+        "activated_draw": True,
+        "activated_draw_count": 1,
+        "activation_cost_mana": "{0}",
+        "activation_cost_generic": 0,
+        "activation_cost_colors": [],
+        "activation_requires_tap": True,
+        "activation_requires_sacrifice": False,
+        "activation_remove_counter_cost": {
+            "count": 1,
+            "target_controller": "self",
+            "counter_types": ["any"],
+            "constraints": {"card_types": ["permanent"], "exclude_card_types": ["land"]},
+        },
+        "_rule_logical_key": "battle_rule_v1:oaka",
+    }
+    try:
+        result = validator.run_simple_activated_draw(
+            battle,
+            {
+                "name": "O'aka activates draw ability",
+                "type": "simple_activated_draw",
+                "card": {"name": "O'aka, Traveling Merchant"},
+                "controller_mana": {},
+                "controller_library": [
+                    {"name": "E2E Activated Draw Card", "type_line": "Sorcery", "effect": "draw_cards"}
+                ],
+                "counter_cost_targets": [
+                    {
+                        "name": "E2E Counter Permanent",
+                        "type_line": "Creature - Fixture",
+                        "effect": "creature",
+                        "power": 2,
+                        "toughness": 2,
+                        "plus_one_counters": 1,
+                        "counters": {"+1/+1": 1},
+                    }
+                ],
+                "expected_draw_count": 1,
+                "expected_tapped_source": True,
+                "expected_remove_counter_cost_count": 1,
+                "expected_remove_counter_type": "+1/+1",
+                "logical_rule_key": "battle_rule_v1:oaka",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "O'aka, Traveling Merchant"
+    assert result["cards_drawn"] == 1
+    assert result["source_tapped"] is True
+    assert result["removed_counter_cost_count"] == 1
+    assert result["removed_counter_cost_type"] == "+1/+1"
+
+
 def test_fixed_draw_spell_runner_pays_sacrifice_two_creatures_cost() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

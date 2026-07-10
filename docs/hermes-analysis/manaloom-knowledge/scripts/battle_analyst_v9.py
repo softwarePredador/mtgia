@@ -37338,6 +37338,12 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
             activation_discard_target = str(permanent.get("activation_discard_target") or "any_card")
             sacrifice_target = None
             sacrifice_options = []
+            tap_candidates = []
+            tap_cost_options = []
+            removed_counter_cost_target = None
+            removed_counter_cost_type = None
+            removed_counter_cost_count = 0
+            remove_counter_cost_options = []
             if sacrifice_target_type:
                 sacrifice_target, sacrifice_options = choose_activation_sacrifice_target(
                     player,
@@ -37407,6 +37413,34 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
                     risk_flags=["low_life", "life_payment"],
                 )
                 continue
+            if _activation_tap_cost(permanent):
+                tap_candidates, tap_cost_options = _choose_activation_tap_cost_candidates(
+                    player,
+                    permanent,
+                    permanent,
+                )
+                if not tap_candidates:
+                    _utility_artifact_skip_event(
+                        player,
+                        permanent,
+                        turn,
+                        "no_valid_tap_cost_target_for_activated_draw",
+                        phase=phase,
+                    )
+                    continue
+            if _activation_remove_counter_cost(permanent):
+                removed_counter_cost_target, removed_counter_cost_type, remove_counter_cost_options = (
+                    _choose_activation_remove_counter_cost_option(player, permanent, permanent)
+                )
+                if removed_counter_cost_target is None or not removed_counter_cost_type:
+                    _utility_artifact_skip_event(
+                        player,
+                        permanent,
+                        turn,
+                        "no_valid_remove_counter_cost_target_for_activated_draw",
+                        phase=phase,
+                    )
+                    continue
             discard_cards = []
             if activation_discard_count:
                 if activation_discard_target != "any_card":
@@ -37452,9 +37486,27 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
                 continue
             if permanent.get("activation_requires_tap"):
                 permanent["tapped"] = True
+            if _activation_tap_cost(permanent):
+                tap_candidates = _tap_activation_cost_candidates(player, tap_candidates, turn)
             life_before = player.life
             if life_cost:
                 change_life(player, -life_cost)
+            if _activation_remove_counter_cost(permanent):
+                required_counter_count = int(_activation_remove_counter_cost(permanent).get("count") or 1)
+                removed_counter_cost_count = _remove_activation_counter_cost(
+                    removed_counter_cost_target,
+                    removed_counter_cost_type,
+                    required_counter_count,
+                )
+                if removed_counter_cost_count != required_counter_count:
+                    _utility_artifact_skip_event(
+                        player,
+                        permanent,
+                        turn,
+                        "failed_to_pay_activated_draw_remove_counter_cost",
+                        phase=phase,
+                    )
+                    continue
             sacrificed_name = None
             if sacrifice_target is not None:
                 sacrificed_name = sacrifice_target.get("name", "?")
@@ -37526,6 +37578,13 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
                     "life_after": player.life,
                     "sacrifice_target": sacrifice_target_type or None,
                     "sacrificed": sacrificed_name,
+                    "tap_cost_targets": _tapped_cost_target_names(tap_candidates),
+                    "tap_cost": _tap_cost_label(permanent),
+                    "remove_counter_cost": _counter_cost_label(permanent),
+                    "removed_counter_cost_target": (removed_counter_cost_target or {}).get("name"),
+                    "removed_counter_cost_type": removed_counter_cost_type,
+                    "removed_counter_cost_count": removed_counter_cost_count,
+                    "remove_counter_cost_available_targets": len(remove_counter_cost_options),
                     "sacrifice_options": [
                         option.get("name", "?")
                         for option in sacrifice_options[:6]
@@ -37546,6 +37605,8 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
                     "mana": -activation_mana_paid,
                     "tapped": 1 if permanent.get("activation_requires_tap") else 0,
                     "life": -life_cost,
+                    "tapped_cost_targets": len(tap_candidates),
+                    "removed_counters": -removed_counter_cost_count,
                     "permanents": -1 if sacrificed_name else 0,
                     "graveyard": (
                         0 if sacrifice_target is None or is_token_permanent(sacrifice_target) else 1
@@ -37559,6 +37620,8 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
                         "activated_draw": True,
                         "life_payment": life_cost > 0,
                         "discard_cost": bool(discard_cards),
+                        "tap_cost_target": bool(tap_candidates),
+                        "remove_counter_cost": removed_counter_cost_count > 0,
                         "sacrifice_permanent": sacrificed_name is not None,
                         "sacrifice_token": sacrifice_target is not None and is_token_permanent(sacrifice_target),
                     }.items()
@@ -37581,6 +37644,19 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
                 life_after=player.life,
                 sacrifice_target=sacrifice_target_type or None,
                 sacrificed=sacrificed_name,
+                tap_cost_targets=_tapped_cost_target_names(tap_candidates),
+                tapped_cost_targets=_tapped_cost_target_names(tap_candidates),
+                tap_cost_available_targets=len(tap_cost_options),
+                remove_counter_cost=_counter_cost_label(permanent),
+                removed_counter_cost_target=(removed_counter_cost_target or {}).get("name"),
+                removed_counter_cost_targets=(
+                    [(removed_counter_cost_target or {}).get("name")]
+                    if removed_counter_cost_target is not None
+                    else []
+                ),
+                remove_counter_cost_available_targets=len(remove_counter_cost_options),
+                removed_counter_cost_type=removed_counter_cost_type,
+                removed_counter_cost_count=removed_counter_cost_count,
                 discarded=[card.get("name", "?") for card in discard_cards],
                 discarded_count=len(discard_cards),
                 discard_target=activation_discard_target if activation_discard_count else None,
@@ -50270,6 +50346,8 @@ def _counter_cost_label(effect_data):
 
 def _activation_counter_count(candidate, counter_type):
     normalized = str(counter_type or "").strip().lower()
+    if normalized == "any":
+        return sum(count for _counter_type, count in _activation_available_counter_types(candidate))
     if normalized == "+1/+1":
         return max(0, int((candidate or {}).get("plus_one_counters") or 0))
     if normalized == "-1/-1":
@@ -50277,8 +50355,38 @@ def _activation_counter_count(candidate, counter_type):
     return max(0, int(get_named_counter_count(candidate, normalized) or 0))
 
 
+def _activation_available_counter_types(candidate):
+    if not isinstance(candidate, dict):
+        return []
+    available = []
+    plus_one = max(0, int(candidate.get("plus_one_counters") or 0))
+    if plus_one:
+        available.append(("+1/+1", plus_one))
+    minus_one = max(0, int(candidate.get("minus_one_counters") or 0))
+    if minus_one:
+        available.append(("-1/-1", minus_one))
+    counters = candidate.get("counters")
+    if isinstance(counters, dict):
+        for counter_type, count in sorted(counters.items()):
+            normalized = str(counter_type or "").strip().lower()
+            if normalized in {"+1/+1", "-1/-1"}:
+                continue
+            try:
+                numeric_count = max(0, int(count or 0))
+            except (TypeError, ValueError):
+                numeric_count = 0
+            if numeric_count:
+                available.append((normalized, numeric_count))
+    return available
+
+
 def _remove_activation_counter_cost(candidate, counter_type, count):
     normalized = str(counter_type or "").strip().lower()
+    if normalized == "any":
+        for available_type, available_count in _activation_available_counter_types(candidate):
+            if available_count >= int(count or 0):
+                return _remove_activation_counter_cost(candidate, available_type, count)
+        return 0
     if normalized == "+1/+1":
         return remove_plus_one_counters(candidate, count)
     if normalized == "-1/-1":
@@ -50300,6 +50408,11 @@ def _activation_remove_counter_cost_options(player, source, effect_data):
         if not _sacrifice_cost_candidate_matches(candidate, source, constraints):
             continue
         for counter_type in counter_types:
+            if str(counter_type or "").strip().lower() == "any":
+                for available_type, available_count in _activation_available_counter_types(candidate):
+                    if available_count >= count:
+                        options.append((candidate, available_type))
+                continue
             if _activation_counter_count(candidate, counter_type) >= count:
                 options.append((candidate, counter_type))
     return options

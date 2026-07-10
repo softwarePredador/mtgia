@@ -14959,6 +14959,26 @@ def activated_draw_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str
             return "activated_draw_oracle_cost_not_supported"
         normalized_cost = re.sub(sacrifice_pattern, ",", normalized_cost).strip(" ,")
 
+    tap_cost = activation_tap_cost_from_oracle(text)
+    if isinstance(tap_cost, str):
+        return tap_cost.replace("activation_tap", "activated_draw")
+    if tap_cost:
+        normalized_cost = re.sub(
+            r"(?:^|,\s*)tap\s+(?:an?|one|two|three|four|five|six|seven|eight|nine|ten|\d+)\s+[^,]+?(?:,|$)",
+            ",",
+            normalized_cost,
+        ).strip(" ,")
+
+    remove_counter_cost = activation_remove_counter_cost_from_oracle(text)
+    if isinstance(remove_counter_cost, str):
+        return remove_counter_cost.replace("activation_remove_counter", "activated_draw")
+    if remove_counter_cost:
+        normalized_cost = re.sub(
+            r"(?:^|,\s*)remove .+? from .+? you control(?:,|$)",
+            ",",
+            normalized_cost,
+        ).strip(" ,")
+
     activation = activation_cost_from_oracle_prefix(normalized_cost, allow_source_sacrifice=True)
     if isinstance(activation, str):
         return str(activation).replace("activated_self_boost", "activated_draw")
@@ -14974,6 +14994,11 @@ def activated_draw_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str
     if sacrifice_target:
         activation["activation_sacrifice_target"] = sacrifice_target
         activation["activation_requires_sacrifice_target"] = True
+    if tap_cost:
+        activation["activation_tap_cost"] = tap_cost
+        activation["activation_requires_tap_target"] = True
+    if remove_counter_cost:
+        activation["activation_remove_counter_cost"] = remove_counter_cost
     return activation
 
 
@@ -17741,6 +17766,8 @@ def counter_type_from_oracle_phrase(value: str) -> str | None:
     normalized = re.sub(r"\s+", " ", str(value or "").strip().lower())
     normalized = re.sub(r"^(?:an?|one)\s+", "", normalized).strip()
     normalized = normalized.removesuffix(" counter").strip()
+    if normalized in {"counter", "any"}:
+        return "any"
     mapping = {
         "+1/+1": "+1/+1",
         "-1/-1": "-1/-1",
@@ -17793,7 +17820,7 @@ def activation_remove_counter_cost_from_oracle(text: str) -> dict[str, Any] | st
     cost_text = str(text or "").lower().rsplit(":", 1)[0]
     matches = list(
         re.finditer(
-            r"(?:^|,\s*)remove (?P<counters>.+?) from (?P<object>an?|one)?\s*(?P<target>creature|permanent) you control(?:\s*,?|$)",
+            r"(?:^|,\s*)remove (?P<counters>.+?) from (?P<target>.+?) you control(?:\s*,?|$)",
             cost_text,
         )
     )
@@ -17808,8 +17835,9 @@ def activation_remove_counter_cost_from_oracle(text: str) -> dict[str, Any] | st
         if counter_type is None:
             return "activation_remove_counter_cost_not_supported"
         counter_types.append(counter_type)
-    target = matches[0].group("target")
-    constraints = {"card_types": [target]}
+    constraints = activation_remove_counter_target_constraints_from_phrase(matches[0].group("target"))
+    if constraints is None:
+        return "activation_remove_counter_cost_not_supported"
     return normalized_activation_remove_counter_cost(
         {
             "count": 1,
@@ -17820,27 +17848,111 @@ def activation_remove_counter_cost_from_oracle(text: str) -> dict[str, Any] | st
     )
 
 
+def activation_remove_counter_target_constraints_from_phrase(phrase: str) -> dict[str, Any] | None:
+    normalized = re.sub(r"\s+", " ", str(phrase or "").strip().lower())
+    normalized = re.sub(r"^(?:an?|one)\s+", "", normalized).strip()
+    normalized = normalized.replace("non-land", "nonland")
+    normalized = re.sub(r"\s*,\s*or\s+", " or ", normalized)
+    normalized = re.sub(r"\s*,\s*", ", ", normalized)
+    normalized = normalized.replace(", or ", " or ")
+    mapping = {
+        "artifact": {"card_types": ["artifact"]},
+        "creature": {"card_types": ["creature"]},
+        "land": {"card_types": ["land"]},
+        "permanent": {"card_types": ["permanent"]},
+        "nonland permanent": {"card_types": ["permanent"], "exclude_card_types": ["land"]},
+        "artifact, creature, land or planeswalker": {
+            "card_types": ["artifact", "creature", "land", "planeswalker"],
+        },
+        "artifact, creature, land, or planeswalker": {
+            "card_types": ["artifact", "creature", "land", "planeswalker"],
+        },
+    }
+    return mapping.get(normalized)
+
+
+def activation_remove_counter_source_constraints_from_text(text: str) -> dict[str, Any] | None:
+    source = str(text or "")
+    if "FILTER_CONTROLLED_PERMANENT_NON_LAND" in source or re.search(r"\bnon-?land permanent\b", source, re.I):
+        return {"card_types": ["permanent"], "exclude_card_types": ["land"]}
+    card_types = []
+    for card_type in ("ARTIFACT", "CREATURE", "LAND", "PLANESWALKER"):
+        if f"CardType.{card_type}" in source or re.search(rf"\b{card_type.lower()}s?\b", source, re.I):
+            card_types.append(card_type.lower())
+    if card_types:
+        return {"card_types": sorted(set(card_types))}
+    if "TargetControlledCreaturePermanent" in source or "FilterControlledCreaturePermanent" in source:
+        return {"card_types": ["creature"]}
+    if "TargetControlledPermanent" in source or "TargetPermanent" in source or "FilterControlledPermanent" in source:
+        return {"card_types": ["permanent"]}
+    return None
+
+
 def activation_remove_counter_cost_from_source(text: str, window: str) -> dict[str, Any] | str | None:
     if "RemoveCounterCost" not in (window or ""):
         return None
     matches = list(
         re.finditer(
-            r"new\s+RemoveCounterCost\s*\(\s*new\s+(?P<target>TargetControlledCreaturePermanent|TargetControlledPermanent)\s*\([^)]*\)\s*,\s*CounterType\.(?P<counter>[A-Z0-9]+)\s*\)",
+            r"new\s+RemoveCounterCost\s*\(\s*new\s+(?P<target>TargetControlledCreaturePermanent|TargetControlledPermanent|TargetPermanent)\s*\([^)]*\)\s*,\s*CounterType\.(?P<counter>[A-Z0-9]+)\s*\)",
             window or "",
             re.S,
         )
     )
-    if not matches:
-        return "activated_damage_source_remove_counter_cost_not_supported"
-    if len(matches) > 1 and "OrCost" not in (window or ""):
-        return "activated_damage_source_remove_counter_cost_not_supported"
-    constraints_by_target = []
-    counter_types = []
-    for match in matches:
-        counter_type = counter_type_from_xmage_counter_type(match.group("counter"))
-        if counter_type is None:
+    if matches:
+        if len(matches) > 1 and "OrCost" not in (window or ""):
             return "activated_damage_source_remove_counter_cost_not_supported"
-        target_class = match.group("target")
+        constraints_by_target = []
+        counter_types = []
+        for match in matches:
+            counter_type = counter_type_from_xmage_counter_type(match.group("counter"))
+            if counter_type is None:
+                return "activated_damage_source_remove_counter_cost_not_supported"
+            target_class = match.group("target")
+            target_text = match.group(0)
+            constraints = activation_remove_counter_source_constraints_from_text(target_text)
+            if constraints is None:
+                constraints = {
+                    "card_types": [
+                        "creature"
+                        if target_class == "TargetControlledCreaturePermanent"
+                        else "permanent"
+                    ]
+                }
+            constraints_by_target.append(constraints)
+            counter_types.append(counter_type)
+        first_constraints = constraints_by_target[0]
+        if any(constraints != first_constraints for constraints in constraints_by_target):
+            return "activated_damage_source_remove_counter_cost_not_supported"
+        return normalized_activation_remove_counter_cost(
+            {
+                "count": 1,
+                "target_controller": "self",
+                "counter_types": counter_types,
+                "constraints": first_constraints,
+            }
+        )
+    any_counter_matches = list(
+        re.finditer(
+            r"new\s+RemoveCounterCost\s*\(\s*new\s+(?P<target>TargetControlledCreaturePermanent|TargetControlledPermanent|TargetPermanent)\s*\((?P<args>[^)]*)\)\s*\)",
+            window or "",
+            re.S,
+        )
+    )
+    if not any_counter_matches:
+        return "activated_damage_source_remove_counter_cost_not_supported"
+    if len(any_counter_matches) != 1:
+        return "activated_damage_source_remove_counter_cost_not_supported"
+    match = any_counter_matches[0]
+    target_class = match.group("target")
+    args = match.group("args")
+    search_text = f"{target_class}({args})"
+    target_args = split_top_level_args(args or "")
+    for arg in target_args:
+        arg = arg.strip()
+        if re.match(r"^[A-Za-z_][A-Za-z0-9_]*$", arg):
+            search_text += "\n" + source_filter_window(text, arg)
+    constraints = activation_remove_counter_source_constraints_from_text(search_text)
+    if constraints is None:
         constraints = {
             "card_types": [
                 "creature"
@@ -17848,17 +17960,12 @@ def activation_remove_counter_cost_from_source(text: str, window: str) -> dict[s
                 else "permanent"
             ]
         }
-        constraints_by_target.append(constraints)
-        counter_types.append(counter_type)
-    first_constraints = constraints_by_target[0]
-    if any(constraints != first_constraints for constraints in constraints_by_target):
-        return "activated_damage_source_remove_counter_cost_not_supported"
     return normalized_activation_remove_counter_cost(
         {
             "count": 1,
             "target_controller": "self",
-            "counter_types": counter_types,
-            "constraints": first_constraints,
+            "counter_types": ["any"],
+            "constraints": constraints,
         }
     )
 
@@ -18060,6 +18167,9 @@ def activation_tap_cost_from_phrase(phrase: str) -> dict[str, Any] | str:
     elif object_text in {"soldier", "soldiers"}:
         constraints["card_types"] = ["creature"]
         constraints["required_subtypes"] = ["soldier"]
+    elif object_text in {"wizard", "wizards"}:
+        constraints["card_types"] = ["creature"]
+        constraints["required_subtypes"] = ["wizard"]
     else:
         return "activation_tap_cost_not_supported"
     return normalized_activation_tap_cost(
@@ -18131,6 +18241,9 @@ def activation_tap_cost_source_constraints(search_text: str) -> dict[str, Any] |
     if "SubType.SOLDIER" in text or re.search(r"\buntapped soldiers?\b", text, re.I):
         constraints["card_types"] = ["creature"]
         constraints["required_subtypes"] = ["soldier"]
+    if "SubType.WIZARD" in text or re.search(r"\buntapped wizards?\b", text, re.I):
+        constraints["card_types"] = ["creature"]
+        constraints["required_subtypes"] = ["wizard"]
     if "CardType.ARTIFACT" in text or re.search(r"\buntapped artifacts?\b", text, re.I):
         constraints["card_types"] = ["artifact"]
     color_matches = [
@@ -19119,14 +19232,18 @@ def activated_draw_from_source(source: str) -> dict[str, Any] | str:
         "ExileFrom",
         "ExileSourceFromGraveCost",
         "MillCardsCost",
-        "RemoveCounterCost",
         "ReturnToHandSourceCost",
         "RevealTargetFromHandCost",
-        "TapTargetCost",
     }
     present_risky = sorted(cost for cost in risky_cost_classes if cost in window)
     if present_risky:
         return "activated_draw_source_cost_not_supported"
+    remove_counter_cost = activation_remove_counter_cost_from_source(text, window)
+    if isinstance(remove_counter_cost, str):
+        return remove_counter_cost.replace("activated_damage", "activated_draw")
+    tap_cost = activation_tap_cost_from_source(text, window)
+    if isinstance(tap_cost, str):
+        return tap_cost.replace("activation_tap", "activated_draw")
     discard_count = 0
     if re.search(r"new\s+DiscardCardCost\s*\(\s*\)", window):
         discard_count = 1
@@ -19194,6 +19311,15 @@ def activated_draw_from_source(source: str) -> dict[str, Any] | str:
             if sacrifice_target
             else {}
         ),
+        **(
+            {
+                "activation_tap_cost": tap_cost,
+                "activation_requires_tap_target": True,
+            }
+            if tap_cost
+            else {}
+        ),
+        **({"activation_remove_counter_cost": remove_counter_cost} if remove_counter_cost else {}),
     }
 
 
@@ -26802,6 +26928,18 @@ def split_row(
         parsed_activation = activated_draw_from_source(source_text)
         if isinstance(parsed_activation, str):
             return None, parsed_activation
+        source_tap_cost = normalized_activation_tap_cost(parsed_activation.get("activation_tap_cost"))
+        oracle_tap_cost = normalized_activation_tap_cost(oracle_activation.get("activation_tap_cost"))
+        if source_tap_cost != oracle_tap_cost:
+            return None, "activated_draw_source_oracle_tap_cost_mismatch"
+        source_remove_counter_cost = normalized_activation_remove_counter_cost(
+            parsed_activation.get("activation_remove_counter_cost")
+        )
+        oracle_remove_counter_cost = normalized_activation_remove_counter_cost(
+            oracle_activation.get("activation_remove_counter_cost")
+        )
+        if source_remove_counter_cost != oracle_remove_counter_cost:
+            return None, "activated_draw_source_oracle_remove_counter_cost_mismatch"
         for key in (
             "count",
             "activation_cost_mana",
@@ -26814,9 +26952,14 @@ def split_row(
             "activation_discard_count",
             "activation_discard_target",
             "activation_requires_discard_card",
+            "activation_requires_tap_target",
         ):
             if parsed_activation.get(key) != oracle_activation.get(key):
                 return None, "activated_draw_source_oracle_mismatch"
+        if source_tap_cost:
+            parsed_activation["activation_tap_cost"] = source_tap_cost
+        if source_remove_counter_cost:
+            parsed_activation["activation_remove_counter_cost"] = source_remove_counter_cost
         oracle_count = int(oracle_activation["count"])
         type_line = str(metadata.get("type_line") or "").lower()
         permanent_type = (

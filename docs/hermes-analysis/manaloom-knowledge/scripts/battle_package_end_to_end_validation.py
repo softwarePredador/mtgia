@@ -4922,6 +4922,20 @@ def run_sacrifice_mana_source_activation(
     if scenario.get("sacrifice_target"):
         sacrifice_target = battle.enrich_card(dict(scenario["sacrifice_target"]))
         active.battlefield.append(sacrifice_target)
+    tap_cost_targets = [
+        battle.enrich_card(dict(item))
+        for item in (scenario.get("tap_cost_targets") or [])
+        if isinstance(item, dict)
+    ]
+    if tap_cost_targets:
+        active.battlefield.extend(tap_cost_targets)
+    counter_cost_targets = [
+        battle.enrich_card(dict(item))
+        for item in (scenario.get("counter_cost_targets") or [])
+        if isinstance(item, dict)
+    ]
+    if counter_cost_targets:
+        active.battlefield.extend(counter_cost_targets)
     add_manifest_mana(active, scenario.get("controller_mana") or {})
 
     before_events = len(events)
@@ -5411,6 +5425,20 @@ def run_simple_activated_draw(
     if scenario.get("sacrifice_target"):
         sacrifice_target = battle.enrich_card(dict(scenario["sacrifice_target"]))
         active.battlefield.append(sacrifice_target)
+    tap_cost_targets = [
+        battle.enrich_card(dict(item))
+        for item in (scenario.get("tap_cost_targets") or [])
+        if isinstance(item, dict)
+    ]
+    if tap_cost_targets:
+        active.battlefield.extend(tap_cost_targets)
+    counter_cost_targets = [
+        battle.enrich_card(dict(item))
+        for item in (scenario.get("counter_cost_targets") or [])
+        if isinstance(item, dict)
+    ]
+    if counter_cost_targets:
+        active.battlefield.extend(counter_cost_targets)
     add_manifest_mana(active, scenario.get("controller_mana") or {})
 
     starting_hand_names = [card.get("name", "?") for card in active.hand if isinstance(card, dict)]
@@ -5421,6 +5449,13 @@ def run_simple_activated_draw(
     expected_discard_count = int(scenario.get("expected_discard_count") or 0)
     expected_life_paid = int(scenario.get("expected_life_paid") or 0)
     expected_tapped_source = bool(scenario.get("expected_tapped_source", effect.get("activation_requires_tap", False)))
+    expected_tap_cost_count = int(scenario.get("expected_tap_cost_count") or 0)
+    expected_remove_counter_cost_count = int(scenario.get("expected_remove_counter_cost_count") or 0)
+    expected_remove_counter_type = str(scenario.get("expected_remove_counter_type") or "+1/+1")
+    counter_cost_before = {
+        item.get("name"): _counter_value(battle, item, expected_remove_counter_type)
+        for item in counter_cost_targets
+    }
     expected_sacrificed_source = bool(effect.get("activation_requires_sacrifice"))
     all_players = [active, opponent]
     before_events = len(events)
@@ -5451,6 +5486,13 @@ def run_simple_activated_draw(
             "battle_execution",
             f"{card['name']} source tapped={bool(source.get('tapped'))}, expected {expected_tapped_source}",
         )
+    if expected_tap_cost_count:
+        tapped_targets = [item for item in tap_cost_targets if bool(item.get("tapped"))]
+        if len(tapped_targets) != expected_tap_cost_count:
+            fail(
+                "battle_execution",
+                f"{card['name']} tapped tap-cost targets={len(tapped_targets)}, expected {expected_tap_cost_count}",
+            )
     if expected_life_paid and active.life != starting_life - expected_life_paid:
         fail(
             "battle_execution",
@@ -5487,6 +5529,49 @@ def run_simple_activated_draw(
             "battle_events",
             f"{card['name']} cards_drawn={activation_event.get('cards_drawn')}, expected {expected_draw_count}",
         )
+    if expected_tap_cost_count:
+        expected_tap_names = [item.get("name") for item in tap_cost_targets]
+        event_tap_names = list(activation_event.get("tap_cost_targets") or activation_event.get("tapped_cost_targets") or [])
+        if len(event_tap_names) != expected_tap_cost_count or not set(expected_tap_names).intersection(event_tap_names):
+            fail(
+                "battle_events",
+                f"{card['name']} tap_cost_targets={event_tap_names!r}, expected {expected_tap_names!r}",
+            )
+    if expected_remove_counter_cost_count:
+        if not counter_cost_targets:
+            fail("battle_execution", f"{card['name']} expected counter cost target was not configured")
+        expected_counter_names = [item.get("name") for item in counter_cost_targets]
+        event_counter_names = list(activation_event.get("removed_counter_cost_targets") or [])
+        if not set(expected_counter_names).intersection(set(event_counter_names)):
+            fail(
+                "battle_events",
+                f"{card['name']} removed_counter_cost_targets={event_counter_names!r}, expected one of {expected_counter_names!r}",
+            )
+        if str(activation_event.get("removed_counter_cost_type") or "") != expected_remove_counter_type:
+            fail(
+                "battle_events",
+                f"{card['name']} removed_counter_cost_type={activation_event.get('removed_counter_cost_type')!r}, expected {expected_remove_counter_type!r}",
+            )
+        if int(activation_event.get("removed_counter_cost_count") or 0) != expected_remove_counter_cost_count:
+            fail(
+                "battle_events",
+                f"{card['name']} removed_counter_cost_count={activation_event.get('removed_counter_cost_count')}, expected {expected_remove_counter_cost_count}",
+            )
+        removed_targets = [
+            item
+            for item in counter_cost_targets
+            if item.get("name") in set(event_counter_names)
+        ]
+        if not removed_targets:
+            fail("battle_execution", f"{card['name']} counter cost target not found after activation")
+        removed_target = removed_targets[0]
+        before = counter_cost_before.get(removed_target.get("name"), 0)
+        after = _counter_value(battle, removed_target, expected_remove_counter_type)
+        if before - after != expected_remove_counter_cost_count:
+            fail(
+                "battle_execution",
+                f"{card['name']} removed {before - after} {expected_remove_counter_type} counters, expected {expected_remove_counter_cost_count}",
+            )
     if not expected_sacrificed_source:
         if int(activation_event.get("discarded_count") or 0) != expected_discard_count:
             fail(
@@ -5518,6 +5603,9 @@ def run_simple_activated_draw(
         "discarded_count": expected_discard_count,
         "life_paid": expected_life_paid,
         "source_tapped": bool(source.get("tapped")),
+        "tapped_cost_targets": [item.get("name") for item in tap_cost_targets if bool(item.get("tapped"))],
+        "removed_counter_cost_count": expected_remove_counter_cost_count,
+        "removed_counter_cost_type": expected_remove_counter_type if expected_remove_counter_cost_count else None,
         "sacrificed_source": expected_sacrificed_source,
         "target_sacrificed": bool(sacrifice_target is not None and sacrifice_target not in active.battlefield),
     }

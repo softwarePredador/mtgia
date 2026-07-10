@@ -7602,6 +7602,135 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "activated_draw_oracle_cost_not_supported")
 
+    def test_permanent_activated_draw_maps_tap_untapped_wizard_cost(self) -> None:
+        row = queue_row(
+            split.DRAW_ENGINE_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["draw", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Azami, Lady of Scrolls",
+                type_line="Legendary Creature - Human Wizard",
+                oracle_text="Tap an untapped Wizard you control: Draw a card.",
+            ),
+            source_text="""
+                private static final FilterControlledPermanent filter =
+                    new FilterControlledPermanent("untapped Wizard you control");
+                static {
+                    filter.add(TappedPredicate.UNTAPPED);
+                    filter.add(SubType.WIZARD.getPredicate());
+                }
+                this.addAbility(new SimpleActivatedAbility(
+                    new DrawCardSourceControllerEffect(1),
+                    new TapTargetCost(new TargetControlledPermanent(1, 1, filter, false))
+                ));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_DRAW_SCOPE)
+        self.assertEqual(effect["activation_cost_mana"], "{0}")
+        self.assertFalse(effect["activation_requires_tap"])
+        self.assertEqual(
+            effect["activation_tap_cost"],
+            {
+                "count": 1,
+                "target_controller": "self",
+                "constraints": {
+                    "card_types": ["creature"],
+                    "required_subtypes": ["wizard"],
+                    "tapped_state": "untapped",
+                },
+            },
+        )
+        self.assertTrue(effect["activation_requires_tap_target"])
+
+    def test_permanent_activated_draw_maps_remove_any_counter_nonland_cost(self) -> None:
+        row = queue_row(
+            split.DRAW_ENGINE_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["draw", "activated_ability", "counter"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="O'aka, Traveling Merchant",
+                type_line="Legendary Creature - Human Citizen",
+                oracle_text="{T}, Remove a counter from a nonland permanent you control: Draw a card.",
+            ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(new DrawCardSourceControllerEffect(1), new TapSourceCost());
+                ability.addCost(new RemoveCounterCost(new TargetPermanent(StaticFilters.FILTER_CONTROLLED_PERMANENT_NON_LAND)));
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertTrue(effect["activation_requires_tap"])
+        self.assertEqual(
+            effect["activation_remove_counter_cost"],
+            {
+                "count": 1,
+                "target_controller": "self",
+                "counter_types": ["any"],
+                "constraints": {"card_types": ["permanent"], "exclude_card_types": ["land"]},
+            },
+        )
+
+    def test_permanent_activated_draw_maps_remove_any_counter_type_list_cost(self) -> None:
+        row = queue_row(
+            split.DRAW_ENGINE_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["draw", "activated_ability", "counter"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Soul Diviner",
+                type_line="Creature - Zombie Wizard",
+                oracle_text="{T}, Remove a counter from an artifact, creature, land, or planeswalker you control: Draw a card.",
+            ),
+            source_text="""
+                private static final FilterPermanent filter =
+                    new FilterControlledPermanent("an artifact, creature, land, or planeswalker you control");
+                static {
+                    filter.add(Predicates.or(
+                        CardType.ARTIFACT.getPredicate(),
+                        CardType.CREATURE.getPredicate(),
+                        CardType.LAND.getPredicate(),
+                        CardType.PLANESWALKER.getPredicate()
+                    ));
+                }
+                Ability ability = new SimpleActivatedAbility(
+                    new DrawCardSourceControllerEffect(1), new TapSourceCost()
+                );
+                ability.addCost(new RemoveCounterCost(new TargetPermanent(1, 1, filter, true)));
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(
+            effect["activation_remove_counter_cost"],
+            {
+                "count": 1,
+                "target_controller": "self",
+                "counter_types": ["any"],
+                "constraints": {"card_types": ["artifact", "creature", "land", "planeswalker"]},
+            },
+        )
+
     def test_permanent_activated_draw_blocks_dynamic_count(self) -> None:
         row = queue_row(
             split.DRAW_ENGINE_UNIT,

@@ -1514,6 +1514,76 @@ def test_manifest_builds_simple_activated_draw_execution_scenario_with_sacrifice
     assert scenario["sacrifice_target"]["type_line"] == "Artifact"
 
 
+def test_manifest_builds_simple_activated_draw_execution_scenario_with_tap_cost_target() -> None:
+    rule = {
+        "normalized_name": "azami-lady-of-scrolls",
+        "card_name": "Azami, Lady of Scrolls",
+        "oracle_hash": "hash-azami",
+        "logical_rule_key": "battle_rule_v1:azami",
+        "required_effect_fields": {
+            "effect": "draw_engine",
+            "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+            "activated_draw": True,
+            "activated_draw_count": 1,
+            "activation_cost_mana": "{0}",
+            "activation_cost_generic": 0,
+            "activation_cost_colors": [],
+            "activation_requires_tap": False,
+            "activation_requires_tap_target": True,
+            "activation_tap_cost": {
+                "count": 1,
+                "target_controller": "self",
+                "constraints": {
+                    "card_types": ["creature"],
+                    "required_subtypes": ["wizard"],
+                    "tapped_state": "untapped",
+                },
+            },
+        },
+    }
+
+    scenario = builder.simple_activated_draw_execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "simple_activated_draw"
+    assert scenario["expected_tap_cost_count"] == 1
+    assert scenario["tap_cost_targets"][0]["type_line"].startswith("Creature")
+    assert "Wizard" in scenario["tap_cost_targets"][0]["type_line"]
+
+
+def test_manifest_builds_simple_activated_draw_execution_scenario_with_remove_counter_cost() -> None:
+    rule = {
+        "normalized_name": "soul-diviner",
+        "card_name": "Soul Diviner",
+        "oracle_hash": "hash-soul-diviner",
+        "logical_rule_key": "battle_rule_v1:soul-diviner",
+        "required_effect_fields": {
+            "effect": "draw_engine",
+            "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+            "activated_draw": True,
+            "activated_draw_count": 1,
+            "activation_cost_mana": "{0}",
+            "activation_cost_generic": 0,
+            "activation_cost_colors": [],
+            "activation_requires_tap": True,
+            "activation_remove_counter_cost": {
+                "count": 1,
+                "target_controller": "self",
+                "counter_types": ["any"],
+                "constraints": {"card_types": ["artifact", "creature", "land", "planeswalker"]},
+            },
+        },
+    }
+
+    scenario = builder.simple_activated_draw_execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "simple_activated_draw"
+    assert scenario["expected_remove_counter_cost_count"] == 1
+    assert scenario["expected_remove_counter_type"] == "+1/+1"
+    assert scenario["counter_cost_targets"][0]["plus_one_counters"] == 1
+
+
 def test_manifest_builds_target_player_x_draw_execution_scenario() -> None:
     rule = {
         "normalized_name": "braingeyser",

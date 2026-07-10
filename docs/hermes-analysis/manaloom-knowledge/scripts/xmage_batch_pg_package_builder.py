@@ -3047,7 +3047,7 @@ def _manifest_remove_counter_cost_fixture(
     ]
     if not counter_types:
         return None, None, 0
-    counter_type = "+1/+1" if "+1/+1" in counter_types else counter_types[0]
+    counter_type = "+1/+1" if "+1/+1" in counter_types or "any" in counter_types else counter_types[0]
     if constraints.get("target_subtypes") and not constraints.get("required_subtypes"):
         constraints["required_subtypes"] = list(constraints.get("target_subtypes") or [])
     if constraints.get("required_subtypes") and not constraints.get("card_types"):
@@ -3281,6 +3281,23 @@ def simple_activated_draw_execution_scenario_from_expected_rule(
             matching=True,
         )
         scenario["expect_target_sacrificed"] = True
+    tap_cost_targets = _manifest_tap_cost_fixtures(
+        "E2E Activated Draw Tap Cost Target",
+        required.get("activation_tap_cost") if isinstance(required.get("activation_tap_cost"), dict) else None,
+    )
+    if tap_cost_targets:
+        scenario["tap_cost_targets"] = tap_cost_targets
+        scenario["expected_tap_cost_count"] = len(tap_cost_targets)
+    counter_cost_target, counter_type, counter_count = _manifest_remove_counter_cost_fixture(
+        "E2E Activated Draw Counter Cost Target",
+        required.get("activation_remove_counter_cost")
+        if isinstance(required.get("activation_remove_counter_cost"), dict)
+        else None,
+    )
+    if counter_cost_target:
+        scenario["counter_cost_targets"] = [counter_cost_target]
+        scenario["expected_remove_counter_cost_count"] = counter_count
+        scenario["expected_remove_counter_type"] = counter_type
     return scenario
 
 
