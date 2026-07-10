@@ -6468,7 +6468,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         )
         proposal, reason = split.split_row(
             row,
-            metadata(oracle_text="Draw four cards, then discard three cards."),
+            metadata(oracle_text="Draw four cards, then discard three cards at random."),
             source_text=(
                 "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(4));"
                 "this.getSpellAbility().addEffect(new DiscardControllerEffect(3, true));"
@@ -6482,6 +6482,23 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["discard_count"], 3)
         self.assertEqual(effect["draw_discard_order"], "draw_then_discard")
         self.assertTrue(effect["discard_random"])
+
+    def test_fixed_draw_discard_spell_blocks_random_source_without_oracle_random(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=["DiscardControllerEffect", "DrawCardSourceControllerEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Draw four cards, then discard three cards."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(4));"
+                "this.getSpellAbility().addEffect(new DiscardControllerEffect(3, true));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "draw_discard_spell_source_oracle_mismatch")
 
     def test_fixed_draw_discard_spell_maps_discard_then_draw_pair(self) -> None:
         row = queue_row(

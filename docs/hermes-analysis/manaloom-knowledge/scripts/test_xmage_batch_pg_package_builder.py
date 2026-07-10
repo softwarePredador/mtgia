@@ -952,6 +952,36 @@ def test_manifest_builds_fixed_draw_additional_cost_scenario() -> None:
     assert scenario["controller_battlefield"][0]["type_line"] == "Creature - Soldier"
 
 
+def test_manifest_builds_fixed_draw_discard_random_scenario() -> None:
+    rule = {
+        "normalized_name": "goblin lore",
+        "card_name": "Goblin Lore",
+        "oracle_hash": "hash-goblin-lore",
+        "logical_rule_key": "battle_rule_v1:hash-goblin-lore",
+        "required_effect_fields": {
+            "effect": "draw_cards",
+            "battle_model_scope": "xmage_fixed_draw_discard_spell_v1",
+            "count": 4,
+            "draw_count": 4,
+            "discard_count": 3,
+            "discard_random": True,
+            "draw_discard_order": "draw_then_discard",
+            "sorcery": True,
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "fixed_draw_discard_spell"
+    assert scenario["expected_draw_count"] == 4
+    assert scenario["expected_discard_count"] == 3
+    assert scenario["expected_discard_random"] is True
+    assert scenario["expected_draw_discard_order"] == "draw_then_discard"
+    assert len(scenario["controller_library"]) == 4
+    assert len(scenario["controller_hand"]) == 3
+
+
 def test_manifest_expected_rule_preserves_damage_prevention_fields() -> None:
     proposal = {
         "normalized_name": "vine snare",

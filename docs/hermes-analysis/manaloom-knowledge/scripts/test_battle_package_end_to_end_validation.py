@@ -1607,6 +1607,55 @@ def test_fixed_draw_spell_runner_pays_sacrifice_two_creatures_cost() -> None:
     ]
 
 
+def test_fixed_draw_discard_spell_runner_executes_random_discard() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "draw_cards",
+        "battle_model_scope": "xmage_fixed_draw_discard_spell_v1",
+        "count": 4,
+        "draw_count": 4,
+        "discard_count": 3,
+        "discard_random": True,
+        "draw_discard_order": "draw_then_discard",
+        "draw_discard_spell": True,
+    }
+    try:
+        result = validator.run_fixed_draw_discard_spell(
+            battle,
+            {
+                "name": "Goblin Lore draws then discards",
+                "type": "fixed_draw_discard_spell",
+                "card": {"name": "Goblin Lore", "type_line": "Sorcery"},
+                "controller_library": [
+                    {"name": f"E2E Draw Discard Library Card {index + 1}", "type_line": "Sorcery", "effect": "draw_cards"}
+                    for index in range(4)
+                ],
+                "controller_hand": [
+                    {"name": f"E2E Draw Discard Spare Card {index + 1}", "type_line": "Instant", "effect": "draw_cards"}
+                    for index in range(3)
+                ],
+                "expected_draw_count": 4,
+                "expected_discard_count": 3,
+                "expected_discard_random": True,
+                "expected_draw_discard_order": "draw_then_discard",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Goblin Lore"
+    assert result["cards_drawn"] == 4
+    assert result["cards_discarded"] == 3
+    assert result["discard_random"] is True
+    assert result["order"] == "draw_then_discard"
+
+
 def test_single_target_removal_runner_validates_controller_life_gain() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []
@@ -4083,19 +4132,23 @@ def test_spell_cast_gain_life_runner_resolves_matching_land_enter_trigger() -> N
     previous_handler = battle.REPLAY_EVENT_HANDLER
     previous_get_card_effect = battle.get_card_effect
     battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
-    battle.get_card_effect = lambda card: {
-        "effect": "life_gain_engine",
-        "battle_model_scope": "xmage_spell_cast_gain_life_v1",
-        "trigger": "spell_cast",
-        "trigger_effect": "gain_life",
-        "spell_cast_gain_life": True,
-        "spell_cast_gain_life_amount": 1,
-        "spell_cast_gain_life_required_colors": ["B"],
-        "land_enter_gain_life": True,
-        "land_enter_gain_life_amount": 1,
-        "land_enter_gain_life_subtypes": ["Swamp"],
-        "_rule_logical_key": "battle_rule_v1:staff-of-the-death-magus",
-    }
+    battle.get_card_effect = lambda card: (
+        {
+            "effect": "life_gain_engine",
+            "battle_model_scope": "xmage_spell_cast_gain_life_v1",
+            "trigger": "spell_cast",
+            "trigger_effect": "gain_life",
+            "spell_cast_gain_life": True,
+            "spell_cast_gain_life_amount": 1,
+            "spell_cast_gain_life_required_colors": ["B"],
+            "land_enter_gain_life": True,
+            "land_enter_gain_life_amount": 1,
+            "land_enter_gain_life_subtypes": ["Swamp"],
+            "_rule_logical_key": "battle_rule_v1:staff-of-the-death-magus",
+        }
+        if card.get("name") == "Staff of the Death Magus"
+        else {"effect": "land"} if "Land" in str(card.get("type_line") or "") else {}
+    )
     try:
         result = validator.run_spell_cast_gain_life(
             battle,

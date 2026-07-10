@@ -9660,6 +9660,91 @@ def run_fixed_draw_spell(
     }
 
 
+def run_fixed_draw_discard_spell(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    effect = dict(battle.get_card_effect(card))
+    if effect.get("effect") != "draw_cards" or not effect.get("draw_discard_spell"):
+        fail("battle_execution", f"{card['name']} draw_discard_spell={effect.get('draw_discard_spell')!r}")
+    active = battle.Player(str(scenario.get("player") or "Spell Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
+    active.library = [
+        battle.enrich_card(dict(library_card))
+        for library_card in (scenario.get("controller_library") or scenario.get("library") or [])
+        if isinstance(library_card, dict)
+    ]
+    active.hand = [
+        battle.enrich_card(dict(hand_card))
+        for hand_card in (scenario.get("controller_hand") or [])
+        if isinstance(hand_card, dict)
+    ]
+    starting_hand_count = len(active.hand)
+    starting_library_count = len(active.library)
+    expected_draw_count = int(
+        scenario.get("expected_draw_count") or effect.get("draw_count") or effect.get("count") or 0
+    )
+    expected_discard_count = int(scenario.get("expected_discard_count") or effect.get("discard_count") or 0)
+    expected_order = str(scenario.get("expected_draw_discard_order") or effect.get("draw_discard_order") or "draw_then_discard")
+    expected_discard_random = bool(scenario.get("expected_discard_random", effect.get("discard_random")))
+    before_events = len(events)
+
+    battle.apply_effect_immediate(
+        active,
+        [opponent],
+        battle.enrich_card(card),
+        turn=int(scenario.get("turn") or 7140),
+        rng=random.Random(int(scenario.get("seed") or 7140)),
+        effect_data_override=effect,
+        phase=str(scenario.get("phase") or "precombat_main"),
+    )
+
+    if len(active.library) != starting_library_count - expected_draw_count:
+        fail(
+            "battle_execution",
+            f"{card['name']} library={len(active.library)}, expected {starting_library_count - expected_draw_count}",
+        )
+    expected_hand_count = starting_hand_count + expected_draw_count - expected_discard_count
+    if len(active.hand) != expected_hand_count:
+        fail("battle_execution", f"{card['name']} hand={len(active.hand)}, expected {expected_hand_count}")
+    event = next(
+        (
+            data
+            for event_name, data in events[before_events:]
+            if event_name == "draw_discard_spell_resolved"
+            and data.get("card") == card.get("name")
+        ),
+        None,
+    )
+    if event is None:
+        fail("battle_events", f"missing {card['name']} draw_discard_spell_resolved event")
+    if int(event.get("cards_drawn") or 0) != expected_draw_count:
+        fail("battle_events", f"{card['name']} cards_drawn={event.get('cards_drawn')}")
+    if int(event.get("requested_draw_count") or 0) != expected_draw_count:
+        fail("battle_events", f"{card['name']} requested_draw_count={event.get('requested_draw_count')}")
+    if int(event.get("cards_discarded") or 0) != expected_discard_count:
+        fail("battle_events", f"{card['name']} cards_discarded={event.get('cards_discarded')}")
+    if int(event.get("requested_discard_count") or 0) != expected_discard_count:
+        fail("battle_events", f"{card['name']} requested_discard_count={event.get('requested_discard_count')}")
+    if str(event.get("order") or "") != expected_order:
+        fail("battle_events", f"{card['name']} order={event.get('order')!r}, expected {expected_order!r}")
+    if bool(event.get("discard_random")) != expected_discard_random:
+        fail(
+            "battle_events",
+            f"{card['name']} discard_random={event.get('discard_random')!r}, expected {expected_discard_random!r}",
+        )
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "cards_drawn": expected_draw_count,
+        "cards_discarded": expected_discard_count,
+        "discard_random": expected_discard_random,
+        "order": expected_order,
+    }
+
+
 SCENARIO_RUNNERS = {
     "attack_self_boost": run_attack_self_boost,
     "aura_static_power_toughness_attachment": run_aura_static_power_toughness_attachment,
@@ -9691,6 +9776,7 @@ SCENARIO_RUNNERS = {
     "damage_target_create_treasure": run_damage_target_create_treasure,
     "damage_prevention": run_damage_prevention,
     "fixed_draw_spell": run_fixed_draw_spell,
+    "fixed_draw_discard_spell": run_fixed_draw_discard_spell,
     "fixed_damage_target_spell": run_fixed_damage_target_spell,
     "dynamic_life_gain": run_dynamic_life_gain,
     "each_player_sacrifice": run_each_player_sacrifice,

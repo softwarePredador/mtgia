@@ -14985,34 +14985,36 @@ def fixed_draw_discard_spell_from_oracle(metadata: dict[str, Any]) -> dict[str, 
     text = re.sub(r"\s+", " ", oracle_text(metadata)).strip().lower()
     if has_oracle_complexity(metadata):
         return "draw_discard_spell_oracle_not_simple"
-    number_pattern = r"(a|one|two|three|four|five|\d+)"
+    number_pattern = r"(?:a|one|two|three|four|five|\d+)"
     draw_then_discard = re.fullmatch(
-        rf"draw {number_pattern} cards?, then discard {number_pattern} cards?\.?",
+        rf"draw (?P<draw>{number_pattern}) cards?, then discard (?P<discard>{number_pattern}) cards?(?P<random> at random)?\.?",
         text,
     )
     if draw_then_discard:
-        draw_count = number_word_to_int(draw_then_discard.group(1))
-        discard_count = number_word_to_int(draw_then_discard.group(2))
+        draw_count = number_word_to_int(draw_then_discard.group("draw"))
+        discard_count = number_word_to_int(draw_then_discard.group("discard"))
         if draw_count <= 0 or discard_count <= 0:
             return "draw_discard_spell_oracle_count_not_fixed"
         return {
             "draw_count": draw_count,
             "discard_count": discard_count,
             "draw_discard_order": "draw_then_discard",
+            "discard_random": bool(draw_then_discard.group("random")),
         }
     discard_then_draw = re.fullmatch(
-        rf"discard {number_pattern} cards?, then draw {number_pattern} cards?\.?",
+        rf"discard (?P<discard>{number_pattern}) cards?(?P<random> at random)?, then draw (?P<draw>{number_pattern}) cards?\.?",
         text,
     )
     if discard_then_draw:
-        discard_count = number_word_to_int(discard_then_draw.group(1))
-        draw_count = number_word_to_int(discard_then_draw.group(2))
+        discard_count = number_word_to_int(discard_then_draw.group("discard"))
+        draw_count = number_word_to_int(discard_then_draw.group("draw"))
         if draw_count <= 0 or discard_count <= 0:
             return "draw_discard_spell_oracle_count_not_fixed"
         return {
             "draw_count": draw_count,
             "discard_count": discard_count,
             "draw_discard_order": "discard_then_draw",
+            "discard_random": bool(discard_then_draw.group("random")),
         }
     return "draw_discard_spell_oracle_not_exact_fixed"
 
@@ -32772,7 +32774,12 @@ def split_row(
             source_draw_discard = fixed_draw_discard_spell_from_source(source_text, classes)
             if isinstance(source_draw_discard, str):
                 return None, source_draw_discard
-            comparison_keys = ("draw_count", "discard_count", "draw_discard_order")
+            comparison_keys = (
+                "draw_count",
+                "discard_count",
+                "draw_discard_order",
+                "discard_random",
+            )
             if any(
                 oracle_draw_discard.get(key) != source_draw_discard.get(key)
                 for key in comparison_keys

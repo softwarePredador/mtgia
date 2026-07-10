@@ -130,6 +130,7 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "draw_count",
     "proliferate_count",
     "discard_count",
+    "discard_random",
     "draw_discard_order",
     "put_land_from_hand",
     "put_land_tapped",
@@ -3272,6 +3273,49 @@ def fixed_draw_spell_execution_scenario_from_expected_rule(
     return scenario
 
 
+def fixed_draw_discard_spell_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_fixed_draw_discard_spell_v1":
+        return None
+    expected_draw_count = int(required.get("draw_count") or required.get("count") or 0)
+    expected_discard_count = int(required.get("discard_count") or 0)
+    if expected_draw_count <= 0 or expected_discard_count <= 0:
+        return None
+    return {
+        "name": f"{rule['card_name']} draws then discards",
+        "type": "fixed_draw_discard_spell",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": "Instant" if required.get("instant") else "Sorcery",
+        },
+        "controller_library": [
+            {
+                "name": f"E2E Draw Discard Library Card {index + 1}",
+                "type_line": "Instant" if index % 2 == 0 else "Sorcery",
+                "effect": "draw_cards",
+                "cmc": index + 1,
+            }
+            for index in range(expected_draw_count)
+        ],
+        "controller_hand": [
+            {
+                "name": f"E2E Draw Discard Spare Card {index + 1}",
+                "type_line": "Instant" if index % 2 == 0 else "Sorcery",
+                "effect": "draw_cards",
+                "cmc": index + 1,
+            }
+            for index in range(expected_discard_count)
+        ],
+        "expected_draw_count": expected_draw_count,
+        "expected_discard_count": expected_discard_count,
+        "expected_discard_random": bool(required.get("discard_random")),
+        "expected_draw_discard_order": str(required.get("draw_discard_order") or "draw_then_discard"),
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def combat_damage_draw_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
@@ -6143,6 +6187,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or boost_untap_target_spell_execution_scenario_from_expected_rule(rule)
         or simple_activated_draw_execution_scenario_from_expected_rule(rule)
         or fixed_draw_spell_execution_scenario_from_expected_rule(rule)
+        or fixed_draw_discard_spell_execution_scenario_from_expected_rule(rule)
         or target_player_draw_execution_scenario_from_expected_rule(rule)
         or combat_damage_draw_execution_scenario_from_expected_rule(rule)
         or simple_activated_damage_execution_scenario_from_expected_rule(rule)
