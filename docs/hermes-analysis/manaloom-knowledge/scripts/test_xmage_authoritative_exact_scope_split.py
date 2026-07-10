@@ -20307,6 +20307,107 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["destroy_card_types"], ["creature"])
         self.assertEqual(effect["destination"], "graveyard")
 
+    def test_return_all_attacking_creatures_maps_to_mass_return_scope(self) -> None:
+        row = queue_row(
+            split.MASS_RETURN_TO_HAND_UNIT,
+            effect_classes=["ReturnToHandFromBattlefieldAllEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Aetherize",
+                oracle_text="Return all attacking creatures to their owner's hand.",
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new ReturnToHandFromBattlefieldAllEffect("
+                "StaticFilters.FILTER_ATTACKING_CREATURES));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "mass_return_to_hand")
+        self.assertEqual(effect["battle_model_scope"], split.MASS_RETURN_TO_HAND_SCOPE)
+        self.assertEqual(effect["return_card_types"], ["creature"])
+        self.assertEqual(effect["return_combat_state"], "attacking")
+        self.assertEqual(effect["destination"], "hand")
+
+    def test_return_noncreature_nonland_permanents_maps_to_mass_return_scope(self) -> None:
+        row = queue_row(
+            split.MASS_RETURN_TO_HAND_UNIT,
+            effect_classes=["ReturnToHandFromBattlefieldAllEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Filter Out",
+                oracle_text="Return all noncreature, nonland permanents to their owners' hands.",
+            ),
+            source_text=(
+                "private static final FilterPermanent filter = new FilterNonlandPermanent();"
+                "filter.add(Predicates.not(CardType.CREATURE.getPredicate()));"
+                "this.getSpellAbility().addEffect(new ReturnToHandFromBattlefieldAllEffect(filter));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["return_card_types"], ["permanent"])
+        self.assertEqual(effect["return_exclude_card_types"], ["creature", "land"])
+
+    def test_return_all_creatures_except_supported_subtypes_maps_to_mass_return_scope(self) -> None:
+        row = queue_row(
+            split.MASS_RETURN_TO_HAND_UNIT,
+            effect_classes=["ReturnToHandFromBattlefieldAllEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Whelming Wave",
+                oracle_text=(
+                    "Return all creatures to their owners' hands except for "
+                    "Krakens, Leviathans, Octopuses, and Serpents."
+                ),
+            ),
+            source_text=(
+                "FilterCreaturePermanent filter = new FilterCreaturePermanent();"
+                "filter.add(Predicates.not(Predicates.or("
+                "SubType.KRAKEN.getPredicate(), SubType.LEVIATHAN.getPredicate(), "
+                "SubType.OCTOPUS.getPredicate(), SubType.SERPENT.getPredicate())));"
+                "this.getSpellAbility().addEffect(new ReturnToHandFromBattlefieldAllEffect(filter));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        self.assertEqual(
+            proposal["effect_json"]["return_excluded_subtypes"],
+            ["kraken", "leviathan", "octopus", "serpent"],
+        )
+
+    def test_return_historic_filter_stays_blocked(self) -> None:
+        row = queue_row(
+            split.MASS_RETURN_TO_HAND_UNIT,
+            effect_classes=["ReturnToHandFromBattlefieldAllEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Desynchronization",
+                oracle_text=(
+                    "Return each nonland permanent that's not historic to its owner's hand. "
+                    "(Artifacts, legendaries, and Sagas are historic.)"
+                ),
+            ),
+            source_text=(
+                "FilterNonlandPermanent filter = new FilterNonlandPermanent();"
+                "filter.add(Predicates.not(HistoricPredicate.instance));"
+                "this.getSpellAbility().addEffect(new ReturnToHandFromBattlefieldAllEffect(filter));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "mass_return_to_hand_oracle_scope_not_supported")
+
     def test_damage_all_creatures_maps_to_damage_wipe_scope(self) -> None:
         row = queue_row(split.BOARD_WIPE_UNIT, effect_classes=["DamageAllEffect"])
         proposal, reason = split.split_row(

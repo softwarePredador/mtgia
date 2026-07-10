@@ -3570,6 +3570,34 @@ def test_board_wipe_execution_scenario_preserves_destroy_filters() -> None:
     assert scenario["destroy_exclude_commanders"] is True
 
 
+def test_mass_return_to_hand_fields_and_execution_scenario_are_manifested() -> None:
+    proposal = {
+        "normalized_name": "aetherize",
+        "card_name": "Aetherize",
+        "oracle_hash": "hash-aetherize",
+        "logical_rule_key": "battle_rule_v1:aetherize",
+        "effect_json": {
+            "effect": "mass_return_to_hand",
+            "battle_model_scope": "xmage_return_all_matching_permanents_to_hand_spell_v1",
+            "return_card_types": ["creature"],
+            "return_controller": "any",
+            "return_combat_state": "attacking",
+            "destination": "hand",
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    required = expected["required_effect_fields"]
+    assert required["return_card_types"] == ["creature"]
+    assert required["return_controller"] == "any"
+    assert required["return_combat_state"] == "attacking"
+    assert scenario["type"] == "mass_return_to_hand"
+    assert scenario["return_card_types"] == ["creature"]
+    assert scenario["return_combat_state"] == "attacking"
+
+
 def test_manifest_expected_rule_preserves_dynamic_graveyard_damage_fields() -> None:
     proposal = {
         "normalized_name": "kindle",

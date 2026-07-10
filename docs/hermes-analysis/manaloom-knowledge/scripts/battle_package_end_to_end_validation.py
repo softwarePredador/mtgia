@@ -3497,13 +3497,31 @@ def run_creature_dies_each_player_sacrifice(
 
 def _board_wipe_type_line(card_type: str, scenario: dict[str, Any], *, matching: bool) -> str:
     normalized = str(card_type or "creature").strip().lower()
+    excluded_type_values = {
+        str(value or "").strip().lower()
+        for value in scenario.get("destroy_exclude_card_types") or []
+        if str(value or "").strip()
+    }
+    generic_permanent_type = "Artifact"
+    if normalized == "permanent" and matching:
+        for candidate_type, candidate_line in (
+            ("artifact", "Artifact"),
+            ("enchantment", "Enchantment"),
+            ("planeswalker", "Planeswalker - Jace"),
+            ("battle", "Battle - Siege"),
+            ("creature", "Creature - Soldier"),
+            ("land", "Land"),
+        ):
+            if candidate_type not in excluded_type_values:
+                generic_permanent_type = candidate_line
+                break
     mapping = {
         "artifact": "Artifact",
         "battle": "Battle - Siege",
         "creature": "Creature - Soldier",
         "enchantment": "Enchantment",
         "land": "Land",
-        "permanent": "Creature - Soldier",
+        "permanent": generic_permanent_type,
         "planeswalker": "Planeswalker - Jace",
     }
     type_line = mapping.get(normalized, "Creature - Soldier")
@@ -3521,8 +3539,7 @@ def _board_wipe_type_line(card_type: str, scenario: dict[str, Any], *, matching:
                 type_line = f"{type_line} - {' '.join(required_subtypes)}"
     excluded_types = [
         str(value or "").strip().title()
-        for value in scenario.get("destroy_exclude_card_types") or []
-        if str(value or "").strip()
+        for value in excluded_type_values
     ]
     if not matching and excluded_types:
         type_line = f"{type_line} {' '.join(excluded_types)}"
@@ -3597,6 +3614,8 @@ def _board_wipe_fixture_permanent(
         permanent["counters"] = {} if matching else {"+1/+1": 1}
         permanent["plus_one_counters"] = 0 if matching else 1
     combat_state = str(scenario.get("destroy_combat_state") or "").strip().lower()
+    if combat_state == "attacking":
+        permanent["attacking"] = bool(matching)
     if combat_state == "blocking_or_blocked":
         permanent["blocking"] = bool(matching)
         permanent["blocked"] = False
@@ -3761,6 +3780,152 @@ def run_board_wipe(
         "expected_destroyed": len(expected_destroyed_names),
         "destroy_card_types": wipe_event.get("destroy_card_types") or destroy_card_types,
         "destroy_controller": wipe_event.get("destroy_controller") or destroy_controller,
+    }
+
+
+def _mass_return_scenario_as_destroy_filter(scenario: dict[str, Any]) -> dict[str, Any]:
+    aliases = dict(scenario)
+    for field in (
+        "card_types",
+        "controller",
+        "required_colors",
+        "excluded_colors",
+        "required_subtypes",
+        "excluded_subtypes",
+        "exclude_card_types",
+        "combat_state",
+    ):
+        return_field = f"return_{field}"
+        destroy_field = f"destroy_{field}"
+        if return_field in aliases and destroy_field not in aliases:
+            aliases[destroy_field] = aliases[return_field]
+    return aliases
+
+
+def run_mass_return_to_hand(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    active = battle.Player(str(scenario.get("player") or "Active"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
+    before_events = len(events)
+    effect_data = battle.get_card_effect(card)
+    if effect_data.get("effect") != "mass_return_to_hand":
+        fail("battle_execution", f"{card['name']} effect={effect_data.get('effect')!r}")
+    return_card_types = list(
+        scenario.get("return_card_types")
+        or effect_data.get("return_card_types")
+        or ["creature"]
+    )
+    return_controller = str(
+        scenario.get("return_controller")
+        or effect_data.get("return_controller")
+        or "any"
+    ).strip().lower()
+    scenario_with_effect = _mass_return_scenario_as_destroy_filter({**effect_data, **scenario})
+    target_active = return_controller not in {"opponent", "opponents", "opponents_control"}
+    target_opponent = return_controller not in {"self", "you", "controller"}
+    expected_returned_names: set[str] = set()
+    expected_survivor_names: set[str] = set()
+
+    def add_fixture(owner, owner_label: str, targeted: bool) -> None:
+        for card_type in return_card_types:
+            permanent = _board_wipe_fixture_permanent(
+                f"{owner_label} Matching {card_type.title()}",
+                card_type,
+                scenario_with_effect,
+                matching=True,
+            )
+            owner.battlefield.append(permanent)
+            if targeted:
+                expected_returned_names.add(permanent["name"])
+            else:
+                expected_survivor_names.add(permanent["name"])
+        decoy_type = _board_wipe_nonmatching_type(return_card_types)
+        if decoy_type:
+            decoy = _board_wipe_fixture_permanent(
+                f"{owner_label} Nonmatching {decoy_type.title()}",
+                decoy_type,
+                scenario_with_effect,
+                matching=True,
+            )
+            owner.battlefield.append(decoy)
+            expected_survivor_names.add(decoy["name"])
+        has_extra_filter = any(
+            scenario_with_effect.get(field) not in (None, "", [], False)
+            for field in (
+                "destroy_required_colors",
+                "destroy_excluded_colors",
+                "destroy_required_subtypes",
+                "destroy_excluded_subtypes",
+                "destroy_exclude_card_types",
+                "destroy_combat_state",
+            )
+        )
+        if has_extra_filter:
+            filtered_decoy = _board_wipe_fixture_permanent(
+                f"{owner_label} Filtered Decoy",
+                return_card_types[0],
+                scenario_with_effect,
+                matching=False,
+            )
+            owner.battlefield.append(filtered_decoy)
+            expected_survivor_names.add(filtered_decoy["name"])
+
+    add_fixture(active, "Active", target_active)
+    add_fixture(opponent, "Opponent", target_opponent)
+
+    battle.apply_effect_immediate(
+        active,
+        [opponent],
+        card,
+        turn=int(scenario.get("turn") or 6),
+        rng=random.Random(int(scenario.get("seed") or 7070)),
+    )
+
+    hand_names = {
+        str(item.get("name") or "")
+        for owner in (active, opponent)
+        for item in owner.hand
+        if isinstance(item, dict)
+    }
+    battlefield_names = {
+        str(item.get("name") or "")
+        for owner in (active, opponent)
+        for item in owner.battlefield
+        if isinstance(item, dict)
+    }
+    missing_returned = expected_returned_names - hand_names
+    wrongly_returned = expected_survivor_names & hand_names
+    if missing_returned:
+        fail("battle_execution", f"{card['name']} did not return {sorted(missing_returned)}")
+    if wrongly_returned:
+        fail("battle_execution", f"{card['name']} wrongly returned {sorted(wrongly_returned)}")
+    if not expected_survivor_names.issubset(battlefield_names):
+        fail("battle_execution", f"{card['name']} survivor state mismatch")
+    return_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "mass_return_to_hand_resolved" and data.get("card") == card.get("name")
+        ),
+        None,
+    )
+    if return_event is None:
+        fail("battle_events", f"missing {card['name']} mass_return_to_hand_resolved event")
+    if int(return_event.get("returned") or 0) != len(expected_returned_names):
+        fail(
+            "battle_events",
+            f"{card['name']} returned={return_event.get('returned')}, expected {len(expected_returned_names)}",
+        )
+    return {
+        "card_name": card["name"],
+        "returned": int(return_event.get("returned") or 0),
+        "expected_returned": len(expected_returned_names),
+        "return_card_types": return_event.get("return_card_types") or return_card_types,
+        "return_controller": return_event.get("return_controller") or return_controller,
     }
 
 
@@ -9164,6 +9329,7 @@ SCENARIO_RUNNERS = {
     "becomes_blocked_self_boost": run_becomes_blocked_self_boost,
     "board_wipe": run_board_wipe,
     "combat_damage_draw": run_combat_damage_draw,
+    "mass_return_to_hand": run_mass_return_to_hand,
     "conditional_land_play": run_conditional_land_play,
     "counter_unless_pays_response": run_counter_unless_pays_response,
     "copy_stack_ability_response": run_copy_stack_ability_response,

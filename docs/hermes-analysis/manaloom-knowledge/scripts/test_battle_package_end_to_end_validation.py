@@ -782,6 +782,42 @@ def test_board_wipe_runner_validates_extended_destroy_predicates() -> None:
     assert result["expected_destroyed"] == 2
 
 
+def test_mass_return_to_hand_runner_validates_return_filters() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    effect = {
+        "effect": "mass_return_to_hand",
+        "battle_model_scope": "xmage_return_all_matching_permanents_to_hand_spell_v1",
+        "return_card_types": ["creature"],
+        "return_controller": "any",
+        "return_combat_state": "attacking",
+        "destination": "hand",
+    }
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: effect
+    try:
+        result = validator.run_mass_return_to_hand(
+            battle,
+            {
+                "name": "Aetherize returns only attacking creatures",
+                "type": "mass_return_to_hand",
+                "card": {"name": "Aetherize", "type_line": "Instant"},
+                **effect,
+                "logical_rule_key": "battle_rule_v1:aetherize",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Aetherize"
+    assert result["returned"] == 2
+    assert result["expected_returned"] == 2
+
+
 def test_global_stat_modifier_draw_spell_runner_executes_boost_and_draw() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

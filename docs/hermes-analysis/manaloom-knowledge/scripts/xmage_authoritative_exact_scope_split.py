@@ -85,6 +85,10 @@ TUTOR_UNIT = "tutor::xmage_library_search_variant_review_v1"
 TUTOR_HAND_UNIT = "tutor::any_tutor_to_hand_v1"
 ETB_TUTOR_HAND_CREATURE_UNIT = "creature::etb_tutor_to_hand_creature_variant_v1"
 BOARD_WIPE_UNIT = "board_wipe::xmage_mass_removal_or_sacrifice_variant_review_v1"
+MASS_RETURN_TO_HAND_UNIT = (
+    "xmage_signature::ReturnToHandFromBattlefieldAllEffect::no_ability_class::"
+    "no_target_class::no_condition_class::no_signal"
+)
 ADD_COUNTERS_TARGET_UNIT = "add_counters::targeted_add_counters_variant_v1"
 ADD_COUNTERS_SOURCE_UNIT = "add_counters::source_add_counters_variant_v1"
 BOOST_TARGET_UNIT = (
@@ -211,6 +215,7 @@ SUPPORTED_UNITS = {
     TUTOR_HAND_UNIT,
     ETB_TUTOR_HAND_CREATURE_UNIT,
     BOARD_WIPE_UNIT,
+    MASS_RETURN_TO_HAND_UNIT,
     ADD_COUNTERS_TARGET_UNIT,
     UNTAP_TARGET_UNIT,
     BOOST_TARGET_UNIT,
@@ -331,6 +336,7 @@ COUNTER_UNLESS_PAYS_DRAW_SCOPE = (
     "xmage_counter_target_spell_unless_controller_pays_generic_draw_card_v1"
 )
 BOUNCE_SCOPE = "xmage_return_target_to_hand_spell_v1"
+MASS_RETURN_TO_HAND_SCOPE = "xmage_return_all_matching_permanents_to_hand_spell_v1"
 RECURSION_SCOPE = "xmage_return_target_graveyard_card_to_hand_spell_v1"
 RECURSION_MILL_RETURN_SCOPE = "xmage_mill_then_return_graveyard_card_to_hand_spell_v1"
 RECURSION_BATTLEFIELD_SCOPE = "xmage_return_target_graveyard_card_to_battlefield_spell_v1"
@@ -503,6 +509,7 @@ SPELL_UNITS = {
     TUTOR_UNIT,
     TUTOR_HAND_UNIT,
     BOARD_WIPE_UNIT,
+    MASS_RETURN_TO_HAND_UNIT,
     ADD_COUNTERS_TARGET_UNIT,
     ADD_COUNTERS_SOURCE_UNIT,
     UNTAP_TARGET_UNIT,
@@ -7093,6 +7100,163 @@ def destroy_all_source_matches_spec(source: str, spec: dict[str, Any]) -> bool:
         if subtype_constant and f"SubType.{subtype_constant}" not in text:
             return False
     return True
+
+
+def _return_all_to_hand_line(metadata: dict[str, Any]) -> str:
+    text = " ".join(oracle_effect_lines_without_neutral_auxiliary(metadata))
+    return re.sub(r"\s+", " ", strip_parenthetical_reminders(text)).strip()
+
+
+def _return_subtype_exceptions(value: str) -> list[str] | None:
+    words = [
+        re.sub(r"s$", "", part.strip().lower())
+        for part in re.split(r",|\band\b", value)
+        if part.strip()
+    ]
+    aliases = {"octopuse": "octopus"}
+    normalized = [aliases.get(word, word) for word in words if word]
+    supported = {"kraken", "leviathan", "octopus", "serpent"}
+    if set(normalized) == supported:
+        return ["kraken", "leviathan", "octopus", "serpent"]
+    return None
+
+
+def return_all_to_hand_spec_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str | None:
+    text = _return_all_to_hand_line(metadata)
+    match = re.match(
+        r"^return all (?P<body>.+?) to (?:their owners' hands|their owner's hand|their owners' hand|their owner's hands|its owner's hand|its owners' hands)(?: except for (?P<except>.+?))?\.?$",
+        text,
+    )
+    if not match:
+        return None
+    body = re.sub(r"\s+", " ", match.group("body")).strip()
+    except_text = re.sub(r"\s+", " ", match.group("except") or "").strip()
+    spec: dict[str, Any] | None = None
+    if body == "creatures":
+        spec = {"return_card_types": ["creature"], "return_controller": "any"}
+    elif body == "attacking creatures":
+        spec = {
+            "return_card_types": ["creature"],
+            "return_controller": "any",
+            "return_combat_state": "attacking",
+        }
+    elif body == "lands":
+        spec = {"return_card_types": ["land"], "return_controller": "any"}
+    elif body == "artifacts you control":
+        spec = {"return_card_types": ["artifact"], "return_controller": "self"}
+    elif body == "creatures you control":
+        spec = {"return_card_types": ["creature"], "return_controller": "self"}
+    elif body == "noncreature, nonland permanents":
+        spec = {
+            "return_card_types": ["permanent"],
+            "return_controller": "any",
+            "return_exclude_card_types": ["creature", "land"],
+        }
+    elif body == "green permanents":
+        spec = {
+            "return_card_types": ["permanent"],
+            "return_controller": "any",
+            "return_required_colors": ["G"],
+        }
+    elif body == "nonblue creatures":
+        spec = {
+            "return_card_types": ["creature"],
+            "return_controller": "any",
+            "return_excluded_colors": ["U"],
+        }
+    elif body == "artifacts and enchantments":
+        spec = {
+            "return_card_types": ["artifact", "enchantment"],
+            "return_controller": "any",
+        }
+    if spec is None:
+        return None
+    if except_text:
+        excluded_subtypes = _return_subtype_exceptions(except_text)
+        if excluded_subtypes is None:
+            return "mass_return_to_hand_oracle_exception_not_supported"
+        spec["return_excluded_subtypes"] = excluded_subtypes
+    return spec
+
+
+def return_all_to_hand_source_blocker(source: str) -> str | None:
+    text = source or ""
+    if len(re.findall(r"new\s+ReturnToHandFromBattlefieldAllEffect\s*\(", text)) != 1:
+        return "mass_return_to_hand_source_not_single_effect"
+    if re.search(r"\bnew\s+Mode\s*\(", text) or ".addMode(" in text:
+        return "mass_return_to_hand_source_modal_not_supported"
+    blockers = {
+        "HistoricPredicate": "mass_return_to_hand_historic_filter_not_supported",
+        "TokenPredicate": "mass_return_to_hand_token_filter_not_supported",
+        "SourceDidDamageWatcher": "mass_return_to_hand_damage_history_filter_not_supported",
+        "dealt damage this turn": "mass_return_to_hand_damage_history_filter_not_supported",
+        "ChooseCreatureTypeEffect": "mass_return_to_hand_chosen_type_not_supported",
+    }
+    for needle, reason in blockers.items():
+        if needle in text:
+            return reason
+    return None
+
+
+def return_all_to_hand_spec_from_source(source: str) -> dict[str, Any] | str | None:
+    blocker = return_all_to_hand_source_blocker(source)
+    if blocker:
+        return blocker
+    text = source or ""
+    if "StaticFilters.FILTER_ATTACKING_CREATURES" in text:
+        return {
+            "return_card_types": ["creature"],
+            "return_controller": "any",
+            "return_combat_state": "attacking",
+        }
+    if "StaticFilters.FILTER_PERMANENT_CREATURES" in text:
+        return {"return_card_types": ["creature"], "return_controller": "any"}
+    if "StaticFilters.FILTER_LANDS" in text:
+        return {"return_card_types": ["land"], "return_controller": "any"}
+    if "FilterControlledArtifactPermanent" in text:
+        return {"return_card_types": ["artifact"], "return_controller": "self"}
+    if "FilterControlledCreaturePermanent" in text:
+        return {"return_card_types": ["creature"], "return_controller": "self"}
+    if "StaticFilters.FILTER_PERMANENT_ARTIFACTS_AND_ENCHANTMENTS" in text:
+        return {
+            "return_card_types": ["artifact", "enchantment"],
+            "return_controller": "any",
+        }
+    if (
+        "FilterNonlandPermanent" in text
+        and "Predicates.not(CardType.CREATURE.getPredicate())" in text
+    ):
+        return {
+            "return_card_types": ["permanent"],
+            "return_controller": "any",
+            "return_exclude_card_types": ["creature", "land"],
+        }
+    if (
+        "FilterCreaturePermanent" in text
+        and "Predicates.not(new ColorPredicate(ObjectColor.BLUE))" in text
+    ):
+        return {
+            "return_card_types": ["creature"],
+            "return_controller": "any",
+            "return_excluded_colors": ["U"],
+        }
+    if "ColorPredicate(ObjectColor.GREEN)" in text and "FilterCreaturePermanent" not in text:
+        return {
+            "return_card_types": ["permanent"],
+            "return_controller": "any",
+            "return_required_colors": ["G"],
+        }
+    subtype_constants = {
+        value.lower()
+        for value in re.findall(r"SubType\.(KRAKEN|LEVIATHAN|OCTOPUS|SERPENT)\.getPredicate", text)
+    }
+    if subtype_constants == {"kraken", "leviathan", "octopus", "serpent"}:
+        return {
+            "return_card_types": ["creature"],
+            "return_controller": "any",
+            "return_excluded_subtypes": ["kraken", "leviathan", "octopus", "serpent"],
+        }
+    return None
 
 
 def fixed_sacrifice_count_word(value: str) -> int | None:
@@ -24298,6 +24462,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "fixed destroy-target plus draw-card spell"
     elif scope == BOUNCE_DRAW_SCOPE:
         scope_kind = "fixed return-target-to-hand plus draw-card spell"
+    elif scope == MASS_RETURN_TO_HAND_SCOPE:
+        scope_kind = "fixed return-all matching permanents to their owners' hands spell"
     elif scope == DESTROY_COMPENSATION_TOKEN_SCOPE:
         scope_kind = "fixed destroy-target spell with target-controller creature-token compensation"
     elif scope == EXILE_COMPENSATION_TOKEN_SCOPE:
@@ -24869,6 +25035,40 @@ def split_row(
 
     flags = spell_flags(metadata)
     classes = effect_classes(row)
+
+    if unit == MASS_RETURN_TO_HAND_UNIT:
+        if classes != {"ReturnToHandFromBattlefieldAllEffect"}:
+            return None, "mass_return_to_hand_effect_class_not_pure"
+        if ability_classes(row):
+            return None, "mass_return_to_hand_ability_class_not_simple"
+        if has_oracle_complexity(metadata):
+            return None, "mass_return_to_hand_oracle_not_simple"
+        oracle_return = return_all_to_hand_spec_from_oracle(metadata)
+        if isinstance(oracle_return, str):
+            return None, oracle_return
+        if oracle_return is None:
+            return None, "mass_return_to_hand_oracle_scope_not_supported"
+        source_return = return_all_to_hand_spec_from_source(source_text)
+        if isinstance(source_return, str):
+            return None, source_return
+        if source_return is None:
+            return None, "mass_return_to_hand_source_scope_not_supported"
+        if source_return != oracle_return:
+            return None, "mass_return_to_hand_source_oracle_mismatch"
+        effect_json = {
+            "effect": "mass_return_to_hand",
+            "battle_model_scope": MASS_RETURN_TO_HAND_SCOPE,
+            "destination": "hand",
+            "xmage_effect_class": "ReturnToHandFromBattlefieldAllEffect",
+            **oracle_return,
+            **flags,
+        }
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_return_all_matching_permanents_to_hand_spell",
+        ), "selected_exact_scope"
 
     if tap_target_spell_unit:
         if classes != {"TapTargetEffect"}:

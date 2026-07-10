@@ -26736,6 +26736,10 @@ def _permanent_matches_destroy_card_types(permanent, destroy_card_types, effect_
     if effect_data.get("destroy_counter_state") == "none" and _permanent_has_any_counter(permanent):
         return False
     combat_state = str(effect_data.get("destroy_combat_state") or "").strip().lower()
+    if combat_state == "attacking" and not (
+        isinstance(permanent, dict) and permanent.get("attacking")
+    ):
+        return False
     if combat_state == "blocking_or_blocked" and not (
         isinstance(permanent, dict) and (permanent.get("blocking") or permanent.get("blocked"))
     ):
@@ -26780,6 +26784,35 @@ def _permanent_matches_destroy_card_types(permanent, destroy_card_types, effect_
         ):
             return False
     return True
+
+
+def _return_to_hand_destroy_filter_aliases(effect_data):
+    aliases = dict(effect_data or {})
+    for field in (
+        "card_types",
+        "controller",
+        "required_colors",
+        "excluded_colors",
+        "required_subtypes",
+        "excluded_subtypes",
+        "exclude_card_types",
+        "tapped_state",
+        "nonbasic_lands",
+        "combat_state",
+    ):
+        return_field = f"return_{field}"
+        destroy_field = f"destroy_{field}"
+        if return_field in aliases and destroy_field not in aliases:
+            aliases[destroy_field] = aliases[return_field]
+    return aliases
+
+
+def _permanent_matches_return_to_hand_filter(permanent, return_card_types, effect_data=None):
+    return _permanent_matches_destroy_card_types(
+        permanent,
+        return_card_types,
+        _return_to_hand_destroy_filter_aliases(effect_data or {}),
+    )
 
 
 def _normalized_modal_exile_modes(effect_data):
@@ -64660,6 +64693,145 @@ def apply_effect_immediate(
         resolve_tragic_arrogance(player, opponents, card, effect_data, turn)
     elif effect == "each_player_sacrifice":
         resolve_each_player_sacrifice(player, opponents, card, effect_data, turn)
+    elif effect == "mass_return_to_hand":
+        return_card_types = list(effect_data.get("return_card_types") or ["creature"])
+        return_controller = str(effect_data.get("return_controller") or "any").strip().lower()
+        moved = 0
+        vanished_tokens = 0
+        commanders_to_command_zone = 0
+        permanents_seen = 0
+        creatures_returned = 0
+        lands_returned = 0
+        artifacts_returned = 0
+        enchantments_returned = 0
+        planeswalkers_returned = 0
+        battles_returned = 0
+        own_permanents_returned = 0
+        opponent_permanents_returned = 0
+        per_player = []
+        for participant in [player] + list(opponents):
+            is_self = participant is player
+            if return_controller in {"opponent", "opponents", "opponents_control"} and is_self:
+                continue
+            if return_controller in {"self", "you", "controller"} and not is_self:
+                continue
+            returned_cards = []
+            for permanent in list(getattr(participant, "battlefield", []) or []):
+                if not _permanent_matches_return_to_hand_filter(permanent, return_card_types, effect_data):
+                    continue
+                permanents_seen += 1
+                returned_cards.append(permanent)
+            player_summary = {
+                "player": getattr(participant, "name", "?"),
+                "returned": 0,
+                "vanished_tokens": 0,
+                "commanders_to_command_zone": 0,
+                "cards": [],
+            }
+            for permanent in returned_cards:
+                type_flags = _destroyed_permanent_type_flags(permanent)
+                destination = move_permanent_from_battlefield_to_hand(
+                    participant,
+                    permanent,
+                    reason="mass_return_to_hand",
+                    source=card,
+                    turn=turn,
+                )
+                card_name = permanent.get("name", "?") if isinstance(permanent, dict) else str(permanent)
+                player_summary["cards"].append(card_name)
+                if destination == "vanished_token":
+                    vanished_tokens += 1
+                    player_summary["vanished_tokens"] += 1
+                    continue
+                if destination == "command_zone":
+                    commanders_to_command_zone += 1
+                    player_summary["commanders_to_command_zone"] += 1
+                moved += 1
+                player_summary["returned"] += 1
+                if is_self:
+                    own_permanents_returned += 1
+                else:
+                    opponent_permanents_returned += 1
+                if type_flags["creature"]:
+                    creatures_returned += 1
+                if type_flags["land"]:
+                    lands_returned += 1
+                if type_flags["artifact"]:
+                    artifacts_returned += 1
+                if type_flags["enchantment"]:
+                    enchantments_returned += 1
+                if type_flags["planeswalker"]:
+                    planeswalkers_returned += 1
+                if type_flags["battle"]:
+                    battles_returned += 1
+            per_player.append(player_summary)
+        fields = replay_rule_fields(effect_data)
+        emit_decision_trace(
+            decision_type="mass_return_to_hand",
+            player=player,
+            turn=turn,
+            phase="resolution",
+            available_options=[
+                decision_card_option(card, effect_data, action="resolve_mass_return_to_hand"),
+                {"action": "defer_bounce_not_available_after_resolution"},
+            ],
+            chosen_option=decision_card_option(card, effect_data, action="resolve_mass_return_to_hand"),
+            rejected_options=[{"action": "defer_bounce_not_available_after_resolution"}],
+            score_components={
+                "return_card_types": return_card_types,
+                "return_controller": return_controller,
+                "permanents_seen": permanents_seen,
+                "returned": moved,
+                "vanished_tokens": vanished_tokens,
+                "commanders_to_command_zone": commanders_to_command_zone,
+                "own_permanents_returned": own_permanents_returned,
+                "opponent_permanents_returned": opponent_permanents_returned,
+            },
+            rule_source=fields.get("rule_source", "battle_heuristic"),
+            rule_status=fields.get("rule_review_status", "heuristic"),
+            confidence="medium",
+            expected_benefit_score=max(0, opponent_permanents_returned - own_permanents_returned) * 8,
+            actual_outcome="mass_return_to_hand_resolved",
+            reason="temporary_reset_matching_permanents",
+            strategic_principle="bounce_when_tempo_or_asymmetry_justifies_reset",
+            heuristic_version=DECISION_STRATEGY_VERSION,
+            resource_delta={
+                "returned": moved,
+                "opponent_permanents_returned": opponent_permanents_returned,
+                "own_permanents_returned": own_permanents_returned,
+            },
+            risk_flags=[],
+            rejected_reason="spell_already_resolving",
+        )
+        emit_replay_event(
+            "mass_return_to_hand_resolved",
+            player=player.name,
+            card=card.get("name", "?"),
+            return_card_types=return_card_types,
+            return_controller=return_controller,
+            return_required_colors=effect_data.get("return_required_colors") or [],
+            return_excluded_colors=effect_data.get("return_excluded_colors") or [],
+            return_required_subtypes=effect_data.get("return_required_subtypes") or [],
+            return_excluded_subtypes=effect_data.get("return_excluded_subtypes") or [],
+            return_exclude_card_types=effect_data.get("return_exclude_card_types") or [],
+            return_combat_state=effect_data.get("return_combat_state"),
+            returned=moved,
+            vanished_tokens=vanished_tokens,
+            commanders_to_command_zone=commanders_to_command_zone,
+            permanents_seen=permanents_seen,
+            creatures_returned=creatures_returned,
+            lands_returned=lands_returned,
+            artifacts_returned=artifacts_returned,
+            enchantments_returned=enchantments_returned,
+            planeswalkers_returned=planeswalkers_returned,
+            battles_returned=battles_returned,
+            own_permanents_returned=own_permanents_returned,
+            opponent_permanents_returned=opponent_permanents_returned,
+            per_player=per_player,
+            turn=turn,
+            **fields,
+        )
+        finish_resolved_spell(player, card, turn=turn)
     elif effect == "board_wipe":
         if effect_data.get("exile_modes"):
             resolve_modal_exile_board_wipe(player, opponents, card, effect_data, turn)

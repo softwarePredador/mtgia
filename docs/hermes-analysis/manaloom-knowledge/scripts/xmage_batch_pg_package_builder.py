@@ -433,6 +433,14 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "destroy_dealt_damage_to_you_this_turn",
     "destroy_exclude_commanders",
     "destroy_enchanted_state",
+    "return_card_types",
+    "return_controller",
+    "return_required_colors",
+    "return_excluded_colors",
+    "return_required_subtypes",
+    "return_excluded_subtypes",
+    "return_exclude_card_types",
+    "return_combat_state",
     "sacrifice_count",
     "sacrifice_card_types",
     "sacrifice_scope",
@@ -4426,6 +4434,34 @@ def board_wipe_execution_scenario_from_expected_rule(
     return scenario
 
 
+def mass_return_to_hand_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_return_all_matching_permanents_to_hand_spell_v1":
+        return None
+    return_card_types = list(required.get("return_card_types") or ["creature"])
+    scenario = {
+        "name": f"{rule['card_name']} returns matching permanents to hand",
+        "type": "mass_return_to_hand",
+        "card": {"name": rule["card_name"], "type_line": "Instant"},
+        "return_card_types": return_card_types,
+        "return_controller": required.get("return_controller", "any"),
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+    for field in (
+        "return_required_colors",
+        "return_excluded_colors",
+        "return_required_subtypes",
+        "return_excluded_subtypes",
+        "return_exclude_card_types",
+        "return_combat_state",
+    ):
+        if required.get(field) not in (None, "", []):
+            scenario[field] = required[field]
+    return scenario
+
+
 def _library_pick_matching_card(target: str, *, name: str, cmc: int = 5) -> dict[str, Any]:
     normalized = str(target or "any_card").strip().lower()
     mapping = {
@@ -5910,6 +5946,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or attack_self_boost_execution_scenario_from_expected_rule(rule)
         or becomes_blocked_self_boost_execution_scenario_from_expected_rule(rule)
         or board_wipe_execution_scenario_from_expected_rule(rule)
+        or mass_return_to_hand_execution_scenario_from_expected_rule(rule)
         or each_player_sacrifice_execution_scenario_from_expected_rule(rule)
         or multi_target_damage_execution_scenario_from_expected_rule(rule)
         or multi_target_removal_execution_scenario_from_expected_rule(rule)
