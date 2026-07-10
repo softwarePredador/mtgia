@@ -15409,6 +15409,109 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertTrue(effect["mana_activation_requires_tap"])
         self.assertEqual(effect["activation_life_cost"], 1)
 
+    def test_simple_mana_ability_source_maps_tap_and_discard_cost(self) -> None:
+        row = queue_row(
+            split.RAMP_CREATURE_UNIT,
+            effect_classes=["BasicManaEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleManaAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Bog Witch",
+                type_line="Creature - Human Spellshaper",
+                oracle_text="{B}, {T}, Discard a card: Add {B}{B}{B}.",
+            ),
+            source_text=(
+                "Ability ability = new SimpleManaAbility(Zone.BATTLEFIELD, "
+                "Mana.BlackMana(3), new ManaCostsImpl<>(\"{B}\"));"
+                "ability.addCost(new TapSourceCost());"
+                "ability.addCost(new DiscardCardCost());"
+                "this.addAbility(ability);"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.MANA_SCOPE)
+        self.assertEqual(effect["produces"], "B")
+        self.assertEqual(effect["produced_mana_symbols"], ["B", "B", "B"])
+        self.assertEqual(effect["activation_mana_cost"], "{B}")
+        self.assertTrue(effect["mana_activation_requires_tap"])
+        self.assertEqual(effect["activation_discard_count"], 1)
+        self.assertEqual(effect["activation_discard_target"], "any_card")
+
+    def test_simple_mana_source_with_unmodeled_discard_auxiliary_maps_partial_mana(self) -> None:
+        row = queue_row(
+            split.RAMP_ARTIFACT_UNIT,
+            effect_classes=["DrawDiscardControllerEffect"],
+            ability_kind="activated",
+            ability_classes=["AnyColorManaAbility", "SimpleActivatedAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Network Terminal",
+                type_line="Artifact",
+                oracle_text=(
+                    "{T}: Add one mana of any color.\n"
+                    "{1}, {T}, Tap another untapped artifact you control: Draw a card, then discard a card."
+                ),
+            ),
+            source_text=(
+                "this.addAbility(new AnyColorManaAbility());"
+                "Ability ability = new SimpleActivatedAbility("
+                "new DrawDiscardControllerEffect(1, 1), new GenericManaCost(1));"
+                "ability.addCost(new TapSourceCost());"
+                "ability.addCost(new TapTargetCost(new TargetControlledPermanent(filter)));"
+                "this.addAbility(ability);"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.MANA_SCOPE)
+        self.assertEqual(proposal["family_id"], "xmage_simple_mana_source_with_unmodeled_auxiliary")
+        self.assertTrue(effect["_runtime_partial"])
+        self.assertEqual(effect["produces"], "WUBRG")
+        self.assertNotIn("activation_discard_count", effect)
+
+    def test_simple_mana_source_multiline_oracle_does_not_merge_auxiliary_mana_cost(self) -> None:
+        row = queue_row(
+            split.RAMP_CREATURE_UNIT,
+            effect_classes=["ReturnToHandSourceEffect", "FetchQuestEffect", "OneShotEffect"],
+            ability_kind="activated",
+            ability_classes=["GreenManaAbility", "SimpleActivatedAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Bramble Familiar // Fetch Quest",
+                type_line="Creature - Elemental Raccoon",
+                oracle_text=(
+                    "{T}: Add {G}.\n"
+                    "{1}{G}, {T}, Discard a card: Return this creature to its owner's hand."
+                ),
+            ),
+            source_text=(
+                "this.addAbility(new GreenManaAbility());"
+                "Ability ability = new SimpleActivatedAbility("
+                "new ReturnToHandSourceEffect(true), new ManaCostsImpl<>(\"{1}{G}\"));"
+                "ability.addCost(new TapSourceCost());"
+                "ability.addCost(new DiscardTargetCost(new TargetCardInHand(StaticFilters.FILTER_CARD)));"
+                "this.addAbility(ability);"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.MANA_SCOPE)
+        self.assertEqual(effect["mana_produced"], 1)
+        self.assertEqual(effect["produced_mana_symbols"], ["G"])
+        self.assertEqual(effect["produces"], "G")
+        self.assertTrue(effect["_runtime_partial"])
+
     def test_simple_mana_source_blocks_mixed_life_cost_color_modes(self) -> None:
         row = queue_row(
             split.RAMP_ARTIFACT_UNIT,

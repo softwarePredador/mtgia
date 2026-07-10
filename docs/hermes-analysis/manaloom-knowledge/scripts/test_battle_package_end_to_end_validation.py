@@ -3680,6 +3680,54 @@ def test_simple_mana_source_refresh_runner_executes_partial_mana_rule() -> None:
     assert result["tapped"] is True
 
 
+def test_simple_mana_source_refresh_runner_pays_discard_cost() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "ramp_permanent",
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "is_mana_source": True,
+        "mana_produced": 1,
+        "produces": "B",
+        "produced_mana_symbols": ["B"],
+        "mana_activation_requires_tap": False,
+        "activation_discard_count": 1,
+        "activation_discard_target": "any_card",
+        "_rule_logical_key": "battle_rule_v1:skirge",
+    }
+    try:
+        result = validator.run_simple_mana_source_refresh(
+            battle,
+            {
+                "name": "Skirge Familiar refreshes modeled mana source",
+                "type": "simple_mana_source_refresh",
+                "card": {"name": "Skirge Familiar"},
+                "type_line": "Creature - Imp",
+                "source_overrides": {"summoning_sick": False},
+                "controller_hand": [
+                    {"name": "E2E Spare Card", "type_line": "Sorcery", "effect": "draw_cards", "cmc": 2}
+                ],
+                "expected_available_mana_after_refresh": 1,
+                "expected_tapped": False,
+                "expected_sources": 1,
+                "expected_discard_count": 1,
+                "expected_discard_target": "any_card",
+                "logical_rule_key": "battle_rule_v1:skirge",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Skirge Familiar"
+    assert result["available_mana"] == 1
+    assert result["discarded_count"] == 1
+
+
 def test_simple_mana_source_refresh_runner_validates_pain_talisman_modes() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

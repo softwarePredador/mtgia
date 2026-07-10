@@ -2917,11 +2917,17 @@ def simple_mana_source_execution_scenario_from_expected_rule(rule: dict[str, Any
     enters_tapped = bool(required.get("enters_tapped"))
     activation_life_cost = int(required.get("activation_life_cost") or 0)
     activation_life_gain = int(required.get("mana_activation_life_gain") or 0)
+    activation_discard_count = int(required.get("activation_discard_count") or 0)
+    discard_hand = [
+        {"name": f"E2E Spare Discard Card {index + 1}", "type_line": "Sorcery", "effect": "draw_cards", "cmc": 2}
+        for index in range(max(0, activation_discard_count))
+    ]
     scenario = {
         "name": f"{rule['card_name']} refreshes modeled mana source",
         "type": "simple_mana_source_refresh",
         "card": {"name": rule["card_name"]},
         "controller_mana": controller_mana,
+        "controller_hand": discard_hand,
         "expected_available_mana_after_refresh": (
             activation_cost_total if enters_tapped else mana_produced
         ),
@@ -2947,6 +2953,9 @@ def simple_mana_source_execution_scenario_from_expected_rule(rule: dict[str, Any
         scenario["expected_life_after_refresh"] = 40 - activation_life_cost + activation_life_gain
     if activation_life_cost:
         scenario["expected_life_paid"] = activation_life_cost
+    if activation_discard_count:
+        scenario["expected_discard_count"] = activation_discard_count
+        scenario["expected_discard_target"] = required.get("activation_discard_target") or "any_card"
     if activation_life_gain:
         scenario["expected_mana_activation_life_gain"] = activation_life_gain
     conditional_life_loss_by_color = _manifest_conditional_life_loss_by_color(

@@ -1,0 +1,351 @@
+{
+  "battle_execution": {
+    "event_count": 9,
+    "results": [
+      {
+        "activation_limit_per_turn": 0,
+        "available_mana": 3,
+        "card_name": "Bog Witch",
+        "conditional_life_loss_by_color": {},
+        "conditional_mana": 0,
+        "discarded_count": 1,
+        "life_after_refresh": 40,
+        "life_paid": 0,
+        "mana_activation_life_gain": 0,
+        "scenario": "Bog Witch refreshes modeled mana source",
+        "sources": 2,
+        "tapped": true
+      },
+      {
+        "activation_limit_per_turn": 0,
+        "available_mana": 1,
+        "card_name": "Bramble Familiar // Fetch Quest",
+        "conditional_life_loss_by_color": {},
+        "conditional_mana": 0,
+        "discarded_count": 0,
+        "life_after_refresh": 40,
+        "life_paid": 0,
+        "mana_activation_life_gain": 0,
+        "scenario": "Bramble Familiar // Fetch Quest refreshes modeled mana source",
+        "sources": 1,
+        "tapped": true
+      },
+      {
+        "activation_limit_per_turn": 0,
+        "available_mana": 1,
+        "card_name": "Izzet Keyrune",
+        "conditional_life_loss_by_color": {},
+        "conditional_mana": 1,
+        "discarded_count": 0,
+        "life_after_refresh": 40,
+        "life_paid": 0,
+        "mana_activation_life_gain": 0,
+        "scenario": "Izzet Keyrune refreshes modeled mana source",
+        "sources": 1,
+        "tapped": true
+      },
+      {
+        "activation_limit_per_turn": 0,
+        "available_mana": 1,
+        "card_name": "Network Terminal",
+        "conditional_life_loss_by_color": {},
+        "conditional_mana": 1,
+        "discarded_count": 0,
+        "life_after_refresh": 40,
+        "life_paid": 0,
+        "mana_activation_life_gain": 0,
+        "scenario": "Network Terminal refreshes modeled mana source",
+        "sources": 1,
+        "tapped": true
+      },
+      {
+        "activation_limit_per_turn": 0,
+        "available_mana": 1,
+        "card_name": "Skirge Familiar",
+        "conditional_life_loss_by_color": {},
+        "conditional_mana": 0,
+        "discarded_count": 1,
+        "life_after_refresh": 40,
+        "life_paid": 0,
+        "mana_activation_life_gain": 0,
+        "scenario": "Skirge Familiar refreshes modeled mana source",
+        "sources": 1,
+        "tapped": false
+      },
+      {
+        "activation_limit_per_turn": 0,
+        "available_mana": 1,
+        "card_name": "Starting Column",
+        "conditional_life_loss_by_color": {},
+        "conditional_mana": 1,
+        "discarded_count": 0,
+        "life_after_refresh": 40,
+        "life_paid": 0,
+        "mana_activation_life_gain": 0,
+        "scenario": "Starting Column refreshes modeled mana source",
+        "sources": 1,
+        "tapped": true
+      }
+    ],
+    "scenario_count": 6
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-10T22:07:07.867528+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg723_mana_source_discard_costs_new_server_package_manifest.json",
+  "package_id": "pg723_mana_source_discard_costs_new_server_package_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 6
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Bog Witch",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:cc9b88d2a957eadf106872241dc8b486",
+          "oracle_hash": "cba4ed150bbd23de0f94252f5d7b5305",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Bramble Familiar // Fetch Quest",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7574c910d2d459228c8c526ad47869ac",
+          "oracle_hash": "a59914f9d0ed7af3cda793ca139946a1",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Izzet Keyrune",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:397302a8d184a991cf7dc87dde6e2094",
+          "oracle_hash": "37a98c015cfe212b0b3d3ce9b8dbc9e7",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Network Terminal",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e86ddd864393b9f9383252deee30dc58",
+          "oracle_hash": "fc6edb1298d7e58a60754909b239ba98",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Skirge Familiar",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:bca1b1499151165d4343361df4396b23",
+          "oracle_hash": "64e60412be4fdf68e746400ccdf3d88b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Starting Column",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3a94c90daa02788d3e091ac74885910d",
+          "oracle_hash": "e581419d19f31ddbc0aebf1e66091441",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 6
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Bog Witch",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:cc9b88d2a957eadf106872241dc8b486",
+          "oracle_hash": "cba4ed150bbd23de0f94252f5d7b5305",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Bramble Familiar // Fetch Quest",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7574c910d2d459228c8c526ad47869ac",
+          "oracle_hash": "a59914f9d0ed7af3cda793ca139946a1",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Izzet Keyrune",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:397302a8d184a991cf7dc87dde6e2094",
+          "oracle_hash": "37a98c015cfe212b0b3d3ce9b8dbc9e7",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Network Terminal",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e86ddd864393b9f9383252deee30dc58",
+          "oracle_hash": "fc6edb1298d7e58a60754909b239ba98",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Skirge Familiar",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:bca1b1499151165d4343361df4396b23",
+          "oracle_hash": "64e60412be4fdf68e746400ccdf3d88b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Starting Column",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3a94c90daa02788d3e091ac74885910d",
+          "oracle_hash": "e581419d19f31ddbc0aebf1e66091441",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 6
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Bog Witch",
+          "logical_rule_key": "battle_rule_v1:cc9b88d2a957eadf106872241dc8b486"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Bramble Familiar // Fetch Quest",
+          "logical_rule_key": "battle_rule_v1:7574c910d2d459228c8c526ad47869ac"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Izzet Keyrune",
+          "logical_rule_key": "battle_rule_v1:397302a8d184a991cf7dc87dde6e2094"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Network Terminal",
+          "logical_rule_key": "battle_rule_v1:e86ddd864393b9f9383252deee30dc58"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Skirge Familiar",
+          "logical_rule_key": "battle_rule_v1:bca1b1499151165d4343361df4396b23"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Starting Column",
+          "logical_rule_key": "battle_rule_v1:3a94c90daa02788d3e091ac74885910d"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 6
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Bog Witch",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:cc9b88d2a957eadf106872241dc8b486"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Bramble Familiar // Fetch Quest",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:7574c910d2d459228c8c526ad47869ac"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Izzet Keyrune",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:397302a8d184a991cf7dc87dde6e2094"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Network Terminal",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:e86ddd864393b9f9383252deee30dc58"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Skirge Familiar",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:bca1b1499151165d4343361df4396b23"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Starting Column",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:3a94c90daa02788d3e091ac74885910d"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 9,
+        "scenarios": 6
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

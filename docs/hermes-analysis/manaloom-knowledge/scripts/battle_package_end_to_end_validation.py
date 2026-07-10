@@ -4694,6 +4694,11 @@ def run_simple_mana_source_refresh(
     active = battle.Player(str(scenario.get("player") or "Mana Source Controller"), None, [])
     if scenario.get("starting_life") is not None:
         active.life = int(scenario["starting_life"])
+    active.hand = [
+        dict(card)
+        for card in (scenario.get("controller_hand") or [])
+        if isinstance(card, dict)
+    ]
     support_sources = [
         battle.enrich_card(dict(support))
         for support in (
@@ -4821,6 +4826,32 @@ def run_simple_mana_source_refresh(
                 "battle_events",
                 f"{card['name']} life_paid={life_event.get('life_paid')}, expected {expected_life_paid}",
             )
+    expected_discard_count = int(scenario.get("expected_discard_count") or 0)
+    if expected_discard_count:
+        discard_event = next(
+            (
+                data
+                for replay_event, data in events[before_events:]
+                if replay_event == "mana_source_activation_discard_cost_paid"
+                and data.get("card") == card.get("name")
+            ),
+            None,
+        )
+        if discard_event is None:
+            fail("battle_events", f"missing {card['name']} mana-source discard payment event")
+        if int(discard_event.get("activation_discard_count") or 0) != expected_discard_count:
+            fail(
+                "battle_events",
+                f"{card['name']} activation_discard_count="
+                f"{discard_event.get('activation_discard_count')}, expected {expected_discard_count}",
+            )
+        expected_discard_target = str(scenario.get("expected_discard_target") or "any_card")
+        if str(discard_event.get("activation_discard_target") or "any_card") != expected_discard_target:
+            fail(
+                "battle_events",
+                f"{card['name']} activation_discard_target="
+                f"{discard_event.get('activation_discard_target')}, expected {expected_discard_target}",
+            )
     expected_activation_life_gain = int(scenario.get("expected_mana_activation_life_gain") or 0)
     if expected_activation_life_gain:
         gain_event = next(
@@ -4849,6 +4880,7 @@ def run_simple_mana_source_refresh(
         "sources": int(event.get("sources") or 0),
         "activation_limit_per_turn": expected_activation_limit,
         "life_paid": expected_life_paid,
+        "discarded_count": expected_discard_count,
         "mana_activation_life_gain": expected_activation_life_gain,
         "life_after_refresh": active.life,
         "conditional_life_loss_by_color": expected_life_loss_by_color,

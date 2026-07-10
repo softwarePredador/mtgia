@@ -6383,6 +6383,29 @@ def conditional_land_enters_tapped_for_state(land, player=None):
 def pay_mana_source_activation_costs(player, source, turn=None):
     if not isinstance(source, dict):
         return True
+    discard_count = max(0, int(source.get("activation_discard_count") or 0))
+    discard_target = source.get("activation_discard_target") or "any_card"
+    discard_cards = []
+    if discard_count > 0:
+        discard_cards = _choose_activation_discard_cost_cards(
+            player,
+            discard_count,
+            discard_target,
+            random_discard=bool(source.get("activation_discard_random")),
+        )
+        if len(discard_cards) != discard_count:
+            emit_replay_event(
+                "mana_source_activation_skipped",
+                player=getattr(player, "name", "?"),
+                card=source.get("name", "?"),
+                reason="insufficient_hand_for_discard_cost",
+                activation_discard_count=discard_count,
+                activation_discard_target=discard_target,
+                hand_count=len(getattr(player, "hand", []) or []),
+                turn=turn,
+                **replay_rule_fields(source),
+            )
+            return False
     activation_mana_cost = source.get("activation_mana_cost")
     if activation_mana_cost:
         if not player.can_pay(activation_mana_cost):
@@ -6499,6 +6522,56 @@ def pay_mana_source_activation_costs(player, source, turn=None):
             life_paid=life_cost,
             life_before=life_before,
             life_after=player.life,
+            turn=turn,
+            **replay_rule_fields(source),
+        )
+    discarded = []
+    if discard_cards:
+        removed_cards = _remove_exact_cards_from_hand(player, discard_cards)
+        if len(removed_cards) != len(discard_cards):
+            emit_replay_event(
+                "mana_source_activation_skipped",
+                player=getattr(player, "name", "?"),
+                card=source.get("name", "?"),
+                reason="failed_to_remove_discard_cost_from_hand",
+                activation_discard_count=discard_count,
+                activation_discard_target=discard_target,
+                turn=turn,
+                **replay_rule_fields(source),
+            )
+            return False
+        discard_resolution = resolve_effect_discard_cards(
+            player,
+            removed_cards,
+            top_limit=0,
+            opponents=[],
+            turn=turn,
+            phase="mana_source_activation",
+            rng=random,
+        )
+        discarded = [
+            card.get("name", "?")
+            for card in discard_resolution.get("to_graveyard", removed_cards)
+            if isinstance(card, dict)
+        ]
+        emit_replay_event(
+            "mana_source_activation_discard_cost_paid",
+            player=getattr(player, "name", "?"),
+            card=source.get("name", "?"),
+            activation_discard_count=len(discarded),
+            activation_discard_target=discard_target,
+            discarded=discarded,
+            discard_to_graveyard=[
+                card.get("name", "?")
+                for card in discard_resolution.get("to_graveyard") or []
+                if isinstance(card, dict)
+            ],
+            discard_to_library_top=[
+                card.get("name", "?")
+                for card in discard_resolution.get("to_top") or []
+                if isinstance(card, dict)
+            ],
+            discard_replacement_used=bool(discard_resolution.get("used_replacement")),
             turn=turn,
             **replay_rule_fields(source),
         )

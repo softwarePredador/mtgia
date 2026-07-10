@@ -13226,6 +13226,52 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_simple_mana_source_permanent_pays_discard_cost_on_refresh(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        familiar = self.battle.enrich_card(
+            {
+                "name": "Skirge Familiar",
+                "type_line": "Creature - Imp",
+                "effect": "ramp_permanent",
+                "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+                "is_mana_source": True,
+                "mana_produced": 1,
+                "produces": "B",
+                "produced_mana_symbols": ["B"],
+                "activation_discard_count": 1,
+                "activation_discard_target": "any_card",
+                "activation_requires_discard_card": True,
+                "activation_requires_tap": False,
+                "mana_activation_requires_tap": False,
+                "permanent_type": "creature",
+                "summoning_sick": False,
+                "_rule_logical_key": "battle_rule_v1:skirge-familiar",
+            }
+        )
+        active.battlefield = [familiar]
+        active.hand = [
+            {"name": "Discard Me", "type_line": "Sorcery", "effect": "draw_cards", "cmc": 3},
+            {"name": "Keep Me", "type_line": "Instant", "effect": "direct_damage", "cmc": 1},
+        ]
+
+        active.refresh_mana_sources(turn=7)
+
+        self.assertEqual(active.available_mana(), 1)
+        self.assertEqual(active.mana_pool.black, 1)
+        self.assertEqual([card["name"] for card in active.hand], ["Discard Me"])
+        self.assertEqual([card["name"] for card in active.graveyard], ["Keep Me"])
+        self.assertTrue(
+            any(
+                event == "mana_source_activation_discard_cost_paid"
+                and data.get("card") == "Skirge Familiar"
+                and data.get("activation_discard_count") == 1
+                and data.get("activation_discard_target") == "any_card"
+                and data.get("discarded") == ["Keep Me"]
+                and data.get("rule_logical_key") == "battle_rule_v1:skirge-familiar"
+                for event, data in self.events
+            )
+        )
+
     def test_simple_mana_source_permanent_skips_life_cost_when_life_low(self) -> None:
         active = self.battle.Player("Active", None, [])
         active.life = 2

@@ -18009,6 +18009,7 @@ def activation_discard_cost_from_source(window: str) -> dict[str, Any] | str | N
         re.S,
     )
     random_matches = re.findall(r"new\s+DiscardCardCost\s*\(\s*true\s*\)", window or "")
+    explicit_choice_matches = re.findall(r"new\s+DiscardCardCost\s*\(\s*false\s*\)", window or "")
     plain_matches = re.findall(r"new\s+DiscardCardCost\s*\(\s*\)", window or "")
     artifact_matches = re.findall(
         r"new\s+DiscardCardCost\s*\(\s*StaticFilters\.FILTER_CARD_ARTIFACT_[A-Z]+\s*\)",
@@ -18021,6 +18022,7 @@ def activation_discard_cost_from_source(window: str) -> dict[str, Any] | str | N
     supported_count = (
         len(random_target_matches)
         + len(random_matches)
+        + len(explicit_choice_matches)
         + len(plain_matches)
         + len(artifact_matches)
         + len(land_matches)
@@ -18054,6 +18056,12 @@ def activation_discard_cost_from_source(window: str) -> dict[str, Any] | str | N
         return {
             "activation_discard_count": 1,
             "activation_discard_target": "artifact_card",
+            "activation_requires_discard_card": True,
+        }
+    if explicit_choice_matches:
+        return {
+            "activation_discard_count": 1,
+            "activation_discard_target": "any_card",
             "activation_requires_discard_card": True,
         }
     return {
@@ -22853,6 +22861,8 @@ def simple_mana_source_costs_from_phrase(cost_phrase: str) -> dict[str, Any] | N
     requires_tap = False
     activation_symbols: list[str] = []
     activation_life_cost = 0
+    activation_discard_count = 0
+    activation_discard_target: str | None = None
     tokens = [
         re.sub(r"\s+", " ", token.strip().lower())
         for token in str(cost_phrase or "").split(",")
@@ -22867,6 +22877,10 @@ def simple_mana_source_costs_from_phrase(cost_phrase: str) -> dict[str, Any] | N
         life_match = re.fullmatch(r"pay (?P<life>\d+) life", token)
         if life_match:
             activation_life_cost += int(life_match.group("life"))
+            continue
+        if token == "discard a card":
+            activation_discard_count += 1
+            activation_discard_target = "any_card"
             continue
         if re.fullmatch(r"(?:\{[0-9wubrgc]+\})+", token):
             activation_symbols.extend(
@@ -22883,6 +22897,10 @@ def simple_mana_source_costs_from_phrase(cost_phrase: str) -> dict[str, Any] | N
         detail["activation_mana_cost"] = "".join(f"{{{symbol}}}" for symbol in activation_symbols)
     if activation_life_cost:
         detail["activation_life_cost"] = activation_life_cost
+    if activation_discard_count:
+        detail["activation_discard_count"] = activation_discard_count
+        detail["activation_discard_target"] = activation_discard_target or "any_card"
+        detail["activation_requires_discard_card"] = True
     return detail
 
 
@@ -22945,6 +22963,8 @@ def simple_mana_source_detail_from_line(text: str) -> dict[str, Any] | None:
     unsupported_tokens = set(UNSUPPORTED_SIMPLE_MANA_ORACLE_TOKENS)
     if re.search(r"(?:^|,\s*)pay \d+ life(?=[:,])", working_text):
         unsupported_tokens.discard("pay ")
+    if re.search(r"(?:^|,\s*)discard a card(?=:)", working_text):
+        unsupported_tokens.discard("discard")
     if any(token in working_text for token in unsupported_tokens):
         return None
     activation_limit_per_turn = None
@@ -22952,7 +22972,10 @@ def simple_mana_source_detail_from_line(text: str) -> dict[str, Any] | None:
     if working_text.endswith(once_each_turn_suffix):
         activation_limit_per_turn = 1
         working_text = working_text[: -len(once_each_turn_suffix)].strip().rstrip(".") + "."
-    if re.search(r"(?:^|,\s*)pay \d+ life(?=[:,])", working_text):
+    if re.search(r"(?:^|,\s*)pay \d+ life(?=[:,])", working_text) or re.search(
+        r"(?:^|,\s*)discard a card(?=:)",
+        working_text,
+    ):
         generic_detail = simple_mana_source_detail_from_generic_line(
             working_text,
             activation_limit_per_turn=activation_limit_per_turn,
@@ -23750,12 +23773,14 @@ def dies_fixed_mana_source_blocker(source_text: str, detail: dict[str, Any]) -> 
 
 def simple_mana_source_detail_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
     text = strip_parenthetical_reminders(oracle_text(metadata))
-    detail = simple_mana_source_detail_from_line(text)
-    if detail is not None:
-        return detail
+    lines = normalized_oracle_lines(metadata)
+    if len(lines) <= 1:
+        detail = simple_mana_source_detail_from_line(text)
+        if detail is not None:
+            return detail
 
     candidates = []
-    for line in normalized_oracle_lines(metadata):
+    for line in lines:
         line_detail = simple_mana_source_detail_from_line(line)
         if line_detail is not None:
             candidates.append(line_detail)
@@ -23808,6 +23833,24 @@ def has_direct_independent_safe_mana_ability(
     return False
 
 
+def add_mana_source_activation_detail_fields(
+    effect_json: dict[str, Any],
+    mana_source_detail: dict[str, Any],
+) -> None:
+    for key in (
+        "activation_mana_cost",
+        "activation_life_cost",
+        "activation_discard_count",
+        "activation_discard_target",
+        "activation_requires_discard_card",
+        "activation_discard_random",
+        "activation_limit_per_turn",
+    ):
+        value = mana_source_detail.get(key)
+        if value not in (None, "", 0, False):
+            effect_json[key] = value
+
+
 def simple_mana_source_source_blocker(
     source_text: str,
     ability_class_values: set[str],
@@ -23820,6 +23863,19 @@ def simple_mana_source_source_blocker(
         allow_auxiliary_sacrifice_cost_when_independent_mana
         and has_direct_independent_safe_mana_ability(text, ability_class_values)
     )
+    expected_discard_count = (
+        int(mana_source_detail.get("activation_discard_count") or 0)
+        if mana_source_detail is not None
+        else 0
+    )
+    expected_discard_target = (
+        str(mana_source_detail.get("activation_discard_target") or "any_card")
+        if mana_source_detail is not None
+        else "any_card"
+    )
+    expected_discard_random = bool(
+        mana_source_detail.get("activation_discard_random")
+    ) if mana_source_detail is not None else False
     unsupported_markers = {
         "SacrificeSourceCost": "mana_source_source_sacrifice_cost_not_supported",
         "SacrificeTargetCost": "mana_source_source_sacrifice_target_cost_not_supported",
@@ -23832,6 +23888,22 @@ def simple_mana_source_source_blocker(
         if marker in text:
             if marker == "SacrificeSourceCost" and has_independent_mana:
                 continue
+            if marker == "Discard":
+                if expected_discard_count > 0:
+                    source_discard = activation_discard_cost_from_source(text)
+                    if isinstance(source_discard, str):
+                        return "mana_source_source_discard_cost_not_supported"
+                    if not source_discard:
+                        return "mana_source_source_discard_cost_missing"
+                    if int(source_discard.get("activation_discard_count") or 0) != expected_discard_count:
+                        return "mana_source_source_discard_cost_mismatch"
+                    if str(source_discard.get("activation_discard_target") or "any_card") != expected_discard_target:
+                        return "mana_source_source_discard_cost_mismatch"
+                    if bool(source_discard.get("activation_discard_random")) != expected_discard_random:
+                        return "mana_source_source_discard_cost_mismatch"
+                    continue
+                if has_independent_mana:
+                    continue
             return reason
     source_life_costs = [
         int(value)
@@ -36562,6 +36634,7 @@ def split_row(
                 effect_json.pop("draw_on_self_sacrifice", None)
             if mana_source_detail.get("produced_mana_symbols"):
                 effect_json["produced_mana_symbols"] = list(mana_source_detail["produced_mana_symbols"])
+            add_mana_source_activation_detail_fields(effect_json, mana_source_detail)
             static_keywords = ordered_keywords(
                 keywords_from_ability_classes({"xmage_ability_classes": list(mana_ability_classes)})
             )
@@ -36632,8 +36705,7 @@ def split_row(
             }
             if mana_source_detail.get("produced_mana_symbols"):
                 effect_json["produced_mana_symbols"] = list(mana_source_detail["produced_mana_symbols"])
-            if mana_source_detail.get("activation_mana_cost"):
-                effect_json["activation_mana_cost"] = mana_source_detail["activation_mana_cost"]
+            add_mana_source_activation_detail_fields(effect_json, mana_source_detail)
             if "EntersBattlefieldTappedAbility" in mana_ability_classes:
                 effect_json["enters_tapped"] = True
             return build_proposal(
@@ -36922,6 +36994,7 @@ def split_row(
             }
             if mana_source_detail.get("produced_mana_symbols"):
                 effect_json["produced_mana_symbols"] = list(mana_source_detail["produced_mana_symbols"])
+            add_mana_source_activation_detail_fields(effect_json, mana_source_detail)
             static_keywords = sorted(
                 {
                     STATIC_SELF_KEYWORD_ABILITY_CLASSES[ability]
@@ -37030,10 +37103,7 @@ def split_row(
                 effect_json["produced_mana_symbols"] = list(
                     mana_source_detail["produced_mana_symbols"]
                 )
-            if mana_source_detail.get("activation_mana_cost"):
-                effect_json["activation_mana_cost"] = mana_source_detail["activation_mana_cost"]
-            if mana_source_detail.get("activation_life_cost"):
-                effect_json["activation_life_cost"] = int(mana_source_detail["activation_life_cost"])
+            add_mana_source_activation_detail_fields(effect_json, mana_source_detail)
             return build_proposal(
                 row,
                 metadata,
@@ -37083,10 +37153,7 @@ def split_row(
             effect_json["enters_tapped"] = True
         if mana_source_detail.get("produced_mana_symbols"):
             effect_json["produced_mana_symbols"] = list(mana_source_detail["produced_mana_symbols"])
-        if mana_source_detail.get("activation_mana_cost"):
-            effect_json["activation_mana_cost"] = mana_source_detail["activation_mana_cost"]
-        if mana_source_detail.get("activation_life_cost"):
-            effect_json["activation_life_cost"] = int(mana_source_detail["activation_life_cost"])
+        add_mana_source_activation_detail_fields(effect_json, mana_source_detail)
         return build_proposal(row, metadata, effect_json, family_id="xmage_simple_mana_source_permanent"), "selected_exact_scope"
 
     return None, "unsupported_adapter_work_unit"

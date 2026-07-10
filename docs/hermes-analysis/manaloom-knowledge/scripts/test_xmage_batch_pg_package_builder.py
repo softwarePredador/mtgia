@@ -1109,6 +1109,40 @@ def test_simple_mana_source_execution_scenario_pays_life_cost() -> None:
     assert scenario["expected_conditional_mana"] == 1
 
 
+def test_simple_mana_source_execution_scenario_pays_discard_cost() -> None:
+    rule = {
+        "card_name": "Skirge Familiar",
+        "logical_rule_key": "battle_rule_v1:skirge_familiar",
+        "required_effect_fields": {
+            "effect": "ramp_permanent",
+            "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+            "is_mana_source": True,
+            "mana_produced": 1,
+            "produces": "B",
+            "produced_mana_symbols": ["B"],
+            "mana_activation_requires_tap": False,
+            "activation_discard_count": 1,
+            "activation_discard_target": "any_card",
+        },
+    }
+
+    scenario = builder.simple_mana_source_execution_scenario_from_expected_rule(rule)
+
+    assert scenario["type"] == "simple_mana_source_refresh"
+    assert scenario["controller_hand"] == [
+        {
+            "name": "E2E Spare Discard Card 1",
+            "type_line": "Sorcery",
+            "effect": "draw_cards",
+            "cmc": 2,
+        }
+    ]
+    assert scenario["expected_discard_count"] == 1
+    assert scenario["expected_discard_target"] == "any_card"
+    assert scenario["expected_available_mana_after_refresh"] == 1
+    assert scenario["expected_sources"] == 1
+
+
 def test_simple_mana_source_execution_scenario_preserves_activation_limit() -> None:
     rule = {
         "card_name": "Abzan Devotee",
