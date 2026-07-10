@@ -8013,6 +8013,134 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         effect = proposal["effect_json"]
         self.assertEqual(effect["spell_cast_gain_life_required_colors"], ["U", "B", "R"])
 
+    def test_spell_cast_gain_life_maps_any_player_color_filter(self) -> None:
+        row = queue_row(
+            split.LIFE_UNIT,
+            effect_classes=["GainLifeEffect"],
+            ability_kind="triggered",
+            ability_classes=["SpellCastAllTriggeredAbility"],
+            xmage_signals=["triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Angel's Feather",
+                type_line="Artifact",
+                oracle_text="Whenever a player casts a white spell, you may gain 1 life.",
+            ),
+            source_text="""
+                private static final FilterSpell filter = new FilterSpell("a white spell");
+                static {
+                    filter.add(new ColorPredicate(ObjectColor.WHITE));
+                }
+                this.addAbility(new SpellCastAllTriggeredAbility(
+                    new GainLifeEffect(1), filter, true));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.SPELL_CAST_GAIN_LIFE_SCOPE)
+        self.assertEqual(effect["effect"], "life_gain_engine")
+        self.assertEqual(effect["spell_cast_gain_life_required_colors"], ["W"])
+        self.assertTrue(effect["spell_cast_gain_life_any_player"])
+        self.assertTrue(effect["spell_cast_gain_life_optional"])
+
+    def test_spell_cast_gain_life_maps_static_value_amount(self) -> None:
+        row = queue_row(
+            split.LIFE_UNIT,
+            effect_classes=["GainLifeEffect"],
+            ability_kind="triggered",
+            ability_classes=["SpellCastAllTriggeredAbility"],
+            xmage_signals=["triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Demon's Horn",
+                type_line="Artifact",
+                oracle_text="Whenever a player casts a black spell, you may gain 1 life.",
+            ),
+            source_text="""
+                private static final FilterSpell filter = new FilterSpell("a black spell");
+                static {
+                    filter.add(new ColorPredicate(ObjectColor.BLACK));
+                }
+                this.addAbility(new SpellCastAllTriggeredAbility(
+                    new GainLifeEffect(StaticValue.get(1), "you may gain 1 life"), filter, true));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["spell_cast_gain_life_amount"], 1)
+        self.assertEqual(effect["spell_cast_gain_life_required_colors"], ["B"])
+        self.assertTrue(effect["spell_cast_gain_life_any_player"])
+
+    def test_spell_cast_gain_life_maps_custom_any_player_color_ability(self) -> None:
+        row = queue_row(
+            split.LIFE_UNIT,
+            effect_classes=["GainLifeEffect"],
+            ability_kind="triggered",
+            ability_classes=["KrakensEyeAbility"],
+            xmage_signals=[],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Kraken's Eye",
+                type_line="Artifact",
+                oracle_text="Whenever a player casts a blue spell, you may gain 1 life.",
+            ),
+            source_text="""
+                class KrakensEyeAbility extends TriggeredAbilityImpl {
+                    public KrakensEyeAbility() {
+                        super(Zone.BATTLEFIELD, new GainLifeEffect(1), true);
+                    }
+                    public boolean checkEventType(GameEvent event, Game game) {
+                        return event.getType() == GameEvent.EventType.SPELL_CAST;
+                    }
+                    public boolean checkTrigger(GameEvent event, Game game) {
+                        Spell spell = game.getStack().getSpell(event.getTargetId());
+                        return spell != null && spell.getColor(game).isBlue();
+                    }
+                }
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["spell_cast_gain_life_required_colors"], ["U"])
+        self.assertTrue(effect["spell_cast_gain_life_any_player"])
+
+    def test_spell_cast_gain_life_blocks_any_player_optional_cost(self) -> None:
+        row = queue_row(
+            split.LIFE_UNIT,
+            effect_classes=["GainLifeEffect"],
+            ability_kind="triggered",
+            ability_classes=["SpellCastAllTriggeredAbility"],
+            xmage_signals=["triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Apothecary Initiate",
+                type_line="Creature - Kithkin Cleric",
+                oracle_text=(
+                    "Whenever a player casts a white spell, you may pay {1}. "
+                    "If you do, you gain 1 life."
+                ),
+            ),
+            source_text="""
+                this.addAbility(new SpellCastAllTriggeredAbility(
+                    new DoIfCostPaid(new GainLifeEffect(1), new ManaCostsImpl<>("{1}")),
+                    filter, false));
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "spell_cast_gain_life_oracle_optional_cost_not_supported")
+
     def test_spell_cast_token_maker_maps_instant_or_sorcery_filter(self) -> None:
         row = queue_row(
             split.SPELL_CAST_TOKEN_MAKER_UNIT,

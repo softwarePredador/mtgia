@@ -4016,6 +4016,67 @@ def test_spell_cast_gain_life_runner_blocks_nonmatching_and_resolves_matching_sp
     assert result["trigger_spell"] == "Blue Instant"
 
 
+def test_spell_cast_gain_life_runner_resolves_any_player_opponent_spell() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "life_gain_engine",
+        "battle_model_scope": "xmage_spell_cast_gain_life_v1",
+        "trigger": "spell_cast",
+        "trigger_effect": "gain_life",
+        "spell_cast_gain_life": True,
+        "spell_cast_gain_life_amount": 1,
+        "spell_cast_gain_life_required_colors": ["W"],
+        "spell_cast_gain_life_any_player": True,
+        "_rule_logical_key": "battle_rule_v1:angels-feather",
+    }
+    try:
+        result = validator.run_spell_cast_gain_life(
+            battle,
+            {
+                "name": "Angel's Feather gains life when opponent casts white spell",
+                "type": "spell_cast_gain_life",
+                "card": {
+                    "name": "Angel's Feather",
+                    "type_line": "Artifact",
+                    "effect": "life_gain_engine",
+                },
+                "starting_life": 20,
+                "matching_spell": {
+                    "name": "White Instant",
+                    "type_line": "Instant",
+                    "colors": ["W"],
+                    "cmc": 2,
+                },
+                "matching_spell_controller": "opponent",
+                "nonmatching_spell": {
+                    "name": "Green Sorcery",
+                    "type_line": "Sorcery",
+                    "colors": ["G"],
+                    "cmc": 2,
+                },
+                "nonmatching_spell_controller": "opponent",
+                "expected_trigger": "spell_cast",
+                "expected_life_gain": 1,
+                "expected_life_after": 21,
+                "logical_rule_key": "battle_rule_v1:angels-feather",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Angel's Feather"
+    assert result["life_after"] == 21
+    assert result["trigger"] == "spell_cast"
+    assert result["trigger_spell"] == "White Instant"
+    assert result["trigger_spell_controller"] == "Opponent"
+
+
 def test_spell_cast_token_maker_runner_blocks_nonmatching_and_resolves_matching_spell() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

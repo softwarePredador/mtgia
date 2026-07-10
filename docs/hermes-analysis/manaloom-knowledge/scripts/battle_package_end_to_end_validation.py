@@ -1611,8 +1611,13 @@ def run_spell_cast_gain_life(
     if isinstance(nonmatching_spell, dict):
         before_life = active.life
         before_events = len(events)
+        nonmatching_caster = (
+            opponent
+            if str(scenario.get("nonmatching_spell_controller") or "").lower() == "opponent"
+            else active
+        )
         battle.trigger_spell_cast_engines(
-            active,
+            nonmatching_caster,
             all_players,
             dict(nonmatching_spell),
             turn=turn,
@@ -1640,8 +1645,13 @@ def run_spell_cast_gain_life(
     if not matching_spell:
         fail("scenario", f"{card['name']} missing matching_spell")
     before_events = len(events)
+    matching_caster = (
+        opponent
+        if str(scenario.get("matching_spell_controller") or "").lower() == "opponent"
+        else active
+    )
     battle.trigger_spell_cast_engines(
-        active,
+        matching_caster,
         all_players,
         matching_spell,
         turn=turn,
@@ -1685,6 +1695,7 @@ def run_spell_cast_gain_life(
         "life_gained": expected_life_gain,
         "trigger": event.get("trigger"),
         "trigger_spell": event.get("trigger_spell"),
+        "trigger_spell_controller": event.get("trigger_spell_controller"),
     }
 
 

@@ -4927,6 +4927,55 @@ def test_spell_cast_gain_life_execution_scenario_uses_matching_and_nonmatching_s
     assert "Creature" in scenario["nonmatching_spell"]["type_line"]
 
 
+def test_spell_cast_gain_life_execution_scenario_uses_opponent_for_any_player_trigger() -> None:
+    rule = {
+        "normalized_name": "angels feather",
+        "card_name": "Angel's Feather",
+        "logical_rule_key": "battle_rule_v1:angels-feather",
+        "required_effect_fields": {
+            "effect": "life_gain_engine",
+            "battle_model_scope": "xmage_spell_cast_gain_life_v1",
+            "trigger": "spell_cast",
+            "trigger_effect": "gain_life",
+            "spell_cast_gain_life": True,
+            "spell_cast_gain_life_amount": 1,
+            "spell_cast_gain_life_required_colors": ["W"],
+            "spell_cast_gain_life_any_player": True,
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario["type"] == "spell_cast_gain_life"
+    assert scenario["matching_spell_controller"] == "opponent"
+    assert scenario["nonmatching_spell_controller"] == "opponent"
+    assert scenario["matching_spell"]["colors"] == ["W"]
+    assert scenario["card"]["type_line"] == "Artifact"
+
+
+def test_spell_cast_gain_life_execution_scenario_picks_true_nonmatching_color() -> None:
+    rule = {
+        "normalized_name": "wurms tooth",
+        "card_name": "Wurm's Tooth",
+        "logical_rule_key": "battle_rule_v1:wurms-tooth",
+        "required_effect_fields": {
+            "effect": "life_gain_engine",
+            "battle_model_scope": "xmage_spell_cast_gain_life_v1",
+            "trigger": "spell_cast",
+            "trigger_effect": "gain_life",
+            "spell_cast_gain_life": True,
+            "spell_cast_gain_life_amount": 1,
+            "spell_cast_gain_life_required_colors": ["G"],
+            "spell_cast_gain_life_any_player": True,
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario["matching_spell"]["colors"] == ["G"]
+    assert scenario["nonmatching_spell"]["colors"] != ["G"]
+
+
 def test_spell_cast_token_maker_execution_scenario_uses_matching_and_nonmatching_spells() -> None:
     rule = {
         "normalized_name": "third path iconoclast",

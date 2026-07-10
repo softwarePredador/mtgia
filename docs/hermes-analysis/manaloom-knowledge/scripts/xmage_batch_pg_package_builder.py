@@ -586,6 +586,7 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "spell_cast_gain_life_required_colors",
     "spell_cast_gain_life_source_zone",
     "spell_cast_gain_life_optional",
+    "spell_cast_gain_life_any_player",
     "spell_cast_token_maker",
     "spell_cast_token_card_types",
     "spell_cast_token_required_subtypes",
@@ -2473,16 +2474,24 @@ def spell_cast_gain_life_execution_scenario_from_expected_rule(
     elif required_colors:
         matching_spell["type_line"] = "Instant"
         matching_spell["colors"] = [required_colors[0]]
+        nonmatching_color = next(
+            (
+                color
+                for color in ["W", "U", "B", "R", "G"]
+                if color not in set(required_colors)
+            ),
+            None,
+        )
         nonmatching_spell = {
-            "name": f"E2E Nonmatching Green Spell for {rule['card_name']}",
+            "name": f"E2E Nonmatching Spell for {rule['card_name']}",
             "type_line": "Sorcery",
-            "colors": ["G"],
+            "colors": [nonmatching_color or "C"],
             "effect": "draw_cards",
             "cmc": 2,
         }
     source_effect = required.get("effect") or "life_gain_engine"
-    source_type_line = "Creature - Cleric" if source_effect == "creature" else "Enchantment"
-    return {
+    source_type_line = "Creature - Cleric" if source_effect == "creature" else "Artifact"
+    scenario = {
         "name": f"{rule['card_name']} gains life when matching spell is cast",
         "type": "spell_cast_gain_life",
         "card": {
@@ -2498,6 +2507,11 @@ def spell_cast_gain_life_execution_scenario_from_expected_rule(
         "expected_life_after": 20 + amount,
         "logical_rule_key": rule["logical_rule_key"],
     }
+    if required.get("spell_cast_gain_life_any_player"):
+        scenario["matching_spell_controller"] = "opponent"
+        if nonmatching_spell is not None:
+            scenario["nonmatching_spell_controller"] = "opponent"
+    return scenario
 
 
 def spell_cast_token_maker_execution_scenario_from_expected_rule(

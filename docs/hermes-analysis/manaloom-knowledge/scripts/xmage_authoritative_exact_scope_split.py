@@ -1191,6 +1191,19 @@ def java_constructor_int(source: str, class_name: str, *, default: int | None = 
     return default
 
 
+def java_gain_life_effect_amount(source: str) -> int | None:
+    amount = java_constructor_int(source, "GainLifeEffect")
+    if amount is not None:
+        return amount
+    match = re.search(
+        r"\bGainLifeEffect\s*\(\s*StaticValue\.get\s*\(\s*(\d+)\s*\)",
+        source or "",
+    )
+    if match:
+        return int(match.group(1))
+    return None
+
+
 def java_constructor_int_or_noarg_default(
     source: str,
     class_name: str,
@@ -11718,10 +11731,24 @@ def is_spell_cast_add_counters_source_unit(row: dict[str, Any]) -> bool:
 def is_spell_cast_gain_life_unit(row: dict[str, Any]) -> bool:
     if str(row.get("adapter_work_unit") or "") != LIFE_UNIT:
         return False
+    abilities = ability_classes(row)
+    supported_triggers = {
+        "SpellCastControllerTriggeredAbility",
+        "SpellCastAllTriggeredAbility",
+        "KrakensEyeAbility",
+        "WurmsToothAbility",
+    }
+    trigger_abilities = abilities.intersection(supported_triggers)
+    remaining = abilities - trigger_abilities
+    signals = set(row.get("xmage_signals") or [])
+    custom_trigger_ability = bool(
+        trigger_abilities.intersection({"KrakensEyeAbility", "WurmsToothAbility"})
+    )
     return (
         effect_classes(row) == {"GainLifeEffect"}
-        and ability_classes(row) == {"SpellCastControllerTriggeredAbility"}
-        and set(row.get("xmage_signals") or []) == {"triggered_ability"}
+        and len(trigger_abilities) == 1
+        and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
+        and (signals == {"triggered_ability"} or (custom_trigger_ability and not signals))
     )
 
 
@@ -19823,8 +19850,11 @@ def spell_cast_add_counters_specs_match(
 
 def spell_cast_gain_life_filter_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
     text = re.sub(r"\s+", " ", oracle_text_after_leading_static_keywords(metadata)).strip().lower()
+    if "may pay" in text:
+        return "spell_cast_gain_life_oracle_optional_cost_not_supported"
     match = re.search(
-        r"whenever you cast (?P<filter>.+?), you (?P<may>may )?gain "
+        r"whenever (?:(?P<you>you) cast|(?P<player>a player) casts|(?P<opponent>an opponent) casts) "
+        r"(?P<filter>.+?), you (?P<may>may )?gain "
         r"(?P<count>a|an|one|two|three|four|five|six|seven|eight|nine|ten|\d+) life\.?",
         text,
     )
@@ -19840,6 +19870,10 @@ def spell_cast_gain_life_filter_from_oracle(metadata: dict[str, Any]) -> dict[st
         "spell_cast_gain_life_optional": bool(match.group("may")),
         "trigger": "spell_cast",
     }
+    if match.group("player"):
+        result["spell_cast_gain_life_any_player"] = True
+    elif match.group("opponent"):
+        return "spell_cast_gain_life_oracle_caster_scope_not_supported"
     filter_specs: list[tuple[str, dict[str, Any]]] = [
         ("a", {}),
         ("an enchantment", {"spell_cast_gain_life_card_types": ["enchantment"]}),
@@ -19869,19 +19903,33 @@ def spell_cast_gain_life_filter_from_oracle(metadata: dict[str, Any]) -> dict[st
 
 def spell_cast_gain_life_filter_from_source(source: str) -> dict[str, Any] | str:
     text = source or ""
-    if len(re.findall(r"new\s+SpellCastControllerTriggeredAbility\s*\(", text)) != 1:
+    controller_trigger_count = len(
+        re.findall(r"new\s+SpellCastControllerTriggeredAbility\s*\(", text)
+    )
+    all_trigger_count = len(re.findall(r"new\s+SpellCastAllTriggeredAbility\s*\(", text))
+    custom_spell_cast_trigger = bool(
+        re.search(r"class\s+\w+\s+extends\s+TriggeredAbilityImpl", text)
+        and "SPELL_CAST" in text
+        and re.search(
+            r"\bspell\.getColor\s*\(\s*game\s*\)\.is(?:White|Blue|Black|Red|Green)\s*\(",
+            text,
+        )
+    )
+    if controller_trigger_count + all_trigger_count + int(custom_spell_cast_trigger) != 1:
         return "spell_cast_gain_life_source_not_single_trigger"
     if "DoIfCostPaid" in text or "SacrificeSourceCost" in text or "PayLifeCost" in text:
         return "spell_cast_gain_life_source_optional_cost_not_supported"
-    if "SpellCastAllTriggeredAbility" in text or "OrTriggeredAbility" in text:
+    if "OrTriggeredAbility" in text:
         return "spell_cast_gain_life_source_trigger_not_supported"
-    amount = java_constructor_int(text, "GainLifeEffect")
+    amount = java_gain_life_effect_amount(text)
     if amount is None or amount <= 0:
         return "spell_cast_gain_life_source_amount_not_fixed"
     result: dict[str, Any] = {
         "spell_cast_gain_life_amount": amount,
         "trigger": "spell_cast",
     }
+    if all_trigger_count or custom_spell_cast_trigger:
+        result["spell_cast_gain_life_any_player"] = True
     if "FILTER_SPELL_A_NON_CREATURE" in text:
         result["trigger"] = "noncreature_spell_cast"
         return result
@@ -19892,6 +19940,15 @@ def spell_cast_gain_life_filter_from_source(source: str) -> dict[str, Any] | str
         TOKEN_COLOR_WORDS.get(match.lower())
         for match in re.findall(r"ObjectColor\.(WHITE|BLUE|BLACK|RED|GREEN)\b", text)
     ]
+    if not color_symbols:
+        method_color_words = [
+            match.lower()
+            for match in re.findall(
+                r"\bspell\.getColor\s*\(\s*game\s*\)\.is(White|Blue|Black|Red|Green)\s*\(",
+                text,
+            )
+        ]
+        color_symbols = [TOKEN_COLOR_WORDS.get(word) for word in method_color_words]
     if color_symbols:
         result["spell_cast_gain_life_required_colors"] = color_symbols
         return result
@@ -19909,6 +19966,7 @@ def spell_cast_gain_life_specs_match(
         "spell_cast_gain_life_amount",
         "spell_cast_gain_life_card_types",
         "spell_cast_gain_life_required_colors",
+        "spell_cast_gain_life_any_player",
     }
     for key in comparable_keys:
         oracle_value = oracle_spec.get(key)
@@ -26298,11 +26356,20 @@ def split_row(
             "trigger_effect": "gain_life",
             "spell_cast_gain_life": True,
             "xmage_effect_class": "GainLifeEffect",
-            "xmage_ability_class": "SpellCastControllerTriggeredAbility",
+            "xmage_ability_class": sorted(ability_classes(row))[0],
             **oracle_spec,
         }
         if permanent_effect == "creature":
             effect_json["is_creature_permanent"] = True
+        keyword_list = [
+            STATIC_SELF_KEYWORD_ABILITY_CLASSES[ability]
+            for ability in sorted(
+                ability_classes(row).intersection(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
+            )
+        ]
+        if keyword_list:
+            effect_json["keywords"] = keyword_list
+            effect_json["_keywords_are_self"] = True
         return build_proposal(
             row,
             metadata,
