@@ -3435,6 +3435,97 @@ def test_target_keyword_draw_spell_runner_respects_multicolored_target_constrain
     assert result["cards_drawn"] == 1
 
 
+def test_target_keyword_draw_spell_runner_executes_boost_draw_without_keywords() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "composite_resolution",
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1",
+        "target": "creature",
+        "target_controller": "self",
+        "target_constraints": {"card_types": ["creature"], "controller_scope": "self", "combat_state": "blocking"},
+        "power_delta": 2,
+        "toughness_delta": 2,
+        "granted_keywords_until_eot": [],
+        "draw_count": 1,
+        "_composite_rule_components": [
+            {
+                "effect": "stat_modifier_until_eot",
+                "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+                "target": "creature",
+                "target_controller": "self",
+                "target_constraints": {
+                    "card_types": ["creature"],
+                    "controller_scope": "self",
+                    "combat_state": "blocking",
+                },
+                "power_delta": 2,
+                "toughness_delta": 2,
+                "granted_keywords_until_eot": [],
+            },
+            {
+                "effect": "draw_cards",
+                "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+                "count": 1,
+            },
+        ],
+        "_rule_logical_key": "battle_rule_v1:aangs-defense",
+    }
+    try:
+        result = validator.run_target_keyword_draw_spell(
+            battle,
+            {
+                "name": "Aang's Defense boosts blocking target and draws 1",
+                "type": "target_keyword_draw_spell",
+                "card": {"name": "Aang's Defense", "type_line": "Instant"},
+                "target": {
+                    "name": "E2E Blocking Target Creature",
+                    "type_line": "Creature - Soldier",
+                    "power": 2,
+                    "toughness": 2,
+                    "blocking": True,
+                },
+                "nonmatching_target": {
+                    "name": "E2E Nonblocking Illegal Creature",
+                    "type_line": "Creature - Soldier",
+                    "power": 2,
+                    "toughness": 2,
+                    "blocking": False,
+                },
+                "expected_target_constraints": {
+                    "card_types": ["creature"],
+                    "controller_scope": "self",
+                    "combat_state": "blocking",
+                },
+                "expected_power_delta": 2,
+                "expected_toughness_delta": 2,
+                "expected_keywords": [],
+                "expected_draw_count": 1,
+                "library": [
+                    {"name": "E2E Draw Card", "type_line": "Instant", "effect": "draw_cards"},
+                    {"name": "E2E Remaining Card", "type_line": "Sorcery", "effect": "draw_cards"},
+                ],
+                "logical_rule_key": "battle_rule_v1:aangs-defense",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Aang's Defense"
+    assert result["target"] == "E2E Blocking Target Creature"
+    assert result["nonmatching_target"] == "E2E Nonblocking Illegal Creature"
+    assert result["target_power"] == 4
+    assert result["target_toughness"] == 4
+    assert result["granted_keywords"] == []
+    assert result["cards_drawn"] == 1
+    assert result["hand"] == ["E2E Draw Card"]
+
+
 def test_simple_mana_source_refresh_runner_executes_partial_mana_rule() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

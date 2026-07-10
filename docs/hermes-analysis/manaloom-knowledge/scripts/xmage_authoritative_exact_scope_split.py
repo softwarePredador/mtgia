@@ -8118,9 +8118,38 @@ def target_creature_permanent_count_from_source(source: str) -> dict[str, Any] |
         source or "",
         re.S,
     )
-    if len(any_matches) + len(controlled_matches) != 1:
+    permanent_matches = re.findall(
+        r"new\s+TargetPermanent\s*\(\s*([A-Za-z_][A-Za-z0-9_]*)\s*\)",
+        source or "",
+        re.S,
+    )
+    if len(any_matches) + len(controlled_matches) + len(permanent_matches) != 1:
         return "target_creature_permanent_count_not_single"
-    target_controller = "self" if controlled_matches else "any"
+    target_controller = "self" if (
+        controlled_matches
+        or "FilterControlledCreaturePermanent" in (source or "")
+        or "TargetControlledCreaturePermanent" in (source or "")
+    ) else "any"
+    constraints: dict[str, Any] = {"card_types": ["creature"]}
+    if target_controller == "self":
+        constraints["controller_scope"] = "self"
+    if "FilterBlockingCreature" in (source or "") or "BlockingPredicate.instance" in (source or ""):
+        constraints["combat_state"] = "blocking"
+    if permanent_matches:
+        if not (
+            "FilterBlockingCreature" in (source or "")
+            or "FilterCreaturePermanent" in (source or "")
+            or "FilterControlledCreaturePermanent" in (source or "")
+        ):
+            return "target_creature_permanent_count_dynamic_or_unsupported"
+        return {
+            "target_count": 1,
+            "target_count_min": 1,
+            "target_count_max": 1,
+            "up_to_count": False,
+            "target_controller": target_controller,
+            "target_constraints": constraints,
+        }
     matches = controlled_matches or any_matches
     args = [arg.strip() for arg in matches[0].split(",") if arg.strip()]
     if not args:
@@ -8130,6 +8159,7 @@ def target_creature_permanent_count_from_source(source: str) -> dict[str, Any] |
             "target_count_max": 1,
             "up_to_count": False,
             "target_controller": target_controller,
+            "target_constraints": constraints,
         }
     if len(args) == 1 and re.fullmatch(r"\d+", args[0]):
         count = int(args[0])
@@ -8141,6 +8171,7 @@ def target_creature_permanent_count_from_source(source: str) -> dict[str, Any] |
             "target_count_max": count,
             "up_to_count": False,
             "target_controller": target_controller,
+            "target_constraints": constraints,
         }
     if len(args) == 2 and all(re.fullmatch(r"\d+", arg) for arg in args):
         minimum = int(args[0])
@@ -8153,6 +8184,7 @@ def target_creature_permanent_count_from_source(source: str) -> dict[str, Any] |
             "target_count_max": maximum,
             "up_to_count": minimum < maximum,
             "target_controller": target_controller,
+            "target_constraints": constraints,
         }
     return "target_creature_permanent_count_dynamic_or_unsupported"
 
@@ -8673,24 +8705,39 @@ def dynamic_count_boost_target_from_source(source: str) -> dict[str, Any] | str 
     )
 
 
-def fixed_boost_draw_from_oracle(metadata: dict[str, Any]) -> tuple[int, int, int] | None:
+def fixed_boost_draw_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
     text = strip_leading_parenthetical_reminders(oracle_text(metadata))
     match = re.match(
-        r"^target creature gets ([+-]?\d+)/([+-]?\d+) until end of turn\. draw a card\.?$",
+        r"^target (?P<target>blocking creature(?: you control)?|creature(?: you control)?) "
+        r"gets (?P<power>[+-]?\d+)/(?P<toughness>[+-]?\d+) until end of turn\. draw a card\.?$",
         text,
     )
     if not match:
         return None
-    power = signed_int_from_oracle(match.group(1))
-    toughness = signed_int_from_oracle(match.group(2))
+    power = signed_int_from_oracle(match.group("power"))
+    toughness = signed_int_from_oracle(match.group("toughness"))
     if power is None or toughness is None:
         return None
-    return power, toughness, 1
+    target_phrase = str(match.group("target") or "").strip()
+    target_controller = "self" if target_phrase.endswith(" you control") else "any"
+    constraints: dict[str, Any] = {"card_types": ["creature"]}
+    if target_controller == "self":
+        constraints["controller_scope"] = "self"
+    if target_phrase.startswith("blocking creature"):
+        constraints["combat_state"] = "blocking"
+    return {
+        "power_delta": power,
+        "toughness_delta": toughness,
+        "draw_count": 1,
+        "target": "creature",
+        "target_controller": target_controller,
+        "target_constraints": constraints,
+    }
 
 
-def fixed_boost_draw_from_source(source: str) -> tuple[int, int, int] | None:
+def fixed_boost_draw_from_source(source: str) -> dict[str, Any] | None:
     text = source or ""
-    boost = fixed_boost_target_from_source(text)
+    boost = fixed_boost_target_spec_from_source(text)
     if boost is None:
         return None
     draw_matches = re.findall(r"new\s+DrawCardSourceControllerEffect\s*\(\s*(\d+)\s*\)", text)
@@ -8700,7 +8747,14 @@ def fixed_boost_draw_from_source(source: str) -> tuple[int, int, int] | None:
     draw_match = re.search(r"new\s+DrawCardSourceControllerEffect\s*\(", text)
     if not boost_match or not draw_match or boost_match.start() > draw_match.start():
         return None
-    return boost[0], boost[1], int(draw_matches[0])
+    return {
+        "power_delta": int(boost["power_delta"]),
+        "toughness_delta": int(boost["toughness_delta"]),
+        "draw_count": int(draw_matches[0]),
+        "target": "creature",
+        "target_controller": str(boost.get("target_controller") or "any"),
+        "target_constraints": dict(boost.get("target_constraints") or {"card_types": ["creature"]}),
+    }
 
 
 def fixed_boost_scry_from_oracle(metadata: dict[str, Any]) -> tuple[int, int, int] | None:
@@ -32215,13 +32269,18 @@ def split_row(
                 return None, "boost_draw_source_not_fixed"
             if source_boost != oracle_boost:
                 return None, "boost_draw_source_oracle_mismatch"
-            power_delta, toughness_delta, draw_count = oracle_boost
+            power_delta = int(oracle_boost["power_delta"])
+            toughness_delta = int(oracle_boost["toughness_delta"])
+            draw_count = int(oracle_boost["draw_count"])
+            target_type = str(oracle_boost.get("target") or "creature")
+            target_controller = str(oracle_boost.get("target_controller") or "any")
+            target_constraints = dict(oracle_boost.get("target_constraints") or {"card_types": ["creature"]})
             boost_component = {
                 "effect": "stat_modifier_until_eot",
                 "battle_model_scope": BOOST_TARGET_SCOPE,
-                "target": "creature",
-                "target_constraints": {"card_types": ["creature"]},
-                "target_controller": "any",
+                "target": target_type,
+                "target_constraints": target_constraints,
+                "target_controller": target_controller,
                 "power_delta": power_delta,
                 "toughness_delta": toughness_delta,
                 "power_boost": power_delta,
@@ -32244,6 +32303,9 @@ def split_row(
                 "toughness_delta": toughness_delta,
                 "power_boost": power_delta,
                 "toughness_boost": toughness_delta,
+                "target": target_type,
+                "target_constraints": target_constraints,
+                "target_controller": target_controller,
                 "draw_count": draw_count,
                 "count": draw_count,
                 "_composite_rule_components": [boost_component, draw_component],

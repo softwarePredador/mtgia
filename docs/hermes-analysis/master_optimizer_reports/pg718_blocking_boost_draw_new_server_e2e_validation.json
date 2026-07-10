@@ -1,0 +1,157 @@
+{
+  "battle_execution": {
+    "event_count": 10,
+    "results": [
+      {
+        "card_name": "Aang's Defense",
+        "cards_drawn": 1,
+        "granted_keywords": [],
+        "hand": [
+          "E2E Draw Card 1"
+        ],
+        "nonmatching_target": "E2E Illegal Target Creature",
+        "scenario": "Aang's Defense grants target keyword and draws 1",
+        "target": "E2E Target Creature",
+        "target_power": 4,
+        "target_toughness": 4
+      },
+      {
+        "card_name": "Gallantry",
+        "cards_drawn": 1,
+        "granted_keywords": [],
+        "hand": [
+          "E2E Draw Card 1"
+        ],
+        "nonmatching_target": "E2E Illegal Target Creature",
+        "scenario": "Gallantry grants target keyword and draws 1",
+        "target": "E2E Target Creature",
+        "target_power": 6,
+        "target_toughness": 6
+      }
+    ],
+    "scenario_count": 2
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-10T20:02:18.464081+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg718_blocking_boost_draw_new_server_package_manifest.json",
+  "package_id": "pg718_blocking_boost_draw_new_server_package_manifest",
+  "snapshot": "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 2
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1",
+          "card_name": "Aang's Defense",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e7bf87a85c25e1f0b6d32db6efff30b5",
+          "oracle_hash": "64cefc51cdab7c6274154d69adda89e2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1",
+          "card_name": "Gallantry",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:73cba2a058674ea5d048304fb6b16cfb",
+          "oracle_hash": "9858f271a2639fe3e21469a90f5aa4d1",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 2
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1",
+          "card_name": "Aang's Defense",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e7bf87a85c25e1f0b6d32db6efff30b5",
+          "oracle_hash": "64cefc51cdab7c6274154d69adda89e2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1",
+          "card_name": "Gallantry",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:73cba2a058674ea5d048304fb6b16cfb",
+          "oracle_hash": "9858f271a2639fe3e21469a90f5aa4d1",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 2
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Aang's Defense",
+          "logical_rule_key": "battle_rule_v1:e7bf87a85c25e1f0b6d32db6efff30b5"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Gallantry",
+          "logical_rule_key": "battle_rule_v1:73cba2a058674ea5d048304fb6b16cfb"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 2
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Aang's Defense",
+          "component_keys": [],
+          "effect": "composite_resolution",
+          "logical_rule_key": "battle_rule_v1:e7bf87a85c25e1f0b6d32db6efff30b5"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Gallantry",
+          "component_keys": [],
+          "effect": "composite_resolution",
+          "logical_rule_key": "battle_rule_v1:73cba2a058674ea5d048304fb6b16cfb"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 10,
+        "scenarios": 2
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

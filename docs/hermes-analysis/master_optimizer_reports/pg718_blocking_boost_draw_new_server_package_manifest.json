@@ -1,0 +1,408 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg718_blocking_boost_draw_new_server_blo_20260710_200045",
+  "deploy_id": "pg718_blocking_boost_draw_new_server",
+  "execution_scenarios": [
+    {
+      "card": {
+        "name": "Aang's Defense",
+        "type_line": "Instant"
+      },
+      "expected_draw_count": 1,
+      "expected_keywords": [],
+      "expected_power_delta": 2,
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ],
+        "combat_state": "blocking",
+        "controller_scope": "self"
+      },
+      "expected_toughness_delta": 2,
+      "library": [
+        {
+          "effect": "draw_cards",
+          "name": "E2E Draw Card 1",
+          "type_line": "Instant"
+        },
+        {
+          "effect": "draw_cards",
+          "name": "E2E Draw Card 2",
+          "type_line": "Instant"
+        }
+      ],
+      "logical_rule_key": "battle_rule_v1:e7bf87a85c25e1f0b6d32db6efff30b5",
+      "name": "Aang's Defense grants target keyword and draws 1",
+      "nonmatching_target": {
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Illegal Target Creature",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "target": {
+        "blocking": true,
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Target Creature",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "type": "target_keyword_draw_spell"
+    },
+    {
+      "card": {
+        "name": "Gallantry",
+        "type_line": "Instant"
+      },
+      "expected_draw_count": 1,
+      "expected_keywords": [],
+      "expected_power_delta": 4,
+      "expected_target_constraints": {
+        "card_types": [
+          "creature"
+        ],
+        "combat_state": "blocking"
+      },
+      "expected_toughness_delta": 4,
+      "library": [
+        {
+          "effect": "draw_cards",
+          "name": "E2E Draw Card 1",
+          "type_line": "Instant"
+        },
+        {
+          "effect": "draw_cards",
+          "name": "E2E Draw Card 2",
+          "type_line": "Instant"
+        }
+      ],
+      "logical_rule_key": "battle_rule_v1:73cba2a058674ea5d048304fb6b16cfb",
+      "name": "Gallantry grants target keyword and draws 1",
+      "nonmatching_target": {
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Illegal Target Creature",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "target": {
+        "blocking": true,
+        "cmc": 3,
+        "effect": "creature",
+        "name": "E2E Target Creature",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Creature - Soldier"
+      },
+      "type": "target_keyword_draw_spell"
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Aang's Defense",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e7bf87a85c25e1f0b6d32db6efff30b5",
+      "min_rule_version": 2,
+      "normalized_name": "aang's defense",
+      "oracle_hash": "64cefc51cdab7c6274154d69adda89e2",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+            "compose_on_resolution": true,
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 2,
+            "power_delta": 2,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "combat_state": "blocking",
+              "controller_scope": "self"
+            },
+            "target_controller": "self",
+            "toughness_boost": 2,
+            "toughness_delta": 2,
+            "xmage_effect_class": "BoostTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+            "compose_on_resolution": true,
+            "count": 1,
+            "effect": "draw_cards",
+            "xmage_effect_class": "DrawCardSourceControllerEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1",
+        "count": 1,
+        "draw_count": 1,
+        "effect": "composite_resolution",
+        "instant": true,
+        "power_boost": 2,
+        "power_delta": 2,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "combat_state": "blocking",
+          "controller_scope": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 2,
+        "toughness_delta": 2,
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "DrawCardSourceControllerEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Gallantry",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:73cba2a058674ea5d048304fb6b16cfb",
+      "min_rule_version": 2,
+      "normalized_name": "gallantry",
+      "oracle_hash": "9858f271a2639fe3e21469a90f5aa4d1",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+            "compose_on_resolution": true,
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 4,
+            "power_delta": 4,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "combat_state": "blocking"
+            },
+            "target_controller": "any",
+            "toughness_boost": 4,
+            "toughness_delta": 4,
+            "xmage_effect_class": "BoostTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+            "compose_on_resolution": true,
+            "count": 1,
+            "effect": "draw_cards",
+            "xmage_effect_class": "DrawCardSourceControllerEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1",
+        "count": 1,
+        "draw_count": 1,
+        "effect": "composite_resolution",
+        "instant": true,
+        "power_boost": 4,
+        "power_delta": 4,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "combat_state": "blocking"
+        },
+        "target_controller": "any",
+        "toughness_boost": 4,
+        "toughness_delta": 4,
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "DrawCardSourceControllerEffect"
+        ]
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_fixed_boost_draw_card_spell": 2
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg718_blocking_boost_draw_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg718_blocking_boost_draw_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg718_blocking_boost_draw_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg718_blocking_boost_draw_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg718_blocking_boost_draw_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg718_blocking_boost_draw_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-10T20:00:45+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Aang's Defense"
+      },
+      "card_name": "Aang's Defense",
+      "effect": "composite_resolution",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e7bf87a85c25e1f0b6d32db6efff30b5",
+      "normalized_name": "aang's defense",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+            "compose_on_resolution": true,
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 2,
+            "power_delta": 2,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "combat_state": "blocking",
+              "controller_scope": "self"
+            },
+            "target_controller": "self",
+            "toughness_boost": 2,
+            "toughness_delta": 2,
+            "xmage_effect_class": "BoostTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+            "compose_on_resolution": true,
+            "count": 1,
+            "effect": "draw_cards",
+            "xmage_effect_class": "DrawCardSourceControllerEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1",
+        "count": 1,
+        "draw_count": 1,
+        "effect": "composite_resolution",
+        "instant": true,
+        "power_boost": 2,
+        "power_delta": 2,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "combat_state": "blocking",
+          "controller_scope": "self"
+        },
+        "target_controller": "self",
+        "toughness_boost": 2,
+        "toughness_delta": 2,
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "DrawCardSourceControllerEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Gallantry"
+      },
+      "card_name": "Gallantry",
+      "effect": "composite_resolution",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:73cba2a058674ea5d048304fb6b16cfb",
+      "normalized_name": "gallantry",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+            "compose_on_resolution": true,
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 4,
+            "power_delta": 4,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "combat_state": "blocking"
+            },
+            "target_controller": "any",
+            "toughness_boost": 4,
+            "toughness_delta": 4,
+            "xmage_effect_class": "BoostTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+            "compose_on_resolution": true,
+            "count": 1,
+            "effect": "draw_cards",
+            "xmage_effect_class": "DrawCardSourceControllerEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1",
+        "count": 1,
+        "draw_count": 1,
+        "effect": "composite_resolution",
+        "instant": true,
+        "power_boost": 4,
+        "power_delta": 4,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "combat_state": "blocking"
+        },
+        "target_controller": "any",
+        "toughness_boost": 4,
+        "toughness_delta": 4,
+        "xmage_effect_classes": [
+          "BoostTargetEffect",
+          "DrawCardSourceControllerEffect"
+        ]
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Aang's Defense",
+    "Gallantry"
+  ],
+  "selected_count": 2,
+  "slug": "blocking_boost_draw_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Aang's Defense",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e7bf87a85c25e1f0b6d32db6efff30b5",
+      "min_rule_version": 2,
+      "normalized_name": "aang's defense",
+      "oracle_hash": "64cefc51cdab7c6274154d69adda89e2",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Gallantry",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:73cba2a058674ea5d048304fb6b16cfb",
+      "min_rule_version": 2,
+      "normalized_name": "gallantry",
+      "oracle_hash": "9858f271a2639fe3e21469a90f5aa4d1",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

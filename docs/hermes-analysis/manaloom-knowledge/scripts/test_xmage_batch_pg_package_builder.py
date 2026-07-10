@@ -2848,6 +2848,57 @@ def test_manifest_builds_global_boost_draw_spell_execution_scenario() -> None:
     assert scenario["expected_creature_filter"] == {"combat_state": "attacking"}
 
 
+def test_manifest_builds_target_boost_draw_spell_execution_scenario() -> None:
+    rule = {
+        "normalized_name": "aangs defense",
+        "card_name": "Aang's Defense",
+        "oracle_hash": "hash-aangs-defense",
+        "logical_rule_key": "battle_rule_v1:hash-aangs-defense",
+        "required_effect_fields": {
+            "effect": "composite_resolution",
+            "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"], "controller_scope": "self", "combat_state": "blocking"},
+            "target_controller": "self",
+            "power_delta": 2,
+            "toughness_delta": 2,
+            "draw_count": 1,
+            "_composite_rule_components": [
+                {
+                    "effect": "stat_modifier_until_eot",
+                    "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+                    "target": "creature",
+                    "target_constraints": {
+                        "card_types": ["creature"],
+                        "controller_scope": "self",
+                        "combat_state": "blocking",
+                    },
+                    "target_controller": "self",
+                    "power_delta": 2,
+                    "toughness_delta": 2,
+                    "duration": "until_end_of_turn",
+                },
+                {
+                    "effect": "draw_cards",
+                    "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+                    "count": 1,
+                },
+            ],
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "target_keyword_draw_spell"
+    assert scenario["target"]["blocking"] is True
+    assert scenario["nonmatching_target"].get("blocking") is not True
+    assert scenario["expected_keywords"] == []
+    assert scenario["expected_power_delta"] == 2
+    assert scenario["expected_toughness_delta"] == 2
+    assert scenario["expected_draw_count"] == 1
+
+
 def test_manifest_builds_controlled_stat_modifier_filtered_execution_scenario() -> None:
     rule = {
         "normalized_name": "guardians' pledge",

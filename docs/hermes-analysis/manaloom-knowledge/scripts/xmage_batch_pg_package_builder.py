@@ -4239,6 +4239,7 @@ def target_keyword_draw_spell_execution_scenario_from_expected_rule(
 ) -> dict[str, Any] | None:
     required = dict(rule.get("required_effect_fields") or {})
     if required.get("battle_model_scope") not in {
+        "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1",
         "xmage_fixed_keyword_target_creature_until_eot_draw_card_spell_v1",
         "xmage_fixed_boost_keyword_target_creature_until_eot_draw_card_spell_v1",
     }:

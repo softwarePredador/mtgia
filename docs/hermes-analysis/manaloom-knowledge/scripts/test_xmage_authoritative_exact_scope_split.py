@@ -9756,6 +9756,36 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             ["stat_modifier_until_eot", "draw_cards"],
         )
 
+    def test_fixed_boost_draw_spell_maps_blocking_creature_constraints(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=["BoostTargetEffect", "DrawCardSourceControllerEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Target blocking creature you control gets +2/+2 until end of turn. Draw a card."),
+            source_text=(
+                "private static final FilterPermanent filter = new FilterControlledCreaturePermanent("
+                "\"blocking creature you control\");"
+                "filter.add(BlockingPredicate.instance);"
+                "this.getSpellAbility().addEffect(new BoostTargetEffect(2, 2));"
+                "this.getSpellAbility().addTarget(new TargetPermanent(filter));"
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(1));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.BOOST_DRAW_SCOPE)
+        self.assertEqual(effect["target_controller"], "self")
+        self.assertEqual(
+            effect["target_constraints"],
+            {"card_types": ["creature"], "controller_scope": "self", "combat_state": "blocking"},
+        )
+        self.assertEqual(effect["power_delta"], 2)
+        self.assertEqual(effect["toughness_delta"], 2)
+        self.assertEqual(effect["draw_count"], 1)
+
     def test_fixed_boost_draw_spell_blocks_dynamic_draw(self) -> None:
         row = queue_row(
             split.DRAW_UNIT,
