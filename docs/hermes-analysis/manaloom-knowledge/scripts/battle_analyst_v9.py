@@ -56993,6 +56993,13 @@ def trigger_spell_cast_engines(
         if permanent.get("trigger_effect") == "token_maker":
             if permanent.get("trigger_artifact_spell") and not is_artifact_spell_for_controller(player, spell):
                 continue
+            if not spell_cast_token_filter_matches(
+                permanent,
+                player,
+                spell,
+                source_zone=source_zone,
+            ):
+                continue
             token_count = max(1, int(permanent.get("trigger_token_count") or permanent.get("token_count") or 1))
 
             def resolve_generic_spell_cast_token_maker_trigger(
@@ -57022,6 +57029,30 @@ def trigger_spell_cast_engines(
                     trigger_spell=spell.get("name", "?"),
                     effect="token_maker",
                     trigger_artifact_spell=bool(permanent.get("trigger_artifact_spell")),
+                    trigger_spell_type_line=spell.get("type_line"),
+                    trigger_spell_source_zone=source_zone,
+                    spell_cast_token_card_types=permanent.get("spell_cast_token_card_types") or [],
+                    spell_cast_token_required_subtypes=permanent.get(
+                        "spell_cast_token_required_subtypes"
+                    )
+                    or [],
+                    spell_cast_token_required_supertypes=permanent.get(
+                        "spell_cast_token_required_supertypes"
+                    )
+                    or [],
+                    spell_cast_token_required_colors=permanent.get(
+                        "spell_cast_token_required_colors"
+                    )
+                    or [],
+                    spell_cast_token_requires_multicolored=bool(
+                        permanent.get("spell_cast_token_requires_multicolored")
+                    ),
+                    spell_cast_token_requires_historic=bool(
+                        permanent.get("spell_cast_token_requires_historic")
+                    ),
+                    spell_cast_token_mana_value_min=int(
+                        permanent.get("spell_cast_token_mana_value_min") or 0
+                    ),
                     controller_life_lost=max(0, life_before - player.life),
                     life_before=life_before,
                     life_after=player.life,
@@ -58995,6 +59026,69 @@ def spell_cast_gain_life_filter_matches(permanent, controller, spell, *, source_
         if _color_symbol(value)
     ]
     if required_colors and not any(_spell_has_color(spell, color) for color in required_colors):
+        return False
+    return True
+
+
+def spell_cast_token_filter_matches(permanent, controller, spell, *, source_zone="hand"):
+    if not isinstance(permanent, dict) or not isinstance(spell, dict):
+        return False
+    required_zone = str(permanent.get("spell_cast_token_source_zone") or "").strip().lower()
+    if required_zone and str(source_zone or "hand").strip().lower() != required_zone:
+        return False
+    required_types = [
+        str(value).strip().lower()
+        for value in _as_list(permanent.get("spell_cast_token_card_types"))
+        if str(value).strip()
+    ]
+    if required_types:
+        artifact_required = "artifact" in required_types
+        nonartifact_required_types = [
+            card_type for card_type in required_types if card_type != "artifact"
+        ]
+        type_match = bool(nonartifact_required_types) and _card_type_matches(
+            spell,
+            nonartifact_required_types,
+        )
+        artifact_match = artifact_required and is_artifact_spell_for_controller(controller, spell)
+        if not type_match and not artifact_match:
+            return False
+    type_line = str(spell.get("type_line") or "").lower()
+    required_subtypes = [
+        str(value).replace("_", " ").strip().lower()
+        for value in _as_list(permanent.get("spell_cast_token_required_subtypes"))
+        if str(value).strip()
+    ]
+    if required_subtypes and not any(re.search(rf"\b{re.escape(subtype)}\b", type_line) for subtype in required_subtypes):
+        return False
+    required_supertypes = [
+        str(value).strip().lower()
+        for value in _as_list(permanent.get("spell_cast_token_required_supertypes"))
+        if str(value).strip()
+    ]
+    if "legendary" in required_supertypes and "legendary" not in type_line and not spell.get("legendary"):
+        return False
+    if permanent.get("spell_cast_token_requires_multicolored"):
+        if len(_spell_color_symbols(spell)) < 2:
+            return False
+    required_colors = [
+        _color_symbol(value)
+        for value in _as_list(permanent.get("spell_cast_token_required_colors"))
+        if _color_symbol(value)
+    ]
+    if required_colors and not any(_spell_has_color(spell, color) for color in required_colors):
+        return False
+    if permanent.get("spell_cast_token_requires_historic"):
+        is_historic = (
+            is_artifact_spell_for_controller(controller, spell)
+            or "legendary" in type_line
+            or bool(spell.get("legendary"))
+            or re.search(r"\bsaga\b", type_line) is not None
+        )
+        if not is_historic:
+            return False
+    mana_value_min = int(permanent.get("spell_cast_token_mana_value_min") or 0)
+    if mana_value_min > 0 and card_mana_value(spell) < mana_value_min:
         return False
     return True
 

@@ -3953,6 +3953,69 @@ def test_spell_cast_gain_life_runner_blocks_nonmatching_and_resolves_matching_sp
     assert result["trigger_spell"] == "Blue Instant"
 
 
+def test_spell_cast_token_maker_runner_blocks_nonmatching_and_resolves_matching_spell() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "creature",
+        "battle_model_scope": "xmage_spell_cast_create_creature_token_v1",
+        "trigger": "noncreature_spell_cast",
+        "trigger_effect": "token_maker",
+        "spell_cast_token_maker": True,
+        "trigger_token_count": 1,
+        "token_count": 1,
+        "token_name": "Soldier Token",
+        "token_power": 1,
+        "token_toughness": 1,
+        "token_subtype": "Soldier",
+        "artifact_tokens": True,
+        "_rule_logical_key": "battle_rule_v1:third-path-iconoclast",
+    }
+    try:
+        result = validator.run_spell_cast_token_maker(
+            battle,
+            {
+                "name": "Third Path Iconoclast creates token when matching spell is cast",
+                "type": "spell_cast_token_maker",
+                "card": {
+                    "name": "Third Path Iconoclast",
+                    "type_line": "Creature - Human Monk",
+                    "effect": "creature",
+                },
+                "matching_spell": {"name": "Blue Instant", "type_line": "Instant", "cmc": 2},
+                "nonmatching_spell": {
+                    "name": "Creature Spell",
+                    "type_line": "Creature - Soldier",
+                    "cmc": 2,
+                },
+                "expected_trigger": "noncreature_spell_cast",
+                "expected_tokens_created": 1,
+                "expected_token": {
+                    "name": "Soldier Token",
+                    "count": 1,
+                    "power": 1,
+                    "toughness": 1,
+                    "subtype": "Soldier",
+                    "artifact": True,
+                },
+                "logical_rule_key": "battle_rule_v1:third-path-iconoclast",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Third Path Iconoclast"
+    assert result["tokens_created"] == 1
+    assert result["trigger"] == "noncreature_spell_cast"
+    assert result["trigger_spell"] == "Blue Instant"
+    assert result["token_names"] == ["Soldier Token"]
+
+
 def test_modal_damage_or_destroy_runner_executes_chosen_destroy_mode() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

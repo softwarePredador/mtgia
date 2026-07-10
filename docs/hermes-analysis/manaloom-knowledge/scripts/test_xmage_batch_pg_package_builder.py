@@ -4890,6 +4890,37 @@ def test_spell_cast_gain_life_execution_scenario_uses_matching_and_nonmatching_s
     assert "Creature" in scenario["nonmatching_spell"]["type_line"]
 
 
+def test_spell_cast_token_maker_execution_scenario_uses_matching_and_nonmatching_spells() -> None:
+    rule = {
+        "normalized_name": "third path iconoclast",
+        "card_name": "Third Path Iconoclast",
+        "logical_rule_key": "battle_rule_v1:third-path-iconoclast",
+        "required_effect_fields": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_spell_cast_create_creature_token_v1",
+            "trigger": "noncreature_spell_cast",
+            "trigger_effect": "token_maker",
+            "spell_cast_token_maker": True,
+            "trigger_token_count": 1,
+            "token_count": 1,
+            "token_name": "Soldier Token",
+            "token_power": 1,
+            "token_toughness": 1,
+            "token_subtype": "Soldier",
+            "artifact_tokens": True,
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario["type"] == "spell_cast_token_maker"
+    assert scenario["expected_trigger"] == "noncreature_spell_cast"
+    assert scenario["matching_spell"]["type_line"] == "Instant"
+    assert "Creature" in scenario["nonmatching_spell"]["type_line"]
+    assert scenario["expected_token"]["name"] == "Soldier Token"
+    assert scenario["expected_token"]["artifact"] is True
+
+
 def test_creature_enters_draw_execution_scenario_uses_matching_entering_creature() -> None:
     rule = {
         "normalized_name": "elemental bond",

@@ -1688,6 +1688,139 @@ def run_spell_cast_gain_life(
     }
 
 
+def run_spell_cast_token_maker(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    active = battle.Player(str(scenario.get("player") or "Spell Token Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
+    all_players = [active, opponent]
+    turn = int(scenario.get("turn") or 6)
+    effect_data = battle.get_card_effect(card)
+    source = battle.prepare_entering_permanent(
+        battle.enrich_card({**card, **effect_data}),
+        controller=active,
+        all_players=all_players,
+        turn=turn,
+    )
+    active.battlefield.append(source)
+
+    nonmatching_spell = scenario.get("nonmatching_spell")
+    if isinstance(nonmatching_spell, dict):
+        before_token_count = len(
+            [
+                permanent
+                for permanent in active.battlefield
+                if isinstance(permanent, dict) and battle.is_token_permanent(permanent)
+            ]
+        )
+        before_events = len(events)
+        battle.trigger_spell_cast_engines(
+            active,
+            all_players,
+            dict(nonmatching_spell),
+            turn=turn,
+            phase="precombat_main",
+        )
+        after_token_count = len(
+            [
+                permanent
+                for permanent in active.battlefield
+                if isinstance(permanent, dict) and battle.is_token_permanent(permanent)
+            ]
+        )
+        if after_token_count != before_token_count:
+            fail(
+                "battle_execution",
+                f"{card['name']} created tokens from nonmatching spell {nonmatching_spell.get('name')}",
+            )
+        unexpected = next(
+            (
+                data
+                for event_name, data in events[before_events:]
+                if event_name == "trigger_resolved"
+                and data.get("card") == card.get("name")
+                and data.get("effect") == "token_maker"
+            ),
+            None,
+        )
+        if unexpected is not None:
+            fail("battle_events", f"{card['name']} token trigger resolved from nonmatching spell")
+
+    matching_spell = dict(scenario.get("matching_spell") or {})
+    if not matching_spell:
+        fail("scenario", f"{card['name']} missing matching_spell")
+    before_events = len(events)
+    before_tokens = [
+        permanent
+        for permanent in active.battlefield
+        if isinstance(permanent, dict) and battle.is_token_permanent(permanent)
+    ]
+    battle.trigger_spell_cast_engines(
+        active,
+        all_players,
+        matching_spell,
+        turn=turn,
+        phase="precombat_main",
+    )
+    after_tokens = [
+        permanent
+        for permanent in active.battlefield
+        if isinstance(permanent, dict) and battle.is_token_permanent(permanent)
+    ]
+    created_tokens = after_tokens[len(before_tokens):]
+    expected = dict(scenario.get("expected_token") or {})
+    expected_tokens = scenario.get("expected_tokens") or [expected]
+    expected_total = int(
+        scenario.get("expected_tokens_created")
+        or sum(int(token.get("count") or 0) for token in expected_tokens)
+    )
+    if len(created_tokens) != expected_total:
+        fail(
+            "battle_execution",
+            f"{card['name']} created token total={len(created_tokens)}, expected {expected_total}",
+        )
+    matches = assert_expected_token_multiset(
+        battle,
+        created_tokens,
+        expected_tokens,
+        card["name"],
+    )
+    event = next(
+        (
+            data
+            for event_name, data in events[before_events:]
+            if event_name == "trigger_resolved"
+            and data.get("card") == card.get("name")
+            and data.get("effect") == "token_maker"
+        ),
+        None,
+    )
+    if event is None:
+        fail("battle_events", f"missing {card['name']} spell-cast token_maker trigger_resolved event")
+    if int(event.get("tokens_created") or 0) != expected_total:
+        fail(
+            "battle_events",
+            f"{card['name']} tokens_created={event.get('tokens_created')}, expected {expected_total}",
+        )
+    expected_trigger = scenario.get("expected_trigger")
+    if expected_trigger and event.get("trigger") != expected_trigger:
+        fail(
+            "battle_events",
+            f"{card['name']} trigger={event.get('trigger')!r}, expected {expected_trigger!r}",
+        )
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "tokens_created": len(matches),
+        "trigger": event.get("trigger"),
+        "trigger_spell": event.get("trigger_spell"),
+        "token_names": sorted(token.get("name") for token in matches),
+    }
+
+
 def run_creature_etb_create_tokens(
     battle,
     scenario: dict[str, Any],
@@ -9390,6 +9523,7 @@ SCENARIO_RUNNERS = {
     "damage_gain_life_spell": run_damage_gain_life_spell,
     "simple_activated_create_token": run_simple_activated_create_token,
     "spell_cast_gain_life": run_spell_cast_gain_life,
+    "spell_cast_token_maker": run_spell_cast_token_maker,
     "controlled_stat_modifier_until_eot": run_controlled_stat_modifier_until_eot,
     "counter_target_response": run_counter_target_response,
     "stat_modifier_until_eot": run_stat_modifier_until_eot,

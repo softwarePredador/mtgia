@@ -152,6 +152,10 @@ TOKEN_SPELL_FLASHBACK_UNIT = (
     "token_maker::xmage_signature::CreateTokenEffect::FlashbackAbility::"
     "no_target_class::no_condition_class::token"
 )
+SPELL_CAST_TOKEN_MAKER_UNIT = (
+    "token_maker::xmage_signature::CreateTokenEffect::SpellCastControllerTriggeredAbility::"
+    "no_target_class::no_condition_class::token,triggered_ability"
+)
 LOOK_LIBRARY_PICK_SPELL_UNIT = (
     "xmage_signature::LookLibraryAndPickControllerEffect::no_ability_class::"
     "no_target_class::no_condition_class::no_signal"
@@ -439,6 +443,7 @@ PERMANENT_ACTIVATED_DRAW_DISCARD_SCOPE = "xmage_permanent_simple_activated_draw_
 SPELL_CAST_DRAW_ENGINE_SCOPE = "xmage_spell_cast_draw_engine_v1"
 SPELL_CAST_ADD_COUNTERS_SOURCE_SCOPE = "xmage_spell_cast_add_counters_source_v1"
 SPELL_CAST_GAIN_LIFE_SCOPE = "xmage_spell_cast_gain_life_v1"
+SPELL_CAST_TOKEN_MAKER_SCOPE = "xmage_spell_cast_create_creature_token_v1"
 ETB_LIFE_GAIN_CREATURE_SCOPE = "xmage_creature_etb_gain_life_v1"
 ETB_DYNAMIC_LIFE_GAIN_CREATURE_SCOPE = "xmage_creature_etb_dynamic_gain_life_v1"
 CREATURE_ENTERS_LIFE_GAIN_TRIGGER_SCOPE = "xmage_creature_enters_life_gain_trigger_v1"
@@ -11656,6 +11661,15 @@ def is_spell_cast_gain_life_unit(row: dict[str, Any]) -> bool:
     )
 
 
+def is_spell_cast_token_maker_unit(row: dict[str, Any]) -> bool:
+    return (
+        str(row.get("adapter_work_unit") or "") == SPELL_CAST_TOKEN_MAKER_UNIT
+        and effect_classes(row) == {"CreateTokenEffect"}
+        and ability_classes(row) == {"SpellCastControllerTriggeredAbility"}
+        and set(row.get("xmage_signals") or []) == {"token", "triggered_ability"}
+    )
+
+
 def is_counter_unless_pays_spell_unit(row: dict[str, Any]) -> bool:
     return (
         str(row.get("adapter_work_unit") or "") == COUNTER_UNLESS_PAYS_UNIT
@@ -19831,6 +19845,220 @@ def spell_cast_gain_life_specs_match(
     return True
 
 
+def spell_cast_token_filter_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    text = normalized_token_oracle_phrase(
+        oracle_text_after_leading_static_keywords(metadata)
+    )
+    if text.count("whenever you cast") != 1:
+        return "spell_cast_token_oracle_not_single_trigger"
+    if " only once each turn" in text:
+        return "spell_cast_token_oracle_once_each_turn_not_supported"
+    if " if you do" in text or re.search(r"\byou may pay\b", text):
+        return "spell_cast_token_oracle_optional_cost_not_supported"
+    match = re.search(
+        r"^whenever you cast (?P<filter>.+?), (?P<may>you may )?create (?P<phrase>.+)$",
+        text,
+    )
+    if not match:
+        return "spell_cast_token_oracle_not_simple"
+    filter_text = re.sub(r"\s+", " ", match.group("filter").strip())
+    simple_filter_text = re.sub(r"\s+spell$", "", filter_text)
+    result: dict[str, Any] = {
+        "spell_cast_token_optional": bool(match.group("may")),
+        "trigger": "spell_cast",
+    }
+    filter_specs: list[tuple[str, dict[str, Any]]] = [
+        ("a", {}),
+        ("a creature", {"spell_cast_token_card_types": ["creature"]}),
+        ("an artifact", {"spell_cast_token_card_types": ["artifact"], "trigger_artifact_spell": True}),
+        ("an enchantment", {"spell_cast_token_card_types": ["enchantment"]}),
+        ("an instant or sorcery", {"spell_cast_token_card_types": ["instant", "sorcery"]}),
+        ("a noncreature", {"trigger": "noncreature_spell_cast"}),
+        ("a multicolored", {"spell_cast_token_requires_multicolored": True}),
+        ("a historic", {"spell_cast_token_requires_historic": True}),
+    ]
+    for prefix, spec in filter_specs:
+        if simple_filter_text == prefix:
+            result.update(spec)
+            return result
+    match_mv = re.fullmatch(r"a spell with mana value (?P<mv>\d+) or greater", filter_text)
+    if match_mv:
+        result["spell_cast_token_mana_value_min"] = int(match_mv.group("mv"))
+        return result
+    color_filter_text = re.sub(
+        r"^(?:a|an)\s+spell\s+that(?:'s| is)\s+",
+        "",
+        simple_filter_text,
+    )
+    color_filter_text = re.sub(r"^(?:a|an)\s+", "", color_filter_text)
+    color_parts = [
+        part.strip()
+        for part in re.split(r",| or ", color_filter_text)
+        if part.strip()
+    ]
+    color_symbols = [TOKEN_COLOR_WORDS.get(part) for part in color_parts]
+    if color_parts and all(color_symbols):
+        result["spell_cast_token_required_colors"] = color_symbols
+        return result
+    subtype_match = re.fullmatch(r"an? (?P<subtype>[a-z][a-z0-9 -]*)", simple_filter_text)
+    if subtype_match:
+        subtype = subtype_match.group("subtype").replace("-", " ").strip()
+        if subtype not in {
+            "artifact",
+            "creature",
+            "enchantment",
+            "historic",
+            "instant or sorcery",
+            "multicolored",
+            "noncreature",
+            "spell",
+        }:
+            result["spell_cast_token_required_subtypes"] = [subtype]
+            return result
+    return "spell_cast_token_oracle_filter_not_supported"
+
+
+def spell_cast_token_filter_from_source(source: str) -> dict[str, Any] | str:
+    text = source or ""
+    if len(re.findall(r"new\s+SpellCastControllerTriggeredAbility\s*\(", text)) != 1:
+        return "spell_cast_token_source_not_single_trigger"
+    if len(re.findall(r"new\s+CreateTokenEffect\s*\(", text)) != 1:
+        return "spell_cast_token_source_not_single_create_token_effect"
+    if "DoIfCostPaid" in text:
+        return "spell_cast_token_source_optional_cost_not_supported"
+    if "setTriggersLimitEachTurn" in text or "setTriggersLimit" in text:
+        return "spell_cast_token_source_once_each_turn_not_supported"
+    if "AdventurePredicate" in text:
+        return "spell_cast_token_source_filter_not_supported"
+    trigger_args = extract_java_call_args(text, "SpellCastControllerTriggeredAbility")
+    trigger_parts = split_java_args(trigger_args or "")
+    optional = bool(trigger_parts and trigger_parts[-1].strip() == "true")
+    result: dict[str, Any] = {
+        "spell_cast_token_optional": optional,
+        "trigger": "spell_cast",
+    }
+    if "FILTER_SPELL_A_NON_CREATURE" in text:
+        result["trigger"] = "noncreature_spell_cast"
+        return result
+    if "FILTER_SPELL_A_CREATURE" in text:
+        result["spell_cast_token_card_types"] = ["creature"]
+        return result
+    if "FILTER_SPELL_AN_ARTIFACT" in text:
+        result["spell_cast_token_card_types"] = ["artifact"]
+        result["trigger_artifact_spell"] = True
+        return result
+    if "FILTER_SPELL_AN_ENCHANTMENT" in text:
+        result["spell_cast_token_card_types"] = ["enchantment"]
+        return result
+    if "FILTER_SPELL_AN_INSTANT_OR_SORCERY" in text or "FilterInstantOrSorcerySpell" in text:
+        result["spell_cast_token_card_types"] = ["instant", "sorcery"]
+        return result
+    if "FILTER_SPELL_A_MULTICOLORED" in text:
+        result["spell_cast_token_requires_multicolored"] = True
+        return result
+    if "FILTER_SPELL_HISTORIC" in text:
+        result["spell_cast_token_requires_historic"] = True
+        return result
+    if "FILTER_SPELL_MV_4_OR_GREATER" in text:
+        result["spell_cast_token_mana_value_min"] = 4
+        return result
+    if "SpellZonePredicate(Zone.GRAVEYARD)" in text:
+        result["spell_cast_token_source_zone"] = "graveyard"
+    subtype_matches = [
+        value.lower()
+        for value in re.findall(r"SubType\.([A-Z_]+)\.getPredicate\s*\(\s*\)", text)
+    ]
+    if subtype_matches:
+        result["spell_cast_token_required_subtypes"] = subtype_matches
+    if "SuperType.LEGENDARY.getPredicate()" in text:
+        result["spell_cast_token_required_supertypes"] = ["legendary"]
+    color_symbols = [
+        TOKEN_COLOR_WORDS.get(match.lower())
+        for match in re.findall(r"ObjectColor\.(WHITE|BLUE|BLACK|RED|GREEN)\b", text)
+    ]
+    if color_symbols:
+        result["spell_cast_token_required_colors"] = color_symbols
+    mv_match = re.search(
+        r"ManaValuePredicate\s*\(\s*ComparisonType\.MORE_THAN\s*,\s*(\d+)\s*\)",
+        text,
+    )
+    if mv_match:
+        result["spell_cast_token_mana_value_min"] = int(mv_match.group(1)) + 1
+    supported_filter = any(
+        key in result
+        for key in (
+            "spell_cast_token_card_types",
+            "spell_cast_token_required_subtypes",
+            "spell_cast_token_required_supertypes",
+            "spell_cast_token_required_colors",
+            "spell_cast_token_requires_multicolored",
+            "spell_cast_token_requires_historic",
+            "spell_cast_token_source_zone",
+            "spell_cast_token_mana_value_min",
+        )
+    )
+    if len(trigger_parts) == 2 and trigger_parts[-1].strip() in {"true", "false"}:
+        supported_filter = True
+    if not supported_filter:
+        return "spell_cast_token_source_filter_not_supported"
+    return result
+
+
+def spell_cast_token_specs_match(
+    oracle_spec: dict[str, Any],
+    source_spec: dict[str, Any],
+) -> bool:
+    comparable_keys = {
+        "trigger",
+        "trigger_artifact_spell",
+        "spell_cast_token_card_types",
+        "spell_cast_token_required_subtypes",
+        "spell_cast_token_required_supertypes",
+        "spell_cast_token_required_colors",
+        "spell_cast_token_requires_multicolored",
+        "spell_cast_token_requires_historic",
+        "spell_cast_token_source_zone",
+        "spell_cast_token_mana_value_min",
+        "spell_cast_token_optional",
+    }
+    for key in comparable_keys:
+        oracle_value = oracle_spec.get(key)
+        source_value = source_spec.get(key)
+        if isinstance(oracle_value, list):
+            oracle_value = sorted(str(value) for value in oracle_value)
+        if isinstance(source_value, list):
+            source_value = sorted(str(value) for value in source_value)
+        if oracle_value != source_value:
+            return False
+    return True
+
+
+def spell_cast_create_token_oracle_blocker(
+    metadata: dict[str, Any],
+    token_data: dict[str, Any],
+    token_count: int,
+) -> str | None:
+    text = normalized_token_oracle_phrase(
+        oracle_text_after_leading_static_keywords(metadata)
+    )
+    if text.count("whenever you cast") != 1:
+        return "spell_cast_token_oracle_not_single_trigger"
+    if " only once each turn" in text:
+        return "spell_cast_token_oracle_once_each_turn_not_supported"
+    if " if you do" in text or re.search(r"\byou may pay\b", text):
+        return "spell_cast_token_oracle_optional_cost_not_supported"
+    match = re.search(
+        r"^whenever you cast (?P<filter>.+?), (?:you may )?create (?P<phrase>.+)$",
+        text,
+    )
+    if not match:
+        return "spell_cast_token_oracle_not_simple"
+    phrase = match.group("phrase").strip()
+    if phrase not in token_count_phrase_options(token_data, token_count):
+        return "spell_cast_token_oracle_token_mismatch"
+    return None
+
+
 def activated_recursion_to_hand_target_from_source(text: str) -> tuple[str, int, bool] | str:
     lowered = str(text or "").lower()
     if "arcane card" in lowered or "SubType.ARCANE.getPredicate()" in text:
@@ -24567,6 +24795,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "permanent with a simple activated draw-then-discard ability"
     elif scope == SPELL_CAST_DRAW_ENGINE_SCOPE:
         scope_kind = "permanent with a triggered draw ability on casting matching spells"
+    elif scope == SPELL_CAST_TOKEN_MAKER_SCOPE:
+        scope_kind = "permanent with a triggered token-creation ability on casting matching spells"
     elif scope == RECURSION_BATTLEFIELD_ALL_SCOPE:
         scope_kind = "return-all matching graveyard cards to battlefield spell"
     elif scope == GRAVEYARD_EXILE_SPELL_SCOPE:
@@ -24691,6 +24921,7 @@ def split_row(
     spell_cast_draw_engine_unit = is_spell_cast_draw_engine_unit(row)
     spell_cast_add_counters_source_unit = is_spell_cast_add_counters_source_unit(row)
     spell_cast_gain_life_unit = is_spell_cast_gain_life_unit(row)
+    spell_cast_token_maker_unit = is_spell_cast_token_maker_unit(row)
     permanent_activated_draw_discard_unit = is_permanent_activated_draw_discard_unit(row)
     dies_recursion_creature_unit = is_creature_dies_recursion_unit(row)
     etb_damage_creature_unit = is_creature_etb_damage_unit(row)
@@ -24852,6 +25083,7 @@ def split_row(
         and not spell_cast_draw_engine_unit
         and not spell_cast_add_counters_source_unit
         and not spell_cast_gain_life_unit
+        and not spell_cast_token_maker_unit
         and not permanent_activated_draw_discard_unit
         and not dies_recursion_creature_unit
         and not etb_damage_creature_unit
@@ -24956,6 +25188,7 @@ def split_row(
         and not spell_cast_draw_engine_unit
         and not spell_cast_add_counters_source_unit
         and not spell_cast_gain_life_unit
+        and not spell_cast_token_maker_unit
         and not permanent_activated_draw_discard_unit
         and not dies_recursion_creature_unit
         and not etb_damage_creature_unit
@@ -25995,6 +26228,68 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_spell_cast_gain_life",
+        ), "selected_exact_scope"
+
+    if spell_cast_token_maker_unit:
+        if not is_permanent_metadata(metadata) or is_spell(metadata):
+            return None, "spell_cast_token_not_permanent"
+        source_spec = spell_cast_token_filter_from_source(source_text)
+        if isinstance(source_spec, str):
+            return None, source_spec
+        oracle_spec = spell_cast_token_filter_from_oracle(metadata)
+        if isinstance(oracle_spec, str):
+            return None, oracle_spec
+        if not spell_cast_token_specs_match(oracle_spec, source_spec):
+            return None, "spell_cast_token_source_oracle_mismatch"
+        parsed_effect = fixed_create_token_effect_from_source(source_text)
+        token_parts = fixed_literal_token_parts(parsed_effect)
+        if isinstance(token_parts, str):
+            return None, token_parts
+        token_class, token_count, token_extra = token_parts
+        token_data, token_reason = parse_simple_token_class(
+            token_class_source(row, source_text, token_class),
+            token_class,
+        )
+        if token_reason:
+            return None, token_reason
+        token_blocker = spell_cast_create_token_oracle_blocker(
+            metadata,
+            token_data,
+            token_count,
+        )
+        if token_blocker:
+            return None, token_blocker
+        type_line = str(metadata.get("type_line") or "").lower()
+        permanent_effect = (
+            "creature"
+            if "creature" in type_line
+            else "artifact"
+            if "artifact" in type_line
+            else "enchantment"
+            if "enchantment" in type_line
+            else "permanent"
+        )
+        effect_json = {
+            "effect": permanent_effect,
+            "battle_model_scope": SPELL_CAST_TOKEN_MAKER_SCOPE,
+            "ability_kind": "triggered",
+            "trigger_effect": "token_maker",
+            "spell_cast_token_maker": True,
+            "trigger_token_count": token_count,
+            "token_count": token_count,
+            "xmage_effect_class": "CreateTokenEffect",
+            "xmage_ability_class": "SpellCastControllerTriggeredAbility",
+            **token_data,
+            **token_extra,
+            **oracle_spec,
+        }
+        if permanent_effect == "creature":
+            effect_json["is_creature_permanent"] = True
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_spell_cast_create_creature_token",
         ), "selected_exact_scope"
 
     if permanent_activated_destroy_unit:
@@ -36067,6 +36362,7 @@ def build_exact_split_report(
             and not is_spell_cast_draw_engine_unit(row)
             and not is_spell_cast_add_counters_source_unit(row)
             and not is_spell_cast_gain_life_unit(row)
+            and not is_spell_cast_token_maker_unit(row)
             and not is_permanent_activated_draw_discard_unit(row)
             and not is_creature_etb_damage_unit(row)
             and not is_creature_etb_graveyard_to_library_unit(row)
@@ -36170,6 +36466,7 @@ def build_exact_split_report(
                 "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawDiscardControllerEffect and SimpleActivatedAbility, exact draw-then-discard counts, and mana/tap/life/source self-sacrifice costs only",
                 "add_counters::source_add_counters_variant_v1 rows with AddCountersSourceEffect and SpellCastControllerTriggeredAbility, exact source self-counter count, supported spell filters, and only static self keywords",
                 "life_gain::xmage_life_gain_variant_review_v1 rows with GainLifeEffect and SpellCastControllerTriggeredAbility, exact controller life gain, and supported spell filters",
+                "token_maker rows with CreateTokenEffect and SpellCastControllerTriggeredAbility, exact fixed safe creature-token class, supported spell filters, no optional payment, and no once-per-turn trigger limit",
                 "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, EntersBattlefieldTriggeredAbility, and exact fixed ETB damage Oracle text",
                 "xmage_signature BoostTargetEffect + EntersBattlefieldTriggeredAbility rows with exact fixed target-creature boost until EOT and generic TargetCreaturePermanent source target",
                 "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, DiesSourceTriggeredAbility, exact fixed dies-damage Oracle/source agreement, and no auxiliary ability class",

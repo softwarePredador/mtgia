@@ -8013,6 +8013,153 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         effect = proposal["effect_json"]
         self.assertEqual(effect["spell_cast_gain_life_required_colors"], ["U", "B", "R"])
 
+    def test_spell_cast_token_maker_maps_instant_or_sorcery_filter(self) -> None:
+        row = queue_row(
+            split.SPELL_CAST_TOKEN_MAKER_UNIT,
+            effect_classes=["CreateTokenEffect"],
+            ability_kind="triggered",
+            ability_classes=["SpellCastControllerTriggeredAbility"],
+            xmage_signals=["token", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Talrand, Sky Summoner",
+                type_line="Legendary Creature - Merfolk Wizard",
+                oracle_text=(
+                    "Whenever you cast an instant or sorcery spell, create a 2/2 blue "
+                    "Drake creature token with flying."
+                ),
+            ),
+            source_text="""
+                this.addAbility(new SpellCastControllerTriggeredAbility(
+                    new CreateTokenEffect(new DrakeToken()),
+                    StaticFilters.FILTER_SPELL_AN_INSTANT_OR_SORCERY, false));
+                class DrakeToken extends TokenImpl {
+                    public DrakeToken() {
+                        super("Drake Token", "2/2 blue Drake creature token with flying");
+                        cardType.add(CardType.CREATURE);
+                        subtype.add(SubType.DRAKE);
+                        color.setBlue(true);
+                        power = new MageInt(2);
+                        toughness = new MageInt(2);
+                        addAbility(FlyingAbility.getInstance());
+                    }
+                }
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "creature")
+        self.assertEqual(effect["battle_model_scope"], split.SPELL_CAST_TOKEN_MAKER_SCOPE)
+        self.assertEqual(effect["trigger"], "spell_cast")
+        self.assertEqual(effect["trigger_effect"], "token_maker")
+        self.assertTrue(effect["spell_cast_token_maker"])
+        self.assertEqual(effect["spell_cast_token_card_types"], ["instant", "sorcery"])
+        self.assertEqual(effect["token_name"], "Drake Token")
+        self.assertEqual(effect["token_power"], 2)
+        self.assertEqual(effect["token_keywords"], ["flying"])
+
+    def test_spell_cast_token_maker_maps_noncreature_filter_artifact_token(self) -> None:
+        row = queue_row(
+            split.SPELL_CAST_TOKEN_MAKER_UNIT,
+            effect_classes=["CreateTokenEffect"],
+            ability_kind="triggered",
+            ability_classes=["SpellCastControllerTriggeredAbility"],
+            xmage_signals=["token", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Third Path Iconoclast",
+                type_line="Creature - Human Monk",
+                oracle_text=(
+                    "Whenever you cast a noncreature spell, create a 1/1 colorless "
+                    "Soldier artifact creature token."
+                ),
+            ),
+            source_text="""
+                this.addAbility(new SpellCastControllerTriggeredAbility(
+                    new CreateTokenEffect(new SoldierArtifactToken()),
+                    StaticFilters.FILTER_SPELL_A_NON_CREATURE, false));
+                class SoldierArtifactToken extends TokenImpl {
+                    public SoldierArtifactToken() {
+                        super("Soldier Token", "1/1 colorless Soldier artifact creature token");
+                        cardType.add(CardType.CREATURE);
+                        cardType.add(CardType.ARTIFACT);
+                        subtype.add(SubType.SOLDIER);
+                        power = new MageInt(1);
+                        toughness = new MageInt(1);
+                    }
+                }
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["trigger"], "noncreature_spell_cast")
+        self.assertEqual(effect["token_name"], "Soldier Token")
+        self.assertTrue(effect["artifact_tokens"])
+
+    def test_spell_cast_token_maker_blocks_optional_payment(self) -> None:
+        row = queue_row(
+            split.SPELL_CAST_TOKEN_MAKER_UNIT,
+            effect_classes=["CreateTokenEffect"],
+            ability_kind="triggered",
+            ability_classes=["SpellCastControllerTriggeredAbility"],
+            xmage_signals=["token", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Digsite Engineer",
+                type_line="Creature - Dwarf Artificer",
+                oracle_text=(
+                    "Whenever you cast an artifact spell, you may pay {2}. If you do, "
+                    "create a 0/0 colorless Construct artifact creature token with "
+                    "\"This creature gets +1/+1 for each artifact you control.\""
+                ),
+            ),
+            source_text="""
+                this.addAbility(new SpellCastControllerTriggeredAbility(new DoIfCostPaid(
+                    new CreateTokenEffect(new KarnConstructToken()), new GenericManaCost(2)
+                ), StaticFilters.FILTER_SPELL_AN_ARTIFACT, false));
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "spell_cast_token_source_optional_cost_not_supported")
+
+    def test_spell_cast_token_maker_blocks_once_each_turn_limit(self) -> None:
+        row = queue_row(
+            split.SPELL_CAST_TOKEN_MAKER_UNIT,
+            effect_classes=["CreateTokenEffect"],
+            ability_kind="triggered",
+            ability_classes=["SpellCastControllerTriggeredAbility"],
+            xmage_signals=["token", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Whispering Wizard",
+                type_line="Creature - Human Wizard",
+                oracle_text=(
+                    "Whenever you cast a noncreature spell, create a 1/1 white Spirit "
+                    "creature token with flying. This ability triggers only once each turn."
+                ),
+            ),
+            source_text="""
+                this.addAbility(new SpellCastControllerTriggeredAbility(
+                    new CreateTokenEffect(new SpiritWhiteToken()),
+                    StaticFilters.FILTER_SPELL_A_NON_CREATURE, false
+                ).setTriggersLimitEachTurn(1));
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "spell_cast_token_source_once_each_turn_not_supported")
+
     def test_permanent_activated_life_gain_maps_simple_mana_and_tap_cost(self) -> None:
         row = queue_row(
             split.LIFE_UNIT,

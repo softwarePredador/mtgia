@@ -580,6 +580,17 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "spell_cast_gain_life_required_colors",
     "spell_cast_gain_life_source_zone",
     "spell_cast_gain_life_optional",
+    "spell_cast_token_maker",
+    "spell_cast_token_card_types",
+    "spell_cast_token_required_subtypes",
+    "spell_cast_token_required_supertypes",
+    "spell_cast_token_required_colors",
+    "spell_cast_token_requires_multicolored",
+    "spell_cast_token_requires_historic",
+    "spell_cast_token_source_zone",
+    "spell_cast_token_mana_value_min",
+    "spell_cast_token_optional",
+    "trigger_artifact_spell",
     "flashback_cost",
     "flashback_status",
     "cycling_cost",
@@ -2429,6 +2440,109 @@ def spell_cast_gain_life_execution_scenario_from_expected_rule(
         "expected_trigger": trigger,
         "expected_life_gain": amount,
         "expected_life_after": 20 + amount,
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
+def spell_cast_token_maker_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_spell_cast_create_creature_token_v1":
+        return None
+    expected_count = int(required.get("trigger_token_count") or required.get("token_count") or 1)
+    if expected_count <= 0:
+        return None
+    trigger = str(required.get("trigger") or "spell_cast")
+    card_types = [str(value) for value in required.get("spell_cast_token_card_types") or []]
+    subtypes = [
+        str(value).replace("_", " ").strip()
+        for value in required.get("spell_cast_token_required_subtypes") or []
+        if str(value).strip()
+    ]
+    required_colors = [
+        str(value)
+        for value in required.get("spell_cast_token_required_colors") or []
+    ]
+    mana_value_min = int(required.get("spell_cast_token_mana_value_min") or 0)
+    matching_spell = {
+        "name": f"E2E Matching Spell for {rule['card_name']}",
+        "type_line": "Instant",
+        "effect": "draw_cards",
+        "cmc": max(2, mana_value_min or 2),
+    }
+    nonmatching_spell = {
+        "name": f"E2E Nonmatching Spell for {rule['card_name']}",
+        "type_line": "Creature - Goblin",
+        "effect": "creature",
+        "cmc": 2,
+    }
+    if trigger == "noncreature_spell_cast":
+        matching_spell["type_line"] = "Instant"
+        nonmatching_spell["type_line"] = "Creature - Soldier"
+    elif card_types:
+        primary_type = card_types[0].lower()
+        if primary_type == "artifact":
+            matching_spell["type_line"] = "Artifact"
+            matching_spell["effect"] = "artifact"
+        elif primary_type == "enchantment":
+            matching_spell["type_line"] = "Enchantment"
+            matching_spell["effect"] = "enchantment"
+        elif primary_type == "creature":
+            matching_spell["type_line"] = "Creature - Soldier"
+            matching_spell["effect"] = "creature"
+            nonmatching_spell["type_line"] = "Instant"
+            nonmatching_spell["effect"] = "draw_cards"
+        elif set(value.lower() for value in card_types) == {"instant", "sorcery"}:
+            matching_spell["type_line"] = "Instant"
+            nonmatching_spell["type_line"] = "Creature - Soldier"
+    if subtypes:
+        subtype_line = " ".join(subtype.title() for subtype in subtypes[:1])
+        matching_spell["type_line"] = f"Creature - {subtype_line}"
+        matching_spell["effect"] = "creature"
+        nonmatching_spell["type_line"] = "Creature - Goblin"
+        nonmatching_spell["effect"] = "creature"
+    if required.get("spell_cast_token_requires_multicolored"):
+        matching_spell["colors"] = ["W", "U"]
+        matching_spell["mana_cost"] = "{W}{U}"
+        nonmatching_spell["type_line"] = "Instant"
+        nonmatching_spell["effect"] = "draw_cards"
+        nonmatching_spell["colors"] = ["G"]
+        nonmatching_spell["mana_cost"] = "{G}"
+    elif required_colors:
+        matching_spell["colors"] = [required_colors[0]]
+        matching_spell["mana_cost"] = "{" + required_colors[0] + "}"
+        nonmatching_spell["type_line"] = "Instant"
+        nonmatching_spell["effect"] = "draw_cards"
+        nonmatching_spell["colors"] = ["G"]
+        nonmatching_spell["mana_cost"] = "{G}"
+    if mana_value_min > 0:
+        matching_spell["cmc"] = mana_value_min
+        nonmatching_spell["type_line"] = matching_spell["type_line"]
+        nonmatching_spell["effect"] = matching_spell.get("effect")
+        nonmatching_spell["cmc"] = max(0, mana_value_min - 1)
+    source_effect = str(required.get("effect") or "permanent")
+    if source_effect == "creature":
+        source_type_line = "Creature - Wizard"
+    elif source_effect == "artifact":
+        source_type_line = "Artifact"
+    elif source_effect == "enchantment":
+        source_type_line = "Enchantment"
+    else:
+        source_type_line = "Artifact"
+    return {
+        "name": f"{rule['card_name']} creates tokens when matching spell is cast",
+        "type": "spell_cast_token_maker",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": source_type_line,
+            "effect": source_effect,
+        },
+        "matching_spell": matching_spell,
+        "nonmatching_spell": nonmatching_spell,
+        "expected_trigger": trigger,
+        "expected_token": expected_token_from_component(required),
+        "expected_tokens_created": expected_count,
         "logical_rule_key": rule["logical_rule_key"],
     }
 
@@ -5964,6 +6078,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or creature_etb_draw_discard_execution_scenario_from_expected_rule(rule)
         or creature_etb_target_stat_modifier_execution_scenario_from_expected_rule(rule)
         or spell_cast_gain_life_execution_scenario_from_expected_rule(rule)
+        or spell_cast_token_maker_execution_scenario_from_expected_rule(rule)
     )
 
 
