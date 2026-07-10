@@ -1402,6 +1402,24 @@ def dynamic_token_count_from_source(source: str, count_expression: str) -> dict[
     return named_graveyard_plus_base_token_count_from_source(source, expression)
 
 
+def fixed_token_class_from_create_token_arg(source: str, token_arg: str) -> str | None:
+    text = source or ""
+    arg = str(token_arg or "").strip()
+    token_match = re.fullmatch(r"new\s+(?P<class>\w+)\s*\([^)]*\)", arg, re.S)
+    if token_match:
+        return token_match.group("class")
+    if not re.fullmatch(r"[A-Za-z_]\w*", arg):
+        return None
+    matches = {
+        match.group("class")
+        for match in re.finditer(
+            rf"\b{re.escape(arg)}\s*=\s*new\s+(?P<class>\w+)\s*\(",
+            text,
+        )
+    }
+    return next(iter(matches)) if len(matches) == 1 else None
+
+
 def fixed_create_token_effect_from_source(source: str) -> tuple[str, int] | dict[str, Any] | str:
     text = source or ""
     if len(re.findall(r"new\s+CreateTokenEffect\s*\(", text)) != 1:
@@ -1416,10 +1434,9 @@ def fixed_create_token_effect_from_source(source: str) -> tuple[str, int] | dict
     parts = split_java_args(args)
     if not parts:
         return "token_source_create_token_not_fixed"
-    token_match = re.fullmatch(r"new\s+(?P<class>\w+)\s*\([^)]*\)", parts[0].strip(), re.S)
-    if not token_match:
+    token_class = fixed_token_class_from_create_token_arg(text, parts[0])
+    if token_class is None:
         return "token_source_create_token_not_fixed"
-    token_class = token_match.group("class")
     count_expression = parts[1].strip() if len(parts) > 1 else ""
     token_tapped = len(parts) > 2 and parts[2].strip() == "true"
     if len(parts) > 3 and parts[3].strip() == "true":

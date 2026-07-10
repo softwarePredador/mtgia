@@ -1,0 +1,538 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg720_token_variable_arg_new_server_toke_20260710_203259",
+  "deploy_id": "pg720_token_variable_arg_new_server",
+  "execution_scenarios": [
+    {
+      "card": {
+        "name": "Ant Queen"
+      },
+      "controller_hand": [],
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 1,
+        "green": 1,
+        "red": 0,
+        "white": 0
+      },
+      "expected_discard_count": 0,
+      "expected_discard_random": false,
+      "expected_discard_target": "any_card",
+      "expected_exiled_source_from_graveyard": false,
+      "expected_tapped_source": false,
+      "expected_token": {
+        "artifact": false,
+        "colors": [
+          "G"
+        ],
+        "count": 1,
+        "keywords": [],
+        "name": "Insect Token",
+        "power": 1,
+        "subtype": "Insect",
+        "tapped": false,
+        "toughness": 1
+      },
+      "logical_rule_key": "battle_rule_v1:6c6a795001e21e4f389c32adde4533d0",
+      "name": "Ant Queen activates token ability",
+      "source_zone": "battlefield",
+      "type": "simple_activated_create_token"
+    },
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Broodmate Dragon",
+        "type_line": "Creature"
+      },
+      "expected_keywords": [
+        "flying"
+      ],
+      "expected_token": {
+        "artifact": false,
+        "artifact_only": false,
+        "colors": [
+          "R"
+        ],
+        "count": 1,
+        "keywords": [
+          "flying"
+        ],
+        "mana_produced": null,
+        "name": "Dragon Token",
+        "power": 4,
+        "produced_mana_symbols": [],
+        "produces": null,
+        "sacrifice_for_colorless_mana": false,
+        "subtype": "Dragon",
+        "tapped": false,
+        "toughness": 4
+      },
+      "logical_rule_key": "battle_rule_v1:4063c079795837e8b94c581cf24ee0a8",
+      "name": "Broodmate Dragon enters and creates modeled creature tokens",
+      "type": "creature_etb_create_tokens"
+    },
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Roc Egg",
+        "type_line": "Creature"
+      },
+      "expected_keywords": [
+        "defender"
+      ],
+      "expected_token": {
+        "artifact": false,
+        "artifact_only": false,
+        "colors": [
+          "W"
+        ],
+        "count": 1,
+        "keywords": [
+          "flying"
+        ],
+        "mana_produced": null,
+        "name": "Bird Token",
+        "power": 3,
+        "produced_mana_symbols": [],
+        "produces": null,
+        "sacrifice_for_colorless_mana": false,
+        "subtype": "Bird",
+        "tapped": false,
+        "toughness": 3
+      },
+      "logical_rule_key": "battle_rule_v1:5385b7d23648efeaf502bff68b2a7f0b",
+      "name": "Roc Egg dies and creates modeled creature tokens",
+      "type": "creature_dies_create_tokens"
+    },
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Sprouting Thrinax",
+        "type_line": "Creature"
+      },
+      "expected_keywords": [],
+      "expected_token": {
+        "artifact": false,
+        "artifact_only": false,
+        "colors": [
+          "G"
+        ],
+        "count": 3,
+        "keywords": [],
+        "mana_produced": null,
+        "name": "Saproling Token",
+        "power": 1,
+        "produced_mana_symbols": [],
+        "produces": null,
+        "sacrifice_for_colorless_mana": false,
+        "subtype": "Saproling",
+        "tapped": false,
+        "toughness": 1
+      },
+      "logical_rule_key": "battle_rule_v1:302fae4cf3a57e7203c835da45e5b69c",
+      "name": "Sprouting Thrinax dies and creates modeled creature tokens",
+      "type": "creature_dies_create_tokens"
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Ant Queen",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6c6a795001e21e4f389c32adde4533d0",
+      "min_rule_version": 2,
+      "normalized_name": "ant queen",
+      "oracle_hash": "53a7ae4dd6f6a5ef1c68b5fe980dd44b",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "token_maker",
+            "activation_cost_colors": [
+              "G"
+            ],
+            "activation_cost_generic": 1,
+            "activation_cost_mana": "{1}{G}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+            "effect": "token_maker",
+            "token_colors": [
+              "G"
+            ],
+            "token_count": 1,
+            "token_description": "1/1 green Insect creature token",
+            "token_name": "Insect Token",
+            "token_power": 1,
+            "token_subtype": "Insect",
+            "token_toughness": 1,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "CreateTokenEffect",
+            "xmage_token_class": "InsectToken"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+        "activated_effect": "token_maker",
+        "activation_cost_colors": [
+          "G"
+        ],
+        "activation_cost_generic": 1,
+        "activation_cost_mana": "{1}{G}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+        "effect": "creature",
+        "token_colors": [
+          "G"
+        ],
+        "token_count": 1,
+        "token_name": "Insect Token",
+        "token_power": 1,
+        "token_subtype": "Insect",
+        "token_toughness": 1,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "InsectToken"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Broodmate Dragon",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4063c079795837e8b94c581cf24ee0a8",
+      "min_rule_version": 2,
+      "normalized_name": "broodmate dragon",
+      "oracle_hash": "423b550b931b4696b2288ce547c32449",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+        "effect": "creature",
+        "etb_token_colors": [
+          "R"
+        ],
+        "etb_token_count": 1,
+        "etb_token_flying": true,
+        "etb_token_keywords": [
+          "flying"
+        ],
+        "etb_token_name": "Dragon Token",
+        "etb_token_power": 4,
+        "etb_token_subtype": "Dragon",
+        "etb_token_toughness": 4,
+        "keywords": [
+          "flying"
+        ],
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "DragonToken"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Roc Egg",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5385b7d23648efeaf502bff68b2a7f0b",
+      "min_rule_version": 2,
+      "normalized_name": "roc egg",
+      "oracle_hash": "c35bfc0f113c1ee5e7539b5d813aec4f",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+        "dies_token_colors": [
+          "W"
+        ],
+        "dies_token_count": 1,
+        "dies_token_flying": true,
+        "dies_token_keywords": [
+          "flying"
+        ],
+        "dies_token_name": "Bird Token",
+        "dies_token_power": 3,
+        "dies_token_subtype": "Bird",
+        "dies_token_toughness": 3,
+        "effect": "creature",
+        "keywords": [
+          "defender"
+        ],
+        "trigger": "dies",
+        "xmage_ability_class": "DiesSourceTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "RocEggToken"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sprouting Thrinax",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:302fae4cf3a57e7203c835da45e5b69c",
+      "min_rule_version": 2,
+      "normalized_name": "sprouting thrinax",
+      "oracle_hash": "ea0c06cc0ad372bf9d662623bfc90f2a",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+        "dies_token_colors": [
+          "G"
+        ],
+        "dies_token_count": 3,
+        "dies_token_name": "Saproling Token",
+        "dies_token_power": 1,
+        "dies_token_subtype": "Saproling",
+        "dies_token_toughness": 1,
+        "effect": "creature",
+        "trigger": "dies",
+        "xmage_ability_class": "DiesSourceTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "SaprolingToken"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_creature_dies_create_tokens": 2,
+    "xmage_creature_etb_create_tokens": 1,
+    "xmage_permanent_simple_activated_create_token": 1
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg720_token_variable_arg_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg720_token_variable_arg_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg720_token_variable_arg_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg720_token_variable_arg_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg720_token_variable_arg_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg720_token_variable_arg_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-10T20:32:59+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Ant Queen"
+      },
+      "card_name": "Ant Queen",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6c6a795001e21e4f389c32adde4533d0",
+      "normalized_name": "ant queen",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "token_maker",
+            "activation_cost_colors": [
+              "G"
+            ],
+            "activation_cost_generic": 1,
+            "activation_cost_mana": "{1}{G}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+            "effect": "token_maker",
+            "token_colors": [
+              "G"
+            ],
+            "token_count": 1,
+            "token_description": "1/1 green Insect creature token",
+            "token_name": "Insect Token",
+            "token_power": 1,
+            "token_subtype": "Insect",
+            "token_toughness": 1,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "CreateTokenEffect",
+            "xmage_token_class": "InsectToken"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+        "activated_effect": "token_maker",
+        "activation_cost_colors": [
+          "G"
+        ],
+        "activation_cost_generic": 1,
+        "activation_cost_mana": "{1}{G}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+        "effect": "creature",
+        "token_colors": [
+          "G"
+        ],
+        "token_count": 1,
+        "token_name": "Insect Token",
+        "token_power": 1,
+        "token_subtype": "Insect",
+        "token_toughness": 1,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "InsectToken"
+      }
+    },
+    {
+      "card": {
+        "name": "Broodmate Dragon"
+      },
+      "card_name": "Broodmate Dragon",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4063c079795837e8b94c581cf24ee0a8",
+      "normalized_name": "broodmate dragon",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+        "effect": "creature",
+        "etb_token_colors": [
+          "R"
+        ],
+        "etb_token_count": 1,
+        "etb_token_flying": true,
+        "etb_token_keywords": [
+          "flying"
+        ],
+        "etb_token_name": "Dragon Token",
+        "etb_token_power": 4,
+        "etb_token_subtype": "Dragon",
+        "etb_token_toughness": 4,
+        "keywords": [
+          "flying"
+        ],
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "DragonToken"
+      }
+    },
+    {
+      "card": {
+        "name": "Roc Egg"
+      },
+      "card_name": "Roc Egg",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5385b7d23648efeaf502bff68b2a7f0b",
+      "normalized_name": "roc egg",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+        "dies_token_colors": [
+          "W"
+        ],
+        "dies_token_count": 1,
+        "dies_token_flying": true,
+        "dies_token_keywords": [
+          "flying"
+        ],
+        "dies_token_name": "Bird Token",
+        "dies_token_power": 3,
+        "dies_token_subtype": "Bird",
+        "dies_token_toughness": 3,
+        "effect": "creature",
+        "keywords": [
+          "defender"
+        ],
+        "trigger": "dies",
+        "xmage_ability_class": "DiesSourceTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "RocEggToken"
+      }
+    },
+    {
+      "card": {
+        "name": "Sprouting Thrinax"
+      },
+      "card_name": "Sprouting Thrinax",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:302fae4cf3a57e7203c835da45e5b69c",
+      "normalized_name": "sprouting thrinax",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+        "dies_token_colors": [
+          "G"
+        ],
+        "dies_token_count": 3,
+        "dies_token_name": "Saproling Token",
+        "dies_token_power": 1,
+        "dies_token_subtype": "Saproling",
+        "dies_token_toughness": 1,
+        "effect": "creature",
+        "trigger": "dies",
+        "xmage_ability_class": "DiesSourceTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "SaprolingToken"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Ant Queen",
+    "Broodmate Dragon",
+    "Roc Egg",
+    "Sprouting Thrinax"
+  ],
+  "selected_count": 4,
+  "slug": "token_variable_arg_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Ant Queen",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6c6a795001e21e4f389c32adde4533d0",
+      "min_rule_version": 2,
+      "normalized_name": "ant queen",
+      "oracle_hash": "53a7ae4dd6f6a5ef1c68b5fe980dd44b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Broodmate Dragon",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4063c079795837e8b94c581cf24ee0a8",
+      "min_rule_version": 2,
+      "normalized_name": "broodmate dragon",
+      "oracle_hash": "423b550b931b4696b2288ce547c32449",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Roc Egg",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5385b7d23648efeaf502bff68b2a7f0b",
+      "min_rule_version": 2,
+      "normalized_name": "roc egg",
+      "oracle_hash": "c35bfc0f113c1ee5e7539b5d813aec4f",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_dies_create_tokens_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sprouting Thrinax",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:302fae4cf3a57e7203c835da45e5b69c",
+      "min_rule_version": 2,
+      "normalized_name": "sprouting thrinax",
+      "oracle_hash": "ea0c06cc0ad372bf9d662623bfc90f2a",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_dies_create_tokens_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

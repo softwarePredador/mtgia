@@ -5343,6 +5343,107 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["etb_token_subtype"], "Goblin")
         self.assertEqual(effect["etb_token_colors"], ["R"])
 
+    def test_creature_etb_create_tokens_resolves_token_variable_argument(self) -> None:
+        row = queue_row(
+            "token_maker::xmage_signature::CreateTokenEffect::"
+            "EntersBattlefieldTriggeredAbility,FlyingAbility::"
+            "no_target_class::no_condition_class::token,triggered_ability",
+            effect_classes=["CreateTokenEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility", "FlyingAbility"],
+            xmage_signals=["token", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Broodmate Dragon",
+                type_line="Creature - Dragon",
+                oracle_text=(
+                    "Flying\n"
+                    "When Broodmate Dragon enters the battlefield, create a 4/4 red Dragon "
+                    "creature token with flying."
+                ),
+            ),
+            source_text="""
+                private static final DragonToken dragonToken = new DragonToken();
+                this.addAbility(FlyingAbility.getInstance());
+                this.addAbility(new EntersBattlefieldTriggeredAbility(
+                    new CreateTokenEffect(dragonToken)));
+                class DragonToken extends TokenImpl {
+                    public DragonToken() {
+                        super("Dragon Token", "4/4 red Dragon creature token with flying");
+                        cardType.add(CardType.CREATURE);
+                        subtype.add(SubType.DRAGON);
+                        color.setRed(true);
+                        power = new MageInt(4);
+                        toughness = new MageInt(4);
+                        addAbility(FlyingAbility.getInstance());
+                    }
+                }
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.ETB_TOKEN_CREATURE_SCOPE)
+        self.assertEqual(effect["etb_token_name"], "Dragon Token")
+        self.assertEqual(effect["etb_token_power"], 4)
+        self.assertEqual(effect["etb_token_keywords"], ["flying"])
+        self.assertEqual(effect["keywords"], ["flying"])
+
+    def test_permanent_activated_create_token_resolves_token_variable_argument(self) -> None:
+        row = queue_row(
+            "token_maker::xmage_signature::CreateTokenEffect::"
+            "SimpleActivatedAbility::no_target_class::no_condition_class::token,activated_ability",
+            effect_classes=["CreateTokenEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["token", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Ant Queen",
+                type_line="Creature - Insect",
+                oracle_text="{1}{G}: Create a 1/1 green Insect creature token.",
+            ),
+            source_text="""
+                private static final InsectToken insectToken = new InsectToken();
+                this.addAbility(new SimpleActivatedAbility(
+                    new CreateTokenEffect(insectToken),
+                    new ManaCostsImpl<>("{1}{G}")));
+                class InsectToken extends TokenImpl {
+                    public InsectToken() {
+                        super("Insect Token", "1/1 green Insect creature token");
+                        cardType.add(CardType.CREATURE);
+                        subtype.add(SubType.INSECT);
+                        color.setGreen(true);
+                        power = new MageInt(1);
+                        toughness = new MageInt(1);
+                    }
+                }
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_TOKEN_SCOPE)
+        self.assertEqual(effect["activated_effect"], "token_maker")
+        self.assertEqual(effect["activation_cost_mana"], "{1}{G}")
+        self.assertEqual(effect["token_name"], "Insect Token")
+
+    def test_create_token_variable_argument_requires_unique_token_class(self) -> None:
+        parsed = split.fixed_create_token_effect_from_source(
+            """
+            Token token = new SoldierToken();
+            token = new GoblinToken();
+            this.addAbility(new EntersBattlefieldTriggeredAbility(
+                new CreateTokenEffect(token)));
+            """
+        )
+
+        self.assertEqual(parsed, "token_source_create_token_not_fixed")
+
     def test_creature_etb_create_treasure_maps_legacy_enters_battlefield_wording(self) -> None:
         row = queue_row(
             split.ETB_TOKEN_CREATURE_UNIT,

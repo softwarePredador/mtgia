@@ -1,0 +1,250 @@
+{
+  "battle_execution": {
+    "event_count": 6,
+    "results": [
+      {
+        "card_name": "Ant Queen",
+        "discard_target": null,
+        "discarded_count": 0,
+        "exiled_source_from_graveyard": false,
+        "scenario": "Ant Queen activates token ability",
+        "token_name": "Insect Token",
+        "tokens_created": 1
+      },
+      {
+        "card_name": "Broodmate Dragon",
+        "scenario": "Broodmate Dragon enters and creates modeled creature tokens",
+        "token_cant_block": false,
+        "token_names": [
+          "Dragon Token"
+        ],
+        "tokens_created": 1,
+        "validated_keywords": [
+          "flying"
+        ]
+      },
+      {
+        "card_name": "Roc Egg",
+        "sacrifice_for_colorless_mana": false,
+        "scenario": "Roc Egg dies and creates modeled creature tokens",
+        "token_cant_block": false,
+        "token_name": "Bird Token",
+        "token_names": [
+          "Bird Token"
+        ],
+        "token_tapped": false,
+        "tokens_created": 1,
+        "validated_keywords": [
+          "defender"
+        ]
+      },
+      {
+        "card_name": "Sprouting Thrinax",
+        "sacrifice_for_colorless_mana": false,
+        "scenario": "Sprouting Thrinax dies and creates modeled creature tokens",
+        "token_cant_block": false,
+        "token_name": "Saproling Token",
+        "token_names": [
+          "Saproling Token",
+          "Saproling Token",
+          "Saproling Token"
+        ],
+        "token_tapped": false,
+        "tokens_created": 3,
+        "validated_keywords": []
+      }
+    ],
+    "scenario_count": 4
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-10T20:34:01.145829+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg720_token_variable_arg_new_server_package_manifest.json",
+  "package_id": "pg720_token_variable_arg_new_server_package_manifest",
+  "snapshot": "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 4
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+          "card_name": "Ant Queen",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6c6a795001e21e4f389c32adde4533d0",
+          "oracle_hash": "53a7ae4dd6f6a5ef1c68b5fe980dd44b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "card_name": "Broodmate Dragon",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4063c079795837e8b94c581cf24ee0a8",
+          "oracle_hash": "423b550b931b4696b2288ce547c32449",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "card_name": "Roc Egg",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5385b7d23648efeaf502bff68b2a7f0b",
+          "oracle_hash": "c35bfc0f113c1ee5e7539b5d813aec4f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "card_name": "Sprouting Thrinax",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:302fae4cf3a57e7203c835da45e5b69c",
+          "oracle_hash": "ea0c06cc0ad372bf9d662623bfc90f2a",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 4
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+          "card_name": "Ant Queen",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6c6a795001e21e4f389c32adde4533d0",
+          "oracle_hash": "53a7ae4dd6f6a5ef1c68b5fe980dd44b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "card_name": "Broodmate Dragon",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4063c079795837e8b94c581cf24ee0a8",
+          "oracle_hash": "423b550b931b4696b2288ce547c32449",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "card_name": "Roc Egg",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5385b7d23648efeaf502bff68b2a7f0b",
+          "oracle_hash": "c35bfc0f113c1ee5e7539b5d813aec4f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "card_name": "Sprouting Thrinax",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:302fae4cf3a57e7203c835da45e5b69c",
+          "oracle_hash": "ea0c06cc0ad372bf9d662623bfc90f2a",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 4
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+          "battle_rule_version": 2,
+          "card_name": "Ant Queen",
+          "logical_rule_key": "battle_rule_v1:6c6a795001e21e4f389c32adde4533d0"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "battle_rule_version": 2,
+          "card_name": "Broodmate Dragon",
+          "logical_rule_key": "battle_rule_v1:4063c079795837e8b94c581cf24ee0a8"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "battle_rule_version": 2,
+          "card_name": "Roc Egg",
+          "logical_rule_key": "battle_rule_v1:5385b7d23648efeaf502bff68b2a7f0b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "battle_rule_version": 2,
+          "card_name": "Sprouting Thrinax",
+          "logical_rule_key": "battle_rule_v1:302fae4cf3a57e7203c835da45e5b69c"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 4
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Ant Queen",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:6c6a795001e21e4f389c32adde4533d0"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Broodmate Dragon",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:4063c079795837e8b94c581cf24ee0a8"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Roc Egg",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:5385b7d23648efeaf502bff68b2a7f0b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Sprouting Thrinax",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:302fae4cf3a57e7203c835da45e5b69c"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 6,
+        "scenarios": 4
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}
