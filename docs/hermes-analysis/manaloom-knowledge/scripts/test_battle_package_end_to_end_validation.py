@@ -3510,6 +3510,56 @@ def test_creature_etb_target_stat_modifier_runner_executes_trigger() -> None:
     )
 
 
+def test_creature_etb_each_player_sacrifice_runner_executes_trigger() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "creature",
+        "battle_model_scope": "xmage_creature_etb_each_player_sacrifice_fixed_permanents_v1",
+        "ability_kind": "triggered",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "each_player_sacrifice",
+        "etb_each_player_sacrifice": True,
+        "sacrifice_count": 1,
+        "sacrifice_card_types": ["creature"],
+        "sacrifice_scope": "each_player",
+        "sacrifice_choice": "controller_choice_lowest_value",
+        "_rule_logical_key": "battle_rule_v1:fleshbag-marauder",
+    }
+    try:
+        result = validator.run_each_player_sacrifice(
+            battle,
+            {
+                "name": "Fleshbag Marauder enters and each player sacrifices a creature",
+                "type": "each_player_sacrifice",
+                "card": {
+                    "name": "Fleshbag Marauder",
+                    "type_line": "Creature - Zombie Warrior",
+                    "effect": "creature",
+                },
+                "sacrifice_count": 1,
+                "sacrifice_card_types": ["creature"],
+                "expected_sacrificed_per_player": 1,
+                "logical_rule_key": "battle_rule_v1:fleshbag-marauder",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Fleshbag Marauder"
+    assert result["sacrificed"] == 2
+    assert result["sacrifice_count"] == 1
+    assert any(
+        event == "each_player_sacrifice_resolved" and data.get("card") == "Fleshbag Marauder"
+        for event, data in events
+    )
+
+
 def test_fixed_create_tokens_runner_counts_controlled_subtype_support() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

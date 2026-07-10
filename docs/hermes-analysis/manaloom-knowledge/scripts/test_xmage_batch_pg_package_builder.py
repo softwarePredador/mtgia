@@ -548,6 +548,36 @@ def test_creature_etb_draw_discard_execution_scenario_is_manifested() -> None:
     assert scenario["expected_keywords"] == ["flying"]
 
 
+def test_creature_etb_each_player_sacrifice_execution_scenario_is_manifested() -> None:
+    proposal = {
+        "normalized_name": "fleshbag marauder",
+        "card_name": "Fleshbag Marauder",
+        "oracle_hash": "hash-fleshbag-marauder",
+        "logical_rule_key": "battle_rule_v1:fleshbag-marauder",
+        "effect_json": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_etb_each_player_sacrifice_fixed_permanents_v1",
+            "ability_kind": "triggered",
+            "trigger": "enters_battlefield",
+            "trigger_effect": "each_player_sacrifice",
+            "etb_each_player_sacrifice": True,
+            "sacrifice_count": 1,
+            "sacrifice_card_types": ["creature"],
+            "sacrifice_scope": "each_player",
+            "sacrifice_choice": "controller_choice_lowest_value",
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    assert expected["required_effect_fields"]["etb_each_player_sacrifice"] is True
+    assert scenario["type"] == "each_player_sacrifice"
+    assert scenario["card"]["type_line"] == "Creature"
+    assert scenario["sacrifice_count"] == 1
+    assert scenario["sacrifice_card_types"] == ["creature"]
+
+
 def test_creature_etb_target_stat_modifier_execution_scenario_is_manifested() -> None:
     proposal = {
         "normalized_name": "blister beetle",

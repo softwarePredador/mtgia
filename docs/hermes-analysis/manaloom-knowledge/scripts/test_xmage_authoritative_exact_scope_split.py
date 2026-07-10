@@ -28584,6 +28584,34 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["sacrifice_scope"], "each_player")
         self.assertEqual(effect["sacrifice_choice"], "controller_choice_lowest_value")
 
+    def test_creature_etb_each_player_sacrifice_maps_fixed_creature_count(self) -> None:
+        proposal, reason = split.split_row(
+            queue_row(
+                split.BOARD_WIPE_UNIT,
+                effect_classes=["SacrificeAllEffect"],
+                ability_classes=["EntersBattlefieldTriggeredAbility"],
+            ),
+            metadata(
+                name="Fleshbag Marauder",
+                type_line="Creature - Zombie Warrior",
+                oracle_text="When this creature enters, each player sacrifices a creature of their choice.",
+            ),
+            source_text="""
+                this.addAbility(new EntersBattlefieldTriggeredAbility(
+                    new SacrificeAllEffect(1, new FilterControlledCreaturePermanent("creature"))));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "creature")
+        self.assertEqual(effect["battle_model_scope"], split.ETB_EACH_PLAYER_SACRIFICE_SCOPE)
+        self.assertEqual(effect["trigger"], "enters_battlefield")
+        self.assertEqual(effect["trigger_effect"], "each_player_sacrifice")
+        self.assertTrue(effect["etb_each_player_sacrifice"])
+        self.assertEqual(effect["sacrifice_count"], 1)
+        self.assertEqual(effect["sacrifice_card_types"], ["creature"])
+
     def test_each_player_sacrifice_maps_fixed_land_count(self) -> None:
         proposal, reason = split.split_row(
             queue_row(split.BOARD_WIPE_UNIT, effect_classes=["SacrificeAllEffect"]),

@@ -20457,6 +20457,15 @@ def resolve_generic_permanent_etb(
             finish_spell=False,
             phase=phase or "battlefield_etb",
         )
+    if effect_data.get("etb_each_player_sacrifice"):
+        resolve_each_player_sacrifice(
+            player,
+            opponents,
+            permanent,
+            effect_data,
+            turn,
+            finish_spell=False,
+        )
     resolve_etb_library_creature_tutor(player, permanent, effect_data, turn)
     if effect_data.get("etb_tutor_target"):
         resolve_etb_library_tutor_to_hand(player, opponents, permanent, effect_data, turn)
@@ -27699,7 +27708,7 @@ def _move_sacrificed_permanent(controller, permanent, card, *, reason):
     return "graveyard"
 
 
-def resolve_each_player_sacrifice(player, opponents, card, effect_data, turn):
+def resolve_each_player_sacrifice(player, opponents, card, effect_data, turn, *, finish_spell=True):
     players = [player] + list(opponents or [])
     context = board_wipe_decision_context(player, opponents)
     sacrifice_count = max(1, int(effect_data.get("sacrifice_count") or effect_data.get("count") or 1))
@@ -27835,7 +27844,8 @@ def resolve_each_player_sacrifice(player, opponents, card, effect_data, turn):
         turn=turn,
         **fields,
     )
-    finish_resolved_spell(player, card, turn=turn)
+    if finish_spell:
+        finish_resolved_spell(player, card, turn=turn)
 
 
 def permanent_matches_tragic_arrogance_choice(permanent, choice_type):

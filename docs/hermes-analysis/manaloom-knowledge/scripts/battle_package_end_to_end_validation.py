@@ -3358,15 +3358,18 @@ def run_each_player_sacrifice(
         fail("battle_events", f"{card['name']} own sacrifice count mismatch")
     if int(event.get("opponent_permanents_sacrificed") or 0) != expected_per_player:
         fail("battle_events", f"{card['name']} opponent sacrifice count mismatch")
+    source_is_permanent = "creature" in str(card.get("type_line") or "").lower()
     active_sacrificed_graveyard = [
         permanent
         for permanent in active.graveyard
-        if not (isinstance(permanent, dict) and permanent.get("name") == card.get("name"))
+        if source_is_permanent
+        or not (isinstance(permanent, dict) and permanent.get("name") == card.get("name"))
     ]
     opponent_sacrificed_graveyard = [
         permanent
         for permanent in opponent.graveyard
-        if not (isinstance(permanent, dict) and permanent.get("name") == card.get("name"))
+        if source_is_permanent
+        or not (isinstance(permanent, dict) and permanent.get("name") == card.get("name"))
     ]
     if len(active_sacrificed_graveyard) != expected_per_player or len(opponent_sacrificed_graveyard) != expected_per_player:
         fail(
