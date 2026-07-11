@@ -198,6 +198,8 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "recursion_mana_value_max",
     "recursion_mana_value_max_from_x",
     "target_mana_value_max_from_x",
+    "target_mana_value_exact_from_x",
+    "target_mana_value_source",
     "pre_recursion_mill_count",
     "etb_draw_count",
     "etb_draw_condition_status",
@@ -512,6 +514,7 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "etb_each_player_sacrifice",
     "dies_each_player_sacrifice",
     "controller_gains_life",
+    "controller_gain_life_source",
     "life_gain",
     "life_gain_amount",
     "life_gain_amount_source",
@@ -7689,6 +7692,7 @@ def single_target_removal_execution_scenario_from_expected_rule(
         "xmage_exile_target_spell_v1",
         "xmage_destroy_target_spell_v1",
         "xmage_destroy_target_and_controller_gain_life_spell_v1",
+        "xmage_destroy_target_and_dynamic_controller_gain_life_spell_v1",
         "xmage_destroy_target_and_source_controller_loses_life_spell_v1",
         "xmage_destroy_target_and_source_controller_damage_spell_v1",
         "xmage_destroy_target_and_target_controller_damage_spell_v1",
@@ -7722,9 +7726,61 @@ def single_target_removal_execution_scenario_from_expected_rule(
         "logical_rule_key": rule["logical_rule_key"],
     }
     controller_life_gain = int(required.get("controller_gains_life") or 0)
+    controller_gain_life_source = str(
+        required.get("controller_gain_life_source")
+        or required.get("gain_life_source")
+        or required.get("life_gain_amount_source")
+        or ""
+    ).strip().lower()
+    if controller_gain_life_source == "target_mana_value":
+        controller_life_gain = int(scenario["target"].get("cmc") or scenario["target"].get("mana_value") or 0)
+    elif controller_gain_life_source == "x_value":
+        x_value = int(scenario["target"].get("cmc") or scenario["target"].get("mana_value") or 3)
+        scenario["card"]["mana_cost"] = "{X}{G}"
+        scenario["card"]["x_value"] = x_value
+        scenario["card"]["_cast_context"] = {"x_value": x_value}
+        controller_life_gain = x_value
+    elif controller_gain_life_source in {"battlefield_permanent_count", "controller_battlefield_count"}:
+        per = int(required.get("life_gain_per_count") or 1)
+        base = int(required.get("life_gain_base_amount") or 0)
+        fixture_count = 3
+        card_types = {str(value).lower() for value in required.get("battlefield_count_card_types") or []}
+        keywords = [
+            str(value).lower().replace(" ", "_")
+            for value in required.get("battlefield_count_keywords") or []
+            if str(value).strip()
+        ]
+        if keywords:
+            keyword = keywords[0]
+            fixture_type_line = "Creature - Bird" if "creature" in card_types else "Artifact Creature - Construct"
+            scenario["controller_battlefield"] = [
+                {
+                    "name": f"E2E Controlled Keyword Permanent {index + 1}",
+                    "type_line": fixture_type_line,
+                    "keywords": [keyword],
+                    keyword: True,
+                    "cmc": 1,
+                }
+                for index in range(fixture_count)
+            ]
+            controller_life_gain = base + fixture_count * per
+        elif "artifact" in card_types:
+            scenario["controller_battlefield"] = [
+                {"name": f"E2E Controlled Artifact {index + 1}", "type_line": "Artifact", "effect": "artifact", "cmc": 1}
+                for index in range(fixture_count)
+            ]
+            controller_life_gain = base + fixture_count * per
+        elif "creature" in card_types:
+            scenario["controller_battlefield"] = [
+                {"name": f"E2E Controlled Creature {index + 1}", "type_line": "Creature - Soldier", "cmc": 1}
+                for index in range(fixture_count)
+            ]
+            controller_life_gain = base + fixture_count * per
     if controller_life_gain > 0:
         scenario["controller_life"] = 10
         scenario["expected_controller_life_gain"] = controller_life_gain
+        if controller_gain_life_source:
+            scenario["expected_controller_life_gain_source"] = controller_gain_life_source
     source_controller_life_loss = int(required.get("source_controller_life_loss_on_resolve") or 0)
     source_controller_damage = int(required.get("source_controller_damage_on_resolve") or 0)
     target_controller_damage = int(required.get("target_controller_damage_on_resolve") or 0)
@@ -7909,6 +7965,67 @@ def single_target_removal_and_surveil_execution_scenario_from_expected_rule(
             {"name": f"E2E Surveil Land {index}", "type_line": "Land", "effect": "land", "cmc": 0}
             for index in range(1, 5)
         ],
+        "library": [
+            {"name": "E2E Low Priority Land", "type_line": "Land", "effect": "land", "cmc": 0},
+            {"name": "E2E High Priority Spell", "type_line": "Sorcery", "effect": "draw_cards", "cmc": 7},
+            {"name": "E2E Library Remainder", "type_line": "Instant", "effect": "direct_damage", "cmc": 2},
+        ],
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
+def single_target_removal_and_scry_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_destroy_target_and_scry_spell_v1":
+        return None
+    if required.get("effect") != "composite_resolution":
+        return None
+    components = [
+        component
+        for component in required.get("_composite_rule_components") or []
+        if isinstance(component, dict)
+    ]
+    removal_component = next(
+        (
+            component
+            for component in components
+            if component.get("effect") in {"remove_creature", "remove_permanent"}
+        ),
+        None,
+    )
+    scry_component = next(
+        (component for component in components if component.get("effect") == "scry"),
+        None,
+    )
+    if removal_component is None or scry_component is None:
+        return None
+    constraints = dict(required.get("target_constraints") or removal_component.get("target_constraints") or {})
+    destination = str(required.get("destination") or removal_component.get("destination") or "graveyard").lower()
+    scry_count = int(
+        required.get("scry_count")
+        or scry_component.get("scry_count")
+        or scry_component.get("count")
+        or 1
+    )
+    return {
+        "name": f"{rule['card_name']} destroys one legal target and scries",
+        "type": "single_target_removal_and_scry",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": "Sorcery" if required.get("sorcery") is True else "Instant",
+        },
+        "target": _target_fixture_from_constraints("E2E Legal Removal Target", constraints, matching=True),
+        "nonmatching_target": _target_fixture_from_constraints(
+            "E2E Illegal Removal Target",
+            constraints,
+            matching=False,
+        ),
+        "expected_destination": destination,
+        "expected_effect": removal_component.get("effect"),
+        "expected_target_constraints": constraints,
+        "expected_scry_count": scry_count,
         "library": [
             {"name": "E2E Low Priority Land", "type_line": "Land", "effect": "land", "cmc": 0},
             {"name": "E2E High Priority Spell", "type_line": "Sorcery", "effect": "draw_cards", "cmc": 7},
@@ -8460,6 +8577,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or multi_target_damage_execution_scenario_from_expected_rule(rule)
         or multi_target_removal_execution_scenario_from_expected_rule(rule)
         or single_target_removal_and_draw_execution_scenario_from_expected_rule(rule)
+        or single_target_removal_and_scry_execution_scenario_from_expected_rule(rule)
         or single_target_removal_and_surveil_execution_scenario_from_expected_rule(rule)
         or modal_damage_or_destroy_execution_scenario_from_expected_rule(rule)
         or single_target_removal_execution_scenario_from_expected_rule(rule)

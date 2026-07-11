@@ -10811,20 +10811,97 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                 self.assertEqual(effect["controller_gains_life"], expected_life)
                 self.assertEqual(effect["target_constraints"], expected_constraints)
 
-    def test_destroy_gain_life_spell_blocks_dynamic_life_gain(self) -> None:
-        row = queue_row(split.LIFE_UNIT, effect_classes=["DestroyTargetEffect", "GainLifeEffect"])
-        proposal, reason = split.split_row(
-            row,
-            metadata(oracle_text="Destroy target artifact. You gain life equal to its mana value."),
-            source_text=(
-                "this.getSpellAbility().addTarget(new TargetArtifactPermanent());"
-                "this.getSpellAbility().addEffect(new DestroyTargetEffect());"
-                "this.getSpellAbility().addEffect(new GainLifeEffect(TargetManaValue.instance));"
+    def test_destroy_gain_life_spell_maps_dynamic_life_gain_sources(self) -> None:
+        cases = [
+            (
+                "Destroy target artifact. You gain life equal to its mana value.",
+                (
+                    "this.getSpellAbility().addTarget(new TargetArtifactPermanent());"
+                    "this.getSpellAbility().addEffect(new DestroyTargetEffect());"
+                    "this.getSpellAbility().addEffect(new GainLifeEffect(TargetManaValue.instance));"
+                ),
+                "artifact",
+                "target_mana_value",
+                {"card_types": ["artifact"]},
+                {},
             ),
-        )
+            (
+                "Destroy target artifact or enchantment with mana value X. It can't be regenerated. You gain X life.",
+                (
+                    "this.getSpellAbility().addEffect(new DestroyTargetEffect("
+                    "\"Destroy target artifact or enchantment with mana value X. It can't be regenerated\", true));"
+                    "this.getSpellAbility().addEffect(new GainLifeEffect(GetXValue.instance));"
+                    "this.getSpellAbility().addTarget(new TargetPermanent(StaticFilters.FILTER_PERMANENT_ARTIFACT_OR_ENCHANTMENT));"
+                    "this.getSpellAbility().setTargetAdjuster(new XManaValueTargetAdjuster());"
+                ),
+                "artifact_or_enchantment",
+                "x_value",
+                {"card_types": ["artifact", "enchantment"], "target_mana_value_source": "x_value"},
+                {"target_mana_value_exact_from_x": True, "target_mana_value_source": "x_value"},
+            ),
+            (
+                "Destroy target creature. You gain 1 life for each artifact you control.",
+                (
+                    "this.getSpellAbility().addEffect(new DestroyTargetEffect());"
+                    "this.getSpellAbility().addTarget(new TargetCreaturePermanent());"
+                    "this.getSpellAbility().addEffect(new GainLifeEffect(ArtifactYouControlCount.instance)"
+                    ".setText(\"you gain 1 life for each artifact you control\"));"
+                ),
+                "creature",
+                "battlefield_permanent_count",
+                {"card_types": ["creature"]},
+                {
+                    "battlefield_count_scope": "controller_battlefield",
+                    "battlefield_count_card_types": ["artifact"],
+                    "life_gain_per_count": 1,
+                },
+            ),
+            (
+                "Destroy target tapped creature. You gain 1 life for each creature you control with flying.",
+                (
+                    "private static final FilterPermanent filter = new FilterCreaturePermanent(\"tapped creature\");"
+                    "private static final FilterPermanent filter2 = new FilterControlledCreaturePermanent("
+                    "\"creature you control with flying\");"
+                    "filter.add(TappedPredicate.TAPPED);"
+                    "filter2.add(new AbilityPredicate(FlyingAbility.class));"
+                    "private static final DynamicValue xValue = new PermanentsOnBattlefieldCount(filter2);"
+                    "this.getSpellAbility().addEffect(new DestroyTargetEffect());"
+                    "this.getSpellAbility().addTarget(new TargetPermanent(filter));"
+                    "this.getSpellAbility().addEffect(new GainLifeEffect(xValue));"
+                ),
+                "tapped_creature",
+                "battlefield_permanent_count",
+                {"card_types": ["creature"], "tapped_state": "tapped"},
+                {
+                    "battlefield_count_scope": "controller_battlefield",
+                    "battlefield_count_card_types": ["creature"],
+                    "battlefield_count_keywords": ["flying"],
+                    "life_gain_per_count": 1,
+                },
+            ),
+        ]
+        for oracle, source, expected_target, expected_source, expected_constraints, extra_fields in cases:
+            with self.subTest(expected_source=expected_source):
+                row = queue_row(split.LIFE_UNIT, effect_classes=["DestroyTargetEffect", "GainLifeEffect"])
+                proposal, reason = split.split_row(
+                    row,
+                    metadata(oracle_text=oracle),
+                    source_text=source,
+                )
 
-        self.assertIsNone(proposal)
-        self.assertEqual(reason, "destroy_life_gain_source_not_fixed")
+                self.assertEqual(reason, "selected_exact_scope")
+                effect = proposal["effect_json"]
+                self.assertEqual(
+                    effect["effect"],
+                    "remove_creature" if split.restricted_target_base(expected_target) == "creature" else "remove_permanent",
+                )
+                self.assertEqual(effect["battle_model_scope"], split.DESTROY_DYNAMIC_GAIN_LIFE_SCOPE)
+                self.assertEqual(effect["target"], expected_target)
+                self.assertEqual(effect["controller_gains_life"], 0)
+                self.assertEqual(effect["controller_gain_life_source"], expected_source)
+                self.assertEqual(effect["target_constraints"], expected_constraints)
+                for key, expected_value in extra_fields.items():
+                    self.assertEqual(effect[key], expected_value)
 
     def test_destroy_target_controller_life_loss_spell_maps_fixed_loss(self) -> None:
         row = queue_row(split.DESTROY_UNIT, effect_classes=["DestroyTargetEffect", "LoseLifeTargetControllerEffect"])
@@ -12104,6 +12181,44 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         effect = proposal["effect_json"]
         self.assertEqual(effect["target"], "creature")
         self.assertEqual(effect["target_constraints"], {"card_types": ["creature"], "power_min": 3})
+
+    def test_fixed_destroy_scry_spell_maps_artifact_enchantment_or_flying_creature_predicate(self) -> None:
+        row = queue_row(
+            split.DESTROY_UNIT,
+            effect_classes=["DestroyTargetEffect", "ScryEffect"],
+            ability_classes=["FlyingAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Destroy target artifact, enchantment, or creature with flying. Scry 1."),
+            source_text=(
+                "private static final FilterPermanent filter = new FilterPermanent("
+                "\"artifact, enchantment, or creature with flying\");"
+                "filter.add(Predicates.or("
+                "CardType.ARTIFACT.getPredicate(),"
+                "CardType.ENCHANTMENT.getPredicate(),"
+                "Predicates.and(CardType.CREATURE.getPredicate(), new AbilityPredicate(FlyingAbility.class))));"
+                "this.getSpellAbility().addEffect(new DestroyTargetEffect());"
+                "this.getSpellAbility().addEffect(new ScryEffect(1, false));"
+                "this.getSpellAbility().addTarget(new TargetPermanent(filter));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DESTROY_SCRY_SCOPE)
+        self.assertEqual(effect["target"], "permanent")
+        self.assertEqual(
+            effect["target_constraints"],
+            {
+                "any_of": [
+                    {"card_types": ["artifact"]},
+                    {"card_types": ["enchantment"]},
+                    {"card_types": ["creature"], "required_keywords": ["flying"]},
+                ]
+            },
+        )
+        self.assertEqual(effect["scry_count"], 1)
 
     def test_fixed_destroy_surveil_spell_maps_to_composite_runtime(self) -> None:
         row = queue_row(split.DESTROY_UNIT, effect_classes=["DestroyTargetEffect", "SurveilEffect"])

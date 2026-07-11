@@ -3437,6 +3437,12 @@ def run_single_target_removal(
                 "battle_events",
                 f"{card['name']} life_gain_recipient={removal_event.get('life_gain_recipient')!r}",
             )
+        expected_life_gain_source = str(scenario.get("expected_controller_life_gain_source") or "").strip()
+        if expected_life_gain_source and str(removal_event.get("controller_gain_life_source") or "").strip() != expected_life_gain_source:
+            fail(
+                "battle_events",
+                f"{card['name']} controller_gain_life_source={removal_event.get('controller_gain_life_source')!r}",
+            )
     if expected_source_controller_life_loss > 0:
         expected_life = controller_starting_life - expected_source_controller_life_loss
         if active.life != expected_life:
@@ -3740,6 +3746,97 @@ def run_single_target_removal_and_surveil(
         "surveil_looked_at": looked_at,
         "surveil_moved_to_graveyard": list(surveil_event.get("moved_to_graveyard") or []),
         "surveil_top_after": list(surveil_event.get("top_after") or []),
+    }
+
+
+def run_single_target_removal_and_scry(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    active = battle.Player(str(scenario.get("player") or "Active"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
+    active.library = [dict(library_card) for library_card in scenario.get("library") or []]
+    target = dict(scenario["target"])
+    nonmatching = dict(
+        scenario.get("nonmatching_target")
+        or {
+            "name": "E2E Illegal Removal Target",
+            "type_line": "Land",
+            "effect": "land",
+            "cmc": 0,
+        }
+    )
+    opponent.battlefield = [nonmatching, target]
+    before_events = len(events)
+
+    effect_data = battle.get_card_effect(card)
+    if effect_data.get("effect") != "composite_resolution":
+        fail("battle_execution", f"{card['name']} effect={effect_data.get('effect')!r}")
+
+    battle.apply_effect_immediate(
+        active,
+        [opponent],
+        card,
+        turn=int(scenario.get("turn") or 6),
+        rng=random.Random(int(scenario.get("seed") or 6067)),
+    )
+
+    target_name = str(target.get("name") or "")
+    nonmatching_name = str(nonmatching.get("name") or "")
+    destination = str(scenario.get("expected_destination") or "graveyard").lower()
+    destination_zone_name = "exile" if destination == "exile" else "hand" if destination == "hand" else "graveyard"
+    destination_zone = getattr(opponent, destination_zone_name)
+    moved_names = [str(item.get("name") or "") for item in destination_zone if isinstance(item, dict)]
+    battlefield_names = [str(item.get("name") or "") for item in opponent.battlefield if isinstance(item, dict)]
+    if target_name not in moved_names:
+        fail("battle_execution", f"{card['name']} did not move legal target {target_name} to {destination}")
+    if nonmatching_name not in battlefield_names:
+        fail("battle_execution", f"{card['name']} removed illegal target {nonmatching_name}")
+
+    removal_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "removal_resolved"
+            and data.get("card") == card.get("name")
+            and data.get("target") == target_name
+        ),
+        None,
+    )
+    if removal_event is None:
+        fail("battle_events", f"missing {card['name']} removal_resolved event for {target_name}")
+    if removal_event.get("target_legal") is not True:
+        fail("battle_events", f"{card['name']} target_legal={removal_event.get('target_legal')!r}")
+
+    expected_scry_count = int(scenario.get("expected_scry_count") or 1)
+    scry_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "scry_resolved"
+            and data.get("card") == card.get("name")
+            and int(data.get("scry_count") or 0) == expected_scry_count
+        ),
+        None,
+    )
+    if scry_event is None:
+        fail("battle_events", f"missing {card['name']} scry_resolved event")
+    looked_at = list(scry_event.get("looked_at") or [])
+    if len(looked_at) != min(expected_scry_count, len(scenario.get("library") or [])):
+        fail("battle_events", f"{card['name']} scry looked_at={looked_at!r}")
+
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "target": target_name,
+        "nonmatching_target": nonmatching_name,
+        "destination": destination,
+        "moved_names": moved_names,
+        "scry_count": expected_scry_count,
+        "scry_looked_at": looked_at,
+        "scry_top_after": list(scry_event.get("top_after") or []),
     }
 
 
@@ -13179,6 +13276,7 @@ SCENARIO_RUNNERS = {
     "remove_permanent_basic_land_compensation": run_remove_permanent_basic_land_compensation,
     "single_target_removal": run_single_target_removal,
     "single_target_removal_and_draw": run_single_target_removal_and_draw,
+    "single_target_removal_and_scry": run_single_target_removal_and_scry,
     "single_target_removal_and_surveil": run_single_target_removal_and_surveil,
     "multi_target_removal": run_multi_target_removal,
     "simple_mana_source_refresh": run_simple_mana_source_refresh,

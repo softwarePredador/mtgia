@@ -76,6 +76,24 @@ class RuntimePgRuleFallbackForPromotedHotfixesTests(unittest.TestCase):
         except RuntimeError as exc:
             self._tmp.cleanup()
             raise unittest.SkipTest(str(exc)) from exc
+        except Exception as exc:
+            message = str(exc).lower()
+            if any(
+                fragment in message
+                for fragment in (
+                    "could not translate host name",
+                    "failed host lookup",
+                    "connection refused",
+                    "nodename nor servname provided",
+                    "no route to host",
+                )
+            ):
+                self._tmp.cleanup()
+                raise unittest.SkipTest(
+                    f"PostgreSQL unavailable for runtime fallback guardrail: {exc}"
+                ) from exc
+            self._tmp.cleanup()
+            raise
         with pg_conn:
             with pg_conn.cursor() as cur:
                 sync_pg.ensure_pg_table(cur)

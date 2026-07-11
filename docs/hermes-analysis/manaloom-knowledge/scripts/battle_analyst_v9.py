@@ -2319,10 +2319,13 @@ def effect_uses_x_cast_value(effect_data):
         return True
     if str(effect_data.get("treasure_count_source") or "").strip().lower() == "x_value":
         return True
+    if str(effect_data.get("controller_gain_life_source") or effect_data.get("gain_life_source") or "").strip().lower() == "x_value":
+        return True
     return any(
         effect_data.get(key)
         for key in (
             "target_mana_value_max_from_x",
+            "target_mana_value_exact_from_x",
             "count_from_x",
             "target_count_from_x",
             "recursion_count_from_x",
@@ -10357,6 +10360,9 @@ CARD_EFFECT_FIELD_RULE_KEYS = (
     "target_type",
     "target_controller",
     "target_constraints",
+    "target_mana_value_exact_from_x",
+    "target_mana_value_source",
+    "target_mana_value_max_from_x",
     "destination",
     "amount",
     "damage",
@@ -10400,6 +10406,16 @@ CARD_EFFECT_FIELD_RULE_KEYS = (
     "target_controller_damage_on_resolve",
     "source_controller_life_loss_on_resolve",
     "source_controller_damage_on_resolve",
+    "controller_gains_life",
+    "controller_gain_life_source",
+    "gain_life_source",
+    "life_gain_per_count",
+    "life_gain_base_amount",
+    "battlefield_count_scope",
+    "battlefield_count_card_types",
+    "battlefield_count_subtypes",
+    "battlefield_count_excluded_card_types",
+    "battlefield_count_excluded_subtypes",
     "life_loss_amount",
     "scry_on_counter",
     "scry_count",
@@ -14527,6 +14543,20 @@ def is_legal_target(spell, target, controller, all_players=None, target_type=Non
                 return False
         except Exception:
             return False
+    dynamic_mana_value_source = str(
+        constraints.get("target_mana_value_source")
+        or constraints.get("target_cmc_source")
+        or spell.get("target_mana_value_source")
+        or spell.get("target_cmc_source")
+        or ""
+    ).strip().lower()
+    if dynamic_mana_value_source == "x_value":
+        try:
+            x_value = x_value_from_effect_context(spell)
+            if card_mana_value(target) != int(float(x_value or 0)):
+                return False
+        except Exception:
+            return False
     # Ward: doesn't affect legality, only triggers on cast
     return True
 
@@ -14709,7 +14739,22 @@ def removal_annotation_replay_fields(effect_data):
     return fields
 
 
-def removal_life_gain_requested(effect_data, target):
+def _removal_controller_battlefield_life_gain_count(effect_data, source_controller, target=None, target_controller=None):
+    if source_controller is None:
+        return 0
+    scope = str((effect_data or {}).get("battlefield_count_scope") or "controller_battlefield").lower()
+    if scope != "controller_battlefield":
+        return 0
+    count = 0
+    for permanent in getattr(source_controller, "battlefield", []) or []:
+        if permanent is target and target_controller is source_controller and removal_destination(effect_data) == "graveyard":
+            continue
+        if _battlefield_count_card_matches(permanent, effect_data):
+            count += 1
+    return count
+
+
+def removal_life_gain_requested(effect_data, target, source_controller=None, target_controller=None):
     if not isinstance(effect_data, dict):
         return 0
     if effect_data.get("controller_gains_life"):
@@ -14717,6 +14762,26 @@ def removal_life_gain_requested(effect_data, target):
             return max(0, int(effect_data.get("controller_gains_life") or 0))
         except Exception:
             return 0
+    controller_gain_life_source = str(
+        effect_data.get("controller_gain_life_source")
+        or effect_data.get("gain_life_source")
+        or effect_data.get("life_gain_amount_source")
+        or ""
+    ).strip().lower()
+    if controller_gain_life_source == "target_mana_value":
+        return max(0, int(card_mana_value(target)))
+    if controller_gain_life_source == "x_value":
+        return max(0, int(x_value_from_effect_context(effect_data)))
+    if controller_gain_life_source in {"battlefield_permanent_count", "controller_battlefield_count"}:
+        count = _removal_controller_battlefield_life_gain_count(
+            effect_data,
+            source_controller,
+            target=target,
+            target_controller=target_controller,
+        )
+        base = max(0, int(effect_data.get("life_gain_base_amount") or 0))
+        per = max(0, int(effect_data.get("life_gain_per_count") or 1))
+        return base + count * per
     if effect_data.get("target_controller_life_gain_equal_target_power"):
         try:
             return max(0, int((target or {}).get("power") or 0))
@@ -14731,13 +14796,29 @@ def removal_life_gain_requested(effect_data, target):
 
 
 def removal_life_gain_recipient(effect_data, source_controller, target_controller):
-    if isinstance(effect_data, dict) and effect_data.get("controller_gains_life"):
+    controller_gain_life_source = ""
+    if isinstance(effect_data, dict):
+        controller_gain_life_source = str(
+            effect_data.get("controller_gain_life_source")
+            or effect_data.get("gain_life_source")
+            or effect_data.get("life_gain_amount_source")
+            or ""
+        ).strip().lower()
+    if isinstance(effect_data, dict) and (
+        effect_data.get("controller_gains_life")
+        or controller_gain_life_source in {"target_mana_value", "x_value", "battlefield_permanent_count", "controller_battlefield_count"}
+    ):
         return source_controller
     return target_controller
 
 
 def apply_removal_life_gain(effect_data, target_controller, target, source_controller=None):
-    requested = removal_life_gain_requested(effect_data, target)
+    requested = removal_life_gain_requested(
+        effect_data,
+        target,
+        source_controller=source_controller,
+        target_controller=target_controller,
+    )
     recipient = removal_life_gain_recipient(effect_data, source_controller, target_controller)
     if requested <= 0 or recipient is None:
         return requested, 0
@@ -14927,11 +15008,28 @@ def removal_life_gain_replay_fields(effect_data, requested, gained):
     fields = {}
     if not isinstance(effect_data, dict):
         return fields
+    controller_gain_life_source = str(
+        effect_data.get("controller_gain_life_source")
+        or effect_data.get("gain_life_source")
+        or effect_data.get("life_gain_amount_source")
+        or ""
+    ).strip().lower()
     if effect_data.get("controller_gains_life"):
         fields["controller_gains_life"] = int(
             effect_data.get("controller_gains_life") or 0
         )
         fields["life_gain_recipient"] = "controller"
+    elif controller_gain_life_source in {"target_mana_value", "x_value", "battlefield_permanent_count", "controller_battlefield_count"}:
+        fields["controller_gains_life"] = int(requested or 0)
+        fields["controller_gain_life_source"] = controller_gain_life_source
+        fields["life_gain_recipient"] = "controller"
+        if controller_gain_life_source == "x_value":
+            fields["x_value"] = x_value_from_effect_context(effect_data)
+        if controller_gain_life_source in {"battlefield_permanent_count", "controller_battlefield_count"}:
+            fields["battlefield_life_gain_count"] = int(
+                (int(requested or 0) - int(effect_data.get("life_gain_base_amount") or 0))
+                / max(1, int(effect_data.get("life_gain_per_count") or 1))
+            )
     elif effect_data.get("target_controller_life_gain_equal_target_power"):
         fields["target_controller_life_gain_equal_target_power"] = True
         fields["life_gain_status"] = effect_data.get(

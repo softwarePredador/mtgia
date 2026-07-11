@@ -283,6 +283,7 @@ DAMAGE_CREATE_TREASURE_SCOPE = "xmage_fixed_damage_target_create_treasure_spell_
 GRAVEYARD_COUNT_DAMAGE_SCOPE = "xmage_dynamic_graveyard_count_damage_spell_v1"
 DYNAMIC_COUNT_DAMAGE_SCOPE = "xmage_dynamic_count_damage_spell_v1"
 DESTROY_GAIN_LIFE_SCOPE = "xmage_destroy_target_and_controller_gain_life_spell_v1"
+DESTROY_DYNAMIC_GAIN_LIFE_SCOPE = "xmage_destroy_target_and_dynamic_controller_gain_life_spell_v1"
 DESTROY_TARGET_CONTROLLER_LOSE_LIFE_SCOPE = (
     "xmage_destroy_target_and_target_controller_loses_life_spell_v1"
 )
@@ -631,6 +632,7 @@ ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES = {
     "MiracleAbility",
     "RetraceAbility",
     "SpectacleAbility",
+    "SpellAbility",
     "SplitSecondAbility",
     "SurgeAbility",
     "SuspendAbility",
@@ -2995,17 +2997,8 @@ def creature_dies_create_treasure_from_oracle(metadata: dict[str, Any]) -> int |
     return int(count)
 
 
-def simple_destroy_gain_life_from_source(source: str) -> tuple[str, int] | None:
+def _destroy_gain_life_target_from_source(source: str) -> str | None:
     text = source or ""
-    if has_additional_cost(text):
-        return None
-    if "TargetPointer" in text or ".setTargetPointer" in text:
-        return None
-    if len(re.findall(r"new\s+DestroyTargetEffect\s*\(\s*\)", text, re.S)) != 1:
-        return None
-    life_matches = re.findall(r"new\s+GainLifeEffect\s*\(\s*(\d+)\s*\)", text, re.S)
-    if len(life_matches) != 1:
-        return None
     target_classes = re.findall(r"new\s+(Target\w+)\s*\(", text)
     if len(target_classes) != 1:
         return None
@@ -3028,7 +3021,7 @@ def simple_destroy_gain_life_from_source(source: str) -> tuple[str, int] | None:
     }
     restricted_target = restricted_battlefield_target_from_source(text)
     if restricted_target in supported_targets:
-        return restricted_target, int(life_matches[0])
+        return restricted_target
     target_patterns = [
         (
             "artifact_or_enchantment",
@@ -3050,7 +3043,75 @@ def simple_destroy_gain_life_from_source(source: str) -> tuple[str, int] | None:
     ]
     if len(matched_targets) != 1 or matched_targets[0] not in supported_targets:
         return None
-    return matched_targets[0], int(life_matches[0])
+    return matched_targets[0]
+
+
+def simple_destroy_gain_life_from_source(source: str) -> tuple[str, int] | None:
+    text = source or ""
+    if has_additional_cost(text):
+        return None
+    if "TargetPointer" in text or ".setTargetPointer" in text:
+        return None
+    if len(re.findall(r"new\s+DestroyTargetEffect\s*\(\s*\)", text, re.S)) != 1:
+        return None
+    life_matches = re.findall(r"new\s+GainLifeEffect\s*\(\s*(\d+)\s*\)", text, re.S)
+    if len(life_matches) != 1:
+        return None
+    target = _destroy_gain_life_target_from_source(text)
+    if target is None:
+        return None
+    return target, int(life_matches[0])
+
+
+def dynamic_destroy_gain_life_from_source(source: str) -> dict[str, Any] | None:
+    text = source or ""
+    if has_additional_cost(text):
+        return None
+    if "TargetPointer" in text or ".setTargetPointer" in text:
+        return None
+    if len(re.findall(r"new\s+DestroyTargetEffect\s*\(", text, re.S)) != 1:
+        return None
+    life_matches = re.findall(r"new\s+GainLifeEffect\s*\(\s*([^)]+?)\s*\)", text, re.S)
+    if len(life_matches) != 1:
+        return None
+    target = _destroy_gain_life_target_from_source(text)
+    if target is None:
+        return None
+    token = re.sub(r"\s+", " ", life_matches[0]).strip()
+    if "TargetManaValue.instance" in token:
+        return {
+            "target": target,
+            "controller_gain_life_source": "target_mana_value",
+        }
+    if "GetXValue.instance" in token and "XManaValueTargetAdjuster" in text:
+        return {
+            "target": target,
+            "controller_gain_life_source": "x_value",
+            "target_mana_value_exact_from_x": True,
+            "target_mana_value_source": "x_value",
+        }
+    if "ArtifactYouControlCount.instance" in token:
+        return {
+            "target": target,
+            "controller_gain_life_source": "battlefield_permanent_count",
+            "battlefield_count_scope": "controller_battlefield",
+            "battlefield_count_card_types": ["artifact"],
+            "life_gain_per_count": 1,
+        }
+    source_life_gain = dynamic_life_gain_from_source(text)
+    if isinstance(source_life_gain, dict):
+        amount_source = str(source_life_gain.get("life_gain_amount_source") or "").strip().lower()
+        if amount_source == "battlefield_permanent_count":
+            return {
+                "target": target,
+                "controller_gain_life_source": "battlefield_permanent_count",
+                **{
+                    key: value
+                    for key, value in source_life_gain.items()
+                    if key != "life_gain_amount_source"
+                },
+            }
+    return None
 
 
 def simple_destroy_gain_life_from_oracle(metadata: dict[str, Any]) -> tuple[str, int] | None:
@@ -3082,6 +3143,55 @@ def simple_destroy_gain_life_from_oracle(metadata: dict[str, Any]) -> tuple[str,
     if target not in supported_targets:
         return None
     return target, int(match.group("life"))
+
+
+def dynamic_destroy_gain_life_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
+    text = oracle_text(metadata)
+    destroy = destroy_target_from_oracle(metadata)
+    if destroy is None:
+        return None
+    _, target = destroy
+    if re.fullmatch(r"destroy target .+?\. you gain life equal to its mana value\.?", text):
+        if target not in {"artifact", "enchantment", "artifact_or_enchantment"}:
+            return None
+        return {
+            "target": target,
+            "controller_gain_life_source": "target_mana_value",
+        }
+    if re.fullmatch(
+        r"destroy target artifact or enchantment with mana value x\. it can't be regenerated\. you gain x life\.?",
+        text,
+    ):
+        return {
+            "target": "artifact_or_enchantment",
+            "controller_gain_life_source": "x_value",
+            "target_mana_value_exact_from_x": True,
+            "target_mana_value_source": "x_value",
+        }
+    if re.fullmatch(r"destroy target creature\. you gain 1 life for each artifact you control\.?", text):
+        return {
+            "target": "creature",
+            "controller_gain_life_source": "battlefield_permanent_count",
+            "battlefield_count_scope": "controller_battlefield",
+            "battlefield_count_card_types": ["artifact"],
+            "life_gain_per_count": 1,
+        }
+    match = re.fullmatch(r"destroy target .+?\. (?P<life_gain>you gain .+?)\.?", text)
+    if match:
+        parsed_life_gain = dynamic_life_gain_from_oracle({"oracle_text": match.group("life_gain")})
+        if isinstance(parsed_life_gain, dict):
+            amount_source = str(parsed_life_gain.get("life_gain_amount_source") or "").strip().lower()
+            if amount_source == "battlefield_permanent_count":
+                return {
+                    "target": target,
+                    "controller_gain_life_source": "battlefield_permanent_count",
+                    **{
+                        key: value
+                        for key, value in parsed_life_gain.items()
+                        if key != "life_gain_amount_source"
+                    },
+                }
+    return None
 
 
 def simple_destroy_target_controller_life_loss_from_source(source: str) -> int | None:
@@ -36372,7 +36482,8 @@ def split_row(
         ), "selected_exact_scope"
 
     if unit == DESTROY_UNIT and classes == {"DestroyTargetEffect", "ScryEffect"}:
-        unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+        declared_abilities = source_declared_ability_classes(source_text) if source_text else ability_classes(row)
+        unsupported_abilities = declared_abilities - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
         if unsupported_abilities:
             return None, "destroy_scry_ability_class_not_simple"
         oracle_destroy_scry = fixed_destroy_scry_from_oracle(metadata)
@@ -39005,20 +39116,61 @@ def split_row(
         ), "selected_exact_scope"
 
     if unit == LIFE_UNIT and classes == {"DestroyTargetEffect", "GainLifeEffect"}:
-        unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+        declared_abilities = source_declared_ability_classes(source_text) if source_text else ability_classes(row)
+        unsupported_abilities = declared_abilities - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
         if unsupported_abilities:
             return None, "destroy_life_gain_ability_class_not_simple"
         if has_oracle_complexity(metadata):
             return None, "destroy_life_gain_oracle_not_simple"
         source_destroy = simple_destroy_gain_life_from_source(source_text)
-        if source_destroy is None:
+        if source_destroy is not None:
+            oracle_destroy = simple_destroy_gain_life_from_oracle(metadata)
+            if oracle_destroy is None:
+                return None, "destroy_life_gain_oracle_not_exact_fixed"
+            if source_destroy != oracle_destroy:
+                return None, "destroy_life_gain_source_oracle_mismatch"
+            target, life_gain = oracle_destroy
+            effect = (
+                "remove_creature"
+                if restricted_target_base(target) == "creature"
+                else "remove_permanent"
+            )
+            effect_json = {
+                "effect": effect,
+                "battle_model_scope": DESTROY_GAIN_LIFE_SCOPE,
+                "target": target,
+                "target_constraints": target_constraints_for(target),
+                "destination": "graveyard",
+                "controller_gains_life": life_gain,
+                "xmage_effect_classes": ["DestroyTargetEffect", "GainLifeEffect"],
+                **flags,
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_destroy_target_gain_life_spell",
+            ), "selected_exact_scope"
+        source_dynamic = dynamic_destroy_gain_life_from_source(source_text)
+        if source_dynamic is None:
             return None, "destroy_life_gain_source_not_fixed"
-        oracle_destroy = simple_destroy_gain_life_from_oracle(metadata)
-        if oracle_destroy is None:
-            return None, "destroy_life_gain_oracle_not_exact_fixed"
-        if source_destroy != oracle_destroy:
-            return None, "destroy_life_gain_source_oracle_mismatch"
-        target, life_gain = oracle_destroy
+        oracle_dynamic = dynamic_destroy_gain_life_from_oracle(metadata)
+        if oracle_dynamic is None:
+            return None, "destroy_life_gain_dynamic_oracle_not_exact"
+        if source_dynamic != oracle_dynamic:
+            return None, "destroy_life_gain_dynamic_source_oracle_mismatch"
+        target = str(oracle_dynamic["target"])
+        dynamic_fields = {
+            key: value
+            for key, value in oracle_dynamic.items()
+            if key != "target"
+        }
+        target_constraints = target_constraints_for(target)
+        if dynamic_fields.get("target_mana_value_source") == "x_value":
+            target_constraints = {
+                **target_constraints,
+                "target_mana_value_source": "x_value",
+            }
         effect = (
             "remove_creature"
             if restricted_target_base(target) == "creature"
@@ -39026,19 +39178,20 @@ def split_row(
         )
         effect_json = {
             "effect": effect,
-            "battle_model_scope": DESTROY_GAIN_LIFE_SCOPE,
+            "battle_model_scope": DESTROY_DYNAMIC_GAIN_LIFE_SCOPE,
             "target": target,
-            "target_constraints": target_constraints_for(target),
+            "target_constraints": target_constraints,
             "destination": "graveyard",
-            "controller_gains_life": life_gain,
+            "controller_gains_life": 0,
             "xmage_effect_classes": ["DestroyTargetEffect", "GainLifeEffect"],
+            **dynamic_fields,
             **flags,
         }
         return build_proposal(
             row,
             metadata,
             effect_json,
-            family_id="xmage_destroy_target_gain_life_spell",
+            family_id="xmage_destroy_dynamic_gain_life_spell",
         ), "selected_exact_scope"
 
     if unit == LIFE_UNIT and classes == {"DrawCardSourceControllerEffect", "GainLifeEffect"}:
