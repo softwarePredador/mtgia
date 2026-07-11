@@ -265,6 +265,7 @@ DRAW_LOSE_LIFE_SPELL_SCOPE = "xmage_fixed_controller_draw_lose_life_spell_v1"
 TARGET_DRAW_LOSE_LIFE_SPELL_SCOPE = "xmage_fixed_target_player_draw_lose_life_spell_v1"
 DRAW_LOSE_HALF_LIFE_SPELL_SCOPE = "xmage_controller_draw_lose_half_life_rounded_up_spell_v1"
 DAMAGE_SCOPE = "xmage_fixed_damage_target_spell_v1"
+CONDITIONAL_DAMAGE_SCOPE = "xmage_conditional_fixed_damage_target_spell_v1"
 MULTI_TARGET_DAMAGE_SCOPE = "xmage_fixed_multi_target_damage_spell_v1"
 DAMAGE_EACH_TARGET_SCOPE = "xmage_fixed_damage_each_target_spell_v1"
 DAMAGE_EACH_OPPONENT_SCOPE = "spell_damage_each_opponent_v1"
@@ -14973,6 +14974,178 @@ def dynamic_count_damage_from_source(source: str) -> dict[str, Any] | str | None
         "damage_per_count": 1,
         **{key: value for key, value in spec.items() if key != "damage_base_amount"},
     }
+
+
+CONDITIONAL_DAMAGE_CONDITION_FIELDS: dict[str, dict[str, Any]] = {
+    "morbid": {
+        "conditional_damage_condition": "creature_died_this_turn",
+    },
+    "metalcraft": {
+        "conditional_damage_condition": "controlled_artifacts_gte",
+        "conditional_damage_artifact_threshold": 3,
+    },
+    "hellbent": {
+        "conditional_damage_condition": "controller_has_no_cards_in_hand",
+    },
+    "spell mastery": {
+        "conditional_damage_condition": "controller_graveyard_instant_sorcery_count_gte",
+        "conditional_damage_graveyard_instant_sorcery_threshold": 2,
+    },
+    "threshold": {
+        "conditional_damage_condition": "controller_graveyard_count_gte",
+        "conditional_damage_graveyard_count_threshold": 7,
+    },
+    "delirium": {
+        "conditional_damage_condition": "controller_graveyard_card_types_gte",
+        "conditional_damage_graveyard_card_types_threshold": 4,
+    },
+    "raid": {
+        "conditional_damage_condition": "controller_attacked_this_turn",
+    },
+    "snow permanents": {
+        "conditional_damage_condition": "controlled_snow_permanents_gte",
+        "conditional_damage_snow_permanent_threshold": 3,
+    },
+    "drawn two cards": {
+        "conditional_damage_condition": "controller_drawn_cards_this_turn_gte",
+        "conditional_damage_drawn_cards_threshold": 2,
+    },
+    "spacecraft": {
+        "conditional_damage_condition": "controls_permanent_subtype",
+        "conditional_damage_required_subtype": "Spacecraft",
+    },
+    "kicker": {
+        "conditional_damage_condition": "spell_was_kicked",
+    },
+}
+
+
+def _conditional_damage_condition_from_label(label: str) -> dict[str, Any] | None:
+    normalized = re.sub(r"\s+", " ", str(label or "").strip().lower())
+    fields = CONDITIONAL_DAMAGE_CONDITION_FIELDS.get(normalized)
+    return dict(fields) if fields else None
+
+
+def conditional_damage_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str | None:
+    text = strip_parenthetical_reminders(oracle_text(metadata))
+    text = re.sub(r"\s+", " ", text.strip().lower())
+    if not re.search(r"\binstead\b", text):
+        return None
+    if "deals x damage" in text or "divided as you choose" in text or "additional cost" in text:
+        return "conditional_damage_oracle_not_fixed"
+    damage_amounts = [int(value) for value in re.findall(r"\bdeals\s+(\d+)\s+damage\b", text)]
+    if len(damage_amounts) != 2:
+        return "conditional_damage_oracle_amount_count_not_supported"
+    base_amount, conditional_amount = damage_amounts
+    if base_amount <= 0 or conditional_amount <= 0:
+        return "conditional_damage_oracle_amount_not_fixed"
+    kicker_cost = None
+    if "if this spell was kicked" in text:
+        condition_fields = _conditional_damage_condition_from_label("kicker")
+        kicker_match = re.search(r"\bkicker\s+(?P<cost>(?:\{[^}]+\})+)", text)
+        if not kicker_match:
+            return "conditional_damage_oracle_kicker_cost_not_supported"
+        kicker_cost = kicker_match.group("cost")
+    else:
+        label_match = re.search(
+            r"\b(?P<label>morbid|metalcraft|hellbent|spell mastery|threshold|delirium|raid)\s+[—-]",
+            text,
+        )
+        if label_match:
+            condition_fields = _conditional_damage_condition_from_label(label_match.group("label"))
+        elif "if you control three or more snow permanents" in text:
+            condition_fields = _conditional_damage_condition_from_label("snow permanents")
+        elif "if you've drawn two or more cards this turn" in text:
+            condition_fields = _conditional_damage_condition_from_label("drawn two cards")
+        elif "if you control a spacecraft" in text:
+            condition_fields = _conditional_damage_condition_from_label("spacecraft")
+        else:
+            return "conditional_damage_oracle_condition_not_supported"
+    if condition_fields is None:
+        return "conditional_damage_oracle_condition_not_supported"
+    target = damage_target_from_oracle(metadata)
+    if target is None:
+        return "conditional_damage_target_not_supported"
+    result = {
+        "amount": base_amount,
+        "damage": base_amount,
+        "conditional_damage_amount": conditional_amount,
+        "target": target,
+        **condition_fields,
+    }
+    if kicker_cost:
+        result["kicker_mana_cost"] = kicker_cost
+    return result
+
+
+def conditional_damage_from_source(source: str) -> dict[str, Any] | str | None:
+    text = source or ""
+    if has_additional_cost(text):
+        return "conditional_damage_additional_cost_not_supported"
+    if "withCantBePrevented" in text:
+        return "conditional_damage_cant_be_prevented_not_supported"
+    if len(re.findall(r"new\s+ConditionalOneShotEffect\s*\(", text)) != 1:
+        return "conditional_damage_source_effect_count_not_supported"
+    args = extract_constructor_args(text, "ConditionalOneShotEffect")
+    if args is None:
+        return "conditional_damage_source_not_supported"
+    parts = split_top_level_args(args)
+    if len(parts) < 3:
+        return "conditional_damage_source_not_supported"
+
+    def damage_amount_from_part(part: str) -> int | None:
+        match = re.search(r"new\s+DamageTargetEffect\s*\(\s*(\d+)\s*(?:,|\))", part or "", re.S)
+        return int(match.group(1)) if match else None
+
+    conditional_amount = damage_amount_from_part(parts[0])
+    base_amount = damage_amount_from_part(parts[1])
+    if conditional_amount is None or base_amount is None or conditional_amount <= 0 or base_amount <= 0:
+        return "conditional_damage_source_amount_not_fixed"
+    condition_text = parts[2]
+    condition_fields: dict[str, Any] | None = None
+    if "MorbidCondition" in condition_text:
+        condition_fields = _conditional_damage_condition_from_label("morbid")
+    elif "MetalcraftCondition" in condition_text:
+        condition_fields = _conditional_damage_condition_from_label("metalcraft")
+    elif "HellbentCondition" in condition_text:
+        condition_fields = _conditional_damage_condition_from_label("hellbent")
+    elif "SpellMasteryCondition" in condition_text:
+        condition_fields = _conditional_damage_condition_from_label("spell mastery")
+    elif "ThresholdCondition" in condition_text:
+        condition_fields = _conditional_damage_condition_from_label("threshold")
+    elif "DeliriumCondition" in condition_text:
+        condition_fields = _conditional_damage_condition_from_label("delirium")
+    elif "RaidCondition" in condition_text:
+        condition_fields = _conditional_damage_condition_from_label("raid")
+    elif (
+        "PermanentsOnTheBattlefieldCondition" in text
+        and "SuperType.SNOW" in text
+        and "ComparisonType.MORE_THAN" in text
+    ):
+        condition_fields = _conditional_damage_condition_from_label("snow permanents")
+    elif "DrewTwoOrMoreCardsCondition" in condition_text:
+        condition_fields = _conditional_damage_condition_from_label("drawn two cards")
+    elif (
+        "PermanentsOnTheBattlefieldCondition" in text
+        and "SubType.SPACECRAFT" in text
+    ):
+        condition_fields = _conditional_damage_condition_from_label("spacecraft")
+    elif "KickedCondition" in condition_text:
+        condition_fields = _conditional_damage_condition_from_label("kicker")
+    if condition_fields is None:
+        return "conditional_damage_source_condition_not_supported"
+    result = {
+        "amount": base_amount,
+        "damage": base_amount,
+        "conditional_damage_amount": conditional_amount,
+        **condition_fields,
+    }
+    if condition_fields.get("conditional_damage_condition") == "spell_was_kicked":
+        kicker_match = re.search(r"new\s+KickerAbility\s*\(\s*\"(?P<cost>(?:\{[^}]+\})+)\"", text)
+        if not kicker_match:
+            return "conditional_damage_source_kicker_cost_not_supported"
+        result["kicker_mana_cost"] = kicker_match.group("cost")
+    return result
 
 
 def x_damage_target_from_oracle(metadata: dict[str, Any]) -> str | None:
@@ -38073,6 +38246,73 @@ def split_row(
                     family_id="xmage_fixed_damage_each_target_spell",
                 ), "selected_exact_scope"
 
+        if damage_classes == {"ConditionalOneShotEffect", "DamageTargetEffect"}:
+            all_abilities = ability_classes(row)
+            unsupported_abilities = (
+                all_abilities
+                - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+                - {"KickerAbility"}
+            )
+            if unsupported_abilities:
+                return None, "conditional_damage_ability_class_not_supported"
+            if not is_spell(metadata):
+                return None, "not_instant_or_sorcery_spell"
+            oracle_conditional_damage = conditional_damage_from_oracle(metadata)
+            if isinstance(oracle_conditional_damage, str):
+                return None, oracle_conditional_damage
+            if oracle_conditional_damage is None:
+                return None, "conditional_damage_oracle_not_exact"
+            source_conditional_damage = conditional_damage_from_source(source_text)
+            if isinstance(source_conditional_damage, str):
+                return None, source_conditional_damage
+            if source_conditional_damage is None:
+                return None, "conditional_damage_source_not_supported"
+            if "KickerAbility" in all_abilities and oracle_conditional_damage.get("conditional_damage_condition") != "spell_was_kicked":
+                return None, "conditional_damage_kicker_condition_mismatch"
+            for key in (
+                "amount",
+                "damage",
+                "conditional_damage_amount",
+                "conditional_damage_condition",
+                "kicker_mana_cost",
+                "conditional_damage_artifact_threshold",
+                "conditional_damage_graveyard_instant_sorcery_threshold",
+                "conditional_damage_graveyard_count_threshold",
+                "conditional_damage_graveyard_card_types_threshold",
+                "conditional_damage_snow_permanent_threshold",
+                "conditional_damage_drawn_cards_threshold",
+                "conditional_damage_required_subtype",
+            ):
+                if oracle_conditional_damage.get(key) != source_conditional_damage.get(key):
+                    return None, f"conditional_damage_source_oracle_{key}_mismatch"
+            target = str(oracle_conditional_damage["target"])
+            if not source_matches_target_constraint(source_text, target):
+                return None, "conditional_damage_target_source_mismatch"
+            target_base = restricted_target_base(target)
+            effect_json = {
+                "effect": "direct_damage",
+                "battle_model_scope": CONDITIONAL_DAMAGE_SCOPE,
+                "amount": int(oracle_conditional_damage["amount"]),
+                "damage": int(oracle_conditional_damage["damage"]),
+                "conditional_damage_base_amount": int(oracle_conditional_damage["amount"]),
+                "conditional_damage_amount": int(oracle_conditional_damage["conditional_damage_amount"]),
+                "target": target_base,
+                "target_constraints": target_constraints_for(target),
+                "xmage_effect_classes": ["ConditionalOneShotEffect", "DamageTargetEffect"],
+                **{
+                    key: value
+                    for key, value in oracle_conditional_damage.items()
+                    if key.startswith("conditional_damage_") or key == "kicker_mana_cost"
+                },
+                **flags,
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_conditional_fixed_damage_spell",
+            ), "selected_exact_scope"
+
         cant_be_countered_auxiliary = damage_classes == {"CantBeCounteredSourceEffect", "DamageTargetEffect"}
         if damage_classes != {"DamageTargetEffect"} and not cant_be_countered_auxiliary:
             return None, "damage_effect_class_not_pure"
@@ -40976,25 +41216,26 @@ def split_row(
                 "xmage_ability_classes": sorted(mana_ability_classes),
             }
             formidable_life_reset = formidable_life_total_reset_detail_from_oracle(metadata)
+            formidable_life_reset_modeled = False
             if formidable_life_reset is not None:
                 source_formidable_life_reset = formidable_life_total_reset_detail_from_source(source_text)
-                if isinstance(source_formidable_life_reset, str):
-                    return None, source_formidable_life_reset
-                if source_formidable_life_reset is None:
-                    return None, "formidable_life_total_reset_source_not_supported"
-                for key in (
-                    "auxiliary_activated_effect",
-                    "formidable_life_total_reset",
-                    "formidable_activation_mana_cost",
-                    "formidable_activation_requires_tap",
-                    "formidable_controlled_creatures_total_power_gte",
-                    "formidable_life_total_count_scope",
-                ):
-                    if source_formidable_life_reset.get(key) != formidable_life_reset.get(key):
-                        return None, f"formidable_life_total_reset_source_oracle_{key}_mismatch"
-                effect_json.update(formidable_life_reset)
-                effect_json["battle_model_scope"] = RESTRICTED_MANA_WITH_FORMIDABLE_LIFE_RESET_SCOPE
-                effect_json["ability_kind"] = "activated_mana_and_formidable_activated"
+                if isinstance(source_formidable_life_reset, dict):
+                    for key in (
+                        "auxiliary_activated_effect",
+                        "formidable_life_total_reset",
+                        "formidable_activation_mana_cost",
+                        "formidable_activation_requires_tap",
+                        "formidable_controlled_creatures_total_power_gte",
+                        "formidable_life_total_count_scope",
+                    ):
+                        if source_formidable_life_reset.get(key) != formidable_life_reset.get(key):
+                            source_formidable_life_reset = None
+                            break
+                if isinstance(source_formidable_life_reset, dict):
+                    effect_json.update(formidable_life_reset)
+                    effect_json["battle_model_scope"] = RESTRICTED_MANA_WITH_FORMIDABLE_LIFE_RESET_SCOPE
+                    effect_json["ability_kind"] = "activated_mana_and_formidable_activated"
+                    formidable_life_reset_modeled = True
             if restricted_mana_source.get("produced_mana_symbols"):
                 effect_json["produced_mana_symbols"] = list(
                     restricted_mana_source["produced_mana_symbols"]
@@ -41011,7 +41252,7 @@ def split_row(
                 "ConditionalColorlessManaAbility",
                 "ConditionalColoredManaAbility",
             }
-            if formidable_life_reset is not None:
+            if formidable_life_reset_modeled:
                 restricted_mana_ability_classes.add("ActivateIfConditionActivatedAbility")
             auxiliary_ability_classes = sorted(
                 mana_ability_classes
@@ -41025,7 +41266,7 @@ def split_row(
                 "ConditionalManaEffect",
                 "ManaEffect",
             }
-            if formidable_life_reset is not None:
+            if formidable_life_reset_modeled:
                 modeled_restricted_mana_effect_classes.update(
                     {
                         "OneShotEffect",

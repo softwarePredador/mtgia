@@ -704,6 +704,8 @@ def clear_turn_scoped_permanent_flags(all_players):
         participant._life_gained_turn_marker = CURRENT_REPLAY_TURN
         participant.creatures_died_this_turn = 0
         participant._creatures_died_turn_marker = CURRENT_REPLAY_TURN
+        participant.attacked_this_turn = 0
+        participant._attacked_turn_marker = CURRENT_REPLAY_TURN
 
 
 class EngineMetrics:
@@ -2370,6 +2372,8 @@ def runtime_cast_plan_for_card(player, card, effect_data, *, additional_generic=
             return None
         x_value = chosen_x
 
+    kicker_costs, kicker_paid = mark_kicker_cast_choice(player, card, effect_data)
+    additional_costs = merge_additional_costs(additional_costs, kicker_costs)
     locked_cost = card_cost_for_player_state(
         player,
         card,
@@ -2377,14 +2381,20 @@ def runtime_cast_plan_for_card(player, card, effect_data, *, additional_generic=
         x_value=0
         if effect_data.get("x_value_source") == "blight_greatest_toughness_controlled_creature"
         else x_value,
+        additional_costs=additional_costs,
     )
     if not player.can_pay(locked_cost):
         return None
+    modes = []
+    if kicker_paid:
+        modes.append(f"kicker:{effect_data.get('kicker_mana_cost')}")
     return {
         "locked_cost": locked_cost,
         "cost_context": cost_context,
         "x_value": x_value,
         "additional_costs": additional_costs,
+        "modes": modes,
+        "kicker_paid": bool(kicker_paid),
     }
 
 
@@ -2526,6 +2536,43 @@ def mark_buyback_cast_choice(player, card, effect_data):
 
 def buyback_was_paid(effect_data):
     return buyback_runtime_enabled(effect_data) and bool(effect_data.get("_buyback_paid"))
+
+
+def kicker_runtime_enabled(effect_data):
+    if not isinstance(effect_data, dict):
+        return False
+    return (
+        str(effect_data.get("conditional_damage_condition") or "").strip().lower()
+        == "spell_was_kicked"
+        and bool(effect_data.get("kicker_mana_cost"))
+    )
+
+
+def mark_kicker_cast_choice(player, card, effect_data):
+    """Choose optional kicker when the full locked cost is payable."""
+    if not kicker_runtime_enabled(effect_data):
+        return [], False
+    kicker_cost = str(effect_data.get("kicker_mana_cost") or "").strip()
+    if not kicker_cost:
+        effect_data["_kicker_paid"] = False
+        effect_data["_spell_was_kicked"] = False
+        return [], False
+    additional_costs = [kicker_cost]
+    full_cost = card_cost_for_effect_with_additional_costs(
+        player,
+        card,
+        effect_data,
+        additional_costs=additional_costs,
+    )
+    if player.can_pay(full_cost):
+        effect_data["_kicker_paid"] = True
+        effect_data["_spell_was_kicked"] = True
+        effect_data["_kicker_additional_costs"] = additional_costs
+        return additional_costs, True
+    effect_data["_kicker_paid"] = False
+    effect_data["_spell_was_kicked"] = False
+    effect_data.pop("_kicker_additional_costs", None)
+    return [], False
 
 
 def spree_runtime_enabled(effect_data):
@@ -11545,6 +11592,19 @@ class Player:
             self._creatures_died_turn_marker = turn_marker
         return int(getattr(self, "creatures_died_this_turn", 0) or 0)
 
+    def record_attacked_this_turn(self, amount=1, turn_marker=None):
+        if turn_marker is not None and getattr(self, "_attacked_turn_marker", None) != turn_marker:
+            self.attacked_this_turn = 0
+            self._attacked_turn_marker = turn_marker
+        self.attacked_this_turn += max(0, int(amount or 0))
+        return self.attacked_this_turn
+
+    def attacked_this_turn_count(self, turn_marker=None):
+        if turn_marker is not None and getattr(self, "_attacked_turn_marker", None) != turn_marker:
+            self.attacked_this_turn = 0
+            self._attacked_turn_marker = turn_marker
+        return int(getattr(self, "attacked_this_turn", 0) or 0)
+
     def _draw_replacement_source(self, phase=None):
         source = _first_static_replacement_permanent(
             self,
@@ -11673,6 +11733,8 @@ class Player:
         self._life_gained_turn_marker = None
         self.creatures_died_this_turn = 0
         self._creatures_died_turn_marker = None
+        self.attacked_this_turn = 0
+        self._attacked_turn_marker = None
         self.surge_to_victory_delayed_triggers = []
         self.failed_draw_from_empty_library = False
         self.turn_end_requested = False
@@ -50543,11 +50605,21 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng, *, fini
     if dynamic_amount is not None:
         amount = dynamic_amount
     else:
-        raw_amount = effect_data.get("amount") or effect_data.get("damage") or 3
-        if raw_amount == "x_available":
-            amount = max(1, int(card.get("cmc") or 0), player.available_mana())
+        conditional_amount, conditional_amount_fields = conditional_damage_amount(
+            player,
+            opponents,
+            effect_data,
+            turn=turn,
+        )
+        if conditional_amount is not None:
+            amount = conditional_amount
+            dynamic_amount_fields = conditional_amount_fields
         else:
-            amount = int(raw_amount)
+            raw_amount = effect_data.get("amount") or effect_data.get("damage") or 3
+            if raw_amount == "x_available":
+                amount = max(1, int(card.get("cmc") or 0), player.available_mana())
+            else:
+                amount = int(raw_amount)
     amount = apply_controller_noncombat_damage_modifiers(
         player,
         amount,
@@ -57582,6 +57654,142 @@ def dynamic_damage_amount(player, opponents, effect_data):
         "damage_per_count": per_count,
         "damage_per_graveyard_count": per_count,
     }
+
+
+def _graveyard_instant_sorcery_count(player):
+    count = 0
+    for card in getattr(player, "graveyard", []) or []:
+        if not isinstance(card, dict):
+            continue
+        type_line = str(card.get("type_line") or "").lower()
+        if re.search(r"\binstant\b", type_line) or re.search(r"\bsorcery\b", type_line):
+            count += 1
+    return count
+
+
+def conditional_damage_amount(player, opponents, effect_data, turn=None):
+    condition = str(effect_data.get("conditional_damage_condition") or "").strip().lower()
+    if not condition:
+        return None, {}
+    try:
+        base_amount = int(effect_data.get("conditional_damage_base_amount") or effect_data.get("amount") or effect_data.get("damage") or 0)
+    except Exception:
+        base_amount = 0
+    try:
+        condition_amount = int(effect_data.get("conditional_damage_amount") or base_amount)
+    except Exception:
+        condition_amount = base_amount
+    participants = [player, *list(opponents or [])]
+    condition_met = False
+    replay_fields = {
+        "conditional_damage_condition": condition,
+        "conditional_damage_base_amount": base_amount,
+        "conditional_damage_amount": condition_amount,
+    }
+    if condition == "creature_died_this_turn":
+        died_count = 0
+        for participant in participants:
+            if hasattr(participant, "creatures_died_this_turn_count"):
+                died_count += int(participant.creatures_died_this_turn_count(turn) or 0)
+            else:
+                died_count += int(getattr(participant, "creatures_died_this_turn", 0) or 0)
+        condition_met = died_count > 0
+        replay_fields["creatures_died_this_turn"] = died_count
+    elif condition == "controlled_artifacts_gte":
+        threshold = int(effect_data.get("conditional_damage_artifact_threshold") or 3)
+        artifact_count = controlled_artifact_count(player)
+        condition_met = artifact_count >= threshold
+        replay_fields["conditional_damage_artifact_threshold"] = threshold
+        replay_fields["controlled_artifact_count"] = artifact_count
+    elif condition == "controller_attacked_this_turn":
+        attacked_count = int(effect_data.get("_controller_attacked_this_turn") or 0)
+        if hasattr(player, "attacked_this_turn_count"):
+            attacked_count = max(attacked_count, int(player.attacked_this_turn_count(turn) or 0))
+        else:
+            attacked_count = max(attacked_count, int(getattr(player, "attacked_this_turn", 0) or 0))
+        condition_met = attacked_count > 0
+        replay_fields["controller_attacked_this_turn_count"] = attacked_count
+    elif condition == "controlled_snow_permanents_gte":
+        threshold = int(effect_data.get("conditional_damage_snow_permanent_threshold") or 3)
+        snow_count = sum(
+            1
+            for permanent in getattr(player, "battlefield", []) or []
+            if isinstance(permanent, dict)
+            and (
+                permanent.get("is_snow")
+                or permanent_has_subtype(permanent, "snow")
+                or "snow" in str(permanent.get("type_line") or "").lower().split()
+            )
+        )
+        condition_met = snow_count >= threshold
+        replay_fields["conditional_damage_snow_permanent_threshold"] = threshold
+        replay_fields["controlled_snow_permanent_count"] = snow_count
+    elif condition == "controller_drawn_cards_this_turn_gte":
+        threshold = int(effect_data.get("conditional_damage_drawn_cards_threshold") or 2)
+        drawn_count = max(
+            int(effect_data.get("_controller_drawn_cards_this_turn") or 0),
+            int(getattr(player, "cards_drawn_this_turn", 0) or 0),
+        )
+        condition_met = drawn_count >= threshold
+        replay_fields["conditional_damage_drawn_cards_threshold"] = threshold
+        replay_fields["controller_drawn_cards_this_turn"] = drawn_count
+    elif condition == "controls_permanent_subtype":
+        required_subtype = str(effect_data.get("conditional_damage_required_subtype") or "").strip()
+        subtype_count = sum(
+            1
+            for permanent in getattr(player, "battlefield", []) or []
+            if isinstance(permanent, dict) and permanent_has_subtype(permanent, required_subtype)
+        )
+        condition_met = bool(required_subtype and subtype_count > 0)
+        replay_fields["conditional_damage_required_subtype"] = required_subtype
+        replay_fields["controlled_required_subtype_count"] = subtype_count
+    elif condition == "controller_has_no_cards_in_hand":
+        hand_size = len(getattr(player, "hand", []) or [])
+        condition_met = hand_size == 0
+        replay_fields["controller_hand_size"] = hand_size
+    elif condition == "controller_graveyard_instant_sorcery_count_gte":
+        threshold = int(effect_data.get("conditional_damage_graveyard_instant_sorcery_threshold") or 2)
+        count = _graveyard_instant_sorcery_count(player)
+        condition_met = count >= threshold
+        replay_fields["conditional_damage_graveyard_instant_sorcery_threshold"] = threshold
+        replay_fields["controller_graveyard_instant_sorcery_count"] = count
+    elif condition == "controller_graveyard_count_gte":
+        threshold = int(effect_data.get("conditional_damage_graveyard_count_threshold") or 7)
+        count = len(getattr(player, "graveyard", []) or [])
+        condition_met = count >= threshold
+        replay_fields["conditional_damage_graveyard_count_threshold"] = threshold
+        replay_fields["controller_graveyard_count"] = count
+    elif condition == "controller_graveyard_card_types_gte":
+        threshold = int(effect_data.get("conditional_damage_graveyard_card_types_threshold") or 4)
+        count = _graveyard_card_type_count(player)
+        condition_met = count >= threshold
+        replay_fields["conditional_damage_graveyard_card_types_threshold"] = threshold
+        replay_fields["controller_graveyard_card_types"] = count
+    elif condition == "spell_was_kicked":
+        kicker_cost = str(effect_data.get("kicker_mana_cost") or "").strip()
+        cast_context = effect_data.get("_cast_context") if isinstance(effect_data, dict) else {}
+        context_additional_costs = (
+            list(cast_context.get("additional_costs") or [])
+            if isinstance(cast_context, dict)
+            else []
+        )
+        kicker_additional_costs = list(effect_data.get("_kicker_additional_costs") or [])
+        condition_met = bool(
+            effect_data.get("_spell_was_kicked")
+            or effect_data.get("_kicker_paid")
+            or (kicker_cost and kicker_cost in context_additional_costs)
+            or (kicker_cost and kicker_cost in kicker_additional_costs)
+        )
+        replay_fields["kicker_mana_cost"] = kicker_cost
+        replay_fields["kicker_paid"] = bool(condition_met)
+        replay_fields["cast_additional_costs"] = context_additional_costs or kicker_additional_costs
+    else:
+        replay_fields["conditional_damage_condition_supported"] = False
+        replay_fields["conditional_damage_condition_met"] = False
+        return base_amount, replay_fields
+    replay_fields["conditional_damage_condition_supported"] = True
+    replay_fields["conditional_damage_condition_met"] = bool(condition_met)
+    return (condition_amount if condition_met else base_amount), replay_fields
 
 
 def _dynamic_life_gain_count_from_source(player, opponents, effect_data):
@@ -72237,6 +72445,7 @@ def declare_attackers_step(attacker, opponents, all_players, turn):
                 turn,
                 phase="combat",
             )
+    attacker.record_attacked_this_turn(len(attackers), turn)
 
     emit_decision_trace(
         decision_type="combat_attack",

@@ -447,6 +447,17 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "graveyard_self_return_activation_cost_colors",
     "amount",
     "damage",
+    "conditional_damage_base_amount",
+    "conditional_damage_amount",
+    "conditional_damage_condition",
+    "conditional_damage_artifact_threshold",
+    "conditional_damage_graveyard_instant_sorcery_threshold",
+    "conditional_damage_graveyard_count_threshold",
+    "conditional_damage_graveyard_card_types_threshold",
+    "conditional_damage_snow_permanent_threshold",
+    "conditional_damage_drawn_cards_threshold",
+    "conditional_damage_required_subtype",
+    "kicker_mana_cost",
     "gain_life",
     "controller_gain_life",
     "damage_amount_source",
@@ -4877,9 +4888,23 @@ def fixed_damage_target_spell_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
     required = dict(rule.get("required_effect_fields") or {})
-    if required.get("battle_model_scope") != "xmage_fixed_damage_target_spell_v1":
+    scope = str(required.get("battle_model_scope") or "")
+    if scope not in {
+        "xmage_fixed_damage_target_spell_v1",
+        "xmage_conditional_fixed_damage_target_spell_v1",
+    }:
         return None
-    damage = int(required.get("amount") or required.get("damage") or 0)
+    is_conditional_damage = scope == "xmage_conditional_fixed_damage_target_spell_v1"
+    damage = int(
+        (
+            required.get("conditional_damage_amount")
+            if is_conditional_damage
+            else None
+        )
+        or required.get("amount")
+        or required.get("damage")
+        or 0
+    )
     if damage <= 0:
         return None
     type_line = "Sorcery" if required.get("sorcery") is True else "Instant"
@@ -4922,8 +4947,117 @@ def fixed_damage_target_spell_execution_scenario_from_expected_rule(
         ),
         "logical_rule_key": rule["logical_rule_key"],
     }
+    if is_conditional_damage:
+        condition = str(required.get("conditional_damage_condition") or "")
+        scenario["expected_conditional_damage_condition"] = condition
+        scenario["expected_conditional_damage_condition_met"] = True
+        scenario["expected_conditional_damage_base_amount"] = int(
+            required.get("conditional_damage_base_amount")
+            or required.get("amount")
+            or required.get("damage")
+            or 0
+        )
+        if condition == "creature_died_this_turn":
+            scenario["creatures_died_this_turn"] = 1
+        elif condition == "controlled_artifacts_gte":
+            threshold = int(required.get("conditional_damage_artifact_threshold") or 3)
+            scenario["controller_battlefield"] = [
+                *scenario.get("controller_battlefield", []),
+                *[
+                    {
+                        "name": f"E2E Metalcraft Artifact {index}",
+                        "type_line": "Artifact",
+                        "effect": "artifact",
+                    }
+                    for index in range(1, threshold + 1)
+                ],
+            ]
+        elif condition == "controller_attacked_this_turn":
+            scenario["effect_overrides"] = {
+                **dict(scenario.get("effect_overrides") or {}),
+                "_controller_attacked_this_turn": 1,
+            }
+        elif condition == "controlled_snow_permanents_gte":
+            threshold = int(required.get("conditional_damage_snow_permanent_threshold") or 3)
+            scenario["controller_battlefield"] = [
+                *scenario.get("controller_battlefield", []),
+                *[
+                    {
+                        "name": f"E2E Snow Permanent {index}",
+                        "type_line": "Snow Artifact",
+                        "effect": "artifact",
+                        "is_snow": True,
+                    }
+                    for index in range(1, threshold + 1)
+                ],
+            ]
+        elif condition == "controller_drawn_cards_this_turn_gte":
+            threshold = int(required.get("conditional_damage_drawn_cards_threshold") or 2)
+            scenario["effect_overrides"] = {
+                **dict(scenario.get("effect_overrides") or {}),
+                "_controller_drawn_cards_this_turn": threshold,
+            }
+        elif condition == "controls_permanent_subtype":
+            required_subtype = str(required.get("conditional_damage_required_subtype") or "").strip()
+            scenario["controller_battlefield"] = [
+                *scenario.get("controller_battlefield", []),
+                {
+                    "name": f"E2E {required_subtype or 'Required'} Permanent",
+                    "type_line": f"Artifact - {required_subtype or 'Vehicle'}",
+                    "effect": "artifact",
+                    "subtypes": [required_subtype] if required_subtype else [],
+                },
+            ]
+        elif condition == "controller_has_no_cards_in_hand":
+            scenario["controller_hand"] = []
+        elif condition == "controller_graveyard_instant_sorcery_count_gte":
+            threshold = int(required.get("conditional_damage_graveyard_instant_sorcery_threshold") or 2)
+            scenario["controller_graveyard"] = [
+                {
+                    "name": f"E2E Spell Mastery Graveyard {index}",
+                    "type_line": "Instant" if index % 2 else "Sorcery",
+                    "effect": "direct_damage",
+                }
+                for index in range(1, threshold + 1)
+            ]
+        elif condition == "controller_graveyard_count_gte":
+            threshold = int(required.get("conditional_damage_graveyard_count_threshold") or 7)
+            scenario["controller_graveyard"] = [
+                {
+                    "name": f"E2E Threshold Graveyard {index}",
+                    "type_line": "Creature",
+                    "effect": "creature",
+                }
+                for index in range(1, threshold + 1)
+            ]
+        elif condition == "controller_graveyard_card_types_gte":
+            threshold = int(required.get("conditional_damage_graveyard_card_types_threshold") or 4)
+            type_lines = ["Creature", "Instant", "Sorcery", "Artifact", "Enchantment", "Land"]
+            scenario["controller_graveyard"] = [
+                {
+                    "name": f"E2E Delirium Graveyard {index}",
+                    "type_line": type_lines[(index - 1) % len(type_lines)],
+                    "effect": "graveyard_card",
+                }
+                for index in range(1, threshold + 1)
+            ]
+        elif condition == "spell_was_kicked":
+            kicker_cost = str(required.get("kicker_mana_cost") or "").strip()
+            scenario["effect_overrides"] = {
+                "_spell_was_kicked": True,
+                "_kicker_paid": True,
+                "_kicker_additional_costs": [kicker_cost] if kicker_cost else [],
+                "_cast_context": {
+                    "additional_costs": [kicker_cost] if kicker_cost else [],
+                    "modes": [f"kicker:{kicker_cost}"] if kicker_cost else ["kicker"],
+                },
+            }
+            scenario["expected_kicker_paid"] = True
+            if kicker_cost:
+                scenario["expected_kicker_mana_cost"] = kicker_cost
     if required.get("requires_return_land_to_hand"):
         scenario["controller_battlefield"] = [
+            *scenario.get("controller_battlefield", []),
             {
                 "name": "E2E Return Cost Land",
                 "type_line": "Basic Land - Mountain",

@@ -2462,6 +2462,134 @@ def test_manifest_builds_fixed_damage_target_spell_execution_scenario() -> None:
     assert scenario["nonmatching_target"]["colors"] == ["B"]
 
 
+def test_manifest_builds_conditional_fixed_damage_target_spell_execution_scenario() -> None:
+    proposal = {
+        "normalized_name": "galvanic blast",
+        "card_name": "Galvanic Blast",
+        "oracle_hash": "hash-galvanic-blast",
+        "logical_rule_key": "battle_rule_v1:hash-galvanic-blast",
+        "effect_json": {
+            "effect": "direct_damage",
+            "battle_model_scope": "xmage_conditional_fixed_damage_target_spell_v1",
+            "amount": 2,
+            "damage": 2,
+            "conditional_damage_base_amount": 2,
+            "conditional_damage_amount": 4,
+            "conditional_damage_condition": "controlled_artifacts_gte",
+            "conditional_damage_artifact_threshold": 3,
+            "target": "any_target",
+            "target_constraints": {"scope": "any_target"},
+        },
+    }
+
+    rule = builder.expected_rule_from_proposal(proposal)
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "fixed_damage_target_spell"
+    assert scenario["expected_damage"] == 4
+    assert scenario["expected_conditional_damage_condition"] == "controlled_artifacts_gte"
+    assert scenario["expected_conditional_damage_base_amount"] == 2
+    assert len(scenario["controller_battlefield"]) == 3
+
+
+def test_manifest_builds_kicked_conditional_damage_execution_scenario() -> None:
+    proposal = {
+        "normalized_name": "burst lightning",
+        "card_name": "Burst Lightning",
+        "oracle_hash": "hash-burst-lightning",
+        "logical_rule_key": "battle_rule_v1:hash-burst-lightning",
+        "effect_json": {
+            "effect": "direct_damage",
+            "battle_model_scope": "xmage_conditional_fixed_damage_target_spell_v1",
+            "amount": 2,
+            "damage": 2,
+            "conditional_damage_base_amount": 2,
+            "conditional_damage_amount": 4,
+            "conditional_damage_condition": "spell_was_kicked",
+            "kicker_mana_cost": "{4}",
+            "target": "any_target",
+            "target_constraints": {"scope": "any_target"},
+        },
+    }
+
+    rule = builder.expected_rule_from_proposal(proposal)
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "fixed_damage_target_spell"
+    assert scenario["expected_damage"] == 4
+    assert scenario["expected_conditional_damage_condition"] == "spell_was_kicked"
+    assert scenario["expected_conditional_damage_base_amount"] == 2
+    assert scenario["expected_kicker_paid"] is True
+    assert scenario["expected_kicker_mana_cost"] == "{4}"
+    assert scenario["effect_overrides"]["_spell_was_kicked"] is True
+    assert scenario["effect_overrides"]["_kicker_additional_costs"] == ["{4}"]
+
+
+def test_manifest_builds_new_conditional_damage_context_scenarios() -> None:
+    base = {
+        "normalized_name": "conditional sample",
+        "card_name": "Conditional Sample",
+        "oracle_hash": "hash-conditional-sample",
+        "logical_rule_key": "battle_rule_v1:hash-conditional-sample",
+        "effect_json": {
+            "effect": "direct_damage",
+            "battle_model_scope": "xmage_conditional_fixed_damage_target_spell_v1",
+            "amount": 2,
+            "damage": 2,
+            "conditional_damage_base_amount": 2,
+            "conditional_damage_amount": 4,
+            "target": "any_target",
+            "target_constraints": {"scope": "any_target"},
+        },
+    }
+
+    raid_rule = builder.expected_rule_from_proposal({
+        **base,
+        "effect_json": {
+            **base["effect_json"],
+            "conditional_damage_condition": "controller_attacked_this_turn",
+        },
+    })
+    raid_scenario = builder.execution_scenario_from_expected_rule(raid_rule)
+    assert raid_scenario["effect_overrides"]["_controller_attacked_this_turn"] == 1
+
+    snow_rule = builder.expected_rule_from_proposal({
+        **base,
+        "effect_json": {
+            **base["effect_json"],
+            "conditional_damage_condition": "controlled_snow_permanents_gte",
+            "conditional_damage_snow_permanent_threshold": 3,
+        },
+    })
+    snow_scenario = builder.execution_scenario_from_expected_rule(snow_rule)
+    assert len(snow_scenario["controller_battlefield"]) == 3
+    assert all(card["is_snow"] for card in snow_scenario["controller_battlefield"])
+
+    drawn_rule = builder.expected_rule_from_proposal({
+        **base,
+        "effect_json": {
+            **base["effect_json"],
+            "conditional_damage_condition": "controller_drawn_cards_this_turn_gte",
+            "conditional_damage_drawn_cards_threshold": 2,
+        },
+    })
+    drawn_scenario = builder.execution_scenario_from_expected_rule(drawn_rule)
+    assert drawn_scenario["effect_overrides"]["_controller_drawn_cards_this_turn"] == 2
+
+    subtype_rule = builder.expected_rule_from_proposal({
+        **base,
+        "effect_json": {
+            **base["effect_json"],
+            "conditional_damage_condition": "controls_permanent_subtype",
+            "conditional_damage_required_subtype": "Spacecraft",
+        },
+    })
+    subtype_scenario = builder.execution_scenario_from_expected_rule(subtype_rule)
+    assert subtype_scenario["controller_battlefield"][0]["subtypes"] == ["Spacecraft"]
+
+
 def test_manifest_builds_fixed_damage_target_shuffle_self_execution_scenario() -> None:
     proposal = {
         "normalized_name": "beacon of destruction",

@@ -351,6 +351,251 @@ def test_fixed_damage_target_spell_runner_executes_damage_and_cant_be_countered(
     assert result["cant_be_countered"] is True
 
 
+def test_conditional_fixed_damage_target_spell_runner_executes_condition_met() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "direct_damage",
+        "battle_model_scope": "xmage_conditional_fixed_damage_target_spell_v1",
+        "amount": 2,
+        "damage": 2,
+        "conditional_damage_base_amount": 2,
+        "conditional_damage_amount": 4,
+        "conditional_damage_condition": "controlled_artifacts_gte",
+        "conditional_damage_artifact_threshold": 3,
+        "target": "any_target",
+        "target_constraints": {"scope": "any_target"},
+    }
+    try:
+        result = validator.run_fixed_damage_target_spell(
+            battle,
+            {
+                "name": "Galvanic Blast deals conditional target damage",
+                "type": "fixed_damage_target_spell",
+                "card": {"name": "Galvanic Blast", "type_line": "Instant"},
+                "expected_damage": 4,
+                "expected_life_gain": 0,
+                "expected_target_constraints": {"scope": "any_target"},
+                "expected_conditional_damage_condition": "controlled_artifacts_gte",
+                "expected_conditional_damage_condition_met": True,
+                "expected_conditional_damage_base_amount": 2,
+                "controller_battlefield": [
+                    {"name": "E2E Artifact A", "type_line": "Artifact", "effect": "artifact"},
+                    {"name": "E2E Artifact B", "type_line": "Artifact", "effect": "artifact"},
+                    {"name": "E2E Artifact C", "type_line": "Artifact", "effect": "artifact"},
+                ],
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["damage"] == 4
+    assert result["opponent_life"] == 16
+
+
+def test_conditional_fixed_damage_target_spell_uses_base_when_condition_unmet() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "direct_damage",
+        "battle_model_scope": "xmage_conditional_fixed_damage_target_spell_v1",
+        "amount": 2,
+        "damage": 2,
+        "conditional_damage_base_amount": 2,
+        "conditional_damage_amount": 4,
+        "conditional_damage_condition": "controlled_artifacts_gte",
+        "conditional_damage_artifact_threshold": 3,
+        "target": "any_target",
+        "target_constraints": {"scope": "any_target"},
+    }
+    try:
+        active = battle.Player("Damage Controller", None, [])
+        opponent = battle.Player("Opponent", None, [])
+        opponent.life = 20
+        card = {"name": "Galvanic Blast", "type_line": "Instant"}
+        battle.apply_effect_immediate(active, [opponent], card, turn=7, rng=None)
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    damage_event = next(data for event, data in events if event == "damage_resolved")
+    assert damage_event["amount"] == 2
+    assert damage_event["conditional_damage_condition"] == "controlled_artifacts_gte"
+    assert damage_event["conditional_damage_condition_met"] is False
+    assert opponent.life == 18
+
+
+def test_kicked_conditional_fixed_damage_target_spell_runner_executes_kicked_amount() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "direct_damage",
+        "battle_model_scope": "xmage_conditional_fixed_damage_target_spell_v1",
+        "amount": 2,
+        "damage": 2,
+        "conditional_damage_base_amount": 2,
+        "conditional_damage_amount": 4,
+        "conditional_damage_condition": "spell_was_kicked",
+        "kicker_mana_cost": "{4}",
+        "target": "any_target",
+        "target_constraints": {"scope": "any_target"},
+    }
+    try:
+        result = validator.run_fixed_damage_target_spell(
+            battle,
+            {
+                "name": "Burst Lightning deals kicked conditional target damage",
+                "type": "fixed_damage_target_spell",
+                "card": {"name": "Burst Lightning", "type_line": "Instant"},
+                "expected_damage": 4,
+                "expected_life_gain": 0,
+                "expected_target_constraints": {"scope": "any_target"},
+                "expected_conditional_damage_condition": "spell_was_kicked",
+                "expected_conditional_damage_condition_met": True,
+                "expected_conditional_damage_base_amount": 2,
+                "expected_kicker_paid": True,
+                "expected_kicker_mana_cost": "{4}",
+                "effect_overrides": {
+                    "_spell_was_kicked": True,
+                    "_kicker_paid": True,
+                    "_kicker_additional_costs": ["{4}"],
+                    "_cast_context": {"additional_costs": ["{4}"], "modes": ["kicker:{4}"]},
+                },
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["damage"] == 4
+    assert result["opponent_life"] == 16
+    damage_event = next(data for event, data in events if event == "damage_resolved")
+    assert damage_event["kicker_paid"] is True
+    assert damage_event["kicker_mana_cost"] == "{4}"
+
+
+def test_kicked_conditional_fixed_damage_target_spell_uses_base_when_not_kicked() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "direct_damage",
+        "battle_model_scope": "xmage_conditional_fixed_damage_target_spell_v1",
+        "amount": 2,
+        "damage": 2,
+        "conditional_damage_base_amount": 2,
+        "conditional_damage_amount": 4,
+        "conditional_damage_condition": "spell_was_kicked",
+        "kicker_mana_cost": "{4}",
+        "target": "any_target",
+        "target_constraints": {"scope": "any_target"},
+    }
+    try:
+        active = battle.Player("Damage Controller", None, [])
+        opponent = battle.Player("Opponent", None, [])
+        opponent.life = 20
+        card = {"name": "Burst Lightning", "type_line": "Instant"}
+        battle.apply_effect_immediate(active, [opponent], card, turn=7, rng=None)
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    damage_event = next(data for event, data in events if event == "damage_resolved")
+    assert damage_event["amount"] == 2
+    assert damage_event["conditional_damage_condition"] == "spell_was_kicked"
+    assert damage_event["conditional_damage_condition_met"] is False
+    assert damage_event["kicker_paid"] is False
+    assert opponent.life == 18
+
+
+def test_conditional_fixed_damage_target_spell_executes_new_condition_contexts() -> None:
+    cases = [
+        (
+            "controller_attacked_this_turn",
+            {},
+            {"_controller_attacked_this_turn": 1},
+        ),
+        (
+            "controlled_snow_permanents_gte",
+            {"conditional_damage_snow_permanent_threshold": 3},
+            {},
+        ),
+        (
+            "controller_drawn_cards_this_turn_gte",
+            {"conditional_damage_drawn_cards_threshold": 2},
+            {"_controller_drawn_cards_this_turn": 2},
+        ),
+        (
+            "controls_permanent_subtype",
+            {"conditional_damage_required_subtype": "Spacecraft"},
+            {},
+        ),
+    ]
+    for condition, extra_fields, effect_overrides in cases:
+        battle = validator.load_battle(validator.DEFAULT_BATTLE)
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        previous_get_card_effect = battle.get_card_effect
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        battle.get_card_effect = lambda card, condition=condition, extra_fields=extra_fields: {
+            "effect": "direct_damage",
+            "battle_model_scope": "xmage_conditional_fixed_damage_target_spell_v1",
+            "amount": 2,
+            "damage": 2,
+            "conditional_damage_base_amount": 2,
+            "conditional_damage_amount": 4,
+            "conditional_damage_condition": condition,
+            "target": "any_target",
+            "target_constraints": {"scope": "any_target"},
+            **extra_fields,
+        }
+        try:
+            scenario = {
+                "name": f"{condition} conditional target damage",
+                "type": "fixed_damage_target_spell",
+                "card": {"name": f"{condition} Sample", "type_line": "Instant"},
+                "expected_damage": 4,
+                "expected_life_gain": 0,
+                "expected_target_constraints": {"scope": "any_target"},
+                "expected_conditional_damage_condition": condition,
+                "expected_conditional_damage_condition_met": True,
+                "expected_conditional_damage_base_amount": 2,
+                "effect_overrides": effect_overrides,
+            }
+            if condition == "controlled_snow_permanents_gte":
+                scenario["controller_battlefield"] = [
+                    {"name": f"Snow Permanent {index}", "type_line": "Snow Artifact", "effect": "artifact", "is_snow": True}
+                    for index in range(1, 4)
+                ]
+            if condition == "controls_permanent_subtype":
+                scenario["controller_battlefield"] = [
+                    {"name": "Spacecraft Permanent", "type_line": "Artifact - Spacecraft", "effect": "artifact", "subtypes": ["Spacecraft"]}
+                ]
+            result = validator.run_fixed_damage_target_spell(battle, scenario, events)
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+            battle.get_card_effect = previous_get_card_effect
+
+        assert result["damage"] == 4
+        damage_event = next(data for event, data in events if event == "damage_resolved")
+        assert damage_event["conditional_damage_condition"] == condition
+        assert damage_event["conditional_damage_condition_met"] is True
+
+
 def test_fixed_damage_target_spell_runner_pays_return_land_cost() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

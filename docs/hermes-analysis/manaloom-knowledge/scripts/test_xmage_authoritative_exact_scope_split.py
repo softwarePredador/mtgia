@@ -201,6 +201,271 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertTrue(effect["end_step_draw_optional"])
         self.assertEqual(effect["end_step_draw_condition"], "creature_died_this_turn")
 
+    def test_conditional_morbid_damage_maps_exact_scope(self) -> None:
+        row = queue_row(
+            split.DAMAGE_UNIT,
+            effect_classes=["ConditionalOneShotEffect", "DamageTargetEffect"],
+            xmage_signals=["targeting", "condition"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Brimstone Volley",
+                type_line="Instant",
+                oracle_text=(
+                    "Brimstone Volley deals 3 damage to any target. "
+                    "Morbid - Brimstone Volley deals 5 damage instead if a creature died this turn."
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new ConditionalOneShotEffect(
+                    new DamageTargetEffect(5), new DamageTargetEffect(3),
+                    MorbidCondition.instance,
+                    "<br><i>Morbid</i> &mdash; {this} deals 5 damage instead if a creature died this turn."));
+                this.getSpellAbility().addTarget(new TargetAnyTarget());
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.CONDITIONAL_DAMAGE_SCOPE)
+        self.assertEqual(effect["amount"], 3)
+        self.assertEqual(effect["conditional_damage_amount"], 5)
+        self.assertEqual(effect["conditional_damage_condition"], "creature_died_this_turn")
+        self.assertEqual(effect["target"], "any_target")
+
+    def test_conditional_raid_damage_maps_exact_scope(self) -> None:
+        row = queue_row(
+            split.DAMAGE_UNIT,
+            effect_classes=["ConditionalOneShotEffect", "DamageTargetEffect"],
+            xmage_signals=["targeting", "condition"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Firecannon Blast",
+                type_line="Sorcery",
+                oracle_text=(
+                    "Firecannon Blast deals 3 damage to target creature. "
+                    "Raid - Firecannon Blast deals 6 damage instead if you attacked this turn."
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new ConditionalOneShotEffect(
+                    new DamageTargetEffect(6), new DamageTargetEffect(3),
+                    RaidCondition.instance, "{this} deals 3 damage to target creature."));
+                this.getSpellAbility().addTarget(new TargetCreaturePermanent());
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.CONDITIONAL_DAMAGE_SCOPE)
+        self.assertEqual(effect["amount"], 3)
+        self.assertEqual(effect["conditional_damage_amount"], 6)
+        self.assertEqual(effect["conditional_damage_condition"], "controller_attacked_this_turn")
+        self.assertEqual(effect["target"], "creature")
+
+    def test_conditional_snow_permanent_damage_maps_exact_scope(self) -> None:
+        row = queue_row(
+            split.DAMAGE_UNIT,
+            effect_classes=["ConditionalOneShotEffect", "DamageTargetEffect"],
+            xmage_signals=["targeting", "condition"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Frost Bite",
+                type_line="Snow Instant",
+                oracle_text=(
+                    "Frost Bite deals 2 damage to target creature or planeswalker. "
+                    "If you control three or more snow permanents, it deals 3 damage instead."
+                ),
+            ),
+            source_text="""
+                private static final FilterPermanent filter = new FilterControlledPermanent();
+                static { filter.add(SuperType.SNOW.getPredicate()); }
+                private static final Condition condition
+                    = new PermanentsOnTheBattlefieldCondition(filter, ComparisonType.MORE_THAN, 2);
+                this.getSpellAbility().addEffect(new ConditionalOneShotEffect(
+                    new DamageTargetEffect(3), new DamageTargetEffect(2),
+                    condition, "{this} deals 2 damage to target creature or planeswalker."));
+                this.getSpellAbility().addTarget(new TargetCreatureOrPlaneswalker());
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["conditional_damage_condition"], "controlled_snow_permanents_gte")
+        self.assertEqual(effect["conditional_damage_snow_permanent_threshold"], 3)
+        self.assertEqual(effect["target"], "creature_or_planeswalker")
+
+    def test_conditional_drawn_cards_damage_maps_exact_scope(self) -> None:
+        row = queue_row(
+            split.DAMAGE_UNIT,
+            effect_classes=["ConditionalOneShotEffect", "DamageTargetEffect"],
+            xmage_signals=["targeting", "condition"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Galvanize",
+                type_line="Instant",
+                oracle_text=(
+                    "Galvanize deals 3 damage to target creature. "
+                    "If you've drawn two or more cards this turn, Galvanize deals 5 damage to that creature instead."
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new ConditionalOneShotEffect(
+                    new DamageTargetEffect(5), new DamageTargetEffect(3),
+                    DrewTwoOrMoreCardsCondition.instance,
+                    "{this} deals 3 damage to target creature."));
+                this.getSpellAbility().addTarget(new TargetCreaturePermanent());
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["conditional_damage_condition"], "controller_drawn_cards_this_turn_gte")
+        self.assertEqual(effect["conditional_damage_drawn_cards_threshold"], 2)
+        self.assertEqual(effect["target"], "creature")
+
+    def test_conditional_required_subtype_damage_maps_exact_scope(self) -> None:
+        row = queue_row(
+            split.DAMAGE_UNIT,
+            effect_classes=["ConditionalOneShotEffect", "DamageTargetEffect"],
+            xmage_signals=["targeting", "condition"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Invasive Maneuvers",
+                type_line="Instant",
+                oracle_text=(
+                    "Invasive Maneuvers deals 3 damage to target creature. "
+                    "It deals 5 damage instead if you control a Spacecraft."
+                ),
+            ),
+            source_text="""
+                private static final Condition condition
+                    = new PermanentsOnTheBattlefieldCondition(new FilterControlledPermanent(SubType.SPACECRAFT));
+                this.getSpellAbility().addEffect(new ConditionalOneShotEffect(
+                    new DamageTargetEffect(5), new DamageTargetEffect(3), condition,
+                    "{this} deals 3 damage to target creature."));
+                this.getSpellAbility().addTarget(new TargetCreaturePermanent());
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["conditional_damage_condition"], "controls_permanent_subtype")
+        self.assertEqual(effect["conditional_damage_required_subtype"], "Spacecraft")
+        self.assertEqual(effect["target"], "creature")
+
+    def test_conditional_kicker_damage_maps_exact_scope(self) -> None:
+        row = queue_row(
+            split.DAMAGE_UNIT,
+            effect_classes=["ConditionalOneShotEffect", "DamageTargetEffect"],
+            ability_classes=["KickerAbility"],
+            xmage_signals=["targeting", "condition"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Burst Lightning",
+                type_line="Instant",
+                oracle_text=(
+                    "Kicker {4} (You may pay an additional {4} as you cast this spell.)\n"
+                    "Burst Lightning deals 2 damage to any target. If this spell was kicked, "
+                    "it deals 4 damage instead."
+                ),
+            ),
+            source_text="""
+                this.addAbility(new KickerAbility("{4}"));
+                this.getSpellAbility().addEffect(new ConditionalOneShotEffect(
+                    new DamageTargetEffect(4), new DamageTargetEffect(2),
+                    KickedCondition.ONCE,
+                    "{this} deals 2 damage to any target. If this spell was kicked, it deals 4 damage instead"));
+                this.getSpellAbility().addTarget(new TargetAnyTarget());
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        self.assertTrue(proposal["safe_for_batch_pg_package"])
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.CONDITIONAL_DAMAGE_SCOPE)
+        self.assertEqual(effect["amount"], 2)
+        self.assertEqual(effect["conditional_damage_amount"], 4)
+        self.assertEqual(effect["conditional_damage_condition"], "spell_was_kicked")
+        self.assertEqual(effect["kicker_mana_cost"], "{4}")
+        self.assertEqual(effect["target"], "any_target")
+
+    def test_conditional_x_bargain_damage_stays_blocked(self) -> None:
+        row = queue_row(
+            split.DAMAGE_UNIT,
+            effect_classes=["ConditionalOneShotEffect", "DamageTargetEffect"],
+            xmage_signals=["targeting", "condition"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Stonesplitter Bolt",
+                type_line="Instant",
+                oracle_text=(
+                    "Bargain (You may sacrifice an artifact, enchantment, or token as you cast this spell.)\n"
+                    "Stonesplitter Bolt deals X damage to target creature or planeswalker. "
+                    "If this spell was bargained, it deals twice X damage to that permanent instead."
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new ConditionalOneShotEffect(
+                    new DamageTargetEffect(new MultipliedValue(GetXValue.instance, 2)),
+                    new DamageTargetEffect(GetXValue.instance),
+                    BargainedCondition.instance, ""));
+                this.getSpellAbility().addTarget(new TargetCreatureOrPlaneswalker());
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "conditional_damage_oracle_not_fixed")
+
+    def test_conditional_kicker_damage_with_unmodeled_prevention_stays_blocked(self) -> None:
+        row = queue_row(
+            split.DAMAGE_UNIT,
+            effect_classes=[
+                "CantBeCounteredSourceEffect",
+                "ConditionalOneShotEffect",
+                "DamageTargetEffect",
+            ],
+            ability_classes=["KickerAbility", "SimpleStaticAbility"],
+            xmage_signals=["targeting", "condition"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Urza's Rage",
+                type_line="Instant",
+                oracle_text=(
+                    "Kicker {8}{R} (You may pay an additional {8}{R} as you cast this spell.)\n"
+                    "This spell can't be countered.\n"
+                    "Urza's Rage deals 3 damage to any target. If this spell was kicked, "
+                    "instead it deals 10 damage to that permanent or player and the damage can't be prevented."
+                ),
+            ),
+            source_text="""
+                this.addAbility(new KickerAbility("{8}{R}"));
+                this.getSpellAbility().addEffect(new CantBeCounteredSourceEffect());
+                this.getSpellAbility().addEffect(new ConditionalOneShotEffect(
+                    new DamageTargetEffect(10).withCantBePrevented(), new DamageTargetEffect(3),
+                    KickedCondition.ONCE, ""));
+                this.getSpellAbility().addTarget(new TargetAnyTarget());
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "damage_effect_class_not_pure")
+
     def test_beginning_controller_end_step_formidable_draw_maps_threshold(self) -> None:
         row = queue_row(
             split.DRAW_ENGINE_UNIT,

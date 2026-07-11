@@ -1261,10 +1261,21 @@ def run_damage_gain_life_spell(
     expected_treasure_count = int(scenario.get("expected_treasure_count") or 0)
     constraints = dict(scenario.get("expected_target_constraints") or {})
     active.hand = [battle.enrich_card(dict(card)) for card in (scenario.get("controller_hand") or [])]
+    active.graveyard = [
+        battle.enrich_card(dict(card))
+        for card in (scenario.get("controller_graveyard") or [])
+    ]
     active.battlefield = [
         battle.enrich_card(dict(card))
         for card in (scenario.get("controller_battlefield") or [])
     ]
+    if scenario.get("creatures_died_this_turn") is not None:
+        died_count = int(scenario.get("creatures_died_this_turn") or 0)
+        turn_marker = int(scenario.get("turn") or 5)
+        if hasattr(active, "record_creature_died"):
+            active.record_creature_died(died_count, turn_marker=turn_marker)
+        else:
+            active.creatures_died_this_turn = died_count
     target = dict(scenario.get("target") or {})
     nonmatching_target = None
     if target:
@@ -1284,12 +1295,19 @@ def run_damage_gain_life_spell(
     controller_life_before = active.life
     controller_treasures_before = int(getattr(active, "treasures", 0) or 0)
     opponent_life_before = opponent.life
+    effect_override = None
+    if isinstance(scenario.get("effect_overrides"), dict):
+        effect_override = {
+            **dict(battle.get_card_effect(card) or {}),
+            **dict(scenario.get("effect_overrides") or {}),
+        }
     battle.apply_effect_immediate(
         active,
         [opponent],
         card,
         turn=int(scenario.get("turn") or 5),
         rng=random.Random(int(scenario.get("seed") or 6075)),
+        effect_data_override=effect_override,
     )
     expected_additional_cost = str(scenario.get("expected_additional_cost") or "").strip()
     additional_cost_event = None
@@ -1352,6 +1370,34 @@ def run_damage_gain_life_spell(
         fail("battle_events", f"missing {card['name']} damage_resolved event")
     if int(damage_event.get("amount") or 0) != expected_damage:
         fail("battle_events", f"{card['name']} damage amount={damage_event.get('amount')}, expected {expected_damage}")
+    expected_condition = str(scenario.get("expected_conditional_damage_condition") or "").strip()
+    if expected_condition:
+        if damage_event.get("conditional_damage_condition") != expected_condition:
+            fail(
+                "battle_events",
+                f"{card['name']} conditional_damage_condition={damage_event.get('conditional_damage_condition')!r}, expected {expected_condition!r}",
+            )
+        if bool(damage_event.get("conditional_damage_condition_met")) is not bool(
+            scenario.get("expected_conditional_damage_condition_met")
+        ):
+            fail(
+                "battle_events",
+                f"{card['name']} conditional_damage_condition_met={damage_event.get('conditional_damage_condition_met')!r}",
+            )
+        expected_base = int(scenario.get("expected_conditional_damage_base_amount") or 0)
+        if expected_base and int(damage_event.get("conditional_damage_base_amount") or 0) != expected_base:
+            fail(
+                "battle_events",
+                f"{card['name']} conditional_damage_base_amount={damage_event.get('conditional_damage_base_amount')}, expected {expected_base}",
+            )
+    if "expected_kicker_paid" in scenario and bool(damage_event.get("kicker_paid")) is not bool(scenario.get("expected_kicker_paid")):
+        fail("battle_events", f"{card['name']} kicker_paid={damage_event.get('kicker_paid')!r}")
+    expected_kicker_cost = str(scenario.get("expected_kicker_mana_cost") or "").strip()
+    if expected_kicker_cost and damage_event.get("kicker_mana_cost") != expected_kicker_cost:
+        fail(
+            "battle_events",
+            f"{card['name']} kicker_mana_cost={damage_event.get('kicker_mana_cost')!r}, expected {expected_kicker_cost!r}",
+        )
     if int(damage_event.get("life_gain_requested") or 0) != expected_life_gain:
         fail(
             "battle_events",
