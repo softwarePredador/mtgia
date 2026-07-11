@@ -9850,6 +9850,8 @@ SAFE_RUNTIME_SECONDARY_ANNOTATION_KEYS = {
     "requires_sacrifice_creature_or_land",
     "requires_sacrifice_creature_or_enchantment",
     "requires_sacrifice_creature_or_planeswalker",
+    "requires_sacrifice_permanent",
+    "requires_sacrifice_blue_permanent",
     "requires_sacrifice_green_creature",
     "requires_sacrifice_land",
     "requires_return_land_to_hand",
@@ -12400,6 +12402,8 @@ class Player:
             castable_counters = []
             for card in counters:
                 effect = get_card_effect(card)
+                if not additional_card_costs_are_payable(self, card, effect):
+                    continue
                 target_x_value = counter_target_x_value_for_target(effect, target_card)
                 if target_x_value is not None:
                     if self.can_pay(card_cost_for_player_state(self, card, x_value=target_x_value)):
@@ -12459,6 +12463,9 @@ class Player:
             if not self.spend_mana(cost):
                 return None
         self.hand.remove(counter)
+        if not pay_additional_card_costs(self, counter, effect, turn=turn):
+            self.hand.append(counter)
+            return None
         self.graveyard.append(counter)
         self.counters_available = len(self.counterspell_cards())
         target_controller_obj = getattr(stack_item, "controller", None)
@@ -23408,6 +23415,8 @@ def activation_sacrifice_target_matches(permanent, target_type):
     target = str(target_type or "").strip().lower()
     if target in {"", "permanent", "any_permanent"}:
         return True
+    if target == "blue_permanent":
+        return card_has_color(permanent, "U")
     if target == "creature":
         return is_battlefield_creature(permanent)
     if target == "artifact":
@@ -24219,6 +24228,22 @@ def additional_card_costs_are_payable(player, card, effect_data, cost_context=No
         )
         if permanent is None:
             return False
+    if effect_data.get("requires_sacrifice_permanent"):
+        permanent, _options = choose_activation_sacrifice_target(
+            player,
+            card,
+            "permanent",
+        )
+        if permanent is None:
+            return False
+    if effect_data.get("requires_sacrifice_blue_permanent"):
+        permanent, _options = choose_activation_sacrifice_target(
+            player,
+            card,
+            "blue_permanent",
+        )
+        if permanent is None:
+            return False
     if effect_data.get("requires_sacrifice_artifact_or_creature"):
         permanent, _options = choose_activation_sacrifice_target(
             player,
@@ -24289,6 +24314,10 @@ def additional_cost_option_effect_fields(option):
         effect_data["requires_sacrifice_creature_or_enchantment"] = True
     elif cost == "sacrifice_creature_or_planeswalker":
         effect_data["requires_sacrifice_creature_or_planeswalker"] = True
+    elif cost == "sacrifice_permanent":
+        effect_data["requires_sacrifice_permanent"] = True
+    elif cost == "sacrifice_blue_permanent":
+        effect_data["requires_sacrifice_blue_permanent"] = True
     elif cost == "sacrifice_artifact_or_creature":
         effect_data["requires_sacrifice_artifact_or_creature"] = True
     elif cost == "sacrifice_land":
@@ -24362,6 +24391,8 @@ def pay_additional_card_costs(player, card, effect_data, *, turn=None, cost_cont
         and not effect_data.get("requires_sacrifice_green_creature")
         and not effect_data.get("requires_sacrifice_creature_or_enchantment")
         and not effect_data.get("requires_sacrifice_creature_or_planeswalker")
+        and not effect_data.get("requires_sacrifice_permanent")
+        and not effect_data.get("requires_sacrifice_blue_permanent")
         and not effect_data.get("requires_sacrifice_artifact_or_creature")
         and effect_data.get("additional_cost") not in {"sacrifice_artifact", "sacrifice_goblin"}
         and not effect_data.get("requires_sacrifice_land")
@@ -24784,6 +24815,16 @@ def pay_additional_card_costs(player, card, effect_data, *, turn=None, cost_cont
             "requires_sacrifice_creature_or_planeswalker",
             "sacrifice_creature_or_planeswalker",
             "creature_or_planeswalker",
+        ),
+        (
+            "requires_sacrifice_permanent",
+            "sacrifice_permanent",
+            "permanent",
+        ),
+        (
+            "requires_sacrifice_blue_permanent",
+            "sacrifice_blue_permanent",
+            "blue_permanent",
         ),
     ):
         if not effect_data.get(cost_flag):

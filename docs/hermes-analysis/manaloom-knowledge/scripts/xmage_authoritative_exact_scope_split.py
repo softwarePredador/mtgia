@@ -2656,6 +2656,23 @@ def metadata_without_parenthetical_reminders(metadata: dict[str, Any]) -> dict[s
     return updated
 
 
+def metadata_without_leading_additional_cost_lines(metadata: dict[str, Any]) -> dict[str, Any]:
+    lines = []
+    for line in normalized_oracle_lines(metadata):
+        if line.startswith("as an additional cost to cast "):
+            line = re.sub(
+                r"^as an additional cost to cast (?:this spell|[^.]+), .*?\.\s*",
+                "",
+                line,
+                count=1,
+            ).strip()
+        if line:
+            lines.append(line)
+    updated = dict(metadata)
+    updated["oracle_text"] = "\n".join(lines)
+    return updated
+
+
 def has_non_neutral_oracle_complexity(
     metadata: dict[str, Any],
     tokens: set[str] = SPELL_COMPLEXITY_TOKENS,
@@ -16156,6 +16173,7 @@ def activation_sacrifice_target_from_phrase(phrase: str) -> str | None:
         "creature or planeswalker": "creature_or_planeswalker",
         "nontoken permanent": "nontoken_permanent",
         "non-token permanent": "nontoken_permanent",
+        "blue permanent": "blue_permanent",
         "token": "token",
         "creature": "creature",
         "artifact": "artifact",
@@ -21898,6 +21916,8 @@ def fixed_spell_additional_cost_fields_from_source(
         if "SacrificeTargetCost" in text and sacrifice_target:
             sacrifice_patterns = {
                 "creature": r"additional cost.*sacrifice (?:a|one) creature",
+                "permanent": r"additional cost.*sacrifice (?:a|one) permanent",
+                "blue_permanent": r"additional cost.*sacrifice (?:a|one) blue permanent",
                 "artifact_or_creature": r"additional cost.*sacrifice (?:an?|one) artifact or creature",
                 "creature_or_enchantment": r"additional cost.*sacrifice (?:a|one) creature or enchantment",
                 "creature_or_planeswalker": r"additional cost.*sacrifice (?:a|one) creature or planeswalker",
@@ -21980,6 +22000,28 @@ def fixed_spell_additional_cost_fields_from_source(
             "xmage_additional_cost_class": "DiscardTargetCost",
             "xmage_additional_cost_target": "land",
         }, None
+    if "SacrificeTargetCost" in text and re.search(
+        r"additional cost.*sacrifice (?:a|one) permanent", lowered_oracle
+    ):
+        sacrifice_target = activation_sacrifice_target_from_source(text, text)
+        if sacrifice_target == "permanent":
+            return {
+                "additional_cost": "sacrifice_permanent",
+                "requires_sacrifice_permanent": True,
+                "xmage_additional_cost_class": "SacrificeTargetCost",
+                "xmage_additional_cost_target": "permanent",
+            }, None
+    if "SacrificeTargetCost" in text and re.search(
+        r"additional cost.*sacrifice (?:a|one) blue permanent", lowered_oracle
+    ):
+        sacrifice_target = activation_sacrifice_target_from_source(text, text)
+        if sacrifice_target == "blue_permanent":
+            return {
+                "additional_cost": "sacrifice_blue_permanent",
+                "requires_sacrifice_blue_permanent": True,
+                "xmage_additional_cost_class": "SacrificeTargetCost",
+                "xmage_additional_cost_target": "blue_permanent",
+            }, None
     if "SacrificeTargetCost" in text and re.search(
         r"additional cost.*sacrifice (?:a|one) creature", lowered_oracle
     ):
@@ -22116,6 +22158,28 @@ def fixed_destroy_spell_additional_cost_fields_from_source(
         source,
         metadata,
         "destroy_additional_cost_not_supported",
+    )
+
+
+def fixed_exile_spell_additional_cost_fields_from_source(
+    source: str,
+    metadata: dict[str, Any],
+) -> tuple[dict[str, Any] | None, str | None]:
+    return fixed_spell_additional_cost_fields_from_source(
+        source,
+        metadata,
+        "exile_additional_cost_not_supported",
+    )
+
+
+def fixed_counter_spell_additional_cost_fields_from_source(
+    source: str,
+    metadata: dict[str, Any],
+) -> tuple[dict[str, Any] | None, str | None]:
+    return fixed_spell_additional_cost_fields_from_source(
+        source,
+        metadata,
+        "counter_additional_cost_not_supported",
     )
 
 
@@ -29647,6 +29711,10 @@ def split_row(
             elif unit == DRAW_UNIT and effect_classes(row) == {"DrawCardSourceControllerEffect"}:
                 pass
             elif unit == DESTROY_UNIT and effect_classes(row) == {"DestroyTargetEffect"}:
+                pass
+            elif unit == EXILE_UNIT and effect_classes(row) == {"ExileTargetEffect"}:
+                pass
+            elif unit == COUNTER_UNIT and effect_classes(row) == {"CounterTargetEffect"}:
                 pass
             else:
                 return None, "additional_cost_detected"
@@ -39366,9 +39434,20 @@ def split_row(
         unsupported_abilities = unsupported_simple_removal_source_ability_classes(source_text)
         if unsupported_abilities:
             return None, "exile_auxiliary_ability_class_not_supported"
-        if has_non_neutral_oracle_complexity(metadata):
+        additional_cost_fields, additional_cost_reason = fixed_exile_spell_additional_cost_fields_from_source(
+            source_text,
+            metadata,
+        )
+        if additional_cost_reason is not None:
+            return None, additional_cost_reason
+        effect_metadata = (
+            metadata_without_leading_additional_cost_lines(metadata)
+            if additional_cost_fields
+            else metadata
+        )
+        if has_non_neutral_oracle_complexity(effect_metadata):
             return None, "exile_oracle_not_simple"
-        multi_target = fixed_multi_target_removal_from_oracle(metadata, "exile")
+        multi_target = fixed_multi_target_removal_from_oracle(effect_metadata, "exile")
         if multi_target is not None:
             source_count = fixed_multi_target_count_from_source(source_text)
             if isinstance(source_count, str):
@@ -39394,10 +39473,11 @@ def split_row(
                 "max_targets": int(multi_target["target_count_max"]),
                 "up_to_count": bool(multi_target["up_to_count"]),
                 "xmage_effect_class": "ExileTargetEffect",
+                **(additional_cost_fields or {}),
                 **flags,
             }
             return build_proposal(row, metadata, effect_json, family_id="xmage_exile_multi_target_spell"), "selected_exact_scope"
-        target = exile_target_from_oracle(metadata)
+        target = exile_target_from_oracle(effect_metadata)
         if target is None:
             return None, "exile_target_not_supported"
         effect, target_type = target
@@ -39411,6 +39491,7 @@ def split_row(
             "target_constraints": target_constraints_for(target_type),
             "destination": "exile",
             "xmage_effect_class": "ExileTargetEffect",
+            **(additional_cost_fields or {}),
             **flags,
         }
         return build_proposal(row, metadata, effect_json, family_id="xmage_exile_target_spell"), "selected_exact_scope"
@@ -39642,12 +39723,23 @@ def split_row(
         unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
         if unsupported_abilities:
             return None, "counter_ability_class_not_simple"
-        target = counter_target_from_oracle(metadata)
+        additional_cost_fields, additional_cost_reason = fixed_counter_spell_additional_cost_fields_from_source(
+            source_text,
+            metadata,
+        )
+        if additional_cost_reason is not None:
+            return None, additional_cost_reason
+        effect_metadata = (
+            metadata_without_leading_additional_cost_lines(metadata)
+            if additional_cost_fields
+            else metadata
+        )
+        target = counter_target_from_oracle(effect_metadata)
         if target is None:
-            if has_non_neutral_oracle_complexity(metadata):
+            if has_non_neutral_oracle_complexity(effect_metadata):
                 return None, "counter_oracle_not_simple"
             return None, "counter_target_not_supported"
-        if has_non_neutral_oracle_complexity(metadata) and target not in {
+        if has_non_neutral_oracle_complexity(effect_metadata) and target not in {
             "spell_mana_value_2_or_less_or_red_green_spell_mana_value_6_or_less",
         }:
             return None, "counter_oracle_not_simple"
@@ -39684,6 +39776,7 @@ def split_row(
             "target": target,
             "target_constraints": counter_target_constraints_for(target),
             "xmage_effect_class": "CounterTargetEffect",
+            **(additional_cost_fields or {}),
             **flags,
         }
         if target_count is not None:

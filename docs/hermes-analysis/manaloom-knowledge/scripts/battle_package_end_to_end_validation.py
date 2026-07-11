@@ -10886,6 +10886,13 @@ def run_counter_target_response(
     phase = str(scenario.get("phase") or "precombat_main")
     active = battle.Player(str(scenario.get("active_player") or "Active"), None, [])
     responder = battle.Player(str(scenario.get("responder") or "Responder"), None, [])
+    if scenario.get("responder_life") is not None:
+        responder.life = int(scenario.get("responder_life") or responder.life)
+    responder.battlefield = [
+        battle.enrich_card(dict(card))
+        for card in (scenario.get("responder_battlefield") or [])
+        if isinstance(card, dict)
+    ]
     add_manifest_mana(responder, scenario.get("responder_mana") or {"generic": 3, "blue": 2})
     expected_cards_drawn = int(scenario.get("expected_cards_drawn") or response_card.get("draw_on_counter") or 0)
     if expected_cards_drawn and not getattr(responder, "library", []):
@@ -10950,6 +10957,56 @@ def run_counter_target_response(
     if not actual_countered:
         fail("battle_execution", f"{response_card['name']} did not counter legal stack object")
 
+    expected_additional_cost = str(scenario.get("expected_additional_cost") or "").strip()
+    additional_cost_event = None
+    if expected_additional_cost:
+        additional_cost_event = next(
+            (
+                data
+                for event, data in events
+                if event == "additional_cost_paid"
+                and data.get("player") == responder.name
+                and data.get("card") == response_card.get("name")
+                and data.get("cost") == expected_additional_cost
+            ),
+            None,
+        )
+        if additional_cost_event is None:
+            fail(
+                "battle_events",
+                f"missing {response_card['name']} additional_cost_paid {expected_additional_cost}",
+            )
+        expected_sacrificed = str(scenario.get("expected_sacrificed_name") or "").strip()
+        if expected_sacrificed:
+            if additional_cost_event.get("sacrificed") != expected_sacrificed:
+                fail(
+                    "battle_events",
+                    f"{response_card['name']} sacrificed={additional_cost_event.get('sacrificed')!r}, expected {expected_sacrificed!r}",
+                )
+            if any(
+                isinstance(permanent, dict) and permanent.get("name") == expected_sacrificed
+                for permanent in responder.battlefield
+            ):
+                fail("battle_execution", f"{response_card['name']} did not sacrifice {expected_sacrificed}")
+        expected_returned = str(scenario.get("expected_returned_land_name") or "").strip()
+        if expected_returned:
+            if additional_cost_event.get("returned") != expected_returned:
+                fail(
+                    "battle_events",
+                    f"{response_card['name']} returned={additional_cost_event.get('returned')!r}, expected {expected_returned!r}",
+                )
+            if not any(
+                isinstance(card, dict) and card.get("name") == expected_returned
+                for card in responder.hand
+            ):
+                fail("battle_execution", f"{response_card['name']} did not return {expected_returned} to hand")
+        expected_pay_life = int(scenario.get("expected_pay_life_amount") or 0)
+        if expected_pay_life > 0 and int(additional_cost_event.get("pay_life_amount") or 0) != expected_pay_life:
+            fail(
+                "battle_events",
+                f"{response_card['name']} pay_life_amount={additional_cost_event.get('pay_life_amount')!r}",
+            )
+
     counter_event = next(
         (
             data
@@ -11013,6 +11070,7 @@ def run_counter_target_response(
         "target_stack_effect": target_stack_effect.get("effect"),
         "countered": actual_countered,
         "cards_drawn": int(counter_event.get("cards_drawn") or 0),
+        "additional_cost": expected_additional_cost or None,
         "countered_spell_to_top_library": bool(
             counter_event.get("countered_spell_to_top_library")
         ),

@@ -121,6 +121,8 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "requires_sacrifice_creature_or_land",
     "requires_sacrifice_creature_or_enchantment",
     "requires_sacrifice_creature_or_planeswalker",
+    "requires_sacrifice_permanent",
+    "requires_sacrifice_blue_permanent",
     "requires_sacrifice_artifact_or_creature",
     "requires_sacrifice_artifact",
     "requires_sacrifice_goblin",
@@ -7586,7 +7588,7 @@ def counter_target_execution_scenario_from_expected_rule(
     if str(dynamic_mana_value_source or "").strip().lower() == "x_value":
         counter_card["mana_cost"] = "{X}{U}"
         counter_card["_cast_context"] = {"x_value": int(matching["card"].get("cmc") or 0)}
-    return {
+    scenario = {
         "name": f"{rule['card_name']} counters a legal stack object",
         "type": "counter_target_response",
         "card": counter_card,
@@ -7602,6 +7604,72 @@ def counter_target_execution_scenario_from_expected_rule(
         "expected_countered_spell_to_exile": bool(required.get("countered_spell_to_exile")),
         "logical_rule_key": rule["logical_rule_key"],
     }
+    selected_additional_cost = str(required.get("additional_cost") or "").strip()
+    if selected_additional_cost == "pay_life":
+        pay_life_amount = int(required.get("pay_life_amount") or 0)
+        if pay_life_amount > 0:
+            scenario["responder_life"] = max(20, pay_life_amount + 5)
+            scenario["expected_additional_cost"] = "pay_life"
+            scenario["expected_pay_life_amount"] = pay_life_amount
+    elif selected_additional_cost == "return_land_to_hand":
+        land = {
+            "name": "E2E Return Cost Land",
+            "type_line": "Land",
+            "effect": "land",
+            "produces": "U",
+        }
+        scenario["responder_battlefield"] = [land]
+        scenario["expected_additional_cost"] = "return_land_to_hand"
+        scenario["expected_returned_land_name"] = land["name"]
+    elif selected_additional_cost in {
+        "sacrifice_creature",
+        "sacrifice_creature_or_enchantment",
+        "sacrifice_creature_or_planeswalker",
+        "sacrifice_permanent",
+        "sacrifice_blue_permanent",
+        "sacrifice_artifact_or_creature",
+    }:
+        fixture_by_cost = {
+            "sacrifice_creature": {
+                "name": "E2E Sacrifice Cost Creature",
+                "type_line": "Creature - Soldier",
+                "effect": "creature",
+                "power": 1,
+                "toughness": 1,
+            },
+            "sacrifice_creature_or_enchantment": {
+                "name": "E2E Sacrifice Cost Enchantment",
+                "type_line": "Enchantment",
+                "effect": "enchantment",
+            },
+            "sacrifice_creature_or_planeswalker": {
+                "name": "E2E Sacrifice Cost Planeswalker",
+                "type_line": "Planeswalker",
+                "effect": "planeswalker",
+                "loyalty": 3,
+            },
+            "sacrifice_permanent": {
+                "name": "E2E Sacrifice Cost Permanent",
+                "type_line": "Enchantment",
+                "effect": "enchantment",
+            },
+            "sacrifice_blue_permanent": {
+                "name": "E2E Sacrifice Cost Blue Permanent",
+                "type_line": "Enchantment",
+                "effect": "enchantment",
+                "colors": ["U"],
+                "mana_cost": "{1}{U}",
+            },
+            "sacrifice_artifact_or_creature": {
+                "name": "E2E Sacrifice Cost Artifact",
+                "type_line": "Artifact",
+                "effect": "artifact",
+            },
+        }
+        scenario["responder_battlefield"] = [fixture_by_cost[selected_additional_cost]]
+        scenario["expected_additional_cost"] = selected_additional_cost
+        scenario["expected_sacrificed_name"] = fixture_by_cost[selected_additional_cost]["name"]
+    return scenario
 
 
 def _damage_source_fixture_from_prevention_constraints(
@@ -7826,6 +7894,8 @@ def single_target_removal_execution_scenario_from_expected_rule(
         "sacrifice_creature",
         "sacrifice_creature_or_enchantment",
         "sacrifice_creature_or_planeswalker",
+        "sacrifice_permanent",
+        "sacrifice_blue_permanent",
         "sacrifice_artifact_or_creature",
     }:
         fixture_by_cost = {
@@ -7846,6 +7916,18 @@ def single_target_removal_execution_scenario_from_expected_rule(
                 "type_line": "Planeswalker",
                 "effect": "planeswalker",
                 "loyalty": 3,
+            },
+            "sacrifice_permanent": {
+                "name": "E2E Sacrifice Cost Permanent",
+                "type_line": "Enchantment",
+                "effect": "enchantment",
+            },
+            "sacrifice_blue_permanent": {
+                "name": "E2E Sacrifice Cost Blue Permanent",
+                "type_line": "Enchantment",
+                "effect": "enchantment",
+                "colors": ["U"],
+                "mana_cost": "{1}{U}",
             },
             "sacrifice_artifact_or_creature": {
                 "name": "E2E Sacrifice Cost Artifact",

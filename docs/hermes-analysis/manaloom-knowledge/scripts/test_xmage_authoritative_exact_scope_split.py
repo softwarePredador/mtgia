@@ -16717,19 +16717,26 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                 self.assertIsNone(proposal)
                 self.assertIn(reason, {"exile_target_not_supported", "exile_target_source_mismatch"})
 
-    def test_exile_spell_with_additional_cost_stays_blocked(self) -> None:
+    def test_exile_spell_maps_sacrifice_permanent_additional_cost(self) -> None:
         row = queue_row(split.EXILE_UNIT, effect_classes=["ExileTargetEffect"])
         proposal, reason = split.split_row(
             row,
             metadata(oracle_text="As an additional cost to cast this spell, sacrifice a permanent. Exile target creature."),
             source_text=(
-                "this.getSpellAbility().addCost(new SacrificeTargetCost());"
+                "this.getSpellAbility().addCost(new SacrificeTargetCost(StaticFilters.FILTER_PERMANENT));"
                 "this.getSpellAbility().addEffect(new ExileTargetEffect());"
+                "this.getSpellAbility().addTarget(new TargetCreaturePermanent());"
             ),
         )
 
-        self.assertIsNone(proposal)
-        self.assertEqual(reason, "additional_cost_detected")
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "remove_creature")
+        self.assertEqual(effect["battle_model_scope"], split.EXILE_SCOPE)
+        self.assertEqual(effect["target"], "creature")
+        self.assertEqual(effect["additional_cost"], "sacrifice_permanent")
+        self.assertTrue(effect["requires_sacrifice_permanent"])
+        self.assertEqual(effect["xmage_additional_cost_target"], "permanent")
 
     def test_creature_etb_fixed_mana_maps_to_triggered_ramp_permanent(self) -> None:
         row = queue_row(
@@ -18996,6 +19003,29 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["target"], "blue_spell")
         self.assertEqual(effect["target_constraints"]["spell_colors"], ["U"])
         self.assertTrue(effect["requires_blue_target"])
+
+    def test_counter_target_spell_maps_sacrifice_blue_permanent_additional_cost(self) -> None:
+        row = queue_row(split.COUNTER_UNIT, effect_classes=["CounterTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="As an additional cost to cast this spell, sacrifice a blue permanent. Counter target spell."),
+            source_text=(
+                "private static final FilterControlledPermanent filter = "
+                "new FilterControlledPermanent(\"a blue permanent\");"
+                "this.getSpellAbility().addCost(new SacrificeTargetCost(filter));"
+                "this.getSpellAbility().addEffect(new CounterTargetEffect());"
+                "this.getSpellAbility().addTarget(new TargetSpell());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "counter")
+        self.assertEqual(effect["battle_model_scope"], split.COUNTER_SCOPE)
+        self.assertEqual(effect["target"], "spell")
+        self.assertEqual(effect["additional_cost"], "sacrifice_blue_permanent")
+        self.assertTrue(effect["requires_sacrifice_blue_permanent"])
+        self.assertEqual(effect["xmage_additional_cost_target"], "blue_permanent")
 
     def test_counter_target_spell_ignores_neutral_auxiliary_oracle_lines(self) -> None:
         row = queue_row(
