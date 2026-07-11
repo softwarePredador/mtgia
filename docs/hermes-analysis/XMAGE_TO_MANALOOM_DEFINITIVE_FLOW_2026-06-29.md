@@ -731,6 +731,13 @@ patterns:
   abilities, and unsupported auxiliary ability classes remain blocked by
   `mana_source_auxiliary_ability_not_supported` or the narrower mana-source
   blockers.
+- `ramp_permanent::xmage_creature_mana_source_variant_review_v1` with exact
+  XMage `AnyColorLandsProduceManaAbility`, exact Oracle text for "one mana of
+  any color/type that a land you/an opponent controls could produce", no
+  auxiliary effect class, and one supported dependency controller ->
+  `xmage_simple_tap_land_color_dependent_mana_source_permanent_v1`. The runtime
+  derives conditional mana modes from current controller or opponent lands and
+  excludes colorless unless Oracle says "any type".
 - `counter_spell::counter_target_stack_object_variant_v1` ->
   `xmage_counter_target_spell_v1`
 - `bounce::targeted_return_to_hand_variant_v1` ->

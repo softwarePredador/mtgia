@@ -4789,6 +4789,19 @@ def run_simple_mana_source_refresh(
         for card in (scenario.get("controller_hand") or [])
         if isinstance(card, dict)
     ]
+    opponent = battle.Player(str(scenario.get("opponent") or "Mana Source Opponent"), None, [])
+    if hasattr(battle, "bind_table_context"):
+        battle.bind_table_context([active, opponent])
+    controller_lands = [
+        dict(land)
+        for land in (scenario.get("controller_lands") or [])
+        if isinstance(land, dict)
+    ]
+    opponent_lands = [
+        dict(land)
+        for land in (scenario.get("opponent_lands") or [])
+        if isinstance(land, dict)
+    ]
     support_sources = [
         battle.enrich_card(dict(support))
         for support in (
@@ -4797,7 +4810,8 @@ def run_simple_mana_source_refresh(
         )
         if isinstance(support, dict)
     ]
-    active.battlefield = [*support_sources, source]
+    active.battlefield = [*controller_lands, *support_sources, source]
+    opponent.battlefield = opponent_lands
     turn = int(scenario.get("turn") or 5)
     before_events = len(events)
 
@@ -4843,6 +4857,27 @@ def run_simple_mana_source_refresh(
                 "battle_execution",
                 f"{card['name']} conditional restrictions={actual_restrictions}, "
                 f"expected {expected_restrictions}",
+            )
+    expected_conditional_colors = sorted(
+        str(value)
+        for value in (scenario.get("expected_conditional_colors") or [])
+        if str(value)
+    )
+    if expected_conditional_colors:
+        actual_conditional_colors = sorted(
+            {
+                str(mode.get("color") or "")
+                for conditional_source in getattr(active, "conditional_mana_sources", []) or []
+                if isinstance(conditional_source, dict)
+                for mode in conditional_source.get("modes") or []
+                if isinstance(mode, dict) and str(mode.get("color") or "")
+            }
+        )
+        if actual_conditional_colors != expected_conditional_colors:
+            fail(
+                "battle_execution",
+                f"{card['name']} conditional colors={actual_conditional_colors}, "
+                f"expected {expected_conditional_colors}",
             )
     payable_card = scenario.get("expected_restricted_mana_payable_card")
     if isinstance(payable_card, dict):

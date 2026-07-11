@@ -490,6 +490,10 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "produced_mana_symbols",
     "conditional_mana_modes",
     "conditional_mana_modes_status",
+    "conditionally_produces_controller_land_colors",
+    "conditionally_produces_opponent_land_colors",
+    "land_mana_dependency_controller",
+    "land_mana_dependency_allows_colorless",
     "life_for_colored_mana",
     "mana_activation_life_gain",
     "mana_activation_requires_tap",
@@ -2904,6 +2908,27 @@ def _manifest_support_sources_for_controller_mana(mana: dict[str, int]) -> list[
     return sources
 
 
+def _manifest_land_color_dependency_lands(*, allows_colorless: bool) -> tuple[list[dict[str, Any]], list[str]]:
+    lands = [
+        {
+            "name": "E2E Dependency Forest",
+            "type_line": "Land",
+            "produces": "G",
+            "tapped": True,
+        },
+        {
+            "name": "E2E Dependency Wastes",
+            "type_line": "Land",
+            "produces": "C",
+            "tapped": True,
+        },
+    ]
+    colors = ["green"]
+    if allows_colorless:
+        colors.append("colorless")
+    return lands, colors
+
+
 def simple_mana_source_execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any] | None:
     required = dict(rule.get("required_effect_fields") or {})
     if required.get("effect") != "ramp_permanent" or not required.get("is_mana_source"):
@@ -2914,6 +2939,7 @@ def simple_mana_source_execution_scenario_from_expected_rule(rule: dict[str, Any
         "xmage_simple_tap_mana_source_with_activated_draw_v1",
         "xmage_simple_mana_source_with_etb_draw_v1",
         "xmage_simple_tap_restricted_mana_source_permanent_v1",
+        "xmage_simple_tap_land_color_dependent_mana_source_permanent_v1",
         "pain_talisman_color_pair_partial_v1",
     }:
         return None
@@ -3015,6 +3041,16 @@ def simple_mana_source_execution_scenario_from_expected_rule(rule: dict[str, Any
     )
     if conditional_life_loss_by_color:
         scenario["expected_conditional_life_loss_by_color"] = conditional_life_loss_by_color
+    land_dependency_controller = str(required.get("land_mana_dependency_controller") or "")
+    if land_dependency_controller in {"self", "opponent"}:
+        lands, expected_colors = _manifest_land_color_dependency_lands(
+            allows_colorless=bool(required.get("land_mana_dependency_allows_colorless"))
+        )
+        scenario["expected_conditional_colors"] = expected_colors
+        if land_dependency_controller == "self":
+            scenario["controller_lands"] = lands
+        else:
+            scenario["opponent_lands"] = lands
     return scenario
 
 

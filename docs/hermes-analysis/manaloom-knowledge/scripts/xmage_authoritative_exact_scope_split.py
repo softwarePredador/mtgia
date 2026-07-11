@@ -331,6 +331,7 @@ DESTROY_COMPENSATION_TOKEN_SCOPE = "xmage_destroy_target_with_controller_creatur
 EXILE_COMPENSATION_TOKEN_SCOPE = "xmage_exile_target_with_controller_creature_token_compensation_spell_v1"
 MANA_SCOPE = "xmage_simple_tap_mana_source_permanent_v1"
 RESTRICTED_MANA_SCOPE = "xmage_simple_tap_restricted_mana_source_permanent_v1"
+LAND_COLOR_DEPENDENT_MANA_SCOPE = "xmage_simple_tap_land_color_dependent_mana_source_permanent_v1"
 PAIN_TALISMAN_SCOPE = "pain_talisman_color_pair_partial_v1"
 MANA_WITH_ACTIVATION_LIFE_GAIN_SCOPE = "xmage_simple_tap_mana_source_with_gain_life_v1"
 MANA_WITH_ACTIVATED_DRAW_SCOPE = "xmage_simple_tap_mana_source_with_activated_draw_v1"
@@ -23914,6 +23915,74 @@ def restricted_mana_source_detail_from_source(
     return detail
 
 
+def land_color_dependent_mana_source_detail_from_oracle(
+    metadata: dict[str, Any],
+) -> dict[str, Any] | str | None:
+    candidates: list[dict[str, Any]] = []
+    for line in normalized_oracle_lines(metadata):
+        normalized = strip_parenthetical_reminders(
+            re.sub(r"\s+", " ", str(line or "").strip().lower())
+        ).strip()
+        match = re.fullmatch(
+            r"\{t\}: add one mana of any (?P<kind>color|type) that a land "
+            r"(?P<controller>you|an opponent) controls? could produce\.?",
+            normalized,
+        )
+        if not match:
+            continue
+        candidates.append(
+            {
+                "produces": "WUBRGC" if match.group("kind") == "type" else "WUBRG",
+                "mana_produced": 1,
+                "mana_activation_requires_tap": True,
+                "land_mana_dependency_controller": (
+                    "self" if match.group("controller") == "you" else "opponent"
+                ),
+                "land_mana_dependency_allows_colorless": match.group("kind") == "type",
+            }
+        )
+    if len(candidates) == 1:
+        return candidates[0]
+    return None
+
+
+def land_color_dependent_mana_source_detail_from_source(
+    source_text: str,
+    mana_ability_classes: set[str],
+) -> dict[str, Any] | str | None:
+    if "AnyColorLandsProduceManaAbility" not in mana_ability_classes:
+        return None
+    if mana_ability_classes != {"AnyColorLandsProduceManaAbility"}:
+        return "land_color_mana_source_ability_class_not_exact"
+    if re.search(r"new\s+[A-Za-z0-9_]+Effect\s*\(", source_text or ""):
+        return "land_color_mana_source_effect_class_not_empty"
+    matches = re.findall(
+        r"new\s+AnyColorLandsProduceManaAbility\s*\((.*?)\)",
+        source_text or "",
+        flags=re.S,
+    )
+    if len(matches) != 1:
+        return "land_color_mana_source_source_not_single"
+    args = split_top_level_args(matches[0])
+    if not args:
+        return "land_color_mana_source_target_controller_missing"
+    controller_arg = str(args[0] or "")
+    if "TargetController.YOU" in controller_arg:
+        controller = "self"
+    elif "TargetController.OPPONENT" in controller_arg:
+        controller = "opponent"
+    else:
+        return "land_color_mana_source_target_controller_not_supported"
+    allows_colorless = len(args) >= 2 and str(args[1]).strip().lower() == "false"
+    return {
+        "produces": "WUBRGC" if allows_colorless else "WUBRG",
+        "mana_produced": 1,
+        "mana_activation_requires_tap": True,
+        "land_mana_dependency_controller": controller,
+        "land_mana_dependency_allows_colorless": allows_colorless,
+    }
+
+
 def sacrifice_mana_source_detail_from_line(text: str) -> dict[str, Any] | None:
     normalized = strip_parenthetical_reminders(re.sub(r"\s+", " ", str(text or "").strip().lower())).strip()
     prefix_match = re.match(
@@ -37526,6 +37595,64 @@ def split_row(
                 metadata,
                 effect_json,
                 family_id="xmage_restricted_spell_category_mana_source",
+            ), "selected_exact_scope"
+        land_color_mana_source = land_color_dependent_mana_source_detail_from_oracle(metadata)
+        if land_color_mana_source is not None:
+            source_land_color_mana = land_color_dependent_mana_source_detail_from_source(
+                source_text,
+                mana_ability_classes,
+            )
+            if isinstance(source_land_color_mana, str):
+                return None, source_land_color_mana
+            if source_land_color_mana is None:
+                return None, "land_color_mana_source_source_not_supported"
+            for key in (
+                "produces",
+                "mana_produced",
+                "mana_activation_requires_tap",
+                "land_mana_dependency_controller",
+                "land_mana_dependency_allows_colorless",
+            ):
+                if source_land_color_mana.get(key) != land_color_mana_source.get(key):
+                    return None, f"land_color_mana_source_source_oracle_{key}_mismatch"
+            type_line = str(metadata.get("type_line") or "").lower()
+            permanent_type = (
+                "creature"
+                if "creature" in type_line
+                else "artifact"
+                if "artifact" in type_line
+                else "permanent"
+            )
+            dependency_controller = str(
+                land_color_mana_source["land_mana_dependency_controller"]
+            )
+            effect_json = {
+                "effect": "ramp_permanent",
+                "battle_model_scope": LAND_COLOR_DEPENDENT_MANA_SCOPE,
+                "is_mana_source": True,
+                "mana_produced": int(land_color_mana_source["mana_produced"]),
+                "produces": str(land_color_mana_source["produces"]),
+                "mana_activation_requires_tap": True,
+                "activation_requires_tap": True,
+                "permanent_type": permanent_type,
+                "ability_kind": "activated_mana",
+                "land_mana_dependency_controller": dependency_controller,
+                "land_mana_dependency_allows_colorless": bool(
+                    land_color_mana_source["land_mana_dependency_allows_colorless"]
+                ),
+                "xmage_mana_ability_classes": ["AnyColorLandsProduceManaAbility"],
+                "xmage_effect_classes": sorted(classes),
+                "xmage_ability_classes": sorted(mana_ability_classes),
+            }
+            if dependency_controller == "self":
+                effect_json["conditionally_produces_controller_land_colors"] = True
+            elif dependency_controller == "opponent":
+                effect_json["conditionally_produces_opponent_land_colors"] = True
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_land_color_dependent_mana_source",
             ), "selected_exact_scope"
         limited_choice_mana_source = limited_times_color_choice_mana_source_from_source(source_text)
         if isinstance(limited_choice_mana_source, str):

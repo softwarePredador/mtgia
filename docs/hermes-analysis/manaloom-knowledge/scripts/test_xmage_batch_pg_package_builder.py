@@ -5917,3 +5917,40 @@ def test_restricted_mana_source_manifest_preserves_conditional_modes() -> None:
     assert scenario["expected_conditional_restrictions"] == ["creature_spell"]
     assert scenario["expected_restricted_mana_payable_card"]["type_line"] == "Creature"
     assert scenario["expected_restricted_mana_blocked_card"]["type_line"] == "Sorcery"
+
+
+def test_land_color_dependent_mana_source_manifest_builds_land_dependency_scenario() -> None:
+    proposal = {
+        "normalized_name": "naga vitalist",
+        "card_name": "Naga Vitalist",
+        "oracle_hash": "hash-naga-vitalist",
+        "logical_rule_key": "battle_rule_v1:naga-vitalist",
+        "effect_json": {
+            "effect": "ramp_permanent",
+            "battle_model_scope": "xmage_simple_tap_land_color_dependent_mana_source_permanent_v1",
+            "is_mana_source": True,
+            "mana_produced": 1,
+            "produces": "WUBRGC",
+            "mana_activation_requires_tap": True,
+            "activation_requires_tap": True,
+            "conditionally_produces_controller_land_colors": True,
+            "land_mana_dependency_controller": "self",
+            "land_mana_dependency_allows_colorless": True,
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    required = expected["required_effect_fields"]
+
+    assert required["conditionally_produces_controller_land_colors"] is True
+    assert required["land_mana_dependency_controller"] == "self"
+    assert required["land_mana_dependency_allows_colorless"] is True
+
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    assert scenario["type"] == "simple_mana_source_refresh"
+    assert scenario["expected_conditional_mana"] == 1
+    assert scenario["expected_conditional_colors"] == ["green", "colorless"]
+    assert scenario["controller_lands"][0]["produces"] == "G"
+    assert scenario["controller_lands"][1]["produces"] == "C"
+    assert "opponent_lands" not in scenario

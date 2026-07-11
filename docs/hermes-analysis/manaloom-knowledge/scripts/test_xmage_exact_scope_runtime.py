@@ -13233,6 +13233,86 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         )
         self.assertTrue(artificer["tapped"])
 
+    def test_land_color_dependent_mana_source_uses_controller_land_colors(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        vitalist = self.battle.enrich_card(
+            {
+                "name": "Naga Vitalist",
+                "type_line": "Creature - Snake Druid",
+                "effect": "ramp_permanent",
+                "battle_model_scope": "xmage_simple_tap_land_color_dependent_mana_source_permanent_v1",
+                "is_mana_source": True,
+                "mana_produced": 1,
+                "produces": "WUBRGC",
+                "activation_requires_tap": True,
+                "mana_activation_requires_tap": True,
+                "conditionally_produces_controller_land_colors": True,
+                "land_mana_dependency_controller": "self",
+                "land_mana_dependency_allows_colorless": True,
+            }
+        )
+        active.battlefield = [
+            {"name": "Fixture Forest", "type_line": "Land", "produces": "G", "tapped": True},
+            {"name": "Fixture Wastes", "type_line": "Land", "produces": "C", "tapped": True},
+            vitalist,
+        ]
+
+        active.refresh_mana_sources(turn=7)
+
+        self.assertEqual(active.mana_pool.colorless, 0)
+        self.assertEqual(active.available_mana(), 1)
+        self.assertEqual(len(active.conditional_mana_sources), 1)
+        self.assertEqual(
+            sorted(
+                mode["color"]
+                for item in active.conditional_mana_sources
+                for mode in item["modes"]
+            ),
+            ["colorless", "green"],
+        )
+        self.assertTrue(vitalist["tapped"])
+
+    def test_land_color_dependent_mana_source_uses_opponent_land_colors_without_colorless(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        self.battle.bind_table_context([active, opponent])
+        explorer = self.battle.enrich_card(
+            {
+                "name": "Quirion Explorer",
+                "type_line": "Creature - Elf Druid Scout",
+                "effect": "ramp_permanent",
+                "battle_model_scope": "xmage_simple_tap_land_color_dependent_mana_source_permanent_v1",
+                "is_mana_source": True,
+                "mana_produced": 1,
+                "produces": "WUBRG",
+                "activation_requires_tap": True,
+                "mana_activation_requires_tap": True,
+                "conditionally_produces_opponent_land_colors": True,
+                "land_mana_dependency_controller": "opponent",
+                "land_mana_dependency_allows_colorless": False,
+            }
+        )
+        active.battlefield = [explorer]
+        opponent.battlefield = [
+            {"name": "Opponent Forest", "type_line": "Land", "produces": "G", "tapped": True},
+            {"name": "Opponent Wastes", "type_line": "Land", "produces": "C", "tapped": True},
+        ]
+
+        active.refresh_mana_sources(turn=7)
+
+        self.assertEqual(active.mana_pool.colorless, 0)
+        self.assertEqual(active.available_mana(), 1)
+        self.assertEqual(len(active.conditional_mana_sources), 1)
+        self.assertEqual(
+            [
+                mode["color"]
+                for item in active.conditional_mana_sources
+                for mode in item["modes"]
+            ],
+            ["green"],
+        )
+        self.assertTrue(explorer["tapped"])
+
     def test_simple_mana_source_permanent_pays_life_cost_on_refresh(self) -> None:
         active = self.battle.Player("Active", None, [])
         lens = self.battle.enrich_card(

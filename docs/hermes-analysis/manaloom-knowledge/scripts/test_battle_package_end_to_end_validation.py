@@ -5653,3 +5653,61 @@ def test_simple_mana_source_runner_validates_restricted_spell_mana() -> None:
     assert result["card_name"] == "Beastcaller Savant"
     assert result["available_mana"] == 1
     assert result["conditional_mana"] == 1
+
+
+def test_simple_mana_source_runner_validates_land_color_dependency_modes() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "ramp_permanent",
+        "battle_model_scope": "xmage_simple_tap_land_color_dependent_mana_source_permanent_v1",
+        "is_mana_source": True,
+        "mana_produced": 1,
+        "produces": "WUBRGC",
+        "mana_activation_requires_tap": True,
+        "activation_requires_tap": True,
+        "conditionally_produces_controller_land_colors": True,
+        "land_mana_dependency_controller": "self",
+        "land_mana_dependency_allows_colorless": True,
+        "_rule_logical_key": "battle_rule_v1:naga-vitalist",
+    }
+    try:
+        result = validator.run_simple_mana_source_refresh(
+            battle,
+            {
+                "name": "Naga Vitalist refreshes modeled land-dependent mana source",
+                "type": "simple_mana_source_refresh",
+                "card": {"name": "Naga Vitalist", "type_line": "Creature"},
+                "controller_lands": [
+                    {
+                        "name": "E2E Dependency Forest",
+                        "type_line": "Land",
+                        "produces": "G",
+                        "tapped": True,
+                    },
+                    {
+                        "name": "E2E Dependency Wastes",
+                        "type_line": "Land",
+                        "produces": "C",
+                        "tapped": True,
+                    },
+                ],
+                "expected_available_mana_after_refresh": 1,
+                "expected_tapped": True,
+                "expected_sources": 1,
+                "expected_conditional_mana": 1,
+                "expected_conditional_colors": ["green", "colorless"],
+                "logical_rule_key": "battle_rule_v1:naga-vitalist",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Naga Vitalist"
+    assert result["available_mana"] == 1
+    assert result["conditional_mana"] == 1

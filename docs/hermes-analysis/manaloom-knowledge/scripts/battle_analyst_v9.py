@@ -4478,6 +4478,28 @@ def _opponent_land_mana_colors_for_player(player):
     return _ordered_mana_colors(colors)
 
 
+def _controller_land_mana_colors_for_player(player):
+    colors = []
+    for permanent in getattr(player, "battlefield", []) or []:
+        if not isinstance(permanent, dict) or not is_effective_land(permanent):
+            continue
+        for color in _land_mana_colors_for_controller(player, permanent):
+            if color not in colors:
+                colors.append(color)
+    return _ordered_mana_colors(colors)
+
+
+def _filter_land_dependency_mana_colors(colors, source):
+    filtered = list(colors or [])
+    if isinstance(source, dict) and source.get("land_mana_dependency_allows_colorless") is False:
+        filtered = [
+            color
+            for color in filtered
+            if color not in {"colorless", "generic"}
+        ]
+    return _ordered_mana_colors(filtered)
+
+
 def _read_conditional_mana_modes(source):
     modes = source.get("conditional_mana_modes") if isinstance(source, dict) else None
     if isinstance(modes, str):
@@ -4602,8 +4624,30 @@ def conditional_mana_source_for_state(player, source, produced):
             )
     if isinstance(source, dict) and source.get("mana_produced_from_colors_among_permanents"):
         return None
+    if isinstance(source, dict) and source.get("conditionally_produces_controller_land_colors"):
+        controller_land_colors = _filter_land_dependency_mana_colors(
+            _controller_land_mana_colors_for_player(player),
+            source,
+        )
+        if controller_land_colors:
+            return _conditional_mana_source_entry(
+                source,
+                produced,
+                [
+                    {
+                        "color": color,
+                        "restriction": "any_spell",
+                        "mode": "controller_land_color_dependency",
+                    }
+                    for color in controller_land_colors
+                ],
+                "controller_land_color_mana_source",
+            )
     if isinstance(source, dict) and source.get("conditionally_produces_opponent_land_colors"):
-        opponent_land_colors = _opponent_land_mana_colors_for_player(player)
+        opponent_land_colors = _filter_land_dependency_mana_colors(
+            _opponent_land_mana_colors_for_player(player),
+            source,
+        )
         if opponent_land_colors:
             return _conditional_mana_source_entry(
                 source,

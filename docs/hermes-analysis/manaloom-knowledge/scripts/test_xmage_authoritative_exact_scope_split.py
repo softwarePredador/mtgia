@@ -17116,6 +17116,62 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "mana_source_unsafe_ability_class")
 
+    def test_land_color_dependent_mana_source_maps_exact_scope(self) -> None:
+        fixtures = [
+            (
+                "Harvester Druid",
+                "Creature - Human Druid",
+                "{T}: Add one mana of any color that a land you control could produce.",
+                "TargetController.YOU",
+                False,
+                "self",
+                "WUBRG",
+            ),
+            (
+                "Naga Vitalist",
+                "Creature - Snake Druid",
+                "{T}: Add one mana of any type that a land you control could produce.",
+                "TargetController.YOU, false",
+                True,
+                "self",
+                "WUBRGC",
+            ),
+            (
+                "Quirion Explorer",
+                "Creature - Elf Druid Scout",
+                "{T}: Add one mana of any color that a land an opponent controls could produce.",
+                "TargetController.OPPONENT",
+                False,
+                "opponent",
+                "WUBRG",
+            ),
+        ]
+        for name, type_line, oracle_text, source_arg, allows_colorless, controller, produces in fixtures:
+            with self.subTest(name=name):
+                row = queue_row(
+                    split.RAMP_CREATURE_UNIT,
+                    effect_classes=[],
+                    ability_kind="activated",
+                    ability_classes=["AnyColorLandsProduceManaAbility"],
+                )
+                proposal, reason = split.split_row(
+                    row,
+                    metadata(name=name, type_line=type_line, oracle_text=oracle_text),
+                    source_text=(
+                        "this.addAbility(new AnyColorLandsProduceManaAbility("
+                        f"{source_arg}));"
+                    ),
+                )
+
+                self.assertEqual(reason, "selected_exact_scope")
+                self.assertEqual(proposal["family_id"], "xmage_land_color_dependent_mana_source")
+                effect = proposal["effect_json"]
+                self.assertEqual(effect["battle_model_scope"], split.LAND_COLOR_DEPENDENT_MANA_SCOPE)
+                self.assertEqual(effect["land_mana_dependency_controller"], controller)
+                self.assertEqual(effect["land_mana_dependency_allows_colorless"], allows_colorless)
+                self.assertEqual(effect["produces"], produces)
+                self.assertTrue(effect["mana_activation_requires_tap"])
+
     def test_counter_target_creature_spell_maps_to_stack_constraints(self) -> None:
         row = queue_row(split.COUNTER_UNIT, effect_classes=["CounterTargetEffect"])
         proposal, reason = split.split_row(
