@@ -4058,6 +4058,32 @@ def test_board_wipe_execution_scenario_preserves_destroy_filters() -> None:
     assert scenario["destroy_exclude_commanders"] is True
 
 
+def test_damage_wipe_execution_scenario_preserves_damage_players() -> None:
+    proposal = {
+        "normalized_name": "rain of embers",
+        "card_name": "Rain of Embers",
+        "oracle_hash": "hash-rain-of-embers",
+        "logical_rule_key": "battle_rule_v1:rain-of-embers",
+        "effect_json": {
+            "effect": "damage_wipe",
+            "battle_model_scope": "xmage_fixed_damage_each_creature_each_player_spell_v1",
+            "amount": 1,
+            "damage": 1,
+            "damage_scope": "each_creature",
+            "damage_players": True,
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    assert expected["required_effect_fields"]["damage_players"] is True
+    assert scenario["type"] == "damage_wipe"
+    assert scenario["expected_damage"] == 1
+    assert scenario["expected_damage_scope"] == "each_creature"
+    assert scenario["expected_damage_players"] is True
+
+
 def test_mass_return_to_hand_fields_and_execution_scenario_are_manifested() -> None:
     proposal = {
         "normalized_name": "aetherize",

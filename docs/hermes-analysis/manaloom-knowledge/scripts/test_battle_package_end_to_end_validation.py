@@ -1511,6 +1511,45 @@ def test_damage_each_opponent_and_their_permanents_runner_executes_composite_dam
     )
 
 
+def test_damage_wipe_runner_executes_each_creature_each_player_damage() -> None:
+    effect = {
+        "effect": "damage_wipe",
+        "battle_model_scope": "xmage_fixed_damage_each_creature_each_player_spell_v1",
+        "ability_kind": "one_shot",
+        "amount": 1,
+        "damage": 1,
+        "damage_scope": "each_creature",
+        "damage_players": True,
+        "_rule_logical_key": "battle_rule_v1:rain-of-embers",
+    }
+    scenario = {
+        "name": "Rain of Embers damages each creature and player",
+        "type": "damage_wipe",
+        "card": {"name": "Rain of Embers", "type_line": "Sorcery"},
+        "expected_damage": 1,
+        "expected_damage_scope": "each_creature",
+        "expected_damage_players": True,
+        "logical_rule_key": "battle_rule_v1:rain-of-embers",
+    }
+
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: dict(effect)
+    try:
+        result = validator.run_damage_wipe(battle, scenario, events)
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Rain of Embers"
+    assert result["damage_players"] is True
+    assert result["players_damaged"] == 2
+    assert result["creatures_destroyed"] == 2
+
+
 def test_target_player_x_draw_runner_uses_cast_x_value() -> None:
     effect = {
         "effect": "draw_cards",

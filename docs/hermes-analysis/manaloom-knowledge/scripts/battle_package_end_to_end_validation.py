@@ -4145,6 +4145,96 @@ def run_board_wipe(
     }
 
 
+def run_damage_wipe(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    active = battle.Player(str(scenario.get("player") or "Active"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
+    active.life = int(scenario.get("active_life") or 20)
+    opponent.life = int(scenario.get("opponent_life") or 20)
+    expected_damage = int(scenario.get("expected_damage") or 1)
+    expected_scope = str(scenario.get("expected_damage_scope") or "each_creature")
+    expected_damage_players = bool(scenario.get("expected_damage_players"))
+    active_creature = {
+        "name": "E2E Active Small Creature",
+        "type_line": "Creature - Fixture",
+        "effect": "creature",
+        "power": 1,
+        "toughness": max(1, expected_damage),
+    }
+    opponent_creature = {
+        "name": "E2E Opponent Small Creature",
+        "type_line": "Creature - Fixture",
+        "effect": "creature",
+        "power": 1,
+        "toughness": max(1, expected_damage),
+    }
+    active.battlefield.append(active_creature)
+    opponent.battlefield.append(opponent_creature)
+    starting_life = {active.name: active.life, opponent.name: opponent.life}
+    before_events = len(events)
+
+    battle.apply_effect_immediate(
+        active,
+        [opponent],
+        card,
+        turn=int(scenario.get("turn") or 6),
+        rng=random.Random(int(scenario.get("seed") or 6076)),
+    )
+
+    if expected_damage_players:
+        if active.life != starting_life[active.name] - expected_damage:
+            fail("battle_execution", f"{card['name']} active life={active.life}")
+        if opponent.life != starting_life[opponent.name] - expected_damage:
+            fail("battle_execution", f"{card['name']} opponent life={opponent.life}")
+    else:
+        if active.life != starting_life[active.name] or opponent.life != starting_life[opponent.name]:
+            fail("battle_execution", f"{card['name']} damaged players unexpectedly")
+    if active.battlefield or opponent.battlefield:
+        fail(
+            "battle_execution",
+            f"{card['name']} left creatures active={active.battlefield} opponent={opponent.battlefield}",
+        )
+    graveyard_names = {
+        str(item.get("name") or "")
+        for owner in (active, opponent)
+        for item in owner.graveyard
+        if isinstance(item, dict)
+    }
+    if {active_creature["name"], opponent_creature["name"]} - graveyard_names:
+        fail("battle_execution", f"{card['name']} missing destroyed creatures in graveyard")
+    wipe_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "damage_wipe_resolved" and data.get("card") == card.get("name")
+        ),
+        None,
+    )
+    if wipe_event is None:
+        fail("battle_events", f"missing {card['name']} damage_wipe_resolved event")
+    if wipe_event.get("damage_scope") != expected_scope:
+        fail(
+            "battle_events",
+            f"{card['name']} damage_scope={wipe_event.get('damage_scope')}, expected {expected_scope}",
+        )
+    if bool(wipe_event.get("damage_players")) != expected_damage_players:
+        fail("battle_events", f"{card['name']} damage_players={wipe_event.get('damage_players')}")
+    if expected_damage_players and int(wipe_event.get("players_damaged") or 0) != 2:
+        fail("battle_events", f"{card['name']} players_damaged={wipe_event.get('players_damaged')}")
+    return {
+        "card_name": card["name"],
+        "damage": expected_damage,
+        "damage_scope": wipe_event.get("damage_scope"),
+        "damage_players": bool(wipe_event.get("damage_players")),
+        "players_damaged": int(wipe_event.get("players_damaged") or 0),
+        "creatures_destroyed": int(wipe_event.get("creatures_destroyed") or 0),
+    }
+
+
 def _mass_return_scenario_as_destroy_filter(scenario: dict[str, Any]) -> dict[str, Any]:
     aliases = dict(scenario)
     for field in (
@@ -10650,6 +10740,7 @@ SCENARIO_RUNNERS = {
     "copy_stack_ability_response": run_copy_stack_ability_response,
     "copy_spell_choose_new_targets": run_copy_spell_choose_new_targets,
     "change_single_target_response": run_change_single_target_response,
+    "damage_wipe": run_damage_wipe,
     "creature_dies_create_treasure": run_creature_dies_create_treasure,
     "creature_dies_add_counters": run_creature_dies_add_counters,
     "creature_dies_create_tokens": run_creature_dies_create_tokens,

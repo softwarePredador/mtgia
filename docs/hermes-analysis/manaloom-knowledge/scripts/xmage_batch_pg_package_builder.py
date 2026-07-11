@@ -411,6 +411,7 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "damage_amount_source",
     "damage_base_amount",
     "damage_per_graveyard_count",
+    "damage_players",
     "exile_if_dies_from_damage",
     "exile_if_dies_target",
     "damage_scope",
@@ -5072,6 +5073,29 @@ def board_wipe_execution_scenario_from_expected_rule(
     return scenario
 
 
+def damage_wipe_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("effect") != "damage_wipe":
+        return None
+    if required.get("battle_model_scope") not in {
+        "xmage_fixed_damage_all_matching_permanents_spell_v1",
+        "xmage_fixed_damage_each_creature_each_player_spell_v1",
+    }:
+        return None
+    expected_damage = int(required.get("damage") or required.get("amount") or 1)
+    return {
+        "name": f"{rule['card_name']} deals damage to matching permanents",
+        "type": "damage_wipe",
+        "card": {"name": rule["card_name"], "type_line": "Sorcery"},
+        "expected_damage": expected_damage,
+        "expected_damage_scope": required.get("damage_scope") or "each_creature",
+        "expected_damage_players": bool(required.get("damage_players")),
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def mass_return_to_hand_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
@@ -6618,6 +6642,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or proliferate_draw_spell_execution_scenario_from_expected_rule(rule)
         or attack_self_boost_execution_scenario_from_expected_rule(rule)
         or becomes_blocked_self_boost_execution_scenario_from_expected_rule(rule)
+        or damage_wipe_execution_scenario_from_expected_rule(rule)
         or board_wipe_execution_scenario_from_expected_rule(rule)
         or mass_return_to_hand_execution_scenario_from_expected_rule(rule)
         or each_player_sacrifice_execution_scenario_from_expected_rule(rule)

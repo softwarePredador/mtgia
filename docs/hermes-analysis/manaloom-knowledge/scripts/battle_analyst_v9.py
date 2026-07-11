@@ -56133,6 +56133,36 @@ def apply_damage_wipe(player, opponents, card, effect_data, turn, *, finish_spel
         if str(value or "").strip()
     ]
     damage_exclude_tokens = bool(effect_data.get("damage_exclude_tokens"))
+    damage_players = bool(effect_data.get("damage_players"))
+    participants = [player] + list(opponents)
+    live_before_player_damage = {
+        id(participant): participant.is_alive()
+        for participant in participants
+    }
+    damaged_players = []
+    if damage_players:
+        for participant in participants:
+            life_before = participant.life
+            damage_dealt, target_amount, dealt = deal_damage_to_player_with_static_replacements(
+                player,
+                participant,
+                card,
+                amount,
+                turn=turn,
+                phase="resolution",
+                damage_event_type="player",
+            )
+            damaged_players.append(
+                {
+                    "player": participant.name,
+                    "life_before": life_before,
+                    "life_after": participant.life,
+                    "amount": target_amount,
+                    "damage_dealt": damage_dealt,
+                    "dealt": dealt,
+                    "result": "player_damage" if dealt else "prevented",
+                }
+            )
     affected_players = (
         list(opponents)
         if damage_scope
@@ -56142,7 +56172,7 @@ def apply_damage_wipe(player, opponents, card, effect_data, turn, *, finish_spel
             "each_creature_and_planeswalker_opponents_control",
             "creatures_opponents_control",
         }
-        else [player] + list(opponents)
+        else participants
     )
     destroyed = []
     protected = []
@@ -56155,7 +56185,7 @@ def apply_damage_wipe(player, opponents, card, effect_data, turn, *, finish_spel
     planeswalkers_destroyed = 0
     for participant in affected_players:
         is_self = participant is player
-        is_live_opponent = (not is_self) and participant.is_alive()
+        is_live_opponent = (not is_self) and live_before_player_damage.get(id(participant), participant.is_alive())
         for permanent in list(participant.battlefield):
             if is_battlefield_creature(permanent):
                 if damage_scope == "each_untapped_creature" and bool(permanent.get("tapped")):
@@ -56328,6 +56358,9 @@ def apply_damage_wipe(player, opponents, card, effect_data, turn, *, finish_spel
         damage_excluded_subtypes=damage_excluded_subtypes,
         damage_required_colors=damage_required_colors,
         damage_exclude_tokens=damage_exclude_tokens,
+        damage_players=damage_players,
+        damaged_players=damaged_players,
+        players_damaged=sum(1 for entry in damaged_players if entry.get("dealt")),
         damage_amount_source=effect_data.get("damage_amount_source"),
         x_value=effect_data.get("x_value"),
         graveyard_damage_count=effect_data.get("graveyard_damage_count"),

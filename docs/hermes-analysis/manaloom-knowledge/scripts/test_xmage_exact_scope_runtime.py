@@ -20164,6 +20164,56 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_damage_wipe_can_damage_each_creature_and_each_player(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.life = 20
+        opponent.life = 20
+        active.battlefield.append(
+            {"name": "Own Soldier", "type_line": "Creature - Soldier", "toughness": 1}
+        )
+        opponent.battlefield.append(
+            {"name": "Opp Goblin", "type_line": "Creature - Goblin", "toughness": 1}
+        )
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Rain of Embers",
+                "type_line": "Sorcery",
+                "oracle_text": "Rain of Embers deals 1 damage to each creature and each player.",
+            },
+            turn=10,
+            rng=random.Random(10),
+            effect_data_override={
+                "effect": "damage_wipe",
+                "battle_model_scope": "xmage_fixed_damage_each_creature_each_player_spell_v1",
+                "amount": 1,
+                "damage": 1,
+                "damage_scope": "each_creature",
+                "damage_players": True,
+            },
+        )
+
+        self.assertEqual(active.life, 19)
+        self.assertEqual(opponent.life, 19)
+        self.assertEqual(active.battlefield, [])
+        self.assertEqual(opponent.battlefield, [])
+        self.assertIn("Own Soldier", [card["name"] for card in active.graveyard])
+        self.assertIn("Rain of Embers", [card["name"] for card in active.graveyard])
+        self.assertIn("Opp Goblin", [card["name"] for card in opponent.graveyard])
+        self.assertTrue(
+            any(
+                event == "damage_wipe_resolved"
+                and data.get("card") == "Rain of Embers"
+                and data.get("damage_players") is True
+                and data.get("players_damaged") == 2
+                and data.get("creatures_destroyed") == 2
+                for event, data in self.events
+            )
+        )
+
     def test_damage_wipe_respects_flying_and_attacking_scopes(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

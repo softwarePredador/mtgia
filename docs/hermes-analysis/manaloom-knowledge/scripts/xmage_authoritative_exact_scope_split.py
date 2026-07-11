@@ -40,6 +40,10 @@ DRAW_ENGINE_UNIT = "draw_engine::xmage_draw_card_variant_review_v1"
 DAMAGE_UNIT = "direct_damage::targeted_damage_variant_v1"
 MULTI_TARGET_DAMAGE_UNIT = "multi_target_damage::xmage_multi_target_damage_variant_review_v1"
 DAMAGE_EACH_OPPONENT_UNIT = "damage_each_opponent::spell_damage_each_opponent_v1"
+DAMAGE_EVERYTHING_UNIT = (
+    "xmage_signature::DamageEverythingEffect::no_ability_class::"
+    "no_target_class::no_condition_class::no_signal"
+)
 DESTROY_UNIT = "removal_destroy::targeted_destroy_variant_v1"
 ACTIVATED_SELF_SAC_DESTROY_ARTIFACT_OR_ENCHANTMENT_UNIT = (
     "remove_permanent::activated_sacrifice_self_destroy_artifact_or_enchantment_v1"
@@ -200,6 +204,7 @@ SUPPORTED_UNITS = {
     DAMAGE_UNIT,
     MULTI_TARGET_DAMAGE_UNIT,
     DAMAGE_EACH_OPPONENT_UNIT,
+    DAMAGE_EVERYTHING_UNIT,
     DESTROY_UNIT,
     TAP_TARGET_CREATURE_UNIT,
     TAP_TARGET_PERMANENT_UNIT,
@@ -262,6 +267,7 @@ DAMAGE_EACH_OPPONENT_SCOPE = "spell_damage_each_opponent_v1"
 DAMAGE_EACH_OPPONENT_AND_THEIR_PERMANENTS_SCOPE = (
     "xmage_damage_each_opponent_and_their_permanents_spell_v1"
 )
+DAMAGE_EVERYTHING_SCOPE = "xmage_fixed_damage_each_creature_each_player_spell_v1"
 X_DAMAGE_SCOPE = "xmage_x_damage_target_spell_v1"
 DAMAGE_EXILE_IF_DIES_SCOPE = "xmage_fixed_damage_target_exile_if_dies_spell_v1"
 SACRIFICE_CREATURE_POWER_DAMAGE_SCOPE = "xmage_sacrifice_creature_power_damage_spell_v1"
@@ -506,6 +512,7 @@ SPELL_UNITS = {
     DRAW_UNIT,
     DAMAGE_UNIT,
     MULTI_TARGET_DAMAGE_UNIT,
+    DAMAGE_EVERYTHING_UNIT,
     DESTROY_UNIT,
     TREASURE_UNIT,
     LIFE_UNIT,
@@ -6853,6 +6860,35 @@ def damage_all_scope_from_oracle(metadata: dict[str, Any]) -> str | None:
     if not spec:
         return None
     return str(spec["damage_scope"])
+
+
+def fixed_damage_everything_amount_from_oracle(metadata: dict[str, Any]) -> int | str | None:
+    text = strip_parenthetical_reminders(oracle_text(metadata))
+    match = re.match(
+        r"^.+ deals? (?P<amount>\d+) damage to each creature and each player\.?$",
+        text,
+    )
+    if not match:
+        if "each creature and each player" in text and re.search(r"\bdeals? x damage\b", text):
+            return "damage_everything_amount_not_fixed"
+        return None
+    return int(match.group("amount"))
+
+
+def fixed_damage_everything_amount_from_source(source: str) -> int | str | None:
+    text = source or ""
+    if len(re.findall(r"\bnew\s+DamageEverythingEffect\s*\(", text)) != 1:
+        return "damage_everything_source_not_single"
+    constructor_args = extract_constructor_args(text, "DamageEverythingEffect")
+    if constructor_args is None:
+        return "damage_everything_source_not_supported"
+    parts = split_top_level_args(constructor_args)
+    if len(parts) != 1:
+        return "damage_everything_source_filter_not_supported"
+    amount = java_constructor_int(text, "DamageEverythingEffect")
+    if amount is None or amount <= 0:
+        return "damage_everything_amount_not_fixed"
+    return amount
 
 
 def dynamic_damage_all_scope_from_phrase(phrase: str) -> dict[str, Any] | None:
@@ -36449,6 +36485,39 @@ def split_row(
             effect_json["tutor_enters_tapped"] = bool(oracle_tutor.get("enters_tapped"))
         return build_proposal(row, metadata, effect_json, family_id="xmage_library_search_spell"), "selected_exact_scope"
 
+    if unit == DAMAGE_EVERYTHING_UNIT:
+        if classes != {"DamageEverythingEffect"}:
+            return None, "damage_everything_effect_class_not_pure"
+        if ability_classes(row):
+            return None, "damage_everything_ability_class_not_simple"
+        oracle_amount = fixed_damage_everything_amount_from_oracle(metadata)
+        if isinstance(oracle_amount, str):
+            return None, oracle_amount
+        if oracle_amount is None:
+            return None, "damage_everything_oracle_not_exact"
+        source_amount = fixed_damage_everything_amount_from_source(source_text)
+        if isinstance(source_amount, str):
+            return None, source_amount
+        if source_amount != oracle_amount:
+            return None, "damage_everything_source_oracle_mismatch"
+        effect_json = {
+            "effect": "damage_wipe",
+            "battle_model_scope": DAMAGE_EVERYTHING_SCOPE,
+            "amount": oracle_amount,
+            "damage": oracle_amount,
+            "damage_scope": "each_creature",
+            "damage_players": True,
+            "target_controller": "all",
+            "xmage_effect_class": "DamageEverythingEffect",
+            **flags,
+        }
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_damage_each_creature_each_player_spell",
+        ), "selected_exact_scope"
+
     if unit == BOARD_WIPE_UNIT:
         if classes == {"SacrificeAllEffect"} and ability_classes(row) == {"EntersBattlefieldTriggeredAbility"}:
             if "creature" not in str(metadata.get("type_line") or "").lower():
@@ -38073,6 +38142,7 @@ def build_exact_split_report(
                 "tutor::xmage_library_search_variant_review_v1 rows with SearchLibraryPutOnLibraryEffect, EntersBattlefieldTriggeredAbility, exact ETB tutor-to-library-top Oracle/source agreement, and only static self keywords",
                 "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, SimpleActivatedAbility, exact creature Oracle tap damage, and TapSourceCost only",
                 "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, SimpleActivatedAbility plus only static self keywords, fixed activated damage, mana/tap/self-sacrifice source costs only, and simple any-target or creature targets",
+                "xmage_signature DamageEverythingEffect one-shot spell rows with exact fixed damage to each creature and each player, no filter, no X value, and no additional cost",
                 "multi_target_damage::xmage_multi_target_damage_variant_review_v1 rows with one-shot DamageMultiEffect, fixed total damage, exact Oracle/source target-count range, and supported TargetAmount filters",
                 "removal_destroy::targeted_destroy_variant_v1 rows with DestroyTargetEffect, SimpleActivatedAbility, exact activated destroy-target Oracle text, and mana/tap/self-sacrifice source costs only",
                 "life_gain::xmage_life_gain_variant_review_v1 rows with GainLifeEffect, SimpleActivatedAbility, exact fixed activated life-gain Oracle text, and mana/tap/source self-sacrifice costs only",
