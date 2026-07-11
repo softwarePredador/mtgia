@@ -11391,6 +11391,115 @@ def run_fixed_draw_discard_spell(
     }
 
 
+def run_simple_activated_put_from_hand_to_battlefield(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    effect = dict(battle.get_card_effect(card))
+    if (
+        effect.get("battle_model_scope")
+        != "xmage_permanent_simple_activated_put_hand_card_onto_battlefield_v1"
+        or effect.get("activated_effect") != "put_from_hand_onto_battlefield"
+    ):
+        fail(
+            "battle_execution",
+            f"{card['name']} put-from-hand scope/effect mismatch: "
+            f"{effect.get('battle_model_scope')!r}/{effect.get('activated_effect')!r}",
+        )
+    permanent_effect = str(effect.get("effect") or "artifact")
+    default_type_line = {
+        "creature": "Creature - Fixture",
+        "artifact": "Artifact",
+        "land": "Land",
+    }.get(permanent_effect, "Artifact")
+    source = battle.enrich_card(
+        {
+            **card,
+            "type_line": str(scenario.get("source_type_line") or default_type_line),
+            "summoning_sick": False,
+            **effect,
+            **dict(scenario.get("source_overrides") or {}),
+        }
+    )
+    active = battle.Player(str(scenario.get("player") or "Hand Cheat Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Hand Cheat Opponent"), None, [])
+    active.battlefield = [source]
+    active.hand = [
+        battle.enrich_card(dict(hand_card))
+        for hand_card in (scenario.get("controller_hand") or [])
+        if isinstance(hand_card, dict)
+    ]
+    add_manifest_mana(active, scenario.get("controller_mana") or {})
+    expected_moved = str(scenario.get("expected_moved") or "")
+    expected_target_type = str(scenario.get("expected_target_type") or effect.get("put_from_hand_target") or "")
+    expected_tapped_source = bool(
+        scenario.get("expected_tapped_source", effect.get("activation_requires_tap", False))
+    )
+    expected_sacrificed_source = bool(
+        scenario.get("expected_sacrificed_source", effect.get("activation_requires_sacrifice", False))
+    )
+    before_events = len(events)
+
+    activated = battle.activate_permanent_put_from_hand_to_battlefield(
+        active,
+        [opponent],
+        [active, opponent],
+        source,
+        turn=int(scenario.get("turn") or 7149),
+        rng=random.Random(int(scenario.get("seed") or 7149)),
+        phase=str(scenario.get("phase") or "precombat_main"),
+    )
+    if not activated:
+        fail("battle_execution", f"{card['name']} put-from-hand activation failed")
+    battlefield_names = [item.get("name", "?") for item in active.battlefield if isinstance(item, dict)]
+    hand_names = [item.get("name", "?") for item in active.hand if isinstance(item, dict)]
+    if expected_moved and expected_moved not in battlefield_names:
+        fail("battle_execution", f"{card['name']} moved card missing from battlefield: {battlefield_names}")
+    if expected_moved and expected_moved in hand_names:
+        fail("battle_execution", f"{card['name']} moved card remained in hand")
+    if bool(source.get("tapped")) != expected_tapped_source:
+        fail(
+            "battle_execution",
+            f"{card['name']} source tapped={bool(source.get('tapped'))}, expected {expected_tapped_source}",
+        )
+    if expected_sacrificed_source:
+        if source in active.battlefield or source not in active.graveyard:
+            fail("battle_execution", f"{card['name']} source sacrifice zone mismatch")
+    elif source not in active.battlefield:
+        fail("battle_execution", f"{card['name']} source left battlefield unexpectedly")
+    activation_event = next(
+        (
+            data
+            for event, data in reversed(events[before_events:])
+            if event == "activated_ability"
+            and data.get("card") == card.get("name")
+            and data.get("effect") == "put_from_hand_onto_battlefield"
+        ),
+        None,
+    )
+    if activation_event is None:
+        fail("battle_events", f"missing {card['name']} put-from-hand activated_ability event")
+    if expected_moved and activation_event.get("moved_cards") != [expected_moved]:
+        fail("battle_events", f"{card['name']} moved_cards={activation_event.get('moved_cards')!r}")
+    if expected_target_type and activation_event.get("target_type") != expected_target_type:
+        fail("battle_events", f"{card['name']} target_type={activation_event.get('target_type')!r}")
+    if bool(activation_event.get("sacrificed_source")) != expected_sacrificed_source:
+        fail(
+            "battle_events",
+            f"{card['name']} sacrificed_source={activation_event.get('sacrificed_source')!r}",
+        )
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "moved": activation_event.get("moved_cards") or [],
+        "target_type": activation_event.get("target_type"),
+        "source_tapped": bool(source.get("tapped")),
+        "source_sacrificed": expected_sacrificed_source,
+    }
+
+
 SCENARIO_RUNNERS = {
     "attack_self_boost": run_attack_self_boost,
     "aura_static_power_toughness_attachment": run_aura_static_power_toughness_attachment,
@@ -11445,6 +11554,7 @@ SCENARIO_RUNNERS = {
     "sacrifice_mana_source_activation": run_sacrifice_mana_source_activation,
     "simple_activated_draw": run_simple_activated_draw,
     "simple_activated_draw_discard": run_simple_activated_draw_discard,
+    "simple_activated_put_from_hand_to_battlefield": run_simple_activated_put_from_hand_to_battlefield,
     "simple_activated_damage": run_simple_activated_damage,
     "simple_activated_tap_target": run_simple_activated_tap_target,
     "simple_activated_untap_target": run_simple_activated_untap_target,

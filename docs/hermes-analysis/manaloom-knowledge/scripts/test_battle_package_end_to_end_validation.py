@@ -1889,6 +1889,79 @@ def test_simple_activated_draw_runner_executes_sacrifice_target_cost() -> None:
     assert result["target_sacrificed"] is True
 
 
+def test_put_from_hand_to_battlefield_runner_moves_best_hand_card() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    scope = "xmage_permanent_simple_activated_put_hand_card_onto_battlefield_v1"
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "creature",
+        "battle_model_scope": scope,
+        "ability_kind": "static_and_activated",
+        "activated_effect": "put_from_hand_onto_battlefield",
+        "activated_battle_model_scope": scope,
+        "put_from_hand_target": "creature_card",
+        "target": "creature_card",
+        "destination": "battlefield",
+        "count": 1,
+        "optional": True,
+        "activation_cost_mana": "{G}",
+        "activation_cost_generic": 0,
+        "activation_cost_colors": ["G"],
+        "activation_requires_tap": True,
+        "activation_requires_sacrifice": False,
+        "_rule_logical_key": "battle_rule_v1:elvish-piper",
+    }
+    try:
+        result = validator.run_simple_activated_put_from_hand_to_battlefield(
+            battle,
+            {
+                "name": "Elvish Piper puts a creature from hand onto battlefield",
+                "type": "simple_activated_put_from_hand_to_battlefield",
+                "card": {"name": "Elvish Piper"},
+                "controller_mana": {"green": 1},
+                "controller_hand": [
+                    {
+                        "name": "E2E Low Value Creature",
+                        "type_line": "Creature - Human",
+                        "effect": "creature",
+                        "mana_value": 2,
+                    },
+                    {
+                        "name": "E2E High Value Creature",
+                        "type_line": "Creature - Giant",
+                        "effect": "creature",
+                        "mana_value": 7,
+                        "power": 7,
+                        "toughness": 7,
+                    },
+                    {
+                        "name": "E2E Invalid Hand Spell",
+                        "type_line": "Sorcery",
+                        "effect": "draw_cards",
+                        "mana_value": 2,
+                    },
+                ],
+                "expected_moved": "E2E High Value Creature",
+                "expected_target_type": "creature_card",
+                "expected_tapped_source": True,
+                "expected_sacrificed_source": False,
+                "logical_rule_key": "battle_rule_v1:elvish-piper",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Elvish Piper"
+    assert result["moved"] == ["E2E High Value Creature"]
+    assert result["target_type"] == "creature_card"
+    assert result["source_tapped"] is True
+
+
 def test_simple_activated_draw_runner_executes_tap_cost_target() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

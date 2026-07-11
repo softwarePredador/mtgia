@@ -298,6 +298,9 @@ TAP_TARGET_SPELL_SCOPE = "xmage_tap_target_spell_v1"
 PERMANENT_ACTIVATED_RECURSION_TO_HAND_SCOPE = "xmage_permanent_simple_activated_graveyard_to_hand_v1"
 PERMANENT_ACTIVATED_RECURSION_TO_BATTLEFIELD_SCOPE = "xmage_permanent_simple_activated_graveyard_to_battlefield_v1"
 PERMANENT_ACTIVATED_GRAVEYARD_EXILE_SCOPE = "xmage_permanent_simple_activated_exile_graveyard_card_v1"
+PERMANENT_ACTIVATED_HAND_TO_BATTLEFIELD_SCOPE = (
+    "xmage_permanent_simple_activated_put_hand_card_onto_battlefield_v1"
+)
 PERMANENT_ACTIVATED_LIFE_GAIN_SCOPE = "xmage_permanent_simple_activated_life_gain_v1"
 GRAVEYARD_SELF_RETURN_TO_HAND_SCOPE = "xmage_graveyard_simple_activated_self_return_to_hand_v1"
 GRAVEYARD_SELF_RETURN_TO_BATTLEFIELD_SCOPE = (
@@ -11951,6 +11954,14 @@ def is_permanent_activated_tutor_hand_unit(row: dict[str, Any]) -> bool:
         return False
     return (
         effect_classes(row) == {"SearchLibraryPutInHandEffect"}
+        and ability_classes(row) == {"SimpleActivatedAbility"}
+        and "activated_ability" in set(row.get("xmage_signals") or [])
+    )
+
+
+def is_permanent_activated_hand_to_battlefield_unit(row: dict[str, Any]) -> bool:
+    return (
+        effect_classes(row) == {"PutCardFromHandOntoBattlefieldEffect"}
         and ability_classes(row) == {"SimpleActivatedAbility"}
         and "activated_ability" in set(row.get("xmage_signals") or [])
     )
@@ -26538,6 +26549,161 @@ def activated_library_tutor_to_hand_from_source(source: str) -> dict[str, Any] |
     }
 
 
+HAND_TO_BATTLEFIELD_TARGET_PHRASES = {
+    "an artifact": "artifact_card",
+    "an artifact card": "artifact_card",
+    "a creature": "creature_card",
+    "a creature card": "creature_card",
+    "a land": "land_card",
+    "a land card": "land_card",
+    "a basic land": "basic_land_card",
+    "a basic land card": "basic_land_card",
+    "a minotaur permanent": "minotaur_permanent_card",
+    "a minotaur permanent card": "minotaur_permanent_card",
+    "a multicolored creature": "multicolored_creature_card",
+    "a multicolored creature card": "multicolored_creature_card",
+    "a historic permanent": "historic_permanent_card",
+    "a historic permanent card": "historic_permanent_card",
+}
+
+
+def hand_to_battlefield_target_from_phrase(phrase: str) -> str | None:
+    normalized = re.sub(r"\s+", " ", str(phrase or "").strip().lower())
+    return HAND_TO_BATTLEFIELD_TARGET_PHRASES.get(normalized)
+
+
+def hand_to_battlefield_target_constraints_for(target: str) -> dict[str, Any]:
+    constraints: dict[str, Any] = {"zone": "hand", "controller": "self"}
+    if target == "artifact_card":
+        constraints["card_types"] = ["artifact"]
+    elif target == "creature_card":
+        constraints["card_types"] = ["creature"]
+    elif target == "land_card":
+        constraints["card_types"] = ["land"]
+    elif target == "basic_land_card":
+        constraints["card_types"] = ["land"]
+        constraints["required_supertypes"] = ["basic"]
+    elif target == "minotaur_permanent_card":
+        constraints["card_types"] = ["permanent"]
+        constraints["subtypes"] = ["minotaur"]
+    elif target == "multicolored_creature_card":
+        constraints["card_types"] = ["creature"]
+        constraints["color_count_min"] = 2
+    elif target == "historic_permanent_card":
+        constraints["card_types"] = ["permanent"]
+        constraints["historic"] = True
+    return constraints
+
+
+def activated_hand_to_battlefield_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    text = strip_parenthetical_reminders(activated_ability_line_from_oracle(metadata))
+    text = re.sub(r"\s+", " ", text).strip().lower()
+    if text.count(":") != 1:
+        return "activated_hand_to_battlefield_oracle_not_simple"
+    cost_text, effect_text = [part.strip() for part in text.split(":", 1)]
+    source_name = re.sub(r"\s+", " ", str(metadata.get("name") or "").strip().lower())
+    if source_name:
+        source_sacrifice_pattern = rf"(^|,\s*)sacrifice {re.escape(source_name)}(?=,|$)"
+        cost_text = re.sub(
+            source_sacrifice_pattern,
+            lambda match: f"{match.group(1)}sacrifice this permanent",
+            cost_text,
+        )
+    activation = activation_cost_from_oracle_prefix(cost_text, allow_source_sacrifice=True)
+    if isinstance(activation, str):
+        return str(activation).replace("activated_self_boost", "activated_hand_to_battlefield")
+    match = re.fullmatch(
+        r"you may put (?P<target>.+?) from your hand onto the battlefield\.?",
+        effect_text,
+    )
+    if not match:
+        return "activated_hand_to_battlefield_oracle_not_simple"
+    target = hand_to_battlefield_target_from_phrase(match.group("target"))
+    if target is None:
+        return "activated_hand_to_battlefield_oracle_target_not_supported"
+    return {
+        "target": target,
+        "count": 1,
+        "destination": "battlefield",
+        "optional": True,
+        **activation,
+    }
+
+
+def hand_to_battlefield_source_target(source: str) -> str | None:
+    text = source or ""
+    if "StaticFilters.FILTER_CARD_ARTIFACT_AN" in text:
+        return "artifact_card"
+    if "StaticFilters.FILTER_CARD_CREATURE_A" in text:
+        return "creature_card"
+    if "StaticFilters.FILTER_CARD_BASIC_LAND_A" in text:
+        return "basic_land_card"
+    if "StaticFilters.FILTER_CARD_LAND_A" in text:
+        return "land_card"
+    if "FilterPermanentCard" in text and "SubType.MINOTAUR" in text:
+        return "minotaur_permanent_card"
+    if "FilterCreatureCard" in text and "MulticoloredPredicate" in text:
+        return "multicolored_creature_card"
+    if "FilterPermanentCard" in text and "HistoricPredicate" in text:
+        return "historic_permanent_card"
+    return None
+
+
+def activated_hand_to_battlefield_from_source(source: str) -> dict[str, Any] | str:
+    text = source or ""
+    effect_matches = re.findall(r"PutCardFromHandOntoBattlefieldEffect\s*\(", text)
+    if len(effect_matches) != 1:
+        return "activated_hand_to_battlefield_source_effect_not_supported"
+    effect_index = text.find("PutCardFromHandOntoBattlefieldEffect")
+    window = text[max(0, effect_index - 500) : effect_index + 1800]
+    if "SimpleActivatedAbility" not in window:
+        return "activated_hand_to_battlefield_source_not_simple_activated"
+    risky_cost_classes = {
+        "CompositeCost",
+        "DiscardCardCost",
+        "DiscardTargetCost",
+        "ExileFrom",
+        "ExileSourceFromGraveCost",
+        "PayLifeCost",
+        "RemoveCounterCost",
+        "ReturnToHandSourceCost",
+        "SacrificeTargetCost",
+        "TapTargetCost",
+    }
+    present_risky = sorted(cost for cost in risky_cost_classes if cost in window)
+    if present_risky:
+        return "activated_hand_to_battlefield_source_cost_not_supported"
+    target = hand_to_battlefield_source_target(text)
+    if target is None:
+        return "activated_hand_to_battlefield_source_target_not_supported"
+    cost_text = "{0}"
+    mana_match = re.search(r'ManaCostsImpl<[^>]*>\s*\(\s*"([^"]+)"\s*\)', window)
+    generic_match = re.search(r"GenericManaCost\s*\(\s*(\d+)\s*\)", window)
+    colored_match = re.search(r"ColoredManaCost\s*\(\s*ColoredManaSymbol\.([WUBRG])\s*\)", window)
+    if mana_match:
+        cost_text = mana_match.group(1)
+    elif generic_match:
+        cost_text = "{" + generic_match.group(1) + "}"
+    elif colored_match:
+        cost_text = "{" + colored_match.group(1) + "}"
+    cost_text = canonical_mana_cost_text(cost_text)
+    parsed_cost = parse_mana_cost_text(cost_text)
+    if parsed_cost is None:
+        return "activated_hand_to_battlefield_source_mana_cost_not_supported"
+    activation_cost_generic, activation_cost_colors = parsed_cost
+    return {
+        "target": target,
+        "count": 1,
+        "destination": "battlefield",
+        "optional": True,
+        "activation_cost_mana": cost_text,
+        "activation_cost_generic": activation_cost_generic,
+        "activation_cost_colors": activation_cost_colors,
+        "activation_requires_tap": "TapSourceCost" in window,
+        "activation_requires_sacrifice": "SacrificeSourceCost" in window,
+    }
+
+
 def library_tutor_specs_match(source_tutor: dict[str, Any], oracle_tutor: dict[str, Any]) -> str | None:
     scalar_keys = (
         "target",
@@ -27439,6 +27605,7 @@ def split_row(
     permanent_activated_regenerate_target_unit = is_permanent_activated_regenerate_target_unit(row)
     permanent_activated_tutor_battlefield_unit = is_permanent_activated_tutor_battlefield_unit(row)
     permanent_activated_tutor_hand_unit = is_permanent_activated_tutor_hand_unit(row)
+    permanent_activated_hand_to_battlefield_unit = is_permanent_activated_hand_to_battlefield_unit(row)
     attack_target_keyword_unit = is_creature_attack_target_keyword_unit(row)
     attack_self_boost_creature_unit = is_creature_attack_self_boost_unit(row)
     becomes_blocked_self_boost_creature_unit = is_creature_becomes_blocked_self_boost_unit(row)
@@ -27593,6 +27760,7 @@ def split_row(
         and not permanent_activated_regenerate_target_unit
         and not permanent_activated_tutor_battlefield_unit
         and not permanent_activated_tutor_hand_unit
+        and not permanent_activated_hand_to_battlefield_unit
         and not attack_target_keyword_unit
         and not attack_self_boost_creature_unit
         and not becomes_blocked_self_boost_creature_unit
@@ -28358,6 +28526,88 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_permanent_simple_activated_library_search_to_battlefield",
+        ), "selected_exact_scope"
+
+    if permanent_activated_hand_to_battlefield_unit:
+        if not is_permanent_metadata(metadata) or is_spell(metadata):
+            return None, "activated_hand_to_battlefield_not_permanent"
+        oracle_activation = activated_hand_to_battlefield_from_oracle(metadata)
+        if isinstance(oracle_activation, str):
+            return None, oracle_activation
+        source_activation = activated_hand_to_battlefield_from_source(source_text)
+        if isinstance(source_activation, str):
+            return None, source_activation
+        for key in (
+            "target",
+            "count",
+            "destination",
+            "optional",
+            "activation_cost_mana",
+            "activation_cost_generic",
+            "activation_cost_colors",
+            "activation_requires_tap",
+            "activation_requires_sacrifice",
+        ):
+            if source_activation.get(key) != oracle_activation.get(key):
+                return None, f"activated_hand_to_battlefield_source_oracle_{key}_mismatch"
+        target = str(oracle_activation["target"])
+        type_line = str(metadata.get("type_line") or "").lower()
+        permanent_effect = (
+            "creature"
+            if "creature" in type_line
+            else "artifact"
+            if "artifact" in type_line
+            else "permanent"
+        )
+        target_constraints = hand_to_battlefield_target_constraints_for(target)
+        activated_effect = {
+            "effect": "put_from_hand_onto_battlefield",
+            "battle_model_scope": PERMANENT_ACTIVATED_HAND_TO_BATTLEFIELD_SCOPE,
+            "ability_kind": "activated",
+            "activated_effect": "put_from_hand_onto_battlefield",
+            "put_from_hand_target": target,
+            "target": target,
+            "target_constraints": target_constraints,
+            "destination": "battlefield",
+            "count": 1,
+            "optional": True,
+            "xmage_effect_class": "PutCardFromHandOntoBattlefieldEffect",
+            "xmage_ability_class": "SimpleActivatedAbility",
+            **source_activation,
+        }
+        effect_json = {
+            "effect": permanent_effect,
+            "battle_model_scope": PERMANENT_ACTIVATED_HAND_TO_BATTLEFIELD_SCOPE,
+            "ability_kind": "static_and_activated",
+            "activated_effect": "put_from_hand_onto_battlefield",
+            "activated_battle_model_scope": PERMANENT_ACTIVATED_HAND_TO_BATTLEFIELD_SCOPE,
+            "put_from_hand_target": target,
+            "target": target,
+            "target_constraints": target_constraints,
+            "destination": "battlefield",
+            "count": 1,
+            "optional": True,
+            "_activated_rule_effects": [activated_effect],
+            "xmage_effect_class": "PutCardFromHandOntoBattlefieldEffect",
+            "xmage_ability_class": "SimpleActivatedAbility",
+            **{
+                key: source_activation[key]
+                for key in (
+                    "activation_cost_mana",
+                    "activation_cost_generic",
+                    "activation_cost_colors",
+                    "activation_requires_tap",
+                    "activation_requires_sacrifice",
+                )
+                if key in source_activation
+            },
+            **flags,
+        }
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_permanent_simple_activated_hand_to_battlefield",
         ), "selected_exact_scope"
 
     if permanent_activated_tutor_hand_unit:
@@ -39871,6 +40121,7 @@ def build_exact_split_report(
             and not is_permanent_activated_regenerate_source_unit(row)
             and not is_permanent_activated_regenerate_target_unit(row)
             and not is_permanent_activated_tutor_hand_unit(row)
+            and not is_permanent_activated_hand_to_battlefield_unit(row)
             and not is_creature_attack_target_keyword_unit(row)
             and not is_creature_attack_self_boost_unit(row)
             and not is_static_controlled_pt_unit(row)

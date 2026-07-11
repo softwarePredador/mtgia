@@ -25139,6 +25139,96 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_permanent_activated_put_creature_from_hand_to_battlefield_moves_best_card(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        scope = "xmage_permanent_simple_activated_put_hand_card_onto_battlefield_v1"
+        effect = {
+            "effect": "put_from_hand_onto_battlefield",
+            "battle_model_scope": scope,
+            "ability_kind": "activated",
+            "activated_effect": "put_from_hand_onto_battlefield",
+            "put_from_hand_target": "creature_card",
+            "target": "creature_card",
+            "target_constraints": {"zone": "hand", "controller": "self", "card_types": ["creature"]},
+            "destination": "battlefield",
+            "count": 1,
+            "optional": True,
+            "activation_cost_mana": "{G}",
+            "activation_cost_generic": 0,
+            "activation_cost_colors": ["G"],
+            "activation_requires_tap": True,
+            "activation_requires_sacrifice": False,
+            "_rule_logical_key": "battle_rule_v1:fixture-piper",
+        }
+        piper = {
+            "name": "Fixture Piper",
+            "type_line": "Creature - Elf Shaman",
+            "effect": "creature",
+            "battle_model_scope": scope,
+            "activated_effect": "put_from_hand_onto_battlefield",
+            "activated_battle_model_scope": scope,
+            "put_from_hand_target": "creature_card",
+            "target": "creature_card",
+            "count": 1,
+            "destination": "battlefield",
+            "optional": True,
+            "activation_cost_mana": "{G}",
+            "activation_cost_generic": 0,
+            "activation_cost_colors": ["G"],
+            "activation_requires_tap": True,
+            "activation_requires_sacrifice": False,
+            "summoning_sick": False,
+            "_activated_rule_effects": [effect],
+        }
+        small_creature = {
+            "name": "Small Creature",
+            "type_line": "Creature - Human",
+            "effect": "creature",
+            "mana_value": 2,
+            "power": 2,
+            "toughness": 2,
+        }
+        big_creature = {
+            "name": "Big Creature",
+            "type_line": "Creature - Giant",
+            "effect": "creature",
+            "mana_value": 7,
+            "power": 7,
+            "toughness": 7,
+        }
+        land = {"name": "Forest", "type_line": "Basic Land - Forest", "effect": "land"}
+        active.battlefield = [piper]
+        active.hand = [small_creature, land, big_creature]
+        active.mana_pool.add("green", 1)
+
+        activated = self.battle.activate_permanent_put_from_hand_to_battlefield(
+            active,
+            [opponent],
+            [active, opponent],
+            piper,
+            turn=3,
+            rng=random.Random(3),
+            phase="precombat_main",
+        )
+
+        self.assertTrue(activated)
+        self.assertTrue(piper["tapped"])
+        self.assertEqual(active.mana_pool.green, 0)
+        self.assertEqual([card["name"] for card in active.hand], ["Small Creature", "Forest"])
+        self.assertIn("Big Creature", [card["name"] for card in active.battlefield])
+        self.assertTrue(
+            any(
+                event == "activated_ability"
+                and data.get("card") == "Fixture Piper"
+                and data.get("effect") == "put_from_hand_onto_battlefield"
+                and data.get("moved_cards") == ["Big Creature"]
+                and data.get("activation_cost") == "{G}"
+                and data.get("tapped") is True
+                for event, data in self.events
+            )
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

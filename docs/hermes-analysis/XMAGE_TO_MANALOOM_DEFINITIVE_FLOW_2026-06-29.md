@@ -20356,6 +20356,88 @@ Evidence:
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260711_post_pg740b_conditional_etb_draw_hash_backfill_new_server_commander_legal.md`
 - `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260711_post_pg740b_conditional_etb_draw_hash_backfill_new_server_final.md`
 
+## PG750 Hand-To-Battlefield Checkpoint - 2026-07-11
+
+PG750 adds exact runtime support for simple activated permanents that put one
+matching card from the controller's hand onto the battlefield.
+
+Supported XMage pattern:
+
+- `PutCardFromHandOntoBattlefieldEffect`
+- `SimpleActivatedAbility`
+- Oracle and source agree on target class, count, destination, optionality,
+  mana cost, tap requirement, and source-sacrifice requirement.
+
+Supported target classes:
+
+- artifact card;
+- creature card;
+- land card;
+- basic land card;
+- Minotaur permanent card;
+- multicolored creature card;
+- historic permanent card.
+
+Promoted cards:
+
+- `Copper Gnomes`
+- `Didgeridoo`
+- `Dragon Arch`
+- `Elvish Piper`
+- `Firebrand Ranger`
+- `Krosan Wayfarer`
+- `Llanowar Scout`
+- `Quicksilver Amulet`
+- `Sakura-Tribe Scout`
+- `Scaled Herbalist`
+- `Thran Temporal Gateway`
+- `Walking Atlas`
+
+Validation evidence:
+
+- split report selected `12` exact proposals in
+  `xmage_permanent_simple_activated_hand_to_battlefield`;
+- precheck found `12` target card rows and no existing/shadow conflicts;
+- apply upserted `12` verified executable rows;
+- postcheck confirmed `12/12` promoted verified/auto rows with matching
+  `oracle_hash`;
+- package E2E passed PostgreSQL, SQLite/Hermes, canonical snapshot,
+  `runtime_get_card_effect`, and `12` battle-execution scenarios;
+- battle evidence confirmed each promoted card moved the expected matching hand
+  card to battlefield;
+- PG750B and PG750C backfilled `55` pre-existing trusted executable rules with
+  blank `oracle_hash`, clearing the readiness
+  `trusted_rule_oracle_hash_backfill` lane.
+
+Final post-PG750C state:
+
+- global readiness:
+  `battle_and_oracle_ready=6437`, `battle_family_mapper_required=27439`,
+  `snapshot_has_verified_rule=6462`, `trusted_rule_oracle_hash_backfill=0`;
+- authoritative queue:
+  `target_identity_count=24516`,
+  `xmage_authoritative_source_count=24203`,
+  `xmage_missing_source_exception_count=313`,
+  `xmage_authoritative_parser_gap_count=0`,
+  `xmage_authoritative_adapter_required_count=24203`,
+  `adapter_work_unit_count=11291`;
+- validation gates:
+  package E2E passed, `server-target` quality gate passed,
+  `xmage_strategy_consistency_audit` passed `26/26`,
+  `pg_hermes_sqlite_contract_audit` passed `51/51`,
+  `operational_surface_alignment_audit` passed, and
+  `legacy_contamination_audit` passed.
+
+Evidence:
+
+- `docs/hermes-analysis/PG750_HAND_TO_BATTLEFIELD_EVIDENCE_2026-07-11.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260711_pg750_hand_to_battlefield_candidate.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg750_hand_to_battlefield_new_server_package_manifest.json`
+- `docs/hermes-analysis/master_optimizer_reports/pg750_hand_to_battlefield_new_server_e2e_validation.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260711_post_pg750c_active_hash_backfill_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260711_post_pg750c_active_hash_backfill_new_server_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260711_post_pg750c_active_hash_backfill_new_server_final.md`
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

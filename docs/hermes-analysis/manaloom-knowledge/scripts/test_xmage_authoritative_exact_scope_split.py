@@ -32500,6 +32500,78 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "mana_source_unsafe_ability_class")
 
+    def test_permanent_activated_put_creature_from_hand_to_battlefield_maps(self) -> None:
+        proposal, reason = split.split_row(
+            queue_row(
+                "xmage_signature::PutCardFromHandOntoBattlefieldEffect::SimpleActivatedAbility",
+                effect_classes=["PutCardFromHandOntoBattlefieldEffect"],
+                ability_kind="activated",
+                ability_classes=["SimpleActivatedAbility"],
+                xmage_signals=["activated_ability"],
+            ),
+            metadata(
+                name="Elvish Piper",
+                type_line="Creature - Elf Shaman",
+                oracle_text="{G}, {T}: You may put a creature card from your hand onto the battlefield.",
+            ),
+            source_text="""
+                SimpleActivatedAbility ability = new SimpleActivatedAbility(
+                    new PutCardFromHandOntoBattlefieldEffect(StaticFilters.FILTER_CARD_CREATURE_A),
+                    new ManaCostsImpl<>("{G}"));
+                ability.addCost(new TapSourceCost());
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_HAND_TO_BATTLEFIELD_SCOPE)
+        self.assertEqual(effect["effect"], "creature")
+        self.assertEqual(effect["activated_effect"], "put_from_hand_onto_battlefield")
+        self.assertEqual(effect["put_from_hand_target"], "creature_card")
+        self.assertEqual(effect["activation_cost_mana"], "{G}")
+        self.assertEqual(effect["activation_cost_generic"], 0)
+        self.assertEqual(effect["activation_cost_colors"], ["G"])
+        self.assertTrue(effect["activation_requires_tap"])
+        self.assertFalse(effect["activation_requires_sacrifice"])
+        self.assertEqual(effect["target_constraints"]["card_types"], ["creature"])
+
+    def test_permanent_activated_put_minotaur_from_hand_to_battlefield_maps(self) -> None:
+        proposal, reason = split.split_row(
+            queue_row(
+                "xmage_signature::PutCardFromHandOntoBattlefieldEffect::SimpleActivatedAbility",
+                effect_classes=["PutCardFromHandOntoBattlefieldEffect"],
+                ability_kind="activated",
+                ability_classes=["SimpleActivatedAbility"],
+                xmage_signals=["activated_ability"],
+            ),
+            metadata(
+                name="Didgeridoo",
+                type_line="Artifact",
+                oracle_text="{3}: You may put a Minotaur permanent card from your hand onto the battlefield.",
+            ),
+            source_text="""
+                FilterPermanentCard filter = new FilterPermanentCard("a Minotaur permanent card");
+                filter.add(SubType.MINOTAUR.getPredicate());
+                this.addAbility(new SimpleActivatedAbility(
+                    new PutCardFromHandOntoBattlefieldEffect(filter),
+                    new ManaCostsImpl<>("{3}")));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_HAND_TO_BATTLEFIELD_SCOPE)
+        self.assertEqual(effect["effect"], "artifact")
+        self.assertEqual(effect["put_from_hand_target"], "minotaur_permanent_card")
+        self.assertEqual(effect["activation_cost_mana"], "{3}")
+        self.assertEqual(effect["activation_cost_generic"], 3)
+        self.assertEqual(effect["activation_cost_colors"], [])
+        self.assertFalse(effect["activation_requires_tap"])
+        self.assertFalse(effect["activation_requires_sacrifice"])
+        self.assertEqual(effect["target_constraints"]["card_types"], ["permanent"])
+        self.assertEqual(effect["target_constraints"]["subtypes"], ["minotaur"])
+
 
 if __name__ == "__main__":
     unittest.main()

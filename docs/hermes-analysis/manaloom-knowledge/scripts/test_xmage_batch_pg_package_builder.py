@@ -153,6 +153,42 @@ def test_graveyard_to_library_draw_execution_scenario_is_manifested() -> None:
     assert scenario["expected_recovered_count"] == 2
 
 
+def test_put_from_hand_to_battlefield_execution_scenario_is_manifested() -> None:
+    proposal = {
+        "normalized_name": "elvish piper",
+        "card_name": "Elvish Piper",
+        "oracle_hash": "hash-piper",
+        "logical_rule_key": "battle_rule_v1:piper",
+        "effect_json": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_put_hand_card_onto_battlefield_v1",
+            "ability_kind": "static_and_activated",
+            "activated_effect": "put_from_hand_onto_battlefield",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_put_hand_card_onto_battlefield_v1",
+            "put_from_hand_target": "creature_card",
+            "target": "creature_card",
+            "destination": "battlefield",
+            "count": 1,
+            "optional": True,
+            "activation_cost_mana": "{G}",
+            "activation_cost_generic": 0,
+            "activation_cost_colors": ["G"],
+            "activation_requires_tap": True,
+            "activation_requires_sacrifice": False,
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    assert expected["required_effect_fields"]["put_from_hand_target"] == "creature_card"
+    assert scenario["type"] == "simple_activated_put_from_hand_to_battlefield"
+    assert scenario["expected_moved"] == "E2E High Value Creature"
+    assert scenario["expected_target_type"] == "creature_card"
+    assert scenario["controller_mana"]["green"] == 1
+    assert scenario["expected_tapped_source"] is True
+
+
 def test_static_filtered_protection_execution_scenario_is_manifested() -> None:
     proposal = {
         "normalized_name": "enemy of the guildpact",

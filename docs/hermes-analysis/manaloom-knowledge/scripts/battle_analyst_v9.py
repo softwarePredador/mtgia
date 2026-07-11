@@ -9457,6 +9457,7 @@ COMPOSABLE_RESOLUTION_EFFECTS = {
 
 EXECUTABLE_ACTIVATED_SECONDARY_EFFECTS = {
     "copy_creature_token",
+    "put_from_hand_onto_battlefield",
 }
 
 ACTIVATED_SECONDARY_PROMOTED_KEYS = {
@@ -9467,9 +9468,15 @@ ACTIVATED_SECONDARY_PROMOTED_KEYS = {
     "activation_requires_tap",
     "copy_target_types",
     "exclude_source_from_copy_targets",
+    "count",
+    "destination",
+    "optional",
+    "put_from_hand_target",
     "station_level_required",
     "station_threshold",
     "target_controller",
+    "target",
+    "target_constraints",
     "token_legendary",
 }
 
@@ -36928,6 +36935,16 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
     ):
         return 1
 
+    if activate_permanent_put_from_hand_to_battlefield_sources(
+        player,
+        opponents,
+        all_players,
+        turn,
+        rng,
+        phase=phase,
+    ):
+        return 1
+
     if activate_permanent_library_tutors_to_battlefield(
         player,
         opponents,
@@ -49940,6 +49957,9 @@ SIMPLE_ACTIVATED_TUTOR_BATTLEFIELD_SCOPE = (
 SIMPLE_ACTIVATED_TUTOR_HAND_SCOPE = (
     "xmage_permanent_simple_activated_library_search_to_hand_v1"
 )
+SIMPLE_ACTIVATED_HAND_TO_BATTLEFIELD_SCOPE = (
+    "xmage_permanent_simple_activated_put_hand_card_onto_battlefield_v1"
+)
 GRAVEYARD_SELF_RETURN_TO_HAND_SCOPE = "xmage_graveyard_simple_activated_self_return_to_hand_v1"
 GRAVEYARD_SELF_RETURN_TO_BATTLEFIELD_SCOPE = (
     "xmage_graveyard_simple_activated_self_return_to_battlefield_v1"
@@ -50606,6 +50626,40 @@ def _activated_rule_effects_for_permanent(permanent):
         ):
             graveyard_to_library_effect[key] = permanent.get(key)
         effects.append(graveyard_to_library_effect)
+    if (
+        permanent.get("activated_effect") == "put_from_hand_onto_battlefield"
+        and permanent.get("activated_battle_model_scope") == SIMPLE_ACTIVATED_HAND_TO_BATTLEFIELD_SCOPE
+    ):
+        hand_to_battlefield_effect = {
+            "effect": "put_from_hand_onto_battlefield",
+            "battle_model_scope": permanent.get("activated_battle_model_scope"),
+            "ability_kind": "activated",
+            "activated_effect": "put_from_hand_onto_battlefield",
+            "activation_requires_tap": bool(permanent.get("activation_requires_tap")),
+            "activation_requires_sacrifice": bool(permanent.get("activation_requires_sacrifice")),
+            "activation_cost_mana": permanent.get("activation_cost_mana"),
+            "activation_cost_generic": permanent.get("activation_cost_generic"),
+            "activation_cost_colors": permanent.get("activation_cost_colors"),
+            "target": permanent.get("put_from_hand_target") or permanent.get("target") or "creature_card",
+            "put_from_hand_target": permanent.get("put_from_hand_target")
+            or permanent.get("target")
+            or "creature_card",
+            "target_constraints": permanent.get("target_constraints"),
+            "count": permanent.get("count") or 1,
+            "destination": permanent.get("destination") or "battlefield",
+            "optional": bool(permanent.get("optional", True)),
+        }
+        for key in (
+            "_rule_source",
+            "_rule_review_status",
+            "_rule_execution_status",
+            "_rule_confidence",
+            "_rule_version",
+            "_rule_logical_key",
+            "_rule_oracle_hash",
+        ):
+            hand_to_battlefield_effect[key] = permanent.get(key)
+        effects.append(hand_to_battlefield_effect)
     fallback_tutor_scope = permanent.get("activated_battle_model_scope")
     if (
         not any(effect.get("battle_model_scope") == fallback_tutor_scope for effect in effects)
@@ -50695,6 +50749,350 @@ def library_tutor_battlefield_effect_for_permanent(permanent):
 
 def library_tutor_hand_effect_for_permanent(permanent):
     return library_tutor_effect_for_permanent(permanent, destination="hand")
+
+
+def put_from_hand_to_battlefield_effect_for_permanent(permanent):
+    if not isinstance(permanent, dict):
+        return None
+    for effect_data in _activated_rule_effects_for_permanent(permanent):
+        if (
+            effect_data.get("battle_model_scope") == SIMPLE_ACTIVATED_HAND_TO_BATTLEFIELD_SCOPE
+            and effect_data.get("ability_kind") == "activated"
+            and effect_data.get("activated_effect") == "put_from_hand_onto_battlefield"
+        ):
+            return effect_data
+    return None
+
+
+def _card_type_line(card):
+    return str((card or {}).get("type_line") or "").lower()
+
+
+def _card_is_permanent_card(card):
+    type_line = _card_type_line(card)
+    return bool(type_line) and not any(
+        card_type in type_line
+        for card_type in ("instant", "sorcery")
+    )
+
+
+def _card_is_artifact(card):
+    return "artifact" in _card_type_line(card) or (card or {}).get("effect") == "artifact"
+
+
+def _card_is_creature_card(card):
+    return "creature" in _card_type_line(card) or (card or {}).get("effect") == "creature"
+
+
+def _card_is_basic_land(card):
+    return is_effective_land(card) and (
+        "basic" in _card_type_line(card)
+        or "basic" in {str(value).lower() for value in (card or {}).get("supertypes", [])}
+    )
+
+
+def _card_is_historic_permanent(card):
+    type_line = _card_type_line(card)
+    return _card_is_permanent_card(card) and (
+        _card_is_artifact(card)
+        or "legendary" in type_line
+        or "saga" in type_line
+    )
+
+
+def _hand_to_battlefield_target_matches(card, target_type):
+    target = str(target_type or "").lower()
+    if target == "artifact_card":
+        return _card_is_artifact(card)
+    if target == "creature_card":
+        return _card_is_creature_card(card)
+    if target == "land_card":
+        return is_effective_land(card)
+    if target == "basic_land_card":
+        return _card_is_basic_land(card)
+    if target == "minotaur_permanent_card":
+        return _card_is_permanent_card(card) and permanent_has_subtype(card, "minotaur")
+    if target == "multicolored_creature_card":
+        return _card_is_creature_card(card) and len(card_color_symbol_set(card)) >= 2
+    if target == "historic_permanent_card":
+        return _card_is_historic_permanent(card)
+    return False
+
+
+def _hand_to_battlefield_candidate_score(card, target_type, player):
+    target = str(target_type or "").lower()
+    if target in {"land_card", "basic_land_card"}:
+        return estimated_land_mana_value(card, player) * 20
+    score = int(card_mana_value(card) or 0) * 10
+    if _card_is_creature_card(card):
+        try:
+            score += int(card.get("power") or 0) + int(card.get("toughness") or 0)
+        except Exception:
+            score += 0
+    if _card_is_historic_permanent(card):
+        score += 4
+    if target == "multicolored_creature_card":
+        score += len(card_color_symbol_set(card)) * 3
+    return score
+
+
+def _permanent_put_from_hand_activation_plan(player, permanent, effect_data, turn):
+    if effect_data is None or permanent not in getattr(player, "battlefield", []):
+        return None
+    if str(effect_data.get("destination") or "battlefield") != "battlefield":
+        return None
+    requires_tap = bool(effect_data.get("activation_requires_tap"))
+    if requires_tap and permanent.get("tapped"):
+        return None
+    if (
+        requires_tap
+        and is_battlefield_creature(permanent)
+        and permanent.get("summoning_sick")
+        and not has_haste(permanent)
+    ):
+        return None
+    activation_cost_colors = list(effect_data.get("activation_cost_colors") or [])
+    activation_cost_generic = adjusted_activated_ability_generic_cost(
+        player,
+        permanent,
+        int(effect_data.get("activation_cost_generic") or 0),
+        activation_colors=activation_cost_colors,
+    )
+    activation_cost_text = (
+        effect_data.get("activation_cost_mana")
+        or _activation_cost_text(activation_cost_generic, activation_cost_colors)
+    )
+    if not player.can_pay(activation_cost_text):
+        return None
+    target_type = str(effect_data.get("put_from_hand_target") or effect_data.get("target") or "")
+    candidates = [
+        card
+        for card in list(getattr(player, "hand", []) or [])
+        if isinstance(card, dict) and _hand_to_battlefield_target_matches(card, target_type)
+    ]
+    if not candidates:
+        return None
+    scored_candidates = [
+        (
+            candidate,
+            _hand_to_battlefield_candidate_score(candidate, target_type, player),
+        )
+        for candidate in candidates
+    ]
+    scored_candidates.sort(
+        key=lambda item: (
+            -item[1],
+            -int(card_mana_value(item[0]) or 0),
+            str(item[0].get("name") or ""),
+        )
+    )
+    count = max(1, int(effect_data.get("count") or 1))
+    selected = scored_candidates[:count]
+    return {
+        "activation_cost_generic": activation_cost_generic,
+        "activation_cost_colors": activation_cost_colors,
+        "activation_cost_text": activation_cost_text,
+        "target_type": target_type,
+        "scored_candidates": scored_candidates,
+        "selected": selected,
+        "expected_score": sum(score for _candidate, score in selected),
+        "turn": turn,
+    }
+
+
+def activate_permanent_put_from_hand_to_battlefield(
+    player,
+    opponents,
+    all_players,
+    permanent,
+    turn,
+    rng,
+    *,
+    phase="precombat_main",
+    effect_data=None,
+):
+    if phase not in MAIN_PHASES:
+        return False
+    effect_data = effect_data or put_from_hand_to_battlefield_effect_for_permanent(permanent)
+    plan = _permanent_put_from_hand_activation_plan(player, permanent, effect_data, turn)
+    if plan is None:
+        return False
+    if not player.spend_mana(plan["activation_cost_text"]):
+        return False
+    if effect_data.get("activation_requires_tap"):
+        permanent["tapped"] = True
+    sacrificed_source = False
+    if effect_data.get("activation_requires_sacrifice"):
+        if permanent in player.battlefield:
+            player.battlefield.remove(permanent)
+        player.graveyard.append(permanent)
+        player.record_permanent_sacrificed(permanent, turn)
+        sacrificed_source = True
+
+    participants = list(all_players or [player] + list(opponents or []))
+    moved_cards = []
+    for selected_card, _score in plan["selected"]:
+        if selected_card not in player.hand:
+            continue
+        player.hand.remove(selected_card)
+        permanent_payload = {
+            **selected_card,
+            **get_card_effect(selected_card),
+        }
+        entering = prepare_entering_permanent(
+            enrich_card(permanent_payload),
+            controller=player,
+            all_players=participants,
+            turn=turn,
+        )
+        player.battlefield.append(entering)
+        moved_cards.append(entering)
+        if is_effective_land(entering):
+            trigger_landfall(
+                player,
+                entering,
+                turn,
+                "activated_put_from_hand_to_battlefield",
+                opponents=opponents,
+                active_player=player,
+                all_players=participants,
+            )
+
+    fields = replay_rule_fields(effect_data)
+    chosen_card = moved_cards[0] if moved_cards else None
+    chosen_score = plan["selected"][0][1] if plan["selected"] else 0
+    emit_decision_trace(
+        decision_type="activated_ability",
+        player=player,
+        turn=turn,
+        phase=phase,
+        available_options=[
+            decision_card_option(
+                candidate,
+                get_card_effect(candidate),
+                score=score,
+                action="activate_put_from_hand_to_battlefield",
+                target_type=plan["target_type"],
+                destination="battlefield",
+            )
+            for candidate, score in plan["scored_candidates"][:10]
+        ],
+        chosen_option=decision_card_option(
+            chosen_card,
+            get_card_effect(chosen_card) if chosen_card else None,
+            score=chosen_score,
+            action="activate_put_from_hand_to_battlefield" if chosen_card else "no_target",
+            target_type=plan["target_type"],
+            destination="battlefield",
+        ),
+        rejected_options=[
+            decision_card_option(
+                candidate,
+                get_card_effect(candidate),
+                score=score,
+                action="defer_put_from_hand_to_battlefield",
+                target_type=plan["target_type"],
+                destination="battlefield",
+            )
+            for candidate, score in plan["scored_candidates"][len(plan["selected"]):10]
+        ],
+        score_components={
+            "activation_cost": plan["activation_cost_text"],
+            "activation_cost_generic": plan["activation_cost_generic"],
+            "activation_cost_colors": plan["activation_cost_colors"],
+            "candidate_count": len(plan["scored_candidates"]),
+            "selected_count": len(moved_cards),
+            "target_type": plan["target_type"],
+            "selected_cards": [card.get("name", "?") for card in moved_cards],
+            "sacrificed_source": sacrificed_source,
+        },
+        rule_source=fields.get("rule_source", "battle_rule"),
+        rule_status=fields.get("rule_review_status", "verified"),
+        confidence="medium" if moved_cards else "low",
+        expected_benefit_score=plan["expected_score"],
+        actual_outcome="put_from_hand_to_battlefield_activated" if moved_cards else "no_target_moved",
+        reason="activate_put_from_hand_when_valid_hand_target_available",
+        strategic_principle="convert activated cheat effect into the highest-value matching hand permanent",
+        heuristic_version=DECISION_STRATEGY_VERSION,
+        resource_delta={
+            "mana": -(plan["activation_cost_generic"] + len(plan["activation_cost_colors"])),
+            "cards_from_hand_to_battlefield": len(moved_cards),
+            "tapped": 1 if effect_data.get("activation_requires_tap") else 0,
+            "permanents": -1 if sacrificed_source else 0,
+        },
+        risk_flags=[
+            flag
+            for flag, active in {
+                "tap_ability": bool(effect_data.get("activation_requires_tap")),
+                "sacrifice_source": sacrificed_source,
+                "no_target_moved": not moved_cards,
+            }.items()
+            if active
+        ],
+    )
+    emit_replay_event(
+        "activated_ability",
+        player=player.name,
+        card=permanent.get("name", "?"),
+        effect="put_from_hand_onto_battlefield",
+        activation_kind="simple_activated_put_from_hand_to_battlefield",
+        activation_cost=plan["activation_cost_text"],
+        target_type=plan["target_type"],
+        destination="battlefield",
+        moved_cards=[card.get("name", "?") for card in moved_cards],
+        moved_count=len(moved_cards),
+        tapped=bool(permanent.get("tapped")),
+        sacrificed_source=sacrificed_source,
+        mana_paid=plan["activation_cost_generic"] + len(plan["activation_cost_colors"]),
+        phase=phase,
+        turn=turn,
+        **fields,
+    )
+    return bool(moved_cards)
+
+
+def activate_permanent_put_from_hand_to_battlefield_sources(
+    player,
+    opponents,
+    all_players,
+    turn,
+    rng,
+    *,
+    phase="precombat_main",
+):
+    if not player.is_alive() or phase not in MAIN_PHASES:
+        return 0
+    options = []
+    for permanent in list(getattr(player, "battlefield", []) or []):
+        if not isinstance(permanent, dict):
+            continue
+        if is_artifact_permanent(permanent) and artifact_activated_abilities_locked(player, permanent, all_players):
+            continue
+        effect_data = put_from_hand_to_battlefield_effect_for_permanent(permanent)
+        plan = _permanent_put_from_hand_activation_plan(player, permanent, effect_data, turn)
+        if plan is None:
+            continue
+        options.append((plan["expected_score"], -plan["activation_cost_generic"], permanent, effect_data))
+    if not options:
+        return 0
+    options.sort(
+        key=lambda item: (
+            item[0],
+            item[1],
+            str(item[2].get("name") or ""),
+        ),
+        reverse=True,
+    )
+    return 1 if activate_permanent_put_from_hand_to_battlefield(
+        player,
+        opponents,
+        all_players,
+        options[0][2],
+        turn,
+        rng,
+        phase=phase,
+        effect_data=options[0][3],
+    ) else 0
 
 
 def graveyard_to_library_effect_for_permanent(permanent):

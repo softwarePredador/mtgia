@@ -581,6 +581,7 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "ability_kind",
     "activated_effect",
     "activated_battle_model_scope",
+    "put_from_hand_target",
     "activated_remove_effect",
     "activated_remove_target",
     "activated_tap_target",
@@ -3754,6 +3755,120 @@ def simple_activated_damage_execution_scenario_from_expected_rule(
         )
         scenario["expected_target"] = target or None
     return scenario
+
+
+def _hand_to_battlefield_manifest_cards(target_type: str) -> tuple[list[dict[str, Any]], str]:
+    target = str(target_type or "creature_card").strip().lower()
+    invalid_card = {
+        "name": "E2E Invalid Hand Spell",
+        "type_line": "Sorcery",
+        "effect": "draw_cards",
+        "cmc": 2,
+    }
+    if target == "artifact_card":
+        expected = {
+            "name": "E2E High Value Artifact",
+            "type_line": "Artifact",
+            "effect": "artifact",
+            "mana_value": 6,
+            "cmc": 6,
+        }
+        return [
+            {"name": "E2E Low Value Artifact", "type_line": "Artifact", "effect": "artifact", "mana_value": 1},
+            invalid_card,
+            expected,
+        ], expected["name"]
+    if target == "land_card":
+        expected = {"name": "E2E Utility Land", "type_line": "Land", "effect": "land", "cmc": 0}
+        return [invalid_card, expected], expected["name"]
+    if target == "basic_land_card":
+        expected = {"name": "E2E Basic Forest", "type_line": "Basic Land - Forest", "effect": "land", "cmc": 0}
+        return [
+            {"name": "E2E Nonbasic Land", "type_line": "Land", "effect": "land", "cmc": 0},
+            invalid_card,
+            expected,
+        ], expected["name"]
+    if target == "minotaur_permanent_card":
+        expected = {
+            "name": "E2E High Value Minotaur",
+            "type_line": "Creature - Minotaur Warrior",
+            "effect": "creature",
+            "mana_value": 6,
+            "power": 5,
+            "toughness": 5,
+        }
+        return [
+            {"name": "E2E Non Minotaur", "type_line": "Creature - Human", "effect": "creature", "mana_value": 2},
+            invalid_card,
+            expected,
+        ], expected["name"]
+    if target == "multicolored_creature_card":
+        expected = {
+            "name": "E2E High Value Multicolor Creature",
+            "type_line": "Creature - Dragon",
+            "effect": "creature",
+            "colors": ["R", "G"],
+            "mana_cost": "{4}{R}{G}",
+            "mana_value": 6,
+            "power": 6,
+            "toughness": 6,
+        }
+        return [
+            {"name": "E2E Mono Creature", "type_line": "Creature - Human", "effect": "creature", "colors": ["W"], "mana_value": 2},
+            invalid_card,
+            expected,
+        ], expected["name"]
+    if target == "historic_permanent_card":
+        expected = {
+            "name": "E2E Legendary Historic Creature",
+            "type_line": "Legendary Creature - Angel",
+            "effect": "creature",
+            "mana_value": 6,
+            "power": 5,
+            "toughness": 5,
+        }
+        return [
+            {"name": "E2E Nonhistoric Creature", "type_line": "Creature - Human", "effect": "creature", "mana_value": 2},
+            invalid_card,
+            expected,
+        ], expected["name"]
+    expected = {
+        "name": "E2E High Value Creature",
+        "type_line": "Creature - Giant",
+        "effect": "creature",
+        "mana_value": 7,
+        "power": 7,
+        "toughness": 7,
+    }
+    return [
+        {"name": "E2E Low Value Creature", "type_line": "Creature - Human", "effect": "creature", "mana_value": 2},
+        invalid_card,
+        expected,
+    ], expected["name"]
+
+
+def put_from_hand_to_battlefield_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_permanent_simple_activated_put_hand_card_onto_battlefield_v1":
+        return None
+    if required.get("activated_effect") != "put_from_hand_onto_battlefield":
+        return None
+    target_type = str(required.get("put_from_hand_target") or required.get("target") or "creature_card")
+    hand_cards, expected_moved = _hand_to_battlefield_manifest_cards(target_type)
+    return {
+        "name": f"{rule['card_name']} puts a card from hand onto battlefield",
+        "type": "simple_activated_put_from_hand_to_battlefield",
+        "card": {"name": rule["card_name"]},
+        "controller_mana": _manifest_mana_for_required_activation(required),
+        "controller_hand": hand_cards,
+        "expected_moved": expected_moved,
+        "expected_target_type": target_type,
+        "expected_tapped_source": bool(required.get("activation_requires_tap")),
+        "expected_sacrificed_source": bool(required.get("activation_requires_sacrifice")),
+        "logical_rule_key": rule["logical_rule_key"],
+    }
 
 
 def simple_activated_draw_execution_scenario_from_expected_rule(
@@ -7267,6 +7382,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or boost_untap_target_spell_execution_scenario_from_expected_rule(rule)
         or simple_activated_draw_execution_scenario_from_expected_rule(rule)
         or simple_activated_draw_discard_execution_scenario_from_expected_rule(rule)
+        or put_from_hand_to_battlefield_execution_scenario_from_expected_rule(rule)
         or fixed_draw_spell_execution_scenario_from_expected_rule(rule)
         or graveyard_to_library_draw_execution_scenario_from_expected_rule(rule)
         or fixed_draw_discard_spell_execution_scenario_from_expected_rule(rule)
