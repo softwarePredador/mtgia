@@ -24999,9 +24999,11 @@ def limited_times_mana_source_detail_from_oracle(metadata: dict[str, Any]) -> di
             continue
         working = strip_parenthetical_reminders(line)
         match = re.match(
-            r"^(?P<cost>(?:\{[0-9wubrgc]+\})+): add (?P<mana>one mana of any color|(?:\{[wubrgc]\})+)\. "
+            r"^(?P<cost>(?:\{[0-9wubrgc]+\})+|pay \d+ life): add "
+            r"(?P<mana>one mana of any color|(?:\{[wubrgc]\})+)\. "
             r"(?P<tail>.+?) activate only once each turn\.?$",
             working,
+            flags=re.I,
         )
         if not match:
             continue
@@ -25016,7 +25018,12 @@ def limited_times_mana_source_detail_from_oracle(metadata: dict[str, Any]) -> di
                 "mana_produced": len(symbols),
                 "produced_mana_symbols": symbols,
             }
-        parsed["activation_mana_cost"] = match.group("cost").upper()
+        cost_text = match.group("cost").strip()
+        life_match = re.fullmatch(r"pay (?P<life>\d+) life", cost_text, flags=re.I)
+        if life_match:
+            parsed["activation_life_cost"] = int(life_match.group("life"))
+        else:
+            parsed["activation_mana_cost"] = cost_text.upper()
         parsed["mana_activation_requires_tap"] = False
         parsed["activation_limit_per_turn"] = 1
         parsed["_runtime_partial_mana_tail"] = match.group("tail").strip().rstrip(".")
@@ -25039,8 +25046,14 @@ def limited_times_color_choice_mana_source_from_source(source_text: str) -> dict
         or "ConditionalColorlessManaAbility" in args_text
     ):
         return "limited_mana_source_conditional_not_supported"
+    cost_detail: dict[str, Any] = {}
     cost_match = re.search(r"new\s+GenericManaCost\s*\(\s*(\d+)\s*\)", args_text)
-    if not cost_match:
+    life_cost_match = re.search(r"new\s+PayLifeCost\s*\(\s*(\d+)\s*\)", args_text)
+    if cost_match:
+        cost_detail["activation_mana_cost"] = f"{{{int(cost_match.group(1))}}}"
+    elif life_cost_match:
+        cost_detail["activation_life_cost"] = int(life_cost_match.group(1))
+    else:
         return "limited_mana_source_cost_not_supported"
     if "AddManaFromColorChoicesEffect" in args_text:
         mana_types = [
@@ -25053,11 +25066,11 @@ def limited_times_color_choice_mana_source_from_source(source_text: str) -> dict
         return {
             "produces": _unique_mana_symbols(mana_types),
             "mana_produced": 1,
-            "activation_mana_cost": f"{{{int(cost_match.group(1))}}}",
             "mana_activation_requires_tap": False,
             "activation_limit_per_turn": 1,
             "xmage_mana_effect_class": "AddManaFromColorChoicesEffect",
             "xmage_mana_ability_class": "LimitedTimesPerTurnActivatedManaAbility",
+            **cost_detail,
         }
     any_color = limited_times_add_any_color_amount_from_source(text, args_text)
     if any_color is not None:
@@ -25065,11 +25078,11 @@ def limited_times_color_choice_mana_source_from_source(source_text: str) -> dict
         return {
             "produces": "WUBRG",
             "mana_produced": amount,
-            "activation_mana_cost": f"{{{int(cost_match.group(1))}}}",
             "mana_activation_requires_tap": False,
             "activation_limit_per_turn": 1,
             "xmage_mana_effect_class": effect_class,
             "xmage_mana_ability_class": "LimitedTimesPerTurnActivatedManaAbility",
+            **cost_detail,
         }
     if "BasicManaEffect" in args_text:
         symbols = java_simple_mana_symbols_from_source(args_text)
@@ -25079,11 +25092,11 @@ def limited_times_color_choice_mana_source_from_source(source_text: str) -> dict
             "produces": _unique_mana_symbols(symbols),
             "mana_produced": len(symbols),
             "produced_mana_symbols": symbols,
-            "activation_mana_cost": f"{{{int(cost_match.group(1))}}}",
             "mana_activation_requires_tap": False,
             "activation_limit_per_turn": 1,
             "xmage_mana_effect_class": "BasicManaEffect",
             "xmage_mana_ability_class": "LimitedTimesPerTurnActivatedManaAbility",
+            **cost_detail,
         }
     return "limited_mana_source_effect_not_supported"
 
@@ -39202,6 +39215,7 @@ def split_row(
                 "produces",
                 "mana_produced",
                 "activation_mana_cost",
+                "activation_life_cost",
                 "mana_activation_requires_tap",
                 "activation_limit_per_turn",
             ):
@@ -39233,7 +39247,6 @@ def split_row(
                 "produces": str(mana_source_detail["produces"]),
                 "activation_requires_tap": mana_requires_tap,
                 "mana_activation_requires_tap": mana_requires_tap,
-                "activation_mana_cost": mana_source_detail["activation_mana_cost"],
                 "activation_limit_per_turn": int(mana_source_detail["activation_limit_per_turn"]),
                 "permanent_type": permanent_type,
                 "ability_kind": "activated_mana",
@@ -39270,11 +39283,12 @@ def split_row(
                 effect_json["xmage_unmodeled_effect_classes"] = non_mana_effect_classes
             if mana_source_detail.get("_runtime_partial_mana_tail"):
                 effect_json["_runtime_partial_mana_tail"] = mana_source_detail["_runtime_partial_mana_tail"]
-            family_id = (
-                "xmage_limited_times_color_choice_mana_source_permanent"
-                if xmage_mana_effect_class == "AddManaFromColorChoicesEffect"
-                else "xmage_limited_times_any_color_mana_source_permanent"
-            )
+            if xmage_mana_effect_class == "AddManaFromColorChoicesEffect":
+                family_id = "xmage_limited_times_color_choice_mana_source_permanent"
+            elif xmage_mana_effect_class == "BasicManaEffect":
+                family_id = "xmage_limited_times_fixed_mana_source_permanent"
+            else:
+                family_id = "xmage_limited_times_any_color_mana_source_permanent"
             return build_proposal(
                 row,
                 metadata,

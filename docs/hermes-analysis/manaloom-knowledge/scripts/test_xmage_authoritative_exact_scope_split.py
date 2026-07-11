@@ -16523,7 +16523,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             ["BecomesColorTargetEffect", "SurveilEffect"],
         )
 
-    def test_limited_times_basic_mana_source_blocks_unpaid_life_cost(self) -> None:
+    def test_limited_times_basic_mana_source_maps_pay_life_cost(self) -> None:
         row = queue_row(
             split.RAMP_CREATURE_UNIT,
             effect_classes=["BasicManaEffect"],
@@ -16544,8 +16544,18 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             ),
         )
 
-        self.assertIsNone(proposal)
-        self.assertEqual(reason, "limited_mana_source_cost_not_supported")
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(proposal["family_id"], "xmage_limited_times_fixed_mana_source_permanent")
+        self.assertEqual(effect["battle_model_scope"], split.MANA_SCOPE)
+        self.assertEqual(effect["produces"], "C")
+        self.assertEqual(effect["produced_mana_symbols"], ["C"])
+        self.assertEqual(effect["mana_produced"], 1)
+        self.assertEqual(effect["activation_life_cost"], 1)
+        self.assertFalse(effect["mana_activation_requires_tap"])
+        self.assertEqual(effect["activation_limit_per_turn"], 1)
+        self.assertTrue(effect["_runtime_partial"])
+        self.assertEqual(effect["modeled_ability_subset"], "mana_source_only")
 
     def test_limited_times_color_choice_mana_source_preserves_static_keyword(self) -> None:
         row = queue_row(
