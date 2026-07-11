@@ -28379,6 +28379,83 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertTrue(effect["activated_self_sacrifice_bounce"])
         self.assertEqual(effect["destination"], "hand")
 
+    def test_permanent_activated_bounce_maps_sacrifice_permanent_cost_creature_target(self) -> None:
+        row = queue_row(
+            split.BOUNCE_UNIT,
+            effect_classes=["ReturnToHandTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Barrin, Master Wizard",
+                type_line="Legendary Creature - Human Wizard",
+                oracle_text="{2}, Sacrifice a permanent: Return target creature to its owner's hand.",
+            ),
+            source_text="""
+                SimpleActivatedAbility ability = new SimpleActivatedAbility(
+                    new ReturnToHandTargetEffect(),
+                    new ManaCostsImpl<>("{2}"));
+                ability.addCost(new SacrificeTargetCost(StaticFilters.FILTER_PERMANENT));
+                ability.addTarget(new TargetCreaturePermanent());
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_BOUNCE_SCOPE)
+        self.assertEqual(effect["target"], "creature")
+        self.assertEqual(effect["activation_cost_mana"], "{2}")
+        self.assertFalse(effect["activation_requires_sacrifice"])
+        self.assertEqual(
+            effect["activation_sacrifice_cost"],
+            {"count": 1, "target_controller": "self", "constraints": {"card_types": ["permanent"]}},
+        )
+        self.assertEqual(effect["activation_sacrifice_target"], "permanent")
+        self.assertTrue(effect["activation_requires_sacrifice_target"])
+
+    def test_permanent_activated_bounce_maps_sacrifice_permanent_cost_permanent_target(self) -> None:
+        row = queue_row(
+            split.BOUNCE_UNIT,
+            effect_classes=["ReturnToHandTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Dispersing Orb",
+                type_line="Enchantment",
+                oracle_text="{3}{U}, Sacrifice a permanent: Return target permanent to its owner's hand.",
+            ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(
+                    new ReturnToHandTargetEffect(),
+                    new ManaCostsImpl<>("{3}{U}"));
+                ability.addCost(new SacrificeTargetCost(StaticFilters.FILTER_PERMANENT));
+                ability.addTarget(new TargetPermanent().withChooseHint("return to hand"));
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_BOUNCE_SCOPE)
+        self.assertEqual(effect["target"], "permanent")
+        self.assertEqual(effect["activation_cost_mana"], "{3}{U}")
+        self.assertEqual(effect["activation_cost_generic"], 3)
+        self.assertEqual(effect["activation_cost_colors"], ["U"])
+        self.assertEqual(
+            effect["activation_sacrifice_cost"],
+            {"count": 1, "target_controller": "self", "constraints": {"card_types": ["permanent"]}},
+        )
+        self.assertEqual(effect["activation_sacrifice_target"], "permanent")
+        self.assertTrue(effect["activation_requires_sacrifice_target"])
+
     def test_creature_etb_recursion_maps_to_triggered_creature_scope(self) -> None:
         row = queue_row(
             split.RECURSION_UNIT,

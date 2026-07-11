@@ -18870,6 +18870,8 @@ def activation_sacrifice_cost_from_phrase(phrase: str) -> dict[str, Any] | str:
         constraints["card_types"] = ["artifact"]
     elif text in {"land", "lands"}:
         constraints["card_types"] = ["land"]
+    elif text in {"permanent", "permanents"}:
+        constraints["card_types"] = ["permanent"]
     elif text in {"nonland permanent", "nonland permanents"}:
         constraints["card_types"] = ["permanent"]
         constraints["exclude_card_types"] = ["land"]
@@ -18940,6 +18942,8 @@ def activation_sacrifice_cost_from_source(text: str, window: str) -> dict[str, A
         constraints["card_types"] = ["artifact"]
     elif "FILTER_LANDS" in cost_arg or "FILTER_LAND" in cost_arg or "FilterControlledLandPermanent" in cost_arg:
         constraints["card_types"] = ["land"]
+    elif re.search(r"\b(?:StaticFilters\.)?FILTER_PERMANENT\b", cost_arg):
+        constraints["card_types"] = ["permanent"]
     elif "filter" in cost_arg:
         filter_match = re.search(
             r"FilterControlledPermanent\s+filter\s*=\s*new\s+FilterControlledPermanent\s*\((.*?)\)\s*;",
