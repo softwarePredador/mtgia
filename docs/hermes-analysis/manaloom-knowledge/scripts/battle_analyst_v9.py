@@ -2597,6 +2597,111 @@ def merge_additional_costs(*cost_groups):
     return costs
 
 
+def _spell_has_x_in_mana_cost(card):
+    if not isinstance(card, dict):
+        return False
+    mana_cost = str(card.get("mana_cost") or "")
+    return bool(re.search(r"\{X\}", mana_cost, flags=re.I))
+
+
+def _spell_mana_value_for_trigger(card):
+    if not isinstance(card, dict):
+        return 0
+    return card_mana_value(card)
+
+
+def mana_spent_cast_trigger_matches(card, effect_data, trigger):
+    if not isinstance(trigger, dict):
+        return False
+    spell_filter = str(trigger.get("spell_filter") or "").strip().lower()
+    if spell_filter == "dragon_creature_spell":
+        return is_battlefield_creature(card) and permanent_has_subtype(card, "Dragon")
+    if spell_filter == "mana_value_gte":
+        return _spell_mana_value_for_trigger(card) >= int(trigger.get("mana_value_gte") or 0)
+    if spell_filter == "x_mana_cost_spell":
+        return _spell_has_x_in_mana_cost(card)
+    return False
+
+
+def _cast_x_value_for_trigger(card, effect_data):
+    for source in (card, effect_data):
+        if not isinstance(source, dict):
+            continue
+        cast_context = source.get("_cast_context")
+        if isinstance(cast_context, dict) and cast_context.get("x_value") not in (None, ""):
+            try:
+                return max(0, int(float(cast_context.get("x_value") or 0)))
+            except Exception:
+                return 0
+        if source.get("x_value") not in (None, ""):
+            try:
+                return max(0, int(float(source.get("x_value") or 0)))
+            except Exception:
+                return 0
+    return 0
+
+
+def resolve_mana_spent_cast_triggers(player, card, effect_data, spent_sources, *, turn=None, phase=None):
+    resolved = 0
+    for spent in spent_sources or []:
+        if not isinstance(spent, dict):
+            continue
+        trigger = spent.get("mana_spent_cast_trigger")
+        if not trigger or not mana_spent_cast_trigger_matches(card, effect_data, trigger):
+            continue
+        effect_results = []
+        for trigger_effect in trigger.get("effects") or []:
+            if not isinstance(trigger_effect, dict):
+                continue
+            effect_kind = str(trigger_effect.get("effect") or "").strip()
+            if effect_kind == "draw_cards":
+                count = max(0, int(trigger_effect.get("count") or 0))
+                if count > 0:
+                    drawn = player.draw(count, random, phase=phase)
+                    effect_results.append({
+                        "effect": effect_kind,
+                        "count": count,
+                        "drawn": [item.get("name", "?") for item in drawn if isinstance(item, dict)],
+                    })
+            elif effect_kind == "gain_life":
+                amount = max(0, int(trigger_effect.get("amount") or 0))
+                if str(trigger_effect.get("amount_source") or "") == "half_x_rounded_down":
+                    amount = _cast_x_value_for_trigger(card, effect_data) // 2
+                if amount > 0:
+                    before = int(getattr(player, "life", 0))
+                    gain_life(player, amount, cap=999)
+                    effect_results.append({
+                        "effect": effect_kind,
+                        "amount": amount,
+                        "life_before": before,
+                        "life_after": int(getattr(player, "life", before)),
+                    })
+            elif effect_kind == "scry":
+                count = max(0, int(trigger_effect.get("count") or 0))
+                if count > 0:
+                    scry_result = scry_library_for_controller(player, count)
+                    effect_results.append({
+                        "effect": effect_kind,
+                        "count": count,
+                        **scry_result,
+                    })
+        if effect_results:
+            resolved += 1
+            emit_replay_event(
+                "mana_spent_cast_trigger_resolved",
+                player=getattr(player, "name", "?"),
+                card=spent.get("source"),
+                cast_card=card.get("name", "?") if isinstance(card, dict) else str(card),
+                spell_filter=trigger.get("spell_filter"),
+                effects=effect_results,
+                amount_paid=int(spent.get("amount_paid") or 0),
+                turn=turn,
+                phase=phase,
+                **dict(spent.get("rule_fields") or {}),
+            )
+    return resolved
+
+
 def begin_cast_context(
     player,
     card,
@@ -2716,6 +2821,14 @@ def commit_cast_payment(ctx):
         ),
         **ctx.to_replay_fields(),
         **replay_rule_fields(ctx.effect_data),
+    )
+    resolve_mana_spent_cast_triggers(
+        ctx.controller,
+        ctx.card,
+        ctx.effect_data,
+        getattr(ctx.controller, "last_conditional_mana_spent_sources", []),
+        turn=CURRENT_REPLAY_TURN,
+        phase=ctx.phase,
     )
     return True
 
@@ -4640,7 +4753,7 @@ def _conditional_mana_source_entry(source, amount, modes, source_kind):
         )
     if not available_modes:
         return None
-    return {
+    entry = {
         "source": source.get("name", "?") if isinstance(source, dict) else str(source),
         "amount": max(0, int(amount or 0)),
         "remaining": max(0, int(amount or 0)),
@@ -4649,12 +4762,26 @@ def _conditional_mana_source_entry(source, amount, modes, source_kind):
         "same_color_choice": bool(source.get("conditional_mana_same_color_choice")),
         "rule_fields": replay_rule_fields(source) if isinstance(source, dict) else {},
     }
+    if isinstance(source, dict) and source.get("mana_spent_cast_trigger"):
+        entry["mana_spent_cast_trigger"] = copy.deepcopy(source.get("mana_spent_cast_trigger") or {})
+    return entry
 
 
 def _configured_conditional_mana_source_for_state(player, source, produced):
     if not isinstance(source, dict):
         return None
     modes = _read_conditional_mana_modes(source)
+    if not modes and source.get("mana_spent_cast_trigger"):
+        colors = _source_explicit_mana_colors(source) or source_colors(source) or ["generic"]
+        modes = [
+            {
+                "color": color,
+                "restriction": "any_spell",
+                "mode": "mana_spent_cast_trigger",
+                "status": "runtime_executor_v1",
+            }
+            for color in colors
+        ]
     if not modes:
         return None
     overall_runtime_enabled = _mana_runtime_status_enabled(source.get("conditional_mana_modes_status"))
@@ -11362,6 +11489,7 @@ class Player:
         self.mana_pool = ManaPool()
         self.restricted_mana = {}
         self.conditional_mana_sources = []
+        self.last_conditional_mana_spent_sources = []
         self.lands_played_this_turn = 0
         self.max_lands_per_turn = 1
         self.is_human = is_human
@@ -11556,6 +11684,7 @@ class Player:
         }
         conditional_sources = []
         conditional_life_payments = []
+        conditional_mana_spent_sources = []
         for source in getattr(self, "conditional_mana_sources", []) or []:
             if not isinstance(source, dict):
                 continue
@@ -11657,6 +11786,18 @@ class Player:
                 life_loss = life_loss_per_unit * paid
                 source["remaining"] = source_remaining - paid
                 life_payment += life_loss
+                conditional_mana_spent_sources.append({
+                    "source": source.get("source"),
+                    "source_kind": source.get("source_kind"),
+                    "color": color,
+                    "mode": mode.get("mode"),
+                    "restriction": mode.get("restriction"),
+                    "amount_paid": paid,
+                    "rule_fields": dict(source.get("rule_fields") or {}),
+                    "mana_spent_cast_trigger": copy.deepcopy(
+                        source.get("mana_spent_cast_trigger") or {}
+                    ),
+                })
                 if life_loss:
                     conditional_life_payments.append({
                         "source": source.get("source"),
@@ -11711,6 +11852,18 @@ class Player:
                 life_loss = life_loss_per_unit * paid
                 source["remaining"] = source_remaining - paid
                 life_payment += life_loss
+                conditional_mana_spent_sources.append({
+                    "source": source.get("source"),
+                    "source_kind": source.get("source_kind"),
+                    "color": mode.get("color"),
+                    "mode": mode.get("mode"),
+                    "restriction": mode.get("restriction"),
+                    "amount_paid": paid,
+                    "rule_fields": dict(source.get("rule_fields") or {}),
+                    "mana_spent_cast_trigger": copy.deepcopy(
+                        source.get("mana_spent_cast_trigger") or {}
+                    ),
+                })
                 if life_loss:
                     conditional_life_payments.append({
                         "source": source.get("source"),
@@ -11914,6 +12067,7 @@ class Player:
             restricted_pool,
             conditional_sources,
             conditional_life_payments,
+            conditional_mana_spent_sources,
         )
 
     def can_pay(self, cost):
@@ -11927,7 +12081,16 @@ class Player:
         plan = self._payment_plan(cost)
         if plan is None:
             return False
-        pool, self.treasures, life_payment, restricted_pool, conditional_sources, conditional_life_payments = plan
+        (
+            pool,
+            self.treasures,
+            life_payment,
+            restricted_pool,
+            conditional_sources,
+            conditional_life_payments,
+            conditional_mana_spent_sources,
+        ) = plan
+        self.last_conditional_mana_spent_sources = copy.deepcopy(conditional_mana_spent_sources)
         for color, amount in pool.items():
             setattr(self.mana_pool, color, amount)
         self.restricted_mana = {

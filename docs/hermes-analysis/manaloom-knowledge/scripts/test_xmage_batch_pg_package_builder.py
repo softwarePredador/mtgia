@@ -1309,6 +1309,35 @@ def test_manifest_expected_rule_preserves_partial_mana_source_fields() -> None:
     assert required["xmage_unmodeled_auxiliary_ability_classes"] == ["CrewAbility"]
 
 
+def test_mana_spent_cast_trigger_manifest_builds_cast_trigger_scenario() -> None:
+    rule = {
+        "card_name": "Scaled Nurturer",
+        "logical_rule_key": "battle_rule_v1:scaled",
+        "required_effect_fields": {
+            "effect": "ramp_permanent",
+            "battle_model_scope": "xmage_simple_tap_mana_source_with_mana_spent_cast_trigger_v1",
+            "is_mana_source": True,
+            "mana_produced": 1,
+            "produces": "G",
+            "produced_mana_symbols": ["G"],
+            "mana_activation_requires_tap": True,
+            "mana_spent_cast_trigger": {
+                "spell_filter": "dragon_creature_spell",
+                "effects": [{"effect": "gain_life", "amount": 2}],
+            },
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario["type"] == "mana_spent_cast_trigger"
+    assert scenario["card"]["name"] == "Scaled Nurturer"
+    assert scenario["cast_card"]["type_line"] == "Creature - Dragon"
+    assert scenario["cast_card"]["mana_cost"] == "{G}"
+    assert scenario["expected_life_gain"] == 2
+    assert scenario["expected_draw_count"] == 0
+
+
 def test_simple_mana_source_execution_scenario_pays_activation_cost() -> None:
     rule = {
         "card_name": "Ceta Disciple",

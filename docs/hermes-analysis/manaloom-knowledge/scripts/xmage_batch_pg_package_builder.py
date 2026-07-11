@@ -520,6 +520,7 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "mana_produced",
     "produces",
     "produced_mana_symbols",
+    "mana_spent_cast_trigger",
     "conditional_mana_modes",
     "conditional_mana_modes_status",
     "conditionally_produces_controller_land_colors",
@@ -3333,6 +3334,7 @@ def simple_mana_source_execution_scenario_from_expected_rule(rule: dict[str, Any
         "xmage_simple_tap_land_color_dependent_mana_source_permanent_v1",
         "xmage_fixed_color_dynamic_mana_source_permanent_v1",
         "xmage_controlled_creature_condition_conditional_mana_source_permanent_v1",
+        "xmage_simple_tap_mana_source_with_mana_spent_cast_trigger_v1",
         "pain_talisman_color_pair_partial_v1",
     }:
         return None
@@ -3501,6 +3503,98 @@ def simple_mana_source_execution_scenario_from_expected_rule(rule: dict[str, Any
         else:
             scenario["opponent_lands"] = lands
     return scenario
+
+
+def mana_spent_cast_trigger_execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_simple_tap_mana_source_with_mana_spent_cast_trigger_v1":
+        return None
+    trigger = dict(required.get("mana_spent_cast_trigger") or {})
+    effects = [effect for effect in trigger.get("effects") or [] if isinstance(effect, dict)]
+    if not trigger or not effects:
+        return None
+    produced_symbols = [
+        str(symbol or "").strip().upper()
+        for symbol in required.get("produced_mana_symbols") or []
+        if str(symbol or "").strip().upper() in {"W", "U", "B", "R", "G", "C"}
+    ]
+    produces = str(required.get("produces") or "C").upper()
+    symbol = produced_symbols[0] if produced_symbols else next(
+        (candidate for candidate in "WUBRGC" if candidate in produces),
+        "C",
+    )
+    cast_card = {
+        "name": "E2E Qualified Spell",
+        "type_line": "Sorcery",
+        "mana_cost": "{1}" if symbol == "C" else f"{{{symbol}}}",
+        "cmc": 1,
+        "effect": "draw_cards",
+    }
+    if trigger.get("spell_filter") == "dragon_creature_spell":
+        cast_card.update({
+            "name": "E2E Dragon Creature Spell",
+            "type_line": "Creature - Dragon",
+            "effect": "creature",
+            "power": 3,
+            "toughness": 3,
+        })
+    elif trigger.get("spell_filter") == "mana_value_gte":
+        cast_card.update({
+            "name": "E2E Six Mana Spell",
+            "type_line": "Sorcery",
+            "cmc": int(trigger.get("mana_value_gte") or 6),
+        })
+
+    expected_draw_count = sum(
+        int(effect.get("count") or 0)
+        for effect in effects
+        if effect.get("effect") == "draw_cards"
+    )
+    expected_scry_count = sum(
+        int(effect.get("count") or 0)
+        for effect in effects
+        if effect.get("effect") == "scry"
+    )
+    library: list[dict[str, Any]] = []
+    library.extend(
+        {
+            "name": f"E2E Trigger Draw Card {index + 1}",
+            "type_line": "Instant",
+            "effect": "draw_cards",
+            "cmc": index + 1,
+        }
+        for index in range(expected_draw_count)
+    )
+    if expected_scry_count:
+        library.extend([
+            {"name": "E2E Low Priority Scry Card", "type_line": "Land", "effect": "land", "cmc": 0},
+            {"name": "E2E High Priority Scry Card", "type_line": "Sorcery", "effect": "draw_cards", "cmc": 6},
+            {"name": "E2E Library Remainder", "type_line": "Creature", "effect": "creature", "cmc": 2},
+        ])
+
+    return {
+        "name": f"{rule['card_name']} resolves mana-spent cast trigger",
+        "type": "mana_spent_cast_trigger",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": required.get("source_type_line") or "Artifact",
+            "mana_cost": required.get("source_mana_cost") or "",
+        },
+        "type_line": required.get("source_type_line") or "Artifact",
+        "source_overrides": {"summoning_sick": False},
+        "cast_card": cast_card,
+        "controller_library": library,
+        "expected_available_mana_after_refresh": int(required.get("mana_produced") or 0),
+        "expected_trigger_count": 1,
+        "expected_draw_count": expected_draw_count,
+        "expected_life_gain": sum(
+            int(effect.get("amount") or 0)
+            for effect in effects
+            if effect.get("effect") == "gain_life"
+        ),
+        "expected_scry_count": expected_scry_count,
+        "logical_rule_key": rule["logical_rule_key"],
+    }
 
 
 def _manifest_unlock_cost_for_mana_source(required: dict[str, Any]) -> str:
@@ -7539,6 +7633,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or creature_etb_scry_execution_scenario_from_expected_rule(rule)
         or creature_etb_library_pick_execution_scenario_from_expected_rule(rule)
         or creature_dies_create_tokens_execution_scenario_from_expected_rule(rule)
+        or mana_spent_cast_trigger_execution_scenario_from_expected_rule(rule)
         or simple_mana_source_execution_scenario_from_expected_rule(rule)
         or sacrifice_mana_source_execution_scenario_from_expected_rule(rule)
         or damage_each_opponent_spell_execution_scenario_from_expected_rule(rule)

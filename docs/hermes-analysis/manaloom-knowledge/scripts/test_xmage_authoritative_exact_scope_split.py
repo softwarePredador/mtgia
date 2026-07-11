@@ -33128,6 +33128,119 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["target_constraints"]["card_types"], ["permanent"])
         self.assertEqual(effect["target_constraints"]["subtypes"], ["minotaur"])
 
+    def test_mana_spent_dragon_scry_source_maps_to_exact_runtime_scope(self) -> None:
+        proposal, reason = split.split_row(
+            queue_row(
+                "ramp_permanent::xmage_artifact_mana_source_variant_review_v1",
+                effect_classes=["CreateDelayedTriggeredAbilityEffect", "ScryEffect"],
+                ability_kind="activated_mana",
+                ability_classes=["BasicManaAbility", "BlueManaAbility", "ManaSpentDelayedTriggeredAbility"],
+            ),
+            metadata(
+                name="Lapis Orb of Dragonkind",
+                type_line="Artifact",
+                oracle_text=(
+                    "{T}: Add {U}. When you spend this mana to cast a Dragon creature spell, scry 2."
+                ),
+            ),
+            source_text="""
+                BasicManaAbility ability = new BlueManaAbility();
+                ability.addEffect(new CreateDelayedTriggeredAbilityEffect(
+                    new ManaSpentDelayedTriggeredAbility(new ScryEffect(2), filter)
+                ));
+                static { filter.add(SubType.DRAGON.getPredicate()); }
+                private static final FilterSpell filter = new FilterCreatureSpell("a Dragon creature spell");
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        self.assertTrue(proposal["safe_for_batch_pg_package"])
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.MANA_SPENT_CAST_TRIGGER_SCOPE)
+        self.assertEqual(effect["produced_mana_symbols"], ["U"])
+        self.assertEqual(
+            effect["mana_spent_cast_trigger"],
+            {
+                "spell_filter": "dragon_creature_spell",
+                "effects": [{"effect": "scry", "count": 2}],
+            },
+        )
+
+    def test_mana_spent_high_mana_value_draw_source_maps_to_exact_runtime_scope(self) -> None:
+        proposal, reason = split.split_row(
+            queue_row(
+                "ramp_permanent::xmage_creature_mana_source_variant_review_v1",
+                effect_classes=["CreateDelayedTriggeredAbilityEffect", "DrawCardSourceControllerEffect"],
+                ability_kind="activated_mana",
+                ability_classes=[
+                    "BasicManaAbility",
+                    "GreenManaAbility",
+                    "ManaSpentDelayedTriggeredAbility",
+                    "PartnerAbility",
+                ],
+            ),
+            metadata(
+                name="Gilanra, Caller of Wirewood",
+                type_line="Legendary Creature - Elf Druid",
+                oracle_text=(
+                    "{T}: Add {G}. When you spend this mana to cast a spell with mana value 6 or greater, draw a card.\n"
+                    "Partner"
+                ),
+            ),
+            source_text="""
+                filter.add(new ManaValuePredicate(ComparisonType.MORE_THAN, 5));
+                BasicManaAbility ability = new GreenManaAbility();
+                ability.addEffect(new CreateDelayedTriggeredAbilityEffect(
+                    new ManaSpentDelayedTriggeredAbility(new DrawCardSourceControllerEffect(1), filter)
+                ));
+                this.addAbility(PartnerAbility.getInstance());
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.MANA_SPENT_CAST_TRIGGER_SCOPE)
+        self.assertEqual(effect["mana_spent_cast_trigger"]["spell_filter"], "mana_value_gte")
+        self.assertEqual(effect["mana_spent_cast_trigger"]["mana_value_gte"], 6)
+        self.assertEqual(effect["mana_spent_cast_trigger"]["effects"], [{"effect": "draw_cards", "count": 1}])
+
+    def test_mana_spent_dragon_etb_replacement_stays_partial(self) -> None:
+        proposal, reason = split.split_row(
+            queue_row(
+                "ramp_permanent::xmage_artifact_mana_source_variant_review_v1",
+                effect_classes=[
+                    "CreateDelayedTriggeredAbilityEffect",
+                    "GainAbilityTargetEffect",
+                    "JadeOrbAdditionalCounterEffect",
+                    "JadeOrbGainHexproofEffect",
+                ],
+                ability_kind="activated_mana",
+                ability_classes=["BasicManaAbility", "GreenManaAbility", "ManaSpentDelayedTriggeredAbility"],
+            ),
+            metadata(
+                name="Jade Orb of Dragonkind",
+                type_line="Artifact",
+                oracle_text=(
+                    "{T}: Add {G}. When you spend this mana to cast a Dragon creature spell, "
+                    "it enters with an additional +1/+1 counter on it and gains hexproof until your next turn."
+                ),
+            ),
+            source_text="""
+                BasicManaAbility ability = new GreenManaAbility();
+                ManaSpentDelayedTriggeredAbility manaSpentAbility = new ManaSpentDelayedTriggeredAbility(
+                    new JadeOrbAdditionalCounterEffect(), filter);
+                manaSpentAbility.addEffect(new JadeOrbGainHexproofEffect());
+                ability.addEffect(new CreateDelayedTriggeredAbilityEffect(manaSpentAbility));
+                static { filter.add(SubType.DRAGON.getPredicate()); }
+                private static final FilterSpell filter = new FilterCreatureSpell("a Dragon creature spell");
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        self.assertFalse(proposal["safe_for_batch_pg_package"])
+        self.assertEqual(proposal["proposal_status"], "runtime_partial_requires_family_runtime")
+        self.assertTrue(proposal["effect_json"]["_runtime_partial"])
+
 
 if __name__ == "__main__":
     unittest.main()

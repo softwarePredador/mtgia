@@ -347,6 +347,7 @@ PAIN_TALISMAN_SCOPE = "pain_talisman_color_pair_partial_v1"
 MANA_WITH_ACTIVATION_LIFE_GAIN_SCOPE = "xmage_simple_tap_mana_source_with_gain_life_v1"
 MANA_WITH_ACTIVATED_DRAW_SCOPE = "xmage_simple_tap_mana_source_with_activated_draw_v1"
 MANA_WITH_ETB_DRAW_SCOPE = "xmage_simple_mana_source_with_etb_draw_v1"
+MANA_SPENT_CAST_TRIGGER_SCOPE = "xmage_simple_tap_mana_source_with_mana_spent_cast_trigger_v1"
 ETB_FIXED_MANA_CREATURE_SCOPE = "xmage_creature_etb_add_fixed_mana_v1"
 SELF_SACRIFICE_MANA_SOURCE_SCOPE = "xmage_self_sacrifice_mana_source_permanent_v1"
 TAP_AND_SELF_SACRIFICE_MANA_SOURCE_SCOPE = "xmage_tap_and_self_sacrifice_mana_source_permanent_v1"
@@ -26166,6 +26167,81 @@ def simple_mana_source_detail_from_oracle(metadata: dict[str, Any]) -> dict[str,
     return None
 
 
+def mana_spent_cast_trigger_detail_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
+    candidates: list[dict[str, Any]] = []
+    for line in normalized_oracle_lines(metadata):
+        working = strip_parenthetical_reminders(line)
+        if "when you spend this mana to cast" not in working:
+            continue
+        match = re.fullmatch(
+            r"\{t\}: add (?P<mana>.+?)\. when you spend this mana to cast "
+            r"(?P<filter>.+?), (?P<effect>.+?)\.?",
+            working,
+        )
+        if not match:
+            return None
+        mana_detail = mana_detail_from_add_phrase(match.group("mana"))
+        if mana_detail is None:
+            return None
+        filter_text = match.group("filter").strip()
+        effect_text = match.group("effect").strip()
+        trigger: dict[str, Any] | None = None
+        if filter_text == "a spell with mana value 6 or greater" and effect_text == "draw a card":
+            trigger = {
+                "spell_filter": "mana_value_gte",
+                "mana_value_gte": 6,
+                "effects": [{"effect": "draw_cards", "count": 1}],
+            }
+        elif filter_text == "a dragon creature spell" and effect_text == "you gain 2 life":
+            trigger = {
+                "spell_filter": "dragon_creature_spell",
+                "effects": [{"effect": "gain_life", "amount": 2}],
+            }
+        elif filter_text == "a dragon creature spell" and effect_text == "scry 2":
+            trigger = {
+                "spell_filter": "dragon_creature_spell",
+                "effects": [{"effect": "scry", "count": 2}],
+            }
+        if trigger is None:
+            return None
+        candidates.append({
+            **mana_detail,
+            "mana_activation_requires_tap": True,
+            "mana_spent_cast_trigger": trigger,
+        })
+    if len(candidates) == 1:
+        return candidates[0]
+    return None
+
+
+def mana_spent_cast_trigger_source_blocker(source_text: str, detail: dict[str, Any]) -> str | None:
+    text = source_text or ""
+    if "ManaSpentDelayedTriggeredAbility" not in text:
+        return "mana_spent_trigger_source_missing_delayed_trigger"
+    trigger = dict(detail.get("mana_spent_cast_trigger") or {})
+    spell_filter = str(trigger.get("spell_filter") or "")
+    if spell_filter == "mana_value_gte":
+        if "ManaValuePredicate(ComparisonType.MORE_THAN, 5)" not in text:
+            return "mana_spent_trigger_source_mana_value_filter_mismatch"
+        if "DrawCardSourceControllerEffect(1)" not in text:
+            return "mana_spent_trigger_source_draw_mismatch"
+    elif spell_filter == "dragon_creature_spell":
+        if "FilterCreatureSpell" not in text or "SubType.DRAGON.getPredicate()" not in text:
+            return "mana_spent_trigger_source_dragon_filter_mismatch"
+        effect = (trigger.get("effects") or [{}])[0]
+        if effect.get("effect") == "gain_life":
+            if f"GainLifeEffect({int(effect.get('amount') or 0)})" not in text:
+                return "mana_spent_trigger_source_life_gain_mismatch"
+        elif effect.get("effect") == "scry":
+            if f"ScryEffect({int(effect.get('count') or 0)})" not in text:
+                return "mana_spent_trigger_source_scry_mismatch"
+        else:
+            return "mana_spent_trigger_source_effect_not_supported"
+    else:
+        return "mana_spent_trigger_source_filter_not_supported"
+    return None
+
+
 def simple_mana_source_from_oracle(metadata: dict[str, Any]) -> tuple[str, int] | None:
     detail = simple_mana_source_detail_from_oracle(metadata)
     if detail is None:
@@ -40869,6 +40945,60 @@ def split_row(
                 family_id="xmage_target_sacrifice_mana_source_permanent",
             ), "selected_exact_scope"
         auxiliary_abilities = mana_ability_classes - SAFE_MANA_ABILITY_CLASSES
+        mana_spent_trigger_detail = mana_spent_cast_trigger_detail_from_oracle(metadata)
+        if mana_spent_trigger_detail is not None:
+            source_blocker = simple_mana_source_source_blocker(
+                source_text,
+                mana_ability_classes,
+                mana_spent_trigger_detail,
+            )
+            if source_blocker:
+                return None, source_blocker
+            trigger_source_blocker = mana_spent_cast_trigger_source_blocker(
+                source_text,
+                mana_spent_trigger_detail,
+            )
+            if trigger_source_blocker:
+                return None, trigger_source_blocker
+            type_line = str(metadata.get("type_line") or "").lower()
+            permanent_type = (
+                "creature"
+                if "creature" in type_line
+                else "artifact"
+                if "artifact" in type_line
+                else "permanent"
+            )
+            mana_requires_tap = bool(mana_spent_trigger_detail.get("mana_activation_requires_tap", True))
+            effect_json = {
+                "effect": "ramp_permanent",
+                "battle_model_scope": MANA_SPENT_CAST_TRIGGER_SCOPE,
+                "is_mana_source": True,
+                "mana_produced": int(mana_spent_trigger_detail["mana_produced"]),
+                "produces": str(mana_spent_trigger_detail["produces"]),
+                "activation_requires_tap": mana_requires_tap,
+                "mana_activation_requires_tap": mana_requires_tap,
+                "permanent_type": permanent_type,
+                "ability_kind": "activated_mana",
+                "mana_spent_cast_trigger": mana_spent_trigger_detail["mana_spent_cast_trigger"],
+                "conditional_mana_modes_status": "runtime_executor_v1",
+                "xmage_mana_ability_classes": sorted(
+                    mana_ability_classes & SAFE_MANA_ABILITY_CLASSES
+                ),
+                "xmage_auxiliary_ability_classes": sorted(auxiliary_abilities),
+                "xmage_effect_classes": sorted(classes),
+                "xmage_ability_classes": sorted(mana_ability_classes),
+            }
+            if mana_spent_trigger_detail.get("produced_mana_symbols"):
+                effect_json["produced_mana_symbols"] = list(
+                    mana_spent_trigger_detail["produced_mana_symbols"]
+                )
+            add_mana_source_activation_detail_fields(effect_json, mana_spent_trigger_detail)
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_mana_spent_cast_trigger_mana_source",
+            ), "selected_exact_scope"
         if limited_choice_mana_supported:
             mana_source_detail = limited_times_mana_source_detail_from_oracle(metadata)
             if mana_source_detail is None:
