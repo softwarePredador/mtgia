@@ -1338,6 +1338,40 @@ def test_mana_spent_cast_trigger_manifest_builds_cast_trigger_scenario() -> None
     assert scenario["expected_draw_count"] == 0
 
 
+def test_mana_activation_cast_trigger_manifest_builds_x_spell_scenario() -> None:
+    rule = {
+        "card_name": "Brass Infiniscope",
+        "logical_rule_key": "battle_rule_v1:brass",
+        "required_effect_fields": {
+            "effect": "ramp_permanent",
+            "battle_model_scope": "xmage_simple_tap_mana_source_with_next_cast_x_trigger_v1",
+            "is_mana_source": True,
+            "mana_produced": 2,
+            "produces": "C",
+            "produced_mana_symbols": ["C", "C"],
+            "mana_activation_requires_tap": True,
+            "mana_activation_cast_trigger": {
+                "spell_filter": "x_mana_cost_spell",
+                "duration": "end_of_turn",
+                "trigger_timing": "next_matching_cast",
+                "effects": [
+                    {"effect": "draw_cards", "count": 1},
+                    {"effect": "gain_life", "amount_source": "half_x_rounded_down"},
+                ],
+            },
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario["type"] == "mana_activation_cast_trigger"
+    assert scenario["card"]["name"] == "Brass Infiniscope"
+    assert scenario["cast_card"]["mana_cost"] == "{X}"
+    assert scenario["x_value"] == 2
+    assert scenario["expected_draw_count"] == 1
+    assert scenario["expected_life_gain"] == 1
+
+
 def test_simple_mana_source_execution_scenario_pays_activation_cost() -> None:
     rule = {
         "card_name": "Ceta Disciple",

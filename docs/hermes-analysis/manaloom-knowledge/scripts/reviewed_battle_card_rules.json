@@ -118,7 +118,8 @@
     "source": "curated",
     "confidence": 0.86,
     "review_status": "active",
-    "notes": "Oracle-reviewed on 2026-06-17 against Scryfall: Sacrifice a creature: Add {C}{C}. Runtime intentionally models this as a passive artifact with reviewed activated-mana metadata, not as free ramp on spell resolution. Full activation needs a dedicated sacrifice-creature mana executor."
+    "notes": "Oracle-reviewed on 2026-06-17 against Scryfall: Sacrifice a creature: Add {C}{C}. Runtime intentionally models this as a passive artifact with reviewed activated-mana metadata, not as free ramp on spell resolution. Full activation needs a dedicated sacrifice-creature mana executor.",
+    "oracle_hash": "dd3e1f004f2b178f31b638fad9cad591"
   },
   "Aven Mindcensor": {
     "rules": [
@@ -204,7 +205,8 @@
     "source": "curated",
     "confidence": 0.88,
     "review_status": "active",
-    "notes": "Oracle-reviewed on 2026-06-18 against Scryfall: Basking Broodscale is a 2/2 creature with Adapt 1 and a trigger that creates an Eldrazi Spawn token whenever one or more +1/+1 counters are put on it. Runtime must model it as a creature permanent first and never create tokens immediately on spell resolution. Adapt and the counter-to-token trigger remain tracked gaps."
+    "notes": "Oracle-reviewed on 2026-06-18 against Scryfall: Basking Broodscale is a 2/2 creature with Adapt 1 and a trigger that creates an Eldrazi Spawn token whenever one or more +1/+1 counters are put on it. Runtime must model it as a creature permanent first and never create tokens immediately on spell resolution. Adapt and the counter-to-token trigger remain tracked gaps.",
+    "oracle_hash": "325bca13766fa2c770259e79375080bc"
   },
   "Akroma's Will": {
     "effect_json": {
@@ -245,7 +247,8 @@
     "source": "curated",
     "confidence": 1.0,
     "review_status": "verified",
-    "notes": "Oracle-reviewed on 2026-06-16 against official Gatherer/Scryfall: player cannot lose this turn and damage cannot reduce life below 1."
+    "notes": "Oracle-reviewed on 2026-06-16 against official Gatherer/Scryfall: player cannot lose this turn and damage cannot reduce life below 1.",
+    "oracle_hash": "627c4ce7adf5be44b93e2b850159e5d9"
   },
   "Approach of the Second Sun": {
     "effect_json": {
@@ -355,7 +358,8 @@
     "source": "curated",
     "confidence": 0.99,
     "review_status": "verified",
-    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: Ancient Den is an artifact land that taps for white. Runtime keeps it as a land mana source, not as a spell heuristic."
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: Ancient Den is an artifact land that taps for white. Runtime keeps it as a land mana source, not as a spell heuristic.",
+    "oracle_hash": "c7264c311c98ff99b293a96ad9ab2daf"
   },
   "Ancient Tomb": {
     "effect_json": {
@@ -376,7 +380,8 @@
     "source": "curated",
     "confidence": 0.98,
     "review_status": "verified",
-    "notes": "Oracle-reviewed on 2026-06-18 against official Gatherer text: Ancient Tomb taps for {C} and deals 2 damage to you while effectively producing an extra colorless mana over a normal land under the current pooled-mana abstraction. Runtime uses the explicit life-cost and bonus-mana fields instead of collapsing it into a generic land."
+    "notes": "Oracle-reviewed on 2026-06-18 against official Gatherer text: Ancient Tomb taps for {C} and deals 2 damage to you while effectively producing an extra colorless mana over a normal land under the current pooled-mana abstraction. Runtime uses the explicit life-cost and bonus-mana fields instead of collapsing it into a generic land.",
+    "oracle_hash": "5f61966c5bfc67508502d929ca891af3"
   },
   "Apex of Power": {
     "effect_json": {
@@ -420,7 +425,8 @@
     "source": "curated",
     "confidence": 0.81,
     "review_status": "active",
-    "notes": "Reviewed generic battle model. Official card is a mana-filtering artifact that cantrips when put into a graveyard from the battlefield. Runtime now models it as a sacrifice-to-filter-and-draw utility artifact, but still does not implement full mana-ability timing or every combo edge case."
+    "notes": "Reviewed generic battle model. Official card is a mana-filtering artifact that cantrips when put into a graveyard from the battlefield. Runtime now models it as a sacrifice-to-filter-and-draw utility artifact, but still does not implement full mana-ability timing or every combo edge case.",
+    "oracle_hash": "e42c268c0db1c7273a78d08b85d8918b"
   },
   "Dismember": {
     "effect_json": {
@@ -443,7 +449,8 @@
     "source": "curated",
     "confidence": 0.98,
     "review_status": "verified",
-    "notes": "Oracle-reviewed on 2026-06-17 against Scryfall API: cost is {1}{B/P}{B/P}; target creature gets -5/-5 until end of turn. Runtime models this as a stat modifier, not destroy/exile."
+    "notes": "Oracle-reviewed on 2026-06-17 against Scryfall API: cost is {1}{B/P}{B/P}; target creature gets -5/-5 until end of turn. Runtime models this as a stat modifier, not destroy/exile.",
+    "oracle_hash": "e3824a160f31571d21bccb7be33474cf"
   },
   "Drown in Dreams": {
     "effect_json": {
@@ -484,7 +491,8 @@
     "source": "curated",
     "confidence": 0.97,
     "review_status": "verified",
-    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: as an additional cost sacrifice a land, then search for any land card and put it onto the battlefield. Runtime uses the explicit sacrifice-land gate and contextual land-target scoring instead of treating this as permanent ramp."
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: as an additional cost sacrifice a land, then search for any land card and put it onto the battlefield. Runtime uses the explicit sacrifice-land gate and contextual land-target scoring instead of treating this as permanent ramp.",
+    "oracle_hash": "67869230ccb8b4499893e14915ca8b14"
   },
   "Curator's Ward": {
     "effect_json": {
@@ -854,7 +862,8 @@
     "source": "curated",
     "confidence": 0.88,
     "review_status": "active",
-    "notes": "Oracle-reviewed on 2026-06-17 against current card text: this is a creature permanent with an enters/discard/search line, not an immediate free tutor on resolution. Runtime keeps it as a creature until the ETB discard-tutor branch is modeled explicitly."
+    "notes": "Oracle-reviewed on 2026-06-17 against current card text: this is a creature permanent with an enters/discard/search line, not an immediate free tutor on resolution. Runtime keeps it as a creature until the ETB discard-tutor branch is modeled explicitly.",
+    "oracle_hash": "2339245d7d8beb5a87ea1c0c8b67dc88"
   },
   "Gemstone Caverns": {
     "effect_json": {
@@ -872,7 +881,8 @@
     "source": "curated",
     "confidence": 0.84,
     "review_status": "active",
-    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: Gemstone Caverns has a pregame luck-counter branch that changes its output. Runtime keeps the current broad fixing abstraction for battle consistency until dedicated pregame modeling exists."
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: Gemstone Caverns has a pregame luck-counter branch that changes its output. Runtime keeps the current broad fixing abstraction for battle consistency until dedicated pregame modeling exists.",
+    "oracle_hash": "2c25335e12791e77b9c19c9b3af0a413"
   },
   "Ghoulcaller's Bell": {
     "effect_json": {
@@ -935,7 +945,8 @@
     "source": "curated",
     "confidence": 0.99,
     "review_status": "verified",
-    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: Great Furnace is an artifact land that taps for red. Runtime keeps it as a land mana source, not as a spell heuristic."
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: Great Furnace is an artifact land that taps for red. Runtime keeps it as a land mana source, not as a spell heuristic.",
+    "oracle_hash": "ed6887f502cae452812d5f5d0a0c5792"
   },
   "Hall of Heliod's Generosity": {
     "effect_json": {
@@ -954,7 +965,8 @@
     "source": "curated",
     "confidence": 0.9,
     "review_status": "active",
-    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: this is primarily a colorless utility land with enchantment-recursion activation. Runtime keeps the recursion profile as reviewed metadata while preserving the baseline colorless land behavior."
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: this is primarily a colorless utility land with enchantment-recursion activation. Runtime keeps the recursion profile as reviewed metadata while preserving the baseline colorless land behavior.",
+    "oracle_hash": "cf91d14269b30b7db1f05234d34db931"
   },
   "Hypothesizzle": {
     "effect_json": {
@@ -1013,7 +1025,8 @@
     "source": "curated",
     "confidence": 0.84,
     "review_status": "active",
-    "notes": "Oracle-reviewed on 2026-06-17 against Scryfall: {T}: Add one mana of any type that a land you control could produce; with a +1/+1 counter it adds three instead; {3}{G}{G}: Adapt 3. Runtime models only the baseline mana-dork mode with summoning sickness. Adapt and triple-mana replacement remain tracked gaps."
+    "notes": "Oracle-reviewed on 2026-06-17 against Scryfall: {T}: Add one mana of any type that a land you control could produce; with a +1/+1 counter it adds three instead; {3}{G}{G}: Adapt 3. Runtime models only the baseline mana-dork mode with summoning sickness. Adapt and triple-mana replacement remain tracked gaps.",
+    "oracle_hash": "5bb72caef291ea420e5de42a141665ab"
   },
   "Lapse of Certainty": {
     "effect_json": {
@@ -1160,7 +1173,8 @@
     "source": "curated",
     "confidence": 0.98,
     "review_status": "verified",
-    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: Mox Amber taps for one mana of any color among legendary creatures and planeswalkers you control. Runtime must not count it as live opening-hand ramp or active mana without a valid legendary permanent on the battlefield."
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: Mox Amber taps for one mana of any color among legendary creatures and planeswalkers you control. Runtime must not count it as live opening-hand ramp or active mana without a valid legendary permanent on the battlefield.",
+    "oracle_hash": "e47b40cf2afc4c9ceac6bf91815da706"
   },
   "Mind Stone": {
     "effect_json": {
@@ -1181,7 +1195,8 @@
     "source": "curated",
     "confidence": 0.94,
     "review_status": "active",
-    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: Mind Stone is a colorless mana rock that can later be tapped, sacrificed, and turned into a card. Runtime must not collapse it into immediate draw on spell resolution; it enters as a mana permanent and can be cashed in later when hand quality is low."
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: Mind Stone is a colorless mana rock that can later be tapped, sacrificed, and turned into a card. Runtime must not collapse it into immediate draw on spell resolution; it enters as a mana permanent and can be cashed in later when hand quality is low.",
+    "oracle_hash": "8d1c9b62d7e5642df44a61a63de5e240"
   },
   "Mana Vault": {
     "effect_json": {
@@ -1202,7 +1217,8 @@
     "source": "curated",
     "confidence": 0.91,
     "review_status": "active",
-    "notes": "Oracle-reviewed on 2026-06-18 against official Gatherer text: Mana Vault taps for three colorless mana, does not untap normally, can be untapped in upkeep for {4}, and pings while tapped. Runtime already models the fast-mana baseline; the untap/upkeep pain policy remains partial and therefore stays active instead of verified."
+    "notes": "Oracle-reviewed on 2026-06-18 against official Gatherer text: Mana Vault taps for three colorless mana, does not untap normally, can be untapped in upkeep for {4}, and pings while tapped. Runtime already models the fast-mana baseline; the untap/upkeep pain policy remains partial and therefore stays active instead of verified.",
+    "oracle_hash": "35e3fd94c8453c0e326033af49ae18c8"
   },
   "Natural Order": {
     "effect_json": {
@@ -1222,7 +1238,8 @@
     "source": "curated",
     "confidence": 0.96,
     "review_status": "verified",
-    "notes": "Oracle-reviewed on 2026-06-16 against Scryfall/Wizards card text: additional cost is sacrificing a green creature, and the spell searches for a green creature card to put directly onto the battlefield."
+    "notes": "Oracle-reviewed on 2026-06-16 against Scryfall/Wizards card text: additional cost is sacrificing a green creature, and the spell searches for a green creature card to put directly onto the battlefield.",
+    "oracle_hash": "313e25b11a10c99127eca70b7fefbb75"
   },
   "One with the Multiverse": {
     "effect_json": {
@@ -1409,7 +1426,8 @@
     "source": "curated",
     "confidence": 0.93,
     "review_status": "verified",
-    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: this is a graveyard-hate artifact with a later self-sacrifice draw mode. Runtime must not degrade it into a generic draw spell because the draw is conditional and delayed."
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: this is a graveyard-hate artifact with a later self-sacrifice draw mode. Runtime must not degrade it into a generic draw spell because the draw is conditional and delayed.",
+    "oracle_hash": "6a9e4cf9a4397715ccd0737e1b8cf270"
   },
   "Stonespeaker Crystal": {
     "effect_json": {
@@ -1509,7 +1527,8 @@
     "source": "curated",
     "confidence": 0.97,
     "review_status": "verified",
-    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: as an additional cost discard a card, then draw two cards and create two Treasure tokens. Runtime already supports the discard/draw/treasure executor; this reviewed rule prevents the card from degrading into a generic ramp bucket."
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: as an additional cost discard a card, then draw two cards and create two Treasure tokens. Runtime already supports the discard/draw/treasure executor; this reviewed rule prevents the card from degrading into a generic ramp bucket.",
+    "oracle_hash": "9c4fbe06104051a2e8b1d295d307b26a"
   },
   "Vexing Bauble": {
     "effect_json": {
@@ -1527,7 +1546,8 @@
     "source": "curated",
     "confidence": 0.95,
     "review_status": "verified",
-    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: this artifact counters spells cast with no mana spent and can sacrifice itself later to draw a card. Runtime should treat it as a battlefield hate piece, not as an immediate draw spell."
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: this artifact counters spells cast with no mana spent and can sacrifice itself later to draw a card. Runtime should treat it as a battlefield hate piece, not as an immediate draw spell.",
+    "oracle_hash": "020e696ec9560830bb82bf0244595d69"
   },
   "Miscast": {
     "effect_json": {
@@ -1545,7 +1565,8 @@
     "source": "curated",
     "confidence": 0.93,
     "review_status": "verified",
-    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: this is a cheap spell interaction piece aimed at instants or sorceries. Runtime keeps the conservative counter semantic instead of inventing full tax-resolution nuance."
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: this is a cheap spell interaction piece aimed at instants or sorceries. Runtime keeps the conservative counter semantic instead of inventing full tax-resolution nuance.",
+    "oracle_hash": "dff145f1eaaa76d6f9e44e688bb29726"
   },
   "Mystical Tutor": {
     "effect_json": {
@@ -1564,7 +1585,8 @@
     "source": "curated",
     "confidence": 0.95,
     "review_status": "active",
-    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: search your library for an instant or sorcery card and reveal it, then shuffle and put that card on top. Runtime first promotes the strict target filter and decision trace; exact top-of-library destination parity remains tracked separately."
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: search your library for an instant or sorcery card and reveal it, then shuffle and put that card on top. Runtime first promotes the strict target filter and decision trace; exact top-of-library destination parity remains tracked separately.",
+    "oracle_hash": "6a72f3c0228efaa3bb3bb616122ed036"
   },
   "Lantern of Insight": {
     "effect_json": {
@@ -1639,7 +1661,8 @@
     "source": "curated",
     "confidence": 0.9,
     "review_status": "active",
-    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: this is a colorless utility land with artifact-threshold life gain and an artifact tutor activation. Runtime preserves the reviewed utility profile while treating it as a normal land for mana."
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: this is a colorless utility land with artifact-threshold life gain and an artifact tutor activation. Runtime preserves the reviewed utility profile while treating it as a normal land for mana.",
+    "oracle_hash": "9529349d5e874f6304264ddf6a2d0c2f"
   },
   "Chrome Mox": {
     "effect_json": {
@@ -1658,7 +1681,8 @@
     "source": "curated",
     "confidence": 0.98,
     "review_status": "verified",
-    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: this enters only after imprinting a nonartifact, nonland colored card from hand. Runtime should use the dedicated imprint selector and never treat it as free unconditional mana."
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: this enters only after imprinting a nonartifact, nonland colored card from hand. Runtime should use the dedicated imprint selector and never treat it as free unconditional mana.",
+    "oracle_hash": "44481be7f5347792ede1a9b679a424b3"
   },
   "Command Tower": {
     "effect_json": {
@@ -1797,7 +1821,8 @@
     "source": "curated",
     "confidence": 0.98,
     "review_status": "verified",
-    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: this enters only if you discard a land as an additional cost, then taps for one mana of any color. Runtime should use the explicit discard-land gate and stay conservative about spending your last land without payoff."
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: this enters only if you discard a land as an additional cost, then taps for one mana of any color. Runtime should use the explicit discard-land gate and stay conservative about spending your last land without payoff.",
+    "oracle_hash": "517f664e6c81ce9c204c09a20e14be2d"
   },
   "Nature's Claim": {
     "effect_json": {
@@ -1817,7 +1842,8 @@
     "source": "curated",
     "confidence": 0.98,
     "review_status": "verified",
-    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: destroy target artifact or enchantment; its controller gains 4 life. Runtime must keep the target restriction explicit instead of widening the card to generic nonland permanent removal."
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: destroy target artifact or enchantment; its controller gains 4 life. Runtime must keep the target restriction explicit instead of widening the card to generic nonland permanent removal.",
+    "oracle_hash": "c88d03f66daf06b46fd567dca8e34c50"
   },
   "Everflowing Chalice": {
     "effect_json": {
@@ -1835,7 +1861,8 @@
     "source": "curated",
     "confidence": 0.97,
     "review_status": "verified",
-    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: Everflowing Chalice enters with a charge counter for each multikicker payment and taps for colorless equal to its counters. Runtime should pay multikicker before treating it as a mana source."
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: Everflowing Chalice enters with a charge counter for each multikicker payment and taps for colorless equal to its counters. Runtime should pay multikicker before treating it as a mana source.",
+    "oracle_hash": "2916ac287962232283ac7b1dbe684b7d"
   },
   "Birgi, God of Storytelling": {
     "effect_json": {
@@ -1856,7 +1883,8 @@
     "source": "curated",
     "confidence": 0.92,
     "review_status": "verified",
-    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: whenever you cast a spell, add {R} until end of turn. Runtime keeps the creature body and the spell-cast mana trigger without modeling every backside/modal nuance."
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: whenever you cast a spell, add {R} until end of turn. Runtime keeps the creature body and the spell-cast mana trigger without modeling every backside/modal nuance.",
+    "oracle_hash": "5f1ed696a63cd668fd46a2fe9971a54e"
   },
   "Channeled Force": {
     "effect_json": {
@@ -1893,7 +1921,8 @@
     "source": "curated",
     "confidence": 0.91,
     "review_status": "verified",
-    "notes": "Oracle-reviewed on 2026-06-17 against mechanics coverage: runtime should create a hasty token copy that sacrifices at the next end step, not collapse this into a generic token-maker bucket."
+    "notes": "Oracle-reviewed on 2026-06-17 against mechanics coverage: runtime should create a hasty token copy that sacrifices at the next end step, not collapse this into a generic token-maker bucket.",
+    "oracle_hash": "336afa048144f8fb9a88dfc3b6588f4b"
   },
   "Firemind Vessel": {
     "effect_json": {
@@ -1950,7 +1979,8 @@
     "source": "curated",
     "confidence": 0.93,
     "review_status": "active",
-    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: Sunbaked Canyon taps for red or white at the cost of life and can be sacrificed to draw. Runtime preserves the land identity plus reviewed utility profile."
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: Sunbaked Canyon taps for red or white at the cost of life and can be sacrificed to draw. Runtime preserves the land identity plus reviewed utility profile.",
+    "oracle_hash": "eae946655b75e4666adfbdb760bee0ff"
   },
   "Urza's Saga": {
     "effect_json": {
@@ -1969,7 +1999,8 @@
     "source": "curated",
     "confidence": 0.91,
     "review_status": "active",
-    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: Urza's Saga is an enchantment land Saga with mana, Construct-token, and tutor chapters. Runtime keeps the baseline colorless land plus reviewed saga profile; full chapter sequencing remains partially modeled."
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: Urza's Saga is an enchantment land Saga with mana, Construct-token, and tutor chapters. Runtime keeps the baseline colorless land plus reviewed saga profile; full chapter sequencing remains partially modeled.",
+    "oracle_hash": "43e3b1636425f22bbd834442ddb93bc0"
   },
   "Valakut Awakening": {
     "effect_json": {
@@ -2056,7 +2087,8 @@
     "source": "curated",
     "confidence": 0.93,
     "review_status": "verified",
-    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: Wall of Omens is a creature that draws a card when it enters the battlefield. Runtime must place it on the battlefield and apply the ETB draw, never degrade it into a generic draw spell."
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: Wall of Omens is a creature that draws a card when it enters the battlefield. Runtime must place it on the battlefield and apply the ETB draw, never degrade it into a generic draw spell.",
+    "oracle_hash": "755be179e545f27507f78b6a79a34485"
   },
   "Wayfarer's Bauble": {
     "effect_json": {
@@ -2079,7 +2111,8 @@
     "source": "curated",
     "confidence": 0.92,
     "review_status": "active",
-    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: Wayfarer's Bauble is not immediate land ramp on cast; it is a battlefield artifact that later pays {2}, taps, and sacrifices itself to fetch a basic land tapped. Runtime now preserves the permanent-first sequencing and a safe activation slice."
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: Wayfarer's Bauble is not immediate land ramp on cast; it is a battlefield artifact that later pays {2}, taps, and sacrifices itself to fetch a basic land tapped. Runtime now preserves the permanent-first sequencing and a safe activation slice.",
+    "oracle_hash": "f11935fa793ae03d95ae75d62cdfa516"
   },
   "War Room": {
     "effect_json": {
@@ -2098,7 +2131,8 @@
     "source": "curated",
     "confidence": 0.93,
     "review_status": "active",
-    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: this is a colorless utility land that pays life to draw. Runtime preserves the draw-land utility profile while keeping the baseline mana source explicit."
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: this is a colorless utility land that pays life to draw. Runtime preserves the draw-land utility profile while keeping the baseline mana source explicit.",
+    "oracle_hash": "d9c250570bb91d94ceae9fcd74081ef5"
   },
   "Sami's Curiosity": {
     "effect_json": {
@@ -2160,7 +2194,8 @@
     "source": "curated",
     "confidence": 0.9,
     "review_status": "active",
-    "notes": "Oracle-reviewed on 2026-06-18 against Scryfall: Scavenging Ooze is a creature permanent with a repeatable graveyard-exile activation that can grow itself and gain life. Runtime must not resolve it as immediate removal on spell cast; it should enter the battlefield as a creature first. The activated exile/counter/life mode remains tracked until a dedicated graveyard-hate creature executor exists."
+    "notes": "Oracle-reviewed on 2026-06-18 against Scryfall: Scavenging Ooze is a creature permanent with a repeatable graveyard-exile activation that can grow itself and gain life. Runtime must not resolve it as immediate removal on spell cast; it should enter the battlefield as a creature first. The activated exile/counter/life mode remains tracked until a dedicated graveyard-hate creature executor exists.",
+    "oracle_hash": "072765012c562c0dd7e6c1965a77fa17"
   },
   "Shark Typhoon": {
     "effect_json": {
@@ -2200,7 +2235,8 @@
     "source": "curated",
     "confidence": 0.97,
     "review_status": "verified",
-    "notes": "Oracle-reviewed on 2026-06-18 against official Gatherer text: Seething Song adds five red mana immediately and then goes to the graveyard. Runtime should keep it as a one-shot ritual, not a permanent mana source or generic draw placeholder."
+    "notes": "Oracle-reviewed on 2026-06-18 against official Gatherer text: Seething Song adds five red mana immediately and then goes to the graveyard. Runtime should keep it as a one-shot ritual, not a permanent mana source or generic draw placeholder.",
+    "oracle_hash": "ccd492289c6f1c14c8fb7a248d7bbf32"
   },
   "Silence": {
     "effect_json": {
@@ -2217,7 +2253,8 @@
     "source": "curated",
     "confidence": 0.97,
     "review_status": "verified",
-    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: opponents cannot cast spells this turn. Runtime should set the until-end-of-turn silence state, not materialize a battlefield permanent."
+    "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: opponents cannot cast spells this turn. Runtime should set the until-end-of-turn silence state, not materialize a battlefield permanent.",
+    "oracle_hash": "a0ca3c09a7db091c435ab31adb9c1780"
   },
   "The Emperor of Palamecia": {
     "effect_json": {

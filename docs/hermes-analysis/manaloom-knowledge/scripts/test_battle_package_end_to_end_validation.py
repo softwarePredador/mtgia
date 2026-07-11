@@ -4957,6 +4957,118 @@ def test_mana_spent_cast_trigger_runner_resolves_life_gain() -> None:
     assert any(event == "mana_spent_cast_trigger_resolved" for event, _data in events)
 
 
+def test_mana_activation_cast_trigger_runner_resolves_x_spell_draw_life() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+
+    def get_effect(card):
+        if card.get("name") == "Brass Infiniscope":
+            return {
+                "effect": "ramp_permanent",
+                "battle_model_scope": "xmage_simple_tap_mana_source_with_next_cast_x_trigger_v1",
+                "is_mana_source": True,
+                "mana_produced": 2,
+                "produces": "C",
+                "produced_mana_symbols": ["C", "C"],
+                "mana_activation_requires_tap": True,
+                "mana_activation_cast_trigger": {
+                    "spell_filter": "x_mana_cost_spell",
+                    "duration": "end_of_turn",
+                    "trigger_timing": "next_matching_cast",
+                    "effects": [
+                        {"effect": "draw_cards", "count": 1},
+                        {"effect": "gain_life", "amount_source": "half_x_rounded_down"},
+                    ],
+                },
+                "_rule_logical_key": "battle_rule_v1:brass",
+            }
+        return {"effect": "draw_cards"}
+
+    battle.get_card_effect = get_effect
+    try:
+        result = validator.run_mana_activation_cast_trigger(
+            battle,
+            {
+                "name": "Brass Infiniscope resolves next X spell trigger",
+                "type": "mana_activation_cast_trigger",
+                "card": {"name": "Brass Infiniscope", "type_line": "Artifact"},
+                "cast_card": {
+                    "name": "E2E X Spell",
+                    "type_line": "Sorcery",
+                    "mana_cost": "{X}",
+                    "cmc": 0,
+                    "effect": "draw_cards",
+                },
+                "x_value": 2,
+                "controller_library": [{"name": "E2E Trigger Draw", "type_line": "Instant"}],
+                "expected_available_mana_after_refresh": 2,
+                "expected_trigger_count": 1,
+                "expected_draw_count": 1,
+                "expected_life_gain": 1,
+                "logical_rule_key": "battle_rule_v1:brass",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Brass Infiniscope"
+    assert result["trigger_count"] == 1
+    assert result["draw_count"] == 1
+    assert result["life_gain"] == 1
+    assert result["x_value"] == 2
+    assert any(event == "mana_activation_cast_trigger_created" for event, _data in events)
+    assert any(event == "mana_activation_cast_trigger_resolved" for event, _data in events)
+
+
+def test_mana_activation_cast_trigger_refresh_does_not_duplicate_pending_trigger() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+
+    def get_effect(card):
+        if card.get("name") == "Brass Infiniscope":
+            return {
+                "effect": "ramp_permanent",
+                "battle_model_scope": "xmage_simple_tap_mana_source_with_next_cast_x_trigger_v1",
+                "is_mana_source": True,
+                "mana_produced": 2,
+                "produces": "C",
+                "produced_mana_symbols": ["C", "C"],
+                "mana_activation_requires_tap": True,
+                "mana_activation_cast_trigger": {
+                    "spell_filter": "x_mana_cost_spell",
+                    "duration": "end_of_turn",
+                    "trigger_timing": "next_matching_cast",
+                    "effects": [{"effect": "draw_cards", "count": 1}],
+                },
+                "_rule_logical_key": "battle_rule_v1:brass",
+            }
+        return {"effect": "draw_cards"}
+
+    battle.get_card_effect = get_effect
+    try:
+        player = battle.Player("Mana Trigger Controller", None, [])
+        source_card = {"name": "Brass Infiniscope", "type_line": "Artifact", "summoning_sick": False}
+        source = battle.enrich_card({**source_card, **get_effect(source_card)})
+        player.battlefield = [source]
+        player.refresh_mana_sources(turn=8)
+        player.refresh_mana_sources(turn=8)
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    created = [data for event, data in events if event == "mana_activation_cast_trigger_created"]
+    assert len(created) == 1
+    assert len(player.pending_mana_activation_cast_triggers) == 1
+
+
 def test_simple_mana_source_refresh_runner_validates_tap_support_cost() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

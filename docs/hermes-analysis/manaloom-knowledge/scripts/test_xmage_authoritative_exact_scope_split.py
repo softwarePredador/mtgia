@@ -33204,6 +33204,61 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["mana_spent_cast_trigger"]["mana_value_gte"], 6)
         self.assertEqual(effect["mana_spent_cast_trigger"]["effects"], [{"effect": "draw_cards", "count": 1}])
 
+    def test_mana_activation_next_cast_x_trigger_maps_brass_infiniscope(self) -> None:
+        proposal, reason = split.split_row(
+            queue_row(
+                "ramp_permanent::xmage_artifact_mana_source_variant_review_v1",
+                effect_classes=[
+                    "BrassInfiniscopeDelayedEffect",
+                    "BrassInfiniscopeManaEffect",
+                    "ManaEffect",
+                    "OneShotEffect",
+                ],
+                ability_kind="activated_mana",
+                ability_classes=["CastNextSpellDelayedTriggeredAbility", "SimpleManaAbility"],
+            ),
+            metadata(
+                name="Brass Infiniscope",
+                type_line="Artifact",
+                mana_cost="{4}",
+                oracle_text=(
+                    "{T}: Add {C}{C}. When you next cast a spell with {X} in its mana cost this turn, "
+                    "you draw a card and gain half X life, rounded down."
+                ),
+            ),
+            source_text="""
+                SimpleManaAbility manaAbility = new SimpleManaAbility(
+                    Zone.BATTLEFIELD,
+                    new BrassInfiniscopeManaEffect(),
+                    new TapSourceCost()
+                );
+                filter.add(VariableManaCostPredicate.instance);
+                game.addDelayedTriggeredAbility(
+                    new CastNextSpellDelayedTriggeredAbility(new BrassInfiniscopeDelayedEffect(), filter, false),
+                    source
+                );
+                public Mana produceMana(Game game, Ability source) {
+                    return Mana.ColorlessMana(2);
+                }
+                player.drawCards(1, source, game);
+                player.gainLife(xValue / 2, game, source);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        self.assertTrue(proposal["safe_for_batch_pg_package"])
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.MANA_ACTIVATION_NEXT_CAST_X_TRIGGER_SCOPE)
+        self.assertEqual(effect["produced_mana_symbols"], ["C", "C"])
+        self.assertEqual(effect["mana_activation_cast_trigger"]["spell_filter"], "x_mana_cost_spell")
+        self.assertEqual(
+            effect["mana_activation_cast_trigger"]["effects"],
+            [
+                {"effect": "draw_cards", "count": 1},
+                {"effect": "gain_life", "amount_source": "half_x_rounded_down"},
+            ],
+        )
+
     def test_mana_spent_dragon_etb_replacement_stays_partial(self) -> None:
         proposal, reason = split.split_row(
             queue_row(

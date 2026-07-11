@@ -2641,6 +2641,46 @@ def _cast_x_value_for_trigger(card, effect_data):
     return 0
 
 
+def _resolve_cast_trigger_effects(player, card, effect_data, trigger, *, phase=None):
+    effect_results = []
+    for trigger_effect in trigger.get("effects") or []:
+        if not isinstance(trigger_effect, dict):
+            continue
+        effect_kind = str(trigger_effect.get("effect") or "").strip()
+        if effect_kind == "draw_cards":
+            count = max(0, int(trigger_effect.get("count") or 0))
+            if count > 0:
+                drawn = player.draw(count, random, phase=phase)
+                effect_results.append({
+                    "effect": effect_kind,
+                    "count": count,
+                    "drawn": [item.get("name", "?") for item in drawn if isinstance(item, dict)],
+                })
+        elif effect_kind == "gain_life":
+            amount = max(0, int(trigger_effect.get("amount") or 0))
+            if str(trigger_effect.get("amount_source") or "") == "half_x_rounded_down":
+                amount = _cast_x_value_for_trigger(card, effect_data) // 2
+            if amount > 0:
+                before = int(getattr(player, "life", 0))
+                gain_life(player, amount, cap=999)
+                effect_results.append({
+                    "effect": effect_kind,
+                    "amount": amount,
+                    "life_before": before,
+                    "life_after": int(getattr(player, "life", before)),
+                })
+        elif effect_kind == "scry":
+            count = max(0, int(trigger_effect.get("count") or 0))
+            if count > 0:
+                scry_result = scry_library_for_controller(player, count)
+                effect_results.append({
+                    "effect": effect_kind,
+                    "count": count,
+                    **scry_result,
+                })
+    return effect_results
+
+
 def resolve_mana_spent_cast_triggers(player, card, effect_data, spent_sources, *, turn=None, phase=None):
     resolved = 0
     for spent in spent_sources or []:
@@ -2649,42 +2689,7 @@ def resolve_mana_spent_cast_triggers(player, card, effect_data, spent_sources, *
         trigger = spent.get("mana_spent_cast_trigger")
         if not trigger or not mana_spent_cast_trigger_matches(card, effect_data, trigger):
             continue
-        effect_results = []
-        for trigger_effect in trigger.get("effects") or []:
-            if not isinstance(trigger_effect, dict):
-                continue
-            effect_kind = str(trigger_effect.get("effect") or "").strip()
-            if effect_kind == "draw_cards":
-                count = max(0, int(trigger_effect.get("count") or 0))
-                if count > 0:
-                    drawn = player.draw(count, random, phase=phase)
-                    effect_results.append({
-                        "effect": effect_kind,
-                        "count": count,
-                        "drawn": [item.get("name", "?") for item in drawn if isinstance(item, dict)],
-                    })
-            elif effect_kind == "gain_life":
-                amount = max(0, int(trigger_effect.get("amount") or 0))
-                if str(trigger_effect.get("amount_source") or "") == "half_x_rounded_down":
-                    amount = _cast_x_value_for_trigger(card, effect_data) // 2
-                if amount > 0:
-                    before = int(getattr(player, "life", 0))
-                    gain_life(player, amount, cap=999)
-                    effect_results.append({
-                        "effect": effect_kind,
-                        "amount": amount,
-                        "life_before": before,
-                        "life_after": int(getattr(player, "life", before)),
-                    })
-            elif effect_kind == "scry":
-                count = max(0, int(trigger_effect.get("count") or 0))
-                if count > 0:
-                    scry_result = scry_library_for_controller(player, count)
-                    effect_results.append({
-                        "effect": effect_kind,
-                        "count": count,
-                        **scry_result,
-                    })
+        effect_results = _resolve_cast_trigger_effects(player, card, effect_data, trigger, phase=phase)
         if effect_results:
             resolved += 1
             emit_replay_event(
@@ -2699,6 +2704,75 @@ def resolve_mana_spent_cast_triggers(player, card, effect_data, spent_sources, *
                 phase=phase,
                 **dict(spent.get("rule_fields") or {}),
             )
+    return resolved
+
+
+def record_mana_activation_cast_trigger(player, source, produced, *, turn=None):
+    if not isinstance(source, dict) or not source.get("mana_activation_cast_trigger"):
+        return False
+    if not hasattr(player, "pending_mana_activation_cast_triggers"):
+        player.pending_mana_activation_cast_triggers = []
+    trigger = copy.deepcopy(source.get("mana_activation_cast_trigger") or {})
+    if not isinstance(trigger, dict) or not trigger:
+        return False
+    source_object_id = id(source)
+    for existing in player.pending_mana_activation_cast_triggers:
+        if not isinstance(existing, dict):
+            continue
+        if existing.get("source_object_id") == source_object_id and existing.get("turn") == turn:
+            return False
+    entry = {
+        "source": source.get("name", "?"),
+        "source_object_id": source_object_id,
+        "trigger": trigger,
+        "amount_produced": max(0, int(produced or 0)),
+        "rule_fields": replay_rule_fields(source),
+        "turn": turn,
+    }
+    player.pending_mana_activation_cast_triggers.append(entry)
+    emit_replay_event(
+        "mana_activation_cast_trigger_created",
+        player=getattr(player, "name", "?"),
+        card=entry["source"],
+        spell_filter=trigger.get("spell_filter"),
+        amount_produced=entry["amount_produced"],
+        turn=turn,
+        **entry["rule_fields"],
+    )
+    return True
+
+
+def resolve_mana_activation_cast_triggers(player, card, effect_data, *, turn=None, phase=None):
+    pending = list(getattr(player, "pending_mana_activation_cast_triggers", []) or [])
+    remaining = []
+    resolved = 0
+    for entry in pending:
+        if not isinstance(entry, dict):
+            continue
+        if entry.get("turn") is not None and turn is not None and entry.get("turn") != turn:
+            continue
+        trigger = entry.get("trigger")
+        if not trigger or not mana_spent_cast_trigger_matches(card, effect_data, trigger):
+            remaining.append(entry)
+            continue
+        effect_results = _resolve_cast_trigger_effects(player, card, effect_data, trigger, phase=phase)
+        if not effect_results:
+            remaining.append(entry)
+            continue
+        resolved += 1
+        emit_replay_event(
+            "mana_activation_cast_trigger_resolved",
+            player=getattr(player, "name", "?"),
+            card=entry.get("source"),
+            cast_card=card.get("name", "?") if isinstance(card, dict) else str(card),
+            spell_filter=trigger.get("spell_filter"),
+            effects=effect_results,
+            amount_produced=int(entry.get("amount_produced") or 0),
+            turn=turn,
+            phase=phase,
+            **dict(entry.get("rule_fields") or {}),
+        )
+    player.pending_mana_activation_cast_triggers = remaining
     return resolved
 
 
@@ -2827,6 +2901,13 @@ def commit_cast_payment(ctx):
         ctx.card,
         ctx.effect_data,
         getattr(ctx.controller, "last_conditional_mana_spent_sources", []),
+        turn=CURRENT_REPLAY_TURN,
+        phase=ctx.phase,
+    )
+    resolve_mana_activation_cast_triggers(
+        ctx.controller,
+        ctx.card,
+        ctx.effect_data,
         turn=CURRENT_REPLAY_TURN,
         phase=ctx.phase,
     )
@@ -11490,6 +11571,7 @@ class Player:
         self.restricted_mana = {}
         self.conditional_mana_sources = []
         self.last_conditional_mana_spent_sources = []
+        self.pending_mana_activation_cast_triggers = []
         self.lands_played_this_turn = 0
         self.max_lands_per_turn = 1
         self.is_human = is_human
@@ -11555,6 +11637,14 @@ class Player:
         self.mana_pool.empty()
         self.restricted_mana = {}
         self.conditional_mana_sources = []
+        if not hasattr(self, "pending_mana_activation_cast_triggers"):
+            self.pending_mana_activation_cast_triggers = []
+        if turn is not None:
+            self.pending_mana_activation_cast_triggers = [
+                entry
+                for entry in self.pending_mana_activation_cast_triggers
+                if isinstance(entry, dict) and entry.get("turn") == turn
+            ]
         refresh_graveyard_count_creature_statics_for_player(
             self,
             turn=turn,
@@ -11609,18 +11699,21 @@ class Player:
             if configured_conditional_source:
                 self.conditional_mana_sources.append(configured_conditional_source)
                 resolve_mana_source_activation_life_gain(self, source, turn=turn)
+                record_mana_activation_cast_trigger(self, source, produced, turn=turn)
                 mark_mana_source_used_if_nonstandard_untap(source)
                 record_mana_source_activation(source, turn)
                 active_sources += 1
                 continue
             if add_fixed_produced_mana_symbols_to_pool(self, source, produced):
                 resolve_mana_source_activation_life_gain(self, source, turn=turn)
+                record_mana_activation_cast_trigger(self, source, produced, turn=turn)
                 mark_mana_source_used_if_nonstandard_untap(source)
                 record_mana_source_activation(source, turn)
                 active_sources += 1
                 continue
             if add_distributed_controlled_color_mana_to_pool(self, source, produced):
                 resolve_mana_source_activation_life_gain(self, source, turn=turn)
+                record_mana_activation_cast_trigger(self, source, produced, turn=turn)
                 mark_mana_source_used_if_nonstandard_untap(source)
                 record_mana_source_activation(source, turn)
                 active_sources += 1
@@ -11629,6 +11722,7 @@ class Player:
             if conditional_source:
                 self.conditional_mana_sources.append(conditional_source)
                 resolve_mana_source_activation_life_gain(self, source, turn=turn)
+                record_mana_activation_cast_trigger(self, source, produced, turn=turn)
                 mark_mana_source_used_if_nonstandard_untap(source)
                 record_mana_source_activation(source, turn)
                 active_sources += 1
@@ -11639,6 +11733,7 @@ class Player:
             color = colors[0] if len(colors) == 1 else "generic"
             self.mana_pool.add(color, produced)
             resolve_mana_source_activation_life_gain(self, source, turn=turn)
+            record_mana_activation_cast_trigger(self, source, produced, turn=turn)
             mark_mana_source_used_if_nonstandard_untap(source)
             record_mana_source_activation(source, turn)
             active_sources += 1

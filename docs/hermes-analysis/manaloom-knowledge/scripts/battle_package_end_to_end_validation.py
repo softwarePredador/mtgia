@@ -5530,6 +5530,114 @@ def run_mana_spent_cast_trigger(
     }
 
 
+def run_mana_activation_cast_trigger(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    effect = battle.get_card_effect(card)
+    source = battle.enrich_card(
+        {
+            **card,
+            "type_line": scenario.get("type_line") or card.get("type_line") or "Artifact",
+            "summoning_sick": False,
+            **effect,
+            **dict(scenario.get("source_overrides") or {}),
+        }
+    )
+    active = battle.Player(str(scenario.get("player") or "Mana Trigger Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Mana Trigger Opponent"), None, [])
+    if hasattr(battle, "bind_table_context"):
+        battle.bind_table_context([active, opponent])
+    active.battlefield = [
+        battle.enrich_card(dict(permanent))
+        for permanent in scenario.get("controller_battlefield") or []
+        if isinstance(permanent, dict)
+    ]
+    active.battlefield.append(source)
+    active.library = [
+        dict(item)
+        for item in scenario.get("controller_library") or []
+        if isinstance(item, dict)
+    ]
+    cast_card = dict(scenario["cast_card"])
+    active.hand.append(cast_card)
+    turn = int(scenario.get("turn") or 5)
+    phase = str(scenario.get("phase") or "precombat_main")
+    before_events = len(events)
+
+    active.refresh_mana_sources(turn=turn)
+    expected_available = int(scenario.get("expected_available_mana_after_refresh") or 0)
+    if active.available_mana() != expected_available:
+        fail(
+            "battle_execution",
+            f"{card['name']} available mana={active.available_mana()}, expected {expected_available}",
+        )
+
+    x_value = int(scenario.get("x_value") or 0)
+    previous_turn = getattr(battle, "CURRENT_REPLAY_TURN", None)
+    battle.CURRENT_REPLAY_TURN = turn
+    try:
+        ctx = battle.begin_cast_context(
+            active,
+            cast_card,
+            phase,
+            effect_data=battle.get_card_effect(cast_card),
+            x_value=x_value,
+        )
+        if not battle.commit_cast_payment(ctx):
+            fail("battle_execution", f"{card['name']} could not pay qualifying cast")
+    finally:
+        battle.CURRENT_REPLAY_TURN = previous_turn
+
+    trigger_events = [
+        data
+        for replay_event, data in events[before_events:]
+        if replay_event == "mana_activation_cast_trigger_resolved"
+        and data.get("card") == card.get("name")
+    ]
+    expected_trigger_count = int(scenario.get("expected_trigger_count") or 0)
+    if len(trigger_events) != expected_trigger_count:
+        fail(
+            "battle_events",
+            f"{card['name']} mana activation cast trigger count={len(trigger_events)}, "
+            f"expected {expected_trigger_count}",
+        )
+    trigger_effects = [
+        effect
+        for event in trigger_events
+        for effect in event.get("effects") or []
+        if isinstance(effect, dict)
+    ]
+    expected_draw_count = int(scenario.get("expected_draw_count") or 0)
+    actual_draw_count = sum(
+        int(effect.get("count") or 0)
+        for effect in trigger_effects
+        if effect.get("effect") == "draw_cards"
+    )
+    if actual_draw_count != expected_draw_count:
+        fail("battle_execution", f"{card['name']} drew {actual_draw_count}, expected {expected_draw_count}")
+    expected_life_gain = int(scenario.get("expected_life_gain") or 0)
+    actual_life_gain = sum(
+        int(effect.get("amount") or 0)
+        for effect in trigger_effects
+        if effect.get("effect") == "gain_life"
+    )
+    if actual_life_gain != expected_life_gain:
+        fail("battle_execution", f"{card['name']} gained {actual_life_gain}, expected {expected_life_gain}")
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "cast_card": cast_card.get("name"),
+        "trigger_count": len(trigger_events),
+        "draw_count": actual_draw_count,
+        "life_gain": actual_life_gain,
+        "x_value": x_value,
+        "available_mana_after_cast": active.available_mana(),
+    }
+
+
 def run_sacrifice_mana_source_activation(
     battle,
     scenario: dict[str, Any],
@@ -12044,6 +12152,7 @@ SCENARIO_RUNNERS = {
     "multi_target_removal": run_multi_target_removal,
     "simple_mana_source_refresh": run_simple_mana_source_refresh,
     "mana_spent_cast_trigger": run_mana_spent_cast_trigger,
+    "mana_activation_cast_trigger": run_mana_activation_cast_trigger,
     "sacrifice_mana_source_activation": run_sacrifice_mana_source_activation,
     "simple_activated_draw": run_simple_activated_draw,
     "simple_activated_draw_discard": run_simple_activated_draw_discard,
