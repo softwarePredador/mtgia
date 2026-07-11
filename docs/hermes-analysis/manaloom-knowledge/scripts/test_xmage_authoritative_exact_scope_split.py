@@ -28247,7 +28247,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                     new ReturnToHandTargetEffect(),
                     new ColoredManaCost(ColoredManaSymbol.U));
                 ability.addCost(new TapSourceCost());
-                ability.addCost(new DiscardCardCost());
+                ability.addCost(new DiscardTargetCost(new TargetCardInHand()));
                 ability.addTarget(new TargetCreaturePermanent());
                 this.addAbility(ability);
             """,
@@ -28263,6 +28263,89 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["activation_discard_count"], 1)
         self.assertEqual(effect["activation_discard_target"], "any_card")
         self.assertTrue(effect["activation_requires_discard_card"])
+
+    def test_permanent_activated_bounce_maps_self_nonsnow_land_target_filter(self) -> None:
+        row = queue_row(
+            split.BOUNCE_UNIT,
+            effect_classes=["ReturnToHandTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Hallowed Ground",
+                type_line="Enchantment",
+                oracle_text="{W}{W}: Return target nonsnow land you control to its owner's hand.",
+            ),
+            source_text="""
+                private static final FilterControlledPermanent filter =
+                    new FilterControlledLandPermanent("nonsnow land you control");
+                static {
+                    filter.add(Predicates.not(SuperType.SNOW.getPredicate()));
+                }
+                Ability ability = new SimpleActivatedAbility(
+                    new ReturnToHandTargetEffect(),
+                    new ManaCostsImpl<>("{W}{W}"));
+                ability.addTarget(new TargetControlledPermanent(filter));
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_BOUNCE_SCOPE)
+        self.assertEqual(effect["target"], "nonsnow_land")
+        self.assertEqual(effect["target_controller"], "self")
+        self.assertEqual(
+            effect["target_constraints"],
+            {"card_types": ["land"], "exclude_supertypes": ["snow"], "controller_scope": "self"},
+        )
+        self.assertEqual(effect["activation_cost_mana"], "{W}{W}")
+        self.assertEqual(effect["activation_cost_colors"], ["W", "W"])
+
+    def test_permanent_activated_bounce_maps_target_variable_creature_with_counter(self) -> None:
+        row = queue_row(
+            split.BOUNCE_UNIT,
+            effect_classes=["ReturnToHandTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Razorfin Abolisher",
+                type_line="Creature - Merfolk Wizard",
+                oracle_text="{1}{U}, {T}: Return target creature with a counter on it to its owner's hand.",
+            ),
+            source_text="""
+                private static final FilterCreaturePermanent filter =
+                    new FilterCreaturePermanent("creature with a counter on it");
+                static {
+                    filter.add(CounterAnyPredicate.instance);
+                }
+                Ability ability = new SimpleActivatedAbility(
+                    new ReturnToHandTargetEffect(),
+                    new ManaCostsImpl<>("{1}{U}"));
+                ability.addCost(new TapSourceCost());
+                Target target = new TargetPermanent(filter);
+                ability.addTarget(target);
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_BOUNCE_SCOPE)
+        self.assertEqual(effect["target"], "creature_with_counter")
+        self.assertEqual(effect["target_controller"], "any")
+        self.assertEqual(effect["target_constraints"], {"card_types": ["creature"], "requires_counter": True})
+        self.assertEqual(effect["activation_cost_mana"], "{1}{U}")
+        self.assertEqual(effect["activation_cost_generic"], 1)
+        self.assertEqual(effect["activation_cost_colors"], ["U"])
+        self.assertTrue(effect["activation_requires_tap"])
 
     def test_permanent_activated_bounce_maps_self_sacrifice_source(self) -> None:
         row = queue_row(

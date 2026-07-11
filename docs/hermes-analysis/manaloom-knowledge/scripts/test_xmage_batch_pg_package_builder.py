@@ -3031,6 +3031,42 @@ def test_manifest_builds_simple_activated_bounce_self_discard_scenario() -> None
     assert scenario["controller_hand"][0]["name"] == "E2E Activated Bounce Discard 1"
 
 
+def test_manifest_builds_simple_activated_bounce_counter_target_scenario() -> None:
+    rule = {
+        "normalized_name": "razorfin abolisher",
+        "card_name": "Razorfin Abolisher",
+        "oracle_hash": "hash-razorfin-abolisher",
+        "logical_rule_key": "battle_rule_v1:hash-razorfin-abolisher",
+        "required_effect_fields": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_return_to_hand_v1",
+            "activated_effect": "return_to_hand",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_return_to_hand_v1",
+            "activated_remove_effect": "remove_creature",
+            "activated_remove_target": "creature_with_counter",
+            "target": "creature_with_counter",
+            "target_controller": "any",
+            "target_constraints": {
+                "card_types": ["creature"],
+                "requires_counter": True,
+            },
+            "destination": "hand",
+            "activation_cost_mana": "{1}{U}",
+            "activation_cost_generic": 1,
+            "activation_cost_colors": ["U"],
+            "activation_requires_tap": True,
+        },
+    }
+
+    scenario = builder.simple_activated_bounce_execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "simple_activated_bounce"
+    assert scenario["expected_target_constraints"] == {"card_types": ["creature"], "requires_counter": True}
+    assert scenario["target"]["type_line"] == "Creature - Soldier"
+    assert scenario["target"]["counters"] == {"+1/+1": 1}
+
+
 def test_manifest_builds_simple_activated_self_keyword_execution_scenario() -> None:
     rule = {
         "normalized_name": "cobalt golem",

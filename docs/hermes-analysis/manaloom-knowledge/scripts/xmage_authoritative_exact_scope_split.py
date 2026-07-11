@@ -19089,7 +19089,41 @@ def source_effect_target_window(text: str, effect_index: int) -> str:
         target_window = search_area[add_target_match.start() : add_target_match.start() + 1400]
     else:
         target_window = search_area[:1400]
-    filter_refs = re.findall(r"\b(?:TargetPermanent|TargetCreaturePermanent|TargetArtifactPermanent)\s*\(\s*([A-Za-z_][A-Za-z0-9_]*)\s*\)", target_window)
+    add_target_args = (
+        extract_java_call_args(search_area[add_target_match.start() :], "addTarget")
+        if add_target_match
+        else None
+    )
+    target_var_windows: list[str] = []
+    if add_target_args:
+        for arg in split_java_args(add_target_args):
+            arg = arg.strip()
+            if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", arg):
+                continue
+            assignment_pattern = (
+                rf"\b(?:Target|TargetPermanent|TargetCreaturePermanent|TargetControlledPermanent|"
+                rf"TargetArtifactPermanent|TargetLandPermanent|TargetEnchantmentPermanent)\s+"
+                rf"{re.escape(arg)}\s*=\s*new\s+[^;]+;"
+            )
+            for assignment in re.finditer(assignment_pattern, source, re.S):
+                assignment_window = source[assignment.start() : assignment.end()]
+                target_var_windows.append(assignment_window)
+                target_window += "\n" + assignment_window
+    target_constructor_classes = (
+        "TargetPermanent",
+        "TargetControlledPermanent",
+        "TargetCreaturePermanent",
+        "TargetControlledCreaturePermanent",
+        "TargetArtifactPermanent",
+        "TargetLandPermanent",
+        "TargetEnchantmentPermanent",
+    )
+    target_constructor_pattern = (
+        r"\b(?:"
+        + "|".join(target_constructor_classes)
+        + r")\s*\(\s*([A-Za-z_][A-Za-z0-9_]*)\s*\)"
+    )
+    filter_refs = re.findall(target_constructor_pattern, target_window)
     for filter_name in filter_refs:
         filter_window = source_filter_window(source, filter_name)
         if not filter_window:
@@ -19227,6 +19261,11 @@ def activation_discard_cost_from_source(window: str) -> dict[str, Any] | str | N
         window or "",
         re.S,
     )
+    generic_target_matches = re.findall(
+        r"new\s+DiscardTargetCost\s*\(\s*new\s+TargetCardInHand\s*\(\s*\)\s*\)",
+        window or "",
+        re.S,
+    )
     random_matches = re.findall(r"new\s+DiscardCardCost\s*\(\s*true\s*\)", window or "")
     explicit_choice_matches = re.findall(r"new\s+DiscardCardCost\s*\(\s*false\s*\)", window or "")
     plain_matches = re.findall(r"new\s+DiscardCardCost\s*\(\s*\)", window or "")
@@ -19240,6 +19279,7 @@ def activation_discard_cost_from_source(window: str) -> dict[str, Any] | str | N
     )
     supported_count = (
         len(random_target_matches)
+        + len(generic_target_matches)
         + len(random_matches)
         + len(explicit_choice_matches)
         + len(plain_matches)
@@ -19257,6 +19297,12 @@ def activation_discard_cost_from_source(window: str) -> dict[str, Any] | str | N
             "activation_discard_target": "any_card",
             "activation_requires_discard_card": True,
             "activation_discard_random": True,
+        }
+    if generic_target_matches:
+        return {
+            "activation_discard_count": 1,
+            "activation_discard_target": "any_card",
+            "activation_requires_discard_card": True,
         }
     if random_matches:
         return {
@@ -19744,7 +19790,7 @@ def activated_bounce_target_from_source(text: str) -> dict[str, Any] | None:
     owner_and_controller = bool(re.search(r"both own and control|OwnPredicate", search, re.I))
     target_patterns = [
         ("white_or_black_creature", r"white or black creature|ObjectColor\.WHITE.*ObjectColor\.BLACK"),
-        ("creature_with_counter", r"creature with a counter|CounterPredicate|counter on it"),
+        ("creature_with_counter", r"creature with a counter|CounterAnyPredicate|CounterPredicate|counter on it"),
         ("nonsnow_land", r"nonsnow land|non-snow land|Predicates\.not\([^)]*Snow"),
         ("nonland_permanent", r"FilterNonlandPermanent|FILTER_PERMANENT_NON_LAND|Predicates\.not\(CardType\.LAND"),
         ("artifact_or_enchantment", r"FILTER_PERMANENT_ARTIFACT_OR_ENCHANTMENT"),

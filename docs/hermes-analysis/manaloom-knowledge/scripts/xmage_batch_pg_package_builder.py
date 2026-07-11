@@ -6258,6 +6258,8 @@ def _target_fixture_from_constraints(
         fixture["toughness"] = toughness
     if active_constraints.get("requires_activated_ability_with_tap_cost"):
         fixture["has_activated_ability_with_tap_cost"] = bool(matching)
+    if active_constraints.get("requires_counter") or active_constraints.get("with_counter"):
+        fixture["counters"] = {"+1/+1": 1} if matching else {}
     if colors:
         fixture["colors"] = colors
     if active_constraints.get("token"):
