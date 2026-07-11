@@ -277,6 +277,7 @@ X_DAMAGE_SCOPE = "xmage_x_damage_target_spell_v1"
 DAMAGE_EXILE_IF_DIES_SCOPE = "xmage_fixed_damage_target_exile_if_dies_spell_v1"
 SACRIFICE_CREATURE_POWER_DAMAGE_SCOPE = "xmage_sacrifice_creature_power_damage_spell_v1"
 DAMAGE_GAIN_LIFE_SCOPE = "xmage_fixed_damage_target_and_controller_gain_life_spell_v1"
+DYNAMIC_DAMAGE_GAIN_LIFE_SCOPE = "xmage_dynamic_damage_target_and_controller_gain_life_spell_v1"
 DAMAGE_CREATE_TREASURE_SCOPE = "xmage_fixed_damage_target_create_treasure_spell_v1"
 GRAVEYARD_COUNT_DAMAGE_SCOPE = "xmage_dynamic_graveyard_count_damage_spell_v1"
 DYNAMIC_COUNT_DAMAGE_SCOPE = "xmage_dynamic_count_damage_spell_v1"
@@ -14936,7 +14937,8 @@ def _dynamic_count_damage_source_spec_from_expr(source: str, expr: str) -> dict[
         )
     if subtype_match:
         subtype = subtype_match.group(1).lower()
-        card_types = ["land"] if subtype == "mountain" else []
+        basic_land_subtypes = {"plains", "island", "swamp", "mountain", "forest", "desert"}
+        card_types = ["land"] if subtype in basic_land_subtypes else []
         fields = {
             "damage_amount_source": "battlefield_permanent_count",
             "battlefield_count_scope": "controller_battlefield",
@@ -15857,6 +15859,128 @@ def fixed_damage_gain_life_from_oracle(metadata: dict[str, Any]) -> tuple[int, i
         "target tapped creature": "tapped_creature",
     }
     return int(match.group(1)), int(match.group(3)), target_map[match.group(2)]
+
+
+def _dynamic_damage_gain_life_spec_from_expr(source: str, expr: str) -> dict[str, Any] | str | None:
+    token = re.sub(r"\s+", " ", str(expr or "")).strip()
+    parts = split_top_level_args(token)
+    if len(parts) > 1 and any(part.strip().startswith('"') for part in parts[1:]):
+        token = parts[0].strip()
+    if "GetXValue" in token or "ManacostVariableValue" in token:
+        return {"damage_amount_source": "x_value"}
+    spec = _dynamic_count_damage_source_spec_from_expr(source, token)
+    if isinstance(spec, str) or spec is None:
+        return spec
+    return spec
+
+
+def _canonical_dynamic_damage_gain_life_spec(spec: dict[str, Any]) -> dict[str, Any]:
+    normalized: dict[str, Any] = {
+        "target": str(spec.get("target") or ""),
+        "damage_amount_source": str(spec.get("damage_amount_source") or ""),
+        "damage_base_amount": int(spec.get("damage_base_amount") or 0),
+        "damage_per_count": int(spec.get("damage_per_count") or 1),
+    }
+    for key in (
+        "battlefield_count_scope",
+        "graveyard_count_scope",
+        "battlefield_count_combat_state",
+        "mana_symbol_count_color",
+    ):
+        if spec.get(key) not in (None, "", []):
+            normalized[key] = str(spec.get(key))
+    for key in (
+        "battlefield_count_card_types",
+        "battlefield_count_subtypes",
+        "graveyard_count_card_types",
+        "graveyard_count_subtypes",
+    ):
+        values = spec.get(key)
+        if values not in (None, "", []):
+            normalized[key] = sorted(str(value).lower() for value in as_list(values) if str(value))
+    return normalized
+
+
+def dynamic_damage_gain_life_from_source(source: str) -> dict[str, Any] | str | None:
+    text = source or ""
+    if has_additional_cost(text):
+        return "damage_life_gain_dynamic_additional_cost_not_supported"
+    if len(re.findall(r"new\s+DamageTargetEffect\s*\(", text)) != 1:
+        return "damage_life_gain_dynamic_damage_source_not_single"
+    if len(re.findall(r"new\s+GainLifeEffect\s*\(", text)) != 1:
+        return "damage_life_gain_dynamic_life_source_not_single"
+    if "TargetPointer" in text or ".setTargetPointer" in text:
+        return "damage_life_gain_dynamic_target_pointer_not_supported"
+    damage_args = extract_constructor_args(text, "DamageTargetEffect")
+    life_args = extract_constructor_args(text, "GainLifeEffect")
+    if damage_args is None or life_args is None:
+        return None
+    damage_spec = _dynamic_damage_gain_life_spec_from_expr(text, damage_args)
+    if isinstance(damage_spec, str) or damage_spec is None:
+        return damage_spec or "damage_life_gain_dynamic_damage_source_not_supported"
+    life_spec = _dynamic_damage_gain_life_spec_from_expr(text, life_args)
+    if isinstance(life_spec, str) or life_spec is None:
+        return life_spec or "damage_life_gain_dynamic_life_source_not_supported"
+    damage_spec = {
+        "damage_base_amount": int(damage_spec.get("damage_base_amount") or 0),
+        "damage_per_count": int(damage_spec.get("damage_per_count") or 1),
+        **{key: value for key, value in damage_spec.items() if key not in {"damage_base_amount", "damage_per_count"}},
+    }
+    life_spec = {
+        "damage_base_amount": int(life_spec.get("damage_base_amount") or 0),
+        "damage_per_count": int(life_spec.get("damage_per_count") or 1),
+        **{key: value for key, value in life_spec.items() if key not in {"damage_base_amount", "damage_per_count"}},
+    }
+    if _canonical_dynamic_damage_gain_life_spec(damage_spec) != _canonical_dynamic_damage_gain_life_spec(life_spec):
+        return "damage_life_gain_dynamic_source_damage_life_mismatch"
+    target = damage_target_from_source(text)
+    if target is None:
+        return "damage_life_gain_dynamic_source_target_not_supported"
+    return {
+        "target": target,
+        **damage_spec,
+    }
+
+
+def dynamic_damage_gain_life_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str | None:
+    text = " ".join(oracle_effect_lines_without_neutral_auxiliary(metadata))
+    text = strip_parenthetical_reminders(text)
+    text = re.sub(r"\s+", " ", text).strip()
+    target_pattern = (
+        r"any target|target attacking or blocking creature|target creature or planeswalker|"
+        r"target creature|target opponent or planeswalker|target player or planeswalker|"
+        r"target opponent|target player"
+    )
+    match = re.match(
+        rf"^.+ deals x damage to (?P<target>{target_pattern})"
+        rf"(?: and you gain x life|\. you gain x life)"
+        rf"(?:, where x is (?P<where>.+?))?\.?$",
+        text,
+    )
+    if not match:
+        return None
+    target = _dynamic_damage_target_from_phrase(match.group("target"))
+    if target is None:
+        return "damage_life_gain_dynamic_oracle_target_not_supported"
+    where_text = re.sub(r"\s+", " ", str(match.group("where") or "").strip())
+    if not where_text:
+        return _dynamic_count_damage_dict("x_value", target=target)
+    base = 0
+    filter_text = where_text
+    base_match = re.match(r"^(?P<base>\d+) plus the number of (?P<filter>.+)$", filter_text)
+    if base_match:
+        base = int(base_match.group("base"))
+        filter_text = base_match.group("filter")
+    else:
+        filter_text = re.sub(r"^(?:the number of|the greatest number of)\s+", "", filter_text)
+    count_fields = _dynamic_damage_count_fields_from_filter(filter_text)
+    if isinstance(count_fields, str):
+        return count_fields
+    if count_fields is None:
+        return "damage_life_gain_dynamic_oracle_filter_not_supported"
+    count_fields = dict(count_fields)
+    amount_source = str(count_fields.pop("damage_amount_source"))
+    return _dynamic_count_damage_dict(amount_source, target=target, base=base, **count_fields)
 
 
 def activated_tap_damage_from_oracle(metadata: dict[str, Any]) -> tuple[int, str] | None:
@@ -38714,31 +38838,68 @@ def split_row(
         if has_non_neutral_oracle_complexity(metadata):
             return None, "damage_life_gain_oracle_not_simple"
         source_damage = fixed_damage_gain_life_from_source(source_text)
-        if source_damage is None:
+        if source_damage is not None:
+            oracle_damage = fixed_damage_gain_life_from_oracle(metadata)
+            if oracle_damage is None:
+                return None, "damage_life_gain_oracle_not_exact_fixed"
+            if source_damage != oracle_damage:
+                return None, "damage_life_gain_source_oracle_mismatch"
+            amount, life_gain, target = oracle_damage
+            effect_json = {
+                "effect": "direct_damage",
+                "battle_model_scope": DAMAGE_GAIN_LIFE_SCOPE,
+                "amount": amount,
+                "damage": amount,
+                "gain_life": life_gain,
+                "controller_gain_life": life_gain,
+                "target": target,
+                "target_constraints": target_constraints_for(target),
+                "xmage_effect_classes": ["DamageTargetEffect", "GainLifeEffect"],
+                **flags,
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_fixed_damage_gain_life_spell",
+            ), "selected_exact_scope"
+        source_dynamic = dynamic_damage_gain_life_from_source(source_text)
+        if isinstance(source_dynamic, str):
+            return None, source_dynamic
+        if source_dynamic is None:
             return None, "damage_life_gain_source_not_fixed"
-        oracle_damage = fixed_damage_gain_life_from_oracle(metadata)
-        if oracle_damage is None:
-            return None, "damage_life_gain_oracle_not_exact_fixed"
-        if source_damage != oracle_damage:
-            return None, "damage_life_gain_source_oracle_mismatch"
-        amount, life_gain, target = oracle_damage
+        oracle_dynamic = dynamic_damage_gain_life_from_oracle(metadata)
+        if isinstance(oracle_dynamic, str):
+            return None, oracle_dynamic
+        if oracle_dynamic is None:
+            return None, "damage_life_gain_dynamic_oracle_not_exact"
+        if _canonical_dynamic_damage_gain_life_spec(source_dynamic) != _canonical_dynamic_damage_gain_life_spec(oracle_dynamic):
+            return None, "damage_life_gain_dynamic_source_oracle_mismatch"
+        target = str(oracle_dynamic.get("target") or "")
+        dynamic_fields = {
+            key: value
+            for key, value in oracle_dynamic.items()
+            if key != "target"
+        }
         effect_json = {
             "effect": "direct_damage",
-            "battle_model_scope": DAMAGE_GAIN_LIFE_SCOPE,
-            "amount": amount,
-            "damage": amount,
-            "gain_life": life_gain,
-            "controller_gain_life": life_gain,
+            "battle_model_scope": DYNAMIC_DAMAGE_GAIN_LIFE_SCOPE,
+            "amount": 0,
+            "damage": 0,
+            "gain_life": 0,
+            "controller_gain_life": 0,
+            "controller_gain_life_source": "damage_amount",
             "target": target,
             "target_constraints": target_constraints_for(target),
             "xmage_effect_classes": ["DamageTargetEffect", "GainLifeEffect"],
+            **dynamic_fields,
             **flags,
         }
         return build_proposal(
             row,
             metadata,
             effect_json,
-            family_id="xmage_fixed_damage_gain_life_spell",
+            family_id="xmage_dynamic_damage_gain_life_spell",
         ), "selected_exact_scope"
 
     if unit == LIFE_UNIT and classes == {"DestroyTargetEffect", "GainLifeEffect"}:

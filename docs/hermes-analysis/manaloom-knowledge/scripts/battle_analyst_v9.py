@@ -50628,6 +50628,14 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng, *, fini
         phase=phase,
     )
     life_gain_requested = int(effect_data.get("gain_life") or effect_data.get("controller_gain_life") or 0)
+    controller_gain_life_source = str(
+        effect_data.get("controller_gain_life_source")
+        or effect_data.get("gain_life_source")
+        or ""
+    ).strip().lower()
+    if controller_gain_life_source in {"damage_amount", "dynamic_damage_amount"}:
+        source_life_amount = dynamic_amount if dynamic_amount is not None else amount
+        life_gain_requested += max(0, int(source_life_amount or 0))
     lifelink_sources = spell_lifelink_sources(player, card)
 
     def apply_controller_lifegain(damage_dealt=0):

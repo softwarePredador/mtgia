@@ -460,8 +460,11 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "kicker_mana_cost",
     "gain_life",
     "controller_gain_life",
+    "controller_gain_life_source",
+    "gain_life_source",
     "damage_amount_source",
     "damage_base_amount",
+    "damage_per_count",
     "damage_per_graveyard_count",
     "damage_players",
     "exile_if_dies_from_damage",
@@ -4842,14 +4845,79 @@ def damage_each_opponent_and_their_permanents_execution_scenario_from_expected_r
     }
 
 
+def _dynamic_damage_gain_life_fixture(required: dict[str, Any]) -> tuple[int, dict[str, Any]] | None:
+    amount_source = str(required.get("damage_amount_source") or "").strip().lower()
+    if amount_source == "x_value":
+        x_value = int(required.get("x_value") or 3)
+        return x_value, {
+            "x_value": x_value,
+            "effect_overrides": {
+                "x_value": x_value,
+                "_cast_context": {"x_value": x_value},
+            },
+        }
+    if amount_source != "battlefield_permanent_count":
+        return None
+    scope = str(required.get("battlefield_count_scope") or "controller_battlefield").strip().lower()
+    if scope != "controller_battlefield":
+        return None
+    card_types = [
+        str(value).strip().lower()
+        for value in required.get("battlefield_count_card_types") or []
+        if str(value).strip()
+    ]
+    subtypes = [
+        str(value).strip().lower()
+        for value in required.get("battlefield_count_subtypes") or []
+        if str(value).strip()
+    ]
+    if not card_types and not subtypes:
+        return None
+    count = 3
+    primary_type = card_types[0] if card_types else "creature"
+    primary_subtype = subtypes[0] if subtypes else ""
+    if primary_type == "land" and primary_subtype:
+        type_line = f"Basic Land - {primary_subtype.title()}"
+    elif primary_subtype:
+        type_line = f"{primary_type.title()} - {primary_subtype.title()}"
+    else:
+        type_line = primary_type.title()
+    battlefield = [
+        {
+            "name": f"E2E Counted Permanent {index + 1}",
+            "type_line": type_line,
+            "subtypes": subtypes,
+            "effect": "creature" if primary_type == "creature" else "permanent",
+        }
+        for index in range(count)
+    ]
+    base = int(required.get("damage_base_amount") or 0)
+    per_count = int(required.get("damage_per_count") or required.get("damage_per_graveyard_count") or 1)
+    return base + (count * per_count), {"controller_battlefield": battlefield}
+
+
 def damage_gain_life_spell_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
     required = dict(rule.get("required_effect_fields") or {})
-    if required.get("battle_model_scope") != "xmage_fixed_damage_target_and_controller_gain_life_spell_v1":
+    scope = required.get("battle_model_scope")
+    if scope not in {
+        "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+        "xmage_dynamic_damage_target_and_controller_gain_life_spell_v1",
+    }:
         return None
-    damage = int(required.get("amount") or required.get("damage") or 0)
-    life_gain = int(required.get("controller_gain_life") or required.get("gain_life") or 0)
+    dynamic_fixture: dict[str, Any] = {}
+    if scope == "xmage_dynamic_damage_target_and_controller_gain_life_spell_v1":
+        fixture = _dynamic_damage_gain_life_fixture(required)
+        if fixture is None:
+            return None
+        damage, dynamic_fixture = fixture
+        if str(required.get("controller_gain_life_source") or required.get("gain_life_source") or "").lower() != "damage_amount":
+            return None
+        life_gain = damage
+    else:
+        damage = int(required.get("amount") or required.get("damage") or 0)
+        life_gain = int(required.get("controller_gain_life") or required.get("gain_life") or 0)
     if damage <= 0 or life_gain <= 0:
         return None
     type_line = "Sorcery" if required.get("sorcery") is True else "Instant"
@@ -4872,6 +4940,7 @@ def damage_gain_life_spell_execution_scenario_from_expected_rule(
         "expected_target_constraints": target_constraints,
         "controller_life": 10,
         "opponent_life": max(20, damage + 5),
+        **dynamic_fixture,
         **(
             {
                 "expect_shuffle_self": True,

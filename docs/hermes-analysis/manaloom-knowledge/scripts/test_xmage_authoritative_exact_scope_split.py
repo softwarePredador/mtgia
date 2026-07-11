@@ -10462,11 +10462,11 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                 self.assertEqual(effect["target"], expected_target)
                 self.assertEqual(effect["target_constraints"], expected_constraints)
 
-    def test_fixed_damage_gain_life_spell_blocks_variable_x(self) -> None:
+    def test_dynamic_damage_gain_life_spell_maps_variable_x(self) -> None:
         row = queue_row(split.LIFE_UNIT, effect_classes=["DamageTargetEffect", "GainLifeEffect"])
         proposal, reason = split.split_row(
             row,
-            metadata(oracle_text="Fixture Drain deals X damage to any target and you gain X life."),
+            metadata(oracle_text="Death Grasp deals X damage to any target. You gain X life."),
             source_text=(
                 "this.getSpellAbility().addEffect(new DamageTargetEffect(GetXValue.instance));"
                 "this.getSpellAbility().addEffect(new GainLifeEffect(GetXValue.instance));"
@@ -10474,8 +10474,79 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             ),
         )
 
-        self.assertIsNone(proposal)
-        self.assertEqual(reason, "damage_life_gain_source_not_fixed")
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DYNAMIC_DAMAGE_GAIN_LIFE_SCOPE)
+        self.assertEqual(effect["damage_amount_source"], "x_value")
+        self.assertEqual(effect["controller_gain_life_source"], "damage_amount")
+        self.assertEqual(effect["target"], "any_target")
+
+    def test_dynamic_damage_gain_life_spell_maps_creatures_you_control_count(self) -> None:
+        row = queue_row(split.LIFE_UNIT, effect_classes=["DamageTargetEffect", "GainLifeEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                oracle_text=(
+                    "Harsh Sustenance deals X damage to any target and you gain X life, "
+                    "where X is the number of creatures you control."
+                )
+            ),
+            source_text=(
+                "Effect effect = new DamageTargetEffect(CreaturesYouControlCount.PLURAL);"
+                "this.getSpellAbility().addEffect(effect);"
+                "this.getSpellAbility().addTarget(new TargetAnyTarget());"
+                "effect = new GainLifeEffect(CreaturesYouControlCount.PLURAL);"
+                "this.getSpellAbility().addEffect(effect);"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DYNAMIC_DAMAGE_GAIN_LIFE_SCOPE)
+        self.assertEqual(effect["damage_amount_source"], "battlefield_permanent_count")
+        self.assertEqual(effect["battlefield_count_scope"], "controller_battlefield")
+        self.assertEqual(effect["battlefield_count_card_types"], ["creature"])
+        self.assertEqual(effect["controller_gain_life_source"], "damage_amount")
+
+    def test_dynamic_damage_gain_life_spell_maps_swamps_you_control_count(self) -> None:
+        cases = [
+            (
+                "Consuming Corruption deals X damage to target creature or planeswalker and you gain X life, where X is the number of Swamps you control.",
+                (
+                    "private static final DynamicValue xValue = new PermanentsOnBattlefieldCount(new FilterControlledPermanent(SubType.SWAMP));"
+                    "this.getSpellAbility().addEffect(new DamageTargetEffect(xValue));"
+                    "this.getSpellAbility().addEffect(new GainLifeEffect(xValue));"
+                    "this.getSpellAbility().addTarget(new TargetCreatureOrPlaneswalker());"
+                ),
+                "creature_or_planeswalker",
+            ),
+            (
+                "Tendrils of Corruption deals X damage to target creature and you gain X life, where X is the number of Swamps you control.",
+                (
+                    "private static final FilterPermanent filter = new FilterControlledPermanent();"
+                    "static { filter.add(SubType.SWAMP.getPredicate()); }"
+                    "private static final DynamicValue xValue = new PermanentsOnBattlefieldCount(filter);"
+                    "this.getSpellAbility().addEffect(new DamageTargetEffect(xValue));"
+                    "this.getSpellAbility().addEffect(new GainLifeEffect(xValue));"
+                    "this.getSpellAbility().addTarget(new TargetCreaturePermanent());"
+                ),
+                "creature",
+            ),
+        ]
+        for oracle_text, source_text, expected_target in cases:
+            with self.subTest(oracle_text=oracle_text):
+                row = queue_row(split.LIFE_UNIT, effect_classes=["DamageTargetEffect", "GainLifeEffect"])
+                proposal, reason = split.split_row(row, metadata(oracle_text=oracle_text), source_text=source_text)
+
+                self.assertEqual(reason, "selected_exact_scope")
+                effect = proposal["effect_json"]
+                self.assertEqual(effect["battle_model_scope"], split.DYNAMIC_DAMAGE_GAIN_LIFE_SCOPE)
+                self.assertEqual(effect["target"], expected_target)
+                self.assertEqual(effect["damage_amount_source"], "battlefield_permanent_count")
+                self.assertEqual(effect["battlefield_count_scope"], "controller_battlefield")
+                self.assertEqual(effect["battlefield_count_card_types"], ["land"])
+                self.assertEqual(effect["battlefield_count_subtypes"], ["swamp"])
+                self.assertEqual(effect["controller_gain_life_source"], "damage_amount")
 
     def test_fixed_damage_gain_life_spell_blocks_cleave_auxiliary(self) -> None:
         row = queue_row(
