@@ -5711,3 +5711,56 @@ def test_simple_mana_source_runner_validates_land_color_dependency_modes() -> No
     assert result["card_name"] == "Naga Vitalist"
     assert result["available_mana"] == 1
     assert result["conditional_mana"] == 1
+
+
+def test_simple_mana_source_runner_validates_fixed_color_dynamic_mana() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "ramp_permanent",
+        "battle_model_scope": "xmage_fixed_color_dynamic_mana_source_permanent_v1",
+        "is_mana_source": True,
+        "mana_produced": 1,
+        "produces": "B",
+        "mana_activation_requires_tap": True,
+        "activation_requires_tap": True,
+        "activation_mana_cost": "{2}",
+        "dynamic_mana_amount_source": "battlefield_permanent_count",
+        "dynamic_mana_battlefield_count_scope": "controller_battlefield",
+        "dynamic_mana_battlefield_count_subtypes": ["swamp"],
+        "_rule_logical_key": "battle_rule_v1:magus-of-the-coffers",
+    }
+    try:
+        result = validator.run_simple_mana_source_refresh(
+            battle,
+            {
+                "name": "Magus of the Coffers refreshes modeled dynamic mana source",
+                "type": "simple_mana_source_refresh",
+                "card": {
+                    "name": "Magus of the Coffers",
+                    "type_line": "Creature - Human Wizard",
+                    "mana_cost": "{4}{B}",
+                },
+                "controller_mana": {"generic": 2},
+                "controller_battlefield": [
+                    {"name": "E2E Swamp One", "type_line": "Land - Swamp"},
+                    {"name": "E2E Swamp Two", "type_line": "Land - Swamp"},
+                    {"name": "E2E Swamp Three", "type_line": "Land - Swamp"},
+                ],
+                "expected_available_mana_after_refresh": 3,
+                "expected_tapped": True,
+                "expected_sources": 3,
+                "logical_rule_key": "battle_rule_v1:magus-of-the-coffers",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Magus of the Coffers"
+    assert result["available_mana"] == 3
+    assert result["conditional_mana"] == 0

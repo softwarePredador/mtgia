@@ -13313,6 +13313,149 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         )
         self.assertTrue(explorer["tapped"])
 
+    def test_fixed_color_dynamic_mana_source_counts_all_battlefield_subtypes(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        self.battle.bind_table_context([active, opponent])
+        priest = self.battle.enrich_card(
+            {
+                "name": "Priest of Titania",
+                "type_line": "Creature - Elf Druid",
+                "effect": "ramp_permanent",
+                "battle_model_scope": "xmage_fixed_color_dynamic_mana_source_permanent_v1",
+                "is_mana_source": True,
+                "mana_produced": 1,
+                "produces": "G",
+                "activation_requires_tap": True,
+                "mana_activation_requires_tap": True,
+                "dynamic_mana_amount_source": "battlefield_permanent_count",
+                "dynamic_mana_battlefield_count_scope": "all_battlefield",
+                "dynamic_mana_battlefield_count_subtypes": ["elf"],
+            }
+        )
+        active.battlefield = [
+            {"name": "Controller Elf", "type_line": "Creature - Elf"},
+            priest,
+        ]
+        opponent.battlefield = [
+            {"name": "Opponent Elf", "type_line": "Creature - Elf"},
+            {"name": "Opponent Soldier", "type_line": "Creature - Soldier"},
+        ]
+
+        active.refresh_mana_sources(turn=7)
+
+        self.assertEqual(active.available_mana(), 3)
+        self.assertEqual(active.mana_pool.green, 3)
+        self.assertTrue(priest["tapped"])
+
+    def test_fixed_color_dynamic_mana_source_pays_activation_cost_and_counts_swamps(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        support_one = self.battle.enrich_card(
+            {
+                "name": "Support Rock One",
+                "type_line": "Artifact",
+                "effect": "ramp_permanent",
+                "is_mana_source": True,
+                "mana_produced": 1,
+                "produces": "C",
+                "mana_activation_requires_tap": True,
+            }
+        )
+        support_two = self.battle.enrich_card(
+            {
+                "name": "Support Rock Two",
+                "type_line": "Artifact",
+                "effect": "ramp_permanent",
+                "is_mana_source": True,
+                "mana_produced": 1,
+                "produces": "C",
+                "mana_activation_requires_tap": True,
+            }
+        )
+        magus = self.battle.enrich_card(
+            {
+                "name": "Magus of the Coffers",
+                "type_line": "Creature - Human Wizard",
+                "effect": "ramp_permanent",
+                "battle_model_scope": "xmage_fixed_color_dynamic_mana_source_permanent_v1",
+                "is_mana_source": True,
+                "mana_produced": 1,
+                "produces": "B",
+                "activation_requires_tap": True,
+                "mana_activation_requires_tap": True,
+                "activation_mana_cost": "{2}",
+                "dynamic_mana_amount_source": "battlefield_permanent_count",
+                "dynamic_mana_battlefield_count_scope": "controller_battlefield",
+                "dynamic_mana_battlefield_count_subtypes": ["swamp"],
+            }
+        )
+        active.battlefield = [
+            {"name": "Fixture Swamp One", "type_line": "Land - Swamp"},
+            {"name": "Fixture Swamp Two", "type_line": "Land - Swamp"},
+            {"name": "Fixture Swamp Three", "type_line": "Land - Swamp"},
+            support_one,
+            support_two,
+            magus,
+        ]
+
+        active.refresh_mana_sources(turn=7)
+
+        self.assertEqual(active.available_mana(), 3)
+        self.assertEqual(active.mana_pool.colorless, 0)
+        self.assertEqual(active.mana_pool.black, 3)
+        self.assertTrue(magus["tapped"])
+
+    def test_fixed_color_dynamic_mana_source_uses_devotion_and_source_power(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        acolyte = self.battle.enrich_card(
+            {
+                "name": "Karametra's Acolyte",
+                "type_line": "Creature - Human Druid",
+                "mana_cost": "{3}{G}",
+                "effect": "ramp_permanent",
+                "battle_model_scope": "xmage_fixed_color_dynamic_mana_source_permanent_v1",
+                "is_mana_source": True,
+                "mana_produced": 1,
+                "produces": "G",
+                "activation_requires_tap": True,
+                "mana_activation_requires_tap": True,
+                "dynamic_mana_amount_source": "devotion_to_green",
+            }
+        )
+        active.battlefield = [
+            {"name": "Green Permanent One", "type_line": "Creature", "mana_cost": "{G}"},
+            {"name": "Green Permanent Two", "type_line": "Enchantment", "mana_cost": "{G}"},
+            acolyte,
+        ]
+
+        active.refresh_mana_sources(turn=7)
+
+        self.assertEqual(active.available_mana(), 3)
+        self.assertEqual(active.mana_pool.green, 3)
+
+        active = self.battle.Player("Active", None, [])
+        joiner = self.battle.enrich_card(
+            {
+                "name": "Viridian Joiner",
+                "type_line": "Creature - Elf Druid",
+                "power": 4,
+                "effect": "ramp_permanent",
+                "battle_model_scope": "xmage_fixed_color_dynamic_mana_source_permanent_v1",
+                "is_mana_source": True,
+                "mana_produced": 1,
+                "produces": "G",
+                "activation_requires_tap": True,
+                "mana_activation_requires_tap": True,
+                "dynamic_mana_amount_source": "source_power",
+            }
+        )
+        active.battlefield = [joiner]
+
+        active.refresh_mana_sources(turn=8)
+
+        self.assertEqual(active.available_mana(), 4)
+        self.assertEqual(active.mana_pool.green, 4)
+
     def test_simple_mana_source_permanent_pays_life_cost_on_refresh(self) -> None:
         active = self.battle.Player("Active", None, [])
         lens = self.battle.enrich_card(

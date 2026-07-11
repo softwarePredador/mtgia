@@ -5954,3 +5954,41 @@ def test_land_color_dependent_mana_source_manifest_builds_land_dependency_scenar
     assert scenario["controller_lands"][0]["produces"] == "G"
     assert scenario["controller_lands"][1]["produces"] == "C"
     assert "opponent_lands" not in scenario
+
+
+def test_fixed_color_dynamic_mana_source_manifest_builds_count_scenario() -> None:
+    proposal = {
+        "normalized_name": "magus of the coffers",
+        "card_name": "Magus of the Coffers",
+        "oracle_hash": "hash-magus-of-the-coffers",
+        "logical_rule_key": "battle_rule_v1:magus-of-the-coffers",
+        "effect_json": {
+            "effect": "ramp_permanent",
+            "battle_model_scope": "xmage_fixed_color_dynamic_mana_source_permanent_v1",
+            "is_mana_source": True,
+            "mana_produced": 1,
+            "produces": "B",
+            "mana_activation_requires_tap": True,
+            "activation_requires_tap": True,
+            "activation_mana_cost": "{2}",
+            "dynamic_mana_amount_source": "battlefield_permanent_count",
+            "dynamic_mana_battlefield_count_scope": "controller_battlefield",
+            "dynamic_mana_battlefield_count_subtypes": ["swamp"],
+            "source_type_line": "Creature - Human Wizard",
+            "source_mana_cost": "{4}{B}",
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    required = expected["required_effect_fields"]
+
+    assert required["dynamic_mana_amount_source"] == "battlefield_permanent_count"
+    assert required["dynamic_mana_battlefield_count_subtypes"] == ["swamp"]
+
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    assert scenario["type"] == "simple_mana_source_refresh"
+    assert scenario["expected_available_mana_after_refresh"] == 3
+    assert scenario["controller_mana"]["generic"] == 2
+    assert len(scenario["controller_battlefield"]) == 3
+    assert scenario["type_line"] == "Creature - Human Wizard"

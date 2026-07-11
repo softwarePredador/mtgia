@@ -32,13 +32,20 @@ def queue_row(
     }
 
 
-def metadata(name: str = "Fixture Spell", *, type_line: str = "Instant", oracle_text: str = "Draw two cards."):
+def metadata(
+    name: str = "Fixture Spell",
+    *,
+    type_line: str = "Instant",
+    oracle_text: str = "Draw two cards.",
+    mana_cost: str = "",
+):
     return {
         "card_id": "card-1",
         "name": name,
         "type_line": type_line,
         "oracle_text": oracle_text,
         "oracle_hash": split.md5_text(oracle_text),
+        "mana_cost": mana_cost,
     }
 
 
@@ -17171,6 +17178,90 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                 self.assertEqual(effect["land_mana_dependency_allows_colorless"], allows_colorless)
                 self.assertEqual(effect["produces"], produces)
                 self.assertTrue(effect["mana_activation_requires_tap"])
+
+    def test_fixed_color_dynamic_mana_source_maps_exact_scope(self) -> None:
+        fixtures = [
+            (
+                "Priest of Titania",
+                "Creature - Elf Druid",
+                "{T}: Add {G} for each Elf on the battlefield.",
+                "{1}{G}",
+                "private static final FilterPermanent filter = new FilterPermanent(SubType.ELF, \"Elf on the battlefield\");\n"
+                "private static final DynamicValue xValue = new PermanentsOnBattlefieldCount(filter);\n"
+                "this.addAbility(new DynamicManaAbility(Mana.GreenMana(1), xValue));",
+                {
+                    "produces": "G",
+                    "dynamic_mana_amount_source": "battlefield_permanent_count",
+                    "dynamic_mana_battlefield_count_scope": "all_battlefield",
+                    "dynamic_mana_battlefield_count_subtypes": ["elf"],
+                },
+            ),
+            (
+                "Karametra's Acolyte",
+                "Creature - Human Druid",
+                "{T}: Add an amount of {G} equal to your devotion to green.",
+                "{3}{G}",
+                "this.addAbility(new DynamicManaAbility(Mana.GreenMana(1), DevotionCount.G));",
+                {
+                    "produces": "G",
+                    "dynamic_mana_amount_source": "devotion_to_green",
+                },
+            ),
+            (
+                "Magus of the Coffers",
+                "Creature - Human Wizard",
+                "{2}, {T}: Add {B} for each Swamp you control.",
+                "{4}{B}",
+                "private static final FilterControlledPermanent filter = new FilterControlledPermanent(\"Swamp you control\");\n"
+                "filter.add(SubType.SWAMP.getPredicate());\n"
+                "Ability ability = new DynamicManaAbility(Mana.BlackMana(1), new PermanentsOnBattlefieldCount(filter), new GenericManaCost(2));",
+                {
+                    "produces": "B",
+                    "dynamic_mana_amount_source": "battlefield_permanent_count",
+                    "dynamic_mana_battlefield_count_scope": "controller_battlefield",
+                    "dynamic_mana_battlefield_count_subtypes": ["swamp"],
+                    "activation_mana_cost": "{2}",
+                },
+            ),
+            (
+                "Viridian Joiner",
+                "Creature - Elf Druid",
+                "{T}: Add an amount of {G} equal to Viridian Joiner's power.",
+                "{2}{G}",
+                "this.addAbility(new DynamicManaAbility(Mana.GreenMana(1), SourcePermanentPowerValue.NOT_NEGATIVE));",
+                {
+                    "produces": "G",
+                    "dynamic_mana_amount_source": "source_power",
+                },
+            ),
+        ]
+        for name, type_line, oracle_text, mana_cost, source_text, expected_fields in fixtures:
+            with self.subTest(name=name):
+                row = queue_row(
+                    split.RAMP_CREATURE_UNIT,
+                    effect_classes=[],
+                    ability_kind="activated",
+                    ability_classes=["DynamicManaAbility"],
+                )
+                proposal, reason = split.split_row(
+                    row,
+                    metadata(
+                        name=name,
+                        type_line=type_line,
+                        oracle_text=oracle_text,
+                        mana_cost=mana_cost,
+                    ),
+                    source_text=source_text,
+                )
+
+                self.assertEqual(reason, "selected_exact_scope")
+                self.assertEqual(proposal["family_id"], "xmage_fixed_color_dynamic_mana_source")
+                effect = proposal["effect_json"]
+                self.assertEqual(effect["battle_model_scope"], split.DYNAMIC_FIXED_COLOR_MANA_SCOPE)
+                self.assertEqual(effect["source_type_line"], type_line)
+                self.assertEqual(effect["source_mana_cost"], mana_cost)
+                for key, value in expected_fields.items():
+                    self.assertEqual(effect[key], value)
 
     def test_counter_target_creature_spell_maps_to_stack_constraints(self) -> None:
         row = queue_row(split.COUNTER_UNIT, effect_classes=["CounterTargetEffect"])

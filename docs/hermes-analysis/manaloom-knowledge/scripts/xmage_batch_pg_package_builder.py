@@ -494,6 +494,12 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "conditionally_produces_opponent_land_colors",
     "land_mana_dependency_controller",
     "land_mana_dependency_allows_colorless",
+    "dynamic_mana_amount_source",
+    "dynamic_mana_battlefield_count_scope",
+    "dynamic_mana_battlefield_count_card_types",
+    "dynamic_mana_battlefield_count_subtypes",
+    "source_type_line",
+    "source_mana_cost",
     "life_for_colored_mana",
     "mana_activation_life_gain",
     "mana_activation_requires_tap",
@@ -2929,6 +2935,42 @@ def _manifest_land_color_dependency_lands(*, allows_colorless: bool) -> tuple[li
     return lands, colors
 
 
+def _manifest_dynamic_fixed_mana_fixture(required: dict[str, Any]) -> tuple[dict[str, Any], int | None]:
+    amount_source = str(required.get("dynamic_mana_amount_source") or "").strip().lower()
+    if not amount_source:
+        return {}, None
+    if amount_source == "battlefield_permanent_count":
+        scope = str(required.get("dynamic_mana_battlefield_count_scope") or "controller_battlefield").lower()
+        subtypes = [str(value).lower() for value in required.get("dynamic_mana_battlefield_count_subtypes") or []]
+        if "swamp" in subtypes:
+            return {
+                "controller_battlefield": [
+                    {"name": f"E2E Swamp {index + 1}", "type_line": "Land - Swamp"}
+                    for index in range(3)
+                ]
+            }, 3
+        if "elf" in subtypes:
+            fixture = {
+                "controller_battlefield": [
+                    {"name": "E2E Controller Elf", "type_line": "Creature - Elf"}
+                ],
+                "opponent_battlefield": [
+                    {"name": "E2E Opponent Elf", "type_line": "Creature - Elf"}
+                ],
+            }
+            return fixture, 3 if scope == "all_battlefield" else 2
+    if amount_source == "devotion_to_green":
+        return {
+            "controller_battlefield": [
+                {"name": "E2E Green Devotion One", "type_line": "Creature", "mana_cost": "{G}"},
+                {"name": "E2E Green Devotion Two", "type_line": "Enchantment", "mana_cost": "{G}"},
+            ]
+        }, 3
+    if amount_source == "source_power":
+        return {"source_overrides": {"power": 3}}, 3
+    return {}, None
+
+
 def simple_mana_source_execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any] | None:
     required = dict(rule.get("required_effect_fields") or {})
     if required.get("effect") != "ramp_permanent" or not required.get("is_mana_source"):
@@ -2940,12 +2982,15 @@ def simple_mana_source_execution_scenario_from_expected_rule(rule: dict[str, Any
         "xmage_simple_mana_source_with_etb_draw_v1",
         "xmage_simple_tap_restricted_mana_source_permanent_v1",
         "xmage_simple_tap_land_color_dependent_mana_source_permanent_v1",
+        "xmage_fixed_color_dynamic_mana_source_permanent_v1",
         "pain_talisman_color_pair_partial_v1",
     }:
         return None
     mana_produced = int(required.get("mana_produced") or 0)
     if mana_produced <= 0:
         return None
+    dynamic_fixture, dynamic_mana_produced = _manifest_dynamic_fixed_mana_fixture(required)
+    expected_mana_produced = int(dynamic_mana_produced or mana_produced)
     controller_mana = _manifest_mana_for_activation_cost(required.get("activation_mana_cost"))
     activation_cost_total = sum(controller_mana.values())
     support_sources = _manifest_support_sources_for_controller_mana(controller_mana)
@@ -2972,11 +3017,16 @@ def simple_mana_source_execution_scenario_from_expected_rule(rule: dict[str, Any
     scenario = {
         "name": f"{rule['card_name']} refreshes modeled mana source",
         "type": "simple_mana_source_refresh",
-        "card": {"name": rule["card_name"]},
+        "card": {
+            "name": rule["card_name"],
+            "type_line": required.get("source_type_line") or "Artifact",
+            "mana_cost": required.get("source_mana_cost") or "",
+        },
+        "type_line": required.get("source_type_line") or "Artifact",
         "controller_mana": controller_mana,
         "controller_hand": discard_hand,
         "expected_available_mana_after_refresh": (
-            activation_cost_total if enters_tapped else mana_produced
+            activation_cost_total if enters_tapped else expected_mana_produced
         ),
         "expected_tapped": (
             enters_tapped or bool(required.get("mana_activation_requires_tap", True))
@@ -3001,6 +3051,14 @@ def simple_mana_source_execution_scenario_from_expected_rule(rule: dict[str, Any
         "source_overrides": {"tapped": True} if enters_tapped else {},
         "logical_rule_key": rule["logical_rule_key"],
     }
+    for key, value in dynamic_fixture.items():
+        if key == "source_overrides":
+            scenario["source_overrides"] = {
+                **dict(scenario.get("source_overrides") or {}),
+                **dict(value or {}),
+            }
+        else:
+            scenario[key] = value
     restriction_fixture_cards = {
         "creature_spell": (
             {"name": "E2E Creature Spell", "type_line": "Creature", "mana_cost": "{1}", "cmc": 1},

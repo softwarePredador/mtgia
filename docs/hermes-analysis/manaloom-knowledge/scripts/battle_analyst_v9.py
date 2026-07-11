@@ -6146,6 +6146,67 @@ def is_legendary_creature_or_planeswalker_permanent(card):
     )
 
 
+def _permanent_matches_dynamic_mana_count(permanent, card_types, subtypes):
+    if not isinstance(permanent, dict):
+        return False
+    type_line = str(permanent.get("type_line") or "").lower()
+    for card_type in _as_list(card_types):
+        wanted = str(card_type or "").strip().lower()
+        if wanted and wanted not in type_line:
+            return False
+    for subtype in _as_list(subtypes):
+        wanted = str(subtype or "").strip()
+        if wanted and not permanent_has_subtype(permanent, wanted):
+            return False
+    return True
+
+
+def _battlefield_permanent_count_for_dynamic_mana(player, source):
+    scope = str(source.get("dynamic_mana_battlefield_count_scope") or "controller_battlefield").lower()
+    card_types = source.get("dynamic_mana_battlefield_count_card_types") or []
+    subtypes = source.get("dynamic_mana_battlefield_count_subtypes") or []
+    players = [player]
+    if scope == "all_battlefield":
+        players = _table_players_for(player) or [player]
+    total = 0
+    for participant in players:
+        for permanent in getattr(participant, "battlefield", []) or []:
+            if _permanent_matches_dynamic_mana_count(permanent, card_types, subtypes):
+                total += 1
+    return total
+
+
+def devotion_to_color(player, symbol):
+    target = str(symbol or "").strip().upper()
+    if target not in {"W", "U", "B", "R", "G"}:
+        return 0
+    devotion = 0
+    for permanent in getattr(player, "battlefield", []) or []:
+        if not isinstance(permanent, dict):
+            continue
+        mana_cost = str(permanent.get("mana_cost") or "")
+        devotion += mana_cost.count(f"{{{target}}}")
+        devotion += mana_cost.count(f"{{{target}/P}}")
+        for hybrid in re.findall(r"\{([^}]+)\}", mana_cost):
+            parts = [part.strip().upper() for part in hybrid.split("/")]
+            if target in parts and target != hybrid.strip().upper():
+                devotion += 1
+    return devotion
+
+
+def _dynamic_mana_source_production_for_state(player, source):
+    amount_source = str(source.get("dynamic_mana_amount_source") or "").strip().lower()
+    if not amount_source:
+        return None
+    if amount_source == "battlefield_permanent_count":
+        return _battlefield_permanent_count_for_dynamic_mana(player, source)
+    if amount_source == "devotion_to_green":
+        return devotion_to_color(player, "G")
+    if amount_source == "source_power":
+        return _source_power_value(source)
+    return 0
+
+
 def mana_source_production_for_state(player, source):
     if source == "land":
         return 1
@@ -6203,6 +6264,9 @@ def mana_source_production_for_state(player, source):
         return max(0, int(counter_scaled_mana or 0))
     if source.get("mana_produced_from_colors_among_permanents"):
         return len(_controlled_permanent_mana_colors(player))
+    dynamic_produced = _dynamic_mana_source_production_for_state(player, source)
+    if dynamic_produced is not None:
+        return max(0, int(dynamic_produced or 0))
     life_payment_divisor = int(source.get("mana_produced_from_life_payment_divisor") or 0)
     if life_payment_divisor > 0:
         return max(0, int(getattr(player, "life", 0) or 0) // life_payment_divisor)

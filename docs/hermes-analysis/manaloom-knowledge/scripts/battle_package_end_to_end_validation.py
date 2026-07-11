@@ -4776,7 +4776,7 @@ def run_simple_mana_source_refresh(
     source = battle.enrich_card(
         {
             **card,
-            "type_line": scenario.get("type_line") or "Artifact",
+            "type_line": scenario.get("type_line") or card.get("type_line") or "Artifact",
             **effect,
             **dict(scenario.get("source_overrides") or {}),
         }
@@ -4802,6 +4802,21 @@ def run_simple_mana_source_refresh(
         for land in (scenario.get("opponent_lands") or [])
         if isinstance(land, dict)
     ]
+    controller_battlefield = [
+        dict(permanent)
+        for permanent in (scenario.get("controller_battlefield") or [])
+        if isinstance(permanent, dict)
+    ]
+    opponent_battlefield = [
+        dict(permanent)
+        for permanent in (scenario.get("opponent_battlefield") or [])
+        if isinstance(permanent, dict)
+    ]
+    active.graveyard = [
+        dict(card)
+        for card in (scenario.get("controller_graveyard") or [])
+        if isinstance(card, dict)
+    ]
     support_sources = [
         battle.enrich_card(dict(support))
         for support in (
@@ -4810,8 +4825,8 @@ def run_simple_mana_source_refresh(
         )
         if isinstance(support, dict)
     ]
-    active.battlefield = [*controller_lands, *support_sources, source]
-    opponent.battlefield = opponent_lands
+    active.battlefield = [*controller_lands, *controller_battlefield, *support_sources, source]
+    opponent.battlefield = [*opponent_lands, *opponent_battlefield]
     turn = int(scenario.get("turn") or 5)
     before_events = len(events)
 

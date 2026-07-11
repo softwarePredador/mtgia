@@ -738,6 +738,14 @@ patterns:
   `xmage_simple_tap_land_color_dependent_mana_source_permanent_v1`. The runtime
   derives conditional mana modes from current controller or opponent lands and
   excludes colorless unless Oracle says "any type".
+- `ramp_permanent::xmage_creature_mana_source_variant_review_v1` with exact
+  XMage `DynamicManaAbility`, fixed produced color, no sacrifice target, no
+  auxiliary effect class, and one supported amount source ->
+  `xmage_fixed_color_dynamic_mana_source_permanent_v1`. Supported amount
+  sources are battlefield permanent counts by type/subtype, devotion to a fixed
+  color, and source power. "Any one color" dynamic mana and target-sacrifice
+  dynamic mana remain blocked until runtime can lock the color choice or model
+  the target-sacrifice refresh safely.
 - `counter_spell::counter_target_stack_object_variant_v1` ->
   `xmage_counter_target_spell_v1`
 - `bounce::targeted_return_to_hand_variant_v1` ->
