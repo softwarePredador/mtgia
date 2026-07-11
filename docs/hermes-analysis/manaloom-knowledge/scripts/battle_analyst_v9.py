@@ -10420,10 +10420,12 @@ CARD_EFFECT_FIELD_RULE_KEYS = (
     "target_controller_life_loss_on_counter",
     "life_loss_on_destroy",
     "target_controller_life_loss_on_destroy",
+    "target_controller_life_loss_on_resolve",
     "target_controller_damage_on_resolve",
     "source_controller_life_loss_on_resolve",
     "source_controller_damage_on_resolve",
     "controller_gains_life",
+    "target_controller_gains_life",
     "controller_gain_life_source",
     "gain_life_source",
     "life_gain_per_count",
@@ -14915,6 +14917,49 @@ def apply_removal_target_controller_life_loss(
     return requested, lost
 
 
+def removal_target_controller_life_loss_on_resolve_requested(effect_data):
+    if not isinstance(effect_data, dict):
+        return 0
+    try:
+        return max(0, int(effect_data.get("target_controller_life_loss_on_resolve") or 0))
+    except Exception:
+        return 0
+
+
+def apply_removal_target_controller_life_loss_on_resolve(
+    effect_data,
+    target_controller,
+    source_card,
+    target,
+    turn,
+    *,
+    phase="resolution",
+):
+    requested = removal_target_controller_life_loss_on_resolve_requested(effect_data)
+    if requested <= 0 or target_controller is None:
+        return requested, 0
+    before = int(getattr(target_controller, "life", 0) or 0)
+    change_life(target_controller, -requested)
+    after = int(getattr(target_controller, "life", 0) or 0)
+    lost = max(0, before - after)
+    emit_replay_event(
+        "target_controller_life_loss_on_resolve",
+        player=getattr(target_controller, "name", None),
+        card=source_card.get("name", "?") if isinstance(source_card, dict) else "?",
+        target=target.get("name", "?") if isinstance(target, dict) else "?",
+        target_controller=getattr(target_controller, "name", None),
+        life_loss_on_resolve=requested,
+        target_controller_life_loss_on_resolve=requested,
+        target_controller_life_before=before,
+        target_controller_life_after=after,
+        target_controller_life_lost=lost,
+        turn=turn,
+        phase=phase,
+        **replay_rule_fields(effect_data),
+    )
+    return requested, lost
+
+
 def removal_target_controller_damage_requested(effect_data):
     if not isinstance(effect_data, dict):
         return 0
@@ -16081,6 +16126,14 @@ def resolve_multi_target_removal(player, opponents, card, effect_data, turn, rng
             destination,
             turn,
         )
+        apply_removal_target_controller_life_loss_on_resolve(
+            effect_data,
+            target_controller,
+            card,
+            target,
+            turn,
+            phase="resolution",
+        )
         apply_removal_target_controller_damage(
             effect_data,
             target_controller,
@@ -16289,6 +16342,14 @@ def resolve_declared_single_removal(player, opponents, card, effect_data, turn, 
         target,
         destination,
         turn,
+    )
+    apply_removal_target_controller_life_loss_on_resolve(
+        effect_data,
+        target_controller,
+        card,
+        target,
+        turn,
+        phase="resolution",
     )
     apply_removal_target_controller_damage(
         effect_data,
@@ -69700,6 +69761,14 @@ def apply_effect_immediate(
                     t,
                     destination,
                     turn,
+                )
+                apply_removal_target_controller_life_loss_on_resolve(
+                    effect_data,
+                    opp,
+                    card,
+                    t,
+                    turn,
+                    phase="resolution",
                 )
                 apply_removal_target_controller_damage(
                     effect_data,

@@ -13397,6 +13397,62 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "bounce_draw_oracle_not_exact_fixed")
 
+    def test_bounce_gain_life_spell_maps_controller_gain(self) -> None:
+        row = queue_row(
+            split.LIFE_UNIT,
+            effect_classes=["ReturnToHandTargetEffect", "GainLifeEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Dramatic Rescue",
+                oracle_text="Return target tapped creature to its owner's hand. You gain 2 life.",
+            ),
+            source_text=(
+                'FilterCreaturePermanent filter = new FilterCreaturePermanent("tapped creature");'
+                "filter.add(TappedPredicate.TAPPED);"
+                "this.getSpellAbility().addTarget(new TargetPermanent(filter));"
+                "this.getSpellAbility().addEffect(new ReturnToHandTargetEffect());"
+                "this.getSpellAbility().addEffect(new GainLifeEffect(2));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "remove_creature")
+        self.assertEqual(effect["battle_model_scope"], split.BOUNCE_GAIN_LIFE_SCOPE)
+        self.assertEqual(effect["target"], "creature")
+        self.assertEqual(effect["target_constraints"], {"card_types": ["creature"], "tapped_state": "tapped"})
+        self.assertEqual(effect["destination"], "hand")
+        self.assertEqual(effect["controller_gains_life"], 2)
+
+    def test_bounce_target_controller_life_loss_spell_maps_fixed_loss(self) -> None:
+        row = queue_row(
+            split.BOUNCE_UNIT,
+            effect_classes=["ReturnToHandTargetEffect", "LoseLifeTargetControllerEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Vapor Snag",
+                oracle_text="Return target creature to its owner's hand. Its controller loses 1 life.",
+            ),
+            source_text=(
+                "this.getSpellAbility().addTarget(new TargetCreaturePermanent());"
+                "this.getSpellAbility().addEffect(new ReturnToHandTargetEffect());"
+                "this.getSpellAbility().addEffect(new LoseLifeTargetControllerEffect(1));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "remove_creature")
+        self.assertEqual(effect["battle_model_scope"], split.BOUNCE_TARGET_CONTROLLER_LOSE_LIFE_SCOPE)
+        self.assertEqual(effect["target"], "creature")
+        self.assertEqual(effect["destination"], "hand")
+        self.assertEqual(effect["target_controller_life_loss_on_resolve"], 1)
+        self.assertEqual(effect["resolution_order"], "bounce_then_target_controller_life_loss")
+
     def test_damage_spell_with_mana_variable_x_maps_to_runtime(self) -> None:
         row = queue_row(split.DAMAGE_UNIT, effect_classes=["DamageTargetEffect"])
         proposal, reason = split.split_row(
@@ -16675,6 +16731,92 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         )
         self.assertEqual(effect["_composite_rule_components"][0]["battle_model_scope"], split.GRAVEYARD_EXILE_SPELL_SCOPE)
         self.assertEqual(effect["_composite_rule_components"][0]["graveyard_exile_target"], "any_card")
+
+    def test_exile_target_controller_gain_life_spell_maps_power_constraint(self) -> None:
+        row = queue_row(
+            split.EXILE_UNIT,
+            effect_classes=["ExileTargetEffect", "GainLifeTargetControllerEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Last Breath",
+                oracle_text="Exile target creature with power 2 or less. Its controller gains 4 life.",
+            ),
+            source_text=(
+                'FilterCreaturePermanent filter = new FilterCreaturePermanent("creature with power 2 or less");'
+                "filter.add(new PowerPredicate(ComparisonType.FEWER_THAN, 3));"
+                "this.getSpellAbility().addTarget(new TargetPermanent(filter));"
+                "this.getSpellAbility().addEffect(new ExileTargetEffect());"
+                "this.getSpellAbility().addEffect(new GainLifeTargetControllerEffect(4));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "remove_creature")
+        self.assertEqual(effect["battle_model_scope"], split.EXILE_TARGET_CONTROLLER_GAIN_LIFE_SCOPE)
+        self.assertEqual(effect["target"], "creature")
+        self.assertEqual(effect["target_constraints"], {"card_types": ["creature"], "power_max": 2})
+        self.assertEqual(effect["destination"], "exile")
+        self.assertEqual(effect["target_controller_gains_life"], 4)
+
+    def test_exile_source_controller_life_loss_spell_maps_fixed_loss(self) -> None:
+        row = queue_row(
+            split.EXILE_UNIT,
+            effect_classes=["ExileTargetEffect", "LoseLifeSourceControllerEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Anguished Unmaking",
+                oracle_text="Exile target nonland permanent. You lose 3 life.",
+            ),
+            source_text=(
+                "this.getSpellAbility().addTarget(new TargetNonlandPermanent());"
+                "this.getSpellAbility().addEffect(new ExileTargetEffect());"
+                "this.getSpellAbility().addEffect(new LoseLifeSourceControllerEffect(3));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "remove_permanent")
+        self.assertEqual(effect["battle_model_scope"], split.EXILE_SOURCE_CONTROLLER_LOSE_LIFE_SCOPE)
+        self.assertEqual(effect["target"], "nonland_permanent")
+        self.assertEqual(effect["source_controller_life_loss_on_resolve"], 3)
+        self.assertEqual(effect["resolution_order"], "exile_then_source_controller_life_loss")
+
+    def test_exile_source_controller_damage_spell_maps_multi_target_damage_once(self) -> None:
+        row = queue_row(
+            split.EXILE_UNIT,
+            effect_classes=["ExileTargetEffect", "DamageControllerEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Ashes to Ashes",
+                type_line="Sorcery",
+                oracle_text="Exile two target nonartifact creatures. Ashes to Ashes deals 5 damage to you.",
+            ),
+            source_text=(
+                'FilterCreaturePermanent filter = new FilterCreaturePermanent("nonartifact creature");'
+                "filter.add(Predicates.not(CardType.ARTIFACT.getPredicate()));"
+                "this.getSpellAbility().addTarget(new TargetPermanent(2, filter));"
+                "this.getSpellAbility().addEffect(new ExileTargetEffect());"
+                "this.getSpellAbility().addEffect(new DamageControllerEffect(5));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "remove_creature")
+        self.assertEqual(effect["battle_model_scope"], split.EXILE_SOURCE_CONTROLLER_DAMAGE_SCOPE)
+        self.assertEqual(effect["target"], "creature")
+        self.assertEqual(effect["target_constraints"], {"card_types": ["creature"], "exclude_card_types": ["artifact"]})
+        self.assertEqual(effect["target_count"], 2)
+        self.assertEqual(effect["source_controller_damage_on_resolve"], 5)
+        self.assertEqual(effect["resolution_order"], "exile_then_source_controller_damage")
 
     def test_exile_target_spell_maps_restricted_single_targets(self) -> None:
         cases = [

@@ -79,6 +79,8 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "life_gain_on_counter",
     "life_loss_on_counter",
     "target_controller_life_loss_on_counter",
+    "target_controller_gains_life",
+    "target_controller_life_loss_on_resolve",
     "target_controller_damage_on_resolve",
     "source_controller_life_loss_on_resolve",
     "source_controller_damage_on_resolve",
@@ -7914,7 +7916,12 @@ def single_target_removal_execution_scenario_from_expected_rule(
         "xmage_destroy_target_and_source_controller_damage_spell_v1",
         "xmage_destroy_target_and_target_controller_damage_spell_v1",
         "xmage_return_target_to_hand_spell_v1",
+        "xmage_return_target_to_hand_and_controller_gain_life_spell_v1",
+        "xmage_return_target_to_hand_and_target_controller_loses_life_spell_v1",
         "xmage_put_target_permanent_on_library_spell_v1",
+        "xmage_exile_target_and_target_controller_gain_life_spell_v1",
+        "xmage_exile_target_and_source_controller_loses_life_spell_v1",
+        "xmage_exile_target_and_source_controller_damage_spell_v1",
     }:
         return None
     if required.get("effect") not in {"remove_creature", "remove_permanent"}:
@@ -7998,8 +8005,13 @@ def single_target_removal_execution_scenario_from_expected_rule(
         scenario["expected_controller_life_gain"] = controller_life_gain
         if controller_gain_life_source:
             scenario["expected_controller_life_gain_source"] = controller_gain_life_source
+    target_controller_life_gain = int(required.get("target_controller_gains_life") or 0)
+    if target_controller_life_gain > 0:
+        scenario["target_controller_life"] = 10
+        scenario["expected_target_controller_life_gain"] = target_controller_life_gain
     source_controller_life_loss = int(required.get("source_controller_life_loss_on_resolve") or 0)
     source_controller_damage = int(required.get("source_controller_damage_on_resolve") or 0)
+    target_controller_life_loss = int(required.get("target_controller_life_loss_on_resolve") or 0)
     target_controller_damage = int(required.get("target_controller_damage_on_resolve") or 0)
     if source_controller_life_loss > 0:
         scenario["controller_life"] = 20
@@ -8007,6 +8019,9 @@ def single_target_removal_execution_scenario_from_expected_rule(
     if source_controller_damage > 0:
         scenario["controller_life"] = 20
         scenario["expected_source_controller_damage"] = source_controller_damage
+    if target_controller_life_loss > 0:
+        scenario["target_controller_life"] = 20
+        scenario["expected_target_controller_life_loss"] = target_controller_life_loss
     if target_controller_damage > 0:
         scenario["target_controller_life"] = 20
         scenario["expected_target_controller_damage"] = target_controller_damage
@@ -8400,8 +8415,11 @@ def multi_target_removal_execution_scenario_from_expected_rule(
         "xmage_exile_target_spell_v1",
         "xmage_destroy_target_spell_v1",
         "xmage_destroy_target_and_source_controller_loses_life_spell_v1",
+        "xmage_destroy_target_and_source_controller_damage_spell_v1",
         "xmage_return_target_to_hand_spell_v1",
         "xmage_put_target_permanent_on_library_spell_v1",
+        "xmage_exile_target_and_source_controller_loses_life_spell_v1",
+        "xmage_exile_target_and_source_controller_damage_spell_v1",
     }:
         return None
     if required.get("effect") not in {"remove_creature", "remove_permanent"}:
@@ -8442,6 +8460,10 @@ def multi_target_removal_execution_scenario_from_expected_rule(
     if source_controller_life_loss > 0:
         scenario["controller_life"] = 20
         scenario["expected_source_controller_life_loss"] = source_controller_life_loss
+    source_controller_damage = int(required.get("source_controller_damage_on_resolve") or 0)
+    if source_controller_damage > 0:
+        scenario["controller_life"] = 20
+        scenario["expected_source_controller_damage"] = source_controller_damage
     return scenario
 
 

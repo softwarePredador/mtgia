@@ -4727,6 +4727,81 @@ def test_destroy_gain_life_scenario_carries_controller_life_gain() -> None:
     assert scenario["controller_life"] == 10
 
 
+def test_bounce_gain_life_scenario_carries_controller_life_gain() -> None:
+    rule = {
+        "normalized_name": "dramatic rescue fixture",
+        "card_name": "Dramatic Rescue Fixture",
+        "oracle_hash": "hash-dramatic-rescue-fixture",
+        "logical_rule_key": "battle_rule_v1:hash-dramatic-rescue-fixture",
+        "required_effect_fields": {
+            "effect": "remove_creature",
+            "battle_model_scope": "xmage_return_target_to_hand_and_controller_gain_life_spell_v1",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"], "tapped_state": "tapped"},
+            "destination": "hand",
+            "controller_gains_life": 2,
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "single_target_removal"
+    assert scenario["expected_destination"] == "hand"
+    assert scenario["expected_controller_life_gain"] == 2
+    assert scenario["controller_life"] == 10
+
+
+def test_bounce_target_controller_life_loss_scenario_carries_loss() -> None:
+    rule = {
+        "normalized_name": "vapor snag fixture",
+        "card_name": "Vapor Snag Fixture",
+        "oracle_hash": "hash-vapor-snag-fixture",
+        "logical_rule_key": "battle_rule_v1:hash-vapor-snag-fixture",
+        "required_effect_fields": {
+            "effect": "remove_creature",
+            "battle_model_scope": "xmage_return_target_to_hand_and_target_controller_loses_life_spell_v1",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "destination": "hand",
+            "target_controller_life_loss_on_resolve": 1,
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "single_target_removal"
+    assert scenario["expected_destination"] == "hand"
+    assert scenario["expected_target_controller_life_loss"] == 1
+    assert scenario["target_controller_life"] == 20
+
+
+def test_exile_target_controller_gain_life_scenario_carries_target_gain() -> None:
+    rule = {
+        "normalized_name": "last breath fixture",
+        "card_name": "Last Breath Fixture",
+        "oracle_hash": "hash-last-breath-fixture",
+        "logical_rule_key": "battle_rule_v1:hash-last-breath-fixture",
+        "required_effect_fields": {
+            "effect": "remove_creature",
+            "battle_model_scope": "xmage_exile_target_and_target_controller_gain_life_spell_v1",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"], "power_max": 2},
+            "destination": "exile",
+            "target_controller_gains_life": 4,
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "single_target_removal"
+    assert scenario["expected_destination"] == "exile"
+    assert scenario["expected_target_controller_life_gain"] == 4
+    assert scenario["target_controller_life"] == 10
+
+
 def test_destroy_source_controller_life_loss_scenario_carries_loss() -> None:
     rule = {
         "normalized_name": "infernal grasp fixture",
@@ -4801,6 +4876,59 @@ def test_destroy_source_controller_damage_scenario_carries_damage() -> None:
     assert scenario["type"] == "single_target_removal"
     assert scenario["expected_source_controller_damage"] == 3
     assert scenario["controller_life"] == 20
+
+
+def test_exile_source_controller_life_loss_scenario_carries_loss() -> None:
+    rule = {
+        "normalized_name": "anguished unmaking fixture",
+        "card_name": "Anguished Unmaking Fixture",
+        "oracle_hash": "hash-anguished-unmaking-fixture",
+        "logical_rule_key": "battle_rule_v1:hash-anguished-unmaking-fixture",
+        "required_effect_fields": {
+            "effect": "remove_permanent",
+            "battle_model_scope": "xmage_exile_target_and_source_controller_loses_life_spell_v1",
+            "target": "nonland_permanent",
+            "target_constraints": {"card_types": ["permanent"], "exclude_card_types": ["land"]},
+            "destination": "exile",
+            "source_controller_life_loss_on_resolve": 3,
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "single_target_removal"
+    assert scenario["expected_source_controller_life_loss"] == 3
+    assert scenario["controller_life"] == 20
+
+
+def test_multi_target_exile_source_controller_damage_scenario_carries_damage_once() -> None:
+    rule = {
+        "normalized_name": "ashes to ashes fixture",
+        "card_name": "Ashes to Ashes Fixture",
+        "oracle_hash": "hash-ashes-to-ashes-fixture",
+        "logical_rule_key": "battle_rule_v1:hash-ashes-to-ashes-fixture",
+        "required_effect_fields": {
+            "effect": "remove_creature",
+            "battle_model_scope": "xmage_exile_target_and_source_controller_damage_spell_v1",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"], "exclude_card_types": ["artifact"]},
+            "destination": "exile",
+            "target_count_min": 2,
+            "target_count_max": 2,
+            "max_targets": 2,
+            "source_controller_damage_on_resolve": 5,
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "multi_target_removal"
+    assert scenario["expected_destination"] == "exile"
+    assert scenario["expected_source_controller_damage"] == 5
+    assert scenario["controller_life"] == 20
+    assert len(scenario["targets"]) == 2
 
 
 def test_destroy_target_controller_damage_scenario_carries_damage() -> None:

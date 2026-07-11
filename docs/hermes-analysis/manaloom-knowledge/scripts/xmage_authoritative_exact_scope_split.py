@@ -296,6 +296,19 @@ DESTROY_SOURCE_CONTROLLER_DAMAGE_SCOPE = (
 DESTROY_TARGET_CONTROLLER_DAMAGE_SCOPE = (
     "xmage_destroy_target_and_target_controller_damage_spell_v1"
 )
+BOUNCE_GAIN_LIFE_SCOPE = "xmage_return_target_to_hand_and_controller_gain_life_spell_v1"
+BOUNCE_TARGET_CONTROLLER_LOSE_LIFE_SCOPE = (
+    "xmage_return_target_to_hand_and_target_controller_loses_life_spell_v1"
+)
+EXILE_TARGET_CONTROLLER_GAIN_LIFE_SCOPE = (
+    "xmage_exile_target_and_target_controller_gain_life_spell_v1"
+)
+EXILE_SOURCE_CONTROLLER_LOSE_LIFE_SCOPE = (
+    "xmage_exile_target_and_source_controller_loses_life_spell_v1"
+)
+EXILE_SOURCE_CONTROLLER_DAMAGE_SCOPE = (
+    "xmage_exile_target_and_source_controller_damage_spell_v1"
+)
 CREATURE_TAP_DAMAGE_SCOPE = "xmage_creature_tap_fixed_damage_target_activated_v1"
 TAP_DAMAGE_ACTIVATED_SCOPE = "xmage_tap_fixed_damage_target_activated_ability_v1"
 PERMANENT_ACTIVATED_DAMAGE_SCOPE = "xmage_permanent_simple_activated_damage_v1"
@@ -3522,6 +3535,207 @@ def fixed_bounce_draw_from_source(source: str) -> int | None:
     return draw_count
 
 
+def fixed_bounce_gain_life_from_oracle(
+    metadata: dict[str, Any],
+) -> tuple[str, str, str, int] | None:
+    text = " ".join(oracle_effect_lines_without_neutral_auxiliary(metadata))
+    text = re.sub(r"\s+", " ", text).strip()
+    match = re.match(
+        r"^(return target .+? to its owner's hand)\. you gain (?P<life>\d+) life\.?$",
+        text,
+    )
+    if not match:
+        return None
+    simple_metadata = dict(metadata)
+    simple_metadata["oracle_text"] = f"{match.group(1)}."
+    parsed = bounce_target_from_oracle(simple_metadata)
+    if parsed is None:
+        return None
+    effect, target, target_controller = parsed
+    return effect, target, target_controller, int(match.group("life"))
+
+
+def fixed_bounce_gain_life_from_source(source: str) -> int | None:
+    text = source or ""
+    if has_additional_cost(text):
+        return None
+    if "TargetPointer" in text or ".setTargetPointer" in text:
+        return None
+    if "TargetAdjuster" in text or ".setTargetAdjuster" in text:
+        return None
+    bounce_matches = list(re.finditer(r"new\s+ReturnToHandTargetEffect\s*\(\s*\)", text, re.S))
+    if len(bounce_matches) != 1:
+        return None
+    life_matches = list(re.finditer(r"new\s+GainLifeEffect\s*\(\s*(\d+)\s*\)", text, re.S))
+    if len(life_matches) != 1:
+        return None
+    if bounce_matches[0].start() > life_matches[0].start():
+        return None
+    return int(life_matches[0].group(1))
+
+
+def fixed_bounce_target_controller_life_loss_from_oracle(
+    metadata: dict[str, Any],
+) -> tuple[str, str, str, int] | None:
+    text = " ".join(oracle_effect_lines_without_neutral_auxiliary(metadata))
+    text = re.sub(r"\s+", " ", text).strip()
+    match = re.match(
+        r"^(return target .+? to its owner's hand)\. its controller loses (?P<life>\d+) life\.?$",
+        text,
+    )
+    if not match:
+        return None
+    simple_metadata = dict(metadata)
+    simple_metadata["oracle_text"] = f"{match.group(1)}."
+    parsed = bounce_target_from_oracle(simple_metadata)
+    if parsed is None:
+        return None
+    effect, target, target_controller = parsed
+    return effect, target, target_controller, int(match.group("life"))
+
+
+def fixed_bounce_target_controller_life_loss_from_source(source: str) -> int | None:
+    text = source or ""
+    if has_additional_cost(text):
+        return None
+    if "TargetPointer" in text or ".setTargetPointer" in text:
+        return None
+    if "TargetAdjuster" in text or ".setTargetAdjuster" in text:
+        return None
+    bounce_matches = list(re.finditer(r"new\s+ReturnToHandTargetEffect\s*\(\s*\)", text, re.S))
+    if len(bounce_matches) != 1:
+        return None
+    life_matches = list(
+        re.finditer(r"new\s+LoseLifeTargetControllerEffect\s*\(\s*(\d+)\s*\)", text, re.S)
+    )
+    if len(life_matches) != 1:
+        return None
+    if bounce_matches[0].start() > life_matches[0].start():
+        return None
+    return int(life_matches[0].group(1))
+
+
+def _exile_source_controller_penalty_target_from_oracle(
+    exile_text: str,
+) -> dict[str, Any] | None:
+    simple_metadata = {"oracle_text": f"{exile_text}."}
+    multi_target = fixed_multi_target_removal_from_oracle(simple_metadata, "exile")
+    if multi_target is not None:
+        return dict(multi_target)
+    parsed = exile_target_from_oracle(simple_metadata)
+    if parsed is None:
+        return None
+    effect, target = parsed
+    return {
+        "effect": effect,
+        "target": target,
+        "destination": "exile",
+    }
+
+
+def fixed_exile_target_controller_gain_life_from_oracle(
+    metadata: dict[str, Any],
+) -> dict[str, Any] | None:
+    text = " ".join(oracle_effect_lines_without_neutral_auxiliary(metadata))
+    text = re.sub(r"\s+", " ", text).strip()
+    match = re.match(r"^(?P<exile>exile target .+?)\. its controller gains (?P<life>\d+) life\.?$", text)
+    if not match:
+        return None
+    parsed = _exile_source_controller_penalty_target_from_oracle(match.group("exile"))
+    if parsed is None:
+        return None
+    return {**parsed, "target_controller_gains_life": int(match.group("life"))}
+
+
+def fixed_exile_target_controller_gain_life_from_source(source: str) -> int | None:
+    text = source or ""
+    if has_additional_cost(text):
+        return None
+    if "TargetPointer" in text or ".setTargetPointer" in text:
+        return None
+    if "TargetAdjuster" in text or ".setTargetAdjuster" in text:
+        return None
+    exile_matches = list(re.finditer(r"new\s+ExileTargetEffect\s*\(\s*\)", text, re.S))
+    if len(exile_matches) != 1:
+        return None
+    life_matches = list(
+        re.finditer(r"new\s+GainLifeTargetControllerEffect\s*\(\s*(\d+)\s*\)", text, re.S)
+    )
+    if len(life_matches) != 1:
+        return None
+    if exile_matches[0].start() > life_matches[0].start():
+        return None
+    return int(life_matches[0].group(1))
+
+
+def fixed_exile_source_controller_life_loss_from_oracle(
+    metadata: dict[str, Any],
+) -> dict[str, Any] | None:
+    text = " ".join(oracle_effect_lines_without_neutral_auxiliary(metadata))
+    text = re.sub(r"\s+", " ", text).strip()
+    match = re.match(r"^(?P<exile>exile .+?)\. you lose (?P<life>\d+) life\.?$", text)
+    if not match:
+        return None
+    parsed = _exile_source_controller_penalty_target_from_oracle(match.group("exile"))
+    if parsed is None:
+        return None
+    return {**parsed, "source_controller_life_loss_on_resolve": int(match.group("life"))}
+
+
+def fixed_exile_source_controller_life_loss_from_source(source: str) -> int | None:
+    text = source or ""
+    if has_additional_cost(text):
+        return None
+    if "TargetPointer" in text or ".setTargetPointer" in text:
+        return None
+    if "TargetAdjuster" in text or ".setTargetAdjuster" in text:
+        return None
+    if len(re.findall(r"new\s+ExileTargetEffect\s*\(", text, re.S)) != 1:
+        return None
+    life_matches = list(
+        re.finditer(r"new\s+LoseLifeSourceControllerEffect\s*\(\s*(\d+)\s*\)", text, re.S)
+    )
+    if len(life_matches) != 1:
+        return None
+    return int(life_matches[0].group(1))
+
+
+def fixed_exile_source_controller_damage_from_oracle(
+    metadata: dict[str, Any],
+) -> dict[str, Any] | None:
+    text = " ".join(oracle_effect_lines_without_neutral_auxiliary(metadata))
+    text = re.sub(r"\s+", " ", text).strip()
+    name = re.escape(str(metadata.get("name") or "").strip().lower())
+    match = re.match(
+        rf"^(?P<exile>exile .+?)\. {name} deals (?P<damage>\d+) damage to you\.?$",
+        text,
+    )
+    if not match:
+        return None
+    parsed = _exile_source_controller_penalty_target_from_oracle(match.group("exile"))
+    if parsed is None:
+        return None
+    return {**parsed, "source_controller_damage_on_resolve": int(match.group("damage"))}
+
+
+def fixed_exile_source_controller_damage_from_source(source: str) -> int | None:
+    text = source or ""
+    if has_additional_cost(text):
+        return None
+    if "TargetPointer" in text or ".setTargetPointer" in text:
+        return None
+    if "TargetAdjuster" in text or ".setTargetAdjuster" in text:
+        return None
+    if len(re.findall(r"new\s+ExileTargetEffect\s*\(", text, re.S)) != 1:
+        return None
+    damage_matches = list(
+        re.finditer(r"new\s+DamageControllerEffect\s*\(\s*(\d+)\s*\)", text, re.S)
+    )
+    if len(damage_matches) != 1:
+        return None
+    return int(damage_matches[0].group(1))
+
+
 def word_or_int(value: str) -> int:
     token = str(value or "").strip().lower()
     if token == "a":
@@ -4157,6 +4371,8 @@ def removal_multi_target_from_phrase(phrase: str) -> tuple[str, str] | None:
     mapping = {
         "creature": ("remove_creature", "creature"),
         "creatures": ("remove_creature", "creature"),
+        "nonartifact creature": ("remove_creature", "nonartifact_creature"),
+        "nonartifact creatures": ("remove_creature", "nonartifact_creature"),
         "nonblack creature": ("remove_creature", "nonblack_creature"),
         "nonblack creatures": ("remove_creature", "nonblack_creature"),
         "artifact": ("remove_permanent", "artifact"),
@@ -15365,6 +15581,7 @@ def restricted_target_base(target: str) -> str:
         "creature_power_3_or_greater",
         "creature_power_4_or_greater",
         "creature_power_3_or_less",
+        "creature_power_2_or_less",
         "creature_power_1_or_less",
         "creature_toughness_4_or_greater",
         "creature_toughness_2_or_less",
@@ -15541,6 +15758,7 @@ def restricted_battlefield_target_from_oracle(metadata: dict[str, Any], action: 
         ),
         (r"target creature or spacecraft", "creature_or_spacecraft"),
         (r"target creature with power 3 or less", "creature_power_3_or_less"),
+        (r"target creature with power 2 or less", "creature_power_2_or_less"),
         (r"target creature with power 3 or greater", "creature_power_3_or_greater"),
         (r"target creature with power 4 or greater", "creature_power_4_or_greater"),
         (r"target creature with toughness 4 or greater", "creature_toughness_4_or_greater"),
@@ -15880,6 +16098,11 @@ def restricted_battlefield_target_from_source(source: str) -> str | None:
         )
     ):
         return "spirit_or_disturb_creature_or_enchantment"
+    if (
+        "FilterCreaturePermanent" in text
+        and re.search(r"PowerPredicate\s*\(\s*ComparisonType\.FEWER_THAN\s*,\s*3\s*\)", text)
+    ):
+        return "creature_power_2_or_less"
     if (
         "FilterCreaturePermanent" in text
         and re.search(r"PowerPredicate\s*\(\s*ComparisonType\.FEWER_THAN\s*,\s*4\s*\)", text)
@@ -28686,6 +28909,8 @@ def target_constraints_for(target: str) -> dict[str, Any]:
         return {"card_types": ["creature"], "exclude_subtypes": ["vampire", "werewolf", "zombie"]}
     if target == "creature_power_3_or_less":
         return {"card_types": ["creature"], "power_max": 3}
+    if target == "creature_power_2_or_less":
+        return {"card_types": ["creature"], "power_max": 2}
     if target == "creature_power_1_or_less":
         return {"card_types": ["creature"], "power_max": 1}
     if target == "creature_toughness_4_or_greater":
@@ -39324,6 +39549,45 @@ def split_row(
             family_id="xmage_destroy_dynamic_gain_life_spell",
         ), "selected_exact_scope"
 
+    if unit == LIFE_UNIT and classes == {"ReturnToHandTargetEffect", "GainLifeEffect"}:
+        unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+        if unsupported_abilities:
+            return None, "bounce_life_gain_ability_class_not_simple"
+        if has_non_neutral_oracle_complexity(metadata):
+            return None, "bounce_life_gain_oracle_not_simple"
+        oracle_bounce = fixed_bounce_gain_life_from_oracle(metadata)
+        if oracle_bounce is None:
+            return None, "bounce_life_gain_oracle_not_exact_fixed"
+        source_life_gain = fixed_bounce_gain_life_from_source(source_text)
+        if source_life_gain is None:
+            return None, "bounce_life_gain_source_not_fixed"
+        effect, target_type, target_controller, oracle_life_gain = oracle_bounce
+        if source_life_gain != oracle_life_gain:
+            return None, "bounce_life_gain_source_oracle_mismatch"
+        if not source_matches_bounce_target(source_text, target_type):
+            return None, "bounce_life_gain_target_source_mismatch"
+        if not source_matches_bounce_target_controller(source_text, target_controller):
+            return None, "bounce_life_gain_source_controller_mismatch"
+        target_base = restricted_target_base(target_type)
+        effect_json = {
+            "effect": effect,
+            "battle_model_scope": BOUNCE_GAIN_LIFE_SCOPE,
+            "target": target_base,
+            "target_constraints": target_constraints_with_controller(target_type, target_controller),
+            "target_controller": target_controller,
+            "destination": "hand",
+            "controller_gains_life": int(oracle_life_gain),
+            "resolution_order": "bounce_then_controller_gain_life",
+            "xmage_effect_classes": ["ReturnToHandTargetEffect", "GainLifeEffect"],
+            **flags,
+        }
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_return_target_to_hand_controller_gain_life_spell",
+        ), "selected_exact_scope"
+
     if unit == LIFE_UNIT and classes == {"DrawCardSourceControllerEffect", "GainLifeEffect"}:
         unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
         if unsupported_abilities:
@@ -39489,6 +39753,153 @@ def split_row(
             **flags,
         }
         return build_proposal(row, metadata, effect_json, family_id="xmage_fixed_life_gain_spell"), "selected_exact_scope"
+
+    if unit == EXILE_UNIT and classes == {"ExileTargetEffect", "GainLifeTargetControllerEffect"}:
+        unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+        if unsupported_abilities:
+            return None, "exile_target_controller_gain_life_ability_class_not_simple"
+        if has_non_neutral_oracle_complexity(metadata):
+            return None, "exile_target_controller_gain_life_oracle_not_simple"
+        source_life_gain = fixed_exile_target_controller_gain_life_from_source(source_text)
+        if source_life_gain is None:
+            return None, "exile_target_controller_gain_life_source_not_fixed"
+        oracle_exile = fixed_exile_target_controller_gain_life_from_oracle(metadata)
+        if oracle_exile is None:
+            return None, "exile_target_controller_gain_life_oracle_not_exact_fixed"
+        oracle_life_gain = int(oracle_exile["target_controller_gains_life"])
+        if source_life_gain != oracle_life_gain:
+            return None, "exile_target_controller_gain_life_source_oracle_mismatch"
+        target_type = str(oracle_exile["target"])
+        if not source_matches_target_constraint(source_text, target_type):
+            return None, "exile_target_controller_gain_life_target_source_mismatch"
+        target_base = restricted_target_base(target_type)
+        effect_json = {
+            "effect": oracle_exile["effect"],
+            "battle_model_scope": EXILE_TARGET_CONTROLLER_GAIN_LIFE_SCOPE,
+            "target": target_base,
+            "target_constraints": target_constraints_for(target_type),
+            "destination": "exile",
+            "target_controller_gains_life": oracle_life_gain,
+            "resolution_order": "exile_then_target_controller_gain_life",
+            "xmage_effect_classes": ["ExileTargetEffect", "GainLifeTargetControllerEffect"],
+            **flags,
+        }
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_exile_target_controller_gain_life_spell",
+        ), "selected_exact_scope"
+
+    if unit == EXILE_UNIT and classes == {"ExileTargetEffect", "LoseLifeSourceControllerEffect"}:
+        unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+        if unsupported_abilities:
+            return None, "exile_source_controller_life_loss_ability_class_not_simple"
+        source_life_loss = fixed_exile_source_controller_life_loss_from_source(source_text)
+        if source_life_loss is None:
+            return None, "exile_source_controller_life_loss_source_not_fixed"
+        oracle_exile = fixed_exile_source_controller_life_loss_from_oracle(metadata)
+        if oracle_exile is None:
+            return None, "exile_source_controller_life_loss_oracle_not_exact_fixed"
+        oracle_life_loss = int(oracle_exile["source_controller_life_loss_on_resolve"])
+        if source_life_loss != oracle_life_loss:
+            return None, "exile_source_controller_life_loss_source_oracle_mismatch"
+        target_type = str(oracle_exile["target"])
+        if not source_matches_target_constraint(source_text, target_type):
+            return None, "exile_source_controller_life_loss_target_source_mismatch"
+        target_base = restricted_target_base(target_type)
+        target_count_max = int(oracle_exile.get("target_count_max") or oracle_exile.get("count") or 1)
+        effect_json = {
+            "effect": oracle_exile["effect"],
+            "battle_model_scope": EXILE_SOURCE_CONTROLLER_LOSE_LIFE_SCOPE,
+            "target": target_base,
+            "target_constraints": target_constraints_for(target_type),
+            "destination": "exile",
+            "source_controller_life_loss_on_resolve": oracle_life_loss,
+            "life_loss_amount": oracle_life_loss,
+            "resolution_order": "exile_then_source_controller_life_loss",
+            "xmage_effect_classes": ["ExileTargetEffect", "LoseLifeSourceControllerEffect"],
+            **flags,
+        }
+        if target_count_max > 1:
+            source_count = fixed_multi_target_count_from_source(source_text)
+            if isinstance(source_count, str):
+                return None, source_count
+            if source_count is None:
+                return None, "exile_source_controller_life_loss_multi_target_source_count_not_fixed"
+            for key in ("target_count_min", "target_count_max", "up_to_count"):
+                if source_count.get(key) != oracle_exile.get(key):
+                    return None, f"exile_source_controller_life_loss_source_oracle_{key}_mismatch"
+            effect_json.update(
+                {
+                    "target_count": target_count_max,
+                    "target_count_min": int(oracle_exile["target_count_min"]),
+                    "target_count_max": target_count_max,
+                    "max_targets": target_count_max,
+                    "up_to_count": bool(oracle_exile.get("up_to_count")),
+                }
+            )
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_exile_target_source_controller_life_loss_spell",
+        ), "selected_exact_scope"
+
+    if unit == EXILE_UNIT and classes == {"DamageControllerEffect", "ExileTargetEffect"}:
+        unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+        if unsupported_abilities:
+            return None, "exile_source_controller_damage_ability_class_not_simple"
+        source_damage = fixed_exile_source_controller_damage_from_source(source_text)
+        if source_damage is None:
+            return None, "exile_source_controller_damage_source_not_fixed"
+        oracle_exile = fixed_exile_source_controller_damage_from_oracle(metadata)
+        if oracle_exile is None:
+            return None, "exile_source_controller_damage_oracle_not_exact_fixed"
+        oracle_damage = int(oracle_exile["source_controller_damage_on_resolve"])
+        if source_damage != oracle_damage:
+            return None, "exile_source_controller_damage_source_oracle_mismatch"
+        target_type = str(oracle_exile["target"])
+        if not source_matches_target_constraint(source_text, target_type):
+            return None, "exile_source_controller_damage_target_source_mismatch"
+        target_base = restricted_target_base(target_type)
+        target_count_max = int(oracle_exile.get("target_count_max") or oracle_exile.get("count") or 1)
+        effect_json = {
+            "effect": oracle_exile["effect"],
+            "battle_model_scope": EXILE_SOURCE_CONTROLLER_DAMAGE_SCOPE,
+            "target": target_base,
+            "target_constraints": target_constraints_for(target_type),
+            "destination": "exile",
+            "source_controller_damage_on_resolve": oracle_damage,
+            "damage_amount": oracle_damage,
+            "resolution_order": "exile_then_source_controller_damage",
+            "xmage_effect_classes": ["ExileTargetEffect", "DamageControllerEffect"],
+            **flags,
+        }
+        if target_count_max > 1:
+            source_count = fixed_multi_target_count_from_source(source_text)
+            if isinstance(source_count, str):
+                return None, source_count
+            if source_count is None:
+                return None, "exile_source_controller_damage_multi_target_source_count_not_fixed"
+            for key in ("target_count_min", "target_count_max", "up_to_count"):
+                if source_count.get(key) != oracle_exile.get(key):
+                    return None, f"exile_source_controller_damage_source_oracle_{key}_mismatch"
+            effect_json.update(
+                {
+                    "target_count": target_count_max,
+                    "target_count_min": int(oracle_exile["target_count_min"]),
+                    "target_count_max": target_count_max,
+                    "max_targets": target_count_max,
+                    "up_to_count": bool(oracle_exile.get("up_to_count")),
+                }
+            )
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_exile_target_source_controller_damage_spell",
+        ), "selected_exact_scope"
 
     if unit == EXILE_UNIT:
         if classes != {"ExileTargetEffect"}:
@@ -39857,6 +40268,46 @@ def split_row(
             effect_json["counter_target_mana_value_source"] = "x_value"
             effect_json["xmage_target_adjuster"] = "XManaValueTargetAdjuster"
         return build_proposal(row, metadata, effect_json, family_id="xmage_counter_target_spell"), "selected_exact_scope"
+
+    if unit == BOUNCE_UNIT and classes == {"ReturnToHandTargetEffect", "LoseLifeTargetControllerEffect"}:
+        unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+        if unsupported_abilities:
+            return None, "bounce_target_controller_life_loss_ability_class_not_simple"
+        if has_non_neutral_oracle_complexity(metadata):
+            return None, "bounce_target_controller_life_loss_oracle_not_simple"
+        oracle_bounce = fixed_bounce_target_controller_life_loss_from_oracle(metadata)
+        if oracle_bounce is None:
+            return None, "bounce_target_controller_life_loss_oracle_not_exact_fixed"
+        source_life_loss = fixed_bounce_target_controller_life_loss_from_source(source_text)
+        if source_life_loss is None:
+            return None, "bounce_target_controller_life_loss_source_not_fixed"
+        effect, target_type, target_controller, oracle_life_loss = oracle_bounce
+        if source_life_loss != oracle_life_loss:
+            return None, "bounce_target_controller_life_loss_source_oracle_mismatch"
+        if not source_matches_bounce_target(source_text, target_type):
+            return None, "bounce_target_controller_life_loss_target_source_mismatch"
+        if not source_matches_bounce_target_controller(source_text, target_controller):
+            return None, "bounce_target_controller_life_loss_source_controller_mismatch"
+        target_base = restricted_target_base(target_type)
+        effect_json = {
+            "effect": effect,
+            "battle_model_scope": BOUNCE_TARGET_CONTROLLER_LOSE_LIFE_SCOPE,
+            "target": target_base,
+            "target_constraints": target_constraints_with_controller(target_type, target_controller),
+            "target_controller": target_controller,
+            "destination": "hand",
+            "target_controller_life_loss_on_resolve": int(oracle_life_loss),
+            "life_loss_amount": int(oracle_life_loss),
+            "resolution_order": "bounce_then_target_controller_life_loss",
+            "xmage_effect_classes": ["ReturnToHandTargetEffect", "LoseLifeTargetControllerEffect"],
+            **flags,
+        }
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_return_target_to_hand_target_controller_life_loss_spell",
+        ), "selected_exact_scope"
 
     if unit == BOUNCE_UNIT:
         if classes != {"ReturnToHandTargetEffect"}:

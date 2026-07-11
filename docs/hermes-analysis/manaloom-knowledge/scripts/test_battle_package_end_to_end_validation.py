@@ -3080,6 +3080,188 @@ def test_single_target_removal_runner_validates_controller_life_gain() -> None:
     assert result["controller_life_gained"] == 4
 
 
+def test_single_target_removal_runner_validates_target_controller_life_gain() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "remove_creature",
+        "battle_model_scope": "xmage_exile_target_and_target_controller_gain_life_spell_v1",
+        "target": "creature",
+        "target_constraints": {"card_types": ["creature"], "power_max": 2},
+        "destination": "exile",
+        "target_controller_gains_life": 4,
+        "_rule_logical_key": "battle_rule_v1:last-breath-fixture",
+    }
+    try:
+        result = validator.run_single_target_removal(
+            battle,
+            {
+                "name": "Last Breath Fixture exiles one legal target",
+                "type": "single_target_removal",
+                "card": {"name": "Last Breath Fixture", "type_line": "Instant"},
+                "target": {
+                    "name": "E2E Legal Removal Target",
+                    "type_line": "Creature - Soldier",
+                    "effect": "creature",
+                    "cmc": 2,
+                    "power": 2,
+                    "toughness": 2,
+                },
+                "nonmatching_target": {
+                    "name": "E2E Illegal Removal Target",
+                    "type_line": "Creature - Giant",
+                    "effect": "creature",
+                    "cmc": 4,
+                    "power": 4,
+                    "toughness": 4,
+                },
+                "expected_destination": "exile",
+                "expected_effect": "remove_creature",
+                "expected_target_constraints": {"card_types": ["creature"], "power_max": 2},
+                "expected_target_controller_life_gain": 4,
+                "target_controller_life": 10,
+                "logical_rule_key": "battle_rule_v1:last-breath-fixture",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Last Breath Fixture"
+    assert result["target_controller_life_before"] == 10
+    assert result["target_controller_life_after"] == 14
+    assert result["target_controller_life_gained"] == 4
+
+
+def test_single_target_removal_runner_validates_target_controller_life_loss_on_resolve() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "remove_creature",
+        "battle_model_scope": "xmage_return_target_to_hand_and_target_controller_loses_life_spell_v1",
+        "target": "creature",
+        "target_constraints": {"card_types": ["creature"]},
+        "destination": "hand",
+        "target_controller_life_loss_on_resolve": 1,
+        "_rule_logical_key": "battle_rule_v1:vapor-snag-fixture",
+    }
+    try:
+        result = validator.run_single_target_removal(
+            battle,
+            {
+                "name": "Vapor Snag Fixture bounces one legal target",
+                "type": "single_target_removal",
+                "card": {"name": "Vapor Snag Fixture", "type_line": "Instant"},
+                "target": {
+                    "name": "E2E Legal Removal Target",
+                    "type_line": "Creature - Soldier",
+                    "effect": "creature",
+                    "cmc": 2,
+                    "power": 2,
+                    "toughness": 2,
+                },
+                "nonmatching_target": {
+                    "name": "E2E Illegal Removal Target",
+                    "type_line": "Land",
+                    "effect": "land",
+                    "cmc": 0,
+                },
+                "expected_destination": "hand",
+                "expected_effect": "remove_creature",
+                "expected_target_controller_life_loss": 1,
+                "target_controller_life": 20,
+                "logical_rule_key": "battle_rule_v1:vapor-snag-fixture",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Vapor Snag Fixture"
+    assert result["target_controller_life_before"] == 20
+    assert result["target_controller_life_after"] == 19
+    assert result["target_controller_life_lost"] == 1
+
+
+def test_multi_target_removal_runner_validates_source_controller_damage() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "remove_creature",
+        "battle_model_scope": "xmage_exile_target_and_source_controller_damage_spell_v1",
+        "target": "creature",
+        "target_constraints": {"card_types": ["creature"], "exclude_card_types": ["artifact"]},
+        "destination": "exile",
+        "target_count": 2,
+        "target_count_min": 2,
+        "target_count_max": 2,
+        "max_targets": 2,
+        "source_controller_damage_on_resolve": 5,
+        "_rule_logical_key": "battle_rule_v1:ashes-to-ashes-fixture",
+    }
+    try:
+        result = validator.run_multi_target_removal(
+            battle,
+            {
+                "name": "Ashes to Ashes Fixture exiles two legal targets",
+                "type": "multi_target_removal",
+                "card": {"name": "Ashes to Ashes Fixture", "type_line": "Sorcery"},
+                "targets": [
+                    {
+                        "name": "E2E Legal Removal Target 1",
+                        "type_line": "Creature - Soldier",
+                        "effect": "creature",
+                        "cmc": 2,
+                        "power": 2,
+                        "toughness": 2,
+                    },
+                    {
+                        "name": "E2E Legal Removal Target 2",
+                        "type_line": "Creature - Cleric",
+                        "effect": "creature",
+                        "cmc": 3,
+                        "power": 2,
+                        "toughness": 3,
+                    },
+                ],
+                "nonmatching_target": {
+                    "name": "E2E Illegal Removal Target",
+                    "type_line": "Artifact Creature - Construct",
+                    "effect": "creature",
+                    "cmc": 2,
+                    "power": 2,
+                    "toughness": 2,
+                },
+                "expected_destination": "exile",
+                "expected_effect": "remove_creature",
+                "expected_target_count": 2,
+                "expected_source_controller_damage": 5,
+                "controller_life": 20,
+                "logical_rule_key": "battle_rule_v1:ashes-to-ashes-fixture",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Ashes to Ashes Fixture"
+    assert result["controller_life_before"] == 20
+    assert result["controller_life_after"] == 15
+    assert result["source_controller_damage_dealt"] == 5
+
+
 def test_single_target_removal_and_draw_runner_exiles_and_draws() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []
