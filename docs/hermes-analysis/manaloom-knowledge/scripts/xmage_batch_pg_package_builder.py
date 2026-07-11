@@ -128,6 +128,8 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "requires_sacrifice_goblin",
     "requires_sacrifice_land",
     "requires_return_land_to_hand",
+    "requires_return_permanent_to_hand",
+    "requires_return_creature_to_hand",
     "xmage_additional_cost_class",
     "xmage_additional_cost_target",
     "count",
@@ -5236,7 +5238,40 @@ def fixed_damage_target_spell_execution_scenario_from_expected_rule(
             }
         ]
         scenario["expected_additional_cost"] = "return_land_to_hand"
+        scenario["expected_returned_name"] = "E2E Return Cost Land"
         scenario["expected_returned_land_name"] = "E2E Return Cost Land"
+    for return_flag, cost_name, fixture in (
+        (
+            "requires_return_permanent_to_hand",
+            "return_permanent_to_hand",
+            {
+                "name": "E2E Return Cost Permanent",
+                "type_line": "Artifact",
+                "effect": "mana_rock",
+                "cmc": 1,
+            },
+        ),
+        (
+            "requires_return_creature_to_hand",
+            "return_creature_to_hand",
+            {
+                "name": "E2E Return Cost Creature",
+                "type_line": "Creature - Wizard",
+                "effect": "creature",
+                "power": 1,
+                "toughness": 1,
+                "cmc": 1,
+            },
+        ),
+    ):
+        if not required.get(return_flag):
+            continue
+        scenario["controller_battlefield"] = [
+            *scenario.get("controller_battlefield", []),
+            fixture,
+        ]
+        scenario["expected_additional_cost"] = cost_name
+        scenario["expected_returned_name"] = fixture["name"]
     if required.get("requires_sacrifice_creature_or_enchantment"):
         scenario["controller_battlefield"] = [
             *scenario.get("controller_battlefield", []),
@@ -7620,7 +7655,29 @@ def counter_target_execution_scenario_from_expected_rule(
         }
         scenario["responder_battlefield"] = [land]
         scenario["expected_additional_cost"] = "return_land_to_hand"
+        scenario["expected_returned_name"] = land["name"]
         scenario["expected_returned_land_name"] = land["name"]
+    elif selected_additional_cost in {"return_permanent_to_hand", "return_creature_to_hand"}:
+        fixture = (
+            {
+                "name": "E2E Return Cost Creature",
+                "type_line": "Creature - Wizard",
+                "effect": "creature",
+                "power": 1,
+                "toughness": 1,
+                "cmc": 1,
+            }
+            if selected_additional_cost == "return_creature_to_hand"
+            else {
+                "name": "E2E Return Cost Permanent",
+                "type_line": "Artifact",
+                "effect": "mana_rock",
+                "cmc": 1,
+            }
+        )
+        scenario["responder_battlefield"] = [fixture]
+        scenario["expected_additional_cost"] = selected_additional_cost
+        scenario["expected_returned_name"] = fixture["name"]
     elif selected_additional_cost in {
         "sacrifice_creature",
         "sacrifice_creature_or_enchantment",

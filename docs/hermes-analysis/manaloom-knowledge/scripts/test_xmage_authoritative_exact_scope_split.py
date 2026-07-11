@@ -19027,6 +19027,52 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertTrue(effect["requires_sacrifice_blue_permanent"])
         self.assertEqual(effect["xmage_additional_cost_target"], "blue_permanent")
 
+    def test_counter_target_spell_maps_return_permanent_to_hand_additional_cost(self) -> None:
+        row = queue_row(split.COUNTER_UNIT, effect_classes=["CounterTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="As an additional cost to cast this spell, return a permanent you control to its owner's hand. Counter target spell."),
+            source_text=(
+                "this.getSpellAbility().addCost(new ReturnToHandChosenControlledPermanentCost("
+                "new TargetControlledPermanent(new FilterControlledPermanent(\"a permanent\"))));"
+                "this.getSpellAbility().addEffect(new CounterTargetEffect());"
+                "this.getSpellAbility().addTarget(new TargetSpell());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "counter")
+        self.assertEqual(effect["battle_model_scope"], split.COUNTER_SCOPE)
+        self.assertEqual(effect["target"], "spell")
+        self.assertEqual(effect["additional_cost"], "return_permanent_to_hand")
+        self.assertTrue(effect["requires_return_permanent_to_hand"])
+        self.assertEqual(effect["xmage_additional_cost_class"], "ReturnToHandChosenControlledPermanentCost")
+        self.assertEqual(effect["xmage_additional_cost_target"], "permanent")
+
+    def test_counter_target_spell_maps_return_creature_to_hand_additional_cost(self) -> None:
+        row = queue_row(split.COUNTER_UNIT, effect_classes=["CounterTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="As an additional cost to cast this spell, return a creature you control to its owner's hand. Counter target spell."),
+            source_text=(
+                "this.getSpellAbility().addCost(new ReturnToHandChosenControlledPermanentCost("
+                "new TargetControlledCreaturePermanent()));"
+                "this.getSpellAbility().addEffect(new CounterTargetEffect());"
+                "this.getSpellAbility().addTarget(new TargetSpell());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "counter")
+        self.assertEqual(effect["battle_model_scope"], split.COUNTER_SCOPE)
+        self.assertEqual(effect["target"], "spell")
+        self.assertEqual(effect["additional_cost"], "return_creature_to_hand")
+        self.assertTrue(effect["requires_return_creature_to_hand"])
+        self.assertEqual(effect["xmage_additional_cost_class"], "ReturnToHandChosenControlledPermanentCost")
+        self.assertEqual(effect["xmage_additional_cost_target"], "creature")
+
     def test_counter_target_spell_ignores_neutral_auxiliary_oracle_lines(self) -> None:
         row = queue_row(
             split.COUNTER_UNIT,

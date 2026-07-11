@@ -9855,6 +9855,8 @@ SAFE_RUNTIME_SECONDARY_ANNOTATION_KEYS = {
     "requires_sacrifice_green_creature",
     "requires_sacrifice_land",
     "requires_return_land_to_hand",
+    "requires_return_permanent_to_hand",
+    "requires_return_creature_to_hand",
     "requires_one_additional_cost_option",
     "additional_cost_options",
 }
@@ -24289,6 +24291,19 @@ def additional_card_costs_are_payable(player, card, effect_data, cost_context=No
         )
         if land is None:
             return False
+    for return_flag, return_target_type in (
+        ("requires_return_permanent_to_hand", "permanent"),
+        ("requires_return_creature_to_hand", "creature"),
+    ):
+        if not effect_data.get(return_flag):
+            continue
+        permanent, _options = choose_activation_sacrifice_target(
+            player,
+            card,
+            return_target_type,
+        )
+        if permanent is None:
+            return False
     return True
 
 
@@ -24324,6 +24339,10 @@ def additional_cost_option_effect_fields(option):
         effect_data["requires_sacrifice_land"] = True
     elif cost == "return_land_to_hand":
         effect_data["requires_return_land_to_hand"] = True
+    elif cost == "return_permanent_to_hand":
+        effect_data["requires_return_permanent_to_hand"] = True
+    elif cost == "return_creature_to_hand":
+        effect_data["requires_return_creature_to_hand"] = True
     return effect_data
 
 
@@ -24397,6 +24416,8 @@ def pay_additional_card_costs(player, card, effect_data, *, turn=None, cost_cont
         and effect_data.get("additional_cost") not in {"sacrifice_artifact", "sacrifice_goblin"}
         and not effect_data.get("requires_sacrifice_land")
         and not effect_data.get("requires_return_land_to_hand")
+        and not effect_data.get("requires_return_permanent_to_hand")
+        and not effect_data.get("requires_return_creature_to_hand")
         and not planned_sacrifices
         and not planned_blight
     ):
@@ -24634,6 +24655,53 @@ def pay_additional_card_costs(player, card, effect_data, *, turn=None, cost_cont
             land_options=land_options,
             selection_reason=selection_reason,
             strategic_risk_flags=strategic_risk_flags,
+        )
+    for return_flag, cost_name, return_target_type in (
+        (
+            "requires_return_permanent_to_hand",
+            "return_permanent_to_hand",
+            "permanent",
+        ),
+        (
+            "requires_return_creature_to_hand",
+            "return_creature_to_hand",
+            "creature",
+        ),
+    ):
+        if not effect_data.get(return_flag):
+            continue
+        returned_permanent, permanent_options = choose_activation_sacrifice_target(
+            player,
+            card,
+            return_target_type,
+        )
+        if not returned_permanent:
+            emit_replay_event(
+                "additional_cost_failed",
+                player=player.name,
+                card=card.get("name", "?"),
+                cost=cost_name,
+                return_target_type=return_target_type,
+                turn=turn,
+            )
+            return False
+        if returned_permanent in player.battlefield:
+            player.battlefield.remove(returned_permanent)
+        player.hand.append(returned_permanent)
+        emit_replay_event(
+            "additional_cost_paid",
+            player=player.name,
+            card=card.get("name", "?"),
+            cost=cost_name,
+            returned=returned_permanent.get("name", "?"),
+            returned_to="hand",
+            return_target_type=return_target_type,
+            permanent_options=[
+                option.get("name", "?")
+                for option in permanent_options[:8]
+                if isinstance(option, dict)
+            ],
+            turn=turn,
         )
     if effect_data.get("additional_cost") in {"sacrifice_artifact", "sacrifice_goblin"}:
         sacrifice_target_type = (

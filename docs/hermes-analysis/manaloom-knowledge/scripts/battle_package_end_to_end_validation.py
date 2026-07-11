@@ -1339,7 +1339,11 @@ def run_damage_gain_life_spell(
                 for permanent in active.battlefield
             ):
                 fail("battle_execution", f"{card['name']} did not sacrifice {expected_sacrificed}")
-        expected_returned = str(scenario.get("expected_returned_land_name") or "").strip()
+        expected_returned = str(
+            scenario.get("expected_returned_name")
+            or scenario.get("expected_returned_land_name")
+            or ""
+        ).strip()
         if expected_returned:
             if additional_cost_event.get("returned") != expected_returned:
                 fail(
@@ -1355,7 +1359,7 @@ def run_damage_gain_life_spell(
                 isinstance(permanent, dict) and permanent.get("name") == expected_returned
                 for permanent in active.battlefield
             ):
-                fail("battle_execution", f"{card['name']} left returned land {expected_returned} on battlefield")
+                fail("battle_execution", f"{card['name']} left returned permanent {expected_returned} on battlefield")
 
     damage_event = next(
         (
@@ -10988,7 +10992,11 @@ def run_counter_target_response(
                 for permanent in responder.battlefield
             ):
                 fail("battle_execution", f"{response_card['name']} did not sacrifice {expected_sacrificed}")
-        expected_returned = str(scenario.get("expected_returned_land_name") or "").strip()
+        expected_returned = str(
+            scenario.get("expected_returned_name")
+            or scenario.get("expected_returned_land_name")
+            or ""
+        ).strip()
         if expected_returned:
             if additional_cost_event.get("returned") != expected_returned:
                 fail(

@@ -326,6 +326,34 @@ def test_counter_target_stack_object_execution_scenario_is_manifested() -> None:
     assert scenario["nonmatching_stack_effect"]["effect"] == "mana_ability"
 
 
+def test_counter_target_return_creature_additional_cost_execution_scenario_is_manifested() -> None:
+    proposal = {
+        "normalized_name": "familiars ruse",
+        "card_name": "Familiar's Ruse",
+        "oracle_hash": "hash-familiars-ruse",
+        "logical_rule_key": "battle_rule_v1:familiars ruse",
+        "effect_json": {
+            "effect": "counter",
+            "battle_model_scope": "xmage_counter_target_spell_v1",
+            "target": "spell",
+            "target_constraints": {"zone": "stack", "stack_object": "spell"},
+            "additional_cost": "return_creature_to_hand",
+            "requires_return_creature_to_hand": True,
+            "xmage_additional_cost_class": "ReturnToHandChosenControlledPermanentCost",
+            "xmage_additional_cost_target": "creature",
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    assert expected["required_effect_fields"]["requires_return_creature_to_hand"] is True
+    assert scenario["type"] == "counter_target_response"
+    assert scenario["expected_additional_cost"] == "return_creature_to_hand"
+    assert scenario["expected_returned_name"] == "E2E Return Cost Creature"
+    assert scenario["responder_battlefield"][0]["type_line"] == "Creature - Wizard"
+
+
 def test_counter_target_excluded_spell_subtype_execution_scenario_uses_illegal_subtype_fixture() -> None:
     proposal = {
         "normalized_name": "faerie trickery",

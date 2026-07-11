@@ -21967,20 +21967,20 @@ def fixed_spell_additional_cost_fields_from_source(
                 "xmage_additional_cost_class": "PayLifeCost",
             }, None
         return None, unsupported_reason
-    if (
-        "ReturnToHandChosenControlledPermanentCost" in text
-        and re.search(
-            r"additional cost.*return a land you control to (?:its|their) owner's hand",
-            lowered_oracle,
-        )
-    ):
+    if "ReturnToHandChosenControlledPermanentCost" in text:
         return_target = activation_sacrifice_target_from_source(text, text)
-        if return_target == "land":
+        return_patterns = {
+            "land": r"additional cost.*return a land you control to (?:its|their) owner's hand",
+            "creature": r"additional cost.*return a creature you control to (?:its|their) owner's hand",
+            "permanent": r"additional cost.*return a permanent you control to (?:its|their) owner's hand",
+        }
+        pattern = return_patterns.get(str(return_target or ""))
+        if pattern and re.search(pattern, lowered_oracle):
             return {
-                "additional_cost": "return_land_to_hand",
-                "requires_return_land_to_hand": True,
+                "additional_cost": f"return_{return_target}_to_hand",
+                f"requires_return_{return_target}_to_hand": True,
                 "xmage_additional_cost_class": "ReturnToHandChosenControlledPermanentCost",
-                "xmage_additional_cost_target": "land",
+                "xmage_additional_cost_target": return_target,
             }, None
     if "DiscardCardCost" in text and re.search(r"additional cost.*discard a card", lowered_oracle):
         return {
