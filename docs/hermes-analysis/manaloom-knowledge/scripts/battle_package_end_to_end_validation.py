@@ -6409,6 +6409,117 @@ def run_tap_target_spell(
     }
 
 
+def run_target_color_tap_untap_draw_spell(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    effect = battle.get_card_effect(card)
+    if effect.get("effect") != "composite_resolution":
+        fail("battle_execution", f"{card['name']} effect={effect.get('effect')!r}")
+    action = str(scenario.get("expected_action") or "").strip().lower()
+    if action not in {"tap", "untap"}:
+        fail("battle_execution", f"{card['name']} unsupported action={action!r}")
+    active = battle.Player(str(scenario.get("player") or "Color Tap Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Color Tap Opponent"), None, [])
+    active.library = [
+        battle.enrich_card(dict(library_card))
+        for library_card in (scenario.get("library") or [])
+        if isinstance(library_card, dict)
+    ]
+    target = battle.enrich_card(dict(scenario.get("target") or {}))
+    nonmatching_target = (
+        battle.enrich_card(dict(scenario["nonmatching_target"]))
+        if isinstance(scenario.get("nonmatching_target"), dict)
+        else None
+    )
+    if action == "tap":
+        opponent.battlefield = ([nonmatching_target] if nonmatching_target is not None else []) + [target]
+    else:
+        active.battlefield = ([nonmatching_target] if nonmatching_target is not None else []) + [target]
+    expected_target_colors = [
+        str(color or "").strip().upper()
+        for color in (scenario.get("expected_target_colors") or effect.get("target_colors_until_eot") or [])
+        if str(color or "").strip()
+    ]
+    expected_draw_count = int(scenario.get("expected_draw_count") or effect.get("draw_count") or 1)
+    nonmatching_colors_before = list(nonmatching_target.get("colors") or []) if nonmatching_target is not None else None
+    nonmatching_tapped_before = bool(nonmatching_target.get("tapped")) if nonmatching_target is not None else None
+    before_events = len(events)
+    library_before = len(active.library)
+    battle.apply_effect_immediate(
+        active,
+        [opponent],
+        battle.enrich_card({**card, **effect}),
+        turn=int(scenario.get("turn") or 7),
+        rng=random.Random(int(scenario.get("seed") or 6076)),
+        effect_data_override=effect,
+        phase=str(scenario.get("phase") or "precombat_main"),
+    )
+    target_colors = [
+        str(color or "").strip().upper()
+        for color in (target.get("colors") or [])
+        if str(color or "").strip()
+    ]
+    if target_colors != expected_target_colors:
+        fail("battle_execution", f"{card['name']} target colors={target_colors!r}, expected {expected_target_colors!r}")
+    expected_tapped = action == "tap"
+    if bool(target.get("tapped")) != expected_tapped:
+        fail("battle_execution", f"{card['name']} target tapped={target.get('tapped')!r}, expected {expected_tapped}")
+    if nonmatching_target is not None:
+        if list(nonmatching_target.get("colors") or []) != nonmatching_colors_before:
+            fail("battle_execution", f"{card['name']} incorrectly changed illegal target colors")
+        if bool(nonmatching_target.get("tapped")) != nonmatching_tapped_before:
+            fail("battle_execution", f"{card['name']} incorrectly changed illegal target tapped state")
+    if len(active.hand) != expected_draw_count:
+        fail("battle_execution", f"{card['name']} drew {len(active.hand)} cards, expected {expected_draw_count}")
+    if len(active.library) != library_before - expected_draw_count:
+        fail(
+            "battle_execution",
+            f"{card['name']} library={len(active.library)}, expected {library_before - expected_draw_count}",
+        )
+    event_name = "tap_target_resolved" if action == "tap" else "stat_modifier_until_eot_untap_target_resolved"
+    action_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == event_name and data.get("card") == card.get("name")
+        ),
+        None,
+    )
+    if action_event is None:
+        fail("battle_events", f"missing {card['name']} {event_name} event")
+    if list(action_event.get("target_colors_until_eot") or []) != expected_target_colors:
+        fail(
+            "battle_events",
+            f"{card['name']} event colors={action_event.get('target_colors_until_eot')!r}, expected {expected_target_colors!r}",
+        )
+    draw_component_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "composite_rule_component_resolved"
+            and data.get("card") == card.get("name")
+            and data.get("component_effect") == "draw_cards"
+            and data.get("outcome") == "cards_drawn"
+        ),
+        None,
+    )
+    if draw_component_event is None:
+        fail("battle_events", f"missing {card['name']} composite draw_cards component event")
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "action": action,
+        "target": target.get("name"),
+        "target_tapped": bool(target.get("tapped")),
+        "target_colors": expected_target_colors,
+        "cards_drawn": expected_draw_count,
+        "hand": [item.get("name") for item in active.hand if isinstance(item, dict)],
+    }
+
+
 def run_stat_modifier_until_eot_untap_target(
     battle,
     scenario: dict[str, Any],
@@ -11831,6 +11942,7 @@ SCENARIO_RUNNERS = {
     "simple_activated_tap_target": run_simple_activated_tap_target,
     "simple_activated_untap_target": run_simple_activated_untap_target,
     "tap_target_spell": run_tap_target_spell,
+    "target_color_tap_untap_draw_spell": run_target_color_tap_untap_draw_spell,
     "gain_control_untap_haste_until_eot": run_gain_control_untap_haste_until_eot,
     "stat_modifier_until_eot_untap_target": run_stat_modifier_until_eot_untap_target,
     "add_counters_target_spell": run_add_counters_target_spell,

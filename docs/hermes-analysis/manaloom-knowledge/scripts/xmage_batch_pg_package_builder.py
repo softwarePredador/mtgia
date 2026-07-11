@@ -102,6 +102,7 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "grants_menace",
     "grants_unblockable",
     "attached_creature_cant_be_blocked",
+    "tap_target",
     "untap_target",
     "blocker_count_mode",
     "duration",
@@ -4658,6 +4659,79 @@ def tap_target_spell_execution_scenario_from_expected_rule(
     }
 
 
+def color_tap_untap_draw_spell_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") not in {
+        "xmage_fixed_color_tap_target_creature_until_eot_draw_card_spell_v1",
+        "xmage_fixed_color_untap_target_creature_until_eot_draw_card_spell_v1",
+    }:
+        return None
+    if required.get("effect") != "composite_resolution":
+        return None
+    components = [
+        component
+        for component in required.get("_composite_rule_components") or []
+        if isinstance(component, dict)
+    ]
+    action_component = next(
+        (
+            component
+            for component in components
+            if component.get("effect") in {"tap_target", "stat_modifier_until_eot_untap_target"}
+        ),
+        None,
+    )
+    draw_component = next((component for component in components if component.get("effect") == "draw_cards"), None)
+    if action_component is None or draw_component is None:
+        return None
+    action = "untap" if action_component.get("effect") == "stat_modifier_until_eot_untap_target" else "tap"
+    draw_count = int(required.get("draw_count") or draw_component.get("draw_count") or draw_component.get("count") or 1)
+    if draw_count <= 0:
+        return None
+    constraints = dict(
+        required.get("target_constraints")
+        or action_component.get("target_constraints")
+        or {"card_types": ["creature"]}
+    )
+    target_colors_until_eot = [
+        str(value).strip().upper()
+        for value in (
+            required.get("target_colors_until_eot")
+            or action_component.get("target_colors_until_eot")
+            or []
+        )
+        if str(value).strip()
+    ]
+    target = _target_fixture_from_constraints("E2E Color Tap Target", constraints, matching=True)
+    target["tapped"] = action == "untap"
+    target["colors"] = [_fixture_color_not_in(set(target_colors_until_eot or ["W"]))]
+    target.setdefault("power", 2)
+    target.setdefault("toughness", 2)
+    nonmatching = _target_fixture_from_constraints("E2E Illegal Color Tap Target", constraints, matching=False)
+    nonmatching["tapped"] = action == "untap"
+    return {
+        "name": f"{rule['card_name']} changes target color, {action}s it, and draws {draw_count}",
+        "type": "target_color_tap_untap_draw_spell",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": "Sorcery" if required.get("sorcery") is True else "Instant",
+        },
+        "target": target,
+        "nonmatching_target": nonmatching,
+        "expected_action": action,
+        "expected_target_colors": target_colors_until_eot,
+        "expected_draw_count": draw_count,
+        "expected_target_constraints": constraints,
+        "library": [
+            {"name": f"E2E Draw Card {index + 1}", "type_line": "Instant", "effect": "draw_cards"}
+            for index in range(draw_count + 1)
+        ],
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def boost_untap_target_spell_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
@@ -7472,6 +7546,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or damage_gain_life_spell_execution_scenario_from_expected_rule(rule)
         or fixed_damage_target_spell_execution_scenario_from_expected_rule(rule)
         or damage_target_create_treasure_execution_scenario_from_expected_rule(rule)
+        or color_tap_untap_draw_spell_execution_scenario_from_expected_rule(rule)
         or tap_target_spell_execution_scenario_from_expected_rule(rule)
         or gain_control_untap_haste_execution_scenario_from_expected_rule(rule)
         or add_counters_target_spell_execution_scenario_from_expected_rule(rule)

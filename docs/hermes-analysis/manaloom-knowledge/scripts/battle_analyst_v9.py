@@ -5446,10 +5446,11 @@ def choose_stat_modifier_targets(player, opponents, card, effect_data):
     return preferred[: min(requested_count, len(preferred))]
 
 
-def resolve_stat_modifier_until_eot_untap_target_spell(player, opponents, card, effect_data, turn):
+def resolve_stat_modifier_until_eot_untap_target_spell(player, opponents, card, effect_data, turn, *, finish=True):
     power_delta = int(effect_data.get("power_delta") or effect_data.get("power_boost") or 0)
     toughness_delta = int(effect_data.get("toughness_delta") or effect_data.get("toughness_boost") or 0)
     target_type = str(effect_data.get("target") or "").lower() or _target_type_from_constraints(effect_data) or "creature"
+    target_colors_until_eot = stat_modifier_target_colors_until_eot(effect_data)
     candidates = stat_modifier_candidate_targets(player, opponents, card, effect_data)
     selected = choose_stat_modifier_targets(player, opponents, card, effect_data)
     requested_count = stat_modifier_target_count(effect_data)
@@ -5465,11 +5466,13 @@ def resolve_stat_modifier_until_eot_untap_target_spell(player, opponents, card, 
             available_targets=len(candidates),
             target_count=0,
             targets_untapped_count=0,
+            target_colors_until_eot=target_colors_until_eot,
             result="no_legal_target",
             turn=turn,
             **replay_rule_fields(effect_data),
         )
-        finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+        if finish:
+            finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
         return []
 
     details = []
@@ -5485,6 +5488,7 @@ def resolve_stat_modifier_until_eot_untap_target_spell(player, opponents, card, 
             continue
         power_before = _numeric_card_stat(target, "power")
         toughness_before = _numeric_card_stat(target, "toughness", "power")
+        target_colors_before = ordered_card_color_symbols(target)
         tapped_before = bool(target.get("tapped"))
         remember_until_eot(target, "power")
         remember_until_eot(target, "toughness")
@@ -5503,6 +5507,8 @@ def resolve_stat_modifier_until_eot_untap_target_spell(player, opponents, card, 
                 set_until_eot(target, keyword, True)
         if effect_data.get("untap_target"):
             target["tapped"] = False
+        if target_colors_until_eot:
+            set_until_eot(target, "colors", target_colors_until_eot)
         details.append(
             {
                 "target": target.get("name", "?"),
@@ -5514,6 +5520,9 @@ def resolve_stat_modifier_until_eot_untap_target_spell(player, opponents, card, 
                 "target_tapped_before": tapped_before,
                 "target_tapped_after": bool(target.get("tapped")),
                 "target_untapped": tapped_before and not bool(target.get("tapped")),
+                "target_colors_before": target_colors_before,
+                "target_colors_after": ordered_card_color_symbols(target),
+                "target_colors_until_eot": target_colors_until_eot,
                 "granted_keywords_until_eot": granted_keywords,
                 **decision,
             }
@@ -5538,11 +5547,13 @@ def resolve_stat_modifier_until_eot_untap_target_spell(player, opponents, card, 
         power_delta=power_delta,
         toughness_delta=toughness_delta,
         granted_keywords_until_eot=granted_keywords,
+        target_colors_until_eot=target_colors_until_eot,
         result=result,
         turn=turn,
         **replay_rule_fields(effect_data),
     )
-    finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+    if finish:
+        finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
     return [target for _owner, target in selected]
 
 
@@ -53248,11 +53259,12 @@ def tap_target_spell_candidates(player, opponents, card, effect_data):
     return candidates
 
 
-def apply_tap_target_spell(player, opponents, card, effect_data, turn, rng):
+def apply_tap_target_spell(player, opponents, card, effect_data, turn, rng, *, finish=True):
     count = tap_target_spell_count(effect_data)
     candidates = tap_target_spell_candidates(player, opponents, card, effect_data)
     selected = candidates[:count]
     target_type = str(effect_data.get("target") or _target_type_from_constraints(effect_data) or "permanent").lower()
+    target_colors_until_eot = stat_modifier_target_colors_until_eot(effect_data)
     if not selected:
         emit_replay_event(
             "tap_target_resolved",
@@ -53262,12 +53274,14 @@ def apply_tap_target_spell(player, opponents, card, effect_data, turn, rng):
             target_tapped=False,
             target_tapped_count=0,
             available_targets=0,
+            target_colors_until_eot=target_colors_until_eot,
             result="no_legal_target",
             turn=turn,
             **replay_rule_fields(effect_data),
         )
-        finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
-        return
+        if finish:
+            finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+        return []
     available_options = [
         decision_card_option(
             permanent,
@@ -53313,6 +53327,7 @@ def apply_tap_target_spell(player, opponents, card, effect_data, turn, rng):
     )
     tapped = []
     illegal = []
+    tapped_permanents = []
     for _priority, controller, permanent in selected:
         decision = targeting_decision(
             card,
@@ -53327,12 +53342,20 @@ def apply_tap_target_spell(player, opponents, card, effect_data, turn, rng):
         if check_ward(permanent, card, player, rng):
             illegal.append(permanent.get("name", "?"))
             continue
+        target_colors_before = ordered_card_color_symbols(permanent)
         permanent["tapped"] = True
+        if target_colors_until_eot:
+            set_until_eot(permanent, "colors", target_colors_until_eot)
+        target_colors_after = ordered_card_color_symbols(permanent)
+        tapped_permanents.append(permanent)
         tapped.append(
             {
                 "target": permanent.get("name", "?"),
                 "target_player": controller.name,
                 "target_type_line": permanent.get("type_line", ""),
+                "target_colors_before": target_colors_before,
+                "target_colors_after": target_colors_after,
+                "target_colors_until_eot": target_colors_until_eot,
             }
         )
     emit_replay_event(
@@ -53346,10 +53369,13 @@ def apply_tap_target_spell(player, opponents, card, effect_data, turn, rng):
         available_targets=len(candidates),
         tapped_targets=tapped,
         illegal_targets=illegal,
+        target_colors_until_eot=target_colors_until_eot,
         turn=turn,
         **replay_rule_fields(effect_data),
     )
-    finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+    if finish:
+        finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+    return tapped_permanents
 
 
 def can_activate_generic_tap_target_permanent(player, permanent, opponents, *, effect_data=None):
@@ -65434,6 +65460,57 @@ def resolve_composite_resolution_effect(player, opponents, card, effect_data, tu
                         "target": target.get("name", "?"),
                         "power_delta": power_delta,
                         "toughness_delta": toughness_delta,
+                    }
+                )
+        elif component_effect == "stat_modifier_until_eot_untap_target":
+            component_payload = dict(component)
+            component_payload["_composite_component_index"] = index
+            targets = resolve_stat_modifier_until_eot_untap_target_spell(
+                player,
+                opponents,
+                card,
+                component_payload,
+                turn,
+                finish=False,
+            )
+            power_delta = int(component.get("power_delta") or component.get("power_boost") or 0)
+            toughness_delta = int(component.get("toughness_delta") or component.get("toughness_boost") or 0)
+            if not targets:
+                outcome = "no_legal_target"
+                skipped.append({"effect": component_effect, "reason": outcome})
+            else:
+                outcome = "stat_modifier_until_eot_untap_target_applied"
+                applied.append(
+                    {
+                        "effect": component_effect,
+                        "target_count": len(targets),
+                        "power_delta": power_delta,
+                        "toughness_delta": toughness_delta,
+                        "target_colors_until_eot": component.get("target_colors_until_eot") or [],
+                    }
+                )
+        elif component_effect == "tap_target":
+            component_payload = dict(component)
+            component_payload["_composite_component_index"] = index
+            tapped_targets = apply_tap_target_spell(
+                player,
+                opponents,
+                card,
+                component_payload,
+                turn,
+                rng,
+                finish=False,
+            )
+            if not tapped_targets:
+                outcome = "no_legal_target"
+                skipped.append({"effect": component_effect, "reason": outcome})
+            else:
+                outcome = "tap_target_spell_used"
+                applied.append(
+                    {
+                        "effect": component_effect,
+                        "target_count": len(tapped_targets),
+                        "target_colors_until_eot": component.get("target_colors_until_eot") or [],
                     }
                 )
         elif component_effect == "global_stat_modifier_until_eot":

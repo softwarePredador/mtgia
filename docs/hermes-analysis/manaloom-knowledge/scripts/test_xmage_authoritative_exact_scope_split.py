@@ -11018,6 +11018,70 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["toughness_delta"], 0)
         self.assertEqual(effect["draw_count"], 1)
 
+    def test_fixed_color_untap_draw_spell_maps_cerulean_wisps_pattern(self) -> None:
+        row = queue_row(
+            split.UNTAP_TARGET_UNIT,
+            effect_classes=[
+                "BecomesColorTargetEffect",
+                "DrawCardSourceControllerEffect",
+                "UntapTargetEffect",
+            ],
+            ability_classes=[],
+            xmage_signals=["targeting", "draw"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Cerulean Wisps",
+                oracle_text="Target creature becomes blue until end of turn. Untap that creature. Draw a card.",
+            ),
+            source_text=(
+                "this.getSpellAbility().addTarget(new TargetCreaturePermanent());"
+                "this.getSpellAbility().addEffect(new BecomesColorTargetEffect(ObjectColor.BLUE, Duration.EndOfTurn));"
+                "this.getSpellAbility().addEffect(new UntapTargetEffect().setText(\"Untap that creature\"));"
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(1).concatBy(\"<br>\"));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.COLOR_UNTAP_DRAW_SCOPE)
+        self.assertEqual(effect["target_colors_until_eot"], ["U"])
+        self.assertTrue(effect["untap_target"])
+        self.assertEqual(effect["draw_count"], 1)
+
+    def test_fixed_color_tap_draw_spell_maps_niveous_wisps_pattern(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=[
+                "BecomesColorTargetEffect",
+                "DrawCardSourceControllerEffect",
+                "TapTargetEffect",
+            ],
+            ability_classes=[],
+            xmage_signals=["targeting", "draw"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Niveous Wisps",
+                oracle_text="Target creature becomes white until end of turn. Tap that creature. Draw a card.",
+            ),
+            source_text=(
+                "this.getSpellAbility().addTarget(new TargetCreaturePermanent());"
+                "this.getSpellAbility().addEffect(new BecomesColorTargetEffect(ObjectColor.WHITE, Duration.EndOfTurn));"
+                "this.getSpellAbility().addEffect(new TapTargetEffect(\"tap that creature\"));"
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(1).concatBy(\"<br>\"));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.COLOR_TAP_DRAW_SCOPE)
+        self.assertEqual(effect["target_colors_until_eot"], ["W"])
+        self.assertTrue(effect["tap_target"])
+        self.assertEqual(effect["draw_count"], 1)
+
     def test_fixed_boost_keyword_draw_spell_maps_guided_strike_pattern(self) -> None:
         row = queue_row(
             split.DRAW_UNIT,

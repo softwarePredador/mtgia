@@ -330,6 +330,8 @@ KEYWORD_DRAW_SCOPE = "xmage_fixed_keyword_target_creature_until_eot_draw_card_sp
 BOOST_KEYWORD_DRAW_SCOPE = "xmage_fixed_boost_keyword_target_creature_until_eot_draw_card_spell_v1"
 COLOR_KEYWORD_DRAW_SCOPE = "xmage_fixed_color_keyword_target_creature_until_eot_draw_card_spell_v1"
 COLOR_BOOST_DRAW_SCOPE = "xmage_fixed_color_boost_target_creature_until_eot_draw_card_spell_v1"
+COLOR_TAP_DRAW_SCOPE = "xmage_fixed_color_tap_target_creature_until_eot_draw_card_spell_v1"
+COLOR_UNTAP_DRAW_SCOPE = "xmage_fixed_color_untap_target_creature_until_eot_draw_card_spell_v1"
 DESTROY_DRAW_SCOPE = "xmage_destroy_target_and_draw_card_spell_v1"
 BOUNCE_DRAW_SCOPE = "xmage_return_target_to_hand_and_draw_card_spell_v1"
 EXILE_SCOPE = "xmage_exile_target_spell_v1"
@@ -9406,6 +9408,36 @@ def becomes_color_target_from_source(source: str) -> str | None:
     return OBJECT_COLOR_TO_SYMBOL.get(matches[0])
 
 
+def fixed_color_tap_untap_draw_target_from_source(
+    source: str,
+    tap_effect_class: str,
+) -> tuple[str, str, int, dict[str, Any]] | None:
+    text = source or ""
+    color = becomes_color_target_from_source(text)
+    if color is None:
+        return None
+    if tap_effect_class not in {"TapTargetEffect", "UntapTargetEffect"}:
+        return None
+    tap_matches = re.findall(rf"new\s+{re.escape(tap_effect_class)}\s*\(", text)
+    if len(tap_matches) != 1:
+        return None
+    draw_matches = re.findall(r"new\s+DrawCardSourceControllerEffect\s*\(\s*(\d+)\s*\)", text)
+    if len(draw_matches) != 1:
+        return None
+    color_match = re.search(r"new\s+BecomesColorTargetEffect\s*\(", text)
+    tap_match = re.search(rf"new\s+{re.escape(tap_effect_class)}\s*\(", text)
+    draw_match = re.search(r"new\s+DrawCardSourceControllerEffect\s*\(", text)
+    if not color_match or not tap_match or not draw_match:
+        return None
+    if not (color_match.start() < tap_match.start() < draw_match.start()):
+        return None
+    if len(re.findall(r"new\s+TargetCreaturePermanent\s*\(", text)) != 1:
+        return None
+    if not re.search(r"new\s+TargetCreaturePermanent\s*\(\s*\)", text):
+        return None
+    return color, "any", int(draw_matches[0]), {"card_types": ["creature"]}
+
+
 def fixed_boost_keyword_draw_target_from_source(
     source: str,
     keyword_ability_class: str,
@@ -11793,6 +11825,21 @@ def fixed_color_boost_draw_target_from_oracle(
     if power is None or toughness is None:
         return None
     return COLOR_WORD_TO_SYMBOL[match.group(1)], power, toughness, "any", 1, {"card_types": ["creature"]}
+
+
+def fixed_color_tap_untap_draw_target_from_oracle(
+    metadata: dict[str, Any],
+) -> tuple[str, str, str, int, dict[str, Any]] | None:
+    text = strip_parenthetical_reminders(oracle_text(metadata))
+    text = re.sub(r"\s+", " ", text).strip().lower()
+    color_words = "|".join(re.escape(word) for word in sorted(COLOR_WORD_TO_SYMBOL, key=len, reverse=True))
+    match = re.match(
+        rf"^target creature becomes ({color_words}) until end of turn\. (tap|untap) that creature\. draw a card\.?$",
+        text,
+    )
+    if not match:
+        return None
+    return COLOR_WORD_TO_SYMBOL[match.group(1)], match.group(2), "any", 1, {"card_types": ["creature"]}
 
 
 def fixed_boost_keyword_draw_target_from_oracle(
@@ -27788,6 +27835,10 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "fixed target-creature color plus keyword plus draw-card spell"
     elif scope == COLOR_BOOST_DRAW_SCOPE:
         scope_kind = "fixed target-creature color plus boost plus draw-card spell"
+    elif scope == COLOR_TAP_DRAW_SCOPE:
+        scope_kind = "fixed target-creature color plus tap plus draw-card spell"
+    elif scope == COLOR_UNTAP_DRAW_SCOPE:
+        scope_kind = "fixed target-creature color plus untap plus draw-card spell"
     elif scope == DESTROY_DRAW_SCOPE:
         scope_kind = "fixed destroy-target plus draw-card spell"
     elif scope == BOUNCE_DRAW_SCOPE:
@@ -28168,6 +28219,20 @@ def split_row(
         and set(row.get("xmage_signals") or []) == {"targeting", "draw"}
         and not ability_classes(row)
     )
+    color_tap_draw_spell_unit = (
+        unit == DRAW_UNIT
+        and effect_classes(row)
+        == {"BecomesColorTargetEffect", "DrawCardSourceControllerEffect", "TapTargetEffect"}
+        and set(row.get("xmage_signals") or []) == {"targeting", "draw"}
+        and not ability_classes(row)
+    )
+    color_untap_draw_spell_unit = (
+        unit == UNTAP_TARGET_UNIT
+        and effect_classes(row)
+        == {"BecomesColorTargetEffect", "DrawCardSourceControllerEffect", "UntapTargetEffect"}
+        and set(row.get("xmage_signals") or []) == {"targeting", "draw"}
+        and not ability_classes(row)
+    )
     fixed_token_spell_unit = unit in {TOKEN_SPELL_UNIT, TOKEN_SPELL_FLASHBACK_UNIT}
     treasure_etb_creature_unit = (
         unit == TREASURE_UNIT
@@ -28395,6 +28460,8 @@ def split_row(
         and not boost_keyword_draw_spell_unit
         and not color_keyword_draw_spell_unit
         and not color_boost_draw_spell_unit
+        and not color_tap_draw_spell_unit
+        and not color_untap_draw_spell_unit
         and not treasure_etb_creature_unit
         and not etb_each_player_sacrifice_creature_unit
         and not dies_each_player_sacrifice_creature_unit
@@ -28416,6 +28483,101 @@ def split_row(
 
     flags = spell_flags(metadata)
     classes = effect_classes(row)
+
+    if color_tap_draw_spell_unit or color_untap_draw_spell_unit:
+        if not is_spell(metadata):
+            return None, "not_instant_or_sorcery_spell"
+        oracle_spec = fixed_color_tap_untap_draw_target_from_oracle(metadata)
+        if oracle_spec is None:
+            return None, "color_tap_untap_draw_oracle_not_exact_fixed"
+        oracle_color, oracle_action, oracle_target_controller, oracle_draw_count, oracle_target_constraints = oracle_spec
+        expected_action = "untap" if color_untap_draw_spell_unit else "tap"
+        if oracle_action != expected_action:
+            return None, "color_tap_untap_draw_source_oracle_action_mismatch"
+        source_spec = fixed_color_tap_untap_draw_target_from_source(
+            source_text,
+            "UntapTargetEffect" if color_untap_draw_spell_unit else "TapTargetEffect",
+        )
+        if source_spec is None:
+            return None, "color_tap_untap_draw_source_not_exact_fixed"
+        source_color, source_target_controller, source_draw_count, source_target_constraints = source_spec
+        if source_color != oracle_color:
+            return None, "color_tap_untap_draw_source_oracle_color_mismatch"
+        if source_target_controller != oracle_target_controller:
+            return None, "color_tap_untap_draw_source_oracle_target_mismatch"
+        if source_draw_count != oracle_draw_count:
+            return None, "color_tap_untap_draw_source_oracle_draw_count_mismatch"
+        if source_target_constraints != oracle_target_constraints:
+            return None, "color_tap_untap_draw_source_oracle_target_constraints_mismatch"
+        if expected_action == "untap":
+            action_component = {
+                "effect": "stat_modifier_until_eot_untap_target",
+                "battle_model_scope": COLOR_UNTAP_DRAW_SCOPE,
+                "target": "creature",
+                "target_constraints": oracle_target_constraints,
+                "target_controller": oracle_target_controller,
+                "power_delta": 0,
+                "toughness_delta": 0,
+                "power_boost": 0,
+                "toughness_boost": 0,
+                "target_colors_until_eot": [oracle_color],
+                "duration": "until_end_of_turn",
+                "untap_target": True,
+                "compose_on_resolution": True,
+                "xmage_effect_classes": ["BecomesColorTargetEffect", "UntapTargetEffect"],
+            }
+            scope = COLOR_UNTAP_DRAW_SCOPE
+            family_id = "xmage_fixed_color_untap_draw_card_spell"
+            xmage_component_class = "UntapTargetEffect"
+        else:
+            action_component = {
+                "effect": "tap_target",
+                "battle_model_scope": TAP_TARGET_SPELL_SCOPE,
+                "target": "creature",
+                "target_constraints": oracle_target_constraints,
+                "target_controller": oracle_target_controller,
+                "target_count": 1,
+                "target_colors_until_eot": [oracle_color],
+                "duration": "until_end_of_turn",
+                "compose_on_resolution": True,
+                "xmage_effect_classes": ["BecomesColorTargetEffect", "TapTargetEffect"],
+            }
+            scope = COLOR_TAP_DRAW_SCOPE
+            family_id = "xmage_fixed_color_tap_draw_card_spell"
+            xmage_component_class = "TapTargetEffect"
+        draw_component = {
+            "effect": "draw_cards",
+            "battle_model_scope": DRAW_SCOPE,
+            "count": oracle_draw_count,
+            "compose_on_resolution": True,
+            "xmage_effect_class": "DrawCardSourceControllerEffect",
+        }
+        effect_json = {
+            "effect": "composite_resolution",
+            "battle_model_scope": scope,
+            "target": "creature",
+            "target_constraints": oracle_target_constraints,
+            "target_controller": oracle_target_controller,
+            "target_colors_until_eot": [oracle_color],
+            "duration": "until_end_of_turn",
+            "tap_target": expected_action == "tap",
+            "untap_target": expected_action == "untap",
+            "draw_count": oracle_draw_count,
+            "count": oracle_draw_count,
+            "_composite_rule_components": [action_component, draw_component],
+            "xmage_effect_classes": [
+                "BecomesColorTargetEffect",
+                xmage_component_class,
+                "DrawCardSourceControllerEffect",
+            ],
+            **flags,
+        }
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id=family_id,
+        ), "selected_exact_scope"
 
     if unit == MASS_RETURN_TO_HAND_UNIT:
         if classes != {"ReturnToHandFromBattlefieldAllEffect"}:

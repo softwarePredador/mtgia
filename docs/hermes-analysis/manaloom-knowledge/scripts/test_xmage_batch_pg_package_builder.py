@@ -3481,6 +3481,50 @@ def test_manifest_builds_color_keyword_draw_spell_execution_scenario() -> None:
     assert scenario["expected_draw_count"] == 1
 
 
+def test_manifest_builds_color_tap_draw_spell_execution_scenario() -> None:
+    rule = {
+        "normalized_name": "niveous wisps",
+        "card_name": "Niveous Wisps",
+        "oracle_hash": "hash-niveous-wisps",
+        "logical_rule_key": "battle_rule_v1:hash-niveous-wisps",
+        "required_effect_fields": {
+            "effect": "composite_resolution",
+            "battle_model_scope": "xmage_fixed_color_tap_target_creature_until_eot_draw_card_spell_v1",
+            "target": "creature",
+            "target_controller": "any",
+            "target_constraints": {"card_types": ["creature"]},
+            "target_colors_until_eot": ["W"],
+            "tap_target": True,
+            "draw_count": 1,
+            "_composite_rule_components": [
+                {
+                    "effect": "tap_target",
+                    "battle_model_scope": "xmage_tap_target_spell_v1",
+                    "target": "creature",
+                    "target_constraints": {"card_types": ["creature"]},
+                    "target_controller": "any",
+                    "target_colors_until_eot": ["W"],
+                },
+                {
+                    "effect": "draw_cards",
+                    "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+                    "count": 1,
+                },
+            ],
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    assert scenario["type"] == "target_color_tap_untap_draw_spell"
+    assert scenario["expected_action"] == "tap"
+    assert scenario["expected_target_colors"] == ["W"]
+    assert scenario["target"]["tapped"] is False
+    assert scenario["target"]["colors"] != ["W"]
+    assert scenario["expected_draw_count"] == 1
+
+
 def test_manifest_builds_multicolored_target_keyword_draw_fixture() -> None:
     rule = {
         "normalized_name": "psychotic fury",
