@@ -2638,11 +2638,21 @@ def creature_etb_draw_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
     required = dict(rule.get("required_effect_fields") or {})
-    if required.get("battle_model_scope") != "xmage_creature_etb_draw_cards_v1":
+    scope = required.get("battle_model_scope")
+    if scope not in {
+        "xmage_creature_etb_draw_cards_v1",
+        "xmage_creature_etb_dynamic_draw_cards_v1",
+    }:
         return None
-    if required.get("etb_draw_discard") or required.get("etb_dynamic_draw"):
+    if required.get("etb_draw_discard"):
         return None
-    draw_count = int(required.get("etb_draw_count") or required.get("draw_count") or 0)
+    dynamic_source = str(required.get("etb_draw_count_source") or required.get("draw_count_source") or "").strip()
+    if required.get("etb_dynamic_draw"):
+        if dynamic_source != "creatures_you_control_died_this_turn":
+            return None
+        draw_count = 3
+    else:
+        draw_count = int(required.get("etb_draw_count") or required.get("draw_count") or 0)
     if draw_count <= 0:
         return None
     scenario: dict[str, Any] = {
@@ -2667,6 +2677,9 @@ def creature_etb_draw_execution_scenario_from_expected_rule(
         "expected_keywords": list(required.get("keywords") or []),
         "logical_rule_key": rule["logical_rule_key"],
     }
+    if dynamic_source == "creatures_you_control_died_this_turn":
+        scenario["etb_draw_count_source"] = dynamic_source
+        scenario["creatures_you_control_died_this_turn_count"] = draw_count
     if required.get("etb_draw_condition"):
         scenario["expected_condition"] = required.get("etb_draw_condition")
         scenario["controller_battlefield"] = _condition_fixture_permanents(required)

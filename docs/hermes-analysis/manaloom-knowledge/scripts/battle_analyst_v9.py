@@ -20320,8 +20320,13 @@ def _controlled_permanents(player):
     ]
 
 
-def etb_dynamic_draw_count(player, permanent, effect_data):
+def etb_dynamic_draw_count(player, permanent, effect_data, turn=None):
     source = str(effect_data.get("etb_draw_count_source") or effect_data.get("draw_count_source") or "")
+    if source == "creatures_you_control_died_this_turn":
+        turn_marker = turn if turn is not None else CURRENT_REPLAY_TURN
+        if hasattr(player, "creatures_died_this_turn_count"):
+            return player.creatures_died_this_turn_count(turn_marker)
+        return int(getattr(player, "creatures_died_this_turn", 0) or 0)
     if source == "controlled_creatures_with_plus_one_counters":
         return sum(
             1
@@ -20829,7 +20834,7 @@ def resolve_generic_permanent_etb(
             phase=phase,
         )
     if effect_data.get("etb_dynamic_draw"):
-        requested = max(0, int(etb_dynamic_draw_count(player, permanent, effect_data) or 0))
+        requested = max(0, int(etb_dynamic_draw_count(player, permanent, effect_data, turn=turn) or 0))
         hand_before = len(player.hand)
         library_before = len(player.library)
         drawn = player.draw(requested, rng) if requested > 0 else []

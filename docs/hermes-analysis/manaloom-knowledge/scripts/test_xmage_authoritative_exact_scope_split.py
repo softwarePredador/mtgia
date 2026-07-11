@@ -26633,7 +26633,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                 for key, value in expected_fields.items():
                     self.assertEqual(effect[key], value)
 
-    def test_creature_etb_dynamic_draw_blocks_turn_death_count(self) -> None:
+    def test_creature_etb_dynamic_draw_maps_turn_death_count(self) -> None:
         row = queue_row(
             split.DRAW_ENGINE_UNIT,
             effect_classes=["DrawCardSourceControllerEffect"],
@@ -26651,11 +26651,38 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                     "of creatures that died under your control this turn."
                 ),
             ),
-            source_text="new DrawCardSourceControllerEffect(new CreaturesDiedUnderYourControlThisTurnCount())",
+            source_text="""
+                this.addAbility(new EntersBattlefieldTriggeredAbility(
+                    new DrawCardSourceControllerEffect(LilianasStandardBearerCount.instance)
+                ), new LilianasStandardBearerWatcher());
+
+                enum LilianasStandardBearerCount implements DynamicValue {
+                    instance;
+                    @Override
+                    public int calculate(Game game, Ability sourceAbility, Effect effect) {
+                        LilianasStandardBearerWatcher watcher = game.getState().getWatcher(LilianasStandardBearerWatcher.class);
+                        return watcher == null ? 0 : watcher.getCount(sourceAbility.getControllerId());
+                    }
+                }
+
+                class LilianasStandardBearerWatcher extends Watcher {
+                    @Override
+                    public void watch(GameEvent event, Game game) {
+                        ZoneChangeEvent zEvent = (ZoneChangeEvent) event;
+                        if (zEvent.isDiesEvent() && zEvent.getTarget().isCreature(game)) {
+                            playerMap.compute(zEvent.getTarget().getControllerId(), CardUtil::setOrIncrementValue);
+                        }
+                    }
+                }
+            """,
         )
 
-        self.assertIsNone(proposal)
-        self.assertEqual(reason, "etb_draw_count_not_fixed")
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.ETB_DYNAMIC_DRAW_CREATURE_SCOPE)
+        self.assertTrue(effect["etb_dynamic_draw"])
+        self.assertEqual(effect["etb_draw_count_source"], "creatures_you_control_died_this_turn")
+        self.assertIn("flash", effect["keywords"])
 
     def test_creature_etb_draw_lose_life_maps_to_triggered_creature_scope(self) -> None:
         row = queue_row(

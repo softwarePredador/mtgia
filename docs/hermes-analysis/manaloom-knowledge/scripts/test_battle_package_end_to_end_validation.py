@@ -5068,6 +5068,61 @@ def test_creature_etb_conditional_draw_runner_executes_trigger() -> None:
     )
 
 
+def test_creature_etb_dynamic_draw_runner_counts_creatures_died_this_turn() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "creature",
+        "battle_model_scope": "xmage_creature_etb_dynamic_draw_cards_v1",
+        "ability_kind": "triggered",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "dynamic_draw_cards",
+        "etb_dynamic_draw": True,
+        "etb_draw_count_source": "creatures_you_control_died_this_turn",
+        "_rule_logical_key": "battle_rule_v1:lilianas-standard-bearer",
+    }
+    try:
+        result = validator.run_creature_etb_draw(
+            battle,
+            {
+                "name": "Liliana's Standard Bearer enters and draws dynamically",
+                "type": "creature_etb_draw",
+                "card": {
+                    "name": "Liliana's Standard Bearer",
+                    "type_line": "Creature - Zombie Knight",
+                    "effect": "creature",
+                },
+                "controller_library": [
+                    {"name": "E2E Drawn Card 1", "type_line": "Instant", "effect": "draw_cards", "cmc": 2},
+                    {"name": "E2E Drawn Card 2", "type_line": "Instant", "effect": "draw_cards", "cmc": 2},
+                    {"name": "E2E Drawn Card 3", "type_line": "Instant", "effect": "draw_cards", "cmc": 2},
+                ],
+                "creatures_you_control_died_this_turn_count": 3,
+                "expected_draw_count": 3,
+                "expected_hand_after": 3,
+                "logical_rule_key": "battle_rule_v1:lilianas-standard-bearer",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Liliana's Standard Bearer"
+    assert result["cards_drawn"] == 3
+    assert result["hand_after"] == 3
+    assert any(
+        event == "trigger_resolved"
+        and data.get("card") == "Liliana's Standard Bearer"
+        and data.get("effect") == "dynamic_draw_cards"
+        and data.get("cards_drawn") == 3
+        for event, data in events
+    )
+
+
 def test_creature_etb_target_stat_modifier_runner_executes_trigger() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

@@ -10702,6 +10702,57 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_creature_etb_dynamic_draw_counts_creatures_died_this_turn(self) -> None:
+        active = self.battle.Player(
+            "Active",
+            None,
+            [{"name": "Drawn A"}, {"name": "Drawn B"}, {"name": "Drawn C"}, {"name": "Drawn D"}],
+        )
+        opponent = self.battle.Player("Opponent", None, [])
+        active.record_creature_died(3, turn_marker=4)
+        effect = {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_etb_dynamic_draw_cards_v1",
+            "ability_kind": "triggered",
+            "trigger": "enters_battlefield",
+            "etb_dynamic_draw": True,
+            "etb_draw_count_source": "creatures_you_control_died_this_turn",
+            "_rule_logical_key": "battle_rule_v1:lilianas-standard-bearer",
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Liliana's Standard Bearer",
+                "type_line": "Creature - Zombie Knight",
+                "mana_cost": "{2}{B}",
+                "oracle_text": (
+                    "Flash\nWhen this creature enters, draw X cards, where X is the number "
+                    "of creatures that died under your control this turn."
+                ),
+                "power": 3,
+                "toughness": 1,
+            },
+            turn=4,
+            rng=random.Random(1481),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual([card["name"] for card in active.hand], ["Drawn A", "Drawn B", "Drawn C"])
+        self.assertEqual([card["name"] for card in active.library], ["Drawn D"])
+        self.assertTrue(
+            any(
+                event == "trigger_resolved"
+                and data.get("card") == "Liliana's Standard Bearer"
+                and data.get("effect") == "dynamic_draw_cards"
+                and data.get("draw_count_source") == "creatures_you_control_died_this_turn"
+                and data.get("cards_requested") == 3
+                and data.get("cards_drawn") == 3
+                for event, data in self.events
+            )
+        )
+
     def test_creature_etb_dynamic_draw_excludes_source_for_other_subtype(self) -> None:
         active = self.battle.Player("Active", None, [{"name": "Drawn A"}, {"name": "Drawn B"}])
         opponent = self.battle.Player("Opponent", None, [])

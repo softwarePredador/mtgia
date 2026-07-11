@@ -22928,6 +22928,13 @@ def etb_draw_discard_from_source(source_text: str) -> dict[str, Any] | str:
 def etb_dynamic_draw_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
     text = re.sub(r"\s+", " ", oracle_text_after_leading_static_keywords(metadata)).strip()
     if re.fullmatch(
+        r"(?:when|whenever) [^.]* enters(?: the battlefield)?[, ]+draw x cards?, where x is the number "
+        r"of creatures that died under your control this turn\.?",
+        text,
+        flags=re.I,
+    ):
+        return {"draw_count_source": "creatures_you_control_died_this_turn"}
+    if re.fullmatch(
         r"(?:when|whenever) [^.]* enters(?: the battlefield)?[, ]+draw a card for each creature "
         r"you control with a \+1/\+1 counter on it\.?",
         text,
@@ -22981,6 +22988,17 @@ def etb_dynamic_draw_from_source(source_text: str, oracle_data: dict[str, Any]) 
     source = str(oracle_data.get("draw_count_source") or "")
     subtype = str(oracle_data.get("draw_count_subtype") or "").strip()
     color = str(oracle_data.get("draw_count_color") or "").strip().lower()
+    if source == "creatures_you_control_died_this_turn":
+        compact = re.sub(r"\s+", "", text)
+        if (
+            "DrawCardSourceControllerEffect" not in text
+            or "isDiesEvent()" not in compact
+            or ".isCreature(game)" not in compact
+            or "getControllerId()" not in compact
+            or "Watcher" not in text
+        ):
+            return "etb_dynamic_draw_source_oracle_mismatch"
+        return dict(oracle_data)
     if source == "controlled_creatures_with_plus_one_counters":
         if "PermanentsOnBattlefieldCount(StaticFilters.FILTER_CONTROLLED_CREATURE_P1P1)" not in re.sub(r"\s+", "", text):
             return "etb_dynamic_draw_source_oracle_mismatch"

@@ -2369,6 +2369,23 @@ def run_creature_etb_draw(
     )
 
     effect_data = battle.get_card_effect(card)
+    turn = int(scenario.get("turn") or 6)
+    if (
+        str(effect_data.get("etb_draw_count_source") or effect_data.get("draw_count_source") or "").strip().lower()
+        == "creatures_you_control_died_this_turn"
+    ):
+        died_count = int(
+            scenario.get("creatures_you_control_died_this_turn_count")
+            or expected_draw_count
+            or 3
+        )
+        if hasattr(active, "record_creature_died"):
+            active.record_creature_died(died_count, turn_marker=turn)
+        else:
+            active.creatures_died_this_turn = died_count
+        if expected_draw_count <= 0:
+            expected_draw_count = died_count
+            expected_hand_after = died_count
     expected_condition = scenario.get("expected_condition")
     if expected_condition and effect_data.get("etb_draw_condition") != expected_condition:
         fail(
@@ -2379,7 +2396,7 @@ def run_creature_etb_draw(
         battle.enrich_card({**card, **effect_data}),
         controller=active,
         all_players=[active, opponent],
-        turn=int(scenario.get("turn") or 6),
+        turn=turn,
     )
     active.battlefield.append(permanent)
     expected_keywords = [str(value) for value in (scenario.get("expected_keywords") or [])]
@@ -2401,7 +2418,7 @@ def run_creature_etb_draw(
         [opponent],
         permanent,
         effect_data,
-        int(scenario.get("turn") or 6),
+        turn,
         random.Random(int(scenario.get("seed") or 6079)),
         all_players=[active, opponent],
     )
@@ -2413,7 +2430,7 @@ def run_creature_etb_draw(
             if event_name == "trigger_resolved"
             and data.get("card") == card.get("name")
             and data.get("trigger") == "enters_battlefield"
-            and data.get("effect") == "draw_cards"
+            and data.get("effect") in {"draw_cards", "dynamic_draw_cards"}
         ),
         None,
     )

@@ -628,6 +628,35 @@ def test_creature_etb_conditional_draw_execution_scenario_is_manifested() -> Non
     assert scenario["controller_battlefield"][0]["type_line"] == "Artifact"
 
 
+def test_creature_etb_dynamic_draw_execution_scenario_counts_turn_deaths() -> None:
+    proposal = {
+        "normalized_name": "lilianas standard bearer",
+        "card_name": "Liliana's Standard Bearer",
+        "oracle_hash": "hash-lilianas-standard-bearer",
+        "logical_rule_key": "battle_rule_v1:lilianas-standard-bearer",
+        "effect_json": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_etb_dynamic_draw_cards_v1",
+            "ability_kind": "triggered",
+            "trigger": "enters_battlefield",
+            "trigger_effect": "dynamic_draw_cards",
+            "etb_dynamic_draw": True,
+            "etb_draw_count_source": "creatures_you_control_died_this_turn",
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    required = expected["required_effect_fields"]
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    assert required["etb_dynamic_draw"] is True
+    assert required["etb_draw_count_source"] == "creatures_you_control_died_this_turn"
+    assert scenario["type"] == "creature_etb_draw"
+    assert scenario["expected_draw_count"] == 3
+    assert scenario["creatures_you_control_died_this_turn_count"] == 3
+    assert len(scenario["controller_library"]) == 3
+
+
 def test_creature_etb_each_player_sacrifice_execution_scenario_is_manifested() -> None:
     proposal = {
         "normalized_name": "fleshbag marauder",
