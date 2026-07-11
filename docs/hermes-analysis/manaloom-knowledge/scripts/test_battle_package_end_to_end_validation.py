@@ -135,6 +135,56 @@ def test_hand_cycling_runner_uses_battle_runtime_cycling_executor() -> None:
     assert result["drawn"] == ["E2E Fresh Cycling Draw"]
 
 
+def test_creature_etb_life_gain_draw_runner_respects_resolution_order() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    effect = {
+        "effect": "creature",
+        "battle_model_scope": "xmage_creature_etb_gain_life_draw_cards_v1",
+        "etb_life_gain_draw": True,
+        "etb_life_gain_amount": 1,
+        "life_gain_amount": 1,
+        "etb_draw_count": 1,
+        "draw_count": 1,
+        "resolution_order": "gain_then_draw",
+        "keywords": ["flying"],
+        "flying": True,
+        "_rule_logical_key": "battle_rule_v1:inspiring-overseer",
+    }
+    previous_get_card_effect = battle.get_card_effect
+    previous_handler = getattr(battle, "REPLAY_EVENT_HANDLER", None)
+    events: list[tuple[str, dict]] = []
+    battle.get_card_effect = lambda card: dict(effect)
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    try:
+        result = validator.run_creature_etb_life_gain_draw(
+            battle,
+            {
+                "name": "Inspiring Overseer gains life and draws on ETB",
+                "type": "creature_etb_life_gain_draw",
+                "card": {"name": "Inspiring Overseer", "type_line": "Creature - Angel Cleric"},
+                "starting_life": 20,
+                "controller_library": [
+                    {"name": "E2E Fresh ETB Draw", "type_line": "Instant", "effect": "draw_cards"}
+                ],
+                "expected_life_gain": 1,
+                "expected_life_after": 21,
+                "expected_draw_count": 1,
+                "expected_hand_after": 1,
+                "expected_resolution_order": "gain_then_draw",
+                "expected_keywords": ["flying"],
+            },
+            events,
+        )
+    finally:
+        battle.get_card_effect = previous_get_card_effect
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+
+    assert result["card_name"] == "Inspiring Overseer"
+    assert result["life_gained"] == 1
+    assert result["cards_drawn"] == 1
+    assert result["resolution_order"] == "gain_then_draw"
+
+
 def test_static_filtered_protection_runner_blocks_matching_source() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     effect = {

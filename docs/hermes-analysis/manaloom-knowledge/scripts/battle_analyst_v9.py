@@ -21643,6 +21643,72 @@ def resolve_generic_permanent_etb(
             turn,
             phase=phase,
         )
+    if effect_data.get("etb_life_gain_draw"):
+        requested_draw = max(0, int(effect_data.get("etb_draw_count") or effect_data.get("draw_count") or 0))
+        requested_life = max(
+            0,
+            int(effect_data.get("etb_life_gain_amount") or effect_data.get("life_gain_amount") or 0),
+        )
+        resolution_order = str(effect_data.get("resolution_order") or "gain_then_draw")
+
+        def resolve_life_gain_component() -> None:
+            life_before = int(getattr(player, "life", 0))
+            if requested_life > 0:
+                gain_life(player, requested_life, cap=999)
+            emit_replay_event(
+                "trigger_resolved",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                trigger="enters_battlefield",
+                effect="gain_life",
+                life_gain_requested=requested_life,
+                life_gained=max(0, int(getattr(player, "life", 0)) - life_before),
+                controller_life_before=life_before,
+                controller_life_after=int(getattr(player, "life", 0)),
+                resolution_order=resolution_order,
+                turn=turn,
+                phase=phase,
+                **replay_rule_fields(effect_data),
+            )
+
+        def resolve_draw_component() -> None:
+            hand_before = len(player.hand)
+            library_before = len(player.library)
+            drawn = player.draw(requested_draw, rng) if requested_draw > 0 else []
+            if all_players is not None and drawn:
+                process_player_draw_triggers(
+                    player,
+                    len(drawn),
+                    turn,
+                    phase,
+                    all_players,
+                    stack=stack,
+                    turn_player=player,
+                )
+            emit_replay_event(
+                "trigger_resolved",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                trigger="enters_battlefield",
+                effect="draw_cards",
+                cards_requested=requested_draw,
+                cards_drawn=len(drawn),
+                hand_before=hand_before,
+                hand_after=len(player.hand),
+                library_before=library_before,
+                library_after=len(player.library),
+                resolution_order=resolution_order,
+                turn=turn,
+                phase=phase,
+                **replay_rule_fields(effect_data),
+            )
+
+        if resolution_order == "draw_then_gain":
+            resolve_draw_component()
+            resolve_life_gain_component()
+        else:
+            resolve_life_gain_component()
+            resolve_draw_component()
     if effect_data.get("etb_dynamic_draw"):
         requested = max(0, int(etb_dynamic_draw_count(player, permanent, effect_data, turn=turn) or 0))
         hand_before = len(player.hand)
@@ -21675,7 +21741,11 @@ def resolve_generic_permanent_etb(
             phase=phase,
             **replay_rule_fields(effect_data),
         )
-    if effect_data.get("etb_draw_count") and not effect_data.get("etb_draw_discard"):
+    if (
+        effect_data.get("etb_draw_count")
+        and not effect_data.get("etb_draw_discard")
+        and not effect_data.get("etb_life_gain_draw")
+    ):
         requested = int(effect_data.get("etb_draw_count") or 1)
         hand_before = len(player.hand)
         library_before = len(player.library)
@@ -21763,7 +21833,10 @@ def resolve_generic_permanent_etb(
             "pick_all_matching": bool(effect_data.get("etb_library_pick_all_matching")),
         }
         resolve_dig_to_hand(player, permanent, dig_effect, turn)
-    if effect_data.get("etb_life_gain_amount") or effect_data.get("etb_dynamic_life_gain"):
+    if (
+        effect_data.get("etb_life_gain_amount")
+        or effect_data.get("etb_dynamic_life_gain")
+    ) and not effect_data.get("etb_life_gain_draw"):
         dynamic_replay_fields = {}
         if effect_data.get("etb_dynamic_life_gain"):
             amount, dynamic_replay_fields = dynamic_life_gain_amount(

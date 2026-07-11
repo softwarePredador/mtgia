@@ -2680,6 +2680,136 @@ def run_creature_etb_draw(
     }
 
 
+def run_creature_etb_life_gain_draw(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    active = battle.Player(str(scenario.get("player") or "ETB Life Draw Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
+    active.life = int(scenario.get("starting_life") or 20)
+    active.library = [battle.enrich_card(dict(card)) for card in (scenario.get("controller_library") or [])]
+    active.battlefield.extend(
+        battle.enrich_card(dict(permanent))
+        for permanent in (scenario.get("controller_battlefield") or [])
+        if isinstance(permanent, dict)
+    )
+
+    expected_draw_count = int(scenario.get("expected_draw_count") or 0)
+    expected_hand_after = int(
+        scenario.get("expected_hand_after")
+        if scenario.get("expected_hand_after") is not None
+        else expected_draw_count
+    )
+    expected_life_gain = int(scenario.get("expected_life_gain") or 0)
+    expected_life_after = int(
+        scenario.get("expected_life_after")
+        if scenario.get("expected_life_after") is not None
+        else int(active.life) + expected_life_gain
+    )
+    expected_resolution_order = str(scenario.get("expected_resolution_order") or "gain_then_draw")
+
+    effect_data = battle.get_card_effect(card)
+    permanent = battle.prepare_entering_permanent(
+        battle.enrich_card({**card, **effect_data}),
+        controller=active,
+        all_players=[active, opponent],
+        turn=int(scenario.get("turn") or 6),
+    )
+    active.battlefield.append(permanent)
+    expected_keywords = [str(value) for value in (scenario.get("expected_keywords") or [])]
+    missing_keywords = [
+        keyword
+        for keyword in expected_keywords
+        if not battle.card_has_keyword(permanent, keyword)
+    ]
+    if missing_keywords:
+        fail(
+            "battle_execution",
+            f"{card['name']} missing expected ETB permanent keywords: {missing_keywords}",
+        )
+
+    before_events = len(events)
+    library_before = len(active.library)
+    battle.resolve_generic_permanent_etb(
+        active,
+        [opponent],
+        permanent,
+        effect_data,
+        int(scenario.get("turn") or 6),
+        random.Random(int(scenario.get("seed") or 6081)),
+        all_players=[active, opponent],
+    )
+
+    scoped_events = list(enumerate(events[before_events:]))
+    gain_event = next(
+        (
+            (index, data)
+            for index, (event_name, data) in scoped_events
+            if event_name == "trigger_resolved"
+            and data.get("card") == card.get("name")
+            and data.get("trigger") == "enters_battlefield"
+            and data.get("effect") == "gain_life"
+        ),
+        None,
+    )
+    draw_event = next(
+        (
+            (index, data)
+            for index, (event_name, data) in scoped_events
+            if event_name == "trigger_resolved"
+            and data.get("card") == card.get("name")
+            and data.get("trigger") == "enters_battlefield"
+            and data.get("effect") == "draw_cards"
+        ),
+        None,
+    )
+    if gain_event is None:
+        fail("battle_events", f"missing {card['name']} ETB gain_life trigger_resolved event")
+    if draw_event is None:
+        fail("battle_events", f"missing {card['name']} ETB draw_cards trigger_resolved event")
+    gain_index, gain_data = gain_event
+    draw_index, draw_data = draw_event
+    if expected_resolution_order == "gain_then_draw" and gain_index > draw_index:
+        fail("battle_events", f"{card['name']} resolved draw before life gain")
+    if expected_resolution_order == "draw_then_gain" and draw_index > gain_index:
+        fail("battle_events", f"{card['name']} resolved life gain before draw")
+    if int(gain_data.get("life_gain_requested") or 0) != expected_life_gain:
+        fail(
+            "battle_events",
+            f"{card['name']} life_gain_requested={gain_data.get('life_gain_requested')}, expected {expected_life_gain}",
+        )
+    if int(draw_data.get("cards_drawn") or 0) != expected_draw_count:
+        fail(
+            "battle_events",
+            f"{card['name']} cards_drawn={draw_data.get('cards_drawn')}, expected {expected_draw_count}",
+        )
+    if active.life != expected_life_after:
+        fail(
+            "battle_execution",
+            f"{card['name']} life after ETB={active.life}, expected {expected_life_after}",
+        )
+    if len(active.hand) != expected_hand_after:
+        fail(
+            "battle_execution",
+            f"{card['name']} hand after ETB={len(active.hand)}, expected {expected_hand_after}",
+        )
+    if len(active.library) != library_before - expected_draw_count:
+        fail(
+            "battle_execution",
+            f"{card['name']} library after ETB={len(active.library)}",
+        )
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "life_gained": expected_life_gain,
+        "cards_drawn": expected_draw_count,
+        "resolution_order": expected_resolution_order,
+        "validated_keywords": expected_keywords,
+    }
+
+
 def run_creature_etb_target_stat_modifier(
     battle,
     scenario: dict[str, Any],
@@ -13740,6 +13870,7 @@ SCENARIO_RUNNERS = {
     "creature_etb_create_tokens": run_creature_etb_create_tokens,
     "creature_etb_dynamic_life_gain": run_creature_etb_dynamic_life_gain,
     "creature_etb_draw": run_creature_etb_draw,
+    "creature_etb_life_gain_draw": run_creature_etb_life_gain_draw,
     "creature_etb_draw_discard": run_creature_etb_draw_discard,
     "creature_etb_target_stat_modifier": run_creature_etb_target_stat_modifier,
     "creature_etb_library_pick": run_creature_etb_library_pick,

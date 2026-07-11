@@ -239,6 +239,7 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "etb_life_loss",
     "life_loss_amount",
     "damage_amount",
+    "etb_life_gain_draw",
     "etb_life_gain_amount",
     "etb_dynamic_life_gain",
     "etb_scry_count",
@@ -2563,6 +2564,45 @@ def creature_etb_dynamic_life_gain_execution_scenario_from_expected_rule(
     scenario["expected_life_gain"] = expected_life_gain
     scenario["expected_life_after"] = int(scenario["starting_life"]) + expected_life_gain
     return scenario
+
+
+def creature_etb_life_gain_draw_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_creature_etb_gain_life_draw_cards_v1":
+        return None
+    draw_count = int(required.get("etb_draw_count") or required.get("draw_count") or 0)
+    life_gain = int(required.get("etb_life_gain_amount") or required.get("life_gain_amount") or 0)
+    if draw_count <= 0 or life_gain <= 0:
+        return None
+    starting_life = 20
+    return {
+        "name": f"{rule['card_name']} gains life and draws on ETB",
+        "type": "creature_etb_life_gain_draw",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": "Creature - Cleric",
+            "effect": required.get("effect") or "creature",
+        },
+        "starting_life": starting_life,
+        "controller_library": [
+            {
+                "name": f"E2E Drawn Card {index + 1}",
+                "type_line": "Instant",
+                "effect": "draw_cards",
+                "cmc": 2,
+            }
+            for index in range(draw_count)
+        ],
+        "expected_draw_count": draw_count,
+        "expected_hand_after": draw_count,
+        "expected_life_gain": life_gain,
+        "expected_life_after": starting_life + life_gain,
+        "expected_resolution_order": required.get("resolution_order") or "gain_then_draw",
+        "expected_keywords": list(required.get("keywords") or []),
+        "logical_rule_key": rule["logical_rule_key"],
+    }
 
 
 def creature_enters_life_gain_execution_scenario_from_expected_rule(
@@ -9071,6 +9111,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or mana_source_etb_draw_unblocked_control_transfer_execution_scenario_from_expected_rule(rule)
         or creature_enters_tapped_execution_scenario_from_expected_rule(rule)
         or spell_mana_ritual_execution_scenario_from_expected_rule(rule)
+        or creature_etb_life_gain_draw_execution_scenario_from_expected_rule(rule)
         or simple_mana_source_execution_scenario_from_expected_rule(rule)
         or sacrifice_mana_source_execution_scenario_from_expected_rule(rule)
         or damage_each_opponent_spell_execution_scenario_from_expected_rule(rule)

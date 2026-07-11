@@ -99,6 +99,38 @@ def test_hand_cycling_runtime_fields_and_execution_scenario_are_manifested() -> 
     assert scenario["controller_mana"]["generic"] == 2
 
 
+def test_creature_etb_life_gain_draw_execution_scenario_is_manifested() -> None:
+    proposal = {
+        "normalized_name": "inspiring overseer",
+        "card_name": "Inspiring Overseer",
+        "logical_rule_key": "battle_rule_v1:inspiring-overseer",
+        "oracle_hash": "hash-overseer",
+        "effect_json": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_etb_gain_life_draw_cards_v1",
+            "ability_kind": "triggered",
+            "trigger": "enters_battlefield",
+            "etb_life_gain_draw": True,
+            "etb_life_gain_amount": 1,
+            "life_gain_amount": 1,
+            "etb_draw_count": 1,
+            "draw_count": 1,
+            "resolution_order": "gain_then_draw",
+            "keywords": ["flying"],
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    assert expected["required_effect_fields"]["etb_life_gain_draw"] is True
+    assert scenario["type"] == "creature_etb_life_gain_draw"
+    assert scenario["expected_life_gain"] == 1
+    assert scenario["expected_draw_count"] == 1
+    assert scenario["expected_resolution_order"] == "gain_then_draw"
+    assert scenario["expected_keywords"] == ["flying"]
+
+
 def test_counter_unless_pays_dynamic_fields_and_execution_scenario_are_manifested() -> None:
     proposal = {
         "normalized_name": "spell stutter",

@@ -50,6 +50,49 @@ def metadata(
 
 
 class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
+    def test_creature_etb_life_gain_draw_maps_to_ordered_runtime_scope(self) -> None:
+        row = queue_row(
+            split.LIFE_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect", "GainLifeEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility", "FlyingAbility"],
+            xmage_signals=["draw", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Inspiring Overseer",
+                type_line="Creature - Angel Cleric",
+                oracle_text="Flying\nWhen this creature enters, you gain 1 life and draw a card.",
+            ),
+            source_text="""
+                this.addAbility(FlyingAbility.getInstance());
+                Ability ability = new EntersBattlefieldTriggeredAbility(new GainLifeEffect(1));
+                ability.addEffect(new DrawCardSourceControllerEffect(1).concatBy("and"));
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.ETB_LIFE_GAIN_DRAW_CREATURE_SCOPE)
+        self.assertTrue(effect["etb_life_gain_draw"])
+        self.assertEqual(effect["etb_life_gain_amount"], 1)
+        self.assertEqual(effect["etb_draw_count"], 1)
+        self.assertEqual(effect["resolution_order"], "gain_then_draw")
+        self.assertEqual(effect["keywords"], ["flying"])
+
+    def test_conditional_creature_etb_life_gain_draw_is_not_simple_scope(self) -> None:
+        row = queue_row(
+            split.LIFE_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect", "GainLifeEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["draw", "condition", "triggered_ability"],
+        )
+
+        self.assertFalse(split.is_creature_etb_life_gain_draw_unit(row))
+
     def test_cycling_only_creature_maps_to_runtime_hand_cycling_scope(self) -> None:
         row = queue_row(
             "xmage_signature::no_effect_class::CyclingAbility::"

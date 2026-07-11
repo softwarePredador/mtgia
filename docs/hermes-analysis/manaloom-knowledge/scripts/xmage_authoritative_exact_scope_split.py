@@ -533,6 +533,7 @@ SPELL_CAST_ADD_COUNTERS_SOURCE_SCOPE = "xmage_spell_cast_add_counters_source_v1"
 SPELL_CAST_GAIN_LIFE_SCOPE = "xmage_spell_cast_gain_life_v1"
 SPELL_CAST_TOKEN_MAKER_SCOPE = "xmage_spell_cast_create_creature_token_v1"
 ETB_LIFE_GAIN_CREATURE_SCOPE = "xmage_creature_etb_gain_life_v1"
+ETB_LIFE_GAIN_DRAW_CREATURE_SCOPE = "xmage_creature_etb_gain_life_draw_cards_v1"
 ETB_DYNAMIC_LIFE_GAIN_CREATURE_SCOPE = "xmage_creature_etb_dynamic_gain_life_v1"
 CREATURE_ENTERS_LIFE_GAIN_TRIGGER_SCOPE = "xmage_creature_enters_life_gain_trigger_v1"
 CREATURE_ENTERS_DRAW_TRIGGER_SCOPE = "xmage_creature_enters_draw_trigger_v1"
@@ -12453,6 +12454,19 @@ def is_creature_etb_life_gain_unit(row: dict[str, Any]) -> bool:
         and "EntersBattlefieldTriggeredAbility" in abilities
         and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
         and set(row.get("xmage_signals") or []).issubset({"triggered_ability"})
+    )
+
+
+def is_creature_etb_life_gain_draw_unit(row: dict[str, Any]) -> bool:
+    if str(row.get("adapter_work_unit") or "") != LIFE_UNIT:
+        return False
+    abilities = ability_classes(row)
+    remaining = abilities - {"EntersBattlefieldTriggeredAbility"}
+    return (
+        effect_classes(row) == {"GainLifeEffect", "DrawCardSourceControllerEffect"}
+        and "EntersBattlefieldTriggeredAbility" in abilities
+        and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
+        and set(row.get("xmage_signals") or []).issubset({"draw", "triggered_ability"})
     )
 
 
@@ -24482,6 +24496,33 @@ def fixed_life_gain_draw_from_oracle(metadata: dict[str, Any]) -> tuple[int, int
     return None
 
 
+def fixed_etb_life_gain_draw_from_oracle(metadata: dict[str, Any]) -> tuple[int, int, str] | None:
+    text = re.sub(r"\s+", " ", oracle_text_after_leading_static_keywords(metadata)).strip().rstrip(".").lower()
+    number = r"(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten)"
+    prefix = r"(?:when|whenever) [^,]* enters(?: the battlefield)?[, ]+"
+    gain_then_draw = re.fullmatch(
+        rf"{prefix}you gain (?P<gain>{number}) life and draw (?P<draw>a|{number}) cards?",
+        text,
+    )
+    if gain_then_draw:
+        return (
+            word_or_int(gain_then_draw.group("gain")),
+            word_or_int(gain_then_draw.group("draw")),
+            "gain_then_draw",
+        )
+    draw_then_gain = re.fullmatch(
+        rf"{prefix}you draw (?P<draw>a|{number}) cards? and you gain (?P<gain>{number}) life",
+        text,
+    )
+    if draw_then_gain:
+        return (
+            word_or_int(draw_then_gain.group("gain")),
+            word_or_int(draw_then_gain.group("draw")),
+            "draw_then_gain",
+        )
+    return None
+
+
 def fixed_life_gain_draw_from_source(source_text: str) -> tuple[int, int, str] | None:
     text = str(source_text or "")
     gain_matches = list(re.finditer(r"new\s+GainLifeEffect\s*\(", text))
@@ -30233,6 +30274,7 @@ def split_row(
         CREATURE_ENTERS_TAPPED_EFFECT_UNIT,
     }
     etb_life_gain_creature_unit = is_creature_etb_life_gain_unit(row)
+    etb_life_gain_draw_creature_unit = is_creature_etb_life_gain_draw_unit(row)
     creature_enters_life_gain_unit = is_creature_enters_life_gain_unit(row)
     creature_enters_draw_unit = is_creature_enters_draw_unit(row)
     dies_life_gain_creature_unit = is_creature_dies_life_gain_unit(row)
@@ -30451,6 +30493,7 @@ def split_row(
         and not static_flying_can_block_only_flying_creature_unit
         and not static_horsemanship_creature_unit
         and not etb_life_gain_creature_unit
+        and not etb_life_gain_draw_creature_unit
         and not creature_enters_life_gain_unit
         and not creature_enters_draw_unit
         and not dies_life_gain_creature_unit
@@ -30596,6 +30639,7 @@ def split_row(
         and not static_flying_can_block_only_flying_creature_unit
         and not static_horsemanship_creature_unit
         and not dies_life_gain_creature_unit
+        and not etb_life_gain_draw_creature_unit
         and not etb_draw_creature_unit
         and not etb_scry_creature_unit
         and not etb_draw_lose_life_creature_unit
@@ -35574,6 +35618,52 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_static_self_combat_keyword_creature",
+        ), "selected_exact_scope"
+
+    if etb_life_gain_draw_creature_unit:
+        if not is_creature_metadata(metadata):
+            return None, "etb_life_gain_draw_not_creature"
+        oracle_pair = fixed_etb_life_gain_draw_from_oracle(metadata)
+        if oracle_pair is None:
+            return None, "etb_life_gain_draw_oracle_not_fixed"
+        source_pair = fixed_life_gain_draw_from_source(source_text)
+        if source_pair is None:
+            return None, "etb_life_gain_draw_source_not_fixed"
+        if source_pair != oracle_pair:
+            return None, "etb_life_gain_draw_source_oracle_mismatch"
+        life_gain, draw_count, resolution_order = oracle_pair
+        keyword_list = ordered_keywords(keywords_from_ability_classes(row))
+        xmage_effect_classes = (
+            ["GainLifeEffect", "DrawCardSourceControllerEffect"]
+            if resolution_order == "gain_then_draw"
+            else ["DrawCardSourceControllerEffect", "GainLifeEffect"]
+        )
+        effect_json = {
+            "effect": "creature",
+            "battle_model_scope": ETB_LIFE_GAIN_DRAW_CREATURE_SCOPE,
+            "ability_kind": "triggered",
+            "trigger": "enters_battlefield",
+            "trigger_effect": "life_gain_draw",
+            "etb_trigger_effect": "life_gain_draw",
+            "etb_life_gain_draw": True,
+            "etb_life_gain_amount": life_gain,
+            "life_gain_amount": life_gain,
+            "etb_draw_count": draw_count,
+            "draw_count": draw_count,
+            "resolution_order": resolution_order,
+            "xmage_effect_classes": xmage_effect_classes,
+            "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        }
+        if keyword_list:
+            effect_json["keywords"] = keyword_list
+            effect_json["_keywords_are_self"] = True
+            for keyword in keyword_list:
+                effect_json[keyword] = True
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_creature_etb_gain_life_draw_cards",
         ), "selected_exact_scope"
 
     if etb_life_gain_creature_unit:
@@ -44464,6 +44554,7 @@ def build_exact_split_report(
             and not is_static_flying_can_block_only_flying_creature_unit(row)
             and not is_static_horsemanship_creature_unit(row)
             and not is_creature_etb_life_gain_unit(row)
+            and not is_creature_etb_life_gain_draw_unit(row)
             and not is_creature_dies_life_gain_unit(row)
             and not is_creature_enters_draw_unit(row)
             and not is_creature_etb_draw_unit(row)
