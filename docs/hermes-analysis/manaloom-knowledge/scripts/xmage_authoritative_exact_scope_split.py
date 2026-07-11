@@ -263,6 +263,7 @@ PREVENT_DAMAGE_FROM_CREATURES_SPELL_SCOPE = "xmage_prevent_damage_from_creatures
 DRAW_DISCARD_SPELL_SCOPE = "xmage_fixed_draw_discard_spell_v1"
 DRAW_LOSE_LIFE_SPELL_SCOPE = "xmage_fixed_controller_draw_lose_life_spell_v1"
 TARGET_DRAW_LOSE_LIFE_SPELL_SCOPE = "xmage_fixed_target_player_draw_lose_life_spell_v1"
+DRAW_LOSE_HALF_LIFE_SPELL_SCOPE = "xmage_controller_draw_lose_half_life_rounded_up_spell_v1"
 DAMAGE_SCOPE = "xmage_fixed_damage_target_spell_v1"
 MULTI_TARGET_DAMAGE_SCOPE = "xmage_fixed_multi_target_damage_spell_v1"
 DAMAGE_EACH_TARGET_SCOPE = "xmage_fixed_damage_each_target_spell_v1"
@@ -16137,6 +16138,27 @@ def fixed_draw_lose_life_spell_from_oracle(metadata: dict[str, Any]) -> dict[str
     return "draw_lose_life_spell_oracle_not_exact_fixed"
 
 
+def draw_lose_half_life_spell_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    text = re.sub(r"\s+", " ", oracle_text(metadata)).strip().lower()
+    if has_oracle_complexity(metadata):
+        return "draw_lose_half_life_spell_oracle_not_simple"
+    match = re.fullmatch(
+        r"draw (?P<draw>a|one|two|three|four|five|\d+) cards?\. you lose half your life, rounded up\.?",
+        text,
+    )
+    if not match:
+        return "draw_lose_half_life_spell_oracle_not_exact"
+    draw_count = number_word_to_int(match.group("draw"))
+    if draw_count <= 0:
+        return "draw_lose_half_life_spell_count_not_fixed"
+    return {
+        "draw_count": draw_count,
+        "target_controller": "self",
+        "life_loss_mode": "half_rounded_up",
+        "life_loss_rounding": "up",
+    }
+
+
 def fixed_target_player_draw_spell_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
     text = re.sub(
         r"\s+",
@@ -20928,6 +20950,46 @@ def fixed_draw_lose_life_spell_from_source(source: str, classes: set[str]) -> di
         "life_loss": int(life_loss),
         "target_controller": target_controller,
         "xmage_effect_classes": effect_classes,
+    }
+
+
+def draw_lose_half_life_spell_from_source(source: str, classes: set[str]) -> dict[str, Any] | str:
+    text = source or ""
+    if has_additional_cost(text):
+        return "draw_lose_half_life_spell_source_additional_cost_not_supported"
+    unsupported_markers = {
+        "ConditionalOneShotEffect",
+        "DoIfCostPaid",
+        "Mode",
+        "Modes",
+        "TargetPointer",
+        ".setTargetPointer",
+    }
+    if any(marker in text for marker in unsupported_markers):
+        return "draw_lose_half_life_spell_source_not_simple"
+    if classes != {"DrawCardSourceControllerEffect", "LoseHalfLifeEffect"}:
+        return "draw_lose_half_life_spell_source_effect_class_not_supported"
+    if len(re.findall(r"\bDrawCardSourceControllerEffect\s*\(", text)) != 1:
+        return "draw_lose_half_life_spell_source_not_simple"
+    if len(re.findall(r"\bLoseHalfLifeEffect\s*\(", text)) != 1:
+        return "draw_lose_half_life_spell_source_not_simple"
+    draw_count = java_constructor_int_or_noarg_default(
+        text,
+        "DrawCardSourceControllerEffect",
+        noarg_default=1,
+    )
+    if draw_count is None or draw_count <= 0:
+        return "draw_lose_half_life_spell_source_count_not_fixed"
+    draw_match = re.search(r"\bDrawCardSourceControllerEffect\s*\(", text)
+    half_life_match = re.search(r"\bLoseHalfLifeEffect\s*\(", text)
+    if not draw_match or not half_life_match or draw_match.start() > half_life_match.start():
+        return "draw_lose_half_life_spell_source_order_not_supported"
+    return {
+        "draw_count": int(draw_count),
+        "target_controller": "self",
+        "life_loss_mode": "half_rounded_up",
+        "life_loss_rounding": "up",
+        "xmage_effect_classes": ["DrawCardSourceControllerEffect", "LoseHalfLifeEffect"],
     }
 
 
@@ -37138,6 +37200,46 @@ def split_row(
                 metadata,
                 effect_json,
                 family_id="xmage_fixed_draw_put_land_from_hand_spell",
+            ), "selected_exact_scope"
+
+        if classes == {"DrawCardSourceControllerEffect", "LoseHalfLifeEffect"}:
+            unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+            if unsupported_abilities:
+                return None, "draw_lose_half_life_spell_ability_class_not_simple"
+            oracle_draw_life = draw_lose_half_life_spell_from_oracle(metadata)
+            if isinstance(oracle_draw_life, str):
+                return None, oracle_draw_life
+            source_draw_life = draw_lose_half_life_spell_from_source(source_text, classes)
+            if isinstance(source_draw_life, str):
+                return None, source_draw_life
+            comparison_keys = (
+                "draw_count",
+                "target_controller",
+                "life_loss_mode",
+                "life_loss_rounding",
+            )
+            if any(
+                oracle_draw_life.get(key) != source_draw_life.get(key)
+                for key in comparison_keys
+            ):
+                return None, "draw_lose_half_life_spell_source_oracle_mismatch"
+            effect_json = {
+                "effect": "draw_cards",
+                "battle_model_scope": DRAW_LOSE_HALF_LIFE_SPELL_SCOPE,
+                "count": int(oracle_draw_life["draw_count"]),
+                "draw_count": int(oracle_draw_life["draw_count"]),
+                "target_controller": "self",
+                "life_loss_mode": "half_rounded_up",
+                "life_loss_rounding": "up",
+                "draw_lose_life_spell": True,
+                "xmage_effect_classes": list(source_draw_life["xmage_effect_classes"]),
+                **flags,
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_draw_lose_half_life_spell",
             ), "selected_exact_scope"
 
         if classes in (

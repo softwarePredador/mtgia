@@ -4900,6 +4900,57 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_draw_lose_half_life_spell_rounds_up(self) -> None:
+        active = self.battle.Player(
+            "Active",
+            None,
+            [
+                {"name": "Fresh Card A", "cmc": 2},
+                {"name": "Fresh Card B", "cmc": 3},
+                {"name": "Fresh Card C", "cmc": 4},
+                {"name": "Fresh Card D", "cmc": 5},
+            ],
+        )
+        opponent = self.battle.Player("Opponent", None, [])
+        active.life = 21
+        spell = {"name": "Fixture Cruel Bargain", "type_line": "Sorcery", "cmc": 3}
+        effect_data = {
+            "effect": "draw_cards",
+            "battle_model_scope": "xmage_controller_draw_lose_half_life_rounded_up_spell_v1",
+            "draw_lose_life_spell": True,
+            "count": 4,
+            "draw_count": 4,
+            "life_loss_mode": "half_rounded_up",
+            "life_loss_rounding": "up",
+            "target_controller": "self",
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            spell,
+            turn=763,
+            rng=random.Random(763),
+            effect_data_override=effect_data,
+            phase="resolution",
+        )
+
+        self.assertEqual(len(active.hand), 4)
+        self.assertEqual(active.life, 10)
+        self.assertTrue(
+            any(
+                event == "draw_lose_life_spell_resolved"
+                and data.get("card") == "Fixture Cruel Bargain"
+                and data.get("target_player") == "Active"
+                and data.get("cards_drawn") == 4
+                and data.get("life_before") == 21
+                and data.get("life_lost") == 11
+                and data.get("life_after") == 10
+                and data.get("life_loss_mode") == "half_rounded_up"
+                for event, data in self.events
+            )
+        )
+
     def test_target_player_draw_lose_life_spell_targets_lethal_opponent(self) -> None:
         active = self.battle.Player("Active", None, [{"name": "Active Card"}])
         opponent = self.battle.Player(

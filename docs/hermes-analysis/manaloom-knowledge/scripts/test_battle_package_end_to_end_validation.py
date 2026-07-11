@@ -2039,6 +2039,53 @@ def test_look_at_hand_draw_runner_reveals_opponent_hand_and_draws() -> None:
     )
 
 
+def test_draw_lose_half_life_runner_draws_and_rounds_up_life_loss() -> None:
+    effect = {
+        "effect": "draw_cards",
+        "battle_model_scope": "xmage_controller_draw_lose_half_life_rounded_up_spell_v1",
+        "count": 4,
+        "draw_count": 4,
+        "target_controller": "self",
+        "life_loss_mode": "half_rounded_up",
+        "life_loss_rounding": "up",
+        "draw_lose_life_spell": True,
+        "_rule_logical_key": "battle_rule_v1:cruel-bargain",
+    }
+    rule = {
+        "card_name": "Cruel Bargain",
+        "logical_rule_key": "battle_rule_v1:cruel-bargain",
+        "required_effect_fields": effect,
+    }
+    scenario = package_builder.draw_lose_life_spell_execution_scenario_from_expected_rule(rule)
+
+    assert scenario is not None
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: dict(effect)
+    try:
+        result = validator.run_draw_lose_life_spell(battle, scenario, events)
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Cruel Bargain"
+    assert result["cards_drawn"] == 4
+    assert result["life_before"] == 21
+    assert result["life_lost"] == 11
+    assert result["life_after"] == 10
+    assert result["life_loss_mode"] == "half_rounded_up"
+    assert any(
+        event == "draw_lose_life_spell_resolved"
+        and data.get("card") == "Cruel Bargain"
+        and data.get("life_lost") == 11
+        and data.get("life_after") == 10
+        for event, data in events
+    )
+
+
 def test_simple_activated_draw_runner_executes_sacrifice_target_cost() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

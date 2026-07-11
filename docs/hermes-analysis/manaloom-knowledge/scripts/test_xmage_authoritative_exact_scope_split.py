@@ -6794,6 +6794,50 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["life_loss"], 3)
         self.assertEqual(effect["target_controller"], "self")
 
+    def test_draw_lose_half_life_spell_maps(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect", "LoseHalfLifeEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Draw four cards. You lose half your life, rounded up."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(4));"
+                "this.getSpellAbility().addEffect(new LoseHalfLifeEffect());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DRAW_LOSE_HALF_LIFE_SPELL_SCOPE)
+        self.assertTrue(effect["draw_lose_life_spell"])
+        self.assertEqual(effect["draw_count"], 4)
+        self.assertEqual(effect["life_loss_mode"], "half_rounded_up")
+        self.assertEqual(effect["life_loss_rounding"], "up")
+        self.assertEqual(effect["target_controller"], "self")
+        self.assertEqual(
+            effect["xmage_effect_classes"],
+            ["DrawCardSourceControllerEffect", "LoseHalfLifeEffect"],
+        )
+
+    def test_draw_lose_half_life_spell_blocks_source_order_mismatch(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect", "LoseHalfLifeEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Draw four cards. You lose half your life, rounded up."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new LoseHalfLifeEffect());"
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(4));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "draw_lose_half_life_spell_source_order_not_supported")
+
     def test_fixed_target_player_draw_lose_life_spell_maps(self) -> None:
         row = queue_row(
             split.DRAW_UNIT,

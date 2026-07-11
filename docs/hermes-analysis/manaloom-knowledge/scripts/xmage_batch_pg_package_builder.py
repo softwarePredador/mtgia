@@ -130,6 +130,10 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "xmage_additional_cost_target",
     "count",
     "draw_count",
+    "draw_lose_life_spell",
+    "life_loss",
+    "life_loss_mode",
+    "life_loss_rounding",
     "proliferate_count",
     "discard_count",
     "discard_random",
@@ -4310,6 +4314,54 @@ def fixed_draw_spell_execution_scenario_from_expected_rule(
     return scenario
 
 
+def draw_lose_life_spell_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if not required.get("draw_lose_life_spell"):
+        return None
+    if required.get("battle_model_scope") not in {
+        "xmage_fixed_controller_draw_lose_life_spell_v1",
+        "xmage_controller_draw_lose_half_life_rounded_up_spell_v1",
+    }:
+        return None
+    expected_draw_count = int(required.get("draw_count") or required.get("count") or 0)
+    if expected_draw_count <= 0:
+        return None
+    life_loss_mode = str(required.get("life_loss_mode") or "").strip()
+    starting_life = 21 if life_loss_mode == "half_rounded_up" else 20
+    expected_life_lost = (
+        (starting_life + 1) // 2
+        if life_loss_mode == "half_rounded_up"
+        else int(required.get("life_loss") or 0)
+    )
+    if expected_life_lost <= 0:
+        return None
+    return {
+        "name": f"{rule['card_name']} draws then loses life",
+        "type": "draw_lose_life_spell",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": "Instant" if required.get("instant") else "Sorcery",
+        },
+        "controller_life": starting_life,
+        "controller_library": [
+            {
+                "name": f"E2E Draw Lose Life Card {index + 1}",
+                "type_line": "Instant" if index % 2 == 0 else "Sorcery",
+                "effect": "draw_cards",
+                "cmc": index + 1,
+            }
+            for index in range(expected_draw_count)
+        ],
+        "expected_draw_count": expected_draw_count,
+        "expected_life_lost": expected_life_lost,
+        "expected_life_after": starting_life - expected_life_lost,
+        "expected_life_loss_mode": life_loss_mode or None,
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def graveyard_to_library_draw_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
@@ -7854,6 +7906,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or simple_activated_draw_discard_execution_scenario_from_expected_rule(rule)
         or put_from_hand_to_battlefield_execution_scenario_from_expected_rule(rule)
         or fixed_draw_spell_execution_scenario_from_expected_rule(rule)
+        or draw_lose_life_spell_execution_scenario_from_expected_rule(rule)
         or graveyard_to_library_draw_execution_scenario_from_expected_rule(rule)
         or fixed_draw_discard_spell_execution_scenario_from_expected_rule(rule)
         or look_at_hand_draw_execution_scenario_from_expected_rule(rule)

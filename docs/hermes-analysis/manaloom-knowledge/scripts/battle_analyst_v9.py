@@ -66841,6 +66841,7 @@ def resolve_draw_lose_life_spell(
 ):
     draw_count = max(0, int(effect_data.get("draw_count") or effect_data.get("count") or 0))
     life_loss = max(0, int(effect_data.get("life_loss") or 0))
+    life_loss_mode = str(effect_data.get("life_loss_mode") or "").strip().lower()
     target_controller = str(effect_data.get("target_controller") or "self")
     if target_controller == "target_player":
         target_player, target_reason = _draw_lose_life_target_player(player, opponents, effect_data)
@@ -66858,6 +66859,8 @@ def resolve_draw_lose_life_spell(
         turn_player=player,
     )
     life_before = int(getattr(target_player, "life", 0) or 0)
+    if life_loss_mode == "half_rounded_up":
+        life_loss = max(0, (life_before + 1) // 2)
     if life_loss:
         change_life(target_player, -life_loss)
     life_after = int(getattr(target_player, "life", life_before) or 0)
@@ -66871,6 +66874,8 @@ def resolve_draw_lose_life_spell(
         cards_drawn=len(drawn_cards),
         requested_draw_count=draw_count,
         life_lost=life_loss,
+        life_loss_mode=life_loss_mode or None,
+        life_loss_rounding=effect_data.get("life_loss_rounding"),
         life_before=life_before,
         life_after=life_after,
         library_remaining=len(target_player.library),

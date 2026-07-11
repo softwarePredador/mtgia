@@ -12099,6 +12099,88 @@ def run_fixed_draw_spell(
     }
 
 
+def run_draw_lose_life_spell(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    effect = dict(battle.get_card_effect(card))
+    if effect.get("effect") != "draw_cards" or not effect.get("draw_lose_life_spell"):
+        fail("battle_execution", f"{card['name']} draw_lose_life_spell={effect.get('draw_lose_life_spell')!r}")
+    active = battle.Player(str(scenario.get("player") or "Spell Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
+    active.life = int(scenario.get("controller_life") or 20)
+    active.library = [
+        battle.enrich_card(dict(library_card))
+        for library_card in (scenario.get("controller_library") or scenario.get("library") or [])
+        if isinstance(library_card, dict)
+    ]
+    starting_life = int(active.life)
+    starting_hand_count = len(active.hand)
+    starting_library_count = len(active.library)
+    expected_draw_count = int(scenario.get("expected_draw_count") or effect.get("draw_count") or effect.get("count") or 0)
+    expected_life_lost = int(scenario.get("expected_life_lost") or effect.get("life_loss") or 0)
+    expected_life_after = int(scenario.get("expected_life_after") or (starting_life - expected_life_lost))
+    expected_life_loss_mode = scenario.get("expected_life_loss_mode")
+    before_events = len(events)
+
+    battle.apply_effect_immediate(
+        active,
+        [opponent],
+        battle.enrich_card(card),
+        turn=int(scenario.get("turn") or 7630),
+        rng=random.Random(int(scenario.get("seed") or 7630)),
+        effect_data_override=effect,
+        phase=str(scenario.get("phase") or "precombat_main"),
+    )
+
+    if len(active.library) != starting_library_count - expected_draw_count:
+        fail(
+            "battle_execution",
+            f"{card['name']} library={len(active.library)}, expected {starting_library_count - expected_draw_count}",
+        )
+    if len(active.hand) != starting_hand_count + expected_draw_count:
+        fail(
+            "battle_execution",
+            f"{card['name']} hand={len(active.hand)}, expected {starting_hand_count + expected_draw_count}",
+        )
+    if int(active.life) != expected_life_after:
+        fail("battle_execution", f"{card['name']} life={active.life}, expected {expected_life_after}")
+    event = next(
+        (
+            data
+            for event_name, data in events[before_events:]
+            if event_name == "draw_lose_life_spell_resolved"
+            and data.get("card") == card.get("name")
+        ),
+        None,
+    )
+    if event is None:
+        fail("battle_events", f"missing {card['name']} draw_lose_life_spell_resolved event")
+    if int(event.get("cards_drawn") or 0) != expected_draw_count:
+        fail("battle_events", f"{card['name']} cards_drawn={event.get('cards_drawn')}")
+    if int(event.get("requested_draw_count") or 0) != expected_draw_count:
+        fail("battle_events", f"{card['name']} requested_draw_count={event.get('requested_draw_count')}")
+    if int(event.get("life_before") or 0) != starting_life:
+        fail("battle_events", f"{card['name']} life_before={event.get('life_before')}")
+    if int(event.get("life_lost") or 0) != expected_life_lost:
+        fail("battle_events", f"{card['name']} life_lost={event.get('life_lost')}")
+    if int(event.get("life_after") or 0) != expected_life_after:
+        fail("battle_events", f"{card['name']} life_after={event.get('life_after')}")
+    if expected_life_loss_mode and event.get("life_loss_mode") != expected_life_loss_mode:
+        fail("battle_events", f"{card['name']} life_loss_mode={event.get('life_loss_mode')!r}")
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "cards_drawn": expected_draw_count,
+        "life_before": starting_life,
+        "life_lost": expected_life_lost,
+        "life_after": expected_life_after,
+        "life_loss_mode": expected_life_loss_mode,
+    }
+
+
 def run_graveyard_to_library_draw_spell(
     battle,
     scenario: dict[str, Any],
@@ -12413,6 +12495,7 @@ SCENARIO_RUNNERS = {
     "damage_target_create_treasure": run_damage_target_create_treasure,
     "damage_prevention": run_damage_prevention,
     "fixed_draw_spell": run_fixed_draw_spell,
+    "draw_lose_life_spell": run_draw_lose_life_spell,
     "graveyard_to_library_draw_spell": run_graveyard_to_library_draw_spell,
     "fixed_draw_discard_spell": run_fixed_draw_discard_spell,
     "fixed_damage_target_spell": run_fixed_damage_target_spell,
