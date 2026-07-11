@@ -15836,7 +15836,8 @@ def fixed_damage_gain_life_from_source(source: str) -> tuple[int, int, str] | No
 
 
 def fixed_damage_gain_life_from_oracle(metadata: dict[str, Any]) -> tuple[int, int, str] | None:
-    text = oracle_text(metadata)
+    text = " ".join(oracle_effect_lines_without_neutral_auxiliary(metadata))
+    text = re.sub(r"\s+", " ", text).strip()
     match = re.match(
         r"^.+ deals (\d+) damage to "
         r"(any target|target attacking or blocking creature|target creature|target creature or planeswalker|target nonblack creature|target opponent or planeswalker|target player or planeswalker|target tapped creature)"
@@ -38707,7 +38708,10 @@ def split_row(
         return build_proposal(row, metadata, effect_json, family_id="xmage_destroy_target_spell"), "selected_exact_scope"
 
     if unit == LIFE_UNIT and classes == {"DamageTargetEffect", "GainLifeEffect"}:
-        if has_oracle_complexity(metadata):
+        unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+        if unsupported_abilities:
+            return None, "damage_life_gain_ability_class_not_simple"
+        if has_non_neutral_oracle_complexity(metadata):
             return None, "damage_life_gain_oracle_not_simple"
         source_damage = fixed_damage_gain_life_from_source(source_text)
         if source_damage is None:

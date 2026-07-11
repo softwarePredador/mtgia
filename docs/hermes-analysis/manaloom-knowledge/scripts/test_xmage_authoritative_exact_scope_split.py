@@ -10337,6 +10337,66 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["battle_model_scope"], split.DAMAGE_GAIN_LIFE_SCOPE)
         self.assertEqual(effect["target"], "creature")
 
+    def test_fixed_damage_gain_life_spell_allows_neutral_flashback_auxiliary(self) -> None:
+        row = queue_row(
+            split.LIFE_UNIT,
+            effect_classes=["DamageTargetEffect", "GainLifeEffect"],
+            ability_classes=["FlashbackAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Smiting Helix",
+                oracle_text=(
+                    "Smiting Helix deals 3 damage to any target and you gain 3 life.\n"
+                    "Flashback {R}{W}"
+                ),
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new DamageTargetEffect(3));"
+                "this.getSpellAbility().addEffect(new GainLifeEffect(3).concatBy(\"and\"));"
+                "this.getSpellAbility().addTarget(new TargetAnyTarget());"
+                "this.addAbility(new FlashbackAbility(this, new ManaCostsImpl<>(\"{R}{W}\")));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DAMAGE_GAIN_LIFE_SCOPE)
+        self.assertEqual(effect["amount"], 3)
+        self.assertEqual(effect["gain_life"], 3)
+        self.assertEqual(effect["target"], "any_target")
+
+    def test_fixed_damage_gain_life_spell_allows_neutral_convoke_auxiliary(self) -> None:
+        row = queue_row(
+            split.LIFE_UNIT,
+            effect_classes=["DamageTargetEffect", "GainLifeEffect"],
+            ability_classes=["ConvokeAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Covenant of Blood",
+                oracle_text=(
+                    "Convoke\n"
+                    "Covenant of Blood deals 4 damage to any target and you gain 4 life."
+                ),
+            ),
+            source_text=(
+                "this.addAbility(new ConvokeAbility());"
+                "this.getSpellAbility().addEffect(new DamageTargetEffect(4));"
+                "this.getSpellAbility().addEffect(new GainLifeEffect(4).concatBy(\"and\"));"
+                "this.getSpellAbility().addTarget(new TargetAnyTarget());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DAMAGE_GAIN_LIFE_SCOPE)
+        self.assertEqual(effect["amount"], 4)
+        self.assertEqual(effect["gain_life"], 4)
+        self.assertEqual(effect["target"], "any_target")
+
     def test_fixed_damage_gain_life_spell_maps_restricted_targets(self) -> None:
         cases = [
             (
@@ -10416,6 +10476,33 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
 
         self.assertIsNone(proposal)
         self.assertEqual(reason, "damage_life_gain_source_not_fixed")
+
+    def test_fixed_damage_gain_life_spell_blocks_cleave_auxiliary(self) -> None:
+        row = queue_row(
+            split.LIFE_UNIT,
+            effect_classes=["DamageTargetEffect", "GainLifeEffect"],
+            ability_classes=["CleaveAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                oracle_text=(
+                    "Cleave {1}{B}{B}\n"
+                    "Fixture Drain deals 3 damage to target [Human] creature. You gain 3 life."
+                ),
+            ),
+            source_text=(
+                "Ability ability = new CleaveAbility(this, new DamageTargetEffect(3), \"{1}{B}{B}\");"
+                "ability.addEffect(new GainLifeEffect(3));"
+                "ability.addTarget(new TargetCreaturePermanent());"
+                "this.getSpellAbility().addEffect(new DamageTargetEffect(3));"
+                "this.getSpellAbility().addEffect(new GainLifeEffect(3));"
+                "this.getSpellAbility().addTarget(new TargetPermanent(filter));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "damage_life_gain_ability_class_not_simple")
 
     def test_destroy_gain_life_spell_maps_to_controller_life_gain(self) -> None:
         row = queue_row(split.LIFE_UNIT, effect_classes=["DestroyTargetEffect", "GainLifeEffect"])
