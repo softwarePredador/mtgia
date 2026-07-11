@@ -13576,6 +13576,149 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_mana_source_taps_required_untapped_creature_support(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        source = self.battle.enrich_card(
+            {
+                "name": "Fixture Support Druid",
+                "type_line": "Creature - Elf Druid",
+                "effect": "ramp_permanent",
+                "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+                "is_mana_source": True,
+                "mana_produced": 1,
+                "produces": "WUBRG",
+                "mana_activation_requires_tap": True,
+                "mana_source_requires_untapped_creature": True,
+                "mana_activation_tap_support_count": 1,
+                "mana_activation_tap_support_type": "creature",
+                "mana_source_support_can_include_source": False,
+            }
+        )
+        support = {"name": "Fixture Support Soldier", "type_line": "Creature - Soldier"}
+        active.battlefield = [support, source]
+
+        active.refresh_mana_sources(turn=7)
+
+        self.assertEqual(active.available_mana(), 1)
+        self.assertEqual(len(active.conditional_mana_sources), 1)
+        self.assertTrue(source["tapped"])
+        self.assertTrue(support["tapped"])
+        self.assertTrue(
+            any(
+                event == "mana_source_support_tapped"
+                and data.get("card") == "Fixture Support Druid"
+                and data.get("support") == "Fixture Support Soldier"
+                and data.get("support_type") == "creature"
+                for event, data in self.events
+            )
+        )
+
+    def test_mana_source_support_cost_does_not_count_source_when_forbidden(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        source = self.battle.enrich_card(
+            {
+                "name": "Fixture Citanul",
+                "type_line": "Creature - Elf Druid",
+                "effect": "ramp_permanent",
+                "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+                "is_mana_source": True,
+                "mana_produced": 1,
+                "produces": "WUBRG",
+                "mana_activation_requires_tap": True,
+                "mana_source_requires_untapped_artifact_or_creature": True,
+                "mana_activation_tap_support_count": 1,
+                "mana_activation_tap_support_type": "artifact_or_creature",
+                "mana_source_support_can_include_source": False,
+            }
+        )
+        active.battlefield = [source]
+
+        active.refresh_mana_sources(turn=7)
+
+        self.assertEqual(active.available_mana(), 0)
+        self.assertFalse(source.get("tapped", False))
+        self.assertFalse(any(event == "mana_source_support_tapped" for event, _data in self.events))
+
+        support = {"name": "Fixture Support Relic", "type_line": "Artifact"}
+        active.battlefield = [support, source]
+        source["tapped"] = False
+        active.refresh_mana_sources(turn=8)
+
+        self.assertEqual(active.available_mana(), 1)
+        self.assertTrue(source["tapped"])
+        self.assertTrue(support["tapped"])
+
+    def test_mana_source_support_cost_skips_support_source_after_tapping_it(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        source = self.battle.enrich_card(
+            {
+                "name": "A Fixture Prototype",
+                "type_line": "Artifact",
+                "effect": "ramp_permanent",
+                "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+                "is_mana_source": True,
+                "mana_produced": 1,
+                "produces": "C",
+                "produced_mana_symbols": ["C"],
+                "mana_activation_requires_tap": False,
+                "mana_source_requires_untapped_artifact_or_creature": True,
+                "mana_activation_tap_support_count": 1,
+                "mana_activation_tap_support_type": "artifact_or_creature",
+                "mana_source_support_can_include_source": False,
+            }
+        )
+        support_source = self.battle.enrich_card(
+            {
+                "name": "Z Fixture Support Rock",
+                "type_line": "Artifact",
+                "effect": "ramp_permanent",
+                "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+                "is_mana_source": True,
+                "mana_produced": 1,
+                "produces": "C",
+                "produced_mana_symbols": ["C"],
+                "mana_activation_requires_tap": True,
+            }
+        )
+        active.battlefield = [source, support_source]
+
+        active.refresh_mana_sources(turn=7)
+
+        self.assertEqual(active.available_mana(), 1)
+        self.assertTrue(support_source["tapped"])
+        self.assertFalse(source.get("tapped", False))
+
+    def test_mana_source_support_cost_can_include_source_without_tap_activation(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        source = self.battle.enrich_card(
+            {
+                "name": "Fixture Moonsnare",
+                "type_line": "Artifact",
+                "effect": "ramp_permanent",
+                "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+                "is_mana_source": True,
+                "mana_produced": 1,
+                "produces": "C",
+                "produced_mana_symbols": ["C"],
+                "mana_activation_requires_tap": False,
+                "mana_source_requires_untapped_artifact_or_creature": True,
+            }
+        )
+        active.battlefield = [source]
+
+        active.refresh_mana_sources(turn=7)
+
+        self.assertEqual(active.available_mana(), 1)
+        self.assertEqual(active.mana_pool.colorless, 1)
+        self.assertTrue(source["tapped"])
+        self.assertTrue(
+            any(
+                event == "mana_source_support_tapped"
+                and data.get("support") == "Fixture Moonsnare"
+                for event, data in self.events
+            )
+        )
+
     def test_restricted_mana_source_refreshes_conditional_mana_not_free_colorless(self) -> None:
         active = self.battle.Player("Active", None, [])
         artificer = self.battle.enrich_card(

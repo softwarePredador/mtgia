@@ -520,6 +520,11 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "life_for_colored_mana",
     "mana_activation_life_gain",
     "mana_activation_requires_tap",
+    "mana_source_requires_untapped_creature",
+    "mana_source_requires_untapped_artifact_or_creature",
+    "mana_activation_tap_support_count",
+    "mana_activation_tap_support_type",
+    "mana_source_support_can_include_source",
     "mana_activation_requires_sacrifice_target",
     "sacrifice_mana_source_contextual_only",
     "sacrifice_mana_produced",
@@ -3252,6 +3257,35 @@ def simple_mana_source_execution_scenario_from_expected_rule(rule: dict[str, Any
     activation_life_cost = int(required.get("activation_life_cost") or 0)
     activation_life_gain = int(required.get("mana_activation_life_gain") or 0)
     activation_discard_count = int(required.get("activation_discard_count") or 0)
+    support_tap_count = int(required.get("mana_activation_tap_support_count") or 0)
+    support_tap_type = str(required.get("mana_activation_tap_support_type") or "")
+    controller_battlefield = []
+    support_tapped_names: list[str] = []
+    for index in range(max(0, support_tap_count)):
+        if support_tap_type == "creature":
+            support_card = {
+                "name": f"E2E Untapped Support Creature {index + 1}",
+                "type_line": "Creature - Citizen",
+                "power": 1,
+                "toughness": 1,
+                "tapped": False,
+            }
+        elif support_tap_type == "artifact_or_creature":
+            support_card = {
+                "name": f"E2E Untapped Support Artifact {index + 1}",
+                "type_line": "Artifact",
+                "tapped": False,
+            }
+        else:
+            support_card = {
+                "name": f"E2E Untapped Support Permanent {index + 1}",
+                "type_line": "Creature",
+                "power": 1,
+                "toughness": 1,
+                "tapped": False,
+            }
+        controller_battlefield.append(support_card)
+        support_tapped_names.append(support_card["name"])
     discard_hand = [
         {"name": f"E2E Spare Discard Card {index + 1}", "type_line": "Sorcery", "effect": "draw_cards", "cmc": 2}
         for index in range(max(0, activation_discard_count))
@@ -3301,6 +3335,9 @@ def simple_mana_source_execution_scenario_from_expected_rule(rule: dict[str, Any
         ),
         "expected_conditional_restrictions": conditional_restrictions,
         "expected_activation_limit_per_turn": int(required.get("activation_limit_per_turn") or 0),
+        "controller_battlefield": controller_battlefield,
+        "expected_support_tapped_count": support_tap_count,
+        "expected_support_tapped_names": support_tapped_names,
         "support_mana_sources": support_sources,
         "source_overrides": {"tapped": True} if enters_tapped else {},
         "logical_rule_key": rule["logical_rule_key"],

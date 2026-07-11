@@ -1229,6 +1229,40 @@ def test_simple_mana_source_execution_scenario_pays_activation_cost() -> None:
     assert scenario["expected_sources"] == 2
 
 
+def test_simple_mana_source_execution_scenario_seeds_tap_support_cost() -> None:
+    rule = {
+        "card_name": "Citanul Stalwart",
+        "logical_rule_key": "battle_rule_v1:citanul-stalwart",
+        "required_effect_fields": {
+            "effect": "ramp_permanent",
+            "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+            "is_mana_source": True,
+            "mana_produced": 1,
+            "produces": "WUBRG",
+            "mana_activation_requires_tap": True,
+            "mana_source_requires_untapped_artifact_or_creature": True,
+            "mana_activation_tap_support_count": 1,
+            "mana_activation_tap_support_type": "artifact_or_creature",
+            "mana_source_support_can_include_source": False,
+        },
+    }
+
+    scenario = builder.simple_mana_source_execution_scenario_from_expected_rule(rule)
+
+    assert scenario["type"] == "simple_mana_source_refresh"
+    assert scenario["controller_battlefield"] == [
+        {
+            "name": "E2E Untapped Support Artifact 1",
+            "type_line": "Artifact",
+            "tapped": False,
+        }
+    ]
+    assert scenario["expected_support_tapped_count"] == 1
+    assert scenario["expected_support_tapped_names"] == ["E2E Untapped Support Artifact 1"]
+    assert scenario["expected_sources"] == 1
+    assert scenario["expected_conditional_mana"] == 1
+
+
 def test_simple_mana_source_execution_scenario_pays_life_cost() -> None:
     rule = {
         "card_name": "Phyrexian Lens",

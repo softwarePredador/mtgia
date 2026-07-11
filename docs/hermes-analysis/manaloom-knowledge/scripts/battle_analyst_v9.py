@@ -4352,6 +4352,21 @@ def _has_untapped_mana_support_permanent(
     allow_artifact=False,
     include_source=False,
 ):
+    return _untapped_mana_support_permanent(
+        player,
+        source,
+        allow_artifact=allow_artifact,
+        include_source=include_source,
+    ) is not None
+
+
+def _untapped_mana_support_permanent(
+    player,
+    source,
+    *,
+    allow_artifact=False,
+    include_source=False,
+):
     for permanent in getattr(player, "battlefield", []) or []:
         if not isinstance(permanent, dict):
             continue
@@ -4360,10 +4375,53 @@ def _has_untapped_mana_support_permanent(
         if permanent.get("tapped"):
             continue
         if is_battlefield_creature(permanent):
-            return True
+            return permanent
         if allow_artifact and is_artifact_permanent(permanent):
-            return True
-    return False
+            return permanent
+    return None
+
+
+def _mana_source_support_can_include_source(source):
+    if not isinstance(source, dict):
+        return False
+    if "mana_source_support_can_include_source" in source:
+        return bool(source.get("mana_source_support_can_include_source"))
+    return not bool(
+        source.get("mana_activation_requires_tap")
+        or source.get("activation_requires_tap")
+    )
+
+
+def _required_mana_support_tap_cost(player, source):
+    if not isinstance(source, dict):
+        return None, None
+    support_count = int(source.get("mana_activation_tap_support_count") or 0)
+    if support_count <= 0 and (
+        source.get("mana_source_requires_untapped_creature")
+        or source.get("mana_source_requires_untapped_artifact_or_creature")
+    ):
+        support_count = 1
+    if support_count <= 0:
+        return None, None
+    if support_count != 1:
+        return None, "unsupported_tap_support_count"
+    if source.get("mana_source_requires_untapped_creature"):
+        support = _untapped_mana_support_permanent(
+            player,
+            source,
+            allow_artifact=False,
+            include_source=False,
+        )
+        return support, "creature"
+    if source.get("mana_source_requires_untapped_artifact_or_creature"):
+        support = _untapped_mana_support_permanent(
+            player,
+            source,
+            allow_artifact=True,
+            include_source=_mana_source_support_can_include_source(source),
+        )
+        return support, "artifact_or_creature"
+    return None, None
 
 
 def mana_source_colors_for_state(player, source):
@@ -6289,7 +6347,7 @@ def mana_source_production_for_state(player, source):
             player,
             source,
             allow_artifact=True,
-            include_source=True,
+            include_source=_mana_source_support_can_include_source(source),
         )
     ):
         return 0
@@ -6606,6 +6664,29 @@ def pay_mana_source_activation_costs(player, source, turn=None):
                 **replay_rule_fields(source),
             )
             return False
+    support_to_tap, support_type_or_error = _required_mana_support_tap_cost(player, source)
+    if support_type_or_error == "unsupported_tap_support_count":
+        emit_replay_event(
+            "mana_source_activation_skipped",
+            player=getattr(player, "name", "?"),
+            card=source.get("name", "?"),
+            reason="unsupported_tap_support_count",
+            mana_activation_tap_support_count=source.get("mana_activation_tap_support_count"),
+            turn=turn,
+            **replay_rule_fields(source),
+        )
+        return False
+    if support_type_or_error and support_to_tap is None:
+        emit_replay_event(
+            "mana_source_activation_skipped",
+            player=getattr(player, "name", "?"),
+            card=source.get("name", "?"),
+            reason="missing_untapped_support_permanent",
+            mana_activation_tap_support_type=support_type_or_error,
+            turn=turn,
+            **replay_rule_fields(source),
+        )
+        return False
     activation_mana_cost = source.get("activation_mana_cost")
     if activation_mana_cost:
         if not player.can_pay(activation_mana_cost):
@@ -6772,6 +6853,17 @@ def pay_mana_source_activation_costs(player, source, turn=None):
                 if isinstance(card, dict)
             ],
             discard_replacement_used=bool(discard_resolution.get("used_replacement")),
+            turn=turn,
+            **replay_rule_fields(source),
+        )
+    if support_to_tap is not None:
+        support_to_tap["tapped"] = True
+        emit_replay_event(
+            "mana_source_support_tapped",
+            player=getattr(player, "name", "?"),
+            card=source.get("name", "?"),
+            support=support_to_tap.get("name", "?"),
+            support_type=support_type_or_error,
             turn=turn,
             **replay_rule_fields(source),
         )
@@ -11312,6 +11404,8 @@ class Player:
         )
         active_sources = 0
         for source in sources:
+            if isinstance(source, dict) and source.get("tapped"):
+                continue
             produced = mana_source_production_for_state(self, source)
             if produced <= 0:
                 continue
@@ -37677,6 +37771,26 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
     ]
     if phase == "postcombat_main":
         for permanent in self_counter_permanents:
+            effect_data = activated_self_add_counters_effect_for_permanent(permanent)
+            if (
+                effect_data
+                and effect_data.get("activation_requires_tap")
+                and is_battlefield_creature(permanent)
+                and permanent.get("summoning_sick")
+                and not has_haste(permanent)
+            ):
+                emit_replay_event(
+                    "activated_ability_skipped",
+                    player=player.name,
+                    card=permanent.get("name", "?"),
+                    activation_kind="simple_activated_add_counters_self",
+                    reason="summoning_sick",
+                    strategic_guardrail_reason="creature_summoning_sick_for_activated_add_counters",
+                    phase=phase,
+                    turn=turn,
+                    **replay_rule_fields(effect_data),
+                )
+                continue
             if activate_generic_add_counters_self_permanent(
                 player,
                 permanent,
@@ -50013,14 +50127,20 @@ def _activated_rule_effects_for_permanent(permanent):
         ):
             add_counters_effect[key] = permanent.get(key)
         effects.append(add_counters_effect)
+    flat_activated_scope = permanent.get("activated_battle_model_scope") or permanent.get(
+        "battle_model_scope"
+    )
+    flat_activated_effect = permanent.get("activated_effect") or (
+        "add_counters" if permanent.get("activated_add_counters") else None
+    )
     if (
-        permanent.get("activated_effect") == "add_counters"
-        and permanent.get("activated_battle_model_scope") == SIMPLE_ACTIVATED_SELF_ADD_COUNTERS_SCOPE
+        flat_activated_effect == "add_counters"
+        and flat_activated_scope == SIMPLE_ACTIVATED_SELF_ADD_COUNTERS_SCOPE
         and str(permanent.get("activated_add_counters_target") or permanent.get("target") or "self").lower() == "self"
     ):
         self_add_counters_effect = {
             "effect": permanent.get("effect") or "creature",
-            "battle_model_scope": permanent.get("activated_battle_model_scope"),
+            "battle_model_scope": flat_activated_scope,
             "ability_kind": "activated",
             "activated_effect": "add_counters",
             "activated_add_counters": bool(permanent.get("activated_add_counters")),
@@ -53171,6 +53291,8 @@ def activate_generic_add_counters_self_permanent(player, permanent, turn, rng, *
     sacrificed_cost_targets = []
     if sacrifice_candidates:
         sacrificed_cost_targets = _sacrifice_activation_cost_candidates(player, sacrifice_candidates, turn)
+    permanent["utility_artifact_used_this_turn"] = True
+    permanent["activated_add_counters_used_this_turn"] = True
     activation_cost_generic = int(effect_data.get("activation_cost_generic") or 0)
     activation_cost_colors = list(effect_data.get("activation_cost_colors") or [])
     mana_paid = activation_cost_generic + len(activation_cost_colors)
@@ -53277,6 +53399,21 @@ def activate_generic_add_counters_self_permanent(player, permanent, turn, rng, *
         phase=phase,
         extra_event_fields={"activation_kind": "simple_activated_add_counters_self"},
     )
+    if resolved:
+        emit_replay_event(
+            "utility_permanent_activated",
+            player=player.name,
+            card=permanent.get("name", "?"),
+            activation_kind="simple_activated_add_counters_self",
+            effect="add_counters",
+            counter_type=counter_type,
+            counters_added=counter_count,
+            result="counters_added",
+            target=permanent.get("name", "?"),
+            phase=phase,
+            turn=turn,
+            **fields,
+        )
     return bool(resolved)
 
 

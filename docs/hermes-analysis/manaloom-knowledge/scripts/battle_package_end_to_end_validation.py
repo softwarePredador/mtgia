@@ -4937,6 +4937,41 @@ def run_simple_mana_source_refresh(
     expected_tapped = bool(scenario.get("expected_tapped"))
     if bool(source.get("tapped")) != expected_tapped:
         fail("battle_execution", f"{card['name']} tapped={source.get('tapped')!r}")
+    expected_support_tapped_names = sorted(
+        str(value)
+        for value in (scenario.get("expected_support_tapped_names") or [])
+        if str(value)
+    )
+    if expected_support_tapped_names:
+        actual_support_tapped_names = sorted(
+            str(permanent.get("name") or "")
+            for permanent in active.battlefield
+            if isinstance(permanent, dict)
+            and permanent is not source
+            and permanent.get("tapped")
+            and str(permanent.get("name") or "") in expected_support_tapped_names
+        )
+        if actual_support_tapped_names != expected_support_tapped_names:
+            fail(
+                "battle_execution",
+                f"{card['name']} tapped support={actual_support_tapped_names}, "
+                f"expected {expected_support_tapped_names}",
+            )
+    expected_support_tapped_count = int(scenario.get("expected_support_tapped_count") or 0)
+    if expected_support_tapped_count and not expected_support_tapped_names:
+        actual_support_tapped_count = sum(
+            1
+            for permanent in active.battlefield
+            if isinstance(permanent, dict)
+            and permanent is not source
+            and permanent.get("tapped")
+        )
+        if actual_support_tapped_count != expected_support_tapped_count:
+            fail(
+                "battle_execution",
+                f"{card['name']} tapped support count={actual_support_tapped_count}, "
+                f"expected {expected_support_tapped_count}",
+            )
     expected_conditional = int(scenario.get("expected_conditional_mana") or 0)
     conditional_total = sum(
         int(item.get("amount") or 0)
@@ -5144,6 +5179,18 @@ def run_simple_mana_source_refresh(
                 f"{card['name']} life_gained={gain_event.get('life_gained')}, "
                 f"expected {expected_activation_life_gain}",
             )
+    if expected_support_tapped_count:
+        support_event = next(
+            (
+                data
+                for replay_event, data in events[before_events:]
+                if replay_event == "mana_source_support_tapped"
+                and data.get("card") == card.get("name")
+            ),
+            None,
+        )
+        if support_event is None:
+            fail("battle_events", f"missing {card['name']} mana-source support tap event")
     return {
         "scenario": scenario.get("name"),
         "card_name": card["name"],
@@ -5155,6 +5202,7 @@ def run_simple_mana_source_refresh(
         "life_paid": expected_life_paid,
         "discarded_count": expected_discard_count,
         "mana_activation_life_gain": expected_activation_life_gain,
+        "support_tapped_count": expected_support_tapped_count,
         "life_after_refresh": active.life,
         "conditional_life_loss_by_color": expected_life_loss_by_color,
     }

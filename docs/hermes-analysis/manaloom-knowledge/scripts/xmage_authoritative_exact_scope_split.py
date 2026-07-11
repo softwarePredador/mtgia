@@ -23929,6 +23929,7 @@ def simple_mana_source_costs_from_phrase(cost_phrase: str) -> dict[str, Any] | N
     activation_life_cost = 0
     activation_discard_count = 0
     activation_discard_target: str | None = None
+    tap_support_type: str | None = None
     tokens = [
         re.sub(r"\s+", " ", token.strip().lower())
         for token in str(cost_phrase or "").split(",")
@@ -23947,6 +23948,12 @@ def simple_mana_source_costs_from_phrase(cost_phrase: str) -> dict[str, Any] | N
         if token == "discard a card":
             activation_discard_count += 1
             activation_discard_target = "any_card"
+            continue
+        if token == "tap an untapped creature you control":
+            tap_support_type = "creature"
+            continue
+        if token == "tap an untapped artifact or creature you control":
+            tap_support_type = "artifact_or_creature"
             continue
         if re.fullmatch(r"(?:\{[0-9wubrgc]+\})+", token):
             activation_symbols.extend(
@@ -23967,6 +23974,14 @@ def simple_mana_source_costs_from_phrase(cost_phrase: str) -> dict[str, Any] | N
         detail["activation_discard_count"] = activation_discard_count
         detail["activation_discard_target"] = activation_discard_target or "any_card"
         detail["activation_requires_discard_card"] = True
+    if tap_support_type:
+        detail["mana_activation_tap_support_count"] = 1
+        detail["mana_activation_tap_support_type"] = tap_support_type
+        detail["mana_source_support_can_include_source"] = False
+        if tap_support_type == "creature":
+            detail["mana_source_requires_untapped_creature"] = True
+        else:
+            detail["mana_source_requires_untapped_artifact_or_creature"] = True
     return detail
 
 
@@ -24031,6 +24046,11 @@ def simple_mana_source_detail_from_line(text: str) -> dict[str, Any] | None:
         unsupported_tokens.discard("pay ")
     if re.search(r"(?:^|,\s*)discard a card(?=:)", working_text):
         unsupported_tokens.discard("discard")
+    if re.search(
+        r"(?:^|,\s*)tap an untapped (?:creature|artifact or creature) you control(?=:)",
+        working_text,
+    ):
+        unsupported_tokens.discard("tap an untapped")
     if any(token in working_text for token in unsupported_tokens):
         return None
     activation_limit_per_turn = None
@@ -24038,9 +24058,13 @@ def simple_mana_source_detail_from_line(text: str) -> dict[str, Any] | None:
     if working_text.endswith(once_each_turn_suffix):
         activation_limit_per_turn = 1
         working_text = working_text[: -len(once_each_turn_suffix)].strip().rstrip(".") + "."
-    if re.search(r"(?:^|,\s*)pay \d+ life(?=[:,])", working_text) or re.search(
-        r"(?:^|,\s*)discard a card(?=:)",
-        working_text,
+    if (
+        re.search(r"(?:^|,\s*)pay \d+ life(?=[:,])", working_text)
+        or re.search(r"(?:^|,\s*)discard a card(?=:)", working_text)
+        or re.search(
+            r"(?:^|,\s*)tap an untapped (?:creature|artifact or creature) you control(?=:)",
+            working_text,
+        )
     ):
         generic_detail = simple_mana_source_detail_from_generic_line(
             working_text,
@@ -25462,10 +25486,57 @@ def add_mana_source_activation_detail_fields(
         "activation_requires_discard_card",
         "activation_discard_random",
         "activation_limit_per_turn",
+        "mana_activation_tap_support_count",
+        "mana_activation_tap_support_type",
+        "mana_source_requires_untapped_creature",
+        "mana_source_requires_untapped_artifact_or_creature",
     ):
         value = mana_source_detail.get(key)
         if value not in (None, "", 0, False):
             effect_json[key] = value
+    if "mana_source_support_can_include_source" in mana_source_detail:
+        effect_json["mana_source_support_can_include_source"] = bool(
+            mana_source_detail.get("mana_source_support_can_include_source")
+        )
+
+
+def mana_source_support_cost_source_blocker(
+    source_text: str,
+    mana_source_detail: dict[str, Any],
+) -> str | None:
+    support_count = int(mana_source_detail.get("mana_activation_tap_support_count") or 0)
+    if support_count <= 0:
+        return None
+    if support_count != 1:
+        return "mana_source_tap_support_count_not_supported"
+    support_type = str(mana_source_detail.get("mana_activation_tap_support_type") or "")
+    text = source_text or ""
+    if "TapTargetCost" not in text:
+        return "mana_source_tap_support_cost_missing"
+    if re.search(r"TargetControlledPermanent\s*\(\s*2\s*,", text):
+        return "mana_source_tap_support_count_not_supported"
+    if support_type == "creature":
+        if "CardType.ARTIFACT.getPredicate()" in text:
+            return "mana_source_tap_support_type_mismatch"
+        if (
+            "FILTER_CONTROLLED_UNTAPPED_CREATURE" in text
+            or (
+                "FilterControlledCreaturePermanent" in text
+                and "TappedPredicate.UNTAPPED" in text
+            )
+        ):
+            return None
+        return "mana_source_tap_support_creature_filter_missing"
+    if support_type == "artifact_or_creature":
+        if "TappedPredicate.UNTAPPED" not in text:
+            return "mana_source_tap_support_untapped_filter_missing"
+        if (
+            "CardType.ARTIFACT.getPredicate()" in text
+            and "CardType.CREATURE.getPredicate()" in text
+        ):
+            return None
+        return "mana_source_tap_support_artifact_or_creature_filter_missing"
+    return "mana_source_tap_support_type_not_supported"
 
 
 def simple_mana_source_source_blocker(
@@ -25541,6 +25612,12 @@ def simple_mana_source_source_blocker(
     elif expected_life_cost:
         return "mana_source_source_pay_life_cost_missing"
     if mana_source_detail is not None:
+        support_blocker = mana_source_support_cost_source_blocker(
+            text,
+            mana_source_detail,
+        )
+        if support_blocker:
+            return support_blocker
         requires_tap = bool(mana_source_detail.get("mana_activation_requires_tap", True))
         if "TapSourceCost" in text and not requires_tap:
             return "mana_source_source_oracle_tap_mismatch"

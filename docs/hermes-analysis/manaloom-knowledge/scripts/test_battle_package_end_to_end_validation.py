@@ -4609,6 +4609,63 @@ def test_simple_mana_source_refresh_runner_executes_partial_mana_rule() -> None:
     assert result["tapped"] is True
 
 
+def test_simple_mana_source_refresh_runner_validates_tap_support_cost() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "ramp_permanent",
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "is_mana_source": True,
+        "mana_produced": 1,
+        "produces": "WUBRG",
+        "mana_activation_requires_tap": True,
+        "mana_source_requires_untapped_artifact_or_creature": True,
+        "mana_activation_tap_support_count": 1,
+        "mana_activation_tap_support_type": "artifact_or_creature",
+        "mana_source_support_can_include_source": False,
+        "_rule_logical_key": "battle_rule_v1:citanul",
+    }
+    try:
+        result = validator.run_simple_mana_source_refresh(
+            battle,
+            {
+                "name": "Citanul Stalwart refreshes modeled support-cost mana source",
+                "type": "simple_mana_source_refresh",
+                "card": {"name": "Citanul Stalwart"},
+                "type_line": "Creature - Elf Druid",
+                "controller_battlefield": [
+                    {
+                        "name": "E2E Untapped Support Artifact 1",
+                        "type_line": "Artifact",
+                        "tapped": False,
+                    }
+                ],
+                "expected_available_mana_after_refresh": 1,
+                "expected_tapped": True,
+                "expected_sources": 1,
+                "expected_conditional_mana": 1,
+                "expected_support_tapped_count": 1,
+                "expected_support_tapped_names": ["E2E Untapped Support Artifact 1"],
+                "logical_rule_key": "battle_rule_v1:citanul",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Citanul Stalwart"
+    assert result["support_tapped_count"] == 1
+    assert any(
+        event == "mana_source_support_tapped"
+        and data.get("support") == "E2E Untapped Support Artifact 1"
+        for event, data in events
+    )
+
+
 def test_simple_mana_source_refresh_runner_pays_discard_cost() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

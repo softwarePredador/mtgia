@@ -15701,6 +15701,83 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["produces"], "WUBRG")
         self.assertEqual(effect["permanent_type"], "creature")
 
+    def test_creature_mana_source_taps_untapped_artifact_or_creature_support(self) -> None:
+        row = queue_row(
+            split.RAMP_CREATURE_UNIT,
+            effect_classes=["AddManaOfAnyColorEffect"],
+            ability_kind="activated",
+            ability_classes=["AnyColorManaAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Citanul Stalwart",
+                type_line="Creature - Elf Druid Soldier",
+                oracle_text=(
+                    "{T}, Tap an untapped artifact or creature you control: "
+                    "Add one mana of any color."
+                ),
+            ),
+            source_text="""
+                FilterControlledPermanent filter = new FilterControlledPermanent(
+                    "an untapped artifact or creature you control");
+                filter.add(TappedPredicate.UNTAPPED);
+                filter.add(Predicates.or(
+                    CardType.ARTIFACT.getPredicate(),
+                    CardType.CREATURE.getPredicate()));
+                Ability ability = new AnyColorManaAbility();
+                ability.addCost(new TapTargetCost(new TargetControlledPermanent(filter)));
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.MANA_SCOPE)
+        self.assertEqual(effect["produces"], "WUBRG")
+        self.assertTrue(effect["mana_activation_requires_tap"])
+        self.assertTrue(effect["mana_source_requires_untapped_artifact_or_creature"])
+        self.assertEqual(effect["mana_activation_tap_support_count"], 1)
+        self.assertEqual(effect["mana_activation_tap_support_type"], "artifact_or_creature")
+        self.assertFalse(effect["mana_source_support_can_include_source"])
+
+    def test_creature_mana_source_taps_untapped_creature_support(self) -> None:
+        row = queue_row(
+            split.RAMP_CREATURE_UNIT,
+            effect_classes=["AddManaOfAnyColorEffect"],
+            ability_kind="activated",
+            ability_classes=["AnyColorManaAbility", "ReachAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Jaspera Sentinel",
+                type_line="Creature - Elf Rogue",
+                oracle_text=(
+                    "Reach\n"
+                    "{T}, Tap an untapped creature you control: Add one mana of any color."
+                ),
+            ),
+            source_text="""
+                this.addAbility(ReachAbility.getInstance());
+                Ability ability = new AnyColorManaAbility();
+                ability.addCost(new TapTargetCost(
+                    new TargetControlledPermanent(
+                        StaticFilters.FILTER_CONTROLLED_UNTAPPED_CREATURE)));
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.MANA_SCOPE)
+        self.assertEqual(effect["produces"], "WUBRG")
+        self.assertTrue(effect["mana_source_requires_untapped_creature"])
+        self.assertEqual(effect["mana_activation_tap_support_count"], 1)
+        self.assertEqual(effect["mana_activation_tap_support_type"], "creature")
+        self.assertFalse(effect["mana_source_support_can_include_source"])
+        self.assertEqual(effect["keywords"], ["reach"])
+
     def test_any_color_mana_rock_alias_maps_to_simple_mana_source(self) -> None:
         row = queue_row(
             split.RAMP_ANY_COLOR_MANA_ROCK_UNIT,
@@ -17292,7 +17369,10 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         )
 
         self.assertIsNone(proposal)
-        self.assertEqual(reason, "mana_source_effect_class_not_simple")
+        self.assertEqual(
+            reason,
+            "controlled_creature_condition_conditional_mana_source_pattern_not_supported",
+        )
 
     def test_conditional_mana_source_stays_blocked(self) -> None:
         row = queue_row(
