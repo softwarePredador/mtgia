@@ -333,6 +333,7 @@ MANA_SCOPE = "xmage_simple_tap_mana_source_permanent_v1"
 RESTRICTED_MANA_SCOPE = "xmage_simple_tap_restricted_mana_source_permanent_v1"
 LAND_COLOR_DEPENDENT_MANA_SCOPE = "xmage_simple_tap_land_color_dependent_mana_source_permanent_v1"
 DYNAMIC_FIXED_COLOR_MANA_SCOPE = "xmage_fixed_color_dynamic_mana_source_permanent_v1"
+CONTROLLED_CREATURE_CONDITION_CONDITIONAL_MANA_SCOPE = "xmage_controlled_creature_condition_conditional_mana_source_permanent_v1"
 PAIN_TALISMAN_SCOPE = "pain_talisman_color_pair_partial_v1"
 MANA_WITH_ACTIVATION_LIFE_GAIN_SCOPE = "xmage_simple_tap_mana_source_with_gain_life_v1"
 MANA_WITH_ACTIVATED_DRAW_SCOPE = "xmage_simple_tap_mana_source_with_activated_draw_v1"
@@ -24114,6 +24115,150 @@ def fixed_color_dynamic_mana_source_detail_from_source(
     return detail
 
 
+def controlled_creature_condition_conditional_mana_source_detail_from_oracle(
+    metadata: dict[str, Any],
+) -> dict[str, Any] | str | None:
+    candidates: list[dict[str, Any]] = []
+    type_line = str(metadata.get("type_line") or "")
+    mana_cost = str(metadata.get("mana_cost") or "")
+    for line in normalized_oracle_lines(metadata):
+        normalized = strip_parenthetical_reminders(
+            re.sub(r"\s+", " ", str(line or "").strip().lower())
+        ).strip().rstrip(".")
+        match = re.fullmatch(
+            r"\{t\}: add \{(?P<symbol>[wubrg])\}\. if you control a creature with power (?P<threshold>\d+) or greater, add \{(?P=symbol)\}\{(?P=symbol)\} instead",
+            normalized,
+        )
+        if match:
+            symbol = match.group("symbol").upper()
+            candidates.append(
+                {
+                    "produces": symbol,
+                    "mana_produced": 1,
+                    "produced_mana_symbols": [symbol, symbol],
+                    "conditional_mana_controlled_creature_power_gte": int(match.group("threshold")),
+                    "conditional_mana_produced_when_condition_met": 2,
+                    "mana_activation_requires_tap": True,
+                    "source_type_line": type_line,
+                    "source_mana_cost": mana_cost,
+                }
+            )
+            continue
+        match = re.fullmatch(
+            r"\{t\}: add \{(?P<symbol>[wubrg])\}\. if you control (?P<count>\w+) or more creatures, add \{(?P=symbol)\}\{(?P=symbol)\} instead",
+            normalized,
+        )
+        word_numbers = {
+            "one": 1,
+            "two": 2,
+            "three": 3,
+            "four": 4,
+            "five": 5,
+            "six": 6,
+            "seven": 7,
+            "eight": 8,
+            "nine": 9,
+            "ten": 10,
+        }
+        if match and match.group("count") in word_numbers:
+            symbol = match.group("symbol").upper()
+            candidates.append(
+                {
+                    "produces": symbol,
+                    "mana_produced": 1,
+                    "produced_mana_symbols": [symbol, symbol],
+                    "conditional_mana_controlled_creature_count_gte": word_numbers[match.group("count")],
+                    "conditional_mana_produced_when_condition_met": 2,
+                    "mana_activation_requires_tap": True,
+                    "source_type_line": type_line,
+                    "source_mana_cost": mana_cost,
+                }
+            )
+            continue
+        match = re.fullmatch(
+            r"\{t\}: add one mana of any color\. if you control a creature with power (?P<threshold>\d+) or greater, add two mana of any one color instead",
+            normalized,
+        )
+        if match:
+            candidates.append(
+                {
+                    "produces": "WUBRG",
+                    "mana_produced": 1,
+                    "conditional_mana_controlled_creature_power_gte": int(match.group("threshold")),
+                    "conditional_mana_produced_when_condition_met": 2,
+                    "conditional_mana_same_color_choice": True,
+                    "conditional_mana_modes_status": "runtime_executor_v1",
+                    "conditional_mana_modes": [
+                        {
+                            "color": symbol,
+                            "restriction": "any_spell",
+                            "mode": "controlled_creature_power_gte",
+                            "status": "runtime_executor_v1",
+                        }
+                        for symbol in "WUBRG"
+                    ],
+                    "mana_activation_requires_tap": True,
+                    "source_type_line": type_line,
+                    "source_mana_cost": mana_cost,
+                }
+            )
+    if len(candidates) == 1:
+        return candidates[0]
+    return None
+
+
+def controlled_creature_condition_conditional_mana_source_detail_from_source(
+    source_text: str,
+    mana_ability_classes: set[str],
+) -> dict[str, Any] | str | None:
+    text = source_text or ""
+    if "ConditionalManaEffect" not in text:
+        return None
+    if mana_ability_classes != {"SimpleManaAbility"}:
+        return "controlled_creature_condition_conditional_mana_ability_class_not_exact"
+    if "FerociousCondition.instance" in text:
+        if (
+            "AddManaOfAnyColorEffect(2)" in text
+            and "AddManaOfAnyColorEffect(1)" in text
+        ):
+            return {
+                "produces": "WUBRG",
+                "mana_produced": 1,
+                "conditional_mana_controlled_creature_power_gte": 4,
+                "conditional_mana_produced_when_condition_met": 2,
+                "conditional_mana_same_color_choice": True,
+                "mana_activation_requires_tap": True,
+            }
+        if (
+            "BasicManaEffect(Mana.GreenMana(2))" in text
+            and "BasicManaEffect(Mana.GreenMana(1))" in text
+        ):
+            return {
+                "produces": "G",
+                "mana_produced": 1,
+                "produced_mana_symbols": ["G", "G"],
+                "conditional_mana_controlled_creature_power_gte": 4,
+                "conditional_mana_produced_when_condition_met": 2,
+                "mana_activation_requires_tap": True,
+            }
+    if (
+        "PermanentsOnTheBattlefieldCondition" in text
+        and "StaticFilters.FILTER_CONTROLLED_CREATURE" in text
+        and "ComparisonType.MORE_THAN, 3" in text
+        and "BasicManaEffect(Mana.GreenMana(2))" in text
+        and "BasicManaEffect(Mana.GreenMana(1))" in text
+    ):
+        return {
+            "produces": "G",
+            "mana_produced": 1,
+            "produced_mana_symbols": ["G", "G"],
+            "conditional_mana_controlled_creature_count_gte": 4,
+            "conditional_mana_produced_when_condition_met": 2,
+            "mana_activation_requires_tap": True,
+        }
+    return "controlled_creature_condition_conditional_mana_source_pattern_not_supported"
+
+
 def sacrifice_mana_source_detail_from_line(text: str) -> dict[str, Any] | None:
     normalized = strip_parenthetical_reminders(re.sub(r"\s+", " ", str(text or "").strip().lower())).strip()
     prefix_match = re.match(
@@ -37843,6 +37988,70 @@ def split_row(
                 metadata,
                 effect_json,
                 family_id="xmage_fixed_color_dynamic_mana_source",
+            ), "selected_exact_scope"
+        controlled_creature_condition_conditional_mana = controlled_creature_condition_conditional_mana_source_detail_from_oracle(metadata)
+        if controlled_creature_condition_conditional_mana is not None:
+            source_controlled_creature_condition_conditional_mana = controlled_creature_condition_conditional_mana_source_detail_from_source(
+                source_text,
+                mana_ability_classes,
+            )
+            if isinstance(source_controlled_creature_condition_conditional_mana, str):
+                return None, source_controlled_creature_condition_conditional_mana
+            if source_controlled_creature_condition_conditional_mana is None:
+                return None, "controlled_creature_condition_conditional_mana_source_source_not_supported"
+            for key in (
+                "produces",
+                "mana_produced",
+                "produced_mana_symbols",
+                "conditional_mana_controlled_creature_power_gte",
+                "conditional_mana_controlled_creature_count_gte",
+                "conditional_mana_produced_when_condition_met",
+                "conditional_mana_same_color_choice",
+                "mana_activation_requires_tap",
+            ):
+                if source_controlled_creature_condition_conditional_mana.get(key) != controlled_creature_condition_conditional_mana.get(key):
+                    return None, f"controlled_creature_condition_conditional_mana_source_source_oracle_{key}_mismatch"
+            type_line = str(metadata.get("type_line") or "")
+            effect_json = {
+                "effect": "ramp_permanent",
+                "battle_model_scope": CONTROLLED_CREATURE_CONDITION_CONDITIONAL_MANA_SCOPE,
+                "is_mana_source": True,
+                "mana_produced": int(controlled_creature_condition_conditional_mana["mana_produced"]),
+                "produces": str(controlled_creature_condition_conditional_mana["produces"]),
+                "mana_activation_requires_tap": True,
+                "activation_requires_tap": True,
+                "permanent_type": (
+                    "creature"
+                    if "creature" in type_line.lower()
+                    else "artifact"
+                    if "artifact" in type_line.lower()
+                    else "permanent"
+                ),
+                "ability_kind": "activated_mana",
+                "conditional_mana_produced_when_condition_met": int(
+                    controlled_creature_condition_conditional_mana["conditional_mana_produced_when_condition_met"]
+                ),
+                "source_type_line": type_line,
+                "source_mana_cost": str(metadata.get("mana_cost") or ""),
+                "xmage_mana_ability_classes": ["SimpleManaAbility"],
+                "xmage_effect_classes": sorted(classes),
+                "xmage_ability_classes": sorted(mana_ability_classes),
+            }
+            for optional_key in (
+                "produced_mana_symbols",
+                "conditional_mana_controlled_creature_power_gte",
+                "conditional_mana_controlled_creature_count_gte",
+                "conditional_mana_same_color_choice",
+                "conditional_mana_modes",
+                "conditional_mana_modes_status",
+            ):
+                if controlled_creature_condition_conditional_mana.get(optional_key) not in (None, "", []):
+                    effect_json[optional_key] = controlled_creature_condition_conditional_mana[optional_key]
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_controlled_creature_condition_conditional_mana_source",
             ), "selected_exact_scope"
         limited_choice_mana_source = limited_times_color_choice_mana_source_from_source(source_text)
         if isinstance(limited_choice_mana_source, str):

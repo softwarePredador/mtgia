@@ -17263,6 +17263,91 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                 for key, value in expected_fields.items():
                     self.assertEqual(effect[key], value)
 
+    def test_controlled_creature_condition_conditional_mana_source_maps_exact_scope(self) -> None:
+        fixtures = [
+            (
+                "Leafkin Druid",
+                "{T}: Add {G}. If you control four or more creatures, add {G}{G} instead.",
+                "private static final Condition condition = new PermanentsOnTheBattlefieldCondition(\n"
+                "StaticFilters.FILTER_CONTROLLED_CREATURE, ComparisonType.MORE_THAN, 3);\n"
+                "this.addAbility(new SimpleManaAbility(Zone.BATTLEFIELD, new ConditionalManaEffect(\n"
+                "new BasicManaEffect(Mana.GreenMana(2)), new BasicManaEffect(Mana.GreenMana(1)), condition, \"\"), new TapSourceCost()));",
+                {
+                    "produces": "G",
+                    "produced_mana_symbols": ["G", "G"],
+                    "condition_field": "conditional_mana_controlled_creature_count_gte",
+                    "conditional_mana_same_color_choice": None,
+                },
+            ),
+            (
+                "Raucous Audience",
+                "{T}: Add {G}. If you control a creature with power 4 or greater, add {G}{G} instead.",
+                "this.addAbility(new SimpleManaAbility(new ConditionalManaEffect(\n"
+                "new BasicManaEffect(Mana.GreenMana(2)), new BasicManaEffect(Mana.GreenMana(1)),\n"
+                "FerociousCondition.instance, \"\"), new TapSourceCost()));",
+                {
+                    "produces": "G",
+                    "produced_mana_symbols": ["G", "G"],
+                    "condition_field": "conditional_mana_controlled_creature_power_gte",
+                    "conditional_mana_same_color_choice": None,
+                },
+            ),
+            (
+                "Ilysian Caryatid",
+                "{T}: Add one mana of any color. If you control a creature with power 4 or greater, add two mana of any one color instead.",
+                "this.addAbility(new SimpleManaAbility(Zone.BATTLEFIELD,\n"
+                "new ConditionalManaEffect(new AddManaOfAnyColorEffect(2), new AddManaOfAnyColorEffect(1),\n"
+                "FerociousCondition.instance, \"\"), new TapSourceCost()));",
+                {
+                    "produces": "WUBRG",
+                    "produced_mana_symbols": None,
+                    "condition_field": "conditional_mana_controlled_creature_power_gte",
+                    "conditional_mana_same_color_choice": True,
+                },
+            ),
+        ]
+        for name, oracle_text, source_text, expected_fields in fixtures:
+            with self.subTest(name=name):
+                row = queue_row(
+                    split.RAMP_CREATURE_UNIT,
+                    effect_classes=["BasicManaEffect", "ConditionalManaEffect"],
+                    ability_kind="activated",
+                    ability_classes=["SimpleManaAbility"],
+                )
+                proposal, reason = split.split_row(
+                    row,
+                    metadata(
+                        name=name,
+                        type_line="Creature - Druid",
+                        oracle_text=oracle_text,
+                        mana_cost="{1}{G}",
+                    ),
+                    source_text=source_text,
+                )
+
+                self.assertEqual(reason, "selected_exact_scope")
+                self.assertEqual(
+                    proposal["family_id"],
+                    "xmage_controlled_creature_condition_conditional_mana_source",
+                )
+                effect = proposal["effect_json"]
+                self.assertEqual(effect["battle_model_scope"], split.CONTROLLED_CREATURE_CONDITION_CONDITIONAL_MANA_SCOPE)
+                self.assertEqual(effect["mana_produced"], 1)
+                self.assertEqual(effect[expected_fields["condition_field"]], 4)
+                self.assertEqual(effect["conditional_mana_produced_when_condition_met"], 2)
+                self.assertEqual(effect["produces"], expected_fields["produces"])
+                if expected_fields["produced_mana_symbols"] is None:
+                    self.assertNotIn("produced_mana_symbols", effect)
+                else:
+                    self.assertEqual(effect["produced_mana_symbols"], expected_fields["produced_mana_symbols"])
+                if expected_fields["conditional_mana_same_color_choice"] is None:
+                    self.assertNotIn("conditional_mana_same_color_choice", effect)
+                else:
+                    self.assertEqual(
+                        effect["conditional_mana_same_color_choice"],
+                        expected_fields["conditional_mana_same_color_choice"],
+                    )
+
     def test_counter_target_creature_spell_maps_to_stack_constraints(self) -> None:
         row = queue_row(split.COUNTER_UNIT, effect_classes=["CounterTargetEffect"])
         proposal, reason = split.split_row(

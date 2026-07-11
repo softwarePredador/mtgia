@@ -4569,6 +4569,7 @@ def _conditional_mana_source_entry(source, amount, modes, source_kind):
         "remaining": max(0, int(amount or 0)),
         "modes": available_modes,
         "source_kind": source_kind,
+        "same_color_choice": bool(source.get("conditional_mana_same_color_choice")),
         "rule_fields": replay_rule_fields(source) if isinstance(source, dict) else {},
     }
 
@@ -4709,6 +4710,8 @@ def replay_conditional_mana_source(source):
             for mode in modes
         ],
         "source_kind": source.get("source_kind"),
+        "same_color_choice": bool(source.get("same_color_choice")),
+        "chosen_color": source.get("chosen_color"),
     }
 
 
@@ -6207,6 +6210,45 @@ def _dynamic_mana_source_production_for_state(player, source):
     return 0
 
 
+def _controls_creature_with_power_at_least(player, threshold):
+    minimum = int(threshold or 0)
+    if minimum <= 0:
+        return False
+    for permanent in getattr(player, "battlefield", []) or []:
+        if not isinstance(permanent, dict) or not is_battlefield_creature(permanent):
+            continue
+        try:
+            power = int(float(permanent.get("power") or 0))
+        except (TypeError, ValueError):
+            power = 0
+        if power >= minimum:
+            return True
+    return False
+
+
+def _controlled_creature_count(player):
+    return sum(
+        1
+        for permanent in getattr(player, "battlefield", []) or []
+        if isinstance(permanent, dict) and is_battlefield_creature(permanent)
+    )
+
+
+def _conditional_mana_source_production_for_state(player, source):
+    power_threshold = int(source.get("conditional_mana_controlled_creature_power_gte") or 0)
+    count_threshold = int(source.get("conditional_mana_controlled_creature_count_gte") or 0)
+    if power_threshold <= 0 and count_threshold <= 0:
+        return None
+    condition_met = False
+    if power_threshold > 0:
+        condition_met = _controls_creature_with_power_at_least(player, power_threshold)
+    if count_threshold > 0:
+        condition_met = condition_met or _controlled_creature_count(player) >= count_threshold
+    if condition_met:
+        return int(source.get("conditional_mana_produced_when_condition_met") or source.get("mana_produced") or 0)
+    return int(source.get("mana_produced") or 0)
+
+
 def mana_source_production_for_state(player, source):
     if source == "land":
         return 1
@@ -6267,6 +6309,9 @@ def mana_source_production_for_state(player, source):
     dynamic_produced = _dynamic_mana_source_production_for_state(player, source)
     if dynamic_produced is not None:
         return max(0, int(dynamic_produced or 0))
+    conditional_produced = _conditional_mana_source_production_for_state(player, source)
+    if conditional_produced is not None:
+        return max(0, int(conditional_produced or 0))
     life_payment_divisor = int(source.get("mana_produced_from_life_payment_divisor") or 0)
     if life_payment_divisor > 0:
         return max(0, int(getattr(player, "life", 0) or 0) // life_payment_divisor)
@@ -11358,6 +11403,8 @@ class Player:
             return tag in {"", "any", "any_spell"} or tag in spend_tags
 
         def conditional_modes_for_color(source, color):
+            if source.get("same_color_choice") and source.get("chosen_color") not in (None, "", color):
+                return []
             exact = []
             flexible = []
             for mode in source.get("modes", []) or []:
@@ -11371,10 +11418,12 @@ class Player:
             return exact + flexible
 
         def conditional_modes_for_generic(source):
+            chosen_color = source.get("chosen_color") if source.get("same_color_choice") else None
             modes = [
                 mode
                 for mode in source.get("modes", []) or []
                 if conditional_mode_allowed(mode)
+                and (not chosen_color or str(mode.get("color") or "").strip().lower() == chosen_color)
             ]
             return sorted(modes, key=lambda mode: int(mode.get("life_loss_on_spend") or 0))
 
@@ -11410,6 +11459,8 @@ class Player:
                 paid = min(max_affordable, remaining)
                 if paid <= 0:
                     continue
+                if source.get("same_color_choice"):
+                    source["chosen_color"] = color
                 life_loss = life_loss_per_unit * paid
                 source["remaining"] = source_remaining - paid
                 life_payment += life_loss
@@ -11462,6 +11513,8 @@ class Player:
                 paid = min(max_affordable, remaining)
                 if paid <= 0:
                     continue
+                if source.get("same_color_choice"):
+                    source["chosen_color"] = str(mode.get("color") or "").strip().lower()
                 life_loss = life_loss_per_unit * paid
                 source["remaining"] = source_remaining - paid
                 life_payment += life_loss

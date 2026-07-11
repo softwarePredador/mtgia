@@ -13456,6 +13456,101 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertEqual(active.available_mana(), 4)
         self.assertEqual(active.mana_pool.green, 4)
 
+    def test_controlled_creature_condition_conditional_mana_source_uses_boosted_fixed_green(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        leafkin = self.battle.enrich_card(
+            {
+                "name": "Leafkin Druid",
+                "type_line": "Creature - Elemental Druid",
+                "effect": "ramp_permanent",
+                "battle_model_scope": "xmage_controlled_creature_condition_conditional_mana_source_permanent_v1",
+                "is_mana_source": True,
+                "mana_produced": 1,
+                "produces": "G",
+                "produced_mana_symbols": ["G", "G"],
+                "conditional_mana_controlled_creature_count_gte": 4,
+                "conditional_mana_produced_when_condition_met": 2,
+                "activation_requires_tap": True,
+                "mana_activation_requires_tap": True,
+            }
+        )
+        active.battlefield = [leafkin]
+
+        active.refresh_mana_sources(turn=7)
+
+        self.assertEqual(active.available_mana(), 1)
+        self.assertEqual(active.mana_pool.green, 1)
+
+        active = self.battle.Player("Active", None, [])
+        leafkin = self.battle.enrich_card(dict(leafkin, tapped=False))
+        active.battlefield = [
+            {"name": "Creature One", "type_line": "Creature", "power": 1, "toughness": 1},
+            {"name": "Creature Two", "type_line": "Creature", "power": 1, "toughness": 1},
+            {"name": "Creature Three", "type_line": "Creature", "power": 1, "toughness": 1},
+            leafkin,
+        ]
+
+        active.refresh_mana_sources(turn=8)
+
+        self.assertEqual(active.available_mana(), 2)
+        self.assertEqual(active.mana_pool.green, 2)
+        self.assertTrue(leafkin["tapped"])
+
+    def test_controlled_creature_condition_conditional_mana_source_locks_any_one_color_choice(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        caryatid = self.battle.enrich_card(
+            {
+                "name": "Ilysian Caryatid",
+                "type_line": "Creature - Plant",
+                "effect": "ramp_permanent",
+                "battle_model_scope": "xmage_controlled_creature_condition_conditional_mana_source_permanent_v1",
+                "is_mana_source": True,
+                "mana_produced": 1,
+                "produces": "WUBRG",
+                "conditional_mana_controlled_creature_power_gte": 4,
+                "conditional_mana_produced_when_condition_met": 2,
+                "conditional_mana_same_color_choice": True,
+                "conditional_mana_modes_status": "runtime_executor_v1",
+                "conditional_mana_modes": [
+                    {
+                        "color": symbol,
+                        "restriction": "any_spell",
+                        "mode": "controlled_creature_power_gte",
+                        "status": "runtime_executor_v1",
+                    }
+                    for symbol in "WUBRG"
+                ],
+                "activation_requires_tap": True,
+                "mana_activation_requires_tap": True,
+            }
+        )
+        active.battlefield = [
+            {"name": "Ferocious Bear", "type_line": "Creature - Beast", "power": 4, "toughness": 4},
+            caryatid,
+        ]
+
+        active.refresh_mana_sources(turn=7)
+
+        self.assertEqual(active.mana_pool.total(), 0)
+        self.assertEqual(active.available_mana(), 2)
+        self.assertTrue(
+            active.can_pay_card(
+                {"name": "Double Red Spell", "type_line": "Sorcery", "mana_cost": "{R}{R}", "cmc": 2}
+            )
+        )
+        self.assertFalse(
+            active.can_pay_card(
+                {"name": "Split Color Spell", "type_line": "Sorcery", "mana_cost": "{R}{G}", "cmc": 2}
+            )
+        )
+        self.assertTrue(
+            active.spend_card_mana(
+                {"name": "Double Green Spell", "type_line": "Sorcery", "mana_cost": "{G}{G}", "cmc": 2}
+            )
+        )
+        self.assertEqual(active.available_mana(), 0)
+        self.assertEqual(active.conditional_mana_sources, [])
+
     def test_simple_mana_source_permanent_pays_life_cost_on_refresh(self) -> None:
         active = self.battle.Player("Active", None, [])
         lens = self.battle.enrich_card(

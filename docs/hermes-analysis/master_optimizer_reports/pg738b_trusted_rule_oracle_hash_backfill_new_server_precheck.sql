@@ -1,0 +1,89 @@
+WITH affected AS (
+  SELECT
+    r.card_name,
+    r.normalized_name,
+    r.card_id,
+    r.logical_rule_key,
+    r.review_status,
+    r.execution_status,
+    r.source,
+    r.rule_version,
+    r.effect_json->>'effect' AS effect,
+    r.effect_json->>'battle_model_scope' AS battle_model_scope,
+    c.name AS db_card_name,
+    c.oracle_id,
+    md5(coalesce(c.oracle_text, '')) AS computed_oracle_hash,
+    length(coalesce(c.oracle_text, '')) AS oracle_text_length
+  FROM public.card_battle_rules r
+  JOIN public.cards c ON c.id = r.card_id
+  WHERE r.review_status IN ('verified', 'active')
+    AND r.execution_status IN ('auto', 'executable')
+    AND (r.oracle_hash IS NULL OR btrim(r.oracle_hash) = '')
+    AND btrim(coalesce(c.oracle_text, '')) <> ''
+),
+unsafe AS (
+  SELECT
+    r.card_name,
+    r.normalized_name,
+    r.card_id,
+    r.logical_rule_key,
+    r.review_status,
+    r.execution_status,
+    r.source
+  FROM public.card_battle_rules r
+  LEFT JOIN public.cards c ON c.id = r.card_id
+  WHERE r.review_status IN ('verified', 'active')
+    AND r.execution_status IN ('auto', 'executable')
+    AND (r.oracle_hash IS NULL OR btrim(r.oracle_hash) = '')
+    AND (
+      r.card_id IS NULL
+      OR c.id IS NULL
+      OR btrim(coalesce(c.oracle_text, '')) = ''
+    )
+)
+SELECT
+  (SELECT count(*) FROM affected) AS backfillable_rule_rows,
+  (SELECT count(DISTINCT card_id) FROM affected) AS affected_card_ids,
+  (SELECT count(DISTINCT normalized_name) FROM affected) AS affected_normalized_names,
+  (SELECT count(*) FROM unsafe) AS unsafe_missing_hash_rows,
+  (SELECT jsonb_object_agg(review_status, status_count ORDER BY review_status)
+     FROM (
+       SELECT review_status, count(*) AS status_count
+       FROM affected
+       GROUP BY review_status
+     ) status_counts
+  ) AS review_status_counts,
+  (SELECT jsonb_object_agg(source, source_count ORDER BY source)
+     FROM (
+       SELECT source, count(*) AS source_count
+       FROM affected
+       GROUP BY source
+     ) source_counts
+  ) AS source_counts;
+
+WITH affected AS (
+  SELECT
+    r.card_name,
+    r.normalized_name,
+    r.card_id,
+    r.logical_rule_key,
+    r.review_status,
+    r.execution_status,
+    r.source,
+    r.rule_version,
+    r.effect_json->>'effect' AS effect,
+    r.effect_json->>'battle_model_scope' AS battle_model_scope,
+    c.name AS db_card_name,
+    c.oracle_id,
+    md5(coalesce(c.oracle_text, '')) AS computed_oracle_hash,
+    length(coalesce(c.oracle_text, '')) AS oracle_text_length
+  FROM public.card_battle_rules r
+  JOIN public.cards c ON c.id = r.card_id
+  WHERE r.review_status IN ('verified', 'active')
+    AND r.execution_status IN ('auto', 'executable')
+    AND (r.oracle_hash IS NULL OR btrim(r.oracle_hash) = '')
+    AND btrim(coalesce(c.oracle_text, '')) <> ''
+)
+SELECT *
+FROM affected
+ORDER BY card_name, logical_rule_key, source;

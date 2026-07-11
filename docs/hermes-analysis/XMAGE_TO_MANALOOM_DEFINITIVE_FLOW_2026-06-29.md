@@ -746,6 +746,14 @@ patterns:
   color, and source power. "Any one color" dynamic mana and target-sacrifice
   dynamic mana remain blocked until runtime can lock the color choice or model
   the target-sacrifice refresh safely.
+- `ramp_permanent::xmage_creature_mana_source_variant_review_v1` with exact
+  XMage `ConditionalManaEffect`, one `SimpleManaAbility`, no unsupported
+  auxiliary ability, and a controller creature condition currently maps to
+  `xmage_controlled_creature_condition_conditional_mana_source_permanent_v1`.
+  Supported conditions are "control a creature with power 4 or greater" and
+  "control four or more creatures". The runtime refreshes boosted production
+  from current battlefield state and locks "two mana of any one color" to a
+  single chosen color during payment planning.
 - `counter_spell::counter_target_stack_object_variant_v1` ->
   `xmage_counter_target_spell_v1`
 - `bounce::targeted_return_to_hand_variant_v1` ->

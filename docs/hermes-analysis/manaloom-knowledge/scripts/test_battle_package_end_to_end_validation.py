@@ -5764,3 +5764,69 @@ def test_simple_mana_source_runner_validates_fixed_color_dynamic_mana() -> None:
     assert result["card_name"] == "Magus of the Coffers"
     assert result["available_mana"] == 3
     assert result["conditional_mana"] == 0
+
+
+def test_simple_mana_source_runner_validates_controlled_creature_condition_conditional_mana() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "ramp_permanent",
+        "battle_model_scope": "xmage_controlled_creature_condition_conditional_mana_source_permanent_v1",
+        "is_mana_source": True,
+        "mana_produced": 1,
+        "produces": "WUBRG",
+        "mana_activation_requires_tap": True,
+        "activation_requires_tap": True,
+        "conditional_mana_controlled_creature_power_gte": 4,
+        "conditional_mana_produced_when_condition_met": 2,
+        "conditional_mana_same_color_choice": True,
+        "conditional_mana_modes_status": "runtime_executor_v1",
+        "conditional_mana_modes": [
+            {
+                "color": symbol,
+                "restriction": "any_spell",
+                "mode": "controlled_creature_power_gte",
+                "status": "runtime_executor_v1",
+            }
+            for symbol in "WUBRG"
+        ],
+        "_rule_logical_key": "battle_rule_v1:ilysian-caryatid",
+    }
+    try:
+        result = validator.run_simple_mana_source_refresh(
+            battle,
+            {
+                "name": "Ilysian Caryatid refreshes modeled conditional mana source",
+                "type": "simple_mana_source_refresh",
+                "card": {
+                    "name": "Ilysian Caryatid",
+                    "type_line": "Creature - Plant",
+                    "mana_cost": "{1}{G}",
+                },
+                "controller_battlefield": [
+                    {
+                        "name": "E2E Ferocious Creature",
+                        "type_line": "Creature - Beast",
+                        "power": 4,
+                        "toughness": 4,
+                    }
+                ],
+                "expected_available_mana_after_refresh": 2,
+                "expected_conditional_mana": 2,
+                "expected_conditional_restrictions": ["any_spell"],
+                "expected_tapped": True,
+                "expected_sources": 1,
+                "logical_rule_key": "battle_rule_v1:ilysian-caryatid",
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Ilysian Caryatid"
+    assert result["available_mana"] == 2
+    assert result["conditional_mana"] == 2

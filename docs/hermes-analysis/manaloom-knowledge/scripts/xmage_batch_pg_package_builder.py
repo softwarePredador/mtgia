@@ -498,6 +498,10 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "dynamic_mana_battlefield_count_scope",
     "dynamic_mana_battlefield_count_card_types",
     "dynamic_mana_battlefield_count_subtypes",
+    "conditional_mana_controlled_creature_power_gte",
+    "conditional_mana_controlled_creature_count_gte",
+    "conditional_mana_produced_when_condition_met",
+    "conditional_mana_same_color_choice",
     "source_type_line",
     "source_mana_cost",
     "life_for_colored_mana",
@@ -2971,6 +2975,31 @@ def _manifest_dynamic_fixed_mana_fixture(required: dict[str, Any]) -> tuple[dict
     return {}, None
 
 
+def _manifest_controlled_creature_condition_conditional_mana_fixture(required: dict[str, Any]) -> tuple[dict[str, Any], int | None]:
+    power_threshold = int(required.get("conditional_mana_controlled_creature_power_gte") or 0)
+    count_threshold = int(required.get("conditional_mana_controlled_creature_count_gte") or 0)
+    boosted_amount = int(required.get("conditional_mana_produced_when_condition_met") or 0)
+    if (power_threshold <= 0 and count_threshold <= 0) or boosted_amount <= 0:
+        return {}, None
+    if power_threshold > 0:
+        return {
+            "controller_battlefield": [
+                {
+                    "name": "E2E Ferocious Creature",
+                    "type_line": "Creature - Beast",
+                    "power": power_threshold,
+                    "toughness": power_threshold,
+                }
+            ]
+        }, boosted_amount
+    return {
+        "controller_battlefield": [
+            {"name": f"E2E Creature {index + 1}", "type_line": "Creature", "power": 1, "toughness": 1}
+            for index in range(max(0, count_threshold - 1))
+        ]
+    }, boosted_amount
+
+
 def simple_mana_source_execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any] | None:
     required = dict(rule.get("required_effect_fields") or {})
     if required.get("effect") != "ramp_permanent" or not required.get("is_mana_source"):
@@ -2983,6 +3012,7 @@ def simple_mana_source_execution_scenario_from_expected_rule(rule: dict[str, Any
         "xmage_simple_tap_restricted_mana_source_permanent_v1",
         "xmage_simple_tap_land_color_dependent_mana_source_permanent_v1",
         "xmage_fixed_color_dynamic_mana_source_permanent_v1",
+        "xmage_controlled_creature_condition_conditional_mana_source_permanent_v1",
         "pain_talisman_color_pair_partial_v1",
     }:
         return None
@@ -2990,7 +3020,8 @@ def simple_mana_source_execution_scenario_from_expected_rule(rule: dict[str, Any
     if mana_produced <= 0:
         return None
     dynamic_fixture, dynamic_mana_produced = _manifest_dynamic_fixed_mana_fixture(required)
-    expected_mana_produced = int(dynamic_mana_produced or mana_produced)
+    controlled_creature_condition_fixture, controlled_creature_condition_mana_produced = _manifest_controlled_creature_condition_conditional_mana_fixture(required)
+    expected_mana_produced = int(dynamic_mana_produced or controlled_creature_condition_mana_produced or mana_produced)
     controller_mana = _manifest_mana_for_activation_cost(required.get("activation_mana_cost"))
     activation_cost_total = sum(controller_mana.values())
     support_sources = _manifest_support_sources_for_controller_mana(controller_mana)
@@ -3034,7 +3065,7 @@ def simple_mana_source_execution_scenario_from_expected_rule(rule: dict[str, Any
         "expected_sources": len(support_sources) + (0 if enters_tapped else 1),
         "expected_produced_mana_symbols": required.get("produced_mana_symbols") or [],
         "expected_conditional_mana": (
-            mana_produced
+            expected_mana_produced
             if (
                 conditional_modes
                 or (
@@ -3052,6 +3083,14 @@ def simple_mana_source_execution_scenario_from_expected_rule(rule: dict[str, Any
         "logical_rule_key": rule["logical_rule_key"],
     }
     for key, value in dynamic_fixture.items():
+        if key == "source_overrides":
+            scenario["source_overrides"] = {
+                **dict(scenario.get("source_overrides") or {}),
+                **dict(value or {}),
+            }
+        else:
+            scenario[key] = value
+    for key, value in controlled_creature_condition_fixture.items():
         if key == "source_overrides":
             scenario["source_overrides"] = {
                 **dict(scenario.get("source_overrides") or {}),
