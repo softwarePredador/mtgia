@@ -4732,6 +4732,67 @@ def test_manifest_expected_rule_preserves_composite_damage_draw_components() -> 
     assert required["_composite_rule_components"] == components
 
 
+def test_damage_optional_discard_draw_execution_scenario_is_manifested() -> None:
+    components = [
+        {
+            "effect": "direct_damage",
+            "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+            "amount": 3,
+            "damage": 3,
+            "target": "any_target",
+            "target_constraints": {"scope": "any_target"},
+            "compose_on_resolution": True,
+            "xmage_effect_class": "DamageTargetEffect",
+        },
+        {
+            "effect": "draw_cards",
+            "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+            "count": 1,
+            "compose_on_resolution": True,
+            "xmage_effect_class": "DrawCardSourceControllerEffect",
+            "optional_cost": "discard_card",
+            "optional_cost_count": 1,
+            "discard_count": 1,
+            "optional": True,
+        },
+    ]
+    proposal = {
+        "normalized_name": "tweeze",
+        "card_name": "Tweeze",
+        "oracle_hash": "hash-tweeze",
+        "logical_rule_key": "battle_rule_v1:hash-tweeze",
+        "effect_json": {
+            "effect": "composite_resolution",
+            "battle_model_scope": "xmage_fixed_damage_target_and_draw_card_spell_v1",
+            "amount": 3,
+            "damage": 3,
+            "target": "any_target",
+            "target_constraints": {"scope": "any_target"},
+            "draw_count": 1,
+            "count": 1,
+            "optional_discard_draw": True,
+            "optional_discard_count": 1,
+            "optional_discard_draw_count": 1,
+            "_composite_rule_components": components,
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    required = expected["required_effect_fields"]
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    assert required["optional_discard_draw"] is True
+    assert required["optional_discard_count"] == 1
+    assert required["optional_discard_draw_count"] == 1
+    assert scenario["type"] == "damage_draw_spell"
+    assert scenario["expected_damage"] == 3
+    assert scenario["expected_draw_count"] == 1
+    assert scenario["expected_discard_count"] == 1
+    assert scenario["nonmatching_target"] is None
+    assert scenario["controller_hand"][0]["name"] == "E2E Optional Discard Fodder"
+    assert len(scenario["controller_library"]) >= 2
+
+
 def test_manifest_expected_rule_preserves_zero_amount_for_x_damage() -> None:
     proposal = {
         "normalized_name": "blaze",

@@ -184,6 +184,9 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "damage_target",
     "destroy_target",
     "_composite_rule_components",
+    "optional_discard_draw",
+    "optional_discard_count",
+    "optional_discard_draw_count",
     "recursion_components",
     "recursion_mana_value_max",
     "recursion_mana_value_max_from_x",
@@ -4573,6 +4576,8 @@ def fixed_damage_target_spell_execution_scenario_from_expected_rule(
     if target_constraints.get("scope") in {"player", "player_or_planeswalker", "opponent", "opponent_or_planeswalker"}:
         target = None
         nonmatching_target = None
+    elif target_constraints.get("scope") == "any_target":
+        nonmatching_target = None
     scenario = {
         "name": f"{rule['card_name']} deals fixed target damage",
         "type": "fixed_damage_target_spell",
@@ -4630,6 +4635,76 @@ def fixed_damage_target_spell_execution_scenario_from_expected_rule(
         ]
         scenario["expected_additional_cost"] = "sacrifice_creature_or_planeswalker"
         scenario["expected_sacrificed_name"] = "E2E Sacrifice Cost Planeswalker"
+    return scenario
+
+
+def fixed_damage_draw_spell_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_fixed_damage_target_and_draw_card_spell_v1":
+        return None
+    if required.get("effect") != "composite_resolution":
+        return None
+    damage = int(required.get("amount") or required.get("damage") or 0)
+    draw_count = int(required.get("draw_count") or required.get("count") or 1)
+    if damage <= 0 or draw_count <= 0:
+        return None
+    type_line = "Sorcery" if required.get("sorcery") is True else "Instant"
+    target_constraints = dict(required.get("target_constraints") or {})
+    target = _target_fixture_from_constraints(
+        "E2E Damage Draw Legal Target",
+        target_constraints,
+        matching=True,
+    )
+    nonmatching_target = _target_fixture_from_constraints(
+        "E2E Damage Draw Illegal Target",
+        target_constraints,
+        matching=False,
+    )
+    if target_constraints.get("scope") in {"player", "player_or_planeswalker", "opponent", "opponent_or_planeswalker"}:
+        target = None
+        nonmatching_target = None
+    elif target_constraints.get("scope") == "any_target":
+        nonmatching_target = None
+    optional_discard = bool(required.get("optional_discard_draw"))
+    scenario = {
+        "name": f"{rule['card_name']} deals fixed target damage and draws",
+        "type": "damage_draw_spell",
+        "card": {"name": rule["card_name"], "type_line": type_line},
+        "target": target,
+        "nonmatching_target": nonmatching_target,
+        "expected_damage": damage,
+        "expected_draw_count": draw_count,
+        "expected_discard_count": int(required.get("optional_discard_count") or 1) if optional_discard else 0,
+        "expected_optional_discard_draw": optional_discard,
+        "expected_target": required.get("target"),
+        "expected_target_constraints": target_constraints,
+        "controller_life": 10,
+        "opponent_life": max(20, damage + 5),
+        "controller_hand": (
+            [
+                {
+                    "name": "E2E Optional Discard Fodder",
+                    "type_line": "Land",
+                    "effect": "land",
+                    "cmc": 0,
+                }
+            ]
+            if optional_discard
+            else []
+        ),
+        "controller_library": [
+            {
+                "name": f"E2E Damage Draw Card {index + 1}",
+                "type_line": "Instant",
+                "effect": "draw_cards",
+                "cmc": 1,
+            }
+            for index in range(draw_count + 1)
+        ],
+        "logical_rule_key": rule["logical_rule_key"],
+    }
     return scenario
 
 
@@ -7703,6 +7778,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or damage_each_opponent_spell_execution_scenario_from_expected_rule(rule)
         or damage_each_opponent_and_their_permanents_execution_scenario_from_expected_rule(rule)
         or damage_gain_life_spell_execution_scenario_from_expected_rule(rule)
+        or fixed_damage_draw_spell_execution_scenario_from_expected_rule(rule)
         or fixed_damage_target_spell_execution_scenario_from_expected_rule(rule)
         or damage_target_create_treasure_execution_scenario_from_expected_rule(rule)
         or color_tap_untap_draw_spell_execution_scenario_from_expected_rule(rule)

@@ -10336,6 +10336,85 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_composite_damage_optional_discard_draw_spell_pays_cost_then_draws_once(self) -> None:
+        active = self.battle.Player("Active", None, [{"name": "Fresh Draw"}])
+        active.hand = [{"name": "Discard Fodder", "type_line": "Land", "cmc": 0}]
+        opponent = self.battle.Player("Opponent", None, [])
+        opponent.life = 20
+        effect = {
+            "effect": "composite_resolution",
+            "battle_model_scope": "xmage_fixed_damage_target_and_draw_card_spell_v1",
+            "optional_discard_draw": True,
+            "optional_discard_count": 1,
+            "optional_discard_draw_count": 1,
+            "_composite_rule_components": [
+                {
+                    "effect": "direct_damage",
+                    "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+                    "amount": 3,
+                    "damage": 3,
+                    "target": "any_target",
+                    "target_constraints": {"scope": "any_target"},
+                    "compose_on_resolution": True,
+                },
+                {
+                    "effect": "draw_cards",
+                    "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+                    "count": 1,
+                    "compose_on_resolution": True,
+                    "optional_cost": "discard_card",
+                    "optional_cost_count": 1,
+                    "discard_count": 1,
+                    "optional": True,
+                },
+            ],
+        }
+        card = {
+            "name": "Fixture Tweeze",
+            "type_line": "Sorcery",
+            "oracle_text": (
+                "Fixture Tweeze deals 3 damage to any target. You may discard a card. "
+                "If you do, draw a card."
+            ),
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            card,
+            turn=5,
+            rng=random.Random(53),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(opponent.life, 17)
+        self.assertEqual([card["name"] for card in active.hand], ["Fresh Draw"])
+        self.assertEqual(
+            [card["name"] for card in active.graveyard],
+            ["Discard Fodder", "Fixture Tweeze"],
+        )
+        self.assertTrue(
+            any(
+                event == "composite_rule_component_resolved"
+                and data.get("card") == "Fixture Tweeze"
+                and data.get("component_effect") == "draw_cards"
+                and data.get("outcome") == "cards_drawn"
+                and data.get("optional_cost") == "discard_card"
+                and data.get("optional_cost_paid") is True
+                and data.get("discarded") == ["Discard Fodder"]
+                for event, data in self.events
+            )
+        )
+        self.assertTrue(
+            any(
+                event == "composite_rule_resolved"
+                and data.get("card") == "Fixture Tweeze"
+                and data.get("components_applied") == 2
+                and data.get("components_skipped") == 0
+                for event, data in self.events
+            )
+        )
+
     def test_composite_destroy_scry_spell_removes_target_then_scries(self) -> None:
         active = self.battle.Player(
             "Active",

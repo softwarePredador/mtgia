@@ -3660,11 +3660,31 @@ def fixed_bounce_scry_from_source(source: str) -> int | None:
 
 
 def fixed_damage_draw_from_oracle(metadata: dict[str, Any]) -> tuple[int, int, str] | None:
-    text = oracle_text(metadata)
+    text = re.sub(r"\s+", " ", strip_parenthetical_reminders(oracle_text(metadata))).strip()
     match = re.match(
         r"^.+ deals (\d+) damage to "
         r"(any target|target opponent|target player|target creature or planeswalker|target creature)"
         r"\. draw a card\.?$",
+        text,
+    )
+    if not match:
+        return None
+    target_map = {
+        "any target": "any_target",
+        "target opponent": "opponent",
+        "target player": "player",
+        "target creature": "creature",
+        "target creature or planeswalker": "creature_or_planeswalker",
+    }
+    return int(match.group(1)), 1, target_map[match.group(2)]
+
+
+def fixed_damage_optional_discard_draw_from_oracle(metadata: dict[str, Any]) -> tuple[int, int, str] | None:
+    text = re.sub(r"\s+", " ", strip_parenthetical_reminders(oracle_text(metadata))).strip()
+    match = re.match(
+        r"^.+ deals (\d+) damage to "
+        r"(any target|target opponent|target player|target creature or planeswalker|target creature)"
+        r"\. you may discard a card\. if you do, draw a card\.?$",
         text,
     )
     if not match:
@@ -3697,6 +3717,32 @@ def fixed_damage_draw_from_source(source: str) -> tuple[int, int] | None:
     if draw_count != 1:
         return None
     if damage_matches[0].start() > draw_matches[0].start():
+        return None
+    return int(damage_matches[0].group(1)), draw_count
+
+
+def fixed_damage_optional_discard_draw_from_source(source: str) -> tuple[int, int] | None:
+    text = source or ""
+    if has_additional_cost(text):
+        return None
+    if "TargetPointer" in text or ".setTargetPointer" in text:
+        return None
+    if "DoIfCostPaid" not in text or "DiscardCardCost" not in text:
+        return None
+    damage_matches = list(re.finditer(r"new\s+DamageTargetEffect\s*\(\s*(\d+)\s*\)", text, re.S))
+    draw_matches = list(re.finditer(r"new\s+DrawCardSourceControllerEffect\s*\(", text))
+    if len(damage_matches) != 1 or len(draw_matches) != 1:
+        return None
+    draw_count = java_constructor_int_or_noarg_default(
+        text,
+        "DrawCardSourceControllerEffect",
+        noarg_default=1,
+    )
+    if draw_count != 1:
+        return None
+    if damage_matches[0].start() > draw_matches[0].start():
+        return None
+    if re.search(r"new\s+DiscardCardCost\s*\(\s*\)", text) is None:
         return None
     return int(damage_matches[0].group(1)), draw_count
 
@@ -35887,11 +35933,23 @@ def split_row(
             if unsupported_abilities:
                 return None, "damage_draw_ability_class_not_simple"
             oracle_damage_draw = fixed_damage_draw_from_oracle(metadata)
+            optional_discard_draw = False
+            if oracle_damage_draw is None:
+                oracle_damage_draw = fixed_damage_optional_discard_draw_from_oracle(metadata)
+                optional_discard_draw = oracle_damage_draw is not None
             if oracle_damage_draw is None:
                 return None, "damage_draw_oracle_not_exact_fixed"
-            source_damage_draw = fixed_damage_draw_from_source(source_text)
+            source_damage_draw = (
+                fixed_damage_optional_discard_draw_from_source(source_text)
+                if optional_discard_draw
+                else fixed_damage_draw_from_source(source_text)
+            )
             if source_damage_draw is None:
-                return None, "damage_draw_source_not_fixed"
+                return None, (
+                    "damage_optional_discard_draw_source_not_fixed"
+                    if optional_discard_draw
+                    else "damage_draw_source_not_fixed"
+                )
             amount, draw_count, target = oracle_damage_draw
             if source_damage_draw != (amount, draw_count):
                 return None, "damage_draw_source_oracle_mismatch"
@@ -35915,6 +35973,13 @@ def split_row(
                 "compose_on_resolution": True,
                 "xmage_effect_class": "DrawCardSourceControllerEffect",
             }
+            if optional_discard_draw:
+                draw_component.update({
+                    "optional_cost": "discard_card",
+                    "optional_cost_count": 1,
+                    "discard_count": 1,
+                    "optional": True,
+                })
             effect_json = {
                 "effect": "composite_resolution",
                 "battle_model_scope": DAMAGE_DRAW_SCOPE,
@@ -35928,6 +35993,10 @@ def split_row(
                 "xmage_effect_classes": ["DamageTargetEffect", "DrawCardSourceControllerEffect"],
                 **flags,
             }
+            if optional_discard_draw:
+                effect_json["optional_discard_draw"] = True
+                effect_json["optional_discard_count"] = 1
+                effect_json["optional_discard_draw_count"] = draw_count
             return build_proposal(
                 row,
                 metadata,

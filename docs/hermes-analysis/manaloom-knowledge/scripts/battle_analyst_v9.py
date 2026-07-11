@@ -65561,9 +65561,87 @@ def resolve_composite_resolution_effect(player, opponents, card, effect_data, tu
                 applied.append({"effect": component_effect, **discover_result})
             else:
                 count = int(component.get("count") or component.get("amount") or component.get("draw_count") or 1)
-                player.draw(max(0, count), rng)
-                outcome = "cards_drawn"
-                applied.append({"effect": component_effect, "count": count})
+                optional_cost = str(component.get("optional_cost") or "").strip()
+                if optional_cost == "discard_card":
+                    discard_count = max(
+                        1,
+                        int(component.get("optional_cost_count") or component.get("discard_count") or 1),
+                    )
+                    hand_candidates = [
+                        candidate
+                        for candidate in (getattr(player, "hand", []) or [])
+                        if isinstance(candidate, dict)
+                    ]
+                    if len(hand_candidates) < discard_count:
+                        outcome = "optional_discard_cost_unpaid"
+                        component_fields["optional_cost"] = optional_cost
+                        component_fields["optional_cost_count"] = discard_count
+                        component_fields["optional_cost_paid"] = False
+                        skipped.append(
+                            {
+                                "effect": component_effect,
+                                "reason": outcome,
+                                "optional_cost": optional_cost,
+                                "optional_cost_count": discard_count,
+                            }
+                        )
+                    else:
+                        discarded_cards = _draw_discard_spell_selected_discards(
+                            player,
+                            discard_count,
+                            rng=rng,
+                        )
+                        if len(discarded_cards) != discard_count:
+                            outcome = "optional_discard_cost_unpaid"
+                            component_fields["optional_cost"] = optional_cost
+                            component_fields["optional_cost_count"] = discard_count
+                            component_fields["optional_cost_paid"] = False
+                            skipped.append(
+                                {
+                                    "effect": component_effect,
+                                    "reason": outcome,
+                                    "optional_cost": optional_cost,
+                                    "optional_cost_count": discard_count,
+                                }
+                            )
+                        else:
+                            discard_resolution = resolve_effect_discard_cards(
+                                player,
+                                discarded_cards,
+                                top_limit=0,
+                                opponents=opponents,
+                                turn=turn,
+                                phase=phase,
+                                rng=rng,
+                            )
+                            drawn = player.draw(max(0, count), rng)
+                            outcome = "cards_drawn"
+                            discarded_names = [
+                                discarded.get("name", "?")
+                                for discarded in discarded_cards
+                                if isinstance(discarded, dict)
+                            ]
+                            component_fields["optional_cost"] = optional_cost
+                            component_fields["optional_cost_count"] = discard_count
+                            component_fields["optional_cost_paid"] = True
+                            component_fields["discarded"] = discarded_names
+                            component_fields["discarded_to_graveyard"] = [
+                                entry.get("name", "?")
+                                for entry in discard_resolution.get("to_graveyard", [])
+                                if isinstance(entry, dict)
+                            ]
+                            applied.append(
+                                {
+                                    "effect": component_effect,
+                                    "count": len(drawn),
+                                    "optional_cost": optional_cost,
+                                    "discarded": discarded_names,
+                                }
+                            )
+                else:
+                    player.draw(max(0, count), rng)
+                    outcome = "cards_drawn"
+                    applied.append({"effect": component_effect, "count": count})
         elif component_effect == "proliferate":
             component_payload = dict(component)
             component_payload["_composite_component_index"] = index

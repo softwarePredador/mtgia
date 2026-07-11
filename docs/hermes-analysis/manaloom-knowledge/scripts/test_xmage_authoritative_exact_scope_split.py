@@ -11765,7 +11765,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             ["direct_damage", "draw_cards"],
         )
 
-    def test_fixed_damage_draw_spell_blocks_conditional_draw(self) -> None:
+    def test_fixed_damage_optional_discard_draw_spell_maps_to_composite_runtime(self) -> None:
         row = queue_row(
             split.DRAW_UNIT,
             effect_classes=["DamageTargetEffect", "DrawCardSourceControllerEffect"],
@@ -11786,8 +11786,45 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             ),
         )
 
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "composite_resolution")
+        self.assertEqual(effect["battle_model_scope"], split.DAMAGE_DRAW_SCOPE)
+        self.assertEqual(effect["amount"], 3)
+        self.assertEqual(effect["target"], "any_target")
+        self.assertEqual(effect["draw_count"], 1)
+        self.assertTrue(effect["optional_discard_draw"])
+        self.assertEqual(effect["optional_discard_count"], 1)
+        self.assertEqual(effect["optional_discard_draw_count"], 1)
+        draw_component = effect["_composite_rule_components"][1]
+        self.assertEqual(draw_component["effect"], "draw_cards")
+        self.assertEqual(draw_component["optional_cost"], "discard_card")
+        self.assertEqual(draw_component["optional_cost_count"], 1)
+        self.assertEqual(draw_component["discard_count"], 1)
+        self.assertTrue(draw_component["optional"])
+
+    def test_fixed_damage_optional_discard_draw_blocks_source_without_paid_cost(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=["DamageTargetEffect", "DrawCardSourceControllerEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                oracle_text=(
+                    "Tweeze deals 3 damage to any target. You may discard a card. "
+                    "If you do, draw a card."
+                )
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new DamageTargetEffect(3));"
+                "this.getSpellAbility().addTarget(new TargetAnyTarget());"
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect());"
+            ),
+        )
+
         self.assertIsNone(proposal)
-        self.assertEqual(reason, "damage_draw_oracle_not_exact_fixed")
+        self.assertEqual(reason, "damage_optional_discard_draw_source_not_fixed")
 
     def test_fixed_destroy_draw_spell_maps_to_composite_runtime(self) -> None:
         row = queue_row(

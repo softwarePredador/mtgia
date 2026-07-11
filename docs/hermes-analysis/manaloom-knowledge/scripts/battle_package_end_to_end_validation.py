@@ -1446,6 +1446,134 @@ def run_fixed_damage_target_spell(
     return result
 
 
+def run_damage_draw_spell(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    active = battle.Player(str(scenario.get("player") or "Damage Draw Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
+    active.life = int(scenario.get("controller_life") or 10)
+    opponent.life = int(scenario.get("opponent_life") or 20)
+    active.hand = [
+        battle.enrich_card(dict(hand_card))
+        for hand_card in (scenario.get("controller_hand") or [])
+        if isinstance(hand_card, dict)
+    ]
+    active.library = [
+        battle.enrich_card(dict(library_card))
+        for library_card in (scenario.get("controller_library") or [])
+        if isinstance(library_card, dict)
+    ]
+    expected_damage = int(scenario.get("expected_damage") or 0)
+    expected_draw_count = int(scenario.get("expected_draw_count") or 0)
+    expected_discard_count = int(scenario.get("expected_discard_count") or 0)
+    target = dict(scenario.get("target") or {})
+    nonmatching_target = dict(scenario.get("nonmatching_target") or {})
+    if target:
+        target.setdefault("effect", "creature")
+        target.setdefault("power", 2)
+        target["toughness"] = min(int(target.get("toughness") or 2), max(1, expected_damage))
+        opponent.battlefield = [battle.enrich_card(dict(target))]
+        if nonmatching_target:
+            opponent.battlefield.insert(0, battle.enrich_card(dict(nonmatching_target)))
+
+    before_events = len(events)
+    hand_before = len(active.hand)
+    library_before = len(active.library)
+    opponent_life_before = opponent.life
+
+    effect_data = battle.get_card_effect(card)
+    if effect_data.get("effect") != "composite_resolution":
+        fail("battle_execution", f"{card['name']} effect={effect_data.get('effect')!r}")
+    if effect_data.get("battle_model_scope") != "xmage_fixed_damage_target_and_draw_card_spell_v1":
+        fail("battle_execution", f"{card['name']} scope={effect_data.get('battle_model_scope')!r}")
+
+    battle.apply_effect_immediate(
+        active,
+        [opponent],
+        card,
+        turn=int(scenario.get("turn") or 6079),
+        rng=random.Random(int(scenario.get("seed") or 6079)),
+    )
+
+    damage_event = next(
+        (
+            data
+            for event_name, data in events[before_events:]
+            if event_name == "damage_resolved"
+            and data.get("card") == card.get("name")
+        ),
+        None,
+    )
+    if damage_event is None:
+        fail("battle_events", f"missing {card['name']} damage_resolved event")
+    if int(damage_event.get("amount") or 0) != expected_damage:
+        fail("battle_events", f"{card['name']} damage amount={damage_event.get('amount')}, expected {expected_damage}")
+    if target:
+        target_name = str(target.get("name") or "")
+        if damage_event.get("target") != target_name:
+            fail("battle_events", f"{card['name']} target={damage_event.get('target')!r}, expected {target_name!r}")
+        battlefield_names = [
+            permanent.get("name")
+            for permanent in opponent.battlefield
+            if isinstance(permanent, dict)
+        ]
+        if target_name in battlefield_names:
+            fail("battle_execution", f"{card['name']} did not remove damaged target {target_name}")
+        if nonmatching_target and nonmatching_target.get("name") not in battlefield_names:
+            fail("battle_execution", f"{card['name']} removed illegal target {nonmatching_target.get('name')}")
+    else:
+        expected_life = opponent_life_before - expected_damage
+        if opponent.life != expected_life:
+            fail("battle_execution", f"{card['name']} opponent life={opponent.life}, expected {expected_life}")
+        if damage_event.get("target_player") != opponent.name:
+            fail("battle_events", f"{card['name']} target_player={damage_event.get('target_player')!r}")
+
+    draw_component_event = next(
+        (
+            data
+            for event_name, data in events[before_events:]
+            if event_name == "composite_rule_component_resolved"
+            and data.get("card") == card.get("name")
+            and data.get("component_effect") == "draw_cards"
+        ),
+        None,
+    )
+    if draw_component_event is None:
+        fail("battle_events", f"missing {card['name']} composite draw_cards component event")
+    if expected_discard_count:
+        if draw_component_event.get("optional_cost") != "discard_card":
+            fail("battle_events", f"{card['name']} optional_cost={draw_component_event.get('optional_cost')!r}")
+        if draw_component_event.get("optional_cost_paid") is not True:
+            fail("battle_events", f"{card['name']} optional discard cost was not paid")
+        discarded = draw_component_event.get("discarded") or []
+        if len(discarded) != expected_discard_count:
+            fail("battle_events", f"{card['name']} discarded={discarded}, expected {expected_discard_count}")
+    if draw_component_event.get("outcome") != "cards_drawn":
+        fail("battle_events", f"{card['name']} draw outcome={draw_component_event.get('outcome')!r}")
+
+    if len(active.library) != library_before - expected_draw_count:
+        fail(
+            "battle_execution",
+            f"{card['name']} library={len(active.library)}, expected {library_before - expected_draw_count}",
+        )
+    expected_hand = hand_before - expected_discard_count + expected_draw_count
+    if len(active.hand) != expected_hand:
+        fail("battle_execution", f"{card['name']} hand={len(active.hand)}, expected {expected_hand}")
+
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "damage": expected_damage,
+        "target": damage_event.get("target") or damage_event.get("target_player"),
+        "cards_drawn": expected_draw_count,
+        "cards_discarded": expected_discard_count,
+        "hand": [item.get("name") for item in active.hand if isinstance(item, dict)],
+    }
+
+
 def run_damage_target_create_treasure(
     battle,
     scenario: dict[str, Any],
@@ -12137,6 +12265,7 @@ SCENARIO_RUNNERS = {
     "graveyard_to_library_draw_spell": run_graveyard_to_library_draw_spell,
     "fixed_draw_discard_spell": run_fixed_draw_discard_spell,
     "fixed_damage_target_spell": run_fixed_damage_target_spell,
+    "damage_draw_spell": run_damage_draw_spell,
     "dynamic_life_gain": run_dynamic_life_gain,
     "each_player_sacrifice": run_each_player_sacrifice,
     "fixed_create_creature_tokens": run_fixed_create_creature_tokens,

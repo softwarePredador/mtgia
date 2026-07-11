@@ -405,6 +405,90 @@ def test_fixed_damage_target_spell_runner_pays_return_land_cost() -> None:
     assert result["additional_cost"] == "return_land_to_hand"
 
 
+def test_damage_draw_spell_runner_pays_optional_discard_and_draws() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    previous_get_card_effect = battle.get_card_effect
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    battle.get_card_effect = lambda card: {
+        "effect": "composite_resolution",
+        "battle_model_scope": "xmage_fixed_damage_target_and_draw_card_spell_v1",
+        "amount": 3,
+        "damage": 3,
+        "target": "any_target",
+        "target_constraints": {"scope": "any_target"},
+        "draw_count": 1,
+        "optional_discard_draw": True,
+        "optional_discard_count": 1,
+        "optional_discard_draw_count": 1,
+        "_composite_rule_components": [
+            {
+                "effect": "direct_damage",
+                "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+                "amount": 3,
+                "damage": 3,
+                "target": "any_target",
+                "target_constraints": {"scope": "any_target"},
+                "compose_on_resolution": True,
+            },
+            {
+                "effect": "draw_cards",
+                "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+                "count": 1,
+                "compose_on_resolution": True,
+                "optional_cost": "discard_card",
+                "optional_cost_count": 1,
+                "discard_count": 1,
+                "optional": True,
+            },
+        ],
+        "_rule_logical_key": "battle_rule_v1:tweeze-fixture",
+    }
+    try:
+        result = validator.run_damage_draw_spell(
+            battle,
+            {
+                "name": "Tweeze deals damage, discards, and draws",
+                "type": "damage_draw_spell",
+                "card": {"name": "Tweeze", "type_line": "Sorcery"},
+                "target": {
+                    "name": "E2E Damage Draw Legal Target",
+                    "type_line": "Creature - Fixture",
+                    "effect": "creature",
+                    "power": 2,
+                    "toughness": 2,
+                },
+                "expected_damage": 3,
+                "expected_draw_count": 1,
+                "expected_discard_count": 1,
+                "controller_hand": [
+                    {
+                        "name": "E2E Optional Discard Fodder",
+                        "type_line": "Land",
+                        "effect": "land",
+                        "cmc": 0,
+                    }
+                ],
+                "controller_library": [
+                    {"name": "E2E Damage Draw Card 1", "type_line": "Instant", "effect": "draw_cards"},
+                    {"name": "E2E Damage Draw Card 2", "type_line": "Instant", "effect": "draw_cards"},
+                ],
+            },
+            events,
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+        battle.get_card_effect = previous_get_card_effect
+
+    assert result["card_name"] == "Tweeze"
+    assert result["damage"] == 3
+    assert result["cards_drawn"] == 1
+    assert result["cards_discarded"] == 1
+    assert result["target"] == "E2E Damage Draw Legal Target"
+    assert result["hand"] == ["E2E Damage Draw Card 1"]
+
+
 def test_beginning_end_step_draw_runner_executes_conditioned_draw() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []
