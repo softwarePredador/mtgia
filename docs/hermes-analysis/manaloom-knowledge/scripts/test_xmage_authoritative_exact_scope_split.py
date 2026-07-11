@@ -20410,6 +20410,77 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertTrue(effect["up_to_count"])
         self.assertEqual(effect["destination"], "library_top")
 
+    def test_graveyard_to_library_then_draw_maps_any_number_creatures(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=["PutOnLibraryTargetEffect", "DrawCardSourceControllerEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Footbottom Feast",
+                type_line="Instant",
+                oracle_text=(
+                    "Put any number of target creature cards from your graveyard on top "
+                    "of your library. Draw a card."
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new PutOnLibraryTargetEffect(true));
+                this.getSpellAbility().addTarget(new TargetCardInYourGraveyard(
+                    0, Integer.MAX_VALUE, StaticFilters.FILTER_CARD_CREATURES_YOUR_GRAVEYARD));
+                this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(1).concatBy("<br>"));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "recursion")
+        self.assertEqual(effect["battle_model_scope"], split.GRAVEYARD_TO_LIBRARY_DRAW_SPELL_SCOPE)
+        self.assertEqual(effect["target"], "creature")
+        self.assertEqual(effect["count"], 99)
+        self.assertEqual(effect["destination"], "library_top")
+        self.assertTrue(effect["up_to_count"])
+        self.assertTrue(effect["any_number_targets"])
+        self.assertTrue(effect["draw_after_graveyard_to_library"])
+        self.assertEqual(effect["draw_after_graveyard_to_library_count"], 1)
+        self.assertEqual(effect["resolution_order"], "graveyard_to_library_then_draw")
+        self.assertEqual(effect["graveyard_to_library_target"], "creature")
+        self.assertEqual(effect["graveyard_to_library_target_count"], 99)
+        self.assertTrue(effect["graveyard_to_library_prioritize_draw"])
+
+    def test_graveyard_to_library_then_draw_maps_any_number_artifacts(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect", "PutOnLibraryTargetEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Frantic Salvage",
+                type_line="Instant",
+                oracle_text=(
+                    "Put any number of target artifact cards from your graveyard on top "
+                    "of your library. Draw a card."
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new PutOnLibraryTargetEffect(true));
+                this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(1).concatBy("<br>"));
+                this.getSpellAbility().addTarget(new TargetCardInYourGraveyard(
+                    0, Integer.MAX_VALUE, new FilterArtifactCard("artifact cards from your graveyard")));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.GRAVEYARD_TO_LIBRARY_DRAW_SPELL_SCOPE)
+        self.assertEqual(effect["target"], "artifact")
+        self.assertEqual(
+            effect["target_constraints"],
+            {"zone": "graveyard", "controller": "self", "card_types": ["artifact"]},
+        )
+
     def test_graveyard_to_library_source_destination_mismatch_blocks(self) -> None:
         row = queue_row(split.RECURSION_UNIT, effect_classes=["PutOnLibraryTargetEffect"])
         proposal, reason = split.split_row(

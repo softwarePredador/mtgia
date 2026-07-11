@@ -179,6 +179,72 @@ def test_static_subtype_protection_runner_blocks_matching_source() -> None:
     assert result["protection_from_subtypes"] == ["goblin"]
 
 
+def test_graveyard_to_library_draw_runner_draws_recovered_card() -> None:
+    battle = validator.load_battle(validator.DEFAULT_BATTLE)
+    effect = {
+        "effect": "recursion",
+        "battle_model_scope": "xmage_put_graveyard_cards_on_library_then_draw_spell_v1",
+        "target": "creature",
+        "target_constraints": {"zone": "graveyard", "controller": "self", "card_types": ["creature"]},
+        "count": 99,
+        "destination": "library_top",
+        "up_to_count": True,
+        "target_controller": "self",
+        "target_graveyard_controller": "self",
+        "library_controller": "self",
+        "graveyard_to_library_target": "creature",
+        "graveyard_to_library_target_count": 99,
+        "graveyard_to_library_destination": "library_top",
+        "graveyard_to_library_prioritize_draw": True,
+        "draw_after_graveyard_to_library": True,
+        "draw_after_graveyard_to_library_count": 1,
+        "_rule_logical_key": "battle_rule_v1:feast",
+    }
+    events = []
+    previous_get_card_effect = battle.get_card_effect
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    battle.get_card_effect = lambda card: dict(effect)
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    try:
+        result = validator.run_graveyard_to_library_draw_spell(
+            battle,
+            {
+                "name": "Footbottom Feast recovers graveyard cards then draws",
+                "type": "graveyard_to_library_draw_spell",
+                "card": {"name": "Footbottom Feast", "type_line": "Instant"},
+                "controller_library": [
+                    {"name": "E2E Existing Top", "type_line": "Land", "effect": "land", "cmc": 0}
+                ],
+                "controller_graveyard": [
+                    {
+                        "name": "E2E High Value Creature",
+                        "type_line": "Creature - Giant",
+                        "effect": "creature",
+                        "cmc": 6,
+                    },
+                    {
+                        "name": "E2E Low Value Creature",
+                        "type_line": "Creature - Rat",
+                        "effect": "creature",
+                        "cmc": 1,
+                    },
+                ],
+                "expected_recovered_count": 2,
+                "expected_drawn": "E2E High Value Creature",
+                "expected_library_top_after": "E2E Low Value Creature",
+                "expected_draw_count": 1,
+            },
+            events,
+        )
+    finally:
+        battle.get_card_effect = previous_get_card_effect
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+
+    assert result["card_name"] == "Footbottom Feast"
+    assert result["drawn"] == ["E2E High Value Creature"]
+    assert result["library_top_after"] == "E2E Low Value Creature"
+
+
 def test_equipment_static_attachment_runner_executes_boost_and_keywords() -> None:
     battle = validator.load_battle(validator.DEFAULT_BATTLE)
     events = []

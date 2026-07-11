@@ -418,6 +418,11 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "graveyard_to_library_target_count",
     "graveyard_to_library_destination",
     "graveyard_to_library_up_to_count",
+    "graveyard_to_library_any_number_targets",
+    "graveyard_to_library_prioritize_draw",
+    "any_number_targets",
+    "draw_after_graveyard_to_library",
+    "draw_after_graveyard_to_library_count",
     "graveyard_to_library_activation_cost_mana",
     "graveyard_to_library_activation_cost_generic",
     "graveyard_to_library_activation_cost_colors",
@@ -3974,6 +3979,65 @@ def fixed_draw_spell_execution_scenario_from_expected_rule(
     return scenario
 
 
+def graveyard_to_library_draw_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_put_graveyard_cards_on_library_then_draw_spell_v1":
+        return None
+    if required.get("effect") != "recursion" or not required.get("draw_after_graveyard_to_library"):
+        return None
+    target = str(required.get("target") or required.get("graveyard_to_library_target") or "creature")
+    if target == "artifact":
+        high_card = {
+            "name": "E2E High Value Artifact",
+            "type_line": "Artifact",
+            "effect": "artifact",
+            "cmc": 6,
+        }
+        low_card = {
+            "name": "E2E Low Value Artifact",
+            "type_line": "Artifact",
+            "effect": "artifact",
+            "cmc": 1,
+        }
+    else:
+        high_card = {
+            "name": "E2E High Value Creature",
+            "type_line": "Creature - Giant",
+            "effect": "creature",
+            "power": 6,
+            "toughness": 6,
+            "cmc": 6,
+        }
+        low_card = {
+            "name": "E2E Low Value Creature",
+            "type_line": "Creature - Rat",
+            "effect": "creature",
+            "power": 1,
+            "toughness": 1,
+            "cmc": 1,
+        }
+    return {
+        "name": f"{rule['card_name']} recovers graveyard cards then draws",
+        "type": "graveyard_to_library_draw_spell",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": "Instant" if required.get("instant") else "Sorcery",
+        },
+        "controller_library": [
+            {"name": "E2E Existing Top", "type_line": "Land", "effect": "land", "cmc": 0}
+        ],
+        "controller_graveyard": [high_card, low_card],
+        "expected_recovered_count": 2,
+        "expected_drawn": high_card["name"],
+        "expected_library_top_after": low_card["name"],
+        "expected_target": target,
+        "expected_draw_count": int(required.get("draw_after_graveyard_to_library_count") or 1),
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def fixed_draw_discard_spell_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
@@ -7204,6 +7268,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or simple_activated_draw_execution_scenario_from_expected_rule(rule)
         or simple_activated_draw_discard_execution_scenario_from_expected_rule(rule)
         or fixed_draw_spell_execution_scenario_from_expected_rule(rule)
+        or graveyard_to_library_draw_execution_scenario_from_expected_rule(rule)
         or fixed_draw_discard_spell_execution_scenario_from_expected_rule(rule)
         or target_player_draw_execution_scenario_from_expected_rule(rule)
         or combat_damage_draw_execution_scenario_from_expected_rule(rule)

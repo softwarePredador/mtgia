@@ -126,6 +126,33 @@ def test_counter_unless_pays_draw_execution_scenario_is_manifested() -> None:
     assert scenario["expected_cards_drawn"] == 1
 
 
+def test_graveyard_to_library_draw_execution_scenario_is_manifested() -> None:
+    proposal = {
+        "normalized_name": "footbottom feast",
+        "card_name": "Footbottom Feast",
+        "oracle_hash": "hash-feast",
+        "logical_rule_key": "battle_rule_v1:feast",
+        "effect_json": {
+            "effect": "recursion",
+            "battle_model_scope": "xmage_put_graveyard_cards_on_library_then_draw_spell_v1",
+            "target": "creature",
+            "count": 99,
+            "destination": "library_top",
+            "draw_after_graveyard_to_library": True,
+            "draw_after_graveyard_to_library_count": 1,
+            "instant": True,
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    scenario = builder.execution_scenario_from_expected_rule(expected)
+
+    assert scenario["type"] == "graveyard_to_library_draw_spell"
+    assert scenario["expected_drawn"] == "E2E High Value Creature"
+    assert scenario["expected_library_top_after"] == "E2E Low Value Creature"
+    assert scenario["expected_recovered_count"] == 2
+
+
 def test_static_filtered_protection_execution_scenario_is_manifested() -> None:
     proposal = {
         "normalized_name": "enemy of the guildpact",

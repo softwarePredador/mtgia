@@ -68161,7 +68161,45 @@ def apply_effect_immediate(
             for participant in component_participants:
                 count = component_count(component_data, participant)
                 candidates = matching_component_candidates(participant, component_data)
-                participant_recovered = candidates[:count]
+                prioritize_library_top_draw = (
+                    component_destination == "library_top"
+                    and bool(
+                        component_data.get("graveyard_to_library_prioritize_draw")
+                        or effect_data.get("graveyard_to_library_prioritize_draw")
+                    )
+                )
+                if prioritize_library_top_draw:
+                    scored_candidates = sorted(
+                        candidates,
+                        key=lambda grave_card: (
+                            -graveyard_to_library_candidate_score(
+                                grave_card,
+                                participant,
+                                player,
+                                all_players,
+                                turn,
+                            ),
+                            -int(float(grave_card.get("cmc") or card_mana_value(grave_card) or 0)),
+                            str(grave_card.get("name") or ""),
+                        ),
+                    )
+                    selected_candidates = scored_candidates[:count]
+                    participant_recovered = sorted(
+                        selected_candidates,
+                        key=lambda grave_card: (
+                            graveyard_to_library_candidate_score(
+                                grave_card,
+                                participant,
+                                player,
+                                all_players,
+                                turn,
+                            ),
+                            int(float(grave_card.get("cmc") or card_mana_value(grave_card) or 0)),
+                            str(grave_card.get("name") or ""),
+                        ),
+                    )
+                else:
+                    participant_recovered = candidates[:count]
                 if participant_recovered:
                     recovered_by_player.setdefault(participant.name, []).extend(
                         recovered_card.get("name", "?")
@@ -68318,6 +68356,38 @@ def apply_effect_immediate(
             turn=turn,
             **replay_rule_fields(effect_data),
         )
+        draw_after_graveyard_to_library_count = 0
+        if effect_data.get("draw_after_graveyard_to_library"):
+            try:
+                draw_after_graveyard_to_library_count = max(
+                    0,
+                    int(effect_data.get("draw_after_graveyard_to_library_count") or 1),
+                )
+            except (TypeError, ValueError):
+                draw_after_graveyard_to_library_count = 1
+        if draw_after_graveyard_to_library_count > 0:
+            drawn_cards = player.draw(draw_after_graveyard_to_library_count, rng)
+            process_player_draw_triggers(
+                player,
+                len(drawn_cards),
+                turn,
+                phase,
+                all_players,
+                stack=stack,
+                turn_player=player,
+            )
+            emit_replay_event(
+                "recursion_followup_draw_resolved",
+                player=player.name,
+                card=card.get("name", "?"),
+                draw_count=len(drawn_cards),
+                requested_draw_count=draw_after_graveyard_to_library_count,
+                drawn=[drawn_card.get("name", "?") for drawn_card in drawn_cards],
+                after_destination=destination,
+                turn=turn,
+                phase=phase,
+                **replay_rule_fields(effect_data),
+            )
         if effect_data.get("exiles_self"):
             move_to_exile(player, card, reason="spell_exiles_self", turn=turn)
         else:

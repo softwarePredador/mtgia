@@ -11220,6 +11220,92 @@ def run_fixed_draw_spell(
     }
 
 
+def run_graveyard_to_library_draw_spell(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    effect = dict(battle.get_card_effect(card))
+    if effect.get("effect") != "recursion":
+        fail("battle_execution", f"{card['name']} effect={effect.get('effect')!r}")
+    if effect.get("battle_model_scope") != "xmage_put_graveyard_cards_on_library_then_draw_spell_v1":
+        fail("battle_execution", f"{card['name']} scope={effect.get('battle_model_scope')!r}")
+    if not effect.get("draw_after_graveyard_to_library"):
+        fail("battle_execution", f"{card['name']} missing draw_after_graveyard_to_library")
+    active = battle.Player(str(scenario.get("player") or "Spell Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
+    active.library = [
+        battle.enrich_card(dict(library_card))
+        for library_card in (scenario.get("controller_library") or [])
+        if isinstance(library_card, dict)
+    ]
+    active.graveyard = [
+        battle.enrich_card(dict(graveyard_card))
+        for graveyard_card in (scenario.get("controller_graveyard") or [])
+        if isinstance(graveyard_card, dict)
+    ]
+    expected_drawn = str(scenario.get("expected_drawn") or "")
+    expected_library_top_after = str(scenario.get("expected_library_top_after") or "")
+    expected_recovered_count = int(scenario.get("expected_recovered_count") or 0)
+    expected_draw_count = int(scenario.get("expected_draw_count") or 1)
+    before_events = len(events)
+
+    battle.apply_effect_immediate(
+        active,
+        [opponent],
+        battle.enrich_card(card),
+        turn=int(scenario.get("turn") or 6172),
+        rng=random.Random(int(scenario.get("seed") or 6172)),
+        effect_data_override=effect,
+        phase=str(scenario.get("phase") or "precombat_main"),
+    )
+
+    hand_names = [hand_card.get("name", "?") for hand_card in active.hand]
+    if expected_drawn and expected_drawn not in hand_names:
+        fail("battle_execution", f"{card['name']} hand={hand_names}, expected drawn {expected_drawn!r}")
+    library_names = [library_card.get("name", "?") for library_card in active.library]
+    if expected_library_top_after and (not library_names or library_names[0] != expected_library_top_after):
+        fail(
+            "battle_execution",
+            f"{card['name']} library_top={library_names[:3]}, expected {expected_library_top_after!r}",
+        )
+    recent_events = events[before_events:]
+    recursion_event = next(
+        (
+            data
+            for event, data in recent_events
+            if event == "recursion_resolved" and data.get("card") == card.get("name")
+        ),
+        None,
+    )
+    if recursion_event is None:
+        fail("battle_events", f"missing {card['name']} recursion_resolved event")
+    if expected_recovered_count and int(recursion_event.get("recovered_count") or 0) != expected_recovered_count:
+        fail("battle_events", f"{card['name']} recovered_count={recursion_event.get('recovered_count')}")
+    draw_event = next(
+        (
+            data
+            for event, data in recent_events
+            if event == "recursion_followup_draw_resolved" and data.get("card") == card.get("name")
+        ),
+        None,
+    )
+    if draw_event is None:
+        fail("battle_events", f"missing {card['name']} recursion_followup_draw_resolved event")
+    if int(draw_event.get("draw_count") or 0) != expected_draw_count:
+        fail("battle_events", f"{card['name']} draw_count={draw_event.get('draw_count')}")
+    if expected_drawn and draw_event.get("drawn") != [expected_drawn]:
+        fail("battle_events", f"{card['name']} drawn={draw_event.get('drawn')}")
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "recovered_count": int(recursion_event.get("recovered_count") or 0),
+        "drawn": draw_event.get("drawn") or [],
+        "library_top_after": library_names[0] if library_names else None,
+    }
+
+
 def run_fixed_draw_discard_spell(
     battle,
     scenario: dict[str, Any],
@@ -11339,6 +11425,7 @@ SCENARIO_RUNNERS = {
     "damage_target_create_treasure": run_damage_target_create_treasure,
     "damage_prevention": run_damage_prevention,
     "fixed_draw_spell": run_fixed_draw_spell,
+    "graveyard_to_library_draw_spell": run_graveyard_to_library_draw_spell,
     "fixed_draw_discard_spell": run_fixed_draw_discard_spell,
     "fixed_damage_target_spell": run_fixed_damage_target_spell,
     "dynamic_life_gain": run_dynamic_life_gain,

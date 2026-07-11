@@ -3632,6 +3632,71 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_graveyard_to_library_then_draw_draws_prioritized_recovered_card(self) -> None:
+        active = self.battle.Player(
+            "Active",
+            None,
+            [{"name": "Existing Top", "type_line": "Land", "cmc": 0}],
+        )
+        opponent = self.battle.Player("Opponent", None, [])
+        active.graveyard.extend(
+            [
+                {"name": "Large Graveyard Creature", "type_line": "Creature - Giant", "cmc": 6},
+                {"name": "Small Graveyard Creature", "type_line": "Creature - Rat", "cmc": 1},
+            ]
+        )
+        effect = {
+            "effect": "recursion",
+            "battle_model_scope": "xmage_put_graveyard_cards_on_library_then_draw_spell_v1",
+            "target": "creature",
+            "target_constraints": {"zone": "graveyard", "controller": "self", "card_types": ["creature"]},
+            "count": 99,
+            "destination": "library_top",
+            "up_to_count": True,
+            "any_number_targets": True,
+            "target_controller": "self",
+            "target_graveyard_controller": "self",
+            "library_controller": "self",
+            "graveyard_to_library_target": "creature",
+            "graveyard_to_library_target_count": 99,
+            "graveyard_to_library_destination": "library_top",
+            "graveyard_to_library_prioritize_draw": True,
+            "draw_after_graveyard_to_library": True,
+            "draw_after_graveyard_to_library_count": 1,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Fixture Feast", "type_line": "Instant"},
+            turn=2,
+            rng=random.Random(2),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual([card["name"] for card in active.hand], ["Large Graveyard Creature"])
+        self.assertEqual([card["name"] for card in active.library[:2]], ["Small Graveyard Creature", "Existing Top"])
+        self.assertEqual([card["name"] for card in active.graveyard], ["Fixture Feast"])
+        self.assertTrue(
+            any(
+                event == "recursion_resolved"
+                and data.get("card") == "Fixture Feast"
+                and data.get("destination") == "library_top"
+                and set(data.get("recovered") or [])
+                == {"Large Graveyard Creature", "Small Graveyard Creature"}
+                for event, data in self.events
+            )
+        )
+        self.assertTrue(
+            any(
+                event == "recursion_followup_draw_resolved"
+                and data.get("card") == "Fixture Feast"
+                and data.get("draw_count") == 1
+                and data.get("drawn") == ["Large Graveyard Creature"]
+                for event, data in self.events
+            )
+        )
+
     def test_graveyard_to_library_bottom_recursion_moves_card_from_graveyard(self) -> None:
         active = self.battle.Player(
             "Active",

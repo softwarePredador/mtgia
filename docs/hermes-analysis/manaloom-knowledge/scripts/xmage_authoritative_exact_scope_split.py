@@ -365,6 +365,9 @@ RECURSION_BATTLEFIELD_COUNTER_SCOPE = (
     "xmage_return_target_graveyard_creature_to_battlefield_with_counter_spell_v1"
 )
 GRAVEYARD_TO_LIBRARY_SPELL_SCOPE = "xmage_put_target_graveyard_card_on_library_spell_v1"
+GRAVEYARD_TO_LIBRARY_DRAW_SPELL_SCOPE = (
+    "xmage_put_graveyard_cards_on_library_then_draw_spell_v1"
+)
 LIBRARY_PICK_SPELL_SCOPE = "xmage_reveal_top_library_pick_to_hand_rest_graveyard_spell_v1"
 LOOK_LIBRARY_PICK_SPELL_SCOPE = "xmage_look_library_pick_to_hand_rest_bottom_spell_v1"
 LOOK_LIBRARY_PICK_GRAVEYARD_SPELL_SCOPE = "xmage_look_library_pick_to_hand_rest_graveyard_spell_v1"
@@ -6564,6 +6567,30 @@ def graveyard_to_library_from_oracle(metadata: dict[str, Any]) -> dict[str, Any]
     return None
 
 
+def graveyard_to_library_draw_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    text = oracle_text(metadata)
+    match = re.match(
+        r"^put any number of target (?P<phrase>creature|artifact) cards "
+        r"from your graveyard on top of your library\. draw a card\.?$",
+        text,
+    )
+    if not match:
+        return "graveyard_to_library_draw_oracle_not_exact_any_number"
+    target = etb_recursion_target_from_phrase(match.group("phrase"))
+    if target not in {"creature", "artifact"}:
+        return "graveyard_to_library_draw_oracle_target_not_supported"
+    return {
+        "target": target,
+        "count": 99,
+        "destination": "library_top",
+        "up_to_count": True,
+        "any_number_targets": True,
+        "draw_count": 1,
+        "target_graveyard_controller": "self",
+        "library_controller": "self",
+    }
+
+
 def graveyard_shuffle_to_library_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
     text = oracle_text(metadata)
     match = re.match(
@@ -6607,6 +6634,8 @@ def graveyard_to_library_from_source(source_text: str) -> dict[str, Any] | str:
         library_controller = "owner"
     elif "FILTER_CARD_ARTIFACT_OR_CREATURE" in text:
         target = "artifact_or_creature"
+    elif "FilterArtifactCard" in text:
+        target = "artifact"
     elif "FILTER_CARD_INSTANT_OR_SORCERY_FROM_YOUR_GRAVEYARD" in text or "FilterInstantOrSorceryCard" in text:
         target = "instant_or_sorcery"
     elif (
@@ -6623,11 +6652,21 @@ def graveyard_to_library_from_source(source_text: str) -> dict[str, Any] | str:
         return "graveyard_to_library_source_target_not_supported"
     count = 1
     up_to = False
-    count_match = re.search(r"TargetCardIn(?:Your)?Graveyard\s*\(\s*0\s*,\s*(\d+)", text, re.S)
+    any_number_targets = False
+    count_match = re.search(
+        r"TargetCardIn(?:Your)?Graveyard\s*\(\s*0\s*,\s*(Integer\.MAX_VALUE|\d+)",
+        text,
+        re.S,
+    )
     if count_match:
-        count = int(count_match.group(1))
+        raw_count = count_match.group(1)
+        if raw_count == "Integer.MAX_VALUE":
+            count = 99
+            any_number_targets = True
+        else:
+            count = int(raw_count)
         up_to = True
-    return {
+    result = {
         "target": target,
         "count": count,
         "destination": destination,
@@ -6635,6 +6674,29 @@ def graveyard_to_library_from_source(source_text: str) -> dict[str, Any] | str:
         "target_graveyard_controller": target_graveyard_controller,
         "library_controller": library_controller,
     }
+    if any_number_targets:
+        result["any_number_targets"] = True
+    return result
+
+
+def graveyard_to_library_draw_from_source(source_text: str) -> dict[str, Any] | str:
+    text = str(source_text or "")
+    if len(re.findall(r"new\s+DrawCardSourceControllerEffect\s*\(", text)) != 1:
+        return "graveyard_to_library_draw_source_not_single_draw"
+    draw_count = java_constructor_int(text, "DrawCardSourceControllerEffect", default=1)
+    if draw_count != 1:
+        return "graveyard_to_library_draw_source_draw_count_not_one"
+    parsed = graveyard_to_library_from_source(text)
+    if isinstance(parsed, str):
+        return parsed.replace("graveyard_to_library_", "graveyard_to_library_draw_", 1)
+    if parsed.get("destination") != "library_top":
+        return "graveyard_to_library_draw_source_destination_not_top"
+    if not parsed.get("any_number_targets"):
+        return "graveyard_to_library_draw_source_not_any_number"
+    if parsed.get("target") not in {"creature", "artifact"}:
+        return "graveyard_to_library_draw_source_target_not_supported"
+    parsed["draw_count"] = draw_count
+    return parsed
 
 
 def graveyard_shuffle_to_library_from_source(source_text: str) -> dict[str, Any] | str:
@@ -27199,6 +27261,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "permanent with a simple activated graveyard-exile ability"
     elif scope == PERMANENT_ACTIVATED_GRAVEYARD_TO_LIBRARY_SCOPE:
         scope_kind = "permanent with a simple activated graveyard-to-library ability"
+    elif scope == GRAVEYARD_TO_LIBRARY_DRAW_SPELL_SCOPE:
+        scope_kind = "spell that puts graveyard cards on top of library then draws"
     elif scope == PERMANENT_ACTIVATED_RECURSION_TO_HAND_SCOPE:
         scope_kind = "permanent with a simple activated graveyard-to-hand ability"
     elif scope == PERMANENT_ACTIVATED_RECURSION_TO_BATTLEFIELD_SCOPE:
@@ -34433,6 +34497,96 @@ def split_row(
         ), "selected_exact_scope"
 
     if unit == DRAW_UNIT:
+        if classes == {"DrawCardSourceControllerEffect", "PutOnLibraryTargetEffect"}:
+            unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+            if unsupported_abilities:
+                return None, "graveyard_to_library_draw_ability_class_not_simple"
+            if not is_spell(metadata):
+                return None, "graveyard_to_library_draw_not_instant_or_sorcery"
+            oracle_target = graveyard_to_library_draw_from_oracle(metadata)
+            if isinstance(oracle_target, str):
+                return None, oracle_target
+            source_target = graveyard_to_library_draw_from_source(source_text)
+            if isinstance(source_target, str):
+                return None, source_target
+            for key in (
+                "target",
+                "count",
+                "destination",
+                "up_to_count",
+                "any_number_targets",
+                "draw_count",
+            ):
+                if source_target.get(key) != oracle_target.get(key):
+                    return None, f"graveyard_to_library_draw_source_oracle_{key}_mismatch"
+            target_type = str(oracle_target["target"])
+            count = int(oracle_target["count"])
+            draw_count = int(oracle_target["draw_count"])
+            recursion_component = {
+                "effect": "recursion",
+                "battle_model_scope": GRAVEYARD_TO_LIBRARY_SPELL_SCOPE,
+                "target": target_type,
+                "target_constraints": recursion_target_constraints_for(target_type),
+                "count": count,
+                "destination": "library_top",
+                "target_controller": "self",
+                "target_graveyard_controller": "self",
+                "library_controller": "self",
+                "up_to_count": True,
+                "any_number_targets": True,
+                "graveyard_to_library_target": target_type,
+                "graveyard_to_library_target_count": count,
+                "graveyard_to_library_destination": "library_top",
+                "graveyard_to_library_up_to_count": True,
+                "graveyard_to_library_any_number_targets": True,
+                "graveyard_to_library_prioritize_draw": True,
+                "compose_on_resolution": True,
+                "xmage_effect_class": "PutOnLibraryTargetEffect",
+            }
+            draw_component = {
+                "effect": "draw_cards",
+                "battle_model_scope": DRAW_SCOPE,
+                "count": draw_count,
+                "draw_count": draw_count,
+                "compose_on_resolution": True,
+                "xmage_effect_class": "DrawCardSourceControllerEffect",
+            }
+            effect_json = {
+                "effect": "recursion",
+                "battle_model_scope": GRAVEYARD_TO_LIBRARY_DRAW_SPELL_SCOPE,
+                "target": target_type,
+                "target_constraints": recursion_target_constraints_for(target_type),
+                "count": count,
+                "destination": "library_top",
+                "target_controller": "self",
+                "target_graveyard_controller": "self",
+                "library_controller": "self",
+                "up_to_count": True,
+                "any_number_targets": True,
+                "graveyard_to_library_target": target_type,
+                "graveyard_to_library_target_count": count,
+                "graveyard_to_library_destination": "library_top",
+                "graveyard_to_library_up_to_count": True,
+                "graveyard_to_library_any_number_targets": True,
+                "graveyard_to_library_prioritize_draw": True,
+                "draw_after_graveyard_to_library": True,
+                "draw_after_graveyard_to_library_count": draw_count,
+                "draw_count": draw_count,
+                "resolution_order": "graveyard_to_library_then_draw",
+                "_composite_rule_components": [recursion_component, draw_component],
+                "xmage_effect_classes": [
+                    "PutOnLibraryTargetEffect",
+                    "DrawCardSourceControllerEffect",
+                ],
+                **flags,
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_graveyard_to_library_then_draw_spell",
+            ), "selected_exact_scope"
+
         if classes == {"DrawCardSourceControllerEffect", "ProliferateEffect"}:
             unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
             if unsupported_abilities:
